@@ -4,5 +4,3 @@ bower_components/
 .idea/
 .tmp/
 dist/
-
-typings/

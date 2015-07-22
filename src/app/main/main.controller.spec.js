@@ -3,7 +3,7 @@
 
     describe('controllers', function () {
 
-        beforeEach(module('client'));
+        beforeEach(module('cottontail'));
 
         it('should define more than 5 awesome things', inject(function ($controller) {
             var vm = $controller('MainController');

@@ -34,7 +34,7 @@ module.exports = function(config) {
 
     ngHtml2JsPreprocessor: {
       stripPrefix: 'src/',
-      moduleName: 'client'
+      moduleName: 'cottontail'
     },
 
     browsers : ['PhantomJS'],

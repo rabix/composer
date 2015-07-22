@@ -1,7 +1,7 @@
 <div class="container">
 
     <div>
-        <navbar creationDate="main.creationDate"/>
+        <acme-navbar creationDate="main.creationDate"/>
     </div>
 
     <div class="jumbotron text-center">
@@ -15,8 +15,10 @@
         <p class="animated infinite" ng-class="main.classAnimation">
             <button type="button" class="btn btn-lg btn-success" ng-click="main.showToastr()">Splendid Toastr</button>
         </p>
-
-        <flip></flip>
+        <p>
+            With ♥ thanks to the contributions of
+            <acme-malarkey extra-values="['Yeoman', 'Gulp', 'Angular']"/>
+        </p>
     </div>
 
     <div class="row">

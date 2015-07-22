@@ -1,5 +1,5 @@
 {
-  "name": "client",
+  "name": "cottontail",
   "version": "0.0.0",
   "dependencies": {
     "angular-animate": "~1.4.0",

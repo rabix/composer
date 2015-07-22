@@ -8,20 +8,46 @@ var browserSync = require('browser-sync');
 
 var $ = require('gulp-load-plugins')();
 
-  var tsProject = $.typescript.createProject({
-    target: 'es5',
-    sortOutput: true
-  });
+function webpack(watch, callback) {
+    var webpackOptions = {
+        watch: watch,
+        module: {
+            preLoaders: [{test: /\.js$/, exclude: /node_modules/, loader: 'jshint-loader'}],
+            loaders: [{test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader'}]
+        },
+        output: {filename: 'index.module.js'}
+    };
 
-  gulp.task('scripts', ['tsd:install'], function () {
-  return gulp.src(path.join(conf.paths.src, '/app/**/*.ts'))
-    .pipe($.sourcemaps.init())
-    .pipe($.tslint())
-    .pipe($.tslint.report('prose', { emitError: false }))
-    .pipe($.typescript(tsProject)).on('error', conf.errorHandler('TypeScript'))
-    .pipe($.concat('index.module.js'))
-    .pipe($.sourcemaps.write())
-    .pipe(gulp.dest(path.join(conf.paths.tmp, '/serve/app')))
-    .pipe(browserSync.reload({ stream: true }))
-    .pipe($.size())
+    if (watch) {
+        webpackOptions.devtool = 'inline-source-map';
+    }
+
+    var webpackChangeHandler = function (err, stats) {
+        if (err) {
+            conf.errorHandler('Webpack')(err);
+        }
+        $.util.log(stats.toString({
+            colors: $.util.colors.supportsColor,
+            chunks: false,
+            hash: false,
+            version: false
+        }));
+        browserSync.reload();
+        if (watch) {
+            watch = false;
+            callback();
+        }
+    };
+
+    return gulp.src([path.join(conf.paths.src, '/app/**/*.js'), '!' + path.join(conf.paths.src, '/app/**/*.spec.js')])
+        .pipe($.webpack(webpackOptions, null, webpackChangeHandler))
+        .pipe(gulp.dest(path.join(conf.paths.tmp, '/serve/app')));
+}
+
+gulp.task('scripts', function () {
+    return webpack(false);
+});
+
+gulp.task('scripts:watch', ['scripts'], function (callback) {
+    return webpack(true, callback);
 });
