@@ -4,8 +4,8 @@ module client {
     export class GithubContributor {
         public apiHost: string = 'https://api.github.com/repos/Swiip/generator-gulp-angular';
 
-        private $log:ng.ILogService;
-        private $http:ng.IHttpService;
+        private $log: ng.ILogService;
+        private $http: ng.IHttpService;
 
         /** @ngInject */
         constructor($log: ng.ILogService, $http: ng.IHttpService) {
@@ -13,12 +13,12 @@ module client {
             this.$http = $http;
         }
 
-        getContributors(limit:number = 30) {
+        getContributors(limit: number = 30) {
             return this.$http.get(this.apiHost + '/contributors?per_page=' + limit)
-                .then((response:any) => {
+                .then((response: any) => {
                     return response.data;
                 })
-                .catch((error:any) => {
+                .catch((error: any) => {
                     this.$log.error('XHR Failed for getContributors.\n', error.data);
                 });
         }

@@ -30,6 +30,6 @@ module client {
         .service('githubContributor', GithubContributor)
         .service('webDevTec', WebDevTecService)
         .controller('MainController', MainController)
-        .directive('acmeNavbar', acmeNavbar)
+        .directive('navbar', navbar)
         .directive('acmeMalarkey', acmeMalarkey);
 }

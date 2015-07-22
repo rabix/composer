@@ -21,7 +21,7 @@ module client {
 
     }
 
-    function linkFunc(scope: IProjectsScope, el: JQuery, attr: any, vm: MalarkeyController) {
+    function linkFunc($scope: IProjectsScope, el: JQuery, attr: any, vm: MalarkeyController) {
         var watcher;
         var typist = malarkey(el[0], {
             typeSpeed: 40,
@@ -33,17 +33,17 @@ module client {
 
         el.addClass('acme-malarkey');
 
-        angular.forEach(scope.extraValues, function (value:string) {
+        angular.forEach($scope.extraValues, function (value: string) {
             typist.type(value).pause().delete();
         });
 
-        watcher = scope.$watch('vm.contributors', function (current: IContributor, original: IContributor) {
+        watcher = $scope.$watch('vm.contributors', function (current: IContributor, original: IContributor) {
             angular.forEach(vm.contributors, function (contributor: IContributor) {
                 typist.type(contributor.login).pause().delete();
             });
         });
 
-        scope.$on('$destroy', function () {
+        $scope.$on('$destroy', function () {
             watcher();
         });
     }
@@ -55,7 +55,7 @@ module client {
 
     /** @ngInject */
     class MalarkeyController {
-        public contributors:any[];
+        public contributors: any[];
 
         private $log: ng.ILogService;
         private githubContributor: GithubContributor;
@@ -78,7 +78,7 @@ module client {
 
         getContributors() {
             return this.githubContributor.getContributors(10)
-                .then((data:any) => {
+                .then((data: any) => {
                     this.contributors = data;
                     return this.contributors;
                 });

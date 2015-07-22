@@ -2,7 +2,7 @@ module client {
     'use strict';
 
     /** @ngInject */
-    export function acmeNavbar(): ng.IDirective {
+    export function navbar(): ng.IDirective {
 
         return {
             restrict: 'E',

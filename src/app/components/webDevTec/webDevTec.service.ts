@@ -81,7 +81,7 @@ module client {
                 }
             ];
 
-            this.data = rawData.map((awesomeThing:ITecThing) => {
+            this.data = rawData.map((awesomeThing: ITecThing) => {
                 awesomeThing.rank = Math.random();
                 return awesomeThing;
             });

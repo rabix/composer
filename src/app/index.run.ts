@@ -3,7 +3,7 @@ module client {
 
     export class RunBlock {
         /** @ngInject */
-        constructor($log:ng.ILogService) {
+        constructor($log: ng.ILogService) {
             $log.debug('runBlock end');
         }
 
