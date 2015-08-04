@@ -1,5 +1,5 @@
 class MainController {
-    constructor($timeout, webDevTec, toastr) {
+    constructor($timeout, toastr) {
         'ngInject';
 
         this.awesomeThings = [];
@@ -7,22 +7,6 @@ class MainController {
         this.creationDate = 1437570111495;
         this.toastr = toastr;
 
-        this.activate($timeout, webDevTec);
-    }
-
-    activate($timeout, webDevTec) {
-        this.getWebDevTec(webDevTec);
-        $timeout(() => {
-            this.classAnimation = 'rubberBand';
-        }, 4000);
-    }
-
-    getWebDevTec(webDevTec) {
-        this.awesomeThings = webDevTec.getTec();
-
-        angular.forEach(this.awesomeThings, (awesomeThing) => {
-            awesomeThing.rank = Math.random();
-        });
     }
 
     showToastr() {
@@ -30,5 +14,7 @@ class MainController {
         this.classAnimation = '';
     }
 }
+
+angular.module('cottontail').controller('MainController', MainController);
 
 export default MainController;
