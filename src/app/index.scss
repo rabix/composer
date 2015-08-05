@@ -6,7 +6,7 @@ $navbar-inverse-link-color: #5AADBB;
 $icon-font-path: "../../bower_components/bootstrap-sass-official/assets/fonts/bootstrap/";
 
 /**
- *  Do not remove this comments bellow. It's the markers used by wiredep to inject
+ *  Do not remove this comments below. It's the markers used by wiredep to inject
  *  sass dependencies when defined in the bower.json of your dependencies
  */
 // bower:scss
@@ -28,8 +28,14 @@ $icon-font-path: "../../bower_components/bootstrap-sass-official/assets/fonts/bo
 }
 
 /**
- *  Do not remove this comments bellow. It's the markers used by gulp-inject to inject
+ *  Do not remove this comments below. It's the markers used by gulp-inject to inject
  *  all your sass files automatically
+ *
+ *  Sass files that start with an underscore (_example.scss) will not be injected
+ *  automagically. This is to ensure proper CSS ordering. @import these files into a
+ *  non underscored sass file (main.scss in the root of components) for them to be
+ *  included in the CSS.
+ *
  */
 // injector
 // endinjector
