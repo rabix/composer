@@ -14,7 +14,8 @@ class InputDirective extends ControlElement {
 		this.scope = {
 			model: '=ngModel',
 			disabled: '=?ngDisabled',
-			id: '@'
+			id: '@',
+			placeholder: '@'
 		};
 
 		this.link = function (scope, element, attr) {
