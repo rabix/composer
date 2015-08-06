@@ -1,0 +1,23 @@
+.ct-input {
+  position: relative;
+
+  i {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    color: #aaa;
+  }
+
+  &.ct-focus {
+    i {
+      color: $brand-primary;
+    }
+  }
+
+
+  &.icon {
+    input {
+      padding-left: 30px;
+    }
+  }
+}

@@ -16,7 +16,8 @@
     "moment": "~2.10.3",
     "animate.css": "~3.3.0",
     "angular": "~1.4.0",
-    "lodash": "~3.10.1"
+    "lodash": "~3.10.1",
+    "fontawesome": "~4.4.0"
   },
   "devDependencies": {
     "angular-mocks": "~1.4.0"
