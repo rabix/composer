@@ -5,8 +5,10 @@
 class UIController {
 	constructor() {
 		'ngInject';
-		this.input;
-		this.search;
+		this.input = 'input';
+		this.search = 'search';
+
+		this.disabled = true;
 	}
 }
 

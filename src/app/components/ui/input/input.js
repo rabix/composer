@@ -13,6 +13,7 @@ class InputDirective extends ControlElement {
 		this.controllerAs = 'input';
 		this.scope = {
 			model: '=ngModel',
+			disabled: '=?ngDisabled',
 			id: '@'
 		};
 

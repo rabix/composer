@@ -27,9 +27,11 @@
 
     <div class="col-sm-6">
         <h3>Forms</h3>
-        <ct-input ng-model="main.input" id="asdf">Label for Input</ct-input>
-        <ct-search ng-model="main.search"></ct-search>
-        <ct-email ng-model="main.email">Email here</ct-email>
+        <ct-input ng-model="ui.input" id="asdf">Label for Input</ct-input>
+
+        <ct-input ng-disabled="ui.disabled">Disabled input</ct-input>
+        <ct-search ng-model="ui.search"></ct-search>
+        <ct-email ng-model="ui.email">Email here</ct-email>
         <hr/>
 
         <ct-dropdown name="Right dropdown" intention="primary" position="right">
