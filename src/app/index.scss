@@ -13,6 +13,14 @@ $brand-info: #46c1cc;
 $brand-warning: #eba639;
 $brand-success: #2fb85c;
 
+/** sizes **/
+$border-radius-base: 2px;
+$border-radius-large: 4px;
+
+/** fonts **/
+$font-family-base: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,300,700);
+
 /**
  *  Do not remove this comments below. It's the markers used by wiredep to inject
  *  sass dependencies when defined in the bower.json of your dependencies

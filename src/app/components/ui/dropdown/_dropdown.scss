@@ -1,3 +1,7 @@
 .ct-dropdown {
   display: inline-block;
+
+  .dropdown-menu {
+    @include box-shadow(0 3px 9px rgba(0, 0, 0, 0.125));
+  }
 }
