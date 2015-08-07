@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
+<div class="ct-dropdown dropdown" dropdown is-open="dd.isOpen" ng-class="dd.position">
+    <ct-button class="dropdown-toggle" intention="{{ dd.intention }}" dropdown-toggle ng-disabled="dd.ngDisabled">
+        {{ dd.name || '' }}
+        <span class="caret"></span>
+    </ct-button>
 
-</body>
-</html>
+    <div class="dropdown-content"></div>
+</div>

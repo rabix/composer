@@ -1,0 +1,39 @@
+.ct-input {
+  position: relative;
+
+  input:focus {
+    @include input-box-shadow(rgba(102, 175, 233, 0.5))
+  }
+
+  i {
+    transition: color ease-in-out $transition-duration;
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    color: #aaa;
+  }
+
+  &.ct-focus {
+    i {
+      color: $brand-primary;
+    }
+  }
+
+  &.icon {
+    input {
+      padding-left: 30px;
+    }
+  }
+
+  &.has-error {
+    @include input-states($brand-danger);
+  }
+
+  &.has-success {
+    @include input-states($brand-success);
+  }
+
+  &.has-warning {
+    @include input-states($brand-warning);
+  }
+}
