@@ -3,10 +3,10 @@
         <h3>Buttons</h3>
 
         <ct-button intention="primary">Primary</ct-button>
-        <ct-button intention="success">Success</ct-button>
-        <ct-button intention="warning">Warning</ct-button>
+        <ct-button intention="success" ng-click="ui.toggleSuccess()">Toggle Success</ct-button>
+        <ct-button intention="warning" ng-click="ui.toggleWarning()">Toggle Warning</ct-button>
         <ct-button intention="info">Info</ct-button>
-        <ct-button intention="danger">Danger</ct-button>
+        <ct-button intention="danger" ng-click="ui.toggleError()">Toggle Error</ct-button>
         <ct-button intention="default">Default</ct-button>
         <ct-button>Blank</ct-button>
 
@@ -34,6 +34,19 @@
         <ct-email ng-model="ui.email" placeholder="Enter email">Email here</ct-email>
         <hr/>
 
+        <ct-email has-error="ui.error">Bad email</ct-email>
+        <ct-input has-success="ui.success">Good email</ct-input>
+        <ct-search has-warning="ui.warning">Warning email</ct-search>
+
+        <hr/>
+
+
+        <ct-checkbox>Label to right</ct-checkbox>
+        <ct-checkbox has-error="ui.error">Error</ct-checkbox>
+        <ct-checkbox has-success="ui.success">Success</ct-checkbox>
+        <ct-checkbox has-warning="ui.warning">Warning</ct-checkbox>
+
+        <hr/>
         <ct-dropdown name="Right dropdown" intention="primary" position="right">
             <ul>
                 <li><a href="">Test</a></li>

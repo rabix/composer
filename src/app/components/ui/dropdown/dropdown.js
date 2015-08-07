@@ -50,7 +50,7 @@ class DropdownDirective extends ControlElement {
 
 				angular.forEach(clone, function (el) {
 
-					if (typeof $(el).attr('dropdown-body') !== 'undefined') {
+					if (typeof angular.element(el).attr('dropdown-body') !== 'undefined') {
 						element.children().remove();
 						ul = clone.find('ul');
 					}
@@ -87,6 +87,6 @@ class DropdownController {
 	}
 }
 
-angular.module('cottontail').directive('ctDropdown', () => new DropdownDirective);
+angular.module('cottontail').directive('ctDropdown', () => new DropdownDirective());
 
 export default DropdownDirective;

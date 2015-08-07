@@ -9,6 +9,23 @@ class UIController {
 		this.search = 'search';
 
 		this.disabled = true;
+
+		this.error = true;
+		this.success = true;
+		this.warning = true;
+
+		this.toggleError = function() {
+			this.error = !this.error;
+		};
+
+		this.toggleSuccess = function() {
+			this.success = !this.success;
+		};
+
+		this.toggleWarning = function() {
+			this.warning = !this.warning;
+		};
+
 	}
 }
 

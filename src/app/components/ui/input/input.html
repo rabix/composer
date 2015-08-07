@@ -1,4 +1,4 @@
-<div class="form-group ct-input">
+<div class="form-group ct-input" ng-class="{'has-error': input.error, 'has-success': input.success, 'has-warning': input.warning}">
     <label for="{{ input.id }}" ng-transclude></label>
     <input type="text" id="{{ input.id }}" class="form-control" ng-disabled="input.disabled" ng-model="input.model"  placeholder="{{ input.placeholder }}"/>
 </div>

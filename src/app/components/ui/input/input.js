@@ -15,18 +15,21 @@ class InputDirective extends ControlElement {
 			model: '=ngModel',
 			disabled: '=?ngDisabled',
 			id: '@',
-			placeholder: '@'
+			placeholder: '@',
+			error: '=hasError',
+			success: '=hasSuccess',
+			warning: '=hasWarning'
 		};
 
-		this.link = function (scope, element, attr) {
+		this.link = function (scope, element) {
 			element.find('input').bind('focus', function() {
-				element.find('.ct-input').addClass('ct-focus')
+				element.find('.ct-input').addClass('ct-focus');
 			});
 
 			element.find('input').bind('blur', function() {
 				element.find('.ct-input').removeClass('ct-focus');
 			});
-		}
+		};
 	}
 }
 

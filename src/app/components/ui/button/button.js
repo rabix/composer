@@ -11,7 +11,6 @@ class ButtonDirective extends ControlElement {
 		this.templateUrl = template || 'app/components/ui/button/button.html';
 		this.controller = ButtonController;
 		this.controllerAs = 'btn';
-		this.bindToController = true;
 
 		this.link = function (scope, element, attr) {
 			const btn = angular.element(element).find('button');

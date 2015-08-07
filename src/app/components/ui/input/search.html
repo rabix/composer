@@ -1,4 +1,4 @@
-<div class="form-group ct-input icon">
+<div class="form-group ct-input icon" ng-class="{'has-error': input.error, 'has-success': input.success, 'has-warning': input.warning}">
     <label for="{{ input.id }}" ng-transclude></label>
     <input type="search" id="{{ input.id }}" class="form-control" ng-model="input.model" ng-disabled="input.disabled"  placeholder="{{ input.placeholder }}"/>
     <i class="fa fa-search"></i>
