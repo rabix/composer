@@ -1,0 +1,24 @@
+.flex-col {
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.flex-container {
+  display: flex;
+  flex-basis: auto;
+  height: 100%;
+}
+
+.flex-row {
+  flex-direction: row;
+  flex-grow: 1;
+}
+
+.flex-center {
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-self-center {
+  align-self: center;
+}
