@@ -23,6 +23,8 @@ class ButtonDirective extends ControlElement {
 class LinkDirective extends ButtonDirective {
 	constructor() {
 		super('app/components/ui/button/link.html');
+		this.transclude = true;
+		this.replace = true;
 	}
 }
 

@@ -7,12 +7,12 @@ class LoginController {
 		this.$http = $http;
 	}
 
-	gitHub () {
-		this.$http.get('http://localhost:9000/auth/github', function(success) {
-			console.log(success);
-		}, function(err) {
-			console.log(err);
-		})
+	me () {
+
+        this.$http.get('/api/users/me', function (s) {
+            console.log(s);
+
+        })
 	}
 }
 
