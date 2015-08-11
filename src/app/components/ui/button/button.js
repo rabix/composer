@@ -13,7 +13,7 @@ class ButtonDirective extends ControlElement {
 		this.controllerAs = 'btn';
 
 		this.link = function (scope, element, attr) {
-			const btn = angular.element(element).find('button');
+			const btn = angular.element(element).find('.ct-button').addBack('.ct-button');
 			btn.addClass(scope.btn.prependBtn(attr.intention));
 			btn.addClass(scope.btn.prependBtn(attr.size));
 		}.bind(this);
@@ -23,7 +23,6 @@ class ButtonDirective extends ControlElement {
 class LinkDirective extends ButtonDirective {
 	constructor() {
 		super('app/components/ui/button/link.html');
-		this.transclude = true;
 		this.replace = true;
 	}
 }

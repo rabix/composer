@@ -8,11 +8,9 @@ class LoginController {
 	}
 
 	me () {
-
-        this.$http.get('/api/users/me', function (s) {
-            console.log(s);
-
-        })
+        this.$http.get('/api/users/me').then(function (s) {
+	        console.log(s);
+        });
 	}
 }
 
