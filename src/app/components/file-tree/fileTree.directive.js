@@ -10,6 +10,8 @@ class FileTreeDirective extends BaseElement{
 		this.controller = FileTreeController;
 		this.controllerAs = 'tree';
 
+		this.replace = true;
+
 	}
 }
 

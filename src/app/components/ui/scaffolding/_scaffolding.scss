@@ -1,7 +1,5 @@
 @import "variables";
 @import "mixins";
 @import "flex";
+@import "bootstrap-overrides";
 
-body, html, .cottontail {
-  height: 100%;
-}

@@ -1,0 +1,7 @@
+<ul class="ct-tabs nav nav-tabs">
+    <li ng-repeat="tab in tabs.list" ng-class="{'active': tab.slug === tabs.activeTab}">
+        <a href=""  ng-click="tabs.activateTab(tab)">
+            {{ tab.name }}
+        </a>
+    </li>
+</ul>

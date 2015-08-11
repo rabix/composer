@@ -12,7 +12,8 @@ class NavbarDirective {
             },
             controller: NavbarController,
             controllerAs: 'vm',
-            bindToController: true
+            bindToController: true,
+            replace: true
         };
 
         return directive;

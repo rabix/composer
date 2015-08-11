@@ -1,3 +1,9 @@
 .file-tree {
-  width: 300px;
+  @extend .flex-fixed;
+  width: $sidebar-width;
+  border-right: 1px solid #ddd;
+  padding: $grid-gutter-width/2;
+
+  background: #fff;
+  @include standard-box-shadow();
 }
