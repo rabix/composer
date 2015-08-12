@@ -1,3 +1,29 @@
-.acme-navbar-text {
-  color: white;
+.ct-navbar {
+
+  .navbar-header {
+    position: relative;
+
+    .navbar-brand {
+      padding-left: 70px;
+      cursor: pointer;
+
+      &:hover {
+        .cottontail-logo {
+          opacity: 1;
+        }
+      }
+    }
+
+    .cottontail-logo {
+      position: absolute;
+
+      background: url('../../../assets/images/logo-white.png') no-repeat;
+      opacity: .8;
+      background-size: 45px auto;
+      height: $navbar-height;
+      width: 50px;
+      top: 3px;
+      left: 0;
+    }
+  }
 }
