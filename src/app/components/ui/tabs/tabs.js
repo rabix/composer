@@ -12,7 +12,7 @@ class TabsDirective extends BaseElement {
 			list: '=tabs',
 			tabCallback: '&',
 			tabSrc: '@'
-		}
+		};
 	}
 }
 
