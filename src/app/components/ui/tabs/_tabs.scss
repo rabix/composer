@@ -1,6 +1,6 @@
 .ct-tabs {
   @extend .flex-row;
-  @extend .flex-grow;
+  @extend .flex-dont-grow;
   padding: 10px 10px 0;
 
   background-color: darken($body-bg, 8);

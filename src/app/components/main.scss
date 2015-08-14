@@ -20,4 +20,10 @@ body, html {
 
 .editor-body {
   @extend .flex-grow;
+  @extend .flex-col;
+  @extend .flex-container;
+
+  .ace_editor {
+    @extend .flex-grow; /* to fill space */
+  }
 }

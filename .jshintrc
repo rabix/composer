@@ -13,6 +13,7 @@
     "angular": false,
     "inject": false,
     "module": false,
+    "console": false,
     "_": false
   }
 }

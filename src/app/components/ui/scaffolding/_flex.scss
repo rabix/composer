@@ -16,7 +16,11 @@
 }
 
 .flex-grow {
-  flex: 1;
+  flex-grow: 1;
+}
+
+.flex-dont-grow {
+  flex-grow: 0;
 }
 
 .flex-center {

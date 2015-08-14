@@ -18,11 +18,7 @@ function routerConfig($stateProvider, $urlRouterProvider) {
 		    url: 'editor/',
 		    templateUrl: 'app/main/editor/editor.html',
 		    controller: 'EditorController',
-		    controllerAs: 'edit',
-		    onEnter: function() {
-			    console.log('entered editor');
-			    
-		    }
+		    controllerAs: 'edit'
 	    });
 
     $urlRouterProvider.otherwise('/');

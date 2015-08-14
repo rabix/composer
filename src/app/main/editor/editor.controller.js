@@ -5,6 +5,15 @@
 class EditorController {
 	constructor() {
 		this.tabs = ['file1', 'file2', 'file3'];
+
+		this.code =
+`{
+	"json": "file"
+}`
+	}
+
+	load (editor) {
+		editor.$blockScrolling = Infinity;
 	}
 }
 
