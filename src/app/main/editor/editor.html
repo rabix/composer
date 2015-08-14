@@ -2,8 +2,8 @@
 
         <file-tree class=""></file-tree>
         <div class="editor-body" ui-view>
-            <ct-tabs tabs="edit.tabs"></ct-tabs>
+            <ct-tabs tabs="edit.tabs" callback="edit.switchFiles(tab)"></ct-tabs>
 
-            <div class="editor" ui-ace="{ mode: 'json', theme: 'xcode', onLoad: edit.load}" ng-model="edit.code"></div>
+            <div class="editor" ui-ace="edit.activeFile.config" ng-model="edit.activeFile.content"></div>
         </div>
 </div>

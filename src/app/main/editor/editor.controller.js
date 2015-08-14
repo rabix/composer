@@ -2,18 +2,30 @@
  * Created by Maya on 10.8.15.
  */
 
-class EditorController {
-	constructor() {
-		this.tabs = ['file1', 'file2', 'file3'];
+import {YamlFile, JsonFile, JsFile} from '../../models/file.model';
 
-		this.code =
-`{
-	"json": "file"
-}`
+class EditorController {
+	constructor($timeout) {
+		'ngInject';
+		let makeTab = function (obj) {
+			obj.slug = _.kebabCase(obj.name);
+			return obj;
+		};
+
+		this.tabs = [
+			makeTab(new YamlFile('yaml-file.yaml', `---\n# yaml comment\n-list item`)),
+			makeTab(new JsonFile('json-file.json', `{\n\t"json": "file"\n}`)),
+			makeTab(new JsFile('javascript.js', 'function hello() {\n\n}'))
+		];
 	}
 
 	load (editor) {
 		editor.$blockScrolling = Infinity;
+	}
+
+	switchFiles(file) {
+		console.log('calling callback');
+		this.activeFile = _.find(this.tabs, {slug: file});
 	}
 }
 

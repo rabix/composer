@@ -31,6 +31,8 @@
       "main": [
         "src-min/ace.js",
         "src-min/mode-json.js",
+        "src-min/mode-javascript.js",
+        "src-min/mode-yaml.js",
         "src-min/theme-xcode.js"
       ]
     }

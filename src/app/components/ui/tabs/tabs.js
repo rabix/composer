@@ -10,7 +10,7 @@ class TabsDirective extends BaseElement {
 		this.replace = true;
 		this.scope = {
 			list: '=tabs',
-			tabCallback: '&',
+			callback: '&',
 			tabSrc: '@'
 		};
 	}
@@ -30,14 +30,14 @@ class TabsController {
 			});
 		}
 
-		this.activeTab =  this.list[0].slug;
+		this.activateTab(this.list[0]);
 	}
 
 	activateTab (tab) {
 		this.activeTab = tab.slug;
 
-		if (typeof this.tabCallback === 'function') {
-			this.tabCallback({tab: tab.slug});
+		if (typeof this.callback === 'function') {
+			this.callback({tab: tab.slug});
 		}
 	}
 }
