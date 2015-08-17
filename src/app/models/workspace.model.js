@@ -2,11 +2,12 @@
  * Created by filip on 8/11/15.
  */
 
-class Workspace {
-    constructor(Api) {
-        'ngInject';
+import Model from './base.model';
 
-        this.Api = Api;
+class Workspace extends Model{
+
+    constructor() {
+        super();
     }
 
     get() {
