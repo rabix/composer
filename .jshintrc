@@ -14,6 +14,7 @@
     "inject": false,
     "module": false,
     "console": false,
+    "ace": false,
     "_": false
   }
 }
