@@ -15,11 +15,17 @@ function routerConfig($stateProvider, $urlRouterProvider) {
 		    controllerAs: 'ui'
 	    })
         .state('main.editor', {
-		    url: 'editor/',
-		    templateUrl: 'app/main/editor/editor.html',
-		    controller: 'EditorController',
-		    controllerAs: 'edit'
-	    });
+		    url: 'editor/:workspace',
+		    templateUrl: 'app/main/ide/ide.html',
+		    controller: 'IdeController',
+		    controllerAs: 'ide'
+	    })
+        .state('main.workspace', {
+            url: 'workspace/',
+            templateUrl: 'app/main/workspace/workspace.html',
+            controller: 'WorkspaceController',
+            controllerAs: 'ws'
+        });
 
     $urlRouterProvider.otherwise('/');
 }

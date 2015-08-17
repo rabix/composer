@@ -1,0 +1,13 @@
+<div class="flex-container flex-center">
+    <div class="panel panel-default col-sm-6">
+        <div class="panel-body">
+            <h1>Choose a Workspace <span class="text-muted">Cottontail</span></h1>
+            <hr/>
+
+            <ct-button ng-click="ws.createNewWorkspace()" intention="success" size="block"><i class="fa fa-plus"></i>Create New Workspace</ct-button>
+            <hr/>
+
+            <ct-button ng-click="ws.goToWorkspace(workspace)" intention="default" size="block" ng-repeat="workspace in ws.workspaces"> {{ workspace }}</ct-button>
+        </div>
+    </div>
+</div>
