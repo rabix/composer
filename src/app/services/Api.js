@@ -10,18 +10,32 @@ class Api {
         this._loadConfig();
         this.$resource = $resource;
         this.$http = $http;
+        this._setResources();
     }
 
     _loadConfig() {
 
         this.BASE = '/api';
-        this.WORKSPACE = '/workspace';
+        this.WORKSPACE = '/:workspace';
 
     }
 
+    _setResources() {
+
+        this.file = this.$resource(this.BASE + '/fs'+ this.WORKSPACE + '/:file', {workspace: '@workspace', file: '@file'}, {
+            getAll: {method: 'GET'},
+            create: {method: 'POST'},
+            update: {method: 'PUT'}
+        });
+
+        this.workspaces = this.$resource(this.BASE + '/fs' + this.WORKSPACE, {workspace: '@workspace'}, {
+            query: {method: 'GET'},
+            create: {method: 'POST'},
+            update: {method: 'PUT'}
+        })
+    }
 }
 
-angular.module('cottontail')
-    .service(Api);
+angular.module('cottontail').service('Api', Api);
 
 export default Api;

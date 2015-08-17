@@ -34,6 +34,10 @@ class TabsController {
 	}
 
 	activateTab (tab) {
+		if (tab.slug === this.activeTab) {
+			return;
+		}
+
 		this.activeTab = tab.slug;
 
 		if (typeof this.callback === 'function') {

@@ -1,0 +1,9 @@
+<div class="flex-container">
+
+        <file-tree class=""></file-tree>
+        <div class="editor-body" ui-view>
+            <ct-tabs tabs="ide.files" callback="ide.switchFiles(tab)"></ct-tabs>
+
+            <div class="ideor" ui-ace="ide.activeFile.config" ng-model="ide.activeFile.content"></div>
+        </div>
+</div>
