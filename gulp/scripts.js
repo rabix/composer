@@ -8,6 +8,21 @@ var browserSync = require('browser-sync');
 
 var $ = require('gulp-load-plugins')();
 
+var replace = require('gulp-replace-task');
+var _ = require('lodash');
+
+// get cmd args for config
+var minimist = require('minimist');
+
+var args = minimist(process.argv.slice(2));
+
+var configFile = _.find(args, function (value, arg) {
+    return arg === 'c' || arg === 'config';
+});
+
+var _confPath = configFile || '../../server/config/local.env';
+var _conf = JSON.stringify(require(_confPath));
+
 function webpack(watch, callback) {
     var webpackOptions = {
         watch: watch,
@@ -37,14 +52,35 @@ function webpack(watch, callback) {
             watch = false;
             callback();
         }
+
     };
 
-    return gulp.src([path.join(conf.paths.src, '/app/**/*.js'), '!' + path.join(conf.paths.src, '/app/**/*.spec.js')])
+    return gulp.src([
+            path.join(conf.paths.src, '/app/**/*.js'),
+            path.join(conf.paths.tmp, '/conf/*.js'),
+            '!' + path.join(conf.paths.src, '/app/**/*.spec.js'),
+            '!' + path.join(conf.paths.src, '/app/**/_*.js')
+        ])
         .pipe($.webpack(webpackOptions, null, webpackChangeHandler))
         .pipe(gulp.dest(path.join(conf.paths.tmp, '/serve/app')));
 }
 
-gulp.task('scripts', function () {
+gulp.task('config', function () {
+
+    console.log('doing da config');
+
+    return gulp.src(path.join(conf.paths.src + '/app/config/cottontail.config.js'))
+        .pipe(replace({
+            patterns: [{
+                match: '{{{APP_CONFIG}}}',
+                replacement: _conf
+            }],
+            usePrefix: false
+        }))
+        .pipe(gulp.dest(path.join(conf.paths.tmp, '/conf/')));
+});
+
+gulp.task('scripts', ['config'], function () {
     return webpack(false);
 });
 
