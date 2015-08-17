@@ -1,6 +1,10 @@
 class MainController {
-    constructor() {
+    constructor(Api) {
         'ngInject';
+        Api.file.query().$promise.then(function(result){
+            console.log(result);
+        });
+
     }
 }
 
