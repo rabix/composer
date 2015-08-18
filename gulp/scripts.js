@@ -88,7 +88,7 @@ function webpack(watch, callback) {
 
 gulp.task('config', function () {
 
-    return gulp.src(path.join(conf.paths.src + '/app/config/cottontail.config.js'))
+    return gulp.src(path.join(conf.paths.src + '/app/config/_cottontail.config.js'))
         .pipe(replace({
             patterns: [{
                 match: '{{{APP_CONFIG}}}',
