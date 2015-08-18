@@ -29,6 +29,7 @@ function filterConfig(conf) {
 
     _.forEach(config, function (val, key) {
 
+        // TODO: fix find not optimal
         var find = _.find(forbidden, function (v) {
             var pattern = new RegExp(v , 'ig');
             return pattern.test(key);
