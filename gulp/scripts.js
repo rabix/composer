@@ -23,6 +23,26 @@ var configFile = _.find(args, function (value, arg) {
 var _confPath = configFile || '../../server/config/local.env';
 var _conf = JSON.stringify(require(_confPath));
 
+function filterConfig(conf) {
+    var config = _.clone(JSON.parse(conf), true);
+    var forbidden = ['GITHUB*', 'SESSION_SECRET', 'GOOGLE*', 'TWITTER*',  'FACEBOOK*'];
+
+    _.forEach(config, function (val, key) {
+
+        var find = _.find(forbidden, function (v) {
+            var pattern = new RegExp(v , 'ig');
+            return pattern.test(key);
+        });
+
+        if (find) {
+            config[key] = null;
+            delete config[key];
+        }
+    });
+
+    return JSON.stringify(config);
+}
+
 function webpack(watch, callback) {
     var webpackOptions = {
         watch: watch,
@@ -67,13 +87,11 @@ function webpack(watch, callback) {
 
 gulp.task('config', function () {
 
-    console.log('doing da config');
-
     return gulp.src(path.join(conf.paths.src + '/app/config/cottontail.config.js'))
         .pipe(replace({
             patterns: [{
                 match: '{{{APP_CONFIG}}}',
-                replacement: _conf
+                replacement: filterConfig(_conf)
             }],
             usePrefix: false
         }))
