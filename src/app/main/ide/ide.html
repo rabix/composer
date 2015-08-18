@@ -1,9 +1,9 @@
 <div class="flex-container">
 
-        <file-tree class=""></file-tree>
+        <file-tree files="ide.workspace.files" workspace="{{ ::ide.workspace.name }}" on-add="ide.fileAdded(file)" on-open="ide.fileOpened(file)"></file-tree>
         <div class="editor-body" ui-view>
-            <ct-tabs tabs="ide.files" callback="ide.switchFiles(tab)"></ct-tabs>
+            <ct-tabs tabs="ide.openFiles" callback="ide.switchFiles(tab)" active="ide.activeFile"></ct-tabs>
 
-            <div class="ideor" ui-ace="ide.activeFile.config" ng-model="ide.activeFile.content"></div>
+            <div class="editor" ui-ace="ide.activeFile.config" ng-model="ide.activeFile.content"></div>
         </div>
 </div>

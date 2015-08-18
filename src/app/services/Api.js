@@ -22,8 +22,8 @@ class Api {
 
     _setResources() {
 
-        this.file = this.$resource(this.BASE + '/fs'+ this.WORKSPACE + '/:file', {workspace: '@workspace', file: '@file'}, {
-            getAll: {method: 'GET'},
+        this.files = this.$resource(this.BASE + '/fs'+ this.WORKSPACE + '/:file', {workspace: '@workspace', file: '@file'}, {
+            query: {method: 'GET'},
             create: {method: 'POST'},
             update: {method: 'PUT'}
         });

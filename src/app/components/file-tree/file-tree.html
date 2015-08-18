@@ -1,4 +1,11 @@
 <div class="file-tree">
-    TODO: file tree
+    <ct-button intention="success" size="block" ng-click="tree.createFile()"><i class="fa fa-plus"></i>Add File</ct-button>
 
+    <ul class="list-unstyled">
+        <li ng-repeat="file in tree.files">
+            <a ng-click="tree.openFile(file)">
+                {{ file.name }}
+            </a>
+        </li>
+    </ul>
 </div>

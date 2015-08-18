@@ -20,8 +20,8 @@ class WorkspaceController {
                 <ct-input type="text" ng-model="view.name">Enter workspace name</ct-input>
             </div>
             <div class="modal-footer">
+                <ct-button intention="default" ng-click="cancel()">Cancel</ct-button>
                 <ct-button intention="primary" ng-click="ok(view.name)">Create</ct-button>
-                <ct-button intention="default" ng-click="cancel()">Create</ct-button>
             </div>`,
             controller: ($scope, $modalInstance) => {
                 $scope.ok = function (name) {
