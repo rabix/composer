@@ -62,9 +62,9 @@ class IdeController {
     }
 
     fileOpened (file) {
+        this.activeFile = file;
         if (this.openFiles.indexOf(file) !== -1) {return;}
         this.openFiles.push(file);
-        this.activeFile = file;
     }
 
     switchFiles (file) {

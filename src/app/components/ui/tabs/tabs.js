@@ -29,7 +29,6 @@ class TabsDirective extends BaseElement {
 
             scope.$watch('tabs.switchActiveTab', function (n, o) {
                 if (n !== o) {
-                    console.log('switching');
                     _.forEach(scope.tabs.list, function(tab) {
                         if (tab === n) {
                             scope.tabs.activateTab(tab);
@@ -46,7 +45,6 @@ class TabsController {
 	constructor () {}
 
     activateTab (tab) {
-        console.log('activating tab');
         if (tab.slug === this.activeTab) {
             return;
         }
