@@ -11,39 +11,42 @@ class TabsDirective extends BaseElement {
 		this.scope = {
 			list: '=tabs',
 			callback: '&',
-			tabSrc: '@'
+			tabSrc: '@',
+            activeObj: '=active'
 		};
+
+        this.link = function (scope, element, attr) {
+            scope.list = _.isArray(scope.list) ? scope.list : [scope.list];
+
+            if (_.isString(scope.list[0])) {
+            	scope.list = _.map(scope.list, function(tab) {
+            		return {
+            			name: tab,
+            			slug: _.kebabCase(tab)
+            		};
+            	});
+            }
+
+        }.bind(this);
 	}
 }
 
 class TabsController {
-	constructor () {
+	constructor () {}
 
-		this.list = _.isArray(this.list) ? this.list : [this.list];
+    /* @TODO: make tab activation work two way (from controller to directive, and directive to controller) */
+    activateTab (tab) {
+        console.log('activating tab');
+        if (tab.slug === this.activeTab) {
+            return;
+        }
 
-		if (_.isString(this.list[0])) {
-			this.list = _.map(this.list, function(tab) {
-				return {
-					name: tab,
-					slug: _.kebabCase(tab)
-				};
-			});
-		}
+        this.activeTab = tab.slug;
 
-		this.activateTab(this.list[0]);
-	}
-
-	activateTab (tab) {
-		if (tab.slug === this.activeTab) {
-			return;
-		}
-
-		this.activeTab = tab.slug;
-
-		if (typeof this.callback === 'function') {
-			this.callback({tab: tab.slug});
-		}
-	}
+        if (typeof this.callback === 'function') {
+            this.callback({tab: tab.slug});
+        }
+    }
 }
 
 angular.module('cottontail').directive('ctTabs', () => new TabsDirective());

@@ -6,4 +6,16 @@
 
   background: #fff;
   @include standard-box-shadow();
+
+  ul li a {
+    display: block;
+    border-bottom: 1px solid $modal-content-border-color;
+    padding: $padding-base-vertical $padding-base-horizontal;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: none;
+      background-color: #efefef;
+    }
+  }
 }

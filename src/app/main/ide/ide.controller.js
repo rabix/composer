@@ -2,66 +2,72 @@
  * Created by Maya on 10.8.15.
  */
 
-import {YamlFile, JsonFile, JsFile} from '../../models/file.model';
+import * as fileModel from '../../models/file.model';
 import * as mocks from '../../models/file.mock';
 
 class IdeController {
 
-	constructor(Api, $stateParams) {
+    constructor (Api, $stateParams) {
+        this.openFiles = [];
 
-        this.workspace = {};
+        this.workspace = {
+            name: $stateParams.workspace,
+            files: []
+        };
 
-        Api.workspaces.query({workspace: $stateParams.workspace}, (res) => {
-            this.workspace.files = res.files;
+        let makeTab = function (obj) {
+            obj.slug = _.kebabCase(obj.name);
+            obj.config.onLoad = this.load.bind(this);
+            return obj;
+        }.bind(this);
+
+        Api.workspaces.query({workspace: $stateParams.workspace},
+            (res) => {
+                _.forEach(res.files, (file) => {
+                    if (file.type) {
+                        var fileObj = new fileModel[file.type.substring(1).toUpperCase()](file.name, file.content || '');
+                        this.workspace.files.push(makeTab(fileObj));
+                    }
+                });
+            }, (err) => {
+                new Error(err);
+            });
+
+        this.EditSession = ace.require('ace/edit_session').EditSession;
+    }
+
+    load (editor) {
+        this._editor = editor;
+        editor.$blockScrolling = Infinity;
+
+        editor.commands.addCommand({
+            name: 'autoComplete',
+            bindKey: {win: 'Ctrl-Space', mac: 'Ctrl-Space'},
+            exec: function (editor) {
+                let session = editor.getSession();
+                let pos = editor.getCursorPosition();
+                let token = session.getTokenAt(pos.row, pos.column);
+                let pre = token.value.substr(0, pos.column - token.start);
+
+                console.log(token);
+                console.log("word before cursor: ", pre);
+            }
         });
+    }
 
-		'ngInject';
-		let makeTab = function (obj) {
-			obj.slug = _.kebabCase(obj.name);
-			obj.config.onLoad = this.load.bind(this);
-			return obj;
-		}.bind(this);
+    fileAdded (file) {
+        this.workspace.files.push(file);
+    }
 
-		this.files = [
-			makeTab(new YamlFile('yaml-file.yaml', mocks.yaml)),
-			makeTab(new JsonFile('json-file.json', mocks.json)),
-			makeTab(new JsFile('javascript.js', 'function hello() {\n\n}'))
-		];
+    fileOpened (file) {
+        if (this.openFiles.indexOf(file) !== -1) {return;}
+        this.openFiles.push(file);
+    }
 
-		this.EditSession = ace.require('ace/edit_session').EditSession;
-	}
-	load (editor) {
-		this._editor = editor;
-		editor.$blockScrolling = Infinity;
-
-		editor.commands.addCommand({
-			name: 'autoComplete',
-			bindKey: {win: 'Ctrl-Space',  mac: 'Ctrl-Space'},
-			exec: function(editor) {
-				let session = editor.getSession();
-				let pos = editor.getCursorPosition();
-				let token = session.getTokenAt(pos.row, pos.column);
-				let pre = token.value.substr(0, pos.column - token.start);
-
-				console.log(token);
-				console.log("word before cursor: ", pre);
-			}
-		});
-	}
-
-	switchFiles(file) {
-		if (this.activeFile) {
-			this.activeFile.session = new this.EditSession(this.activeFile.content, 'ace/mode/' + this.activeFile.config.mode);
-		}
-
-		this.activeFile = this.files[_.findIndex(this.files, {slug: file})]; // get file by reference
-
-		if (this.activeFile.session && this._editor) {
-			this._editor.setSession(this.activeFile.session);
-		}
-	}
+    switchFiles (file) {
+        this.activeFile = this.workspace.files[_.findIndex(this.workspace.files, {slug: file})]; // get file by reference
+    }
 }
-
 
 
 IdeController.$inject = ['Api', '$stateParams'];

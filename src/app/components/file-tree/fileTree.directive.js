@@ -9,7 +9,12 @@ class FileTreeDirective extends BaseElement{
 		this.restrict = 'E';
 		this.controller = FileTreeController;
 		this.controllerAs = 'tree';
-
+        this.scope = {
+            files: '=',
+            workspace: '@',
+            fileAddedCb: '&onAdd',
+            fileOpenedCb: '&onOpen'
+        };
 		this.replace = true;
 
 	}

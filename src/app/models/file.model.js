@@ -15,22 +15,22 @@ class BaseFile {
     }
 }
 
-class YamlFile extends BaseFile {
+class YAML extends BaseFile {
     constructor(name, content) {
         super(name, 'yaml', content);
     }
 }
 
-class JsonFile extends BaseFile {
+class JSON extends BaseFile {
     constructor(name, content) {
         super(name, 'json', content);
     }
 }
 
-class JsFile extends BaseFile {
+class JS extends BaseFile {
     constructor(name, content) {
         super(name, 'javascript', content);
     }
 }
 
-export {BaseFile, YamlFile, JsonFile, JsFile};
+export {BaseFile, YAML, JSON, JS};
