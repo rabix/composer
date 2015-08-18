@@ -32,7 +32,7 @@ class Api {
             query: {method: 'GET'},
             create: {method: 'POST'},
             update: {method: 'PUT'}
-        })
+        });
     }
 }
 

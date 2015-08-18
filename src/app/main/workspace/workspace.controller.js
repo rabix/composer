@@ -13,7 +13,6 @@ class WorkspaceController {
     }
 
     createNewWorkspace() {
-        console.log('clicking button!!');
         let modalInstance = this.$modal.open({
             template:
             `<div class="modal-body">
@@ -35,7 +34,7 @@ class WorkspaceController {
         });
 
         modalInstance.result.then(function(name) {
-            this.Api.workspaces.create({workspace: name}, (workspace) => {
+            this.Api.workspaces.create({workspace: name}, () => {
                 this.$state.go('main.editor', {workspace: name});
             });
         }.bind(this));

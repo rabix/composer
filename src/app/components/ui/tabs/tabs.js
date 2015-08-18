@@ -12,20 +12,31 @@ class TabsDirective extends BaseElement {
 			list: '=tabs',
 			callback: '&',
 			tabSrc: '@',
-            activeObj: '=active'
+            switchActiveTab: '='
 		};
 
-        this.link = function (scope, element, attr) {
-            scope.list = _.isArray(scope.list) ? scope.list : [scope.list];
+        this.link = function (scope) {
+            scope.tabs.list = _.isArray(scope.tabs.list) ? scope.tabs.list : [scope.tabs.list];
 
-            if (_.isString(scope.list[0])) {
-            	scope.list = _.map(scope.list, function(tab) {
+            if (_.isString(scope.tabs.list[0])) {
+            	scope.tabs.list = _.map(scope.tabs.list, function(tab) {
             		return {
             			name: tab,
             			slug: _.kebabCase(tab)
             		};
             	});
             }
+
+            scope.$watch('tabs.switchActiveTab', function (n, o) {
+                if (n !== o) {
+                    console.log('switching');
+                    _.forEach(scope.tabs.list, function(tab) {
+                        if (tab === n) {
+                            scope.tabs.activateTab(tab);
+                        }
+                    });
+                }
+            });
 
         }.bind(this);
 	}
@@ -34,7 +45,6 @@ class TabsDirective extends BaseElement {
 class TabsController {
 	constructor () {}
 
-    /* @TODO: make tab activation work two way (from controller to directive, and directive to controller) */
     activateTab (tab) {
         console.log('activating tab');
         if (tab.slug === this.activeTab) {

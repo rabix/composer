@@ -2,8 +2,7 @@
  * Created by Maya on 10.8.15.
  */
 
-import * as fileModel from '../../models/file.model';
-import * as mocks from '../../models/file.mock';
+import NewFile from '../../services/NewFile';
 
 class IdeController {
 
@@ -15,7 +14,7 @@ class IdeController {
             files: []
         };
 
-        let makeTab = function (obj) {
+        this.makeTab = function (obj) {
             obj.slug = _.kebabCase(obj.name);
             obj.config.onLoad = this.load.bind(this);
             return obj;
@@ -25,8 +24,8 @@ class IdeController {
             (res) => {
                 _.forEach(res.files, (file) => {
                     if (file.type) {
-                        var fileObj = new fileModel[file.type.substring(1).toUpperCase()](file.name, file.content || '');
-                        this.workspace.files.push(makeTab(fileObj));
+                        let fileObj = new NewFile(file.name, file.type, file.content);
+                        this.workspace.files.push(this.makeTab(fileObj));
                     }
                 });
             }, (err) => {
@@ -56,16 +55,20 @@ class IdeController {
     }
 
     fileAdded (file) {
-        this.workspace.files.push(file);
+        let fileObj = this.makeTab(new NewFile(file.name, file.type, file.content));
+        this.workspace.files.push(fileObj);
+        this.openFiles.push(fileObj);
+        this.activeFile = fileObj;
     }
 
     fileOpened (file) {
         if (this.openFiles.indexOf(file) !== -1) {return;}
         this.openFiles.push(file);
+        this.activeFile = file;
     }
 
     switchFiles (file) {
-        this.activeFile = this.workspace.files[_.findIndex(this.workspace.files, {slug: file})]; // get file by reference
+        this.activeFile = this.openFiles[_.findIndex(this.openFiles, {slug: file})]; // get file by reference
     }
 }
 

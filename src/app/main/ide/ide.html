@@ -2,7 +2,7 @@
 
         <file-tree files="ide.workspace.files" workspace="{{ ::ide.workspace.name }}" on-add="ide.fileAdded(file)" on-open="ide.fileOpened(file)"></file-tree>
         <div class="editor-body" ui-view>
-            <ct-tabs tabs="ide.openFiles" callback="ide.switchFiles(tab)" active="ide.activeFile"></ct-tabs>
+            <ct-tabs tabs="ide.openFiles" callback="ide.switchFiles(tab)" switch-active-tab="ide.activeFile"></ct-tabs>
 
             <div class="editor" ui-ace="ide.activeFile.config" ng-model="ide.activeFile.content"></div>
         </div>
