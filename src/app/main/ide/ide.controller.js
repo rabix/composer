@@ -5,21 +5,14 @@
 import NewFile from '../../services/NewFile';
 
 class IdeController {
-
-    constructor (Api, $stateParams) {
+    constructor (Api, $stateParams, Editor) {
         this.openFiles = [];
-
         this.workspace = {
             name: $stateParams.workspace,
             files: []
         };
 
-        this.makeTab = function (obj) {
-            obj.slug = _.kebabCase(obj.name);
-            obj.config.onLoad = this.load.bind(this);
-            return obj;
-        }.bind(this);
-
+	    this.Editor = Editor;
 	    this.Api = Api;
 
         Api.workspaces.query({workspace: $stateParams.workspace},
@@ -27,45 +20,27 @@ class IdeController {
                 _.forEach(res.files, (file) => {
                     if (file.type) {
                         let fileObj = new NewFile(file.name, file.type, file.content);
-                        this.workspace.files.push(this.makeTab(fileObj));
+                        this.workspace.files.push(makeTab(fileObj));
                     }
                 });
             }, (err) => {
                 new Error(err);
             });
-
-        this.EditSession = ace.require('ace/edit_session').EditSession;
-    }
-
-    load (editor) {
-        this._editor = editor;
-        editor.$blockScrolling = Infinity;
-
-        editor.commands.addCommand({
-            name: 'autoComplete',
-            bindKey: {win: 'Ctrl-Space', mac: 'Ctrl-Space'},
-            exec: function (editor) {
-                let session = editor.getSession();
-                let pos = editor.getCursorPosition();
-                let token = session.getTokenAt(pos.row, pos.column);
-                let pre = token.value.substr(0, pos.column - token.start);
-
-                console.log(token);
-                console.log("word before cursor: ", pre);
-            }
-        });
     }
 
     fileAdded (file) {
-        let fileObj = this.makeTab(new NewFile(file.name, file.type, file.content));
+        let fileObj = makeTab(new NewFile(file.name, file.type, file.content));
         this.workspace.files.push(fileObj);
         this.openFiles.push(fileObj);
-        this.activeFile = fileObj;
+	    this.setActiveFile(fileObj);
     }
 
     fileOpened (file) {
-        this.activeFile = file;
-        if (this.openFiles.indexOf(file) !== -1) {return;}
+	    this.setActiveFile(file);
+        if (this.openFiles.indexOf(file) !== -1) {
+	        return;
+        }
+
         this.openFiles.push(file);
 
 	    if (!file.content) {
@@ -74,7 +49,7 @@ class IdeController {
     }
 
     switchFiles (file) {
-        this.activeFile = this.openFiles[_.findIndex(this.openFiles, {slug: file})]; // get file by reference
+	    this.setActiveFile(this.openFiles[_.findIndex(this.openFiles, {slug: file})]);
     }
 
 	saveFile (file) {
@@ -83,7 +58,7 @@ class IdeController {
 				console.log('successfully updated file', suc);
 			}, (err) => {
 				console.log('something went wrong here', err);
-			})
+			});
 	}
 
 	loadFile (file) {
@@ -92,12 +67,21 @@ class IdeController {
 				file.content = res.content;
 			}, (err) => {
 				console.log('something went wrong here', err);
-			})
+			});
+	}
+
+	setActiveFile (fileObj) {
+		this.activeFile = fileObj;
+		this.Editor.setMode(fileObj.type);
 	}
 }
 
+function makeTab (obj) {
+	obj.slug = _.kebabCase(obj.name);
+	return obj;
+}
 
-IdeController.$inject = ['Api', '$stateParams'];
+IdeController.$inject = ['Api', '$stateParams', 'Editor'];
 
 angular.module('cottontail').controller('IdeController', IdeController);
 

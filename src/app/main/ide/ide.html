@@ -6,6 +6,15 @@
                 <ct-button intention="primary" ng-click="ide.saveFile(ide.activeFile)" size="sm" ng-if="ide.activeFile">Save</ct-button>
             </ct-tabs>
 
-            <div class="editor" ui-ace="ide.activeFile.config" ng-model="ide.activeFile.content"></div>
+            <div ng-show="ide.activeFile" class="editor" ui-ace="ide.Editor.config" ng-model="ide.activeFile.content"></div>
+            <div ng-show="!ide.activeFile" class="flex-container flex-center">
+                <div class="panel panel-default col-lg-3 col-md-4 col-sm-6">
+                    <div class="panel-body">
+                        <h2 class="text-center">Open a file from the left</h2>
+
+                        <hr/>
+                    </div>
+                </div>
+            </div>
         </div>
 </div>

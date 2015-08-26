@@ -2,14 +2,9 @@
  * Created by majanedeljkovic on 8/14/15.
  */
 
-import * as config from '../constants/editor.const';
-
 class BaseFile {
-    constructor(name, mode, content) {
-        this.config = {
-            mode: mode,
-            theme: config.EDITOR_THEME
-        };
+    constructor(name, type, content) {
+	    this.type = type;
         this.name = name;
         this.content = content || '';
     }
