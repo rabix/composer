@@ -7,6 +7,7 @@ class TabsDirective extends BaseElement {
 		this.controller = TabsController;
 		this.controllerAs = 'tabs';
 		this.templateUrl = 'app/components/ui/tabs/tabs.html';
+		this.transclude = true;
 		this.replace = true;
 		this.scope = {
 			list: '=tabs',

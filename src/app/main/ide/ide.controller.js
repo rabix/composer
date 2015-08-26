@@ -20,6 +20,8 @@ class IdeController {
             return obj;
         }.bind(this);
 
+	    this.Api = Api;
+
         Api.workspaces.query({workspace: $stateParams.workspace},
             (res) => {
                 _.forEach(res.files, (file) => {
@@ -65,11 +67,33 @@ class IdeController {
         this.activeFile = file;
         if (this.openFiles.indexOf(file) !== -1) {return;}
         this.openFiles.push(file);
+
+	    if (!file.content) {
+	        this.loadFile(file);
+	    }
     }
 
     switchFiles (file) {
         this.activeFile = this.openFiles[_.findIndex(this.openFiles, {slug: file})]; // get file by reference
     }
+
+	saveFile (file) {
+		this.Api.files.update({file: file.name, workspace: this.workspace.name, content: file.content},
+			(suc) => {
+				console.log('successfully updated file', suc);
+			}, (err) => {
+				console.log('something went wrong here', err);
+			})
+	}
+
+	loadFile (file) {
+		this.Api.files.query({file: file.name, workspace: this.workspace.name},
+			(res) => {
+				file.content = res.content;
+			}, (err) => {
+				console.log('something went wrong here', err);
+			})
+	}
 }
 
 

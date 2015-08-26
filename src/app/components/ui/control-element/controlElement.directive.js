@@ -7,6 +7,7 @@ class ControlElementDirective {
 		this.restrict = 'E';
 		this.transclude = true;
 		this.bindToController = true;
+		this.replace = true;
 	}
 }
 
