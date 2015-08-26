@@ -27,7 +27,7 @@ function routerConfig($stateProvider, $urlRouterProvider) {
             controllerAs: 'ws'
         });
 
-    $urlRouterProvider.otherwise('/');
+    $urlRouterProvider.otherwise('workspace/');
 }
 
 export default routerConfig;

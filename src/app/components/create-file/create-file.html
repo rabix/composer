@@ -1,0 +1,8 @@
+<div class="modal-body">
+    <ct-input type="text" ng-model="view.name">Enter file name</ct-input>
+    <select class="form-control" ng-options="type.id as type.name for type in types" ng-model="view.type"></select>
+</div>
+<div class="modal-footer">
+    <ct-button intention="default" ng-click="cancel()">Cancel</ct-button>
+    <ct-button intention="primary" ng-click="ok(view.name, view.type)">Create</ct-button>
+</div>
