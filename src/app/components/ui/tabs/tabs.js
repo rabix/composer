@@ -11,12 +11,14 @@ class TabsDirective extends BaseElement {
 		this.replace = true;
 		this.scope = {
 			list: '=tabs',
-			callback: '&',
+			onActiveTab: '&',
 			tabSrc: '@',
-            switchActiveTab: '='
+            switchActiveTab: '=',
+			onCloseTab: '&'
 		};
 
-        this.link = function (scope) {
+        this.link = function (scope, elem, attr) {
+	        scope.tabs.attr = attr;
             scope.tabs.list = _.isArray(scope.tabs.list) ? scope.tabs.list : [scope.tabs.list];
 
             if (_.isString(scope.tabs.list[0])) {
@@ -38,7 +40,7 @@ class TabsDirective extends BaseElement {
                 }
             });
 
-        }.bind(this);
+        };
 	}
 }
 
@@ -52,10 +54,14 @@ class TabsController {
 
         this.activeTab = tab.slug;
 
-        if (typeof this.callback === 'function') {
-            this.callback({tab: tab.slug});
+        if (!_.isUndefined(this.attr.switchActiveTab)) {
+            this.onActiveTab({tab: tab});
         }
     }
+
+	closeTab (tab) {
+		this.onCloseTab({tab: tab});
+	}
 }
 
 angular.module('cottontail').directive('ctTabs', () => new TabsDirective());

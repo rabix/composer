@@ -5,20 +5,40 @@
 
   background-color: darken($body-bg, 8);
 
-  li.active:before {
-    border-color: transparent $body-bg transparent transparent;
-  }
+  li {
+    &.active {
+      &:before {
+        border-color: transparent $body-bg transparent transparent;
+      }
 
-  li.active:after {
-    border-color: transparent transparent transparent $body-bg;
-  }
+      &:after {
+        border-color: transparent transparent transparent $body-bg;
+      }
+    }
 
-  li>a {
-    padding: 6px 20px;
-  }
+    > a {
+      position: relative;
+      padding: 6px 20px;
+    }
 
-  li.transclude {
-    float: right;
-    margin-top: -5px;
+    &.transclude {
+      float: right;
+      margin-top: -5px;
+    }
+
+    i.fa {
+      position: relative;
+      left: 5px;
+      padding: 7px;
+      margin: -7px;
+      cursor: pointer;
+      color: #aeaeae;
+
+      @include transition(color $transition-duration);
+
+      &:hover {
+        color: $alert-danger-text;
+      }
+    }
   }
 }

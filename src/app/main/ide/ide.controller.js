@@ -49,7 +49,7 @@ class IdeController {
     }
 
     switchFiles (file) {
-	    this.setActiveFile(this.openFiles[_.findIndex(this.openFiles, {slug: file})]);
+	    this.setActiveFile(_.find(this.openFiles, file));
     }
 
 	saveFile (file) {
@@ -68,6 +68,23 @@ class IdeController {
 			}, (err) => {
 				console.log('something went wrong here', err);
 			});
+	}
+
+	closeFile (file) {
+		const index = _.indexOf(this.openFiles, file);
+		_.remove(this.openFiles, file);
+		let length = this.openFiles.length;
+
+		if (file === this.activeFile && length !== 0) {
+			if (index < length && index >= 0 ) {
+				this.setActiveFile(this.openFiles[index]);
+			} else {
+				this.setActiveFile(this.openFiles[length - 1]);
+			}
+		} else if (length === 0) {
+			delete this.activeFile;
+		}
+
 	}
 
 	setActiveFile (fileObj) {

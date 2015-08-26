@@ -2,6 +2,8 @@
     <li ng-repeat="tab in tabs.list" ng-class="{'active': tab.slug === tabs.activeTab}">
         <a href=""  ng-click="tabs.activateTab(tab)">
             {{ tab.name }}
+
+            <i class="fa fa-close" ng-click="tabs.closeTab(tab)" ng-if="tabs.attr.onCloseTab"></i>
         </a>
     </li>
 
