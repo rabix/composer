@@ -9,12 +9,8 @@ class CreateFileDirective {
 		this.controllerAs = 'cf';
 		this.bindToController = true;
 
-		this.link = function (scope, element, attr) {
-			console.log('asomething?');
-
+		this.link = function (scope, element) {
 			angular.element(element).on('click', function(e) {
-				console.log(element);
-				
 				scope.cf.openModal();
 			});
 		};
