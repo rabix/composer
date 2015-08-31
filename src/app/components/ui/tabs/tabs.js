@@ -13,7 +13,7 @@ class TabsDirective extends BaseElement {
 			list: '=tabs',
 			onActiveTab: '&',
 			tabSrc: '@',
-            switchActiveTab: '=',
+			currentActiveTab: '=',
 			onCloseTab: '&'
 		};
 
@@ -30,7 +30,7 @@ class TabsDirective extends BaseElement {
             	});
             }
 
-            scope.$watch('tabs.switchActiveTab', function (n, o) {
+            scope.$watch('tabs.currentActiveTab', function (n, o) {
                 if (n !== o) {
                     _.forEach(scope.tabs.list, function(tab) {
                         if (tab === n) {
@@ -54,7 +54,7 @@ class TabsController {
 
         this.activeTab = tab.slug;
 
-        if (!_.isUndefined(this.attr.switchActiveTab)) {
+        if (!_.isUndefined(this.attr.currentActiveTab)) {
             this.onActiveTab({tab: tab});
         }
     }

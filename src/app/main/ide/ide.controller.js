@@ -3,6 +3,7 @@
  */
 
 import NewFile from '../../services/NewFile';
+import * as key from '../../services/Shortcuts';
 
 class IdeController {
     constructor (Api, $stateParams, Editor) {
@@ -26,7 +27,11 @@ class IdeController {
             }, (err) => {
                 new Error(err);
             });
+
+	    this.createShortcuts();
     }
+
+	/** File methods **/
 
     fileAdded (file) {
         let fileObj = makeTab(new NewFile(file.name, file.type, file.content));
@@ -82,14 +87,46 @@ class IdeController {
 				this.setActiveFile(this.openFiles[length - 1]);
 			}
 		} else if (length === 0) {
+			this.activeFile = null;
 			delete this.activeFile;
 		}
-
 	}
 
 	setActiveFile (fileObj) {
 		this.activeFile = fileObj;
 		this.Editor.setMode(fileObj.type);
+	}
+
+	/** Operational methods **/
+	createShortcuts() {
+
+		/** Save **/
+		key.setSave(function(e) {
+			if (this.activeFile) {
+				this.saveFile(this.activeFile)
+			}
+			e.preventDefault();
+		}.bind(this));
+
+		this.Editor.addShortcut('save', function () {
+			this.saveFile(this.activeFile)
+		}.bind(this));
+
+		/** Close Tab **/
+		key.setClose(function(e) {
+			console.log('closing');
+
+			if (this.activeFile) {
+				this.closeFile(this.activeFile)
+			}
+			e.preventDefault();
+		}.bind(this));
+
+		this.Editor.addShortcut('close', function () {
+			console.log('closing');
+
+			this.closeFile(this.activeFile)
+		}.bind(this));
 	}
 }
 
