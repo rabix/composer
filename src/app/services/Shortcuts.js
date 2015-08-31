@@ -18,8 +18,6 @@ export function setTabRight(callback) {
 
 export function setClose(callback) {
 	key(keyMap.close.keyMaster, callback);
-	console.log('set close');
-	
 }
 
 export const keyMap = {
@@ -45,3 +43,4 @@ export const keyMap = {
 	}
 
 };
+

@@ -3,10 +3,11 @@
  */
 
 import NewFile from '../../services/NewFile';
-import * as key from '../../services/Shortcuts';
+import * as Keys from '../../services/Shortcuts';
 
 class IdeController {
-    constructor (Api, $stateParams, Editor) {
+    constructor (Api, $stateParams, Editor, $scope) {
+	    this.$scope = $scope;
         this.openFiles = [];
         this.workspace = {
             name: $stateParams.workspace,
@@ -101,7 +102,7 @@ class IdeController {
 	createShortcuts() {
 
 		/** Save **/
-		key.setSave(function(e) {
+		Keys.setSave(function(e) {
 			if (this.activeFile) {
 				this.saveFile(this.activeFile)
 			}
@@ -113,20 +114,23 @@ class IdeController {
 		}.bind(this));
 
 		/** Close Tab **/
-		key.setClose(function(e) {
-			console.log('closing');
-
+		Keys.setClose(function(e) {
 			if (this.activeFile) {
-				this.closeFile(this.activeFile)
+				this.closeFile(this.activeFile);
+
+				//fixme horrible hack
+				this.$scope.$apply();
 			}
 			e.preventDefault();
 		}.bind(this));
 
 		this.Editor.addShortcut('close', function () {
-			console.log('closing');
+			this.closeFile(this.activeFile);
 
-			this.closeFile(this.activeFile)
+			//fixme horrible hack
+			this.$scope.$apply();
 		}.bind(this));
+
 	}
 }
 
@@ -135,7 +139,7 @@ function makeTab (obj) {
 	return obj;
 }
 
-IdeController.$inject = ['Api', '$stateParams', 'Editor'];
+IdeController.$inject = ['Api', '$stateParams', 'Editor', '$scope'];
 
 angular.module('cottontail').controller('IdeController', IdeController);
 
