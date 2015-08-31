@@ -131,6 +131,54 @@ class IdeController {
 			this.$scope.$apply();
 		}.bind(this));
 
+		/** Move to right **/
+
+		function moveRight(context) {
+			if (context.openFiles.length > 1) {
+				let index = _.indexOf(context.openFiles, context.activeFile);
+				if (index === context.openFiles.length - 1) {
+					context.setActiveFile(context.openFiles[0]);
+				} else {
+					context.setActiveFile(context.openFiles[index + 1]);
+				}
+			}
+
+			//fixme horrible hack
+			context.$scope.$apply();
+		}
+
+		Keys.setTabRight(function(e) {
+			moveRight(this);
+			e.preventDefault();
+		}.bind(this));
+
+		this.Editor.addShortcut('tabRight', function () {
+			moveRight(this);
+		}.bind(this));
+
+		/** Move to left **/
+		function moveLeft(context) {
+			if (context.openFiles.length > 1) {
+				let index = _.indexOf(context.openFiles, context.activeFile);
+				if (index === 0) {
+					context.setActiveFile(context.openFiles[context.openFiles.length - 1]);
+				} else {
+					context.setActiveFile(context.openFiles[index - 1]);
+				}
+			}
+
+			//fixme horrible hack
+			context.$scope.$apply();
+		}
+
+		Keys.setTabLeft(function(e) {
+			moveLeft(this);
+			e.preventDefault();
+		}.bind(this));
+
+		this.Editor.addShortcut('tabLeft', function() {
+			moveLeft(this);
+		}.bind(this));
 	}
 }
 
