@@ -104,13 +104,13 @@ class IdeController {
 		/** Save **/
 		Keys.setSave(function(e) {
 			if (this.activeFile) {
-				this.saveFile(this.activeFile)
+				this.saveFile(this.activeFile);
 			}
 			e.preventDefault();
 		}.bind(this));
 
 		this.Editor.addShortcut('save', function () {
-			this.saveFile(this.activeFile)
+			this.saveFile(this.activeFile);
 		}.bind(this));
 
 		/** Close Tab **/
