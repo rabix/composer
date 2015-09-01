@@ -153,6 +153,7 @@ class IdeController {
 		}.bind(this));
 
 		this.Editor.addShortcut('tabRight', function () {
+            //todo: preventDefault inside browser
 			moveRight(this);
 		}.bind(this));
 
@@ -177,6 +178,7 @@ class IdeController {
 		}.bind(this));
 
 		this.Editor.addShortcut('tabLeft', function() {
+            //todo: preventDefault inside browser
 			moveLeft(this);
 		}.bind(this));
 	}
