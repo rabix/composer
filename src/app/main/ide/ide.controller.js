@@ -6,7 +6,7 @@ import NewFile from '../../services/NewFile';
 import * as Keys from '../../services/Shortcuts';
 
 class IdeController {
-    constructor (Api, $stateParams, Editor, $scope) {
+    constructor (Api, $stateParams, Editor, $scope, Shortcuts) {
 	    this.$scope = $scope;
         this.openFiles = [];
         this.workspace = {
@@ -29,7 +29,7 @@ class IdeController {
                 new Error(err);
             });
 
-	    this.createShortcuts();
+	    this.addKeyboardHandlers($scope, Shortcuts);
     }
 
 	/** File methods **/
@@ -98,88 +98,48 @@ class IdeController {
 		this.Editor.setMode(fileObj.type);
 	}
 
-	/** Operational methods **/
-	createShortcuts() {
-
-		/** Save **/
-		Keys.setSave(function(e) {
+	/**
+	 * Adds event handlers for keyboard shortcuts
+	 * @param $scope
+	 * @param Shortcuts
+	 */
+	addKeyboardHandlers($scope, Shortcuts) {
+		$scope.$on(Shortcuts.events.save, () => {
 			if (this.activeFile) {
-				this.saveFile(this.activeFile);
+				this.saveFile(this.activeFile)
 			}
-			e.preventDefault();
-		}.bind(this));
+		});
 
-		this.Editor.addShortcut('save', function () {
-			this.saveFile(this.activeFile);
-		}.bind(this));
-
-		/** Close Tab **/
-		Keys.setClose(function(e) {
+		$scope.$on(Shortcuts.events.close, function() {
 			if (this.activeFile) {
 				this.closeFile(this.activeFile);
-
-				//fixme horrible hack
-				this.$scope.$apply();
+				$scope.$apply();
 			}
-			e.preventDefault();
 		}.bind(this));
 
-		this.Editor.addShortcut('close', function () {
-			this.closeFile(this.activeFile);
-
-			//fixme horrible hack
-			this.$scope.$apply();
-		}.bind(this));
-
-		/** Move to right **/
-
-		function moveRight(context) {
-			if (context.openFiles.length > 1) {
-				let index = _.indexOf(context.openFiles, context.activeFile);
-				if (index === context.openFiles.length - 1) {
-					context.setActiveFile(context.openFiles[0]);
+		$scope.$on(Shortcuts.events.moveRight, function() {
+			if (this.openFiles.length > 1) {
+				let index = _.indexOf(this.openFiles, this.activeFile);
+				if (index === this.openFiles.length - 1) {
+					this.setActiveFile(this.openFiles[0]);
 				} else {
-					context.setActiveFile(context.openFiles[index + 1]);
+					this.setActiveFile(this.openFiles[index + 1]);
 				}
 			}
-
-			//fixme horrible hack
-			context.$scope.$apply();
-		}
-
-		Keys.setTabRight(function(e) {
-			moveRight(this);
-			e.preventDefault();
-		}.bind(this));
-
-		this.Editor.addShortcut('tabRight', function () {
-            //todo: preventDefault inside browser
-			moveRight(this);
+			$scope.$apply();
 		}.bind(this));
 
 		/** Move to left **/
-		function moveLeft(context) {
-			if (context.openFiles.length > 1) {
-				let index = _.indexOf(context.openFiles, context.activeFile);
+		$scope.$on(Shortcuts.events.moveLeft, function() {
+			if (this.openFiles.length > 1) {
+				let index = _.indexOf(this.openFiles, this.activeFile);
 				if (index === 0) {
-					context.setActiveFile(context.openFiles[context.openFiles.length - 1]);
+					this.setActiveFile(this.openFiles[this.openFiles.length - 1]);
 				} else {
-					context.setActiveFile(context.openFiles[index - 1]);
+					this.setActiveFile(this.openFiles[index - 1]);
 				}
 			}
-
-			//fixme horrible hack
-			context.$scope.$apply();
-		}
-
-		Keys.setTabLeft(function(e) {
-			moveLeft(this);
-			e.preventDefault();
-		}.bind(this));
-
-		this.Editor.addShortcut('tabLeft', function() {
-            //todo: preventDefault inside browser
-			moveLeft(this);
+			$scope.$apply();
 		}.bind(this));
 	}
 }
@@ -189,7 +149,7 @@ function makeTab (obj) {
 	return obj;
 }
 
-IdeController.$inject = ['Api', '$stateParams', 'Editor', '$scope'];
+IdeController.$inject = ['Api', '$stateParams', 'Editor', '$scope', 'Shortcuts'];
 
 angular.module('cottontail').controller('IdeController', IdeController);
 

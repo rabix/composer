@@ -30,11 +30,11 @@
   "overrides": {
     "ace-builds": {
       "main": [
-        "src-min/ace.js",
-        "src-min/mode-json.js",
-        "src-min/mode-javascript.js",
-        "src-min/mode-yaml.js",
-        "src-min/theme-xcode.js"
+        "src/ace.js",
+        "src/mode-json.js",
+        "src/mode-javascript.js",
+        "src/mode-yaml.js",
+        "src/theme-xcode.js"
       ]
     }
   }

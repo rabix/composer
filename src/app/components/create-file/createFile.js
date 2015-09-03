@@ -1,3 +1,5 @@
+const MODAL_OPENED = 'modal-open';
+
 class CreateFileDirective {
 	constructor () {
 		this.restirct = 'A';
@@ -13,14 +15,24 @@ class CreateFileDirective {
 			angular.element(element).on('click', function(e) {
 				scope.cf.openModal();
 			});
+
+			scope.$on(scope.cf.Shortcuts.events.create, function() {
+
+				// prevent multiple modals from being opened
+				if (!angular.element('body').hasClass(MODAL_OPENED)) {
+					scope.cf.openModal();
+					angular.element('body').addClass(MODAL_OPENED);
+				}
+			});
 		};
 	}
 }
 
 class CreateFileController {
-	constructor($modal, Api) {
+	constructor($modal, Api, Shortcuts) {
 		this.$modal = $modal;
 		this.Api = Api;
+		this.Shortcuts = Shortcuts;
 	}
 
 	openModal () {
@@ -63,6 +75,6 @@ class CreateFileController {
 	}
 }
 
-CreateFileController.$inject = ['$modal', 'Api'];
+CreateFileController.$inject = ['$modal', 'Api', 'Shortcuts'];
 
 angular.module('cottontail').directive('createFile', () => new CreateFileDirective());
