@@ -18,6 +18,8 @@
     <!-- css files will be automatically insert here -->
     <!-- endinject -->
     <!-- endbuild -->
+
+    <link rel="stylesheet" href="editors/app/styles/main.css">
 </head>
 <body>
 <!--[if lt IE 10]>
@@ -33,6 +35,162 @@
 <!-- endbower -->
 <!-- endbuild -->
 
+
+
+<script src="editors/bower_components/tv4/tv4.js"></script>
+<script src="editors/bower_components/codemirror/lib/codemirror.js"></script>
+<script src="editors/bower_components/codemirror/mode/javascript/javascript.js"></script>
+<script src="editors/bower_components/angular-hotkeys/build/hotkeys.js"></script>
+<script src="editors/bower_components/clipboard/dist/clipboard.min.js"></script>
+<script src="editors/bower_components/angular-ui-notification/dist/angular-ui-notification.min.js"></script>
+<script src="editors/bower_components/showdown/compressed/Showdown.min.js"></script>
+<script src="editors/bower_components/angular-markdown-text/dist/angular-markdown-text.min.js"></script>
+<script src="editors/bower_components/ng-prettyjson/dist/ng-prettyjson.min.js"></script>
+<script src="editors/bower_components/ng-tags-input/ng-tags-input.js"></script>
+<script src="editors/bower_components/angular-bootstrap/ui-bootstrap.min.js"></script>
+<script src="editors/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+
+<script src="editors/app/vendor/jsandbox/src/jsandbox.js"></script>
+<script src="editors/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="editors/app/vendor/raphael/raphael.js"></script>
+<script src="editors/app/vendor/raphael/raphael.button.js"></script>
+<script src="editors/app/vendor/raphael/raphael.curve.js"></script>
+<script src="editors/app/vendor/raphael/raphael.group.js"></script>
+
+
+<script src="editors/app/vendor/chronicle/chronicle.js"></script>
+<script src="editors/app/vendor/angular-ui-sortable/sortable.min.js"></script>
+
+<script src="editors/app/scripts/util/util.config.js"></script>
+<script src="editors/app/scripts/util/filters/is-empty.js"></script>
+<script src="editors/app/scripts/util/filters/encode.js"></script>
+<script src="editors/app/scripts/util/filters/trim.js"></script>
+<script src="editors/app/scripts/util/filters/repo.js"></script>
+<script src="editors/app/scripts/util/filters/is-integer.js"></script>
+<script src="editors/app/scripts/common/filters/repo-apps.js"></script>
+<script src="editors/app/scripts/util/services/lodash.js"></script>
+
+
+<script src="editors/app/scripts/app/app.config.js"></script>
+<script src="editors/app/scripts/app/controllers/AppsCtrl.js"></script>
+<script src="editors/app/scripts/app/controllers/ToolCtrl.js"></script>
+<script src="editors/app/scripts/app/controllers/ToolRevisionCtrl.js"></script>
+<script src="editors/app/scripts/app/controllers/WorkflowViewCtrl.js"></script>
+<script src="editors/app/scripts/app/controllers/WorkflowEditorCtrl.js"></script>
+<script src="editors/app/scripts/app/models/App.js"></script>
+<script src="editors/app/scripts/app/models/Workflow.js"></script>
+
+<script src="editors/app/scripts/common/common.config.js"></script>
+<script src="editors/app/scripts/common/controllers/MarkdownCtrl.js"></script>
+<script src="editors/app/scripts/common/controllers/ModalTabsCtrl.js"></script>
+<script src="editors/app/scripts/common/controllers/ModalCtrl.js"></script>
+<script src="editors/app/scripts/common/controllers/ConfirmCustomCtrl.js"></script>
+<script src="editors/app/scripts/common/controllers/ExpressionCtrl.js"></script>
+<script src="editors/app/scripts/common/controllers/LiteralCtrl.js"></script>
+<script src="editors/app/scripts/common/directives/copy.js"></script>
+<script src="editors/app/scripts/common/directives/select-all.js"></script>
+<script src="editors/app/scripts/common/directives/loading.js"></script>
+<script src="editors/app/scripts/common/directives/paginator.js"></script>
+<script src="editors/app/scripts/common/directives/json-preview.js"></script>
+<script src="editors/app/scripts/common/directives/error.js"></script>
+<script src="editors/app/scripts/common/directives/is-valid-name.js"></script>
+<script src="editors/app/scripts/common/directives/is-valid-int.js"></script>
+<script src="editors/app/scripts/common/directives/expr.js"></script>
+<script src="editors/app/scripts/common/directives/codemirror.js"></script>
+<script src="editors/app/scripts/common/directives/help-message.js"></script>
+<script src="editors/app/scripts/common/directives/ng-enter.js"></script>
+<script src="editors/app/scripts/common/directives/focus-here.js"></script>
+<script src="editors/app/scripts/common/directives/content-loading.js"></script>
+<script src="editors/app/scripts/common/directives/selected-files.js"></script>
+<script src="editors/app/scripts/common/directives/license-picker.js"></script>
+<script src="editors/app/scripts/common/directives/categories.js"></script>
+<script src="editors/app/scripts/common/services/BeforeUnload.js"></script>
+<script src="editors/app/scripts/common/services/BeforeRedirect.js"></script>
+<script src="editors/app/scripts/common/services/Helper.js"></script>
+<script src="editors/app/scripts/common/services/SandBox.js"></script>
+<script src="editors/app/scripts/common/services/schema-validator.js"></script>
+<script src="editors/app/scripts/common/services/Api.js"></script>
+<script src="editors/app/scripts/common/services/TempGlobals.js"></script>
+<!--<script src="editors/app/scripts/common/services/HTTPInterceptor.js"></script>-->
+<script src="editors/app/scripts/common/services/HotkeyRegistry.js"></script>
+<script src="editors/app/scripts/common/services/Licenses.js"></script>
+<script src="editors/app/scripts/common/constants/ScriptSchema.js"></script>
+<script src="editors/app/scripts/common/constants/ToolSchema.js"></script>
+<script src="editors/app/scripts/common/constants/WorkflowSchema.js"></script>
+<script src="editors/app/scripts/common/constants/HelpMessages.js"></script>
+<script src="editors/app/scripts/common/controllers/ModalJSONCtrl.js"></script>
+
+<script src="editors/app/scripts/common/models/File.js"></script>
+<script src="editors/app/scripts/common/controllers/ChooseFileCtrl.js"></script>
+<script src="editors/app/scripts/common/directives/file-picker.js"></script>
+<script src="editors/app/scripts/common/filters/convert-bits.js"></script>
+<script src="editors/app/scripts/common/filters/loc.js"></script>
+<script src="editors/app/scripts/common/filters/default-defined.js"></script>
+
+
+<script src="editors/app/scripts/cliche/cliche.config.js"></script>
+<script src="editors/app/scripts/cliche/template.js"></script>
+
+
+<script src="editors/app/scripts/cliche/constants/schemas.js"></script>
+<script src="editors/app/scripts/cliche/controllers/ClicheCtrl.js"></script>
+<script src="editors/app/scripts/cliche/controllers/InputFileMoreCtrl.js"></script>
+<script src="editors/app/scripts/cliche/controllers/ManagePropertyArgCtrl.js"></script>
+<script src="editors/app/scripts/cliche/controllers/ManagePropertyInputCtrl.js"></script>
+<script src="editors/app/scripts/cliche/controllers/ManagePropertyOutputCtrl.js"></script>
+<script src="editors/app/scripts/cliche/controllers/ToolSettingsCtrl.js"></script>
+<script src="editors/app/scripts/cliche/controllers/JsonEditorCtrl.js"></script>
+<script src="editors/app/scripts/cliche/directives/suggested-files.js"></script>
+<script src="editors/app/scripts/cliche/directives/property-input.js"></script>
+<script src="editors/app/scripts/cliche/directives/property-output.js"></script>
+<script src="editors/app/scripts/cliche/directives/property-arg.js"></script>
+<script src="editors/app/scripts/cliche/directives/enum.js"></script>
+<script src="editors/app/scripts/cliche/directives/input-field.js"></script>
+<script src="editors/app/scripts/cliche/directives/add-property.js"></script>
+<script src="editors/app/scripts/cliche/directives/key-changer.js"></script>
+<script src="editors/app/scripts/cliche/directives/separator.js"></script>
+<script src="editors/app/scripts/cliche/directives/separator-info.js"></script>
+<script src="editors/app/scripts/cliche/directives/property-header.js"></script>
+<script src="editors/app/scripts/cliche/directives/argument-prefix-validation.js"></script>
+<script src="editors/app/scripts/cliche/directives/empty-to-null.js"></script>
+<script src="editors/app/scripts/cliche/directives/key-value-map.js"></script>
+<script src="editors/app/scripts/cliche/directives/cliche-editor.js"></script>
+<script src="editors/app/scripts/cliche/filters/contains.js"></script>
+<script src="editors/app/scripts/cliche/filters/size.js"></script>
+<script src="editors/app/scripts/cliche/services/Cliche.js"></script>
+<script src="editors/app/scripts/cliche/services/ClicheEvents.js"></script>
+<script src="editors/app/scripts/cliche/services/RecursionHelper.js"></script>
+<script src="editors/app/scripts/cliche/services/Separator.js"></script>
+<script src="editors/app/scripts/cliche/services/Validator.js"></script>
+
+
+<script src="editors/app/scripts/dyole/dyole.config.js"></script>
+<script src="editors/app/scripts/dyole/template.js"></script>
+
+<script src="editors/app/scripts/dyole/constants/Schemas.js"></script>
+
+<script src="editors/app/scripts/dyole/controllers/PipelineCtrl.js"></script>
+<script src="editors/app/scripts/dyole/controllers/NodeEditCtrl.js"></script>
+<script src="editors/app/scripts/dyole/controllers/DyoleJsonEditorCtrl.js"></script>
+<script src="editors/app/scripts/dyole/controllers/DyoleEditMetadataCtrl.js"></script>
+<script src="editors/app/scripts/dyole/controllers/WorkflowSettingsCtrl.js"></script>
+<script src="editors/app/scripts/dyole/directives/pipeline.js"></script>
+<script src="editors/app/scripts/dyole/directives/drag.js"></script>
+<script src="editors/app/scripts/dyole/directives/drop.js"></script>
+<script src="editors/app/scripts/dyole/directives/dyole-editor.js"></script>
+<script src="editors/app/scripts/dyole/factories/pipeline.js"></script>
+<script src="editors/app/scripts/dyole/factories/event.js"></script>
+<script src="editors/app/scripts/dyole/factories/node.js"></script>
+<script src="editors/app/scripts/dyole/factories/connection.js"></script>
+<script src="editors/app/scripts/dyole/factories/terminal.js"></script>
+<script src="editors/app/scripts/dyole/factories/formater.js"></script>
+<script src="editors/app/scripts/dyole/factories/formaterD2.js"></script>
+<script src="editors/app/scripts/dyole/factories/common.js"></script>
+
+
+<script src="editors/app/scripts/dyole/services/PipelineService.js"></script>
+
+
 <!-- build:js({.tmp/serve,.tmp/partials}) scripts/app.js -->
 <!-- inject:js -->
 <!-- js files will be automatically insert here -->
@@ -42,6 +200,5 @@
 <!-- angular templates will be automatically converted in js and inserted here -->
 <!-- endinject -->
 <!-- endbuild -->
-
 </body>
 </html>

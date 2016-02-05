@@ -23,8 +23,9 @@ body, html {
   @extend .flex-grow;
   @extend .flex-col;
   @extend .flex-container;
+  max-width: 100%;
 
-  .ace_editor {
+  .ace_editor, .cliche-editor {
     @extend .flex-grow; /* to fill space */
   }
 }
