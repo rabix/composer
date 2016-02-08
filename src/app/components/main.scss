@@ -23,7 +23,7 @@ body, html {
   @extend .flex-grow;
   @extend .flex-col;
   @extend .flex-container;
-  max-width: 100%;
+  max-width: calc(100% - 250px);
 
   .ace_editor, .cliche-editor {
     @extend .flex-grow; /* to fill space */
