@@ -17,6 +17,18 @@ class IdeController {
         this.Editor = Editor;
         this.Api = Api;
 
+        this.editorApi = {
+            onSave: function (tool){
+                this.activeFile.content = JSON.stringify(tool, null, 4);
+                this.saveFile(this.activeFile);
+            }.bind(this),
+
+            getJson: function (tool){
+                console.log('got json', tool);
+            }.bind(this)
+
+        };
+
         Api.workspaces.query({workspace: $stateParams.workspace},
             (res) => {
                 _.forEach(res.files, (file) => {
