@@ -25,7 +25,13 @@ body, html {
   @extend .flex-container;
   max-width: calc(100% - 250px);
 
-  .ace_editor, .cliche-editor {
+  .ace_editor, .cliche-editor, .dyole-editor {
     @extend .flex-grow; /* to fill space */
+  }
+
+  .cliche-editor, .dyole-editor, .page {
+    @extend .flex-grow; /* to fill space */
+    @extend .flex-container;
+    @extend .flex-col; /* to set arrangement of children */
   }
 }
