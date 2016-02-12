@@ -6,21 +6,26 @@ import NewFile from '../../services/NewFile';
 import * as Keys from '../../services/Shortcuts';
 
 class IdeController {
-    constructor(Api, $stateParams, Editor, $scope, Shortcuts) {
+    constructor(Api, $stateParams, Editor, $scope, Shortcuts, $q) {
         this.$scope = $scope;
         this.openFiles = [];
         this.workspace = {
             name: $stateParams.workspace,
             files: []
         };
-
+        this.$q = $q;
         this.Editor = Editor;
         this.Api = Api;
 
         this.editorApi = {
             onSave: function (tool){
+                let deferred = $q.defer();
                 this.activeFile.content = JSON.stringify(tool, null, 4);
-                this.saveFile(this.activeFile);
+                this.saveFile(this.activeFile).then((suc) => {
+                    deferred.resolve(suc);
+                });
+
+                return deferred.promise;
             }.bind(this),
 
             getJson: function (tool){
@@ -71,12 +76,16 @@ class IdeController {
     }
 
     saveFile(file) {
+        let deferred = this.$q.defer();
         this.Api.files.update({file: file.name, workspace: this.workspace.name, content: file.content},
             (suc) => {
+                deferred.resolve(suc);
                 console.log('successfully updated file', suc);
             }, (err) => {
+                deferred.reject(err);
                 console.log('something went wrong here', err);
             });
+        return deferred.promise;
     }
 
     loadFile(file) {
@@ -168,7 +177,7 @@ function makeTab(obj) {
     return obj;
 }
 
-IdeController.$inject = ['Api', '$stateParams', 'Editor', '$scope', 'Shortcuts'];
+IdeController.$inject = ['Api', '$stateParams', 'Editor', '$scope', 'Shortcuts', '$q'];
 angular.module('cottontail').controller('IdeController', IdeController);
 
 export default IdeController;
