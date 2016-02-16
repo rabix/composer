@@ -10,21 +10,23 @@
                  on-active-tab="ide.switchFiles(tab)"
                  current-active-tab="ide.activeFile"
                  on-close-tab="ide.closeFile(tab)">
-            <ct-button intention="primary" ng-click="ide.saveFile(ide.activeFile)" size="sm" ng-if="ide.activeFile">
-                Save
+            <ct-button ng-show="!ide.activeFile.class" intention="primary" ng-click="ide.saveFile(ide.activeFile)" size="sm" ng-if="ide.activeFile">
+                Import
             </ct-button>
 
-            <ct-button intention="success" ng-click="ide.editorApi.onSave(tool)" size="sm">
-                Save Remotely
-            </ct-button>
+            <span ng-show="ide.activeFile.class">
+                <ct-button intention="success" ng-click="ide.editorApi.onSave()" size="sm">
+                    Save
+                </ct-button>
 
-            <ct-button intention="primary" ng-click="ide.editorApi.getJson(tool)" size="sm">
-                Tool JSON
-            </ct-button>
+                <ct-button intention="primary" ng-click="ide.editorApi.getJson(tool)" size="sm">
+                    Show JSON
+                </ct-button>
 
-            <ct-button intention="warning" ng-click="ide.editorApi.onRun(tool)" size="sm">
-                Run
-            </ct-button>
+                <ct-button intention="warning" ng-click="ide.editorApi.onRun(tool)" size="sm">
+                    Run
+                </ct-button>
+            </span>
         </ct-tabs>
 
 
@@ -42,14 +44,14 @@
 
         <div ng-show="!ide.activeFile" class="flex-container flex-center">
             <div class="panel panel-default col-lg-3 col-md-4 col-sm-6">
-                <div class="panel-body"><h2 class="text-center">Open a file from the left</h2>
+                <div class="panel-body"><h2 class="text-center">Open an app from the left</h2>
 
                     <hr/>
 
                     <ct-button intention="success" create-file="ide.fileAdded(file)" ws="ide.workspace.name"
                                size="block">
                         <i class="fa fa-plus"></i>
-                        Create a new file
+                        Create a new app
                     </ct-button>
                 </div>
             </div>
