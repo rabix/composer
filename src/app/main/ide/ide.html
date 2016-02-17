@@ -1,6 +1,7 @@
 <div class="flex-container">
 
     <file-tree files="ide.workspace.files"
+               structure="ide.structure"
                workspace="{{ ::ide.workspace.name }}"
                on-add="ide.fileAdded(file)"
                on-open="ide.fileOpened(file)"></file-tree>

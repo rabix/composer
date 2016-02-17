@@ -9,7 +9,6 @@
 
   ul li a {
     display: block;
-    border-bottom: 1px solid $modal-content-border-color;
     padding: $padding-base-vertical $padding-base-horizontal;
     cursor: pointer;
 
@@ -17,5 +16,9 @@
       text-decoration: none;
       background-color: #efefef;
     }
+  }
+
+  .list-nested {
+    margin-left: 12px;
   }
 }

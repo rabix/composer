@@ -34,14 +34,48 @@ class IdeController {
 
         };
 
-        Api.workspaces.query({workspace: $stateParams.workspace},
+        Api.workspaces.query({},
             (res) => {
-                _.forEach(res.files, (file) => {
-                    if (file.type) {
-                        let fileObj = new NewFile(file.name, file.type, file.content);
-                        this.workspace.files.push(makeTab(fileObj));
+                let structure = {
+                    name: 'root',
+                    type: 'dir',
+                    directories: {},
+                    files: []
+                };
+                _.forEach(res.paths.dirs, function(dir) {
+                    let tokens = dir.split('/');
+                    let cwd = structure;
+
+                    _.forEach(tokens, function(token) {
+                        if (!cwd.directories[token]) {
+                            cwd.directories[token] = {
+                                name: token,
+                                type: 'dir',
+                                directories: {},
+                                files: []
+                            };
+                        }
+
+                        cwd = cwd.directories[token];
+                    });
+                });
+
+                _.forEach(res.paths.files, function(file) {
+                    let tokens = file.path.split('/');
+                    let cwd = structure;
+
+                    while(tokens.length) {
+                        let token = tokens.shift();
+                        if (tokens.length === 0) {
+                            let fileObj = new NewFile(file.name, file.type, file.content, file.path);
+                            cwd.files.push(fileObj);
+                        } else {
+                            cwd = cwd.directories[token];
+                        }
                     }
                 });
+
+                this.structure = structure;
             }, (err) => {
                 new Error(err);
             });
