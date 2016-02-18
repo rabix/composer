@@ -29,9 +29,7 @@ class Api {
         });
 
         this.workspaces = this.$resource(this.BASE + '/fs', {}, {
-            query: {method: 'GET'},
-            create: {method: 'POST'},
-            update: {method: 'PUT'}
+            query: {method: 'GET'}
         });
     }
 }

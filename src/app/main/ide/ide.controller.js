@@ -45,6 +45,8 @@ class IdeController {
                     files: []
                 };
 
+                res.paths = _.sortBy(res.paths, 'path');
+
                 _.forEach(res.paths, function(file) {
                     let tokens = file.path.split('/');
                     // remove empty strings for paths that start with /
