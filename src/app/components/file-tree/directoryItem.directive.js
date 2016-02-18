@@ -13,7 +13,9 @@ angular.module('cottontail').directive('directoryItem', ['RecursionHelper', func
             var link = function(scope) {
                 scope.openFile = function(file) {
                     scope.$emit('fileOpened', file);
-                }
+                };
+
+                scope.directory.isOpen = scope.directory.name === 'root';
             };
 
             return RecursionHelper.compile(element, link);

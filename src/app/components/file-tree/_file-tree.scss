@@ -14,11 +14,19 @@
 
     &:hover {
       text-decoration: none;
-      background-color: #efefef;
+      font-weight: bold;
     }
   }
 
   .list-nested {
     margin-left: 12px;
+  }
+
+  .directory-name {
+    padding: $padding-base-vertical $padding-base-horizontal;
+    cursor: pointer;
+    &:hover {
+      font-weight: bold;
+    }
   }
 }

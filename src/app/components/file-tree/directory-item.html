@@ -1,6 +1,9 @@
-<li>
-    <i class="fa fa-fw fa-folder"></i>&nbsp;{{ directory.name }}
-    <ul class="list-unstyled list-nested">
+<li class="directory-item">
+    <div class="directory-name" ng-click="directory.isOpen = !directory.isOpen">
+        <i class="fa fa-fw" ng-class="{'fa-folder-o': !directory.isOpen, 'fa-folder-open-o': directory.isOpen}"></i>
+        &nbsp;{{ directory.name }}
+    </div>
+    <ul class="list-unstyled list-nested" ng-show="directory.isOpen">
         <directory-item directory="subDirectory" ng-repeat="subDirectory in directory.directories"></directory-item>
         <li>
             <a ng-click="openFile(file)" ng-repeat="file in directory.files" title="{{ file.path }}">

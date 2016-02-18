@@ -2,6 +2,8 @@
  * Created by Maya on 10.8.15.
  */
 
+/* globals _ */
+
 import NewFile from '../../services/NewFile';
 import * as Keys from '../../services/Shortcuts';
 
@@ -23,7 +25,7 @@ class IdeController {
                 let deferred = $q.defer();
                 this.activeFile.content = JSON.stringify(tool, null, 4);
                 this.saveFile(this.activeFile).then((suc) => {
-                    deferred.resolve(suc);
+                    deferred.resolve(this.activeFile.content);
                 });
 
                 return deferred.promise;
@@ -42,34 +44,32 @@ class IdeController {
                     directories: {},
                     files: []
                 };
-                _.forEach(res.paths.dirs, function(dir) {
-                    let tokens = dir.split('/');
-                    let cwd = structure;
 
-                    _.forEach(tokens, function(token) {
-                        if (!cwd.directories[token]) {
-                            cwd.directories[token] = {
-                                name: token,
-                                type: 'dir',
-                                directories: {},
-                                files: []
-                            };
-                        }
-
-                        cwd = cwd.directories[token];
-                    });
-                });
-
-                _.forEach(res.paths.files, function(file) {
+                _.forEach(res.paths, function(file) {
                     let tokens = file.path.split('/');
+                    // remove empty strings for paths that start with /
+                    tokens = _.filter(tokens, (token) => {
+                        return token !== '';
+                    });
+
                     let cwd = structure;
 
                     while(tokens.length) {
                         let token = tokens.shift();
+
                         if (tokens.length === 0) {
-                            let fileObj = new NewFile(file.name, file.type, file.content, file.path);
+                            let fileObj = makeTab(new NewFile(file.name, file.type, file.content, file.path));
                             cwd.files.push(fileObj);
                         } else {
+                            if (!cwd.directories[token]) {
+                                cwd.directories[token] = {
+                                    name: token,
+                                    type: 'dir',
+                                    directories: {},
+                                    files: []
+                                };
+                            }
+
                             cwd = cwd.directories[token];
                         }
                     }
@@ -86,8 +86,8 @@ class IdeController {
     /** File methods **/
 
     fileAdded(file) {
-        let fileObj = makeTab(new NewFile(file.name, file.type, file.content));
-        this.workspace.files.push(fileObj);
+        let fileObj = makeTab(new NewFile(file.name, file.type, file.content, file.path));
+        this.structure.files.push(fileObj);
         if (file.action === 'tool') {
             fileObj.class = 'CommandLineTool';
         } else if (file.action === 'workflow') {
@@ -113,6 +113,7 @@ class IdeController {
     switchFiles(file) {
         this.setActiveFile(_.find(this.openFiles, file));
     }
+
     getClass(content) {
         try {
             let fileContents = JSON.parse(content);
@@ -125,7 +126,7 @@ class IdeController {
 
     saveFile(file) {
         let deferred = this.$q.defer();
-        this.Api.files.update({file: file.name, workspace: this.workspace.name, content: file.content},
+        this.Api.files.update({file: file.path, content: file.content},
             (suc) => {
                 file.class =  this.getClass(file.content);
                 deferred.resolve(suc);
@@ -138,7 +139,7 @@ class IdeController {
     }
 
     loadFile(file) {
-        this.Api.files.query({file: file.name, workspace: this.workspace.name},
+        this.Api.files.query({file: file.path},
             (res) => {
                 file.class = this.getClass(res.content);
                 file.content = res.content;

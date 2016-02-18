@@ -22,13 +22,13 @@ class Api {
 
     _setResources() {
 
-        this.files = this.$resource(this.BASE + '/fs'+ this.WORKSPACE + '/:file', {workspace: '@workspace', file: '@file'}, {
+        this.files = this.$resource(this.BASE + '/fs' + '/:file', {file: '@file'}, {
             query: {method: 'GET'},
             create: {method: 'POST'},
             update: {method: 'PUT'}
         });
 
-        this.workspaces = this.$resource(this.BASE + '/fs' + this.WORKSPACE, {workspace: '@workspace'}, {
+        this.workspaces = this.$resource(this.BASE + '/fs', {}, {
             query: {method: 'GET'},
             create: {method: 'POST'},
             update: {method: 'PUT'}
