@@ -8,7 +8,7 @@
   background: #fff;
   @include standard-box-shadow();
 
-  .list-unstyled {
+  #editorFileTreeList {
       overflow-y: scroll;
       height: calc(100% - #{$navbar-height});
   }
