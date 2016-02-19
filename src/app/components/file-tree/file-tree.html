@@ -2,10 +2,6 @@
     <ct-button intention="success" size="block" create-file="tree.createFile(file)" ws="tree.workspace"><i class="fa fa-plus"></i>Add File</ct-button>
 
     <ul class="list-unstyled">
-        <li ng-repeat="file in tree.files">
-            <a ng-click="tree.openFile(file)">
-                {{ file.name }}
-            </a>
-        </li>
+        <directory-item directory="tree.structure"></directory-item>
     </ul>
 </div>

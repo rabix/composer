@@ -15,19 +15,13 @@ function routerConfig($stateProvider, $urlRouterProvider) {
 		    controllerAs: 'ui'
 	    })
         .state('main.editor', {
-		    url: 'editor/:workspace',
+		    url: 'editor/',
 		    templateUrl: 'app/main/ide/ide.html',
 		    controller: 'IdeController',
 		    controllerAs: 'ide'
-	    })
-        .state('main.workspace', {
-            url: 'workspace/',
-            templateUrl: 'app/main/workspace/workspace.html',
-            controller: 'WorkspaceController',
-            controllerAs: 'ws'
-        });
+	    });
 
-    $urlRouterProvider.otherwise('workspace/');
+    $urlRouterProvider.otherwise('editor/');
 }
 
 export default routerConfig;

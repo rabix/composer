@@ -8,7 +8,6 @@ angular.module('cottontail',
     [
         'ngAnimate',
         'ngCookies',
-        'ngTouch',
         'ngSanitize',
         'ngResource',
         'ui.router',

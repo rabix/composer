@@ -15,13 +15,24 @@
 
   ul li a {
     display: block;
-    border-bottom: 1px solid $modal-content-border-color;
     padding: $padding-base-vertical $padding-base-horizontal;
     cursor: pointer;
 
     &:hover {
       text-decoration: none;
-      background-color: #efefef;
+      font-weight: bold;
+    }
+  }
+
+  .list-nested {
+    margin-left: 12px;
+  }
+
+  .directory-name {
+    padding: $padding-base-vertical $padding-base-horizontal;
+    cursor: pointer;
+    &:hover {
+      font-weight: bold;
     }
   }
 }

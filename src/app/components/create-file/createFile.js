@@ -66,7 +66,8 @@ class CreateFileController {
         });
 
         modalInstance.result.then(function(file) {
-            this.Api.files.create({workspace: this.workspace, file: file.name}, () => {
+            this.Api.files.create({file: file.name}, (res) => {
+                file = _.extend(res.content, file);
                 this.createFileCb({file: file});
             }, (err) => {
                 console.log(err);

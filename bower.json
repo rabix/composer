@@ -9,7 +9,6 @@
     "angular-cookies": "~1.4.0",
     "angular-resource": "~1.4.0",
     "angular-sanitize": "~1.4.0",
-    "angular-touch": "~1.4.0",
     "angular-ui-ace": "bower",
     "angular-ui-router": "~0.2.15",
     "animate.css": "~3.3.0",

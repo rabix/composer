@@ -2,6 +2,8 @@
  * Created by Maya on 10.8.15.
  */
 
+/* globals _ */
+
 import NewFile from '../../services/NewFile';
 import * as Keys from '../../services/Shortcuts';
 
@@ -23,7 +25,7 @@ class IdeController {
                 let deferred = $q.defer();
                 this.activeFile.content = JSON.stringify(tool, null, 4);
                 this.saveFile(this.activeFile).then((suc) => {
-                    deferred.resolve(suc);
+                    deferred.resolve(this.activeFile.content);
                 });
 
                 return deferred.promise;
@@ -31,20 +33,52 @@ class IdeController {
             getJson: function (tool){
                 console.log('got json', tool);
             }.bind(this)
-
         };
 
-        Api.workspaces.query({workspace: $stateParams.workspace},
-            (res) => {
-                _.forEach(res.files, (file) => {
-                    if (file.type) {
-                        let fileObj = new NewFile(file.name, file.type, file.content);
-                        this.workspace.files.push(makeTab(fileObj));
+        this.getApp = function(app) {
+            let deferred = $q.defer();
+            Api.files.query({file: app.path},
+                (res) => {
+                    try {
+                        let content = JSON.parse(res.content);
+                        deferred.resolve(content);
+                    } catch (ex) {
+                        new Error(ex);
+                        deferred.reject('Could not parse JSON for ' + app.path);
                     }
+                }, (err) => {
+                    new Error(err);
+                    deferred.reject(err);
+                });
+
+            return deferred.promise;
+        };
+
+        this.getToolbox = function () {
+            let deferred = $q.defer();
+
+            Api.toolbox.query({},
+                (res) => {
+                    deferred.resolve(makeTree(res.tools));
+                }, (err) => {
+                    new Error(err);
+                    deferred.reject(err);
+                }
+            );
+
+            return deferred.promise;
+        };
+
+
+        Api.workspaces.query({},
+            (res) => {
+                this.structure = makeTree(res.paths, function (file) {
+                    return makeTab(new NewFile(file.name, file.type, file.content, file.path));
                 });
             }, (err) => {
                 new Error(err);
-            });
+            }
+        );
 
         this.addKeyboardHandlers($scope, Shortcuts);
     }
@@ -52,8 +86,8 @@ class IdeController {
     /** File methods **/
 
     fileAdded(file) {
-        let fileObj = makeTab(new NewFile(file.name, file.type, file.content));
-        this.workspace.files.push(fileObj);
+        let fileObj = makeTab(new NewFile(file.name, file.type, file.content, file.path));
+        this.structure.files.push(fileObj);
         if (file.action === 'tool') {
             fileObj.class = 'CommandLineTool';
         } else if (file.action === 'workflow') {
@@ -79,19 +113,19 @@ class IdeController {
     switchFiles(file) {
         this.setActiveFile(_.find(this.openFiles, file));
     }
+
     getClass(content) {
         try {
             let fileContents = JSON.parse(content);
             return fileContents ? fileContents.class : undefined;
         } catch (ex) {
-            console.log('could not parse json');
             return undefined;
         }
     }
 
     saveFile(file) {
         let deferred = this.$q.defer();
-        this.Api.files.update({file: file.name, workspace: this.workspace.name, content: file.content},
+        this.Api.files.update({file: file.path, content: file.content},
             (suc) => {
                 file.class =  this.getClass(file.content);
                 deferred.resolve(suc);
@@ -104,7 +138,7 @@ class IdeController {
     }
 
     loadFile(file) {
-        this.Api.files.query({file: file.name, workspace: this.workspace.name},
+        this.Api.files.query({file: file.path},
             (res) => {
                 file.class = this.getClass(res.content);
                 file.content = res.content;
@@ -181,8 +215,59 @@ class IdeController {
     }
 }
 
+/**
+ * Creates a file tree from a list of paths
+ *
+ * @param pathList
+ * @param [iterateeCallback] should take path object and return the file object that is pushed to directory's files array
+ * @returns {{name: string, type: string, directories: {}, files: Array}}
+ */
+function makeTree(pathList, iterateeCallback) {
+    let structure = {
+        name: 'root',
+        type: 'dir',
+        directories: {},
+        files: []
+    };
+
+    iterateeCallback = _.isFunction(iterateeCallback) ? iterateeCallback : function (file) { return file; };
+
+    pathList = _.isObject(pathList[0]) ? _.sortBy(pathList, 'path') : _.sort(pathList);
+
+    _.forEach(pathList, function(file) {
+        let tokens = file.path.split('/');
+        // remove empty strings for paths that start with /
+        tokens = _.filter(tokens, (token) => {
+            return token !== '';
+        });
+
+        let cwd = structure;
+
+        while(tokens.length) {
+            let token = tokens.shift();
+
+            if (tokens.length === 0) {
+                cwd.files.push(iterateeCallback(file));
+            } else {
+                if (!cwd.directories[token]) {
+                    cwd.directories[token] = {
+                        name: token,
+                        type: 'dir',
+                        directories: {},
+                        files: []
+                    };
+                }
+
+                cwd = cwd.directories[token];
+            }
+        }
+    });
+
+    return structure;
+}
+
 function makeTab(obj) {
-    obj.slug = _.kebabCase(obj.name);
+    obj.slug = _.kebabCase(obj.path);
     return obj;
 }
 
