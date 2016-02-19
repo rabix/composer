@@ -28,6 +28,10 @@ class Api {
             update: {method: 'PUT'}
         });
 
+        this.toolbox = this.$resource(this.BASE + '/fs/toolbox', {}, {
+            query: {method: 'GET'}
+        });
+
         this.workspaces = this.$resource(this.BASE + '/fs', {}, {
             query: {method: 'GET'}
         });

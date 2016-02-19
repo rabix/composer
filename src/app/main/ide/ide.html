@@ -23,10 +23,6 @@
                 <ct-button intention="primary" ng-click="ide.editorApi.getJson(tool)" size="sm">
                     Show JSON
                 </ct-button>
-
-                <ct-button intention="warning" ng-click="ide.editorApi.onRun(tool)" size="sm">
-                    Run
-                </ct-button>
             </span>
         </ct-tabs>
 
@@ -40,6 +36,8 @@
         </cliche-editor>
         <dyole-editor app="ide.activeFile.content"
                       callbacks="ide.editorApi"
+                      get-toolbox="ide.getToolbox"
+                      get-app="ide.getApp"
                       ng-if="ide.activeFile && ide.activeFile.class === 'Workflow'">
         </dyole-editor>
 
