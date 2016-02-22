@@ -31,11 +31,9 @@ class IdeController {
                 return deferred.promise;
             }.bind(this),
             setToolWorkingCopy: function (blank, tool) {
-                console.log('TOOL: name %s, class %s', tool.label, tool.class);
                 this.activeFile.content = JSON.stringify(tool);
             }.bind(this),
             setWorkflowWorkingCopy: function (blank, tool) {
-                console.log('WORKFLOW: name %s, class %s', tool.label, tool.class);
                 this.activeFile.content = JSON.stringify(tool);
             }.bind(this)
         };
@@ -136,7 +134,6 @@ class IdeController {
     getId(content) {
         try {
             let fileContents = JSON.parse(content);
-            console.log('returning id');
             return fileContents ? fileContents.id || fileContents['sbg:id'] || fileContents.label : undefined;
         } catch (ex) {
             return undefined;
@@ -150,7 +147,6 @@ class IdeController {
                 file.class = this.getClass(file.content);
                 file.id = this.getId(file.content) || file.fullPath;
                 deferred.resolve(suc);
-                console.log('successfully updated file', suc);
             }, (err) => {
                 deferred.reject(err);
                 console.log('something went wrong here', err);
