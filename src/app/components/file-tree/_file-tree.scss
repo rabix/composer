@@ -1,9 +1,38 @@
 .file-tree {
   @extend .flex-fixed;
   width: $sidebar-width;
+  height: 100%;
   border-right: 1px solid #ddd;
   padding: $grid-gutter-width/2;
 
   background: #fff;
   @include standard-box-shadow();
+
+  #editorFileTreeList {
+      overflow-y: scroll;
+      height: calc(100% - #{$navbar-height});
+  }
+
+  ul li a {
+    display: block;
+    padding: $padding-base-vertical $padding-base-horizontal;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: none;
+      font-weight: bold;
+    }
+  }
+
+  .list-nested {
+    margin-left: 12px;
+  }
+
+  .directory-name {
+    padding: $padding-base-vertical $padding-base-horizontal;
+    cursor: pointer;
+    &:hover {
+      font-weight: bold;
+    }
+  }
 }

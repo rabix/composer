@@ -16,12 +16,12 @@ function routerConfig($stateProvider, $urlRouterProvider) {
 	    })
         .state('main.editor', {
 		    url: 'editor/',
-		    templateUrl: 'app/main/editor/editor.html',
-		    controller: 'EditorController',
-		    controllerAs: 'edit'
+		    templateUrl: 'app/main/ide/ide.html',
+		    controller: 'IdeController',
+		    controllerAs: 'ide'
 	    });
 
-    $urlRouterProvider.otherwise('/');
+    $urlRouterProvider.otherwise('editor/');
 }
 
 export default routerConfig;

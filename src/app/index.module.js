@@ -8,12 +8,13 @@ angular.module('cottontail',
     [
         'ngAnimate',
         'ngCookies',
-        'ngTouch',
         'ngSanitize',
         'ngResource',
         'ui.router',
         'ui.bootstrap',
-        'ui.ace'
+        'ui.ace',
+        'registryApp.cliche',
+        'registryApp.dyole'
     ])
     .constant('moment', moment)
     .config(config)

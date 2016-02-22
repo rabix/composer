@@ -14,3 +14,7 @@
   position: relative
 }
 
+// to get rid of rounded corners
+select {
+  -webkit-appearance: none;
+}

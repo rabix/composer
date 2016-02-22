@@ -1,45 +1,69 @@
 import BaseElement from "../control-element/controlElement.directive";
 
 class TabsDirective extends BaseElement {
-	constructor() {
-		super();
+    constructor() {
+        super();
 
-		this.controller = TabsController;
-		this.controllerAs = 'tabs';
-		this.templateUrl = 'app/components/ui/tabs/tabs.html';
-		this.replace = true;
-		this.scope = {
-			list: '=tabs',
-			callback: '&',
-			tabSrc: '@'
-		};
-	}
+        this.controller = TabsController;
+        this.controllerAs = 'tabs';
+        this.templateUrl = 'app/components/ui/tabs/tabs.html';
+        this.transclude = true;
+        this.replace = true;
+        this.scope = {
+            list: '=tabs',
+            onActiveTab: '&',
+            tabSrc: '@',
+            getActiveTab: '&',
+            currentActiveTab: '=',
+            onCloseTab: '&'
+        };
+
+        this.link = function(scope, elem, attr) {
+            scope.tabs.attr = attr;
+            scope.tabs.list = _.isArray(scope.tabs.list) ? scope.tabs.list : [scope.tabs.list];
+
+            if (_.isString(scope.tabs.list[0])) {
+                scope.tabs.list = _.map(scope.tabs.list, function(tab) {
+                    return {
+                        name: tab,
+                        slug: _.kebabCase(tab)
+                    };
+                });
+            }
+
+            scope.$watch(function (){ return scope.tabs.getActiveTab() }, function(n, o) {
+                if (n !== o) {
+                    _.forEach(scope.tabs.list, function(tab) {
+                        if (tab === n) {
+                            scope.tabs.activateTab(tab);
+                        }
+                    });
+                }
+            });
+
+        };
+    }
 }
 
 class TabsController {
-	constructor () {
+    constructor() {
+    }
 
-		this.list = _.isArray(this.list) ? this.list : [this.list];
+    activateTab(tab) {
+        if (tab.slug === this.activeTab) {
+            return;
+        }
 
-		if (_.isString(this.list[0])) {
-			this.list = _.map(this.list, function(tab) {
-				return {
-					name: tab,
-					slug: _.kebabCase(tab)
-				};
-			});
-		}
+        this.activeTab = tab.slug;
 
-		this.activateTab(this.list[0]);
-	}
+        if (!_.isUndefined(this.attr.currentActiveTab)) {
+            this.onActiveTab({tab: tab});
+        }
+    }
 
-	activateTab (tab) {
-		this.activeTab = tab.slug;
-
-		if (typeof this.callback === 'function') {
-			this.callback({tab: tab.slug});
-		}
-	}
+    closeTab(tab) {
+        this.onCloseTab({tab: tab});
+    }
 }
 
 angular.module('cottontail').directive('ctTabs', () => new TabsDirective());

@@ -21,4 +21,4 @@ class NavbarDirective {
 }
 
 angular.module('cottontail')
-    .directive('navigation', () => new NavbarDirective());
+    .directive('navbar', () => new NavbarDirective());

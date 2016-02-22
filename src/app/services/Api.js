@@ -13,8 +13,6 @@ class Api {
         this._setResources();
     }
 
-
-
     _loadConfig() {
 
         this.BASE = '/api';
@@ -24,18 +22,22 @@ class Api {
 
     _setResources() {
 
-        this.file = this.$resource(this.BASE + '/fs'+ this.WORKSPACE + '/:file', {ws: '@ws', file: '@file'}, {
+        this.files = this.$resource(this.BASE + '/fs' + '/:file', {file: '@file'}, {
             query: {method: 'GET'},
-            add: {method: 'POST'},
+            create: {method: 'POST'},
             update: {method: 'PUT'}
         });
 
+        this.toolbox = this.$resource(this.BASE + '/fs/toolbox', {}, {
+            query: {method: 'GET'}
+        });
+
+        this.workspaces = this.$resource(this.BASE + '/fs', {}, {
+            query: {method: 'GET'}
+        });
     }
-
-
 }
 
-angular.module('cottontail')
-    .service('Api', Api);
+angular.module('cottontail').service('Api', Api);
 
 export default Api;

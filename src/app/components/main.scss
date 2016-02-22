@@ -1,9 +1,11 @@
 @import "ui/ui";
 @import "navbar/navbar";
 @import "file-tree/file-tree";
+@import "editor/editor";
 
 body, html {
   height: 100%;
+  background-color: $body-bg;
 }
 
 .main {
@@ -22,8 +24,20 @@ body, html {
   @extend .flex-grow;
   @extend .flex-col;
   @extend .flex-container;
+  max-width: calc(100% - 250px);
 
   .ace_editor {
     @extend .flex-grow; /* to fill space */
+  }
+
+  .ct-tabs {
+    @extend .flex-fixed;
+  }
+
+  .cliche-editor, .dyole-editor, .page {
+    @extend .flex-grow;
+    @extend .flex-shrink;
+    @extend .flex-container;
+    @extend .flex-col; /* to set arrangement of children */
   }
 }

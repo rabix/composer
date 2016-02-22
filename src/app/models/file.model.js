@@ -2,35 +2,38 @@
  * Created by majanedeljkovic on 8/14/15.
  */
 
-import * as config from '../constants/editor.const';
-
 class BaseFile {
-    constructor(name, mode, content) {
-        this.config = {
-            mode: mode,
-            theme: config.EDITOR_THEME
-        };
+    constructor(name, type, content, path, fullPath) {
+	    this.type = type;
         this.name = name;
         this.content = content || '';
+        this.path = path;
+        this.fullPath = fullPath;
     }
 }
 
-class YamlFile extends BaseFile {
-    constructor(name, content) {
-        super(name, 'yaml', content);
+class YAML extends BaseFile {
+    constructor(name, content, path, fullPath) {
+        super(name, 'yaml', content, path, fullPath);
     }
 }
 
-class JsonFile extends BaseFile {
-    constructor(name, content) {
-        super(name, 'json', content);
+class JSON extends BaseFile {
+    constructor(name, content, path, fullPath) {
+        super(name, 'json', content, path, fullPath);
     }
 }
 
-class JsFile extends BaseFile {
-    constructor(name, content) {
-        super(name, 'javascript', content);
+class JS extends BaseFile {
+    constructor(name, content, path, fullPath) {
+        super(name, 'javascript', content, path, fullPath);
     }
 }
 
-export {BaseFile, YamlFile, JsonFile, JsFile};
+class TXT extends BaseFile {
+    constructor(name, content, path, fullPath) {
+        super(name, 'text', content, path, fullPath);
+    }
+}
+
+export {BaseFile, YAML, JSON, JS, TXT};
