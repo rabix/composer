@@ -21,7 +21,7 @@ class IdeController {
         this.Api = Api;
 
         this.editorApi = {
-            onSave: function (tool){
+            onSave: function (blank, tool){
                 let deferred = $q.defer();
                 this.activeFile.content = JSON.stringify(tool, null, 4);
                 this.saveFile(this.activeFile).then((suc) => {
@@ -30,8 +30,13 @@ class IdeController {
 
                 return deferred.promise;
             }.bind(this),
-            getJson: function (tool){
-                console.log('got json', tool);
+            setToolWorkingCopy: function (blank, tool) {
+                console.log('TOOL: name %s, class %s', tool.label, tool.class);
+                this.activeFile.content = JSON.stringify(tool);
+            }.bind(this),
+            setWorkflowWorkingCopy: function (blank, tool) {
+                console.log('WORKFLOW: name %s, class %s', tool.label, tool.class);
+                this.activeFile.content = JSON.stringify(tool);
             }.bind(this)
         };
 
@@ -73,7 +78,7 @@ class IdeController {
         Api.workspaces.query({},
             (res) => {
                 this.structure = makeTree(res.paths, function (file) {
-                    return makeTab(new NewFile(file.name, file.type, file.content, file.path));
+                    return makeTab(new NewFile(file.name, file.type, file.content, file.path, file.fullPath));
                 });
             }, (err) => {
                 new Error(err);
@@ -86,7 +91,7 @@ class IdeController {
     /** File methods **/
 
     fileAdded(file) {
-        let fileObj = makeTab(new NewFile(file.name, file.type, file.content, file.path));
+        let fileObj = makeTab(new NewFile(file.name, file.type, file.content, file.path, file.fullPath));
         this.structure.files.push(fileObj);
         if (file.action === 'tool') {
             fileObj.class = 'CommandLineTool';
@@ -111,6 +116,11 @@ class IdeController {
     }
 
     switchFiles(file) {
+        if (this.activeFile.class === 'CommandLineTool') {
+            this.editorApi.setToolWorkingCopy(this.activeFile.id);
+        } else if (this.activeFile.class === 'Workflow') {
+            this.editorApi.setWorkflowWorkingCopy(this.activeFile.id);
+        }
         this.setActiveFile(_.find(this.openFiles, file));
     }
 
@@ -123,11 +133,22 @@ class IdeController {
         }
     }
 
+    getId(content) {
+        try {
+            let fileContents = JSON.parse(content);
+            console.log('returning id');
+            return fileContents ? fileContents.id || fileContents['sbg:id'] || fileContents.label : undefined;
+        } catch (ex) {
+            return undefined;
+        }
+    }
+
     saveFile(file) {
         let deferred = this.$q.defer();
         this.Api.files.update({file: file.path, content: file.content},
             (suc) => {
-                file.class =  this.getClass(file.content);
+                file.class = this.getClass(file.content);
+                file.id = this.getId(file.content) || file.fullPath;
                 deferred.resolve(suc);
                 console.log('successfully updated file', suc);
             }, (err) => {
@@ -141,6 +162,7 @@ class IdeController {
         this.Api.files.query({file: file.path},
             (res) => {
                 file.class = this.getClass(res.content);
+                file.id = this.getId(res.content) || file.fullPath;
                 file.content = res.content;
             }, (err) => {
                 console.log('something went wrong here', err);
@@ -167,6 +189,10 @@ class IdeController {
     setActiveFile(fileObj) {
         this.activeFile = fileObj;
         this.Editor.setMode(fileObj.type);
+    }
+
+    getActiveFile() {
+        return this.activeFile;
     }
 
     /**

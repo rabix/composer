@@ -3,35 +3,36 @@
  */
 
 class BaseFile {
-    constructor(name, type, content, path) {
+    constructor(name, type, content, path, fullPath) {
 	    this.type = type;
         this.name = name;
         this.content = content || '';
         this.path = path;
+        this.fullPath = fullPath;
     }
 }
 
 class YAML extends BaseFile {
-    constructor(name, content, path) {
-        super(name, 'yaml', content, path);
+    constructor(name, content, path, fullPath) {
+        super(name, 'yaml', content, path, fullPath);
     }
 }
 
 class JSON extends BaseFile {
-    constructor(name, content, path) {
-        super(name, 'json', content, path);
+    constructor(name, content, path, fullPath) {
+        super(name, 'json', content, path, fullPath);
     }
 }
 
 class JS extends BaseFile {
-    constructor(name, content, path) {
-        super(name, 'javascript', content, path);
+    constructor(name, content, path, fullPath) {
+        super(name, 'javascript', content, path, fullPath);
     }
 }
 
 class TXT extends BaseFile {
-    constructor(name, content, path) {
-        super(name, 'text', content, path);
+    constructor(name, content, path, fullPath) {
+        super(name, 'text', content, path, fullPath);
     }
 }
 

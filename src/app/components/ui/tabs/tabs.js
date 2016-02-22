@@ -13,6 +13,7 @@ class TabsDirective extends BaseElement {
             list: '=tabs',
             onActiveTab: '&',
             tabSrc: '@',
+            getActiveTab: '&',
             currentActiveTab: '=',
             onCloseTab: '&'
         };
@@ -30,7 +31,7 @@ class TabsDirective extends BaseElement {
                 });
             }
 
-            scope.$watch('tabs.currentActiveTab', function(n, o) {
+            scope.$watch(function (){ return scope.tabs.getActiveTab() }, function(n, o) {
                 if (n !== o) {
                     _.forEach(scope.tabs.list, function(tab) {
                         if (tab === n) {

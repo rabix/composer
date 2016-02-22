@@ -1,7 +1,7 @@
 import * as fileModel from '../models/file.model';
 
 class NewFile {
-    constructor(name, type, content, path) {
+    constructor(name, type, content, path, fullPath) {
         if (type.indexOf('.') === 0) {
             type = type.substring(1);
         }
@@ -9,7 +9,7 @@ class NewFile {
         if (fileModel[type.toUpperCase()]) {
             modelType = type.toUpperCase();
         }
-        return new fileModel[modelType](name, content || '', path);
+        return new fileModel[modelType](name, content || '', path, fullPath);
     }
 }
 

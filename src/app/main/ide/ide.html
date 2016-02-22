@@ -10,18 +10,15 @@
                  ng-show="ide.activeFile"
                  on-active-tab="ide.switchFiles(tab)"
                  current-active-tab="ide.activeFile"
+                 get-active-tab="ide.getActiveFile()"
                  on-close-tab="ide.closeFile(tab)">
             <ct-button ng-show="!ide.activeFile.class" intention="primary" ng-click="ide.saveFile(ide.activeFile)" size="sm" ng-if="ide.activeFile">
                 Import
             </ct-button>
 
             <span ng-show="ide.activeFile.class">
-                <ct-button intention="success" ng-click="ide.editorApi.onSave()" size="sm">
+                <ct-button intention="success" ng-click="ide.editorApi.onSave(ide.activeFile.id)" size="sm">
                     Save
-                </ct-button>
-
-                <ct-button intention="primary" ng-click="ide.editorApi.getJson(tool)" size="sm">
-                    Show JSON
                 </ct-button>
             </span>
         </ct-tabs>
@@ -32,12 +29,14 @@
 
         <cliche-editor app="ide.activeFile.content"
                        callbacks="ide.editorApi"
+                       external-app-id="ide.activeFile.fullPath"
                        ng-if="ide.activeFile && ide.activeFile.class === 'CommandLineTool'">
         </cliche-editor>
         <dyole-editor app="ide.activeFile.content"
                       callbacks="ide.editorApi"
                       get-toolbox="ide.getToolbox"
                       get-app="ide.getApp"
+                      external-app-id="ide.activeFile.fullPath"
                       ng-if="ide.activeFile && ide.activeFile.class === 'Workflow'">
         </dyole-editor>
 

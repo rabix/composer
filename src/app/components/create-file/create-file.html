@@ -7,7 +7,7 @@
         <select class="form-control" id="create_file_action" ng-options="action.id as action.name for action in actions" ng-model="view.action"></select>
     </div>
     <div class="modal-footer">
-        <ct-button intention="default" ng-click="cancel()">Cancel</ct-button>
+        <ct-button intention="default" type="button" ng-click="cancel()">Cancel</ct-button>
         <ct-button intention="primary" type="submit" ng-click="ok(view.name, view.action)">Continue</ct-button>
     </div>
 </form>
