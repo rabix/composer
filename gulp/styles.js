@@ -21,8 +21,9 @@ gulp.task('styles', function () {
         path.join('!' + conf.paths.src, '/app/**/_*.scss'),
         path.join('!' + conf.paths.src, '/app/index.scss'),
 
-        path.join(conf.paths.src, '/editors/**/*.scss'),
-        path.join('!' + conf.paths.src, '/editors/**/_*.scss')
+        path.join(conf.paths.src, '/editors/app/**/*.scss'),
+        path.join('!' + conf.paths.src, '/editors/**/_*.scss'),
+        path.join('!' + conf.paths.src, '/editors/bower_components/**/_*.scss')
     ], {read: false});
 
     var injectOptions = {

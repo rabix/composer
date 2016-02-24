@@ -82,6 +82,7 @@ function webpack(watch, callback) {
    return gulp.src([
             path.join(conf.paths.src, '/app/**/*.js'),
             path.join(conf.paths.src, '/editors/dist/scripts/**/*min.js'),
+           path.join(conf.paths.src, '/editors/dist/vendor/**/*.js'),
             path.join(conf.paths.tmp, '/conf/*.js'),
             '!' + path.join(conf.paths.src, '/app/**/*.spec.js'),
             '!' + path.join(conf.paths.src, '/app/**/_*.js')
