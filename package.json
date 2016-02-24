@@ -58,5 +58,10 @@
   },
   "engines": {
     "node": ">=0.10.0"
+  },
+  "babel": {
+      "ignore": [
+        "src/editors/**/*.js"
+      ]
   }
 }
