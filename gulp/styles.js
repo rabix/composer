@@ -19,7 +19,10 @@ gulp.task('styles', function () {
     var injectFiles = gulp.src([
         path.join(conf.paths.src, '/app/**/*.scss'),
         path.join('!' + conf.paths.src, '/app/**/_*.scss'),
-        path.join('!' + conf.paths.src, '/app/index.scss')
+        path.join('!' + conf.paths.src, '/app/index.scss'),
+
+        path.join(conf.paths.src, '/editors/**/*.scss'),
+        path.join('!' + conf.paths.src, '/editors/**/_*.scss')
     ], {read: false});
 
     var injectOptions = {
