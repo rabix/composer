@@ -48,7 +48,7 @@ function webpack(watch, callback) {
     var webpackOptions = {
         watch: watch,
         module: {
-            preLoaders: [{test: /\.js$/, exclude: /node_modules/, loader: 'jshint-loader'}],
+           // preLoaders: [{test: /\.js$/, exclude: /node_modules/, loader: 'jshint-loader'}],
             loaders: [{test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader'}]
         },
         output: {filename: 'index.module.js'}
@@ -76,8 +76,13 @@ function webpack(watch, callback) {
 
     };
 
-    return gulp.src([
+
+    //   path.join(conf.paths.src, '/editors/dist/vendor/**/*.js'),
+
+   return gulp.src([
             path.join(conf.paths.src, '/app/**/*.js'),
+            path.join(conf.paths.src, '/editors/dist/scripts/**/*min.js'),
+           path.join(conf.paths.src, '/editors/dist/vendor/**/*.js'),
             path.join(conf.paths.tmp, '/conf/*.js'),
             '!' + path.join(conf.paths.src, '/app/**/*.spec.js'),
             '!' + path.join(conf.paths.src, '/app/**/_*.js')
