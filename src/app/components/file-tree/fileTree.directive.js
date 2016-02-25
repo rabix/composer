@@ -8,7 +8,7 @@ class FileTreeDirective extends BaseElement {
         this.templateUrl = 'app/components/file-tree/file-tree.html';
         this.restrict = 'E';
         this.controller = FileTreeController;
-        this.controllerAs = 'tree';
+        this.controllerAs = 'treeCtrl';
         this.scope = {
             files: '=',
             structure: '=',

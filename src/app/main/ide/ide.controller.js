@@ -20,6 +20,13 @@ class IdeController {
         this.Editor = Editor;
         this.Api = Api;
 
+        this.structure = {
+            name: 'root',
+            type: 'dir',
+            directories: {},
+            files: []
+        };
+
         this.editorApi = {
             onSave: function (blank, tool){
                 let deferred = $q.defer();
@@ -75,9 +82,11 @@ class IdeController {
 
         Api.workspaces.query({},
             (res) => {
-                this.structure = makeTree(res.paths, function (file) {
-                    return makeTab(new NewFile(file.name, file.type, file.content, file.path, file.fullPath));
-                });
+                if (res.paths.length > 0) {
+                    this.structure = makeTree(res.paths, function (file) {
+                        return makeTab(new NewFile(file.name, file.type, file.content, file.path, file.fullPath));
+                    });
+                }
             }, (err) => {
                 new Error(err);
             }
@@ -245,7 +254,7 @@ class IdeController {
  * @returns {{name: string, type: string, directories: {}, files: Array}}
  */
 function makeTree(pathList, iterateeCallback) {
-    let structure = {
+    let makeTreeStructure = {
         name: 'root',
         type: 'dir',
         directories: {},
@@ -263,7 +272,7 @@ function makeTree(pathList, iterateeCallback) {
             return token !== '';
         });
 
-        let cwd = structure;
+        let cwd = makeTreeStructure;
 
         while(tokens.length) {
             let token = tokens.shift();
@@ -285,7 +294,7 @@ function makeTree(pathList, iterateeCallback) {
         }
     });
 
-    return structure;
+    return makeTreeStructure;
 }
 
 function makeTab(obj) {
