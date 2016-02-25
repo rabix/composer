@@ -15,8 +15,8 @@ class Api {
 
     _loadConfig() {
 
-        this.BASE = '/api';
-        this.WORKSPACE = '/:workspace';
+        this.BASE = 'http://localhost:9000/api';
+        this.WORKSPACE = 'http://localhost:9000/:workspace';
 
     }
 
