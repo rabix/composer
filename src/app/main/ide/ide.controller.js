@@ -8,7 +8,8 @@ import NewFile from '../../services/NewFile';
 import * as Keys from '../../services/Shortcuts';
 
 class IdeController {
-    constructor(Api, $stateParams, Editor, $scope, Shortcuts, $q, $timeout) {
+    constructor(Api, $stateParams, Editor, $scope, $rootScope, Shortcuts, $q, $timeout) {
+        this.$rootScope = $rootScope;
         this.$scope = $scope;
         this.openFiles = [];
         this.workspace = {
@@ -24,7 +25,8 @@ class IdeController {
             name: 'root',
             type: 'dir',
             directories: {},
-            files: []
+            files: [],
+            baseDir: null
         };
 
         this.editorApi = {
@@ -82,10 +84,13 @@ class IdeController {
 
         Api.workspaces.query({},
             (res) => {
+                this.structure.baseDir = res.baseDir;
                 if (res.paths.length > 0) {
                     this.structure = makeTree(res.paths, function (file) {
                         return makeTab(new NewFile(file.name, file.type, file.content, file.path, file.fullPath));
-                    });
+                    }, false);
+                } else {
+                    this.structure = makeTree([res.baseDir], null, true);
                 }
             }, (err) => {
                 new Error(err);
@@ -253,7 +258,7 @@ class IdeController {
  * @param [iterateeCallback] should take path object and return the file object that is pushed to directory's files array
  * @returns {{name: string, type: string, directories: {}, files: Array}}
  */
-function makeTree(pathList, iterateeCallback) {
+function makeTree(pathList, iterateeCallback, isEmpty) {
     let makeTreeStructure = {
         name: 'root',
         type: 'dir',
@@ -263,36 +268,38 @@ function makeTree(pathList, iterateeCallback) {
 
     iterateeCallback = _.isFunction(iterateeCallback) ? iterateeCallback : function (file) { return file; };
 
-    pathList = _.isObject(pathList[0]) ? _.sortBy(pathList, 'path') : _.sort(pathList);
+    pathList = _.isObject(pathList[0]) ? _.sortBy(pathList, 'path') : (pathList).sort();
 
-    _.forEach(pathList, function(file) {
-        let tokens = file.path.split('/');
-        // remove empty strings for paths that start with /
-        tokens = _.filter(tokens, (token) => {
-            return token !== '';
-        });
+    if (!isEmpty) {
+        _.forEach(pathList, function (file) {
+            let tokens = file.path.split('/');
+            // remove empty strings for paths that start with /
+            tokens = _.filter(tokens, (token) => {
+                return token !== '';
+            });
 
-        let cwd = makeTreeStructure;
+            let cwd = makeTreeStructure;
 
-        while(tokens.length) {
-            let token = tokens.shift();
+            while (tokens.length) {
+                let token = tokens.shift();
 
-            if (tokens.length === 0) {
-                cwd.files.push(iterateeCallback(file));
-            } else {
-                if (!cwd.directories[token]) {
-                    cwd.directories[token] = {
-                        name: token,
-                        type: 'dir',
-                        directories: {},
-                        files: []
-                    };
+                if (tokens.length === 0) {
+                    cwd.files.push(iterateeCallback(file));
+                } else {
+                    if (!cwd.directories[token]) {
+                        cwd.directories[token] = {
+                            name: token,
+                            type: 'dir',
+                            directories: {},
+                            files: []
+                        };
+                    }
+
+                    cwd = cwd.directories[token];
                 }
-
-                cwd = cwd.directories[token];
             }
-        }
-    });
+        });
+    }
 
     return makeTreeStructure;
 }
@@ -302,7 +309,7 @@ function makeTab(obj) {
     return obj;
 }
 
-IdeController.$inject = ['Api', '$stateParams', 'Editor', '$scope', 'Shortcuts', '$q', '$timeout'];
+IdeController.$inject = ['Api', '$stateParams', 'Editor', '$scope', '$rootScope', 'Shortcuts', '$q', '$timeout'];
 angular.module('cottontail').controller('IdeController', IdeController);
 
 export default IdeController;
