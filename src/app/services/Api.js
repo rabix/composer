@@ -4,8 +4,10 @@
 
 class Api {
 
-    constructor($resource, $http) {
+    constructor($resource, $http, Config) {
         'ngInject';
+
+        this.Config = Config;
 
         this._loadConfig();
         this.$resource = $resource;
@@ -15,8 +17,8 @@ class Api {
 
     _loadConfig() {
 
-        this.BASE = 'http://localhost:9000/api';
-        this.WORKSPACE = 'http://localhost:9000/:workspace';
+        this.BASE =  this.Config.DOMAIN + '/api';
+        this.WORKSPACE = this.BASE + '/:workspace';
 
     }
 
@@ -37,6 +39,8 @@ class Api {
         });
     }
 }
+
+Api.$inject = ['$resource', '$http', 'Config'];
 
 angular.module('cottontail').service('Api', Api);
 
