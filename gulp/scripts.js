@@ -79,13 +79,21 @@ function webpack(watch, callback) {
 
 
 
+
+
    return gulp.src([
-            path.join(conf.paths.src, '/app/**/*.js'),
-            path.join(conf.paths.src, '/editors/dist/scripts/**/*min.js'),
-            path.join(conf.paths.src, '/editors/dist/vendor/raphael/raphael.button.js'),
-            path.join(conf.paths.src, '/editors/dist/vendor/raphael/raphael.curve.js'),
-            path.join(conf.paths.src, '/editors/dist/vendor/raphael/raphael.group.js'),
-            path.join(conf.paths.tmp, '/conf/*.js'),
+           path.join(conf.paths.src, '/app/**/*.js'),
+
+           path.join(conf.paths.src, '/editors/app/scripts/**/*.js'),
+           path.join(conf.paths.src, '/editors/app/vendor/raphael/raphael.button.js'),
+           path.join(conf.paths.src, '/editors/app/vendor/raphael/raphael.curve.js'),
+           path.join(conf.paths.src, '/editors/app/vendor/raphael/raphael.group.js'),
+
+           path.join(conf.paths.src, '/editors/app/vendor/chronicle/chronicle.js'),
+           path.join(conf.paths.src, '/editors/app/vendor/angular-ui-sortable/sortable.min.js'),
+           path.join(conf.paths.src, '/editors/app/vendor/jsandbox/src/jsandbox.js'),
+
+           path.join(conf.paths.tmp, '/conf/*.js'),
             '!' + path.join(conf.paths.src, '/app/**/*.spec.js'),
             '!' + path.join(conf.paths.src, '/app/**/_*.js')
         ])
