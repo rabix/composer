@@ -4,15 +4,22 @@
 
 class Api {
 
-    constructor($resource, $http, Config) {
+    constructor($rootScope, $resource, $http, CottonTailConfig) {
         'ngInject';
 
-        this.Config = Config;
+        this.Config = null;
 
-        this._loadConfig();
+        this.$rootScope = $rootScope;
         this.$resource = $resource;
         this.$http = $http;
+        this.CottonTailConfig = CottonTailConfig;
+    }
+
+    setupApi() {
+        this.Config = this.CottonTailConfig.getConfig();
+        this._loadConfig();
         this._setResources();
+        this.$rootScope.$broadcast('setupApi');
     }
 
     _loadConfig() {
@@ -39,8 +46,6 @@ class Api {
         });
     }
 }
-
-Api.$inject = ['$resource', '$http', 'Config'];
 
 angular.module('cottontail').service('Api', Api);
 

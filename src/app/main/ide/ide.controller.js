@@ -9,6 +9,8 @@ import * as Keys from '../../services/Shortcuts';
 
 class IdeController {
     constructor(Api, $stateParams, Editor, $scope, $rootScope, Shortcuts, $q, $timeout) {
+        var that = this;
+
         this.$rootScope = $rootScope;
         this.$scope = $scope;
         this.openFiles = [];
@@ -48,6 +50,10 @@ class IdeController {
         };
 
         this.getApp = function(app) {
+            if(Api.Config === null)  {
+                return;
+            }
+
             let deferred = $q.defer();
             Api.files.query({file: app.path},
                 (res) => {
@@ -67,6 +73,10 @@ class IdeController {
         };
 
         this.getToolbox = function () {
+            if(Api.Config === null)  {
+                return;
+            }
+
             let deferred = $q.defer();
 
             Api.toolbox.query({},
@@ -82,7 +92,19 @@ class IdeController {
         };
 
 
-        Api.workspaces.query({},
+        $rootScope.$on('setupApi', function() {
+            that.queryWorkSpace();
+        });
+
+        if (Api.Config !== null) {
+            this.queryWorkSpace();
+        }
+
+        this.addKeyboardHandlers($scope, Shortcuts);
+    }
+
+    queryWorkSpace() {
+        this.Api.workspaces.query({},
             (res) => {
                 this.structure.baseDir = res.baseDir;
                 if (res.paths.length > 0) {
@@ -96,8 +118,6 @@ class IdeController {
                 new Error(err);
             }
         );
-
-        this.addKeyboardHandlers($scope, Shortcuts);
     }
 
     /** File methods **/
@@ -155,6 +175,10 @@ class IdeController {
     }
 
     saveFile(file) {
+        if(this.Api.Config === null)  {
+            return;
+        }
+
         let deferred = this.$q.defer();
         this.Api.files.update({file: file.path, content: file.content},
             (suc) => {
@@ -169,6 +193,10 @@ class IdeController {
     }
 
     loadFile(file) {
+        if(this.Api.Config === null)  {
+            return;
+        }
+
         this.Api.files.query({file: file.path},
             (res) => {
                 file.class = this.getClass(res.content);
