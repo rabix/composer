@@ -54,6 +54,13 @@
         "src/mode-yaml.js",
         "src/theme-xcode.js"
       ]
-    }
+    },
+      "ng-prettyjson": {
+          "main": [
+              "src/mode-json.js",
+              "src/ng-prettyjson.js",
+              "src/ng-prettyjson-tmpl.js"
+          ]
+      }
   }
 }
