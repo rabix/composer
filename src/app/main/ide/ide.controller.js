@@ -135,6 +135,7 @@ class IdeController {
     }
 
     fileOpened(file) {
+        this.activeView = 'code';
         this.setActiveFile(file);
         if (this.openFiles.indexOf(file) !== -1) {
             return;
@@ -144,6 +145,8 @@ class IdeController {
 
         if (!file.content) {
             this.loadFile(file);
+        } else if (file.class) {
+            this.activeView = 'gui';
         }
     }
 
@@ -154,6 +157,10 @@ class IdeController {
             this.editorApi.setWorkflowWorkingCopy(this.activeFile.id);
         }
         this.setActiveFile(_.find(this.openFiles, file));
+    }
+
+    switchView(view) {
+        this.activeView = view;
     }
 
     getClass(content) {
@@ -184,6 +191,7 @@ class IdeController {
             (suc) => {
                 file.class = this.getClass(file.content);
                 file.id = this.getId(file.content) || file.fullPath;
+                console.info(file.path + ' successfully saved');
                 deferred.resolve(suc);
             }, (err) => {
                 deferred.reject(err);
@@ -200,6 +208,9 @@ class IdeController {
         this.Api.files.query({file: file.path},
             (res) => {
                 file.class = this.getClass(res.content);
+                if (file.class) {
+                    this.activeView = 'gui';
+                }
                 file.id = this.getId(res.content) || file.fullPath;
                 file.content = res.content;
             }, (err) => {
