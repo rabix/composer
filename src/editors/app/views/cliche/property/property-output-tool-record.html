@@ -1,0 +1,48 @@
+<div property-header
+     class="property-box-header tool"
+     name="{{ view.name }}"
+     position="view.property.outputBinding.position"
+     type="{{ view.type }}"
+     tool-type="tool"
+     mode="output"
+     id-prefix="{{ ::idPrefix }}"
+     index="index"
+     is-required="view.required"
+     handle="handleAction(action)">
+</div>
+
+<div class="property-box-body">
+
+    <div class="row">
+        <div class="col-md-12">
+
+            <h3 class="legend-small">
+                Fields
+            </h3>
+
+            <div class="enum-list-wrap">
+                <add-property
+                        type="input"
+                        tool-type="tool"
+                        ng-model="view.newField"
+                        properties="view.fields"
+                        class="add-enum-item large">
+                </add-property>
+
+                <div class="enum-list-container">
+                    <property-output
+                            ng-repeat="property in view.fields | orderBy:sortByPosition track by property.name"
+                            ng-model="property"
+                            type="{{ type }}"
+                            properties="view.fields">
+                    </property-output>
+
+                    <p class="alert alert-info large" ng-if="view.fields.length === 0">Click the plus button to define a field.</p>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>

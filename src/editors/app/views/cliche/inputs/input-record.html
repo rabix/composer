@@ -1,0 +1,34 @@
+<div class="form-group"
+     ng-class="{required: view.required, 'has-error': view.required && view.model.length === 0 && !isDisabled}">
+
+    <div class="control-label">
+
+        <div class="icons" ng-if="exposed">
+            <label uib-tooltip="Expose" tooltip-placement="left">
+                <input type="checkbox" ng-model="view.expose" ng-change="exposeParams()">
+                <i class="fa" ng-class="{'fa-unlock-alt': view.expose, 'fa-lock': !view.expose}"></i>
+            </label>
+        </div>
+
+        <span class="input-key" title="{{ ::view.name }}">
+            <span class="input-key-inner">{{ ::view.name }}</span>
+        </span>
+    </div>
+
+    <div class="input-property-body">
+        <div class="alert alert-info" ng-if="view.fields | isEmpty">
+            No fields defined.
+        </div>
+
+        <input-field
+                ng-repeat="item in view.list track by item.name"
+                ng-model="item.value[item.name]"
+                class="input-field"
+                prop="item.prop"
+                form="form"
+                is-disabled="isDisabled"
+                ignore-files="{{ exposible }}">
+        </input-field>
+    </div>
+
+</div>

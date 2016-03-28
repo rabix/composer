@@ -1,0 +1,12 @@
+<div class="modal-body">
+
+    <h4 class="center-block">{{ ::view.message }}</h4>
+
+    <div class="center-block">
+            <button ng-repeat="button in view.buttons track by $index"
+                    ng-click="modalInstance[button.modalAction](button.select)"
+                    class="{{ button.class }}">{{ button.text }}</button>
+
+    </div>
+
+</div>

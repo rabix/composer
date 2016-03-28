@@ -1,0 +1,21 @@
+<form ng-submit="ok()"  name="form" class="form">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()"><span>&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title">{{ ::view.label }}</strong></h4>
+    </div>
+    <div class="modal-body">
+
+        <div class="form-group" ng-class="{'has-error': form.name.$invalid}">
+            <label class="control-label" for="{{::view.label}}_input_name">Name</label>
+            <input name="name" id="{{::view.label}}_input_name" is-valid-name="true" class="form-control node-label-edit" type="text" ng-model="view.label" autofocus/>
+        </div>
+
+
+        <div class="alert alert-danger" ng-if="view.error">{{view.error}}</div>
+    </div>
+
+    <div class="modal-footer">
+        <a href class="btn btn-default" ng-click="cancel()">Cancel</a>
+        <button class="btn btn-primary" type="submit">Save</button>
+    </div>
+</form>

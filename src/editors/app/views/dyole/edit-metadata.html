@@ -1,0 +1,13 @@
+<div class="modal-header">
+    <h4 class="modal-title">
+        Edit metadata <help-message message="help.cliche.metadata.metadata"></help-message>
+    </h4>
+</div>
+<div class="modal-body">
+    <div ng-include=" 'views/cliche/tabs/metadata.html' "></div>
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-primary" ng-click="edit($event)">Save</button>
+</div>

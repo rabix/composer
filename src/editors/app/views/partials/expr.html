@@ -1,0 +1,57 @@
+<div class="expression-wrap">
+
+    <div class="input-group" ng-class="{error: view.exprError}">
+
+        <i class="fa fa-warning error" ng-if="view.exprError" title="{{ view.exprError }}"></i>
+
+        <input id="{{ id }}"
+               uib-tooltip="{{ view.tooltipMsg }}"
+               tooltip-trigger="focus"
+               ng-blur="runHandler($event)"
+               ng-keypress="runHandler($event)"
+               ng-if="view.mode === 'transform'"
+               ng-disabled="view.disabled"
+               type="text"
+               class="form-control"
+               ng-model="view.transform.script"
+               ng-readonly="!view.disabled">
+
+        <input id="{{ id }}"
+               uib-tooltip="{{ view.tooltipMsg }}"
+               tooltip-trigger="focus"
+               ng-blur="runHandler($event)"
+               ng-keypress="runHandler($event)"
+               ng-if="view.mode === 'literal'"
+               ng-disabled="view.disabled"
+               type="{{ view.type }}"
+               min="{{ view.min }}"
+               class="form-control"
+               ng-model="view.literal"
+               placeholder="{{ view.placeholder }}"
+               ng-readonly="onlyExpr && !view.disabled">
+
+        <span class="input-group-btn" ng-class="{'tooltip-code': view.transform && !view.exprError}">
+            <!--have to be a tags, otherwise the modal over which expression editor opens will be dismissed-->
+
+            <!--@todo: fix this weird css thing that is going on because of this button-->
+            <a href
+               ng-if="view.longLiteral"
+               ng-disabled="view.disabled"
+               class="btn"
+               uib-tooltip="{{ !view.transform.script && view.transform ? view.transform : 'Click to add a literal'}}"
+               ng-click="editLiteral()"
+               ng-class="{'btn-primary': (view.mode === 'literal' && view.literal && !view.exprError), 'btn-default': (view.mode === 'transform' || !view.literal && !view.exprError), 'btn-warning': (view.mode === 'literal' && view.literal && view.exprError)}">
+                <i class="fa fa-font"></i>
+            </a>
+            <div class="inline-block" uib-tooltip="{{ view.transform.engine !== 'cwl:JsonPointer' ? (view.transform.script || 'There is no expression defined. Click to add it') : 'Editing JsonPointer expressions is currently not supported'}}">
+                <a href
+                   ng-disabled="view.disabled"
+                   class="btn"
+                   ng-click="editExpression()"
+                   ng-class="{'btn-primary': (view.mode === 'transform' && !view.exprError), 'btn-default': (view.mode === 'literal' && !view.exprError), 'btn-warning': (view.mode === 'transform' && view.exprError)}">
+                    <i class="fa fa-code"></i>
+                </a>
+            </div>
+        </span>
+    </div>
+</div>

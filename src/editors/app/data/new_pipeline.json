@@ -1,0 +1,2469 @@
+
+{"errors": [], "stamp": {
+    "modified_on": 1412263892,
+    "created_on": 1409742002,
+    "modified_by": "admin",
+    "created_by": "admin",
+    "changelog": ""
+}, "type": "PRIVATE", "_rev": 3, "_deleted": false, "project_id": "a34d2f9e-5ac3-4403-94d1-aa03f7f3678f", "relations": [
+    {
+        "end_node": "208569",
+        "output_name": "output",
+        "start_node": "425135",
+        "input_name": "read",
+        "type": "connection",
+        "id": "661189"
+    },
+    {
+        "end_node": "269510",
+        "output_name": "aligned",
+        "start_node": "208569",
+        "input_name": "input",
+        "type": "connection",
+        "id": "919384"
+    },
+    {
+        "end_node": "869672",
+        "output_name": "output",
+        "start_node": "425135",
+        "input_name": "read",
+        "type": "connection",
+        "id": "958484"
+    },
+    {
+        "end_node": "269510",
+        "output_name": "aligned",
+        "start_node": "869672",
+        "input_name": "input",
+        "type": "connection",
+        "id": "167593"
+    }
+], "nodes": [
+    {
+        "app": {
+            "repo_id": "53173e5fc511e7441b74fe83",
+            "app_revision": 1,
+            "stamp": {
+                "modified_on": 1396547028,
+                "created_on": 1396547026,
+                "modified_by": "sevenbridges",
+                "created_by": "sevenbridges"
+            },
+            "docs": {
+                "toolkit_version": "0.7.4",
+                "tech_compatibility": "",
+                "pipelines": [],
+                "description": "Burrows-Wheeler Aligner (BWA) is an efficient program that aligns relatively short nucleotide sequences against a long reference sequence such as the human genome.\nIt implements two algorithms, bwa-short and BWA-SW.\nThe former works for query sequences shorter than 200bp and the latter for longer sequences up to around 100kbp. Both algorithms do gapped alignment.\nThey are usually more accurate and faster on queries with low error rates.",
+                "links": "",
+                "author": "",
+                "toolkitVersion": "0.7.4",
+                "toolkit": "bwa",
+                "className": "sbg_bwa.Bwa",
+                "short_description": "Burrows-Wheeler Aligner (BWA) is an efficient program that aligns relatively short nucleotide sequences against a long reference sequence such as the human genome.",
+                "packageVersion": "1.2.1",
+                "categories": ["Aligners"],
+                "name": "BWA"
+            },
+            "_rev": 1,
+            "app_id": "533d9dd2aec8551045f667b9",
+            "_deleted": false,
+            "wrapper": {
+                "classname": "sbg_bwa.Bwa",
+                "image_data": {
+                    "tag": "72c649afc01c6221",
+                    "id": "images.sbgenomics.com/sevenbridges/sbg_bwa"
+                },
+                "repo_id": "53173e5fc511e7441b74fe83",
+                "type": "app",
+                "image_id": "53176093c511e75cd1f9a977"
+            },
+            "_id": "533d9dd2aec8551045f667b9",
+            "_revs": [
+                {
+                    "_rev": 0,
+                    "_id": "533d9dd4aec8551045f667ba"
+                }
+            ],
+            "scheduler_hints": {}
+        },
+        "params": {},
+        "id": "208569",
+        "wrapper": {
+            "repo_id": "53173e5fc511e7441b74fe83",
+            "classname": "sbg_bwa.Bwa",
+            "image_id": "53176093c511e75cd1f9a977",
+            "image_data": {
+                "tag": "72c649afc01c6221",
+                "id": "images.sbgenomics.com/sevenbridges/sbg_bwa"
+            },
+            "type": "app",
+            "scheduler_hints": {
+                "ForceInstance": "r3.2xlarge",
+                "parallel": true
+            }
+        },
+        "exposed": []
+    },
+    {
+        "app": {
+            "repo_id": "53175880c511e756f0e4bbbe",
+            "app_revision": 0,
+            "stamp": {
+                "modified_on": 1396546897,
+                "created_on": 1396546897,
+                "modified_by": "sevenbridges",
+                "created_by": "sevenbridges"
+            },
+            "docs": {
+                "tech_compatibility": "",
+                "pipelines": [],
+                "name": "Input File(s)",
+                "links": "",
+                "author": "",
+                "toolkitVersion": "1.0.8",
+                "toolkit": "system",
+                "toolkit_version": "",
+                "short_description": "Downloads input files to local cluster for further processing.",
+                "packageVersion": "1.0.8",
+                "categories": ["Input/Output"],
+                "description": "Downloads input files to local cluster for further processing."
+            },
+            "_rev": 0,
+            "app_id": "533d9d51aec8551045f6677e",
+            "_deleted": false,
+            "wrapper": {
+                "classname": "sbg_io.input_file.wrapper.InputWrapper",
+                "image_data": {
+                    "tag": "8618ec8872f74458",
+                    "id": "images.sbgenomics.com/sevenbridges/sbg_io"
+                },
+                "repo_id": "53175880c511e756f0e4bbbe",
+                "type": "input/list",
+                "image_id": "53175880c511e756f0e4bbbf"
+            },
+            "_id": "533d9d51aec8551045f6677e",
+            "_revs": [],
+            "scheduler_hints": {}
+        },
+        "params": {},
+        "id": "425135",
+        "wrapper": {
+            "classname": "sbg_io.input_file.wrapper.InputWrapper",
+            "image_data": {
+                "tag": "8618ec8872f74458",
+                "id": "images.sbgenomics.com/sevenbridges/sbg_io"
+            },
+            "repo_id": "53175880c511e756f0e4bbbe",
+            "type": "input/list",
+            "image_id": "53175880c511e756f0e4bbbf"
+        },
+        "exposed": []
+    },
+    {
+        "app": {
+            "repo_id": "53175880c511e756f0e4bbbe",
+            "app_revision": 0,
+            "stamp": {
+                "modified_on": 1396546140,
+                "created_on": 1396546140,
+                "modified_by": "sevenbridges",
+                "created_by": "sevenbridges"
+            },
+            "docs": {
+                "tech_compatibility": "",
+                "pipelines": [],
+                "name": "Output File(s)",
+                "links": "",
+                "author": "",
+                "toolkitVersion": "1.0.8",
+                "toolkit": "system",
+                "toolkit_version": "",
+                "short_description": "Uploads resulting files from processing cluster to user storage.",
+                "packageVersion": "1.0.8",
+                "categories": ["Input/Output"],
+                "description": "Uploads resulting files from processing cluster to user storage."
+            },
+            "_rev": 0,
+            "app_id": "533d9a5caec8551045f66613",
+            "_deleted": false,
+            "wrapper": {
+                "classname": "sbg_io.output_file.wrapper.OutputWrapper",
+                "image_data": {
+                    "tag": "8618ec8872f74458",
+                    "id": "images.sbgenomics.com/sevenbridges/sbg_io"
+                },
+                "repo_id": "53175880c511e756f0e4bbbe",
+                "type": "output/list",
+                "image_id": "53175880c511e756f0e4bbbf"
+            },
+            "_id": "533d9a5caec8551045f66613",
+            "_revs": [],
+            "scheduler_hints": {}
+        },
+        "params": {},
+        "id": "269510",
+        "wrapper": {
+            "classname": "sbg_io.output_file.wrapper.OutputWrapper",
+            "image_data": {
+                "tag": "8618ec8872f74458",
+                "id": "images.sbgenomics.com/sevenbridges/sbg_io"
+            },
+            "repo_id": "53175880c511e756f0e4bbbe",
+            "type": "output/list",
+            "image_id": "53175880c511e756f0e4bbbf"
+        },
+        "exposed": []
+    },
+    {
+        "app": {
+            "repo_id": "53173e5fc511e7441b74fe83",
+            "app_revision": 1,
+            "stamp": {
+                "modified_on": 1396547028,
+                "created_on": 1396547026,
+                "modified_by": "sevenbridges",
+                "created_by": "sevenbridges"
+            },
+            "docs": {
+                "toolkit_version": "0.7.4",
+                "tech_compatibility": "",
+                "pipelines": [],
+                "description": "Burrows-Wheeler Aligner (BWA) is an efficient program that aligns relatively short nucleotide sequences against a long reference sequence such as the human genome.\nIt implements two algorithms, bwa-short and BWA-SW.\nThe former works for query sequences shorter than 200bp and the latter for longer sequences up to around 100kbp. Both algorithms do gapped alignment.\nThey are usually more accurate and faster on queries with low error rates.",
+                "links": "",
+                "author": "",
+                "toolkitVersion": "0.7.4",
+                "toolkit": "bwa",
+                "className": "sbg_bwa.Bwa",
+                "short_description": "Burrows-Wheeler Aligner (BWA) is an efficient program that aligns relatively short nucleotide sequences against a long reference sequence such as the human genome.",
+                "packageVersion": "1.2.1",
+                "categories": ["Aligners"],
+                "name": "BWA"
+            },
+            "_rev": 1,
+            "app_id": "533d9dd2aec8551045f667b9",
+            "_deleted": false,
+            "wrapper": {
+                "classname": "sbg_bwa.Bwa",
+                "image_data": {
+                    "tag": "72c649afc01c6221",
+                    "id": "images.sbgenomics.com/sevenbridges/sbg_bwa"
+                },
+                "repo_id": "53173e5fc511e7441b74fe83",
+                "type": "app",
+                "image_id": "53176093c511e75cd1f9a977"
+            },
+            "_id": "533d9dd2aec8551045f667b9",
+            "_revs": [
+                {
+                    "_rev": 0,
+                    "_id": "533d9dd4aec8551045f667ba"
+                }
+            ],
+            "scheduler_hints": {}
+        },
+        "params": {},
+        "id": "869672",
+        "wrapper": {
+            "repo_id": "53173e5fc511e7441b74fe83",
+            "classname": "sbg_bwa.Bwa",
+            "image_id": "53176093c511e75cd1f9a977",
+            "image_data": {
+                "tag": "72c649afc01c6221",
+                "id": "images.sbgenomics.com/sevenbridges/sbg_bwa"
+            },
+            "type": "app",
+            "scheduler_hints": {
+                "ForceInstance": "",
+                "parallel": false
+            }
+        },
+        "exposed": []
+    }
+], "_id": "5406f4b274b3ba681e91dbbb", "_revs": [
+    {
+        "modified_on": 1409742002,
+        "_rev": 0,
+        "_id": "5406f54774b3ba681e91dbbc",
+        "modified_by": "admin",
+        "changelog": "Pipeline created"
+    },
+    {
+        "modified_on": 1409742151,
+        "_rev": 1,
+        "_id": "542d6f2c2eed8c2fb6c41884",
+        "modified_by": "admin",
+        "changelog": ""
+    },
+    {
+        "modified_on": 1412263724,
+        "_rev": 2,
+        "_id": "542d6fd42eed8c2fb6c41885",
+        "modified_by": "admin",
+        "changelog": ""
+    },
+    {
+        "modified_on": 1412263892,
+        "_rev": 3,
+        "_id": "5406f4b274b3ba681e91dbbb",
+        "modified_by": "admin",
+        "changelog": ""
+    }
+], "display": {
+    "canvas": {
+        "y": 4,
+        "x": 427,
+        "zoom": 1
+    },
+    "description": "",
+    "applicationArea": null,
+    "changelog": "",
+    "name": "test zoom running nodes ",
+    "short_description": "",
+    "nodes": {
+        "208569": {
+            "y": 57.2,
+            "x": -195.3,
+            "label": "BWA"
+        },
+        "269510": {
+            "y": 126.10000000000001,
+            "x": -39.9,
+            "label": "Output File(s)"
+        },
+        "425135": {
+            "y": 126.10000000000001,
+            "x": -350.7,
+            "label": "Input File(s)"
+        },
+        "869672": {
+            "y": 195,
+            "x": -195.3,
+            "label": "BWA"
+        }
+    },
+    "seqPlatform": null,
+    "species": null,
+    "used_apps": ["BWA"]
+}, "scheduler_hints": {
+    "ForceInstance": "m1.large",
+    "parallel": false
+}, "schemas": [
+    {
+        "app": {
+            "schema": {
+                "inputs": [
+                    {
+                        "name": "Read sequence",
+                        "required": false,
+                        "list": true,
+                        "id": "read",
+                        "types": ["fastq", "bam"],
+                        "description": "Read sequence. If using paired-end reads, provide both to this input but make sure 'paired_end' metadata property is set properly."
+                    },
+                    {
+                        "name": "FASTA Reference",
+                        "required": false,
+                        "list": false,
+                        "id": "reference",
+                        "types": ["fasta"],
+                        "description": "Reference sequence to which to align the reads"
+                    }
+                ],
+                "params": [
+                    {
+                        "category": null,
+                        "description": "When disabled, all hits with no more than 'Maximum edit distance' (explicit or implicit) differences will be found. Disabling this mode makes BWA much slower than the default.",
+                        "default": true,
+                        "required": false,
+                        "list": false,
+                        "type": "boolean",
+                        "id": "iterative_search",
+                        "condition": null,
+                        "name": "Iterative search"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the read group in a format like '@RG\tID:foo\tSM:bar'. This value takes precedence over per-attribute parameters. [default: constructed from per-attribute parameters or inferred from metadata]",
+                        "default": null,
+                        "pattern": null,
+                        "required": false,
+                        "list": false,
+                        "type": "string",
+                        "id": "read_group",
+                        "condition": null,
+                        "name": "Read group"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the sequencing technology for RG line. [default: inferred from metadata]",
+                        "default": null,
+                        "required": false,
+                        "list": false,
+                        "values": [
+                            ["454", "454", "454"],
+                            ["Helicos", "Helicos", "Helicos"],
+                            ["Illumina", "Illumina", "Illumina"],
+                            ["Solid", "Solid", "Solid"],
+                            ["IonTorrent", "Iontorrent", "Iontorrent"]
+                        ],
+                        "type": "enum",
+                        "id": "rg_seq_tech",
+                        "condition": null,
+                        "name": "Sequencing technology"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the sample ID for RG line. [default: inferred from metadata]",
+                        "default": null,
+                        "pattern": null,
+                        "required": false,
+                        "list": false,
+                        "type": "string",
+                        "id": "rg_sample",
+                        "condition": null,
+                        "name": "Sample"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the library for RG line. [default: inferred from metadata]",
+                        "default": null,
+                        "pattern": null,
+                        "required": false,
+                        "list": false,
+                        "type": "string",
+                        "id": "rg_library",
+                        "condition": null,
+                        "name": "Library"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the platform unit (lane/slide) for RG line. [default: inferred from metadata]",
+                        "default": null,
+                        "pattern": null,
+                        "required": false,
+                        "list": false,
+                        "type": "string",
+                        "id": "rg_platform_unit",
+                        "condition": null,
+                        "name": "Platform unit"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the sequencing center for RG line.",
+                        "default": null,
+                        "pattern": null,
+                        "required": false,
+                        "list": false,
+                        "type": "string",
+                        "id": "rg_seq_center",
+                        "condition": null,
+                        "name": "Sequencing center"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the median fragment length for RG line.",
+                        "min": null,
+                        "default": null,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "rg_mfl",
+                        "condition": null,
+                        "name": "Median fragment length"
+                    },
+                    {
+                        "category": "Paired end",
+                        "description": "Take the first N subsequence as seed. If N is larger than the query sequence, seeding will be disabled. For long reads, this option is typically ranged from 25 to 35 for 'Max edit distance in seed'=2. [default: 32]",
+                        "min": null,
+                        "default": 32,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "seed_length",
+                        "condition": null,
+                        "name": "Seed length"
+                    },
+                    {
+                        "category": null,
+                        "description": "BWA will not search for suboptimal hits with a score lower than (bestScore-misMsc). [default: 3]",
+                        "min": null,
+                        "default": 3,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "mismatch_penalty",
+                        "condition": null,
+                        "name": "Mismatch penalty"
+                    },
+                    {
+                        "category": null,
+                        "description": "Length of barcode starting from the 5'-end. When N is positive, the barcode of each read will be trimmed before mapping and will be written at the BC SAM tag. For paired-end reads, the barcode from both ends are concatenated. [default: 0]",
+                        "min": null,
+                        "default": 0,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "barcode_length",
+                        "condition": null,
+                        "name": "Barcode length"
+                    },
+                    {
+                        "category": "Gap Properties",
+                        "description": "Gap open penalty [default: 11]",
+                        "min": null,
+                        "default": 11,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "gap_open_penalty",
+                        "condition": null,
+                        "name": "Gap open penalty"
+                    },
+                    {
+                        "category": null,
+                        "description": "Disallow an indel within N bp towards the ends [default: 5]",
+                        "min": null,
+                        "default": 5,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "indel_offset",
+                        "condition": null,
+                        "name": "Indel offset"
+                    },
+                    {
+                        "category": null,
+                        "description": "Maximum edit distance. In case that 'Fraction of missing alignments' parameter is used, the maximum edit distance is automatically chosen for different read lengths, and this parameter is ignored.",
+                        "min": null,
+                        "default": null,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_edit_dist",
+                        "condition": null,
+                        "name": "Maximum edit distance"
+                    },
+                    {
+                        "category": null,
+                        "description": "Proceed with suboptimal alignments if there are no more than N equally best hits. This parameter only affects paired-end mapping. Increasing this threshold helps to improve the pairing accuracy at the cost of speed, especially for short reads (~32bp). [default: 30]",
+                        "min": null,
+                        "default": 30,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "pairing_threshold",
+                        "condition": null,
+                        "name": "Pairing threshold"
+                    },
+                    {
+                        "category": "Gap Properties",
+                        "description": "Maximum number of gap opens [default: 1]",
+                        "min": null,
+                        "default": 1,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_gap_opens",
+                        "condition": null,
+                        "name": "Maximum gap opens"
+                    },
+                    {
+                        "category": "Paired end",
+                        "description": "Maximum insert size for a read pair to be considered being mapped properly. Since BWA 0.4.5, this option is only used when there are not enough good alignments to infer the distribution of insert sizes. [default: 500]",
+                        "min": null,
+                        "default": 500,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_insert_size",
+                        "condition": null,
+                        "name": "Maximum insert size"
+                    },
+                    {
+                        "category": "Paired end",
+                        "description": "Maximum occurrences of a read for pairing. A read with more occurrences will be treated as a single-end read. Reducing this parameter helps faster pairing. [default: 100000]",
+                        "min": null,
+                        "default": 100000,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_read_occ",
+                        "condition": null,
+                        "name": "Maximum read occurrences"
+                    },
+                    {
+                        "category": null,
+                        "description": "Disallow a long deletion within N bp towards the 3'-end [default: 10]",
+                        "min": null,
+                        "default": 10,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "long_del_offset",
+                        "condition": null,
+                        "name": "Long deletion offset"
+                    },
+                    {
+                        "category": "Gap Properties",
+                        "description": "Maximum number of gap extensions, -1 for k-difference mode (disallowing long gaps) [default: -1 (infinity)]",
+                        "min": null,
+                        "default": -1,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_gap_extensions",
+                        "condition": null,
+                        "name": "Maximum gap extensions"
+                    },
+                    {
+                        "category": null,
+                        "description": "The fraction of missing alignments given 2% uniform base error rate. In case that this parameter is used, the maximum edit distance is automatically chosen for different read lengths, and 'Maximum edit distance' parameter is ignored. [default: 0.04]",
+                        "min": null,
+                        "default": 0.04,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "float",
+                        "id": "missing_alignments",
+                        "condition": null,
+                        "name": "Fraction of missing alignments"
+                    },
+                    {
+                        "category": null,
+                        "description": "BWA trims a read down to argmax_x{\\sum_{i=x+1}^l(N-q_i)} if q_l<N where l is the original read length. [default: 0]",
+                        "min": null,
+                        "default": 0,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "read_trimming_qual",
+                        "condition": null,
+                        "name": "Read trimming quality"
+                    },
+                    {
+                        "category": "Gap Properties",
+                        "description": "Gap extension penalty [default: 4]",
+                        "min": null,
+                        "default": 4,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "gap_extension_penalty",
+                        "condition": null,
+                        "name": "Gap extension penalty"
+                    },
+                    {
+                        "category": null,
+                        "description": "Maximum number of alignments to output in the XA tag for reads paired properly. If a read has more than N hits, the XA tag will not be written. [default: 3]",
+                        "min": null,
+                        "default": 3,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "alt_hits",
+                        "condition": null,
+                        "name": "Alternative hits"
+                    },
+                    {
+                        "category": "Paired end",
+                        "description": "Maximum number of alignments to output in the XA tag for disconcordant read pairs (excluding singletons). If a read has more than N hits, the XA tag will not be written. [default: 10]",
+                        "min": null,
+                        "default": 10,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_disconcordant_alt_hits",
+                        "condition": null,
+                        "name": "Maximum disconcordant alt. hits"
+                    },
+                    {
+                        "category": "Seed",
+                        "description": "Maximum edit distance in the seed [default: 2]",
+                        "min": null,
+                        "default": 2,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_seed_edit_distance",
+                        "condition": null,
+                        "name": "Maximum seed edit distance"
+                    },
+                    {
+                        "category": "Align BAMs",
+                        "description": "When aligning BAMs, specify if it contains paired end reads (True) or single end reads (False)",
+                        "default": true,
+                        "required": false,
+                        "list": false,
+                        "type": "boolean",
+                        "id": "is_paired",
+                        "condition": null,
+                        "name": "Paired end BAM"
+                    },
+                    {
+                        "category": null,
+                        "description": "Filter Cassava-filtered sequences",
+                        "default": false,
+                        "required": false,
+                        "list": false,
+                        "type": "boolean",
+                        "id": "filter_cassava_seq",
+                        "condition": null,
+                        "name": "Filter Cassava-filtered sequences"
+                    },
+                    {
+                        "category": null,
+                        "description": "Maximum entries in the queue",
+                        "min": null,
+                        "default": 2000000,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_entries",
+                        "condition": null,
+                        "name": "Maximum entries in the queue"
+                    },
+                    {
+                        "category": "Gap Properties",
+                        "description": "Log-scaled gap penalty for long deletions",
+                        "default": false,
+                        "required": false,
+                        "list": false,
+                        "type": "boolean",
+                        "id": "log_scaled_gap_penalty",
+                        "condition": null,
+                        "name": "Log-scaled gap penalty for long deletions"
+                    },
+                    {
+                        "category": "Advanced",
+                        "description": "Set to true if output should be in BAM format.",
+                        "default": false,
+                        "required": false,
+                        "list": false,
+                        "type": "boolean",
+                        "id": "bam_output",
+                        "condition": null,
+                        "name": "Output BAM file"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "name": "Aligned SAM",
+                        "required": false,
+                        "list": true,
+                        "id": "aligned",
+                        "types": ["sam", "bam"],
+                        "description": "Aligned sequence in SAM format"
+                    }
+                ]
+            },
+            "repo_id": "53173e5fc511e7441b74fe83",
+            "app_revision": 1,
+            "stamp": {
+                "modified_on": 1396547028,
+                "created_on": 1396547026,
+                "modified_by": "sevenbridges",
+                "created_by": "sevenbridges"
+            },
+            "docs": {
+                "className": "sbg_bwa.Bwa",
+                "tech_compatibility": "",
+                "pipelines": [],
+                "description": "Burrows-Wheeler Aligner (BWA) is an efficient program that aligns relatively short nucleotide sequences against a long reference sequence such as the human genome.\nIt implements two algorithms, bwa-short and BWA-SW.\nThe former works for query sequences shorter than 200bp and the latter for longer sequences up to around 100kbp. Both algorithms do gapped alignment.\nThey are usually more accurate and faster on queries with low error rates.",
+                "links": "",
+                "author": "",
+                "toolkitVersion": "0.7.4",
+                "toolkit": "bwa",
+                "toolkit_version": "0.7.4",
+                "short_description": "Burrows-Wheeler Aligner (BWA) is an efficient program that aligns relatively short nucleotide sequences against a long reference sequence such as the human genome.",
+                "packageVersion": "1.2.1",
+                "categories": ["Aligners"],
+                "name": "BWA"
+            },
+            "_rev": 1,
+            "app_id": "533d9dd2aec8551045f667b9",
+            "_deleted": false,
+            "wrapper": {
+                "classname": "sbg_bwa.Bwa",
+                "image_data": {
+                    "tag": "72c649afc01c6221",
+                    "id": "images.sbgenomics.com/sevenbridges/sbg_bwa"
+                },
+                "repo_id": "53173e5fc511e7441b74fe83",
+                "type": "app",
+                "image_id": "53176093c511e75cd1f9a977"
+            },
+            "_id": "533d9dd2aec8551045f667b9",
+            "_revs": [
+                {
+                    "_rev": 0,
+                    "_id": "533d9dd4aec8551045f667ba"
+                }
+            ],
+            "scheduler_hints": {}
+        },
+        "wrapper": {
+            "repo_id": "53173e5fc511e7441b74fe83",
+            "classname": "sbg_bwa.Bwa",
+            "image_id": "53176093c511e75cd1f9a977",
+            "image_data": {
+                "tag": "72c649afc01c6221",
+                "id": "images.sbgenomics.com/sevenbridges/sbg_bwa"
+            },
+            "schema": {
+                "inputs": [
+                    {
+                        "description": "Read sequence. If using paired-end reads, provide both to this input but make sure 'paired_end' metadata property is set properly.",
+                        "required": false,
+                        "list": true,
+                        "id": "read",
+                        "types": ["fastq", "bam"],
+                        "name": "Read sequence"
+                    },
+                    {
+                        "description": "Reference sequence to which to align the reads",
+                        "required": false,
+                        "list": false,
+                        "id": "reference",
+                        "types": ["fasta"],
+                        "name": "FASTA Reference"
+                    }
+                ],
+                "params": [
+                    {
+                        "category": null,
+                        "description": "When disabled, all hits with no more than 'Maximum edit distance' (explicit or implicit) differences will be found. Disabling this mode makes BWA much slower than the default.",
+                        "default": true,
+                        "required": false,
+                        "list": false,
+                        "type": "boolean",
+                        "id": "iterative_search",
+                        "condition": null,
+                        "name": "Iterative search"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the read group in a format like '@RG\tID:foo\tSM:bar'. This value takes precedence over per-attribute parameters. [default: constructed from per-attribute parameters or inferred from metadata]",
+                        "default": null,
+                        "pattern": null,
+                        "required": false,
+                        "list": false,
+                        "type": "string",
+                        "id": "read_group",
+                        "condition": null,
+                        "name": "Read group"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the sequencing technology for RG line. [default: inferred from metadata]",
+                        "default": null,
+                        "required": false,
+                        "list": false,
+                        "values": [
+                            ["454", "454", "454"],
+                            ["Helicos", "Helicos", "Helicos"],
+                            ["Illumina", "Illumina", "Illumina"],
+                            ["Solid", "Solid", "Solid"],
+                            ["IonTorrent", "Iontorrent", "Iontorrent"]
+                        ],
+                        "type": "enum",
+                        "id": "rg_seq_tech",
+                        "condition": null,
+                        "name": "Sequencing technology"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the sample ID for RG line. [default: inferred from metadata]",
+                        "default": null,
+                        "pattern": null,
+                        "required": false,
+                        "list": false,
+                        "type": "string",
+                        "id": "rg_sample",
+                        "condition": null,
+                        "name": "Sample"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the library for RG line. [default: inferred from metadata]",
+                        "default": null,
+                        "pattern": null,
+                        "required": false,
+                        "list": false,
+                        "type": "string",
+                        "id": "rg_library",
+                        "condition": null,
+                        "name": "Library"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the platform unit (lane/slide) for RG line. [default: inferred from metadata]",
+                        "default": null,
+                        "pattern": null,
+                        "required": false,
+                        "list": false,
+                        "type": "string",
+                        "id": "rg_platform_unit",
+                        "condition": null,
+                        "name": "Platform unit"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the sequencing center for RG line.",
+                        "default": null,
+                        "pattern": null,
+                        "required": false,
+                        "list": false,
+                        "type": "string",
+                        "id": "rg_seq_center",
+                        "condition": null,
+                        "name": "Sequencing center"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the median fragment length for RG line.",
+                        "min": null,
+                        "default": null,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "rg_mfl",
+                        "condition": null,
+                        "name": "Median fragment length"
+                    },
+                    {
+                        "category": "Paired end",
+                        "description": "Take the first N subsequence as seed. If N is larger than the query sequence, seeding will be disabled. For long reads, this option is typically ranged from 25 to 35 for 'Max edit distance in seed'=2. [default: 32]",
+                        "min": null,
+                        "default": 32,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "seed_length",
+                        "condition": null,
+                        "name": "Seed length"
+                    },
+                    {
+                        "category": null,
+                        "description": "BWA will not search for suboptimal hits with a score lower than (bestScore-misMsc). [default: 3]",
+                        "min": null,
+                        "default": 3,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "mismatch_penalty",
+                        "condition": null,
+                        "name": "Mismatch penalty"
+                    },
+                    {
+                        "category": null,
+                        "description": "Length of barcode starting from the 5'-end. When N is positive, the barcode of each read will be trimmed before mapping and will be written at the BC SAM tag. For paired-end reads, the barcode from both ends are concatenated. [default: 0]",
+                        "min": null,
+                        "default": 0,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "barcode_length",
+                        "condition": null,
+                        "name": "Barcode length"
+                    },
+                    {
+                        "category": "Gap Properties",
+                        "description": "Gap open penalty [default: 11]",
+                        "min": null,
+                        "default": 11,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "gap_open_penalty",
+                        "condition": null,
+                        "name": "Gap open penalty"
+                    },
+                    {
+                        "category": null,
+                        "description": "Disallow an indel within N bp towards the ends [default: 5]",
+                        "min": null,
+                        "default": 5,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "indel_offset",
+                        "condition": null,
+                        "name": "Indel offset"
+                    },
+                    {
+                        "category": null,
+                        "description": "Maximum edit distance. In case that 'Fraction of missing alignments' parameter is used, the maximum edit distance is automatically chosen for different read lengths, and this parameter is ignored.",
+                        "min": null,
+                        "default": null,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_edit_dist",
+                        "condition": null,
+                        "name": "Maximum edit distance"
+                    },
+                    {
+                        "category": null,
+                        "description": "Proceed with suboptimal alignments if there are no more than N equally best hits. This parameter only affects paired-end mapping. Increasing this threshold helps to improve the pairing accuracy at the cost of speed, especially for short reads (~32bp). [default: 30]",
+                        "min": null,
+                        "default": 30,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "pairing_threshold",
+                        "condition": null,
+                        "name": "Pairing threshold"
+                    },
+                    {
+                        "category": "Gap Properties",
+                        "description": "Maximum number of gap opens [default: 1]",
+                        "min": null,
+                        "default": 1,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_gap_opens",
+                        "condition": null,
+                        "name": "Maximum gap opens"
+                    },
+                    {
+                        "category": "Paired end",
+                        "description": "Maximum insert size for a read pair to be considered being mapped properly. Since BWA 0.4.5, this option is only used when there are not enough good alignments to infer the distribution of insert sizes. [default: 500]",
+                        "min": null,
+                        "default": 500,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_insert_size",
+                        "condition": null,
+                        "name": "Maximum insert size"
+                    },
+                    {
+                        "category": "Paired end",
+                        "description": "Maximum occurrences of a read for pairing. A read with more occurrences will be treated as a single-end read. Reducing this parameter helps faster pairing. [default: 100000]",
+                        "min": null,
+                        "default": 100000,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_read_occ",
+                        "condition": null,
+                        "name": "Maximum read occurrences"
+                    },
+                    {
+                        "category": null,
+                        "description": "Disallow a long deletion within N bp towards the 3'-end [default: 10]",
+                        "min": null,
+                        "default": 10,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "long_del_offset",
+                        "condition": null,
+                        "name": "Long deletion offset"
+                    },
+                    {
+                        "category": "Gap Properties",
+                        "description": "Maximum number of gap extensions, -1 for k-difference mode (disallowing long gaps) [default: -1 (infinity)]",
+                        "min": null,
+                        "default": -1,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_gap_extensions",
+                        "condition": null,
+                        "name": "Maximum gap extensions"
+                    },
+                    {
+                        "category": null,
+                        "description": "The fraction of missing alignments given 2% uniform base error rate. In case that this parameter is used, the maximum edit distance is automatically chosen for different read lengths, and 'Maximum edit distance' parameter is ignored. [default: 0.04]",
+                        "min": null,
+                        "default": 0.04,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "float",
+                        "id": "missing_alignments",
+                        "condition": null,
+                        "name": "Fraction of missing alignments"
+                    },
+                    {
+                        "category": null,
+                        "description": "BWA trims a read down to argmax_x{\\sum_{i=x+1}^l(N-q_i)} if q_l<N where l is the original read length. [default: 0]",
+                        "min": null,
+                        "default": 0,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "read_trimming_qual",
+                        "condition": null,
+                        "name": "Read trimming quality"
+                    },
+                    {
+                        "category": "Gap Properties",
+                        "description": "Gap extension penalty [default: 4]",
+                        "min": null,
+                        "default": 4,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "gap_extension_penalty",
+                        "condition": null,
+                        "name": "Gap extension penalty"
+                    },
+                    {
+                        "category": null,
+                        "description": "Maximum number of alignments to output in the XA tag for reads paired properly. If a read has more than N hits, the XA tag will not be written. [default: 3]",
+                        "min": null,
+                        "default": 3,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "alt_hits",
+                        "condition": null,
+                        "name": "Alternative hits"
+                    },
+                    {
+                        "category": "Paired end",
+                        "description": "Maximum number of alignments to output in the XA tag for disconcordant read pairs (excluding singletons). If a read has more than N hits, the XA tag will not be written. [default: 10]",
+                        "min": null,
+                        "default": 10,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_disconcordant_alt_hits",
+                        "condition": null,
+                        "name": "Maximum disconcordant alt. hits"
+                    },
+                    {
+                        "category": "Seed",
+                        "description": "Maximum edit distance in the seed [default: 2]",
+                        "min": null,
+                        "default": 2,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_seed_edit_distance",
+                        "condition": null,
+                        "name": "Maximum seed edit distance"
+                    },
+                    {
+                        "category": "Align BAMs",
+                        "description": "When aligning BAMs, specify if it contains paired end reads (True) or single end reads (False)",
+                        "default": true,
+                        "required": false,
+                        "list": false,
+                        "type": "boolean",
+                        "id": "is_paired",
+                        "condition": null,
+                        "name": "Paired end BAM"
+                    },
+                    {
+                        "category": null,
+                        "description": "Filter Cassava-filtered sequences",
+                        "default": false,
+                        "required": false,
+                        "list": false,
+                        "type": "boolean",
+                        "id": "filter_cassava_seq",
+                        "condition": null,
+                        "name": "Filter Cassava-filtered sequences"
+                    },
+                    {
+                        "category": null,
+                        "description": "Maximum entries in the queue",
+                        "min": null,
+                        "default": 2000000,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_entries",
+                        "condition": null,
+                        "name": "Maximum entries in the queue"
+                    },
+                    {
+                        "category": "Gap Properties",
+                        "description": "Log-scaled gap penalty for long deletions",
+                        "default": false,
+                        "required": false,
+                        "list": false,
+                        "type": "boolean",
+                        "id": "log_scaled_gap_penalty",
+                        "condition": null,
+                        "name": "Log-scaled gap penalty for long deletions"
+                    },
+                    {
+                        "category": "Advanced",
+                        "description": "Set to true if output should be in BAM format.",
+                        "default": false,
+                        "required": false,
+                        "list": false,
+                        "type": "boolean",
+                        "id": "bam_output",
+                        "condition": null,
+                        "name": "Output BAM file"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "description": "Aligned sequence in SAM format",
+                        "required": false,
+                        "list": true,
+                        "id": "aligned",
+                        "types": ["sam", "bam"],
+                        "name": "Aligned SAM"
+                    }
+                ]
+            },
+            "type": "app",
+            "scheduler_hints": {
+                "ForceInstance": "r3.2xlarge",
+                "parallel": true
+            }
+        }
+    },
+    {
+        "app": {
+            "schema": {
+                "inputs": [],
+                "params": [
+                    {
+                        "category": null,
+                        "description": "Input files",
+                        "default": [],
+                        "pattern": null,
+                        "required": false,
+                        "list": true,
+                        "type": "file",
+                        "id": "path",
+                        "condition": null,
+                        "name": "Input files"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "name": "Output",
+                        "required": false,
+                        "list": true,
+                        "id": "output",
+                        "types": [],
+                        "description": "Output"
+                    }
+                ]
+            },
+            "repo_id": "53175880c511e756f0e4bbbe",
+            "app_revision": 0,
+            "stamp": {
+                "modified_on": 1396546897,
+                "created_on": 1396546897,
+                "modified_by": "sevenbridges",
+                "created_by": "sevenbridges"
+            },
+            "docs": {
+                "tech_compatibility": "",
+                "pipelines": [],
+                "name": "Input File(s)",
+                "links": "",
+                "author": "",
+                "toolkitVersion": "1.0.8",
+                "toolkit": "system",
+                "toolkit_version": "",
+                "short_description": "Downloads input files to local cluster for further processing.",
+                "packageVersion": "1.0.8",
+                "categories": ["Input/Output"],
+                "description": "Downloads input files to local cluster for further processing."
+            },
+            "_rev": 0,
+            "app_id": "533d9d51aec8551045f6677e",
+            "_deleted": false,
+            "wrapper": {
+                "classname": "sbg_io.input_file.wrapper.InputWrapper",
+                "image_data": {
+                    "tag": "8618ec8872f74458",
+                    "id": "images.sbgenomics.com/sevenbridges/sbg_io"
+                },
+                "repo_id": "53175880c511e756f0e4bbbe",
+                "type": "input/list",
+                "image_id": "53175880c511e756f0e4bbbf"
+            },
+            "_id": "533d9d51aec8551045f6677e",
+            "_revs": [],
+            "scheduler_hints": {}
+        },
+        "wrapper": {
+            "repo_id": "53175880c511e756f0e4bbbe",
+            "classname": "sbg_io.input_file.wrapper.InputWrapper",
+            "image_id": "53175880c511e756f0e4bbbf",
+            "image_data": {
+                "tag": "8618ec8872f74458",
+                "id": "images.sbgenomics.com/sevenbridges/sbg_io"
+            },
+            "type": "input/list",
+            "schema": {
+                "inputs": [],
+                "type": "input/list",
+                "outputs": [
+                    {
+                        "description": "Output",
+                        "required": false,
+                        "list": true,
+                        "id": "output",
+                        "types": [],
+                        "name": "Output"
+                    }
+                ],
+                "params": [
+                    {
+                        "category": null,
+                        "description": "Input files",
+                        "default": [],
+                        "pattern": null,
+                        "required": false,
+                        "list": true,
+                        "type": "file",
+                        "id": "path",
+                        "condition": null,
+                        "name": "Input files"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "app": {
+            "schema": {
+                "inputs": [
+                    {
+                        "description": "Input",
+                        "required": false,
+                        "list": true,
+                        "id": "input",
+                        "types": [],
+                        "name": "Input"
+                    }
+                ],
+                "params": [
+                    {
+                        "category": null,
+                        "description": "Path",
+                        "default": null,
+                        "pattern": null,
+                        "required": false,
+                        "list": false,
+                        "type": "string",
+                        "id": "path",
+                        "condition": null,
+                        "name": "Path"
+                    }
+                ],
+                "outputs": []
+            },
+            "repo_id": "53175880c511e756f0e4bbbe",
+            "app_revision": 0,
+            "stamp": {
+                "modified_on": 1396546140,
+                "created_on": 1396546140,
+                "modified_by": "sevenbridges",
+                "created_by": "sevenbridges"
+            },
+            "docs": {
+                "tech_compatibility": "",
+                "pipelines": [],
+                "name": "Output File(s)",
+                "links": "",
+                "author": "",
+                "toolkitVersion": "1.0.8",
+                "toolkit": "system",
+                "toolkit_version": "",
+                "short_description": "Uploads resulting files from processing cluster to user storage.",
+                "packageVersion": "1.0.8",
+                "categories": ["Input/Output"],
+                "description": "Uploads resulting files from processing cluster to user storage."
+            },
+            "_rev": 0,
+            "app_id": "533d9a5caec8551045f66613",
+            "_deleted": false,
+            "wrapper": {
+                "classname": "sbg_io.output_file.wrapper.OutputWrapper",
+                "image_data": {
+                    "tag": "8618ec8872f74458",
+                    "id": "images.sbgenomics.com/sevenbridges/sbg_io"
+                },
+                "repo_id": "53175880c511e756f0e4bbbe",
+                "type": "output/list",
+                "image_id": "53175880c511e756f0e4bbbf"
+            },
+            "_id": "533d9a5caec8551045f66613",
+            "_revs": [],
+            "scheduler_hints": {}
+        },
+        "wrapper": {
+            "repo_id": "53175880c511e756f0e4bbbe",
+            "classname": "sbg_io.output_file.wrapper.OutputWrapper",
+            "image_id": "53175880c511e756f0e4bbbf",
+            "image_data": {
+                "tag": "8618ec8872f74458",
+                "id": "images.sbgenomics.com/sevenbridges/sbg_io"
+            },
+            "type": "output/list",
+            "schema": {
+                "inputs": [
+                    {
+                        "description": "Input",
+                        "required": false,
+                        "list": true,
+                        "id": "input",
+                        "types": [],
+                        "name": "Input"
+                    }
+                ],
+                "type": "output/list",
+                "outputs": [],
+                "params": [
+                    {
+                        "category": null,
+                        "description": "Path",
+                        "default": null,
+                        "pattern": null,
+                        "required": false,
+                        "list": false,
+                        "type": "string",
+                        "id": "path",
+                        "condition": null,
+                        "name": "Path"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "app": {
+            "schema": {
+                "inputs": [
+                    {
+                        "name": "Read sequence",
+                        "required": false,
+                        "list": true,
+                        "id": "read",
+                        "types": ["fastq", "bam"],
+                        "description": "Read sequence. If using paired-end reads, provide both to this input but make sure 'paired_end' metadata property is set properly."
+                    },
+                    {
+                        "name": "FASTA Reference",
+                        "required": false,
+                        "list": false,
+                        "id": "reference",
+                        "types": ["fasta"],
+                        "description": "Reference sequence to which to align the reads"
+                    }
+                ],
+                "params": [
+                    {
+                        "category": null,
+                        "description": "When disabled, all hits with no more than 'Maximum edit distance' (explicit or implicit) differences will be found. Disabling this mode makes BWA much slower than the default.",
+                        "default": true,
+                        "required": false,
+                        "list": false,
+                        "type": "boolean",
+                        "id": "iterative_search",
+                        "condition": null,
+                        "name": "Iterative search"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the read group in a format like '@RG\tID:foo\tSM:bar'. This value takes precedence over per-attribute parameters. [default: constructed from per-attribute parameters or inferred from metadata]",
+                        "default": null,
+                        "pattern": null,
+                        "required": false,
+                        "list": false,
+                        "type": "string",
+                        "id": "read_group",
+                        "condition": null,
+                        "name": "Read group"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the sequencing technology for RG line. [default: inferred from metadata]",
+                        "default": null,
+                        "required": false,
+                        "list": false,
+                        "values": [
+                            ["454", "454", "454"],
+                            ["Helicos", "Helicos", "Helicos"],
+                            ["Illumina", "Illumina", "Illumina"],
+                            ["Solid", "Solid", "Solid"],
+                            ["IonTorrent", "Iontorrent", "Iontorrent"]
+                        ],
+                        "type": "enum",
+                        "id": "rg_seq_tech",
+                        "condition": null,
+                        "name": "Sequencing technology"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the sample ID for RG line. [default: inferred from metadata]",
+                        "default": null,
+                        "pattern": null,
+                        "required": false,
+                        "list": false,
+                        "type": "string",
+                        "id": "rg_sample",
+                        "condition": null,
+                        "name": "Sample"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the library for RG line. [default: inferred from metadata]",
+                        "default": null,
+                        "pattern": null,
+                        "required": false,
+                        "list": false,
+                        "type": "string",
+                        "id": "rg_library",
+                        "condition": null,
+                        "name": "Library"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the platform unit (lane/slide) for RG line. [default: inferred from metadata]",
+                        "default": null,
+                        "pattern": null,
+                        "required": false,
+                        "list": false,
+                        "type": "string",
+                        "id": "rg_platform_unit",
+                        "condition": null,
+                        "name": "Platform unit"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the sequencing center for RG line.",
+                        "default": null,
+                        "pattern": null,
+                        "required": false,
+                        "list": false,
+                        "type": "string",
+                        "id": "rg_seq_center",
+                        "condition": null,
+                        "name": "Sequencing center"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the median fragment length for RG line.",
+                        "min": null,
+                        "default": null,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "rg_mfl",
+                        "condition": null,
+                        "name": "Median fragment length"
+                    },
+                    {
+                        "category": "Paired end",
+                        "description": "Take the first N subsequence as seed. If N is larger than the query sequence, seeding will be disabled. For long reads, this option is typically ranged from 25 to 35 for 'Max edit distance in seed'=2. [default: 32]",
+                        "min": null,
+                        "default": 32,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "seed_length",
+                        "condition": null,
+                        "name": "Seed length"
+                    },
+                    {
+                        "category": null,
+                        "description": "BWA will not search for suboptimal hits with a score lower than (bestScore-misMsc). [default: 3]",
+                        "min": null,
+                        "default": 3,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "mismatch_penalty",
+                        "condition": null,
+                        "name": "Mismatch penalty"
+                    },
+                    {
+                        "category": null,
+                        "description": "Length of barcode starting from the 5'-end. When N is positive, the barcode of each read will be trimmed before mapping and will be written at the BC SAM tag. For paired-end reads, the barcode from both ends are concatenated. [default: 0]",
+                        "min": null,
+                        "default": 0,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "barcode_length",
+                        "condition": null,
+                        "name": "Barcode length"
+                    },
+                    {
+                        "category": "Gap Properties",
+                        "description": "Gap open penalty [default: 11]",
+                        "min": null,
+                        "default": 11,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "gap_open_penalty",
+                        "condition": null,
+                        "name": "Gap open penalty"
+                    },
+                    {
+                        "category": null,
+                        "description": "Disallow an indel within N bp towards the ends [default: 5]",
+                        "min": null,
+                        "default": 5,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "indel_offset",
+                        "condition": null,
+                        "name": "Indel offset"
+                    },
+                    {
+                        "category": null,
+                        "description": "Maximum edit distance. In case that 'Fraction of missing alignments' parameter is used, the maximum edit distance is automatically chosen for different read lengths, and this parameter is ignored.",
+                        "min": null,
+                        "default": null,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_edit_dist",
+                        "condition": null,
+                        "name": "Maximum edit distance"
+                    },
+                    {
+                        "category": null,
+                        "description": "Proceed with suboptimal alignments if there are no more than N equally best hits. This parameter only affects paired-end mapping. Increasing this threshold helps to improve the pairing accuracy at the cost of speed, especially for short reads (~32bp). [default: 30]",
+                        "min": null,
+                        "default": 30,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "pairing_threshold",
+                        "condition": null,
+                        "name": "Pairing threshold"
+                    },
+                    {
+                        "category": "Gap Properties",
+                        "description": "Maximum number of gap opens [default: 1]",
+                        "min": null,
+                        "default": 1,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_gap_opens",
+                        "condition": null,
+                        "name": "Maximum gap opens"
+                    },
+                    {
+                        "category": "Paired end",
+                        "description": "Maximum insert size for a read pair to be considered being mapped properly. Since BWA 0.4.5, this option is only used when there are not enough good alignments to infer the distribution of insert sizes. [default: 500]",
+                        "min": null,
+                        "default": 500,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_insert_size",
+                        "condition": null,
+                        "name": "Maximum insert size"
+                    },
+                    {
+                        "category": "Paired end",
+                        "description": "Maximum occurrences of a read for pairing. A read with more occurrences will be treated as a single-end read. Reducing this parameter helps faster pairing. [default: 100000]",
+                        "min": null,
+                        "default": 100000,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_read_occ",
+                        "condition": null,
+                        "name": "Maximum read occurrences"
+                    },
+                    {
+                        "category": null,
+                        "description": "Disallow a long deletion within N bp towards the 3'-end [default: 10]",
+                        "min": null,
+                        "default": 10,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "long_del_offset",
+                        "condition": null,
+                        "name": "Long deletion offset"
+                    },
+                    {
+                        "category": "Gap Properties",
+                        "description": "Maximum number of gap extensions, -1 for k-difference mode (disallowing long gaps) [default: -1 (infinity)]",
+                        "min": null,
+                        "default": -1,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_gap_extensions",
+                        "condition": null,
+                        "name": "Maximum gap extensions"
+                    },
+                    {
+                        "category": null,
+                        "description": "The fraction of missing alignments given 2% uniform base error rate. In case that this parameter is used, the maximum edit distance is automatically chosen for different read lengths, and 'Maximum edit distance' parameter is ignored. [default: 0.04]",
+                        "min": null,
+                        "default": 0.04,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "float",
+                        "id": "missing_alignments",
+                        "condition": null,
+                        "name": "Fraction of missing alignments"
+                    },
+                    {
+                        "category": null,
+                        "description": "BWA trims a read down to argmax_x{\\sum_{i=x+1}^l(N-q_i)} if q_l<N where l is the original read length. [default: 0]",
+                        "min": null,
+                        "default": 0,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "read_trimming_qual",
+                        "condition": null,
+                        "name": "Read trimming quality"
+                    },
+                    {
+                        "category": "Gap Properties",
+                        "description": "Gap extension penalty [default: 4]",
+                        "min": null,
+                        "default": 4,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "gap_extension_penalty",
+                        "condition": null,
+                        "name": "Gap extension penalty"
+                    },
+                    {
+                        "category": null,
+                        "description": "Maximum number of alignments to output in the XA tag for reads paired properly. If a read has more than N hits, the XA tag will not be written. [default: 3]",
+                        "min": null,
+                        "default": 3,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "alt_hits",
+                        "condition": null,
+                        "name": "Alternative hits"
+                    },
+                    {
+                        "category": "Paired end",
+                        "description": "Maximum number of alignments to output in the XA tag for disconcordant read pairs (excluding singletons). If a read has more than N hits, the XA tag will not be written. [default: 10]",
+                        "min": null,
+                        "default": 10,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_disconcordant_alt_hits",
+                        "condition": null,
+                        "name": "Maximum disconcordant alt. hits"
+                    },
+                    {
+                        "category": "Seed",
+                        "description": "Maximum edit distance in the seed [default: 2]",
+                        "min": null,
+                        "default": 2,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_seed_edit_distance",
+                        "condition": null,
+                        "name": "Maximum seed edit distance"
+                    },
+                    {
+                        "category": "Align BAMs",
+                        "description": "When aligning BAMs, specify if it contains paired end reads (True) or single end reads (False)",
+                        "default": true,
+                        "required": false,
+                        "list": false,
+                        "type": "boolean",
+                        "id": "is_paired",
+                        "condition": null,
+                        "name": "Paired end BAM"
+                    },
+                    {
+                        "category": null,
+                        "description": "Filter Cassava-filtered sequences",
+                        "default": false,
+                        "required": false,
+                        "list": false,
+                        "type": "boolean",
+                        "id": "filter_cassava_seq",
+                        "condition": null,
+                        "name": "Filter Cassava-filtered sequences"
+                    },
+                    {
+                        "category": null,
+                        "description": "Maximum entries in the queue",
+                        "min": null,
+                        "default": 2000000,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_entries",
+                        "condition": null,
+                        "name": "Maximum entries in the queue"
+                    },
+                    {
+                        "category": "Gap Properties",
+                        "description": "Log-scaled gap penalty for long deletions",
+                        "default": false,
+                        "required": false,
+                        "list": false,
+                        "type": "boolean",
+                        "id": "log_scaled_gap_penalty",
+                        "condition": null,
+                        "name": "Log-scaled gap penalty for long deletions"
+                    },
+                    {
+                        "category": "Advanced",
+                        "description": "Set to true if output should be in BAM format.",
+                        "default": false,
+                        "required": false,
+                        "list": false,
+                        "type": "boolean",
+                        "id": "bam_output",
+                        "condition": null,
+                        "name": "Output BAM file"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "name": "Aligned SAM",
+                        "required": false,
+                        "list": true,
+                        "id": "aligned",
+                        "types": ["sam", "bam"],
+                        "description": "Aligned sequence in SAM format"
+                    }
+                ]
+            },
+            "repo_id": "53173e5fc511e7441b74fe83",
+            "app_revision": 1,
+            "stamp": {
+                "modified_on": 1396547028,
+                "created_on": 1396547026,
+                "modified_by": "sevenbridges",
+                "created_by": "sevenbridges"
+            },
+            "docs": {
+                "className": "sbg_bwa.Bwa",
+                "tech_compatibility": "",
+                "pipelines": [],
+                "description": "Burrows-Wheeler Aligner (BWA) is an efficient program that aligns relatively short nucleotide sequences against a long reference sequence such as the human genome.\nIt implements two algorithms, bwa-short and BWA-SW.\nThe former works for query sequences shorter than 200bp and the latter for longer sequences up to around 100kbp. Both algorithms do gapped alignment.\nThey are usually more accurate and faster on queries with low error rates.",
+                "links": "",
+                "author": "",
+                "toolkitVersion": "0.7.4",
+                "toolkit": "bwa",
+                "toolkit_version": "0.7.4",
+                "short_description": "Burrows-Wheeler Aligner (BWA) is an efficient program that aligns relatively short nucleotide sequences against a long reference sequence such as the human genome.",
+                "packageVersion": "1.2.1",
+                "categories": ["Aligners"],
+                "name": "BWA"
+            },
+            "_rev": 1,
+            "app_id": "533d9dd2aec8551045f667b9",
+            "_deleted": false,
+            "wrapper": {
+                "classname": "sbg_bwa.Bwa",
+                "image_data": {
+                    "tag": "72c649afc01c6221",
+                    "id": "images.sbgenomics.com/sevenbridges/sbg_bwa"
+                },
+                "repo_id": "53173e5fc511e7441b74fe83",
+                "type": "app",
+                "image_id": "53176093c511e75cd1f9a977"
+            },
+            "_id": "533d9dd2aec8551045f667b9",
+            "_revs": [
+                {
+                    "_rev": 0,
+                    "_id": "533d9dd4aec8551045f667ba"
+                }
+            ],
+            "scheduler_hints": {}
+        },
+        "wrapper": {
+            "repo_id": "53173e5fc511e7441b74fe83",
+            "classname": "sbg_bwa.Bwa",
+            "image_id": "53176093c511e75cd1f9a977",
+            "image_data": {
+                "tag": "72c649afc01c6221",
+                "id": "images.sbgenomics.com/sevenbridges/sbg_bwa"
+            },
+            "schema": {
+                "inputs": [
+                    {
+                        "description": "Read sequence. If using paired-end reads, provide both to this input but make sure 'paired_end' metadata property is set properly.",
+                        "required": false,
+                        "list": true,
+                        "id": "read",
+                        "types": ["fastq", "bam"],
+                        "name": "Read sequence"
+                    },
+                    {
+                        "description": "Reference sequence to which to align the reads",
+                        "required": false,
+                        "list": false,
+                        "id": "reference",
+                        "types": ["fasta"],
+                        "name": "FASTA Reference"
+                    }
+                ],
+                "params": [
+                    {
+                        "category": null,
+                        "description": "When disabled, all hits with no more than 'Maximum edit distance' (explicit or implicit) differences will be found. Disabling this mode makes BWA much slower than the default.",
+                        "default": true,
+                        "required": false,
+                        "list": false,
+                        "type": "boolean",
+                        "id": "iterative_search",
+                        "condition": null,
+                        "name": "Iterative search"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the read group in a format like '@RG\tID:foo\tSM:bar'. This value takes precedence over per-attribute parameters. [default: constructed from per-attribute parameters or inferred from metadata]",
+                        "default": null,
+                        "pattern": null,
+                        "required": false,
+                        "list": false,
+                        "type": "string",
+                        "id": "read_group",
+                        "condition": null,
+                        "name": "Read group"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the sequencing technology for RG line. [default: inferred from metadata]",
+                        "default": null,
+                        "required": false,
+                        "list": false,
+                        "values": [
+                            ["454", "454", "454"],
+                            ["Helicos", "Helicos", "Helicos"],
+                            ["Illumina", "Illumina", "Illumina"],
+                            ["Solid", "Solid", "Solid"],
+                            ["IonTorrent", "Iontorrent", "Iontorrent"]
+                        ],
+                        "type": "enum",
+                        "id": "rg_seq_tech",
+                        "condition": null,
+                        "name": "Sequencing technology"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the sample ID for RG line. [default: inferred from metadata]",
+                        "default": null,
+                        "pattern": null,
+                        "required": false,
+                        "list": false,
+                        "type": "string",
+                        "id": "rg_sample",
+                        "condition": null,
+                        "name": "Sample"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the library for RG line. [default: inferred from metadata]",
+                        "default": null,
+                        "pattern": null,
+                        "required": false,
+                        "list": false,
+                        "type": "string",
+                        "id": "rg_library",
+                        "condition": null,
+                        "name": "Library"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the platform unit (lane/slide) for RG line. [default: inferred from metadata]",
+                        "default": null,
+                        "pattern": null,
+                        "required": false,
+                        "list": false,
+                        "type": "string",
+                        "id": "rg_platform_unit",
+                        "condition": null,
+                        "name": "Platform unit"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the sequencing center for RG line.",
+                        "default": null,
+                        "pattern": null,
+                        "required": false,
+                        "list": false,
+                        "type": "string",
+                        "id": "rg_seq_center",
+                        "condition": null,
+                        "name": "Sequencing center"
+                    },
+                    {
+                        "category": "Read group",
+                        "description": "Specify the median fragment length for RG line.",
+                        "min": null,
+                        "default": null,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "rg_mfl",
+                        "condition": null,
+                        "name": "Median fragment length"
+                    },
+                    {
+                        "category": "Paired end",
+                        "description": "Take the first N subsequence as seed. If N is larger than the query sequence, seeding will be disabled. For long reads, this option is typically ranged from 25 to 35 for 'Max edit distance in seed'=2. [default: 32]",
+                        "min": null,
+                        "default": 32,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "seed_length",
+                        "condition": null,
+                        "name": "Seed length"
+                    },
+                    {
+                        "category": null,
+                        "description": "BWA will not search for suboptimal hits with a score lower than (bestScore-misMsc). [default: 3]",
+                        "min": null,
+                        "default": 3,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "mismatch_penalty",
+                        "condition": null,
+                        "name": "Mismatch penalty"
+                    },
+                    {
+                        "category": null,
+                        "description": "Length of barcode starting from the 5'-end. When N is positive, the barcode of each read will be trimmed before mapping and will be written at the BC SAM tag. For paired-end reads, the barcode from both ends are concatenated. [default: 0]",
+                        "min": null,
+                        "default": 0,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "barcode_length",
+                        "condition": null,
+                        "name": "Barcode length"
+                    },
+                    {
+                        "category": "Gap Properties",
+                        "description": "Gap open penalty [default: 11]",
+                        "min": null,
+                        "default": 11,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "gap_open_penalty",
+                        "condition": null,
+                        "name": "Gap open penalty"
+                    },
+                    {
+                        "category": null,
+                        "description": "Disallow an indel within N bp towards the ends [default: 5]",
+                        "min": null,
+                        "default": 5,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "indel_offset",
+                        "condition": null,
+                        "name": "Indel offset"
+                    },
+                    {
+                        "category": null,
+                        "description": "Maximum edit distance. In case that 'Fraction of missing alignments' parameter is used, the maximum edit distance is automatically chosen for different read lengths, and this parameter is ignored.",
+                        "min": null,
+                        "default": null,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_edit_dist",
+                        "condition": null,
+                        "name": "Maximum edit distance"
+                    },
+                    {
+                        "category": null,
+                        "description": "Proceed with suboptimal alignments if there are no more than N equally best hits. This parameter only affects paired-end mapping. Increasing this threshold helps to improve the pairing accuracy at the cost of speed, especially for short reads (~32bp). [default: 30]",
+                        "min": null,
+                        "default": 30,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "pairing_threshold",
+                        "condition": null,
+                        "name": "Pairing threshold"
+                    },
+                    {
+                        "category": "Gap Properties",
+                        "description": "Maximum number of gap opens [default: 1]",
+                        "min": null,
+                        "default": 1,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_gap_opens",
+                        "condition": null,
+                        "name": "Maximum gap opens"
+                    },
+                    {
+                        "category": "Paired end",
+                        "description": "Maximum insert size for a read pair to be considered being mapped properly. Since BWA 0.4.5, this option is only used when there are not enough good alignments to infer the distribution of insert sizes. [default: 500]",
+                        "min": null,
+                        "default": 500,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_insert_size",
+                        "condition": null,
+                        "name": "Maximum insert size"
+                    },
+                    {
+                        "category": "Paired end",
+                        "description": "Maximum occurrences of a read for pairing. A read with more occurrences will be treated as a single-end read. Reducing this parameter helps faster pairing. [default: 100000]",
+                        "min": null,
+                        "default": 100000,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_read_occ",
+                        "condition": null,
+                        "name": "Maximum read occurrences"
+                    },
+                    {
+                        "category": null,
+                        "description": "Disallow a long deletion within N bp towards the 3'-end [default: 10]",
+                        "min": null,
+                        "default": 10,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "long_del_offset",
+                        "condition": null,
+                        "name": "Long deletion offset"
+                    },
+                    {
+                        "category": "Gap Properties",
+                        "description": "Maximum number of gap extensions, -1 for k-difference mode (disallowing long gaps) [default: -1 (infinity)]",
+                        "min": null,
+                        "default": -1,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_gap_extensions",
+                        "condition": null,
+                        "name": "Maximum gap extensions"
+                    },
+                    {
+                        "category": null,
+                        "description": "The fraction of missing alignments given 2% uniform base error rate. In case that this parameter is used, the maximum edit distance is automatically chosen for different read lengths, and 'Maximum edit distance' parameter is ignored. [default: 0.04]",
+                        "min": null,
+                        "default": 0.04,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "float",
+                        "id": "missing_alignments",
+                        "condition": null,
+                        "name": "Fraction of missing alignments"
+                    },
+                    {
+                        "category": null,
+                        "description": "BWA trims a read down to argmax_x{\\sum_{i=x+1}^l(N-q_i)} if q_l<N where l is the original read length. [default: 0]",
+                        "min": null,
+                        "default": 0,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "read_trimming_qual",
+                        "condition": null,
+                        "name": "Read trimming quality"
+                    },
+                    {
+                        "category": "Gap Properties",
+                        "description": "Gap extension penalty [default: 4]",
+                        "min": null,
+                        "default": 4,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "gap_extension_penalty",
+                        "condition": null,
+                        "name": "Gap extension penalty"
+                    },
+                    {
+                        "category": null,
+                        "description": "Maximum number of alignments to output in the XA tag for reads paired properly. If a read has more than N hits, the XA tag will not be written. [default: 3]",
+                        "min": null,
+                        "default": 3,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "alt_hits",
+                        "condition": null,
+                        "name": "Alternative hits"
+                    },
+                    {
+                        "category": "Paired end",
+                        "description": "Maximum number of alignments to output in the XA tag for disconcordant read pairs (excluding singletons). If a read has more than N hits, the XA tag will not be written. [default: 10]",
+                        "min": null,
+                        "default": 10,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_disconcordant_alt_hits",
+                        "condition": null,
+                        "name": "Maximum disconcordant alt. hits"
+                    },
+                    {
+                        "category": "Seed",
+                        "description": "Maximum edit distance in the seed [default: 2]",
+                        "min": null,
+                        "default": 2,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_seed_edit_distance",
+                        "condition": null,
+                        "name": "Maximum seed edit distance"
+                    },
+                    {
+                        "category": "Align BAMs",
+                        "description": "When aligning BAMs, specify if it contains paired end reads (True) or single end reads (False)",
+                        "default": true,
+                        "required": false,
+                        "list": false,
+                        "type": "boolean",
+                        "id": "is_paired",
+                        "condition": null,
+                        "name": "Paired end BAM"
+                    },
+                    {
+                        "category": null,
+                        "description": "Filter Cassava-filtered sequences",
+                        "default": false,
+                        "required": false,
+                        "list": false,
+                        "type": "boolean",
+                        "id": "filter_cassava_seq",
+                        "condition": null,
+                        "name": "Filter Cassava-filtered sequences"
+                    },
+                    {
+                        "category": null,
+                        "description": "Maximum entries in the queue",
+                        "min": null,
+                        "default": 2000000,
+                        "max": null,
+                        "required": false,
+                        "list": false,
+                        "step": null,
+                        "type": "integer",
+                        "id": "max_entries",
+                        "condition": null,
+                        "name": "Maximum entries in the queue"
+                    },
+                    {
+                        "category": "Gap Properties",
+                        "description": "Log-scaled gap penalty for long deletions",
+                        "default": false,
+                        "required": false,
+                        "list": false,
+                        "type": "boolean",
+                        "id": "log_scaled_gap_penalty",
+                        "condition": null,
+                        "name": "Log-scaled gap penalty for long deletions"
+                    },
+                    {
+                        "category": "Advanced",
+                        "description": "Set to true if output should be in BAM format.",
+                        "default": false,
+                        "required": false,
+                        "list": false,
+                        "type": "boolean",
+                        "id": "bam_output",
+                        "condition": null,
+                        "name": "Output BAM file"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "description": "Aligned sequence in SAM format",
+                        "required": false,
+                        "list": true,
+                        "id": "aligned",
+                        "types": ["sam", "bam"],
+                        "name": "Aligned SAM"
+                    }
+                ]
+            },
+            "type": "app",
+            "scheduler_hints": {
+                "ForceInstance": "r3.2xlarge",
+                "parallel": true
+            }
+        }
+    }
+]}

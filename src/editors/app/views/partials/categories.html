@@ -1,0 +1,3 @@
+<tags-input id="category" class="category-tags" ng-model="ngModel" placeholder="Add a category" on-tag-added="onUpdate($tag)" on-tag-removed="onUpdate($tag)">
+    <auto-complete source="loadCategories($query)" min-length="1"></auto-complete>
+</tags-input>

@@ -1,0 +1,24 @@
+<div ng-hide="view.ignore"
+     class="form-group"
+     ng-class="{required: view.required, 'has-error': inputForm.inputFile.$invalid}">
+    <label class="control-label">{{ ::view.name }}</label>
+
+    <div class="input-property-body">
+
+        <div class="input-group">
+            <input type="text"
+                   class="form-control"
+                   name="inputFile"
+                   empty-to-null
+                   ng-model="view.model.path"
+                   ng-disabled="isDisabled"
+                   ng-required="view.required">
+            <span class="input-group-btn">
+                <a href class="btn btn-default" ng-click="more()"><i class="fa fa-ellipsis-h"></i></a>
+            </span>
+        </div>
+
+        <span ng-if="inputForm.inputFile.$invalid" class="help-block">Please provide correct value</span>
+
+    </div>
+</div>

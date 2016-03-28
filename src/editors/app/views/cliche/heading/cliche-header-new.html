@@ -1,0 +1,37 @@
+<div class="heading">
+
+    <!--<a ui-sref="apps" class="btn btn-default pull-left go-back"><i class="fa fa-chevron-left"></i> Back</a>-->
+
+    <h1>
+        <div class="form-group tool-name" ng-class="{'has-error': form.tool.label.$invalid}">
+            <input type="text" placeholder="Tool Name" ng-model="view.tool.label" is-valid-name name="label" class="form-control" required />
+        </div>
+        <div class="actions pull-right">
+
+            <button type="submit"
+                    ng-click="createTool()"
+                    ng-if="view.user"
+                    ng-disabled="view.saving"
+                    class="app-create-btn btn btn-primary">
+                <i class="fa fa-plus"></i> Create
+            </button>
+
+            <div class="btn-group" role="group">
+                <json-preview title="Tool JSON" json="{{ view.tool }}"></json-preview>
+                <json-preview title="Job JSON" json="{{ view.job }}"></json-preview>
+            </div>
+
+            <div class="btn-group right" ng-class="{open: view.isMenuVisible}">
+                <button type="button" ng-click="toggleMenu()" class="btn btn-default dropdown-toggle">
+                    <i class="fa fa-cog"></i>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu" ng-click="toggleMenu()">
+                    <li><a href ng-click="loadJsonEditor()"><i class="fa fa-cloud-download"></i> <span>Import</span></a></li>
+                </ul>
+            </div>
+        </div>
+        <!-- # .actions -->
+    </h1>
+
+</div>

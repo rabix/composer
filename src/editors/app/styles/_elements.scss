@@ -1,0 +1,685 @@
+@import "heading";
+
+/* Remove button */
+.remove-btn {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  right: 0;
+  color: #555;
+  padding: 5px;
+
+  &:hover, &:active, &:focus {
+    text-decoration: none;
+    color: #666;
+  }
+}
+
+.page {
+
+  /* Page description */
+  .description {
+    margin: 20px 0;
+    overflow: auto;
+
+    .panel {
+      p {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        & > span,
+        & > strong {
+          display: inline-block;
+          vertical-align: middle;
+        }
+        & > strong {
+          width: 140px;
+        }
+        &:last-of-type {
+          margin-bottom: 0;
+        }
+      }
+      .panel-body {
+        h5 {
+          margin: -15px -15px 5px;
+          padding: 10px 15px;
+          background-color: #fcf8e3;
+          border-top: 1px solid #faebcc;
+          border-bottom: 1px solid #faebcc;
+        }
+        section {
+          margin: 0 0 20px 0;
+          &:first-child {
+            h5 {
+              border-top: none;
+            }
+          }
+          &:last-child {
+            margin: 0;
+          }
+        }
+      }
+
+      &.horizontal {
+        .panel-body {
+          padding: 0;
+          margin: 0;
+          h5 {
+            margin: 0;
+          }
+          section {
+            padding: 0 0 5px 0;
+            margin: 0;
+            &:not(:last-child) {
+              border-right: 1px solid #faebcc;
+            }
+            p {
+              padding: 5px 15px;
+              margin: 0;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  &.loading {
+    @extend %loading-abs;
+    &:after {
+      opacity: 0;
+      @include transition(opacity 0.3s ease);
+    }
+    &.loading-fade {
+      &:after {
+        opacity: 1;
+      }
+    }
+  }
+
+  .snippet {
+    border-left: 5px solid $orange;
+    margin-bottom: 25px;
+
+    p {
+      padding: 5px;
+      margin: 0 0 5px;
+    }
+
+    .box {
+      background-color: #fcfcfc;
+      padding: 5px;
+      margin: 0 0 5px;
+    }
+
+    pre {
+      @include border-radius(0 3px 3px 0);
+      border-left: none;
+      margin-bottom: 1px;
+    }
+
+    &.log {
+      pre {
+        border-color: $orange;
+        background-color: #222;
+        padding: 0 10px;
+        counter-reset: counter;
+        @include box-shadow(none);
+        @extend %scrollbar;
+
+        .line {
+          color: $orange;
+          white-space: nowrap;
+          &:before {
+            content: counter(counter);
+            counter-increment: counter;
+            display: inline-block;
+            width: 55px;
+            text-align: right;
+            padding: 0 5px 0 0;
+            margin: 0 5px 0 0;
+            color: #666;
+          }
+        }
+      }
+    }
+
+    &.list {
+      ul {
+        list-style: none;
+        border: 1px solid #ddd;
+        border-left-color: transparent;
+        @include border-radius(0 3px 3px 0);
+        padding: 10px 10px 10px 20px;
+        margin: 0;
+      }
+    }
+
+    &.token {
+      border-bottom: 2px solid #f0ad4e;
+      .btn {
+        margin-left: 5px;
+      }
+      .alert {
+        &.trace {
+          visibility: hidden;
+          margin: 5px;
+          display: block;
+          padding: 5px 10px;
+          max-width: 300px;
+          min-height: 32px;
+
+          &.show {
+            visibility: visible;
+          }
+        }
+      }
+    }
+  }
+
+  .col {
+    .tab {
+      position: relative;
+      &.loading {
+        @extend %loading-abs;
+      }
+    }
+
+    &.sidebar-col {
+      width: 450px;
+      z-index: 1;
+      background-color: #fff;
+      border-left: 2px solid $orange;
+      overflow-x: hidden;
+      @include transition(width 0.2s ease);
+
+      .filter,
+      .content,
+      .heading {
+        overflow-x: hidden;
+        white-space: nowrap;
+      }
+
+      &.closed {
+        width: 35px;
+
+        .filter,
+        .content,
+        .nav-tabs-steps li:not(.toggle-action),
+        .nav-tabs-trace li:not(.toggle-action) {
+          display: none;
+        }
+      }
+    }
+  }
+}
+
+.tabs {
+  .tab {
+    &.tab-tbl {
+      margin: 0 -10px;
+    }
+    .tab-title {
+      margin: 0;
+      padding: 5px 10px;
+      border-bottom: 1px solid #ccc;
+      font-size: 20px;
+      @extend %ellipsis;
+    }
+  }
+}
+
+.s3-link {
+  padding: 0 10px;
+  text-overflow: ellipsis;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  display: block;
+}
+
+/* Browser happy box */
+.browsehappy {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.2);
+  p {
+    color: #fff;
+    width: 400px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -200px;
+    font-size: 20px;
+    margin-top: -120px;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 10px;
+    @include border-radius(10px);
+    a {
+      text-decoration: underline;
+      font-weight: bold;
+    }
+
+  }
+}
+
+/* Enumerating list */
+.enum-list-wrap {
+  .alert {
+    padding: 6px 10px;
+    margin: 0;
+    text-overflow: ellipsis;
+    overflow: hidden;
+
+    &.large {
+      padding: 11px 10px;
+    }
+  }
+  .add-enum-item {
+    float: left;
+
+    &.large {
+      .btn {
+        padding: 11px 12px;
+      }
+    }
+  }
+  .enum-list-container {
+    display: block;
+    margin-left: 50px;
+  }
+
+  &.enum-labeled {
+    li > .labeled.remove-btn {
+      top: 27px;
+    }
+
+    .add-enum-item {
+      margin-top: 23px;
+    }
+  }
+  .enum-list {
+    li {
+      position: relative;
+      margin-bottom: 10px;
+
+      .enum-field-empty {
+        padding: 7px 5px;
+        display: block;
+      }
+
+      .enum-field.form-group {
+        border: none;
+        margin: 0 25px 0 0;
+        @include clearfix();
+
+        // hack for when list items are divided into columns
+        > div {
+          position: relative;
+          overflow-x: visible;
+        }
+
+        &.form-group-object {
+          border-bottom: 1px solid #ddd;
+        }
+        &.split {
+          border: none;
+          & > .form-control {
+            display: inline-block;
+            &:nth-child(1) {
+              width: 40%;
+            }
+            &:nth-child(2) {
+              margin-left: -5px;
+              width: 60%;
+            }
+          }
+        }
+      }
+      .remove-btn {
+        top: 4px;
+      }
+      &:last-child {
+        margin-bottom: 0;
+        .enum-field.form-group {
+          &.form-group-object {
+            border-bottom: 0;
+          }
+        }
+      }
+    }
+    &.wide {
+      li {
+        .enum-field.form-group {
+          margin-right: 0px;
+        }
+      }
+    }
+
+    .key-value-map {
+      border: 1px solid #ddd;
+      padding: 10px;
+    }
+  }
+}
+
+/* Legend used as box heading */
+legend {
+  &.toggle {
+    position: relative;
+    cursor: pointer;
+    border: none;
+    padding-left: 25px;
+    @include user-select(none);
+
+    &:after {
+      content: '';
+      display: block;
+      position: absolute;
+      top: 50%;
+      left: 10px;
+      border-left: 5px solid #555;
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+      margin-top: -5px;
+    }
+    &.active {
+      &:after {
+        border-top: 5px solid #555;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-bottom: none;
+        margin-top: -2.5px;
+      }
+    }
+  }
+}
+
+.nested-list {
+  margin-left: 7px;
+}
+
+.app-sidebar-list {
+  border-bottom: 1px solid #ddd;
+  li {
+    border-bottom: 1px solid #ddd;
+    &:first-child {
+      border-top: 1px solid #ddd;
+    }
+    &:last-child {
+      border-bottom: none;
+    }
+    & > span {
+      cursor: pointer;
+      color: #555;
+      padding: 7px 7px;
+      display: block;
+
+
+      &.section-name {
+        font-size: 1em;
+        color: #aaa;
+        text-align: left;
+        text-indent: 13px;
+        font-weight: 100;
+        background: #FFFFFF;
+      }
+
+      i {
+        color: $sidebar-blue;
+      }
+    }
+    & > ul {
+      display: none;
+      & > li {
+        & > span {
+          padding-left: 20px;
+        }
+
+        span.pointer {
+          cursor: pointer;
+          margin-right: 10px;
+        }
+
+        .nested {
+          margin-left: 22px;
+        }
+      }
+    }
+    &.open {
+      & > ul {
+        display: block;
+      }
+    }
+  }
+  .apps-inner-list {
+    li {
+      a {
+        cursor: move;
+        background-color: #fdfdfd;
+        color: #555;
+        padding: 7px 15px 7px 5px;
+        display: block;
+        text-decoration: none;
+        @include user-select(none);
+
+        & > i {
+          color: $sidebar-blue;
+          vertical-align: middle;
+        }
+
+        & > span {
+          display: inline-block;
+          vertical-align: middle;
+        }
+
+        &.drag {
+          opacity: 0.7;
+        }
+
+        .tool-icon {
+          width: 20px;
+          height: 23px;
+          display: inline-block;
+          background-repeat: no-repeat;
+
+          &.CommandLineTool {
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAXCAYAAAALHW+jAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1+/AAAABx0RVh0U29mdHdhcmUAQWRvYmUgRmlyZXdvcmtzIENTNXG14zYAAAAWdEVYdENyZWF0aW9uIFRpbWUAMDQvMjkvMTWEKxpXAAADAUlEQVQ4ja2Vv28jRRTHP7Ner9e7znr9I459Bxik44doUI4COiQEDTQXXXHQAAVIV93p/oBroKehOQkKqBASP4QEojgaSgQiHZzuEJEROHbi3aw3Xu8v7w5F4uhijJIA32rm6c1nZt6beU9IKZnr1Xe+ZlHNavkDP0heB7BM7aPROHxz0efjmy8fjYWUcilorWZc2Q/TW9MotQUw39bUi16lXLw63Jt+sgwqXnn7q2OgTt3sBlH6rT9NLggBRbXA+WYFKSXbbkCSZkgJlqH9aurFF7bdoHf/evX+ScPSP98Zh5fyLBdqQWG1WmatblJQBABVs8TO3pTdcYg/TS4E8Wyrbulfun60MWcoAK2acV3X1KnjRxsyl8Je0XnioTrnmpUjGIBaUDjXrPD4gzUsQyPPpXD96JKuqdNWzbgOIK6+e/snbxKvC6CkqTzctjD14t9iuigJePsRfScgTmdICXaltKl6k3gdoNOs0KmbJ4LmEkBtRccySwzcgKEb4E3idRWgoAg6dZO+M2HbCU4NBXj6sTXONyvselOyXB7EUAhxzMnQixinuPYyKcuMq3aZ9649z5Pdxv8D7A18Pv3uLjdfe5Zu2/rvQEMv8txTD/Bzz2HXC88EVJcZV+0yP9wZ8OPdIS898wgAQZTyzfdb/w7YG/j0Bj7dtsVR8ZDLPE8JXASfRSpwdIpSscBKWTsTYK75BVSALJf8OZrQrps0rPKZQLMspz+akOcHSMWulDYBhm7ALz2Hvf2IXJ4csFxKHD/izu8uo/HBS7ArpU3Fm8QXW7ZxQ9fUME4ztgY+v/XHRMnsH2FBlHLvD4/e0CdOM3RNDVu2ccObxBePFdiGpX82DpKNWZYLRRG0bINOw0Q5/JqzLKfvBDjjkFxK1IIiq6b2heNHl+eMY1l2/Ohyp252gzi97QfJowM3wPUj2g2TPJfs7E1JZhkAlqndM0vFFxcrtphneLGvrNWMK5MwvRUc9hQ4yOSJPUUuJGAR3KyW3/eD5I3DU304GodvLQPN9ReVPVqNcf2jxgAAAABJRU5ErkJggg==');
+          }
+
+          &.Workflow {
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAXCAYAAAALHW+jAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1+/AAAABx0RVh0U29mdHdhcmUAQWRvYmUgRmlyZXdvcmtzIENTNXG14zYAAAAWdEVYdENyZWF0aW9uIFRpbWUAMDQvMjkvMTWEKxpXAAADgklEQVQ4jZ2Vy28bVRSHvxmPx5MZx684TpPINCDzUFsWqRCLqhICURWJTaIilW4oC5C6q/oHsIE960qwgBXKgpcEElJRukFdsEg2dFEaEYLbPIbYHo89b89cFrHT2E7Uit9q5s65353zuOdIQggGuvbZz4yqnJ/40nbC6wA5Q/16v+19NGrzzSfvHj5LQohjQTNF/WrHi267flSQgMGxhpa2shPpG3std+U4qPT+pz8NgWZLxmnHj3613bAmSZBWUsyXswgh2Gk6hFGMEJDT1Q1DS7+903S2ju5Xjr5M5bTvzLa3lMSJpKRkpvMTzJQMUrIEQN7IYLZc/m172G5Yc4LeZimn/di0/eUBQwaoFPWbmqq4DdtfFomQCpMarzxXYq6cPYQBKCmZuXKWl6tFcrpKkgipaftLmqq4laJ+E0C68fmdNasbLEpARlVYOJXD0NKHkGplkrcWqwCsrtepmx3ox9Tq+Gw3HIKohxBQyGbWZasbLALMlrOcXZgaggEsXaxhWh6m5bF0sfYkm0Cx78lM0UACrG6wKAOkZInZkjGWaYBMOoXZcjFbLpl0aux7SpaYL2eR+6FRACRJGjMcaO3PPd7su9zuBifaDaQ8zWB1vc4fmw1KOY1Lr52mNl9g47H1/4EApuViWi5dL+S9N15CScnYTsgPv21gWu6QrfwswIFefWGaVsdn5e4DgqjHhXNzYzYnAvNGhkpBH1rL6SpeGFM3O9TNDhl1PEnHunzu+TLvvL4AwNauTcP2qM0XCXsx5fwE1y+fYbqgc+/+9rMBL5yd4979bTYeWXxw+Qy9JDmMV7UySbUyOVTkY8CjLQyg7QZUK5No/bpbXavTdg5KZuDuqAYEGSBOBI/3u8TJwfLdtTpwcO1++f3vQ9hx6sUJ/+zZJP29SiGbWbe6weJe06HV8ZkvZ0mEYGX1wYkQgEQIWp2AnUaXMIqBJ3f5fKWg39JUxQuimM1dm7+22/hh70SY40c8fGSxtWcTRDGaqniVgn7L6gbnhxrsVE77tu2Ey704kWRZolLQmZ0ykPtXsxcnbDccGm2PRAiUlCzyhvp9w/avDBhDWW7Y/pXZknHaCaI7thO+uNt0aNo+p6YMkkRgtlzC3oF7OUN9aGTSl0Y7tjTI8OhcmSnqV7tedNvpzxQ4yORTZ8poyYyCy/mJL2wn/LD/V1/tt72PjwMN9B8gHKMKF+m2OQAAAABJRU5ErkJggg==');
+          }
+        }
+      }
+      .revisions-list {
+        border-bottom: 1px solid #eee;
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+    }
+  }
+  .alert {
+    margin: 0;
+    padding: 5px 10px 5px 30px;
+  }
+}
+
+/* Pipeline */
+.pipeline-wrap {
+  position: relative;
+
+  .pipeline-drop-area {
+    position: relative;
+
+    &.drag-over {
+//      background-color: #f3f3f3;
+    }
+
+    &.loading {
+      @extend %loading-abs;
+    }
+
+    .pipeline-actions {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+    }
+
+    .pipeline-user-guide {
+      width: 400px;
+      height: 100px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin: -150px 0 0 -200px;
+      @extend %guide-box;
+    }
+
+  }
+}
+
+.job-user-guide {
+  width: 480px;
+  margin: 150px auto;
+  @extend %guide-box;
+}
+
+.changes-mark {
+  color: #aa0000;
+  cursor: pointer;
+  margin: 0 10px;
+
+  .fa {
+    font-size: 12px;
+  }
+  .tooltip {
+    font-weight: normal;
+  }
+}
+
+.pipeline-get-url {
+  position: absolute;
+  bottom: 5px;
+  right: 15px;
+}
+
+.pick-repo-wrap {
+  margin: 15px 0;
+}
+
+.json-pretty-scroll {
+  max-height: 500px;
+  overflow: auto;
+
+  @extend %scrollbar;
+}
+
+.copy-btn {
+  display: inline-block;
+  vertical-align: middle;
+  max-width: 60%;
+
+  %ellipsis {
+    max-width: 100%;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  & > span {
+    @extend %ellipsis;
+  }
+
+  & > span,
+  .btn,
+  .error {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .btn.btn-sm {
+    padding: 2px 10px;
+  }
+
+  .error {
+    @extend %ellipsis;
+    color: $brand-danger;
+  }
+}
+
+.toggle-btn {
+  color: #555;
+  display: block;
+  padding: 5px;
+  text-decoration: none;
+  &:hover {
+    color: #555;
+    text-decoration: none;
+  }
+}
+
+.preload {
+  img {
+    display: none;
+  }
+}
+
+ul.nav-tabs.nav-borders {
+  border-bottom: 2px solid #3584D1;
+  border-top: 2px solid #3584D1;
+}
+
+.modal-body .modal-tabs {
+  padding: 15px;
+}
+
+.status-codes {
+  width: 100%;
+}
+
+.description-field {
+  margin-top: 5px;
+}
+
+.change-schema {
+
+  .input-group[class*="col-"] {
+    padding: 15px;
+  }
+
+  .required-checkbox {
+    margin: 9px 0 5px;
+  }
+
+  input[type="checkbox"], select {
+    display: inline-block;
+  }
+
+  input[type="checkbox"] {
+    padding: 0;
+    margin: 0;
+    vertical-align: middle;
+    position: relative;
+    top: -1px;
+    overflow: hidden;
+    left: 10px;
+  }
+
+}
+
+.workflow-settings {
+
+  .require-metadata {
+    margin: 0px 2px 0;
+  }
+
+  .set-instance {
+    margin-top: 10px;
+  }
+}

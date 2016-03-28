@@ -1,0 +1,71 @@
+<div class="modal-header">
+    <button type="button" class="close" ng-click="cancel()"><span>&times;</span><span class="sr-only">Close</span></button>
+    <h4 class="modal-title">More for <strong>{{ ::view.key }}</strong></h4>
+</div>
+<div class="modal-body">
+
+    <form ng-submit="update()" name="view.form" novalidate>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group" ng-class="{'has-error': (view.form.path.$invalid && view.form.$dirty)}">
+                    <label for="path" class="control-label">Path</label>
+                    <input type="text" class="form-control" id="path" name="path" ng-model="view.schema.path" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group" ng-class="{'has-error': (view.form.size.$invalid && view.form.$dirty)}">
+                    <label for="size" class="control-label">Size</label>
+                    <input type="number" min="0" class="form-control" id="size" name="size" ng-model="view.schema.size">
+                </div>
+            </div>
+        </div>
+
+        <div class="meta-list">
+
+            <div class="row">
+                <div class="col-md-12">
+
+                    <label class="control-label">Metadata</label>
+                    <div class="enum-list-wrap">
+                        <a href ng-click="addMetadata()" class="btn btn-default add-enum-item"><i class="fa fa-plus"></i></a>
+
+                        <div class="enum-list-container">
+                            <ul class="enum-list">
+                                <li ng-repeat="meta in view.metadata" ng-if="meta.key !== '__inherit__'" ng-class="{'has-error': meta.error}">
+                                    <div class="enum-field form-group form-group-file">
+                                        <div class="col-md-6">
+                                            <i class="fa fa-warning error" ng-if="meta.error" title="Duplicate metadata key. This key value pair will not be saved."></i>
+                                            <input key-changer key="meta.key" items="view.metadata" has-error="meta.error" type="text" class="form-control" placeholder="Metadata Key" ng-model="meta.key"/>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <expr ng-model="meta.value" index="{{ $index }}" type="string"  handle-item-update="updateMetaValue(index, value)" placeholder="Metadata Value"></expr>
+                                        </div>
+                                    </div>
+                                    <a href class="fa fa-remove remove-btn" ng-click="removeMetadata($index)"></a>
+                                </li>
+                            </ul>
+
+                            <p class="alert alert-info" ng-if="view.metadata | isEmpty">Click the plus button to add a metadata key-value pair.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <label class="control-label">Secondary Files</label>
+                <enum ng-model="view.schema.secondaryFiles" path="view.schema.path" type="'ext'"></enum>
+            </div>
+        </div>
+
+        <div class="form-group main-actions">
+            <a href class="btn btn-warning" ng-click="cancel()">Cancel</a>
+            <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+
+    </form>
+
+</div>

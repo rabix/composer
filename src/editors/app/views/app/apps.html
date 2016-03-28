@@ -1,0 +1,59 @@
+<div ng-class="view.classes" loading="view.loading">
+
+    <div class="filters">
+        <div class="row no-margin">
+            <div class="col-md-4">
+                <form class="search-form" ng-submit="searchApps()" novalidate>
+                    <div class="input-group">
+                        <input type="text" class="form-control" ng-model="view.searchTerm" placeholder="Search apps" required>
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary" type="submit"><i class="fa fa-search"></i></button>
+                            <a ng-if="!(view.searchTerm | isEmpty)" class="btn btn-default" href ng-click="resetSearch()"><i class="fa fa-ban"></i></a>
+                        </span>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-md-8">
+                <label class="checkbox inline" ng-show="view.user">
+                    <input type="checkbox" ng-model="view.mine" ng-change="toggleMyApps()" /> mine
+                </label>
+
+                <a ui-sref="cliche-new({type: 'tool'})" ng-if="view.tab === 'tools'" class="btn btn-primary pull-right"><i class="fa fa-plus"></i> New Tool</a>
+                <a ui-sref="cliche-new({type: 'script'})" ng-if="view.tab === 'scripts'" class="btn btn-primary pull-right"><i class="fa fa-plus"></i> New Script</a>
+                <a ui-sref="workflow-editor({id: 0, mode: 'new'})" ng-if="view.tab === 'workflows'" class="btn btn-primary pull-right"><i class="fa fa-plus"></i> New Workflow</a>
+            </div>
+
+        </div>
+    </div>
+    <!-- # .filters -->
+
+    <div class="nav nav-tabs nav-page">
+        <li ng-class="{active: view.tab === 'tools'}"><a href ng-click="switchTab('tools')">Tools</a></li>
+        <li ng-class="{active: view.tab === 'scripts'}"><a href ng-click="switchTab('scripts')">Scripts</a></li>
+        <li ng-class="{active: view.tab === 'workflows'}"><a href ng-click="switchTab('workflows')">Workflows</a></li>
+    </div>
+
+    <div ng-show="!view.loading" class="content content-tbl flex-box-column">
+
+        <div class="tabs flex-box-column flex-one">
+
+            <div ng-show="view.tab === 'tools'" class="tab tools flex-box-column flex-one">
+                <ng-include class="include flex-box-column flex-one" src="'views/app/tabs/tools.html'"></ng-include>
+            </div>
+            <!-- # .tools -->
+
+            <div ng-show="view.tab === 'scripts'" class="tab scripts flex-box-column flex-one">
+                <ng-include class="include flex-box-column flex-one" src="'views/app/tabs/scripts.html'"></ng-include>
+            </div>
+            <div ng-show="view.tab === 'workflows'" class="tab workflows flex-box-column flex-one">
+                <ng-include class="include flex-box-column flex-one" src="'views/app/tabs/workflows.html'"></ng-include>
+            </div>
+
+        </div>
+        <!-- # .tabs-->
+
+    </div>
+    <!-- # .content -->
+
+</div>

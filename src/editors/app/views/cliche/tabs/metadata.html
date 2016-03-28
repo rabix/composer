@@ -1,0 +1,136 @@
+<ng-form class="content content-ten" name="metadata">
+
+    <div>
+        <h3 class="legend-small">Additional Information
+            <help-message message="{{ :: 'clicheMetadataMetadata' | loc }}"></help-message></h3>
+
+
+        <div class="row section form">
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="additional_info_label" class="control-label">Label</label>
+                    <input uib-tooltip="{{ :: 'clicheMetadataLabel' | loc }}"
+                           tooltip-trigger="focus"
+                           class="form-control"
+                           ng-model="view.tool.label"
+                           id="additional_info_label"
+                           name="label"
+                           type="text"/>
+                </div>
+
+                <div class="form-group">
+                    <label for="additional_info_toolkit" class="control-label">Toolkit</label>
+                    <input uib-tooltip="{{ :: 'clicheMetadataToolkit' | loc }}"
+                           tooltip-trigger="focus"
+                           class="form-control"
+                           ng-model="view.tool['sbg:toolkit']"
+                           id="additional_info_toolkit"
+                           name="toolkit"
+                           type="text"/>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="additional_info_toolkit_version">Toolkit Version</label>
+                    <input uib-tooltip="{{ :: 'clicheMetadataToolkitVersion' | loc }}"
+                           tooltip-trigger="focus"
+                           class="form-control"
+                           name="toolkitVersion"
+                           ng-model="view.tool['sbg:toolkitVersion']"
+                           id="additional_info_toolkit_version"
+                           type="text"/>
+                </div>
+
+
+                <div class="form-group">
+                    <label>Links</label>
+                    <div class="enum-list-wrap">
+                        <a href ng-click="addLink()" class="btn btn-default add-enum-item">
+                            <i class="fa fa-plus"></i>
+                        </a>
+
+                        <div class="enum-list-container">
+                            <ul class="enum-list">
+                                <li ng-repeat="link in view.tool['sbg:links']">
+                                    <div class="enum-field form-group form-group-file">
+                                        <div class="col-md-6">
+                                            <input type="text"
+                                                   name="linkLabel{{$index}}"
+                                                   class="form-control"
+                                                   placeholder="Link label"
+                                                   ng-model="link.label"/>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <input type="text"
+                                                   name="linkUrl{{$index}}"
+                                                   class="form-control"
+                                                   placeholder="Link URL"
+                                                   ng-model="link.id"/>
+                                        </div>
+                                    </div>
+                                    <a href class="fa fa-remove remove-btn" ng-click="removeLink($index)"></a>
+                                </li>
+                            </ul>
+
+                            <p class="alert alert-info" ng-if="view.tool['sbg:links'] | isEmpty">Click the plus button to add a link</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="additional_info_author">Tool Author/Organization</label>
+                    <input uib-tooltip="{{ :: 'clicheMetadataAuthor' | loc }}"
+                           tooltip-trigger="focus"
+                           type="text"
+                           id="additional_info_author"
+                           class="form-control"
+                           ng-model="view.tool['sbg:toolAuthor']"/>
+                </div>
+
+                <div class="form-group">
+                    <label for="additional_info_license">
+                        Tool License
+                    </label>
+                    <license-picker id="additional_info_license" ng-model="view.tool['sbg:license']"></license-picker>
+                </div>
+
+                <div class="form-group">
+                    <label class="third-class">
+                        Categories
+                        <help-message message="{{ :: 'clicheMetadataCategories' | loc }}"></help-message>
+                    </label>
+                    <categories ng-model="view.categories" on-update="updateCategories()"></categories>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="control-label" for="additional_info_description">
+                    Description
+                    <help-message message="{{ :: 'clicheMetadataDescription' | loc }}"></help-message>
+                </label>
+                <div ng-hide="view.preview" class="form-group">
+                    <textarea id="additional_info_description"
+                              class="form-control"
+                              ng-model="view.tool.description"
+                              name="description"
+                              cols="30"
+                              rows="15">
+                    </textarea>
+                </div>
+
+                <div ng-show="view.preview" class="form-group">
+                    <div class="markdown-body" markdown="view.tool.description"></div>
+                </div>
+
+                <div class="form-group">
+                    <a href ng-click="togglePreview()" class="btn btn-default">{{ view.preview ? 'Edit' : 'Preview' }}</a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+</ng-form>

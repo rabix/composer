@@ -1,0 +1,46 @@
+<div property-header
+     class="property-box-header tool"
+     name="{{ view.name }}"
+     position="view.property.inputBinding.position"
+     adapter="view.property.inputBinding"
+     type="{{ view.type }}"
+     tool-type="tool"
+     mode="input"
+     id-prefix="{{ ::idPrefix }}"
+     index="index"
+     is-required="view.required"
+     handle="handleAction(action)">
+</div>
+
+<div class="property-box-body">
+    <div class="row">
+
+        <div class="col-md-3 box-col">
+            <strong class="key">Prefix:</strong>
+            <div class="value">
+                <span>{{ view.property.inputBinding.prefix }}</span>
+                <i ng-if="!view.property.inputBinding.prefix">Not defined</i>
+            </div>
+        </div>
+
+        <div class="col-md-3 box-col">
+            <strong class="key">Separate:</strong>
+            <div class="value">
+                <span>{{ view.property.inputBinding.separate }}</span>
+            </div>
+        </div>
+
+        <div class="col-md-4 box-col">
+            <strong class="key">Value:</strong>
+            <div class="value">
+                <div class="value">
+                    <i class="fa fa-warning error" ng-if="view.exprError" title="{{ view.exprError }}"></i>
+                    {{ view.property.inputBinding.valueFrom.script}}
+                </div>
+                <i ng-if="!view.property.inputBinding.valueFrom">Not defined</i>
+            </div>
+        </div>
+
+    </div>
+
+</div>

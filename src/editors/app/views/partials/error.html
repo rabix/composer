@@ -1,0 +1,8 @@
+<div class="general-error alert alert-danger" ng-class="{show: errors.length > 0}">
+    <button type="button" class="close" ng-click="closeErrors()"><span>&times;</span><span class="sr-only">Close</span></button>
+    <div ng-repeat="error in errors">
+        <p>{{ error.message }}</p>
+        <pre ng-if="error.json" class="pre" id="http-error" pretty-json="error.json"></pre>
+    </div>
+
+</div>

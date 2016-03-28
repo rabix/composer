@@ -1,0 +1,68 @@
+
+<ng-form class="content form flex-box-column flex-one" name="job" role="form" novalidate>
+
+    <div class="section flex-auto col-lg-7 col-md-8">
+
+        <h3 class="flex-auto legend-small">
+            Allocated Resources
+            <help-message message="{{ :: 'clicheTestAllocatedResources' | loc }}"></help-message>
+        </h3>
+
+        <div class="form-group">
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group" ng-class="{'has-error': form.job.arCpu.$invalid}">
+                        <label for="allocated_memory_resource" class="control-label">CPU</label>
+                        <input id="allocated_memory_resource"
+                               type="{{ view.reqCpuRequirement.value.script ? 'text' : 'number' }}"
+                               class="form-control"
+                               name="arCpu"
+                               ng-model="view.job.allocatedResources.cpu"
+                               ng-readonly="view.reqCpuRequirement.value.script"
+                               min="{{ view.reqCpuRequirement.value.script ? 0 : view.reqCpuRequirement.value }}">
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group" ng-class="{'has-error': form.job.arMem.$invalid}">
+                        <label for="allocated_cpu_resource" class="control-label">Memory</label>
+                        <input id="allocated_cpu_resource"
+                               type="{{ view.reqMemRequirement.value.script ? 'text' : 'number' }}"
+                               class="form-control"
+                               name="arMem"
+                               ng-model="view.job.allocatedResources.mem"
+                               ng-readonly="view.reqMemRequirement.value.script"
+                               min="{{ view.reqMemRequirement.value.script ? 0 : view.reqMemRequirement.value }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- # .section -->
+
+    <div class="section bottom flex-box-column flex-one col-lg-7 col-md-8">
+
+        <div class="flex-auto category-container" ng-repeat="cat in view.inputCategories">
+            <h4 ng-click="cat.show = !cat.show" class="category-title">
+                {{ ::cat.name }}
+                <i class="fa pull-right mg-right-10" ng-class="{'fa-caret-up': cat.show, 'fa-caret-down': !cat.show}"></i>
+            </h4>
+
+            <div class="input-container" ng-show="cat.show">
+                <input-field
+                        ng-repeat="property in cat.inputs | orderBy:sortByPosition track by property['id']"
+                        ng-model="view.job.inputs[property['id'].slice(1)]"
+                        values="view.job.inputs[property['id'].slice(1)]"
+                        class="input-field"
+                        key="id"
+                        prop="property"
+                        form="form.job">
+                </input-field>
+            </div>
+        </div>
+
+        <p class="alert alert-info" ng-if="view.tool.inputs.length === 0">There are no input ports defined.</p>
+    </div>
+    <!-- # .section -->
+</ng-form>
+

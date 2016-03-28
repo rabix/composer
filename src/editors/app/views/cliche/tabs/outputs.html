@@ -1,0 +1,40 @@
+<ng-form class="content" name="outputs">
+
+    <h3 class="legend-small">
+        Output Ports
+        <help-message message="{{ :: 'clicheOutputsProperties' | loc }}"></help-message>
+    </h3>
+
+    <div class="enum-list-wrap">
+        <add-property
+                tooltip-msg="{{ :: 'clicheOutputsAddOutput' | loc }}"
+                tooltip-placement="right"
+                ng-model="view.newOutput"
+                type="output"
+                key="id"
+                tool-type="{{ view.type }}"
+                properties="view.tool.outputs"
+                class="add-enum-item large"
+                id="output_add_button">>
+        </add-property>
+
+        <div class="enum-list-container">
+            <property-output
+                    ng-repeat="property in view.tool.outputs track by property.id"
+                    ng-model="property"
+                    key="id"
+                    name="propertyOutput{{$index}}"
+                    type="{{ view.type }}"
+                    properties="view.tool.outputs"
+                    index="$index"
+                    id-prefix="output">
+            </property-output>
+
+            <p class="alert alert-info large" ng-if="view.tool.outputs.length === 0">
+                 Click the plus button to add output ports.
+            </p>
+        </div>
+    </div>
+</ng-form>
+
+

@@ -1,0 +1,28 @@
+<div class="form-group"
+     ng-hide="ignoreFiles && view.itemsType === 'File'"
+     ng-class="{required: view.required, 'has-error': view.required && view.model.length === 0 && !isDisabled}">
+
+    <div class="control-label">
+
+        <ng-include src="'views/cliche/inputs/input-icon-box.html'"></ng-include>
+
+        <span class="input-key" title="{{ ::view.name }}">
+            <span class="input-key-inner">{{ ::view.name }}</span>
+        </span>
+
+    </div>
+
+    <div class="input-property-body">
+        <enum
+             ng-model="view.model"
+             type="view.itemsType"
+             properties="view.items.fields"
+             symbols="view.items.symbols"
+             is-required="view.required"
+             exposible="{{ view.exposible }}"
+             form="form"
+             is-disabled="isDisabled">
+        </enum>
+    </div>
+
+</div>

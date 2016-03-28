@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>JSandbox test suite</title>
+<link rel="stylesheet" type="text/css" href="http://code.jquery.com/qunit/qunit-1.15.0.css" title="QUnit" />
+<script type="text/javascript" src="http://code.jquery.com/qunit/qunit-1.15.0.js"></script>
+<link rel="jsandbox" href="src/jsandbox-worker.js" />
+<script type="text/javascript" src="src/jsandbox.js"></script>
+</head>
+<body>
+<h1 id="qunit-header">JSandbox test suite</h1>
+<h2 id="qunit-banner"></h2>
+<div id="qunit-testrunner-toolbar"></div>
+<h2 id="qunit-userAgent"></h2>
+<ol id="qunit-tests"></ol>
+<div id="qunit-main"></div>
+
+<script type="text/javascript">
+//<![CDATA[
+
+module("JSandbox");
+
+asyncTest("options", function() {
+	var tests = 3,
+	done = 0;
+	expect(tests);
+	
+	JSandbox.eval("1+1", function(r) { equal(r, 2, "data, callback");if(++done==tests)start(); });
+	JSandbox.eval("1+input", function(r) { equal(r, 3, "input");if(++done==tests)start(); }, 2, function() { ok(false, "input");if(++done==tests)start(); });
+	JSandbox.exec("#SYNTAX ERROR", function() { ok(false, "onerror");if(++done==tests)start(); }, null, function() { ok(true, "onerror");if(++done==tests)start(); });
+});
+
+asyncTest("restricting functions", function() {
+	var tests = 10,
+	done = 0;
+	expect(tests);
+	
+	// these three tests need to pass or else JSandbox is insecure
+	JSandbox.eval('typeof XMLHttpRequest==="undefined"', function(r) { ok(r, "XMLHttpRequest");if(++done==tests)start(); });
+	JSandbox.eval('typeof importScripts==="undefined"', function(r) { ok(r, "importScripts");if(++done==tests)start(); });
+	JSandbox.eval('typeof Worker==="undefined"', function(r) { ok(r, "Worker");if(++done==tests)start(); });
+	
+	// https://bugzilla.mozilla.org/show_bug.cgi?id=512464
+	JSandbox.eval('typeof postMessage==="undefined"', function(r) { ok(r, "postMessage");if(++done==tests)start(); });
+	JSandbox.eval('typeof addEventListener==="undefined"&&typeof attachEvent==="undefined"', function(r) { ok(r, "addEventListener");if(++done==tests)start(); });
+	JSandbox.eval('typeof removeEventListener==="undefined"&&typeof detachEvent==="undefined"', function(r) { ok(r, "removeEventListener");if(++done==tests)start(); });
+	JSandbox.eval('typeof dispatchEvent==="undefined"', function(r) { ok(r, "dispatchEvent");if(++done==tests)start(); });
+	
+	// IE-specific functions
+	JSandbox.eval('typeof attachEvent==="undefined"', function(r) { ok(r, "attachEvent");if(++done==tests)start(); });
+	JSandbox.eval('typeof detachEvent==="undefined"', function(r) { ok(r, "detachEvent");if(++done==tests)start(); });
+	JSandbox.eval('typeof ActiveXObject==="undefined"', function(r) { ok(r, "ActiveXObject");if(++done==tests)start(); });
+});
+
+asyncTest("instance catch-alls", function() {
+	var tests = 2,
+	done = 0;
+	expect(tests);
+
+	var sandbox = new JSandbox();
+	sandbox.onerror = function() { ok(true, "onerror");if(++done==tests)start(); };
+	sandbox.onresponse = function() { ok(true, "onresponse");if(++done==tests)start(); };
+
+	sandbox.exec("1");
+	sandbox.exec("#SYNTAX ERROR");
+});
+
+asyncTest("loading external scripts", function() {
+	var tests = 3,
+	done = 0;
+	expect(tests);
+	
+	var sandbox = new JSandbox();
+	sandbox.load("data:,0", function() { ok(true, "callback");if(++done==tests)start(); }, null, function(e) { ok(false, "callback");if(++done==tests)start(); });
+	sandbox.load(["data:,1", "data:,2"], function() { ok(true, "data");if(++done==tests)start(); }, null, function(e) { ok(false, "data");if(++done==tests)start(); });
+	sandbox.load("test-suite.html", function() { ok(false, "onerror");if(++done==tests)start(); }, null, function() { ok(true, "onerror");if(++done==tests)start(); });
+});
+
+asyncTest("instances", function() {
+	var tests = 2,
+	done = 0,
+	input = 1;
+	expect(tests);
+	
+	var sandbox = new JSandbox();
+	sandbox.exec("var x=input", function(r) {
+		ok(true, "exec");
+		sandbox.eval("x", function(r) {
+			equal(r, input, "lookup");
+			start();
+		}, null, function (e) {alert(uneval(e));
+			ok(false, "lookup");
+			start();
+		});
+	}, input, function(e){ok(false, "exec");ok(false, "lookup");start();});
+});
+
+asyncTest("premature ending", function() {
+	var tests = 2,
+	done = 0,
+	abortPassed = true,
+	terminatePassed = true;
+	expect(tests);
+	
+	var expensiveLoop = "for(var i=0;i<10000;i++){(function(){var foo='bar';}())};";
+	
+	var sandbox = new JSandbox(),
+	request = sandbox.exec(expensiveLoop + "var x=0", function () { abortPassed = false; });
+	sandbox.abort(request);
+	ok(abortPassed, "abort");
+	sandbox.exec(expensiveLoop, function() { terminatePassed = false; });
+	sandbox.terminate();
+	setTimeout(function() {
+		ok(terminatePassed, "terminate");
+		start();
+	}, 500);
+});
+
+//]]>
+</script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<div class="modal-header">
+    <h4 class="modal-title">
+        <a href="{{::data['id']}}" target="_blank">
+            {{ data.label || data.name || data.softwareDescription.name }}
+        </a>
+    </h4>
+</div>
+
+<div class="modal-body no-padding">
+    <div class="col">
+        <div class="heading no-padding">
+            <ul class="nav nav-tabs nav-tabs-steps nav-borders">
+                <!--<li ng-class="{active: view.tab === 'info'}"><a href ng-click="switchTab('info')">Info</a></li>-->
+                <li ng-class="{active: view.tab === 'schema'}"><a href ng-click="switchTab('schema')">Schema</a></li>
+                <li ng-class="{active: view.tab === 'change-id'}"><a href ng-click="switchTab('change-id')">Change ID</a></li>
+                <!--<li ng-class="{active: view.tab === 'tags'}"><a href ng-click="switchTab('tags')">Tags</a></li>-->
+            </ul>
+        </div>
+
+        <div class="tabs right flex-one modal-tabs" ng-switch="view.tab">
+            <!--<div class="tab" ng-switch-when="info">-->
+                <!--<p>-->
+                    <!--<strong>Author:</strong>-->
+                    <!--<span> {{ ::data['sbg:createdBy'] }} </span>-->
+                <!--</p>-->
+                <!--<p>-->
+                    <!--<strong>Description{{ ::data.description.length ? '' : ':'}}</strong>-->
+                    <!--<div class="form-group" ng-class="{ 'format': data.description.length}">-->
+                        <!--<div class="markdown-body" markdown="data.description"></div>-->
+                    <!--</div>-->
+                <!--</p>-->
+            <!--</div>-->
+
+            <div ng-switch-when="schema">
+
+                <div class="row change-schema">
+                    <div class="col-md-12 no-padding">
+
+                        <div class="col-md-12">
+                            <label>Change Schema:</label>
+                        </div>
+
+                        <div class="col-md-6">
+                            <select class="form-control"
+                                    ng-model="view.type"
+                                    ng-options=" value.value as value.name for value in view.schemaTypes">
+                            </select>
+                        </div>
+
+                        <div class="col-md-6" ng-if="view.type === 'array'">
+                            <select class="form-control"
+                                    ng-model="view.itemType"
+                                    ng-options=" value.value as value.name for value in view.itemTypes">
+                            </select>
+                        </div>
+
+                        <div class="col-md-12 required-checkbox" ng-if="view.type === 'enum'">
+                            <label>Enum Name: </label>
+                            <input class="form-control" type="text" ng-model="view.enumName" required >
+                        </div>
+
+                        <div class="col-md-12 required-checkbox" ng-if="view.type === 'enum'">
+                            <enum ng-model="view.enumSymbols" type="'string'" min="1" is-required="true"></enum>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 required-checkbox">
+                        <label for="isRequired">Required:</label>
+                        <input name="isRequired" type="checkbox" ng-model="view.required"/>
+                    </div>
+
+                </div>
+                <div class="json-pretty-scroll json-trace">
+                    <pre pretty-json="schema"></pre>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 description-field">
+                        <label for="description">Description: </label>
+                        <input name="description" type="text" class="form-control" ng-model="schema.description">
+                    </div>
+                </div>
+            </div>
+
+            <div ng-switch-when="change-id">
+
+                <form class="form">
+                    <label for="step-id-input">Step's ID:</label>
+                    <div>
+                        <span>#</span>
+                        <input id="node-id-input" type="text" ng-model="view.stepId" ng-change="onIdChange(view.stepId)" />
+                        <button ng-disabled="!view.isIdChanged" ng-click="saveNewId(view.stepId)" class="btn btn-default" title="Save node ID">
+                            <i class="fa fa-check"></i>
+                        </button>
+                        <button ng-disabled="view.isIdOriginal" ng-click="resetId()" class="btn btn-default" title="Reset node ID to original value">
+                            <i class="fa fa-remove"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">Close</button>
+    <button class="btn btn-primary" ng-click="ok()">Save</button>
+</div>

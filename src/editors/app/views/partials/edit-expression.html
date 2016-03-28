@@ -1,0 +1,24 @@
+<div class="modal-body">
+
+    <form class="expression-form">
+
+        <div class="flex-box-row">
+
+            <div class="control-label flex-auto">Available Context:</div>
+
+            <div class="flex-one flex-box-row">
+                <span class="flex-auto">$job</span>
+
+                <div ng-if="view.self" class="flex-one flex-box-row">
+                    <span class="flex-auto"> $self:</span>
+                    <input type="text" class="form-control flex-one" ng-model="view.arg" placeholder="{{ ::view.exampleText }}" />
+                </div>
+            </div>
+
+        </div>
+
+    </form>
+
+    <codemirror code="view.expr" arg="view.arg" default-self='view.defaultSelf' handle-load="ok(expr)" handle-cancel="cancel()" handle-clear="clear()"></codemirror>
+
+</div>

@@ -1,0 +1,12 @@
+<code_scheme name="Default (1)">
+  <option name="HTML_ATTRIBUTE_WRAP" value="4" />
+  <option name="HTML_ALIGN_TEXT" value="true" />
+  <option name="HTML_KEEP_WHITESPACES_INSIDE" value="span,pre,textarea,p" />
+  <option name="HTML_DONT_ADD_BREAKS_IF_INLINE_CONTENT" value="h1,h2,h3,h4,h5,h6,p" />
+  <XML>
+    <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
+  </XML>
+  <editorconfig>
+    <option name="ENABLED" value="false" />
+  </editorconfig>
+</code_scheme>

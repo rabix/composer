@@ -1,0 +1,21 @@
+<li ng-class="{open: directory.isOpen}">
+
+    <span ng-click="directory.isOpen = !directory.isOpen">
+        <i class="fa" ng-class="{'fa-plus-square': !directory.isOpen, 'fa-minus-square': directory.isOpen}"></i>
+        {{ ::directory.name }}
+    </span>
+
+    <ul class="apps-inner-list nested-list">
+        <repo-item ng-repeat="dir in directory.directories" directory="dir"></repo-item>
+
+        <li ng-repeat="app in filteredApps = (directory.files | filter:view.searchTerm)">
+
+            <a href drag="app">
+                <i class="fa"><span class="tool-icon" ng-class="::app.class"></span></i>
+                <span> {{ ::app.name }} </span>
+            </a>
+        </li>
+
+    </ul>
+
+</li>

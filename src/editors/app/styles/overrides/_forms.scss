@@ -1,0 +1,212 @@
+/* Form group override */
+.form-group {
+  &.required {
+    & > .control-label {
+      position: relative;
+      &:after {
+        content: '*';
+        display: inline-block;
+        color: #D9534F;
+        padding: 0 5px;
+      }
+    }
+  }
+}
+
+.control-label {
+  small {
+    font-weight: normal;
+  }
+}
+
+/* Input group override */
+.input-group {
+  .form-control, .btn {
+    height: 33px;
+  }
+
+  .inline-block {
+    margin-left: -1px;
+  }
+}
+
+/* Form override */
+form,
+.form {
+
+  input {
+    &.form-control {
+      &:read-only {
+        cursor: text;
+        background-color: #fff;
+      }
+    }
+  }
+  textarea {
+    resize: none;
+    &.form-control {
+      height: auto;
+    }
+  }
+  .form-group {
+    position: relative;
+    &.meta-group {
+      margin: 0;
+      .btn {
+        width: 41px;
+      }
+    }
+
+    &.unit {
+      &:after {
+        content: 'KB';
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        color: #999;
+      }
+      .form-control {
+        padding-right: 30px;
+      }
+    }
+
+    .checkboxes {
+      .checkbox {
+        display: inline-block;
+        vertical-align: middle;
+        width: 50%;
+        margin: 0 0 5px 0;
+        + .checkbox {
+          margin-top: 0;
+        }
+      }
+    }
+
+    &.form-group-email {
+      input[type=email] {
+        padding-left: 60px;
+      }
+      &:before {
+        content: 'mailto:';
+        display: inline-block;
+        color: #aaa;
+        position: absolute;
+        bottom: 7px;
+        left: 7px;
+      }
+    }
+  }
+}
+
+/* Form control override */
+.form-control {
+  color: #555;
+  height: 33px;
+  @include border-radius(0);
+
+  &.script-area {
+    resize: none;
+    min-height: 400px;
+    background-color: #222;
+    color: $orange;
+    border-color: $orange;
+    padding: 10px;
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  }
+}
+
+/* Help block override */
+.help-block {
+  margin: 0;
+  font-size: 12px;
+}
+
+/* Has Error extension */
+.has-error {
+  .fa-warning {
+    color: $brand-danger;
+  }
+
+  select,
+  textarea,
+  input[type="text"],
+  input[type="password"],
+  input[type="number"],
+  input[type="date"],
+  input[type="email"],
+  input[type="url"],
+  input[type="tel"],
+  input[type="search"],
+  .tags,
+  .form-control {
+    background-color: lighten(#D91E18, 47);
+
+    &:hover, &:focus, &:hover:focus, &.focused {
+      border-color: darken(#D91E18, 10);
+    }
+  }
+}
+
+/* Input group override */
+.input-group {
+  &.input-group-lg {
+    .form-control {
+      @include border-radius(0);
+    }
+    .btn {
+      @include border-radius(0);
+    }
+  }
+}
+
+
+/* Label extension */
+label {
+  &.empty-label {
+    @media (max-width: 600px) {
+      height: 0;
+      float: left;
+    }
+  }
+}
+
+/* Legend extension */
+legend {
+  &.legend-r {
+    text-align: right;
+  }
+  &.legend-tiny {
+    font-size: 14px;
+    font-weight: bold;
+    border-bottom: none;
+    margin: 0 0 5px 0;
+    background-color: #eee;
+    padding: 2px 5px;
+  }
+}
+
+.legend-small {
+  font-size: 16px;
+  color: #333;
+  line-height: inherit;
+  margin-bottom: 20px;
+  margin-top: 5px;
+  border-bottom: 1px solid #e5e5e5;
+  font-weight: normal;
+
+  &.nb {
+    border-bottom: none;
+  }
+
+  .btn {
+    padding: 1px 7px;
+    line-height: 20px;
+    margin: 3px;
+    font-size: 12px;
+  }
+
+  label {
+    font-weight: normal;
+    margin-bottom: 0;
+  }
+}

@@ -1,0 +1,25 @@
+<div property-header
+     class="property-box-header tool"
+     name="{{ view.name }}"
+     position="view.property.outputBinding.position"
+     type="{{ view.type }}"
+     tool-type="tool"
+     mode="output"
+     id-prefix="{{ ::idPrefix }}"
+     index="index"
+     is-required="view.required"
+     handle="handleAction(action)">
+</div>
+
+<div class="property-box-body">
+
+    <div class="row">
+        <div class="col-md-12 box-col">
+            <strong class="key">Enum:</strong>
+            <div class="value">
+                <span ng-if="view.symbols">{{ view.symbols.join(', ') }}</span>
+            </div>
+        </div>
+    </div>
+
+</div>

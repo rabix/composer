@@ -1,0 +1,74 @@
+<div ng-class="view.classes" loading="view.loading">
+
+    <div class="heading">
+        <a ui-sref="tool({id: view.revision.app_id, tab: 'revisions'})" class="btn btn-default pull-left go-back"><i class="fa fa-chevron-left"></i> Back</a>
+        <h1>
+            <span>
+                {{ ::view.revision.name }}
+                <span class="tool-repo">({{ ::view.repo.owner }}/{{ ::view.repo.name }})</span>
+                <span class="version"><i class="fa fa-tag"></i> v{{ ::view.revision.version }}</span>
+            </span>
+            <a ui-sref="cliche-edit({type: (view.app.is_script ? 'script' : 'tool'), id: view.revision.app_id, revision: view.revision._id})" class="btn btn-primary pull-right"><i class="fa fa-pencil"></i> Edit</a>
+        </h1>
+    </div>
+    <!-- # .heading -->
+
+    <div ng-if="!view.loading" class="content content-mix">
+
+        <div class="description">
+            <div class="markdown-body" markdown="::view.revision.description"></div>
+        </div>
+
+        <div class="description">
+            <div class="panel panel-warning panel-app horizontal">
+                <div class="panel-body">
+                    <div class="row no-margin">
+
+                        <section class="col-md-6">
+                            <h5>Author</h5>
+                            <p><strong>Name:</strong> {{ ::view.author.github.name }} </p>
+                            <p><strong>Username:</strong> <a ng-href="http://github.com/{{ ::view.author.github.login }}" target="_blank">{{ ::view.author.github.login }}</a> </p>
+                            <p><strong>Repo:</strong> <a ui-sref="repo({id: view.repo._id})">{{ ::view.repo.owner }}/{{ ::view.repo.name }}</a></p>
+                        </section>
+
+                        <section class="col-md-6">
+                            <h5>Docker Image Details</h5>
+                            <p>
+                                <strong>Image Id:</strong>
+                                {{ ::view.docker.dockerImageId }}
+                                <i ng-if="!view.docker.dockerImageId">Not defined</i>
+                            </p>
+                            <p>
+                                <strong>Image Repo[:Tag]:</strong>
+                                {{ ::view.docker.dockerPull }}
+                                <i ng-if="!view.docker.dockerPull">Not defined</i>
+                            </p>
+                        </section>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div ng-if="view.app.is_script" class="snippet">
+            <p>Script</p>
+            <pre pretty-json="::view.revision.json.transform"></pre>
+        </div>
+
+        <div class="snippet">
+            <p>Use this command to run app</p>
+            <pre>$ rabix "<a ng-href="/tool-revision/{{ ::view.revision._id }}" target="_blank">{{ view.domain }}/tool-revision/{{ ::view.revision._id }}</a>"</pre>
+        </div>
+
+        <div class="snippet">
+            <a href class="toggle-btn" ng-click="toggleJson()">
+                Use this code snippet for your pipeline
+                <i class="fa" ng-class="{'fa-chevron-right': !view.isJsonVisible, 'fa-chevron-down': view.isJsonVisible}"></i>
+            </a>
+            <pre ng-class="{hide: !view.isJsonVisible}" pretty-json="::view.revision.json"></pre>
+        </div>
+
+    </div>
+    <!-- # .content -->
+
+</div>

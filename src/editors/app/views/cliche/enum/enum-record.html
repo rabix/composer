@@ -1,0 +1,12 @@
+<div class="enum-field form-group form-group-object">
+    <i class="enum-field-empty" ng-if="properties | isEmpty">Property not defined</i>
+    <input-field
+            ng-repeat="property in properties track by property.name"
+            ng-model="item.value[property.name]"
+            class="input-field"
+            prop="property"
+            form="form"
+            is-disabled="isDisabled"
+            ignore-files="{{ exposible }}">
+    </input-field>
+</div>

@@ -1,0 +1,30 @@
+.suggested-files {
+
+    span {
+        &.file-name {
+            @extend %ellipsis;
+            max-width: 292px;
+
+            .remove-file {
+                display: none;
+                cursor: pointer;
+            }
+
+            &:hover {
+                .remove-file {
+                    display: block;
+                    position: absolute;
+                    right: 5px;
+                    top: 5px;
+                    font-size: 20px;
+                    color: $brand-danger;
+                }
+            }
+
+        }
+
+        &.pick-file {
+            vertical-align: top;
+        }
+    }
+}

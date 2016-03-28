@@ -1,0 +1,368 @@
+<form ng-submit="save()" name="view.form" novalidate>
+
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()"><span>&times;</span><span class="sr-only">Close</span>
+        </button>
+        <h4 class="modal-title">
+            <span>{{ (view.mode === 'edit') ? 'Edit' : 'Add' }} Input Property</span>
+            <label class="checkbox inline">
+                <input type="checkbox" ng-model="view.required" name="required" id="input_modal_required"> required
+            </label>
+        </h4>
+    </div>
+
+    <div class="modal-body">
+
+        <p ng-if="view.error" class="alert alert-danger">{{ view.error }}</p>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group" ng-class="{'has-error': (view.form.name.$invalid && view.form.$dirty)}">
+                    <label class="control-label" for="input_modal_id">{{ view.key === 'id' ? 'ID' : 'Name' }}</label>
+                    <input uib-tooltip="{{ :: 'clicheInputsInputId' | loc }}"
+                           tooltip-trigger="focus"
+                           type="text"
+                           class="form-control"
+                           id="input_modal_id"
+                           name="name"
+                           ng-model="view.name"
+                           is-valid-name
+                           required>
+                    <span class="help-block">Allowed characters are alphanumerics and _</span>
+                </div>
+            </div>
+            <!-- END Name -->
+
+            <div class="col-md-4">
+                <div class="form-group" ng-class="{'has-error': (view.form.type.$invalid && view.form.$dirty)}">
+                    <label class="control-label">
+                        Type
+                        <help-message message="{{ :: 'clicheInputsType' | loc }}"></help-message>
+                    </label>
+                    <select class="form-control"
+                            id="input_modal_type"
+                            name="type"
+                            ng-model="view.type"
+                            ng-options="option for option in view.types"
+                            required></select>
+                </div>
+            </div>
+            <!-- END Type -->
+
+            <div class="col-md-4" ng-if="view.type === 'array'">
+                <div class="form-group">
+                    <label class="control-label">
+                        Item Type
+                        <help-message message="{{ :: 'clicheInputsItemType' | loc }}"></help-message>
+                    </label>
+                    <select class="form-control"
+                            id="input_modal_item_type"
+                            name="itemType"
+                            ng-model="view.itemsType"
+                            ng-options="option for option in view.itemTypes"></select>
+                </div>
+            </div>
+            <!-- END Item Type -->
+
+        </div>
+
+        <div class="row" ng-if="view.type === 'enum' || view.itemsType === 'enum'">
+            <div class="col-md-12">
+                <enum ng-model="view.symbols" type="'string'" min="1" is-required="true"></enum>
+            </div>
+        </div>
+
+
+        <h3 class="legend-small">
+            Additional information
+        </h3>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group" ng-class="{'has-error': (view.form.label.$invalid && view.form.$dirty)}">
+                    <label class="control-label" for="input_modal_label">
+                        Label
+                    </label>
+                    <input uib-tooltip="{{ :: 'clicheInputsLabel' | loc }}"
+                           tooltip-trigger="focus"
+                           type="text"
+                           class="form-control"
+                           id="input_modal_label"
+                           name="label"
+                           ng-model="view.label">
+                </div>
+            </div>
+            <!-- END Label -->
+
+
+            <div class="col-md-4">
+                <div class="form-group" ng-class="{'has-error': (view.form.description.$invalid && view.form.$dirty)}">
+                    <label class="control-label" for="input_modal_description">
+                        Description
+                    </label>
+                    <input uib-tooltip="{{ :: 'clicheInputsDescription' | loc }}"
+                           tooltip-trigger="focus"
+                           type="text"
+                           class="form-control"
+                           id="input_modal_description"
+                           name="description"
+                           ng-model="view.description">
+                </div>
+            </div>
+            <!-- END Description -->
+        </div>
+
+        <div class="row">
+
+            <div class="col-md-4">
+                <div class="form-group" ng-class="{'has-error': (view.form.altPrefix.$invalid && view.form.$dirty)}">
+                    <label class="control-label" for="input_modal_alt_prefix">
+                        Alternative Prefix
+                    </label>
+                    <input uib-tooltip="{{ :: 'clicheInputsAltPrefix' | loc }}"
+                           tooltip-trigger="focus"
+                           type="text"
+                           class="form-control"
+                           id="input_modal_alt_prefix"
+                           name="altPrefix"
+                           ng-model="view.altPrefix">
+                </div>
+            </div>
+            <!-- END Alt Prefix -->
+
+
+            <div class="col-md-4">
+                <div class="form-group" ng-class="{'has-error': (view.form.category.$invalid && view.form.$dirty)}">
+                    <label class="control-label" for="input_modal_category">
+                        Category
+                    </label>
+                    <input uib-tooltip="{{ :: 'clicheInputsCategory' | loc }}"
+                           tooltip-trigger="focus"
+                           type="text"
+                           class="form-control"
+                           id="input_modal_category"
+                           name="category"
+                           ng-model="view.category">
+                </div>
+            </div>
+            <!-- END Category -->
+
+            <div class="col-md-4" ng-show="!isFileType">
+                <div class="form-group"
+                     ng-class="{'has-error': (view.form.toolDefaultValue.$invalid && view.form.$dirty)}">
+                    <label class="control-label" for="input_modal_tool_default_value">
+                        Tool Default
+                    </label>
+                    <input uib-tooltip="{{ :: 'clicheInputsToolDefaultValue' | loc }}"
+                           tooltip-trigger="focus"
+                           type="text"
+                           class="form-control"
+                           id="input_modal_tool_default_value"
+                           name="toolDefaultValue"
+                           ng-model="view.toolDefaultValue">
+                </div>
+            </div>
+            <!-- END Tool Default -->
+
+            <div class="col-md-4" ng-show="isFileType">
+                <div class="form-group" ng-class="{'has-error': (view.form.fileTypes.$invalid && view.form.$dirty)}">
+                    <label class="control-label" for="input_modal_file_types">
+                        File Types
+                    </label>
+                    <input uib-tooltip="{{ :: 'clicheInputsFileTypes' | loc }}"
+                           tooltip-trigger="focus"
+                           type="text"
+                           class="form-control"
+                           id="input_modal_file_types"
+                           name="fileTypes"
+                           ng-model="view.fileTypes">
+                </div>
+            </div>
+            <!-- END File Types -->
+
+        </div>
+
+        <div ng-if="showStageInput">
+            <h3 class="legend-small">
+                <label for="input_modal_stage_input">Stage Input</label>
+            </h3>
+            <div class="row">
+                <div class="form-group col-md-6">
+                    <select name="stageInput"
+                            class="form-control"
+                            id="input_modal_stage_input"
+                            ng-options="key as value for (key, value) in {copy: 'Copy', link: 'Link'}"
+                            ng-model="view.stageInput">
+                        <option value>-- none --</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <h3 class="legend-small" ng-if="view.type === 'File'">
+            <label class="checkbox inline">
+                <input type="checkbox"
+                       ng-model="view.property.inputBinding.loadContents"
+                       name="loadContents"
+                       id="input_modal_load_contents">
+                Load Contents
+            </label>
+            <help-message message="{{ :: 'clicheBindingsLoadContents' | loc }}"></help-message>
+        </h3>
+         <!--END LoadContents -->
+
+
+        <div ng-if="view.type === 'File'">
+            <h3 class="legend-small">
+                Secondary Files
+                <help-message message="{{ :: 'clicheInputsSecondaryFiles' | loc }}"></help-message>
+
+            </h3>
+
+            <div class="enum-list-wrap">
+
+                <a href
+                   ng-click="addSecondaryFile()"
+                   class="btn btn-default add-enum-item"><i class="fa fa-plus"></i></a>
+
+                <div class="enum-list-container">
+                    <ul class="enum-list">
+                        <li ng-repeat="file in view.property.inputBinding.secondaryFiles track by $index">
+                            <div class="enum-field form-group form-group-file">
+                                <expr ng-model="file"
+                                      index="{{ $index }}"
+                                      handle-item-update="updateSecondaryFile(value, index)"></expr>
+                            </div>
+                            <a href class="fa fa-remove remove-btn" ng-click="removeSecondaryFile($index)"></a>
+                        </li>
+                    </ul>
+
+                    <p class="alert alert-info" ng-if="view.property.inputBinding.secondaryFiles | isEmpty">
+                        Click the plus button to add a file
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!--END Secondary Files-->
+
+        <h3 class="legend-small">
+            <label class="checkbox inline">
+                <input type="checkbox"
+                       name="includeInCmd"
+                       ng-model="view.adapter"
+                       ng-change="toggleAdapter()"
+                       ng-disabled="view.disabledAll"
+                       id="input_modal_include_in_cl">
+                Include in command line
+            </label>
+        </h3>
+        <!--END Include In Command Line-->
+
+        <div ng-if="!!(view.property.inputBinding['sbg:cmdInclude'])" class="row">
+
+            <div class="col-md-2">
+                <div class="form-group" ng-class="{'has-error': (view.form.position.$invalid && view.form.$dirty)}">
+                    <label class="control-label" for="input_modal_position">
+                        Position
+                    </label>
+                    <input uib-tooltip="{{ :: 'clicheBindingsPosition' | loc }}"
+                           tooltip-trigger="focus"
+                           type="number"
+                           class="form-control"
+                           id="input_modal_position"
+                           name="position"
+                           ng-model="view.property.inputBinding.position">
+                </div>
+            </div>
+            <!-- END Position -->
+
+            <div class="col-md-2">
+                <div class="form-group" ng-class="{'has-error': (view.form.prefix.$invalid && view.form.$dirty)}">
+                    <label class="control-label" for="input_modal_prefix">Prefix</label>
+                    <input uib-tooltip="{{ :: 'clicheBindingsPrefix' | loc }}"
+                           tooltip-trigger="focus"
+                           type="text"
+                           class="form-control"
+                           id="input_modal_prefix"
+                           name="prefix"
+                           ng-model="view.property.inputBinding.prefix"
+                           ng-disabled="view.disabled"
+                           ng-required="view.type === 'boolean'">
+                    <span class="help-block" ng-if="view.type === 'boolean'">
+                        Required if type is boolean
+                    </span>
+                </div>
+            </div>
+            <!-- END Prefix -->
+
+            <div class="col-md-3">
+                <div class="form-group">
+
+                    <label class="control-label" for="input_modal_separate">
+                        Separate prefix with
+                        <help-message message="{{ :: 'clicheBindingsSeparatePrefix' | loc }}"></help-message>
+                    </label>
+
+                    <separator type="list"
+                               model="view.property.inputBinding.separate"
+                               id="input_modal_separate"
+                               is-disabled="view.disabled">
+                    </separator>
+                </div>
+            </div>
+            <!-- END Separator -->
+
+            <div ng-if="view.type === 'array'" class="col-md-2">
+                <div class="form-group">
+                    <label class="control-label" for="input_modal_separator">
+                        Item Separator
+                        <help-message message="{{ :: 'clicheBindingsItemSeparator' | loc }}"></help-message>
+                    </label>
+                    <separator type="item"
+                               id="input_modal_separator"
+                               model="view.property.inputBinding.itemSeparator"
+                               is-disabled="view.disabled">
+                    </separator>
+                </div>
+            </div>
+            <!-- END Item Separator -->
+
+            <div class="col-md-3" ng-if="!view.disabled && view.items.type !== 'record'">
+                <div class="form-group">
+                    <label class="control-label" for="input_modal_value">
+                        Value
+                        <help-message message="{{ :: 'clicheBindingsValue' | loc }}"></help-message>
+                    </label>
+                    <expr ng-model="view.property.inputBinding.valueFrom"
+                          handle-item-update="updateTransform(value)"
+                          only-expr="true"
+                          self="true"
+                          id="input_modal_value"
+                          self-type="view.type"
+                          self-item-type="view.items.type"
+                          placeholder="value"
+                          prop-id="{{ ::view.property.id }}">
+                    </expr>
+                </div>
+            </div>
+            <!-- END Transform -->
+
+        </div>
+
+        <p ng-if="!(!!view.property.inputBinding['sbg:cmdInclude'])" class="alert alert-info">
+            This input will not be automatically included in the generated command line.
+        </p>
+
+    </div>
+
+    <div class="modal-footer">
+        <a href class="btn btn-warning" ng-click="cancel()">Cancel</a>
+        <button type="submit"
+                class="btn btn-primary"
+                id="input_modal_save_button"
+                ng-disabled="view.form.$pristine || view.form.$invalid">
+            Save
+        </button>
+    </div>
+</form>
+

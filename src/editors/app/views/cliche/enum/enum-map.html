@@ -1,0 +1,11 @@
+<ng-form name="inputForm" class="input-property">
+
+    <div class="enum-field form-group form-group-file" ng-class="{'has-error': (inputForm.enumNumber.$invalid && !isDisabled)}">
+
+        <key-value-map
+                ng-disabled="isDisabled"
+                list="item.value">
+        </key-value-map>
+    </div>
+
+</ng-form>

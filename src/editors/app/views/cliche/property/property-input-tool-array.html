@@ -1,0 +1,89 @@
+<div property-header
+     class="property-box-header tool"
+     name="{{ view.name }}"
+     position="view.property.inputBinding.position"
+     adapter="view.property.inputBinding"
+     type="array"
+     tool-type="tool"
+     mode="input"
+     id-prefix="{{ ::idPrefix }}"
+     index="index"
+     item-type="{{ view.itemsType }}"
+     is-required="view.required"
+     handle="handleAction(action)">
+</div>
+
+<div class="property-box-body">
+
+    <div class="row">
+        <div class="col-md-3 box-col">
+            <strong class="key">Prefix:</strong>
+            <div class="value">
+                <span ng-if="view.itemsType !== 'record'">{{ view.property.inputBinding.prefix }}</span>
+                <i class="none" ng-if="view.itemsType === 'record'">none</i>
+                <i ng-if="!view.property.inputBinding.prefix && view.itemsType !== 'record'">Not defined</i>
+            </div>
+        </div>
+
+        <div class="col-md-3 box-col">
+            <strong class="key">Separate:</strong>
+            <div class="value">
+                <span>{{ view.property.inputBinding.separate }}</span>
+            </div>
+        </div>
+
+        <div class="col-md-3 box-col">
+            <strong class="key">Item Separator:</strong>
+            <div class="value">
+                <separator-info type="item" model="view.property.inputBinding.itemSeparator"></separator-info>
+            </div>
+        </div>
+
+        <div class="col-md-3 box-col">
+            <strong class="key">Value:</strong>
+            <div class="value">
+                <div ng-if="view.itemsType !== 'record'" class="value">
+                    <i class="fa fa-warning error" ng-if="view.exprError" title="{{ view.exprError }}"></i>
+                    {{ view.property.inputBinding.valueFrom.script }}
+                </div>
+                <i ng-if="view.itemsType === 'record'">none</i>
+                <i ng-if="view.itemsType !== 'record' && !view.property.inputBinding.valueFrom">Not defined</i>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row" ng-if="view.itemsType === 'record'">
+        <div class="col-md-12">
+
+            <h3 class="legend-small">
+                Fields
+            </h3>
+
+            <div class="enum-list-wrap">
+                <add-property
+                        type="input"
+                        ng-model="newField"
+                        tool-type="tool"
+                        properties="view.items.fields"
+                        class="add-enum-item large">
+                </add-property>
+
+                <div class="enum-list-container">
+                    <property-input
+                            ng-repeat="property in view.items.fields | orderBy:sortByPosition track by property.name"
+                            ng-model="property"
+                            type="{{ type }}"
+                            inputs="inputs[view.name]"
+                            properties="view.items.fields"
+                            handler="handler()">
+                    </property-input>
+
+                    <p class="alert alert-info large" ng-if="view.items.fields.length === 0">Click the plus button to define a field.</p>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>

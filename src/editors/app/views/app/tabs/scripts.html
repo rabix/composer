@@ -1,0 +1,73 @@
+<div class="content content-tbl">
+    <table class="table table-hover apps">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Repo</th>
+                <th>Author</th>
+                <th class="right">
+                    <a href
+                       class="btn btn-default btn-toggle"
+                       uib-tooltip="Toggle Versions"
+                       tooltip-placement="left"
+                       ng-click="toggleRevisions('scripts')">
+                        <i class="fa" ng-class="{'fa-chevron-right': !view.active.scripts, 'fa-chevron-down': view.active.scripts}"></i>
+                    </a>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat-start="script in view.scripts">
+                <td><a ui-sref="tool({id: script._id, mode: 'preview'})" ng-click="change($event, script)">{{ ::script.name }}</a></td>
+                <td><a ui-sref="repo({id: script.repo._id})">{{ ::script.repo.owner }}/{{ ::script.repo.name }}</a></td>
+                <td><p uib-tooltip="{{ ::script.author }}" tooltip-popup-delay="1000">{{ ::script.author }}</p></td>
+                <td class="right">
+                    <a class="btn btn-default" uib-tooltip="Edit Script" ui-sref="cliche-edit({type: 'script', id: script._id, revision: 'latest'})"><i class="fa fa-pencil"></i></a>
+                    <a href
+                       class="btn btn-default btn-toggle"
+                       uib-tooltip="Toggle Versions ({{ ::script.revisions.length }})"
+                       tooltip-placement="left"
+                       ng-click="toggleRevisions('scripts', script)">
+                        {{ ::script.revisions.length }} <i class="fa" ng-class="{'fa-chevron-right': !script.active, 'fa-chevron-down': script.active}"></i>
+                    </a>
+                </td>
+            </tr>
+            <tr class="inner-table" ng-class="{active: script.active}" ng-repeat-end>
+                <td colspan="4">
+                    <div class="inner-table-body">
+                        <table class="table table-hover app-revisions">
+                            <thead>
+                            <tr>
+                                <th>Versions</th>
+                                <th>Description</th>
+                                <th class="right">&nbsp;</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="revision in ::script.revisions">
+                                <td><a ui-sref="tool-revision({id: revision._id})" class="version"><strong><i class="fa fa-tag"></i> v{{ ::revision.version }}</strong></a></td>
+                                <td>
+                                    <p ng-if="revision.description" uib-tooltip="{{ ::revision.description }}" tooltip-popup-delay="1000">{{ ::revision.description }}</p>
+                                    <i ng-if="!revision.description">No description</i>
+                                </td>
+                                <td class="right">
+                                    <a class="btn btn-sm btn-default" uib-tooltip="Edit Revision" ui-sref="cliche-edit({type: 'script', id: script._id, revision: revision._id})"><i class="fa fa-pencil"></i></a>
+                                </td>
+                            </tr>
+                            <tr class="empty" ng-if="script.revisions.length === 0">
+                                <td colspan="4"><p class="alert alert-info">There are no public versions for this script</p></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+            <tr class="empty" ng-if="view.scripts.length === 0">
+                <td colspan="4"><p class="alert alert-info">There are no scripts found</p></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<!-- # .content-->
+
+<paginator class="paginator" page="view.page.scripts" total="view.total.scripts" handler="getMoreScripts(offset)"></paginator>

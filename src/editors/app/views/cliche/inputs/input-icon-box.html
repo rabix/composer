@@ -1,0 +1,11 @@
+<div class="icons" ng-if="exposed">
+    <label uib-tooltip="Expose" tooltip-placement="left">
+        <input ng-disabled="view.includeInPorts" type="checkbox" ng-model="view.expose" ng-change="exposeParams()">
+        <i class="fa" ng-class="{'fa-unlock-alt': view.expose, 'fa-lock': !view.expose, 'disabled': view.includeInPorts}"></i>
+    </label>
+
+    <label uib-tooltip="Include in Ports" tooltip-placement="left">
+        <input type="checkbox" ng-model="view.includeInPorts" ng-change="includeInPorts()">
+        <i class="fa" ng-class="{'fa-toggle-on': view.includeInPorts, 'fa-toggle-off': !view.includeInPorts}"></i>
+    </label>
+</div>
