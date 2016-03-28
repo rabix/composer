@@ -1,13 +1,9 @@
-/**
- * Created by filip on 8/11/15.
- */
-
 class Api {
 
     constructor($rootScope, $resource, $http, CottonTailConfig) {
         'ngInject';
 
-        this.Config = null;
+        this.serverConfig = null;
 
         this.$rootScope = $rootScope;
         this.$resource = $resource;
@@ -16,7 +12,7 @@ class Api {
     }
 
     setupApi() {
-        this.Config = this.CottonTailConfig.getConfig();
+        this.serverConfig = this.CottonTailConfig.getConfig();
         this._loadConfig();
         this._setResources();
         this.$rootScope.$broadcast('setupApi');
@@ -24,9 +20,7 @@ class Api {
 
     _loadConfig() {
 
-        this.BASE =  this.Config.DOMAIN + '/api';
-        this.WORKSPACE = this.BASE + '/:workspace';
-
+        this.BASE = `http://${this.serverConfig.host}:${this.serverConfig.port}/api`;
     }
 
     _setResources() {
