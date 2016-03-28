@@ -11,10 +11,18 @@
     display: block;
     padding: $padding-base-vertical $padding-base-horizontal;
     cursor: pointer;
+    overflow: hidden;
+    position: relative;
 
     &:hover {
       text-decoration: none;
       font-weight: bold;
+    }
+
+    .file-name {
+      position: absolute;
+      left: 35px;
+      white-space: nowrap;
     }
   }
 
