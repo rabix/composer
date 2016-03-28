@@ -1,56 +1,86 @@
-<div class="flex-container" id="ideContainer">
+<div class="flex-container ide">
 
-    <file-tree files="ide.workspace.files"
-               structure="ide.structure"
-               workspace="{{ ::ide.workspace.name }}"
-               on-add="ide.fileAdded(file)"
-               on-open="ide.fileOpened(file)"></file-tree>
-    <div class="editor-body" ui-view>
-        <ct-tabs tabs="ide.openFiles"
-                 ng-show="ide.activeFile"
-                 on-active-tab="ide.switchFiles(tab)"
-                 current-active-tab="ide.activeFile"
-                 get-active-tab="ide.getActiveFile()"
-                 on-close-tab="ide.closeFile(tab)">
-            <ct-button ng-show="!ide.activeFile.class" intention="primary" ng-click="ide.saveFile(ide.activeFile)" size="sm" ng-if="ide.activeFile">
-                Import
+    <div class="toolbar">
+        <div class="cottontail-logo"></div>
+        <div class="actions" ng-show="ide.activeFile">
+            <ct-button intention="primary"
+                       size="sm"
+                       ng-click="ide.switchView('code', ide.activeFile)">
+                <i class="fa fa-fw fa-code"></i> Code View
             </ct-button>
 
-            <span ng-show="ide.activeFile.class">
-                <ct-button intention="success" ng-click="ide.editorApi.onSave(ide.activeFile.id)" size="sm">
-                    Save
-                </ct-button>
-            </span>
-        </ct-tabs>
+            <ct-button intention="primary"
+                       size="sm"
+                       ng-click="ide.switchView(ide.activeFile)">
+                <i class="fa fa-fw fa-pencil-square"></i> Code View
+            </ct-button>
+
+            <ct-button ng-show="!ide.activeFile.class"
+                       intention="success"
+                       ng-click="ide.saveFile(ide.activeFile)"
+                       size="sm"
+                       ng-if="ide.activeFile">
+                <i class="fa fa-fw fa-save"></i>
+                Save
+            </ct-button>
+
+            <ct-button intention="success"
+                       ng-click="ide.editorApi.onSave(ide.activeFile.id)"
+                       size="sm"
+                       ng-show="ide.activeFile.class">
+                <i class="fa fa-fw fa-save"></i>
+                Save
+            </ct-button>
+        </div>
+    </div>
+
+    <div class="ide-container">
+        <file-tree files="ide.workspace.files"
+                   structure="ide.structure"
+                   workspace="{{ ::ide.workspace.name }}"
+                   on-add="ide.fileAdded(file)"
+                   on-open="ide.fileOpened(file)">
+        </file-tree>
+
+        <div class="editor-body" ui-view>
+            <ct-tabs tabs="ide.openFiles"
+                     ng-show="ide.activeFile"
+                     on-active-tab="ide.switchFiles(tab)"
+                     current-active-tab="ide.activeFile"
+                     get-active-tab="ide.getActiveFile()"
+                     on-close-tab="ide.closeFile(tab)">
+
+            </ct-tabs>
 
 
-        <div ng-show="ide.activeFile && !ide.activeFile.class" class="editor" ui-ace="ide.Editor.config"
-             ng-model="ide.activeFile.content"></div>
+            <div ng-show="ide.activeFile && !ide.activeFile.class" class="editor" ui-ace="ide.Editor.config"
+                 ng-model="ide.activeFile.content"></div>
 
-        <cliche-editor app="ide.activeFile.content"
-                       callbacks="ide.editorApi"
-                       external-app-id="ide.activeFile.fullPath"
-                       ng-if="ide.activeFile && ide.activeFile.class === 'CommandLineTool'">
-        </cliche-editor>
-        <dyole-editor app="ide.activeFile.content"
-                      callbacks="ide.editorApi"
-                      get-toolbox="ide.getToolbox"
-                      get-app="ide.getApp"
-                      external-app-id="ide.activeFile.fullPath"
-                      ng-if="ide.activeFile && ide.activeFile.class === 'Workflow'">
-        </dyole-editor>
+            <cliche-editor app="ide.activeFile.content"
+                           callbacks="ide.editorApi"
+                           external-app-id="ide.activeFile.fullPath"
+                           ng-if="ide.activeFile && ide.activeFile.class === 'CommandLineTool'">
+            </cliche-editor>
+            <dyole-editor app="ide.activeFile.content"
+                          callbacks="ide.editorApi"
+                          get-toolbox="ide.getToolbox"
+                          get-app="ide.getApp"
+                          external-app-id="ide.activeFile.fullPath"
+                          ng-if="ide.activeFile && ide.activeFile.class === 'Workflow'">
+            </dyole-editor>
 
-        <div ng-show="!ide.activeFile" class="flex-container flex-center">
-            <div class="panel panel-default col-lg-3 col-md-4 col-sm-6">
-                <div class="panel-body"><h2 class="text-center">Open an app from the left</h2>
+            <div ng-show="!ide.activeFile" class="flex-container flex-center">
+                <div class="panel panel-default col-lg-3 col-md-4 col-sm-6">
+                    <div class="panel-body"><h2 class="text-center">Open an app from the left</h2>
 
-                    <hr/>
+                        <hr/>
 
-                    <ct-button intention="success" create-file="ide.fileAdded(file)" ws="ide.workspace.name"
-                               size="block">
-                        <i class="fa fa-plus"></i>
-                        Create a new app
-                    </ct-button>
+                        <ct-button intention="success" create-file="ide.fileAdded(file)" ws="ide.workspace.name"
+                                   size="block">
+                            <i class="fa fa-plus"></i>
+                            Create a new app
+                        </ct-button>
+                    </div>
                 </div>
             </div>
         </div>
