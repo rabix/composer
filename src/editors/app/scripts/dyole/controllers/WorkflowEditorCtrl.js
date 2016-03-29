@@ -175,7 +175,7 @@ angular.module('registryApp.app')
 
                 if (app === '' || app === '{}') {
                     workflow = _.assign(_.cloneDeep(rawRabixWorkflow), {id: $scope.externalAppId || ''});
-                    _saveCallback(null, workflow);
+                    _editorSaveCallback(null, workflow);
                 } else {
                     workflow = JSON.parse(app);
                 }
@@ -661,13 +661,13 @@ angular.module('registryApp.app')
                 }
             }
 
-            var _saveCallback = $scope.callbacks.onSave;
+            var _editorSaveCallback = $scope.callbacks.editorOnSave;
             var _setWorkingCopyCallback = $scope.callbacks.setWorkflowWorkingCopy;
 
             $scope.callbacks.onSave = function(toolId, copyToSave) {
                 var workflow = PipelineInstance.format();
                 if (workflow && toolId === $scope.view.pipelineId) {
-                    var result = _saveCallback(null, workflow);
+                    var result = _editorSaveCallback(null, workflow);
 
                     $scope.view.loading = true;
                     _runPostCallback(result, function (result) {
@@ -676,7 +676,7 @@ angular.module('registryApp.app')
                         Notification.success('Workflow saved successfully');
                     });
                 } else if (toolId === null) {
-                    _saveCallback(null, copyToSave);
+                    _editorSaveCallback(null, copyToSave);
                 }
             };
 

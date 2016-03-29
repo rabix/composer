@@ -69,9 +69,9 @@ angular.module('registryApp.dyole')
              * @returns {string}
              * @private
              */
-            generateNodeId: function(model, used) {
+            generateNodeId: function (model, used) {
                 var _id, check = true,
-                    name = (model.softwareDescription && model.softwareDescription.label) ? model.softwareDescription.label : model.label || model.id,
+                    name = (model.softwareDescription && model.softwareDescription.label) ? model.softwareDescription.label : model.label || model.name,
                     n = 0;
 
                 // remove # to start striping and creating unique id
@@ -79,37 +79,24 @@ angular.module('registryApp.dyole')
                     name = name.slice(1);
                 }
 
-                var _checkIdPath = function (id) {
-                    var sp = id.split('/');
-
-                    return sp.length > 0;
-                };
-
-
-                if (this,_checkIdPath(name)) {
-                    var tmp = name.split('/');
-                    name = tmp[ tmp.length - 1 ];
-                }
-
-
-                var _fixName = function(n) {
+                var _fixName = function (n) {
 
                     var regex = /[^A-Za-z0-9]/g;
 
                     return n.replace(regex, '_');
                 };
 
-                //name = _fixName(name);
+                name = _fixName(name);
 
                 used = used || {};
 
-                var _checkIdAvailable = function(id) {
+                var _checkIdAvailable = function (id) {
                     return !!used[id];
                 };
 
-                //if (name.charAt(0) !== '#') {
-                //    name = '#' + name;
-                //}
+                if (name.charAt(0) !== '#') {
+                    name = '#' + name;
+                }
 
                 while (check) {
 

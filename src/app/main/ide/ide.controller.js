@@ -34,7 +34,7 @@ class IdeController {
         };
 
         this.editorApi = {
-            onSave: function (blank, tool){
+            editorOnSave: function (blank, tool){
                 let deferred = $q.defer();
                 this.activeFile.content = JSON.stringify(tool, null, 4);
                 this.saveFile(this.activeFile).then((suc) => {
