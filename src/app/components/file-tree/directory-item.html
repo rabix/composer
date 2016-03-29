@@ -3,7 +3,7 @@
     <button ng-if="directory.isRoot === true"
             ng-click="reloadTree()"
             class="pull-right btn btn-link">
-        <i class="fa fa-refresh"></i>
+        <i class="fa fa-refresh" ng-class="{'fa-spin': directoryLoadingInProgress === true}"></i>
     </button>
 
     <div class="directory-name" ng-click="directory.isOpen = !directory.isOpen">

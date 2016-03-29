@@ -23,6 +23,8 @@ class IdeController {
         this.Editor = Editor;
         this.Api = Api;
 
+        this.$scope.directoryLoadingInProgress = true;
+
         this.structure = {
             name: 'root',
             type: 'dir',
@@ -92,7 +94,10 @@ class IdeController {
         };
 
         $rootScope.$on('setupApi', () => that.queryWorkSpace());
-        $rootScope.$on('reloadDirectoryTree', () => that.updateDirectoryTree());
+
+        $rootScope.$on('reloadDirectoryTree', function(event, data) {
+            that.updateDirectoryTree().then(data.onComplete);
+        });
 
         if (Api.Config !== null) {
             this.queryWorkSpace();
@@ -105,8 +110,11 @@ class IdeController {
      * Update the directory tree without losing the reference to the structure object
      */
     updateDirectoryTree() {
+        let deferred = this.$q.defer();
+
         this.Api.workspaces.query({}, (res) => {
             let newTree = this._createDirectoryTreeStructure(res);
+
 
             (function sync(existing, update) {
                 existing.files.length = 0;
@@ -130,7 +138,10 @@ class IdeController {
                 }
             })(this.structure, newTree);
 
+            deferred.resolve(this.structure);
         });
+
+        return deferred.promise;
     }
 
     /**
