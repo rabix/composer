@@ -91,10 +91,8 @@ class IdeController {
             return deferred.promise;
         };
 
-
-        $rootScope.$on('setupApi', function() {
-            that.queryWorkSpace();
-        });
+        $rootScope.$on('setupApi', () => that.queryWorkSpace());
+        $rootScope.$on('reloadDirectoryTree', () => that.updateDirectoryTree());
 
         if (Api.Config !== null) {
             this.queryWorkSpace();
@@ -103,17 +101,59 @@ class IdeController {
         this.addKeyboardHandlers($scope, Shortcuts);
     }
 
+    /**
+     * Update the directory tree without losing the reference to the structure object
+     */
+    updateDirectoryTree() {
+        this.Api.workspaces.query({}, (res) => {
+            let newTree = this._createDirectoryTreeStructure(res);
+
+            (function sync(existing, update) {
+                existing.files.length = 0;
+                for (let f of update.files) {
+                    existing.files.push(f);
+                }
+
+                for (let name in existing.directories) {
+                    if (!update.directories[name]) {
+                        delete existing.directories[name];
+                    }
+                }
+
+                for (let name in update.directories) {
+                    let dir = update.directories[name];
+                    if (existing.directories[name]) {
+                        sync(existing.directories[name], dir);
+                    } else {
+                        existing.directories[name] = dir;
+                    }
+                }
+            })(this.structure, newTree);
+
+        });
+    }
+
+    /**
+     *
+     * @param fsResponse
+     * @returns {{name: string, type: string, directories: {}, files: Array}}
+     * @private
+     */
+    _createDirectoryTreeStructure(fsResponse) {
+
+        if (fsResponse.paths.length > 0) {
+            return makeTree(fsResponse.paths, function (file) {
+                return makeTab(new NewFile(file.name, file.type, file.content, file.path, file.fullPath));
+            }, false)
+        }
+
+        return makeTree([fsResponse.baseDir], null, true);
+    }
+
     queryWorkSpace() {
         this.Api.workspaces.query({},
             (res) => {
-                this.structure.baseDir = res.baseDir;
-                if (res.paths.length > 0) {
-                    this.structure = makeTree(res.paths, function (file) {
-                        return makeTab(new NewFile(file.name, file.type, file.content, file.path, file.fullPath));
-                    }, false);
-                } else {
-                    this.structure = makeTree([res.baseDir], null, true);
-                }
+                this.structure = this._createDirectoryTreeStructure(res);
             }, (err) => {
                 new Error(err);
             }
@@ -291,7 +331,8 @@ function makeTree(pathList, iterateeCallback, isEmpty) {
         name: 'root',
         type: 'dir',
         directories: {},
-        files: []
+        files: [],
+        isRoot: true
     };
 
     iterateeCallback = _.isFunction(iterateeCallback) ? iterateeCallback : function (file) { return file; };

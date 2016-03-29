@@ -6,7 +6,7 @@ class FileTreeController {
 
         $scope.$on('fileOpened', (event, data) => {
             this.fileOpenedCb({file: data});
-        })
+        });
 	}
 
     createFile (file) {

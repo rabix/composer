@@ -15,7 +15,11 @@ angular.module('cottontail').directive('directoryItem', ['RecursionHelper', func
                     scope.$emit('fileOpened', file);
                 };
 
-                scope.directory.isOpen = scope.directory.name === 'root';
+                scope.reloadTree = function(){
+                    scope.$emit('reloadDirectoryTree');
+                };
+
+                scope.directory.isOpen = scope.directory.isRoot;
             };
 
             return RecursionHelper.compile(element, link);
