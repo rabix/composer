@@ -9,7 +9,7 @@ class NewFile {
         if (fileModel[type.toUpperCase()]) {
             modelType = type.toUpperCase();
         }
-        return new fileModel[modelType](name, content || '', path, fullPath);
+        return new fileModel[modelType](name, content || null, path, fullPath);
     }
 }
 

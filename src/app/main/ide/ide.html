@@ -5,22 +5,22 @@
         <div class="actions" ng-show="ide.activeFile">
             <ct-button intention="primary"
                        size="sm"
-                       ng-show="ide.activeFile.class && ide.activeView === 'gui'"
-                       ng-click="ide.switchView('code')">
+                       ng-show="ide.activeFile.class && ide.activeFile.view === 'gui'"
+                       ng-click="ide.switchView(ide.activeFile, 'code')">
                 <i class="fa fa-fw fa-code"></i> Code View
             </ct-button>
 
             <ct-button intention="primary"
                        size="sm"
-                       ng-show="ide.activeFile.class && ide.activeView === 'code'"
-                       ng-click="ide.switchView('gui')">
+                       ng-show="ide.activeFile.class && ide.activeFile.view === 'code'"
+                       ng-click="ide.switchView(ide.activeFile, 'gui')">
                 <i class="fa fa-fw fa-pencil-square"></i> GUI View
             </ct-button>
 
             <ct-button intention="success"
                        ng-click="ide.saveFile(ide.activeFile)"
                        size="sm"
-                       ng-show="ide.activeView === 'code'">
+                       ng-show="ide.activeFile.view === 'code'">
                 <i class="fa fa-fw fa-save"></i>
                 Save
             </ct-button>
@@ -28,7 +28,7 @@
             <ct-button intention="success"
                        ng-click="ide.editorApi.onSave(ide.activeFile.id)"
                        size="sm"
-                       ng-show="ide.activeView === 'gui'">
+                       ng-show="ide.activeFile.view === 'gui'">
                 <i class="fa fa-fw fa-save"></i>
                 Save
             </ct-button>
@@ -54,20 +54,26 @@
             </ct-tabs>
 
 
-            <div ng-show="ide.activeFile && ide.activeView === 'code'" class="editor" ui-ace="ide.Editor.config"
-                 ng-model="ide.activeFile.content"></div>
+            <div ng-show="ide.activeFile && ide.activeFile.view === 'code'"
+                 class="editor"
+                 ui-ace="ide.Editor.config"
+                 ng-model="ide.activeFile.content">
+            </div>
 
             <cliche-editor app="ide.activeFile.content"
                            callbacks="ide.editorApi"
-                           external-app-id="ide.activeFile.fullPath"
-                           ng-if="ide.activeFile && ide.activeView === 'gui' && ide.activeFile.class === 'CommandLineTool'">
+                           external-app-id="ide.activeFile.id"
+                           external-app-path="ide.activeFile.fullPath"
+                           ng-if="ide.activeFile && ide.activeFile.view === 'gui' && ide.activeFile.class === 'CommandLineTool'">
             </cliche-editor>
+            
             <dyole-editor app="ide.activeFile.content"
                           callbacks="ide.editorApi"
                           get-toolbox="ide.getToolbox"
                           get-app="ide.getApp"
-                          external-app-id="ide.activeFile.fullPath"
-                          ng-if="ide.activeFile && ide.activeView === 'gui' && ide.activeFile.class === 'Workflow'">
+                          external-app-id="ide.activeFile.id"
+                          external-app-path="ide.activeFile.fullPath"
+                          ng-if="ide.activeFile && ide.activeFile.view === 'gui' && ide.activeFile.class === 'Workflow'">
             </dyole-editor>
 
             <div ng-show="!ide.activeFile" class="flex-container flex-center">
