@@ -42,10 +42,10 @@ class IdeController {
                 return deferred.promise;
             }.bind(this),
             setToolWorkingCopy: function (blank, tool) {
-                this.activeFile.content = JSON.stringify(tool);
+                this.activeFile.content = JSON.stringify(tool, null, 4);
             }.bind(this),
             setWorkflowWorkingCopy: function (blank, tool) {
-                this.activeFile.content = JSON.stringify(tool);
+                this.activeFile.content = JSON.stringify(tool, null, 4);
             }.bind(this)
         };
 
@@ -166,7 +166,16 @@ class IdeController {
     }
 
     switchView(file, view) {
-        // @todo: add workingcopy logic here
+
+        // working copy needs to be retrieved only from gui editor and copied over the activeFile.content
+        if (file.view === 'gui') {
+            if (this.activeFile.class === 'CommandLineTool') {
+                this.editorApi.setToolWorkingCopy(this.activeFile.id);
+            } else if (this.activeFile.class === 'Workflow') {
+                this.editorApi.setWorkflowWorkingCopy(this.activeFile.id);
+            }
+        }
+
         file.view = view;
     }
 
