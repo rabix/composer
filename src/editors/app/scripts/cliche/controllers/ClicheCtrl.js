@@ -801,8 +801,12 @@ angular.module('registryApp.cliche')
                 var tool;
 
                 // blank app is created
-                if (app === '') {
-                    tool = _.assign(_.cloneDeep(rawTool), {id: $scope.externalAppId || ''});
+                if (app === null) {
+                    tool = _.assign(_.cloneDeep(rawTool), {
+                        id: $scope.externalAppId || '',
+                        'ct:path': $scope.externalAppPath || '',
+                        label: $scope.externalAppPath ? _.last($scope.externalAppPath.split('/')).split('.')[0] : 'Command Line Tool'
+                    });
                     // save it immediately
                     _saveCallback(null, tool);
                 } else {
@@ -855,20 +859,30 @@ angular.module('registryApp.cliche')
                 }
             }
 
-            var _saveCallback = $scope.callbacks.onSave;
+            var _saveCallback = $scope.callbacks.editorOnSave;
             var _setWorkingCopyCallback = $scope.callbacks.setToolWorkingCopy;
 
-            $scope.callbacks.onSave = function(toolId, copyToSave) {
+            $scope.callbacks.editorOnSave = function(toolId, copyToSave) {
                 if (toolId && _.isString(toolId) &&
                     (toolId === $scope.view.tool.id ||
                     toolId === $scope.view.tool['sbg:id'] ||
                     toolId === $scope.view.tool.label)) {
-                    var promise = _saveCallback(null, _removeEmptyFields(Cliche.getTool()));
+
+                    /* save jobJSON to tool */
+                    var tool = _removeEmptyFields(Cliche.getTool());
+                    tool['sbg:job'] = Cliche.getJob();
+
+                    /* send to external service to save */
+                    var promise = _saveCallback(null, tool);
+                    /* turn on loading while app is being saved */
                     $scope.view.loading = true;
+
+                    /* run onSuccess and onError callbacks */
                     _runPostCallback(promise, function (result) {
                         $scope.view.loading = false;
                         Notification.success('Tool saved successfully');
                     });
+
                 } else if (toolId === null) {
                     _saveCallback(null, copyToSave);
                 }

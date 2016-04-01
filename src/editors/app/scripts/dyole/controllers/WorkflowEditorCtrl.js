@@ -173,10 +173,22 @@ angular.module('registryApp.app')
             function _appsLoaded(app) {
                 var workflow;
 
-                if (app === '' || app === '{}') {
-                    workflow = _.assign(_.cloneDeep(rawRabixWorkflow), {id: $scope.externalAppId || ''});
+                // blank workflow is created
+                if (app === null) {
+                    workflow = _.assign(_.cloneDeep(rawRabixWorkflow), {
+                        id: $scope.externalAppId || '',
+                        'ct:path': $scope.externalAppPath || '',
+                        label: $scope.externalAppPath ? _.last($scope.externalAppPath.split('/')).split('.')[0] : 'Workflow'
+                    });
+                    // save it immediately
                     _editorSaveCallback(null, workflow);
                 } else {
+                    //@todo: for whatever reason, when there are multiple editors open, app is undefined and
+                    // though the editor saves correctly, it throws an exception. Fix this!
+
+                    if (_.isUndefined(app)) {
+                        return;
+                    }
                     workflow = JSON.parse(app);
                 }
 
@@ -664,7 +676,7 @@ angular.module('registryApp.app')
             var _editorSaveCallback = $scope.callbacks.editorOnSave;
             var _setWorkingCopyCallback = $scope.callbacks.setWorkflowWorkingCopy;
 
-            $scope.callbacks.onSave = function(toolId, copyToSave) {
+            $scope.callbacks.editorOnSave = function(toolId, copyToSave) {
                 var workflow = PipelineInstance.format();
                 if (workflow && toolId === $scope.view.pipelineId) {
                     var result = _editorSaveCallback(null, workflow);
@@ -674,6 +686,7 @@ angular.module('registryApp.app')
                         $scope.view.loading = false;
                         _appsLoaded(result);
                         Notification.success('Workflow saved successfully');
+
                     });
                 } else if (toolId === null) {
                     _editorSaveCallback(null, copyToSave);

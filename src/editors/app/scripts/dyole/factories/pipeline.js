@@ -47,6 +47,11 @@ angular.module('registryApp.dyole')
             this.Event = angular.copy(Event);
 
             /**
+             * Callback to get app
+             */
+            this.getApp = options.getApp;
+
+            /**
              * Pipeline in preview?
              * @type {.scope.editMode|*|Pipeline.editMode|$scope.view.editMode}
              */
@@ -80,7 +85,7 @@ angular.module('registryApp.dyole')
 
             this._drawScrollbars();
 
-            //this._checkOutdated();
+            this._checkOutdated();
         };
 
         Pipeline.prototype = {
@@ -570,11 +575,11 @@ angular.module('registryApp.dyole')
              * @private
              */
             createConnectionFromModel: function(connection) {
-                var _self = this,
-                    input = _self.nodes[connection.start_node].getTerminalById(
-                        connection.output_name, 'output'),
-                    output = _self.nodes[connection.end_node].getTerminalById(
-                        connection.input_name, 'input');
+                var _self = this;
+                var input = _self.nodes[connection.start_node].getTerminalById(
+                    connection.output_name, 'output');
+                var output = _self.nodes[connection.end_node].getTerminalById(
+                    connection.input_name, 'input');
 
                 _self.connections[connection.id] = Connection.getInstance({
                     model: connection,
@@ -620,7 +625,7 @@ angular.module('registryApp.dyole')
                     type = isInput ? 'input' : 'output';
 
 
-                var newId = terminal.model.id.slice(1);
+                var newId = terminal.model.id[0] === '#' ? terminal.model.id.slice(1) : terminal.model.id;
 
                 var descriptions = {
                     input: '###*Input*' + '\n' + 'Downloads input files to local cluster for further processing.',
@@ -1152,26 +1157,10 @@ angular.module('registryApp.dyole')
                     return valueType.toLowerCase() === type.toLowerCase();
                 };
 
-                // split app ID and remove revision element, then join it again into string
-                var appId = nodeModel['sbg:id'].split('/'),
-                    appData;
+                return this.getApp(nodeModel).then(function(result) {
 
-                appData = {
-                    projectOwner: appId[0],
-                    projectSlug: appId[1],
-                    appName: appId[2]
-                }
-
-                return App.getApp(appData).then(function(result) {
-
-                    if (typeof result.message === 'object' && !_.isEmpty(result.message)) {
-
-                        var newNode = result.message;
-
-                        if (nodeModel['sbg:revision'] === newNode['sbg:revision']) {
-                            Notification.primary('Node is already up to date.');
-                            return false;
-                        }
+                    if (result) {
+                        var newNode = result;
 
                         var connections = _.map(node.connections, function(connection) {
                             return connection.model;
@@ -1285,6 +1274,8 @@ angular.module('registryApp.dyole')
                     }
 
                     return this;
+                }, function(err) {
+                    console.log(err);
                 });
 
             },
@@ -1356,6 +1347,7 @@ angular.module('registryApp.dyole')
                     var _id = Common.generateNodeId(model, _self.nodes);
 
                     model['sbg:id'] = model.id = _id;
+                    model.label = model.label ? model.label : model.id;
 
                     if (_.isEmpty(_self.model.schemas)) {
                         _self.model.schemas = {};
@@ -1392,37 +1384,44 @@ angular.module('registryApp.dyole')
             },
 
             _checkOutdated: function() {
-                var _self = this,
-                    list = [];
+                var _self = this;
+                //var list = [];
 
-                _.forEach(this.model.nodes, function(node) {
-                    if (!Common.checkSystem(node)) {
-                        list.push(node['sbg:id']);
+                //_.forEach(this.model.nodes, function(node) {
+                //    if (!Common.checkSystem(node)) {
+                //        list.push(node['sbg:id']);
+                //    }
+                //});
+
+                // fixme: temporarily removing checks if tool is outdated. Always allowing user to update tool
+                _.forEach(_self.nodes, function(node) {
+                    if (!Common.checkSystem(node) && node.model.class && !node.model['sbg:id']) {
+                        node.setOutdated(true);
                     }
                 });
 
-                App.checkOutdatedInWf(list).then(function(response) {
-                    var map = response.message;
-
-                    _.forEach(map, function(isOutdated, nodeId) {
-
-                        if (isOutdated) {
-
-                            _.forEach(_self.nodes, function(node) {
-
-                                if (!Common.checkSystem(node.model)) {
-
-                                    if (node.model['sbg:id'] === nodeId) {
-                                        node.setOutdated(true);
-                                    }
-                                }
-                            });
-                        }
-                    });
-
-                }, function(err) {
-                    console.error(err);
-                });
+                //App.checkOutdatedInWf(list).then(function(response) {
+                //    var map = response.message;
+                //
+                //    _.forEach(map, function(isOutdated, nodeId) {
+                //
+                //        if (isOutdated) {
+                //
+                //            _.forEach(_self.nodes, function(node) {
+                //
+                //                if (!Common.checkSystem(node.model)) {
+                //
+                //                    if (node.model['sbg:id'] === nodeId) {
+                //                        node.setOutdated(true);
+                //                    }
+                //                }
+                //            });
+                //        }
+                //    });
+                //
+                //}, function(err) {
+                //    console.error(err);
+                //});
 
             },
 

@@ -6,6 +6,7 @@ angular.module('registryApp.cliche')
             scope: {
                 app: '=',
                 externalAppId: '=',
+                externalAppPath: '=',
                 callbacks: '=',
             },
             controller: 'ClicheCtrl',

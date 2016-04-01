@@ -34,7 +34,6 @@ body {
   color: #555;
   font-family: $font-family-base;
 
-  @import "sidebar";
   @import "loader";
   @import "error";
   @import "cliche";

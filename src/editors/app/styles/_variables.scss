@@ -1,12 +1,13 @@
 $fa-font-path: "../fonts/";
 $gray: #f3f3f3;
-$orange: #f0ad4e;
 $green: #5cb85c;
 $red: #d9534f;
 $blue: #428bca;
 $sidebar: 200px;
 $dark-blue: #1A3852;
 $sidebar-blue: #29567D;
+
+$orange: $blue;
 
 $custom-gutter: 15px;
 
@@ -27,4 +28,3 @@ $modal-xl: 1100px;
 $tooltip-max-width: 250px;
 
 @import "../../bower_components/bootstrap-sass-official/vendor/assets/stylesheets/bootstrap/variables";
-@import 'overrides/sbg-variables';

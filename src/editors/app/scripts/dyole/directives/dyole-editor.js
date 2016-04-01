@@ -7,6 +7,7 @@ angular.module('registryApp.dyole')
             scope: {
                 app: '=',
                 externalAppId: '=',
+                externalAppPath: '=',
                 isDirty: '=',
                 callbacks: '=',
                 getToolbox: '=',

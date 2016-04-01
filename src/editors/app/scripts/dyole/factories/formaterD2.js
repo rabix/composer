@@ -673,7 +673,7 @@ angular.module('registryApp.dyole')
                 _.forEach(grouped, function(links, group) {
 
                     var node;
-                    var split = group.split('.');
+                    var split = group.split(Const.generalSeparator);
 
                     if (split.length === 1) {
 

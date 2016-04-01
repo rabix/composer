@@ -6,6 +6,8 @@
 
     .master-form {
       & > .content {
+        @include flex-basis(1px);
+
         & > .form {
           width: 100%;
         }

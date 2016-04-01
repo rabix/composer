@@ -203,6 +203,14 @@
   flex-flow: $value;
 }
 
+@mixin flex-basis($value) {
+  -webkit-flex-basis: $value;
+  -moz-flex-basis: $value;
+  -ms-flex-basis: $value;
+  -o-flex-basis: $value;
+  flex-basis: $value;
+}
+
 @mixin flex($values) {
   -webkit-box-flex: $values;
   -moz-box-flex:  $values;
