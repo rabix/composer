@@ -11,7 +11,7 @@ var $ = require('gulp-load-plugins')();
 var wiredep = require('wiredep').stream;
 var _ = require('lodash');
 
-gulp.task('styles', function () {
+gulp.task('styles', ['copy:images'], function () {
     var sassOptions = {
         style: 'expanded'
     };
