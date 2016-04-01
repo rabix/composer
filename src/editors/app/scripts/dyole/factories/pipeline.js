@@ -1187,6 +1187,7 @@ angular.module('registryApp.dyole')
                         y = (y + translation.y) + canvas.top;
 
                         newNode.label = oldLabel;
+                        newNode.isOutdated = true;  //@todo: remove this, temporarily make all nodes outdated all the time.
 
                         _.forEach(portIncludedInputs, function(inp) {
 

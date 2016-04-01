@@ -35,8 +35,8 @@ angular.module('registryApp.dyole')
 
             this.selected = false;
 
-            this.isOutdated = this._checkNodeOutdated();
-            //this.isOutdated = true; // make all of them outdated so you can work simultaniusly without overhead of checking
+            //this.isOutdated = this._checkNodeOutdated();
+            this.isOutdated = true; // make all of them outdated so you can work simultaniusly without overhead of checking
 
             this.inputRefs = this.model.inputs;
 
@@ -77,7 +77,9 @@ angular.module('registryApp.dyole')
                 outdated: {
                     //fill: '#F5AB35',
                     //fill: '#86b0d4',
-                    fill: '#2b7450',
+                    //fill: '#2b7450',
+                    fill: '#29567D', //@todo making color the same as non-update nodes while all nodes are can always be updated
+
                     gradient: ''
                 },
 
