@@ -1,26 +1,28 @@
 .file-tree {
   @extend .flex-fixed;
   width: $sidebar-width;
-  height: 100%;
   border-right: 1px solid #ddd;
   padding: $grid-gutter-width/2;
 
   background: #fff;
   @include standard-box-shadow();
 
-  #editorFileTreeList {
-      overflow-y: scroll;
-      height: calc(100% - #{$navbar-height});
-  }
-
   ul li a {
     display: block;
     padding: $padding-base-vertical $padding-base-horizontal;
     cursor: pointer;
+    overflow: hidden;
+    position: relative;
 
     &:hover {
       text-decoration: none;
       font-weight: bold;
+    }
+
+    .file-name {
+      position: absolute;
+      left: 35px;
+      white-space: nowrap;
     }
   }
 

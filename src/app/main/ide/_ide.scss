@@ -1,0 +1,33 @@
+.ide {
+    /*Minus 2px because of some padding*/
+    //height: calc(100% - #{$navbar-height} - 2px);
+  @extend .flex-container;
+  @extend .flex-box-column;
+
+  .ide-container {
+    @extend .flex-container;
+    @extend .flex-box-row;
+  }
+
+  .toolbar {
+    height: $navbar-height;
+    background-color: $navbar-inverse-bg;
+    padding: 10px;
+
+    .cottontail-logo {
+      position: absolute;
+
+      background: url('../../../assets/images/logo-white.png') no-repeat;
+      opacity: .8;
+      background-size: 45px auto;
+      height: $navbar-height;
+      width: 50px;
+      top: 3px;
+      left: 10px;
+    }
+
+    .actions {
+      float: right;
+    }
+  }
+}

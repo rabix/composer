@@ -6,7 +6,7 @@ class BaseFile {
     constructor(name, type, content, path, fullPath) {
 	    this.type = type;
         this.name = name;
-        this.content = content || '';
+        this.content = content || null;
         this.path = path;
         this.fullPath = fullPath;
     }

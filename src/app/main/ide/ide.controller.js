@@ -44,10 +44,10 @@ class IdeController {
                 return deferred.promise;
             }.bind(this),
             setToolWorkingCopy: function (blank, tool) {
-                this.activeFile.content = JSON.stringify(tool);
+                this.activeFile.content = JSON.stringify(tool, null, 4);
             }.bind(this),
             setWorkflowWorkingCopy: function (blank, tool) {
-                this.activeFile.content = JSON.stringify(tool);
+                this.activeFile.content = JSON.stringify(tool, null, 4);
             }.bind(this)
         };
 
@@ -57,7 +57,7 @@ class IdeController {
             }
 
             let deferred = $q.defer();
-            Api.files.query({file: app.path},
+            Api.files.query({file: app.path || app['ct:path']},
                 (res) => {
                     try {
                         let content = JSON.parse(res.content);
@@ -175,12 +175,19 @@ class IdeController {
 
     fileAdded(file) {
         let fileObj = makeTab(new NewFile(file.name, file.type, file.content, file.path, file.fullPath));
+        fileObj.id = this.createId(file);
+
         this.structure.files.push(fileObj);
+        fileObj.view = 'gui';
+
         if (file.action === 'tool') {
             fileObj.class = 'CommandLineTool';
         } else if (file.action === 'workflow') {
             fileObj.class = 'Workflow';
+        } else {
+            fileObj.view = 'code';
         }
+
         this.openFiles.push(fileObj);
         this.setActiveFile(fileObj);
     }
@@ -193,8 +200,10 @@ class IdeController {
 
         this.openFiles.push(file);
 
-        if (!file.content) {
+        if (_.isNull(file.content)) {
             this.loadFile(file);
+        } else {
+            file.view = file.class ? 'gui' : 'code';
         }
     }
 
@@ -207,6 +216,20 @@ class IdeController {
         this.setActiveFile(_.find(this.openFiles, file));
     }
 
+    switchView(file, view) {
+
+        // working copy needs to be retrieved only from gui editor and copied over the activeFile.content
+        if (file.view === 'gui') {
+            if (this.activeFile.class === 'CommandLineTool') {
+                this.editorApi.setToolWorkingCopy(this.activeFile.id);
+            } else if (this.activeFile.class === 'Workflow') {
+                this.editorApi.setWorkflowWorkingCopy(this.activeFile.id);
+            }
+        }
+
+        file.view = view;
+    }
+
     getClass(content) {
         try {
             let fileContents = JSON.parse(content);
@@ -216,13 +239,17 @@ class IdeController {
         }
     }
 
-    getId(content) {
+    getId(content, file) {
         try {
             let fileContents = JSON.parse(content);
-            return fileContents ? fileContents.id || fileContents['sbg:id'] || fileContents.label : undefined;
+            return fileContents ? ((fileContents.id && fileContents.id !== '') ? fileContents.id : fileContents['sbg:id'] || fileContents.label) : this.createId(file);
         } catch (ex) {
             return undefined;
         }
+    }
+
+    createId(file) {
+        return _.kebabCase(file.fullPath);
     }
 
     saveFile(file) {
@@ -234,7 +261,8 @@ class IdeController {
         this.Api.files.update({file: file.path, content: file.content},
             (suc) => {
                 file.class = this.getClass(file.content);
-                file.id = this.getId(file.content) || file.fullPath;
+                file.id = this.getId(file.content, file);
+                console.info(file.path + ' successfully saved');
                 deferred.resolve(suc);
             }, (err) => {
                 deferred.reject(err);
@@ -251,7 +279,10 @@ class IdeController {
         this.Api.files.query({file: file.path},
             (res) => {
                 file.class = this.getClass(res.content);
-                file.id = this.getId(res.content) || file.fullPath;
+
+                file.view = file.class ? 'gui' : 'code';
+
+                file.id = this.getId(res.content, file);
                 file.content = res.content;
             }, (err) => {
                 console.log('something went wrong here', err);
