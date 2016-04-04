@@ -212,7 +212,15 @@ angular.module('registryApp.app')
                     if (_.isUndefined(app)) {
                         return;
                     }
+
                     workflow = JSON.parse(app);
+
+                    if (!workflow.id) {
+                        workflow.id = $scope.externalAppId || $scope.externalAppPath || _.uniqueId();
+                    }
+
+                    workflow = _.assign(_.cloneDeep(rawRabixWorkflow), workflow);
+
                 }
 
                 $scope.view.pipelineId = workflow.id || workflow['sbg:id'] || workflow.label;
@@ -700,7 +708,8 @@ angular.module('registryApp.app')
              * Retrieves current JSON for tool by label from all the workflows currently open.
              * Calls the original setWorkingCopy function by passing the JSON.
              *
-             * @param {string} toolId label of reqested tool
+             * @param {string} toolId label of registered tool
+             * @param {object} workingCopy
              */
             $scope.callbacks.setWorkflowWorkingCopy = function (toolId, workingCopy) {
                 if (toolId && _.isString(toolId) &&

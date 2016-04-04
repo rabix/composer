@@ -812,6 +812,10 @@ angular.module('registryApp.cliche')
                 } else {
                     var toolJSON =  JSON.parse(app);
                     tool = _.assign(_.cloneDeep(rawTool), toolJSON);
+
+                    if (!tool.id) {
+                        tool.id = $scope.externalAppId || $scope.externalAppPath || _.uniqueId();
+                    }
                 }
 
                 /** @type CWLTool */

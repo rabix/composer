@@ -242,7 +242,12 @@ class IdeController {
     getId(content, file) {
         try {
             let fileContents = JSON.parse(content);
-            return fileContents ? ((fileContents.id && fileContents.id !== '') ? fileContents.id : fileContents['sbg:id'] || fileContents.label) : this.createId(file);
+
+            // if there are no file contents, create an id
+            // if there are file contents, check/set first its id. Make sure it's not an empty string.
+            // then check/set sbg:id, then label
+            // if none of those exist, create an id
+            return fileContents ? ((fileContents.id && fileContents.id !== '') ? fileContents.id : fileContents['sbg:id'] || fileContents.label || this.createId(file)) : this.createId(file);
         } catch (ex) {
             return undefined;
         }
