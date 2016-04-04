@@ -4,7 +4,8 @@ angular.module('registryApp.dyole').directive('repoItem', ['RecursionHelper', '$
         return {
             restrict: 'E',
             scope: {
-                directory: '='
+                directory: '=',
+                filter: '='
             },
             template: $templateCache.get('views/dyole/repo-item.html'),
             compile: function(element) {

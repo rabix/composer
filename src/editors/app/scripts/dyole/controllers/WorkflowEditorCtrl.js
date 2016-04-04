@@ -126,21 +126,17 @@ angular.module('registryApp.app')
 
             var toggleState = true;
 
-            var toggleAll = function() {
+            var toggleAll = function(repo) {
 
-                _.forEach($scope.view.repoTypes.MyApps, function(obj, repo) {
-                    $scope.view.repoGroups[repo] = toggleState;
-                });
-
-                _.forEach($scope.view.repoTypes.PublicApps, function(obj, repo) {
-                    $scope.view.repoGroups[repo] = toggleState;
-                });
-
-                $scope.view.groups.MyApps = toggleState;
-                $scope.view.groups.PublicApps = toggleState;
-
-                toggleState = !toggleState;
-
+                if (!repo) {
+                    toggleAll($scope.view.repoTypes.myApps);
+                    toggleState = !toggleState;
+                } else {
+                    repo.allOpen = toggleState;
+                    _.forEach(repo.directories, function(dir) {
+                        toggleAll(dir);
+                    });
+                }
             };
 
             $scope.resetSearch = function() {
@@ -232,26 +228,6 @@ angular.module('registryApp.app')
              */
             $scope.switchTab = function(tab) {
                 $scope.view.tab = tab;
-            };
-
-            /**
-             * Toggle top level groups
-             * @param group
-             */
-            $scope.toggleGroup = function(group) {
-                $scope.view.groups[group] = !$scope.view.groups[group];
-            };
-
-            /**
-             * Toggle repo list visibility
-             *
-             * @param repo
-             */
-            $scope.toggleRepo = function(repo) {
-                if (_.isUndefined($scope.view.repoGroups[repo])) {
-                    $scope.view.repoGroups[repo] = false;
-                }
-                $scope.view.repoGroups[repo] = !$scope.view.repoGroups[repo];
             };
 
             /**

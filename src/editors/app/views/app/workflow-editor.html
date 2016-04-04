@@ -4,7 +4,9 @@
         <div class="main-heading">
             <div class="actions pull-right">
 
-                <button class="btn btn-default" ng-click="editMetadata()" ng-disabled="view.saving" ><i class="fa fa-pencil"></i> Additional Information</button>
+                <button class="btn btn-default" ng-click="editMetadata()" ng-disabled="view.saving"><i
+                        class="fa fa-pencil"></i> Additional Information
+                </button>
 
                 <div class="btn-group right" uib-dropdown is-open="status.isopen">
                     <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle>
@@ -18,15 +20,9 @@
                             <a href ng-click="workflowSettings()"><i class="fa fa-cog"></i> <span>Settings</span></a>
                         </li>
 
-                        <!--<li>-->
-                            <!--<a href ng-click="loadJsonImport()"><i class="fa fa-cloud-download"></i> <span>Import</span></a>-->
-                        <!--</li>-->
-
-                        <!--<li>-->
-                            <!--<a href='' ng-click="validateWorkflowJSON()" ng-disabled="view.saving" ><i class="fa fa-check"></i> Validate</a>-->
-                        <!--</li>-->
                         <li>
-                            <a href='' ng-click="workflowToJSON()" ng-disabled="view.saving" ><i class="fa fa-code"></i> JSON</a>
+                            <a href='' ng-click="workflowToJSON()" ng-disabled="view.saving"><i class="fa fa-code"></i>
+                                JSON</a>
                         </li>
                     </ul>
                 </div>
@@ -54,37 +50,54 @@
 
                     <li class="toggle-action">
                         <a href ng-click="toggleSidebar()">
-                            <i ng-class="{'fa-chevron-right': view.showSidebar, 'fa-chevron-left': !view.showSidebar}" class="fa"></i>
+                            <i ng-class="{'fa-chevron-right': view.showSidebar, 'fa-chevron-left': !view.showSidebar}"
+                               class="fa"></i>
                         </a>
                     </li>
 
                     <li ng-class="{active: view.tab === 'apps'}"><a href ng-click="switchTab('apps')">Apps</a></li>
-                    <li ng-class="{active: view.tab === 'params'}"><a href ng-click="switchTab('params')">Params</a></li>
+                    <li ng-class="{active: view.tab === 'params'}"><a href ng-click="switchTab('params')">Params</a>
+                    </li>
                     <!--<li ng-class="{active: view.tab === 'properties'}"><a href ng-click="switchTab('properties')">Properties</a></li>-->
                 </ul>
             </div>
 
             <div class="content content-tbl flex-box-column">
 
-                <div class="tabs right flex-one-height" >
+                <div class="tabs right flex-one-height">
 
-                    <div class="tab flex-box-column flex-one" ng-class="{loading: view.filtering}" ng-show="view.tab === 'apps'">
+                    <div class="tab flex-box-column flex-one" ng-class="{loading: view.filtering}"
+                         ng-show="view.tab === 'apps'">
                         <form class="search-form" ng-submit="" novalidate>
-                            <!--<div class="input-group">-->
-                                <!--<input type="text" class="form-control" ng-model="view.searchTerm" placeholder="Search apps"-->
-                                       <!--required>-->
-                        <!--<span class="input-group-btn">-->
-                            <!--&lt;!&ndash;<button class="btn btn-primary" type="submit"><i class="fa fa-search"></i></button>&ndash;&gt;-->
-                            <!--<button ng-disabled="view.searchTerm | isEmpty" class="btn btn-expression btn-default" ng-click="resetSearch()"><i class="fa fa-ban"></i></button>-->
-                        <!--</span>-->
-                            <!--</div>-->
+                            <div class="input-group">
+                                <input type="text" class="form-control" ng-model="view.searchTerm"
+                                       placeholder="Search apps"
+                                       required>
+                                <span class="input-group-btn">
+                                    <button ng-disabled="view.searchTerm | isEmpty"
+                                            class="btn btn-expression btn-default"
+                                            ng-click="resetSearch()">
+                                        <i class="fa fa-ban"></i>
+                                    </button>
+                                     <button class="btn btn-expression btn-default"
+                                             ng-click="refreshSource()"
+                                             uib-tooltip="{{ refreshingSource ? 'Reloading' : 'Reload search results' }}"
+                                             tooltip-trigger="mouseenter"
+                                             tooltip-placement="left"
+                                             tooltip-append-to-body="true">
+                                         <i class="fa fa-refresh"
+                                            ng-class="{'fa-spin': refreshingSource}"></i>
+                                     </button>
+                                </span>
+                            </div>
                         </form>
                         <ul class="app-sidebar-list">
 
-                            <li ng-repeat="(repoType, repoTypeObj) in view.repoTypes" ng-class="{open: view.groups[repoType]}">
+                            <li ng-repeat="(repoType, repoTypeObj) in view.repoTypes"
+                                class="open">
 
-                                <span ng-click="toggleGroup(repoType)">
-                                    <i class="fa" ng-class="{'fa-plus-square': !view.groups[repoType], 'fa-minus-square': view.groups[repoType]}"></i>
+                                <span>
+                                    <i class="fa fa-minus-square"></i>
                                     {{ ::view.capitalize(repoType)}}
                                 </span>
 
@@ -92,12 +105,14 @@
 
                                     <li ng-if="(repoTypeObj | isEmpty)">
                                         <p class="alert alert-info">
-                                            <span ng-if="repoType === 'MyApps'">You don't have any apps yet</span>
-                                            <span ng-if="repoType === 'PublicApps'">There are no public apps</span>
+                                            You don't have any apps yet
                                         </p>
                                     </li>
 
-                                    <repo-item ng-repeat="directory in repoTypeObj.directories" directory="directory"></repo-item>
+                                    <repo-item ng-repeat="directory in repoTypeObj.directories"
+                                               filter="view.searchTerm"
+                                               directory="directory">
+                                    </repo-item>
 
                                     <li ng-repeat="app in filteredApps = (repoTypeObj.files | filter:view.searchTerm)">
 
@@ -116,16 +131,19 @@
                     </div>
 
                     <div class="tab flex-one" ng-show="view.tab === 'params'">
-                        <p class="alert alert-info" ng-if="view.json | isEmpty">Select node in order to change its parameters</p>
+                        <p class="alert alert-info" ng-if="view.json | isEmpty">Select node in order to change its
+                            parameters</p>
 
                         <form ng-if="!(view.json | isEmpty)" class="form" name="paramForms" novalidate>
 
                             <h3 class="tab-title">{{ ::view.json.label }}</h3>
 
-                            <div ng-repeat="cat in view.inputCategories" ng-if="!view.json.softwareDescription" class="category-container sm">
-                                <h4 class="category-title" ng-class="{first: $first}"  ng-click="cat.show = !cat.show">
+                            <div ng-repeat="cat in view.inputCategories" ng-if="!view.json.softwareDescription"
+                                 class="category-container sm">
+                                <h4 class="category-title" ng-class="{first: $first}" ng-click="cat.show = !cat.show">
                                     {{ ::cat.name }}
-                                    <i class="fa pull-right mg-right-10" ng-class="{'fa-caret-up': cat.show, 'fa-caret-down': !cat.show}"></i>
+                                    <i class="fa pull-right mg-right-10"
+                                       ng-class="{'fa-caret-up': cat.show, 'fa-caret-down': !cat.show}"></i>
                                 </h4>
                                 <div class="input-container input-container-sm" ng-show="cat.show">
 
@@ -158,7 +176,9 @@
                             >
                             </suggested-files>
 
-                            <p class="alert alert-info" ng-if="view.json.inputs.length === 0 && !view.json.softwareDescription">There are no params that can be set or exposed.</p>
+                            <p class="alert alert-info"
+                               ng-if="view.json.inputs.length === 0 && !view.json.softwareDescription">There are no
+                                params that can be set or exposed.</p>
                         </form>
 
                     </div>
