@@ -50,6 +50,8 @@ angular.module('registryApp.app')
                 otherRepositories: false
             };
 
+            $scope.refreshingSource = false;
+
             setTimeout(function(){
                 getToolBox();
             }, 100);
@@ -101,12 +103,18 @@ angular.module('registryApp.app')
                     console.error('getToolbox is not a function');
                 } else {
                     var result = $scope.getToolbox();
+
                     if (!result || !result.then) {
                         console.error('Expected to get a promise from getToolbox, instead got: ', result);
                     } else {
+                        var deferred = $q.defer();
+
                         result.then(function(tools) {
                             $scope.view.repoTypes.myApps = tools;
+                            deferred.resolve();
                         });
+
+                        return deferred.promise;
                     }
                 }
             }
@@ -159,6 +167,25 @@ angular.module('registryApp.app')
 
             });
 
+            $scope.refreshSource = function () {
+                var minSpinningTime = 1000;
+                var startTime = new Date().valueOf();
+
+                if (!$scope.refreshingSource) {
+                    $scope.refreshingSource = true;
+
+                    getToolBox().then(function() {
+                        var timeDiff = (new Date().valueOf()) - startTime;
+                        if (timeDiff < minSpinningTime) {
+                            $timeout(function() {
+                                $scope.refreshingSource = false;
+                            }, minSpinningTime - timeDiff);
+                        } else {
+                            $scope.refreshingSource = false;
+                        }
+                    });
+                }
+            };
 
             /**
              * Callback when apps are loaded
