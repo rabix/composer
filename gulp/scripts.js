@@ -80,6 +80,6 @@ gulp.task('scripts', function () {
     return webpack(false);
 });
 
-gulp.task('scripts:watch', ['scripts'], function (callback) {
+gulp.task('scripts:watch', ['editor:templates', 'scripts'], function (callback) {
     return webpack(true, callback);
 });
