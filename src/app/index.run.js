@@ -8,6 +8,16 @@ function runBlock($log, ConfigProvider, CottonTailConfig, Api) {
     }, function (err) {
         new Error(err);
     });
+
+    window.onerror = function (message, file, lineNumber, column, trace) {
+        Api.report.send({
+            message: message,
+            file: file,
+            line: lineNumber,
+            column: column,
+            stackTrace: trace.stack
+        });
+    };
 }
 
 export default runBlock;

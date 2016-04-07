@@ -38,6 +38,10 @@ class Api {
         this.workspaces = this.$resource(this.BASE + '/fs', {}, {
             query: {method: 'GET'}
         });
+
+        this.report = this.$resource(`${this.BASE}/log`, {}, {
+            send: {method: 'POST'}
+        });
     }
 }
 
