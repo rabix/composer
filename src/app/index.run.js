@@ -15,7 +15,7 @@ function runBlock($log, ConfigProvider, CottonTailConfig, Api) {
             file: file,
             line: lineNumber,
             column: column,
-            stackTrace: trace.stack
+            stack: trace.stack
         });
     };
 }
