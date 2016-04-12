@@ -36,7 +36,8 @@ angular.module('registryApp.cliche', [
             };
 
             NotificationProvider.setOptions({
-                delay: 6000
+                delay: 6000,
+                startTop: 50
             });
         }
     ]);
