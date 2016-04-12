@@ -2,7 +2,7 @@
  * Created by Maya on 10.8.15.
  */
 
-/* globals _ */
+/* globals _, JSON */
 
 import NewFile from '../../services/NewFile';
 import * as Keys from '../../services/Shortcuts';

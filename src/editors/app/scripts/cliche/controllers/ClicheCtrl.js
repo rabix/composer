@@ -899,7 +899,10 @@ angular.module('registryApp.cliche')
                     toolId === $scope.view.tool['sbg:id'] ||
                     toolId === $scope.view.tool.label)) {
 
-                    _setWorkingCopyCallback(null, _removeEmptyFields(Cliche.getTool()));
+                    var tool = Cliche.getTool();
+                    tool['sbg:job'] = Cliche.getJob();
+
+                    _setWorkingCopyCallback(null, _removeEmptyFields(tool));
                 } else if (toolId === null) {
                     // until it propagates back to the main controller outside the directive
                     _setWorkingCopyCallback(null, workingCopy);

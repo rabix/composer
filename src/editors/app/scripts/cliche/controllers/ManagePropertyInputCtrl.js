@@ -353,6 +353,8 @@ angular.module('registryApp.cliche')
             if ($scope.view.property.inputBinding.secondaryFiles.length === 0) {
                 delete $scope.view.property.inputBinding.secondaryFiles;
             }
+
+            $scope.view.form.$setDirty();
         };
 
         /**
