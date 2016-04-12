@@ -832,6 +832,7 @@ angular.module('registryApp.dyole')
             _transformModel: function(nodeModel) {
 
                 var model = nodeModel.json || nodeModel;
+                debugger;
 
                 _.forEach(model.inputs.properties, function(input, name) {
                     input.name = name;

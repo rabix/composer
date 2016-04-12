@@ -71,7 +71,7 @@ angular.module('registryApp.dyole')
              */
             generateNodeId: function (model, used) {
                 var _id, check = true,
-                    name = (model.softwareDescription && model.softwareDescription.label) ? model.softwareDescription.label : model.label || model.name,
+                    name = (model.softwareDescription && model.softwareDescription.label) ? model.softwareDescription.label : model.label || model.id || model.name,
                     n = 0;
 
                 // remove # to start striping and creating unique id
