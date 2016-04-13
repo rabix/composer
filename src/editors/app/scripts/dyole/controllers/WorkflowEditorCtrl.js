@@ -732,7 +732,7 @@ angular.module('registryApp.app')
                 _appsLoaded($scope.app);
 
                 $scope.$watch('app', function(n, o) {
-                    if (n && n !== o) {
+                    if (!_.isUndefined(n) && n !== o) {
                         _appsLoaded(n);
                     }
                 });

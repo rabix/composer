@@ -39,7 +39,7 @@ angular.module('registryApp.dyole', [
 
             NotificationProvider.setOptions({
                 delay: 6000,
-                startTop: 50
+                startTop: 55
             });
         }
     ]);

@@ -36,6 +36,7 @@ class IdeController {
         this.editorApi = {
             editorOnSave: function (blank, tool){
                 let deferred = $q.defer();
+                tool['ct:path'] = this.activeFile.fullPath; // update path so that it's always the current path (in case file has moved)
                 this.activeFile.content = JSON.stringify(tool, null, 4);
                 this.saveFile(this.activeFile).then((suc) => {
                     deferred.resolve(this.activeFile.content);
