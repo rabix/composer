@@ -44,5 +44,24 @@ gulp.task('cliche:templates', function () {
 });
 
 gulp.task('editor:templates', ['cliche:templates', 'dyole:templates'], function () {
-    
+});
+
+gulp.task('templates:watch', function() {
+    gulp.watch([
+        path.join(conf.paths.src, '/editors/app/views/**/*.html'),
+        path.join(conf.paths.src, '/editors/app/views/dyole/**/*.html'),
+        path.join(conf.paths.src, '/editors/app/views/cliche/**/*.html'),
+        path.join(conf.paths.src, '/editors/app/views/app/**/*.html'),
+        path.join(conf.paths.src, '/editors/app/views/repo/**/*.html'),
+        path.join(conf.paths.src, '/editors/app/views/task/**/*.html')
+    ], ['dyole:templates']);
+
+    gulp.watch([
+        path.join(conf.paths.src, '/editors/app/views/**/*.html'),
+        path.join(conf.paths.src, '/editors/app/views/cliche/**/*.html'),
+        path.join(conf.paths.src, '/editors/app/views/app/**/*.html'),
+        path.join(conf.paths.src, '/editors/app/views/repo/**/*.html'),
+        path.join(conf.paths.src, '/editors/app/views/task/**/*.html')
+    ], ['cliche:templates'])
+
 });

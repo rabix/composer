@@ -27,3 +27,7 @@ wrench.readdirSyncRecursive('./gulp').filter(function(file) {
 gulp.task('default', ['clean'], function () {
   gulp.start('build');
 });
+
+gulp.task('local-build', ['editor:templates', 'scripts', 'styles'], function () {
+  gulp.start('inject');
+});
