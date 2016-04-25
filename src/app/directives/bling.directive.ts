@@ -1,6 +1,5 @@
-import {Directive, ElementRef, Input, OnInit, OnChanges, OutputFactory} from "angular2/core";
+import {Directive, ElementRef, Input, OnInit} from "angular2/core";
 import {Observable} from "rxjs/Observable";
-import {Scheduler} from "rxjs/Scheduler";
 
 @Directive({
     selector: "[ct-bling]",
@@ -11,11 +10,11 @@ import {Scheduler} from "rxjs/Scheduler";
 export class BlingDirective implements OnInit {
 
     @Input("speed")
-    private speedStream: Observable;
+    private speedStream: Observable<number>;
 
     private el: ElementRef;
 
-    private colorChangeStream: Observable;
+    private colorChangeStream: Observable<string>;
 
     constructor(el: ElementRef) {
         this.el = el;

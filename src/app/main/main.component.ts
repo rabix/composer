@@ -13,7 +13,7 @@ import {Subject} from "rxjs/Subject";
     directives: [BlingDirective]
 })
 export class MainComponent implements OnInit {
-    private speedStream: BehaviorSubject;
+    private speedStream: BehaviorSubject<number>;
 
     constructor() {
         this.speedStream = new BehaviorSubject(200);
