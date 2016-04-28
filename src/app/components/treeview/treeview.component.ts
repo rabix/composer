@@ -1,7 +1,7 @@
-import {Component} from "angular2/core";
-@Component({
-    selector: "treeview",
-    template: "Here be filesystem tree"
+import {Component, ViewDecorator} from "angular2/core";
+import {WorkspaceComponent} from "../../decorators/workspace-component.annotation";
+@WorkspaceComponent(<ViewDecorator.View>{
+    
 })
 export class TreeviewComponent {
 

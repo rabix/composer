@@ -8,9 +8,6 @@ require("./editor-sidebar.component.scss");
 
     selector: "editor-sidebar",
     directives: [EditorSidebarItemComponent],
-    host: {
-        "class": "component-editor-sidebar",
-    },
     template: `
             <nav>
                 <editor-sidebar-item title="Project" icon="files-o"></editor-sidebar-item>

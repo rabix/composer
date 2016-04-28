@@ -2,7 +2,6 @@ import {Component, OnInit} from "angular2/core";
 import {EditorSidebarComponent} from "../components/editor-sidebar/editor-sidebar.component";
 import {WorkspaceLayoutComponent} from "../components/workspace/workspace.component";
 
-
 require("./../../assets/sass/main.scss");
 require("./main.component.scss");
 
@@ -12,6 +11,7 @@ require("./main.component.scss");
         <section class="editor-container">
             <editor-sidebar></editor-sidebar>
             <workspace></workspace>
+            <div id="aceContainer" style="z-index: 10; position: absolute; top: 0; left: 0; width: 500px; height: 500px;"></div>
         </section>
     `,
     directives: [EditorSidebarComponent, WorkspaceLayoutComponent]
@@ -19,9 +19,12 @@ require("./main.component.scss");
 export class MainComponent implements OnInit {
 
     constructor() {
+
+
     }
 
     ngOnInit(): any {
-        return undefined;
+
+        console.log('Ace', ace.edit("aceContainer"));
     }
 }

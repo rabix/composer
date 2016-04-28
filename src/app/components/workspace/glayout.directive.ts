@@ -29,9 +29,6 @@ export class GLayoutDirective implements OnInit {
                 appRef: ApplicationRef,
                 injector: Injector) {
 
-        console.log('Finished glayout');
-
-
         this.el       = el;
         this.dcl      = dcl;
         this.appRef   = appRef;
@@ -40,7 +37,6 @@ export class GLayoutDirective implements OnInit {
 
     ngOnInit(): any {
         const config = this.provideLayoutConfig();
-        console.log('Layout config', config);
 
         this.layout = new GoldenLayout(config, this.el.nativeElement);
 

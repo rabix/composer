@@ -4,6 +4,7 @@
     },
     "devDependencies": {},
     "ambientDependencies": {
+        "ace": "registry:dt/ace#0.0.0+20160317120654",
         "angular-protractor": "github:DefinitelyTyped/DefinitelyTyped/angular-protractor/angular-protractor.d.ts#64b25f63f0ec821040a5d3e049a976865062ed9d",
         "core-js": "registry:dt/core-js#0.0.0+20160317120654",
         "hammerjs": "github:DefinitelyTyped/DefinitelyTyped/hammerjs/hammerjs.d.ts#74a4dfc1bc2dfadec47b8aae953b28546cb9c6b7",

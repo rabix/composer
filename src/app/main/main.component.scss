@@ -5,17 +5,16 @@
 
 .editor-container {
     height: 100%;
+
+    & > editor-sidebar {
+        float: left;
+        width: 90px;
+    }
+
+    & > workspace {
+        float: left;
+        height: 100%;
+        width: calc(100% - 90px);
+    }
 }
 
-.component-editor-sidebar {
-    float: left;
-    width: 90px;
-}
-
-.component-workspace {
-    background-color: #00b0e8;
-    display: block;
-    float: left;
-    height: 100%;
-    width: calc(100% - 90px);
-}

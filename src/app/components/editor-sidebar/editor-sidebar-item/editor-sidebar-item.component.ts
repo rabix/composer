@@ -13,7 +13,6 @@ require("./editor-sidebar-item.component.scss");
 })
 export class EditorSidebarItemComponent implements OnInit {
     ngOnInit(): any {
-        console.log('Stuff', this.title, this.icon);
     }
 
     @Input() title;
