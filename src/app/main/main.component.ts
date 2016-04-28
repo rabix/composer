@@ -11,7 +11,7 @@ require("./main.component.scss");
         <section class="editor-container">
             <editor-sidebar></editor-sidebar>
             <workspace></workspace>
-            <div id="aceContainer" style="z-index: 10; position: absolute; top: 0; left: 0; width: 500px; height: 500px;"></div>
+            <div id="aceContainer" style="z-index: 10; position: absolute; top: 20px; left: 90px; width: 295px; height: 500px;"></div>
         </section>
     `,
     directives: [EditorSidebarComponent, WorkspaceLayoutComponent]
@@ -19,8 +19,6 @@ require("./main.component.scss");
 export class MainComponent implements OnInit {
 
     constructor() {
-
-
     }
 
     ngOnInit(): any {
