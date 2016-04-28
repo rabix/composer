@@ -48,7 +48,6 @@ module.exports = {
         'polyfills': './src/polyfills.ts',
         'vendor': './src/vendor.ts',
         'main': './src/main.browser.ts'
-
     },
 
     /*
@@ -72,6 +71,7 @@ module.exports = {
         modulesDirectories: ['node_modules']
 
     },
+    devtool: "source-map",
 
     /*
      * Options affecting the normal modules.
@@ -120,53 +120,39 @@ module.exports = {
          *
          * See: http://webpack.github.io/docs/configuration.html#module-loaders
          */
-        loaders: [
-
-            /*
-             * Typescript loader support for .ts and Angular 2 async routes via .async.ts
-             *
-             * See: https://github.com/s-panferov/awesome-typescript-loader
-             */
-            {
-                test: /\.ts$/,
-                loader: 'awesome-typescript-loader',
-                exclude: [/\.(spec|e2e)\.ts$/]
-            },
-
-            /*
-             * Json loader support for *.json files.
-             *
-             * See: https://github.com/webpack/json-loader
-             */
-            {
-                test: /\.json$/,
-                loader: 'json-loader'
-            },
-
-            /*
-             * Raw loader support for *.css files
-             * Returns file content as string
-             *
-             * See: https://github.com/webpack/raw-loader
-             */
-            {
-                test: /\.css$/,
-                loader: 'raw-loader'
-            },
-
-            /* Raw loader support for *.html
-             * Returns file content as string
-             *
-             * See: https://github.com/webpack/raw-loader
-             */
-            {
-                test: /\.html$/,
-                loader: 'raw-loader',
-                exclude: [helpers.root('src/index.html')]
-            }
-
-        ]
-
+        loaders: [{
+            test: /\.ts$/,
+            loader: 'awesome-typescript-loader',
+            exclude: [/\.(spec|e2e)\.ts$/]
+        }, {
+            test: /\.json$/,
+            loader: 'json-loader'
+        }, {
+            test: /\.scss$/,
+            loaders: ['style', 'css?sourceMap', 'resolve-url', 'sass?sourceMap']
+        }, {
+            test: /\.css$/,
+            loader: 'raw-loader'
+        }, {
+            test: /\.html$/,
+            loader: 'raw-loader',
+            exclude: [helpers.root('src/index.html')]
+        }, {
+            test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
+            loader: 'url?limit=10000&mimetype=application/font-woff'
+        }, {
+            test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
+            loader: 'url?limit=10000&mimetype=application/font-woff'
+        }, {
+            test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
+            loader: 'url?limit=10000&mimetype=application/octet-stream'
+        }, {
+            test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
+            loader: 'file'
+        }, {
+            test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
+            loader: 'url?limit=10000&mimetype=image/svg+xml'
+        }]
     },
 
     /*
@@ -175,6 +161,8 @@ module.exports = {
      * See: http://webpack.github.io/docs/configuration.html#plugins
      */
     plugins: [
+
+        // new ExtractTextPlugin('styles.css'),
 
         /*
          * Plugin: ForkCheckerPlugin

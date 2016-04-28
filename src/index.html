@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="en">
 <head>
 
     <title><%= webpackConfig.metadata.title %></title>
@@ -9,18 +9,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="<%= webpackConfig.metadata.title %>">
 
+    <link type="text/css" rel="stylesheet" href="https://golden-layout.com/files/latest/css/goldenlayout-base.css"/>
+    <link type="text/css" rel="stylesheet"
+          href="https://golden-layout.com/files/latest/css/goldenlayout-dark-theme.css"/>
+
     <!-- base url -->
     <base href="<%= webpackConfig.metadata.baseUrl %>">
 </head>
 
 <body>
 
-<app>
-    Loading...
-</app>
+<cottontail>Loading...</cottontail>
 
 <% if (webpackConfig.metadata.ENV === 'development') { %>
-<!-- Webpack Dev Server reload -->
 <script src="/webpack-dev-server.js"></script>
 <% } %>
 

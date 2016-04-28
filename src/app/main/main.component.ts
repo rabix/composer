@@ -1,45 +1,27 @@
 import {Component, OnInit} from "angular2/core";
-import {BlingDirective} from "../directives/bling.directive";
-import {BehaviorSubject} from "rxjs/Rx";
-import {Subject} from "rxjs/Subject";
+import {EditorSidebarComponent} from "../components/editor-sidebar/editor-sidebar.component";
+import {WorkspaceLayoutComponent} from "../components/workspace/workspace.component";
+
+
+require("./../../assets/sass/main.scss");
+require("./main.component.scss");
 
 @Component({
-    selector: "app",
+    selector: "cottontail",
     template: `
-        <p>
-            App Name: 
-            <span ct-bling [speed]="speedStream">{{ title }}</span>
-        </p>`,
-    directives: [BlingDirective]
+        <section class="editor-container">
+            <editor-sidebar></editor-sidebar>
+            <workspace></workspace>
+        </section>
+    `,
+    directives: [EditorSidebarComponent, WorkspaceLayoutComponent]
 })
 export class MainComponent implements OnInit {
-    private speedStream: BehaviorSubject<number>;
 
     constructor() {
-        this.speedStream = new BehaviorSubject(200);
     }
 
     ngOnInit(): any {
-        setTimeout(() => {
-            console.log('Switching to 1s');
-            this.speedStream.next(2000);
-        }, 2000);
-
-        setTimeout(() => {
-            console.log('Next switch');
-            this.speedStream.next(1000);
-        }, 5000);
-
-        setTimeout(() => {
-            console.log('completing');
-            this.speedStream.complete();
-        }, 6000);
-
-        let sub = new Subject();
-
-
-
+        return undefined;
     }
-
-    title = "Next-Generation Cottontail";
 }

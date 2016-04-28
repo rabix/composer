@@ -1,0 +1,21 @@
+.component-main {
+    width: 100%;
+    height: 100%;
+}
+
+.editor-container {
+    height: 100%;
+}
+
+.component-editor-sidebar {
+    float: left;
+    width: 90px;
+}
+
+.component-workspace {
+    background-color: #00b0e8;
+    display: block;
+    float: left;
+    height: 100%;
+    width: calc(100% - 90px);
+}

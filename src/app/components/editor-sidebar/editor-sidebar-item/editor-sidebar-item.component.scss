@@ -1,0 +1,21 @@
+@import "../../../../assets/sass/variables";
+
+.editor-sidebar-item {
+
+    color: darken($label-color, 10);
+    display: block;
+    margin: 0;
+    padding: 20px 10px 0 10px;
+    text-align: center;
+    text-transform: uppercase;
+    width: 100%;
+
+    &:hover {
+        color: $label-color;
+    }
+
+    .title {
+        font-size: $font-size-xs;
+        margin-top: 4px;
+    }
+}

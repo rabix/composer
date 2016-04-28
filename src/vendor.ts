@@ -4,4 +4,4 @@ import "angular2/core";
 import "angular2/common";
 import "angular2/http";
 import "angular2/router";
-import "rxjs/Rx";
+import "golden-layout";

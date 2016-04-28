@@ -1,5 +1,7 @@
+
 import {Directive, ElementRef, Input, OnInit} from "angular2/core";
 import {Observable} from "rxjs/Observable";
+import {BehaviorSubject} from "rxjs/Rx";
 
 @Directive({
     selector: "[ct-bling]",
@@ -18,9 +20,13 @@ export class BlingDirective implements OnInit {
 
     constructor(el: ElementRef) {
         this.el = el;
+
     }
 
     ngOnInit(): any {
+        if(!this.speedStream){
+            this.speedStream = new BehaviorSubject(500);
+        }
 
         this.colorChangeStream = this.speedStream
             .switchMap((speed) => Observable.interval(speed).startWith(1).map(() => {

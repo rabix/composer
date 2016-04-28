@@ -1,0 +1,12 @@
+@import "../../../assets/sass/variables";
+@import "~bootstrap/scss/mixins";
+
+@import url(https://fonts.googleapis.com/css?family=Montserrat);
+
+.component-editor-sidebar {
+    background-color: $color-gray-base;
+    color: $label-color;
+    display: block;
+    font-family: "Montserrat", sans-serif;
+    height: 100%;
+}
