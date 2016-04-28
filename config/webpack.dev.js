@@ -57,6 +57,8 @@ module.exports = webpackMerge(commonConfig, {
      */
     output: {
 
+        publicPath: 'http://localhost:3000/',
+
         /**
          * The output directory as absolute path (required).
          *
