@@ -34,13 +34,6 @@
 declare var ENV: string;
 declare var HMR: boolean;
 
-declare var GoldenLayout: any;
-
-declare module "golden-layout" {
-
-    export var GoldenLayout;
-}
-
 interface GlobalEnvironment {
     ENV;
     HMR;

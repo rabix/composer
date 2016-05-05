@@ -7,6 +7,7 @@ const helpers = require('./helpers');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ForkCheckerPlugin = require('awesome-typescript-loader').ForkCheckerPlugin;
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 /*
  * Webpack Constants
@@ -105,8 +106,7 @@ module.exports = {
                 loader: 'source-map-loader',
                 exclude: [
                     // these packages have problems with their sourcemaps
-                    helpers.root('node_modules/rxjs'),
-                    helpers.root('node_modules/@angular2-material')
+                    helpers.root('node_modules/rxjs')
                 ]
             }
 
@@ -129,7 +129,7 @@ module.exports = {
             loader: 'json-loader'
         }, {
             test: /\.scss$/,
-            loaders: ['style', 'css?sourceMap', 'resolve-url', 'sass?sourceMap']
+            loader: ExtractTextPlugin.extract('css?sourceMap!resolve-url!sass?sourceMap')
         }, {
             test: /\.css$/,
             loader: 'raw-loader'
@@ -138,20 +138,8 @@ module.exports = {
             loader: 'raw-loader',
             exclude: [helpers.root('src/index.html')]
         }, {
-            test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
-            loader: 'url?limit=10000&mimetype=application/font-woff'
-        }, {
-            test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
-            loader: 'url?limit=10000&mimetype=application/font-woff'
-        }, {
-            test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
-            loader: 'url?limit=10000&mimetype=application/octet-stream'
-        }, {
-            test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
-            loader: 'file'
-        }, {
-            test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
-            loader: 'url?limit=10000&mimetype=image/svg+xml'
+            test: /\.(eot|woff|woff2|ttf|svg|png|jpg)$/,
+            loader: 'url-loader?limit=30000&name=[name]-[hash].[ext]'
         }]
     },
 
@@ -162,7 +150,9 @@ module.exports = {
      */
     plugins: [
 
-        // new ExtractTextPlugin('styles.css'),
+        new ExtractTextPlugin('styles.css', {
+            allChunks: true
+        }),
 
         /*
          * Plugin: ForkCheckerPlugin

@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from "angular2/core";
+import {Component, Input, OnInit} from "@angular/core";
 require("./editor-sidebar-item.component.scss");
 
 @Component({

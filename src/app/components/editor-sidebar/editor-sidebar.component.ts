@@ -1,9 +1,11 @@
 import {EditorSidebarItemComponent} from "./editor-sidebar-item/editor-sidebar-item.component";
-import {WorkspaceComponent} from "../../decorators/workspace-component.annotation";
-import {Component, ComponentFactory} from "angular2/core";
+import {Component} from "@angular/core";
 
 require("./editor-sidebar.component.scss");
 
+// @WorkspaceComponent({
+//     name: "Good Title"
+// })
 @Component({
 
     selector: "editor-sidebar",

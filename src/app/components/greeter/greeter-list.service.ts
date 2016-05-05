@@ -1,4 +1,4 @@
-import {Injectable} from "angular2/core";
+import {Injectable} from "@angular/core";
 import {BehaviorSubject} from "rxjs/Rx";
 import {Observable} from "rxjs/Observable";
 
@@ -11,7 +11,7 @@ export class GreeterListService {
 
 
     constructor() {
-        this.listStream = new BehaviorSubject(this.currentValues);
+        this.listStream = new BehaviorSubject<string[]>(this.currentValues);
     }
 
     public setValues(list: string[]) {
@@ -19,8 +19,8 @@ export class GreeterListService {
         this.listStream.next(this.currentValues);
     }
 
-    public getList() {
-        return Observable.merge(this.listStream);
+    public getList(): Observable<string[]> {
+        return this.listStream;
     }
 
     public removeValue(value: string) {

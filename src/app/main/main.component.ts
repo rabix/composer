@@ -1,6 +1,6 @@
-import {Component, OnInit} from "angular2/core";
+import {Component, OnInit} from "@angular/core";
 import {EditorSidebarComponent} from "../components/editor-sidebar/editor-sidebar.component";
-import {WorkspaceLayoutComponent} from "../components/workspace/workspace.component";
+import {WorkspaceComponent} from "../components/workspace/workspace.component";
 
 require("./../../assets/sass/main.scss");
 require("./main.component.scss");
@@ -13,7 +13,7 @@ require("./main.component.scss");
             <workspace></workspace>
         </section>
     `,
-    directives: [EditorSidebarComponent, WorkspaceLayoutComponent]
+    directives: [EditorSidebarComponent, WorkspaceComponent]
 })
 export class MainComponent implements OnInit {
 

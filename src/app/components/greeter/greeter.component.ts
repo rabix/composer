@@ -1,5 +1,5 @@
-import {Component} from "angular2/core";
-import {NgFor} from "angular2/common";
+import {Component} from "@angular/core";
+import {NgFor} from "@angular/common";
 import {GreeterListService} from "./greeter-list.service";
 @Component({
     selector: 'greeter',
@@ -20,12 +20,12 @@ import {GreeterListService} from "./greeter-list.service";
         }
     `],
     template: `
-        <p>Title!</p>
+        <p>This is a greeter!</p>
         <ul>
-            <li *ngFor="#item of items | async">
+            <li *ngFor="let item of items | async">
             Item: <code>{{ item }}</code>
             
-            <button (click)="deleteItem(item)">delete</button>
+            <button class="btn btn-info" (click)="deleteItem(item)">delete</button>
             </li>
         </ul>
     `
@@ -40,9 +40,17 @@ export class GreeterComponent {
         this.listProvider = listProvider;
 
         this.items = this.listProvider.getList();
+        console.log("Creating a greeter");
+
+    }
+
+    ngOnDestroy() {
+        console.log("Destroying a component", arguments);
     }
 
     deleteItem(item) {
+        console.log('Click', item);
         this.listProvider.removeValue(item);
+        console.log('list provider', this.listProvider.listStream.getValue());
     }
 }
