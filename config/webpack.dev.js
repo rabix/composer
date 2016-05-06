@@ -80,7 +80,7 @@ module.exports = webpackMerge(commonConfig, {
          *
          * See: http://webpack.github.io/docs/configuration.html#output-sourcemapfilename
          */
-        sourceMapFilename: '[name].map',
+        sourceMapFilename: '[file].[name].map',
 
         /** The filename of non-entry chunks as relative path
          * inside the output.path directory.
