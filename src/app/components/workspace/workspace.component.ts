@@ -2,15 +2,15 @@ import {
     Component,
     ElementRef,
     ComponentRef,
-    Directive,
-    DynamicComponentLoader,
     ApplicationRef,
-    Injector
+    ComponentResolver,
+    ComponentFactory,
+    Injector,
 } from "@angular/core";
 
 import {GreeterComponent} from "../greeter/greeter.component";
-import {Observable} from "rxjs/Observable";
 import * as GoldenLayout from "golden-layout";
+import {Observable} from "rxjs/Observable";
 
 require("./workspace.component.scss");
 
@@ -21,17 +21,14 @@ require("./workspace.component.scss");
 export class WorkspaceComponent {
 
     private layout: any;
-    private el: ElementRef;
-    private dcl: DynamicComponentLoader;
-    private appRef: ApplicationRef;
-    private injector: Injector;
 
-    constructor(el: ElementRef, dcl: DynamicComponentLoader, appRef: ApplicationRef, injector: Injector) {
-        this.el       = el;
-        this.dcl      = dcl;
-        this.appRef   = appRef;
-        this.injector = injector;
-        this.layout   = new GoldenLayout(this.getLayoutConfig(), this.el.nativeElement);
+    constructor(private el: ElementRef,
+                private appRef: ApplicationRef,
+                private resolver: ComponentResolver,
+                private injector: Injector) {
+
+        this.layout = new GoldenLayout(this.getLayoutConfig(), this.el.nativeElement);
+
     }
 
     ngOnInit() {
@@ -50,20 +47,17 @@ export class WorkspaceComponent {
         this.layout.registerComponent("blinger", (container, componentState) => {
             let targetElement = container.getElement()[0];
 
-            this.dcl.loadAsRoot(GreeterComponent, targetElement, this.injector)
-                .then((comp)=> {
-
-                    container.componentReference = comp;
-
-                    (<any>this.appRef)._loadComponent(comp);
-                    return comp;
-                });
+            this.resolver.resolveComponent(GreeterComponent).then((factory: ComponentFactory<any>) => {
+                let comp = container.componentReference = factory.create(this.injector, [], targetElement);
+                (<any>this.appRef)._loadComponent(comp);
+            });
         });
 
         Observable.fromEvent(this.layout, "itemDestroyed")
             .filter((ev: any) => ev.type === "component")
             .map((ev: any) => ev.container.componentReference)
             .subscribe((comp: ComponentRef<GreeterComponent>) => {
+
                 comp.changeDetectorRef.detach();
                 comp.destroy();
             });

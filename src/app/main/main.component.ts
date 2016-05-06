@@ -1,4 +1,4 @@
-import {Component, OnInit} from "@angular/core";
+import {Component} from "@angular/core";
 import {EditorSidebarComponent} from "../components/editor-sidebar/editor-sidebar.component";
 import {WorkspaceComponent} from "../components/workspace/workspace.component";
 
@@ -15,11 +15,6 @@ require("./main.component.scss");
     `,
     directives: [EditorSidebarComponent, WorkspaceComponent]
 })
-export class MainComponent implements OnInit {
+export class MainComponent {
 
-    constructor() {
-    }
-
-    ngOnInit(): any {
-    }
 }
