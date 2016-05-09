@@ -1,39 +1,31 @@
-import {
-    Component,
-    ElementRef,
-    ComponentRef,
-    ApplicationRef,
-    ComponentResolver,
-    ComponentFactory,
-    Injector,
-} from "@angular/core";
-
+import {Component, ElementRef} from "@angular/core";
 import {GreeterComponent} from "../greeter/greeter.component";
 import * as GoldenLayout from "golden-layout";
 import {Observable} from "rxjs/Observable";
+import {ComponentRegistry} from "./registry/component-registry";
+import {ComponentRegistryFactoryService} from "./registry/component-registry-factory.service";
 
 require("./workspace.component.scss");
 
 @Component({
     selector: "workspace",
     template: "",
+    providers: [ComponentRegistryFactoryService]
 })
 export class WorkspaceComponent {
 
     private layout: any;
+    private registry: ComponentRegistry;
 
-    constructor(private el: ElementRef,
-                private appRef: ApplicationRef,
-                private resolver: ComponentResolver,
-                private injector: Injector) {
+    constructor(private el: ElementRef, registryFactory: ComponentRegistryFactoryService) {
 
-        this.layout = new GoldenLayout(this.getLayoutConfig(), this.el.nativeElement);
-
+        this.layout   = new GoldenLayout(this.getLayoutConfig(), this.el.nativeElement);
+        this.registry = registryFactory.forLayout(this.layout);
     }
 
     ngOnInit() {
-        this.registerLayoutComponents();
 
+        //noinspection TypeScriptUnresolvedFunction
         Observable.fromEvent(window, "resize").debounceTime(200).subscribe(() => {
             this.layout.updateSize(this.el.nativeElement.clientWidth, this.el.nativeElement.clientHeight);
         });
@@ -43,29 +35,9 @@ export class WorkspaceComponent {
         this.layout.init();
     }
 
-    private registerLayoutComponents() {
-        this.layout.registerComponent("blinger", (container, componentState) => {
-            let targetElement = container.getElement()[0];
-
-            this.resolver.resolveComponent(GreeterComponent).then((factory: ComponentFactory<any>) => {
-                let comp = container.componentReference = factory.create(this.injector, [], targetElement);
-                (<any>this.appRef)._loadComponent(comp);
-            });
-        });
-
-        Observable.fromEvent(this.layout, "itemDestroyed")
-            .filter((ev: any) => ev.type === "component")
-            .map((ev: any) => ev.container.componentReference)
-            .subscribe((comp: ComponentRef<GreeterComponent>) => {
-
-                comp.changeDetectorRef.detach();
-                comp.destroy();
-            });
-
-    }
-
     private getLayoutConfig() {
-        const defaultConfig = {
+
+        return {
             settings: {
                 hasHeaders: true,
                 reorderEnabled: true,
@@ -73,36 +45,23 @@ export class WorkspaceComponent {
                 popoutWholeStack: false,
                 showPopoutIcon: false,
                 showMaximiseIcon: true,
-                showCloseIcon: true,
+                showCloseIcon: false,
             },
             content: [{
                 type: "row",
                 content: [{
                     type: "component",
-                    componentName: "blinger",
+                    componentName: GreeterComponent,
                     title: "Navigation",
                     width: 25
                 },
                     {
-                        type: "column",
-                        content: [
-                            {
-                                type: "component",
-                                title: "my-workflow.json",
-                                componentName: "blinger",
-                            }, {
-                                type: "component",
-                                title: "my-notes.txt",
-                                componentName: "blinger",
-                                componentState: {label: "Component Title"}
-                            }
-                        ]
+                        type: "component",
+                        title: "my-workflow.json",
+                        componentName: GreeterComponent,
                     },
                 ]
             }]
         };
-
-
-        return defaultConfig;
     }
 }
