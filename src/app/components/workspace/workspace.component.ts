@@ -4,6 +4,7 @@ import * as GoldenLayout from "golden-layout";
 import {Observable} from "rxjs/Observable";
 import {ComponentRegistry} from "./registry/component-registry";
 import {ComponentRegistryFactoryService} from "./registry/component-registry-factory.service";
+import {CodeEditorComponent} from "../code-editor/code-editor.component";
 
 require("./workspace.component.scss");
 
@@ -49,17 +50,18 @@ export class WorkspaceComponent {
             },
             content: [{
                 type: "row",
-                content: [{
-                    type: "component",
-                    componentName: GreeterComponent,
-                    title: "Navigation",
-                    width: 25
-                },
+                content: [
+                    {
+                        type: "component",
+                        componentName: GreeterComponent,
+                        title: "Navigation",
+                        width: 25
+                    },
                     {
                         type: "component",
                         title: "my-workflow.json",
-                        componentName: GreeterComponent,
-                    },
+                        componentName: CodeEditorComponent,
+                    }
                 ]
             }]
         };
