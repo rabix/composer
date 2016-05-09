@@ -11,7 +11,7 @@ export class ComponentRegistryFactoryService {
 
     }
 
-    public forLayout(layout: any) {
+    public create(layout: any) {
         return new ComponentRegistry(layout, this.resolver, this.injector, this.appRef);
     }
 

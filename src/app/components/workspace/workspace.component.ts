@@ -20,7 +20,7 @@ export class WorkspaceComponent {
     constructor(private el: ElementRef, registryFactory: ComponentRegistryFactoryService) {
 
         this.layout   = new GoldenLayout(this.getLayoutConfig(), this.el.nativeElement);
-        this.registry = registryFactory.forLayout(this.layout);
+        this.registry = registryFactory.create(this.layout);
     }
 
     ngOnInit() {
