@@ -26,19 +26,6 @@ export class ComponentRegistry {
         return components.concat(...structures.map((structure) => this.extractComponents(structure.content), []));
     }
 
-    public register(component: any): string {
-
-
-        if (this.components[component]) {
-            return this.components[component].component;
-        }
-
-        this.registerComponent(component);
-
-        return component;
-
-    }
-
     private registerComponent(componentName: string): void {
 
         this.layout.registerComponent(componentName, (container, state) => {
