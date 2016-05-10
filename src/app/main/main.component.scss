@@ -5,6 +5,7 @@
 
 .editor-container {
     height: 100%;
+    overflow: hidden;
 
     & > editor-sidebar {
         float: left;

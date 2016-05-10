@@ -4,16 +4,20 @@ import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {Observable} from "rxjs/Observable";
+import {Subscription} from "rxjs/Subscription";
 
 export class CodeEditor {
     editor:Editor;
     session:IEditSession;
     document:Document;
 
+    private subscriptions:Subscription[] = [];
+
     text:string;
 
-    changeStream:Subject<any> = new BehaviorSubject<any>({});
-    
+    textStream:Observable<string> = new BehaviorSubject(null);
+    changeStream:Observable<any> = new Subject();
+
     constructor(editor:Editor) {
         this.editor = editor;
         this.session = editor.getSession();
@@ -23,10 +27,10 @@ export class CodeEditor {
         this.setMode('javascript');
         this._attachEventStreams();
     }
-    
+
     private _attachEventStreams() {
 
-        Observable.fromEventPattern(
+        let changeSubscription = Observable.fromEventPattern(
             (h) => {
                 this.document.on('change', (e) => {
                     h(e);
@@ -34,6 +38,8 @@ export class CodeEditor {
             }, (h) => {
             }
         ).subscribe(this.changeStream);
+
+        this.subscriptions.push(changeSubscription);
     }
 
     public setText(text:string):void {
@@ -52,5 +58,8 @@ export class CodeEditor {
 
     public dispose():void {
         // detach listeners and subscriptions
+        this.subscriptions.forEach((sub) => {
+            sub.unsubscribe();
+        });
     }
 }

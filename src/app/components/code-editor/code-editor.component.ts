@@ -24,6 +24,10 @@ export class CodeEditorComponent implements OnInit {
     ngOnInit():any {
         let editorInstance = ace.edit(this.elem.nativeElement.getElementsByClassName('editor')[0]);
         this.editor = new CodeEditor(editorInstance);
+
+        this.editor.changeStream.subscribe(e => {
+            console.log('change stream from component', e);
+        })
     }
 
     ngOnDestroy():any {
