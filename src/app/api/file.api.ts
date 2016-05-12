@@ -8,7 +8,7 @@ export class FileApi {
     constructor(private rxSocketIO: RxSocketIO) { }
 
     getFilesInWorkspace() {
-        return Observable.create(observer => {
+        /*return Observable.create(observer => {
                 let subscriber = this.rxSocketIO.emitEvent('getFilesInWorkspace', null).subscribe(
                     function (data) {
                         observer.next(data);
@@ -20,14 +20,43 @@ export class FileApi {
                 setTimeout(function(){
                     subscriber.unsubscribe();
                 }, 500);
-            })
+            })*/
+        return this.createObservableFromRxSocketEvent(
+            this.rxSocketIO.emitEvent('getFilesInWorkspace', null))
             .map(this.extractData)
             .catch(this.handleError);
     }
 
+    getCWLToolbox() {
+        return this.createObservableFromRxSocketEvent(
+            this.rxSocketIO.emitEvent('getCWLToolbox', null))
+            .map(this.extractData)
+            .catch(this.handleError);
+    }
+
+    getFile(file) {
+        return this.createObservableFromRxSocketEvent(
+            this.rxSocketIO.emitEvent('getFile', { file: file }))
+            .map(this.extractData)
+            .catch(this.handleError);
+    }
+
+    updateFile(file) {
+        return this.createObservableFromRxSocketEvent(
+            this.rxSocketIO.emitEvent('updateFile', { file: file }))
+            .catch(this.handleError);
+    }
+
     createFile(file) {
+        return this.createObservableFromRxSocketEvent(
+            this.rxSocketIO.emitEvent('createFile', { file: file }))
+            .catch(this.handleError);
+    }
+
+    
+    private createObservableFromRxSocketEvent(rxSocketEvent) {
         return Observable.create(observer => {
-                let subscriber = this.rxSocketIO.emitEvent('createFile', { file: file }).subscribe(
+                let subscriber = rxSocketEvent.subscribe(
                     function (data) {
                         observer.next(data);
                     },
@@ -38,8 +67,7 @@ export class FileApi {
                 setTimeout(function(){
                     subscriber.unsubscribe();
                 }, 500);
-            })
-            .catch(this.handleError);
+            });
     }
 
     private extractData(res: Response) {
