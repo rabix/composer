@@ -40,17 +40,9 @@ export class GreeterComponent {
         this.listProvider = listProvider;
 
         this.items = this.listProvider.getList();
-        console.log("Creating a greeter");
-
-    }
-
-    ngOnDestroy() {
-        console.log("Destroying a component", arguments);
     }
 
     deleteItem(item) {
-        console.log('Click', item);
         this.listProvider.removeValue(item);
-        console.log('list provider', this.listProvider.listStream.getValue());
     }
 }

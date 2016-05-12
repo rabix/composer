@@ -1,7 +1,8 @@
 /*
  * Providers provided by Angular
  */
-import {bootstrap} from '@angular/platform-browser-dynamic';
+import {bootstrap} from "@angular/platform-browser-dynamic";
+import {HTTP_PROVIDERS} from "@angular/http";
 /*
  * Platform and Environment
  * our providers/directives/pipes
@@ -9,7 +10,7 @@ import {bootstrap} from '@angular/platform-browser-dynamic';
 import {MainComponent} from "./app/main/main.component";
 
 export function main(): Promise<any> {
-    return bootstrap(MainComponent).catch(err => console.error(err));
+    return bootstrap(MainComponent, [HTTP_PROVIDERS]).catch(err => console.error(err));
 }
 
 if ('development' === ENV && HMR === true) {

@@ -1,7 +1,7 @@
 
 
 const helpers = require('./helpers');
-
+const appConfig =  require('../../config/config.test.json');
 /**
  * Webpack Plugins
  */
@@ -86,7 +86,7 @@ module.exports = {
                 exclude: [
                     // these packages have problems with their sourcemaps
                     helpers.root('node_modules/rxjs'),
-                    helpers.root('node_modules/@angular2-material')
+                    helpers.root('node_modules/@angular'),
                 ]
             }
 
@@ -192,6 +192,7 @@ module.exports = {
         new DefinePlugin({
             'ENV': JSON.stringify(ENV),
             'HMR': false,
+            'APP_ENV_CONFIG': JSON.stringify(appConfig),
             'process.env': {
                 'ENV': JSON.stringify(ENV),
                 'NODE_ENV': JSON.stringify(ENV),

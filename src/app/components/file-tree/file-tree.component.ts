@@ -4,7 +4,7 @@ import "rxjs/Rx";
 @Component({
     selector: "file-tree",
     template: `
-        <tree-element *ngFor="let item of items"></tree-element>
+        <h2>Hello, File Tree!</h2>
     `
 })
 export class FileTreeComponent {

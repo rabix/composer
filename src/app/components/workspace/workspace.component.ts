@@ -5,6 +5,7 @@ import {Observable} from "rxjs/Observable";
 import {ComponentRegistry} from "./registry/component-registry";
 import {ComponentRegistryFactoryService} from "./registry/component-registry-factory.service";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
+import {FileTreeComponent} from "../file-tree/file-tree.component";
 
 require("./workspace.component.scss");
 
@@ -53,7 +54,7 @@ export class WorkspaceComponent {
                 content: [
                     {
                         type: "component",
-                        componentName: GreeterComponent,
+                        componentName: FileTreeComponent,
                         title: "Navigation",
                         width: 25
                     },

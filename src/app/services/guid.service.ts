@@ -7,7 +7,7 @@ import {Injectable} from "@angular/core";
 export class GuidService {
     public generate() {
         let mask = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
-        mask.replace(/[xy]/g, (replacer) => {
+        return mask.replace(/[xy]/g, (replacer) => {
             let x = Math.random() * 16 | 0,
                 y = x & 0x3 | 0x8;
 
