@@ -1,8 +1,8 @@
 import {EditorSidebarItemComponent} from "./editor-sidebar-item/editor-sidebar-item.component";
 import {Component} from "@angular/core";
-import {FileApi} from "../../api/file.api";
+import {FileApi} from "../../services/api/file.api";
 import { HTTP_PROVIDERS } from '@angular/http';
-import {RxSocketIO} from "../../api/rx-socket.io";
+import {RxSocketIO} from "../../services/api/rx-socket.io";
 
 require("./editor-sidebar.component.scss");
 
