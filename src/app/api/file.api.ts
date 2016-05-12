@@ -8,19 +8,6 @@ export class FileApi {
     constructor(private rxSocketIO: RxSocketIO) { }
 
     getFilesInWorkspace() {
-        /*return Observable.create(observer => {
-                let subscriber = this.rxSocketIO.emitEvent('getFilesInWorkspace', null).subscribe(
-                    function (data) {
-                        observer.next(data);
-                    },
-                    function (e) {
-                        console.log('Error: ' + e.message);
-                    });
-
-                setTimeout(function(){
-                    subscriber.unsubscribe();
-                }, 500);
-            })*/
         return this.createObservableFromRxSocketEvent(
             this.rxSocketIO.emitEvent('getFilesInWorkspace', null))
             .map(this.extractData)
@@ -41,9 +28,9 @@ export class FileApi {
             .catch(this.handleError);
     }
 
-    updateFile(file) {
+    updateFile(file, content) {
         return this.createObservableFromRxSocketEvent(
-            this.rxSocketIO.emitEvent('updateFile', { file: file }))
+            this.rxSocketIO.emitEvent('updateFile', { file: file, content: content}))
             .catch(this.handleError);
     }
 
