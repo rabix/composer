@@ -1,36 +1,43 @@
 import { Injectable }     from '@angular/core';
-import { Http, Response } from '@angular/http';
+import { Response } from '@angular/http';
 import { Observable }     from 'rxjs/Observable';
-import * as io from 'socket.io-client';
+import {RxSocketIO} from "./rx-socket.io";
 
 @Injectable()
 export class FileApi {
+    constructor(private rxSocketIO: RxSocketIO) { }
 
-    constructor (private http: Http) {}
-
-    private socket = io('http://localhost:9000');
-
-    getFilesInWorkspace(): Observable<any[]> {
+    getFilesInWorkspace() {
         return Observable.create(observer => {
-                this.socket.emit('getFilesInWorkspace', (data) => {
-                    observer.next(data)
-                });
-                return {
-                    unsubscribe : this.socket.close
-                }
+                let subscriber = this.rxSocketIO.emitEvent('getFilesInWorkspace', null).subscribe(
+                    function (data) {
+                        observer.next(data);
+                    },
+                    function (e) {
+                        console.log('Error: ' + e.message);
+                    });
+
+                setTimeout(function(){
+                    subscriber.unsubscribe();
+                }, 500);
             })
             .map(this.extractData)
             .catch(this.handleError);
     }
 
-    getFilesInWorkspace(): Observable<any[]> {
+    createFile(file) {
         return Observable.create(observer => {
-                this.socket.emit('createFile', {
-                    
-                });
-                return {
-                    unsubscribe : this.socket.close
-                }
+                let subscriber = this.rxSocketIO.emitEvent('createFile', { file: file }).subscribe(
+                    function (data) {
+                        observer.next(data);
+                    },
+                    function (e) {
+                        console.log('Error: ' + e.message);
+                    });
+
+                setTimeout(function(){
+                    subscriber.unsubscribe();
+                }, 500);
             })
             .catch(this.handleError);
     }
@@ -43,9 +50,8 @@ export class FileApi {
     }
 
     private handleError (error: any) {
-        // In a real world app, we might send the error to remote logging infrastructure
         let errMsg = error.message || 'Server error';
-        console.error(errMsg); // log to console instead
+        console.error(errMsg);
         return Observable.throw(errMsg);
     }
 }
