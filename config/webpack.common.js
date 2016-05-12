@@ -208,6 +208,10 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: 'src/index.html',
             chunksSortMode: helpers.packageSort(['polyfills', 'vendor', 'main'])
+        }),
+
+        new webpack.ProvidePlugin({
+            io: 'socket.io-client'
         })
 
     ],
