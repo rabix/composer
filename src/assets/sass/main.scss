@@ -5,7 +5,23 @@
 @import "~font-awesome/scss/font-awesome";
 
 html, body {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
+  background: black;
+}
+
+.initial-loading {
+  color: #aaa;
+  display: table;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+
+  .icon {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+  }
 }
 

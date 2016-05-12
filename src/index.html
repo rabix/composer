@@ -12,6 +12,7 @@
     <link type="text/css" rel="stylesheet" href="https://golden-layout.com/files/latest/css/goldenlayout-base.css"/>
     <link type="text/css" rel="stylesheet"
           href="https://golden-layout.com/files/latest/css/goldenlayout-dark-theme.css"/>
+    <link rel="stylesheet" href="">
 
     <!-- base url -->
     <base href="<%= webpackConfig.metadata.baseUrl %>">
@@ -20,7 +21,15 @@
 
 <body>
 
-<cottontail>Loading...</cottontail>
+<cottontail>
+
+    <div class="initial-loading">
+        <div class="icon">
+            <i class="fa fa-gear fa-4x fa-spin"></i>
+            <p>Loading...</p>
+        </div>
+    </div>
+</cottontail>
 
 <% if (webpackConfig.metadata.ENV === 'development') { %>
 <script src="/webpack-dev-server.js"></script>
