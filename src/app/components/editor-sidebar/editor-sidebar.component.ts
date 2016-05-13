@@ -1,9 +1,6 @@
 import {EditorSidebarItemComponent} from "./editor-sidebar-item/editor-sidebar-item.component";
 import {Component} from "@angular/core";
-import {FileApi} from "../../services/api/file.api";
 import {HTTP_PROVIDERS} from '@angular/http';
-import {SocketService} from "../../services/api/socket.service";
-
 require("./editor-sidebar.component.scss");
 
 // @WorkspaceComponent({
@@ -23,37 +20,5 @@ require("./editor-sidebar.component.scss");
     providers: [HTTP_PROVIDERS]
 })
 export class EditorSidebarComponent {
-
-    constructor(private fileApi: FileApi) {
-    }
-
-    ngOnInit() {
-        this.getFilesInWorkspace();
-        this.createFile();
-    }
-
-    //TODO: this here for testing
-    getFilesInWorkspace() {
-        this.fileApi.getFilesInWorkspace()
-            .subscribe(
-                result => {
-                    console.log('getFilesInWorkspace: ' + result.baseDir);
-                },
-                error => {
-                    console.log(error);
-                });
-    }
-
-    //TODO: this here for testing
-    createFile() {
-        this.fileApi.createFile('t2.json')
-            .subscribe(
-                result => {
-                    console.log(result);
-                },
-                error => {
-                    console.log(error);
-                });
-    }
-
+    
 }

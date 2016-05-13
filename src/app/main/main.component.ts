@@ -6,6 +6,7 @@ import {ApiService} from "../services/api/api.service";
 import {SocketService} from "../services/api/socket.service";
 import {FileApi} from "../services/api/file.api";
 import {FilePath} from "../services/api/api-response-types";
+import {EditorSidebarComponent} from "../components/editor-sidebar/editor-sidebar.component";
 
 require("./../../assets/sass/main.scss");
 require("./main.component.scss");
@@ -20,7 +21,7 @@ require("./main.component.scss");
             <!--<code-editor [text]="text"></code-editor>-->
         </section>
     `,
-    directives: [WorkspaceComponent, CodeEditorComponent],
+    directives: [EditorSidebarComponent, WorkspaceComponent, CodeEditorComponent],
     providers: [provide(APP_CONFIG, {useValue: CONFIG}), ApiService, FileApi, SocketService]
 })
 export class MainComponent {
