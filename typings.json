@@ -1,7 +1,5 @@
 {
     "dependencies": {
-        "golden-layout": "github:Genedata/typed-golden-layout",
-        "index": "github:Genedata/typed-golden-layout/index.d.ts",
         "zone.js": "github:gdi2290/typed-zone.js#66ea8a3451542bb7798369306840e46be1d6ec89"
     },
     "devDependencies": {},
@@ -15,5 +13,8 @@
         "socket.io": "registry:dt/socket.io#1.4.4+20160317120654",
         "socket.io-client": "registry:dt/socket.io-client#1.4.4+20160317120654",
         "webpack": "github:DefinitelyTyped/DefinitelyTyped/webpack/webpack.d.ts#95c02169ba8fa58ac1092422efbd2e3174a206f4"
+    },
+    "ambientDevDependencies": {
+        "q": "registry:dt/q#0.0.0+20160417152954"
     }
 }

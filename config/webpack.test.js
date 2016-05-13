@@ -1,5 +1,5 @@
 
-
+const webpack = require('webpack');
 const helpers = require('./helpers');
 const appConfig =  require('../../config/config.test.json');
 /**
@@ -199,6 +199,10 @@ module.exports = {
                 'HMR': false,
             }
         }),
+
+        new webpack.ProvidePlugin({
+            io: 'socket.io-client'
+        })
 
 
     ],

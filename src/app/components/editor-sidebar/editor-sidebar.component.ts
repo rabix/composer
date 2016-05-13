@@ -1,8 +1,8 @@
 import {EditorSidebarItemComponent} from "./editor-sidebar-item/editor-sidebar-item.component";
 import {Component} from "@angular/core";
 import {FileApi} from "../../services/api/file.api";
-import { HTTP_PROVIDERS } from '@angular/http';
-import {RxSocketIO} from "../../services/api/rx-socket.io";
+import {HTTP_PROVIDERS} from '@angular/http';
+import {SocketService} from "../../services/api/socket.service";
 
 require("./editor-sidebar.component.scss");
 
@@ -20,15 +20,12 @@ require("./editor-sidebar.component.scss");
                 <editor-sidebar-item title="Settings" icon="cog"></editor-sidebar-item>
             </nav>
     `,
-    providers:  [
-        HTTP_PROVIDERS,
-        FileApi,
-        RxSocketIO
-    ]
+    providers: [HTTP_PROVIDERS]
 })
 export class EditorSidebarComponent {
 
-    constructor (private fileApi: FileApi) {}
+    constructor(private fileApi: FileApi) {
+    }
 
     ngOnInit() {
         this.getFilesInWorkspace();
