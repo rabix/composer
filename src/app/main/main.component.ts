@@ -5,7 +5,6 @@ import {APP_CONFIG, CONFIG} from "../config/app.config";
 import {ApiService} from "../services/api/api.service";
 import {SocketService} from "../services/api/socket.service";
 import {FileApi} from "../services/api/file.api";
-import {FilePath} from "../services/api/api-response-types";
 import {EditorSidebarComponent} from "../components/editor-sidebar/editor-sidebar.component";
 
 require("./../../assets/sass/main.scss");
@@ -18,7 +17,7 @@ require("./main.component.scss");
             <editor-sidebar></editor-sidebar>
             <workspace></workspace>
             
-            <!--<code-editor [text]="text"></code-editor>-->
+            <code-editor [text]="text"></code-editor>
         </section>
     `,
     directives: [EditorSidebarComponent, WorkspaceComponent, CodeEditorComponent],
@@ -26,25 +25,7 @@ require("./main.component.scss");
 })
 export class MainComponent {
 
-    constructor(private fileApi: FileApi) {
-        fileApi.getDirContent().subscribe((paths) => {
-            console.log("1. Content is ");
-        });
-        fileApi.getDirContent().subscribe((content) => {
-            console.log("2. Content is ", content);
-        });
-        fileApi.getDirContent().subscribe((content) => {
-            console.log("3. Content is ", content);
-        });
+    constructor() {
 
-        setTimeout(function(){
-            fileApi.getDirContent().subscribe((content) => {
-                console.log("4. Content is ", content);
-            });
-            fileApi.getDirContent().subscribe((content) => {
-                console.log("5. Content is ", content);
-            });
-
-        }, 5000)
     }
 }
