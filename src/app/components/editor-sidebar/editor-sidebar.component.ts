@@ -3,9 +3,6 @@ import {Component} from "@angular/core";
 import {HTTP_PROVIDERS} from '@angular/http';
 require("./editor-sidebar.component.scss");
 
-// @WorkspaceComponent({
-//     name: "Good Title"
-// })
 @Component({
 
     selector: "editor-sidebar",
@@ -20,5 +17,5 @@ require("./editor-sidebar.component.scss");
     providers: [HTTP_PROVIDERS]
 })
 export class EditorSidebarComponent {
-    
+
 }
