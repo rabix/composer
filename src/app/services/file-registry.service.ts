@@ -2,17 +2,22 @@ import {Injectable} from "@angular/core";
 
 class File {
 
-    private path;
-
+    private relativePath;
+    public content:string;
+    private type: string;
 
     toString(): string {
-        return this.path;
+        return this.relativePath;
     }
 }
 
 class Directory {
 
-    private path: string;
+    private relativePath: string;
+    private fullPath: string;
+    private isEmpty: boolean;
+    
+    private type: string;
 
     private files: File[];
     private directories: Directory[];
