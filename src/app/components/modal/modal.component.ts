@@ -1,6 +1,9 @@
-import { Component, ComponentRef, DynamicComponentLoader, ApplicationRef, Injectable, ViewContainerRef } from '@angular/core';
-import { NgStyle } from '@angular/common';
+import { Component, ComponentRef, DynamicComponentLoader, ApplicationRef, Injectable,
+    ComponentResolver, ViewChild, ViewContainerRef, OnInit, ComponentFactory} from '@angular/core';
+import { NgStyle, FORM_DIRECTIVES } from '@angular/common';
 import { PromiseWrapper } from '@angular/common/src/facade/async';
+
+import { DynamicDataInterface, CustomComponentBuilder } from '../../builders/component/custom-component.builder';
 
 /**
  * Usage: https://github.com/czeckd/angular2-simple-modal
@@ -16,16 +19,12 @@ export enum ModalType {
 export class ModalComponent {
 
     title:string = '';
-    message:string = '';
+    dynamicTemplateString:string = '';
     type:ModalType = ModalType.Default;
     blocking:boolean = true;
     confirmBtn:string = null;
     cancelBtn:string = 'OK';
-
-    selectLabel:string = '';
-    selectOptions:any[];
-    selectedValue:any;
-
+    data: any;
     width:number = 250;
     height:number = 150;
 
@@ -34,22 +33,13 @@ export class ModalComponent {
     <div class="modal-content">
     
            <div class="modal-header">
-            <h2  *ngIf="title" class="modal-title" [innerHTML]="title"></h2>
+            <h2 *ngIf="title" class="modal-title" [innerHTML]="title"></h2>
            </div>
           
             <div class="modal-body">
-                <div class="modal-message" [innerHTML]="message"></div>
                 
-                <!--
-                TODO: !!!This is a temporary solution until I figure out how to pass data here
-                -->
+                <div #dynamicContentPlaceHolder></div>
                 
-                <fieldset *ngIf="selectOptions.length > 0" class="form-group">
-                <label for="create_file_action">{{selectLabel}}</label>
-                    <select class="form-control" id="create_file_action" [(ngModel)]="selectedValue">
-                        <option *ngFor="let value of selectOptions" [value]="value">{{value.name}}</option>
-                    </select>
-                </fieldset>
             </div>
             
             <div class="modal-footer">
@@ -67,17 +57,13 @@ export class ModalComponent {
 
     toComponent() : Function {
         let title:string = this.title;
-        let message:string = this.message;
+        let dynamicTemplateString:string = this.dynamicTemplateString;
         let width:string = this.width + 'px';
         let height:string = this.height + 'px';
         let confirmBtn:string = this.confirmBtn;
         let cancelBtn:string = this.cancelBtn;
         let icon:string = null;
-
-        let selectLabel:string = this.selectLabel;
-        let selectOptions:any[] = this.selectOptions;
-        let selectedValue:any = this.selectedValue;
-
+        let data:any = this.data;
         let template:string;
 
         if (this.blocking) {
@@ -85,9 +71,9 @@ export class ModalComponent {
                 `<div class="modal" [ngStyle]="{'width':'` + width + `', 'height':'` + height + `'}">` +
                 this.template + `</div></div>`;
         } else {
-            template = `<div class="modal-background" (click)="cancel()">` +
-                `<div class="modal" (click)="$event.stopPropagation()" [ngStyle]="{'width':'` + width + `', 'height':'` + height + `'}">` +
-                this.template + `</div></div>`;;
+            template = `<div class="modal-background" (click)="cancel()">
+                <div id="modalDiv" class="modal" (click)="$event.stopPropagation()" [ngStyle]="{'width':'` + width + `', 'height':'` + height + `'}">` +
+                this.template + `</div></div>`;
         }
 
         switch (this.type) {
@@ -108,20 +94,54 @@ export class ModalComponent {
         @Component({
             selector: 'modal',
             directives: [ NgStyle ],
-            template: template
+            template: template,
+            providers: [CustomComponentBuilder]
         })
-        class Modal {
+        class Modal implements OnInit {
+            
+            public entity: { description: string };
+            // reference for a <div> with #
+            @ViewChild('dynamicContentPlaceHolder', {read: ViewContainerRef})
+            protected dynamicComponentTarget: ViewContainerRef;
+
+            // ng loader and our custom builder
+            constructor(
+                private dcl:DynamicComponentLoader,
+                private app:ApplicationRef,
+                protected componentResolver: ComponentResolver,
+                protected customComponentBuilder: CustomComponentBuilder
+            ){}
+
+            public ngOnInit(){
+                // dynamic template built
+                var template = dynamicTemplateString;
+
+                // now we get built component, just to load it
+                var dynamicComponent = this.customComponentBuilder
+                    .CreateComponent(template, FORM_DIRECTIVES);
+
+                // we have a component and its target
+                this.componentResolver
+                    .resolveComponent(dynamicComponent)
+                    .then((factory: ComponentFactory<DynamicDataInterface>) =>
+                    {
+                        // Instantiates a single {@link Component} and inserts its Host View
+                        //   into this container at the specified `index`
+                        let dynamicComponent = this.dynamicComponentTarget.createComponent(factory, 0);
+
+                        // and here we have access to our dynamic component
+                        let component: DynamicDataInterface = dynamicComponent.instance;
+                        component.data = data;
+                    });
+            }
+
             cref:ComponentRef<Modal> = null;
 
             /* tslint:disable:no-unused-variable */
             private title:string = title;
-            private message:string = message;
+            private dynamicTemplateString:string = dynamicTemplateString;
             private icon:string = icon;
-
-            private selectLabel:string = selectLabel;
-            private selectOptions:any[] = selectOptions;
-            private selectedValue:any = selectedValue;
-
+            
             /* tslint:enable:no-unused-variable */
             private confirmBtn:string = confirmBtn;
             private cancelBtn:string = cancelBtn;
@@ -146,19 +166,20 @@ export class ModalComponent {
 
     show() : Promise<any> {
         // Top level hack
-        let vcr:ViewContainerRef = this.app['_rootComponents'][0]['_hostElement'].vcRef;
+        let viewContainerRef:ViewContainerRef = this.app['_rootComponents'][0]['_hostElement'].vcRef;
 
         // Set up the promise to return.
-        let pw:any = PromiseWrapper.completer();
+        let promiseWrapper:any = PromiseWrapper.completer();
 
-        this.dcl.loadNextToLocation(this.toComponent(), vcr).then( (cref) => {
+        //TODO: replace DynamicComponentLoader
+        this.dcl.loadNextToLocation(this.toComponent(), viewContainerRef).then( (cref) => {
             // Assign the cref to the newly created modal so it can self-destruct correctly.
             cref.instance.cref = cref;
 
             // Assign the promise to resolve.
-            cref.instance.result = pw;
+            cref.instance.result = promiseWrapper;
         });
 
-        return pw.promise;
+        return promiseWrapper.promise;
     }
 }
