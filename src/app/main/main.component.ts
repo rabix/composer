@@ -27,7 +27,41 @@ require("./main.component.scss");
 })
 export class MainComponent {
 
-    constructor() {
+    constructor(fileApi: FileApi) {
+        /**
+         * Example API usage
+         */
+
+        // let fileName = new Date().getTime().toString() + '.txt';
+
+        // fileApi.createFile(fileName).subscribe(res => {
+        //     console.log(`1. Created ${fileName}:`, res);
+        // });
+        //
+        // fileApi.updateFile(fileName, new Date().toString()).subscribe(res => {
+        //     console.log(`2. Updated ${fileName}:`, res);
+        // });
+        //
+        // fileApi.getFileContent(fileName).subscribe((res) => {
+        //     console.log(`3. Reading ${fileName} content:`, res);
+        // });
+        //
+        // fileApi.getDirContent().subscribe((res) => {
+        //     console.log(`4. Directory contents`, res);
+        // });
+        //
+        // fileApi.getFileContent('').subscribe(res => {
+        //     console.log(res);
+        // }, err => {
+        //     console.log(err);
+        // });
+        //
+        // fileApi.getFileContent('does not exist').subscribe(res => {
+        //     console.log(res);
+        // }, err => {
+        //     console.log(err);
+        // });
+
 
     }
 }

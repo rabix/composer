@@ -32,7 +32,11 @@ export class SocketService {
         
         return Observable.create((obs: Observer)=> {
             this.ioSocket.emit(eventName, data, (data)=> {
-                obs.next(data);
+                if (data.error) {
+                    obs.error(data);
+                } else {
+                    obs.next(data);
+                }
                 obs.complete();
 
                 setTimeout(function () {

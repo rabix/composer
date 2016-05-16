@@ -3,6 +3,7 @@ export interface FilePath {
     type: string;
     path: string;
     fullPath: string;
+    isEmpty?: boolean;
 }
 
 export interface FS {
