@@ -38,7 +38,7 @@ export class ModalComponent {
            </div>
           
             <div class="modal-body">
-                <div class="modal-message" [innerHTML]=" '<span>'+message + '</span>' "></div>
+                <div class="modal-message" [innerHTML]="message"></div>
                 
                 <!--
                 TODO: !!!This is a temporary solution until I figure out how to pass data here
