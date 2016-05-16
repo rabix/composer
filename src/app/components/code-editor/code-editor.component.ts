@@ -13,24 +13,25 @@ require('brace/mode/javascript');
     selector: 'code-editor',
     inputs: ['text'],
     template: `<div class="code-editor-container">
-                    <div id="code_editor" class="editor"></div>
+                    <div class="editor"></div>
                </div>`
 })
 export class CodeEditorComponent implements OnInit {
     editor: CodeEditor;
-    
-    constructor(private elem: ElementRef) {}
 
-    ngOnInit():any {
+    constructor(private elem: ElementRef) {
+    }
+
+    ngOnInit(): any {
         let editorInstance = ace.edit(this.elem.nativeElement.getElementsByClassName('editor')[0]);
-        this.editor = new CodeEditor(editorInstance);
+        this.editor        = new CodeEditor(editorInstance);
 
         this.editor.changeStream.subscribe(e => {
             console.log('change stream from component', e);
         })
     }
 
-    ngOnDestroy():any {
+    ngOnDestroy(): any {
         this.editor.dispose();
     }
 }
