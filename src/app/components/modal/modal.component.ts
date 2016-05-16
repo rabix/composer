@@ -2,7 +2,9 @@ import { Component, ComponentRef, DynamicComponentLoader, ApplicationRef, Inject
 import { NgStyle } from '@angular/common';
 import { PromiseWrapper } from '@angular/common/src/facade/async';
 
-
+/**
+ * Usage: https://github.com/czeckd/angular2-simple-modal
+ * */
 export enum ModalType {
     Default,
     Info,
@@ -13,23 +15,52 @@ export enum ModalType {
 @Injectable()
 export class ModalComponent {
 
-    title:string = 'Default title';
-    message:string = 'Default message';
+    title:string = '';
+    message:string = '';
     type:ModalType = ModalType.Default;
     blocking:boolean = true;
     confirmBtn:string = null;
     cancelBtn:string = 'OK';
+
+    selectLabel:string = '';
+    selectOptions:any[];
+    selectedValue:any;
+
     width:number = 250;
     height:number = 150;
 
-    template:string = `
-		<img *ngIf="icon" class="modal-icon" [src]="icon" alt="" title="" />
-		<h2 class="modal-title" [innerHTML]="title"></h2>
-		<div class="modal-message" [innerHTML]="message"></div>
-		<div class="modal-buttonbar">
-			<button *ngIf="confirmBtn" (click)="confirm()">{{confirmBtn}}</button>
-			<button *ngIf="cancelBtn" (click)="cancel()" >{{cancelBtn}}</button>
-		</div>`;
+    template:string = `	
+    <div class="modal-dialog" role="document">
+    <div class="modal-content">
+    
+           <div class="modal-header">
+            <h2  *ngIf="title" class="modal-title" [innerHTML]="title"></h2>
+           </div>
+          
+            <div class="modal-body">
+                <div class="modal-message" [innerHTML]=" '<span>'+message + '</span>' "></div>
+                
+                <!--
+                TODO: !!!This is a temporary solution until I figure out how to pass data here
+                -->
+                
+                <fieldset *ngIf="selectOptions.length > 0" class="form-group">
+                <label for="create_file_action">{{selectLabel}}</label>
+                    <select class="form-control" id="create_file_action" [(ngModel)]="selectedValue">
+                        <option *ngFor="let value of selectOptions" [value]="value">{{value.name}}</option>
+                    </select>
+                </fieldset>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-default" *ngIf="cancelBtn" (click)="cancel()" >{{cancelBtn}}</button>
+                <button class="btn btn-primary" *ngIf="confirmBtn" (click)="confirm()">{{confirmBtn}}</button>
+            </div>
+    
+    </div>
+    </div>
+		
+		`;
 
     constructor(private dcl:DynamicComponentLoader, private app:ApplicationRef) {
     }
@@ -42,6 +73,11 @@ export class ModalComponent {
         let confirmBtn:string = this.confirmBtn;
         let cancelBtn:string = this.cancelBtn;
         let icon:string = null;
+
+        let selectLabel:string = this.selectLabel;
+        let selectOptions:any[] = this.selectOptions;
+        let selectedValue:any = this.selectedValue;
+
         let template:string;
 
         if (this.blocking) {
@@ -51,7 +87,7 @@ export class ModalComponent {
         } else {
             template = `<div class="modal-background" (click)="cancel()">` +
                 `<div class="modal" (click)="$event.stopPropagation()" [ngStyle]="{'width':'` + width + `', 'height':'` + height + `'}">` +
-                this.template + `</div></div>`;
+                this.template + `</div></div>`;;
         }
 
         switch (this.type) {
@@ -81,6 +117,11 @@ export class ModalComponent {
             private title:string = title;
             private message:string = message;
             private icon:string = icon;
+
+            private selectLabel:string = selectLabel;
+            private selectOptions:any[] = selectOptions;
+            private selectedValue:any = selectedValue;
+
             /* tslint:enable:no-unused-variable */
             private confirmBtn:string = confirmBtn;
             private cancelBtn:string = cancelBtn;
