@@ -29,8 +29,6 @@ require("./main.component.scss");
 export class MainComponent {
 
     constructor(private fileApi: FileApi) {
-        //modal.defaultViewContainer = viewContainer;
-    
         fileApi.getDirContent().subscribe((paths) => {
             console.log("1. Content is ");
         });
