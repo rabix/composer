@@ -1,5 +1,6 @@
 import { Component, ComponentRef, DynamicComponentLoader, ApplicationRef, Injectable,
     ComponentResolver, ViewChild, ViewContainerRef, OnInit, ComponentFactory} from '@angular/core';
+
 import { NgStyle, FORM_DIRECTIVES } from '@angular/common';
 import { PromiseWrapper } from '@angular/common/src/facade/async';
 
@@ -27,7 +28,7 @@ export class ModalComponent {
     data: any;
     width:number = 250;
     height:number = 150;
-
+    
     template:string = `	
     <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -49,11 +50,11 @@ export class ModalComponent {
     
     </div>
     </div>
-		
 		`;
 
-    constructor(private dcl:DynamicComponentLoader, private app:ApplicationRef) {
-    }
+    constructor(private app:ApplicationRef,
+                private resolver: ComponentResolver
+    ) { }
 
     toComponent() : Function {
         let title:string = this.title;
@@ -98,7 +99,7 @@ export class ModalComponent {
             providers: [CustomComponentBuilder]
         })
         class Modal implements OnInit {
-            
+
             public entity: { description: string };
             // reference for a <div> with #
             @ViewChild('dynamicContentPlaceHolder', {read: ViewContainerRef})
@@ -141,7 +142,7 @@ export class ModalComponent {
             private title:string = title;
             private dynamicTemplateString:string = dynamicTemplateString;
             private icon:string = icon;
-            
+
             /* tslint:enable:no-unused-variable */
             private confirmBtn:string = confirmBtn;
             private cancelBtn:string = cancelBtn;
@@ -170,15 +171,20 @@ export class ModalComponent {
 
         // Set up the promise to return.
         let promiseWrapper:any = PromiseWrapper.completer();
+        
+        this.resolver
+            .resolveComponent(this.toComponent())
+            .then((factory: ComponentFactory<any>) => {
+                let dynamicComponent = viewContainerRef.createComponent(factory, 0);
 
-        //TODO: replace DynamicComponentLoader
-        this.dcl.loadNextToLocation(this.toComponent(), viewContainerRef).then( (cref) => {
-            // Assign the cref to the newly created modal so it can self-destruct correctly.
-            cref.instance.cref = cref;
+                let component = dynamicComponent.instance;
 
-            // Assign the promise to resolve.
-            cref.instance.result = promiseWrapper;
-        });
+                // Assign the cref to the newly created modal so it can self-destruct correctly.
+                component.cref = dynamicComponent;
+
+                // Assign the promise to resolve.
+                component.result = promiseWrapper;
+            });
 
         return promiseWrapper.promise;
     }
