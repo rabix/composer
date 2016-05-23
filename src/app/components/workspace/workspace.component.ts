@@ -1,5 +1,4 @@
 import {Component, ElementRef} from "@angular/core";
-import {GreeterComponent} from "../greeter/greeter.component";
 import * as GoldenLayout from "golden-layout";
 import {Observable} from "rxjs/Observable";
 import {ComponentRegistry} from "./registry/component-registry";
