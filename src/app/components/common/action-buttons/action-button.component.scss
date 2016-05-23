@@ -18,6 +18,8 @@
 
 .editor-sidebar-item {
 
+    font-size: .7rem;
+
     color: darken($label-color, 10);
     display: block;
     margin: 0;
@@ -31,7 +33,7 @@
     }
 
     .title {
-        font-size: $font-size-xs;
+        font-size: 0.65rem;
         margin-top: 4px;
     }
 }

@@ -18,7 +18,8 @@ export class SocketService {
 
 
     constructor(@Inject(APP_CONFIG) private config: AppConfig) {
-        const host      = `${config.protocol}://${config.hostname}:${config.port}`;
+
+        let host      = `http://${config.hostname}:${config.port}`;
         this.connection = this.createConnectionStream(host);
     }
 
@@ -29,7 +30,7 @@ export class SocketService {
     public request(eventName: string, data?: any = {}): Observable<any> {
 
         let sub = this.connection.startWith("Start").subscribe(_ => true);
-        
+
         return Observable.create((obs: Observer)=> {
             this.ioSocket.emit(eventName, data, (data)=> {
                 if (data.error) {

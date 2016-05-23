@@ -3,14 +3,15 @@
  */
 import {bootstrap} from "@angular/platform-browser-dynamic";
 import {HTTP_PROVIDERS} from "@angular/http";
+import {MainComponent} from "./app/main/main.component";
+import {COMMON_PIPES} from "@angular/common";
 /*
  * Platform and Environment
  * our providers/directives/pipes
  */
-import {MainComponent} from "./app/main/main.component";
 
 export function main(): Promise<any> {
-    return bootstrap(MainComponent, [HTTP_PROVIDERS]).catch(err => console.error(err));
+    return bootstrap(MainComponent, [HTTP_PROVIDERS, COMMON_PIPES]).catch(err => console.error(err));
 }
 
 if ('development' === ENV && HMR === true) {
