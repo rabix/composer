@@ -1,4 +1,3 @@
-import {EditorSidebarItemComponent} from "./editor-sidebar-item/editor-sidebar-item.component";
 import {Component} from "@angular/core";
 import {HTTP_PROVIDERS} from '@angular/http';
 import {ActionButtonComponent} from '../common/action-buttons/action-button.component'
@@ -12,7 +11,7 @@ require("./editor-sidebar.component.scss");
 @Component({
 
     selector: "editor-sidebar",
-    directives: [EditorSidebarItemComponent, ActionButtonComponent],
+    directives: [ActionButtonComponent],
     template: `
             <nav>
                 <action-button title="Project" buttonType="{{ACTION_BUTTON_TYPE.SIDEBAR_ITEM}}" 
