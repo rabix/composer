@@ -2,6 +2,7 @@ import {Component} from "@angular/core";
 import {ACTION_BUTTON_TYPE} from "../common/action-button/action-button-type";
 import {ActionButtonComponent} from "../common/action-button/action-button.component";
 import {ModalComponent, ModalType} from '../modal/modal.component';
+import {FileApi} from "../../services/api/file.api";
 
 require("./action-panel.component.scss");
 
@@ -25,7 +26,7 @@ export class ActionPanelComponent {
     private actions: Object[];
     private selectedAction: Object;
 
-    constructor(private modal:ModalComponent) {
+    constructor(private modal:ModalComponent, private fileApi: FileApi) {
         this.ACTION_BUTTON_TYPE = ACTION_BUTTON_TYPE;
 
         this.actions = [{
@@ -59,7 +60,7 @@ export class ActionPanelComponent {
         <form>
             <fieldset class="form-group">
                 <label for="fileName">Enter file name</label>
-                <input type="text" class="form-control" id="fileName" placeholder="File Name">
+                <input type="text" class="form-control" id="fileName" [(ngModel)]="data.fileName" placeholder="File Name">
             </fieldset>
       
             <fieldset class="form-group">
@@ -75,7 +76,7 @@ export class ActionPanelComponent {
             selectLabel: 'Action Type',
             selectOptions: this.actions,
             selectedValue: this.selectedAction
-        }
+        };
 
         this.modal.blocking = false;
         this.modal.type = ModalType.Default;

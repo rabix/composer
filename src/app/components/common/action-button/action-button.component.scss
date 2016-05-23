@@ -1,8 +1,9 @@
 @import "../../../../assets/sass/variables";
 
 .editor-panel-item {
-    padding-right: 1em;
     float: left;
+    text-align: center;
+    padding: 5px;
     color: darken($label-color, 10);
     text-transform: uppercase;
 
