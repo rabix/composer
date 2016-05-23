@@ -9,7 +9,7 @@ require("./action-panel.component.scss");
     directives: [NewFileButtonComponent],
     template: `
     <nav>
-        <new-file-button [buttonType]="buttonType"></new-file-button>
+        <new-file-button [buttonType]="buttonType"></new-file-button>      
     </nav>
        `,
     providers: [],

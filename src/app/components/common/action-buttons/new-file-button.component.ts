@@ -9,7 +9,7 @@ import {ModalComponent, ModalType} from "../../modal/modal.component";
                         title="New File" 
                         buttonType="{{ buttonType }}" 
                         iconClass="fa fa-file fa-lg"
-                        (click)="newFileDialog()">
+                        (click)="openModal()">
         </action-button>
     `,
     providers: [ModalComponent],
@@ -17,26 +17,31 @@ import {ModalComponent, ModalType} from "../../modal/modal.component";
 })
 export class NewFileButtonComponent implements OnInit {
     @Input() buttonType: string;
-             actions: any[];
-             selectedAction: any;
+    fileTypes: any[];
+    selectedType: any;
 
     constructor(private modal: ModalComponent) {
-        this.actions = [{
-            id: 'import',
-            name: 'Import App from Description'
+        this.fileTypes = [{
+            id: '.json',
+            name: 'JSON'
         }, {
-            id: 'tool',
-            name: 'Blank Command Line Tool'
+            id: '.yaml',
+            name: 'YAML'
         }, {
-            id: 'workflow',
-            name: 'Blank Workflow'
+            id: '.js',
+            name: 'JavaScript'
         }];
 
-        this.selectedAction = this.actions[0];
+        this.selectedType = this.fileTypes[0];
     }
 
-    newFileDialog(): void {
-        this.modal.show();
+    /**
+     * Opens new file modal
+     */
+    openModal(): void {
+        this.modal.show().then((result) => {
+            console.log(result);
+        });
     }
 
     ngOnInit() {
@@ -45,42 +50,33 @@ export class NewFileButtonComponent implements OnInit {
 
     initModal() {
         this.modal.dynamicTemplateString = `
-        <h4>Create New App</h4>
+        <h4>Create New File</h4>
         
         <form>
             <fieldset class="form-group">
                 <label for="fileName">Enter file name</label>
-                <input type="text" class="form-control" id="fileName" [(ngModel)]="data.fileName" placeholder="File Name">
+                <input type="text" class="form-control" id="fileName" [(ngModel)]="data.fileName" required placeholder="File Name">
             </fieldset>
       
             <fieldset class="form-group">
-                <label for="create_file_action">{{data.selectLabel}}</label>
-                <select class="form-control" id="create_file_action" [(ngModel)]="data.selectedValue">
-                    <option *ngFor="let value of data.selectOptions" [ngValue]="value">{{value.name}}</option>
+                <label for="create_file_action">File Type</label>
+                <select class="form-control" id="create_file_action" [(ngModel)]="data.selectedType">
+                    <option *ngFor="let fileType of data.fileTypes" [ngValue]="type">{{ fileType.name }} ({{ fileType.id }})</option>
                 </select>
             </fieldset>
         </form>
         `;
 
         this.modal.data = {
-            selectLabel: 'Action Type',
-            selectOptions: this.actions,
-            selectedValue: this.selectedAction,
-            onComplete: function () {
-                console.log(this.selectedValue)
-            },
-            onCancel: function () {
-
-            }
+            fileTypes: this.fileTypes,
+            selectedValue: this.selectedType,
         };
 
         this.modal.blocking   = false;
         this.modal.type       = ModalType.Default;
         this.modal.cancelBtn  = 'Cancel';
-        this.modal.confirmBtn = 'Continue';
+        this.modal.confirmBtn = 'Create';
         this.modal.width      = 350;
         this.modal.height     = 300;
     }
-
-
 }

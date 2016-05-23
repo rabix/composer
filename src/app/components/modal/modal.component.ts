@@ -145,7 +145,7 @@ export class ModalComponent {
 
             confirm() {
                 this.cref.destroy();
-                this.result.resolve(data.onComplete());
+                this.result.resolve(data);
             }
 
             cancel() {
@@ -153,7 +153,7 @@ export class ModalComponent {
 
                 // By rejecting, the show must catch the error. So by resolving,
                 // it can be ignored silently in case the result is unimportant.
-                this.result.resolve(data.onCancel());
+                this.result.resolve();
             }
         }
         return Modal;
