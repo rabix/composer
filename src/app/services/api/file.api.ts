@@ -2,7 +2,7 @@ import {Injectable} from "@angular/core";
 import {SocketService} from "./socket.service";
 import {SOCKET_REQUESTS} from "./socket-events";
 import {FilePath} from "./api-response-types";
-import {Observable} from "rxjs/Observable";
+import {Observable} from "rxjs/Rx";
 
 @Injectable()
 export class FileApi {
@@ -16,7 +16,7 @@ export class FileApi {
             dir: path
         }).map(response => response.content).catch(err => {
             console.error(err);
-            return Observable.empty();
+            return Observable.of(err);
         });
     }
 
@@ -25,7 +25,7 @@ export class FileApi {
             file: path
         }).map(response => response.content).catch(err => {
             console.error(err);
-            return Observable.empty();
+            return Observable.of(err);
         })
     }
 
@@ -35,7 +35,7 @@ export class FileApi {
             content: content || ''
         }).map(response => response.content).catch(err => {
             console.log(err);
-            return Observable.empty();
+            return Observable.of(err);
         })
     }
 
@@ -45,7 +45,7 @@ export class FileApi {
             content: content
         }).map(response => response.content).catch(err => {
             console.error(err);
-            return Observable.empty();
+            return Observable.of(err);
         })
     }
 }

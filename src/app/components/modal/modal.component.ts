@@ -115,7 +115,7 @@ export class ModalComponent {
 
                 // now we get built component, just to load it
                 var dynamicComponent = this.customComponentBuilder
-                    .CreateComponent(template, FORM_DIRECTIVES);
+                    .CreateComponent(template, FORM_DIRECTIVES.concat(data.directives || []));
 
                 // we have a component and its target
                 this.componentResolver

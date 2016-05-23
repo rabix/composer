@@ -1,6 +1,9 @@
 import {Component, Input, OnInit} from '@angular/core';
+import * as _ from 'lodash';
+
 import {ActionButtonComponent} from "./action-button.component";
 import {ModalComponent, ModalType} from "../../modal/modal.component";
+import {FileApi} from "../../../services/api/file.api";
 
 @Component({
     selector: 'new-file-button',
@@ -19,8 +22,9 @@ export class NewFileButtonComponent implements OnInit {
     @Input() buttonType: string;
     fileTypes: any[];
     selectedType: any;
+    loading: boolean;
 
-    constructor(private modal: ModalComponent) {
+    constructor(private modal: ModalComponent, private fileApi: FileApi) {
         this.fileTypes = [{
             id: '.json',
             name: 'JSON'
@@ -33,6 +37,8 @@ export class NewFileButtonComponent implements OnInit {
         }];
 
         this.selectedType = this.fileTypes[0];
+
+        this.loading = true;
     }
 
     /**
@@ -40,7 +46,36 @@ export class NewFileButtonComponent implements OnInit {
      */
     openModal(): void {
         this.modal.show().then((result) => {
-            console.log(result);
+            // turn on loading
+            if (!result) {
+                return;
+            }
+
+            let fileName = result.fileName;
+            let ext = result.selectedValue.id;
+
+            // IF: file already has an extension
+            if ('.' + _.last(fileName.split('.')) === ext) {
+                // remove extension
+                fileName = fileName.split('.').slice(0, -1).join('.');
+            }
+
+            let filePath = fileName + ext;
+
+            // create file
+            this.fileApi.createFile(filePath).subscribe((next) => {
+                console.log(next);
+
+                // IF: file exists
+                if (next.statusCode === 403) {
+                    // prompt user that file already exists
+                    console.log('File already exists');
+                } else {
+                    console.log('something else went wrong...?');
+                }
+
+            });
+
         });
     }
 
@@ -64,12 +99,14 @@ export class NewFileButtonComponent implements OnInit {
                     <option *ngFor="let fileType of data.fileTypes" [ngValue]="type">{{ fileType.name }} ({{ fileType.id }})</option>
                 </select>
             </fieldset>
+            
         </form>
         `;
 
         this.modal.data = {
+            fileName: '',
             fileTypes: this.fileTypes,
-            selectedValue: this.selectedType,
+            selectedValue: this.selectedType
         };
 
         this.modal.blocking   = false;
