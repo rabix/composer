@@ -39,7 +39,7 @@ export class ActionPanelComponent {
             name: 'Blank Workflow'
         }];
 
-        this.selectedAction = this.actions[1];
+        this.selectedAction = this.actions[0];
     }
 
     ngOnInit() {
@@ -47,9 +47,7 @@ export class ActionPanelComponent {
     }
 
     newFileDialog() {
-        this.modal.show().then((result) => {
-            console.log('res ' + result);
-        });
+        this.modal.show();
     }
 
     initModal() {
@@ -65,7 +63,7 @@ export class ActionPanelComponent {
             <fieldset class="form-group">
                 <label for="create_file_action">{{data.selectLabel}}</label>
                 <select class="form-control" id="create_file_action" [(ngModel)]="data.selectedValue">
-                    <option *ngFor="let value of data.selectOptions" [value]="value">{{value.name}}</option>
+                    <option *ngFor="let value of data.selectOptions" [ngValue]="value">{{value.name}}</option>
                 </select>
             </fieldset>
         </form>
@@ -74,8 +72,14 @@ export class ActionPanelComponent {
         this.modal.data = {
             selectLabel: 'Action Type',
             selectOptions: this.actions,
-            selectedValue: this.selectedAction
-        }
+            selectedValue: this.selectedAction,
+            onComplete: function() {
+               console.log(this.selectedValue)
+            },
+            onCancel: function() {
+                
+            }
+        };
 
         this.modal.blocking = false;
         this.modal.type = ModalType.Default;

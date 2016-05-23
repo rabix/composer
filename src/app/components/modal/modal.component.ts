@@ -28,7 +28,7 @@ export class ModalComponent {
     data: any;
     width:number = 250;
     height:number = 150;
-    
+
     template:string = `	
     <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -38,9 +38,7 @@ export class ModalComponent {
            </div>
           
             <div class="modal-body">
-                
                 <div #dynamicContentPlaceHolder></div>
-                
             </div>
             
             <div class="modal-footer">
@@ -107,13 +105,11 @@ export class ModalComponent {
 
             // ng loader and our custom builder
             constructor(
-                private dcl:DynamicComponentLoader,
-                private app:ApplicationRef,
                 protected componentResolver: ComponentResolver,
                 protected customComponentBuilder: CustomComponentBuilder
             ){}
 
-            public ngOnInit(){
+            public ngOnInit() {
                 // dynamic template built
                 var template = dynamicTemplateString;
 
@@ -124,10 +120,9 @@ export class ModalComponent {
                 // we have a component and its target
                 this.componentResolver
                     .resolveComponent(dynamicComponent)
-                    .then((factory: ComponentFactory<DynamicDataInterface>) =>
-                    {
+                    .then((factory: ComponentFactory<DynamicDataInterface>) => {
                         // Instantiates a single {@link Component} and inserts its Host View
-                        //   into this container at the specified `index`
+                        // into this container at the specified `index`
                         let dynamicComponent = this.dynamicComponentTarget.createComponent(factory, 0);
 
                         // and here we have access to our dynamic component
@@ -150,7 +145,7 @@ export class ModalComponent {
 
             confirm() {
                 this.cref.destroy();
-                this.result.resolve(this.confirmBtn);
+                this.result.resolve(data.onComplete());
             }
 
             cancel() {
@@ -158,8 +153,7 @@ export class ModalComponent {
 
                 // By rejecting, the show must catch the error. So by resolving,
                 // it can be ignored silently in case the result is unimportant.
-                // this.result.reject(this.cancelBtn);
-                this.result.resolve(this.cancelBtn);
+                this.result.resolve(data.onCancel());
             }
         }
         return Modal;
@@ -171,7 +165,7 @@ export class ModalComponent {
 
         // Set up the promise to return.
         let promiseWrapper:any = PromiseWrapper.completer();
-        
+
         this.resolver
             .resolveComponent(this.toComponent())
             .then((factory: ComponentFactory<any>) => {
