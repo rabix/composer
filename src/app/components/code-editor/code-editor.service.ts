@@ -24,7 +24,7 @@ export class CodeEditor {
         this.document = this.session.getDocument();
 
         this.setTheme('twilight');
-        this.setMode('javascript');
+        this.setMode('json');
         this._attachEventStreams();
     }
 

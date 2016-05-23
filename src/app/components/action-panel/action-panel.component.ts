@@ -25,7 +25,7 @@ export class ActionPanelComponent {
     private actions: Object[];
     private selectedAction: Object;
 
-    constructor(private modal:ModalComponent) {
+    constructor(private modal:ModalComponent, private fileApi: FileApi) {
         this.ACTION_BUTTON_TYPE = ACTION_BUTTON_TYPE;
 
         this.actions = [{
@@ -57,7 +57,7 @@ export class ActionPanelComponent {
         <form>
             <fieldset class="form-group">
                 <label for="fileName">Enter file name</label>
-                <input type="text" class="form-control" id="fileName" placeholder="File Name">
+                <input type="text" class="form-control" id="fileName" [(ngModel)]="data.fileName" placeholder="File Name">
             </fieldset>
       
             <fieldset class="form-group">

@@ -18,8 +18,6 @@ require("./main.component.scss");
             <editor-sidebar></editor-sidebar>
             <action-panel></action-panel>
             <workspace></workspace>
-            
-            <code-editor [text]="text"></code-editor>
         </section>
     `,
     directives: [EditorSidebarComponent, WorkspaceComponent, CodeEditorComponent, ActionPanelComponent],
@@ -45,12 +43,12 @@ export class MainComponent {
         // fileApi.getFileContent(fileName).subscribe((res) => {
         //     console.log(`3. Reading ${fileName} content:`, res);
         // });
-        //
+        
         // fileApi.getDirContent().subscribe((res) => {
         //     console.log(`4. Directory contents`, res);
         // });
-        //
-        // fileApi.getFileContent('').subscribe(res => {
+
+        // fileApi.getFileContent('wagner-workflow.json').subscribe(res => {
         //     console.log(res);
         // }, err => {
         //     console.log(err);
