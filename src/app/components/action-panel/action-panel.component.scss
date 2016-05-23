@@ -1,13 +1,12 @@
 @import "../../../assets/sass/variables";
 @import "~bootstrap/scss/mixins";
-@import url(https://fonts.googleapis.com/css?family=Montserrat);
 
 action-panel {
     background-color: $color-gray-base;
     color: $label-color;
     display: block;
     font-family: "Montserrat", sans-serif;
-    height: 9%;
+    height: 50px;
     margin-bottom: 2px;
 }
 
