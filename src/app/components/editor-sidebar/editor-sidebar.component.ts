@@ -1,8 +1,8 @@
 import {EditorSidebarItemComponent} from "./editor-sidebar-item/editor-sidebar-item.component";
 import {Component} from "@angular/core";
 import {HTTP_PROVIDERS} from '@angular/http';
-import {ActionButtonComponent} from '../common/action-button/action-button.component'
-import {ACTION_BUTTON_TYPE} from '../common/action-button/action-button-type'
+import {ActionButtonComponent} from '../common/action-buttons/action-button.component'
+import {ACTION_BUTTON_TYPE} from '../common/action-buttons/action-button-type'
 
 require("./editor-sidebar.component.scss");
 
