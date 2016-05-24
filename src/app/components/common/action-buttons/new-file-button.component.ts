@@ -103,8 +103,8 @@ export class NewFileButtonComponent implements OnInit {
             </fieldset>
             
           <div>
-                <button class="btn btn-default" (click)="cancel()"> Cancel </button>
-                <button class="btn btn-primary" (click)="confirm(data)" [disabled]="!newFileForm.form.valid"> Create </button>
+                <button class="btn btn-default" type="button" (click)="cancel()"> Cancel </button>
+                <button class="btn btn-primary" type="button" (click)="confirm(data)" [disabled]="!newFileForm.form.valid"> Create </button>
           </div>
          
         </form>
