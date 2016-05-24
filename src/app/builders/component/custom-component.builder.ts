@@ -1,11 +1,13 @@
 import { Component } from '@angular/core';
 
 export interface DynamicDataInterface {
-    data?: any
+    data?: any;
+    confirm: any;
+    cancel: any;
 }
 
 export class CustomComponentBuilder{
-    
+
     public CreateComponent(tmpl: string, injectDirectives: any[]): any {
 
         @Component({
@@ -14,7 +16,9 @@ export class CustomComponentBuilder{
             directives: injectDirectives,
         })
         class CustomDynamicComponent implements DynamicDataInterface {
-            public data: any
+            public data: any;
+            public confirm: any;
+            public cancel: any;
         }
 
         return CustomDynamicComponent;

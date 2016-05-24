@@ -52,7 +52,7 @@ export class NewFileButtonComponent implements OnInit {
             }
 
             let fileName = result.fileName;
-            let ext = result.selectedValue.id;
+            let ext = result.selectedType.id;
 
             // IF: file already has an extension
             if ('.' + _.last(fileName.split('.')) === ext) {
@@ -87,32 +87,50 @@ export class NewFileButtonComponent implements OnInit {
         this.modal.dynamicTemplateString = `
         <h4>Create New File</h4>
         
-        <form>
+        <form #newFileForm="ngForm">
             <fieldset class="form-group">
                 <label for="fileName">Enter file name</label>
-                <input type="text" class="form-control" id="fileName" [(ngModel)]="data.fileName" required placeholder="File Name">
+                <input ngControl="name" #name="ngForm" required
+                 type="text" class="form-control" id="fileName" [(ngModel)]="data.fileName" 
+                 placeholder="File Name">
             </fieldset>
       
             <fieldset class="form-group">
                 <label for="create_file_action">File Type</label>
                 <select class="form-control" id="create_file_action" [(ngModel)]="data.selectedType">
-                    <option *ngFor="let fileType of data.fileTypes" [ngValue]="type">{{ fileType.name }} ({{ fileType.id }})</option>
+                    <option *ngFor="let fileType of data.fileTypes" [ngValue]="fileType">{{ fileType.name }} ({{ fileType.id }})</option>
                 </select>
             </fieldset>
             
+          <div>
+                <button class="btn btn-default" (click)="cancel()"> Cancel </button>
+                <button class="btn btn-primary" (click)="confirm(data)" [disabled]="!newFileForm.form.valid"> Create </button>
+          </div>
+         
         </form>
         `;
 
         this.modal.data = {
             fileName: '',
             fileTypes: this.fileTypes,
-            selectedValue: this.selectedType
+            selectedType: this.selectedType,
         };
+
+        this.modal.cancel = function() {
+            this.cref.destroy();
+            // By rejecting, the show must catch the error. So by resolving,
+            // it can be ignored silently in case the result is unimportant.
+            this.result.resolve();
+        };
+
+        this.modal.confirm = function(data) {
+            this.cref.destroy();
+            this.result.resolve(data);
+        };
+
 
         this.modal.blocking   = false;
         this.modal.type       = ModalType.Default;
-        this.modal.cancelBtn  = 'Cancel';
-        this.modal.confirmBtn = 'Create';
         this.modal.width      = 350;
         this.modal.height     = 300;
     }

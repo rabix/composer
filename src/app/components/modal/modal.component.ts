@@ -1,4 +1,4 @@
-import { Component, ComponentRef, DynamicComponentLoader, ApplicationRef, Injectable,
+import { Component, ComponentRef, ApplicationRef, Injectable,
     ComponentResolver, ViewChild, ViewContainerRef, OnInit, ComponentFactory} from '@angular/core';
 
 import { NgStyle, FORM_DIRECTIVES } from '@angular/common';
@@ -18,13 +18,12 @@ export enum ModalType {
 
 @Injectable()
 export class ModalComponent {
-
+    confirm: any;
+    cancel: any;
     title:string = '';
     dynamicTemplateString:string = '';
     type:ModalType = ModalType.Default;
     blocking:boolean = true;
-    confirmBtn:string = null;
-    cancelBtn:string = 'OK';
     data: any;
     width:number = 250;
     height:number = 150;
@@ -40,11 +39,6 @@ export class ModalComponent {
             <div class="modal-body">
                 <div #dynamicContentPlaceHolder></div>
             </div>
-            
-            <div class="modal-footer">
-                <button class="btn btn-default" *ngIf="cancelBtn" (click)="cancel()" >{{cancelBtn}}</button>
-                <button class="btn btn-primary" *ngIf="confirmBtn" (click)="confirm()">{{confirmBtn}}</button>
-            </div>
     
     </div>
     </div>
@@ -55,12 +49,13 @@ export class ModalComponent {
     ) { }
 
     toComponent() : Function {
+        let confirm = this.confirm;
+        let cancel = this.cancel;
+
         let title:string = this.title;
         let dynamicTemplateString:string = this.dynamicTemplateString;
         let width:string = this.width + 'px';
         let height:string = this.height + 'px';
-        let confirmBtn:string = this.confirmBtn;
-        let cancelBtn:string = this.cancelBtn;
         let icon:string = null;
         let data:any = this.data;
         let template:string;
@@ -128,33 +123,22 @@ export class ModalComponent {
                         // and here we have access to our dynamic component
                         let component: DynamicDataInterface = dynamicComponent.instance;
                         component.data = data;
+                        component.confirm = confirm.bind(this);
+                        component.cancel = cancel.bind(this);
                     });
             }
 
             cref:ComponentRef<Modal> = null;
 
+            /* This is needed to close the modal when we click on the background */
+            cancel = cancel.bind(this);
+
             /* tslint:disable:no-unused-variable */
             private title:string = title;
             private dynamicTemplateString:string = dynamicTemplateString;
             private icon:string = icon;
-
             /* tslint:enable:no-unused-variable */
-            private confirmBtn:string = confirmBtn;
-            private cancelBtn:string = cancelBtn;
-            private result:any;
-
-            confirm() {
-                this.cref.destroy();
-                this.result.resolve(data);
-            }
-
-            cancel() {
-                this.cref.destroy();
-
-                // By rejecting, the show must catch the error. So by resolving,
-                // it can be ignored silently in case the result is unimportant.
-                this.result.resolve();
-            }
+            result:any;
         }
         return Modal;
     }
@@ -170,7 +154,6 @@ export class ModalComponent {
             .resolveComponent(this.toComponent())
             .then((factory: ComponentFactory<any>) => {
                 let dynamicComponent = viewContainerRef.createComponent(factory, 0);
-
                 let component = dynamicComponent.instance;
 
                 // Assign the cref to the newly created modal so it can self-destruct correctly.
