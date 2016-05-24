@@ -14,7 +14,7 @@ export class SocketService {
     private ioSocket: Socket;
     private connection: Observable<SocketMessage>;
 
-    private connectionTimeout = 2000;
+    private connectionTimeout = 10000;
 
 
     constructor(@Inject(APP_CONFIG) private config: AppConfig) {
