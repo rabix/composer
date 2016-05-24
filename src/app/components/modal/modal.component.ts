@@ -1,10 +1,9 @@
 import { Component, ComponentRef, ApplicationRef, Injectable,
-    ComponentResolver, ViewChild, ViewContainerRef, OnInit, ComponentFactory} from '@angular/core';
-
+        ComponentResolver, ViewChild, ViewContainerRef, OnInit, ComponentFactory} from '@angular/core';
 import { NgStyle, FORM_DIRECTIVES } from '@angular/common';
 import { PromiseWrapper } from '@angular/common/src/facade/async';
-
 import { DynamicDataInterface, CustomComponentBuilder } from '../../builders/component/custom-component.builder';
+require('./modal.component.scss');
 
 /**
  * Usage: https://github.com/czeckd/angular2-simple-modal
