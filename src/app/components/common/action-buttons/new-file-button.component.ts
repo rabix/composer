@@ -4,6 +4,7 @@ import * as _ from 'lodash';
 import {ActionButtonComponent} from "./action-button.component";
 import {ModalComponent, ModalType} from "../../modal/modal.component";
 import {FileApi} from "../../../services/api/file.api";
+import {HttpError, FilePath} from "../../../services/api/api-response-types";
 
 @Component({
     selector: 'new-file-button',
@@ -20,9 +21,9 @@ import {FileApi} from "../../../services/api/file.api";
 })
 export class NewFileButtonComponent implements OnInit {
     @Input() buttonType: string;
-    fileTypes: any[];
-    selectedType: any;
-    loading: boolean;
+             fileTypes: any[];
+             selectedType: any;
+             loading: boolean;
 
     constructor(private modal: ModalComponent, private fileApi: FileApi) {
         this.fileTypes = [{
@@ -52,7 +53,7 @@ export class NewFileButtonComponent implements OnInit {
             }
 
             let fileName = result.fileName;
-            let ext = result.selectedType.id;
+            let ext      = result.selectedType.id;
 
             // IF: file already has an extension
             if ('.' + _.last(fileName.split('.')) === ext) {
@@ -63,16 +64,17 @@ export class NewFileButtonComponent implements OnInit {
             let filePath = fileName + ext;
 
             // create file
-            this.fileApi.createFile(filePath).subscribe((next) => {
-                console.log(next);
-
+            this.fileApi.createFile(filePath).subscribe((next: HttpError|FilePath) => {
+                
                 // IF: file exists
-                if (next.statusCode === 403) {
+                if ((<HttpError> next).statusCode === 403) {
                     // prompt user that file already exists
                     console.log('File already exists');
                 } else {
                     console.log('something else went wrong...?');
                 }
+
+            }, (dismiss) => {
 
             });
 
@@ -86,6 +88,8 @@ export class NewFileButtonComponent implements OnInit {
     initModal() {
         this.modal.dynamicTemplateString = `
         <h4>Create New File</h4>
+        
+        <loading-spinner></loading-spinner>
         
         <form #newFileForm="ngForm">
             <fieldset class="form-group">
@@ -103,8 +107,8 @@ export class NewFileButtonComponent implements OnInit {
             </fieldset>
             
           <div>
-                <button class="btn btn-default" type="button" (click)="cancel()"> Cancel </button>
-                <button class="btn btn-primary" type="button" (click)="confirm(data)" [disabled]="!newFileForm.form.valid"> Create </button>
+                <button type="button" class="btn btn-default" (click)="cancel()"> Cancel </button>
+                <button type="button" class="btn btn-primary" (click)="confirm(data)" [disabled]="!newFileForm.form.valid"> Create </button>
           </div>
          
         </form>
@@ -116,22 +120,22 @@ export class NewFileButtonComponent implements OnInit {
             selectedType: this.selectedType,
         };
 
-        this.modal.cancel = function() {
+        this.modal.cancel = function () {
             this.cref.destroy();
             // By rejecting, the show must catch the error. So by resolving,
             // it can be ignored silently in case the result is unimportant.
             this.result.resolve();
         };
 
-        this.modal.confirm = function(data) {
+        this.modal.confirm = function (data) {
             this.cref.destroy();
             this.result.resolve(data);
         };
 
 
-        this.modal.blocking   = false;
-        this.modal.type       = ModalType.Default;
-        this.modal.width      = 350;
-        this.modal.height     = 300;
+        this.modal.blocking = false;
+        this.modal.type     = ModalType.Default;
+        this.modal.width    = 350;
+        this.modal.height   = 300;
     }
 }
