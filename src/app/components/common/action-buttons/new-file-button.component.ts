@@ -1,6 +1,5 @@
-import {Component, Input, OnInit} from '@angular/core';
-import * as _ from 'lodash';
-
+import {Component, Input, OnInit} from "@angular/core";
+import * as _ from "lodash";
 import {ActionButtonComponent} from "./action-button.component";
 import {ModalComponent, ModalType} from "../../modal/modal.component";
 import {FileApi} from "../../../services/api/file.api";

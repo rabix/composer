@@ -1,4 +1,4 @@
-import {Component, Input, Injector} from "@angular/core";
+import {Component, Input, Injector, Host, forwardRef, Inject} from "@angular/core";
 import {TreeNodeComponent} from "./structure/tree-node.component";
 import "./tree-view.component.scss";
 import {AsyncSocketProviderService} from "../file-tree/async-socket-provider.service";
@@ -8,42 +8,37 @@ import {DynamicallyCompiledComponentDirective} from "../../directives/dynamicall
 @Component({
     selector: "tree-view",
     template: `
-            <tree-node [node]="root" (expansionSwitch)="toggleExpansion($event)"></tree-node>
-           
-           
-            <template ngFor let-componentData [ngForOf]="dynamicComponents | async">
-                <template [dynamicallyCompiled]="componentData.factory" [model]="componentData.data"></template>   
-            </template>
-           
-            <template [ngIf]="isExpanded">
-                <tree-view *ngFor="let node of root.children" [root]="node"></tree-view>
-            </template>
+        <template ngFor let-componentData [ngForOf]="dynamicComponents | async">
+            
+            <!--This <div class="tree-node"> exists as a CSS specificity convenience-->
+            <div class="tree-node">
+                <template class="tree-node" 
+                          [dynamicallyCompiled]="componentData.factory" 
+                          [injector]="injector"
+                          [model]="componentData.data">
+                </template>   
+            </div>
+            
+        </template>
     `,
     directives: [TreeViewComponent, TreeNodeComponent, DynamicallyCompiledComponentDirective],
     pipes: [AsyncPipe]
 })
 export class TreeViewComponent {
 
-    @Input() root;
-    @Input() dataProvider: AsyncSocketProviderService;
+    @Input() dataProvider;
+    @Input() injector: Injector;
 
-    private children;
-    private items      = [];
-    private items;
+
     private isExpanded = false;
-
     private dynamicComponents;
 
-    constructor(private injector: Injector) {
-
-
-    }
 
     toggleExpansion(expanded) {
         this.isExpanded = expanded;
     }
 
     ngOnInit() {
-        this.dynamicComponents = this.dataProvider.getDirContentComponents();
+        this.dynamicComponents = this.dataProvider();
     }
 }

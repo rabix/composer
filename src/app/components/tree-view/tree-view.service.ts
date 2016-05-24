@@ -1,6 +1,5 @@
 import {Injectable} from "@angular/core";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {TreeNodeComponent} from "./structure/tree-node.component";
 
 @Injectable()
 export class TreeViewService{

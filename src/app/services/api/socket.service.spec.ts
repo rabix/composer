@@ -2,8 +2,6 @@ import {it, describe, beforeEachProviders, async, inject} from "@angular/core/te
 import {provide} from "@angular/core";
 import {SocketService} from "./socket.service";
 import {FileApi} from "./file.api";
-import * as Q from "q";
-import {ApiService} from "./api.service";
 import {CONFIG, APP_CONFIG} from "../../config/app.config";
 
 describe("SocketService", () => {

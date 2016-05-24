@@ -1,4 +1,10 @@
-import {ComponentResolver, ComponentFactory, Injector, ApplicationRef, ComponentRef} from "@angular/core";
+import {
+    ComponentResolver,
+    ComponentFactory,
+    Injector,
+    ApplicationRef,
+    ComponentRef
+} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 export class ComponentRegistry {
 
