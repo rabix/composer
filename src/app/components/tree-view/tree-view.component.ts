@@ -1,9 +1,10 @@
-import {Component, Input, Injector, Host, forwardRef, Inject} from "@angular/core";
+import {Component, Input, Injector, Output} from "@angular/core";
 import {TreeNodeComponent} from "./structure/tree-node.component";
 import "./tree-view.component.scss";
-import {AsyncSocketProviderService} from "../file-tree/async-socket-provider.service";
 import {AsyncPipe} from "@angular/common";
 import {DynamicallyCompiledComponentDirective} from "../../directives/dynamically-compiled-component.directive";
+import {BehaviorSubject} from "rxjs/Rx";
+import {ComponentFactoryProviderFn} from "./interfaces/tree-data-provider";
 
 @Component({
     selector: "tree-view",
@@ -26,12 +27,18 @@ import {DynamicallyCompiledComponentDirective} from "../../directives/dynamicall
 })
 export class TreeViewComponent {
 
-    @Input() dataProvider;
+    @Input() dataProvider: ComponentFactoryProviderFn;
     @Input() injector: Injector;
+
+    @Output() onDataLoad: BehaviorSubject<any>;
 
 
     private isExpanded = false;
     private dynamicComponents;
+
+    constructor() {
+        this.onDataLoad = new BehaviorSubject(null);
+    }
 
 
     toggleExpansion(expanded) {
@@ -39,6 +46,8 @@ export class TreeViewComponent {
     }
 
     ngOnInit() {
-        this.dynamicComponents = this.dataProvider();
+        this.dynamicComponents = this.dataProvider().do((data)=> {
+            this.onDataLoad.next(data);
+        });
     }
 }

@@ -1,5 +1,6 @@
-import {Injectable, Injector} from "@angular/core";
+import {Injectable, Injector, ComponentFactory} from "@angular/core";
 import {AsyncSocketProviderService} from "./async-socket-provider.service";
+import {Observable} from "rxjs/Rx";
 
 @Injectable()
 export class FileTreeService {
@@ -12,7 +13,7 @@ export class FileTreeService {
         this.dataProvider = injector.get(AsyncSocketProviderService);
     }
 
-    public getDataProviderForDirectory(directory? = "") {
+    public getDataProviderForDirectory(directory? = ""): () => Observable<ComponentFactory[]> {
 
         return () => this.dataProvider.getNodeContent(directory);
     }
