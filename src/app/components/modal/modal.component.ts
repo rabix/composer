@@ -1,47 +1,33 @@
 import { Component, ComponentRef, ApplicationRef, Injectable,
         ComponentResolver, ViewChild, ViewContainerRef, OnInit, ComponentFactory} from '@angular/core';
-import { NgStyle, FORM_DIRECTIVES } from '@angular/common';
+import { NgStyle } from '@angular/common';
 import { PromiseWrapper } from '@angular/common/src/facade/async';
-import { DynamicDataInterface, CustomComponentBuilder } from '../../builders/component/custom-component.builder';
+import {CustomComponentBuilder, DynamicDataInterface} from '../../builders/component/custom-component.builder';
+import {NewFileModalComponent} from './new-file-modal.component'
 require('./modal.component.scss');
 
 /**
  * Usage: https://github.com/czeckd/angular2-simple-modal
  * */
 export enum ModalType {
-    Default,
-    Info,
-    Warning,
-    Critical
+    NewFile,
+    Select,
+    Confirm,
+    Warning
 }
 
 @Injectable()
 export class ModalComponent {
     confirm: any;
     cancel: any;
+
+    functions: any;
     title:string = '';
-    dynamicTemplateString:string = '';
-    type:ModalType = ModalType.Default;
-    blocking:boolean = true;
+    type:ModalType;
+
     data: any;
     width:number = 250;
     height:number = 150;
-
-    template:string = `	
-    <div class="modal-dialog" role="document">
-    <div class="modal-content">
-    
-           <div class="modal-header">
-            <h2 *ngIf="title" class="modal-title" [innerHTML]="title"></h2>
-           </div>
-          
-            <div class="modal-body">
-                <div #dynamicContentPlaceHolder></div>
-            </div>
-    
-    </div>
-    </div>
-		`;
 
     constructor(private app:ApplicationRef,
                 private resolver: ComponentResolver
@@ -51,37 +37,34 @@ export class ModalComponent {
         let confirm = this.confirm;
         let cancel = this.cancel;
 
-        let title:string = this.title;
-        let dynamicTemplateString:string = this.dynamicTemplateString;
+        let type:ModalType = this.type;
+
         let width:string = this.width + 'px';
         let height:string = this.height + 'px';
-        let icon:string = null;
+
         let data:any = this.data;
-        let template:string;
 
-        if (this.blocking) {
-            template = `<div class="modal-background">` +
-                `<div class="modal" [ngStyle]="{'width':'` + width + `', 'height':'` + height + `'}">` +
-                this.template + `</div></div>`;
-        } else {
-            template = `<div class="modal-background" (click)="cancel()">
-                <div id="modalDiv" class="modal" (click)="$event.stopPropagation()" [ngStyle]="{'width':'` + width + `', 'height':'` + height + `'}">` +
-                this.template + `</div></div>`;
-        }
-
-        switch (this.type) {
-            case ModalType.Info:
-                icon = 'images/info-circle.svg';
-                break;
-            case ModalType.Warning:
-                icon = 'images/warning.svg';
-                break;
-            case ModalType.Critical:
-                icon = 'images/exclamation-circle.svg';
-                break;
-            default:
-                break;
-        }
+        let template:string = `
+        <div class="modal-background" (click)="cancel()">
+        <div id="modalDiv" class="modal" (click)="$event.stopPropagation()" [ngStyle]="{'width':'` + width + `', 'height':'` + height + `'}">
+     
+                <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                
+                       <div class="modal-header">
+                            <h2 *ngIf="title" class="modal-title" [innerHTML]="title"></h2>
+                       </div>
+                      
+                        <div class="modal-body">
+                            <div #dynamicContentPlaceHolder></div>
+                        </div>
+                
+                </div>
+                </div>
+        
+        </div>
+        </div>
+        `;
 
         // Note: Do NOT use styleUrls, because they'll keep getting added to the DOM.
         @Component({
@@ -91,52 +74,43 @@ export class ModalComponent {
             providers: [CustomComponentBuilder]
         })
         class Modal implements OnInit {
-
-            public entity: { description: string };
+            
             // reference for a <div> with #
             @ViewChild('dynamicContentPlaceHolder', {read: ViewContainerRef})
-            protected dynamicComponentTarget: ViewContainerRef;
+            private dynamicComponentTarget: ViewContainerRef;
 
             // ng loader and our custom builder
             constructor(
-                protected componentResolver: ComponentResolver,
-                protected customComponentBuilder: CustomComponentBuilder
+                private componentResolver: ComponentResolver
             ){}
 
             public ngOnInit() {
-                // dynamic template built
-                var template = dynamicTemplateString;
+                switch(type) {
+                    case ModalType.NewFile:
+                        this.injectComponent(NewFileModalComponent);
+                        break;
+                }
+            }
 
-                // now we get built component, just to load it
-                var dynamicComponent = this.customComponentBuilder
-                    .CreateComponent(template, FORM_DIRECTIVES.concat(data.directives || []));
+            injectComponent(component) {
+                this.componentResolver.resolveComponent(component).
+                then((factory: ComponentFactory<DynamicDataInterface>) => {
+                    // Instantiates a single {@link Component} and inserts its Host View
+                    // into this container at the specified `index`
+                    let dynamicComponent = this.dynamicComponentTarget.createComponent(factory, 0);
 
-                // we have a component and its target
-                this.componentResolver
-                    .resolveComponent(dynamicComponent)
-                    .then((factory: ComponentFactory<DynamicDataInterface>) => {
-                        // Instantiates a single {@link Component} and inserts its Host View
-                        // into this container at the specified `index`
-                        let dynamicComponent = this.dynamicComponentTarget.createComponent(factory, 0);
-
-                        // and here we have access to our dynamic component
-                        let component: DynamicDataInterface = dynamicComponent.instance;
-                        component.data = data;
-                        component.confirm = confirm.bind(this);
-                        component.cancel = cancel.bind(this);
-                    });
+                    // and here we have access to our dynamic component
+                    let component: DynamicDataInterface = dynamicComponent.instance;
+                    component.data = data;
+                    component.confirm = confirm.bind(this);
+                    component.cancel = cancel.bind(this);
+                });
             }
 
             cref:ComponentRef<Modal> = null;
 
             /* This is needed to close the modal when we click on the background */
             cancel = cancel.bind(this);
-
-            /* tslint:disable:no-unused-variable */
-            private title:string = title;
-            private dynamicTemplateString:string = dynamicTemplateString;
-            private icon:string = icon;
-            /* tslint:enable:no-unused-variable */
             result:any;
         }
         return Modal;

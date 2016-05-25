@@ -84,31 +84,10 @@ export class NewFileButtonComponent implements OnInit {
     }
 
     initModal() {
-        this.modal.dynamicTemplateString = `
-        <h4>Create New File</h4>
-        
-        <form #newFileForm="ngForm">
-            <fieldset class="form-group">
-                <label for="fileName">Enter file name</label>
-                <input ngControl="name" #name="ngForm" required
-                 type="text" class="form-control" id="fileName" [(ngModel)]="data.fileName" 
-                 placeholder="File Name">
-            </fieldset>
-      
-            <fieldset class="form-group">
-                <label for="create_file_action">File Type</label>
-                <select class="form-control" id="create_file_action" [(ngModel)]="data.selectedType">
-                    <option *ngFor="let fileType of data.fileTypes" [ngValue]="fileType">{{ fileType.name }} ({{ fileType.id }})</option>
-                </select>
-            </fieldset>
-            
-          <div>
-                <button class="btn btn-default" type="button" (click)="cancel()"> Cancel </button>
-                <button class="btn btn-primary" type="button" (click)="confirm(data)" [disabled]="!newFileForm.form.valid"> Create </button>
-          </div>
-         
-        </form>
-        `;
+
+        this.modal.type = ModalType.NewFile;
+        this.modal.width = 350;
+        this.modal.height = 300;
 
         this.modal.data = {
             fileName: '',
@@ -127,11 +106,5 @@ export class NewFileButtonComponent implements OnInit {
             this.cref.destroy();
             this.result.resolve(data);
         };
-
-
-        this.modal.blocking   = false;
-        this.modal.type       = ModalType.Default;
-        this.modal.width      = 350;
-        this.modal.height     = 300;
     }
 }
