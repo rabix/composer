@@ -5,23 +5,28 @@ import {ComponentRegistry} from "./registry/component-registry";
 import {ComponentRegistryFactoryService} from "./registry/component-registry-factory.service";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {FileTreeComponent} from "../file-tree/file-tree.component";
+import {WorkspaceService} from "./workspace.service";
 
 require("./workspace.component.scss");
 
 @Component({
     selector: "workspace",
     template: "",
-    providers: [ComponentRegistryFactoryService]
+    providers: []
 })
 export class WorkspaceComponent {
 
     private layout: any;
     private registry: ComponentRegistry;
 
-    constructor(private el: ElementRef, registryFactory: ComponentRegistryFactoryService) {
+    constructor(private el: ElementRef,
+                private registryFactory: ComponentRegistryFactoryService,
+                private workspaceService: WorkspaceService) {
 
         this.layout   = new GoldenLayout(this.getLayoutConfig(), this.el.nativeElement);
         this.registry = registryFactory.create(this.layout);
+
+
     }
 
     ngOnInit() {
@@ -34,6 +39,7 @@ export class WorkspaceComponent {
 
     ngAfterViewInit() {
         this.layout.init();
+        this.workspaceService.setLayout(this.layout);
     }
 
     private getLayoutConfig() {
@@ -46,7 +52,7 @@ export class WorkspaceComponent {
                 popoutWholeStack: false,
                 showPopoutIcon: false,
                 showMaximiseIcon: true,
-                showCloseIcon: false,
+                showCloseIcon: true,
             },
             content: [{
                 type: "row",
@@ -61,6 +67,9 @@ export class WorkspaceComponent {
                         type: "component",
                         title: "my-workflow.json",
                         componentName: CodeEditorComponent,
+                        componentData: {
+                            filePath: "/Users/ivan/IdeaProjects/SevenBridges/cottontail/client/src/app/components/workspace/registry/component-registry.ts"
+                        }
                     }
                 ]
             }]

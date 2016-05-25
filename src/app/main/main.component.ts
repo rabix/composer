@@ -7,6 +7,10 @@ import {SocketService} from "../services/api/socket.service";
 import {FileApi} from "../services/api/file.api";
 import {EditorSidebarComponent} from "../components/editor-sidebar/editor-sidebar.component";
 import {ActionPanelComponent} from "../components/action-panel/action-panel.component";
+import {AsyncSocketProviderService} from "../components/file-tree/async-socket-provider.service";
+import {FileTreeService} from "../components/file-tree/file-tree-service";
+import {WorkspaceService} from "../components/workspace/workspace.service";
+import {ComponentRegistryFactoryService} from "../components/workspace/registry/component-registry-factory.service";
 
 require("./../../assets/sass/main.scss");
 require("./main.component.scss");
@@ -21,7 +25,16 @@ require("./main.component.scss");
         </section>
     `,
     directives: [EditorSidebarComponent, WorkspaceComponent, CodeEditorComponent, ActionPanelComponent],
-    providers: [provide(APP_CONFIG, {useValue: CONFIG}), ApiService, FileApi, SocketService]
+    providers: [
+        ApiService,
+        AsyncSocketProviderService,
+        ComponentRegistryFactoryService,
+        FileApi,
+        FileTreeService,
+        provide(APP_CONFIG, {useValue: CONFIG}),
+        SocketService,
+        WorkspaceService
+    ]
 })
 export class MainComponent {
 
@@ -43,7 +56,7 @@ export class MainComponent {
         // fileApi.getFileContent(fileName).subscribe((res) => {
         //     console.log(`3. Reading ${fileName} content:`, res);
         // });
-        
+
         // fileApi.getDirContent().subscribe((res) => {
         //     console.log(`4. Directory contents`, res);
         // });

@@ -5,9 +5,13 @@ import {
     ComponentResolver,
     ViewContainerRef,
     ComponentFactory } from '@angular/core';
-import { NgStyle, FORM_DIRECTIVES } from '@angular/common';
+import { 
+    NgStyle,
+    FORM_DIRECTIVES } from '@angular/common';
 import { PromiseWrapper } from '@angular/common/src/facade/async';
-import { ModalBuilder, ModalFunctionsInterface } from './builders/modal.builder.ts';
+import { 
+    ModalBuilder, 
+    ModalFunctionsInterface } from './builders/modal.builder.ts';
 import { InjectableModalInterface } from './interfaces/injectable-modal.interface.ts'
 require('./modal.component.scss');
 

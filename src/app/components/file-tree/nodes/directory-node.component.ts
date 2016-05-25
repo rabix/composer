@@ -44,13 +44,9 @@ export class DirectoryNodeComponent implements TreeViewNode {
 
     ngOnInit() {
         this.isExpandable   = !this.model.isEmpty;
-        this.dataProviderFn = this.fileTreeService.getDataProviderForDirectory(this.model.path);
+        this.dataProviderFn = this.fileTreeService.getDataProviderForDirectory(this.model.absolutePath);
     }
-
-    ngOnDestroy(){
-        console.log("Destroying a dir");
-    }
-
+    
     public toggleExpansion(isExpanded) {
 
         this.isExpanded = isExpanded;
