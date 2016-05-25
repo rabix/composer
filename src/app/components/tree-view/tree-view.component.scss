@@ -1,27 +1,44 @@
+@keyframes tree-node-come-in {
+  0% {
+    opacity: .5;
+    margin-left: -4px;
+  }
+
+  100% {
+    opacity: 1;
+    margin-left: 0;
+  }
+
+}
+
 tree-view {
-    color: white;
-    display: block;
-    margin-left: 20px;
+  color: white;
+  display: block;
+  margin-left: 20px;
 
-    .tree-node {
+  .tree-node {
 
-        font-size: .95em !important;
-        cursor: pointer;
-        -webkit-user-select: none; /* webkit (safari, chrome) browsers */
-        -moz-user-select: none; /* mozilla browsers */
-        -ms-user-select: none; /* IE10+ */
-        user-select: none;
-    }
+    font-size: .95em !important;
+    cursor: pointer;
+    -webkit-user-select: none; /* webkit (safari, chrome) browsers */
+    -moz-user-select: none; /* mozilla browsers */
+    -ms-user-select: none; /* IE10+ */
+    user-select: none;
 
-    .expander {
-        display: inline-block;
-        //padding: 0 0 0 6px;
-        width: 10px;
-        margin: 0 0 0 0;
-    }
+    animation: tree-node-come-in;
+    animation-iteration-count: 1;
+    animation-duration: .15s;
+  }
 
-    .node-icon {
-        margin-right: 4px;
-    }
+  .expander {
+    display: inline-block;
+    //padding: 0 0 0 6px;
+    width: 10px;
+    margin: 0 0 0 0;
+  }
+
+  .node-icon {
+    margin-right: 4px;
+  }
 }
 

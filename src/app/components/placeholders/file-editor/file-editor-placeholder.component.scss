@@ -1,0 +1,17 @@
+@import "../placeholder";
+
+@keyframes slide-right {
+  0% {
+    margin-left: 0;
+  }
+  50% {
+    margin-left: -6px;
+  }
+}
+
+.file-placeholder-hand {
+  animation-name: slide-right;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}

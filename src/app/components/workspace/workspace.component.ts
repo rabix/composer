@@ -6,6 +6,7 @@ import {ComponentRegistryFactoryService} from "./registry/component-registry-fac
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {FileTreeComponent} from "../file-tree/file-tree.component";
 import {WorkspaceService} from "./workspace.service";
+import {FileEditorPlaceholderComponent} from "../placeholders/file-editor/file-editor-placeholder.component";
 
 require("./workspace.component.scss");
 
@@ -25,16 +26,40 @@ export class WorkspaceComponent {
 
         this.layout   = new GoldenLayout(this.getLayoutConfig(), this.el.nativeElement);
         this.registry = registryFactory.create(this.layout);
-
-
+        this.workspaceService.setRegistry(this.registry);
     }
 
     ngOnInit() {
 
-        //noinspection TypeScriptUnresolvedFunction
         Observable.fromEvent(window, "resize").debounceTime(200).subscribe(() => {
             this.layout.updateSize(this.el.nativeElement.clientWidth, this.el.nativeElement.clientHeight);
         });
+
+        Observable.fromEvent(this.layout, "componentCreated")
+            .filter(event => {
+                return event.config.componentName === CodeEditorComponent
+                    && event.parent.contentItems.length === 1
+                    && event.parent.contentItems[0].config.componentName === FileEditorPlaceholderComponent
+            })
+            .subscribe((event) => {
+                event.parent.contentItems[0].remove();
+            });
+
+        Observable.fromEvent(this.layout, "itemDestroyed")
+            .filter(event => {
+                return event.config.componentName === CodeEditorComponent
+                    && event.parent.contentItems.length === 1
+            })
+            .subscribe((event) => {
+
+                // @TODO(ivanb) Move this somewhere (ex. extract the component definition into an enum)
+                event.parent.addChild({
+                    type: "component",
+                    title: "Usage Tip",
+                    componentName: FileEditorPlaceholderComponent,
+                    isClosable: false
+                });
+            });
     }
 
     ngAfterViewInit() {
@@ -61,15 +86,14 @@ export class WorkspaceComponent {
                         type: "component",
                         componentName: FileTreeComponent,
                         title: "Navigation",
-                        width: 25
+                        width: 25,
+                        isClosable: false
                     },
                     {
                         type: "component",
-                        title: "my-workflow.json",
-                        componentName: CodeEditorComponent,
-                        componentData: {
-                            filePath: "/Users/ivan/IdeaProjects/SevenBridges/cottontail/client/src/app/components/workspace/registry/component-registry.ts"
-                        }
+                        title: "Usage Tip",
+                        componentName: FileEditorPlaceholderComponent,
+                        isClosable: false
                     }
                 ]
             }]

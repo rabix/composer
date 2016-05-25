@@ -46,7 +46,7 @@ export class DirectoryNodeComponent implements TreeViewNode {
         this.isExpandable   = !this.model.isEmpty;
         this.dataProviderFn = this.fileTreeService.getDataProviderForDirectory(this.model.absolutePath);
     }
-    
+
     public toggleExpansion(isExpanded) {
 
         this.isExpanded = isExpanded;
