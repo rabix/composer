@@ -1,8 +1,8 @@
 export interface FilePath {
     name: string;
     type: string;
-    path: string;
-    fullPath: string;
+    relativePath: string;
+    absolutePath: string;
     isEmpty?: boolean;
     content?: string;
 }
