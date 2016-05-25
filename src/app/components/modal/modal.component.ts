@@ -1,5 +1,13 @@
-import { Component, ComponentRef, ApplicationRef, Injectable,
-        ComponentResolver, ViewChild, ViewContainerRef, OnInit, ComponentFactory} from '@angular/core';
+import { 
+    Component, 
+    ComponentRef, 
+    ApplicationRef,
+    Injectable,
+    ComponentResolver, 
+    ViewChild, 
+    ViewContainerRef, 
+    OnInit, 
+    ComponentFactory} from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { PromiseWrapper } from '@angular/common/src/facade/async';
 import {CustomComponentBuilder, DynamicDataInterface} from '../../builders/component/custom-component.builder';

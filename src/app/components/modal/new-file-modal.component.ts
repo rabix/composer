@@ -5,6 +5,8 @@ import { NgStyle } from '@angular/common';
     directives: [ NgStyle ],
     template: `
         <h4>Create New File</h4>
+        
+        <loading-spinner></loading-spinner>
 
         <form #newFileForm="ngForm">
             <fieldset class="form-group">
