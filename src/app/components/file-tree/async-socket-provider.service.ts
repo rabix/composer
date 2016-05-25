@@ -16,6 +16,9 @@ export class AsyncSocketProviderService implements TreeDataProvider {
 
     public getNodeContent(dir? = ""): Observable<ComponentFactory[]> {
         let path = `./${dir}`;
+        if(dir.substr(0, 1) === "/"){
+            path = dir;
+        }
 
         return this.fileApi.getDirContent(path).map(items => {
             //noinspection TypeScriptUnresolvedFunction
