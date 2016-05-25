@@ -1,3 +1,8 @@
 .clickable {
     cursor: pointer;
 }
+
+.vertically-aligned-cell {
+    display: table-cell;
+    vertical-align: middle;
+}
