@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { NgStyle } from '@angular/common';
+import {LoadingSpinnerComponent} from "../common/loading-spinner/loading-spinner.component";
 
 @Component({
-    directives: [ NgStyle ],
+    directives: [ NgStyle, LoadingSpinnerComponent ],
     template: `
         <h4>Create New File</h4>
         
-        <loading-spinner></loading-spinner>
+       <!-- <loading-spinner></loading-spinner> !-->
 
         <form #newFileForm="ngForm">
             <fieldset class="form-group">
@@ -28,8 +29,8 @@ import { NgStyle } from '@angular/common';
                 <button class="btn btn-primary" type="button" (click)="confirm(data)" [disabled]="!newFileForm.form.valid"> Create </button>
           </div>
 
-        </form>
-        `
+        </form>`
+        
 })
 export class NewFileModalComponent implements OnInit {
     constructor() { }

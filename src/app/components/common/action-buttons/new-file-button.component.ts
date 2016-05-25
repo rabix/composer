@@ -1,7 +1,9 @@
 import {Component, Input, OnInit} from "@angular/core";
 import * as _ from "lodash";
 import {ActionButtonComponent} from "./action-button.component";
-import {ModalComponent, ModalType} from "../../modal/modal.component";
+import {ModalComponent} from "../../modal/modal.component";
+import {NewFileModalComponent} from "../new-file-modal.component"
+
 import {FileApi} from "../../../services/api/file.api";
 import {HttpError, FilePath} from "../../../services/api/api-response-types";
 
@@ -86,7 +88,7 @@ export class NewFileButtonComponent implements OnInit {
 
     initModal() {
 
-        this.modal.type = ModalType.NewFile;
+        this.modal.modalComponent = NewFileModalComponent;
         this.modal.width = 350;
         this.modal.height = 300;
 
