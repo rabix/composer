@@ -3,17 +3,25 @@ tree-view {
     display: block;
     margin-left: 20px;
 
-    tree-node {
+    .tree-node {
+
+        font-size: .95em !important;
         cursor: pointer;
         -webkit-user-select: none; /* webkit (safari, chrome) browsers */
         -moz-user-select: none; /* mozilla browsers */
         -ms-user-select: none; /* IE10+ */
         user-select: none;
     }
+
     .expander {
         display: inline-block;
-        padding: 0 0 0 6px;
-        margin: 0 6px 0 0;
+        //padding: 0 0 0 6px;
+        width: 10px;
+        margin: 0 0 0 0;
+    }
+
+    .node-icon {
+        margin-right: 4px;
     }
 }
 

@@ -1,9 +1,10 @@
-export interface FilePath extends HttpError {
+export interface FilePath {
     name: string;
     type: string;
     path: string;
     fullPath: string;
     isEmpty?: boolean;
+    content?: string;
 }
 
 export interface HttpError {

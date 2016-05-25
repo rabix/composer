@@ -1,7 +1,7 @@
 import {Component} from "@angular/core";
-import {HTTP_PROVIDERS} from '@angular/http';
-import {ActionButtonComponent} from '../common/action-buttons/action-button.component'
-import {ACTION_BUTTON_TYPE} from '../common/action-buttons/action-button-type'
+import {HTTP_PROVIDERS} from "@angular/http";
+import {ActionButtonComponent} from "../common/action-buttons/action-button.component";
+import {ACTION_BUTTON_TYPE} from "../common/action-buttons/action-button-type";
 
 require("./editor-sidebar.component.scss");
 

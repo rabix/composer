@@ -1,4 +1,4 @@
-import {Component, provide, ViewContainerRef} from "@angular/core";
+import {Component, provide} from "@angular/core";
 import {WorkspaceComponent} from "../components/workspace/workspace.component";
 import {CodeEditorComponent} from "../components/code-editor/code-editor.component";
 import {APP_CONFIG, CONFIG} from "../config/app.config";

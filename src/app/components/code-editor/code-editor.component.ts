@@ -1,8 +1,7 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ElementRef} from "@angular/core";
+import {CodeEditor} from "./code-editor.service";
 import Editor = AceAjax.Editor;
 import TextMode = AceAjax.TextMode;
-import {ElementRef} from "@angular/core";
-import {CodeEditor} from "./code-editor.service";
 
 require('./code-editor.component.scss');
 

@@ -1,4 +1,7 @@
 import {Injectable} from "@angular/core";
+import {FilePath, HttpError} from "./api/api-response-types";
+import {Observable} from "rxjs/Observable";
+import {FileApi} from "./api/file.api";
 
 class File {
 
@@ -37,7 +40,7 @@ export class FileRegistry {
     /**
      * @FIXME(ivanb) Create a provider for HTTP which also resolves the API endpoint
      */
-    constructor() {
+    constructor(private fileApi: FileApi) {
 
         // this.endpoint = "http://localhost:9000";
     }

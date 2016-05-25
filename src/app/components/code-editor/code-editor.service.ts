@@ -1,10 +1,10 @@
-import {Subject} from 'rxjs';
-import Editor = AceAjax.Editor;
-import Document = AceAjax.Document;
-import IEditSession = AceAjax.IEditSession;
+import {Subject} from "rxjs";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {Observable} from "rxjs/Observable";
 import {Subscription} from "rxjs/Subscription";
+import Editor = AceAjax.Editor;
+import Document = AceAjax.Document;
+import IEditSession = AceAjax.IEditSession;
 
 export class CodeEditor {
     editor:Editor;

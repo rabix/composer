@@ -1,9 +1,9 @@
-import {Component, Input, OnInit} from '@angular/core';
-import * as _ from 'lodash';
-
+import {Component, Input, OnInit} from "@angular/core";
+import * as _ from "lodash";
 import {ActionButtonComponent} from "./action-button.component";
 import {ModalComponent, ModalType} from "../../modal/modal.component";
 import {FileApi} from "../../../services/api/file.api";
+import {HttpError, FilePath} from "../../../services/api/api-response-types";
 
 @Component({
     selector: 'new-file-button',
@@ -20,9 +20,9 @@ import {FileApi} from "../../../services/api/file.api";
 })
 export class NewFileButtonComponent implements OnInit {
     @Input() buttonType: string;
-    fileTypes: any[];
-    selectedType: any;
-    loading: boolean;
+             fileTypes: any[];
+             selectedType: any;
+             loading: boolean;
 
     constructor(private modal: ModalComponent, private fileApi: FileApi) {
         this.fileTypes = [{
@@ -52,7 +52,7 @@ export class NewFileButtonComponent implements OnInit {
             }
 
             let fileName = result.fileName;
-            let ext = result.selectedType.id;
+            let ext      = result.selectedType.id;
 
             // IF: file already has an extension
             if ('.' + _.last(fileName.split('.')) === ext) {
@@ -63,16 +63,17 @@ export class NewFileButtonComponent implements OnInit {
             let filePath = fileName + ext;
 
             // create file
-            this.fileApi.createFile(filePath).subscribe((next) => {
-                console.log(next);
-
+            this.fileApi.createFile(filePath).subscribe((next: HttpError|FilePath) => {
+                
                 // IF: file exists
-                if (next.statusCode === 403) {
+                if ((<HttpError> next).statusCode === 403) {
                     // prompt user that file already exists
                     console.log('File already exists');
                 } else {
                     console.log('something else went wrong...?');
                 }
+
+            }, (dismiss) => {
 
             });
 

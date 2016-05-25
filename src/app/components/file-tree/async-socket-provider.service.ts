@@ -4,16 +4,17 @@ import {Observable} from "rxjs/Rx";
 import {FilePath} from "../../services/api/api-response-types";
 import {FileNodeComponent} from "./nodes/file-node.component";
 import {DirectoryNodeComponent} from "./nodes/directory-node.component";
+import {TreeDataProvider} from "../tree-view/interfaces/tree-data-provider";
 
 
 @Injectable()
-export class AsyncSocketProviderService {
+export class AsyncSocketProviderService implements TreeDataProvider {
 
     constructor(private fileApi: FileApi, private resolver: ComponentResolver) {
 
     }
 
-    public getDirContentComponents(dir? = ""): Observable<ComponentFactory[]> {
+    public getNodeContent(dir? = ""): Observable<ComponentFactory[]> {
         let path = `./${dir}`;
 
         return this.fileApi.getDirContent(path).map(items => {
@@ -41,4 +42,3 @@ export class AsyncSocketProviderService {
         }).concatAll();
     }
 }
-
