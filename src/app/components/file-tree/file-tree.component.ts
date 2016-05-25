@@ -4,14 +4,14 @@ import {TreeViewComponent} from "../tree-view/tree-view.component";
 import {TreeViewService} from "../tree-view/tree-view.service";
 import {AsyncSocketProviderService} from "./async-socket-provider.service";
 import {FileTreeService} from "./file-tree-service";
-import {BlockLoaderComponent} from "../component-loader/block-loader.component";
+import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 
 require("./file-tree.component.scss");
 
 @Component({
     selector: "file-tree",
     directives: [TreeViewComponent, BlockLoaderComponent],
-    providers: [TreeViewService, AsyncSocketProviderService, FileTreeService],
+    providers: [TreeViewService, AsyncSocketProviderService],
     template: `
         <block-loader *ngIf="treeIsLoading === true"></block-loader>
         <tree-view [dataProvider]="dataProviderFn" 
@@ -29,7 +29,6 @@ export class FileTreeComponent {
     }
 
     onDataLoad(data) {
-        console.log("Got loading data", data);
         this.treeIsLoading = data === null;
     }
 }

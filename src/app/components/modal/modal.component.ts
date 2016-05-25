@@ -1,17 +1,21 @@
-import { 
-    Component, 
-    ComponentRef, 
+import {
+    Component,
+    ComponentRef,
     ApplicationRef,
     Injectable,
-    ComponentResolver, 
-    ViewChild, 
-    ViewContainerRef, 
-    OnInit, 
-    ComponentFactory} from '@angular/core';
-import { NgStyle } from '@angular/common';
-import { PromiseWrapper } from '@angular/common/src/facade/async';
-import {CustomComponentBuilder, DynamicDataInterface} from '../../builders/component/custom-component.builder';
-import {NewFileModalComponent} from './new-file-modal.component'
+    ComponentResolver,
+    ViewChild,
+    ViewContainerRef,
+    OnInit,
+    ComponentFactory
+} from "@angular/core";
+import {NgStyle} from "@angular/common";
+import {PromiseWrapper} from "@angular/common/src/facade/async";
+import {
+    CustomComponentBuilder,
+    DynamicDataInterface
+} from "../../builders/component/custom-component.builder";
+import {NewFileModalComponent} from "./new-file-modal.component";
 require('./modal.component.scss');
 
 /**

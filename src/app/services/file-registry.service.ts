@@ -1,6 +1,4 @@
 import {Injectable} from "@angular/core";
-import {FilePath, HttpError} from "./api/api-response-types";
-import {Observable} from "rxjs/Observable";
 import {FileApi} from "./api/file.api";
 
 class File {

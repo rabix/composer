@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { NgStyle } from '@angular/common';
+import {Component, OnInit} from "@angular/core";
+import {NgStyle} from "@angular/common";
 
 @Component({
     directives: [ NgStyle ],

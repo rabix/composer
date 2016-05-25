@@ -44,7 +44,6 @@ export class DirectoryNodeComponent implements TreeViewNode {
 
     ngOnInit() {
         this.isExpandable   = !this.model.isEmpty;
-        console.log("Do model", this.model);
         this.dataProviderFn = this.fileTreeService.getDataProviderForDirectory(this.model.absolutePath);
     }
     
