@@ -1,25 +1,26 @@
 import {Component, OnInit, ElementRef} from "@angular/core";
 import {CodeEditor} from "./code-editor.service";
+import {FileRegistry, File} from "../../services/file-registry.service";
+import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import Editor = AceAjax.Editor;
 import TextMode = AceAjax.TextMode;
-import {FileRegistry, File} from "../../services/file-registry.service";
 
 require('./code-editor.component.scss');
 
 @Component({
     selector: 'code-editor',
-    inputs: ['text'],
-    template: `<div class="code-editor-container">
-                    <div class="editor"></div>
-               </div>`,
-    providers: [FileRegistry]
+    directives: [BlockLoaderComponent],
+    template: `
+                <div class="code-editor-container">
+                     <block-loader *ngIf="editor.fileIsLoading"></block-loader>
+                     <div class="editor" [hidden]="editor.fileIsLoading "></div>
+                </div>`,
 })
 export class CodeEditorComponent implements OnInit {
     editor: CodeEditor;
     file: File;
 
-    constructor(private elem: ElementRef, private fileRegistry: FileRegistry) {
-    }
+    constructor(private elem: ElementRef, private fileRegistry: FileRegistry) {}
 
     ngOnInit(): any {
         let editorInstance = ace.edit(this.elem.nativeElement.getElementsByClassName('editor')[0]);
@@ -28,14 +29,7 @@ export class CodeEditorComponent implements OnInit {
         // this check shouldn't be necessary
         if (this.file) {
             this.editor.setMode(this.file.type);
-            this.file.content = this.fileRegistry
-                .fetchFileContent(this.file);
-            
-            this.file.content.subscribe(text => {
-               if (text !== null) {
-                  this.editor.setText(text);
-               } 
-            });
+            this.editor.setTextStream(this.fileRegistry.fetchFileContent(this.file));
         }
     }
 

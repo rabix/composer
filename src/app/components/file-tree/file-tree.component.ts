@@ -13,7 +13,7 @@ require("./file-tree.component.scss");
     directives: [TreeViewComponent, BlockLoaderComponent],
     providers: [TreeViewService, AsyncSocketProviderService],
     template: `
-        <block-loader *ngIf="treeIsLoading === true"></block-loader>
+        <block-loader *ngIf="treeIsLoading"></block-loader>
         <tree-view [dataProvider]="dataProviderFn" 
                    [injector]="injector" 
                    (onDataLoad)="onDataLoad($event)"></tree-view>

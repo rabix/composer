@@ -9,7 +9,7 @@ export class File implements FilePath {
     type: string;
     relativePath: string;
     absolutePath: string;
-    public content: BehaviorSubject<string>;
+    public content: BehaviorSubject<FileChangeEvent>;
 
     constructor(file?: FilePath) {
         this.absolutePath = file.absolutePath;
@@ -22,6 +22,13 @@ export class File implements FilePath {
     toString(): string {
         return this.relativePath;
     }
+}
+
+type FileChangeEventSource = 'FILE_API' | 'ACE_EDITOR';
+
+export interface FileChangeEvent {
+    source: FileChangeEventSource;
+    content: string;
 }
 
 export class Directory {
@@ -51,7 +58,6 @@ export class FileRegistry {
      * @FIXME(ivanb) Create a provider for HTTP which also resolves the API endpoint
      */
     constructor(private fileApi: FileApi) {
-
         fileApi.getDirContent('').flatMap((paths) => {
             //noinspection TypeScriptUnresolvedFunction
             return Observable.from(paths);
@@ -72,12 +78,24 @@ export class FileRegistry {
         // });
     }
 
-    public fetchFileContent(file: File): BehaviorSubject<string> {
+    public fetchFileContent(file: File): BehaviorSubject<FileChangeEvent> {
         const cachedFile = this.fileCache[file.absolutePath];
+
         if (cachedFile && cachedFile.content) {
+
+            // push a new event to the stream with the same content as last one, but different source
+            cachedFile.content.next({
+                source: 'FILE_API',
+                content: cachedFile.content.getValue().content
+            });
+
             return cachedFile.content;
         } else {
-            let temporarySubject: BehaviorSubject<string> = new BehaviorSubject(null);
+
+            let temporarySubject: BehaviorSubject<FileChangeEvent> = new BehaviorSubject({
+                source: 'FILE_API',
+                content: null
+            });
 
             this.fileApi.getFileContent(file.absolutePath)
                 .subscribe((filePath: FilePath|HttpError) => {
@@ -87,7 +105,10 @@ export class FileRegistry {
                         this.fileCache[(<FilePath> filePath).absolutePath]         = new File(<FilePath> filePath);
                         this.fileCache[(<FilePath> filePath).absolutePath].content = temporarySubject;
 
-                        temporarySubject.next((<FilePath> filePath).content);
+                        temporarySubject.next({
+                            source: 'FILE_API',
+                            content: (<FilePath> filePath).content
+                        });
                     }
                 });
 

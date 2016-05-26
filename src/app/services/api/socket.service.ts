@@ -53,7 +53,7 @@ export class SocketService {
             this.ioSocket = io(host);
 
             this.ioSocket.on("connect", () => {
-                console.log("Socket Connection Established");
+                console.info("Socket Connection Established");
             });
 
             for (let eventName in SOCKET_EVENTS) {
@@ -63,7 +63,7 @@ export class SocketService {
             }
 
             return () => {
-                console.log("Closing Socket Connection");
+                console.info("Closing Socket Connection");
                 this.ioSocket.close();
             }
         }).share();
