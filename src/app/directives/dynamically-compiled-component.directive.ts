@@ -12,14 +12,14 @@ import {Directive, ViewContainerRef, Input, ComponentFactory, Injector} from "@a
 export class DynamicallyCompiledComponentDirective {
 
     private model;
-    private factory: ComponentFactory;
+    private factory: ComponentFactory<any>;
     private injector: Injector = null;
 
     constructor(private viewContainer: ViewContainerRef) {
 
     }
 
-    @Input() set dynamicallyCompiled(comp: ComponentFactory) {
+    @Input() set dynamicallyCompiled(comp: ComponentFactory<any>) {
         this.viewContainer.clear();
 
         //noinspection TypeScriptUnresolvedVariable

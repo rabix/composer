@@ -36,21 +36,21 @@ export class WorkspaceComponent {
         });
 
         Observable.fromEvent(this.layout, "componentCreated")
-            .filter(event => {
+            .filter((event:any) => {
                 return event.config.componentName === CodeEditorComponent
                     && event.parent.contentItems.length === 1
                     && event.parent.contentItems[0].config.componentName === FileEditorPlaceholderComponent
             })
-            .subscribe((event) => {
+            .subscribe((event: any) => {
                 event.parent.contentItems[0].remove();
             });
 
         Observable.fromEvent(this.layout, "itemDestroyed")
-            .filter(event => {
+            .filter((event:any) => {
                 return event.config.componentName === CodeEditorComponent
                     && event.parent.contentItems.length === 1
             })
-            .subscribe((event) => {
+            .subscribe((event: any) => {
 
                 // @TODO(ivanb) Move this somewhere (ex. extract the component definition into an enum)
                 // @FIXME(ivanb) Scan the whole tree and check if this is actually the last open editor

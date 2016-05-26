@@ -15,8 +15,7 @@ export class SocketService {
     private connection: Observable<SocketMessage>;
 
     private connectionTimeout = 10000;
-
-
+    
     constructor(@Inject(APP_CONFIG) private config: AppConfig) {
 
         let host      = `http://${config.hostname}:${config.port}`;
@@ -27,11 +26,11 @@ export class SocketService {
         return this.connection;
     }
 
-    public request(eventName: string, data?: any = {}): Observable<any> {
+    public request(eventName: string, data: any = {}): Observable<any> {
 
         let sub = this.connection.startWith("Start").subscribe(_ => true);
 
-        return Observable.create((obs: Observer)=> {
+        return Observable.create((obs: Observer<any>)=> {
             this.ioSocket.emit(eventName, data, (data)=> {
                 if (data.error) {
                     obs.error(data);

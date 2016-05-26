@@ -14,16 +14,14 @@ export class AsyncSocketProviderService implements TreeDataProvider {
 
     }
 
-    public getNodeContent(dir? = ""): Observable<ComponentFactory[]> {
+    public getNodeContent(dir = ""): Observable<Array<{factory: ComponentFactory<any>, data: FilePath}>> {
         let path = `./${dir}`;
-        if(dir.substr(0, 1) === "/"){
+        if (dir.substr(0, 1) === "/") {
             path = dir;
         }
 
-        return this.fileApi.getDirContent(path).map(items => {
-            //noinspection TypeScriptUnresolvedFunction
+        return this.fileApi.getDirContent(path).map((items: FilePath[])=> {
             return Observable.defer(() => {
-                //noinspection TypeScriptUnresolvedFunction
                 return Observable.fromPromise(Promise.all(items.map((item: FilePath) => {
 
                     // Determine the component type
@@ -33,7 +31,7 @@ export class AsyncSocketProviderService implements TreeDataProvider {
                         componentType = DirectoryNodeComponent;
                     }
 
-                    return this.resolver.resolveComponent(componentType).then((factory: ComponentFactory) => {
+                    return this.resolver.resolveComponent(componentType).then((factory: ComponentFactory<any>) => {
                         return {
                             factory: factory,
                             data: item
