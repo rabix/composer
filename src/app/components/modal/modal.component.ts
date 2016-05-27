@@ -5,12 +5,12 @@ import {
     ComponentResolver,
     ViewContainerRef,
     ComponentFactory } from '@angular/core';
-import { 
+import {
     NgStyle,
     FORM_DIRECTIVES } from '@angular/common';
 import { PromiseWrapper } from '@angular/common/src/facade/async';
-import { 
-    ModalBuilder, 
+import {
+    ModalBuilder,
     ModalFunctionsInterface } from './builders/modal.builder.ts';
 import { InjectableModalInterface } from './interfaces/injectable-modal.interface.ts'
 require('./modal.component.scss');
@@ -52,7 +52,7 @@ export class ModalComponent {
                 <div class="modal-content">
                       
                         <div class="modal-body">
-                            <div #dynamicContentPlaceHolder></div>
+                            <template #dynamicContentPlaceHolder></template>
                         </div>
                 
                 </div>
@@ -74,7 +74,7 @@ export class ModalComponent {
             cancel: cancel,
             confirm: confirm
         };
-        
+
         return this.modalBuilder.CreateComponent(injectableModal, modalFunctions, [FORM_DIRECTIVES, NgStyle]);
     }
 

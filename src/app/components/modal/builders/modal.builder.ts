@@ -27,8 +27,8 @@ export class ModalBuilder {
 
         class CustomDynamicComponentModal implements OnInit, DynamicDataInterface {
             public data:any;
-            public confirm:any;
-            public cancel:any;
+            public confirm:Function;
+            public cancel:Function;
 
             // reference for a <div> with #
             @ViewChild(injectableModal.viewContainerRefName, {read: ViewContainerRef})
@@ -39,11 +39,16 @@ export class ModalBuilder {
 
             /* Add other types of modals here */
             public ngOnInit() {
-                this.componentResolver.resolveComponent(injectableModal.modalComponent)
+                this.injectComponent();
+            }
+
+            injectComponent() {
+                return this.componentResolver.resolveComponent(injectableModal.modalComponent)
                     .then((factory:ComponentFactory<DynamicDataInterface>) => {
                         // Instantiates a single {@link Component} and inserts its Host View
                         // into this container at the specified `index`
-                        let dynamicComponent = this.dynamicComponentTarget.createComponent(factory, 0);
+
+                        let dynamicComponent = this.dynamicComponentTarget.createComponent(factory);
 
                         // and here we have access to our dynamic component
                         let component:DynamicDataInterface = dynamicComponent.instance;
@@ -58,7 +63,7 @@ export class ModalBuilder {
             cancel = modalFunctions.cancel.bind(this);
             result:any;
         }
-
+        
         return CustomDynamicComponentModal;
     }
 }
