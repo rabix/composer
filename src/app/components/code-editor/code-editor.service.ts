@@ -6,23 +6,30 @@ import Editor = AceAjax.Editor;
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import {ACE_MODES_MAP} from "./code-editor-modes-map";
+import {FileChangeEvent} from "../../services/file-registry.service";
 
 export class CodeEditor {
     editor: Editor;
     session: IEditSession;
     document: Document;
 
+    fileIsLoading: boolean;
+
     private subscriptions: Subscription[] = [];
 
     text: string;
 
-    textStream: Observable<string> = new BehaviorSubject(null);
-    changeStream: Observable<any>  = new Subject();
+    textStream: BehaviorSubject<FileChangeEvent>;
+    changeStream: Observable<any> = new Subject();
 
     constructor(editor: Editor) {
         this.editor   = editor;
+        // to disable a warning message from ACE about a deprecated method
+        this.editor.$blockScrolling = Infinity;
         this.session  = editor.getSession();
         this.document = this.session.getDocument();
+
+        this.fileIsLoading = true;
 
         this.setTheme('twilight');
         this._attachEventStreams();
@@ -30,19 +37,35 @@ export class CodeEditor {
 
     private _attachEventStreams() {
 
-        let changeSubscription = Observable.fromEventPattern(
-            (h) => {
-                this.document.on('change', (e) => {
-                    h(e);
-                });
-            }, (h) => {
-            }
-        ).subscribe(this.changeStream);
+        //noinspection TypeScriptUnresolvedFunction
+        let changeSubscription = Observable.fromEvent(this.document, 'change')
+            .map((event) => {
+                console.log(event);
+                return <FileChangeEvent> {
+                    source: 'ACE_EDITOR',
+                    content: this.document.getValue()
+                };
+            }).subscribe((event) => {
+                this.textStream.next(event);
+            });
 
         this.subscriptions.push(changeSubscription);
     }
 
-    public setText(text: string): void {
+    public setTextStream(textStream: BehaviorSubject<FileChangeEvent>): void {
+        this.textStream = textStream;
+
+        this.textStream.filter((event) => {
+            return event.content !== null && event.source !== "ACE_EDITOR";
+        }).map((event) => {
+            return event.content
+        }).subscribe((content) => {
+            this.setText(content);
+            this.fileIsLoading = false;
+        });
+    }
+
+    private setText(text: string): void {
         this.document.setValue(text);
     }
 

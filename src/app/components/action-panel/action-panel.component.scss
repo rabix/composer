@@ -7,6 +7,6 @@ action-panel {
     display: block;
     font-family: "Montserrat", sans-serif;
     height: $action-bar-height;
-    margin-bottom: 2px;
+    border-bottom: 1px solid $body-bg;
 }
 

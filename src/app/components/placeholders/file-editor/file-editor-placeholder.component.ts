@@ -8,7 +8,7 @@ require("./file-editor-placeholder.component.scss");
             <div class="vertically-aligned-cell">
                 <i class="fa fa-5x fa-hand-o-left text-muted file-placeholder-hand"></i>
                 <p class="placeholder-title">
-                    Open a file by double-clicking on it's name in the navigation menu.
+                    Open a file by double-clicking on its name in the navigation menu.
                 </p>
             </div>
        </div>

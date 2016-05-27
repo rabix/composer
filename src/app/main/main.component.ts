@@ -11,6 +11,7 @@ import {AsyncSocketProviderService} from "../components/file-tree/async-socket-p
 import {FileTreeService} from "../components/file-tree/file-tree-service";
 import {WorkspaceService} from "../components/workspace/workspace.service";
 import {ComponentRegistryFactoryService} from "../components/workspace/registry/component-registry-factory.service";
+import {FileRegistry} from "../services/file-registry.service";
 
 require("./../../assets/sass/main.scss");
 require("./main.component.scss");
@@ -30,6 +31,7 @@ require("./main.component.scss");
         AsyncSocketProviderService,
         ComponentRegistryFactoryService,
         FileApi,
+        FileRegistry,
         FileTreeService,
         provide(APP_CONFIG, {useValue: CONFIG}),
         SocketService,
