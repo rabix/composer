@@ -1,5 +1,26 @@
 @import "~bootstrap/scss/variables";
 
-$color-gray-base: rgb(51, 51, 51);
+$gui-base-gray: rgb(51, 51, 51);
 $body-bg: #000;
+$body-color: ghostwhite;
+
+/**
+* Layout Size Variables
+*/
 $action-bar-height: 50px;
+$sidebar-width: 70px;
+
+/**
+* Modal Variables
+*/
+$modal-header-border-color: rgba(0,0,0,.3);
+$modal-footer-border-color: $modal-header-border-color;
+$modal-content-bg: $gui-base-gray;
+$modal-content-color: $body-color;
+
+/**
+* Form Variables
+*/
+
+$input-bg: #ccc;
+$input-color-placeholder:#333;

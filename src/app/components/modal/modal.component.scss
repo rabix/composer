@@ -1,10 +1,12 @@
+@import '../../../assets/sass/variables';
+@import '../../../assets/sass/mixins';
+
+
 .modal {
-    color: #000000;
+    color: $modal-content-color;
     position: fixed;
-    border: 2px solid #eee;
-    border-radius: 4px;
-    background-color: #fff;
-    padding:15px;
+    border-radius: $border-radius;
+    background-color: $modal-content-bg;
     left:50%;
     top:35%;
     -webkit-transform: translate(-50%, -50%);
@@ -51,4 +53,60 @@
 
 .modal-buttonbar button {
     margin-left:6px;
+}
+
+// Modal header
+// Top section of the modal w/ title and dismiss
+.modal-header {
+    padding: $modal-title-padding;
+    border-bottom: 1px solid $modal-header-border-color;
+    @include clearfix;
+}
+
+// Modal body
+// Where all modal content resides (sibling of .modal-header and .modal-footer)
+.modal-body {
+    position: relative;
+    padding: $modal-inner-padding;
+}
+
+// Footer (for actions)
+.modal-footer {
+    padding: $modal-inner-padding;
+    text-align: right; // right align buttons
+    border-top: 1px solid $modal-footer-border-color;
+    @include clearfix(); // clear it in case folks use .pull-* classes on buttons
+
+    // Properly space out buttons
+    .btn + .btn {
+        margin-bottom: 0; // account for input[type="submit"] which gets the bottom margin like all other inputs
+        margin-left: 5px;
+    }
+    // but override that for button groups
+    .btn-group .btn + .btn {
+        margin-left: -1px;
+    }
+    // and override it for block buttons as well
+    .btn-block + .btn-block {
+        margin-left: 0;
+    }
+}
+
+
+// Scale up the modal
+@include media-breakpoint-up(sm) {
+    // Automatically set modal's width for larger viewports
+    .modal-dialog {
+        width: $modal-md;
+    }
+    .modal-content {
+        @include box-shadow(0 5px 15px rgba(0,0,0,.5));
+    }
+
+    // Modal sizes
+    .modal-sm { width: $modal-sm; }
+}
+
+@include media-breakpoint-up(md) {
+    .modal-lg { width: $modal-lg; }
 }
