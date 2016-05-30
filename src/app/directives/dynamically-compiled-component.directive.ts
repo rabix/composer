@@ -1,4 +1,4 @@
-import {Directive, ViewContainerRef, Input, ComponentFactory, Injector} from "@angular/core";
+import {Directive, ViewContainerRef, Input, ComponentFactory, Injector, OnInit} from "@angular/core";
 
 @Directive({
     selector: "[dynamicallyCompiled]",
