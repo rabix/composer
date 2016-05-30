@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewContainerRef, ViewChild, ComponentResolver, ComponentFactory, ComponentRef, Injectable} from "@angular/core";
+import {Component, OnInit, ViewContainerRef, ViewChild, ComponentResolver, ComponentFactory, ComponentRef, Injectable, Injector} from "@angular/core";
 import {InjectableModalInterface} from '../interfaces/injectable-modal.interface.ts';
 
 export interface DynamicDataInterface {
@@ -17,7 +17,8 @@ export class ModalBuilder {
 
     public CreateComponent(injectableModal: InjectableModalInterface,
                            modalFunctions: ModalFunctionsInterface,
-                           injectDirectives: any[]): any {
+                           injectDirectives: any[], 
+                           injector?: Injector): any {
 
         @Component({
             selector: injectableModal.selector,
@@ -47,8 +48,7 @@ export class ModalBuilder {
                     .then((factory:ComponentFactory<DynamicDataInterface>) => {
                         // Instantiates a single {@link Component} and inserts its Host View
                         // into this container at the specified `index`
-
-                        let dynamicComponent = this.dynamicComponentTarget.createComponent(factory);
+                        let dynamicComponent = this.dynamicComponentTarget.createComponent(factory, null, injector);
 
                         // and here we have access to our dynamic component
                         let component:DynamicDataInterface = dynamicComponent.instance;

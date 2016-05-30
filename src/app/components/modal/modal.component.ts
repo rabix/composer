@@ -4,7 +4,7 @@ import {
     Injectable,
     ComponentResolver,
     ViewContainerRef,
-    ComponentFactory } from '@angular/core';
+    ComponentFactory, Injector } from '@angular/core';
 import {
     NgStyle,
     FORM_DIRECTIVES } from '@angular/common';
@@ -24,11 +24,11 @@ export class ModalComponent {
     confirm: Function;
     cancel: Function;
     modalComponent:any;
+    
+    injector: Injector;
 
     data: any;
-    width:number = 250;
-    height:number = 150;
-
+    
     constructor(private app:ApplicationRef,
                 private resolver: ComponentResolver,
                 private modalBuilder: ModalBuilder) { }
@@ -38,24 +38,17 @@ export class ModalComponent {
         let cancel = this.cancel;
 
         let modalComponent:any = this.modalComponent;
-
-        let width:string = this.width + 'px';
-        let height:string = this.height + 'px';
-
+        
+        let modalInjector = this.injector;
+        
         let data:any = this.data;
 
         let template:string = `
         <div class="modal-background" (click)="cancel()">
-        <div id="modalDiv" class="modal" (click)="$event.stopPropagation()" [ngStyle]="{'width':'` + width + `', 'height':'` + height + `'}">
+        <div id="modalDiv" class="modal" (click)="$event.stopPropagation()">
      
                 <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                      
-                        <div class="modal-body">
-                            <template #dynamicContentPlaceHolder></template>
-                        </div>
-                
-                </div>
+                    <template class="modal-content" #dynamicContentPlaceHolder></template>
                 </div>
         
         </div>
@@ -75,7 +68,7 @@ export class ModalComponent {
             confirm: confirm
         };
 
-        return this.modalBuilder.CreateComponent(injectableModal, modalFunctions, [FORM_DIRECTIVES, NgStyle]);
+        return this.modalBuilder.CreateComponent(injectableModal, modalFunctions, [FORM_DIRECTIVES, NgStyle], modalInjector);
     }
 
     show() : Promise<any> {

@@ -1,9 +1,10 @@
 @import "bootstrap-pack";
 @import "variables";
+@import "mixins";
 @import "resets";
 @import "utils";
 @import "~font-awesome/scss/font-awesome";
-@import "../../app/components/common/loading-spinner/loading-spinner.component";
+@import "../../app/components/block-loader/block-loader.component";
 
 html, body {
   width: 100%;

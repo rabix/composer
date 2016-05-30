@@ -1,11 +1,8 @@
-import {Component, Input, OnInit} from "@angular/core";
-import * as _ from "lodash";
+import {Component, Input, OnInit, Injector} from "@angular/core";
 import {ActionButtonComponent} from "./action-button.component";
 import {ModalComponent} from "../../modal/modal.component";
-import {NewFileModalComponent} from "../new-file-modal.component"
-
+import {NewFileModalComponent} from "../new-file-modal.component";
 import {FileApi} from "../../../services/api/file.api";
-import {HttpError, FilePath} from "../../../services/api/api-response-types";
 
 @Component({
     selector: 'new-file-button',
@@ -26,60 +23,16 @@ export class NewFileButtonComponent implements OnInit {
              selectedType: any;
              loading: boolean;
 
-    constructor(private modal: ModalComponent, private fileApi: FileApi) {
-        this.fileTypes = [{
-            id: '.json',
-            name: 'JSON'
-        }, {
-            id: '.yaml',
-            name: 'YAML'
-        }, {
-            id: '.js',
-            name: 'JavaScript'
-        }];
-
-        this.selectedType = this.fileTypes[0];
-
-        this.loading = true;
+    constructor(private modal: ModalComponent, private fileApi: FileApi, private injector: Injector) {
+        
     }
 
     /**
      * Opens new file modal
      */
     openModal(): void {
-        this.modal.show().then((result) => {
-            // turn on loading
-            if (!result) {
-                return;
-            }
-
-            let fileName = result.fileName;
-            let ext      = result.selectedType.id;
-
-            // IF: file already has an extension
-            if ('.' + _.last(fileName.split('.')) === ext) {
-                // remove extension
-                fileName = fileName.split('.').slice(0, -1).join('.');
-            }
-
-            let filePath = fileName + ext;
-
-            // create file
-            this.fileApi.createFile(filePath).subscribe((next: HttpError|FilePath) => {
-                
-                // IF: file exists
-                if ((<HttpError> next).statusCode === 403) {
-                    // prompt user that file already exists
-                    console.log('File already exists');
-                } else {
-                    console.log('something else went wrong...?');
-                }
-
-            }, (dismiss) => {
-
-            });
-
-        });
+        // result should just be final result, like file to open
+        this.modal.show();
     }
 
     ngOnInit() {
@@ -89,13 +42,16 @@ export class NewFileButtonComponent implements OnInit {
     initModal() {
 
         this.modal.modalComponent = NewFileModalComponent;
-        this.modal.width = 350;
-        this.modal.height = 300;
+
+        // so the modalComponent can resolve dependencies in the same tree
+        // as the component initiating it
+        this.modal.injector = this.injector;
 
         this.modal.data = {
             fileName: '',
             fileTypes: this.fileTypes,
             selectedType: this.selectedType,
+            isCreatingFile: false
         };
 
         this.modal.cancel = function() {

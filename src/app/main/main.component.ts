@@ -74,6 +74,12 @@ export class MainComponent {
         // }, err => {
         //     console.log(err);
         // });
+        //
+        // fileApi.checkIfFileExists('wagner-workflow.json').subscribe(res => {
+        //     console.log(res);
+        // }, err => {
+        //     console.log(err);
+        // })
 
 
     }

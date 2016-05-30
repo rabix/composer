@@ -10,14 +10,14 @@
 
     & > editor-sidebar {
         float: left;
-        width: 70px;
+        width: $sidebar-width;
     }
 
     & > workspace {
         float: left;
         overflow: hidden;
         height: calc(100% - #{$action-bar-height});
-        width: calc(100% - 90px);
+        width: calc(100% - #{$sidebar-width});
     }
 }
 
