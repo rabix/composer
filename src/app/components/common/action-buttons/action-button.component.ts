@@ -16,8 +16,10 @@ require("./action-button.component.scss");
 export class ActionButtonComponent implements OnInit {
     @Input() title;
     @Input() iconClass;
-    @Input() buttonType;
     
+    // @TODO(mate) Remove buttonType as input, this can be a fixed value for now
+    @Input() buttonType;
+
     ngOnInit(): any {
     }
 }
