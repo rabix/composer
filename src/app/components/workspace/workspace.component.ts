@@ -36,7 +36,7 @@ export class WorkspaceComponent {
         });
 
         Observable.fromEvent(this.layout, "componentCreated")
-            .filter((event:any) => {
+            .filter((event: any) => {
                 return event.config.componentName === CodeEditorComponent
                     && event.parent.contentItems.length === 1
                     && event.parent.contentItems[0].config.componentName === FileEditorPlaceholderComponent
@@ -46,7 +46,7 @@ export class WorkspaceComponent {
             });
 
         Observable.fromEvent(this.layout, "itemDestroyed")
-            .filter((event:any) => {
+            .filter((event: any) => {
                 return event.config.componentName === CodeEditorComponent
                     && event.parent.contentItems.length === 1
             })
@@ -73,7 +73,8 @@ export class WorkspaceComponent {
         return {
             settings: {
                 hasHeaders: true,
-                reorderEnabled: true,
+                constrainDragToContainer: true,
+                reorderEnabled: false,
                 selectionEnabled: false,
                 popoutWholeStack: false,
                 showPopoutIcon: false,

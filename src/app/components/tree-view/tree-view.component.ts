@@ -3,13 +3,13 @@ import {TreeNodeComponent} from "./structure/tree-node.component";
 import "./tree-view.component.scss";
 import {AsyncPipe} from "@angular/common";
 import {DynamicallyCompiledComponentDirective} from "../../directives/dynamically-compiled-component.directive";
-import {BehaviorSubject} from "rxjs/Rx";
+import {BehaviorSubject, Observable} from "rxjs/Rx";
 import {ComponentFactoryProviderFn} from "./interfaces/tree-data-provider";
 
 @Component({
     selector: "tree-view",
     template: `
-        <template ngFor let-componentData [ngForOf]="dynamicComponents | async">
+        <template ngFor let-componentData [ngForOf]="dynamicComponentStream | async">
             
             <!--This <div class="tree-node"> exists as a CSS specificity convenience-->
             <div class="tree-node">
@@ -34,7 +34,7 @@ export class TreeViewComponent {
 
 
     private isExpanded = false;
-    private dynamicComponents;
+    private dynamicComponentStream: Observable<any>;
 
     constructor() {
         this.onDataLoad = new BehaviorSubject(null);
@@ -46,7 +46,7 @@ export class TreeViewComponent {
     }
 
     ngOnInit() {
-        this.dynamicComponents = this.dataProvider().do((data)=> {
+        this.dynamicComponentStream = this.dataProvider().do((data)=> {
             this.onDataLoad.next(data);
         });
     }

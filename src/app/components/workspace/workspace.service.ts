@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {FileTreeService} from "../file-tree/file-tree-service";
+import {FileTreeService} from "../file-tree/file-tree.service";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {FileApi} from "../../services/api/file.api";
 import {ComponentRegistry} from "./registry/component-registry";
