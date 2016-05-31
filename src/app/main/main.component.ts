@@ -1,11 +1,9 @@
 import {Component, provide} from "@angular/core";
 import {WorkspaceComponent} from "../components/workspace/workspace.component";
-import {CodeEditorComponent} from "../components/code-editor/code-editor.component";
 import {APP_CONFIG, CONFIG} from "../config/app.config";
 import {ApiService} from "../services/api/api.service";
 import {SocketService} from "../services/api/socket.service";
 import {FileApi} from "../services/api/file.api";
-import {EditorSidebarComponent} from "../components/editor-sidebar/editor-sidebar.component";
 import {ActionPanelComponent} from "../components/action-panel/action-panel.component";
 import {AsyncSocketProviderService} from "../components/file-tree/async-socket-provider.service";
 import {FileTreeService} from "../components/file-tree/file-tree.service";
@@ -14,7 +12,6 @@ import {ComponentRegistryFactoryService} from "../components/workspace/registry/
 import {FileRegistry} from "../services/file-registry.service";
 import {SocketService as NewSocketService} from "../services/data/providers/socket/socket.service";
 import {BACKEND_SERVICE} from "../services/data/providers/data.types";
-
 import {HmrState} from "angular2-hmr";
 import {DataService} from "../services/data/data.service";
 
@@ -29,7 +26,7 @@ require("./main.component.scss");
             <workspace></workspace>
         </section>
     `,
-    directives: [EditorSidebarComponent, WorkspaceComponent, CodeEditorComponent, ActionPanelComponent],
+    directives: [WorkspaceComponent, ActionPanelComponent],
     providers: [
         ApiService,
         AsyncSocketProviderService,
