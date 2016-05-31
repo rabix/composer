@@ -2,7 +2,8 @@ import {Component, Input} from "@angular/core";
 import {TreeViewNode} from "../../tree-view/interfaces/tree-view-node";
 import {TreeviewSelectableDirective} from "../../tree-view/behaviours/treeview-selectable.directive";
 import {FilePath} from "../../../services/api/api-response-types";
-import {FileTreeService} from "../file-tree-service";
+import {FileTreeService} from "../file-tree.service";
+import {HmrState} from "angular2-hmr";
 
 @Component({
     selector: "file-tree:file",
@@ -33,5 +34,7 @@ export class FileNodeComponent implements TreeViewNode {
     onDoubleClick() {
         this.fileTreeService.openFile(this.model);
     }
+
+    @HmrState() _state = { };
 
 }

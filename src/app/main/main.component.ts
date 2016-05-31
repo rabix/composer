@@ -8,10 +8,15 @@ import {FileApi} from "../services/api/file.api";
 import {EditorSidebarComponent} from "../components/editor-sidebar/editor-sidebar.component";
 import {ActionPanelComponent} from "../components/action-panel/action-panel.component";
 import {AsyncSocketProviderService} from "../components/file-tree/async-socket-provider.service";
-import {FileTreeService} from "../components/file-tree/file-tree-service";
+import {FileTreeService} from "../components/file-tree/file-tree.service";
 import {WorkspaceService} from "../components/workspace/workspace.service";
 import {ComponentRegistryFactoryService} from "../components/workspace/registry/component-registry-factory.service";
 import {FileRegistry} from "../services/file-registry.service";
+import {SocketService as NewSocketService} from "../services/data/providers/socket/socket.service";
+import {BACKEND_SERVICE} from "../services/data/providers/data.types";
+
+import {HmrState} from "angular2-hmr";
+import {DataService} from "../services/data/data.service";
 
 require("./../../assets/sass/main.scss");
 require("./main.component.scss");
@@ -20,7 +25,6 @@ require("./main.component.scss");
     selector: "cottontail",
     template: `
         <section class="editor-container">
-            <editor-sidebar></editor-sidebar>
             <action-panel></action-panel>
             <workspace></workspace>
         </section>
@@ -34,13 +38,17 @@ require("./main.component.scss");
         FileRegistry,
         FileTreeService,
         provide(APP_CONFIG, {useValue: CONFIG}),
+        provide(BACKEND_SERVICE, {useClass: NewSocketService}),
         SocketService,
-        WorkspaceService
+        WorkspaceService,
+        DataService,
     ]
 })
 export class MainComponent {
 
-    constructor(fileApi: FileApi) {
+    @HmrState() _state = {};
+
+    constructor() {
         /**
          * Example API usage
          */

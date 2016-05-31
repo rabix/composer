@@ -15,10 +15,10 @@ export class SocketService {
     private connection: Observable<SocketMessage>;
 
     private connectionTimeout = 10000;
-    
+
     constructor(@Inject(APP_CONFIG) private config: AppConfig) {
 
-        let host      = `http://${config.hostname}:${config.port}`;
+        let host        = `http://${config.hostname}:${config.port}`;
         this.connection = this.createConnectionStream(host);
     }
 
@@ -28,7 +28,7 @@ export class SocketService {
 
     public request(eventName: string, data: any = {}): Observable<any> {
 
-        let sub = this.connection.startWith("Start").subscribe(_ => true);
+        let sub = this.connection.startWith("").subscribe(_ => true);
 
         return Observable.create((obs: Observer<any>)=> {
             this.ioSocket.emit(eventName, data, (data)=> {
