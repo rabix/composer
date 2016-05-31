@@ -50,7 +50,7 @@ module.exports = webpackMerge(commonConfig, {
      * See: http://webpack.github.io/docs/configuration.html#devtool
      * See: https://github.com/webpack/docs/wiki/build-performance#sourcemaps
      */
-    devtool: 'source-map',
+    devtool: 'eval-cheap-module-source-map',
 
     /**
      * Options affecting the output of the compilation.
@@ -123,11 +123,11 @@ module.exports = webpackMerge(commonConfig, {
      *
      * See: https://github.com/wbuchwalter/tslint-loader
      */
-    tslint: {
-        emitErrors: false,
-        failOnHint: false,
-        resourcePath: 'src'
-    },
+    // tslint: {
+    //     emitErrors: false,
+    //     failOnHint: false,
+    //     resourcePath: 'src'
+    // },
 
     /**
      * Webpack Development Server configuration
