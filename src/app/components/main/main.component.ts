@@ -1,21 +1,20 @@
-import {Component, provide} from "@angular/core";
-import {WorkspaceComponent} from "../components/workspace/workspace.component";
-import {APP_CONFIG, CONFIG} from "../config/app.config";
-import {ApiService} from "../services/api/api.service";
-import {SocketService} from "../services/api/socket.service";
-import {FileApi} from "../services/api/file.api";
-import {ActionPanelComponent} from "../components/action-panel/action-panel.component";
-import {AsyncSocketProviderService} from "../components/file-tree/async-socket-provider.service";
-import {FileTreeService} from "../components/file-tree/file-tree.service";
-import {WorkspaceService} from "../components/workspace/workspace.service";
-import {ComponentRegistryFactoryService} from "../components/workspace/registry/component-registry-factory.service";
-import {FileRegistry} from "../services/file-registry.service";
-import {SocketService as NewSocketService} from "../services/data/providers/socket/socket.service";
-import {BACKEND_SERVICE} from "../services/data/providers/data.types";
-import {HmrState} from "angular2-hmr";
-import {DataService} from "../services/data/data.service";
 
-require("./../../assets/sass/main.scss");
+import {WorkspaceComponent} from "../workspace/workspace.component";
+import {ActionPanelComponent} from "../action-panel/action-panel.component";
+import {ApiService} from "../../services/api/api.service";
+import {AsyncSocketProviderService} from "../file-tree/async-socket-provider.service";
+import {ComponentRegistryFactoryService} from "../workspace/registry/component-registry-factory.service";
+import {FileApi} from "../../services/api/file.api";
+import {FileRegistry} from "../../services/file-registry.service";
+import {FileTreeService} from "../file-tree/file-tree.service";
+import {APP_CONFIG, CONFIG} from "../../config/app.config";
+import {BACKEND_SERVICE} from "../../services/data/providers/data.types";
+import {SocketService as NewSocketService} from "../../services/data/providers/socket/socket.service";
+import {WorkspaceService} from "../workspace/workspace.service";
+import {DataService} from "../../services/data/data.service";
+import {SocketService} from "../../services/api/socket.service";
+import {provide, Component} from "@angular/core";
+require("./../../../assets/sass/main.scss");
 require("./main.component.scss");
 
 @Component({
@@ -42,8 +41,6 @@ require("./main.component.scss");
     ]
 })
 export class MainComponent {
-
-    @HmrState() _state = {};
 
     constructor() {
         /**

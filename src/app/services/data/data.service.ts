@@ -3,6 +3,9 @@ import {Subject, Observable} from "rxjs/Rx";
 import {DataRequest, DataResponse} from "./data.types";
 import {BACKEND_SERVICE, BackendService} from "./providers/data.types";
 
+/**
+ * @TODO(ivanb) Make DataNotification be like DataResponse without the request
+ */
 @Injectable()
 export class DataService {
 

@@ -3,7 +3,7 @@
  */
 import {bootstrap} from "@angular/platform-browser-dynamic";
 import {HTTP_PROVIDERS} from "@angular/http";
-import {MainComponent} from "./app/main/main.component";
+import {MainComponent} from "./app/components/main/main.component";
 import {COMMON_PIPES} from "@angular/common";
 import {ModalBuilder} from "./app/components/modal/builders/modal.builder.ts";
 /*
