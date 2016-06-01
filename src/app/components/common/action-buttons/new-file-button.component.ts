@@ -1,8 +1,7 @@
-import {Component, Input, OnInit, Injector} from "@angular/core";
+import {Component, Input, OnInit, Injector, ComponentResolver, ComponentFactory} from "@angular/core";
 import {ActionButtonComponent} from "./action-button.component";
 import {ModalComponent} from "../../modal/modal.component";
 import {NewFileModalComponent} from "../new-file-modal.component";
-import {FileApi} from "../../../services/api/file.api";
 
 @Component({
     selector: 'new-file-button',
@@ -23,10 +22,7 @@ export class NewFileButtonComponent implements OnInit {
              selectedType: any;
              loading: boolean;
 
-    constructor(private modal: ModalComponent, private fileApi: FileApi, private injector: Injector) {
-        
-    }
-
+    constructor(private modal: ModalComponent, private injector: Injector, private resolver: ComponentResolver) { }
     /**
      * Opens new file modal
      */
@@ -41,7 +37,10 @@ export class NewFileButtonComponent implements OnInit {
 
     initModal() {
 
-        this.modal.modalComponent = NewFileModalComponent;
+        this.resolver.resolveComponent(NewFileModalComponent)
+            .then((factory:ComponentFactory) => {
+                this.modal.factory = factory;
+            });
 
         // so the modalComponent can resolve dependencies in the same tree
         // as the component initiating it

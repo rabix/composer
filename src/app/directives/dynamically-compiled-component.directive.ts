@@ -1,29 +1,36 @@
-import {Directive, ViewContainerRef, Input, ComponentFactory, Injector, OnInit} from "@angular/core";
+import {Directive, ViewContainerRef, Input, ComponentFactory, Injector, OnInit, ComponentRef} from "@angular/core";
 
 @Directive({
     selector: "[dynamicallyCompiled]",
-    inputs: [
-        "factory:dynamicallyCompiled",
-        "model:model",
-        "injector:injector"
-    ]
-
 })
-export class DynamicallyCompiledComponentDirective {
+export class DynamicallyCompiledComponentDirective implements OnInit {
+    private cancel() {};
+    private confirm() {};
+    private cref:ComponentRef;
+    private result:any;
 
-    private model;
-    private factory: ComponentFactory<any>;
-    private injector: Injector = null;
+    @Input() model: any;
+    @Input() dynamicallyCompiled: ComponentFactory<any>;
+    
+    @Input() injector: Injector;
+    @Input() functions: any;
 
-    constructor(private viewContainer: ViewContainerRef) {
+    constructor(private viewContainer: ViewContainerRef) { }
 
-    }
+    ngOnInit() {
+        console.log('dynamicallyCompiled ' + this.dynamicallyCompiled);
 
-    @Input() set dynamicallyCompiled(comp: ComponentFactory<any>) {
         this.viewContainer.clear();
 
-        //noinspection TypeScriptUnresolvedVariable
-        this.viewContainer.createComponent(comp, null, this.injector).instance.model = this.model;
+        let component = this.viewContainer.createComponent(this.dynamicallyCompiled, null, this.injector).instance;
+        component.model = this.model;
 
+        this.cref = this.model.cref;
+        this.result = this.model.result;
+
+        if (this.functions) {
+            component.confirm = this.functions.confirm.bind(this);
+            component.cancel = this.functions.cancel.bind(this);
+        }
     }
 }

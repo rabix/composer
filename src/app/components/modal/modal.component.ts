@@ -4,79 +4,69 @@ import {
     Injectable,
     ComponentResolver,
     ViewContainerRef,
-    ComponentFactory, Injector } from '@angular/core';
-import {
-    NgStyle,
-    FORM_DIRECTIVES } from '@angular/common';
+    ComponentFactory, Injector, Input} from '@angular/core';
 import { PromiseWrapper } from '@angular/common/src/facade/async';
-import {
-    ModalBuilder,
-    ModalFunctionsInterface } from './builders/modal.builder.ts';
-import { InjectableModalInterface } from './interfaces/injectable-modal.interface.ts'
+import {DynamicallyCompiledComponentDirective} from "../../directives/dynamically-compiled-component.directive";
+import {NewFileModalComponent} from "../common/new-file-modal.component";
 require('./modal.component.scss');
 
-
 @Injectable()
-@Component({
-    providers: [ModalBuilder]
-})
 export class ModalComponent {
     confirm: Function;
     cancel: Function;
-    modalComponent:any;
-    
+
+    factory: any;
     injector: Injector;
-
     data: any;
-    
+
     constructor(private app:ApplicationRef,
-                private resolver: ComponentResolver,
-                private modalBuilder: ModalBuilder) { }
+                private resolver: ComponentResolver) { }
 
-    toComponent() : Function {
-        let confirm = this.confirm;
-        let cancel = this.cancel;
-
-        let modalComponent:any = this.modalComponent;
-        
-        let modalInjector = this.injector;
-        
-        let data:any = this.data;
-
-        let template:string = `
-        <div class="modal-background" (click)="cancel()">
-        <div id="modalDiv" class="modal" (click)="$event.stopPropagation()">
-     
-                <div class="modal-dialog" role="document">
-                    <template class="modal-content" #dynamicContentPlaceHolder></template>
-                </div>
-        
-        </div>
-        </div>
-        `;
-
-        let injectableModal:InjectableModalInterface = {
-            selector: 'modal',
-            containerTemplate: template,
-            viewContainerRefName: 'dynamicContentPlaceHolder',
-            modalComponent: modalComponent,
-            data: data
+    toComponent() {
+        let factory = this.factory;
+        let data = this.data;
+        let functions = {
+                cancel: this.cancel,
+                confirm: this.confirm
         };
 
-        let modalFunctions:ModalFunctionsInterface = {
-            cancel: cancel,
-            confirm: confirm
-        };
+        @Component({
+            selector: 'container',
+            directives: [DynamicallyCompiledComponentDirective, NewFileModalComponent],
+            template:`
+            <div class="modal-background" (click)="cancel()">
+            <div id="modalDiv" class="modal" (click)="$event.stopPropagation()">
+                    <div class="modal-dialog" role="document">
+                          <template class="tree-node" 
+                              [dynamicallyCompiled]="modalFactory" 
+                              [model]="modalData" 
+                              [functions]="modalFunctions">
+                          </template>
+                    </div>
+            </div>
+            </div>
+            `
+        })
+        class Container {
+            @Input() public modalFactory: any = factory;
+            @Input() public modalData: any = data;
+            @Input() public modalFunctions: any = functions;
+        }
 
-        return this.modalBuilder.CreateComponent(injectableModal, modalFunctions, [FORM_DIRECTIVES, NgStyle], modalInjector);
+        return Container;
     }
 
-    show() : Promise<any> {
+    show(): Promise<any> {
         // Top level hack
         let viewContainerRef:ViewContainerRef = this.app['_rootComponents'][0]['_hostElement'].vcRef;
 
         // Set up the promise to return.
         let promiseWrapper:any = PromiseWrapper.completer();
+
+        let functions = {
+            cancel: this.cancel,
+            confirm: this.confirm
+        };
 
         this.resolver
             .resolveComponent(this.toComponent())
@@ -84,11 +74,15 @@ export class ModalComponent {
                 let dynamicComponent = viewContainerRef.createComponent(factory, 0);
                 let component = dynamicComponent.instance;
 
+                component.cancel = functions.cancel.bind(component);
+
                 // Assign the cref to the newly created modal so it can self-destruct correctly.
                 component.cref = dynamicComponent;
+                this.data.cref = dynamicComponent;
 
                 // Assign the promise to resolve.
                 component.result = promiseWrapper;
+                this.data.result = promiseWrapper;
             });
 
         return promiseWrapper.promise;

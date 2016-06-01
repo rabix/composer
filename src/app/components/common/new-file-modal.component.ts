@@ -1,4 +1,4 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, OnInit, provide} from "@angular/core";
 import {
     NgStyle,
     Control,
@@ -9,11 +9,13 @@ import {
 } from "@angular/common";
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {HttpError, FilePath} from "../../services/api/api-response-types";
+import {SocketService} from "../../services/api/socket.service";
 import {FileApi} from "../../services/api/file.api";
 import * as _ from "lodash";
-
+import {APP_CONFIG, CONFIG} from "../../config/app.config";
 
 @Component({
+    providers:[FileApi, SocketService, provide(APP_CONFIG, {useValue: CONFIG})],
     selector: 'new-file-modal',
     directives: [NgStyle, BlockLoaderComponent, FORM_DIRECTIVES],
     templateUrl: 'app/components/common/new-file-modal.component.html'
