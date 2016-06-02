@@ -1,36 +1,37 @@
 import {Directive, ViewContainerRef, Input, ComponentFactory, Injector, OnInit, ComponentRef} from "@angular/core";
 
+export interface ModalFunctionsInterface {
+    cancel:Function,
+    confirm:Function
+}
+
 @Directive({
     selector: "[dynamicallyCompiled]",
 })
 export class DynamicallyCompiledComponentDirective implements OnInit {
-    private cancel() {};
-    private confirm() {};
     private cref:ComponentRef;
     private result:any;
 
     @Input() model: any;
     @Input() dynamicallyCompiled: ComponentFactory<any>;
-    
+
     @Input() injector: Injector;
-    @Input() functions: any;
+    @Input() modalFunctions: ModalFunctionsInterface;
 
     constructor(private viewContainer: ViewContainerRef) { }
 
     ngOnInit() {
-        console.log('dynamicallyCompiled ' + this.dynamicallyCompiled);
-
         this.viewContainer.clear();
 
         let component = this.viewContainer.createComponent(this.dynamicallyCompiled, null, this.injector).instance;
         component.model = this.model;
 
-        this.cref = this.model.cref;
-        this.result = this.model.result;
+        this.cref = this.model.cref ? this.model.cref : null;
+        this.result = this.model.result ? this.model.result : null;
 
-        if (this.functions) {
-            component.confirm = this.functions.confirm.bind(this);
-            component.cancel = this.functions.cancel.bind(this);
+        if (this.modalFunctions) {
+            component.confirm = this.modalFunctions.confirm.bind(this);
+            component.cancel = this.modalFunctions.cancel.bind(this);
         }
     }
 }

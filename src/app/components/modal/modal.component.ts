@@ -6,15 +6,16 @@ import {
     ViewContainerRef,
     ComponentFactory, Injector, Input} from '@angular/core';
 import { PromiseWrapper } from '@angular/common/src/facade/async';
-import {DynamicallyCompiledComponentDirective} from "../../directives/dynamically-compiled-component.directive";
+import {
+    DynamicallyCompiledComponentDirective,
+    ModalFunctionsInterface
+} from "../../directives/dynamically-compiled-component.directive";
 import {NewFileModalComponent} from "../common/new-file-modal.component";
 require('./modal.component.scss');
 
 @Injectable()
 export class ModalComponent {
-    confirm: Function;
-    cancel: Function;
-
+    functions: ModalFunctionsInterface;
     factory: any;
     injector: Injector;
     data: any;
@@ -25,10 +26,7 @@ export class ModalComponent {
     toComponent() {
         let factory = this.factory;
         let data = this.data;
-        let functions = {
-                cancel: this.cancel,
-                confirm: this.confirm
-        };
+        let functions = this.functions;
 
         @Component({
             selector: 'container',
@@ -40,7 +38,7 @@ export class ModalComponent {
                           <template class="tree-node" 
                               [dynamicallyCompiled]="modalFactory" 
                               [model]="modalData" 
-                              [functions]="modalFunctions">
+                              [modalFunctions]="modalFunctions">
                           </template>
                     </div>
             </div>
@@ -63,18 +61,13 @@ export class ModalComponent {
         // Set up the promise to return.
         let promiseWrapper:any = PromiseWrapper.completer();
 
-        let functions = {
-            cancel: this.cancel,
-            confirm: this.confirm
-        };
-
         this.resolver
             .resolveComponent(this.toComponent())
             .then((factory: ComponentFactory<any>) => {
                 let dynamicComponent = viewContainerRef.createComponent(factory, 0);
                 let component = dynamicComponent.instance;
 
-                component.cancel = functions.cancel.bind(component);
+                component.cancel =this.functions.cancel.bind(component);
 
                 // Assign the cref to the newly created modal so it can self-destruct correctly.
                 component.cref = dynamicComponent;

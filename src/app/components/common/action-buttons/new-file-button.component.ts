@@ -53,16 +53,17 @@ export class NewFileButtonComponent implements OnInit {
             isCreatingFile: false
         };
 
-        this.modal.cancel = function() {
-            this.cref.destroy();
-            // By rejecting, the show must catch the error. So by resolving,
-            // it can be ignored silently in case the result is unimportant.
-            this.result.resolve();
-        };
-
-        this.modal.confirm = function(data) {
-            this.cref.destroy();
-            this.result.resolve(data);
-        };
+        this.modal.functions = {
+            cancel: function() {
+                this.cref.destroy();
+                // By rejecting, the show must catch the error. So by resolving,
+                // it can be ignored silently in case the result is unimportant.
+                this.result.resolve();
+            },
+            confirm: function(data) {
+                this.cref.destroy();
+                this.result.resolve(data);
+            }
+        }
     }
 }
