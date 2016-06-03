@@ -6,6 +6,7 @@ import {TreeviewExpandableDirective} from "../../tree-view/behaviours/treeview-e
 import {FileTreeService} from "../file-tree.service";
 import {TreeViewComponent} from "../../tree-view/tree-view.component";
 import {HmrState} from "angular2-hmr";
+import {DirectoryModel} from "../../../store/models/fs.models";
 
 @Component({
     selector: "file-tree:directory",
@@ -33,7 +34,7 @@ import {HmrState} from "angular2-hmr";
 })
 export class DirectoryNodeComponent implements TreeViewNode {
 
-    @Input() model: FilePath;
+    @Input() model: DirectoryModel;
     private isExpandable = true;
     private isExpanded   = false;
 
@@ -44,8 +45,9 @@ export class DirectoryNodeComponent implements TreeViewNode {
     }
 
     ngOnInit() {
-        this.isExpandable   = !this.model.isEmpty;
-        this.dataProviderFn = this.fileTreeService.createDataProviderForDirectory(this.model.absolutePath);
+        this.isExpandable   = !this.model.hasChildren();
+        this.dataProviderFn = this.fileTreeService
+            .createDataProviderForDirectory(this.model.getAbsolutePath());
     }
 
     public toggleExpansion(isExpanded) {

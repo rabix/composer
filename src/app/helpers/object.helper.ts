@@ -35,10 +35,11 @@ export class ObjectHelper {
      * @param target
      * @param source
      * @returns {Object}
+     * @link ObjectHelper-addEnumerablesTest
      */
     public static addEnumerables(target: Object, source: Object): void {
-        for (let key in Object.keys(source)) {
-            if (target.hasOwnProperty(key)) {
+        for (let key of Object.keys(source)) {
+            if (target.propertyIsEnumerable(key)) {
                 target[key] = source[key];
             }
         }

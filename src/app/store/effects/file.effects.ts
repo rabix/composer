@@ -15,7 +15,7 @@ export class FileEffects {
         .map((update: StateUpdate) => update.action.payload)
         .switchMap(path => this.files.getDirContent(path).map(content => ({content, path})))
         .map(content => ({
-            type: ACTIONS.STRUCTURE_UPDATE,
+            type: ACTIONS.UPDATE_DIRECTORY_CONTENT,
             payload: content
         }));
 }

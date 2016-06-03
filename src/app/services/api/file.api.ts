@@ -3,26 +3,30 @@ import {SocketService} from "./socket.service";
 import {SOCKET_REQUESTS} from "./socket-events";
 import {FilePath, HttpError} from "./api-response-types";
 import {Observable} from "rxjs/Rx";
+import {DirectoryChild, DirectoryModel, FileModel} from "../../store/models/fs.models";
 
 @Injectable()
 export class FileApi {
 
-    constructor(private socketService: SocketService) {
-
+    constructor(private socket: SocketService) {
     }
 
-    getDirContent(path: string = ""): Observable<FilePath[]|HttpError> {
-        return this.socketService.request(SOCKET_REQUESTS.DIR_CONTENT, {
-            dir: path
-        }).map(response => response.content).catch(err => {
-            console.error(err);
-            //noinspection TypeScriptUnresolvedFunction
-            return Observable.of(err);
+    /**
+     * Fetch remote directory content
+     */
+    getDirContent(path: string = ""): Observable<DirectoryChild[]> {
+        return this.socket.request(SOCKET_REQUESTS.DIR_CONTENT, {dir: path}).map(resp => {
+            return resp.content.map((item: FilePath) => {
+                if (item.type === "directory") {
+                    return DirectoryModel.createFromObject(item);
+                }
+                return FileModel.createFromObject(item);
+            });
         });
     }
 
     getFileContent(path: string): Observable<FilePath|HttpError> {
-        return this.socketService.request(SOCKET_REQUESTS.FILE_CONTENT, {
+        return this.socket.request(SOCKET_REQUESTS.FILE_CONTENT, {
             file: path
         }).map(response => response.content).catch(err => {
             console.error(err);
@@ -32,7 +36,7 @@ export class FileApi {
     }
 
     createFile(path: string, content?: string): Observable<FilePath|HttpError> {
-        return this.socketService.request(SOCKET_REQUESTS.CREATE_FILE, {
+        return this.socket.request(SOCKET_REQUESTS.CREATE_FILE, {
             file: path,
             content: content || ''
         }).map(response => response.content).catch(err => {
@@ -43,7 +47,7 @@ export class FileApi {
     }
 
     updateFile(path: string, content: string): Observable<boolean|HttpError> {
-        return this.socketService.request(SOCKET_REQUESTS.UPDATE_FILE, {
+        return this.socket.request(SOCKET_REQUESTS.UPDATE_FILE, {
             file: path,
             content: content
         }).map(response => response.content).catch(err => {
@@ -52,10 +56,10 @@ export class FileApi {
             return Observable.of(err);
         })
     }
-    
+
     checkIfFileExists(path: string): Observable<boolean|HttpError> {
         console.log('this function is being called');
-        return this.socketService.request(SOCKET_REQUESTS.FILE_EXISTS, {
+        return this.socket.request(SOCKET_REQUESTS.FILE_EXISTS, {
             path: path
         }).map(response => {
             console.log(`${path} exists`, response.content);

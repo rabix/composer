@@ -5,6 +5,8 @@ import {FilePath} from "../../services/api/api-response-types";
 import {FileNodeComponent} from "./nodes/file-node.component";
 import {DirectoryNodeComponent} from "./nodes/directory-node.component";
 import {TreeDataProvider} from "../tree-view/interfaces/tree-data-provider";
+import {DirectoryChild, DirectoryModel} from "../../store/models/fs.models";
+import {Directory} from "../../services/file-registry.service";
 
 
 @Injectable()
@@ -20,14 +22,16 @@ export class AsyncSocketProviderService implements TreeDataProvider {
             path = dir;
         }
 
-        return this.fileApi.getDirContent(path).map((items: FilePath[])=> {
+        return this.fileApi.getDirContent(path).map((items: DirectoryChild[])=> {
+
             return Observable.defer(() => {
-                return Observable.fromPromise(Promise.all(items.map((item: FilePath) => {
+
+                return Observable.fromPromise(Promise.all(items.map((item: DirectoryChild) => {
 
                     // Determine the component type
                     // This should probably be moved to a factory
                     let componentType = FileNodeComponent;
-                    if (item.type === "directory") {
+                    if (item instanceof DirectoryModel) {
                         componentType = DirectoryNodeComponent;
                     }
 

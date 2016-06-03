@@ -50,4 +50,36 @@ describe("ObjectHelper", () => {
         });
     });
 
+    /**
+     * @name ObjectHelper-addEnumerablesTest
+     */
+    describe("addEnumerables()", () => {
+        it("should add source properties that exist on the target object", () => {
+            let target = {foo: "", bar: ""};
+            let source = {bar: "baz", goo: "moo"};
+
+            ObjectHelper.addEnumerables(target, source);
+
+            expect(target).toEqual({foo: "", bar: "baz"});
+        });
+
+        it("should extend class instance properties", () => {
+            class TestClass {
+                private first    = null;
+                protected second = "moo";
+                public third     = null;
+            }
+
+            let instance = new TestClass();
+            let source   = {first: "foo", second: "bar", third: "baz"};
+
+            ObjectHelper.addEnumerables(instance, source);
+            expect((<any>instance).first).toEqual("foo");
+            expect((<any>instance).second).toEqual("bar");
+            expect((<any>instance).third).toEqual("baz");
+
+        });
+
+    });
+
 });

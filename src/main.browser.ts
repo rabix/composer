@@ -4,13 +4,9 @@
 import {bootstrap} from "@angular/platform-browser-dynamic";
 import {HTTP_PROVIDERS} from "@angular/http";
 import {MainComponent} from "./app/components/main/main.component";
-import {COMMON_PIPES, FORM_DIRECTIVES, NG_VALIDATORS, NG_ASYNC_VALIDATORS} from "@angular/common";
-import {ModalBuilder} from "./app/components/modal/builders/modal.builder.ts";
+import {COMMON_PIPES, FORM_DIRECTIVES} from "@angular/common";
 import {provideStore} from "@ngrx/store";
-import {runEffects} from "@ngrx/effects";
-import {FileEffects} from "./app/store/effects/file.effects";
 import {REDUCERS} from "./app/store/index";
-import {provide} from "@angular/core";
 /*
  * Platform and Environment
  * our providers/directives/pipes
@@ -21,7 +17,6 @@ export function main(): Promise<any> {
         COMMON_PIPES,
         FORM_DIRECTIVES,
         HTTP_PROVIDERS,
-        ModalBuilder,
         provideStore(REDUCERS)
     ]).catch(err => console.error(err));
 }
