@@ -46,7 +46,7 @@ export class SocketService implements BackendService {
      * @param eventName Name of the socket event that the server expects (HapiJS name)
      * @param data arbitrary data to send
      */
-    private request(eventName: string, data: any = {}): void {
+    private request(eventName: string, data: any = {}){
         this.io.emit(eventName, data, (data)=> {
             if (data.error) {
                 this.emits.error(data);

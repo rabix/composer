@@ -142,8 +142,8 @@ module.exports = webpackMerge(commonConfig, {
         host: METADATA.host,
         historyApiFallback: true,
         watchOptions: {
-            aggregateTimeout: 300,
-            poll: 1000
+            aggregateTimeout: 2000,
+            poll: 5000
         },
         outputPath: helpers.root('dist')
     },

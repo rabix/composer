@@ -87,8 +87,8 @@ export class WorkspaceComponent {
                     {
                         type: "component",
                         componentName: FileTreeComponent,
-                        title: "Navigation",
-                        width: 25,
+                        title: "Project Navigation",
+                        width: 30,
                         isClosable: false
                     },
                     {

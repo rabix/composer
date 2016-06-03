@@ -3,7 +3,6 @@ import {AsyncSocketProviderService} from "./async-socket-provider.service";
 import {Subject} from "rxjs/Rx";
 import {FilePath} from "../../services/api/api-response-types";
 import {DirectoryDataProviderFactory} from "./types";
-import {HmrState} from "angular2-hmr";
 
 @Injectable()
 export class FileTreeService {
@@ -43,6 +42,4 @@ export class FileTreeService {
 
         return () => this.dataProvider.getNodeContent(directory);
     }
-
-    @HmrState() _state = { };
 }

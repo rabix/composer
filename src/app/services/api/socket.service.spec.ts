@@ -57,12 +57,12 @@ describe("SocketService", () => {
     //     });
     // })));
 
-    it('...', async(inject([FileApi], (files: FileApi) => {
-
-        // @FIXME don't test against real socket connection, mock SocketService
-        files.getDirContent().subscribe((data) => {
-            console.log("Got Data", data);
-        });
-
-    })));
+    // it('...', async(inject([FileApi], (files: FileApi) => {
+    //
+    //     // @FIXME don't test against real socket connection, mock SocketService
+    //     files.getDirContent().subscribe((data) => {
+    //         console.log("Got Data", data);
+    //     });
+    //
+    // })));
 });

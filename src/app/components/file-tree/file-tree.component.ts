@@ -5,6 +5,10 @@ import {DataService} from "../../services/data/data.service";
 import {DirectoryDataProviderFactory} from "./types";
 import {FileTreeService} from "./file-tree.service";
 import {TreeViewService, TreeViewComponent} from "../tree-view";
+import {FileEffects} from "../../store/effects/file.effects";
+import {Store} from "@ngrx/store";
+import * as STORE_ACTIONS from "../../store/actions";
+import {directoryTree} from "../../store/file.reducer";
 
 require("./file-tree.component.scss");
 
@@ -24,13 +28,33 @@ export class FileTreeComponent {
     private dataProviderFn: DirectoryDataProviderFactory;
     private treeIsLoading: boolean;
 
+    private storeSubscription;
+
     constructor(private treeService: FileTreeService,
                 private injector: Injector,
-                private dataService: DataService) {
+                private store: Store,
+                private fileEffects: FileEffects) {
 
         this.treeIsLoading  = true;
         this.dataProviderFn = treeService.createDataProviderForDirectory("");
+    }
 
+    ngOnInit() {
+        // We need to react to changes on the directory structure and update the tree
+        this.storeSubscription = this.fileEffects.directoryContent$.subscribe(this.store);
+
+        // Upon the change in the directory tree, we should update the rendering
+        this.store.select("directoryTree").subscribe(tree => {
+            console.log("New Tree Structure:", tree);
+        });
+
+        // This is the main user of the directory structure, it should dispatch the first request
+        this.store.dispatch({type: STORE_ACTIONS.DIR_CONTENT_REQUEST, payload: "./"});
+
+    }
+
+    ngOnDestroy() {
+        this.storeSubscription.unsubscribe();
     }
 
     onDataLoad(data) {

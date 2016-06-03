@@ -1,4 +1,3 @@
-
 import {WorkspaceComponent} from "../workspace/workspace.component";
 import {ActionPanelComponent} from "../action-panel/action-panel.component";
 import {ApiService} from "../../services/api/api.service";
@@ -14,6 +13,8 @@ import {WorkspaceService} from "../workspace/workspace.service";
 import {DataService} from "../../services/data/data.service";
 import {SocketService} from "../../services/api/socket.service";
 import {provide, Component} from "@angular/core";
+import {FileEffects} from "../../store/effects/file.effects";
+import {StateUpdates} from "@ngrx/effects";
 require("./../../../assets/sass/main.scss");
 require("./main.component.scss");
 
@@ -38,6 +39,8 @@ require("./main.component.scss");
         SocketService,
         WorkspaceService,
         DataService,
+        FileEffects,
+        StateUpdates
     ]
 })
 export class MainComponent {
