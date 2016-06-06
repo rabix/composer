@@ -6,8 +6,6 @@ import {
     ComponentRef
 } from "@angular/core";
 import {Observable} from "rxjs/Observable";
-import {CodeEditorComponent} from "../../code-editor/code-editor.component";
-import {FileEditorPlaceholderComponent} from "../../placeholders/file-editor/file-editor-placeholder.component";
 
 
 export class ComponentRegistry {

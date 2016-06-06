@@ -1,45 +1,34 @@
 import {Injectable, Injector} from "@angular/core";
 import {AsyncSocketProviderService} from "./async-socket-provider.service";
-import {Subject} from "rxjs/Rx";
-import {FilePath} from "../../services/api/api-response-types";
 import {DirectoryDataProviderFactory} from "./types";
+import {Store} from "@ngrx/store";
+import * as STORE_ACTIONS from "../../store/actions";
+import {FileModel} from "../../store/models/fs.models";
+
 
 @Injectable()
 export class FileTreeService {
 
     private dataProvider;
 
-    /**
-     * An Observable that emits new data whenever user double-clicks on a file in the tree.
-     *
-     * Example:
-     * ```
-     *  fileTreeService.fileOpenStream.subscribe(fileInfo => fetch(fileInfo.absolutePath));
-     * ```
-     */
-    public fileOpenStream: Subject<FilePath>;
-
-
-    constructor(private injector: Injector) {
-        this.fileOpenStream = new Subject<FilePath>();
+    constructor(private injector: Injector, private store: Store) {
 
         // Injecting AsyncSocketProviderService into the constructor doesn't work at this moment
         // @TODO(ivanb) find out why this works
         this.dataProvider = injector.get(AsyncSocketProviderService);
-
-
     }
 
     /**
-     * Pushes the information about a file to open onto the `fileOpenStream`
-     * @param fileInfo
+     * Dispatches info about file being double clicked to `store`
+     * @param {FileModel} fileInfo
      */
-    public openFile(fileInfo: FilePath): void {
-        this.fileOpenStream.next(fileInfo);
+    public openFile(fileInfo: FileModel): void {
+        this.store.dispatch({type: STORE_ACTIONS.OPEN_FILE_REQUEST, payload: fileInfo});
+        this.store.dispatch({type: STORE_ACTIONS.SELECT_FILE_REQUEST, payload: fileInfo});
     }
 
     public createDataProviderForDirectory(directory = ""): DirectoryDataProviderFactory {
 
-        return () => this.dataProvider.getNodeContent(directory);
+        return <DirectoryDataProviderFactory>(() => this.dataProvider.getNodeContent(directory));
     }
 }

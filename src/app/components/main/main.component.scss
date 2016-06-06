@@ -17,7 +17,7 @@
         float: left;
         overflow: hidden;
         height: calc(100% - #{$action-bar-height});
-        width: calc(100% - #{$sidebar-width});
+        width: 100%;
     }
 }
 

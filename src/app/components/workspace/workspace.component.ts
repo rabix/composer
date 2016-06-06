@@ -7,6 +7,8 @@ import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {FileTreeComponent} from "../file-tree/file-tree.component";
 import {WorkspaceService} from "./workspace.service";
 import {FileEditorPlaceholderComponent} from "../placeholders/file-editor/file-editor-placeholder.component";
+import {Store} from "@ngrx/store";
+import * as STORE_ACTIONS from "../../store/actions";
 
 require("./workspace.component.scss");
 
@@ -22,7 +24,8 @@ export class WorkspaceComponent {
 
     constructor(private el: ElementRef,
                 private registryFactory: ComponentRegistryFactoryService,
-                private workspaceService: WorkspaceService) {
+                private workspaceService: WorkspaceService,
+                private store: Store) {
 
         this.layout   = new GoldenLayout(this.getLayoutConfig(), this.el.nativeElement);
         this.registry = registryFactory.create(this.layout);
@@ -31,10 +34,12 @@ export class WorkspaceComponent {
 
     ngOnInit() {
 
+        //noinspection TypeScriptUnresolvedFunction
         Observable.fromEvent(window, "resize").debounceTime(200).subscribe(() => {
             this.layout.updateSize(this.el.nativeElement.clientWidth, this.el.nativeElement.clientHeight);
         });
 
+        //noinspection TypeScriptUnresolvedFunction
         Observable.fromEvent(this.layout, "componentCreated")
             .filter((event: any) => {
                 return event.config.componentName === CodeEditorComponent
@@ -45,7 +50,13 @@ export class WorkspaceComponent {
                 event.parent.contentItems[0].remove();
             });
 
+        //noinspection TypeScriptUnresolvedFunction
         Observable.fromEvent(this.layout, "itemDestroyed")
+            .do((event: any) => {
+                if (event.config.componentName === CodeEditorComponent) {
+                    this.store.dispatch({type: STORE_ACTIONS.CLOSE_FILE_REQUEST, payload: event.config.componentState.fileInfo});
+                }
+            })
             .filter((event: any) => {
                 return event.config.componentName === CodeEditorComponent
                     && event.parent.contentItems.length === 1

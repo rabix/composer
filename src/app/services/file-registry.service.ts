@@ -3,6 +3,7 @@ import {FileApi} from "./api/file.api";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {FilePath, HttpError} from "./api/api-response-types";
 import {Observable} from "rxjs/Observable";
+import {Subject} from "rxjs/Subject";
 
 export class File implements FilePath {
     name: string;
@@ -31,6 +32,11 @@ export interface FileChangeEvent {
     content: string;
 }
 
+export interface ChangeEvent {
+    source: FileChangeEventSource;
+    data: any;
+}
+
 export class Directory {
 
     private relativePath: string;
@@ -52,12 +58,13 @@ export class FileRegistry {
     private fileCache: {[fileId: string]: File} = {};
     private dirCache: Directory[]               = [];
 
-    private endpoint: string;
+    public fileContentCache: Subject<ChangeEvent>;
 
-    /**
-     * @FIXME(ivanb) Create a provider for HTTP which also resolves the API endpoint
-     */
     constructor(private fileApi: FileApi) {
+        // @todo(maya) create single stream of cached files and changes
+
+        this.fileContentCache = new Subject();
+
         fileApi.getDirContent('').flatMap((paths) => {
             //noinspection TypeScriptUnresolvedFunction
             return Observable.from(paths);
