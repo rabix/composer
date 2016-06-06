@@ -18,7 +18,7 @@ describe("FS Models", () => {
             let dir = DirectoryModel.createFromObject(confObject);
 
             expect(dir.getName()).toEqual(confObject.name);
-            expect(dir.hasChildren()).toEqual(confObject.isEmpty);
+            expect(dir.hasContent()).toEqual(confObject.isEmpty);
             expect(dir.getAbsolutePath()).toEqual(confObject.absolutePath);
             expect(dir.getRelativePath()).toEqual(confObject.relativePath);
         });

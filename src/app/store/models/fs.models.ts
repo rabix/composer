@@ -68,11 +68,15 @@ export class DirectoryModel extends FSItemModel {
         this.children.push(child);
     }
 
-    public setChildren(children: DirectoryChild[]) {
+    public setChildren(children: DirectoryChild[]): void {
         this.children = children;
     }
 
-    public hasChildren() {
+    public hasContent(): boolean {
         return this.isEmpty;
+    }
+
+    public getChildren(): DirectoryChild[] {
+        return this.children;
     }
 }
