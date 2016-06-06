@@ -12,7 +12,7 @@ export class FileEffects {
     @Effect()
     public directoryContent$ = this.updates$
         .whenAction(ACTIONS.DIR_CONTENT_REQUEST)
-        .map((update: StateUpdate) => update.action.payload)
+        .map((update: StateUpdate<StateUpdate>) => update.action.payload)
         .switchMap(path => this.files.getDirContent(path).map(content => ({content, path})))
         .map(content => ({
             type: ACTIONS.UPDATE_DIRECTORY_CONTENT,

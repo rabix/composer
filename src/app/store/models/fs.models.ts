@@ -21,7 +21,7 @@ export class FSItemModel {
 
 export class FileModel extends FSItemModel {
 
-    private content: string|null;
+    private content: string;
     private type: string;
     private modified = false;
 

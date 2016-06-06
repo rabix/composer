@@ -1,5 +1,4 @@
-import {File} from "./fs.models";
-export type Tree = TreeNode[];
+export type Tree = TreeNode<any>[];
 
 export enum NodeExpansionState {
     Expanded,
@@ -12,17 +11,17 @@ export class TreeNode<C> {
     protected title;
     protected parent: TreeNode<any>;
     protected children: TreeNode<any>[] = [];
-    protected expansionState: NodeExpansionState;
-    protected representedObject: C;
+    protected expansionState: NodeExpansionState = NodeExpansionState.Contracted;
+    protected embedded: C;
 
-    public static represent(obj: C, params?: {
+    public static represent<T>(obj: T, params?: {
         parent?: TreeNode<any>
         children?: TreeNode<any>[],
         title?: string,
-    }): TreeNode<C> {
-        let node = new TreeNode<C>();
+    }): TreeNode<T> {
+        let node = new TreeNode<T>();
 
-        node.representedObject = obj;
+        node.embedded = obj;
 
         return node;
     }
@@ -39,13 +38,8 @@ export class TreeNode<C> {
         return this.parent;
     }
 
-    public getRepresentedObject() {
-        return this.representedObject;
+    public getEmbedded() {
+        return this.embedded;
     }
 
 }
-
-let file = File.createFromObject({name: "myfile.txt"});
-let node = TreeNode.represent(file, {
-    title: file.name
-});
