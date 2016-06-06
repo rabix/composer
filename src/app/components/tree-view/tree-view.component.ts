@@ -10,6 +10,8 @@ import {ComponentFactoryProviderFn} from "./interfaces/tree-data-provider";
     selector: "tree-view",
     template: `
         <template ngFor let-componentData [ngForOf]="dynamicComponentStream | async">
+        
+            
             
             <!--This <div class="tree-node"> exists as a CSS specificity convenience-->
             <div class="tree-node">

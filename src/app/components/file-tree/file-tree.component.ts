@@ -8,16 +8,17 @@ import {TreeViewService, TreeViewComponent} from "../tree-view";
 import {FileEffects} from "../../store/effects/file.effects";
 import {Store} from "@ngrx/store";
 import * as STORE_ACTIONS from "../../store/actions";
-import {directoryTree} from "../../store/file.reducer";
+import {NgTemplateOutlet} from "@angular/common";
 
 require("./file-tree.component.scss");
 
 @Component({
     selector: "file-tree",
-    directives: [TreeViewComponent, BlockLoaderComponent],
+    directives: [TreeViewComponent, BlockLoaderComponent, NgTemplateOutlet],
     providers: [TreeViewService, AsyncSocketProviderService, DataService],
     template: `
         <block-loader *ngIf="treeIsLoading"></block-loader>
+        
         <tree-view [dataProvider]="dataProviderFn" 
                    [injector]="injector" 
                    (onDataLoad)="onDataLoad($event)"></tree-view>
