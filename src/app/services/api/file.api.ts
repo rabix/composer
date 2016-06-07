@@ -46,7 +46,9 @@ export class FileApi {
         return this.socket.request(SOCKET_REQUESTS.CREATE_FILE, {
             file: path,
             content: content || ''
-        }).map(response => response.content).catch(err => {
+        }).map(response => {
+            return FileModel.createFromObject(response.content);
+        }).catch(err => {
             console.log(err);
             //noinspection TypeScriptUnresolvedFunction
             return Observable.of(err);

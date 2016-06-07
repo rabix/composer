@@ -49,6 +49,7 @@ export class FileRegistry {
             // when file content is retrieved, check if it's for the correct file, and push
             // new value to cached behavior subject.
             this.store.select("fileContent").subscribe(file => {
+                //@todo(maya) error handling
                 if(file && file.path === path) {
                     this.fileCache[path].next({
                         content: file.model.content,

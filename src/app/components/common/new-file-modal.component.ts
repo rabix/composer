@@ -13,6 +13,8 @@ import {SocketService} from "../../services/api/socket.service";
 import {FileApi} from "../../services/api/file.api";
 import * as _ from "lodash";
 import {APP_CONFIG, CONFIG} from "../../config/app.config";
+import {Store} from "@ngrx/store";
+import * as ACTIONS from "../../store/actions";
 
 @Component({
     providers:[FileApi, SocketService, provide(APP_CONFIG, {useValue: CONFIG})],
@@ -33,7 +35,7 @@ export class NewFileModalComponent implements OnInit {
 
     selectedType: any;
 
-    constructor(private fileApi: FileApi, private formBuilder: FormBuilder) {
+    constructor(private fileApi: FileApi, private formBuilder: FormBuilder, private store: Store) {
         this.fileTypes = [{
             id: '.json',
             name: 'JSON'
@@ -87,6 +89,8 @@ export class NewFileModalComponent implements OnInit {
                 // prompt user that file already exists
                 this.showFileExists = true;
             } else if (!(<HttpError> next).statusCode) {
+                this.store.dispatch({type: ACTIONS.NEW_FILE_CREATED, payload: next});
+                this.store.dispatch({type: ACTIONS.OPEN_FILE_REQUEST, payload: next});
                 this.confirm(next);
             }
         });
