@@ -2,7 +2,9 @@ import {ActionReducer, Action} from "@ngrx/store";
 import {FileModel} from "./models/fs.models";
 import * as STORE_ACTIONS from "./actions";
 
-export const openFiles: ActionReducer<FileModel[]> = (state: FileModel[] = [], action: Action) => {
+export const OPEN_FILES_INITIAL_STATE = [];
+
+export const openFiles: ActionReducer<FileModel[]> = (state: FileModel[] = OPEN_FILES_INITIAL_STATE, action: Action) => {
 
     switch (action.type) {
         case STORE_ACTIONS.OPEN_FILE_REQUEST:
