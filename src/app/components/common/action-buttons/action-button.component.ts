@@ -7,7 +7,7 @@ require("./action-button.component.scss");
         "class": "action-button clickable"
     },
     template: `
-        <div class="{{ buttonType }}">
+        <div class="editor-panel-item">
             <i class="{{iconClass}}"></i>
             <div class="title">{{ title }}</div>
         </div>
@@ -17,9 +17,5 @@ export class ActionButtonComponent implements OnInit {
     @Input() title;
     @Input() iconClass;
     
-    // @TODO(mate) Remove buttonType as input, this can be a fixed value for now
-    @Input() buttonType;
-
-    ngOnInit(): any {
-    }
+    ngOnInit(): any { }
 }

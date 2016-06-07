@@ -8,7 +8,6 @@ import {NewFileModalComponent} from "../new-file-modal.component";
     template: `
         <action-button class="nav-link" 
                         title="New File" 
-                        buttonType="{{ buttonType }}" 
                         iconClass="fa fa-file fa-lg"
                         (click)="openModal()">
         </action-button>
@@ -17,8 +16,7 @@ import {NewFileModalComponent} from "../new-file-modal.component";
     directives: [ActionButtonComponent]
 })
 export class NewFileButtonComponent implements OnInit {
-    @Input() buttonType: string;
-             fileTypes: any[];
+    @Input() fileTypes: any[];
              selectedType: any;
              loading: boolean;
 
