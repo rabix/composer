@@ -18,4 +18,19 @@ export class FileEffects {
             type: ACTIONS.UPDATE_DIRECTORY_CONTENT,
             payload: content
         }));
+
+    @Effect()
+    public fileContent$ = this.updates$
+        .whenAction(ACTIONS.FILE_CONTENT_REQUEST)
+        .map((update: StateUpdate<StateUpdate>) => update.action.payload)
+        .switchMap(path => this.files.getFileContent(path).map(content => ({
+            model: content,
+            path: path
+        })))
+        .map(content => {
+            return {
+                type: ACTIONS.UPDATE_FILE_CONTENT,
+                payload: content
+            }
+        })
 }

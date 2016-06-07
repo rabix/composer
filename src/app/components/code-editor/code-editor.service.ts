@@ -6,7 +6,7 @@ import Editor = AceAjax.Editor;
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import {ACE_MODES_MAP} from "./code-editor-modes-map";
-import {FileChangeEvent} from "../../services/file-registry.service";
+import {IFileChanges} from "../../services/file-registry.service";
 
 export class CodeEditor {
     editor: Editor;
@@ -19,7 +19,7 @@ export class CodeEditor {
 
     text: string;
 
-    textStream: BehaviorSubject<FileChangeEvent>;
+    textStream: BehaviorSubject<IFileChanges>;
     changeStream: Observable<any> = new Subject();
 
     constructor(editor: Editor) {
@@ -41,7 +41,7 @@ export class CodeEditor {
         let changeSubscription = Observable.fromEvent(this.document, 'change')
             .map((event) => {
                 console.log(event);
-                return <FileChangeEvent> {
+                return {
                     source: 'ACE_EDITOR',
                     content: this.document.getValue()
                 };
@@ -52,7 +52,7 @@ export class CodeEditor {
         this.subscriptions.push(changeSubscription);
     }
 
-    public setTextStream(textStream: BehaviorSubject<FileChangeEvent>): void {
+    public setTextStream(textStream: BehaviorSubject<IFileChanges>): void {
         this.textStream = textStream;
 
         this.textStream.filter((event) => {

@@ -4,6 +4,7 @@ import {SOCKET_REQUESTS} from "./socket-events";
 import {FilePath, HttpError} from "./api-response-types";
 import {Observable} from "rxjs/Rx";
 import {DirectoryChild, DirectoryModel, FileModel} from "../../store/models/fs.models";
+import {Store} from "@ngrx/store";
 
 @Injectable()
 export class FileApi {
@@ -15,24 +16,30 @@ export class FileApi {
      * Fetch remote directory content
      */
     getDirContent(path: string = ""): Observable<DirectoryChild[]> {
-        return this.socket.request(SOCKET_REQUESTS.DIR_CONTENT, {dir: path}).map(resp => {
-            return resp.content.map((item: FilePath) => {
-                if (item.type === "directory") {
-                    return DirectoryModel.createFromObject(item);
-                }
-                return FileModel.createFromObject(item);
+        return this.socket.request(SOCKET_REQUESTS.DIR_CONTENT, {dir: path})
+            .map(resp => {
+                return resp.content.map((item: FilePath) => {
+                    if (item.type === "directory") {
+                        return DirectoryModel.createFromObject(item);
+                    }
+                    return FileModel.createFromObject(item);
+                });
+            }).catch(err => {
+                //noinspection TypeScriptUnresolvedFunction
+                return Observable.of(err);
             });
-        });
     }
 
-    getFileContent(path: string): Observable<FilePath|HttpError> {
-        return this.socket.request(SOCKET_REQUESTS.FILE_CONTENT, {
-            file: path
-        }).map(response => response.content).catch(err => {
-            console.error(err);
-            //noinspection TypeScriptUnresolvedFunction
-            return Observable.of(err);
-        })
+    getFileContent(path: string): Observable<FileModel|HttpError> {
+        return this.socket.request(SOCKET_REQUESTS.FILE_CONTENT, {file: path})
+            .map(response => {
+                return FileModel.createFromObject(response.content)
+            })
+            .catch(err => {
+                console.error(err);
+                //noinspection TypeScriptUnresolvedFunction
+                return Observable.of(err);
+            });
     }
 
     createFile(path: string, content?: string): Observable<FilePath|HttpError> {

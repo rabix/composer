@@ -55,7 +55,7 @@ export class NewFileModalComponent implements OnInit {
             fileType: this.fileType
         });
 
-        //@todo: figure out if there is a better way to set a default value
+        //@todo(maya) figure out if there is a better way to set a default value
         this.selectedType = this.fileTypes[0];
 
         this.name.valueChanges.subscribe(() => {this.showFileExists = false;});

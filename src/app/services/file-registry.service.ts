@@ -1,52 +1,13 @@
 import {Injectable} from "@angular/core";
-import {FileApi} from "./api/file.api";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {FilePath, HttpError} from "./api/api-response-types";
-import {Observable} from "rxjs/Observable";
-import {Subject} from "rxjs/Subject";
+import {DirectoryModel} from "../store/models/fs.models";
+import {Store} from "@ngrx/store";
+import * as ACTIONS from "../store/actions";
+import {FileEffects} from "../store/effects/file.effects";
 
-export class File implements FilePath {
-    name: string;
-    type: string;
-    relativePath: string;
-    absolutePath: string;
-    public content: BehaviorSubject<FileChangeEvent>;
-
-    constructor(file?: FilePath) {
-        this.absolutePath = file.absolutePath;
-        this.relativePath = file.relativePath;
-        this.type         = file.type;
-
-        this.content = null;
-    }
-
-    toString(): string {
-        return this.relativePath;
-    }
-}
-
-type FileChangeEventSource = 'FILE_API' | 'ACE_EDITOR';
-
-export interface FileChangeEvent {
-    source: FileChangeEventSource;
+export interface IFileChanges {
     content: string;
-}
-
-export interface ChangeEvent {
-    source: FileChangeEventSource;
-    data: any;
-}
-
-export class Directory {
-
-    private relativePath: string;
-    private absolutePath: string;
-    private isEmpty: boolean;
-
-    private type: string;
-
-    private files: File[];
-    private directories: Directory[];
+    source: string
 }
 
 @Injectable()
@@ -55,71 +16,48 @@ export class FileRegistry {
     /**
      * Contains a map of file identifiers to their *content*
      */
-    private fileCache: {[fileId: string]: File} = {};
-    private dirCache: Directory[]               = [];
+    private fileCache: {[fileId: string]: BehaviorSubject<IFileChanges>} = {};
+    private dirCache: DirectoryModel[]                                   = [];
 
-    public fileContentCache: Subject<ChangeEvent>;
-
-    constructor(private fileApi: FileApi) {
-        // @todo(maya) create single stream of cached files and changes
-
-        this.fileContentCache = new Subject();
-
-        fileApi.getDirContent('').flatMap((paths) => {
-            //noinspection TypeScriptUnresolvedFunction
-            return Observable.from(paths);
-        }).filter((path) => path.type !== 'directory'
-        ).subscribe((file) => {
-            this.fileCache[file.absolutePath] = new File(file);
-        });
-
-        // this.endpoint = "http://localhost:9000";
+    constructor(private store: Store, private fileEffects: FileEffects) {
+        fileEffects.fileContent$.subscribe(this.store);
     }
 
-    public fetchAll() {
-        // let files = this.http.get(`${this.endpoint}/api/fs`).map((response: Response) => {
-        //     console.log(response);
-        //     return response.json()
-        // }).subscribe((res) => {
-        //     console.log(res)
-        // });
-    }
 
-    public fetchFileContent(file: File): BehaviorSubject<FileChangeEvent> {
-        const cachedFile = this.fileCache[file.absolutePath];
+    public loadFile(path: string): any {
+        // check if file exists in cache
+        if (this.fileCache[path]) {
+            let content = this.fileCache[path].getValue().content;
 
-        if (cachedFile && cachedFile.content) {
-
-            // push a new event to the stream with the same content as last one, but different source
-            cachedFile.content.next({
-                source: 'FILE_API',
-                content: cachedFile.content.getValue().content
+            this.fileCache[path].next({
+                content: content,
+                source: 'FILE_API'
             });
 
-            return cachedFile.content;
+            return this.fileCache[path];
         } else {
 
-            let temporarySubject: BehaviorSubject<FileChangeEvent> = new BehaviorSubject({
+            // dispatch request for file contents (picked up by FileEffects.fileContent$
+            this.store.dispatch({type: ACTIONS.FILE_CONTENT_REQUEST, payload: path});
+
+            // create a behavior subject for file content, add it to cache
+            this.fileCache[path] = new BehaviorSubject({
                 source: 'FILE_API',
                 content: null
             });
 
-            this.fileApi.getFileContent(file.absolutePath)
-                .subscribe((filePath: FilePath|HttpError) => {
-                    if ((<HttpError> filePath).error) {
-                        // handle error
-                    } else {
-                        this.fileCache[(<FilePath> filePath).absolutePath]         = new File(<FilePath> filePath);
-                        this.fileCache[(<FilePath> filePath).absolutePath].content = temporarySubject;
+            // when file content is retrieved, check if it's for the correct file, and push
+            // new value to cached behavior subject.
+            this.store.select("fileContent").subscribe(file => {
+                if(file && file.path === path) {
+                    this.fileCache[path].next({
+                        content: file.model.content,
+                        source: 'FILE_API'
+                    });
+                }
+            });
 
-                        temporarySubject.next({
-                            source: 'FILE_API',
-                            content: (<FilePath> filePath).content
-                        });
-                    }
-                });
-
-            return temporarySubject;
+            return this.fileCache[path];
         }
     }
 }

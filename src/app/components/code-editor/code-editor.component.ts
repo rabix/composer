@@ -4,6 +4,7 @@ import {FileRegistry, File} from "../../services/file-registry.service";
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import Editor = AceAjax.Editor;
 import TextMode = AceAjax.TextMode;
+import {FileModel} from "../../store/models/fs.models";
 
 require('./code-editor.component.scss');
 
@@ -18,7 +19,7 @@ require('./code-editor.component.scss');
 })
 export class CodeEditorComponent implements OnInit {
     editor: CodeEditor;
-    file: File;
+    file: FileModel;
 
     constructor(private elem: ElementRef, private fileRegistry: FileRegistry) {}
 
@@ -28,8 +29,8 @@ export class CodeEditorComponent implements OnInit {
 
         // this check shouldn't be necessary
         if (this.file) {
-            this.editor.setMode(this.file.type);
-            this.editor.setTextStream(this.fileRegistry.fetchFileContent(this.file));
+            this.editor.setMode(this.file.getType());
+            this.editor.setTextStream(this.fileRegistry.loadFile(this.file.getAbsolutePath()));
         }
     }
 
@@ -40,7 +41,7 @@ export class CodeEditorComponent implements OnInit {
     public setState(state) {
         // @todo figure out why this is undefined on startup
         if (state.fileInfo) {
-            this.file = new File(state.fileInfo);
+            this.file = state.fileInfo;
         }
     }
 }
