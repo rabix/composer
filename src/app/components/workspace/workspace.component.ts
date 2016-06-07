@@ -7,8 +7,6 @@ import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {FileTreeComponent} from "../file-tree/file-tree.component";
 import {WorkspaceService} from "./workspace.service";
 import {FileEditorPlaceholderComponent} from "../placeholders/file-editor/file-editor-placeholder.component";
-import {Store} from "@ngrx/store";
-import * as STORE_ACTIONS from "../../store/actions";
 
 require("./workspace.component.scss");
 
@@ -24,12 +22,10 @@ export class WorkspaceComponent {
 
     constructor(private el: ElementRef,
                 private registryFactory: ComponentRegistryFactoryService,
-                private workspaceService: WorkspaceService,
-                private store: Store) {
+                private workspaceService: WorkspaceService) {
 
         this.layout   = new GoldenLayout(this.getLayoutConfig(), this.el.nativeElement);
         this.registry = registryFactory.create(this.layout);
-        this.workspaceService.setRegistry(this.registry);
     }
 
     ngOnInit() {
@@ -54,7 +50,7 @@ export class WorkspaceComponent {
         Observable.fromEvent(this.layout, "itemDestroyed")
             .do((event: any) => {
                 if (event.config.componentName === CodeEditorComponent) {
-                    this.store.dispatch({type: STORE_ACTIONS.CLOSE_FILE_REQUEST, payload: event.config.componentState.fileInfo});
+                    this.workspaceService.closeFile(event.config.componentState.fileInfo);
                 }
             })
             .filter((event: any) => {
@@ -72,11 +68,55 @@ export class WorkspaceComponent {
                     isClosable: false
                 });
             });
+
+        // @todo(maya) create an algorithm that does less work and isn't dependent on pairwise
+        this.workspaceService.openFiles
+            .pairwise()
+            .subscribe(fileState => {
+                // pairwise returns an Observable of an array of two items:
+                // [previousValue, currentValue]
+                let prev    = fileState[0];
+                let current = fileState[1];
+
+                let added = current.filter((file) => {
+                    return prev.indexOf(file) === -1;
+                });
+
+                added.forEach((file) => {
+                    this.registry.registerComponent(CodeEditorComponent);
+                    this.layout.root.contentItems[0].contentItems[1].addChild({
+                        type: "component",
+                        title: file.name,
+                        componentName: CodeEditorComponent,
+                        componentState: {
+                            fileInfo: file
+                        },
+                    });
+                });
+            });
+
+        //@todo(maya) implement multiple selected files for multiple panes
+        this.workspaceService.selectedFile
+            .filter(file => file) // ensure that file is not undefined
+            .subscribe(file => {
+                let activeTab = this.layout.root.contentItems[0].contentItems[1].contentItems.filter((contentItem) => {
+                    return contentItem.config.componentState.fileInfo === file;
+                })[0];
+
+                this.layout.root.contentItems[0].contentItems[1].setActiveContentItem(activeTab);
+            });
     }
 
     ngAfterViewInit() {
         this.layout.init();
-        this.workspaceService.setLayout(this.layout);
+
+        //@todo(maya): move this elsewhere
+        //noinspection TypeScriptUnresolvedFunction
+        Observable.fromEvent(this.layout.root.contentItems[0].contentItems[1], "activeContentItemChanged")
+            .subscribe((event: any) => {
+                this.workspaceService.selectFile(event.config.componentState.fileInfo);
+            });
+
     }
 
     private getLayoutConfig() {

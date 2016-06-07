@@ -2,7 +2,7 @@ import {ActionReducer, Action} from "@ngrx/store";
 import {FileModel} from "./models/fs.models";
 import * as STORE_ACTIONS from "./actions";
 
-export const openFiles: ActionReducer = (state: Array<FileModel> = [], action: Action) => {
+export const openFiles: ActionReducer<FileModel[]> = (state: FileModel[] = [], action: Action) => {
 
     switch (action.type) {
         case STORE_ACTIONS.OPEN_FILE_REQUEST:
@@ -12,7 +12,7 @@ export const openFiles: ActionReducer = (state: Array<FileModel> = [], action: A
                 return state;
             }
 
-            return state.concat([action.payload]);
+            return state.concat([file]);
 
         case STORE_ACTIONS.CLOSE_FILE_REQUEST: {
             let file = <FileModel>action.payload;
@@ -26,9 +26,10 @@ export const openFiles: ActionReducer = (state: Array<FileModel> = [], action: A
     return state;
 };
 
-export const selectedFile: ActionReducer = (state: FileModel, action: Action) => {
+export const selectedFile: ActionReducer<FileModel> = (state: FileModel, action: Action) => {
     switch (action.type) {
         case STORE_ACTIONS.SELECT_FILE_REQUEST:
+            //@todo(maya) implement multiple selected files for multiple panes
             return action.payload;
     }
 
