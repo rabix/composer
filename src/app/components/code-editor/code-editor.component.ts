@@ -1,6 +1,6 @@
 import {Component, OnInit, ElementRef} from "@angular/core";
 import {CodeEditor} from "./code-editor.service";
-import {FileRegistry, File} from "../../services/file-registry.service";
+import {FileRegistry} from "../../services/file-registry.service";
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import Editor = AceAjax.Editor;
 import TextMode = AceAjax.TextMode;

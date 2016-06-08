@@ -110,7 +110,7 @@ export class WorkspaceComponent {
     ngAfterViewInit() {
         this.layout.init();
 
-        //@todo(maya): move this elsewhere
+        //@todo(maya): move file selection observable
         //noinspection TypeScriptUnresolvedFunction
         Observable.fromEvent(this.layout.root.contentItems[0].contentItems[1], "activeContentItemChanged")
             .subscribe((event: any) => {

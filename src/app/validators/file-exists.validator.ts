@@ -18,7 +18,7 @@ class FileExistsValidator {
 
     // should create validation function
     constructor(private fileApi: FileApi) {
-        // this.controlDataInput..map((controlValue: any) => {
+        // this.controlDataInput.map((controlValue: any) => {
         //     console.log("Checking: " + controlValue);
         //     return {
         //         foo: "bar"

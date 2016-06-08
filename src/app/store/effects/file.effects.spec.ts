@@ -5,10 +5,12 @@ import {
 
 import {FileEffects} from "./file.effects";
 import {ReflectiveInjector, provide} from "@angular/core";
-import {it, inject, describe, beforeEachProviders} from "@angular/core/testing";
+import {it, inject, describe, beforeEachProviders, expect} from "@angular/core/testing";
 import {FileApi} from "../../services/api/file.api";
 import {Observable} from "rxjs/Rx";
 import {AsyncTestCompleter} from "@angular/core/testing/async_test_completer";
+import {FileModel} from "../models/fs.models";
+import * as ACTIONS from "../../store/actions";
 
 describe('File Effects', function () {
     // let fileEffects: FileEffects;
@@ -33,26 +35,49 @@ describe('File Effects', function () {
             useValue: {
                 getDirContent: function () {
                     return Observable.of(["first", "second", "third"]);
+                },
+                getFileContent: () => {
+                    return Observable.of(FileModel.createFromObject({
+                        name: 'file1',
+                        content: 'hello world'
+                    }));
                 }
             }
         })
     ]);
 
 
-    it('should respond in a certain way', inject([MockStateUpdates, FileEffects, AsyncTestCompleter],
-        (updates: MockStateUpdates, fileFx: FileEffects, completer: AsyncTestCompleter) => {
+    describe('Directory Content', () => {
+        it('should respond in a certain way', inject([MockStateUpdates, FileEffects, AsyncTestCompleter],
+            (updates: MockStateUpdates, fileFx: FileEffects, completer: AsyncTestCompleter) => {
 
-            updates.sendAction({type: "DIR_CONTENT", payload: "nothing"});
+                updates.sendAction({type: "DIR_CONTENT", payload: "nothing"});
 
-            completer.done("yay");
-            // Add an action in the updates queue
-            // updates$.sendAction({type: 'LOGIN', payload: "hello"});
+                completer.done("yay");
+                // Add an action in the updates queue
+                // updates$.sendAction({type: 'LOGIN', payload: "hello"});
 
-            // fileEffects.directoryContent$.subscribe(function (action) {
-            //     console.log("Got dir content action", action);
-            // });
-        }
-    ));
+                // fileEffects.directoryContent$.subscribe(function (action) {
+                //     console.log("Got dir content action", action);
+                // });
+            }
+        ));
+    });
+
+
+    describe('File Content', () => {
+        it('should retreive file content', inject([MockStateUpdates, FileEffects, AsyncTestCompleter],
+            (updates: MockStateUpdates, fileFx: FileEffects, completer: AsyncTestCompleter) => {
+                updates.sendAction({type: ACTIONS.FILE_CONTENT_REQUEST, payload: "nothing"});
+
+                fileFx.fileContent$.subscribe((action) => {
+                    expect(action.payload.model instanceof FileModel).toBeTruthy();
+                    expect(action.payload.model.content).toBe("hello world");
+                    completer.done("finished");
+                })
+            }
+        ));
+    });
 });
 
 

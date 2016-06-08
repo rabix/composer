@@ -56,4 +56,62 @@ describe("FileAPI", () => {
                 });
             }));
     });
+
+    describe("getFileContent", () => {
+        beforeEachProviders(() => [
+            provide(SocketService, {
+                useValue: {
+                    request: (path) => {
+                        let file: FilePath = {
+                            name: "file1.json",
+                            type: ".json",
+                            relativePath: "subroot/file1.json",
+                            absolutePath: "/root/subdir/file1.json",
+                            content: "hello world"
+                        };
+
+                        return Observable.of({
+                            message: "",
+                            content: file
+                        });
+                    }
+                }
+            }),
+        ]);
+
+        it("should return a file's model with its contents",
+            inject([FileApi], (fileApi: FileApi) => {
+                fileApi.getFileContent("/root/subdir/file1.json").subscribe((file) => {
+                    expect(file instanceof FileModel).toEqual(true);
+                    expect(file.getContent()).toEqual("hello world");
+                    expect(file.getAbsolutePath()).toEqual("/root/subdir/file1.json");
+                });
+            })
+        );
+    });
+
+    describe("Error handling", () => {
+        beforeEachProviders(() => [
+            provide(SocketService, {
+                useValue: {
+                    request: () => {
+                        return Observable.of(<HttpError> {
+                            message: "",
+                            status: 404
+                        });
+                    }
+                }
+            }),
+        ]);
+
+        it("should return an error for file contents",
+            inject([FileApi], (fileApi: FileApi) => {
+                fileApi.getFileContent('').subscribe((error) => {
+                    console.log(error);
+                    // expect(error.status).toEqual(404);
+                    // expect(error.message).toBe('');
+                });
+            })
+        );
+    });
 });

@@ -30,7 +30,7 @@ export class FileApi {
             });
     }
 
-    getFileContent(path: string): Observable<FileModel|HttpError> {
+    getFileContent(path: string): Observable<FileModel> {
         return this.socket.request(SOCKET_REQUESTS.FILE_CONTENT, {file: path})
             .map(response => {
                 return FileModel.createFromObject(response.content)
