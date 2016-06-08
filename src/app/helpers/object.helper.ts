@@ -44,4 +44,54 @@ export class ObjectHelper {
             }
         }
     }
+
+    /**
+     * Iterate through all properties of the object and apply the function on each of them
+     *
+     * @param object
+     * @param callback
+     */
+    public static iterateAll(object: Object, callback: (propertyObject : any) => void) {
+        
+        let walked = [];
+        let stack = [{obj: object, stackPath: ''}];
+
+        while(stack.length > 0)  {
+
+            let lastStackItem = stack.pop();
+            let lastStackItemObject = lastStackItem.obj;
+
+            /* Will iterate over ALL enumerable properties of the object!
+             * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...in */
+            for (let property in lastStackItemObject) {
+
+                /* Make sure we don't loop on inherited properties */
+                if (lastStackItemObject.hasOwnProperty(property)) {
+
+                    if (typeof lastStackItemObject[property] === "object") {
+                        let alreadyFound = false;
+
+                        /* Check for circular reference */
+                        for (let i = 0; i < walked.length; i++) {
+                            if (walked[i] === lastStackItemObject[property]) {
+                                alreadyFound = true;
+                                break;
+                            }
+                        }
+
+                        if (!alreadyFound) {
+                            walked.push(lastStackItemObject[property]);
+                            stack.push({obj: lastStackItemObject[property], stack: lastStackItem.stackPath + '.' + property});
+                        }
+
+                    } else {
+                        if (callback) {
+                            callback(lastStackItemObject);
+                        }
+                       // console.log(lastStackItem.stackPath + '.' + property + "=" + lastStackItemObject[property]);
+                    }
+                } /* if */
+            } /* for */
+        } /* while */
+    }
 }

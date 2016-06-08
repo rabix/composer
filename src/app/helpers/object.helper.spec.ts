@@ -82,4 +82,37 @@ describe("ObjectHelper", () => {
 
     });
 
+
+    describe("iterate", () => {
+        it("should find nested properties and apply the callback", () => {
+            let obj = { a: 123, b: { c: { d: 456 }, e: 789 }, g: "ABC" };
+
+            ObjectHelper.iterateAll(obj, function (propertyObject) {
+                if (propertyObject.hasOwnProperty('d')) {
+                    propertyObject['d'] = 444;
+                }
+
+                if (propertyObject.hasOwnProperty('a')) {
+                    propertyObject['a'] = 123;
+                }
+            });
+
+            expect(obj.b.c.d).toEqual(444);
+            expect(obj.a).toEqual(123);
+        });
+
+        it("should handle circular dependencies", () => {
+            let obj = { a: 123, b: { c: { d: 456, circular: null }, e: 789 }, g: "ABC" };
+            obj.b.c.circular = obj;
+
+            ObjectHelper.iterateAll(obj, function (propertyObject) {
+                if (propertyObject.hasOwnProperty('g')) {
+
+                    expect(obj.g).toEqual("ABC");
+                }
+            });
+        });
+
+    });
+
 });
