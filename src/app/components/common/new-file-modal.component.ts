@@ -1,23 +1,19 @@
-import {Component, OnInit, provide} from "@angular/core";
+import {Component, OnInit} from "@angular/core";
 import {
     NgStyle,
     Control,
     ControlGroup,
     Validators,
     FORM_DIRECTIVES,
-    FormBuilder,
+    FormBuilder
 } from "@angular/common";
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
-import {HttpError, FilePath} from "../../services/api/api-response-types";
-import {SocketService} from "../../services/api/socket.service";
-import {FileApi} from "../../services/api/file.api";
 import * as _ from "lodash";
-import {APP_CONFIG, CONFIG} from "../../config/app.config";
 import {Store} from "@ngrx/store";
 import * as ACTIONS from "../../store/actions";
+import {FileEffects} from "../../store/effects/file.effects";
 
 @Component({
-    providers:[FileApi, SocketService, provide(APP_CONFIG, {useValue: CONFIG})],
     selector: 'new-file-modal',
     directives: [NgStyle, BlockLoaderComponent, FORM_DIRECTIVES],
     templateUrl: 'app/components/common/new-file-modal.component.html'
@@ -25,6 +21,7 @@ import * as ACTIONS from "../../store/actions";
 export class NewFileModalComponent implements OnInit {
     isCreatingFile: boolean;
     showFileExists: boolean;
+    isGeneralError: boolean;
 
     name: Control;
     fileType: Control;
@@ -35,7 +32,7 @@ export class NewFileModalComponent implements OnInit {
 
     selectedType: any;
 
-    constructor(private fileApi: FileApi, private formBuilder: FormBuilder, private store: Store) {
+    constructor(private formBuilder: FormBuilder, private store: Store, private fileFx: FileEffects) {
         this.fileTypes = [{
             id: '.json',
             name: 'JSON'
@@ -47,7 +44,9 @@ export class NewFileModalComponent implements OnInit {
             name: 'JavaScript'
         }];
 
-        this.name = new Control('',
+        this.fileFx.newFile$.subscribe(this.store);
+
+        this.name     = new Control('',
             Validators.compose([Validators.required, Validators.minLength(1)])
         );
         this.fileType = new Control(this.fileTypes[0]);
@@ -60,13 +59,16 @@ export class NewFileModalComponent implements OnInit {
         //@todo(maya) figure out if there is a better way to set a default value
         this.selectedType = this.fileTypes[0];
 
-        this.name.valueChanges.subscribe(() => {this.showFileExists = false;});
+        this.name.valueChanges.subscribe(() => {
+            this.showFileExists = false;
+            this.isGeneralError = false;
+        });
     }
 
     createFile(form) {
         // turn on loading
         this.isCreatingFile = true;
-        let formValue = form.value;
+        let formValue       = form.value;
 
         let fileName = formValue.name;
         //noinspection TypeScriptUnresolvedVariable
@@ -81,17 +83,28 @@ export class NewFileModalComponent implements OnInit {
         let filePath = fileName + ext;
 
         // create file
-        this.fileApi.createFile(filePath).subscribe((next: HttpError|FilePath) => {
-            this.isCreatingFile = false;
 
-            // IF: file exists
-            if ((<HttpError> next).statusCode === 403) {
-                // prompt user that file already exists
-                this.showFileExists = true;
-            } else if (!(<HttpError> next).statusCode) {
-                this.store.dispatch({type: ACTIONS.NEW_FILE_CREATED, payload: next});
-                this.store.dispatch({type: ACTIONS.OPEN_FILE_REQUEST, payload: next});
-                this.confirm(next);
+        this.store.dispatch({type: ACTIONS.CREATE_FILE_REQUEST, payload: filePath});
+        this.isCreatingFile = true;
+
+        this.store.select("newFile").subscribe((file) => {
+            if (file && file.path === filePath) {
+                this.isCreatingFile = false;
+                this.store.dispatch({type: ACTIONS.OPEN_FILE_REQUEST, payload: file.model});
+                this.confirm(file.model);
+            }
+        });
+
+        // Handle error if file already exists
+        this.store.select("globalErrors").subscribe((error) => {
+            if (error && error.path === filePath) {
+                this.isCreatingFile = false;
+
+                if (error.error.statusCode === 403) {
+                    this.showFileExists = true;
+                } else {
+                    this.isGeneralError = true;
+                }
             }
         });
     }

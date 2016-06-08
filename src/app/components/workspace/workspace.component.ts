@@ -113,6 +113,7 @@ export class WorkspaceComponent {
         //@todo(maya): move file selection observable
         //noinspection TypeScriptUnresolvedFunction
         Observable.fromEvent(this.layout.root.contentItems[0].contentItems[1], "activeContentItemChanged")
+            .filter((event: any) => event.config.componentName === CodeEditorComponent)
             .subscribe((event: any) => {
                 this.workspaceService.selectFile(event.config.componentState.fileInfo);
             });

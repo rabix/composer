@@ -36,6 +36,7 @@ describe("FileAPI", () => {
                                 absolutePath: "/root/subdir/myTsFile.ts"
                             },
                         ];
+                        //noinspection TypeScriptUnresolvedFunction
                         return Observable.of({
                             message: "",
                             content: paths
@@ -70,6 +71,7 @@ describe("FileAPI", () => {
                             content: "hello world"
                         };
 
+                        //noinspection TypeScriptUnresolvedFunction
                         return Observable.of({
                             message: "",
                             content: file
@@ -95,7 +97,8 @@ describe("FileAPI", () => {
             provide(SocketService, {
                 useValue: {
                     request: () => {
-                        return Observable.of(<HttpError> {
+                        //noinspection TypeScriptUnresolvedFunction
+                        return Observable.of({
                             message: "",
                             status: 404
                         });
@@ -106,8 +109,8 @@ describe("FileAPI", () => {
 
         it("should return an error for file contents",
             inject([FileApi], (fileApi: FileApi) => {
+                //@todo(maya) finish fileApi tests
                 fileApi.getFileContent('').subscribe((error) => {
-                    console.log(error);
                     // expect(error.status).toEqual(404);
                     // expect(error.message).toBe('');
                 });

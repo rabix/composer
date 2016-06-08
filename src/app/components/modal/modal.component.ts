@@ -27,6 +27,7 @@ export class ModalComponent {
         let factory = this.factory;
         let data = this.data;
         let functions = this.functions;
+        let injector = this.injector;
 
         @Component({
             selector: 'container',
@@ -38,7 +39,8 @@ export class ModalComponent {
                           <template class="tree-node" 
                               [dynamicallyCompiled]="modalFactory" 
                               [model]="modalData" 
-                              [modalFunctions]="modalFunctions">
+                              [modalFunctions]="modalFunctions"
+                              [injector]="injector">
                           </template>
                     </div>
             </div>
@@ -49,6 +51,7 @@ export class ModalComponent {
             @Input() public modalFactory: any = factory;
             @Input() public modalData: any = data;
             @Input() public modalFunctions: any = functions;
+            @Input() public injector: Injector = injector;
         }
 
         return Container;

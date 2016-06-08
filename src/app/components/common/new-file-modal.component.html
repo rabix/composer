@@ -9,6 +9,10 @@
 
 
         <div class="modal-body">
+            <div class="alert alert-danger" *ngIf="isGeneralError">
+                An error occurred while trying to create the file
+            </div>
+
             <fieldset class="form-group" [class.has-danger]="showFileExists">
                 <label for="fileName" class="form-control-label">Enter file name</label>
                 <input ngControl="name"

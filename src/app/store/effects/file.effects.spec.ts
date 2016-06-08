@@ -34,12 +34,33 @@ describe('File Effects', function () {
         provide(FileApi, {
             useValue: {
                 getDirContent: function () {
+                    //noinspection TypeScriptUnresolvedFunction
                     return Observable.of(["first", "second", "third"]);
                 },
-                getFileContent: () => {
+                getFileContent: (path) => {
+                    if (!path) {
+                        return Observable.create((obs) => {
+                            obs.error("error message");
+                        });
+                    }
+
+                    //noinspection TypeScriptUnresolvedFunction
                     return Observable.of(FileModel.createFromObject({
-                        name: 'file1',
-                        content: 'hello world'
+                        name: "file1",
+                        content: "hello world"
+                    }));
+                },
+                createFile: (path) => {
+                    if (!path) {
+                        return Observable.create((obs) => {
+                            obs.error("error message");
+                        });
+                    }
+
+                    //noinspection TypeScriptUnresolvedVariable
+                    return Observable.of(FileModel.createFromObject({
+                        name: "file1",
+                        content: "hello world"
                     }));
                 }
             }
@@ -66,18 +87,53 @@ describe('File Effects', function () {
 
 
     describe('File Content', () => {
-        it('should retreive file content', inject([MockStateUpdates, FileEffects, AsyncTestCompleter],
-            (updates: MockStateUpdates, fileFx: FileEffects, completer: AsyncTestCompleter) => {
-                updates.sendAction({type: ACTIONS.FILE_CONTENT_REQUEST, payload: "nothing"});
+        it('should retrieve file content', inject([MockStateUpdates, FileEffects],
+            (updates: MockStateUpdates, fileFx: FileEffects) => {
+                updates.sendAction({type: ACTIONS.FILE_CONTENT_REQUEST, payload: "somePath"});
 
                 fileFx.fileContent$.subscribe((action) => {
-                    expect(action.payload.model instanceof FileModel).toBeTruthy();
+                    expect(action.payload.model instanceof FileModel).toBe(true);
                     expect(action.payload.model.content).toBe("hello world");
-                    completer.done("finished");
-                })
+                });
+            }
+        ));
+
+        it('should handle an error correctly', inject([MockStateUpdates, FileEffects],
+            (updates: MockStateUpdates, fileFx: FileEffects)=> {
+                updates.sendAction({type: ACTIONS.FILE_CONTENT_REQUEST, payload: ''});
+
+                fileFx.fileContent$.subscribe((error) => {
+                    expect(error.payload).toBeDefined();
+                    expect(error.payload.error).toBe("error message");
+                });
             }
         ));
     });
+
+    describe('New File', () => {
+        it('should create a new file and return its file model', inject([MockStateUpdates, FileEffects],
+            (updates: MockStateUpdates, fileFx: FileEffects) => {
+                updates.sendAction({type: ACTIONS.CREATE_FILE_REQUEST, payload: "filePath"});
+
+                fileFx.newFile$.subscribe((action) => {
+                    expect(action.payload.model instanceof FileModel).toBe(true);
+                    expect(action.payload.path).toEqual("filePath");
+                });
+            }
+        ));
+
+
+        it('should handle an error correctly', inject([MockStateUpdates, FileEffects],
+            (updates: MockStateUpdates, fileFx: FileEffects)=> {
+                updates.sendAction({type: ACTIONS.CREATE_FILE_REQUEST, payload: ''});
+
+                fileFx.fileContent$.subscribe((error) => {
+                    expect(error.payload).toBeDefined();
+                    expect(error.payload.error).toBe("error message");
+                });
+            }
+        ))
+    })
 });
 
 

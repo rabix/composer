@@ -24,9 +24,6 @@ export class FileApi {
                     }
                     return FileModel.createFromObject(item);
                 });
-            }).catch(err => {
-                //noinspection TypeScriptUnresolvedFunction
-                return Observable.of(err);
             });
     }
 
@@ -34,11 +31,6 @@ export class FileApi {
         return this.socket.request(SOCKET_REQUESTS.FILE_CONTENT, {file: path})
             .map(response => {
                 return FileModel.createFromObject(response.content)
-            })
-            .catch(err => {
-                console.error(err);
-                //noinspection TypeScriptUnresolvedFunction
-                return Observable.of(err);
             });
     }
 
@@ -48,22 +40,14 @@ export class FileApi {
             content: content || ''
         }).map(response => {
             return FileModel.createFromObject(response.content);
-        }).catch(err => {
-            console.log(err);
-            //noinspection TypeScriptUnresolvedFunction
-            return Observable.of(err);
-        })
+        });
     }
 
     updateFile(path: string, content: string): Observable<boolean|HttpError> {
         return this.socket.request(SOCKET_REQUESTS.UPDATE_FILE, {
             file: path,
             content: content
-        }).map(response => response.content).catch(err => {
-            console.error(err);
-            //noinspection TypeScriptUnresolvedFunction
-            return Observable.of(err);
-        })
+        });
     }
 
     checkIfFileExists(path: string): Observable<boolean|HttpError> {
@@ -73,10 +57,6 @@ export class FileApi {
         }).map(response => {
             console.log(`${path} exists`, response.content);
             return response.content
-        }).catch(err => {
-            console.log(err);
-            //noinspection TypeScriptUnresolvedFunction
-            return Observable.of(err);
-        })
+        });
     }
 }
