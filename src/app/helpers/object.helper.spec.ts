@@ -87,32 +87,36 @@ describe("ObjectHelper", () => {
         it("should find nested properties and apply the callback", () => {
             let obj = { a: 123, b: { c: { d: 456 }, e: 789 }, g: "ABC" };
 
-            ObjectHelper.iterateAll(obj, function (propertyObject) {
-                if (propertyObject.hasOwnProperty('d')) {
-                    propertyObject['d'] = 444;
+            ObjectHelper.iterateAll(obj, function (propName, value, obj) {
+                if (propName === 'd') {
+                    obj['d'] = 444;
                 }
 
-                if (propertyObject.hasOwnProperty('a')) {
-                    propertyObject['a'] = 123;
+                if (propName === 'a') {
+                    obj['a'] = 111;
                 }
             });
 
             expect(obj.b.c.d).toEqual(444);
-            expect(obj.a).toEqual(123);
+            expect(obj.a).toEqual(111);
         });
 
-        it("should handle circular dependencies", () => {
-            let obj = { a: 123, b: { c: { d: 456, circular: null }, e: 789 }, g: "ABC" };
-            obj.b.c.circular = obj;
+        it("should handle circular references", () => {
+            let obj1 = { a: 444 };
+            let obj2 = { a: 123, b: { c: { d: 456 }, e: 789 }, g: "ABC", h: obj1, j: [1] };
 
-            ObjectHelper.iterateAll(obj, function (propertyObject) {
-                if (propertyObject.hasOwnProperty('g')) {
+            obj1['circular'] = obj2 ;
 
-                    expect(obj.g).toEqual("ABC");
-                }
+            obj2.b.c['circular'] = obj2;
+            obj2.j.push(obj2);
+
+            let resultValues = [];
+            ObjectHelper.iterateAll(obj2, function (propName, value)  {
+                    resultValues.push(value);
             });
-        });
 
+            expect(resultValues).toEqual([123, 'ABC', 1, 444, 789, 456]);
+        });
     });
 
 });

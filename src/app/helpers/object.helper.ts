@@ -1,3 +1,5 @@
+import * as _ from "lodash";
+
 export class ObjectHelper {
 
     private static pathDelimiter = ".";
@@ -51,8 +53,8 @@ export class ObjectHelper {
      * @param object
      * @param callback
      */
-    public static iterateAll(object: Object, callback: (propertyObject : any) => void) {
-        
+    public static iterateAll(object: Object, callback: (propertyName: string, propertyValue: any, object?: any) => void) {
+
         let walked = [];
         let stack = [{obj: object, stackPath: ''}];
 
@@ -60,6 +62,8 @@ export class ObjectHelper {
 
             let lastStackItem = stack.pop();
             let lastStackItemObject = lastStackItem.obj;
+            
+            walked.push(lastStackItemObject);
 
             /* Will iterate over ALL enumerable properties of the object!
              * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...in */
@@ -73,7 +77,7 @@ export class ObjectHelper {
 
                         /* Check for circular reference */
                         for (let i = 0; i < walked.length; i++) {
-                            if (walked[i] === lastStackItemObject[property]) {
+                            if (_.isEqual(walked[i], lastStackItemObject[property])) {
                                 alreadyFound = true;
                                 break;
                             }
@@ -85,10 +89,7 @@ export class ObjectHelper {
                         }
 
                     } else {
-                        if (callback) {
-                            callback(lastStackItemObject);
-                        }
-                       // console.log(lastStackItem.stackPath + '.' + property + "=" + lastStackItemObject[property]);
+                        callback(property, lastStackItemObject[property], lastStackItemObject);
                     }
                 } /* if */
             } /* for */
