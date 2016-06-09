@@ -19,20 +19,23 @@ import {FileEffects} from "../../store/effects/file.effects";
     templateUrl: 'app/components/common/new-file-modal.component.html'
 })
 export class NewFileModalComponent implements OnInit {
-    isCreatingFile: boolean;
-    showFileExists: boolean;
-    isGeneralError: boolean;
+    private isCreatingFile: boolean;
+    private showFileExists: boolean;
+    private isGeneralError: boolean;
 
-    name: Control;
-    fileType: Control;
-    newFileForm: ControlGroup;
+    private name: Control;
+    private fileType: Control;
+    private newFileForm: ControlGroup;
 
-    confirm: Function;
-    fileTypes: any[];
+    private confirm: Function;
+    private fileTypes: any[];
 
     selectedType: any;
 
-    constructor(private formBuilder: FormBuilder, private store: Store, private fileFx: FileEffects) {
+    constructor(private formBuilder: FormBuilder,
+                private store: Store,
+                private fileFx: FileEffects) {
+
         this.fileTypes = [{
             id: '.json',
             name: 'JSON'
@@ -71,7 +74,6 @@ export class NewFileModalComponent implements OnInit {
         let formValue       = form.value;
 
         let fileName = formValue.name;
-        //noinspection TypeScriptUnresolvedVariable
         let ext      = formValue.fileType.id;
 
         // IF: file already has an extension
@@ -81,9 +83,8 @@ export class NewFileModalComponent implements OnInit {
         }
 
         let filePath = fileName + ext;
-
-        // create file
-
+        
+        
         this.store.dispatch({type: ACTIONS.CREATE_FILE_REQUEST, payload: filePath});
         this.isCreatingFile = true;
 

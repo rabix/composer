@@ -1,24 +1,34 @@
-import {Component, Input, OnInit, Injector, ComponentResolver, ComponentFactory} from "@angular/core";
+import {
+    Component, Input, OnInit, Injector, ComponentFactory,
+    ComponentResolver
+} from "@angular/core";
 import {ActionButtonComponent} from "./action-button.component";
 import {ModalComponent} from "../../modal/modal.component";
 import {NewFileModalComponent} from "../new-file-modal.component";
+import {FileApi} from "../../../services/api/file.api";
+import {Observable} from "rxjs/Rx";
 
 @Component({
-    selector: 'new-file-button',
+    selector: 'save-as-button',
     template: `
         <action-button class="nav-link" 
-                        title="New File" 
-                        iconClass="fa fa-file fa-lg"
+                        title="Save As" 
+                        iconClass="fa fa-save fa-lg"
                         (click)="openModal()">
         </action-button>
     `,
     providers: [ModalComponent],
     directives: [ActionButtonComponent]
 })
-export class NewFileButtonComponent implements OnInit {
-    @Input() fileTypes: any[];
+export class SaveAsButtonComponent {
+    @Input() content: Observable<string>;
 
-    constructor(private modal: ModalComponent, private injector: Injector, private resolver: ComponentResolver) { }
+    constructor(private modal: ModalComponent,
+                private injector: Injector,
+                private resolver: ComponentResolver) {
+
+    }
+
     /**
      * Opens new file modal
      */
@@ -27,14 +37,14 @@ export class NewFileButtonComponent implements OnInit {
         this.modal.show();
     }
 
-    ngOnInit() {
+    ngAfterViewInit() {
         this.initModal();
     }
 
     initModal() {
 
         this.resolver.resolveComponent(NewFileModalComponent)
-            .then((factory:ComponentFactory) => {
+            .then((factory: ComponentFactory)=> {
                 this.modal.factory = factory;
             });
 
@@ -42,19 +52,23 @@ export class NewFileButtonComponent implements OnInit {
         // as the component initiating it
         this.modal.injector = this.injector;
 
-        this.modal.data = {};
+        debugger;
+        this.modal.data = {
+            content: this.content
+        };
 
         this.modal.functions = {
-            cancel: function() {
+            cancel: function () {
                 this.cref.destroy();
                 // By rejecting, the show must catch the error. So by resolving,
                 // it can be ignored silently in case the result is unimportant.
                 this.result.resolve();
             },
-            confirm: function(data) {
+            confirm: function (data) {
                 this.cref.destroy();
                 this.result.resolve(data);
             }
-        }
+        };
+
     }
 }

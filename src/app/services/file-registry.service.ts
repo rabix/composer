@@ -24,7 +24,7 @@ export class FileRegistry {
     }
 
 
-    public loadFile(path: string): any {
+    public loadFile(path: string): BehaviorSubject<IFileChanges> {
         // check if file exists in cache
         if (this.fileCache[path]) {
             let content = this.fileCache[path].getValue().content;

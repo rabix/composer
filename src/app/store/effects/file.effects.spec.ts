@@ -135,6 +135,3 @@ describe('File Effects', function () {
         ))
     })
 });
-
-
-//@todo(maya) add test for fileContent effect

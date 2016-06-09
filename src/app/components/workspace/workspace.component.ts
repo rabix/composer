@@ -58,7 +58,8 @@ export class WorkspaceComponent {
                     && event.parent.contentItems.length === 1
             })
             .subscribe((event: any) => {
-
+                this.workspaceService.deselectFiles();
+                
                 // @TODO(ivanb) Move this somewhere (ex. extract the component definition into an enum)
                 // @FIXME(ivanb) Scan the whole tree and check if this is actually the last open editor
                 event.parent.addChild({

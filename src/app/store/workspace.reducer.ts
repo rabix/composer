@@ -33,6 +33,8 @@ export const selectedFile: ActionReducer<FileModel> = (state: FileModel, action:
         case STORE_ACTIONS.SELECT_FILE_REQUEST:
             //@todo(maya) implement multiple selected files for multiple panes
             return action.payload;
+        case STORE_ACTIONS.DESELECT_FILE_REQUEST:
+            return null;
     }
 
     return state;

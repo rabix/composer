@@ -40,7 +40,6 @@ export class CodeEditor {
         //noinspection TypeScriptUnresolvedFunction
         let changeSubscription = Observable.fromEvent(this.document, 'change')
             .map((event) => {
-                console.log(event);
                 return {
                     source: 'ACE_EDITOR',
                     content: this.document.getValue()

@@ -30,7 +30,9 @@ export class CodeEditorComponent implements OnInit {
         // this check shouldn't be necessary
         if (this.file) {
             this.editor.setMode(this.file.getType());
-            this.editor.setTextStream(this.fileRegistry.loadFile(this.file.getAbsolutePath()));
+            this.editor.setTextStream(this.fileRegistry.loadFile(
+                this.file.getAbsolutePath()
+            ));
         }
     }
 

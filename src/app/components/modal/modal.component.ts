@@ -29,6 +29,8 @@ export class ModalComponent {
         let functions = this.functions;
         let injector = this.injector;
 
+
+        
         @Component({
             selector: 'container',
             directives: [DynamicallyCompiledComponentDirective, NewFileModalComponent],
