@@ -85,9 +85,18 @@ describe("ObjectHelper", () => {
 
     describe("iterate", () => {
         it("should find nested properties and apply the callback", () => {
-            let obj = { a: 123, b: { c: { d: 456 }, e: 789 }, g: "ABC" };
+            let obj = { 
+                a: 123, 
+                b: { 
+                    c: { 
+                        d: 456 
+                    },
+                    e: 789
+                }, 
+                g: "ABC" 
+            };
 
-            ObjectHelper.iterateAll(obj, function (propName, value, obj) {
+            ObjectHelper.iterateAll(obj, (propName, value, obj) => {
                 if (propName === 'd') {
                     obj['d'] = 444;
                 }
@@ -111,7 +120,7 @@ describe("ObjectHelper", () => {
             obj2.j.push(obj2);
 
             let resultValues = [];
-            ObjectHelper.iterateAll(obj2, function (propName, value)  {
+            ObjectHelper.iterateAll(obj2, (propName, value) => {
                     resultValues.push(value);
             });
 

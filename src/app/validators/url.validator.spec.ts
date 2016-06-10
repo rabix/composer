@@ -1,7 +1,7 @@
 import {it, inject, describe, beforeEachProviders} from "@angular/core/testing";
 import {UrlValidator} from "./url.validator";
 
-describe("RefResolverService", () => {
+describe("UrlValidator", () => {
     beforeEachProviders(() => [UrlValidator]);
 
     describe("isValidUrl", () => {

@@ -1,4 +1,4 @@
-export class ContentReference {
+export interface ContentReference {
     refId: any;
     cwlFile: CwlFile
 }
