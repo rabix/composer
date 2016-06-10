@@ -8,6 +8,9 @@ export interface ModalFunctionsInterface {
 @Directive({
     selector: "[dynamicallyCompiled]",
 })
+/**
+ * @deprecated Use ComponentCompilerDirective instead
+ */
 export class DynamicallyCompiledComponentDirective implements OnInit {
     private cref:ComponentRef;
     private result:any;

@@ -54,6 +54,4 @@ export class DirectoryNodeComponent implements TreeViewNode {
 
         this.isExpanded = isExpanded;
     }
-
-    @HmrState() _state = {};
 }
