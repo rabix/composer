@@ -1,4 +1,4 @@
-import {Injectable, Injector} from "@angular/core";
+import {Injectable, forwardRef, Inject} from "@angular/core";
 import {AsyncSocketProviderService} from "./async-socket-provider.service";
 import {DirectoryDataProviderFactory} from "./types";
 import {Store} from "@ngrx/store";
@@ -11,16 +11,15 @@ export class FileTreeService {
 
     private dataProvider;
 
-    constructor(private injector: Injector, private store: Store) {
-
-        // Injecting AsyncSocketProviderService into the constructor doesn't work at this moment
-        // @TODO(ivanb) find out why this works
-        this.dataProvider = injector.get(AsyncSocketProviderService);
+    constructor(@Inject(forwardRef(() => AsyncSocketProviderService))
+                private dataProvider: AsyncSocketProviderService,
+                private store: Store) {
     }
 
     /**
      * Dispatches info about file being double clicked to `store`
      * @param {FileModel} fileInfo
+     * @TODO remove the store dispatching, architectural change
      */
     public openFile(fileInfo: FileModel): void {
         this.store.dispatch({type: STORE_ACTIONS.OPEN_FILE_REQUEST, payload: fileInfo});

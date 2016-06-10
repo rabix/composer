@@ -6,7 +6,7 @@ import {FileNodeComponent} from "./nodes/file-node.component";
 import {DirectoryNodeComponent} from "./nodes/directory-node.component";
 import {TreeDataProvider} from "../tree-view/interfaces/tree-data-provider";
 import {DirectoryChild, DirectoryModel} from "../../store/models/fs.models";
-import {Directory} from "../../services/file-registry.service";
+import {DynamicComponentContext} from "../runtime-compiler/dynamic-component-context";
 
 
 @Injectable()
@@ -28,19 +28,13 @@ export class AsyncSocketProviderService implements TreeDataProvider {
 
                 return Observable.fromPromise(Promise.all(items.map((item: DirectoryChild) => {
 
-                    // Determine the component type
-                    // This should probably be moved to a factory
                     let componentType = FileNodeComponent;
                     if (item instanceof DirectoryModel) {
                         componentType = DirectoryNodeComponent;
                     }
 
-                    return this.resolver.resolveComponent(componentType).then((factory: ComponentFactory<any>) => {
-                        return {
-                            factory: factory,
-                            data: item
-                        };
-                    });
+                    return this.resolver.resolveComponent(componentType)
+                        .then(factory => new DynamicComponentContext(factory, item));
 
                 })));
             });

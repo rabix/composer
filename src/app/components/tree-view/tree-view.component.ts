@@ -1,30 +1,21 @@
 import {Component, Input, Injector, Output} from "@angular/core";
 import {TreeNodeComponent} from "./structure/tree-node.component";
-import "./tree-view.component.scss";
-import {AsyncPipe} from "@angular/common";
-import {DynamicallyCompiledComponentDirective} from "../../directives/dynamically-compiled-component.directive";
+import {AsyncPipe, NgFor} from "@angular/common";
 import {BehaviorSubject, Observable} from "rxjs/Rx";
 import {ComponentFactoryProviderFn} from "./interfaces/tree-data-provider";
-
+import "./tree-view.component.scss";
+import {ComponentCompilerDirective} from "../runtime-compiler/component-compiler.directive";
+import {DynamicComponentContext} from "../runtime-compiler/dynamic-component-context";
 @Component({
     selector: "tree-view",
     template: `
-        <template ngFor let-componentData [ngForOf]="dynamicComponentStream | async">
-        
-            
-            
-            <!--This <div class="tree-node"> exists as a CSS specificity convenience-->
-            <div class="tree-node">
-                <template class="tree-node" 
-                          [dynamicallyCompiled]="componentData.factory" 
-                          [injector]="injector"
-                          [model]="componentData.data">
-                </template>   
-            </div>
-            
-        </template>
+        <!--This <div class="tree-node"> exists as a CSS specificity convenience-->
+        <div *ngFor="let context of (componentContexts | async)" 
+             class="tree-node" 
+             [component-compiler]="context">
+        </div>   
     `,
-    directives: [TreeViewComponent, TreeNodeComponent, DynamicallyCompiledComponentDirective],
+    directives: [TreeViewComponent, TreeNodeComponent, ComponentCompilerDirective, NgFor],
     pipes: [AsyncPipe]
 })
 export class TreeViewComponent {
@@ -36,7 +27,7 @@ export class TreeViewComponent {
 
 
     private isExpanded = false;
-    private dynamicComponentStream: Observable<any>;
+    private componentContexts: Observable<DynamicComponentContext[]>;
 
     constructor() {
         this.onDataLoad = new BehaviorSubject(null);
@@ -48,7 +39,7 @@ export class TreeViewComponent {
     }
 
     ngOnInit() {
-        this.dynamicComponentStream = this.dataProvider().do((data)=> {
+        this.componentContexts = this.dataProvider().do((data)=> {
             this.onDataLoad.next(data);
         });
     }

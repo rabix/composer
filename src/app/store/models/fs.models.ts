@@ -49,8 +49,7 @@ export class FileModel extends FSItemModel {
 }
 
 export class DirectoryModel extends FSItemModel {
-    private isEmpty: boolean;
-    private children: DirectoryChild[] = [];
+    isEmpty: boolean;
 
     public static createFromObject(data: {
         name: string,
@@ -63,20 +62,4 @@ export class DirectoryModel extends FSItemModel {
         return Object.assign(new DirectoryModel(), data);
     }
 
-
-    public addChild(child: DirectoryChild): void {
-        this.children.push(child);
-    }
-
-    public setChildren(children: DirectoryChild[]): void {
-        this.children = children;
-    }
-
-    public hasContent(): boolean {
-        return this.isEmpty;
-    }
-
-    public getChildren(): DirectoryChild[] {
-        return this.children;
-    }
 }
