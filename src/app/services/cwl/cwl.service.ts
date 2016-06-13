@@ -19,22 +19,28 @@ export class CwlService {
     /* todo: turn the cwl into string with it's references */
     public getCwlFileContent(fileName: string) { }
 
-    public parseCwlFile(file: FileModel): CwlFile {
+    public parseCwlFile(file: FileModel): Observable<CwlFile> {
         //todo: actually parse by the spec. This only checks for the $include and $import.
         let content = JSON.parse(file.getContent());
         let cwlFile: CwlFile = new CwlFile(file.getName(), content, file.getAbsolutePath());
+        let that = this;
 
-        ObjectHelper.iterateAll(cwlFile.content, (propName, value, object) => {
-            if (propName === "$import" || propName === "$include") {
+        return Observable.create(function(observer) {
+            ObjectHelper.iterateAll(cwlFile.content, (propName, value, object) => {
+                if (propName === "$import" || propName === "$include") {
 
-                this.refResolverService.resolveRef(value, cwlFile.path).subscribe((refFile: FileModel) => {
-                    let parsedRefFile:CwlFile = this.parseCwlFile(refFile);
-                    cwlFile.contentReferences.push(parsedRefFile);
-                }, (err) => {
-                    console.error('Error occurred: ' + err);
-                });
-            }
+                    that.refResolverService.resolveRef(value, cwlFile.path).subscribe((refFile: FileModel) => {
+                        that.parseCwlFile(refFile).subscribe((parsedRefFile) => {
+                            cwlFile.contentReferences.push(parsedRefFile);
+                        }, (err) => observer.error(err));
+                    }, (err) => {
+                        console.error('Error occurred: ' + err);
+                        observer.error(err);
+                    });
+                }
+            });
+
+            observer.next(cwlFile);
         });
-        return cwlFile;
     }
 }
