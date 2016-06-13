@@ -12,6 +12,7 @@ import * as _ from "lodash";
 import {Store} from "@ngrx/store";
 import * as ACTIONS from "../../store/actions";
 import {FileEffects} from "../../store/effects/file.effects";
+import {FileStateService} from "../../state/file.state.service";
 
 @Component({
     selector: 'new-file-modal',
@@ -32,7 +33,10 @@ export class NewFileModalComponent implements OnInit {
 
     selectedType: any;
 
-    constructor(private formBuilder: FormBuilder, private store: Store, private fileFx: FileEffects) {
+    constructor(private formBuilder: FormBuilder,
+                private store: Store,
+                private fileFx: FileEffects,
+                private files: FileStateService) {
         this.fileTypes = [{
             id: '.json',
             name: 'JSON'
@@ -88,6 +92,14 @@ export class NewFileModalComponent implements OnInit {
         this.isCreatingFile = true;
 
         this.store.select("newFile").subscribe((file) => {
+
+
+            /**
+             * We are deprecating stores
+             * @TODO act accordingly
+             */
+            this.files.createItem(file);
+
             if (file && file.path === filePath) {
                 this.isCreatingFile = false;
                 this.store.dispatch({type: ACTIONS.OPEN_FILE_REQUEST, payload: file.model});

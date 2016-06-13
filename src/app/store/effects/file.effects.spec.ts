@@ -45,7 +45,7 @@ describe('File Effects', function () {
                     }
 
                     //noinspection TypeScriptUnresolvedFunction
-                    return Observable.of(FileModel.createFromObject({
+                    return Observable.of(new FileModel({
                         name: "file1",
                         content: "hello world"
                     }));
@@ -58,7 +58,7 @@ describe('File Effects', function () {
                     }
 
                     //noinspection TypeScriptUnresolvedVariable
-                    return Observable.of(FileModel.createFromObject({
+                    return Observable.of(new FileModel({
                         name: "file1",
                         content: "hello world"
                     }));

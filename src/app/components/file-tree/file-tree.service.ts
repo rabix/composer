@@ -4,6 +4,7 @@ import {DirectoryDataProviderFactory} from "./types";
 import {Store} from "@ngrx/store";
 import * as STORE_ACTIONS from "../../store/actions";
 import {FileModel} from "../../store/models/fs.models";
+import {FileStateService} from "../../state/file.state.service";
 
 
 @Injectable()
@@ -11,9 +12,16 @@ export class FileTreeService {
 
     private dataProvider;
 
+    private _subscriptions = [];
+
     constructor(@Inject(forwardRef(() => AsyncSocketProviderService))
                 private dataProvider: AsyncSocketProviderService,
-                private store: Store) {
+                private store: Store,
+                private files: FileStateService) {
+
+        this.files.create.subscribe((item) => {
+            console.log("New file is created, should be inserted into the tree", item);
+        })
     }
 
     /**

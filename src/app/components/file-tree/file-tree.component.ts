@@ -24,18 +24,12 @@ export class FileTreeComponent {
     private dataProviderFn: DirectoryDataProviderFactory;
     private treeIsLoading: boolean;
 
-    private storeSubscription;
-
     constructor(private treeService: FileTreeService) {
 
         this.treeIsLoading  = true;
         this.dataProviderFn = treeService.createDataProviderForDirectory("");
     }
 
-
-    ngOnDestroy() {
-        this.storeSubscription.unsubscribe();
-    }
 
     onDataLoad(data) {
         this.treeIsLoading = data === null;

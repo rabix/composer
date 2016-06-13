@@ -5,9 +5,7 @@ import {FileModel} from "./models/fs.models";
 
 describe('File Content Reducer', () => {
    it('should return a file model', () => {
-       let file = FileModel.createFromObject({
-           name: 'file1'
-       });
+       let file = new FileModel({name: "file1"});
 
        let newState = fileContent(undefined, {
            type: UPDATE_FILE_CONTENT,
@@ -17,15 +15,13 @@ describe('File Content Reducer', () => {
            }
        });
 
-       expect(newState.model.getName()).toEqual('file1');
+       expect(newState.model.name).toEqual('file1');
    });
 });
 
 describe('New File Reducer', () => {
     it('should return newly created file model', () => {
-        let file = FileModel.createFromObject({
-            name: 'file1'
-        });
+        let file = new FileModel({name: "file1"});
 
         let newState = newFile(undefined, {
             type: NEW_FILE_CREATED,
@@ -36,6 +32,6 @@ describe('New File Reducer', () => {
         });
 
         expect(newState.model instanceof FileModel).toEqual(true);
-        expect(newState.model.getName()).toEqual('file1');
+        expect(newState.model.name).toEqual('file1');
     });
 });

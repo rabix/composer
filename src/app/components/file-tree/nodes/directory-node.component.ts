@@ -48,7 +48,7 @@ export class DirectoryNodeComponent implements DynamicState {
 
     ngOnInit() {
         this.dataProviderFn = this.fileTreeService
-            .createDataProviderForDirectory(this.model.getAbsolutePath());
+            .createDataProviderForDirectory(this.model.absolutePath);
     }
 
     public toggleExpansion(isExpanded) {

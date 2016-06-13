@@ -11,7 +11,7 @@ describe('Open Files Reducer', () => {
     });
 
     it('should add an opened file to the state', () => {
-        let file = FileModel.createFromObject({
+        let file = new FileModel({
             name: 'test1',
             absolutePath: 'path/to/file'
         });
@@ -26,7 +26,7 @@ describe('Open Files Reducer', () => {
     });
 
     it('should not add the same file to the state twice', () => {
-        let file = FileModel.createFromObject({
+        let file = new FileModel({
             name: 'test1',
             absolutePath: 'path/to/file'
         });
@@ -46,12 +46,12 @@ describe('Open Files Reducer', () => {
     });
 
     it('should remove a file from open files state', () => {
-        let file = FileModel.createFromObject({
+        let file = new FileModel({
             name: 'test1',
             absolutePath: 'path/to/file'
         });
 
-        let file2 = FileModel.createFromObject({
+        let file2 = new FileModel({
             name: 'test2',
             absolutePath: 'path/to/file2'
         });
@@ -81,7 +81,7 @@ describe('Open Files Reducer', () => {
 
 describe('Selected File Reducer', () => {
    it('should return selected file', () => {
-       let file = FileModel.createFromObject({
+       let file = new FileModel({
            name: 'test1',
            absolutePath: 'path/to/file'
        });
