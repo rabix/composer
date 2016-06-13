@@ -98,7 +98,7 @@ export class NewFileModalComponent implements OnInit {
             //@FIXME sometimes, there's a new item on this stream here that is undefined.
 
             if (file && file.path === filePath) {
-                let fileModel = <FileModel> response.model;
+                let fileModel = <FileModel> file.model;
                 
                 this.files.createItem(fileModel);
                 this.isCreatingFile = false;
