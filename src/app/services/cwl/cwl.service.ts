@@ -2,8 +2,6 @@ import {Injectable} from "@angular/core";
 import {CwlFile} from "../../models/cwl.file.model.ts";
 import {ObjectHelper} from "../../helpers/object.helper";
 import {Observable} from "rxjs/Observable";
-import {Observer} from "rxjs/Observer";
-import * as _ from "lodash";
 import {RefResolverService} from "./ref-resolver.service";
 import {Subject} from "rxjs/Subject";
 import {FileModel} from "../../store/models/fs.models";
@@ -21,14 +19,20 @@ export class CwlService {
 
     public parseCwlFile(file: FileModel): Observable<CwlFile> {
         //todo: actually parse by the spec. This only checks for the $include and $import.
-        let content = JSON.parse(file.getContent());
-        let cwlFile: CwlFile = new CwlFile(file.getName(), content, file.getAbsolutePath());
+        let content = JSON.parse(file.content);
+        let cwlFile: CwlFile = new CwlFile({
+            id: file.name,
+            content: content,
+            path: file.absolutePath,
+            contentReferences: []
+        });
+        
         let that = this;
 
         return Observable.create(function(observer) {
             ObjectHelper.iterateAll(cwlFile.content, (propName, value, object) => {
                 if (propName === "$import" || propName === "$include") {
-
+                    
                     that.refResolverService.resolveRef(value, cwlFile.path).subscribe((refFile: FileModel) => {
                         that.parseCwlFile(refFile).subscribe((parsedRefFile) => {
                             cwlFile.contentReferences.push(parsedRefFile);

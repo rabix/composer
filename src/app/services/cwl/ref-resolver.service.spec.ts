@@ -8,80 +8,99 @@ import { Observable }     from 'rxjs/Observable';
 import {RefResolverService} from "./ref-resolver.service";
 import {UrlValidator} from "../../validators/url.validator";
 import {FileApi} from "../../services/api/file.api";
-import {TestScheduler} from "rxjs/Rx.KitchenSink";
+import {Observer} from "rxjs/Observer";
+import {FileModel} from "../../store/models/fs.models";
+import {FileHelper} from "../../helpers/file.helper";
 
-//class HttpService { }
+class MockHttpService {
+    public getRequest(url:string) {
+        return Observable.of({
+            json() {
+                return {
+                    content: "mock"
+                }
+            }
+        });
+    }
+}
+
+let mockFileModel: FileModel = new FileModel({
+    name: 'mock.yml',
+    absolutePath: '/Users/mate/testws/mock.yml',
+    content: '{ "content": "mock" }'
+});
+
+class MockFileApi {
+    public checkIfFileExists() {
+        return Observable.of(true);
+    }
+
+    public getFileContent() {
+        return Observable.of(mockFileModel);
+    }
+}
 
 describe("RefResolverService", () => {
 
-    // Aliases
-    /*var TestScheduler = TestScheduler,
-        onNext = ReactiveTest.onNext,
-        onError = Rx.ReactiveTest.onError,
-        onCompleted = Rx.ReactiveTest.onCompleted,
-        subscribe = Rx.ReactiveTest.subscribe;*/
+    beforeEachProviders(() => [
+        RefResolverService,
+        UrlValidator,
+        FileHelper,
+        provide(FileApi, {useClass: MockFileApi})
+        provide(HttpService, {useClass: MockHttpService})
+    ]);
 
-    class MockHttpService {
-        public getRequest(url:string) {
-           /* return {
-                "content": {
-                    "got response"
-                }
-            }*/
-            /*return Observable.create((observer) => {
-                observer.next({
-                    "content": {
-                        "got response"
-                    }
-                });
-            });*/
-        }
-    }
-
-    class MockFileApi { }
-
-     beforeEachProviders(() => [
-         RefResolverService,
-         UrlValidator,
-         provide(FileApi, {useClass: MockFileApi})
-         provide(HttpService, {useClass: MockHttpService})
-        // new Provider(HttpService, { useClass: MockHttpService })
-     ]);
-
-    describe("resolveRef", () => {
-        it("Return an observable emitting the resolved content",
+    describe("resolveUrlReference", () => {
+        it("should return an FileModel with content from the URL",
             injectAsync([RefResolverService], (refResolverService:RefResolverService) => {
-          /*  inject([RefResolverService, HttpService, FileApi],
-                fakeAsync((httpService: HttpService, fileApi: FileApi) => {*/
 
-                console.log('HERE!!!!!');
+                let expectedResult = new FileModel({
+                    name: 'test.json',
+                    absolutePath: 'https://stackoverflow.com/data/test.json',
+                    content: '{"content":"mock"}'
+                });
 
-               // spyOn(MockHttpService, 'getRequest');
-
-               /* spyOn(MockHttpService, "getRequest").and.returnValue({
-                    "content": {
-                        "got response"
-                    }
-                });*/
-
-                expect(true).toBe(false);
-
-                refResolverService.resolveRef("https://stackoverflow.com/data/test.json").toPromise().then((res) => {
-                    let body = res.json();
-                    expect(body).toBe({"content":  { "got response2 "}});
-
-                   // done();
-                }).catch((e) => console.log(e));
-
-               /*  refResolverService.resolveRef("https://stackoverflow.com/data/test.json").subscribe((res:Response) => {
-                         let body = res.json();
-
-                         console.log(res.json());
-                         expect(body).toBe({"content":  { "got response2 "}});
-                     }, (err) => {
-                         console.error('something wrong occurred: ' + err)
-                     });
-*/                //expect(true).toBe(false);
+                refResolverService.resolveUrlReference('test.json', "https://stackoverflow.com/data/test.json")
+                    .subscribe((res: FileModel) => {
+                        expect(_.isEqual(res, expectedResult)).toBe(true);
+                    });
             }));
     });
+
+    describe("resolveRef", () => {
+
+        it("should call resolveUrlReference if the reference is a URL",
+            injectAsync([RefResolverService], (refResolverService:RefResolverService) => {
+                spyOn(refResolverService, "resolveUrlReference").and.callFake(function() {
+                    return Observable.of({});
+                });
+
+
+                refResolverService.resolveRef("./test.json", "https://stackoverflow.com/data/")
+                    .subscribe((res: FileModel) => {
+                        expect(refResolverService.resolveUrlReference).toHaveBeenCalled();
+                    });
+
+                refResolverService.resolveRef("https://stackoverflow.com/data/test.json", "https://google.com/")
+                    .subscribe((res: FileModel) => {
+                        expect(refResolverService.resolveUrlReference).toHaveBeenCalled();
+                    });
+            }));
+
+
+        it("should return a file from the file system if the reference is NOT a URL",
+            injectAsync([RefResolverService], (refResolverService:RefResolverService) => {
+                
+                refResolverService.resolveRef("./test.json", "/Users/mate/testws/")
+                    .subscribe((res: FileModel) => {
+                        expect(_.isEqual(res, mockFileModel)).toBe(true);
+                    });
+
+                refResolverService.resolveRef("/Users/mate/testws/test.json", "/mock")
+                    .subscribe((res: FileModel) => {
+                        expect(_.isEqual(res, mockFileModel)).toBe(true);
+                    });
+            }));
+    });
+
 });

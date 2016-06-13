@@ -21,20 +21,21 @@ export class RefResolverService {
 
     public resolveRef(referenceString: string, parentPath: string): Observable<FileModel> {
         let that = this;
-        return Observable.create(function(observer) {
-            let isRelative: boolean = FileHelper.isRelativePath(referenceString);
+        let isRelative:boolean = FileHelper.isRelativePath(referenceString);
 
-            //If its a URL
-            if (that.urlValidator.isValidUrl(referenceString) && !isRelative) {
-                that.resolveUrlReference(referenceString, referenceString, observer)
+        //If its a URL
+        if (that.urlValidator.isValidUrl(referenceString) && !isRelative) {
+            return that.resolveUrlReference(referenceString, referenceString);
 
-            } else if (that.urlValidator.isValidUrl(parentPath) && isRelative) {
-                let absoluteRefPath = FileHelper.relativeToAbsolutePath(referenceString, parentPath);
-                that.resolveUrlReference(referenceString, absoluteRefPath, observer)
+        } else if (that.urlValidator.isValidUrl(parentPath) && isRelative) {
+            let absoluteRefPath = FileHelper.relativeToAbsolutePath(referenceString, parentPath);
+            return that.resolveUrlReference(referenceString, absoluteRefPath);
 
-            } else {
-                //If its a file
-                let absoluteRefPath: string;
+        } else {
+            //If its a file
+            return Observable.create((observer) => {
+
+                let absoluteRefPath:string;
                 if (isRelative) {
                     absoluteRefPath = FileHelper.relativeToAbsolutePath(referenceString, parentPath)
                 } else {
@@ -55,24 +56,26 @@ export class RefResolverService {
                     console.error(err);
                     observer.error(err);
                 });
-            }
-        });
+            });
+        }
     }
 
-    public resolveUrlReference(name: string, url: string, observer: Observer) {
-        this.httpService.getRequest(url).subscribe((res) => {
-            let content = JSON.stringify(res.json());
+    public resolveUrlReference(name: string, url: string): Observable<FileModel> {
+        return Observable.create((observer) => {
+            this.httpService.getRequest(url).subscribe((res) => {
+                let content = JSON.stringify(res.json());
 
-            let file:FileModel = FileModel.createFromObject({
-                name: name,
-                absolutePath: url,
-                content: content
+                let file:FileModel = new FileModel({
+                    name: name,
+                    absolutePath: url,
+                    content: content
+                });
+
+                observer.next(file);
+            }, (err) => {
+                console.log(err);
+                observer.error(err);
             });
-            
-            observer.next(file);
-        }, (err) => {
-            console.log(err);
-            observer.error(err);
         });
     }
 }

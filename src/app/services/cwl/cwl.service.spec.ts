@@ -1,13 +1,42 @@
-/*
-import {it, inject, describe, beforeEachProviders, injectAsync} from "@angular/core/testing";
+import {it, describe, beforeEachProviders, injectAsync} from "@angular/core/testing";
 import {CwlService} from "./cwl.service";
 import {CwlFile} from "../../models/cwl.file.model.ts";
 import {RefResolverService} from "./ref-resolver.service";
-import {provide, Provider} from "@angular/core"
+import {provide} from "@angular/core"
 import {FileModel} from "../../store/models/fs.models";
+import {Observable} from "rxjs/Observable";
+import * as _ from "lodash";
+
+let testFileContent = {
+    "form": {
+        "bar": {
+            "$import": "import.yml",
+            "fooo": {
+                "bla": {
+                    "$include": "./include.yml"
+                }
+            }
+        },
+        "$include": "./include2.yml",
+        "c": {
+            "$import": "./import2.yml"
+        },
+        "d": {
+            "$import": "./import2.yml"
+        }
+    }
+};
+
+let refFile: FileModel = new FileModel({
+    name: 'included.yml',
+    absolutePath: '/Users/mate/testws/included.yml',
+    content: '{ "content": "mock" }'
+});
 
 class MockRefResolverService {
-    public resolveRef(value, path) { }
+    public resolveRef() {
+        return Observable.of(refFile);
+    }
 }
 
 describe("CwlFileModel", () => {
@@ -24,51 +53,24 @@ describe("CwlFileModel", () => {
 
         it("should parse the JSON string and get the content references",
             injectAsync([CwlService], (cwlService:CwlService) => {
-                let testFileContent = {
-                    "form": {
-                        "bar": {
-                            "$import": "import.yml",
-                            "fooo": {
-                                "bla": {
-                                    "$include": "./include.yml"
-                                }
-                            }
-                        },
-                        "$include": "./include2.yml",
-                        "c": {
-                            "$import": "./import2.yml"
-                        },
-                        "d": {
-                            "$import": "./import2.yml"
-                        }
-                    }
-                };
 
-                let testFile = FileModel.createFromObject({
-                    name: 'file1',
-                    absolutePath: './Users/mate/testws/file1.json',
+                let testFile = new FileModel({
+                    name: "file1",
+                    absolutePath: "/Users/mate/testws/",
                     content: JSON.stringify(testFileContent)
                 });
 
-               /!* let result:CwlFile = cwlService.parseCwlFile(testFile);
-
-                expect(result.content).toEqual(testFileContent);
-                expect(result.contentReferences).toEqual(['$include2.ymmml', 'import2.yml', 'import.yml', '$include.yml']);*!/
-
-               /!* spyOn(RefResolverService, "resolveRef").and.callFake(function() {
-                    let mockFile = FileModel.createFromObject({
-                        name: 'included.yml',
-                        absolutePath: '/Users/mate/testws/included.yml',
-                        content: 'mock content'
-                    });
-
-                    return mockFile;
-                });*!/
-
-                cwlService.parseCwlFile(testFile).toPromise().then((result) => {
-                    expect(true).toBe(false);
+                let expectedRef = new CwlFile({
+                    id: 'included.yml',
+                    content: {content: 'mock'},
+                    path: '/Users/mate/testws/included.yml',
+                    contentReferences: []
                 });
+                
+                cwlService.parseCwlFile(testFile).subscribe((res: FileModel) => {
+                    expect(res.contentReferences.length).toBe(4);
+                    expect(_.isEqual(res.contentReferences[0], expectedRef)).toBe(true);
+                }, (err) => console.log(err));
             }));
     });
 });
-*/

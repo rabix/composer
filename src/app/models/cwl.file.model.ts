@@ -4,9 +4,16 @@ export class CwlFile {
     contentReferences: CwlFile[] = [];
     path: string;
     
-    constructor(id: string, content: Object, path: string) {
-        this.id = id;
-        this.content = content;
-        this.path = path;
+    constructor(attr: {
+        id: string, 
+        content: Object, 
+        path: string, 
+        contentReferences?: CwlFile[]
+    }) {
+        this.id = attr.id;
+        this.content = attr.content;
+        this.path = attr.path;
+        this.contentReferences = attr.contentReferences;
+
     }
 }
