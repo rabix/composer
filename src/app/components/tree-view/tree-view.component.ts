@@ -27,7 +27,7 @@ export class TreeViewComponent {
 
 
     private isExpanded = false;
-    private componentContexts: Observable<DynamicComponentContext[]>;
+    private componentContexts: Observable<DynamicComponentContext<any>[]>;
 
     constructor() {
         this.onDataLoad = new BehaviorSubject(null);

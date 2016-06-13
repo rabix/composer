@@ -4,6 +4,7 @@ import {DirectoryModel} from "../store/models/fs.models";
 import {Store} from "@ngrx/store";
 import * as ACTIONS from "../store/actions";
 import {FileEffects} from "../store/effects/file.effects";
+import {IFileResponse} from "../store/file-cache.reducer";
 
 export interface IFileChanges {
     content: string;
@@ -19,7 +20,7 @@ export class FileRegistry {
     private fileCache: {[fileId: string]: BehaviorSubject<IFileChanges>} = {};
     private dirCache: DirectoryModel[]                                   = [];
 
-    constructor(private store: Store, private fileEffects: FileEffects) {
+    constructor(private store: Store<any>, private fileEffects: FileEffects) {
         fileEffects.fileContent$.subscribe(this.store);
     }
 
@@ -48,7 +49,7 @@ export class FileRegistry {
 
             // when file content is retrieved, check if it's for the correct file, and push
             // new value to cached behavior subject.
-            this.store.select("fileContent").subscribe(file => {
+            this.store.select("fileContent").subscribe((file: IFileResponse) => {
                 //@todo(maya) error handling
                 if(file && file.path === path) {
                     this.fileCache[path].next({

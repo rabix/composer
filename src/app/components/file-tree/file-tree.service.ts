@@ -9,9 +9,6 @@ import {FileStateService} from "../../state/file.state.service";
 
 @Injectable()
 export class FileTreeService {
-
-    private dataProvider;
-
     private _subscriptions = [];
 
     constructor(@Inject(forwardRef(() => AsyncSocketProviderService))

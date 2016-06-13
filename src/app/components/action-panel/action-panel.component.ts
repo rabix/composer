@@ -30,15 +30,14 @@ require("./action-panel.component.scss");
     providers: [],
 })
 export class ActionPanelComponent {
-    private selectedFileContent: Observable<string>;
     private selectedFileSubject: BehaviorSubject<FileModel>;
     private selectedFile: Observable<FileModel>;
 
-    constructor(private store: Store, private registry: FileRegistry) {
+    constructor(private store: Store<any>, private registry: FileRegistry) {
         this.selectedFileSubject = new BehaviorSubject(null);
         
         this.selectedFile = <Observable<FileModel>> this.store.select('selectedFile')
-            .filter(file => file)
+            .filter(file => !!file)
             .switchMap((file: FileModel) => {
                 return registry.loadFile(file.absolutePath).map(change => {
                     file.content = change.content;

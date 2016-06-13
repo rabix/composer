@@ -23,11 +23,11 @@ export class CodeEditor {
     changeStream: Observable<any> = new Subject();
 
     constructor(editor: Editor) {
-        this.editor   = editor;
+        this.editor                 = editor;
         // to disable a warning message from ACE about a deprecated method
         this.editor.$blockScrolling = Infinity;
-        this.session  = editor.getSession();
-        this.document = this.session.getDocument();
+        this.session                = editor.getSession();
+        this.document               = this.session.getDocument();
 
         this.fileIsLoading = true;
 
@@ -38,8 +38,13 @@ export class CodeEditor {
     private _attachEventStreams() {
 
         //noinspection TypeScriptUnresolvedFunction
-        let changeSubscription = Observable.fromEvent(this.document, 'change')
-            .map((event) => {
+        let changeSubscription = Observable.fromEventPattern(
+            (handler) => {
+                this.document.on('change', e => {
+                    handler(e);
+                });
+            }, () => {})
+            .map(() => {
                 return {
                     source: 'ACE_EDITOR',
                     content: this.document.getValue()

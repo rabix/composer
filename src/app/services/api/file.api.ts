@@ -22,7 +22,7 @@ export class FileApi {
                     if (item.type === "directory") {
                         return new DirectoryModel(item);
                     }
-                    return new FileModel(item);;
+                    return new FileModel(item);
                 });
             });
     }

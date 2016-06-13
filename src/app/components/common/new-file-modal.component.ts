@@ -13,6 +13,10 @@ import {Store} from "@ngrx/store";
 import * as ACTIONS from "../../store/actions";
 import {FileEffects} from "../../store/effects/file.effects";
 import {FileStateService} from "../../state/file.state.service";
+import {HttpError} from "../../services/api/api-response-types";
+import {FileModel} from "../../store/models/fs.models";
+import {IFileResponse} from "../../store/file-cache.reducer";
+import {IGlobalError} from "../../store/errors.reducer";
 
 @Component({
     selector: 'new-file-modal',
@@ -34,7 +38,7 @@ export class NewFileModalComponent implements OnInit {
     selectedType: any;
 
     constructor(private formBuilder: FormBuilder,
-                private store: Store,
+                private store: Store<any>,
                 private fileFx: FileEffects,
                 private files: FileStateService) {
         this.fileTypes = [{
@@ -89,28 +93,29 @@ export class NewFileModalComponent implements OnInit {
         this.store.dispatch({type: ACTIONS.CREATE_FILE_REQUEST, payload: filePath});
         this.isCreatingFile = true;
 
-        this.store.select("newFile").subscribe((file) => {
+        this.store.select("newFile").subscribe((response: IFileResponse) => {
+            if (response && response.path === filePath) {
+                let fileModel = <FileModel> response.model;
+
+                /**
+                 * We are deprecating stores
+                 * @TODO act accordingly
+                 */
+                this.files.createItem(fileModel);
 
 
-            /**
-             * We are deprecating stores
-             * @TODO act accordingly
-             */
-            this.files.createItem(file);
-
-            if (file && file.path === filePath) {
                 this.isCreatingFile = false;
-                this.store.dispatch({type: ACTIONS.OPEN_FILE_REQUEST, payload: file.model});
-                this.confirm(file.model);
+                this.store.dispatch({type: ACTIONS.OPEN_FILE_REQUEST, payload: fileModel});
+                this.confirm(fileModel);
             }
         });
 
         // Handle error if file already exists
-        this.store.select("globalErrors").subscribe((error) => {
+        this.store.select("globalErrors").subscribe((error: IGlobalError) => {
             if (error && error.path === filePath) {
                 this.isCreatingFile = false;
 
-                if (error.error.statusCode === 403) {
+                if ((<HttpError> error.error).statusCode === 403) {
                     this.showFileExists = true;
                 } else {
                     this.isGeneralError = true;

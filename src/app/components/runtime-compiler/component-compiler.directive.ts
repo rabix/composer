@@ -8,7 +8,7 @@ import {hasDynamicState} from "./dynamic-state.interface";
 })
 export class ComponentCompilerDirective {
 
-    @Input("component-compiler") context: DynamicComponentContext;
+    @Input("component-compiler") context: DynamicComponentContext<any>;
 
     constructor(private view: ViewContainerRef,
                 private injector: Injector) {

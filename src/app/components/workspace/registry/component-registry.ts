@@ -56,7 +56,7 @@ export class ComponentRegistry {
      * @param componentName
      */
     public registerComponent(componentName: Function): void {
-        if (this.components[componentName]) {
+        if (this.components[<any> componentName]) {
             return;
         }
 
@@ -78,7 +78,7 @@ export class ComponentRegistry {
 
                 (<any>this.appRef)._loadComponent(comp);
 
-                this.components[componentName] = {
+                this.components[<any> componentName] = {
                     name: componentName,
                     component: comp
                 };

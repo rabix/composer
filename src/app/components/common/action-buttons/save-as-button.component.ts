@@ -45,7 +45,7 @@ export class SaveAsButtonComponent {
     initModal() {
 
         this.resolver.resolveComponent(SaveAsModalComponent)
-            .then((factory: ComponentFactory)=> {
+            .then((factory: ComponentFactory<any>)=> {
                 this.modal.factory = factory;
             });
 

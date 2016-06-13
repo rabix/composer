@@ -12,7 +12,7 @@ export interface ModalFunctionsInterface {
  * @deprecated Use ComponentCompilerDirective instead
  */
 export class DynamicallyCompiledComponentDirective implements OnInit {
-    private cref:ComponentRef;
+    private cref:ComponentRef<any>;
     private result:any;
 
     @Input() model: any;

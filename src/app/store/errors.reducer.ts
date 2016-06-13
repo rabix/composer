@@ -1,8 +1,9 @@
 import {Action, ActionReducer} from "@ngrx/store";
 import * as ACTIONS from "./actions";
 
-interface IGlobalError {
-    
+export interface IGlobalError {
+    path?: string;
+    error?: any;
 }
 
 //@todo(maya): write tests for error reducers, add standard error type
