@@ -15,6 +15,7 @@ import {SocketService} from "../../services/api/socket.service";
 import {provide, Component} from "@angular/core";
 import {FileEffects} from "../../store/effects/file.effects";
 import {StateUpdates} from "@ngrx/effects";
+import {FileStateService} from "../../state/file.state.service";
 require("./../../../assets/sass/main.scss");
 require("./main.component.scss");
 
@@ -40,7 +41,8 @@ require("./main.component.scss");
         WorkspaceService,
         DataService,
         FileEffects,
-        StateUpdates
+        StateUpdates,
+        FileStateService
     ]
 })
 export class MainComponent {

@@ -20,9 +20,9 @@ export class FileApi {
             .map(resp => {
                 return resp.content.map((item: FilePath) => {
                     if (item.type === "directory") {
-                        return DirectoryModel.createFromObject(item);
+                        return new DirectoryModel(item);
                     }
-                    return FileModel.createFromObject(item);
+                    return new FileModel(item);;
                 });
             });
     }
@@ -30,7 +30,7 @@ export class FileApi {
     getFileContent(path: string): Observable<FileModel> {
         return this.socket.request(SOCKET_REQUESTS.FILE_CONTENT, {file: path})
             .map(response => {
-                return FileModel.createFromObject(response.content)
+                return new FileModel(response.content);
             });
     }
 
@@ -39,7 +39,7 @@ export class FileApi {
             file: path,
             content: content || ''
         }).map(response => {
-            return FileModel.createFromObject(response.content);
+            return new FileModel(response.content);
         });
     }
 

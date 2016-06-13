@@ -85,8 +85,8 @@ describe("FileAPI", () => {
             inject([FileApi], (fileApi: FileApi) => {
                 fileApi.getFileContent("/root/subdir/file1.json").subscribe((file) => {
                     expect(file instanceof FileModel).toEqual(true);
-                    expect(file.getContent()).toEqual("hello world");
-                    expect(file.getAbsolutePath()).toEqual("/root/subdir/file1.json");
+                    expect(file.content).toEqual("hello world");
+                    expect(file.absolutePath).toEqual("/root/subdir/file1.json");
                 });
             })
         );

@@ -29,10 +29,8 @@ export class CodeEditorComponent implements OnInit {
 
         // this check shouldn't be necessary
         if (this.file) {
-            this.editor.setMode(this.file.getType() || '.txt');
-            this.editor.setTextStream(this.fileRegistry.loadFile(
-                this.file.getAbsolutePath()
-            ));
+            this.editor.setMode(this.file.type || '.txt');
+            this.editor.setTextStream(this.fileRegistry.loadFile(this.file.absolutePath));
         }
     }
 

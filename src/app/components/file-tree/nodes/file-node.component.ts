@@ -1,9 +1,8 @@
 import {Component, Input} from "@angular/core";
-import {TreeViewNode} from "../../tree-view/interfaces/tree-view-node";
 import {TreeviewSelectableDirective} from "../../tree-view/behaviours/treeview-selectable.directive";
-import {FilePath} from "../../../services/api/api-response-types";
 import {FileTreeService} from "../file-tree.service";
-import {HmrState} from "angular2-hmr";
+import {FileModel} from "../../../store/models/fs.models";
+import {DynamicState} from "../../runtime-compiler/dynamic-state.interface";
 
 @Component({
     selector: "file-tree:file",
@@ -23,18 +22,21 @@ import {HmrState} from "angular2-hmr";
         
     `
 })
-export class FileNodeComponent implements TreeViewNode {
-    isExpandable = false;
+export class FileNodeComponent implements DynamicState {
 
-    @Input() model: FilePath;
+    private isExpandable = false;
+
+    @Input() model: FileModel;
 
     constructor(private fileTreeService: FileTreeService) {
     }
 
-    onDoubleClick() {
+    private onDoubleClick() {
         this.fileTreeService.openFile(this.model);
     }
 
-    @HmrState() _state = { };
+    public setState(state) {
+        this.model = state;
+    }
 
 }

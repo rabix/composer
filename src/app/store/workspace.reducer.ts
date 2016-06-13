@@ -20,7 +20,7 @@ export const openFiles: ActionReducer<FileModel[]> = (state: FileModel[] = OPEN_
             let file = <FileModel>action.payload;
 
             return state.filter((openFile) => {
-                return openFile.getAbsolutePath() !== file.getAbsolutePath();
+                return openFile.absolutePath !== file.absolutePath;
             });
         }
     }
