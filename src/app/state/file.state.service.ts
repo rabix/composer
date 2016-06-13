@@ -1,6 +1,6 @@
 import {FSItemModel} from "../store/models/fs.models";
 import {Injectable} from "@angular/core";
-import {Subject} from "rxjs/Rx";
+import {Subject, Observable} from "rxjs/Rx";
 
 interface ModifierFn extends Function {
     (content: FSItemMap): FSItemMap
@@ -12,7 +12,7 @@ export type FSItemMap = {[relativePath: string]: FSItemModel};
 export class FileStateService {
 
     public create   = new Subject<FSItemModel|FSItemModel[]>();
-    public registry = new Subject<FSItemMap>();
+    public registry = new Observable<FSItemMap>();
 
     private updates = new Subject<any>();
 

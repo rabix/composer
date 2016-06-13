@@ -1,5 +1,4 @@
 import {Injectable, forwardRef, Inject, ComponentResolver} from "@angular/core";
-import {AsyncSocketProviderService} from "./async-socket-provider.service";
 import {DirectoryDataProviderFactory} from "./types";
 import {Store} from "@ngrx/store";
 import * as STORE_ACTIONS from "../../store/actions";

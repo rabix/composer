@@ -16,19 +16,17 @@ export class FileApi {
      * Fetch remote directory content
      */
     getDirContent(path: string = ""): Observable<FSItemModel[]> {
-        if(path === ""){
+        if (path === "") {
             path = "./";
         }
 
         return this.socket.request(SOCKET_REQUESTS.DIR_CONTENT, {dir: path})
-            .map(resp => {
-                return resp.content.map((item: FilePath) => {
-                    if (item.type === "directory") {
-                        return new DirectoryModel(item);
-                    }
-                    return new FileModel(item);
-                });
-            });
+            .map(resp => resp.content.map((item: FilePath) => {
+                if (item.type === "directory") {
+                    return new DirectoryModel(item);
+                }
+                return new FileModel(item);
+            }));
     }
 
     getFileContent(path: string): Observable<FileModel> {
