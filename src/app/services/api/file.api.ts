@@ -34,7 +34,7 @@ export class FileApi {
             });
     }
 
-    createFile(path: string, content?: string): Observable<FilePath|HttpError> {
+    createFile(path: string, content?: string): Observable<FilePath> {
         return this.socket.request(SOCKET_REQUESTS.CREATE_FILE, {
             file: path,
             content: content || ''
@@ -43,14 +43,14 @@ export class FileApi {
         });
     }
 
-    updateFile(path: string, content: string): Observable<boolean|HttpError> {
+    updateFile(path: string, content: string): Observable<boolean> {
         return this.socket.request(SOCKET_REQUESTS.UPDATE_FILE, {
             file: path,
             content: content
         });
     }
 
-    checkIfFileExists(path: string): Observable<boolean|HttpError> {
+    checkIfFileExists(path: string): Observable<boolean> {
         console.log('this function is being called');
         return this.socket.request(SOCKET_REQUESTS.FILE_EXISTS, {
             path: path

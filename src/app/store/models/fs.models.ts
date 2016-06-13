@@ -43,6 +43,10 @@ export class FileModel extends FSItemModel {
         return this.content;
     }
 
+    public setContent(content: string) {
+        this.content = content;
+    }
+
     public isModified() {
         return this.modified;
     }

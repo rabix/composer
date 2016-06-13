@@ -21,15 +21,14 @@ export class ModalComponent {
     data: any;
 
     constructor(private app:ApplicationRef,
-                private resolver: ComponentResolver) { }
+                private resolver: ComponentResolver) {
+    }
 
     toComponent() {
         let factory = this.factory;
         let data = this.data;
         let functions = this.functions;
         let injector = this.injector;
-
-
         
         @Component({
             selector: 'container',
@@ -52,7 +51,7 @@ export class ModalComponent {
         class Container {
             @Input() public modalFactory: any = factory;
             @Input() public modalData: any = data;
-            @Input() public modalFunctions: any = functions;
+            @Input() public modalFunctions: ModalFunctionsInterface = functions;
             @Input() public injector: Injector = injector;
         }
 
@@ -72,7 +71,7 @@ export class ModalComponent {
                 let dynamicComponent = viewContainerRef.createComponent(factory, 0);
                 let component = dynamicComponent.instance;
 
-                component.cancel =this.functions.cancel.bind(component);
+                component.cancel = this.functions.cancel.bind(component);
 
                 // Assign the cref to the newly created modal so it can self-destruct correctly.
                 component.cref = dynamicComponent;

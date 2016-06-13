@@ -1,12 +1,8 @@
-import {
-    Component, Input, OnInit, Injector, ComponentFactory,
-    ComponentResolver
-} from "@angular/core";
+import {Component, Input, Injector, ComponentFactory, ComponentResolver} from "@angular/core";
 import {ActionButtonComponent} from "./action-button.component";
 import {ModalComponent} from "../../modal/modal.component";
-import {NewFileModalComponent} from "../new-file-modal.component";
-import {FileApi} from "../../../services/api/file.api";
-import {Observable} from "rxjs/Rx";
+import {BehaviorSubject} from "rxjs/Rx";
+import {SaveAsModalComponent} from "../save-as-modal.component";
 
 @Component({
     selector: 'save-as-button',
@@ -21,7 +17,7 @@ import {Observable} from "rxjs/Rx";
     directives: [ActionButtonComponent]
 })
 export class SaveAsButtonComponent {
-    @Input() content: Observable<string>;
+    @Input() content: BehaviorSubject<string>;
 
     constructor(private modal: ModalComponent,
                 private injector: Injector,
@@ -33,6 +29,11 @@ export class SaveAsButtonComponent {
      * Opens new file modal
      */
     openModal(): void {
+
+        this.modal.data = {
+            content: this.content.value
+        };
+
         // result should just be final result, like file to open
         this.modal.show();
     }
@@ -43,7 +44,7 @@ export class SaveAsButtonComponent {
 
     initModal() {
 
-        this.resolver.resolveComponent(NewFileModalComponent)
+        this.resolver.resolveComponent(SaveAsModalComponent)
             .then((factory: ComponentFactory)=> {
                 this.modal.factory = factory;
             });
@@ -51,11 +52,6 @@ export class SaveAsButtonComponent {
         // so the modalComponent can resolve dependencies in the same tree
         // as the component initiating it
         this.modal.injector = this.injector;
-
-        debugger;
-        this.modal.data = {
-            content: this.content
-        };
 
         this.modal.functions = {
             cancel: function () {

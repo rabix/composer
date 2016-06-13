@@ -1,0 +1,36 @@
+<block-loader class="overlay" *ngIf="model.isCreatingFile"></block-loader>
+<div>
+    <div class="modal-header">
+        <h4>Save File As</h4>
+    </div>
+
+    <form [ngFormModel]="newFileForm"
+          (ngSubmit)="createFile(newFileForm)">
+
+
+        <div class="modal-body">
+            <div class="alert alert-danger" *ngIf="isGeneralError">
+                An error occurred while trying to create the file
+            </div>
+
+            <fieldset class="form-group" [class.has-danger]="showFileExists">
+                <label for="fileName" class="form-control-label">Enter file name</label>
+                <input ngControl="name"
+                       #name="ngForm"
+                       type="text"
+                       class="form-control"
+                       id="fileName"
+                       placeholder="File Name">
+                <p class="text-help" *ngIf="showFileExists">
+                    A file with that name already exists
+                </p>
+            </fieldset>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-secondary" type="button" (click)="cancel()">Cancel</button>
+            <button class="btn btn-primary" type="submit" [disabled]="!newFileForm.valid">Create</button>
+        </div>
+
+    </form>
+</div>
