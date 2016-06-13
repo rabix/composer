@@ -40,8 +40,8 @@ export class ActionPanelComponent {
         this.selectedFile = <Observable<FileModel>> this.store.select('selectedFile')
             .filter(file => file)
             .switchMap((file: FileModel) => {
-                return registry.loadFile(file.getAbsolutePath()).map(change => {
-                    file.setContent(change.content);
+                return registry.loadFile(file.absolutePath).map(change => {
+                    file.content = change.content;
                     return file;
                 });
             });

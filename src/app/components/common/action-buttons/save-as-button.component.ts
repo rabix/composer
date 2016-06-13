@@ -31,7 +31,7 @@ export class SaveAsButtonComponent {
      */
     openModal(): void {
         this.modal.data = {
-            content: this.content.value.getContent()
+            content: this.content.value.content
         };
 
         // result should just be final result, like file to open

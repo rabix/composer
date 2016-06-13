@@ -25,7 +25,7 @@ export class SaveButtonComponent {
         let file = this.file.getValue();
 
         //@todo(maya) move to a more global service like FileEffects, or something else if removing store 
-        this.fileApi.updateFile(file.getRelativePath(), file.getContent()).subscribe(resp => {
+        this.fileApi.updateFile(file.relativePath, file.content).subscribe(resp => {
             //@todo(maya) implement global notification system
             console.log('Update file response', resp);
         }, err => {
