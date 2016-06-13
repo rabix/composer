@@ -28,7 +28,7 @@ export class SocketService {
 
     public request(eventName: string, data: any = {}): Observable<any> {
 
-        let sub = this.connection.startWith("").subscribe(_ => true);
+        let sub = this.connection.startWith(<any> "").subscribe(_ => true);
 
         return Observable.create((obs: Observer<any>)=> {
             this.ioSocket.emit(eventName, data, (data)=> {
@@ -47,7 +47,7 @@ export class SocketService {
     }
 
     private createConnectionStream(host: string): Observable<any> {
-        return Observable.create((observer: Observer) => {
+        return Observable.create((observer: Observer<any>) => {
 
             this.ioSocket = io(host);
 

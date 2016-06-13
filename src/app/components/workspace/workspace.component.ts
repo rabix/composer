@@ -70,19 +70,23 @@ export class WorkspaceComponent {
                 });
             });
 
-        // @todo(maya) create an algorithm that does less work and isn't dependent on pairwise
         this.workspaceService.openFiles
-            .pairwise()
-            .subscribe(fileState => {
-                // pairwise returns an Observable of an array of two items:
-                // [previousValue, currentValue]
-                let prev    = fileState[0];
-                let current = fileState[1];
+            .subscribe(newList => {
+                let added = [];
 
-                let added = current.filter((file) => {
-                    return prev.indexOf(file) === -1;
-                });
+                if (this.layout.root) {
+                    // filter through open CodeEditorComponents, gather their FileModels
+                    let oldList = this.layout.root.contentItems[0].contentItems[1].contentItems
+                        .filter((item) => item.componentName === CodeEditorComponent)
+                        .map(item => item.config.componentState.fileInfo);
 
+                    // compare already opened FileModels to the list of open files
+                    added = newList.filter((file) => {
+                        return oldList.indexOf(file) === -1;
+                    })
+                }
+
+                // add all new files that are not already open
                 added.forEach((file) => {
                     this.registry.registerComponent(CodeEditorComponent);
                     this.layout.root.contentItems[0].contentItems[1].addChild({
@@ -98,7 +102,7 @@ export class WorkspaceComponent {
 
         //@todo(maya) implement multiple selected files for multiple panes
         this.workspaceService.selectedFile
-            .filter(file => file) // ensure that file is not undefined
+            .filter(file => !!file) // ensure that file is not undefined
             .subscribe(file => {
                 let activeTab = this.layout.root.contentItems[0].contentItems[1].contentItems.filter((contentItem) => {
                     return contentItem.config.componentState.fileInfo === file;

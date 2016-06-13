@@ -1,4 +1,4 @@
-import {Component, Input, Injector} from "@angular/core";
+import {Component, Input, Injector, forwardRef, Inject} from "@angular/core";
 import {FilePath} from "../../../services/api/api-response-types";
 import {TreeViewNode} from "../../tree-view/interfaces/tree-view-node";
 import {TreeviewSelectableDirective} from "../../tree-view/behaviours/treeview-selectable.directive";
@@ -28,7 +28,7 @@ import {DynamicState} from "../../runtime-compiler/dynamic-state.interface";
             
         </div>
         <template [ngIf]="isExpanded">
-            <tree-view [injector]="injector" [dataProvider]="dataProviderFn"></tree-view>
+            <tree-view [dataProvider]="dataProviderFn"></tree-view>
         </template>
         
     `
@@ -42,13 +42,14 @@ export class DirectoryNodeComponent implements DynamicState {
 
     private dataProviderFn;
 
-    constructor(private fileTreeService: FileTreeService, private injector: Injector) {
+    constructor(@Inject(forwardRef(() => FileTreeService))
+                private fileTreeService: FileTreeService) {
 
     }
 
     ngOnInit() {
         this.dataProviderFn = this.fileTreeService
-            .createDataProviderForDirectory(this.model.absolutePath);
+            .createDataProviderForDirectory(this.model.relativePath);
     }
 
     public toggleExpansion(isExpanded) {

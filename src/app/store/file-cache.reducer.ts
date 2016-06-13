@@ -2,7 +2,7 @@ import {ActionReducer, Action} from "@ngrx/store";
 import {FileModel} from "./models/fs.models";
 import * as ACTIONS from "./actions";
 
-interface IFileResponse {
+export interface IFileResponse {
     path: string;
     model: FileModel;
 }

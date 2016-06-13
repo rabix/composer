@@ -57,7 +57,7 @@ describe('File Effects', function () {
                         });
                     }
 
-                    //noinspection TypeScriptUnresolvedVariable
+                    //noinspection TypeScriptUnresolvedFunction
                     return Observable.of(new FileModel({
                         name: "file1",
                         content: "hello world"

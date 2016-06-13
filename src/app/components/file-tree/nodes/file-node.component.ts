@@ -1,4 +1,4 @@
-import {Component, Input} from "@angular/core";
+import {Component, Input, forwardRef, Inject} from "@angular/core";
 import {TreeviewSelectableDirective} from "../../tree-view/behaviours/treeview-selectable.directive";
 import {FileTreeService} from "../file-tree.service";
 import {FileModel} from "../../../store/models/fs.models";
@@ -16,7 +16,7 @@ import {DynamicState} from "../../runtime-compiler/dynamic-state.interface";
             <span class="fa fa-file-o node-icon"></span>
             
              <span class="name">
-                {{ model.name }}
+                {{ model?.name }}
             </span>
         </div>
         
@@ -28,7 +28,9 @@ export class FileNodeComponent implements DynamicState {
 
     @Input() model: FileModel;
 
-    constructor(private fileTreeService: FileTreeService) {
+    constructor(
+        @Inject(forwardRef(() => FileTreeService))
+        private fileTreeService: FileTreeService) {
     }
 
     private onDoubleClick() {

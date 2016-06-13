@@ -14,9 +14,9 @@ export class ObjectHelper {
     public static addProperty(target: Object, path: string[] | string, value: any): void {
 
         // Ensure that path is an array of path elements
-        const path = typeof path === "string" ? path.split(ObjectHelper.pathDelimiter) : path;
+        const resolvedPath = typeof path === "string" ? path.split(ObjectHelper.pathDelimiter) : path;
 
-        path.reduce((acc, curr, index, arr)=> {
+        (<Array<string>> resolvedPath).reduce((acc, curr, index, arr)=> {
             if (index === arr.length - 1) {
                 return acc[curr] = value;
             }

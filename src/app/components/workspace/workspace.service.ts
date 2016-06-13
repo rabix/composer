@@ -9,9 +9,9 @@ export class WorkspaceService {
     public openFiles: Observable<FileModel[]>;
     public selectedFile: Observable<FileModel>;
 
-    constructor(private store: Store) {
-        this.openFiles    = store.select('openFiles');
-        this.selectedFile = store.select('selectedFile');
+    constructor(private store: Store<any>) {
+        this.openFiles    = <Observable<Array<FileModel>>> store.select('openFiles');
+        this.selectedFile = <Observable<FileModel>> store.select('selectedFile');
     }
 
     public selectFile(file: FileModel): void {

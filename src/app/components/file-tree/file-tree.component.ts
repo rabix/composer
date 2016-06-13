@@ -1,4 +1,3 @@
-import {AsyncSocketProviderService} from "./async-socket-provider.service";
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {Component} from "@angular/core";
 import {DataService} from "../../services/data/data.service";
@@ -10,7 +9,7 @@ import {NgTemplateOutlet} from "@angular/common";
 @Component({
     selector: "file-tree",
     directives: [TreeViewComponent, BlockLoaderComponent, NgTemplateOutlet],
-    providers: [TreeViewService, AsyncSocketProviderService, DataService],
+    providers: [TreeViewService, DataService],
     template: `
         <block-loader *ngIf="treeIsLoading"></block-loader>
         

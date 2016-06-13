@@ -30,7 +30,7 @@ export class SaveAsModalComponent implements OnInit {
     private model: any;
 
     constructor(private formBuilder: FormBuilder,
-                private store: Store,
+                private store: Store<any>,
                 private fileFx: FileEffects,
                 private fileApi: FileApi) {
 
@@ -63,7 +63,6 @@ export class SaveAsModalComponent implements OnInit {
             this.isCreatingFile = false;
             this.store.dispatch({type: ACTIONS.OPEN_FILE_REQUEST, payload: file});
             this.confirm(file);
-            console.log(file);
         }, (error) => {
             this.isCreatingFile = false;
             if (error.statusCode === 403) {

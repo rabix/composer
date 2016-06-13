@@ -50,12 +50,6 @@ export class TreeNodeComponent {
 
     ngOnInit() {
 
-        // this.dataProvider.getDirContent().subscribe((data) => {
-        //     console.log("provided data", data);
-        // });
-
         this.isExpandable = this.node.children && this.node.children.length > 0;
-
-
     }
 }

@@ -34,7 +34,7 @@ export class NewFileButtonComponent implements OnInit {
     initModal() {
 
         this.resolver.resolveComponent(NewFileModalComponent)
-            .then((factory:ComponentFactory) => {
+            .then((factory:ComponentFactory<any>) => {
                 this.modal.factory = factory;
             });
 

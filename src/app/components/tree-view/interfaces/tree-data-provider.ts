@@ -5,4 +5,4 @@ export interface TreeDataProvider {
     getNodeContent();
 }
 
-export type ComponentFactoryProviderFn = () => Observable<DynamicComponentContext[]>;
+export type ComponentFactoryProviderFn = () => Observable<DynamicComponentContext<any>[]>;
