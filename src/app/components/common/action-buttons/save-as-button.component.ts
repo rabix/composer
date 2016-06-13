@@ -3,6 +3,7 @@ import {ActionButtonComponent} from "./action-button.component";
 import {ModalComponent} from "../../modal/modal.component";
 import {BehaviorSubject} from "rxjs/Rx";
 import {SaveAsModalComponent} from "../save-as-modal.component";
+import {FileModel} from "../../../store/models/fs.models";
 
 @Component({
     selector: 'save-as-button',
@@ -17,7 +18,7 @@ import {SaveAsModalComponent} from "../save-as-modal.component";
     directives: [ActionButtonComponent]
 })
 export class SaveAsButtonComponent {
-    @Input() content: BehaviorSubject<string>;
+    @Input() content: BehaviorSubject<FileModel>;
 
     constructor(private modal: ModalComponent,
                 private injector: Injector,
@@ -29,9 +30,8 @@ export class SaveAsButtonComponent {
      * Opens new file modal
      */
     openModal(): void {
-
         this.modal.data = {
-            content: this.content.value
+            content: this.content.value.getContent()
         };
 
         // result should just be final result, like file to open

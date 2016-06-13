@@ -90,7 +90,6 @@ export class FileEffects {
                     }
                 })
                 .catch(err => {
-                    debugger;
                     return Observable.of({
                         type: ACTIONS.NEW_FILE_ERROR,
                         payload: {

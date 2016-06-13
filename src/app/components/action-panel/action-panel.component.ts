@@ -6,19 +6,24 @@ import {Observable, BehaviorSubject} from "rxjs/Rx";
 import {AsyncPipe} from "@angular/common";
 import {FileRegistry} from "../../services/file-registry.service";
 import {FileModel} from "../../store/models/fs.models";
+import {SaveButtonComponent} from "../common/action-buttons/save-button.component";
 
 require("./action-panel.component.scss");
 
 @Component({
     selector: "action-panel",
-    directives: [NewFileButtonComponent, SaveAsButtonComponent],
+    directives: [NewFileButtonComponent, SaveAsButtonComponent, SaveButtonComponent],
     template: `
     <nav>
         <new-file-button></new-file-button>   
         <save-as-button
-            *ngIf="selectedFileContent | async"
-            [content]="selectedFileContent"
+            *ngIf="selectedFile | async"
+            [content]="selectedFileSubject"
         ></save-as-button>
+        <save-button
+            *ngIf="selectedFile | async"
+            [file]="selectedFileSubject"
+        ></save-button>
     </nav>
        `,
     pipes: [AsyncPipe],
@@ -26,12 +31,13 @@ require("./action-panel.component.scss");
 })
 export class ActionPanelComponent {
     private selectedFileContent: Observable<string>;
-    private selectedFileSubject: BehaviorSubject<string>;
+    private selectedFileSubject: BehaviorSubject<FileModel>;
+    private selectedFile: Observable<FileModel>;
 
     constructor(private store: Store, private registry: FileRegistry) {
         this.selectedFileSubject = new BehaviorSubject(null);
         
-        this.selectedFileContent = <Observable<string>> this.store.select('selectedFile')
+        this.selectedFile = <Observable<FileModel>> this.store.select('selectedFile')
             .filter(file => file)
             .switchMap((file: FileModel) => {
                 return registry.loadFile(file.getAbsolutePath()).map(change => {
@@ -39,7 +45,7 @@ export class ActionPanelComponent {
                     return file;
                 });
             });
-
-        this.selectedFileContent.subscribe(this.selectedFileSubject);
+        
+        this.selectedFile.subscribe(this.selectedFileSubject);
     }
 }
