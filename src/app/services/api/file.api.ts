@@ -3,7 +3,7 @@ import {SocketService} from "./socket.service";
 import {SOCKET_REQUESTS} from "./socket-events";
 import {FilePath, HttpError} from "./api-response-types";
 import {Observable} from "rxjs/Rx";
-import {DirectoryChild, DirectoryModel, FileModel} from "../../store/models/fs.models";
+import {DirectoryChild, DirectoryModel, FileModel, FSItemModel} from "../../store/models/fs.models";
 import {Store} from "@ngrx/store";
 
 @Injectable()
@@ -15,7 +15,11 @@ export class FileApi {
     /**
      * Fetch remote directory content
      */
-    getDirContent(path: string = ""): Observable<DirectoryChild[]> {
+    getDirContent(path: string = ""): Observable<FSItemModel[]> {
+        if(path === ""){
+            path = "./";
+        }
+
         return this.socket.request(SOCKET_REQUESTS.DIR_CONTENT, {dir: path})
             .map(resp => {
                 return resp.content.map((item: FilePath) => {

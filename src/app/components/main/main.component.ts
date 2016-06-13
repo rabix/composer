@@ -14,7 +14,9 @@ import {DataService} from "../../services/data/data.service";
 import {SocketService} from "../../services/api/socket.service";
 import {provide, Component} from "@angular/core";
 import {FileEffects} from "../../store/effects/file.effects";
+import {UrlValidator} from "../../validators/url.validator"
 import {StateUpdates} from "@ngrx/effects";
+import {HTTP_PROVIDERS} from '@angular/http';
 import {FileStateService} from "../../state/file.state.service";
 require("./../../../assets/sass/main.scss");
 require("./main.component.scss");
@@ -43,6 +45,9 @@ require("./main.component.scss");
         FileEffects,
         StateUpdates,
         FileStateService
+        StateUpdates,
+        UrlValidator,
+        HTTP_PROVIDERS
     ]
 })
 export class MainComponent {

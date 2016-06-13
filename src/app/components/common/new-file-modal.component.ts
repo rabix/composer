@@ -88,22 +88,19 @@ export class NewFileModalComponent implements OnInit {
         }
 
         let filePath = fileName + ext;
-        
-        
+
+
         this.store.dispatch({type: ACTIONS.CREATE_FILE_REQUEST, payload: filePath});
         this.isCreatingFile = true;
 
-        this.store.select("newFile").subscribe((response: IFileResponse) => {
-            if (response && response.path === filePath) {
+        this.store.select("newFile").subscribe((file: IFileResponse) => {
+
+            //@FIXME sometimes, there's a new item on this stream here that is undefined.
+
+            if (file && file.path === filePath) {
                 let fileModel = <FileModel> response.model;
-
-                /**
-                 * We are deprecating stores
-                 * @TODO act accordingly
-                 */
+                
                 this.files.createItem(fileModel);
-
-
                 this.isCreatingFile = false;
                 this.store.dispatch({type: ACTIONS.OPEN_FILE_REQUEST, payload: fileModel});
                 this.confirm(fileModel);
