@@ -18,9 +18,6 @@ export class FileTreeService {
                 private fileApi: FileApi,
                 private resolver: ComponentResolver,
                 private fileRegistry: FileStateService) {
-
-        console.log("Store?", this.store);
-        // this.createDataProviderForDirectory()().subscribe(_ => console.log("Subs", _));
     }
 
     /**
@@ -57,17 +54,20 @@ export class FileTreeService {
             }).distinctUntilChanged((a, b) => {
                 return Object.keys(a).length === Object.keys(b).length;
             }).map(filtered => {
-                console.log("Got changed");
-                return Observable.defer(() => {
+                return <any>Observable.defer(() => {
                     return Observable.fromPromise(Promise.all(filtered.map((item: FSItemModel) => {
-                        let componentType = FileNodeComponent;
+                        let componentType: any = FileNodeComponent;
                         if (item instanceof DirectoryModel) {
                             componentType = DirectoryNodeComponent;
                         }
 
                         return this.resolver.resolveComponent(componentType)
-                            .then(factory => new DynamicComponentContext(factory, item),
-                                (err) => console.error(`Component Compilation Error: ${err}`));
+                            .then(
+                                factory => new DynamicComponentContext(factory, item),
+                                err => {
+                                    throw new Error(`Component Compilation Error: ${err}`)
+                                }
+                            );
 
                     })));
                 });

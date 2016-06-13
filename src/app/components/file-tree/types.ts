@@ -1,4 +1,4 @@
 import {Observable} from "rxjs/Rx";
-import {ComponentFactory} from "@angular/core";
+import {DynamicComponentContext} from "../runtime-compiler/dynamic-component-context";
 
-export type DirectoryDataProviderFactory = () => Observable<ComponentFactory<any>[]>
+export type DirectoryDataProviderFactory = () => Observable<Array<DynamicComponentContext<any>>>
