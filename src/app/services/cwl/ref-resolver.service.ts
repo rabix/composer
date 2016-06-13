@@ -6,52 +6,60 @@ import {Observable} from "rxjs/Observable";
 import {HttpService} from "../../services/http/http.service";
 import {FileApi} from "../../services/api/file.api";
 import {Subject} from "rxjs/Subject";
+import {Subject} from "rxjs/Subject";
 import {FileModel} from "../../store/models/fs.models";
 import {CwlFile} from "../../models/cwl.file.model.ts";
 import {FileHelper} from "../../helpers/file.helper";
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {Observer} from "rxjs/Observer";
 
 @Injectable()
 export class RefResolverService {
-    public refFile: Subject<FileModel> = new Subject<FileModel>();
-
     constructor(private urlValidator: UrlValidator,
                 private httpService: HttpService,
                 private fileApi: FileApi) { }
 
-    public resolveRef(referenceString: string, parentPath: string) {
-        let isRelative: boolean = FileHelper.isRelativePath(referenceString);
+    public resolveRef(referenceString: string, parentPath: string): Observable<FileModel> {
+        let that = this;
+        return Observable.create(function(observer) {
+            let isRelative: boolean = FileHelper.isRelativePath(referenceString);
 
-        //If its a URL
-        if (this.urlValidator.isValidUrl(referenceString) && !isRelative) {
-            this.resolveUrlReference(referenceString, referenceString)
+            //If its a URL
+            if (that.urlValidator.isValidUrl(referenceString) && !isRelative) {
+                that.resolveUrlReference(referenceString, referenceString, observer)
 
-        } else if (this.urlValidator.isValidUrl(parentPath) && isRelative) {
-            let absoluteRefPath = FileHelper.relativeToAbsolutePath(referenceString, parentPath);
-            this.resolveUrlReference(referenceString, absoluteRefPath)
+            } else if (that.urlValidator.isValidUrl(parentPath) && isRelative) {
+                let absoluteRefPath = FileHelper.relativeToAbsolutePath(referenceString, parentPath);
+                that.resolveUrlReference(referenceString, absoluteRefPath, observer)
 
-        } else {
-            //If its a file
-            let absoluteRefPath: string;
-            if (isRelative) {
-                absoluteRefPath = FileHelper.relativeToAbsolutePath(referenceString, parentPath)
             } else {
-                absoluteRefPath = referenceString;
-            }
-
-            this.fileApi.checkIfFileExists(absoluteRefPath).subscribe((fileExists) => {
-                if (fileExists) {
-                    this.fileApi.getFileContent(absoluteRefPath).subscribe((result:FileModel) => {
-                        this.refFile.next(result);
-                    }, (err) => console.error(err));
+                //If its a file
+                let absoluteRefPath: string;
+                if (isRelative) {
+                    absoluteRefPath = FileHelper.relativeToAbsolutePath(referenceString, parentPath)
+                } else {
+                    absoluteRefPath = referenceString;
                 }
 
-            }, (err) => console.error(err));
-        }
+                that.fileApi.checkIfFileExists(absoluteRefPath).subscribe((fileExists) => {
+                    if (fileExists) {
+                        that.fileApi.getFileContent(absoluteRefPath).subscribe((result:FileModel) => {
+                            observer.next(result);
+                        }, (err) => {
+                            console.error(err);
+                            observer.error(err);
+                        });
+                    }
 
-        return this.refFile;
+                }, (err) => {
+                    console.error(err);
+                    observer.error(err);
+                });
+            }
+        });
     }
 
-    public resolveUrlReference(name: string, url: string) {
+    public resolveUrlReference(name: string, url: string, observer: Observer) {
         this.httpService.getRequest(url).subscribe((res) => {
             let content = JSON.stringify(res.json());
 
@@ -60,10 +68,11 @@ export class RefResolverService {
                 absolutePath: url,
                 content: content
             });
-
-            this.refFile.next(file);
+            
+            observer.next(file);
         }, (err) => {
             console.log(err);
+            observer.error(err);
         });
     }
 }

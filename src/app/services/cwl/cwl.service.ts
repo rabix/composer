@@ -12,7 +12,7 @@ import {FileModel} from "../../store/models/fs.models";
 export class CwlService {
 
     /* todo: this should get updated whenever a reference file is updated and other files should update if this changes */
-    public contentRefsSubject: Subject<CwlFile> = new Subject<CwlFile>();
+    private contentRefsSubject: Subject<CwlFile> = new Subject<CwlFile>();
 
     constructor(private refResolverService: RefResolverService) { }
 
@@ -26,23 +26,15 @@ export class CwlService {
 
         ObjectHelper.iterateAll(cwlFile.content, (propName, value, object) => {
             if (propName === "$import" || propName === "$include") {
-                let cwlFileRef = this.getContentReference(value, cwlFile.path + value);
-                cwlFile.contentReferences.push(cwlFileRef);
+
+                this.refResolverService.resolveRef(value, cwlFile.path).subscribe((refFile: FileModel) => {
+                    let parsedRefFile:CwlFile = this.parseCwlFile(refFile);
+                    cwlFile.contentReferences.push(parsedRefFile);
+                }, (err) => {
+                    console.error('Error occurred: ' + err);
+                });
             }
         });
         return cwlFile;
-    }
-
-    public getContentReference(refName: string, path: string): void {
-
-        this.refResolverService.resolveRef(refName, path).subscribe((refFile: FileModel) => {
-            let parsedRefFile: CwlFile = this.parseCwlFile(refFile);
-            this.contentRefsSubject.next(parsedRefFile);
-            
-        }, (err) => {
-            console.error('something wrong occurred: ' + err);
-        }, () => {
-            console.log('done');
-        });
     }
 }
