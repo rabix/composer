@@ -1,18 +1,16 @@
-import {ComponentFactory, Injector, ComponentRef} from "@angular/core";
-import {ComponentState} from "./component-state";
+import {ComponentFactory} from "@angular/core";
+
 export class DynamicComponentContext<C> {
 
     constructor(private componentFactory: ComponentFactory<C>,
-                private componentState: ComponentState = new ComponentState({}),
-                private injector: Injector = null) {
+                private componentState: Object = {}) {
     }
 
-    public create(): ComponentRef<C> {
+    getFactory(): ComponentFactory<C> {
+        return this.componentFactory;
+    }
 
-        const component = this.componentFactory.create(this.injector);
-
-        
-        
-        return component;
+    getState(): Object {
+        return this.componentState;
     }
 }

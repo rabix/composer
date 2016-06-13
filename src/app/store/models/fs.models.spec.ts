@@ -15,12 +15,12 @@ describe("FS Models", () => {
                 absolutePath: "/root/user/foo",
             };
 
-            let dir = DirectoryModel.createFromObject(confObject);
+            let dir = new DirectoryModel(confObject);
 
-            expect(dir.getName()).toEqual(confObject.name);
-            expect(dir.hasContent()).toEqual(confObject.isEmpty);
-            expect(dir.getAbsolutePath()).toEqual(confObject.absolutePath);
-            expect(dir.getRelativePath()).toEqual(confObject.relativePath);
+            expect(dir.name).toEqual(confObject.name);
+            expect(dir.isEmpty).toEqual(confObject.isEmpty);
+            expect(dir.absolutePath).toEqual(confObject.absolutePath);
+            expect(dir.relativePath).toEqual(confObject.relativePath);
         });
     });
 
@@ -34,12 +34,12 @@ describe("FS Models", () => {
                absolutePath: "/root/user/foo",
            };
 
-           let dir = FileModel.createFromObject(confObject);
+           let dir = new FileModel(confObject);
 
-           expect(dir.getName()).toEqual(confObject.name);
-           expect(dir.getAbsolutePath()).toEqual(confObject.absolutePath);
-           expect(dir.getRelativePath()).toEqual(confObject.relativePath);
-           expect(dir.getType()).toEqual(confObject.type);
+           expect(dir.name).toEqual(confObject.name);
+           expect(dir.absolutePath).toEqual(confObject.absolutePath);
+           expect(dir.relativePath).toEqual(confObject.relativePath);
+           expect(dir.type).toEqual(confObject.type);
        });
     });
 });

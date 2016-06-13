@@ -1,6 +1,6 @@
 import {Component, OnInit, ElementRef} from "@angular/core";
 import {CodeEditor} from "./code-editor.service";
-import {FileRegistry, File} from "../../services/file-registry.service";
+import {FileRegistry} from "../../services/file-registry.service";
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import Editor = AceAjax.Editor;
 import TextMode = AceAjax.TextMode;
@@ -29,8 +29,8 @@ export class CodeEditorComponent implements OnInit {
 
         // this check shouldn't be necessary
         if (this.file) {
-            this.editor.setMode(this.file.getType());
-            this.editor.setTextStream(this.fileRegistry.loadFile(this.file.getAbsolutePath()));
+            this.editor.setMode(this.file.type || '.txt');
+            this.editor.setTextStream(this.fileRegistry.loadFile(this.file.absolutePath));
         }
     }
 

@@ -20,63 +20,43 @@ export class FileApi {
             .map(resp => {
                 return resp.content.map((item: FilePath) => {
                     if (item.type === "directory") {
-                        return DirectoryModel.createFromObject(item);
+                        return new DirectoryModel(item);
                     }
-                    return FileModel.createFromObject(item);
+                    return new FileModel(item);;
                 });
-            }).catch(err => {
-                //noinspection TypeScriptUnresolvedFunction
-                return Observable.of(err);
             });
     }
 
-    getFileContent(path: string): Observable<FileModel|HttpError> {
+    getFileContent(path: string): Observable<FileModel> {
         return this.socket.request(SOCKET_REQUESTS.FILE_CONTENT, {file: path})
             .map(response => {
-                return FileModel.createFromObject(response.content)
-            })
-            .catch(err => {
-                console.error(err);
-                //noinspection TypeScriptUnresolvedFunction
-                return Observable.of(err);
+                return new FileModel(response.content);
             });
     }
 
-    createFile(path: string, content?: string): Observable<FilePath|HttpError> {
+    createFile(path: string, content?: string): Observable<FilePath> {
         return this.socket.request(SOCKET_REQUESTS.CREATE_FILE, {
             file: path,
             content: content || ''
         }).map(response => {
-            return FileModel.createFromObject(response.content);
-        }).catch(err => {
-            console.log(err);
-            //noinspection TypeScriptUnresolvedFunction
-            return Observable.of(err);
-        })
+            return new FileModel(response.content);
+        });
     }
 
-    updateFile(path: string, content: string): Observable<boolean|HttpError> {
+    updateFile(path: string, content: string): Observable<boolean> {
         return this.socket.request(SOCKET_REQUESTS.UPDATE_FILE, {
             file: path,
             content: content
-        }).map(response => response.content).catch(err => {
-            console.error(err);
-            //noinspection TypeScriptUnresolvedFunction
-            return Observable.of(err);
-        })
+        });
     }
 
-    checkIfFileExists(path: string): Observable<boolean|HttpError> {
+    checkIfFileExists(path: string): Observable<boolean> {
         console.log('this function is being called');
         return this.socket.request(SOCKET_REQUESTS.FILE_EXISTS, {
             path: path
         }).map(response => {
             console.log(`${path} exists`, response.content);
             return response.content
-        }).catch(err => {
-            console.log(err);
-            //noinspection TypeScriptUnresolvedFunction
-            return Observable.of(err);
-        })
+        });
     }
 }

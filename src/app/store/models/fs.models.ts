@@ -1,82 +1,51 @@
 export type DirectoryChild = DirectoryModel|FileModel;
 
 export class FSItemModel {
-    protected name: string;
-    protected relativePath: string;
-    protected absolutePath: string;
+    name: string;
+    relativePath: string;
+    absolutePath: string;
+    parentDir: string;
 
-    public getName() {
-        return this.name;
+    constructor(attrs: {name: string, relativePath?: string, absolutePath?: string}) {
+        this.name         = attrs.name;
+        this.relativePath = attrs.relativePath;
+        this.absolutePath = attrs.absolutePath;
+
+        if (this.relativePath) {
+            this.parentDir = this.relativePath.substring(0, this.relativePath.indexOf(this.name));
+        }
     }
-
-    public getRelativePath() {
-        return this.relativePath;
-    }
-
-    public getAbsolutePath() {
-        return this.absolutePath;
-    }
-
 }
 
 export class FileModel extends FSItemModel {
 
-    private content: string;
-    private type: string;
-    private modified = false;
+    content: string;
+    type: string;
+    isModified = false;
 
-    public static createFromObject(data: {
+    constructor(attr: {
         name: string,
         relativePath?: string
         absolutePath?: string
         content?: string,
         type?: string
-    }): FileModel {
-        return Object.assign(new FileModel(), data);
-    }
-
-    public getType() {
-        return this.type;
-    }
-
-    public getContent() {
-        return this.content;
-    }
-
-    public isModified() {
-        return this.modified;
+    }) {
+        super(attr);
+        this.content = attr.content;
+        this.type    = attr.type;
     }
 }
 
 export class DirectoryModel extends FSItemModel {
-    private isEmpty: boolean;
-    private children: DirectoryChild[] = [];
+    isEmpty: boolean;
 
-    public static createFromObject(data: {
+    constructor(attr: {
         name: string,
         relativePath?: string
         absolutePath?: string
         isEmpty?: boolean,
-        children?: DirectoryChild[]
-    }): DirectoryModel {
-
-        return Object.assign(new DirectoryModel(), data);
-    }
-
-
-    public addChild(child: DirectoryChild): void {
-        this.children.push(child);
-    }
-
-    public setChildren(children: DirectoryChild[]): void {
-        this.children = children;
-    }
-
-    public hasContent(): boolean {
-        return this.isEmpty;
-    }
-
-    public getChildren(): DirectoryChild[] {
-        return this.children;
+    }) {
+        super(attr);
+        this.isEmpty = attr.isEmpty;
     }
 }

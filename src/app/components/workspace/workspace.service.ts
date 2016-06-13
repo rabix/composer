@@ -27,4 +27,10 @@ export class WorkspaceService {
             payload: file
         });
     }
+
+    public deselectFiles(): void {
+        this.store.dispatch({
+            type: STORE_ACTIONS.DESELECT_FILE_REQUEST
+        });
+    }
 }

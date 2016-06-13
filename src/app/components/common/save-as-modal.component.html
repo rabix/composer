@@ -1,7 +1,7 @@
 <block-loader class="overlay" *ngIf="model.isCreatingFile"></block-loader>
 <div>
     <div class="modal-header">
-        <h4>Create New File</h4>
+        <h4>Save File As</h4>
     </div>
 
     <form [ngFormModel]="newFileForm"
@@ -24,16 +24,6 @@
                 <p class="text-help" *ngIf="showFileExists">
                     A file with that name already exists
                 </p>
-            </fieldset>
-
-            <fieldset class="form-group">
-                <label class="form-control-label" for="create_file_action">File Type</label>
-                <select class="form-control"
-                        ngControl="fileType"
-                        id="create_file_action"
-                        [(ngModel)]="selectedType">
-                    <option *ngFor="let type of fileTypes" [ngValue]="type">{{ type.name }} ({{ type.id }})</option>
-                </select>
             </fieldset>
         </div>
 

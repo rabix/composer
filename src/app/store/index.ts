@@ -1,4 +1,4 @@
-import {openFiles} from './workspace.reducer';
-import {selectedFile} from './workspace.reducer';
-import {fileContent} from './file-cache.reducer';
-export const REDUCERS = {openFiles, selectedFile, fileContent};
+import {openFiles, selectedFile} from './workspace.reducer';
+import {fileContent, newFile} from './file-cache.reducer';
+import {globalErrors} from './errors.reducer';
+export const REDUCERS = {openFiles, selectedFile, fileContent, newFile, globalErrors};

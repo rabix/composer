@@ -36,6 +36,7 @@ describe("FileAPI", () => {
                                 absolutePath: "/root/subdir/myTsFile.ts"
                             },
                         ];
+                        //noinspection TypeScriptUnresolvedFunction
                         return Observable.of({
                             message: "",
                             content: paths
@@ -55,5 +56,55 @@ describe("FileAPI", () => {
                     expect(dirContent[2] instanceof FileModel).toEqual(true);
                 });
             }));
+    });
+
+    describe("getFileContent", () => {
+        beforeEachProviders(() => [
+            provide(SocketService, {
+                useValue: {
+                    request: (path) => {
+                        let file: FilePath = {
+                            name: "file1.json",
+                            type: ".json",
+                            relativePath: "subroot/file1.json",
+                            absolutePath: "/root/subdir/file1.json",
+                            content: "hello world"
+                        };
+
+                        //noinspection TypeScriptUnresolvedFunction
+                        return Observable.of({
+                            message: "",
+                            content: file
+                        });
+                    }
+                }
+            }),
+        ]);
+
+        it("should return a file's model with its contents",
+            inject([FileApi], (fileApi: FileApi) => {
+                fileApi.getFileContent("/root/subdir/file1.json").subscribe((file) => {
+                    expect(file instanceof FileModel).toEqual(true);
+                    expect(file.content).toEqual("hello world");
+                    expect(file.absolutePath).toEqual("/root/subdir/file1.json");
+                });
+            })
+        );
+    });
+
+    describe("Error handling", () => {
+        beforeEachProviders(() => [
+            provide(SocketService, {
+                useValue: {
+                    request: () => {
+                        //noinspection TypeScriptUnresolvedFunction
+                        return Observable.of({
+                            message: "",
+                            status: 404
+                        });
+                    }
+                }
+            }),
+        ]);
     });
 });

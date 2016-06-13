@@ -58,7 +58,8 @@ export class WorkspaceComponent {
                     && event.parent.contentItems.length === 1
             })
             .subscribe((event: any) => {
-
+                this.workspaceService.deselectFiles();
+                
                 // @TODO(ivanb) Move this somewhere (ex. extract the component definition into an enum)
                 // @FIXME(ivanb) Scan the whole tree and check if this is actually the last open editor
                 event.parent.addChild({
@@ -110,9 +111,10 @@ export class WorkspaceComponent {
     ngAfterViewInit() {
         this.layout.init();
 
-        //@todo(maya): move this elsewhere
+        //@todo(maya): move file selection observable
         //noinspection TypeScriptUnresolvedFunction
         Observable.fromEvent(this.layout.root.contentItems[0].contentItems[1], "activeContentItemChanged")
+            .filter((event: any) => event.config.componentName === CodeEditorComponent)
             .subscribe((event: any) => {
                 this.workspaceService.selectFile(event.config.componentState.fileInfo);
             });

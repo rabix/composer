@@ -20,7 +20,7 @@ export const openFiles: ActionReducer<FileModel[]> = (state: FileModel[] = OPEN_
             let file = <FileModel>action.payload;
 
             return state.filter((openFile) => {
-                return openFile.getAbsolutePath() !== file.getAbsolutePath();
+                return openFile.absolutePath !== file.absolutePath;
             });
         }
     }
@@ -33,6 +33,8 @@ export const selectedFile: ActionReducer<FileModel> = (state: FileModel, action:
         case STORE_ACTIONS.SELECT_FILE_REQUEST:
             //@todo(maya) implement multiple selected files for multiple panes
             return action.payload;
+        case STORE_ACTIONS.DESELECT_FILE_REQUEST:
+            return null;
     }
 
     return state;

@@ -17,6 +17,7 @@ import {FileEffects} from "../../store/effects/file.effects";
 import {UrlValidator} from "../../validators/url.validator"
 import {StateUpdates} from "@ngrx/effects";
 import {HTTP_PROVIDERS} from '@angular/http';
+import {FileStateService} from "../../state/file.state.service";
 require("./../../../assets/sass/main.scss");
 require("./main.component.scss");
 
@@ -43,6 +44,8 @@ require("./main.component.scss");
         DataService,
         FileEffects,
         StateUpdates,
+        FileStateService
+        StateUpdates,
         UrlValidator,
         HTTP_PROVIDERS
     ]
@@ -50,46 +53,5 @@ require("./main.component.scss");
 export class MainComponent {
 
     constructor() {
-        /**
-         * Example API usage
-         */
-
-        // let fileName = new Date().getTime().toString() + '.txt';
-
-        // fileApi.createFile(fileName).subscribe(res => {
-        //     console.log(`1. Created ${fileName}:`, res);
-        // });
-        //
-        // fileApi.updateFile(fileName, new Date().toString()).subscribe(res => {
-        //     console.log(`2. Updated ${fileName}:`, res);
-        // });
-        //
-        // fileApi.getFileContent(fileName).subscribe((res) => {
-        //     console.log(`3. Reading ${fileName} content:`, res);
-        // });
-
-        // fileApi.getDirContent().subscribe((res) => {
-        //     console.log(`4. Directory contents`, res);
-        // });
-
-        // fileApi.getFileContent('wagner-workflow.json').subscribe(res => {
-        //     console.log(res);
-        // }, err => {
-        //     console.log(err);
-        // });
-        //
-        // fileApi.getFileContent('does not exist').subscribe(res => {
-        //     console.log(res);
-        // }, err => {
-        //     console.log(err);
-        // });
-        //
-        // fileApi.checkIfFileExists('wagner-workflow.json').subscribe(res => {
-        //     console.log(res);
-        // }, err => {
-        //     console.log(err);
-        // })
-
-
     }
 }
