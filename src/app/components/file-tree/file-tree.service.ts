@@ -1,27 +1,27 @@
-import {Injectable, forwardRef, Inject} from "@angular/core";
+import {Injectable, forwardRef, Inject, ComponentResolver} from "@angular/core";
 import {AsyncSocketProviderService} from "./async-socket-provider.service";
 import {DirectoryDataProviderFactory} from "./types";
 import {Store} from "@ngrx/store";
 import * as STORE_ACTIONS from "../../store/actions";
-import {FileModel} from "../../store/models/fs.models";
-import {FileStateService} from "../../state/file.state.service";
+import {FileModel, FSItemModel, DirectoryModel} from "../../store/models/fs.models";
+import {FileStateService, FSItemMap} from "../../state/file.state.service";
+import {FileApi} from "../../services/api/file.api";
+import {Observable} from "rxjs/Rx";
+import {FileNodeComponent} from "./nodes/file-node.component";
+import {DirectoryNodeComponent} from "./nodes/directory-node.component";
+import {DynamicComponentContext} from "../runtime-compiler/dynamic-component-context";
 
 
 @Injectable()
 export class FileTreeService {
 
-    private dataProvider;
+    constructor(private store: Store,
+                private fileApi: FileApi,
+                private resolver: ComponentResolver,
+                private fileRegistry: FileStateService) {
 
-    private _subscriptions = [];
-
-    constructor(@Inject(forwardRef(() => AsyncSocketProviderService))
-                private dataProvider: AsyncSocketProviderService,
-                private store: Store,
-                private files: FileStateService) {
-
-        this.files.create.subscribe((item) => {
-            console.log("New file is created, should be inserted into the tree", item);
-        })
+        console.log("Store?", this.store);
+        // this.createDataProviderForDirectory()().subscribe(_ => console.log("Subs", _));
     }
 
     /**
@@ -34,8 +34,45 @@ export class FileTreeService {
         this.store.dispatch({type: STORE_ACTIONS.SELECT_FILE_REQUEST, payload: fileInfo});
     }
 
-    public createDataProviderForDirectory(directory = ""): DirectoryDataProviderFactory {
+    public createDataProviderForDirectory(relPathDir = ""): DirectoryDataProviderFactory {
 
-        return <DirectoryDataProviderFactory>(() => this.dataProvider.getNodeContent(directory));
+
+        return () => {
+
+            this.fileApi.getDirContent(relPathDir)
+                .subscribe(data => this.fileRegistry.createItem(data));
+
+            return this.fileRegistry.registry.map((chunk: FSItemMap) => {
+                let filtered = [];
+
+                for (let key in chunk) {
+                    let i     = chunk[key];
+                    let fname = relPathDir.length === 0 ? i.name : `${relPathDir}/${i.name}`;
+
+                    if (i.relativePath === fname) {
+                        filtered.push(i);
+                    }
+                }
+
+                return filtered;
+            }).distinctUntilChanged((a, b) => {
+                return Object.keys(a).length === Object.keys(b).length;
+            }).map(filtered => {
+                console.log("Got changed");
+                return Observable.defer(() => {
+                    return Observable.fromPromise(Promise.all(filtered.map((item: FSItemModel) => {
+                        let componentType = FileNodeComponent;
+                        if (item instanceof DirectoryModel) {
+                            componentType = DirectoryNodeComponent;
+                        }
+
+                        return this.resolver.resolveComponent(componentType)
+                            .then(factory => new DynamicComponentContext(factory, item),
+                                (err) => console.error(`Component Compilation Error: ${err}`));
+
+                    })));
+                });
+            }).concatAll();
+        };
     }
 }
