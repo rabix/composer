@@ -106,15 +106,5 @@ describe("FileAPI", () => {
                 }
             }),
         ]);
-
-        it("should return an error for file contents",
-            inject([FileApi], (fileApi: FileApi) => {
-                //@todo(maya) finish fileApi tests
-                fileApi.getFileContent('').subscribe((error) => {
-                    // expect(error.status).toEqual(404);
-                    // expect(error.message).toBe('');
-                });
-            })
-        );
     });
 });

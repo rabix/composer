@@ -46,5 +46,6 @@ export class DirectoryModel extends FSItemModel {
         isEmpty?: boolean,
     }) {
         super(attr);
+        this.isEmpty = attr.isEmpty;
     }
 }
