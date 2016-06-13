@@ -16,4 +16,11 @@ export class FileHelper {
 
        return stack.join("/");
     }
+    
+    public static isRelativePath(path: string): boolean {
+        let firstTwoCharacters = path.slice(0,2);
+        let firstThreeCharacters = path.slice(0,3);
+
+        return (firstTwoCharacters === './' || firstThreeCharacters === '../');
+    }
 }

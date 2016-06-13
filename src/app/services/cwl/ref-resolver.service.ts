@@ -6,47 +6,64 @@ import {Observable} from "rxjs/Observable";
 import {HttpService} from "../../services/http/http.service";
 import {FileApi} from "../../services/api/file.api";
 import {Subject} from "rxjs/Subject";
+import {FileModel} from "../../store/models/fs.models";
+import {CwlFile} from "../../models/cwl.file.model.ts";
+import {FileHelper} from "../../helpers/file.helper";
 
 @Injectable()
 export class RefResolverService {
-    public content: Subject<any> = new Subject<any>();
+    public refFile: Subject<FileModel> = new Subject<FileModel>();
 
     constructor(private urlValidator: UrlValidator,
                 private httpService: HttpService,
                 private fileApi: FileApi) { }
 
-    public resolveRef(referenceString: string) {
-        if (this.urlValidator.isValidUrl(referenceString)) {
-            //return this.httpService.getRequest(referenceString);
-            this.httpService.getRequest(referenceString).subscribe((res) => {
-                this.content.next(res.json());
-            }, (err) => {
-                console.log(err);
-            });
-            //this.content.next(content)
+    public resolveRef(referenceString: string, parentPath: string) {
+        let isRelative: boolean = FileHelper.isRelativePath(referenceString);
+
+        //If its a URL
+        if (this.urlValidator.isValidUrl(referenceString) && !isRelative) {
+            this.resolveUrlReference(referenceString, referenceString)
+
+        } else if (this.urlValidator.isValidUrl(parentPath) && isRelative) {
+            let absoluteRefPath = FileHelper.relativeToAbsolutePath(referenceString, parentPath);
+            this.resolveUrlReference(referenceString, absoluteRefPath)
+
         } else {
-            this.fileApi.checkIfFileExists(referenceString).subscribe(
-                (exists) => {
+            //If its a file
+            let absoluteRefPath: string;
+            if (isRelative) {
+                absoluteRefPath = FileHelper.relativeToAbsolutePath(referenceString, parentPath)
+            } else {
+                absoluteRefPath = referenceString;
+            }
 
-                    var path = '';
-                    if (exists) {
-                        this.fileApi.getFileContent(path).subscribe(
-                            (content) => {
+            this.fileApi.checkIfFileExists(absoluteRefPath).subscribe((fileExists) => {
+                if (fileExists) {
+                    this.fileApi.getFileContent(absoluteRefPath).subscribe((result:FileModel) => {
+                        this.refFile.next(result);
+                    }, (err) => console.error(err));
+                }
 
-                            },
-                            (err) => {
-
-                            }
-                        )
-                    }
-
-                }, (err) => {
-                    console.error('something wrong occurred: ' + err);
-                }, () => {
-                    console.log('done');
-                });
+            }, (err) => console.error(err));
         }
 
-        return this.content;
+        return this.refFile;
+    }
+
+    public resolveUrlReference(name: string, url: string) {
+        this.httpService.getRequest(url).subscribe((res) => {
+            let content = JSON.stringify(res.json());
+
+            let file:FileModel = FileModel.createFromObject({
+                name: name,
+                absolutePath: url,
+                content: content
+            });
+
+            this.refFile.next(file);
+        }, (err) => {
+            console.log(err);
+        });
     }
 }

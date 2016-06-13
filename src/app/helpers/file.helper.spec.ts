@@ -18,4 +18,13 @@ describe("FileHelper", () => {
 
     });
 
+    describe("isRelativePath()", () => {
+        it("return true if a path begins with './' or '../'", () => {
+
+            expect(FileHelper.isRelativePath("./test.json")).toBe(true);
+            expect(FileHelper.isRelativePath("../../test.json")).toBe(true);
+
+            expect(FileHelper.isRelativePath("test.json")).toBe(false);
+        });
+    });
 });
