@@ -50,13 +50,13 @@ export class FileEffects {
     public newFile$ = this.updates$
         .whenAction(ACTIONS.CREATE_FILE_REQUEST)
         .map((update: StateUpdate<any>) => update.action.payload)
-        .mergeMap(path => this.files.createFile(path)
+        .mergeMap(request => this.files.createFile(request.path, request.content)
             .map(content => {
                 return {
                     type: ACTIONS.NEW_FILE_CREATED,
                     payload: {
                         model: content,
-                        path: path
+                        path: request.path
                     }
                 }
             })
@@ -65,7 +65,7 @@ export class FileEffects {
                 return Observable.of({
                     type: ACTIONS.NEW_FILE_ERROR,
                     payload: {
-                        path: path,
+                        path: request.path,
                         error: err
                     }
                 })

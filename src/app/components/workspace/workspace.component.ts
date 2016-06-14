@@ -1,5 +1,4 @@
 import {Component, ElementRef} from "@angular/core";
-import * as GoldenLayout from "golden-layout";
 import {Observable} from "rxjs/Observable";
 import {ComponentRegistry} from "./registry/component-registry";
 import {ComponentRegistryFactoryService} from "./registry/component-registry-factory.service";
@@ -7,6 +6,7 @@ import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {FileTreeComponent} from "../file-tree/file-tree.component";
 import {WorkspaceService} from "./workspace.service";
 import {FileEditorPlaceholderComponent} from "../placeholders/file-editor/file-editor-placeholder.component";
+import * as GoldenLayout from "golden-layout";
 
 require("./workspace.component.scss");
 
@@ -59,7 +59,7 @@ export class WorkspaceComponent {
             })
             .subscribe((event: any) => {
                 this.workspaceService.deselectFiles();
-                
+
                 // @TODO(ivanb) Move this somewhere (ex. extract the component definition into an enum)
                 // @FIXME(ivanb) Scan the whole tree and check if this is actually the last open editor
                 event.parent.addChild({

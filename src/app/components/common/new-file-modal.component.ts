@@ -41,6 +41,8 @@ export class NewFileModalComponent implements OnInit {
                 private store: Store<any>,
                 private fileFx: FileEffects,
                 private files: FileStateService) {
+        
+        //@todo(maya): expand this list and export it elsewhere so it can be used by others
         this.fileTypes = [{
             id: '.json',
             name: 'JSON'
@@ -90,7 +92,7 @@ export class NewFileModalComponent implements OnInit {
         let filePath = fileName + ext;
 
 
-        this.store.dispatch({type: ACTIONS.CREATE_FILE_REQUEST, payload: filePath});
+        this.store.dispatch({type: ACTIONS.CREATE_FILE_REQUEST, payload: {path: filePath}});
         this.isCreatingFile = true;
 
         this.store.select("newFile").subscribe((file: IFileResponse) => {
