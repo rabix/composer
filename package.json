@@ -44,7 +44,8 @@
     "postinstall": "npm run typings -- install",
     "preversion": "npm test",
     "version": "npm run build",
-    "postversion": "git push && git push --tags"
+    "postversion": "git push && git push --tags",
+    "debug:test": "npm run watch:test -- --debug"
   },
   "dependencies": {
     "@angular/common": "^2.0.0-rc.1",
@@ -99,6 +100,7 @@
     "karma-jasmine": "^0.3.8",
     "karma-mocha-reporter": "^2.0.0",
     "karma-phantomjs-launcher": "^1.0.0",
+    "karma-remap-istanbul": "^0.1.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "1.7.0",
     "node-sass": "^3.5.3",
@@ -108,9 +110,11 @@
     "protractor": "^3.2.2",
     "raw-loader": "0.5.1",
     "remap-istanbul": "^0.5.1",
+    "source-map-inline-loader": "blackbaud-bobbyearl/source-map-inline-loader",
     "rimraf": "^2.5.2",
     "sass-loader": "^3.2.0",
     "source-map-loader": "^0.1.5",
+    "source-map-support": "^0.4.0",
     "style-loader": "^0.13.1",
     "ts-helpers": "1.1.0",
     "ts-node": "^0.7.1",

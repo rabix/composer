@@ -1,6 +1,19 @@
 module.exports = function (config) {
     var testWebpackConfig = require('./webpack.test.js');
+    
+    if (config.debug === true) {
+        testWebpackConfig.module.postLoaders = [];
+    }
 
+    var coverageReporterConfig = {
+        dir: 'coverage/',
+            reporters: [
+            {type: 'text-summary'},
+            {type: 'json'},
+            {type: 'html'}
+        ]
+    };
+    
     config.set({
 
         // base path that will be used to resolve all patterns (e.g. files, exclude)
@@ -38,14 +51,7 @@ module.exports = function (config) {
         // Webpack Config at ./webpack.test.js
         webpack: testWebpackConfig,
 
-        coverageReporter: {
-            dir: 'coverage/',
-            reporters: [
-                {type: 'text-summary'},
-                {type: 'json'},
-                {type: 'html'}
-            ]
-        },
+        coverageReporter: config.debug ? {} : coverageReporterConfig,
 
         // Webpack please don't spam the console when running in karma!
         webpackServer: {noInfo: true},
@@ -56,7 +62,7 @@ module.exports = function (config) {
          * possible values: 'dots', 'progress'
          * available reporters: https://npmjs.org/browse/keyword/karma-reporter
          */
-        reporters: ['mocha', 'coverage'],
+        reporters: config.debug ? [] : ['mocha', 'coverage'],
 
         // web server port
         port: 9876,
@@ -77,10 +83,7 @@ module.exports = function (config) {
          * start these browsers
          * available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
          */
-        browsers: [
-            // 'ChromeCanary',
-            'PhantomJS'
-        ],
+        browsers: config.debug ? ['Chrome'] : ['PhantomJS'],
 
         /*
          * Continuous Integration mode
