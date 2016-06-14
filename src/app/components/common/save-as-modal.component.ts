@@ -14,6 +14,8 @@ import {FileEffects} from "../../store/effects/file.effects";
 import {HttpError} from "../../services/api/api-response-types";
 import {FileModel} from "../../store/models/fs.models";
 import {FileStateService} from "../../state/file.state.service";
+import {IFileResponse} from "../../store/file-cache.reducer";
+import {IGlobalError} from "../../store/errors.reducer";
 
 @Component({
     selector: 'new-file-modal',
@@ -67,7 +69,7 @@ export class SaveAsModalComponent implements OnInit {
             }
         });
         
-        this.store.select("newFile").subscribe((file) => {
+        this.store.select("newFile").subscribe((file: IFileResponse) => {
 
             //@FIXME sometimes, there's a new item on this stream here that is undefined.
 
@@ -82,7 +84,7 @@ export class SaveAsModalComponent implements OnInit {
         });
         
         // Handle error if file already exists
-        this.store.select("globalErrors").subscribe((error) => {
+        this.store.select("globalErrors").subscribe((error: IGlobalError) => {
             if (error && error.path === filePath) {
                 this.isCreatingFile = false;
         
