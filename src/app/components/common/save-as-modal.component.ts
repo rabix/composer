@@ -11,7 +11,9 @@ import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {Store} from "@ngrx/store";
 import * as ACTIONS from "../../store/actions";
 import {FileEffects} from "../../store/effects/file.effects";
-import {FileApi} from "../../services/api/file.api";
+import {HttpError} from "../../services/api/api-response-types";
+import {FileModel} from "../../store/models/fs.models";
+import {FileStateService} from "../../state/file.state.service";
 
 @Component({
     selector: 'new-file-modal',
@@ -32,7 +34,7 @@ export class SaveAsModalComponent implements OnInit {
     constructor(private formBuilder: FormBuilder,
                 private store: Store<any>,
                 private fileFx: FileEffects,
-                private fileApi: FileApi) {
+                private files: FileStateService) {
 
         this.fileFx.copyFile$.subscribe(this.store);
 
@@ -57,48 +59,40 @@ export class SaveAsModalComponent implements OnInit {
         let filePath        = formValue.name;
 
         this.isCreatingFile = true;
-
-
-        this.fileApi.createFile(filePath, this.model.content).subscribe((file) => {
-            this.isCreatingFile = false;
-            this.store.dispatch({type: ACTIONS.OPEN_FILE_REQUEST, payload: file});
-            this.confirm(file);
-        }, (error) => {
-            this.isCreatingFile = false;
-            if (error.statusCode === 403) {
-                this.showFileExists = true;
-            } else {
-                this.isGeneralError = true;
+        
+        this.store.dispatch({
+            type: ACTIONS.CREATE_FILE_REQUEST, payload: {
+                path: filePath,
+                content: this.model.content
             }
         });
-        // this.store.dispatch({
-        //     type: ACTIONS.COPY_FILE_REQUEST, payload: {
-        //         path: filePath,
-        //         content: this.model.content
-        //     }
-        // });
+        
+        this.store.select("newFile").subscribe((file) => {
 
+            //@FIXME sometimes, there's a new item on this stream here that is undefined.
 
-        // this.store.select("newFile").subscribe((file) => {
-        //     if (file && file.path === filePath) {
-        //         this.isCreatingFile = false;
-        //         this.store.dispatch({type: ACTIONS.OPEN_FILE_REQUEST, payload: file.model});
-        //         this.confirm(file.model);
-        //     }
-        // });
-        //
-        // // Handle error if file already exists
-        // this.store.select("globalErrors").subscribe((error) => {
-        //     if (error && error.path === filePath) {
-        //         this.isCreatingFile = false;
-        //
-        //         if (error.error.statusCode === 403) {
-        //             this.showFileExists = true;
-        //         } else {
-        //             this.isGeneralError = true;
-        //         }
-        //     }
-        // });
+            if (file && file.path === filePath) {
+                let fileModel = <FileModel> file.model;
+
+                this.files.createItem(fileModel);
+                this.isCreatingFile = false;
+                this.store.dispatch({type: ACTIONS.OPEN_FILE_REQUEST, payload: fileModel});
+                this.confirm(fileModel);
+            }
+        });
+        
+        // Handle error if file already exists
+        this.store.select("globalErrors").subscribe((error) => {
+            if (error && error.path === filePath) {
+                this.isCreatingFile = false;
+        
+                if ((<HttpError> error.error).statusCode === 403) {
+                    this.showFileExists = true;
+                } else {
+                    this.isGeneralError = true;
+                }
+            }
+        });
     }
 
     public ngOnInit() {

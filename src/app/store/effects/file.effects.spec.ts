@@ -113,7 +113,9 @@ describe('File Effects', function () {
     describe('New File', () => {
         it('should create a new file and return its file model', inject([MockStateUpdates, FileEffects],
             (updates: MockStateUpdates, fileFx: FileEffects) => {
-                updates.sendAction({type: ACTIONS.CREATE_FILE_REQUEST, payload: "filePath"});
+                updates.sendAction({type: ACTIONS.CREATE_FILE_REQUEST, payload: {
+                    path: "filePath"
+                }});
 
                 fileFx.newFile$.subscribe((action) => {
                     expect(action.payload.model instanceof FileModel).toBe(true);

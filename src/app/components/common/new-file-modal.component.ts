@@ -92,7 +92,7 @@ export class NewFileModalComponent implements OnInit {
         let filePath = fileName + ext;
 
 
-        this.store.dispatch({type: ACTIONS.CREATE_FILE_REQUEST, payload: filePath});
+        this.store.dispatch({type: ACTIONS.CREATE_FILE_REQUEST, payload: {path: filePath}});
         this.isCreatingFile = true;
 
         this.store.select("newFile").subscribe((file: IFileResponse) => {
