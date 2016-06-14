@@ -1,17 +1,10 @@
 import {Injectable} from "@angular/core";
 import {UrlValidator} from "../../validators/url.validator"
-import {ReferenceType} from "./reference.type"
-import {Http, Response} from "@angular/http";
 import {Observable} from "rxjs/Observable";
 import {HttpService} from "../../services/http/http.service";
 import {FileApi} from "../../services/api/file.api";
-import {Subject} from "rxjs/Subject";
-import {Subject} from "rxjs/Subject";
 import {FileModel} from "../../store/models/fs.models";
-import {CwlFile} from "../../models/cwl.file.model.ts";
 import {FileHelper} from "../../helpers/file.helper";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {Observer} from "rxjs/Observer";
 
 @Injectable()
 export class RefResolverService {

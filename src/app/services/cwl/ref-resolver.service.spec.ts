@@ -1,14 +1,10 @@
-import {it, inject, injectAsync, describe, beforeEachProviders, fakeAsync} from "@angular/core/testing";
-import {provide, Provider} from "@angular/core"
-import {BaseRequestOptions, Response, ResponseOptions, Http} from "@angular/http";
-import {MockBackend, MockConnection} from "@angular/http/testing";
+import {it, injectAsync, describe, beforeEachProviders} from "@angular/core/testing";
+import {provide} from "@angular/core"
 import {HttpService} from "../http/http.service";
 import { Observable }     from 'rxjs/Observable';
-
 import {RefResolverService} from "./ref-resolver.service";
 import {UrlValidator} from "../../validators/url.validator";
 import {FileApi} from "../../services/api/file.api";
-import {Observer} from "rxjs/Observer";
 import {FileModel} from "../../store/models/fs.models";
 import {FileHelper} from "../../helpers/file.helper";
 

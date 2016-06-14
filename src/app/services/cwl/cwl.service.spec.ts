@@ -67,7 +67,7 @@ describe("CwlFileModel", () => {
                     contentReferences: []
                 });
                 
-                cwlService.parseCwlFile(testFile).subscribe((res: FileModel) => {
+                cwlService.parseCwlFile(testFile).subscribe((res: CwlFile) => {
                     expect(res.contentReferences.length).toBe(4);
                     expect(_.isEqual(res.contentReferences[0], expectedRef)).toBe(true);
                 }, (err) => console.log(err));
