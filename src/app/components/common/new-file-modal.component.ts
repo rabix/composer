@@ -41,6 +41,8 @@ export class NewFileModalComponent implements OnInit {
                 private store: Store<any>,
                 private fileFx: FileEffects,
                 private files: FileStateService) {
+        
+        //@todo(maya): expand this list and export it elsewhere so it can be used by others
         this.fileTypes = [{
             id: '.json',
             name: 'JSON'
