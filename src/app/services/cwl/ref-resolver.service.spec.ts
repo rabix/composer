@@ -42,7 +42,7 @@ describe("RefResolverService", () => {
         RefResolverService,
         UrlValidator,
         FileHelper,
-        provide(FileApi, {useClass: MockFileApi})
+        provide(FileApi, {useClass: MockFileApi}),
         provide(HttpService, {useClass: MockHttpService})
     ]);
 
@@ -86,7 +86,7 @@ describe("RefResolverService", () => {
 
         it("should return a file from the file system if the reference is NOT a URL",
             injectAsync([RefResolverService], (refResolverService:RefResolverService) => {
-                
+
                 refResolverService.resolveRef("./test.json", "/Users/mate/testws/")
                     .subscribe((res: FileModel) => {
                         expect(_.isEqual(res, mockFileModel)).toBe(true);
