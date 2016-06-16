@@ -2,6 +2,8 @@ import {Component, Input, OnInit, Injector, ComponentResolver, ComponentFactory}
 import {ActionButtonComponent} from "./action-button.component";
 import {ModalComponent} from "../../modal/modal.component";
 import {NewFileModalComponent} from "../new-file-modal.component";
+import {ModalData} from "../../../models/modal.data.model";
+import {DynamicComponentContext} from "../../runtime-compiler/dynamic-component-context";
 
 @Component({
     selector: 'new-file-button',
@@ -32,29 +34,23 @@ export class NewFileButtonComponent implements OnInit {
     }
 
     initModal() {
-
         this.resolver.resolveComponent(NewFileModalComponent)
             .then((factory:ComponentFactory<any>) => {
-                this.modal.factory = factory;
+                let modalData = new ModalData({
+                    functions: {
+                        cancel: function() {
+                            this.cref.destroy();
+                            this.result.resolve();
+                        },
+                        confirm: function(data) {
+                            this.cref.destroy();
+                            this.result.resolve(data);
+                        }
+                    }
+                });
+
+                this.modal.injector = this.injector;
+                this.modal.dynamicComponentContext = new DynamicComponentContext(factory, modalData);
             });
-
-        // so the modalComponent can resolve dependencies in the same tree
-        // as the component initiating it
-        this.modal.injector = this.injector;
-
-        this.modal.data = {};
-
-        this.modal.functions = {
-            cancel: function() {
-                this.cref.destroy();
-                // By rejecting, the show must catch the error. So by resolving,
-                // it can be ignored silently in case the result is unimportant.
-                this.result.resolve();
-            },
-            confirm: function(data) {
-                this.cref.destroy();
-                this.result.resolve(data);
-            }
-        }
     }
 }

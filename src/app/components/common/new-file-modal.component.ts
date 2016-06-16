@@ -1,11 +1,11 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, OnInit, ComponentRef} from "@angular/core";
 import {
     NgStyle,
     Control,
     ControlGroup,
     Validators,
     FORM_DIRECTIVES,
-    FormBuilder
+    FormBuilder,
 } from "@angular/common";
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import * as _ from "lodash";
@@ -17,6 +17,7 @@ import {HttpError} from "../../services/api/api-response-types";
 import {FileModel} from "../../store/models/fs.models";
 import {IFileResponse} from "../../store/file-cache.reducer";
 import {IGlobalError} from "../../store/errors.reducer";
+import {ModalData} from "../../models/modal.data.model";
 
 @Component({
     selector: 'new-file-modal',
@@ -32,7 +33,11 @@ export class NewFileModalComponent implements OnInit {
     private fileType: Control;
     private newFileForm: ControlGroup;
 
+    private cref:ComponentRef<any>;
+    private result:any;
     private confirm: Function;
+    private cancel: Function;
+    
     private fileTypes: any[];
 
     selectedType: any;
@@ -121,6 +126,16 @@ export class NewFileModalComponent implements OnInit {
                 }
             }
         });
+    }
+
+    public setState(modalData: ModalData) {
+        this.cref = modalData.cref ? modalData.cref : null;
+        this.result = modalData.result ? modalData.result : null;
+
+        if (modalData.functions) {
+            this.confirm = modalData.functions.confirm.bind(this);
+            this.cancel = modalData.functions.cancel.bind(this);
+        }
     }
 
     public ngOnInit() {
