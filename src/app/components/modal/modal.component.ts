@@ -6,8 +6,6 @@ import {
     ViewContainerRef,
     ComponentFactory, Injector, Input} from '@angular/core';
 import { PromiseWrapper } from '@angular/common/src/facade/async';
-import {NewFileModalComponent} from "../common/new-file-modal.component";
-import {NewFileModalComponent} from "../common/new-file-modal.component";
 import {DynamicComponentContext} from "../runtime-compiler/dynamic-component-context";
 import {ComponentCompilerDirective} from "../runtime-compiler/component-compiler.directive";
 import {ModalData} from "../../models/modal.data.model";
@@ -15,7 +13,7 @@ require('./modal.component.scss');
 
 @Injectable()
 export class ModalComponent {
-    dynamicComponentContext: DynamicComponentContext;
+    dynamicComponentContext: DynamicComponentContext<any>;
     injector: Injector;
 
     constructor(private app:ApplicationRef,
@@ -28,7 +26,7 @@ export class ModalComponent {
 
         @Component({
             selector: 'container',
-            directives: [NewFileModalComponent, ComponentCompilerDirective],
+            directives: [ComponentCompilerDirective],
             template:`
             <div class="modal-background" (click)="cancel()">
             <div id="modalDiv" class="modal" (click)="$event.stopPropagation()">
@@ -41,7 +39,7 @@ export class ModalComponent {
             `
         })
         class Container {
-            @Input() public dynamicComponentContext: DynamicComponentContext = dynamicComponentContext;
+            @Input() public dynamicComponentContext: DynamicComponentContext<any> = dynamicComponentContext;
             @Input() public injector: Injector = injector;
         }
 

@@ -36,7 +36,7 @@ describe('Open Files Reducer', () => {
             payload: file
         });
 
-        let newState = openFiles(newState, {
+        newState = openFiles(newState, {
             type: OPEN_FILE_REQUEST,
             payload: file
         });
@@ -61,7 +61,7 @@ describe('Open Files Reducer', () => {
             payload: file
         });
 
-        let newState = openFiles(newState, {
+        newState = openFiles(newState, {
             type: OPEN_FILE_REQUEST,
             payload: file2
         });

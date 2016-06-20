@@ -1,4 +1,4 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, ComponentRef} from "@angular/core";
 import {
     NgStyle,
     Control,
@@ -16,13 +16,15 @@ import {FileModel} from "../../store/models/fs.models";
 import {FileStateService} from "../../state/file.state.service";
 import {IFileResponse} from "../../store/file-cache.reducer";
 import {IGlobalError} from "../../store/errors.reducer";
+import {ModalData} from "../../models/modal.data.model";
+import {BehaviorSubject} from "rxjs/Rx";
 
 @Component({
     selector: 'new-file-modal',
     directives: [NgStyle, BlockLoaderComponent, FORM_DIRECTIVES],
     templateUrl: 'app/components/common/save-as-modal.component.html'
 })
-export class SaveAsModalComponent implements OnInit {
+export class SaveAsModalComponent {
     private isCreatingFile: boolean;
     private showFileExists: boolean;
     private isGeneralError: boolean;
@@ -30,8 +32,12 @@ export class SaveAsModalComponent implements OnInit {
     private name: Control;
     private newFileForm: ControlGroup;
 
+
+    private cref: ComponentRef<any>;
+    private result: any;
     private confirm: Function;
-    private model: any;
+    private cancel: Function;
+    private model: BehaviorSubject<string>;
 
     constructor(private formBuilder: FormBuilder,
                 private store: Store<any>,
@@ -61,14 +67,14 @@ export class SaveAsModalComponent implements OnInit {
         let filePath        = formValue.name;
 
         this.isCreatingFile = true;
-        
+
         this.store.dispatch({
             type: ACTIONS.CREATE_FILE_REQUEST, payload: {
                 path: filePath,
-                content: this.model.content
+                content: this.model.value
             }
         });
-        
+
         this.store.select("newFile").subscribe((file: IFileResponse) => {
 
             //@FIXME sometimes, there's a new item on this stream here that is undefined.
@@ -82,12 +88,12 @@ export class SaveAsModalComponent implements OnInit {
                 this.confirm(fileModel);
             }
         });
-        
+
         // Handle error if file already exists
         this.store.select("globalErrors").subscribe((error: IGlobalError) => {
             if (error && error.path === filePath) {
                 this.isCreatingFile = false;
-        
+
                 if ((<HttpError> error.error).statusCode === 403) {
                     this.showFileExists = true;
                 } else {
@@ -97,6 +103,14 @@ export class SaveAsModalComponent implements OnInit {
         });
     }
 
-    public ngOnInit() {
+    public setState(modalData: ModalData) {
+        this.cref   = modalData.cref ? modalData.cref : null;
+        this.result = modalData.result ? modalData.result : null;
+        this.model  = modalData.model ? modalData.model : null;
+
+        if (modalData.functions) {
+            this.confirm = modalData.functions.confirm.bind(this);
+            this.cancel  = modalData.functions.cancel.bind(this);
+        }
     }
 }

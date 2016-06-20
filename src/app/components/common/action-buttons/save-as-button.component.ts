@@ -4,6 +4,8 @@ import {ModalComponent} from "../../modal/modal.component";
 import {BehaviorSubject} from "rxjs/Rx";
 import {SaveAsModalComponent} from "../save-as-modal.component";
 import {FileModel} from "../../../store/models/fs.models";
+import {ModalData} from "../../../models/modal.data.model";
+import {DynamicComponentContext} from "../../runtime-compiler/dynamic-component-context";
 
 @Component({
     selector: 'save-as-button',
@@ -19,52 +21,50 @@ import {FileModel} from "../../../store/models/fs.models";
 })
 export class SaveAsButtonComponent {
     @Input() content: BehaviorSubject<FileModel>;
+    model: BehaviorSubject<string>;
 
     constructor(private modal: ModalComponent,
                 private injector: Injector,
                 private resolver: ComponentResolver) {
-
     }
 
     /**
      * Opens new file modal
      */
     openModal(): void {
-        this.modal.data = {
-            content: this.content.value.content
-        };
-
         // result should just be final result, like file to open
         this.modal.show();
     }
 
     ngAfterViewInit() {
+        this.model = new BehaviorSubject(null);
+        this.content.map((file: FileModel) => file.content).subscribe(this.model);
+
         this.initModal();
     }
 
     initModal() {
+        let _self = this;
 
         this.resolver.resolveComponent(SaveAsModalComponent)
             .then((factory: ComponentFactory<any>)=> {
-                this.modal.factory = factory;
+
+                let modalData = new ModalData({
+                    functions: {
+                        cancel: function() {
+                            this.cref.destroy();
+                            this.result.resolve();
+                        },
+                        confirm: function(data) {
+                            this.cref.destroy();
+                            this.result.resolve(data);
+                        }
+                    },
+                    model: _self.model
+                });
+
+                this.modal.injector = this.injector;
+                this.modal.dynamicComponentContext = new DynamicComponentContext(factory, modalData);
             });
-
-        // so the modalComponent can resolve dependencies in the same tree
-        // as the component initiating it
-        this.modal.injector = this.injector;
-
-        this.modal.functions = {
-            cancel: function () {
-                this.cref.destroy();
-                // By rejecting, the show must catch the error. So by resolving,
-                // it can be ignored silently in case the result is unimportant.
-                this.result.resolve();
-            },
-            confirm: function (data) {
-                this.cref.destroy();
-                this.result.resolve(data);
-            }
-        };
-
     }
 }

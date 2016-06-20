@@ -1,11 +1,11 @@
-import {Component, OnInit, ComponentRef} from "@angular/core";
+import {Component, ComponentRef} from "@angular/core";
 import {
     NgStyle,
     Control,
     ControlGroup,
     Validators,
     FORM_DIRECTIVES,
-    FormBuilder,
+    FormBuilder
 } from "@angular/common";
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import * as _ from "lodash";
@@ -24,7 +24,7 @@ import {ModalData} from "../../models/modal.data.model";
     directives: [NgStyle, BlockLoaderComponent, FORM_DIRECTIVES],
     templateUrl: 'app/components/common/new-file-modal.component.html'
 })
-export class NewFileModalComponent implements OnInit {
+export class NewFileModalComponent {
     private isCreatingFile: boolean;
     private showFileExists: boolean;
     private isGeneralError: boolean;
@@ -136,8 +136,5 @@ export class NewFileModalComponent implements OnInit {
             this.confirm = modalData.functions.confirm.bind(this);
             this.cancel = modalData.functions.cancel.bind(this);
         }
-    }
-
-    public ngOnInit() {
     }
 }
