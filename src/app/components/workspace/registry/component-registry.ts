@@ -23,7 +23,7 @@ export class ComponentRegistry {
             .forEach((comp) => {
                 this.registerComponent(comp)
             }); // Register them
-        
+
     }
 
     /**
@@ -71,25 +71,23 @@ export class ComponentRegistry {
 
             this.resolver.resolveComponent(<any>componentName).then((factory: ComponentFactory<any>)=> {
                 let comp = container.componentReference = factory.create(this.injector, [], targetElement);
+
                 if (typeof comp.instance["setState"] === "function") {
                     comp.instance.setState(state);
                 }
 
-
-                (<any>this.appRef)._loadComponent(comp);
+                (this.appRef as any)._loadComponent(comp);
 
                 this.components[<any> componentName] = {
                     name: componentName,
                     component: comp
                 };
 
-
-                //noinspection TypeScriptUnresolvedFunction
                 Observable.fromEvent(this.layout, "itemDestroyed")
                     .filter((ev: any) => ev.type === "component")
                     .map((ev: any) => ev.container.componentReference)
                     .subscribe((comp: ComponentRef<any>) => {
-
+                        (this.appRef as any)._unloadComponent(comp);
                         comp.changeDetectorRef.detach();
                         comp.destroy();
                     });
