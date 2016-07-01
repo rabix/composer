@@ -6,7 +6,7 @@ export interface AppConfig {
     protocol?: string;
 }
 
-declare var APP_ENV_CONFIG;
+declare const APP_ENV_CONFIG;
 
 export const CONFIG: AppConfig = APP_ENV_CONFIG;
 
