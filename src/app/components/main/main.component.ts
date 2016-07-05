@@ -10,6 +10,7 @@ import {BACKEND_SERVICE} from "../../services/data/providers/data.types";
 import {SocketService as NewSocketService} from "../../services/data/providers/socket/socket.service";
 import {WorkspaceService} from "../workspace/workspace.service";
 import {SocketService} from "../../services/api/socket.service";
+import {WebWorkerService} from "../../services/webWorker/web-worker.service";
 import {provide, Component} from "@angular/core";
 import {FileEffects} from "../../store/effects/file.effects";
 import {UrlValidator} from "../../validators/url.validator"
@@ -38,6 +39,7 @@ require("./main.component.scss");
         provide(BACKEND_SERVICE, {useClass: NewSocketService}),
         SocketService,
         WorkspaceService,
+        WebWorkerService,
         FileEffects,
         StateUpdates,
         FileStateService,

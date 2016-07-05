@@ -7,6 +7,7 @@ import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import {ACE_MODES_MAP} from "./code-editor-modes-map";
 import {IFileChanges} from "../../services/file-registry.service";
+import {WebWorkerService, ValidationResponse} from "../../services/webWorker/web-worker.service";
 
 export class CodeEditor {
     editor: Editor;
@@ -18,9 +19,10 @@ export class CodeEditor {
     private subscriptions: Subscription[] = [];
 
     text: string;
-
     textStream: BehaviorSubject<IFileChanges>;
-    changeStream: Observable<any> = new Subject();
+    changeStream: Subject<any> = new Subject();
+
+    webWorkerService: WebWorkerService;
 
     constructor(editor: Editor) {
         this.editor                 = editor;
@@ -28,6 +30,7 @@ export class CodeEditor {
         this.editor.$blockScrolling = Infinity;
         this.session                = editor.getSession();
         this.document               = this.session.getDocument();
+        this.webWorkerService       = new WebWorkerService();
 
         this.fileIsLoading = true;
 
@@ -56,6 +59,21 @@ export class CodeEditor {
         this.subscriptions.push(changeSubscription);
     }
 
+    private _attachJsonValidation(): void {
+        this.textStream
+            .map((fileChanges: IFileChanges) => {
+                return fileChanges.content;
+            })
+            .distinctUntilChanged()
+            .debounceTime(500)
+            .subscribe((jsonText: string) => {
+                this.webWorkerService.validateJsonSchema(jsonText)
+                    .subscribe((res: ValidationResponse) => {
+                        console.dir(res);
+                    });
+            });
+    }
+
     public setTextStream(textStream: BehaviorSubject<IFileChanges>): void {
         this.textStream = textStream;
 
@@ -67,6 +85,8 @@ export class CodeEditor {
             this.setText(content);
             this.fileIsLoading = false;
         });
+
+        this._attachJsonValidation();
     }
 
     private setText(text: string): void {
