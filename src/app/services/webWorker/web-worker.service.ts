@@ -22,7 +22,6 @@ export class WebWorkerService {
     }
 
     public validateJsonSchema(jsonText: string): Observable<ValidationResponse> {
-
         this.postMessage(jsonText);
 
         //noinspection TypeScriptUnresolvedFunction
@@ -32,15 +31,19 @@ export class WebWorkerService {
             }}, () => {})
             .map((res: any) => {
                 let responseMessage: ValidationMessage = res.data;
+                
+                if (!_.isUndefined(responseMessage.error)) {
+                   throw Error(responseMessage.error);
+                } else {
+                    let isValid = responseMessage.isValid;
+                    let errors = responseMessage.data.errors;
+                    let schema = responseMessage.data.schema;
 
-                let isValid = responseMessage.isValid;
-                let errors = responseMessage.data.errors;
-                let schema = responseMessage.data.schema;
-
-                return {
-                    isValid: isValid,
-                    errors: errors,
-                    schema: schema
+                    return {
+                        isValid: isValid,
+                        errors: errors,
+                        schema: schema
+                    }
                 }
             });
     }

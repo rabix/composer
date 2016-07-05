@@ -70,6 +70,8 @@ export class CodeEditor {
                 this.webWorkerService.validateJsonSchema(jsonText)
                     .subscribe((res: ValidationResponse) => {
                         console.dir(res);
+                    }, err => {
+                        console.log(err);
                     });
             });
     }

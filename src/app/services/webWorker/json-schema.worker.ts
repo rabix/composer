@@ -51,7 +51,12 @@ class JsonSchemaWorker {
         if (json !== null && json.cwlVersion && json.class) {
             return this.isClassValid(json.class) && this.isCwlVersionValid(json.cwlVersion);
         } else {
-            console.log('JSON is missing "cwlVersion" or "class"');
+            postMessage({
+                data: null,
+                isValid: false,
+                error: 'JSON is missing "cwlVersion" or "class"'
+            });
+            
             return false;
         }
     }
@@ -65,7 +70,11 @@ class JsonSchemaWorker {
         try {
             json = JSON.parse(jsonText);
         } catch (e) {
-            console.log(jsonText + ' is not a valid JSON');
+            postMessage({
+                data: null,
+                isValid: false,
+                error: jsonText + ' is not a valid JSON'
+            });
         }
 
         if (json !== null && this.isValidCwlJson(json)) {

@@ -1,4 +1,5 @@
 export interface ValidationMessage {
     data: any
-    isValid: boolean
+    isValid: boolean,
+    error?: string
 }
