@@ -26,10 +26,13 @@ export class WebWorkerService {
         this.postMessage(jsonText);
 
         //noinspection TypeScriptUnresolvedFunction
-        return Observable.fromEvent(this.jsonSchemaWorker, 'message')
+        return Observable.fromEventPattern((handler) => {
+            this.jsonSchemaWorker.onmessage = e => {
+                handler(e);
+            }}, () => {})
             .map((res: any) => {
                 let responseMessage: ValidationMessage = res.data;
-                
+
                 let isValid = responseMessage.isValid;
                 let errors = responseMessage.data.errors;
                 let schema = responseMessage.data.schema;
