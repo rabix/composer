@@ -1,40 +1,52 @@
 'use strict';
 
-import {it, inject, async, describe, beforeEachProviders} from "@angular/core/testing";
+import {it, describe, beforeEachProviders} from "@angular/core/testing";
 import {WebWorkerService, ValidationResponse} from "./web-worker.service";
 
+//DON'T use Angular's async method here, it will not always wait for the test to execute!
 describe("WebWorkerService", () => {
 
-    beforeEachProviders(() => [WebWorkerService]);
+    beforeEachProviders(() => []);
 
     describe("validateJsonSchema", () => {
-        it("should return an observable emitting the validation result",
-            async(inject([WebWorkerService], (webWorkerService: WebWorkerService) => {
+        it("should return an observable emitting the validation result", (done) => {
+            let webWorkerService = new WebWorkerService();
+            let mockJson:string = '{"cwlVersion": "draft-3", "class": "CommandLineTool"}';
 
-                    let mockJson: string = '{"cwlVersion": "draft-3", "class": "CommandLineTool"}';
+            webWorkerService.validateJsonSchema(mockJson).subscribe((res:ValidationResponse) => {
 
-                    webWorkerService.validateJsonSchema(mockJson).subscribe((res: ValidationResponse) => {
+                expect(res.isValid).toBe(false);
+                expect(res.errors.length).toBe(3);
+                done();
 
-                        expect(res.isValid).toBe(false);
-                        expect(res.errors.length).toBe(3);
+            }, err => console.log(err));
+        });
 
-                    }, err => console.log(err));
-                })
-            ));
+        it("should return an Error message if the string is not a JSON", (done) => {
+            let webWorkerService = new WebWorkerService();
+            let text:string = "I am not a JSON";
 
-        //TODO(mate): figure out why it only works with one test
+            webWorkerService.validateJsonSchema(text).subscribe((res:ValidationResponse) => {
 
-        /*it("should return an Error message if the string is not a JSON",
-            async(inject([WebWorkerService], (webWorkerService: WebWorkerService) => {
-                    let text: string = "I am not a JSON";
-                    // expect(err).toEqual(new Error('I am not a JSON is not a valid JSON123'));
+            }, err => {
+                expect(err).toEqual(new Error('I am not a JSON is not a valid JSON'));
+                done();
+            });
+        });
 
-                    webWorkerService.validateJsonSchema(text).subscribe((res: ValidationResponse) => {
-                        console.log('heree 1111');
-                    }, err => {
-                        expect(_.isEqual(err, 123)).toBe(true);
-                    });
-                })
-            ));*/
+        
+        it("should return an Error message if JSON has no cwlVersion or class", (done) => {
+            let webWorkerService = new WebWorkerService();
+            let text:string = '{ "fake": "json" }';
+
+            webWorkerService.validateJsonSchema(text).subscribe((res:ValidationResponse) => {
+
+            }, err => {
+                expect(err).toEqual(new Error('JSON is missing "cwlVersion" or "class"'));
+                done();
+            });
+        });
+        
+        
     });
 });

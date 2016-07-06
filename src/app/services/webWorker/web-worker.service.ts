@@ -9,6 +9,7 @@ export interface ValidationResponse {
     schema: any
 }
 
+/* This class should be instantiated (not injected), every instance will have one WebWorker instance. */
 export class WebWorkerService {
 
     jsonSchemaWorker: Worker;
@@ -37,7 +38,7 @@ export class WebWorkerService {
                 } else {
                     let isValid = responseMessage.isValid;
                     let errors = responseMessage.data.errors;
-                    let schema = responseMessage.data.schema;
+                    let schema = responseMessage.data.instance;
 
                     return {
                         isValid: isValid,

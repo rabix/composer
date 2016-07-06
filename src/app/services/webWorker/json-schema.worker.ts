@@ -19,7 +19,7 @@ let draft4 = {
 
 declare function postMessage(message: ValidationMessage): void;
 
-class JsonSchemaWorker {
+export class JsonSchemaWorker {
 
     constructor() {
         onmessage = (e) => {
@@ -27,10 +27,9 @@ class JsonSchemaWorker {
             this.validateJson(requestObj);
         }
     }
-    
-    
+
     //TODO: maybe move this to the cwlts
-    private getJsonSchemaContainer(versionString: string) {
+    getJsonSchemaContainer(versionString: string) {
         switch(versionString) {
             case "draft-3":
                 return draft3;
@@ -39,29 +38,41 @@ class JsonSchemaWorker {
         }
     }
 
-    private isCwlVersionValid(versionString: string) {
+    isCwlVersionValid(versionString: string) {
         return versionString === "draft-3" || versionString === "draft-4"
     }
 
-    private isClassValid(cwlClass: string) {
+    isClassValid(cwlClass: string) {
         return cwlClass === "Workflow" || cwlClass === "CommandLineTool" || cwlClass === "ExpressionTool";
     }
 
-    private isValidCwlJson(json: any) {
+
+    isValidCwlJson(json: any) {
         if (json !== null && json.cwlVersion && json.class) {
-            return this.isClassValid(json.class) && this.isCwlVersionValid(json.cwlVersion);
+            
+            let isValid = this.isClassValid(json.class) && this.isCwlVersionValid(json.cwlVersion);
+            if (!isValid) {
+                postMessage({
+                    data: null,
+                    isValid: false,
+                    error: 'cwlVersion or class is not valid'
+                });
+            }
+            
+            return isValid;
+            
         } else {
             postMessage({
                 data: null,
                 isValid: false,
                 error: 'JSON is missing "cwlVersion" or "class"'
             });
-            
+
             return false;
         }
     }
 
-    private validateJson(jsonText: string) {
+    validateJson(jsonText: string) {
         let validator = new Validator();
         let json = null;
         let cwlVersion = null;
@@ -83,7 +94,7 @@ class JsonSchemaWorker {
 
             let schemaContainer = this.getJsonSchemaContainer(cwlVersion);
             let result: any;
-            
+
             switch(jsonClass) {
                 case 'Workflow':
                     result = validator.validate(json, schemaContainer.wfSchema);
@@ -97,7 +108,6 @@ class JsonSchemaWorker {
                 data: result,
                 isValid: result.valid
             });
-
         }
     }
 }
