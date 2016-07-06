@@ -1,25 +1,12 @@
 /// <reference no-default-lib="true"/>
 import {ValidationMessage} from "./json-schema.interfaces";
+import {draft3, draft4} from "cwlts/lib";
 
 let Validator = require('jsonschema').Validator;
 
-//TODO: change the cwlts to have a method that returns the schemas
-let draft3 = {
-    cltSchema: require("../../../../node_modules/cwlts/src/parser/schemas/draft-3/CLT-schema.json"),
-    wfSchema: require("../../../../node_modules/cwlts/src/parser/schemas/draft-3/WF-schema.json"),
-    etSchema: require("../../../../node_modules/cwlts/src/parser/schemas/draft-3/ET-schema.json")
-};
-
-let draft4 = {
-    cltSchema: require("../../../../node_modules/cwlts/src/parser/schemas/draft-4/CLT-schema.json"),
-    wfSchema: require("../../../../node_modules/cwlts/src/parser/schemas/draft-4/WF-schema.json"),
-    etSchema: require("../../../../node_modules/cwlts/src/parser/schemas/draft-4/ET-schema.json")
-};
-
-
 declare function postMessage(message: ValidationMessage): void;
 
-export class JsonSchemaWorker {
+class JsonSchemaWorker {
 
     constructor() {
         onmessage = (e) => {
@@ -27,8 +14,7 @@ export class JsonSchemaWorker {
             this.validateJson(requestObj);
         }
     }
-
-    //TODO: maybe move this to the cwlts
+    
     getJsonSchemaContainer(versionString: string) {
         switch(versionString) {
             case "draft-3":
@@ -49,7 +35,7 @@ export class JsonSchemaWorker {
 
     isValidCwlJson(json: any) {
         if (json !== null && json.cwlVersion && json.class) {
-            
+
             let isValid = this.isClassValid(json.class) && this.isCwlVersionValid(json.cwlVersion);
             if (!isValid) {
                 postMessage({
@@ -58,9 +44,9 @@ export class JsonSchemaWorker {
                     error: 'cwlVersion or class is not valid'
                 });
             }
-            
+
             return isValid;
-            
+
         } else {
             postMessage({
                 data: null,
