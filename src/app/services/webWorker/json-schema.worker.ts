@@ -84,10 +84,13 @@ class JsonSchemaWorker {
             switch(jsonClass) {
                 case 'Workflow':
                     result = validator.validate(json, schemaContainer.wfSchema);
+                    break;
                 case 'CommandLineTool':
                     result = validator.validate(json, schemaContainer.cltSchema);
+                    break;
                 case 'ExpressionTool':
                     result = validator.validate(json, schemaContainer.etSchema);
+                    break;
             }
 
             postMessage({
