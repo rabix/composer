@@ -1,0 +1,36 @@
+#viewContainer{
+    margin-left: 10px;
+
+    #revisionSelect {
+        color: #000000;
+        margin-right: 40px;
+        width: 100px;
+    }
+
+    #buttonsContainer {
+        margin-top: 10px;
+
+        button {
+            height: 20px;
+            width: 100px;
+            font-size: small;
+            padding: 0;
+
+            border-radius: 0;
+            -webkit-box-shadow: none;
+            -moz-box-shadow: none;
+            box-shadow: none;
+        }
+
+        .selected {
+            background-color: #0275d8;
+            color:  #ffffff;
+            border-color: #0275d8;
+        }
+
+        #saveButton{
+            float: right;
+            margin-right: 15px;
+        }
+    }
+}

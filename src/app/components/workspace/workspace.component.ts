@@ -2,11 +2,11 @@ import {Component, ElementRef} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {ComponentRegistry} from "./registry/component-registry";
 import {ComponentRegistryFactoryService} from "./registry/component-registry-factory.service";
-import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {FileTreeComponent} from "../file-tree/file-tree.component";
 import {WorkspaceService} from "./workspace.service";
 import {FileEditorPlaceholderComponent} from "../placeholders/file-editor/file-editor-placeholder.component";
 import * as GoldenLayout from "golden-layout";
+import {EditorWrapperComponent} from "../editor-wrapper/editor-wrapper.component";
 
 require("./workspace.component.scss");
 
@@ -38,7 +38,7 @@ export class WorkspaceComponent {
         //noinspection TypeScriptUnresolvedFunction
         Observable.fromEvent(this.layout, "componentCreated")
             .filter((event: any) => {
-                return event.config.componentName === CodeEditorComponent
+                return event.config.componentName === EditorWrapperComponent
                     && event.parent.contentItems.length === 1
                     && event.parent.contentItems[0].config.componentName === FileEditorPlaceholderComponent
             })
@@ -49,12 +49,12 @@ export class WorkspaceComponent {
         //noinspection TypeScriptUnresolvedFunction
         Observable.fromEvent(this.layout, "itemDestroyed")
             .do((event: any) => {
-                if (event.config.componentName === CodeEditorComponent) {
+                if (event.config.componentName === EditorWrapperComponent) {
                     this.workspaceService.closeFile(event.config.componentState.fileInfo);
                 }
             })
             .filter((event: any) => {
-                return event.config.componentName === CodeEditorComponent
+                return event.config.componentName === EditorWrapperComponent
                     && event.parent.contentItems.length === 1
             })
             .subscribe((event: any) => {
@@ -77,7 +77,7 @@ export class WorkspaceComponent {
                 if (this.layout.root) {
                     // filter through open CodeEditorComponents, gather their FileModels
                     let oldList = this.layout.root.contentItems[0].contentItems[1].contentItems
-                        .filter((item) => item.componentName === CodeEditorComponent)
+                        .filter((item) => item.componentName === EditorWrapperComponent)
                         .map(item => item.config.componentState.fileInfo);
 
                     // compare already opened FileModels to the list of open files
@@ -88,11 +88,12 @@ export class WorkspaceComponent {
 
                 // add all new files that are not already open
                 added.forEach((file) => {
-                    this.registry.registerComponent(CodeEditorComponent);
+                    this.registry.registerComponent(EditorWrapperComponent);
+
                     this.layout.root.contentItems[0].contentItems[1].addChild({
                         type: "component",
                         title: file.name,
-                        componentName: CodeEditorComponent,
+                        componentName: EditorWrapperComponent,
                         componentState: {
                             fileInfo: file
                         },
@@ -118,7 +119,7 @@ export class WorkspaceComponent {
         //@todo(maya): move file selection observable
         //noinspection TypeScriptUnresolvedFunction
         Observable.fromEvent(this.layout.root.contentItems[0].contentItems[1], "activeContentItemChanged")
-            .filter((event: any) => event.config.componentName === CodeEditorComponent)
+            .filter((event: any) => event.config.componentName === EditorWrapperComponent)
             .subscribe((event: any) => {
                 this.workspaceService.selectFile(event.config.componentState.fileInfo);
             });

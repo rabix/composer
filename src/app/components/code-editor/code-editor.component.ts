@@ -1,4 +1,4 @@
-import {Component, OnInit, ElementRef} from "@angular/core";
+import {Component, OnInit, ElementRef, Input} from "@angular/core";
 import {CodeEditor} from "./code-editor.service";
 import {FileRegistry} from "../../services/file-registry.service";
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
@@ -18,8 +18,8 @@ require('./code-editor.component.scss');
                 </div>`,
 })
 export class CodeEditorComponent implements OnInit {
+    @Input() file: FileModel;
     editor: CodeEditor;
-    file: FileModel;
 
     constructor(private elem: ElementRef, private fileRegistry: FileRegistry) {}
 
@@ -38,10 +38,10 @@ export class CodeEditorComponent implements OnInit {
         this.editor.dispose();
     }
 
-    public setState(state) {
+   /* public setState(state) {
         // @todo figure out why this is undefined on startup
         if (state.fileInfo) {
             this.file = state.fileInfo;
         }
-    }
+    }*/
 }
