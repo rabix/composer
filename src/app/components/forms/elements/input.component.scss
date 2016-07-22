@@ -1,0 +1,18 @@
+@import "../../../../assets/sass/variables";
+
+ct-input {
+    display: block;
+
+    .label-block {
+        display: block;
+
+        .label-text {
+            font-family: $font-family-title;
+            font-size: $font-size-xs;
+            font-weight: 500;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+    }
+}

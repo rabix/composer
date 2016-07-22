@@ -1,13 +1,11 @@
-import {Component, Input, Injector, forwardRef, Inject} from "@angular/core";
-import {FilePath} from "../../../services/api/api-response-types";
-import {TreeViewNode} from "../../tree-view/interfaces/tree-view-node";
-import {TreeviewSelectableDirective} from "../../tree-view/behaviours/treeview-selectable.directive";
-import {TreeviewExpandableDirective} from "../../tree-view/behaviours/treeview-expandable.directive";
-import {FileTreeService} from "../file-tree.service";
-import {TreeViewComponent} from "../../tree-view/tree-view.component";
-import {HmrState} from "angular2-hmr";
+import {Component, Input, forwardRef, Inject, OnInit} from "@angular/core";
 import {DirectoryModel} from "../../../store/models/fs.models";
 import {DynamicState} from "../../runtime-compiler/dynamic-state.interface";
+import {FileTreeService} from "../file-tree.service";
+import {TreeViewComponent} from "../../tree-view/tree-view.component";
+import {TreeviewExpandableDirective} from "../../tree-view/behaviours/treeview-expandable.directive";
+import {TreeViewNode} from "../../tree-view/interfaces/tree-view-node";
+import {TreeviewSelectableDirective} from "../../tree-view/behaviours/treeview-selectable.directive";
 
 @Component({
     selector: "file-tree:directory",
@@ -33,7 +31,7 @@ import {DynamicState} from "../../runtime-compiler/dynamic-state.interface";
         
     `
 })
-export class DirectoryNodeComponent implements DynamicState {
+export class DirectoryNodeComponent implements DynamicState, TreeViewNode, OnInit {
 
 
     @Input() model: DirectoryModel;

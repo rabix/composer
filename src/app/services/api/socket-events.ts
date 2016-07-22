@@ -4,7 +4,8 @@ export const SOCKET_REQUESTS = {
     "FILE_CONTENT": "getFile",
     "CREATE_FILE": "createFile",
     "UPDATE_FILE": "updateFile",
-    "FILE_EXISTS": "fileExists"
+    "FILE_EXISTS": "fileExists",
+    "COPY_FILE": "copyFile"
 };
 
 export const SOCKET_EVENTS = [];

@@ -5,7 +5,4 @@ import {BehaviorSubject} from "rxjs/BehaviorSubject";
 export class TreeViewService{
 
     public highlightedNode = new BehaviorSubject<any>(true);
-    constructor(){
-        console.log("New Tree View Service");
-    }
 }

@@ -1,0 +1,31 @@
+@import "../../../assets/sass/variables";
+
+ct-menu-bar {
+    background: rgba(211, 211, 211, .98);
+    border-bottom: 1px solid #2b2d2f;
+    display: block;
+    font-size: $font-size-root;
+    width: 100%;
+
+    .main-list {
+        display: inline-block;
+        margin: 0;
+        position: relative;
+    }
+
+    & > ct-menu-item {
+        display: inline-block;
+        padding: 2px 10px;
+
+        & > .expander {
+            display: none;
+        }
+
+        & > ct-menu {
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            margin-left: -100%;
+            top: calc(100% + 4px);
+        }
+    }
+}

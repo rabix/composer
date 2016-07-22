@@ -1,4 +1,4 @@
-import {ComponentRef} from '@angular/core';
+import {ComponentRef} from "@angular/core";
 
 export interface ModalFunctionsInterface {
     cancel: Function,

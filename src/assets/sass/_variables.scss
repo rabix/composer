@@ -1,8 +1,15 @@
 @import "~bootstrap/scss/variables";
 
+$font-size-root: 15px;
+$font-family-title: "Montserrat", "Helvetica Neue", sans-serif;
+
 $gui-base-gray: rgb(51, 51, 51);
 $body-bg: #000;
 $body-color: ghostwhite;
+
+$brand-primary: $gray;
+$btn-primary-bg: $brand-primary;
+$btn-primary-border: $gray-dark;
 
 /**
 * Layout Size Variables
@@ -23,4 +30,10 @@ $modal-content-color: $body-color;
 */
 
 $input-bg: #ccc;
-$input-color-placeholder:#333;
+$input-color-placeholder: $gray-dark;
+
+
+$border-radius: 2px;
+$input-border-radius: $border-radius;
+$input-border-radius-sm: $border-radius;
+$input-border-color: $gray-light;

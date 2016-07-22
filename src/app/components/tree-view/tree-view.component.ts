@@ -39,9 +39,6 @@ export class TreeViewComponent {
     }
 
     ngOnInit() {
-        this.componentContexts = this.dataProvider().do((data)=> {
-            console.log("Data loaded", data);
-            this.onDataLoad.next(data);
-        });
+        this.componentContexts = this.dataProvider().do(data => this.onDataLoad.next(data));
     }
 }

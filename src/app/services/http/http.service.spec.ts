@@ -1,8 +1,7 @@
 import {it, inject, describe, beforeEachProviders} from "@angular/core/testing";
-import {provide} from "@angular/core"
+import {provide} from "@angular/core";
 import {BaseRequestOptions, Response, ResponseOptions, Http} from "@angular/http";
 import {MockBackend, MockConnection} from "@angular/http/testing";
-
 import {HttpService} from "./http.service";
 
 describe("HttpService", () => {

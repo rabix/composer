@@ -31,7 +31,6 @@ describe("ApiService", () => {
             });
 
             service.getDirectoryContent("mind over matter").subscribe((next) => {
-                // console.log("Got", next);
             });
         }));
 

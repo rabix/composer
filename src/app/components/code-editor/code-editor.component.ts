@@ -1,10 +1,14 @@
-import {Component, OnInit, ElementRef} from "@angular/core";
-import {CodeEditor} from "./code-editor.service";
-import {FileRegistry} from "../../services/file-registry.service";
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
+import {CodeEditor} from "./code-editor";
+import {Component, OnInit, ElementRef, ViewChild} from "@angular/core";
+import {DynamicState} from "../runtime-compiler/dynamic-state.interface";
+import {FileModel} from "../../store/models/fs.models";
+import {FileRegistry} from "../../services/file-registry.service";
+import {Subscription} from "rxjs/Rx";
+import {EventHubService} from "../../services/event-hub/event-hub.service";
+import {UpdateFileAction} from "../../action-events/index";
 import Editor = AceAjax.Editor;
 import TextMode = AceAjax.TextMode;
-import {FileModel} from "../../store/models/fs.models";
 
 require('./code-editor.component.scss');
 
@@ -12,36 +16,60 @@ require('./code-editor.component.scss');
     selector: 'code-editor',
     directives: [BlockLoaderComponent],
     template: `
-                <div class="code-editor-container">
-                     <block-loader *ngIf="editor.fileIsLoading"></block-loader>
-                     <div class="editor" [hidden]="editor.fileIsLoading "></div>
-                </div>`,
+        <div class="code-editor-container">
+             <block-loader *ngIf="!isLoaded"></block-loader>
+             <div #ace class="editor"></div>
+        </div>`,
 })
-export class CodeEditorComponent implements OnInit {
-    editor: CodeEditor;
-    file: FileModel;
+export class CodeEditorComponent implements OnInit, DynamicState {
+    /** Holds the reference to the CodeEditor service/component */
+    private editor: CodeEditor;
 
-    constructor(private elem: ElementRef, private fileRegistry: FileRegistry) {}
+    /** Provided file that we should open in the editor */
+    private file: FileModel;
+
+    /** Flag that determines if the spinner should be shown */
+    private isLoaded: boolean;
+
+    /** List of subscriptions that should be disposed when destroying this component */
+    private subs: Subscription[];
+
+    /** Reference to the element in which we want to instantiate the Ace editor */
+    @ViewChild("ace")
+    private aceContainer: ElementRef;
+
+    constructor(private fileRegistry: FileRegistry,
+                private eventHub: EventHubService) {
+        this.subs     = [];
+        this.isLoaded = false;
+    }
 
     ngOnInit(): any {
-        let editorInstance = ace.edit(this.elem.nativeElement.getElementsByClassName('editor')[0]);
-        this.editor        = new CodeEditor(editorInstance);
+        // This file that we need to show, check it out from the file repository
+        const fileStream = this.fileRegistry.getFile(this.file);
 
-        // this check shouldn't be necessary
-        if (this.file) {
-            this.editor.setMode(this.file.type || '.txt');
-            this.editor.setTextStream(this.fileRegistry.loadFile(this.file.absolutePath));
-        }
+        // Instantiate the editor and give it the stream through which the file will come through
+        this.editor = new CodeEditor(ace.edit(this.aceContainer.nativeElement), fileStream);
+
+        // Also, we want to turn off the loading spinner and might as well bring our own file up to date
+        this.subs.push(fileStream.subscribe(file => {
+            this.isLoaded = true;
+            this.file     = file;
+        }));
+
+        this.editor.contentChanges.skip(1).subscribe((file) => {
+            this.eventHub.publish(new UpdateFileAction(file));
+        })
+
     }
 
-    ngOnDestroy(): any {
+    ngOnDestroy(): void {
         this.editor.dispose();
+        console.debug("Disposing code editor");
+        this.subs.forEach(sub => sub.unsubscribe());
     }
 
-    public setState(state) {
-        // @todo figure out why this is undefined on startup
-        if (state.fileInfo) {
-            this.file = state.fileInfo;
-        }
+    public setState(state: {fileInfo}): void {
+        this.file = state.fileInfo;
     }
 }

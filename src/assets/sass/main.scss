@@ -1,10 +1,14 @@
-@import "bootstrap-pack";
 @import "variables";
+@import "bootstrap-pack";
 @import "mixins";
 @import "resets";
 @import "utils";
 @import "~font-awesome/scss/font-awesome";
 @import "../../app/components/block-loader/block-loader.component";
+@import "_typography";
+@import "forms";
+
+@import url(https://fonts.googleapis.com/css?family=Montserrat);
 
 html, body {
   width: 100%;

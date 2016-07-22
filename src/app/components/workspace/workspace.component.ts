@@ -1,41 +1,44 @@
-import {Component, ElementRef} from "@angular/core";
-import {Observable} from "rxjs/Observable";
-import {ComponentRegistry} from "./registry/component-registry";
-import {ComponentRegistryFactoryService} from "./registry/component-registry-factory.service";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
+import {Component, ElementRef, OnDestroy} from "@angular/core";
+import {ComponentRegistryFactoryService} from "./registry/component-registry-factory.service";
+import {ComponentRegistry} from "./registry/component-registry";
 import {FileTreeComponent} from "../file-tree/file-tree.component";
+import {Observable} from "rxjs/Rx";
 import {WorkspaceService} from "./workspace.service";
 import {FileEditorPlaceholderComponent} from "../placeholders/file-editor/file-editor-placeholder.component";
 import * as GoldenLayout from "golden-layout";
+import {FileRegistry} from "../../services/file-registry.service";
 
 require("./workspace.component.scss");
 
 @Component({
     selector: "workspace",
     template: "",
-    providers: []
+    providers: [WorkspaceService]
 })
-export class WorkspaceComponent {
+export class WorkspaceComponent implements OnDestroy {
 
     private layout: any;
     private registry: ComponentRegistry;
 
     constructor(private el: ElementRef,
                 private registryFactory: ComponentRegistryFactoryService,
+                private files: FileRegistry,
                 private workspaceService: WorkspaceService) {
 
         this.layout   = new GoldenLayout(this.getLayoutConfig(), this.el.nativeElement);
         this.registry = registryFactory.create(this.layout);
     }
 
-    ngOnInit() {
+    ngAfterViewInit() {
+        this.layout.init();
 
-        //noinspection TypeScriptUnresolvedFunction
-        Observable.fromEvent(window, "resize").debounceTime(200).subscribe(() => {
-            this.layout.updateSize(this.el.nativeElement.clientWidth, this.el.nativeElement.clientHeight);
-        });
 
-        //noinspection TypeScriptUnresolvedFunction
+        const el = this.el.nativeElement;
+        Observable.fromEvent(window, "resize")
+            .debounceTime(50)
+            .subscribe(_ => this.layout.updateSize(el.clientWidth, el.clientHeight));
+
         Observable.fromEvent(this.layout, "componentCreated")
             .filter((event: any) => {
                 return event.config.componentName === CodeEditorComponent
@@ -46,82 +49,66 @@ export class WorkspaceComponent {
                 event.parent.contentItems[0].remove();
             });
 
-        //noinspection TypeScriptUnresolvedFunction
-        Observable.fromEvent(this.layout, "itemDestroyed")
-            .do((event: any) => {
-                if (event.config.componentName === CodeEditorComponent) {
-                    this.workspaceService.closeFile(event.config.componentState.fileInfo);
-                }
-            })
-            .filter((event: any) => {
-                return event.config.componentName === CodeEditorComponent
-                    && event.parent.contentItems.length === 1
-            })
-            .subscribe((event: any) => {
-                this.workspaceService.deselectFiles();
+        Observable.fromEvent(this.layout, "itemDestroyed").filter((event: any) => {
+            return event.config.componentName === CodeEditorComponent
+                && event.parent.contentItems.length === 1
+        }).subscribe((event: any) => {
+            event.parent.addChild({
+                type: "component",
+                title: "Usage Tip",
+                componentName: FileEditorPlaceholderComponent,
+                isClosable: false
+            });
+        });
 
-                // @TODO(ivanb) Move this somewhere (ex. extract the component definition into an enum)
-                // @FIXME(ivanb) Scan the whole tree and check if this is actually the last open editor
-                event.parent.addChild({
-                    type: "component",
-                    title: "Usage Tip",
-                    componentName: FileEditorPlaceholderComponent,
-                    isClosable: false
+        this.workspaceService.onLoadFile.subscribe(file => {
+            this.registry.registerComponent(CodeEditorComponent);
+            const tabs = this.layout.root.contentItems[0].contentItems[1];
+
+            tabs.addChild({
+                type: "component",
+                title: file.name + (file.isModified ? " (modified)" : ""),
+                componentName: CodeEditorComponent,
+                componentState: {
+                    fileInfo: file,
+                },
+            });
+        });
+
+        this.workspaceService.selectedFile.subscribe(file => {
+
+            if (file) {
+                let activeTab = this.registry.findEditorTab(file);
+                activeTab.setTitle(file.name + (file.isModified ? "*" : ""));
+                this.registry.getCodeEditorStack().setActiveContentItem(activeTab);
+            }
+
+        });
+
+        this.workspaceService.onCloseFile.subscribe(file => {
+            this.registry.findEditorTab(file).remove();
+        });
+
+        Observable.fromEvent(this.layout, "tabCreated")
+            .filter((tab: any) => tab.contentItem.componentName === CodeEditorComponent)
+            .subscribe((tab: any) => {
+                const componentState = tab.contentItem.config.componentState;
+                const file           = componentState.fileInfo;
+
+                tab.element.off("click").on("click", ":not(.lm_close_tab)", _ => {
+                    this.workspaceService.openFile(file);
+                });
+
+                tab.element.find(".lm_close_tab").off("click").on("click", _ => {
+                    if (Array.isArray(componentState.subscriptions)) {
+                        componentState.subscriptions.forEach(sub => {
+                            sub.unsubscribe();
+                        });
+                    }
+                    this.workspaceService.closeFile(file);
                 });
             });
 
-        this.workspaceService.openFiles
-            .subscribe(newList => {
-                let added = [];
-
-                if (this.layout.root) {
-                    // filter through open CodeEditorComponents, gather their FileModels
-                    let oldList = this.layout.root.contentItems[0].contentItems[1].contentItems
-                        .filter((item) => item.componentName === CodeEditorComponent)
-                        .map(item => item.config.componentState.fileInfo);
-
-                    // compare already opened FileModels to the list of open files
-                    added = newList.filter((file) => {
-                        return oldList.indexOf(file) === -1;
-                    })
-                }
-
-                // add all new files that are not already open
-                added.forEach((file) => {
-                    this.registry.registerComponent(CodeEditorComponent);
-                    this.layout.root.contentItems[0].contentItems[1].addChild({
-                        type: "component",
-                        title: file.name,
-                        componentName: CodeEditorComponent,
-                        componentState: {
-                            fileInfo: file
-                        },
-                    });
-                });
-            });
-
-        //@todo(maya) implement multiple selected files for multiple panes
-        this.workspaceService.selectedFile
-            .filter(file => !!file) // ensure that file is not undefined
-            .subscribe(file => {
-                let activeTab = this.layout.root.contentItems[0].contentItems[1].contentItems.filter((contentItem) => {
-                    return contentItem.config.componentState.fileInfo === file;
-                })[0];
-
-                this.layout.root.contentItems[0].contentItems[1].setActiveContentItem(activeTab);
-            });
-    }
-
-    ngAfterViewInit() {
-        this.layout.init();
-
-        //@todo(maya): move file selection observable
-        //noinspection TypeScriptUnresolvedFunction
-        Observable.fromEvent(this.layout.root.contentItems[0].contentItems[1], "activeContentItemChanged")
-            .filter((event: any) => event.config.componentName === CodeEditorComponent)
-            .subscribe((event: any) => {
-                this.workspaceService.selectFile(event.config.componentState.fileInfo);
-            });
 
     }
 
@@ -157,5 +144,9 @@ export class WorkspaceComponent {
                 ]
             }]
         };
+    }
+
+    ngOnDestroy() {
+        this.workspaceService.pleaseDontLeaveMemoryLeaks();
     }
 }

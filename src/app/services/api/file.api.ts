@@ -1,10 +1,9 @@
 import {Injectable} from "@angular/core";
 import {SocketService} from "./socket.service";
 import {SOCKET_REQUESTS} from "./socket-events";
-import {FilePath, HttpError} from "./api-response-types";
+import {FilePath} from "./api-response-types";
 import {Observable} from "rxjs/Rx";
-import {DirectoryChild, DirectoryModel, FileModel, FSItemModel} from "../../store/models/fs.models";
-import {Store} from "@ngrx/store";
+import {DirectoryModel, FileModel, FSItemModel} from "../../store/models/fs.models";
 
 @Injectable()
 export class FileApi {
@@ -31,9 +30,8 @@ export class FileApi {
 
     getFileContent(path: string): Observable<FileModel> {
         return this.socket.request(SOCKET_REQUESTS.FILE_CONTENT, {file: path})
-            .map(response => {
-                return new FileModel(response.content);
-            });
+            .map(response => new FileModel(response.content));
+
     }
 
     createFile(path: string, content?: string): Observable<FilePath> {
@@ -45,6 +43,11 @@ export class FileApi {
         });
     }
 
+    copyFile(source: string, destination: string): Observable<FileModel> {
+        return this.socket.request(SOCKET_REQUESTS.COPY_FILE, {source, destination})
+            .map(response => new FileModel(response));
+    }
+
     updateFile(path: string, content: string): Observable<boolean> {
         return this.socket.request(SOCKET_REQUESTS.UPDATE_FILE, {
             file: path,
@@ -53,11 +56,9 @@ export class FileApi {
     }
 
     checkIfFileExists(path: string): Observable<boolean> {
-        console.log('this function is being called');
         return this.socket.request(SOCKET_REQUESTS.FILE_EXISTS, {
             path: path
         }).map(response => {
-            console.log(`${path} exists`, response.content);
             return response.content
         });
     }

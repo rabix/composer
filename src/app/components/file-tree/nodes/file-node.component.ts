@@ -3,6 +3,8 @@ import {TreeviewSelectableDirective} from "../../tree-view/behaviours/treeview-s
 import {FileTreeService} from "../file-tree.service";
 import {FileModel} from "../../../store/models/fs.models";
 import {DynamicState} from "../../runtime-compiler/dynamic-state.interface";
+import {TreeViewNode} from "../../tree-view/interfaces/tree-view-node";
+import {Subscription} from "rxjs/Rx";
 
 @Component({
     selector: "file-tree:file",
@@ -16,29 +18,42 @@ import {DynamicState} from "../../runtime-compiler/dynamic-state.interface";
             <span class="fa fa-file-o node-icon"></span>
             
              <span class="name">
-                {{ model?.name }}
+                {{ file?.name }}<span *ngIf="file?.isModified">*</span>
             </span>
         </div>
         
     `
 })
-export class FileNodeComponent implements DynamicState {
+export class FileNodeComponent implements DynamicState, TreeViewNode {
 
-    private isExpandable = false;
+    public isExpandable = false;
 
-    @Input() model: FileModel;
+    @Input() file: FileModel;
 
-    constructor(
-        @Inject(forwardRef(() => FileTreeService))
-        private fileTreeService: FileTreeService) {
+    private fileWatcher: Subscription;
+
+    constructor(@Inject(forwardRef(() => FileTreeService))
+                private fileTreeService: FileTreeService) {
     }
 
     private onDoubleClick() {
-        this.fileTreeService.openFile(this.model);
+        this.fileTreeService.openFile(this.file);
+        if (!this.fileWatcher) {
+
+            this.fileWatcher = this.fileTreeService.watchFile(this.file).subscribe(file => {
+                this.file = file;
+            });
+        }
     }
 
-    public setState(state) {
-        this.model = state;
+    public setState(file) {
+        this.file = file;
+    }
+
+    ngOnDestroy() {
+        if (this.fileWatcher) {
+            this.fileWatcher.unsubscribe();
+        }
     }
 
 }

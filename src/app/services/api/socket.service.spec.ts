@@ -1,4 +1,4 @@
-import {it, describe, beforeEachProviders, async, inject} from "@angular/core/testing";
+import {describe, beforeEachProviders} from "@angular/core/testing";
 import {provide} from "@angular/core";
 import {SocketService} from "./socket.service";
 import {FileApi} from "./file.api";

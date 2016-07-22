@@ -4,7 +4,7 @@ import {BackendService} from "../data.types";
 import {Inject, Injectable} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {DataRequest, DataResponse} from "../../data.types";
-import {Subject, Observer} from "rxjs/Rx";
+import {Subject} from "rxjs/Rx";
 
 @Injectable()
 export class SocketService implements BackendService {

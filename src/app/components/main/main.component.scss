@@ -21,3 +21,21 @@
     }
 }
 
+
+#runnix {
+    left: 100%;
+    bottom: -50px;
+    width: 100px;
+    height: 100px;
+    z-index: 1000;
+    display: block;
+    position: fixed;
+    background-image: url("../../../assets/img/runny.gif");
+    background-repeat: no-repeat;
+    background-size: contain;
+
+    &.active {
+        transition: left 3s ease-out;
+        left: -200px;
+    }
+}

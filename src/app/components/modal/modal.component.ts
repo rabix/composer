@@ -1,76 +1,157 @@
 import {
     Component,
-    ApplicationRef,
-    Injectable,
-    ComponentResolver,
+    ComponentFactory,
+    ComponentRef,
+    forwardRef,
+    HostBinding,
+    HostListener,
+    Inject,
+    ViewChild,
     ViewContainerRef,
-    ComponentFactory, Injector, Input} from '@angular/core';
-import { PromiseWrapper } from '@angular/common/src/facade/async';
-import {DynamicComponentContext} from "../runtime-compiler/dynamic-component-context";
-import {ComponentCompilerDirective} from "../runtime-compiler/component-compiler.directive";
-import {ModalData} from "../../models/modal.data.model";
-require('./modal.component.scss');
+    Injector
+} from "@angular/core";
+import {Chap} from "./../../helpers/chap";
+import {ModalService} from "./modal.service";
+import {Subscription, Observable, BehaviorSubject} from "rxjs/Rx";
 
-@Injectable()
+require("./modal.component.scss");
+
+export interface ModalOptions {
+    backdrop?: boolean,
+    closeOnOutsideClick?: boolean,
+    closeOnEscape?: boolean
+}
+
+@Component({
+    selector: "ct-modal",
+    template: `
+    <div #container class="ct-modal-frame">
+        <div class="ct-modal-header" 
+             draggable="true" 
+             (dragstart)="onDragStart($event)"
+             (dragend)="onDragEnd($event)">
+             {{ title | async }}
+         </div>
+        <div #nestedComponent></div>
+    </div>
+    `
+})
 export class ModalComponent {
-    dynamicComponentContext: DynamicComponentContext<any>;
-    injector: Injector;
 
-    constructor(private app:ApplicationRef,
-                private resolver: ComponentResolver) {
-    }
+    @HostBinding("class.backdrop")
+    private backdrop: boolean;
 
-    toComponent() {
-        let dynamicComponentContext =this.dynamicComponentContext;
-        let injector = this.injector;
+    @ViewChild("nestedComponent", {read: ViewContainerRef})
+    private nestedComponentContainer: ViewContainerRef;
 
-        @Component({
-            selector: 'container',
-            directives: [ComponentCompilerDirective],
-            template:`
-            <div class="modal-background" (click)="cancel()">
-            <div id="modalDiv" class="modal" (click)="$event.stopPropagation()">
-                    <div class="modal-dialog" role="document">
-                        <template [component-compiler]="dynamicComponentContext">
-                        </template>   
-                    </div>
-            </div>
-            </div>
-            `
-        })
-        class Container {
-            @Input() public dynamicComponentContext: DynamicComponentContext<any> = dynamicComponentContext;
-            @Input() public injector: Injector = injector;
+    @ViewChild("container", {read: ViewContainerRef})
+    private modalWindow: ViewContainerRef;
+
+    public closeOnOutsideClick: boolean;
+    public title: BehaviorSubject<string>;
+    public closeOnEscape: boolean;
+
+    private nestedComponentRef: ComponentRef;
+    private dragSubscription: Subscription;
+    private viewReady: BehaviorSubject<boolean>;
+    private subscriptions: Subscription[];
+
+    constructor(@Inject(forwardRef(() => ModalService))
+                private service: ModalService,
+                private injector: Injector) {
+
+        this.backdrop            = false;
+        this.closeOnOutsideClick = true;
+        this.closeOnEscape       = true;
+
+        this.viewReady = new BehaviorSubject(false);
+        this.title     = new BehaviorSubject("New File");
+
+        this.subscriptions = [];
+
+        if (this.closeOnEscape) {
+            this.subscriptions.push(Observable.fromEvent(document, "keyup")
+                .map(ev => ev.which)
+                .filter(key => key === 27)
+                .subscribe(ev => this.service.close()));
         }
-
-        return Container;
     }
 
-    show(): Promise<any> {
-        // Top level hack
-        let viewContainerRef:ViewContainerRef = this.app['_rootComponents'][0]['_hostElement'].vcRef;
+    @HostListener("click", ["$event.target"])
+    private onClick(target) {
+        const clickInsideTheModal = this.modalWindow.element.nativeElement.contains(target);
 
-        // Set up the promise to return.
-        let promiseWrapper:any = PromiseWrapper.completer();
+        if (!clickInsideTheModal && this.closeOnOutsideClick) {
+            this.service.close();
+        }
+    }
 
-        this.resolver
-            .resolveComponent(this.toComponent())
-            .then((factory: ComponentFactory<any>) => {
-                let dynamicComponent = viewContainerRef.createComponent(factory, 0, this.injector);
-                let component = dynamicComponent.instance;
-                let componentState = <ModalData>this.dynamicComponentContext.getState();
+    private onDragStart(event) {
+        const {clientX: startX, clientY: startY} = event;
 
-                component.cancel = componentState.functions.cancel.bind(component);
+        const style = this.modalWindow.element.nativeElement.style;
+        const top   = parseFloat(style.top);
+        const left  = parseFloat(style.left);
 
-                // Assign the cref to the newly created modal so it can self-destruct correctly.
-                component.cref = dynamicComponent;
-                componentState.cref = dynamicComponent;
+        const img = document.createElement('img');
+        img.src   = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+        event.dataTransfer.setDragImage(img, 0, 0);
 
-                // Assign the promise to resolve.
-                component.result = promiseWrapper;
-                componentState.result = promiseWrapper;
+
+        this.dragSubscription = Observable
+            .fromEvent(event.target, "drag")
+            .filter((event: MouseEvent) => event.pageX !== 0 && event.pageY !== 0)
+            .subscribe((event: MouseEvent) => {
+                this.reposition({
+                    top: top + (event.clientY - startY) + "px",
+                    left: left + (event.clientX - startX) + "px"
+                })
             });
-
-        return promiseWrapper.promise;
     }
+
+    private onDragEnd(event) {
+        this.dragSubscription.unsubscribe();
+    }
+
+    public configure(config: ModalOptions) {
+        Chap.applyParams(config, this);
+    }
+
+    public produce(factory: ComponentFactory) {
+
+        this.nestedComponentRef = this.nestedComponentContainer.createComponent(factory, 0, this.injector);
+
+        Observable.of("Reposition me right away!")
+            .merge(Observable.fromEvent(window, "resize").debounceTime(50))
+            .subscribe(s => {
+                this.reposition();
+            });
+    }
+
+    private reposition(tweak?: any) {
+
+        const el = this.modalWindow.element.nativeElement as HTMLElement;
+
+        el.style.position = "absolute";
+
+        const {clientWidth: wWidth, clientHeight: wHeight} = document.body;
+        const {clientWidth: mWidth, clientHeight: mHeight} = el;
+
+        el.style.maxWidth  = wWidth - 50 + "px";
+        el.style.maxHeight = wHeight - 50 + "px";
+
+        if (tweak) {
+            el.style.top  = tweak.top;
+            el.style.left = tweak.left;
+        } else {
+            el.style.top  = (wHeight - mHeight) / 2 + "px";
+            el.style.left = (wWidth - mWidth) / 2 + "px";
+        }
+    }
+
+    ngOnDestroy() {
+        this.subscriptions.forEach(sub => sub.unsubscribe());
+        this.nestedComponentRef.destroy();
+    }
+
 }

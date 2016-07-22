@@ -1,15 +1,14 @@
-import {
-    ComponentResolver,
-    ComponentFactory,
-    Injector,
-    ApplicationRef,
-    ComponentRef
-} from "@angular/core";
-import {Observable} from "rxjs/Observable";
-
+import {ApplicationRef, ComponentRef, ComponentResolver, Injector} from "@angular/core";
+import {DynamicState, hasDynamicState} from "../../runtime-compiler/dynamic-state.interface";
+import {Observable} from "rxjs/Rx";
+import {CodeEditorComponent} from "../../code-editor/code-editor.component";
+import {FileModel} from "../../../store/models/fs.models";
 
 export class ComponentRegistry {
 
+    /**
+     * Cache of components that are already registered with the GoldenLayout.
+     */
     private components = {};
 
     constructor(private layout: any,
@@ -17,12 +16,19 @@ export class ComponentRegistry {
                 private injector: Injector,
                 private appRef: ApplicationRef) {
 
-        this.extractComponents(this.layout.config.content) // Recursive search for components
-            .map(comp => comp.componentName) // Take our component entries from the object
-            .filter((comp, index, arr) => arr.indexOf(comp) === index) // Take only unique values
-            .forEach((comp) => {
-                this.registerComponent(comp)
-            }); // Register them
+        this.extractComponents(this.layout.config.content)             // Search for ng components
+            .map(comp => comp.componentName)                           // take only their names
+            .filter((comp, index, arr) => arr.indexOf(comp) === index) // that are unique
+            .forEach(comp => this.registerComponent(comp));            // and register them for GL
+
+        Observable.fromEvent(this.layout, "itemDestroyed")     // When the X is clicked on a tab
+            .filter((ev: any) => ev.type === "component")      // and that tab contains a component
+            .map((ev: any) => ev.container.componentReference) // take the contained ComponentRef
+            .subscribe((comp: ComponentRef<any>) => {
+                (this.appRef as any)._unloadComponent(comp);   // remove it from the comp. tree
+                comp.changeDetectorRef.detach();               // remove its change detector
+                comp.destroy();                                // and destroy the component
+            });
 
     }
 
@@ -39,11 +45,11 @@ export class ComponentRegistry {
         const components = [], // We need to extract these
               structures = []; // And traverse into these so we can find more components
 
-        // Go through the current array and distribute it's entries
-        content.forEach((item) => item.type === "component" ? components.push(item) : structures.push(item));
+        // Go through the current array and distribute its entries
+        content.forEach(item => item.type === "component" ? components.push(item) : structures.push(item));
 
         // Then recurse into structures and find more components.
-        return components.concat(...structures.map((structure) => this.extractComponents(structure.content), []));
+        return components.concat(...structures.map(structure => this.extractComponents(structure.content), []));
     }
 
     /**
@@ -60,6 +66,7 @@ export class ComponentRegistry {
             return;
         }
 
+        this.components[<any> componentName] = true;
         // We need to register the function that will be called each time that particular component
         // is going to be instantiated. GL will call it again when adding components
         // later in runtime, so don't add event listeners here
@@ -69,32 +76,31 @@ export class ComponentRegistry {
             // DOM element into which we will insert the component
             let targetElement = container.getElement()[0];
 
-            this.resolver.resolveComponent(<any>componentName).then((factory: ComponentFactory<any>)=> {
-                let comp = container.componentReference = factory.create(this.injector, [], targetElement);
+            this.resolver.resolveComponent(<any>componentName).then(factory => {
+                const componentReference     = factory.create(this.injector, [], targetElement);
+                container.componentReference = componentReference;
 
-                if (typeof comp.instance["setState"] === "function") {
-                    comp.instance.setState(state);
+                if (hasDynamicState(componentReference.instance)) {
+                    (componentReference.instance as DynamicState).setState(state);
                 }
 
-                (this.appRef as any)._loadComponent(comp);
-
-                this.components[<any> componentName] = {
-                    name: componentName,
-                    component: comp
-                };
-
-                Observable.fromEvent(this.layout, "itemDestroyed")
-                    .filter((ev: any) => ev.type === "component")
-                    .map((ev: any) => ev.container.componentReference)
-                    .subscribe((comp: ComponentRef<any>) => {
-                        (this.appRef as any)._unloadComponent(comp);
-                        comp.changeDetectorRef.detach();
-                        comp.destroy();
-                    });
+                (this.appRef as any)._loadComponent(componentReference);
 
 
             });
         });
-
     }
+
+    public getCodeEditorTabs() {
+        return this.getCodeEditorStack().contentItems.filter(item => item.componentName === CodeEditorComponent);
+    }
+
+    public findEditorTab(file: FileModel) {
+        return this.getCodeEditorTabs().find(item => item.config.componentState.fileInfo.id === file.id);
+    }
+
+    public getCodeEditorStack() {
+        return this.layout.root.contentItems[0].contentItems[1];
+    }
+
 }

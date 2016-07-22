@@ -1,6 +1,8 @@
 import {FSItemModel} from "../store/models/fs.models";
 import {Injectable} from "@angular/core";
 import {Subject, Observable} from "rxjs/Rx";
+import {EventHubService} from "../services/event-hub/event-hub.service";
+import {FileCreatedAction} from "../action-events/index";
 
 interface ModifierFn extends Function {
     (content: FSItemMap): FSItemMap
@@ -8,6 +10,10 @@ interface ModifierFn extends Function {
 
 export type FSItemMap = {[relativePath: string]: FSItemModel};
 
+/**
+ * @deprecated
+ * @TODO(ivanb) Remove this when you get the chance
+ */
 @Injectable()
 export class FileStateService {
 
@@ -16,20 +22,20 @@ export class FileStateService {
 
     private updates = new Subject<any>();
 
-    constructor() {
+    constructor(private eventHub: EventHubService) {
 
         this.registry = this.updates
             .scan((content: FSItemMap, update: ModifierFn) => update(content), {})
             .publishReplay(1)
             .refCount();
 
-        this.create
-            .do(_ => console.log("Pushing to updates", _))
-            .map((model: FSItemModel) => (content) => {
+        this.create.map((model: FSItemModel) => (content) => {
                 [].concat(model).forEach((m: FSItemModel) => content[m.relativePath] = m);
                 return content;
             })
             .subscribe(this.updates);
+
+        this.eventHub.onValueFrom(FileCreatedAction).subscribe(this.create);
 
     }
 

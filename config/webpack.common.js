@@ -69,8 +69,7 @@ module.exports = {
         root: helpers.root('src'),
 
         // remove other default values
-        modulesDirectories: ['node_modules']
-
+        modulesDirectories: ['node_modules'],
     },
     devtool: "source-map",
 
@@ -138,7 +137,7 @@ module.exports = {
             loader: 'raw-loader',
             exclude: [helpers.root('src/index.html')]
         }, {
-            test: /\.(eot|woff|woff2|ttf|svg|png|jpg)$/,
+            test: /\.(eot|woff|woff2|ttf|svg|gif|png|jpg)$/,
             loader: 'url-loader?limit=30000&name=[name]-[hash].[ext]'
         }]
     },
@@ -211,7 +210,7 @@ module.exports = {
         }),
 
         new webpack.ProvidePlugin({
-            io: 'socket.io-client'
+            io: 'socket.io-client',
         })
 
     ],

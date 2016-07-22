@@ -1,116 +1,88 @@
-import {Component, ComponentRef} from "@angular/core";
-import {
-    NgStyle,
-    Control,
-    ControlGroup,
-    Validators,
-    FORM_DIRECTIVES,
-    FormBuilder
-} from "@angular/common";
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
-import {Store} from "@ngrx/store";
-import * as ACTIONS from "../../store/actions";
-import {FileEffects} from "../../store/effects/file.effects";
-import {HttpError} from "../../services/api/api-response-types";
-import {FileModel} from "../../store/models/fs.models";
-import {FileStateService} from "../../state/file.state.service";
-import {IFileResponse} from "../../store/file-cache.reducer";
-import {IGlobalError} from "../../store/errors.reducer";
-import {ModalData} from "../../models/modal.data.model";
-import {BehaviorSubject} from "rxjs/Rx";
+import {Component, ViewChild} from "@angular/core";
+import {EventHubService} from "../../services/event-hub/event-hub.service";
+import {NgStyle, ControlGroup, FormBuilder} from "@angular/common";
+import {RadioGroupComponent} from "../forms/elements/radio-group.component";
+import {Validators, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
+import {AlertComponent} from "./alert.component";
+import {InputComponent} from "../forms/elements/input.component";
+import {Observable} from "rxjs";
+import {WorkspaceService} from "../workspace/workspace.service";
+import {CopyFileRequestAction} from "../../action-events/index";
+import {ModalService} from "../modal";
 
 @Component({
     selector: 'new-file-modal',
-    directives: [NgStyle, BlockLoaderComponent, FORM_DIRECTIVES],
-    templateUrl: 'app/components/common/save-as-modal.component.html'
+    directives: [
+        BlockLoaderComponent,
+        NgStyle,
+        AlertComponent,
+        InputComponent,
+        REACTIVE_FORM_DIRECTIVES,
+        FORM_DIRECTIVES,
+    ],
+    template: `
+        <block-loader class="overlay" *ngIf="isCreatingFile"></block-loader>
+        <div>
+            <form (ngSubmit)="onSubmit(newFileForm)" [formGroup]="newFileForm" class="flex-form">
+                <div class="modal-body">
+                    <ct-input [name]="'File Name'"
+                              [autofocus]="true" 
+                              [placeholder]="'ex. my-workflow.json'" 
+                              [control]="newFileForm.controls['name']">
+                    </ct-input>
+                    <ct-alert *ngIf="error" [type]="'danger'">{{ error.message }}</ct-alert>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary btn-sm" type="button" (click)="onCancel()">Cancel</button>
+                    <button class="btn btn-primary btn-sm" type="submit" [disabled]="!newFileForm.valid">Save</button>
+                </div>
+        
+            </form>
+        </div>
+`
 })
 export class SaveAsModalComponent {
     private isCreatingFile: boolean;
-    private showFileExists: boolean;
-    private isGeneralError: boolean;
+    private error: {[message: string]: string};
 
-    private name: Control;
     private newFileForm: ControlGroup;
 
-
-    private cref: ComponentRef<any>;
-    private result: any;
-    private confirm: Function;
-    private cancel: Function;
-    private model: BehaviorSubject<string>;
+    @ViewChild(RadioGroupComponent)
 
     constructor(private formBuilder: FormBuilder,
-                private store: Store<any>,
-                private fileFx: FileEffects,
-                private files: FileStateService) {
-
-        this.fileFx.copyFile$.subscribe(this.store);
-
-        this.name = new Control('',
-            Validators.compose([Validators.required, Validators.minLength(1)])
-        );
+                private eventHub: EventHubService,
+                private workspace: WorkspaceService,
+                private modal: ModalService) {
 
         this.newFileForm = formBuilder.group({
-            name: this.name,
+            name: ["", Validators.compose([Validators.required, Validators.minLength(1)])]
         });
 
-        this.name.valueChanges.subscribe(() => {
-            this.showFileExists = false;
-            this.isGeneralError = false;
-        });
+        this.newFileForm.valueChanges.subscribe(_ => this.error = undefined);
     }
 
-    createFile(form) {
-        // turn on loading
-        this.isCreatingFile = true;
-        let formValue       = form.value;
-        let filePath        = formValue.name;
+    private onSubmit(form: ControlGroup) {
 
-        this.isCreatingFile = true;
+        // If the overlay is shown right away, user working locally would just see
+        // flashing darkening over the modal, so avoid that, but keep the delay low enough
+        // so it does show perceivably instantly
+        Observable.of(1).delay(50).filter(_ => this.error === undefined).subscribe(_ => this.isCreatingFile = true);
 
-        this.store.dispatch({
-            type: ACTIONS.CREATE_FILE_REQUEST, payload: {
-                path: filePath,
-                content: this.model.value
-            }
-        });
-
-        this.store.select("newFile").subscribe((file: IFileResponse) => {
-
-            //@FIXME sometimes, there's a new item on this stream here that is undefined.
-
-            if (file && file.path === filePath) {
-                let fileModel = <FileModel> file.model;
-
-                this.files.createItem(fileModel);
+        let fileName = form.controls["name"].value;
+        this.workspace.selectedFile
+            .switchMap(file => {
+                return this.eventHub.publish(new CopyFileRequestAction(file.absolutePath, fileName)).getResponse()
+            }).first()
+            .subscribe(_ => {
+                this.modal.close();
+            }, (err) => {
+                this.error          = err;
                 this.isCreatingFile = false;
-                this.store.dispatch({type: ACTIONS.OPEN_FILE_REQUEST, payload: fileModel});
-                this.confirm(fileModel);
-            }
-        });
-
-        // Handle error if file already exists
-        this.store.select("globalErrors").subscribe((error: IGlobalError) => {
-            if (error && error.path === filePath) {
-                this.isCreatingFile = false;
-
-                if ((<HttpError> error.error).statusCode === 403) {
-                    this.showFileExists = true;
-                } else {
-                    this.isGeneralError = true;
-                }
-            }
-        });
+            });
     }
 
-    public setState(modalData: ModalData) {
-        this.cref   = modalData.cref ? modalData.cref : null;
-        this.result = modalData.result ? modalData.result : null;
-        this.model  = modalData.model ? modalData.model : null;
-
-        if (modalData.functions) {
-            this.confirm = modalData.functions.confirm.bind(this);
-            this.cancel  = modalData.functions.cancel.bind(this);
-        }
+    public onCancel() {
+        this.modal.close();
     }
 }

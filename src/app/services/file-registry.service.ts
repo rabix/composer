@@ -1,65 +1,76 @@
+import {EventHubService} from "./event-hub/event-hub.service";
+import {
+    CreateFileRequestAction,
+    FetchFileRequestAction,
+    FileCreatedAction,
+    SaveFileRequestAction,
+    UpdateFileAction,
+    CopyFileRequestAction
+} from "../action-events/index";
+import {FileApi} from "./api/file.api";
+import {FileModel} from "../store/models/fs.models";
+import {HashCache} from "../lib/cache.lib";
 import {Injectable} from "@angular/core";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {DirectoryModel} from "../store/models/fs.models";
-import {Store} from "@ngrx/store";
-import * as ACTIONS from "../store/actions";
-import {FileEffects} from "../store/effects/file.effects";
-import {IFileResponse} from "../store/file-cache.reducer";
-
-export interface IFileChanges {
-    content: string;
-    source: string
-}
+import {Observable} from "rxjs/Rx";
 
 @Injectable()
 export class FileRegistry {
 
-    /**
-     * Contains a map of file identifiers to their *content*
-     */
-    private fileCache: {[fileId: string]: BehaviorSubject<IFileChanges>} = {};
-    private dirCache: DirectoryModel[]                                   = [];
+    // Contains all loaded files
+    private fileCache: HashCache<FileModel>;
 
-    constructor(private store: Store<any>, private fileEffects: FileEffects) {
-        fileEffects.fileContent$.subscribe(this.store);
+    constructor(private files: FileApi,
+                private eventHub: EventHubService) {
+
+        this.fileCache = new HashCache<FileModel>({}, (a, b) => a.isChangedSince(b));
+
+        // Whenever a fetch requests comes from the event hub,
+        // forward the request to the FileAPI and pass the result to the cache.
+        this.eventHub.onValueFrom(FetchFileRequestAction)
+            .flatMap(file => this.files.getFileContent(file.absolutePath))
+            .subscribe(file => this.fileCache.put(file.id, file));
+
+        this.eventHub.onValueFrom(UpdateFileAction)
+            .subscribe(file => this.fileCache.put(file.id, file));
+
+        this.eventHub.on(CreateFileRequestAction)
+            .flatMap(action => this.files.createFile(action.payload.relativePath).let(this.eventHub.intercept(action)))
+            .subscribe(file => {
+                this.fileCache.put(file.id, file);
+                this.eventHub.publish(new FileCreatedAction(file));
+            });
+
+        this.eventHub.onValueFrom(SaveFileRequestAction)
+            .flatMap(file => this.files.updateFile(file.relativePath, file.content).map(_ => file))
+            .subscribe(file => {
+                this.fileCache.put(file.id, Object.assign(file, {originalContent: file.content, isModified: false}));
+            });
+
+        this.eventHub.on(CopyFileRequestAction)
+            .flatMap(action => {
+                const {source, destination} = action.payload;
+                return this.files.copyFile(source, destination).let(this.eventHub.intercept(action))
+            })
+            .subscribe(file => {
+                this.eventHub.publish(new FileCreatedAction(file));
+            });
     }
 
-
-    public loadFile(path: string): BehaviorSubject<IFileChanges> {
-        // check if file exists in cache
-        if (this.fileCache[path]) {
-            let content = this.fileCache[path].getValue().content;
-
-            this.fileCache[path].next({
-                content: content,
-                source: 'FILE_API'
-            });
-
-            return this.fileCache[path];
-        } else {
-
-            // dispatch request for file contents (picked up by FileEffects.fileContent$
-            this.store.dispatch({type: ACTIONS.FILE_CONTENT_REQUEST, payload: path});
-
-            // create a behavior subject for file content, add it to cache
-            this.fileCache[path] = new BehaviorSubject({
-                source: 'FILE_API',
-                content: null
-            });
-
-            // when file content is retrieved, check if it's for the correct file, and push
-            // new value to cached behavior subject.
-            this.store.select("fileContent").subscribe((file: IFileResponse) => {
-                //@todo(maya) error handling
-                if(file && file.path === path) {
-                    this.fileCache[path].next({
-                        content: file.model.content,
-                        source: 'FILE_API'
-                    });
-                }
-            });
-
-            return this.fileCache[path];
+    /**
+     * Get the fully loaded FileModel.
+     */
+    public getFile(file: FileModel): Observable<FileModel> {
+        if (!this.fileCache.has(file.id)) {
+            this.eventHub.publish(new FetchFileRequestAction(file));
         }
+        return this.fileCache.watch(file.id);
+    }
+
+    public watchFile(file: FileModel): Observable<FileModel> {
+        return this.fileCache.watch(file.id);
+    }
+
+    public save(file: FileModel) {
+
     }
 }

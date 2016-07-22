@@ -1,7 +1,5 @@
-import {Injectable, forwardRef, Inject, ComponentResolver} from "@angular/core";
+import {Injectable, ComponentResolver} from "@angular/core";
 import {DirectoryDataProviderFactory} from "./types";
-import {Store} from "@ngrx/store";
-import * as STORE_ACTIONS from "../../store/actions";
 import {FileModel, FSItemModel, DirectoryModel} from "../../store/models/fs.models";
 import {FileStateService, FSItemMap} from "../../state/file.state.service";
 import {FileApi} from "../../services/api/file.api";
@@ -9,25 +7,28 @@ import {Observable} from "rxjs/Rx";
 import {FileNodeComponent} from "./nodes/file-node.component";
 import {DirectoryNodeComponent} from "./nodes/directory-node.component";
 import {DynamicComponentContext} from "../runtime-compiler/dynamic-component-context";
+import {OpenFileRequestAction} from "../../action-events/index";
+import {EventHubService} from "../../services/event-hub/event-hub.service";
+import {FileRegistry} from "../../services/file-registry.service";
 
 
 @Injectable()
 export class FileTreeService {
 
-    constructor(private store: Store<any>,
-                private fileApi: FileApi,
+    constructor(private fileApi: FileApi,
                 private resolver: ComponentResolver,
+                private eventHub: EventHubService,
+                private files: FileRegistry,
                 private fileRegistry: FileStateService) {
+
     }
 
-    /**
-     * Dispatches info about file being double clicked to `store`
-     * @param {FileModel} fileInfo
-     * @TODO remove the store dispatching, architectural change
-     */
-    public openFile(fileInfo: FileModel): void {
-        this.store.dispatch({type: STORE_ACTIONS.OPEN_FILE_REQUEST, payload: fileInfo});
-        this.store.dispatch({type: STORE_ACTIONS.SELECT_FILE_REQUEST, payload: fileInfo});
+    public openFile(file: FileModel) {
+        this.eventHub.publish(new OpenFileRequestAction(file));
+    }
+
+    public watchFile(file: FileModel) {
+        return this.files.watchFile(file);
     }
 
     public createDataProviderForDirectory(relPathDir = ""): DirectoryDataProviderFactory {
@@ -35,8 +36,7 @@ export class FileTreeService {
 
         return () => {
 
-            this.fileApi.getDirContent(relPathDir)
-                .subscribe(data => this.fileRegistry.createItem(data));
+            this.fileApi.getDirContent(relPathDir).subscribe(data => this.fileRegistry.createItem(data));
 
             return this.fileRegistry.registry.map((chunk: FSItemMap) => {
                 let filtered = [];
@@ -54,8 +54,11 @@ export class FileTreeService {
             }).distinctUntilChanged((a, b) => {
                 return Object.keys(a).length === Object.keys(b).length;
             }).map(filtered => {
+
+                const ordered = filtered.sort((a: FileModel, b: FileModel) => a.name.localeCompare(b.name));
+
                 return <any>Observable.defer(() => {
-                    return Observable.fromPromise(Promise.all(filtered.map((item: FSItemModel) => {
+                    return Observable.fromPromise(Promise.all(ordered.map((item: FSItemModel) => {
                         let componentType: any = FileNodeComponent;
                         if (item instanceof DirectoryModel) {
                             componentType = DirectoryNodeComponent;
