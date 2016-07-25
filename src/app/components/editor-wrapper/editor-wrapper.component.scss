@@ -1,3 +1,13 @@
+@import "~bootstrap/scss/mixins";
+@import "~bootstrap/scss/_variables";
+@import "~bootstrap/scss/_forms";
+@import "~bootstrap/scss/_input-group";
+@import "~bootstrap/scss/_labels";
+@import "~bootstrap/scss/_tooltip";
+@import "~bootstrap/scss/_buttons";
+@import "~bootstrap/scss/_button-group";
+@import "~bootstrap/scss/_close";
+
 #viewContainer{
     margin-left: 10px;
 
@@ -11,9 +21,7 @@
         margin-top: 10px;
 
         button {
-            height: 20px;
-            width: 100px;
-            font-size: small;
+            width: 8%;
             padding: 0;
 
             border-radius: 0;

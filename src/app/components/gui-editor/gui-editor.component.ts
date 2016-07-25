@@ -1,25 +1,49 @@
-import {Component, OnInit, ElementRef, Input} from "@angular/core";
+import {Component, OnInit, Input} from "@angular/core";
+import {NgFor} from "@angular/common";
 import {FileRegistry} from "../../services/file-registry.service";
-import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {FileModel} from "../../store/models/fs.models";
+import {PropertyInput} from "../inputs/property-input.component";
 
 require('./gui-editor.component.scss');
 
 @Component({
     selector: 'gui-editor',
-    directives: [BlockLoaderComponent],
+    directives: [NgFor, PropertyInput],
     template: `
                 <div id="guiEditorContainer">
-                    <form>
-                      <fieldset class="form-group">
-                        <label for="baseCommand">Base Command</label>
-                        <input type="text" class="form-control" id="baseCommand" placeholder="enter value">
-                      </fieldset>
-                    </form>
+                    <property-input *ngFor="let property of mockInputProperties"
+                     class="propertyInput" 
+                     [type]="property.type" 
+                     [model]="property.value">
+                    </property-input>
                 </div>`,
 })
 export class GuiEditorComponent implements OnInit {
     @Input() file: FileModel;
+
+    /* TODO: get tool properties for display, create a service that returns a list of properties based on the tool */
+    /*mockInputProperties: Array<any> = [
+        {
+            type: "DockerRequirement",
+            value: {
+                dockerPull: "some.docker.image.com"
+            }
+        },
+        {
+            type: "baseCommand",
+            value: "echo"
+        }
+    ];*/
+    mockInputProperties: Array<any> = [
+        {
+            type: "DockerRequirement",
+            value: null
+        },
+        {
+            type: "baseCommand",
+            value: null
+        }
+    ];
 
     constructor(private fileRegistry: FileRegistry) {}
 
