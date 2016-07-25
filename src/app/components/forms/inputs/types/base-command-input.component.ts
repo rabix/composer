@@ -1,5 +1,4 @@
 import {Component, OnInit} from "@angular/core";
-import {NgClass} from "@angular/common";
 
 require ("./base-command-input.component.scss");
 

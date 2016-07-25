@@ -1,8 +1,8 @@
 import {Component, OnInit, Input, ComponentResolver, ComponentFactory} from "@angular/core";
 import {INPUT_TYPES} from "./types/input-types";
-import {DynamicComponentContext} from "../runtime-compiler/dynamic-component-context";
+import {DynamicComponentContext} from "../../runtime-compiler/dynamic-component-context";
 import {DockerInputComponent} from "./types/docker-input.component.ts";
-import {ComponentCompilerDirective} from "../runtime-compiler/component-compiler.directive";
+import {ComponentCompilerDirective} from "../../runtime-compiler/component-compiler.directive";
 import {BaseCommandInput} from "./types/base-command-input.component";
 
 require('./inputs.scss');

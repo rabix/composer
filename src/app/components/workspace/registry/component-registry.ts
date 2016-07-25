@@ -3,7 +3,7 @@ import {DynamicState, hasDynamicState} from "../../runtime-compiler/dynamic-stat
 import {Observable} from "rxjs/Rx";
 import {CodeEditorComponent} from "../../code-editor/code-editor.component";
 import {FileModel} from "../../../store/models/fs.models";
-import {EditorWrapperComponent} from "../../editor-wrapper/editor-wrapper.component";
+import {ToolContainerComponent} from "../../tool-container/tool-container.component";
 
 export class ComponentRegistry {
 
@@ -93,15 +93,18 @@ export class ComponentRegistry {
     }
 
     public getCodeEditorTabs() {
-        //return this.getCodeEditorStack().contentItems.filter(item => item.componentName === CodeEditorComponent);
-        return this.getCodeEditorStack().contentItems.filter(item => item.componentName === EditorWrapperComponent);
+        return this.getToolContainerStack().contentItems.filter(item => item.componentName === CodeEditorComponent);
     }
 
-    public findEditorTab(file: FileModel) {
-        return this.getCodeEditorTabs().find(item => item.config.componentState.fileInfo.id === file.id);
+    public getToolContainerTabs() {
+        return this.getToolContainerStack().contentItems.filter(item => item.componentName === ToolContainerComponent);
+    }
+    
+    public findToolTab(file: FileModel) {
+        return this.getToolContainerTabs().find(item => item.config.componentState.fileInfo.id === file.id);
     }
 
-    public getCodeEditorStack() {
+    public getToolContainerStack() {
         return this.layout.root.contentItems[0].contentItems[1];
     }
 

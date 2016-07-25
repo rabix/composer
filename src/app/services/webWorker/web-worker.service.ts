@@ -19,7 +19,7 @@ export class WebWorkerService {
     }
 
     private postMessage(jsonText: string) {
-        this.jsonSchemaWorker.postMessage(jsonText)
+        this.jsonSchemaWorker.postMessage(jsonText);
     }
 
     public validateJsonSchema(jsonText: string): Observable<ValidationResponse> {

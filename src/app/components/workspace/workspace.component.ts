@@ -8,7 +8,7 @@ import {WorkspaceService} from "./workspace.service";
 import {FileEditorPlaceholderComponent} from "../placeholders/file-editor/file-editor-placeholder.component";
 import * as GoldenLayout from "golden-layout";
 import {FileRegistry} from "../../services/file-registry.service";
-import {EditorWrapperComponent} from "../editor-wrapper/editor-wrapper.component";
+import {ToolContainerComponent} from "../tool-container/tool-container.component";
 
 require("./workspace.component.scss");
 
@@ -42,7 +42,7 @@ export class WorkspaceComponent implements OnDestroy {
 
         Observable.fromEvent(this.layout, "componentCreated")
             .filter((event: any) => {
-                return event.config.componentName === EditorWrapperComponent
+                return event.config.componentName === ToolContainerComponent
                     && event.parent.contentItems.length === 1
                     && event.parent.contentItems[0].config.componentName === FileEditorPlaceholderComponent
             })
@@ -51,7 +51,7 @@ export class WorkspaceComponent implements OnDestroy {
             });
 
         Observable.fromEvent(this.layout, "itemDestroyed").filter((event: any) => {
-            return event.config.componentName === EditorWrapperComponent
+            return event.config.componentName === ToolContainerComponent
                 && event.parent.contentItems.length === 1
         }).subscribe((event: any) => {
             event.parent.addChild({
@@ -63,13 +63,13 @@ export class WorkspaceComponent implements OnDestroy {
         });
 
         this.workspaceService.onLoadFile.subscribe(file => {
-            this.registry.registerComponent(EditorWrapperComponent);
+            this.registry.registerComponent(ToolContainerComponent);
             const tabs = this.layout.root.contentItems[0].contentItems[1];
 
             tabs.addChild({
                 type: "component",
                 title: file.name + (file.isModified ? " (modified)" : ""),
-                componentName: EditorWrapperComponent,
+                componentName: ToolContainerComponent,
                 componentState: {
                     fileInfo: file,
                 },
@@ -79,19 +79,19 @@ export class WorkspaceComponent implements OnDestroy {
         this.workspaceService.selectedFile.subscribe(file => {
 
             if (file) {
-                let activeTab = this.registry.findEditorTab(file);
+                let activeTab = this.registry.findToolTab(file);
                 activeTab.setTitle(file.name + (file.isModified ? "*" : ""));
-                this.registry.getCodeEditorStack().setActiveContentItem(activeTab);
+                this.registry.getToolContainerStack().setActiveContentItem(activeTab);
             }
 
         });
 
         this.workspaceService.onCloseFile.subscribe(file => {
-            this.registry.findEditorTab(file).remove();
+            this.registry.findToolTab(file).remove();
         });
 
         Observable.fromEvent(this.layout, "tabCreated")
-            .filter((tab: any) => tab.contentItem.componentName === EditorWrapperComponent)
+            .filter((tab: any) => tab.contentItem.componentName === ToolContainerComponent)
             .subscribe((tab: any) => {
                 const componentState = tab.contentItem.config.componentState;
                 const file           = componentState.fileInfo;
