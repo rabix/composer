@@ -79,6 +79,7 @@
     "compression-webpack-plugin": "^0.3.1",
     "copy-webpack-plugin": "^3.0.0",
     "css-loader": "^0.23.1",
+    "cwlts": "^1.2.1",
     "es6-promise": "^3.1.2",
     "es6-promise-loader": "^1.0.1",
     "es6-shim": "^0.35.0",
@@ -90,8 +91,10 @@
     "html-webpack-plugin": "^2.15.0",
     "http-server": "^0.9.0",
     "imports-loader": "^0.6.5",
+    "install": "^0.8.1",
     "istanbul-instrumenter-loader": "^0.2.0",
     "json-loader": "^0.5.4",
+    "jsonschema": "^1.1.0",
     "karma": "^0.13.22",
     "karma-chrome-launcher": "^0.2.3",
     "karma-coverage": "^0.5.5",
@@ -103,6 +106,7 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "1.7.0",
     "node-sass": "^3.5.3",
+    "npm": "^3.10.3",
     "parse5": "^2.1.5",
     "phantomjs-polyfill": "0.0.2",
     "phantomjs-prebuilt": "^2.1.7",
@@ -127,7 +131,8 @@
     "webpack": "^1.13.0",
     "webpack-dev-server": "^1.14.1",
     "webpack-md5-hash": "^0.0.5",
-    "webpack-merge": "^0.13.0"
+    "webpack-merge": "^0.13.0",
+    "worker-loader": "^0.7.0"
   },
   "engines": {
     "node": ">= 4.2.1",
