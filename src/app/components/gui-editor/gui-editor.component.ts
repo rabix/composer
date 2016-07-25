@@ -2,7 +2,7 @@ import {Component, OnInit, Input} from "@angular/core";
 import {NgFor} from "@angular/common";
 import {FileRegistry} from "../../services/file-registry.service";
 import {FileModel} from "../../store/models/fs.models";
-import {PropertyInput} from "../inputs/property-input.component";
+import {PropertyInput} from "../forms/inputs/property-input.component";
 
 require('./gui-editor.component.scss');
 

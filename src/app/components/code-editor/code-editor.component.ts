@@ -1,7 +1,6 @@
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {CodeEditor} from "./code-editor";
 import {Component, OnInit, ElementRef, ViewChild, Input} from "@angular/core";
-import {DynamicState} from "../runtime-compiler/dynamic-state.interface";
 import {FileModel} from "../../store/models/fs.models";
 import {FileRegistry} from "../../services/file-registry.service";
 import {Subscription} from "rxjs/Rx";
@@ -21,7 +20,7 @@ require('./code-editor.component.scss');
              <div #ace class="editor"></div>
         </div>`,
 })
-export class CodeEditorComponent implements OnInit, DynamicState {
+export class CodeEditorComponent implements OnInit {
     /** Provided file that we should open in the editor */
     @Input() file: FileModel;
 
@@ -68,8 +67,5 @@ export class CodeEditorComponent implements OnInit, DynamicState {
         console.debug("Disposing code editor");
         this.subs.forEach(sub => sub.unsubscribe());
     }
-
-    public setState(state: {fileInfo}): void {
-        this.file = state.fileInfo;
-    }
+    
 }
