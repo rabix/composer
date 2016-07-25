@@ -8,6 +8,7 @@ import {WorkspaceService} from "./workspace.service";
 import {FileEditorPlaceholderComponent} from "../placeholders/file-editor/file-editor-placeholder.component";
 import * as GoldenLayout from "golden-layout";
 import {FileRegistry} from "../../services/file-registry.service";
+import {EditorWrapperComponent} from "../editor-wrapper/editor-wrapper.component";
 
 require("./workspace.component.scss");
 
@@ -41,7 +42,7 @@ export class WorkspaceComponent implements OnDestroy {
 
         Observable.fromEvent(this.layout, "componentCreated")
             .filter((event: any) => {
-                return event.config.componentName === CodeEditorComponent
+                return event.config.componentName === EditorWrapperComponent
                     && event.parent.contentItems.length === 1
                     && event.parent.contentItems[0].config.componentName === FileEditorPlaceholderComponent
             })
@@ -50,7 +51,7 @@ export class WorkspaceComponent implements OnDestroy {
             });
 
         Observable.fromEvent(this.layout, "itemDestroyed").filter((event: any) => {
-            return event.config.componentName === CodeEditorComponent
+            return event.config.componentName === EditorWrapperComponent
                 && event.parent.contentItems.length === 1
         }).subscribe((event: any) => {
             event.parent.addChild({
@@ -62,13 +63,13 @@ export class WorkspaceComponent implements OnDestroy {
         });
 
         this.workspaceService.onLoadFile.subscribe(file => {
-            this.registry.registerComponent(CodeEditorComponent);
+            this.registry.registerComponent(EditorWrapperComponent);
             const tabs = this.layout.root.contentItems[0].contentItems[1];
 
             tabs.addChild({
                 type: "component",
                 title: file.name + (file.isModified ? " (modified)" : ""),
-                componentName: CodeEditorComponent,
+                componentName: EditorWrapperComponent,
                 componentState: {
                     fileInfo: file,
                 },
@@ -90,7 +91,7 @@ export class WorkspaceComponent implements OnDestroy {
         });
 
         Observable.fromEvent(this.layout, "tabCreated")
-            .filter((tab: any) => tab.contentItem.componentName === CodeEditorComponent)
+            .filter((tab: any) => tab.contentItem.componentName === EditorWrapperComponent)
             .subscribe((tab: any) => {
                 const componentState = tab.contentItem.config.componentState;
                 const file           = componentState.fileInfo;
