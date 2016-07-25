@@ -1,6 +1,6 @@
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {CodeEditor} from "./code-editor";
-import {Component, OnInit, ElementRef, ViewChild} from "@angular/core";
+import {Component, OnInit, ElementRef, ViewChild, Input} from "@angular/core";
 import {DynamicState} from "../runtime-compiler/dynamic-state.interface";
 import {FileModel} from "../../store/models/fs.models";
 import {FileRegistry} from "../../services/file-registry.service";
@@ -22,11 +22,11 @@ require('./code-editor.component.scss');
         </div>`,
 })
 export class CodeEditorComponent implements OnInit, DynamicState {
+    /** Provided file that we should open in the editor */
+    @Input() file: FileModel;
+
     /** Holds the reference to the CodeEditor service/component */
     private editor: CodeEditor;
-
-    /** Provided file that we should open in the editor */
-    private file: FileModel;
 
     /** Flag that determines if the spinner should be shown */
     private isLoaded: boolean;

@@ -3,6 +3,7 @@ import {DynamicState, hasDynamicState} from "../../runtime-compiler/dynamic-stat
 import {Observable} from "rxjs/Rx";
 import {CodeEditorComponent} from "../../code-editor/code-editor.component";
 import {FileModel} from "../../../store/models/fs.models";
+import {EditorWrapperComponent} from "../../editor-wrapper/editor-wrapper.component";
 
 export class ComponentRegistry {
 
@@ -92,7 +93,8 @@ export class ComponentRegistry {
     }
 
     public getCodeEditorTabs() {
-        return this.getCodeEditorStack().contentItems.filter(item => item.componentName === CodeEditorComponent);
+        //return this.getCodeEditorStack().contentItems.filter(item => item.componentName === CodeEditorComponent);
+        return this.getCodeEditorStack().contentItems.filter(item => item.componentName === EditorWrapperComponent);
     }
 
     public findEditorTab(file: FileModel) {

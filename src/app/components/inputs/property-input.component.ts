@@ -23,7 +23,7 @@ export class PropertyInput implements OnInit {
 
     constructor(private resolver: ComponentResolver) { }
 
-    ngOnInit(): any {
+    ngOnInit(): void {
         let componentToResolve: any = null;
 
         switch (this.type) {

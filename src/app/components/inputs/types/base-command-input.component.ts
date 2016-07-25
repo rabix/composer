@@ -15,7 +15,8 @@ require ("./base-command-input.component.scss");
                             
                             <div class="input-group">
                                 
-                                <input type="text" 
+                                <input name="baseCommand"
+                                type="text" 
                                 class="form-control"
                                 [(ngModel)]="baseCommand">
                                 
@@ -33,12 +34,12 @@ export class BaseCommandInput implements OnInit {
 
     constructor() {}
 
-    ngOnInit(): any {
+    ngOnInit(): void {
 
     }
 
     /*TODO: use actual model type here*/
-    public setState(data: any) {
+    public setState(data: any): void {
         this.baseCommand = data ? data : null;
     }
 

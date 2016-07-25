@@ -47,7 +47,7 @@ export class GuiEditorComponent implements OnInit {
 
     constructor(private fileRegistry: FileRegistry) {}
 
-    ngOnInit(): any {
+    ngOnInit(): void {
 
     }
 

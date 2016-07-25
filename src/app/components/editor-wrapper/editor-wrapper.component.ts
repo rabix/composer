@@ -10,7 +10,15 @@ require('./editor-wrapper.component.scss');
 
 @Component({
     selector: 'editor-wrapper',
-    directives: [CodeEditorComponent, GuiEditorComponent, BlockLoaderComponent, NgSwitch, NgSwitchCase, NgSwitchDefault, NgSelectOption],
+    directives: [
+        CodeEditorComponent,
+        GuiEditorComponent,
+        BlockLoaderComponent,
+        NgSwitch,
+        NgSwitchCase,
+        NgSwitchDefault,
+        NgSelectOption
+    ],
     template: `
                 <div id="viewContainer">
                     <div id="buttonsContainer">
@@ -34,7 +42,8 @@ require('./editor-wrapper.component.scss');
                     </div>
                    
                     <div [ngSwitch]="viewMode">
-                        <gui-editor *ngSwitchCase="'gui'" *ngSwitchDefault [file]="file"></gui-editor>
+                        <gui-editor *ngSwitchDefault [file]="file"></gui-editor>
+                        <gui-editor *ngSwitchCase="'gui'" [file]="file"></gui-editor>
                         <code-editor *ngSwitchCase="'json'" [file]="file"></code-editor>
                     </div>
                 </div>`,
@@ -43,26 +52,25 @@ export class EditorWrapperComponent implements OnInit {
     viewMode: string = 'gui';
     file: FileModel;
 
-    /* TODO: load actuala revisions */
+    /* TODO: load actual revisions */
     revisions: Array<string> = ['rev1', 'rev2', 'rev3'];
     selectedRevision: string = this.revisions[0];
 
     constructor(private elem: ElementRef, private fileRegistry: FileRegistry) {}
 
-    ngOnInit(): any {
+    ngOnInit(): void {
 
     }
 
-    onChange(e) {
+    onChange(e): void {
         this.selectedRevision = e.target.value;
     }
 
-    setViewMode(viewMode) {
+    setViewMode(viewMode): void {
         this.viewMode = viewMode;
     }
 
-    public setState(state) {
-        // @todo figure out why this is undefined on startup
+    public setState(state): void {
         if (state.fileInfo) {
             this.file = state.fileInfo;
         }
