@@ -1,8 +1,7 @@
 import {ValidationMessage} from "./json-schema.interfaces";
 import {Observable} from "rxjs/Rx";
-import * as _ from "lodash";
 
-let JsonSchemaWorker = require("worker!./json-schema.worker.ts");
+const JsonSchemaWorker = require("worker!./json-schema.worker.ts");
 
 export interface ValidationResponse {
     isValid: boolean,
@@ -34,7 +33,7 @@ export class WebWorkerService {
             .map((res: any) => {
                 let responseMessage: ValidationMessage = res.data;
                 
-                if (!_.isUndefined(responseMessage.error)) {
+                if (responseMessage.error !== undefined) {
                    throw Error(responseMessage.error);
                 } else {
                     let isValid = responseMessage.isValid;
