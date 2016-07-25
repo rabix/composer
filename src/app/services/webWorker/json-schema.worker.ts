@@ -1,20 +1,20 @@
 /// <reference no-default-lib="true"/>
-import {ValidationMessage} from "./json-schema.interfaces";
-import {draft3, draft4} from "cwlts/lib";
+let {draft3, draft4} = require("cwlts/lib");
+let Validator = require("jsonschema").Validator;
 
-let Validator = require('jsonschema').Validator;
-
-declare function postMessage(message: ValidationMessage): void;
+declare function postMessage(message): void;
 
 class JsonSchemaWorker {
 
     constructor() {
+        let self = this;
+
         onmessage = (e) => {
-            let requestObj: string = e.data;
-            this.validateJson(requestObj);
+            let cotent: string = e.data;
+            self.validateJson(cotent);
         }
     }
-    
+
     getJsonSchemaContainer(versionString: string) {
         switch(versionString) {
             case "draft-3":

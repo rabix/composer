@@ -6,6 +6,7 @@ import {EventTargetLike} from "rxjs/observable/FromEventObservable";
 import Editor = AceAjax.Editor;
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
+import {ValidationResponse, WebWorkerService} from "../../services/webWorker/web-worker.service";
 
 export class CodeEditor {
     /** Holds an instance of the AceEditor */
@@ -20,6 +21,8 @@ export class CodeEditor {
 
     private subs: Subscription[] = [];
 
+    private webWorkerService: WebWorkerService;
+
     public contentChanges: Observable<FileModel>;
 
 
@@ -32,6 +35,7 @@ export class CodeEditor {
         this.session    = editor.getSession();
         this.document   = this.session.getDocument();
         this.fileStream = fileStream;
+        this.webWorkerService = new WebWorkerService();
 
         this.setTheme('twilight');
 
@@ -50,6 +54,25 @@ export class CodeEditor {
             .withLatestFrom(this.fileStream, (content, file) => {
                 return Object.assign(file, {content});
             }).share();
+
+        this._attachJsonValidation();
+    }
+
+    private _attachJsonValidation(): void {
+        this.contentChanges
+            .map(file => {
+                return file.content;
+            })
+            .distinctUntilChanged()
+            .debounceTime(500)
+            .subscribe((content: string) => {
+                this.webWorkerService.validateJsonSchema(content)
+                    .subscribe((res: ValidationResponse) => {
+                        console.dir(res);
+                    }, err => {
+                        console.log(err);
+                    });
+            });
     }
 
     private setText(text: string): void {

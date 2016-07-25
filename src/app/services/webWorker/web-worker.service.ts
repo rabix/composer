@@ -1,5 +1,6 @@
 import {ValidationMessage} from "./json-schema.interfaces";
 import {Observable} from "rxjs/Rx";
+import * as _ from "lodash";
 
 let JsonSchemaWorker = require("worker!./json-schema.worker.ts");
 
