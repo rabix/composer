@@ -1,4 +1,4 @@
-export type CwlFileTemplateType = "blank" | "workflow" | "command_line_tool" | "js_expression" | string;
+export type CwlFileTemplateType = "blank" | "workflow" | "command_line_tool" | string;
 export type CwlFileTemplateVersion = "draft-2" | "v1.0";
 
 export class FileTemplate {
