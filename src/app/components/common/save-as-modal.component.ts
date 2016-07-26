@@ -45,10 +45,7 @@ import {ModalService} from "../modal";
 export class SaveAsModalComponent {
     private isCreatingFile: boolean;
     private error: {[message: string]: string};
-
     private newFileForm: ControlGroup;
-
-    @ViewChild(RadioGroupComponent)
 
     constructor(private formBuilder: FormBuilder,
                 private eventHub: EventHubService,

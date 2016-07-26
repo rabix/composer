@@ -19,7 +19,7 @@ export class FileName {
     public readonly extension: string;
 
     /** Check whether the path is defined as an absolute one */
-    public readonly isAbsolute: string;
+    public readonly isAbsolute: boolean;
 
     constructor(fullPath: string) {
         this.fullPath                 = fullPath;
