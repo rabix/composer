@@ -47,13 +47,22 @@ export class ModalComponent {
     @ViewChild("container", {read: ViewContainerRef})
     private modalWindow: ViewContainerRef;
 
+    /** Should the modal clouse when you click on the area outside of it? */
     public closeOnOutsideClick: boolean;
+
+    /** Title of the modal window */
     public title: BehaviorSubject<string>;
+
+    /** When you press the "ESC" key, should the modal be closed? */
     public closeOnEscape: boolean;
 
-    private nestedComponentRef: ComponentRef;
+    /** Holds the ComponentRef object of a component that is injected and rendered inside the modal */
+    private nestedComponentRef: ComponentRef<any>;
+
+    /** Stream of drag events */
     private dragSubscription: Subscription;
-    private viewReady: BehaviorSubject<boolean>;
+
+    /** Subscriptions to dispose when the modal closes */
     private subscriptions: Subscription[];
 
     constructor(@Inject(forwardRef(() => ModalService))
@@ -64,14 +73,14 @@ export class ModalComponent {
         this.closeOnOutsideClick = true;
         this.closeOnEscape       = true;
 
-        this.viewReady = new BehaviorSubject(false);
+        // FIXME: this should be passed as an argument, not fixed
         this.title     = new BehaviorSubject("New File");
 
         this.subscriptions = [];
 
         if (this.closeOnEscape) {
             this.subscriptions.push(Observable.fromEvent(document, "keyup")
-                .map(ev => ev.which)
+                .map((ev: KeyboardEvent) => ev.which)
                 .filter(key => key === 27)
                 .subscribe(ev => this.service.close()));
         }
@@ -117,7 +126,7 @@ export class ModalComponent {
         Chap.applyParams(config, this);
     }
 
-    public produce(factory: ComponentFactory) {
+    public produce(factory: ComponentFactory<any>) {
 
         this.nestedComponentRef = this.nestedComponentContainer.createComponent(factory, 0, this.injector);
 

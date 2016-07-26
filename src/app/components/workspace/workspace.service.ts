@@ -68,9 +68,9 @@ export class WorkspaceService {
             .groupBy(set => set.all.find(i => i.id === set.load.id) ? "open" : "")
             .subscribe(selector => {
                 if (selector.key !== "open") {
-                    selector.map(set => set.load).subscribe(this.onLoadFile as Subject);
+                    selector.map(set => set.load).subscribe(this.onLoadFile as Subject<FileModel>);
                 }
-                selector.map(set => set.load).subscribe(this.selectFile as Subject);
+                selector.map(set => set.load).subscribe(this.selectFile as Subject<FileModel>);
             });
 
         this.eventHub.onValueFrom(CloseFileAction)
@@ -91,14 +91,14 @@ export class WorkspaceService {
             })
             // When 3 files are open, 1st one selected, and you close the 3rd one, GoldenLayout switches to the 2nd one
             .flatMap(selected => Observable.of(selected).delay(1))
-            .subscribe(this.selectFile as Subject);
+            .subscribe(this.selectFile as Subject<FileModel>);
 
         this.eventHub.onValueFrom(FileCreatedAction)
             .subscribe(file => this.eventHub.publish(new OpenFileRequestAction(file)));
 
         this.fileUpdates
             .scan((content: FileModel[], update: FileUpdateFn) => update(content), [])
-            .subscribe(this.openFiles as Subject);
+            .subscribe(this.openFiles as Subject<FileModel[]>);
 
 
     }

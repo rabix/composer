@@ -1,8 +1,8 @@
-import {Subject, BehaviorSubject} from "rxjs/Rx";
+import {Subject, BehaviorSubject, Observable} from "rxjs/Rx";
 
 interface MenuItemUpdates {
     click?: Subject<MenuItem> | Function;
-    isEnabled?: BehaviorSubject<boolean> | boolean ;
+    isEnabled?: Observable<boolean> | boolean ;
 }
 
 export class MenuItem {
@@ -11,16 +11,16 @@ export class MenuItem {
     public readonly children: MenuItem[];
 
     constructor(name: string,
-                streams?: MenuItemUpdates = {},
-                children?: MenuItem[] = []) {
+                streams?: MenuItemUpdates,
+                children?: MenuItem[]) {
 
         this.name     = name;
-        this.children = children;
+        this.children = children || [];
 
         this.updates = Object.assign({
             click: new Subject(),
             isEnabled: new BehaviorSubject(true)
-        }, streams);
+        }, streams || {});
     }
 
     public addChild(item: MenuItem): void {

@@ -1,4 +1,3 @@
-import {EventHubAction} from "../../action-events/index";
 import {Injectable} from "@angular/core";
 import {Subject, Observable} from "rxjs/Rx";
 
@@ -17,6 +16,10 @@ export class AppErrorEvent {
     code: string | number;
     message: string;
     data: any;
+}
+
+interface SourceInterceptor<T> {
+    (source: any): Observable<T>;
 }
 
 @Injectable()
@@ -61,8 +64,8 @@ export class EventHubService {
         this.responses.next(ev);
     }
 
-    public intercept(action) {
-        return (source) => {
+    public intercept<T>(action): SourceInterceptor<T>{
+        return source => {
             return source.catch(error => {
                 this.respond({action, error});
                 return Observable.empty();

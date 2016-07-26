@@ -34,15 +34,19 @@ import {TreeviewSelectableDirective} from "../../tree-view/behaviours/treeview-s
 export class DirectoryNodeComponent implements DynamicState, TreeViewNode, OnInit {
 
 
-    @Input() model: DirectoryModel;
-    private isExpandable = true;
-    private isExpanded   = false;
+    @Input()
+    private model: DirectoryModel;
+
+    public isExpandable: boolean;
+
+    private isExpanded: boolean;
 
     private dataProviderFn;
 
     constructor(@Inject(forwardRef(() => FileTreeService))
                 private fileTreeService: FileTreeService) {
-
+        this.isExpanded   = false;
+        this.isExpandable = true;
     }
 
     ngOnInit() {

@@ -64,7 +64,7 @@ export class MainComponent implements AfterViewInit {
 
     constructor(private modal: ModalService) {
 
-        this.runnix = Observable.fromEvent(document, "keyup").map(e => e.keyCode).bufferCount(10, 1)
+        this.runnix = Observable.fromEvent(document, "keyup").map((e: KeyboardEvent) => e.keyCode).bufferCount(10, 1)
             .filter(seq => seq.toString() == [38, 38, 40, 40, 37, 39, 37, 39, 66, 65].toString())
             .map(seq => Observable.of(true).concat(Observable.of(false).delay(3000)))
             .concatAll();
