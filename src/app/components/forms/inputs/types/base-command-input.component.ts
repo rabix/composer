@@ -1,37 +1,27 @@
 import {Component, OnInit} from "@angular/core";
 
-require ("./base-command-input.component.scss");
+require("./base-command-input.component.scss");
 
 @Component({
-    selector: 'docker-input',
+    selector: 'base-command-input',
     template: `
-                <form id="baseCommandForm">
-                    <fieldset class="form-group">
-                            <a href="#" class="floatRight">Hide</a>
-                   
-                            <label for="baseCommand">Base Command</label>
-                            <label for="baseCommand" class="secondaryLabel">What command do you want to call from the image</label>
-                            
-                            <div class="input-group">
-                                
-                                <input name="baseCommand"
-                                type="text" 
-                                class="form-control"
-                                [(ngModel)]="baseCommand">
-                                
-                                <span class="input-group-addon addExpression">
-                                   <a href="#">Add expression</a>
-                               </span>
-                            </div>
-                            
-                            <a href="#">Add base command</a>
-                    </fieldset>
-                </form>`,
+            <div class="input-group">
+                <input name="baseCommand"
+                    type="text" 
+                    class="form-control"
+                    [(ngModel)]="baseCommand">
+                    
+                    <span class="input-group-addon addExpression">
+                        <a href="#">Add expression</a>
+                    </span>
+            </div>
+            <a href="#">Add base command</a>
+   `
 })
 export class BaseCommandInput implements OnInit {
     baseCommand: string;
-
-    constructor() {}
+    
+    constructor() { }
 
     ngOnInit(): void {
 
@@ -41,5 +31,4 @@ export class BaseCommandInput implements OnInit {
     public setState(data: any): void {
         this.baseCommand = data ? data : null;
     }
-
 }
