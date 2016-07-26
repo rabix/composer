@@ -1,4 +1,5 @@
 import {FileModel} from "../store/models/fs.models";
+import {CwlFileTemplate} from "../types/file-template.type";
 
 export class EventHubAction {
     public type: string;
@@ -41,8 +42,8 @@ export class UpdateFileAction extends EventHubAction {
 }
 
 export class CreateFileRequestAction extends EventHubAction {
-    constructor(file: FileModel) {
-        super("create_file_request", file);
+    constructor(options: {path: string, content?: string, template?: CwlFileTemplate}) {
+        super("create_file_request", options);
     }
 }
 

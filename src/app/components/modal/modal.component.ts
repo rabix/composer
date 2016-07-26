@@ -144,7 +144,8 @@ export class ModalComponent {
             el.style.top  = tweak.top;
             el.style.left = tweak.left;
         } else {
-            el.style.top  = (wHeight - mHeight) / 2 + "px";
+            // Move the modal a bit more towards the top, looks better that way
+            el.style.top  = (wHeight - mHeight) / 4 + "px";
             el.style.left = (wWidth - mWidth) / 2 + "px";
         }
     }

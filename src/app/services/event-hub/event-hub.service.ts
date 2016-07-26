@@ -37,7 +37,8 @@ export class EventHubService {
             getResponse: () => {
                 return this.responses
                     .filter(ev => ev.action === action)
-                    .flatMap(ev => ev.error ? Observable.throw(ev.error) : Observable.of(ev.response));
+                    .flatMap(ev => ev.error ? Observable.throw(ev.error) : Observable.of(ev.response))
+                    .first();
             }
         }
     }
@@ -46,11 +47,11 @@ export class EventHubService {
         return this.eventStream.asObservable();
     }
 
-    public onValueFrom(actionType: EventHubAction): Observable<any> {
+    public onValueFrom(actionType: Function): Observable<any> {
         return this.on(actionType).map(ev => ev.payload);
     }
 
-    public on(actionType: EventHubAction): Observable<any> {
+    public on(actionType: Function): Observable<any> {
         return this.eventStream.filter(ev => {
             return ev instanceof actionType;
         });
