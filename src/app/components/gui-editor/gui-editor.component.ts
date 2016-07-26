@@ -12,9 +12,9 @@ require('./gui-editor.component.scss');
     template: `
                 <div id="guiEditorContainer">
                     <property-input *ngFor="let property of mockInputProperties"
-                     class="propertyInput" 
-                     [type]="property.type" 
-                     [model]="property.value">
+§                         class="propertyInput" 
+                         [type]="property.type" 
+                         [model]="property.value">
                     </property-input>
                 </div>`,
 })

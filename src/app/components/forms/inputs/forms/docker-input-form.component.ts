@@ -1,10 +1,10 @@
 import {Component, OnInit} from "@angular/core";
-import {DockerInputComponent} from "../types/docker-input.component";
+import {DockerInput} from "../types/docker-input.component";
 import {InputFromComponent} from "./input-form.component";
 
 @Component({
     selector: 'docker-input-form',
-    directives: [DockerInputComponent, InputFromComponent],
+    directives: [DockerInput, InputFromComponent],
     template: `
             <input-form [primaryLabel]="'Docker image'" 
                         [secondaryLabel]="'Docker Repository'"
@@ -14,7 +14,7 @@ import {InputFromComponent} from "./input-form.component";
     `
 })
 export class DockerInputForm implements OnInit {
-    contentComponent = DockerInputComponent;
+    contentComponent = DockerInput;
     inputData: any;
 
     constructor() { }

@@ -10,7 +10,7 @@ import {Component, OnInit} from "@angular/core";
                 [(ngModel)]="dockerPull">
     `,
 })
-export class DockerInputComponent implements OnInit {
+export class DockerInput implements OnInit {
     dockerPull: string;
 
     constructor() { }
