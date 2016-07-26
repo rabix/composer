@@ -27,17 +27,17 @@ require('./tool-container.component.scss');
                     
                         <span id="guiJsonButtons">
                             <button type="button" 
-                                    class="btn btn-secondary selected" 
+                                    class="btn btn-secondary btn-sm selected" 
                                     [ngClass]="{selected: viewMode === 'json'}"
                                     (click)="setViewMode('json')">JSON</button>
                                     
                             <button type="button"
-                                    class="btn btn-secondary" 
+                                    class="btn btn-secondary btn-sm" 
                                     [ngClass]="{selected: viewMode === 'gui'}"
                                     (click)="setViewMode('gui')">GUI</button>
                         </span>
                         
-                        <button id="saveButton" type="button" class="btn btn-secondary">Save</button>
+                        <button id="saveButton" type="button" class="btn btn-secondary btn-sm">Save</button>
                     </div>
                    
                     <div [ngSwitch]="viewMode">

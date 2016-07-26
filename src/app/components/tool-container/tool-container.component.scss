@@ -8,7 +8,9 @@
 @import "~bootstrap/scss/_button-group";
 @import "~bootstrap/scss/_close";
 
-#viewContainer{
+@import "../../../assets/sass/variables";
+
+#viewContainer {
     margin-left: 10px;
 
     #revisionSelect {
@@ -22,18 +24,12 @@
 
         button {
             width: 8%;
-            padding: 0;
-
-            border-radius: 0;
-            -webkit-box-shadow: none;
-            -moz-box-shadow: none;
-            box-shadow: none;
         }
 
         .selected {
-            background-color: #0275d8;
+            background-color: $gui-base-gray;
             color:  #ffffff;
-            border-color: #0275d8;
+            border-color: #ffffff;
         }
 
         #saveButton{
