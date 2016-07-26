@@ -12,19 +12,47 @@ require("./base-command-input.component.scss");
                     [(ngModel)]="baseCommand">
                     
                     <span class="input-group-addon addExpression">
-                        <a href="#">Add expression</a>
+                        <a href="#" (click)="openExpressionSidebar()">Add expression</a>
                     </span>
+                    
             </div>
             <a href="#">Add base command</a>
+            
+            <!--TODO: move this to a re-sizable sidebar-->
+             <div *ngIf="isAddExpressionVisible">
+             
+                <div class="input-group">
+                    <input type="text" 
+                        class="form-control"
+                        [(ngModel)]="newExpression">
+                    
+                    <span class="input-group-addon">
+                        <div class="icon closeIcon" (click)="closeExpressionSidebar()">
+                                <i class="fa fa-lg fa-times"></i>
+                        </div>
+                    </span>
+                </div>
+                
+            </div>
    `
 })
 export class BaseCommandInput implements OnInit {
     baseCommand: string;
-    
+    newExpression: string;
+    isAddExpressionVisible: boolean = false;
+
     constructor() { }
 
     ngOnInit(): void {
 
+    }
+
+    openExpressionSidebar() {
+        this.isAddExpressionVisible = true;
+    }
+
+    closeExpressionSidebar() {
+        this.isAddExpressionVisible = false;
     }
 
     /*TODO: use actual model type here*/
