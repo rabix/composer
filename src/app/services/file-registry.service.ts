@@ -34,7 +34,7 @@ export class FileRegistry {
             .subscribe(file => this.fileCache.put(file.id, file));
 
         this.eventHub.on(CreateFileRequestAction)
-            .flatMap(action => this.files.createFile(action.payload).let(this.eventHub.intercept(action)))
+            .flatMap(action => this.files.createFile(action.payload.relativePath).let(this.eventHub.intercept(action)))
             .subscribe(file => {
                 this.fileCache.put(file.id, file);
                 this.eventHub.publish(new FileCreatedAction(file));

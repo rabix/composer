@@ -70,14 +70,16 @@ export class SaveAsModalComponent {
         Observable.of(1).delay(50).filter(_ => this.error === undefined).subscribe(_ => this.isCreatingFile = true);
 
         let fileName = form.controls["name"].value;
-        this.workspace.selectedFile.switchMap(file => {
-            return this.eventHub.publish(new CopyFileRequestAction(file.absolutePath, fileName)).getResponse()
-        }).subscribe(_ => {
-            this.modal.close();
-        }, (err) => {
-            this.error          = err;
-            this.isCreatingFile = false;
-        });
+        this.workspace.selectedFile
+            .switchMap(file => {
+                return this.eventHub.publish(new CopyFileRequestAction(file.absolutePath, fileName)).getResponse()
+            }).first()
+            .subscribe(_ => {
+                this.modal.close();
+            }, (err) => {
+                this.error          = err;
+                this.isCreatingFile = false;
+            });
     }
 
     public onCancel() {

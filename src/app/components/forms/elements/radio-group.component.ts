@@ -1,12 +1,12 @@
 import {Component, Input, ChangeDetectionStrategy} from "@angular/core";
-import {BehaviorSubject, Subject, Observable} from "rxjs/Rx";
+import {BehaviorSubject, Subject} from "rxjs/Rx";
 import {RadioButtonComponent} from "./radio-button.component";
 
-export interface GroupItem<T> {
+interface GroupItem {
     name: string,
-    icon?: string,
-    value: T,
-    selected?: boolean
+    icon: string,
+    value: any,
+    selected: boolean
 }
 
 @Component({
@@ -18,7 +18,7 @@ export interface GroupItem<T> {
     },
     template: `
         <ct-radio-button #btn *ngFor="let item of items"
-                         [class.btn-primary]="item.value === (value | async)"
+                         [class.btn-primary]="item.value === (selected | async)"
                          (onClick)="onChildClick($event)"
                          [value]="item.value"
                          [name]="item.name" 
@@ -26,32 +26,30 @@ export interface GroupItem<T> {
         </ct-radio-button>        
     `
 })
-export class RadioGroupComponent<T> {
+export class RadioGroupComponent {
 
-    /** Observable of an actively selected value */
-    public readonly value: Observable<T>;
+    public selected: BehaviorSubject<GroupItem>;
 
     @Input()
-    private items: GroupItem<T>[];
+    private items: GroupItem[];
 
     constructor() {
-        this.value = new BehaviorSubject<T>(undefined);
+        this.selected = new BehaviorSubject<GroupItem>(null);
 
     }
 
-    public getSelectedValue(): T {
-        return (this.value as BehaviorSubject<T>).getValue();
+    public getSelectedValue() {
+        return (this.selected as BehaviorSubject<GroupItem>).getValue();
     }
 
     ngAfterViewInit() {
-        const defaultItem = this.items.find(item => item.selected === true);
-
-        if (defaultItem) {
-            (this.value as Subject<T>).next(defaultItem.value);
+        let defaultVal = this.items.find(item => item.selected === true);
+        if (defaultVal) {
+            (this.selected as Subject<GroupItem>).next(defaultVal.value);
         }
     }
 
-    onChildClick(btn: RadioButtonComponent<T>) {
-        (this.value as Subject<T>).next(btn.value);
+    onChildClick(btn: RadioButtonComponent) {
+        (this.selected as Subject<GroupItem>).next(btn.value);
     }
 }

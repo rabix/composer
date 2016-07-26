@@ -4,7 +4,6 @@ import {SOCKET_REQUESTS} from "./socket-events";
 import {FilePath} from "./api-response-types";
 import {Observable} from "rxjs/Rx";
 import {DirectoryModel, FileModel, FSItemModel} from "../../store/models/fs.models";
-import {CwlFileTemplate} from "../../types/file-template.type";
 
 @Injectable()
 export class FileApi {
@@ -32,14 +31,16 @@ export class FileApi {
     getFileContent(path: string): Observable<FileModel> {
         return this.socket.request(SOCKET_REQUESTS.FILE_CONTENT, {file: path})
             .map(response => new FileModel(response.content));
+
     }
 
-    createFile(options: {
-        path: string,
-        content?: string,
-        template?: CwlFileTemplate
-    }): Observable<FilePath> {
-        return this.socket.request(SOCKET_REQUESTS.CREATE_FILE, options).map(r => new FileModel(r.content));
+    createFile(path: string, content?: string): Observable<FilePath> {
+        return this.socket.request(SOCKET_REQUESTS.CREATE_FILE, {
+            file: path,
+            content: content || ''
+        }).map(response => {
+            return new FileModel(response.content);
+        });
     }
 
     copyFile(source: string, destination: string): Observable<FileModel> {

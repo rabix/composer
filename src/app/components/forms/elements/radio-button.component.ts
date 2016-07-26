@@ -9,11 +9,12 @@ require("./radio-button.component.scss");
         "class": "ct-radio-button btn"
     },
     template: `
+        
         <div class="icon"><i class="fa fa-2x fa-{{ icon }}"></i></div>
         <div class="name">{{ name }}</div>
     `
 })
-export class RadioButtonComponent<T> {
+export class RadioButtonComponent {
     @Input()
     public icon: string;
 
@@ -21,20 +22,20 @@ export class RadioButtonComponent<T> {
     public name: string;
 
     @Input()
-    public value: T;
+    public value: any;
 
     @Output()
-    public onClick: Observable<RadioButtonComponent<T>>;
+    public onClick: Observable<boolean>;
 
     constructor() {
         this.icon = "";
         this.name = "";
 
-        this.onClick = new Subject<RadioButtonComponent<T>>();
+        this.onClick = new Subject();
     }
 
     @HostListener("click")
     public onHostClick() {
-        (this.onClick as Subject<RadioButtonComponent<T>>).next(this);
+        (this.onClick as Subject).next(this);
     }
 }

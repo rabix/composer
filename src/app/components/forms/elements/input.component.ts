@@ -40,9 +40,6 @@ export class InputComponent implements AfterViewInit {
     private inputField: ElementRef;
 
     constructor(private renderer: Renderer) {
-        this.name = "";
-        this.placeholder = "";
-        this.autofocus = false;
     }
 
     ngAfterViewInit() {
