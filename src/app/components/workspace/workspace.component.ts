@@ -58,6 +58,7 @@ export class WorkspaceComponent implements OnDestroy {
                 type: "component",
                 title: "Usage Tip",
                 componentName: FileEditorPlaceholderComponent,
+                width: 70,
                 isClosable: false
             });
         });
@@ -70,9 +71,10 @@ export class WorkspaceComponent implements OnDestroy {
                 type: "component",
                 title: file.name + (file.isModified ? " (modified)" : ""),
                 componentName: ToolContainerComponent,
+                width: 70,
                 componentState: {
                     fileInfo: file,
-                },
+                }
             });
         });
 
@@ -140,6 +142,7 @@ export class WorkspaceComponent implements OnDestroy {
                         type: "component",
                         title: "Usage Tip",
                         componentName: FileEditorPlaceholderComponent,
+                        width: 70,
                         isClosable: false
                     }
                 ]

@@ -20,7 +20,7 @@ require('./tool-container.component.scss');
     ],
     template: `
                 <div id="viewContainer">
-                    <div id="buttonsContainer">
+                    <header>
                         <select id="revisionSelect" name="rev" [ngModel]="selectedRevision" (change)="onChange($event)">
                             <option *ngFor="let revision of revisions" [value]="revision">{{revision}}</option>
                         </select>
@@ -38,7 +38,7 @@ require('./tool-container.component.scss');
                         </span>
                         
                         <button id="saveButton" type="button" class="btn btn-secondary btn-sm">Save</button>
-                    </div>
+                    </header>
                    
                     <div [ngSwitch]="viewMode">
                         <block-loader *ngIf="!file"></block-loader>

@@ -16,7 +16,13 @@ require('./gui-editor.component.scss');
                          [type]="property.type" 
                          [model]="property.value">
                     </property-input>
-                </div>`,
+                    
+                    <footer>
+                        <button type="button" class="btn btn-secondary btn-sm">Issues</button>
+                        <button type="button" class="btn btn-secondary btn-sm">Resulting Command</button>
+                    </footer>
+                </div>
+    `
 })
 export class GuiEditorComponent implements OnInit {
     @Input() file: FileModel;
