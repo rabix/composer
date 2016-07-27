@@ -1,4 +1,9 @@
 #baseCommandForm {
+    /*For some reason the input-group has ad default z-index: 2*/
+    .input-group {
+        z-index: 0;
+    }
+
     .addExpression {
         font-size: 0.9em;
         background: #ffffff;

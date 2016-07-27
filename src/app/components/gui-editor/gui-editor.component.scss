@@ -12,22 +12,29 @@
 
     /* TODO: change this styling/colors */
     footer {
-        border: 2px solid #000000;
-        background: #55595c;
-
-        /*The editor width is 70%; and we can't use 100% because the positions of the footer is absolute*/
+        /*The editor width is 70%; and we can't use 100% because the position of the footer is absolute*/
         width: 69.7%;
-        padding-top: 10px;
-        padding-bottom: 10px;
-        padding-left: 10px;
-
         position: absolute;
         bottom: 0;
 
-        button {
-            margin-right: 5px;
-            border-radius: 0;
-            border: 1px solid #000000;
+        .footerButtons {
+            border: 2px solid #000000;
+            background: #55595c;
+            padding: 10px;
+
+            button {
+                margin-right: 5px;
+                border-radius: 0;
+                border: 1px solid #000000;
+            }
+        }
+
+        .commandlineBar {
+            background: black;
+            height: 70px;
+            font-family: monospace;
+            opacity: 0.9;
+            padding-bottom: 14px;
         }
     }
 }
