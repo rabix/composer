@@ -1,3 +1,4 @@
+import {Subject} from "rxjs";
 export module Chap {
     export function noneOf(...args) {
 
@@ -10,7 +11,11 @@ export module Chap {
     export function applyParams(params: Object, target: Object): void {
         Object.keys(params).forEach(key => {
             if (target.hasOwnProperty(key)) {
-                target[key] = params[key];
+                if ((target[key] instanceof Subject) && !(params[key] instanceof Subject)) {
+                    target[key].next(params[key]);
+                } else {
+                    target[key] = params[key];
+                }
             }
         })
     }

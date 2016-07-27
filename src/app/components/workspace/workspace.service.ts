@@ -2,7 +2,7 @@ import {Injectable} from "@angular/core";
 import {FileModel} from "../../store/models/fs.models";
 import {Observable, BehaviorSubject, Subject, Subscription} from "rxjs/Rx";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
-import {OpenFileRequestAction, CloseFileAction, FileCreatedAction} from "../../action-events/index";
+import {OpenFileRequestAction, CloseFileAction, FileCreatedAction, FileDeletedAction} from "../../action-events/index";
 import {FileRegistry} from "../../services/file-registry.service";
 
 interface FileUpdateFn extends Function {
@@ -99,6 +99,10 @@ export class WorkspaceService {
         this.fileUpdates
             .scan((content: FileModel[], update: FileUpdateFn) => update(content), [])
             .subscribe(this.openFiles as Subject<FileModel[]>);
+
+        this.eventHub.onValueFrom(FileDeletedAction).subscribe(file => {
+            this.eventHub.publish(new CloseFileAction(file));
+        });
 
 
     }

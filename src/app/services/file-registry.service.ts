@@ -5,7 +5,10 @@ import {
     FileCreatedAction,
     SaveFileRequestAction,
     UpdateFileAction,
-    CopyFileRequestAction
+    CopyFileRequestAction,
+    DeleteFileRequestAction,
+    FileDeletedAction,
+    DeleteFolderRequestAction, FolderDeletedAction
 } from "../action-events/index";
 import {FileApi} from "./api/file.api";
 import {FileModel} from "../store/models/fs.models";
@@ -61,6 +64,28 @@ export class FileRegistry {
             .subscribe((file: FileModel) => {
                 this.eventHub.publish(new FileCreatedAction(file));
             });
+
+        this.eventHub.on(DeleteFileRequestAction)
+            .flatMap(action => {
+                const file = action.payload;
+                return this.files.deleteFile(file.absolutePath).map(_ => file);
+            })
+            .subscribe((file: FileModel) => {
+                this.eventHub.publish(new FileDeletedAction(file));
+            });
+
+        this.eventHub.on(DeleteFolderRequestAction)
+            .flatMap(action => {
+                const path = action.payload;
+                return this.files.deleteFile(path).map(_ => path);
+            })
+            .subscribe(path => {
+                this.eventHub.publish(new FolderDeletedAction(path));
+            });
+
+        this.eventHub.onValueFrom(FileDeletedAction).subscribe((file: FileModel) => {
+            this.fileCache.remove(file.id);
+        });
     }
 
     /**

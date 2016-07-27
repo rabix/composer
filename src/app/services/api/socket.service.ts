@@ -32,7 +32,7 @@ export class SocketService {
 
         return Observable.create((obs: Observer<any>)=> {
             this.ioSocket.emit(eventName, data, (data)=> {
-                if (data.error) {
+                if (data && data.error) {
                     obs.error(data);
                 } else {
                     obs.next(data);

@@ -61,4 +61,8 @@ export class FileApi {
             return response.content
         });
     }
+
+    deleteFile(path: string): Observable<boolean> {
+        return this.socket.request(SOCKET_REQUESTS.DELETE_FILE, {path})
+    }
 }

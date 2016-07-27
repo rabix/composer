@@ -16,10 +16,12 @@ import {Subscription, Observable, BehaviorSubject} from "rxjs/Rx";
 
 require("./modal.component.scss");
 
-export interface ModalOptions {
+export interface ModalOptions<T> {
+    title?: string,
     backdrop?: boolean,
     closeOnOutsideClick?: boolean,
-    closeOnEscape?: boolean
+    closeOnEscape?: boolean,
+    componentState?: Object
 }
 
 @Component({
@@ -72,9 +74,7 @@ export class ModalComponent {
         this.backdrop            = false;
         this.closeOnOutsideClick = true;
         this.closeOnEscape       = true;
-
-        // FIXME: this should be passed as an argument, not fixed
-        this.title     = new BehaviorSubject("New File");
+        this.title               = new BehaviorSubject("");
 
         this.subscriptions = [];
 
@@ -122,19 +122,25 @@ export class ModalComponent {
         this.dragSubscription.unsubscribe();
     }
 
-    public configure(config: ModalOptions) {
+    public configure<T>(config: ModalOptions<T>) {
+        this.backdrop = config.backdrop;
         Chap.applyParams(config, this);
     }
 
-    public produce(factory: ComponentFactory<any>) {
+    public produce<T>(factory: ComponentFactory<T>, componentState?: Object): ComponentRef<T> {
 
         this.nestedComponentRef = this.nestedComponentContainer.createComponent(factory, 0, this.injector);
+        if (typeof componentState === "object") {
+            Chap.applyParams(componentState, this.nestedComponentRef.instance);
+        }
 
         Observable.of("Reposition me right away!")
             .merge(Observable.fromEvent(window, "resize").debounceTime(50))
             .subscribe(s => {
                 this.reposition();
             });
+
+        return this.nestedComponentRef;
     }
 
     private reposition(tweak?: any) {

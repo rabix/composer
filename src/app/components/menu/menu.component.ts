@@ -1,5 +1,6 @@
 import {Component, Input} from "@angular/core";
 import {MenuItemComponent} from "./menu-item.component";
+import {MenuItem} from "./menu-item";
 
 require("./menu.component.scss");
 
@@ -13,4 +14,8 @@ require("./menu.component.scss");
 export class MenuComponent {
     @Input()
     private items;
+
+    public setItems(items: MenuItem[]) {
+        this.items = items;
+    }
 }

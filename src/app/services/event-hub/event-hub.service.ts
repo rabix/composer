@@ -9,7 +9,8 @@ export interface AppEventAction {
 export interface AppEventResponse {
     action?: AppEventAction;
     response?: any
-    error?: AppErrorEvent
+    error?: AppErrorEvent,
+    message?: string
 }
 
 export class AppErrorEvent {
@@ -40,7 +41,11 @@ export class EventHubService {
             getResponse: () => {
                 return this.responses
                     .filter(ev => ev.action === action)
-                    .flatMap(ev => ev.error ? Observable.throw(ev.error) : Observable.of(ev.response))
+                    .flatMap(ev => {
+                        const msg = ev.message || ev.error || "A mysterious error crossed our paths.";
+                        console.debug("Should return an error", msg, ev);
+                        return ev.error ? Observable.throw(msg) : Observable.of(ev.response)
+                    })
                     .first();
             }
         }

@@ -55,6 +55,10 @@ import {CwlFileTemplate, CwlFileTemplateType} from "../../types/file-template.ty
 `
 })
 export class NewFileModalComponent {
+
+    /** Base directory path prefix for newly created file */
+    public basePath: string;
+
     /** Switch for showing the cog overlay, is active between submitting the form and the API response */
     private isCreatingFile: boolean;
 
@@ -86,6 +90,7 @@ export class NewFileModalComponent {
 
         this.showCwlExtrasForm = false;
         this.subs              = [];
+        this.basePath          = "";
 
         this.fileTypes = [
             {name: "Blank File", value: "blank", icon: "file-text-o", selected: true},
@@ -113,15 +118,17 @@ export class NewFileModalComponent {
         Observable.of(1).delay(50).filter(_ => this.error === undefined).subscribe(_ => this.isCreatingFile = true);
 
         const fileType = this.fileTypeRadio.getSelectedValue();
-        let path       = new FileName(form.controls["filename"].value);
+        let fileName   = new FileName(form.controls["filename"].value);
 
         if (fileType === "workflow" || fileType === "command_line_tool") {
-            path = path.ensureExtension("json");
+            fileName = fileName.ensureExtension("json");
         }
+
+        const path = this.basePath.length ? `${this.basePath}/${fileName.fullPath}` : fileName.fullPath;
 
         // Currently all files will be created for draft-2 until we make a switch button and v1 templates
         const template = new CwlFileTemplate(fileType, "draft-2", this.cwlExtrasForm.value);
-        const action   = new CreateFileRequestAction({path: path.fullPath, template});
+        const action   = new CreateFileRequestAction({path, template});
 
         this.eventHub.publish(action).getResponse().subscribe(_ => {
             this.modal.close();

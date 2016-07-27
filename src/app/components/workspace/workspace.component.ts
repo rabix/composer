@@ -86,7 +86,11 @@ export class WorkspaceComponent implements OnDestroy {
         });
 
         this.workspaceService.onCloseFile.subscribe(file => {
-            this.registry.findEditorTab(file).remove();
+            const tab = this.registry.findEditorTab(file);
+            console.debug("Checking tab", tab);
+            if (tab) {
+                tab.remove();
+            }
         });
 
         Observable.fromEvent(this.layout, "tabCreated")

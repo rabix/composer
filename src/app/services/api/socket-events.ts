@@ -1,11 +1,12 @@
 export const SOCKET_REQUESTS = {
-    "DIR_CONTENT": "getDirContents",
-    "FILES_IN_WORKSPACE": "getFilesInWorkspace",
-    "FILE_CONTENT": "getFile",
+    "COPY_FILE": "copyFile",
     "CREATE_FILE": "createFile",
-    "UPDATE_FILE": "updateFile",
+    "DELETE_FILE": "deleteFile",
+    "DIR_CONTENT": "getDirContents",
+    "FILE_CONTENT": "getFile",
     "FILE_EXISTS": "fileExists",
-    "COPY_FILE": "copyFile"
+    "FILES_IN_WORKSPACE": "getFilesInWorkspace",
+    "UPDATE_FILE": "updateFile"
 };
 
 export const SOCKET_EVENTS = [];

@@ -53,6 +53,30 @@ export class CopyFileRequestAction extends EventHubAction {
     }
 }
 
+export class DeleteFileRequestAction extends EventHubAction {
+    constructor(file: FileModel) {
+        super("delete_file_request", file);
+    }
+}
+
+export class DeleteFolderRequestAction extends EventHubAction {
+    constructor(path: string) {
+        super("delete_folder_request", path);
+    }
+}
+
+export class FileDeletedAction extends EventHubAction {
+    constructor(file: FileModel) {
+        super("file_deleted", file);
+    }
+}
+
+export class FolderDeletedAction extends EventHubAction {
+    constructor(path: string) {
+        super("folder_deleted", path);
+    }
+}
+
 export class FileCreatedAction extends EventHubAction {
     constructor(file: FileModel) {
         super("file_created", file);

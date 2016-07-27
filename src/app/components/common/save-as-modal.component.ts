@@ -1,8 +1,7 @@
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
-import {Component, ViewChild} from "@angular/core";
+import {Component} from "@angular/core";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {NgStyle, ControlGroup, FormBuilder} from "@angular/common";
-import {RadioGroupComponent} from "../forms/elements/radio-group.component";
 import {Validators, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 import {AlertComponent} from "./alert.component";
 import {InputComponent} from "../forms/elements/input.component";
@@ -10,6 +9,7 @@ import {Observable} from "rxjs";
 import {WorkspaceService} from "../workspace/workspace.service";
 import {CopyFileRequestAction} from "../../action-events/index";
 import {ModalService} from "../modal";
+import {FileName} from "../forms/models/file-name";
 
 @Component({
     selector: 'new-file-modal',
@@ -43,14 +43,24 @@ import {ModalService} from "../modal";
 `
 })
 export class SaveAsModalComponent {
+
+    /** Path of the source file that should be copied */
+    public filePath: string;
+
+    /** Toggles the cog loader */
     private isCreatingFile: boolean;
+
+    /** Holds the error object that should be shown below the form if exists */
     private error: {[message: string]: string};
+
+    /** New file destination entry form */
     private newFileForm: ControlGroup;
 
     constructor(private formBuilder: FormBuilder,
                 private eventHub: EventHubService,
-                private workspace: WorkspaceService,
                 private modal: ModalService) {
+
+        this.filePath = undefined;
 
         this.newFileForm = formBuilder.group({
             name: ["", Validators.compose([Validators.required, Validators.minLength(1)])]
@@ -66,15 +76,17 @@ export class SaveAsModalComponent {
         // so it does show perceivably instantly
         Observable.of(1).delay(50).filter(_ => this.error === undefined).subscribe(_ => this.isCreatingFile = true);
 
-        let fileName = form.controls["name"].value;
-        this.workspace.selectedFile.switchMap(file => {
-            return this.eventHub.publish(new CopyFileRequestAction(file.absolutePath, fileName)).getResponse()
-        }).subscribe(_ => {
-            this.modal.close();
-        }, (err) => {
-            this.error          = err;
-            this.isCreatingFile = false;
-        });
+        const destinationPath = new FileName(this.filePath).dir + "/" + form.controls["name"].value;
+
+        return this.eventHub
+            .publish(new CopyFileRequestAction(this.filePath, destinationPath))
+            .getResponse()
+            .subscribe(_ => {
+                this.modal.close();
+            }, (err) => {
+                this.error          = err;
+                this.isCreatingFile = false;
+            });
     }
 
     public onCancel() {
