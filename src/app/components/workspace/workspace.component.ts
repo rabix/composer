@@ -81,7 +81,7 @@ export class WorkspaceComponent implements OnDestroy {
         this.workspaceService.selectedFile.subscribe(file => {
 
             if (file) {
-                let activeTab = this.registry.findToolTab(file);
+                let activeTab = this.registry.findToolContainerTab(file);
                 activeTab.setTitle(file.name + (file.isModified ? "*" : ""));
                 this.registry.getToolContainerStack().setActiveContentItem(activeTab);
             }
@@ -89,7 +89,7 @@ export class WorkspaceComponent implements OnDestroy {
         });
 
         this.workspaceService.onCloseFile.subscribe(file => {
-            this.registry.findToolTab(file).remove();
+            this.registry.findToolContainerTab(file).remove();
         });
 
         Observable.fromEvent(this.layout, "tabCreated")

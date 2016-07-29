@@ -92,20 +92,15 @@ export class ComponentRegistry {
         });
     }
 
-    public getCodeEditorTabs() {
-        return this.getToolContainerStack().contentItems.filter(item => item.componentName === CodeEditorComponent);
-    }
-
-    public getToolContainerTabs() {
-        return this.getToolContainerStack().contentItems.filter(item => item.componentName === ToolContainerComponent);
+    public findToolContainerTab(file: FileModel) {
+        return this.getToolContainerTabs().find(item => item.config.componentState.fileInfo.id === file.id);
     }
     
-    public findToolTab(file: FileModel) {
-        return this.getToolContainerTabs().find(item => item.config.componentState.fileInfo.id === file.id);
+    public getToolContainerTabs() {
+        return this.getToolContainerStack().contentItems.filter(item => item.componentName === ToolContainerComponent);
     }
 
     public getToolContainerStack() {
         return this.layout.root.contentItems[0].contentItems[1];
     }
-
 }
