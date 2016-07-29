@@ -1,3 +1,5 @@
+@import "../../../assets/sass/variables";
+
 #guiEditorContainer {
 
     .propertyInput {
@@ -7,19 +9,45 @@
         height: 100%;
         padding: 20px 20px 30px 20px;
         color: #000000;
-        margin: 20px auto;
+        //margin: 20px auto;
     }
 
-    /* TODO: change this styling/colors */
+    #rightSidebar {
+        right: 0;
+        top: 9%;
+        padding-left: 10px;
+        position: absolute;
+        background: #000000;
+        height: calc(100% - #{$footerButtonsHeight});
+
+        #collapseIcon {
+            padding-top: 5px;
+            height: 100%;
+            position: absolute;
+            cursor: pointer;
+        }
+
+        #sideBarContent {
+            padding-top: 5px;
+            position: absolute;
+            left: 30px;
+        }
+    }
+
     footer {
-        /*The editor width is 70%; and we can't use 100% because the position of the footer is absolute*/
-        width: 69.7%;
+        height: $footer-height;
+        width: 100%;
         position: absolute;
         bottom: 0;
 
         .footerButtons {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+
+            height: $footerButtonsHeight;
             border: 2px solid #000000;
-            background: #55595c;
+            background-color: $gui-base-gray;
             padding: 10px;
 
             button {
@@ -30,11 +58,14 @@
         }
 
         .commandlineBar {
-            background: black;
+            position: absolute;
+            background: #000000;
             height: 70px;
+            width: 100%;
             font-family: monospace;
             opacity: 0.9;
             padding-bottom: 14px;
+            bottom: $footerButtonsHeight;
         }
     }
 }

@@ -2,48 +2,46 @@ import {
     Component,
     OnInit,
     Input,
-    trigger,
-    state,
-    style,
-    transition,
-    animate
 } from "@angular/core";
 import {NgFor} from "@angular/common";
-import {FileRegistry} from "../../services/file-registry.service";
 import {FileModel} from "../../store/models/fs.models";
 import {PropertyInput} from "../forms/inputs/property-input.component";
+import {GuiEditorService, GuiEditorEvent, GuiEditorEventType, SidebarType} from "./gui-editor.service";
+import {GuiEditorAnimations} from "./gui-editor.animations";
 
 require("./gui-editor.component.scss");
 
-type CommandLineState = "visible" | "hidden";
+type VisibilityState = "visible" | "hidden";
+type PropertyPosition = "center" | "left";
 
 @Component({
     selector: "gui-editor",
+    providers: [GuiEditorService],
     directives: [NgFor, PropertyInput],
-    animations: [
-        trigger("commandlineState", [
-            state("visible", style({
-                height: 70,
-                display: "block",
-                overflowY: 'auto'
-            })),
-            state("hidden",   style({
-                height: 20,
-                display: "none",
-                overflowY: 'hidden'
-            })),
-            transition("hidden => visible", animate("100ms ease-in")),
-            transition("visible => hidden", animate("100ms ease-out"))
-        ])
-    ],
+    animations: GuiEditorAnimations,
+    /* TODO(mate): too much HTML */
     template: `
                 <div id="guiEditorContainer">
-                    <property-input *ngFor="let property of mockInputProperties"
-                         class="propertyInput" 
-                         [type]="property.type" 
-                         [model]="property.value">
-                    </property-input>
-                    
+                    <main>
+                        <property-input @propertyPosition="propertyPosition"
+                             *ngFor="let property of mockInputProperties"
+                             class="propertyInput" 
+                             [type]="property.type" 
+                             [model]="property.data">
+                        </property-input>
+                        
+                        <!--TODO(mate): move this to a separate component-->
+                        <div id="rightSidebar" @sidebarState="sidebarState">
+                            <div id="collapseIcon">
+                                <i class="fa fa-lg fa-caret-left" (click)="collapseSidebar()"></i>
+                            </div>
+                            <div id="sideBarContent">
+                                This is the right sidebar content
+                            </div>
+                        </div>
+                    </main>
+                   
+                   <!--TODO(mate): move this to a separate component-->
                     <footer>
                         <div id="commandline"
                              class="commandlineBar"
@@ -63,42 +61,69 @@ type CommandLineState = "visible" | "hidden";
 })
 export class GuiEditorComponent implements OnInit {
     @Input() file: FileModel;
-    commandlineState: CommandLineState = 'hidden';
+    commandlineState: VisibilityState = "hidden";
+    sidebarState: VisibilityState = "hidden";
+    propertyPosition: PropertyPosition = "center";
+
     /*TODO: generate the commandline*/
-    commandlineContent: string = 'This is the command line';
+    commandlineContent: string = "This is the command line";
 
     /* TODO: get tool properties for display, create a service that returns a list of properties based on the tool */
     /*mockInputProperties: Array<any> = [
-        {
-            type: "DockerRequirement",
-            value: {
-                dockerPull: "some.docker.image.com"
-            }
-        },
-        {
-            type: "baseCommand",
-            value: "echo"
-        }
-    ];*/
+     {
+     type: "DockerRequirement",
+     data: {
+     dockerPull: "some.docker.image.com"
+     }
+     },
+     {
+     type: "baseCommand",
+     data: {
+     command: "echo"
+     }
+     }
+     ];*/
     mockInputProperties: Array<any> = [
         {
             type: "DockerRequirement",
-            value: null
+            data: {}
         },
         {
             type: "baseCommand",
-            value: null
+            data: {}
         }
     ];
 
-    constructor(private fileRegistry: FileRegistry) {}
+    constructor(private guiEditorService: GuiEditorService) {
+        let self = this;
+
+        this.guiEditorService.publishedEditorEvents.subscribe((event: GuiEditorEvent) => {
+            if (event.type === GuiEditorEventType.showSidebar) {
+                self.showSideBar(event.data);
+            }
+        });
+    }
 
     ngOnInit(): void {
 
     }
 
-    toggleCommandLine() {
-        this.commandlineState = this.commandlineState === 'hidden' ? 'visible': 'hidden';
+    showSideBar(sidebarType: SidebarType): void {
+        this.sidebarState = "visible";
+        this.togglePropertyPosition();
+    }
+
+    collapseSidebar() {
+        this.sidebarState = "hidden";
+        this.togglePropertyPosition();
+    }
+
+    togglePropertyPosition() {
+        this.propertyPosition = this.sidebarState === "hidden" ? "center": "left";
+    }
+
+    toggleCommandLine(): void {
+        this.commandlineState = this.commandlineState === "hidden" ? "visible": "hidden";
     }
 
 }

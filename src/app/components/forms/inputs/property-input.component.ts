@@ -24,7 +24,7 @@ export class PropertyInput implements OnInit {
         let componentToResolve: any = null;
 
         switch (this.type) {
-            //TODO: change the inputTypes when we have the models
+            //TODO: change this when we have the models
             case this.inputTypes.DOCKER_REQUIREMENT:
                 componentToResolve = DockerInputForm;
                 break;

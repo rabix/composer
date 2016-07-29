@@ -1,4 +1,6 @@
 import {Component, OnInit} from "@angular/core";
+import {GuiEditorService, GuiEditorEventType, SidebarType} from "../../../gui-editor/gui-editor.service";
+import Subscription from "rxjs/Rx";
 
 require("./base-command-input.component.scss");
 
@@ -17,46 +19,37 @@ require("./base-command-input.component.scss");
                     
             </div>
             <a href="#">Add base command</a>
-            
-            <!--TODO: move this to a re-sizable sidebar-->
-             <div *ngIf="isAddExpressionVisible">
-             
-                <div class="input-group">
-                    <input type="text" 
-                        class="form-control"
-                        [(ngModel)]="newExpression">
-                    
-                    <span class="input-group-addon">
-                        <div class="icon closeIcon" (click)="closeExpressionSidebar()">
-                                <i class="fa fa-lg fa-times"></i>
-                        </div>
-                    </span>
-                </div>
-                
-            </div>
-   `
+        `
 })
 export class BaseCommandInput implements OnInit {
     baseCommand: string;
     newExpression: string;
-    isAddExpressionVisible: boolean = false;
 
-    constructor() { }
+    /** List of subscriptions that should be disposed when destroying this component */
+    private subs: Subscription[];
+
+    constructor(private guiEditorService: GuiEditorService) {
+
+    }
 
     ngOnInit(): void {
 
     }
 
-    openExpressionSidebar() {
-        this.isAddExpressionVisible = true;
+    ngOnDestroy(): void {
     }
 
-    closeExpressionSidebar() {
-        this.isAddExpressionVisible = false;
+    openExpressionSidebar() {
+        this.guiEditorService.publishEditorEvent({
+            type: GuiEditorEventType.showSidebar,
+            data: {
+                sidebarType: SidebarType.expression
+            }
+        });
     }
 
     /*TODO: use actual model type here*/
     public setState(data: any): void {
-        this.baseCommand = data ? data : null;
+        this.baseCommand = data.command ? data.command : '';
     }
 }

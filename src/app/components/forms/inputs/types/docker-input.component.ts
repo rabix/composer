@@ -22,7 +22,7 @@ export class DockerInput implements OnInit {
     /*TODO: use actual model type here*/
     public setState(data: any): void {
         if (data) {
-            this.dockerPull = data.dockerPull ? data.dockerPull : null;
+            this.dockerPull = data.dockerPull ? data.dockerPull : '';
         }
     }
 
