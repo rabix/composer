@@ -1,4 +1,3 @@
-import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {Component, ElementRef, OnDestroy} from "@angular/core";
 import {ComponentRegistryFactoryService} from "./registry/component-registry-factory.service";
 import {ComponentRegistry} from "./registry/component-registry";
