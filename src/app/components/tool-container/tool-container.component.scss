@@ -11,9 +11,12 @@
 @import "../../../assets/sass/variables";
 
 #viewContainer {
+    position: relative;
+    display: block;
+    height: 100%;
 
     header {
-        margin-top: 10px;
+        padding-top: 10px;
 
         #revisionSelect {
             color: #000000;

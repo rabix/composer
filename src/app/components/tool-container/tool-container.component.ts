@@ -4,6 +4,10 @@ import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {FileModel} from "../../store/models/fs.models";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {GuiEditorComponent} from "../gui-editor/gui-editor.component";
+import * as templateHtml from "./tool-container.html";
+import {DynamicState} from "../runtime-compiler/dynamic-state.interface";
+import {FileRegistry} from "../../services/file-registry.service";
+import {Subscription} from "rxjs/Rx";
 
 require("./tool-container.component.scss");
 
@@ -18,9 +22,9 @@ require("./tool-container.component.scss");
         NgSwitchDefault,
         NgSelectOption
     ],
-    template: require("./tool-container.html")
+    template: templateHtml
 })
-export class ToolContainerComponent implements OnInit {
+export class ToolContainerComponent implements OnInit, DynamicState {
     viewMode: string = "gui";
     file: FileModel;
 
@@ -28,10 +32,21 @@ export class ToolContainerComponent implements OnInit {
     revisions: Array<string> = ["rev1", "rev2", "rev3"];
     selectedRevision: string = this.revisions[0];
 
-    constructor() {}
+    /** List of subscriptions that should be disposed when destroying this component */
+    private subs: Subscription[];
+
+    constructor(private fileRegistry: FileRegistry) {
+        this.subs = [];
+    }
 
     ngOnInit(): void {
+        // This file that we need to show, check it out from the file repository
+        const fileStream = this.fileRegistry.getFile(this.file);
 
+        // bring our own file up to date
+        this.subs.push(fileStream.subscribe(file => {
+            this.file     = file;
+        }));
     }
 
     onChange(e): void {
@@ -42,9 +57,7 @@ export class ToolContainerComponent implements OnInit {
         this.viewMode = viewMode;
     }
 
-    public setState(state): void {
-        if (state.fileInfo) {
-            this.file = state.fileInfo;
-        }
+    public setState(state: {fileInfo}): void {
+        this.file = state.fileInfo;
     }
 }
