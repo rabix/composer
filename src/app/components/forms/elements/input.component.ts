@@ -16,7 +16,8 @@ require("./input.component.scss");
                 <input #inputField
                        class="form-control input-sm"
                        [placeholder]="placeholder"
-                       [formControl]="control"/>
+                       [formControl]="control"
+                       [(ngModel)]="value"/>
             </div>
         </label>
     `
@@ -35,6 +36,9 @@ export class InputComponent implements AfterViewInit {
 
     @Input()
     private name: string;
+
+    @Input()
+    private value: string;
 
     @ViewChild("inputField")
     private inputField: ElementRef;

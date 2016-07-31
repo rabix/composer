@@ -23,7 +23,6 @@ require("./base-command-input.component.scss");
 })
 export class BaseCommandInput implements OnInit {
     baseCommand: string;
-    newExpression: string;
 
     /** List of subscriptions that should be disposed when destroying this component */
     private subs: Subscription[];

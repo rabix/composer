@@ -1,15 +1,17 @@
 import {Component, OnInit} from "@angular/core";
-import {NgSwitch, NgSwitchCase, NgSwitchDefault, NgSelectOption} from "@angular/common";
+import {NgSwitch, NgSwitchCase, NgSwitchDefault} from "@angular/common";
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {FileModel} from "../../store/models/fs.models";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {GuiEditorComponent} from "../gui-editor/gui-editor.component";
-import * as templateHtml from "./tool-container.html";
 import {DynamicState} from "../runtime-compiler/dynamic-state.interface";
 import {FileRegistry} from "../../services/file-registry.service";
 import {Subscription} from "rxjs/Rx";
+import {ToolHeader} from "./tool-header/tool-header.component";
 
 require("./tool-container.component.scss");
+
+export type ViewMode = "gui" | "json";
 
 @Component({
     selector: "tool-container",
@@ -20,17 +22,30 @@ require("./tool-container.component.scss");
         NgSwitch,
         NgSwitchCase,
         NgSwitchDefault,
-        NgSelectOption
+        ToolHeader
     ],
-    template: templateHtml
+    template: `
+        <div id="viewContainer">
+            <tool-header id="toolHeader" 
+            [viewMode]="viewMode"
+            (viewModeChanged)="setViewMode($event)"></tool-header>
+        
+            <main>
+                <div [ngSwitch]="viewMode">
+                    <block-loader *ngIf="!file"></block-loader>
+                    <gui-editor *ngSwitchCase="'gui'" [file]="file"></gui-editor>
+                    <code-editor *ngSwitchCase="'json'" [file]="file"></code-editor>
+                </div>
+            </main>
+        </div>
+    `
 })
 export class ToolContainerComponent implements OnInit, DynamicState {
-    viewMode: string = "gui";
+    /** Default view mode. TODO: change type */
+    viewMode: ViewMode = "gui";
+    
+    /** File that we will pass to bothe the gui and JSON edtior*/
     file: FileModel;
-
-    /* TODO: load actual revisions */
-    revisions: Array<string> = ["rev1", "rev2", "rev3"];
-    selectedRevision: string = this.revisions[0];
 
     /** List of subscriptions that should be disposed when destroying this component */
     private subs: Subscription[];
@@ -47,10 +62,6 @@ export class ToolContainerComponent implements OnInit, DynamicState {
         this.subs.push(fileStream.subscribe(file => {
             this.file     = file;
         }));
-    }
-
-    onChange(e): void {
-        this.selectedRevision = e.target.value;
     }
 
     setViewMode(viewMode): void {

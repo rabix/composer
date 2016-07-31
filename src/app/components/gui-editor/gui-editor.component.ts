@@ -2,24 +2,38 @@ import {
     Component,
     OnInit,
     Input,
+    trigger,
+    style,
+    animate,
+    state,
+    transition
 } from "@angular/core";
 import {NgFor} from "@angular/common";
 import {FileModel} from "../../store/models/fs.models";
 import {PropertyInput} from "../forms/inputs/property-input.component";
-import {GuiEditorService, GuiEditorEvent, GuiEditorEventType, SidebarType} from "./gui-editor.service";
-import {GuiEditorAnimations} from "./gui-editor.animations";
+import {GuiEditorService} from "./gui-editor.service";
+import {EditorSidebar} from "./sidebar/editor-sidebar.component";
+import {PropertyPosition, VisibilityState} from "./animation.states";
+import {CommandLine} from "./commandline/commandline.component";
 
 require("./gui-editor.component.scss");
-
-type VisibilityState = "visible" | "hidden";
-type PropertyPosition = "center" | "left";
 
 @Component({
     selector: "gui-editor",
     providers: [GuiEditorService],
-    directives: [NgFor, PropertyInput],
-    animations: GuiEditorAnimations,
-    /* TODO(mate): too much HTML */
+    directives: [NgFor, PropertyInput, EditorSidebar, CommandLine],
+    animations: [
+        trigger("propertyPosition", [
+            state("left", style({
+                margin: '20px 0 0 0'
+            })),
+            state("center", style({
+                margin: '20px auto'
+            })),
+            transition("hidden => visible", animate("100ms ease-in")),
+            transition("visible => hidden", animate("100ms ease-out"))
+        ])
+    ],
     template: `
                 <div id="guiEditorContainer">
                     <main>
@@ -30,45 +44,27 @@ type PropertyPosition = "center" | "left";
                              [model]="property.data">
                         </property-input>
                         
-                        <!--TODO(mate): move this to a separate component-->
-                        <div id="rightSidebar" @sidebarState="sidebarState">
-                            <div id="collapseIcon">
-                                <i class="fa fa-lg fa-caret-left" (click)="collapseSidebar()"></i>
-                            </div>
-                            <div id="sideBarContent">
-                                This is the right sidebar content
-                            </div>
-                        </div>
+                        <editor-sidebar (sidebarVisibility)="togglePropertyPosition($event)"></editor-sidebar>
                     </main>
                    
                    <!--TODO(mate): move this to a separate component-->
                     <footer>
-                        <div id="commandline"
-                             class="commandlineBar"
-                             @commandlineState="commandlineState">
-                            {{commandlineContent}}
-                        </div>
-                    
-                        <div class="footerButtons">
-                            <button type="button" class="btn btn-secondary btn-sm">Issues</button>
-                            <button type="button" 
-                            class="btn btn-secondary btn-sm"
-                            (click)="toggleCommandLine()">Resulting Command</button>
-                        </div>
+                        <commandline [content]="commandlineContent"></commandline>
                     </footer>
                 </div>
     `
 })
 export class GuiEditorComponent implements OnInit {
+    /** The file that we are going to use to list the properties*/
     @Input() file: FileModel;
-    commandlineState: VisibilityState = "hidden";
-    sidebarState: VisibilityState = "hidden";
+    
+    /** Positions of the listed properties */
     propertyPosition: PropertyPosition = "center";
 
-    /*TODO: generate the commandline*/
+    /* TODO: generate the commandline */
     commandlineContent: string = "This is the command line";
 
-    /* TODO: get tool properties for display, create a service that returns a list of properties based on the tool */
+    /* TODO: get tool properties for display, probably create a service that returns a list of properties based on the tool */
     /*mockInputProperties: Array<any> = [
      {
      type: "DockerRequirement",
@@ -94,36 +90,13 @@ export class GuiEditorComponent implements OnInit {
         }
     ];
 
-    constructor(private guiEditorService: GuiEditorService) {
-        let self = this;
-
-        this.guiEditorService.publishedEditorEvents.subscribe((event: GuiEditorEvent) => {
-            if (event.type === GuiEditorEventType.showSidebar) {
-                self.showSideBar(event.data);
-            }
-        });
-    }
+    constructor() { }
 
     ngOnInit(): void {
 
     }
 
-    showSideBar(sidebarType: SidebarType): void {
-        this.sidebarState = "visible";
-        this.togglePropertyPosition();
+    togglePropertyPosition(sidebarVisibility: VisibilityState) {
+        this.propertyPosition = sidebarVisibility === "hidden" ? "center": "left";
     }
-
-    collapseSidebar() {
-        this.sidebarState = "hidden";
-        this.togglePropertyPosition();
-    }
-
-    togglePropertyPosition() {
-        this.propertyPosition = this.sidebarState === "hidden" ? "center": "left";
-    }
-
-    toggleCommandLine(): void {
-        this.commandlineState = this.commandlineState === "hidden" ? "visible": "hidden";
-    }
-
 }

@@ -15,29 +15,8 @@
     display: block;
     height: 100%;
 
-    header {
+    #toolHeader {
         height: 9%;
         padding-top: 10px;
-
-        #revisionSelect {
-            color: #000000;
-            margin-right: 40px;
-            width: 100px;
-        }
-
-        button {
-            width: 8%;
-        }
-
-        .selected {
-            background-color: $gui-base-gray;
-            color:  #ffffff;
-            border-color: #ffffff;
-        }
-
-        #saveButton {
-            float: right;
-            margin-right: 15px;
-        }
     }
 }
