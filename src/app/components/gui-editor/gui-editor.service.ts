@@ -17,13 +17,13 @@ export interface GuiEditorEvent {
 
 @Injectable()
 export class GuiEditorService {
-    // Observable string sources
+    // Observable sources
     private guiEditorEvents = new Subject<any>();
 
-    // Observable string streams
-    publishedEditorEvents = this.guiEditorEvents.asObservable();
+    // Observable streams
+    public publishedEditorEvents = this.guiEditorEvents.asObservable();
 
-    // Service message commands
+    // Published events
     publishEditorEvent(guiEditorEvent: GuiEditorEvent) {
         this.guiEditorEvents.next(guiEditorEvent);
     }

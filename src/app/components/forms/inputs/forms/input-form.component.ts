@@ -21,15 +21,21 @@ require ("./input-form.component.scss");
                 </form>`,
 })
 export class InputFromComponent implements OnInit {
-    @Input() primaryLabel: string;
-    @Input() secondaryLabel: string;
-    @Input() contentComponent: any;
-    @Input() inputData: any;
-    dynamicComponentContext: DynamicComponentContext;
+    @Input()
+    private primaryLabel: string;
 
-    constructor(private resolver: ComponentResolver) {
+    @Input()
+    private secondaryLabel: string;
 
-    }
+    @Input()
+    private contentComponent: any;
+
+    @Input()
+    private inputData: any;
+
+    private dynamicComponentContext: DynamicComponentContext;
+
+    constructor(private resolver: ComponentResolver) { }
 
     ngOnInit(): void {
         this.resolver.resolveComponent(this.contentComponent)

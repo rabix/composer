@@ -1,6 +1,5 @@
 import {
     Component,
-    OnInit,
     style,
     animate,
     state,
@@ -47,12 +46,13 @@ require ("./editor-sidebar.component.scss");
                     </div>
     `
 })
-export class EditorSidebar implements OnInit {
+export class EditorSidebarComponent {
     /** Emit changes of the sidebar animation to the parent component */
-    @Output() sidebarVisibility = new EventEmitter();
+    @Output() 
+    private sidebarVisibility = new EventEmitter();
 
     /** State of the sidebar animation */
-    sidebarState: VisibilityState = "hidden";
+    private sidebarState: VisibilityState = "hidden";
 
     constructor(private guiEditorService: GuiEditorService) {
         let self = this;
@@ -62,10 +62,6 @@ export class EditorSidebar implements OnInit {
                 self.showSideBar(event.data);
             }
         });
-    }
-
-    ngOnInit(): void {
-
     }
 
     showSideBar(sidebarType: SidebarType): void {

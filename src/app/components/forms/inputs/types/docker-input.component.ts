@@ -1,4 +1,4 @@
-import {Component, OnInit} from "@angular/core";
+import {Component} from "@angular/core";
 
 @Component({
     selector: 'docker-input',
@@ -10,14 +10,8 @@ import {Component, OnInit} from "@angular/core";
                 [(ngModel)]="dockerPull">
     `,
 })
-export class DockerInput implements OnInit {
-    dockerPull: string;
-
-    constructor() { }
-
-    ngOnInit(): any {
-
-    }
+export class DockerInputComponent {
+    private dockerPull: string;
 
     /*TODO: use actual model type here*/
     public setState(data: any): void {

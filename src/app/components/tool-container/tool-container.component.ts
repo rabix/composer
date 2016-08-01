@@ -7,7 +7,7 @@ import {GuiEditorComponent} from "../gui-editor/gui-editor.component";
 import {DynamicState} from "../runtime-compiler/dynamic-state.interface";
 import {FileRegistry} from "../../services/file-registry.service";
 import {Subscription} from "rxjs/Rx";
-import {ToolHeader} from "./tool-header/tool-header.component";
+import {ToolHeaderComponent} from "./tool-header/tool-header.component";
 
 require("./tool-container.component.scss");
 
@@ -22,7 +22,7 @@ export type ViewMode = "gui" | "json";
         NgSwitch,
         NgSwitchCase,
         NgSwitchDefault,
-        ToolHeader
+        ToolHeaderComponent
     ],
     template: `
         <div id="viewContainer">
@@ -42,10 +42,10 @@ export type ViewMode = "gui" | "json";
 })
 export class ToolContainerComponent implements OnInit, DynamicState {
     /** Default view mode. TODO: change type */
-    viewMode: ViewMode = "gui";
-    
-    /** File that we will pass to bothe the gui and JSON edtior*/
-    file: FileModel;
+    private viewMode: ViewMode = "gui";
+
+    /** File that we will pass to both the gui and JSON editor*/
+    private file: FileModel;
 
     /** List of subscriptions that should be disposed when destroying this component */
     private subs: Subscription[];

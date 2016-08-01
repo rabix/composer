@@ -1,6 +1,5 @@
 import {
     Component,
-    OnInit,
     style,
     animate,
     state,
@@ -48,18 +47,13 @@ require ("./commandline.component.scss");
             </div>
     `
 })
-export class CommandLine implements OnInit {
+export class CommandLineComponent {
     /** Content of the command line */
-    @Input() content: string;
+    @Input() 
+    private content: string;
 
     /** Sate of the commandline animation */
-    commandlineState: VisibilityState = "hidden";
-
-    constructor() { }
-
-    ngOnInit(): void {
-
-    }
+    private commandlineState: VisibilityState = "hidden";
 
     toggleCommandLine(): void {
         this.commandlineState = this.commandlineState === "hidden" ? "visible": "hidden";

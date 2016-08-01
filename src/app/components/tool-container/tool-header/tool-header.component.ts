@@ -1,6 +1,5 @@
 import {
     Component,
-    OnInit,
     EventEmitter,
     Input,
     Output
@@ -34,25 +33,21 @@ require("./tool-header.component.scss");
         </header>
     `
 })
-export class ToolHeader implements OnInit {
+export class ToolHeaderComponent {
     /** The current view mode is needed for styling the selected button */
-    @Input() viewMode: ViewMode;
+    @Input() 
+    private viewMode: ViewMode;
     
     /** Emit changes of the view mode */
-    @Output() viewModeChanged = new EventEmitter();
+    @Output() 
+    private viewModeChanged = new EventEmitter();
     
     /** Tool revisions. TODO: load actual revisions */
-    revisions: Array<string> = ["rev1", "rev2", "rev3"];
+    private revisions: Array<string> = ["rev1", "rev2", "rev3"];
     
     /** Currently selected revision */
-    selectedRevision: string = this.revisions[0];
+    private selectedRevision: string = this.revisions[0];
     
-    constructor() { }
-
-    ngOnInit(): void {
-
-    }
-
     changeViewMode(viewMode: string) {
         this.viewModeChanged.emit(viewMode);
     }

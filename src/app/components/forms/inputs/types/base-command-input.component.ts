@@ -1,4 +1,4 @@
-import {Component, OnInit} from "@angular/core";
+import {Component} from "@angular/core";
 import {GuiEditorService, GuiEditorEventType, SidebarType} from "../../../gui-editor/gui-editor.service";
 import Subscription from "rxjs/Rx";
 
@@ -21,22 +21,13 @@ require("./base-command-input.component.scss");
             <a href="#">Add base command</a>
         `
 })
-export class BaseCommandInput implements OnInit {
-    baseCommand: string;
+export class BaseCommandInputComponent {
+    private baseCommand: string;
 
     /** List of subscriptions that should be disposed when destroying this component */
     private subs: Subscription[];
 
-    constructor(private guiEditorService: GuiEditorService) {
-
-    }
-
-    ngOnInit(): void {
-
-    }
-
-    ngOnDestroy(): void {
-    }
+    constructor(private guiEditorService: GuiEditorService) { }
 
     openExpressionSidebar() {
         this.guiEditorService.publishEditorEvent({
