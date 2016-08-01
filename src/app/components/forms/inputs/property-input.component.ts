@@ -1,5 +1,5 @@
 import {Component, OnInit, Input, ComponentResolver, ComponentFactory} from "@angular/core";
-import {INPUT_TYPES} from "./types/input-types";
+import {INPUT_PROPERTY_TYPE} from "./types/input-types";
 import {DynamicComponentContext} from "../../runtime-compiler/dynamic-component-context";
 import {ComponentCompilerDirective} from "../../runtime-compiler/component-compiler.directive";
 import {BaseCommandFormComponent} from "./forms/base-command-form.component";
@@ -15,25 +15,25 @@ require ("./property-input.component.scss");
 })
 export class PropertyInputComponent implements OnInit {
     @Input()
-    private type: string;
+    private type: INPUT_PROPERTY_TYPE;
 
     @Input()
-    private model: any;
+    private model: Object;
 
     private dynamicComponentContext: DynamicComponentContext<any>;
-    private inputTypes: any = INPUT_TYPES;
 
     constructor(private resolver: ComponentResolver) { }
 
     ngOnInit(): void {
+
         let componentToResolve: any = null;
 
         switch (this.type) {
             //TODO: change this when we have the models
-            case this.inputTypes.DOCKER_REQUIREMENT:
+            case "DockerRequirement":
                 componentToResolve = DockerInputFormComponent;
                 break;
-            case this.inputTypes.BASE_COMMAND:
+            case "baseCommand":
                 componentToResolve = BaseCommandFormComponent;
                 break;
         }

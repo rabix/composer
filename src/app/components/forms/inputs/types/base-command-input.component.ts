@@ -1,6 +1,5 @@
 import {Component, Input} from "@angular/core";
 import {GuiEditorService, GuiEditorEventType, SidebarType} from "../../../gui-editor/gui-editor.service";
-import Subscription from "rxjs/Rx";
 
 require("./base-command-input.component.scss");
 
@@ -26,10 +25,7 @@ require("./base-command-input.component.scss");
 export class BaseCommandInputComponent {
     @Input()
     private baseCommand: string;
-
-    /** List of subscriptions that should be disposed when destroying this component */
-    private subs: Subscription[];
-
+    
     constructor(private guiEditorService: GuiEditorService) { }
 
     openExpressionSidebar() {

@@ -12,13 +12,19 @@ export enum GuiEditorEventType {
 
 export interface GuiEditorEvent {
     type: GuiEditorEventType,
-    data: any
+    data: Object
+}
+
+export interface ShowSidebarEvent extends GuiEditorEvent {
+    data: {
+        sidebarType: SidebarType
+    }
 }
 
 @Injectable()
 export class GuiEditorService {
     // Observable sources
-    private guiEditorEvents = new Subject<any>();
+    private guiEditorEvents = new Subject<GuiEditorEvent>();
 
     // Observable streams
     public publishedEditorEvents = this.guiEditorEvents.asObservable();

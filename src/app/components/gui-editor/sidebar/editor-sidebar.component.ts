@@ -9,7 +9,7 @@ import {
     Output
 } from "@angular/core";
 import {NgFor} from "@angular/common";
-import {GuiEditorService, SidebarType, GuiEditorEvent, GuiEditorEventType} from "../gui-editor.service";
+import {GuiEditorService, SidebarType, GuiEditorEvent, GuiEditorEventType,ShowSidebarEvent} from "../gui-editor.service";
 import {VisibilityState} from "../animation.states";
 
 require ("./editor-sidebar.component.scss");
@@ -48,18 +48,19 @@ require ("./editor-sidebar.component.scss");
 })
 export class EditorSidebarComponent {
     /** Emit changes of the sidebar animation to the parent component */
-    @Output() 
+    @Output()
     private sidebarVisibility = new EventEmitter();
 
     /** State of the sidebar animation */
     private sidebarState: VisibilityState = "hidden";
 
     constructor(private guiEditorService: GuiEditorService) {
-        let self = this;
+        const self = this;
 
         this.guiEditorService.publishedEditorEvents.subscribe((event: GuiEditorEvent) => {
             if (event.type === GuiEditorEventType.showSidebar) {
-                self.showSideBar(event.data);
+                let showSidebarEvent: ShowSidebarEvent = <ShowSidebarEvent>event;
+                self.showSideBar(showSidebarEvent.data.sidebarType);
             }
         });
     }
