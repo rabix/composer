@@ -5,6 +5,8 @@ import {ComponentCompilerDirective} from "../../runtime-compiler/component-compi
 import {BaseCommandFormComponent} from "./forms/base-command-form.component";
 import {DockerInputFormComponent} from "./forms/docker-input-form.component";
 
+require ("./property-input.component.scss");
+
 @Component({
     selector: 'property-input',
     directives: [ComponentCompilerDirective],
@@ -12,10 +14,10 @@ import {DockerInputFormComponent} from "./forms/docker-input-form.component";
                </template>`,
 })
 export class PropertyInputComponent implements OnInit {
-    @Input() 
+    @Input()
     private type: string;
-    
-    @Input() 
+
+    @Input()
     private model: any;
 
     private dynamicComponentContext: DynamicComponentContext<any>;

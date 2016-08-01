@@ -1,21 +1,26 @@
 import {Component, OnInit} from "@angular/core";
-import {DockerInputComponent} from "../types/docker-input.component";
-import {InputFromComponent} from "./input-form.component";
 
 @Component({
     selector: 'docker-input-form',
-    directives: [DockerInputComponent, InputFromComponent],
     template: `
-            <input-form [primaryLabel]="'Docker image'" 
-                        [secondaryLabel]="'Docker Repository'"
-                        [inputData]="inputData"
-                        [contentComponent]="contentComponent">
-            </input-form>
+            <form id="baseCommandForm">
+                    <fieldset class="form-group">
+                          <button type="button" class="btn btn-secondary hideBtn">Hide</button>
+                   
+                            <label>Docker image</label>
+                            <label class="secondaryLabel">Docker Repository</label>
+                            
+                           <input name="dockerPull"
+                                type="text"
+                                class="form-control"
+                                id="dockerImage"
+                                [(ngModel)]="dockerPull">
+                    </fieldset>
+            </form>
     `
 })
 export class DockerInputFormComponent implements OnInit {
-    private contentComponent = DockerInputComponent;
-    private inputData: any;
+    private dockerPull: string;
 
     ngOnInit(): void {
 
@@ -23,7 +28,8 @@ export class DockerInputFormComponent implements OnInit {
 
     /*TODO: use actual model type here*/
     public setState(data: any): void {
-            this.inputData = data
+        if (data) {
+            this.dockerPull = data.dockerPull ? data.dockerPull : '';
+        }
     }
-
 }
