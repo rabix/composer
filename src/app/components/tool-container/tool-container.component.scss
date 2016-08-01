@@ -1,21 +1,12 @@
-@import "~bootstrap/scss/mixins";
-@import "~bootstrap/scss/_variables";
-@import "~bootstrap/scss/_forms";
-@import "~bootstrap/scss/_input-group";
-@import "~bootstrap/scss/_tooltip";
-@import "~bootstrap/scss/_buttons";
-@import "~bootstrap/scss/_button-group";
-@import "~bootstrap/scss/_close";
-
 @import "../../../assets/sass/variables";
 
-#viewContainer {
+.viewContainer {
     position: relative;
     display: block;
     height: 100%;
+}
 
-    #toolHeader {
-        height: 9%;
-        padding-top: 10px;
-    }
+.toolHeader {
+    height: 9%;
+    padding-top: 10px;
 }
