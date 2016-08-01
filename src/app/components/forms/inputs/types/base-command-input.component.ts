@@ -38,6 +38,6 @@ export class BaseCommandInputComponent {
             }
         };
         
-        this.guiEditorService.publishEditorEvent(showSidebarEvent);
+        this.guiEditorService.publishSidebarEvent(showSidebarEvent);
     }
 }

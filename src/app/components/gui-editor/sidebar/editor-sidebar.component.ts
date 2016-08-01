@@ -63,11 +63,8 @@ export class EditorSidebarComponent {
     constructor(private guiEditorService: GuiEditorService) {
         const self = this;
 
-        this.guiEditorService.publishedEditorEvents.subscribe((event: GuiEditorEvent) => {
-            if (event.type === GuiEditorEventType.showSidebar) {
-                let showSidebarEvent: ShowSidebarEvent = <ShowSidebarEvent>event;
-                self.showSideBar(showSidebarEvent.data.sidebarType);
-            }
+        this.guiEditorService.publishedSidebarEvents.subscribe((event: ShowSidebarEvent) => {
+            self.showSideBar(event.data.sidebarType);
         });
     }
 

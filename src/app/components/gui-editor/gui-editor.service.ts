@@ -1,17 +1,16 @@
 import { Injectable } from '@angular/core';
 import { Subject }    from 'rxjs/Subject';
-import {GuiEditorEvent} from "./gui-editor.events";
+import {ShowSidebarEvent} from "./gui-editor.events";
 
 @Injectable()
 export class GuiEditorService {
     // Observable sources
-    private guiEditorEvents = new Subject<GuiEditorEvent>();
-
+    private sidebarEvents = new Subject<ShowSidebarEvent>();
+    
     // Observable streams
-    public publishedEditorEvents = this.guiEditorEvents.asObservable();
-
-    // Published events
-    publishEditorEvent(guiEditorEvent: GuiEditorEvent) {
-        this.guiEditorEvents.next(guiEditorEvent);
+    public publishedSidebarEvents = this.sidebarEvents.asObservable();
+    
+    publishSidebarEvent(guiEditorEvent: ShowSidebarEvent) {
+        this.sidebarEvents.next(guiEditorEvent);
     }
 }
