@@ -10,7 +10,7 @@ require ("./input-form.component.scss");
     template: `
                 <form id="baseCommandForm">
                     <fieldset class="form-group">
-                            <a href="#" class="floatRight">Hide</a>
+                          <button type="button" class="btn btn-secondary hideBtn">Hide</button>
                    
                             <label>{{primaryLabel}}</label>
                             <label class="secondaryLabel">{{secondaryLabel}}</label>

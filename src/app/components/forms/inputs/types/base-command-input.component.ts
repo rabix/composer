@@ -13,12 +13,14 @@ require("./base-command-input.component.scss");
                     class="form-control"
                     [(ngModel)]="baseCommand">
                     
-                    <span class="input-group-addon addExpression">
-                        <a href="#" (click)="openExpressionSidebar()">Add expression</a>
-                    </span>
+                <span class="input-group-addon addExpression">
+                    <button type="button" 
+                        class="btn btn-secondary baseCommandFormBtn" 
+                        (click)="openExpressionSidebar()">Add expression</button>
+                </span>
                     
             </div>
-            <a href="#">Add base command</a>
+            <button type="button" class="btn btn-secondary baseCommandFormBtn">Add base command</button>
         `
 })
 export class BaseCommandInputComponent {

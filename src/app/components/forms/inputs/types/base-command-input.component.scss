@@ -1,3 +1,5 @@
+@import "../../../../../assets/sass/variables";
+
 #baseCommandForm {
     /*For some reason the input-group has ad default z-index: 2*/
     .input-group {
@@ -5,12 +7,16 @@
     }
 
     .addExpression {
-        font-size: 0.9em;
         background: #ffffff;
+        padding: 0;
+        width: 20%;
     }
+}
 
-    .closeIcon {
-        cursor: pointer;
-    }
+button.baseCommandFormBtn {
+    padding: 0;
+    border: 0;
+    background: #ffffff;
+    color: $button-blue-text;
 }
 

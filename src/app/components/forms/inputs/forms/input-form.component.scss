@@ -1,9 +1,13 @@
+@import "../../../../../assets/sass/variables";
+
 .secondaryLabel {
     display: block;
     color:  #808080;
     font-size: small;
 }
 
-.floatRight {
+button.hideBtn {
     float: right;
+    color: $button-blue-text;
+    border: 0;
 }
