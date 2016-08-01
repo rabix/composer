@@ -35,11 +35,11 @@ require ("./editor-sidebar.component.scss");
         ])
     ],
     template: `
-                    <div id="rightSidebar" @sidebarState="sidebarState">
-                        <div id="collapseIcon">
+                    <div class="rightSidebar" @sidebarState="sidebarState">
+                        <div class="collapseIcon">
                             <i class="fa fa-lg fa-caret-left" (click)="collapseSidebar()"></i>
                         </div>
-                        <div id="sideBarContent">
+                        <div class="sideBarContent">
                             <!-- TODO: add expression and objects editor -->
                             This is the right sidebar content
                         </div>

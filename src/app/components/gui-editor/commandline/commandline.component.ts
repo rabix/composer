@@ -33,8 +33,7 @@ require ("./commandline.component.scss");
         ])
     ],
     template: `
-            <div id="commandline"
-                id="commandlineBar"
+            <div class="commandlineBar"
                 @commandlineState="commandlineState">
                 {{content}}
             </div>
@@ -49,7 +48,7 @@ require ("./commandline.component.scss");
 })
 export class CommandLineComponent {
     /** Content of the command line */
-    @Input() 
+    @Input()
     private content: string;
 
     /** Sate of the commandline animation */

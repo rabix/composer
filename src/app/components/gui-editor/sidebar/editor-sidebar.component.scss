@@ -1,11 +1,22 @@
-#collapseIcon {
+@import "../../../../assets/sass/variables";
+
+.rightSidebar {
+    right: 0;
+    top: 9%;
+    padding-left: 10px;
+    position: absolute;
+    background: #000000;
+    height: calc(100% - #{$footerButtonsHeight});
+}
+
+.collapseIcon {
     padding-top: 5px;
     height: 100%;
     position: absolute;
     cursor: pointer;
 }
 
-#sideBarContent {
+.sideBarContent {
     padding-top: 5px;
     position: absolute;
     left: 30px;

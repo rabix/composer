@@ -1,29 +1,17 @@
 @import "../../../assets/sass/variables";
 
-#guiEditorContainer {
+.propertyInput {
+    background: #ffffff;
+    width: 60%;
+    display: block;
+    height: 100%;
+    padding: 20px 20px 30px 20px;
+    color: #000000;
+}
 
-    .propertyInput {
-        background: #ffffff;
-        width: 60%;
-        display: block;
-        height: 100%;
-        padding: 20px 20px 30px 20px;
-        color: #000000;
-    }
-
-    #rightSidebar {
-        right: 0;
-        top: 9%;
-        padding-left: 10px;
-        position: absolute;
-        background: #000000;
-        height: calc(100% - #{$footerButtonsHeight});
-    }
-
-    footer {
-        height: $footer-height;
-        width: 100%;
-        position: absolute;
-        bottom: 0;
-    }
+footer {
+    height: $footer-height;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
 }

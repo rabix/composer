@@ -6,7 +6,7 @@ require("./base-command-input.component.scss");
 @Component({
     selector: 'base-command-input',
     template: `
-            <div class="input-group">
+            <div class="input-group baseCommandInputGroup">
                 <input name="baseCommand"
                     type="text" 
                     class="form-control"

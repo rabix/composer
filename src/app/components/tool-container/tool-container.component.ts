@@ -25,10 +25,8 @@ export type ViewMode = "gui" | "json";
         ToolHeaderComponent
     ],
     template: `
-        <div id="viewContainer">
-            <tool-header id="toolHeader" 
-            [viewMode]="viewMode"
-            (viewModeChanged)="setViewMode($event)"></tool-header>
+        <div class="viewContainer">
+            <tool-header class="toolHeader" [viewMode]="viewMode" (viewModeChanged)="setViewMode($event)"></tool-header>
         
             <main>
                 <div [ngSwitch]="viewMode">
