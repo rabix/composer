@@ -1,25 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject }    from 'rxjs/Subject';
-
-export enum SidebarType {
-    expression,
-    editor
-}
-
-export enum GuiEditorEventType {
-    showSidebar
-}
-
-export interface GuiEditorEvent {
-    type: GuiEditorEventType,
-    data: Object
-}
-
-export interface ShowSidebarEvent extends GuiEditorEvent {
-    data: {
-        sidebarType: SidebarType
-    }
-}
+import {GuiEditorEvent} from "./gui-editor.events";
 
 @Injectable()
 export class GuiEditorService {

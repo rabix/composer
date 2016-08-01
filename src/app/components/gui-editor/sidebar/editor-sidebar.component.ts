@@ -9,10 +9,16 @@ import {
     Output
 } from "@angular/core";
 import {NgFor} from "@angular/common";
-import {GuiEditorService, SidebarType, GuiEditorEvent, GuiEditorEventType,ShowSidebarEvent} from "../gui-editor.service";
+import {GuiEditorService} from "../gui-editor.service";
 import {VisibilityState} from "../animation.states";
+import {GuiEditorEvent, GuiEditorEventType, ShowSidebarEvent} from "../gui-editor.events";
 
 require ("./editor-sidebar.component.scss");
+
+export enum SidebarType {
+    expression,
+    editor
+}
 
 /** TODO: make this switch between an expression editor and an object inspector*/
 @Component({

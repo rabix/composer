@@ -1,5 +1,7 @@
 import {Component, Input} from "@angular/core";
-import {GuiEditorService, GuiEditorEventType, SidebarType} from "../../../gui-editor/gui-editor.service";
+import {GuiEditorService} from "../../../gui-editor/gui-editor.service";
+import {GuiEditorEventType, ShowSidebarEvent} from "../../../gui-editor/gui-editor.events";
+import {SidebarType} from "../../../gui-editor/sidebar/editor-sidebar.component";
 
 require("./base-command-input.component.scss");
 
@@ -25,15 +27,17 @@ require("./base-command-input.component.scss");
 export class BaseCommandInputComponent {
     @Input()
     private baseCommand: string;
-    
+
     constructor(private guiEditorService: GuiEditorService) { }
 
     openExpressionSidebar() {
-        this.guiEditorService.publishEditorEvent({
+        let showSidebarEvent: ShowSidebarEvent = {
             type: GuiEditorEventType.showSidebar,
             data: {
                 sidebarType: SidebarType.expression
             }
-        });
+        };
+        
+        this.guiEditorService.publishEditorEvent(showSidebarEvent);
     }
 }
