@@ -8,7 +8,6 @@ import {
     EventEmitter,
     Output
 } from "@angular/core";
-import {NgFor} from "@angular/common";
 import {GuiEditorService} from "../gui-editor.service";
 import {VisibilityState} from "../animation.states";
 import {ShowSidebarEvent} from "../gui-editor.events";
@@ -23,7 +22,6 @@ export enum SidebarType {
 /** TODO: make this switch between an expression editor and an object inspector*/
 @Component({
     selector: "editor-sidebar",
-    directives: [NgFor],
     animations: [
         trigger("sidebarState", [
             state("visible", style({

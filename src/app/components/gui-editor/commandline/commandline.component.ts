@@ -7,7 +7,6 @@ import {
     trigger,
     Input
 } from "@angular/core";
-import {NgFor} from "@angular/common";
 import {VisibilityState} from "../animation.states";
 
 require ("./commandline.component.scss");
@@ -15,7 +14,6 @@ require ("./commandline.component.scss");
 /** TODO: make this switch between an expression editor and an object inspector*/
 @Component({
     selector: "commandline",
-    directives: [NgFor],
     animations: [
         trigger("commandlineState", [
             state("visible", style({

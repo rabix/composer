@@ -7,7 +7,6 @@ import {
     state,
     transition
 } from "@angular/core";
-import {NgFor} from "@angular/common";
 import {FileModel} from "../../store/models/fs.models";
 import {PropertyInputComponent} from "../forms/inputs/property-input.component";
 import {GuiEditorService} from "./gui-editor.service";
@@ -20,7 +19,7 @@ require("./gui-editor.component.scss");
 @Component({
     selector: "gui-editor",
     providers: [GuiEditorService],
-    directives: [NgFor, PropertyInputComponent, EditorSidebarComponent, CommandLineComponent],
+    directives: [PropertyInputComponent, EditorSidebarComponent, CommandLineComponent],
     animations: [
         trigger("propertyPosition", [
             state("left", style({
