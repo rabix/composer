@@ -10,9 +10,11 @@ import {
     ViewContainerRef,
     Injector
 } from "@angular/core";
-import {Chap} from "./../../helpers/chap";
+import * as Chap from "../../helpers/chap";
 import {ModalService} from "./modal.service";
 import {Subscription, Observable, BehaviorSubject} from "rxjs/Rx";
+import {assignable} from "../../decorators";
+
 
 require("./modal.component.scss");
 
@@ -40,6 +42,7 @@ export interface ModalOptions<T> {
 })
 export class ModalComponent {
 
+    @assignable()
     @HostBinding("class.backdrop")
     private backdrop: boolean;
 
@@ -50,12 +53,15 @@ export class ModalComponent {
     private modalWindow: ViewContainerRef;
 
     /** Should the modal clouse when you click on the area outside of it? */
+    @assignable()
     public closeOnOutsideClick: boolean;
 
     /** Title of the modal window */
+    @assignable("next")
     public title: BehaviorSubject<string>;
 
     /** When you press the "ESC" key, should the modal be closed? */
+    @assignable()
     public closeOnEscape: boolean;
 
     /** Holds the ComponentRef object of a component that is injected and rendered inside the modal */
@@ -124,14 +130,14 @@ export class ModalComponent {
 
     public configure<T>(config: ModalOptions<T>) {
         this.backdrop = config.backdrop;
-        Chap.applyParams(config, this);
+        Chap.Component.assign(config, this);
     }
 
     public produce<T>(factory: ComponentFactory<T>, componentState?: Object): ComponentRef<T> {
 
         this.nestedComponentRef = this.nestedComponentContainer.createComponent(factory, 0, this.injector);
         if (typeof componentState === "object") {
-            Chap.applyParams(componentState, this.nestedComponentRef.instance);
+            Chap.Component.assign(componentState, this.nestedComponentRef.instance);
         }
 
         Observable.of("Reposition me right away!")

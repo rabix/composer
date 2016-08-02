@@ -2,6 +2,7 @@ import {Injectable, ComponentResolver, ViewContainerRef, ComponentRef} from "@an
 import {ModalComponent, ModalOptions} from "./modal.component";
 import {ConfirmComponent} from "./common/confirm.component";
 import {Subject} from "rxjs";
+
 @Injectable()
 export class ModalService {
 

@@ -1,17 +1,18 @@
+import {AlertComponent} from "./alert.component";
+import {assignable} from "../../decorators";
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {Component, ViewChild} from "@angular/core";
+import {CreateFileRequestAction} from "../../action-events";
+import {CwlFileTemplate, CwlFileTemplateType} from "../../types/file-template.type";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {FileName} from "../forms/models/file-name";
+import {InputComponent} from "../forms/elements/input.component";
+import {ModalService} from "../modal";
 import {NgStyle, ControlGroup} from "@angular/common";
+import {Observable, Subscription} from "rxjs";
 import {RadioButtonComponent} from "../forms/elements/radio-button.component";
 import {RadioGroupComponent, GroupItem} from "../forms/elements/radio-group.component";
 import {Validators, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES, FormBuilder, FormGroup} from "@angular/forms";
-import {CreateFileRequestAction} from "../../action-events/index";
-import {AlertComponent} from "./alert.component";
-import {InputComponent} from "../forms/elements/input.component";
-import {Observable, Subscription} from "rxjs";
-import {ModalService} from "../modal";
-import {CwlFileTemplate, CwlFileTemplateType} from "../../types/file-template.type";
 
 @Component({
     selector: 'new-file-modal',
@@ -57,6 +58,7 @@ import {CwlFileTemplate, CwlFileTemplateType} from "../../types/file-template.ty
 export class NewFileModalComponent {
 
     /** Base directory path prefix for newly created file */
+    @assignable()
     public basePath: string;
 
     /** Switch for showing the cog overlay, is active between submitting the form and the API response */

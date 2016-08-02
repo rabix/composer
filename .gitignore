@@ -51,9 +51,6 @@ npm-debug.log
 /dist/**
 .webpack.json
 
-# Doc #
-/doc/
-
 # IDE #
 .idea/
 *.swp

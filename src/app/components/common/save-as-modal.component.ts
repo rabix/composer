@@ -1,15 +1,15 @@
+import {AlertComponent} from "./alert.component";
+import {assignable} from "../../decorators";
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {Component} from "@angular/core";
+import {CopyFileRequestAction} from "../../action-events";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
-import {NgStyle, ControlGroup, FormBuilder} from "@angular/common";
-import {Validators, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
-import {AlertComponent} from "./alert.component";
-import {InputComponent} from "../forms/elements/input.component";
-import {Observable} from "rxjs";
-import {WorkspaceService} from "../workspace/workspace.service";
-import {CopyFileRequestAction} from "../../action-events/index";
-import {ModalService} from "../modal";
 import {FileName} from "../forms/models/file-name";
+import {InputComponent} from "../forms/elements/input.component";
+import {ModalService} from "../modal";
+import {NgStyle, ControlGroup, FormBuilder} from "@angular/common";
+import {Observable} from "rxjs";
+import {Validators, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 
 @Component({
     selector: 'new-file-modal',
@@ -45,6 +45,7 @@ import {FileName} from "../forms/models/file-name";
 export class SaveAsModalComponent {
 
     /** Path of the source file that should be copied */
+    @assignable()
     public filePath: string;
 
     /** Toggles the cog loader */
@@ -59,8 +60,6 @@ export class SaveAsModalComponent {
     constructor(private formBuilder: FormBuilder,
                 private eventHub: EventHubService,
                 private modal: ModalService) {
-
-        this.filePath = undefined;
 
         this.newFileForm = formBuilder.group({
             name: ["", Validators.compose([Validators.required, Validators.minLength(1)])]
