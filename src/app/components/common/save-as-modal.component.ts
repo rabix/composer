@@ -62,7 +62,7 @@ export class SaveAsModalComponent {
                 private modal: ModalService) {
 
         this.newFileForm = formBuilder.group({
-            name: ["", Validators.compose([Validators.required, Validators.minLength(1)])],
+            name: ["", Validators.compose([Validators.required, Validators.minLength(1)])]
         });
 
         this.newFileForm.valueChanges.subscribe(_ => this.error = undefined);
