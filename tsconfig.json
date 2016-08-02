@@ -6,12 +6,7 @@
         "experimentalDecorators": true,
         "sourceMap": true,
         "noEmitHelpers": true,
-        "lib": [
-            "es6",
-            "dom",
-            "es7",
-            "webworker"
-        ],
+        "lib": ["dom", "es6"],
         "types": [
             "core-js",
             "jasmine",
@@ -19,20 +14,14 @@
             "jquery",
             "ace",
             "socket.io-client"
-        ],
-        "baseUrl": "./src"
+        ]
     },
     "exclude": [
-        "node_modules",
-        "typings/main.d.ts",
-        "typings/main"
+        "./node_modules"
     ],
     "filesGlob": [
         "./src/**/*.ts",
-        "./test/**/*.ts",
-        "!./node_modules/**/*.ts",
-        "src/custom-typings.d.ts",
-        "typings/browser.d.ts"
+        "node_modules/zone.js/dist/zone.js.d.ts"
     ],
     "awesomeTypescriptLoaderOptions": {
         "resolveGlobs": true,
