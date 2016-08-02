@@ -19,7 +19,7 @@ require("./tool-header.component.scss");
                         [ngClass]="{selected: viewMode === 'json'}"
                         (click)="changeViewMode('json')">JSON</button>
 
-                <button type="button toolHeaderBtn"
+                <button type="button"
                         class="btn btn-secondary btn-sm toolHeaderBtn"
                         [ngClass]="{selected: viewMode === 'gui'}"
                         (click)="changeViewMode('gui')">GUI</button>

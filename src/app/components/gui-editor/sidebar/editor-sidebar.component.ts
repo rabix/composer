@@ -59,10 +59,8 @@ export class EditorSidebarComponent {
     private sidebarState: VisibilityState = "hidden";
 
     constructor(private guiEditorService: GuiEditorService) {
-        const self = this;
-
         this.guiEditorService.publishedSidebarEvents.subscribe((event: ShowSidebarEvent) => {
-            self.showSideBar(event.data.sidebarType);
+            this.showSideBar(event.data.sidebarType);
         });
     }
 
