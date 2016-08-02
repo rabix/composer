@@ -1,7 +1,7 @@
 import {SidebarType} from "./sidebar/editor-sidebar.component";
 
 export enum GuiEditorEventType {
-    showSidebar
+    ShowSidebar
 }
 
 export interface ShowSidebarEvent {
