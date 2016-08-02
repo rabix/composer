@@ -6,14 +6,14 @@ describe("FileHelper", () => {
     describe("relativeToAbsolutePath()", () => {
 
         it("should convert a relative path to an absolute", () => {
-            let result = FileHelper.relativeToAbsolutePath("./asd.json", "/Users/mate/testws/");
-            expect(result).toEqual("/Users/mate/testws/asd.json");
+            const result1 = FileHelper.relativeToAbsolutePath("./asd.json", "/Users/mate/testws/");
+            expect(result1).toEqual("/Users/mate/testws/asd.json");
 
-            let result = FileHelper.relativeToAbsolutePath("asd.json", "/Users/mate/testws/");
-            expect(result).toEqual("/Users/mate/testws/asd.json");
+            const result2 = FileHelper.relativeToAbsolutePath("asd.json", "/Users/mate/testws/");
+            expect(result2).toEqual("/Users/mate/testws/asd.json");
 
-            let result = FileHelper.relativeToAbsolutePath("../../asd.json", "/Users/mate/testws/");
-            expect(result).toEqual("/Users/asd.json");
+            const result3 = FileHelper.relativeToAbsolutePath("../../asd.json", "/Users/mate/testws/");
+            expect(result3).toEqual("/Users/asd.json");
         });
 
     });
