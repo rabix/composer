@@ -7,6 +7,13 @@
 }
 
 button.hideBtn {
+    font-size: 0.9em;
+
+    /* Large screens */
+    @media only screen  and (min-width : 1824px) {
+        font-size: 1em;
+    }
+
     float: right;
     color: $button-blue-text;
     border: 0;

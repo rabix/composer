@@ -1,12 +1,12 @@
 @import "../../../../assets/sass/variables";
 
-.rightSidebar {
+.editorSidebarComponent {
     right: 0;
-    top: 9%;
+    top: 0;
     padding-left: 10px;
     position: absolute;
     background: #000000;
-    height: calc(100% - #{$footerButtonsHeight});
+    height: calc(100% - #{$editor-footer-height});
 }
 
 .collapseIcon {

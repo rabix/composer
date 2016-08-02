@@ -34,20 +34,19 @@ require("./gui-editor.component.scss");
         ])
     ],
     template: `
-            <main>
-                <property-input @propertyPosition="propertyPosition"
-                     *ngFor="let property of mockInputProperties"
-                     class="propertyInput" 
-                     [type]="property.type" 
-                     [model]="property.data">
-                </property-input>
-                
-                <editor-sidebar (sidebarVisibility)="togglePropertyPosition($event)"></editor-sidebar>
-            </main>
-           
-            <footer>
+          
+            <property-input @propertyPosition="propertyPosition"
+                 *ngFor="let property of mockInputProperties"
+                 class="propertyInput" 
+                 [type]="property.type" 
+                 [model]="property.data">
+            </property-input>
+            
+            <editor-sidebar (sidebarVisibility)="togglePropertyPosition($event)"></editor-sidebar>
+          
+            <div class="footer">
                 <commandline [content]="commandlineContent"></commandline>
-            </footer>
+            </div>
     `
 })
 export class GuiEditorComponent {

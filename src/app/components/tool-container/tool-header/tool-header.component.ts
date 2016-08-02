@@ -13,21 +13,19 @@ require("./tool-header.component.scss");
     selector: "tool-header",
     directives: [NgSelectOption],
     template: `
-        <header class="toolHeader">
-                <span class="guiJsonButtons">
-                    <button type="button"
-                            class="btn btn-secondary btn-sm selected toolHeaderBtn"
-                            [ngClass]="{selected: viewMode === 'json'}"
-                            (click)="changeViewMode('json')">JSON</button>
+            <span class="guiJsonButtons">
+                <button type="button"
+                        class="btn btn-secondary btn-sm selected toolHeaderBtn"
+                        [ngClass]="{selected: viewMode === 'json'}"
+                        (click)="changeViewMode('json')">JSON</button>
 
-                    <button type="button toolHeaderBtn"
-                            class="btn btn-secondary btn-sm toolHeaderBtn"
-                            [ngClass]="{selected: viewMode === 'gui'}"
-                            (click)="changeViewMode('gui')">GUI</button>
-                </span>
+                <button type="button toolHeaderBtn"
+                        class="btn btn-secondary btn-sm toolHeaderBtn"
+                        [ngClass]="{selected: viewMode === 'gui'}"
+                        (click)="changeViewMode('gui')">GUI</button>
+            </span>
     
             <button type="button" class="btn btn-secondary btn-sm saveButton toolHeaderBtn">Save</button>
-        </header>
     `
 })
 export class ToolHeaderComponent {

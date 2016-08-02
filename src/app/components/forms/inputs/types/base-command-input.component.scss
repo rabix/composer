@@ -12,6 +12,13 @@
 }
 
 .btn-secondary.baseCommandFormBtn {
+    font-size: 0.9em;
+
+    /* Large screens */
+    @media only screen  and (min-width : 1824px) {
+        font-size: 1em;
+    }
+
     padding: 0;
     border: 0;
     background: #ffffff;

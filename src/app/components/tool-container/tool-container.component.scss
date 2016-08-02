@@ -1,12 +1,22 @@
 @import "../../../assets/sass/variables";
 
-.viewContainer {
+.toolContainerComponent {
     position: relative;
     display: block;
     height: 100%;
+    width: 100%;
+
+    .mainContent {
+        position: relative;
+        min-height: 500px;
+        height: calc(100% - #{$editor-footer-height} - #{$editor-padding-top});
+    }
 }
 
 .toolHeader {
-    height: 9%;
-    padding-top: 10px;
+    width: 100%;
+    height: $editor-header-height;
+    padding-top: $editor-padding-top;
+    position: relative;
+    display: block;
 }

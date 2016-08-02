@@ -11,7 +11,7 @@ import {
 import {NgFor} from "@angular/common";
 import {GuiEditorService} from "../gui-editor.service";
 import {VisibilityState} from "../animation.states";
-import {GuiEditorEvent, GuiEditorEventType, ShowSidebarEvent} from "../gui-editor.events";
+import {ShowSidebarEvent} from "../gui-editor.events";
 
 require ("./editor-sidebar.component.scss");
 
@@ -41,7 +41,7 @@ export enum SidebarType {
         ])
     ],
     template: `
-                    <div class="rightSidebar" @sidebarState="sidebarState">
+                    <div class="editorSidebarComponent" @sidebarState="sidebarState">
                         <div class="collapseIcon">
                             <i class="fa fa-lg fa-caret-left" (click)="collapseSidebar()"></i>
                         </div>
