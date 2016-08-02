@@ -5,7 +5,22 @@
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "sourceMap": true,
-        "noEmitHelpers": true
+        "noEmitHelpers": true,
+        "lib": [
+            "es6",
+            "dom",
+            "es7",
+            "webworker"
+        ],
+        "types": [
+            "core-js",
+            "jasmine",
+            "node",
+            "jquery",
+            "ace",
+            "socket.io-client"
+        ],
+        "baseUrl": "./src"
     },
     "exclude": [
         "node_modules",
