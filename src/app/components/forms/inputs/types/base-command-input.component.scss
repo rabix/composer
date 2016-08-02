@@ -1,17 +1,17 @@
 @import "../../../../../assets/sass/variables";
 
 /*For some reason the input-group has ad default z-index: 2*/
-.baseCommandInputGroup {
+.base-command-input-group {
     z-index: 0;
 
-    .addExpression {
+    .add-expression {
         background: #ffffff;
         padding: 0;
         width: 20%;
     }
 }
 
-.btn-secondary.baseCommandFormBtn {
+.btn-secondary.base-command-form-btn {
     font-size: 0.9em;
 
     /* Large screens */

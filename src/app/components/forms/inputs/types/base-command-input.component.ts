@@ -8,20 +8,20 @@ require("./base-command-input.component.scss");
 @Component({
     selector: 'base-command-input',
     template: `
-            <div class="input-group baseCommandInputGroup">
+            <div class="input-group base-command-input-group">
                 <input name="baseCommand"
                     type="text" 
                     class="form-control"
                     [(ngModel)]="baseCommand">
                     
-                <span class="input-group-addon addExpression">
+                <span class="input-group-addon add-expression">
                     <button type="button" 
-                        class="btn btn-secondary baseCommandFormBtn" 
+                        class="btn btn-secondary base-command-form-btn" 
                         (click)="openExpressionSidebar()">Add expression</button>
                 </span>
                     
             </div>
-            <button type="button" class="btn btn-secondary baseCommandFormBtn">Add base command</button>
+            <button type="button" class="btn btn-secondary base-command-form-btn">Add base command</button>
         `
 })
 export class BaseCommandInputComponent {
@@ -37,7 +37,7 @@ export class BaseCommandInputComponent {
                 sidebarType: SidebarType.expression
             }
         };
-        
+
         this.guiEditorService.publishSidebarEvent(showSidebarEvent);
     }
 }

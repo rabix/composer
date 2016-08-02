@@ -1,6 +1,6 @@
 @import "../../../../assets/sass/variables";
 
-.editorSidebarComponent {
+.editor-sidebar-component {
     right: 0;
     top: 0;
     padding-left: 10px;
@@ -9,14 +9,14 @@
     height: calc(100% - #{$editor-footer-height});
 }
 
-.collapseIcon {
+.collapse-icon {
     padding-top: 5px;
     height: 100%;
     position: absolute;
     cursor: pointer;
 }
 
-.sideBarContent {
+.sidebar-content {
     padding-top: 5px;
     position: absolute;
     left: 30px;

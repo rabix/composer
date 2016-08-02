@@ -1,14 +1,16 @@
 import {Component, OnInit} from "@angular/core";
 
+require("./form.components.scss");
+
 @Component({
     selector: 'docker-input-form',
     template: `
             <form>
                 <fieldset class="form-group">
-                      <button type="button" class="btn btn-secondary hideBtn">Hide</button>
+                      <button type="button" class="btn btn-secondary hide-btn">Hide</button>
                
                         <label>Docker image</label>
-                        <label class="secondaryLabel">Docker Repository</label>
+                        <label class="secondary-label">Docker Repository</label>
                         
                        <input name="dockerPull"
                             type="text"

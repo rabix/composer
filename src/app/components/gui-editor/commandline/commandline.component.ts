@@ -31,12 +31,12 @@ require ("./commandline.component.scss");
         ])
     ],
     template: `
-            <div class="commandLineComponent"
+            <div class="commandline-component"
                 @commandlineState="commandlineState">
                 {{content}}
             </div>
             
-            <div class="footerButtons">
+            <div class="footer-buttons">
                 <button type="button" class="btn btn-secondary btn-sm">Issues</button>
                 <button type="button" 
                 class="btn btn-secondary btn-sm"

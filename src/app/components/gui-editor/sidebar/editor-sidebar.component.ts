@@ -39,11 +39,11 @@ export enum SidebarType {
         ])
     ],
     template: `
-                    <div class="editorSidebarComponent" @sidebarState="sidebarState">
-                        <div class="collapseIcon">
+                    <div class="editor-sidebar-component" @sidebarState="sidebarState">
+                        <div class="collapse-icon">
                             <i class="fa fa-lg fa-caret-left" (click)="collapseSidebar()"></i>
                         </div>
-                        <div class="sideBarContent">
+                        <div class="sidebar-content">
                             <!-- TODO: add expression and objects editor -->
                             This is the right sidebar content
                         </div>

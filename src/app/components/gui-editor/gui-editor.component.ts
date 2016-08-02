@@ -36,7 +36,7 @@ require("./gui-editor.component.scss");
           
             <property-input @propertyPosition="propertyPosition"
                  *ngFor="let property of mockInputProperties"
-                 class="propertyInput" 
+                 class="property-input" 
                  [type]="property.type" 
                  [model]="property.data">
             </property-input>
