@@ -13,6 +13,7 @@ import {FileModel} from "../../store/models/fs.models";
 import {GuiEditorService} from "./gui-editor.service";
 import {EditorSidebarComponent} from "./sidebar/editor-sidebar.component";
 import {FormPosition, VisibilityState} from "./animation.states";
+import {BehaviorSubject} from "rxjs/Rx";
 import {CommandLineComponent} from "./commandline/commandline.component";
 import {DockerInputFormComponent} from "../forms/inputs/forms/docker-input-form.component";
 import {BaseCommandFormComponent} from "../forms/inputs/forms/base-command-form.component";
@@ -56,7 +57,7 @@ require("./gui-editor.component.scss");
                                 [baseCommand]="'echo'"></base-command-form>
             </form>
                   
-            <editor-sidebar (sidebarVisibility)="togglePropertyPosition($event)"></editor-sidebar>
+            <editor-sidebar [sidebarVisibility]="sidebarVisibility"></editor-sidebar>
           
             <div class="footer">
                 <commandline [content]="commandlineContent"></commandline>
@@ -77,11 +78,14 @@ export class GuiEditorComponent {
     /** ControlGroup that encapsulates the validation for all the nested forms */
     private guiEditorFromControl: ControlGroup;
 
+    private sidebarVisibility: BehaviorSubject<VisibilityState>;
+
     constructor(private formBuilder: FormBuilder) {
         this.guiEditorFromControl = this.formBuilder.group({});
-    }
+        this.sidebarVisibility = new BehaviorSubject<VisibilityState>("hidden");
 
-    togglePropertyPosition(sidebarVisibility: VisibilityState) {
-        this.formPosition = sidebarVisibility === "hidden" ? "center": "left";
+        this.sidebarVisibility.subscribe((state: VisibilityState) => {
+            this.formPosition = state === "hidden" ? "center": "left";
+        });
     }
 }

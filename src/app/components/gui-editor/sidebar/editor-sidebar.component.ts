@@ -1,16 +1,17 @@
 import {
     Component,
+    OnInit,
     style,
     animate,
     state,
     transition,
     trigger,
-    EventEmitter,
-    Output
+    Input
 } from "@angular/core";
 import {GuiEditorService} from "../gui-editor.service";
 import {VisibilityState} from "../animation.states";
 import {ShowSidebarEvent} from "../gui-editor.events";
+import {BehaviorSubject} from "rxjs/Rx";
 
 require ("./editor-sidebar.component.scss");
 
@@ -50,13 +51,13 @@ export enum SidebarType {
                     </div>
     `
 })
-export class EditorSidebarComponent {
+export class EditorSidebarComponent implements OnInit {
     /** Emit changes of the sidebar animation to the parent component */
-    @Output()
-    private sidebarVisibility = new EventEmitter();
+    @Input()
+    private sidebarVisibility: BehaviorSubject<VisibilityState>;
 
     /** State of the sidebar animation */
-    private sidebarState: VisibilityState = "hidden";
+    private sidebarState: VisibilityState;
 
     constructor(private guiEditorService: GuiEditorService) {
         this.guiEditorService.publishedSidebarEvents.subscribe((event: ShowSidebarEvent) => {
@@ -64,13 +65,17 @@ export class EditorSidebarComponent {
         });
     }
 
-    showSideBar(sidebarType: SidebarType): void {
-        this.sidebarState = "visible";
-        this.sidebarVisibility.emit(this.sidebarState);
+    ngOnInit(): void {
+        this.sidebarVisibility.subscribe((state: VisibilityState) => {
+            this.sidebarState = state;
+        });
     }
 
-    collapseSidebar() {
-        this.sidebarState = "hidden";
-        this.sidebarVisibility.emit(this.sidebarState);
+    showSideBar(sidebarType: SidebarType): void {
+        this.sidebarVisibility.next("visible");
+    }
+
+    collapseSidebar(): void {
+        this.sidebarVisibility.next("hidden");
     }
 }
