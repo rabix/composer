@@ -42,7 +42,6 @@ export class BaseCommandInputComponent {
 
     openExpressionSidebar() {
         let showSidebarEvent: ShowSidebarEvent = {
-            type: GuiEditorEventType.ShowSidebar,
             data: {
                 sidebarType: SidebarType.expression
             }
