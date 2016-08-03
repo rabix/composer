@@ -7,9 +7,9 @@ import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {FileName} from "../forms/models/file-name";
 import {InputComponent} from "../forms/elements/input.component";
 import {ModalService} from "../modal";
-import {NgStyle, ControlGroup, FormBuilder} from "@angular/common";
+import {NgStyle} from "@angular/common";
 import {Observable} from "rxjs";
-import {Validators, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
+import {Validators, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES, FormBuilder, FormGroup} from "@angular/forms";
 
 @Component({
     selector: 'new-file-modal',
@@ -55,7 +55,7 @@ export class SaveAsModalComponent {
     private error: {[message: string]: string};
 
     /** New file destination entry form */
-    private newFileForm: ControlGroup;
+    private newFileForm: FormGroup;
 
     constructor(private formBuilder: FormBuilder,
                 private eventHub: EventHubService,
@@ -68,7 +68,7 @@ export class SaveAsModalComponent {
         this.newFileForm.valueChanges.subscribe(_ => this.error = undefined);
     }
 
-    private onSubmit(form: ControlGroup) {
+    private onSubmit(form: FormGroup) {
 
         // If the overlay is shown right away, user working locally would just see
         // flashing darkening over the modal, so avoid that, but keep the delay low enough
