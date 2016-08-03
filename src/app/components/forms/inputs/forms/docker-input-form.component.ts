@@ -1,6 +1,5 @@
 import {Component, Input, OnInit} from "@angular/core";
-import {FormBuilder, ControlGroup} from "@angular/common";
-import {Validators, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
+import {Validators, FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 
 require("./form.components.scss");
 
@@ -34,9 +33,9 @@ export class DockerInputFormComponent implements OnInit {
 
     /** The parent forms control group */
     @Input()
-    private control: ControlGroup;
+    private group: FormGroup;
 
-    private dockerInputForm: ControlGroup;
+    private dockerInputForm: FormGroup;
 
     constructor(private formBuilder: FormBuilder) {
         this.dockerInputForm = this.formBuilder.group({
@@ -45,6 +44,6 @@ export class DockerInputFormComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.control.addControl('dockerInput', this.dockerInputForm.controls['dockerInput']);
+        this.group.addControl('dockerInput', this.dockerInputForm.controls['dockerInput']);
     }
 }

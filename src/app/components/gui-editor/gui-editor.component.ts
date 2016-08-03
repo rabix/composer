@@ -7,8 +7,7 @@ import {
     state,
     transition
 } from "@angular/core";
-import {FormBuilder, ControlGroup} from "@angular/common";
-import {REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
+import {FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 import {FileModel} from "../../store/models/fs.models";
 import {GuiEditorService} from "./gui-editor.service";
 import {EditorSidebarComponent} from "./sidebar/editor-sidebar.component";
@@ -44,17 +43,18 @@ require("./gui-editor.component.scss");
         ])
     ],
     template: `
-            <form (ngSubmit)="onSubmit()"  [formGroup]="guiEditorFromControl">
+            <form (ngSubmit)="onSubmit()"  [formGroup]="guiEditorGroup">
             
                 <docker-input-form @formPosition="formPosition"
                                 class="input-form" 
-                                [control]="guiEditorFromControl"
+                                [group]="guiEditorGroup"
                                 [dockerPull]="'some.docker.image.com'"></docker-input-form>
                                 
                 <base-command-form @formPosition="formPosition"
                                 class="input-form" 
-                                [control]="guiEditorFromControl"
+                                [group]="guiEditorGroup"
                                 [baseCommand]="'echo'"></base-command-form>
+                                
             </form>
                   
             <editor-sidebar [sidebarVisibility]="sidebarVisibility"></editor-sidebar>
@@ -76,12 +76,12 @@ export class GuiEditorComponent {
     private commandlineContent: string = "This is the command line";
 
     /** ControlGroup that encapsulates the validation for all the nested forms */
-    private guiEditorFromControl: ControlGroup;
+    private guiEditorGroup: FormGroup;
 
     private sidebarVisibility: BehaviorSubject<VisibilityState>;
 
     constructor(private formBuilder: FormBuilder) {
-        this.guiEditorFromControl = this.formBuilder.group({});
+        this.guiEditorGroup = this.formBuilder.group({});
         this.sidebarVisibility = new BehaviorSubject<VisibilityState>("hidden");
 
         this.sidebarVisibility.subscribe((state: VisibilityState) => {

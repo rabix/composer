@@ -1,6 +1,5 @@
 import {Component, Input, OnInit} from "@angular/core";
-import {FormBuilder, ControlGroup} from "@angular/common";
-import {Validators, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
+import {Validators, FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 import {BaseCommandInputComponent} from "../types/base-command-input.component";
 
 require("./form.components.scss");
@@ -30,11 +29,11 @@ export class BaseCommandFormComponent implements OnInit {
     @Input()
     private baseCommand: string;
 
-    /** The parent forms control group */
+    /** The parent forms group */
     @Input()
-    private control: ControlGroup;
+    private group: FormGroup;
 
-    private baseCommandForm: ControlGroup;
+    private baseCommandForm: FormGroup;
 
     constructor(private formBuilder: FormBuilder) {
         this.baseCommandForm = this.formBuilder.group({
@@ -43,6 +42,6 @@ export class BaseCommandFormComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.control.addControl('baseCommand', this.baseCommandForm.controls['baseCommand']);
+        this.group.addControl('baseCommand', this.baseCommandForm.controls['baseCommand']);
     }
 }
