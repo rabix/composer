@@ -1,4 +1,5 @@
 import {Component, Input} from "@angular/core";
+import {FormControl, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 import {GuiEditorService} from "../../../gui-editor/gui-editor.service";
 import {GuiEditorEventType, ShowSidebarEvent} from "../../../gui-editor/gui-editor.events";
 import {SidebarType} from "../../../gui-editor/sidebar/editor-sidebar.component";
@@ -7,11 +8,16 @@ require("./base-command-input.component.scss");
 
 @Component({
     selector: 'base-command-input',
+    directives: [
+        REACTIVE_FORM_DIRECTIVES,
+        FORM_DIRECTIVES
+    ],
     template: `
             <div class="input-group base-command-input-group">
                 <input name="baseCommand"
                     type="text" 
                     class="form-control"
+                    [formControl]="inputControl"
                     [(ngModel)]="baseCommand">
                     
                 <span class="input-group-addon add-expression">
@@ -27,6 +33,10 @@ require("./base-command-input.component.scss");
 export class BaseCommandInputComponent {
     @Input()
     private baseCommand: string;
+
+    /** The form control passed from the parent */
+    @Input()
+    private inputControl: FormControl;
 
     constructor(private guiEditorService: GuiEditorService) { }
 

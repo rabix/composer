@@ -7,21 +7,31 @@ import {
     state,
     transition
 } from "@angular/core";
+import {FormBuilder, ControlGroup} from "@angular/common";
+import {REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 import {FileModel} from "../../store/models/fs.models";
-import {PropertyInputComponent} from "../forms/inputs/property-input.component";
 import {GuiEditorService} from "./gui-editor.service";
 import {EditorSidebarComponent} from "./sidebar/editor-sidebar.component";
-import {PropertyPosition, VisibilityState} from "./animation.states";
+import {FormPosition, VisibilityState} from "./animation.states";
 import {CommandLineComponent} from "./commandline/commandline.component";
+import {DockerInputFormComponent} from "../forms/inputs/forms/docker-input-form.component";
+import {BaseCommandFormComponent} from "../forms/inputs/forms/base-command-form.component";
 
 require("./gui-editor.component.scss");
 
 @Component({
     selector: "gui-editor",
     providers: [GuiEditorService],
-    directives: [PropertyInputComponent, EditorSidebarComponent, CommandLineComponent],
+    directives: [
+        DockerInputFormComponent,
+        BaseCommandFormComponent,
+        EditorSidebarComponent,
+        CommandLineComponent,
+        REACTIVE_FORM_DIRECTIVES,
+        FORM_DIRECTIVES
+    ],
     animations: [
-        trigger("propertyPosition", [
+        trigger("formPosition", [
             state("left", style({
                 margin: '20px 0 0 0'
             })),
@@ -33,14 +43,19 @@ require("./gui-editor.component.scss");
         ])
     ],
     template: `
-          
-            <property-input @propertyPosition="propertyPosition"
-                 *ngFor="let property of mockInputProperties"
-                 class="property-input" 
-                 [type]="property.type" 
-                 [model]="property.data">
-            </property-input>
+            <form (ngSubmit)="onSubmit()"  [formGroup]="guiEditorFromControl">
             
+                <docker-input-form @formPosition="formPosition"
+                                class="input-form" 
+                                [control]="guiEditorFromControl"
+                                [dockerPull]="'some.docker.image.com'"></docker-input-form>
+                                
+                <base-command-form @formPosition="formPosition"
+                                class="input-form" 
+                                [control]="guiEditorFromControl"
+                                [baseCommand]="'echo'"></base-command-form>
+            </form>
+                  
             <editor-sidebar (sidebarVisibility)="togglePropertyPosition($event)"></editor-sidebar>
           
             <div class="footer">
@@ -54,38 +69,19 @@ export class GuiEditorComponent {
     private file: FileModel;
 
     /** Positions of the listed properties */
-    propertyPosition: PropertyPosition = "center";
+    private formPosition: FormPosition = "center";
 
     /* TODO: generate the commandline */
-    commandlineContent: string = "This is the command line";
+    private commandlineContent: string = "This is the command line";
 
-    /* TODO: get tool properties for display, probably create a service that returns a list of properties based on the tool */
-    mockInputProperties: Array<any> = [
-        {
-            type: "DockerRequirement",
-            data: {
-                dockerPull: "some.docker.image.com"
-            }
-        },
-        {
-            type: "baseCommand",
-            data: {
-                command: "echo"
-            }
-        }
-    ];
-    /* mockInputProperties: Array<any> = [
-     {
-     type: "DockerRequirement",
-     data: {}
-     },
-     {
-     type: "baseCommand",
-     data: {}
-     }
-     ];*/
+    /** ControlGroup that encapsulates the validation for all the nested forms */
+    private guiEditorFromControl: ControlGroup;
+
+    constructor(private formBuilder: FormBuilder) {
+        this.guiEditorFromControl = this.formBuilder.group({});
+    }
 
     togglePropertyPosition(sidebarVisibility: VisibilityState) {
-        this.propertyPosition = sidebarVisibility === "hidden" ? "center": "left";
+        this.formPosition = sidebarVisibility === "hidden" ? "center": "left";
     }
 }
