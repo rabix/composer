@@ -2,11 +2,11 @@ import {Observable} from "rxjs/Observable";
 import {Subscription} from "rxjs/Subscription";
 import {ACE_MODES_MAP} from "./code-editor-modes-map";
 import {FileModel} from "../../store/models/fs.models";
-import {EventTargetLike} from "rxjs/observable/FromEventObservable";
 import Editor = AceAjax.Editor;
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import {ValidationResponse, WebWorkerService} from "../../services/webWorker/web-worker.service";
+import {EventEmitter} from "events";
 
 export class CodeEditor {
     /** Holds an instance of the AceEditor */
@@ -47,7 +47,7 @@ export class CodeEditor {
                 })
         );
 
-        this.contentChanges = Observable.fromEvent(this.editor as EventTargetLike, "change")
+        this.contentChanges = Observable.fromEvent(this.editor as any, "change")
             .debounceTime(300)
             .map(_ => this.document.getValue())
             .distinctUntilChanged()

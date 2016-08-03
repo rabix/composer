@@ -5,7 +5,10 @@ import {
     FileCreatedAction,
     SaveFileRequestAction,
     UpdateFileAction,
-    CopyFileRequestAction
+    CopyFileRequestAction,
+    DeleteFileRequestAction,
+    FileDeletedAction,
+    DeleteFolderRequestAction, FolderDeletedAction
 } from "../action-events/index";
 import {FileApi} from "./api/file.api";
 import {FileModel} from "../store/models/fs.models";
@@ -34,7 +37,10 @@ export class FileRegistry {
             .subscribe(file => this.fileCache.put(file.id, file));
 
         this.eventHub.on(CreateFileRequestAction)
-            .flatMap(action => this.files.createFile(action.payload.relativePath).let(this.eventHub.intercept(action)))
+            .flatMap(action => {
+                return this.files.createFile(action.payload)
+                    .let(this.eventHub.intercept<FileModel>(action))
+            })
             .subscribe(file => {
                 this.fileCache.put(file.id, file);
                 this.eventHub.publish(new FileCreatedAction(file));
@@ -43,17 +49,43 @@ export class FileRegistry {
         this.eventHub.onValueFrom(SaveFileRequestAction)
             .flatMap(file => this.files.updateFile(file.relativePath, file.content).map(_ => file))
             .subscribe(file => {
-                this.fileCache.put(file.id, Object.assign(file, {originalContent: file.content, isModified: false}));
+                this.fileCache.put(file.id, Object.assign(file, {
+                    originalContent: file.content,
+                    isModified: false
+                }));
             });
 
         this.eventHub.on(CopyFileRequestAction)
             .flatMap(action => {
                 const {source, destination} = action.payload;
-                return this.files.copyFile(source, destination).let(this.eventHub.intercept(action))
+                return this.files.copyFile(source, destination)
+                    .let(this.eventHub.intercept<FileModel>(action))
             })
-            .subscribe(file => {
+            .subscribe((file: FileModel) => {
                 this.eventHub.publish(new FileCreatedAction(file));
             });
+
+        this.eventHub.on(DeleteFileRequestAction)
+            .flatMap(action => {
+                const file = action.payload;
+                return this.files.deleteFile(file.absolutePath).map(_ => file);
+            })
+            .subscribe((file: FileModel) => {
+                this.eventHub.publish(new FileDeletedAction(file));
+            });
+
+        this.eventHub.on(DeleteFolderRequestAction)
+            .flatMap(action => {
+                const path = action.payload;
+                return this.files.deleteFile(path).map(_ => path);
+            })
+            .subscribe(path => {
+                this.eventHub.publish(new FolderDeletedAction(path));
+            });
+
+        this.eventHub.onValueFrom(FileDeletedAction).subscribe((file: FileModel) => {
+            this.fileCache.remove(file.id);
+        });
     }
 
     /**
@@ -70,7 +102,4 @@ export class FileRegistry {
         return this.fileCache.watch(file.id);
     }
 
-    public save(file: FileModel) {
-
-    }
 }

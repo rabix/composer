@@ -10,16 +10,20 @@ import {
     ViewContainerRef,
     Injector
 } from "@angular/core";
-import {Chap} from "./../../helpers/chap";
+import * as Chap from "../../helpers/chap";
 import {ModalService} from "./modal.service";
 import {Subscription, Observable, BehaviorSubject} from "rxjs/Rx";
+import {assignable} from "../../decorators";
+
 
 require("./modal.component.scss");
 
-export interface ModalOptions {
+export interface ModalOptions<T> {
+    title?: string,
     backdrop?: boolean,
     closeOnOutsideClick?: boolean,
-    closeOnEscape?: boolean
+    closeOnEscape?: boolean,
+    componentState?: Object
 }
 
 @Component({
@@ -38,6 +42,7 @@ export interface ModalOptions {
 })
 export class ModalComponent {
 
+    @assignable()
     @HostBinding("class.backdrop")
     private backdrop: boolean;
 
@@ -47,13 +52,25 @@ export class ModalComponent {
     @ViewChild("container", {read: ViewContainerRef})
     private modalWindow: ViewContainerRef;
 
+    /** Should the modal clouse when you click on the area outside of it? */
+    @assignable()
     public closeOnOutsideClick: boolean;
+
+    /** Title of the modal window */
+    @assignable("next")
     public title: BehaviorSubject<string>;
+
+    /** When you press the "ESC" key, should the modal be closed? */
+    @assignable()
     public closeOnEscape: boolean;
 
-    private nestedComponentRef: ComponentRef;
+    /** Holds the ComponentRef object of a component that is injected and rendered inside the modal */
+    private nestedComponentRef: ComponentRef<any>;
+
+    /** Stream of drag events */
     private dragSubscription: Subscription;
-    private viewReady: BehaviorSubject<boolean>;
+
+    /** Subscriptions to dispose when the modal closes */
     private subscriptions: Subscription[];
 
     constructor(@Inject(forwardRef(() => ModalService))
@@ -63,15 +80,13 @@ export class ModalComponent {
         this.backdrop            = false;
         this.closeOnOutsideClick = true;
         this.closeOnEscape       = true;
-
-        this.viewReady = new BehaviorSubject(false);
-        this.title     = new BehaviorSubject("New File");
+        this.title               = new BehaviorSubject("");
 
         this.subscriptions = [];
 
         if (this.closeOnEscape) {
             this.subscriptions.push(Observable.fromEvent(document, "keyup")
-                .map(ev => ev.which)
+                .map((ev: KeyboardEvent) => ev.which)
                 .filter(key => key === 27)
                 .subscribe(ev => this.service.close()));
         }
@@ -113,19 +128,25 @@ export class ModalComponent {
         this.dragSubscription.unsubscribe();
     }
 
-    public configure(config: ModalOptions) {
-        Chap.applyParams(config, this);
+    public configure<T>(config: ModalOptions<T>) {
+        this.backdrop = config.backdrop;
+        Chap.Component.assign(config, this);
     }
 
-    public produce(factory: ComponentFactory) {
+    public produce<T>(factory: ComponentFactory<T>, componentState?: Object): ComponentRef<T> {
 
         this.nestedComponentRef = this.nestedComponentContainer.createComponent(factory, 0, this.injector);
+        if (typeof componentState === "object") {
+            Chap.Component.assign(componentState, this.nestedComponentRef.instance);
+        }
 
         Observable.of("Reposition me right away!")
             .merge(Observable.fromEvent(window, "resize").debounceTime(50))
             .subscribe(s => {
                 this.reposition();
             });
+
+        return this.nestedComponentRef;
     }
 
     private reposition(tweak?: any) {
@@ -144,7 +165,8 @@ export class ModalComponent {
             el.style.top  = tweak.top;
             el.style.left = tweak.left;
         } else {
-            el.style.top  = (wHeight - mHeight) / 2 + "px";
+            // Move the modal a bit more towards the top, looks better that way
+            el.style.top  = (wHeight - mHeight) / 4 + "px";
             el.style.left = (wWidth - mWidth) / 2 + "px";
         }
     }

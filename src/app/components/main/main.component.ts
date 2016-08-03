@@ -2,6 +2,7 @@ import {ApiService} from "../../services/api/api.service";
 import {APP_CONFIG, CONFIG} from "../../config/app.config";
 import {BACKEND_SERVICE} from "../../services/data/providers/data.types";
 import {ComponentRegistryFactoryService} from "../workspace/registry/component-registry-factory.service";
+import {ContextDirective} from "../../services/context/context.directive";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {FileApi} from "../../services/api/file.api";
 import {FileRegistry} from "../../services/file-registry.service";
@@ -15,9 +16,10 @@ import {provide, Component, ViewChild, ViewContainerRef, AfterViewInit} from "@a
 import {SocketService as NewSocketService} from "../../services/data/providers/socket/socket.service";
 import {SocketService} from "../../services/api/socket.service";
 import {UrlValidator} from "../../validators/url.validator";
+import {WebWorkerService} from "../../services/webWorker/web-worker.service";
 import {WorkspaceComponent} from "../workspace/workspace.component";
 import {WorkspaceService} from "../workspace/workspace.service";
-import {WebWorkerService} from "../../services/webWorker/web-worker.service";
+import {ContextService} from "../../services/context/context.service";
 
 require("./../../../assets/sass/main.scss");
 require("./main.component.scss");
@@ -31,15 +33,17 @@ require("./main.component.scss");
         </section>
         <div id="runnix" [class.active]="runnix | async"></div>
         <div #modalAnchor></div>
+        <div #contextMenuAnchor></div>
     `,
     directives: [
         MenuBarComponent,
         WorkspaceComponent,
-
+        ContextDirective
     ],
     providers: [
         ApiService,
         ComponentRegistryFactoryService,
+        ContextService,
         EventHubService,
         FileApi,
         FileRegistry,
@@ -62,9 +66,13 @@ export class MainComponent implements AfterViewInit {
     @ViewChild("modalAnchor", {read: ViewContainerRef})
     private modalAnchor: ViewContainerRef;
 
-    constructor(private modal: ModalService) {
+    @ViewChild("contextMenuAnchor", {read: ViewContainerRef})
+    private contextMenuAnchor: ViewContainerRef;
 
-        this.runnix = Observable.fromEvent(document, "keyup").map(e => e.keyCode).bufferCount(10, 1)
+    constructor(private context: ContextService,
+                private modal: ModalService) {
+
+        this.runnix = Observable.fromEvent(document, "keyup").map((e: KeyboardEvent) => e.keyCode).bufferCount(10, 1)
             .filter(seq => seq.toString() == [38, 38, 40, 40, 37, 39, 37, 39, 66, 65].toString())
             .map(seq => Observable.of(true).concat(Observable.of(false).delay(3000)))
             .concatAll();
@@ -72,5 +80,6 @@ export class MainComponent implements AfterViewInit {
 
     ngAfterViewInit() {
         this.modal.setAnchor(this.modalAnchor);
+        this.context.setAnchor(this.contextMenuAnchor);
     }
 }

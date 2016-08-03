@@ -1,4 +1,5 @@
 import {FileModel} from "../store/models/fs.models";
+import {CwlFileTemplate} from "../types/file-template.type";
 
 export class EventHubAction {
     public type: string;
@@ -41,14 +42,38 @@ export class UpdateFileAction extends EventHubAction {
 }
 
 export class CreateFileRequestAction extends EventHubAction {
-    constructor(file: FileModel) {
-        super("create_file_request", file);
+    constructor(options: {path: string, content?: string, template?: CwlFileTemplate}) {
+        super("create_file_request", options);
     }
 }
 
 export class CopyFileRequestAction extends EventHubAction {
     constructor(source: string, destination: string) {
         super("copy_file_request", {source, destination});
+    }
+}
+
+export class DeleteFileRequestAction extends EventHubAction {
+    constructor(file: FileModel) {
+        super("delete_file_request", file);
+    }
+}
+
+export class DeleteFolderRequestAction extends EventHubAction {
+    constructor(path: string) {
+        super("delete_folder_request", path);
+    }
+}
+
+export class FileDeletedAction extends EventHubAction {
+    constructor(file: FileModel) {
+        super("file_deleted", file);
+    }
+}
+
+export class FolderDeletedAction extends EventHubAction {
+    constructor(path: string) {
+        super("folder_deleted", path);
     }
 }
 

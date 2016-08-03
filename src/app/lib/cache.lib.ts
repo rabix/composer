@@ -41,6 +41,17 @@ export class HashCache<T> {
 
     }
 
+    public remove(id: string) {
+        if (this.has(id)) {
+            const cache = Object.assign(this.cache.getValue(), {});
+
+            cache[id].unsubscribe();
+            delete cache[id];
+
+            this.cache.next(cache);
+        }
+    }
+
     public all(): BehaviorSubject<{[id: string]: ReplaySubject<T>}> {
         return this.cache;
     }

@@ -12,6 +12,9 @@ import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {FileRegistry} from "../../services/file-registry.service";
 
 
+/**
+ * @deprecated
+ */
 @Injectable()
 export class FileTreeService {
 
@@ -31,6 +34,9 @@ export class FileTreeService {
         return this.files.watchFile(file);
     }
 
+    /**
+     * @TODO(ivan) This is really really complicated code, clean it up, preferably by deleting it
+     */
     public createDataProviderForDirectory(relPathDir = ""): DirectoryDataProviderFactory {
 
 

@@ -21,7 +21,8 @@ require("./menu-bar.component.scss");
 })
 export class MenuBarComponent {
 
-    public menuItems;
+    public menuItems: MenuItem[];
+
     private selectedFile: FileModel;
 
     constructor(private workspace: WorkspaceService,
@@ -35,6 +36,7 @@ export class MenuBarComponent {
         const fileMenu = new MenuItem("File", {}, [
             new MenuItem("New...", {
                 click: () => this.modal.show(NewFileModalComponent, {
+                    title: "New File",
                     closeOnOutsideClick: false
                 }),
             }),
@@ -47,7 +49,11 @@ export class MenuBarComponent {
             new MenuItem("Save As...", {
                 isEnabled: fileSelectionExists,
                 click: () => this.modal.show(SaveAsModalComponent, {
-                    closeOnOutsideClick: false
+                    title: "Save",
+                    closeOnOutsideClick: false,
+                    componentState: {
+                        filePath: this.selectedFile.absolutePath,
+                    },
                 })
             })
         ]);
