@@ -29,11 +29,8 @@ export type ViewMode = "gui" | "json";
             <tool-header class="tool-header" [viewMode]="viewMode" (viewModeChanged)="setViewMode($event)"></tool-header>
         
             <div class="main-content">
-                <div [ngSwitch]="viewMode">
-                    <block-loader *ngIf="!file"></block-loader>
-                    <gui-editor *ngSwitchCase="'gui'" [file]="file"></gui-editor>
-                    <code-editor *ngSwitchCase="'json'" [file]="file"></code-editor>
-                </div>
+                <gui-editor [hidden]="viewMode !== 'gui'" [file]="file"></gui-editor>
+                <code-editor [hidden]="viewMode !== 'json'" [file]="file"></code-editor>
             </div>
         </div>
     `
@@ -58,7 +55,7 @@ export class ToolContainerComponent implements OnInit, DynamicState {
 
         // bring our own file up to date
         this.subs.push(fileStream.subscribe(file => {
-            this.file     = file;
+            this.file = file;
         }));
     }
 

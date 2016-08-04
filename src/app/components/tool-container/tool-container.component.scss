@@ -20,3 +20,11 @@
     position: relative;
     display: block;
 }
+
+/*  The "display: none" styles attached to the native hidden property are implemented by the browser.
+    Most browsers do so without an "!important" postscript.
+    Consequently, the style carries low specificity and can be easy to override accidentally.
+    http://angularjs.blogspot.rs/2016/04/5-rookie-mistakes-to-avoid-with-angular.html */
+[hidden] {
+    display: none !important;
+}
