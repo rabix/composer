@@ -1,8 +1,7 @@
 import {Component, Input} from "@angular/core";
 import {FormControl, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
-import {GuiEditorService} from "../../../gui-editor/gui-editor.service";
-import {GuiEditorEventType, ShowSidebarEvent} from "../../../gui-editor/gui-editor.events";
-import {SidebarType} from "../../../gui-editor/sidebar/editor-sidebar.component";
+import {GuiEditorService} from "../../../gui-editor/shared/gui-editor.service";
+import {ShowSidebarEvent} from "../../../gui-editor/shared/gui-editor.events";
 
 require("./base-command-input.component.scss");
 
@@ -43,7 +42,7 @@ export class BaseCommandInputComponent {
     openExpressionSidebar() {
         let showSidebarEvent: ShowSidebarEvent = {
             data: {
-                sidebarType: SidebarType.expression
+                sidebarType: "expression"
             }
         };
 

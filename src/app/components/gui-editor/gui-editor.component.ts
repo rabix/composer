@@ -9,7 +9,7 @@ import {
 } from "@angular/core";
 import {FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 import {FileModel} from "../../store/models/fs.models";
-import {GuiEditorService} from "./gui-editor.service";
+import {GuiEditorService} from "./shared/gui-editor.service";
 import {EditorSidebarComponent} from "./sidebar/editor-sidebar.component";
 import {FormPosition, VisibilityState} from "./animation.states";
 import {BehaviorSubject} from "rxjs/Rx";
@@ -33,10 +33,10 @@ require("./gui-editor.component.scss");
     animations: [
         trigger("formPosition", [
             state("left", style({
-                margin: '20px 0 0 0'
+                margin: "20px 0 0 0"
             })),
             state("center", style({
-                margin: '20px auto'
+                margin: "20px auto"
             })),
             transition("hidden => visible", animate("100ms ease-in")),
             transition("visible => hidden", animate("100ms ease-out"))
