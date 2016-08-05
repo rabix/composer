@@ -29,8 +29,8 @@ export type ViewMode = "gui" | "json";
             <tool-header class="tool-header" [viewMode]="viewMode" (viewModeChanged)="setViewMode($event)"></tool-header>
         
             <div class="main-content">
-                <gui-editor [hidden]="viewMode !== 'gui'" [file]="file"></gui-editor>
-                <code-editor [hidden]="viewMode !== 'json'" [file]="file"></code-editor>
+                <code-editor *ngIf="viewMode === 'json'" [file]="file"></code-editor>
+                <gui-editor *ngIf="viewMode === 'gui'" [file]="file"></gui-editor>
             </div>
         </div>
     `
