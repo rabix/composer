@@ -43,18 +43,18 @@ require("./gui-editor.component.scss");
         ])
     ],
     template: `
-            <form (ngSubmit)="onSubmit()"  [formGroup]="guiEditorGroup">
-            
+            <form (ngSubmit)="onSubmit()" [formGroup]="guiEditorGroup">
                 <docker-input-form @formPosition="formPosition"
                                 class="input-form" 
                                 [group]="guiEditorGroup"
-                                [dockerPull]="'some.docker.image.com'"></docker-input-form>
+                                [dockerPull]="'some.docker.image.com'">
+                </docker-input-form>
                                 
                 <base-command-form @formPosition="formPosition"
                                 class="input-form" 
                                 [group]="guiEditorGroup"
-                                [baseCommand]="'echo'"></base-command-form>
-                                
+                                [baseCommand]="'echo'">
+                </base-command-form>
             </form>
                   
             <editor-sidebar [sidebarVisibility]="sidebarVisibility"></editor-sidebar>
