@@ -13,6 +13,7 @@ import {VisibilityState} from "../animation.states";
 import {ShowSidebarEvent} from "../shared/gui-editor.events";
 import {BehaviorSubject} from "rxjs/Rx";
 import {SidebarType} from "../shared/sidebar.types.ts"
+import {ObjectInspectorComponent} from "../../object-inpsector/object-insepctor.component";
 
 require ("./editor-sidebar.component.scss");
 
@@ -35,23 +36,22 @@ require ("./editor-sidebar.component.scss");
             transition("visible => hidden", animate("100ms ease-out"))
         ])
     ],
+    directives: [ObjectInspectorComponent],
     template: `
-                    <div class="editor-sidebar-component" @sidebarState="sidebarState">
-                        <div class="collapse-icon">
-                            <i class="fa fa-lg fa-caret-left" (click)="collapseSidebar()"></i>
-                        </div>
-                        <div class="sidebar-content">
-                            <!-- TODO: add expression and objects editor -->
-                            <span *ngIf="sidebarType === 'editor'">
-                                Editor
-                            </span>
-                            
-                            <span *ngIf="sidebarType === 'expression'">
-                                Expression
-                            </span>
-                            This is the right sidebar content
-                        </div>
-                    </div>
+            <div class="editor-sidebar-component" @sidebarState="sidebarState">
+                <div class="collapse-icon">
+                    <i class="fa fa-lg fa-caret-left" (click)="collapseSidebar()"></i>
+                </div>
+                <div class="sidebar-content">
+                    <!--TODO: add expression editor here-->
+                    <span [hidden]="sidebarType !== 'expression'">
+                        Expression
+                    </span>
+                    
+                    <object-inspector [hidden]="sidebarType !== 'editor'">
+                    </object-inspector>
+                </div>
+            </div>
     `
 })
 export class EditorSidebarComponent implements OnInit {

@@ -1,13 +1,13 @@
 import {Component, Input, OnInit} from "@angular/core";
 import {Validators, FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
-import {BaseCommandInputComponent} from "../types/base-command-input.component";
+import {ExpressionInputComponent} from "../types/expression-input.component";
 
 require("./form.components.scss");
 
 @Component({
     selector: 'base-command-form',
     directives: [
-        BaseCommandInputComponent,
+        ExpressionInputComponent,
         REACTIVE_FORM_DIRECTIVES,
         FORM_DIRECTIVES
     ],
@@ -19,8 +19,10 @@ require("./form.components.scss");
                         <label>Base Command</label>
                         <label class="secondary-label">What command do you want to call from the image</label>
                         
-                        <base-command-input [inputControl]="baseCommandForm.controls['baseCommand']"
-                                        [baseCommand]="baseCommand"></base-command-input>
+                        <expression-input [inputControl]="baseCommandForm.controls['baseCommand']"
+                                            [expression]="baseCommand">
+                        </expression-input>
+                    <button type="button" class="btn btn-secondary expression-form-btn">Add base command</button>
                 </fieldset>
              </form>
     `

@@ -1,0 +1,11 @@
+@import "../../../../../assets/sass/variables";
+
+/*For some reason the input-group has ad default z-index: 2*/
+.expression-input-group {
+
+    .add-expression {
+        background: #ffffff;
+        padding: 0;
+        width: 20%;
+    }
+}
