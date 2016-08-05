@@ -1,4 +1,4 @@
-import {SidebarType} from "../sidebar/editor-sidebar.component";
+import {SidebarType} from "./sidebar.types";
 
 export interface ShowSidebarEvent {
     data: {
