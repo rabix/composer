@@ -1,4 +1,3 @@
-import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {Component, ElementRef, OnDestroy} from "@angular/core";
 import {ComponentRegistryFactoryService} from "./registry/component-registry-factory.service";
 import {ComponentRegistry} from "./registry/component-registry";
@@ -8,6 +7,7 @@ import {WorkspaceService} from "./workspace.service";
 import {FileEditorPlaceholderComponent} from "../placeholders/file-editor/file-editor-placeholder.component";
 import * as GoldenLayout from "golden-layout";
 import {FileRegistry} from "../../services/file-registry.service";
+import {ToolContainerComponent} from "../tool-container/tool-container.component";
 
 require("./workspace.component.scss");
 
@@ -41,7 +41,7 @@ export class WorkspaceComponent implements OnDestroy {
 
         Observable.fromEvent(this.layout, "componentCreated")
             .filter((event: any) => {
-                return event.config.componentName === CodeEditorComponent
+                return event.config.componentName === ToolContainerComponent
                     && event.parent.contentItems.length === 1
                     && event.parent.contentItems[0].config.componentName === FileEditorPlaceholderComponent
             })
@@ -50,51 +50,49 @@ export class WorkspaceComponent implements OnDestroy {
             });
 
         Observable.fromEvent(this.layout, "itemDestroyed").filter((event: any) => {
-            return event.config.componentName === CodeEditorComponent
+            return event.config.componentName === ToolContainerComponent
                 && event.parent.contentItems.length === 1
         }).subscribe((event: any) => {
             event.parent.addChild({
                 type: "component",
                 title: "Usage Tip",
                 componentName: FileEditorPlaceholderComponent,
+                width: 70,
                 isClosable: false
             });
         });
 
         this.workspaceService.onLoadFile.subscribe(file => {
-            this.registry.registerComponent(CodeEditorComponent);
+            this.registry.registerComponent(ToolContainerComponent);
             const tabs = this.layout.root.contentItems[0].contentItems[1];
 
             tabs.addChild({
                 type: "component",
                 title: file.name + (file.isModified ? " (modified)" : ""),
-                componentName: CodeEditorComponent,
+                componentName: ToolContainerComponent,
+                width: 70,
                 componentState: {
                     fileInfo: file,
-                },
+                }
             });
         });
 
         this.workspaceService.selectedFile.subscribe(file => {
 
             if (file) {
-                let activeTab = this.registry.findEditorTab(file);
+                let activeTab = this.registry.findToolContainerTab(file);
                 activeTab.setTitle(file.name + (file.isModified ? "*" : ""));
-                this.registry.getCodeEditorStack().setActiveContentItem(activeTab);
+                this.registry.getToolContainerStack().setActiveContentItem(activeTab);
             }
 
         });
 
         this.workspaceService.onCloseFile.subscribe(file => {
-            const tab = this.registry.findEditorTab(file);
-            console.debug("Checking tab", tab);
-            if (tab) {
-                tab.remove();
-            }
+            this.registry.findToolContainerTab(file).remove();
         });
 
         Observable.fromEvent(this.layout, "tabCreated")
-            .filter((tab: any) => tab.contentItem.componentName === CodeEditorComponent)
+            .filter((tab: any) => tab.contentItem.componentName === ToolContainerComponent)
             .subscribe((tab: any) => {
                 const componentState = tab.contentItem.config.componentState;
                 const file           = componentState.fileInfo;
@@ -143,6 +141,7 @@ export class WorkspaceComponent implements OnDestroy {
                         type: "component",
                         title: "Usage Tip",
                         componentName: FileEditorPlaceholderComponent,
+                        width: 70,
                         isClosable: false
                     }
                 ]

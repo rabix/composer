@@ -1,13 +1,13 @@
 /// <reference no-default-lib="true"/>
-let {draft3, draft4} = require("cwlts/lib");
-let Validator = require("jsonschema").Validator;
+const {draft3, draft4} = require("cwlts/lib");
+const Validator = require("jsonschema").Validator;
 
 declare function postMessage(message): void;
 
 class JsonSchemaWorker {
 
     constructor() {
-        let self = this;
+        const self = this;
 
         onmessage = (e) => {
             let cotent: string = e.data;

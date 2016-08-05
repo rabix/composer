@@ -1,0 +1,20 @@
+@import "../../../../../assets/sass/variables";
+
+.secondary-label {
+    display: block;
+    color:  #808080;
+    font-size: small;
+}
+
+button.hide-btn {
+    font-size: 0.9em;
+
+    /* Large screens */
+    @media only screen  and (min-width : 1824px) {
+        font-size: 1em;
+    }
+
+    float: right;
+    color: $button-blue-text;
+    border: 0;
+}

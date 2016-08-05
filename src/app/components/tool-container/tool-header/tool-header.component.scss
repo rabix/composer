@@ -1,0 +1,15 @@
+@import "../../../../assets/sass/variables";
+
+.gui-json-buttons {
+    .btn-secondary.selected, .toolHeaderBtn:focus {
+        background-color: $gui-base-gray;
+        color: #ffffff;
+        border-color: #ffffff;
+    }
+}
+
+.save-button {
+    float: right;
+    margin-right: 15px;
+}
+

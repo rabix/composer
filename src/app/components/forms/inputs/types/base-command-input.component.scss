@@ -1,0 +1,26 @@
+@import "../../../../../assets/sass/variables";
+
+/*For some reason the input-group has ad default z-index: 2*/
+.base-command-input-group {
+
+    .add-expression {
+        background: #ffffff;
+        padding: 0;
+        width: 20%;
+    }
+}
+
+.btn-secondary.base-command-form-btn {
+    font-size: 0.9em;
+
+    /* Large screens */
+    @media only screen  and (min-width : 1824px) {
+        font-size: 1em;
+    }
+
+    padding: 0;
+    border: 0;
+    background: #ffffff;
+    color: $button-blue-text;
+}
+
