@@ -1,15 +1,15 @@
 @import "../../../assets/sass/variables";
 
 .tool-container-component {
-    position: relative;
     display: block;
     height: 100%;
     width: 100%;
 
     .main-content {
+        overflow-y: auto;
         position: relative;
-        min-height: 500px;
-        height: calc(100% - #{$editor-footer-height} - #{$editor-padding-top});
+        min-height: calc(100% - #{$editor-footer-height} - #{$editor-header-height} - #{$editor-padding-top});
+        height: calc(100% - #{$editor-footer-height} - #{$editor-header-height} - #{$editor-padding-top});
     }
 }
 
@@ -19,4 +19,11 @@
     padding-top: $editor-padding-top;
     position: relative;
     display: block;
+}
+
+.footer {
+    height: $editor-footer-height;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
 }

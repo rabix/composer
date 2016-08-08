@@ -8,6 +8,7 @@ import {DynamicState} from "../runtime-compiler/dynamic-state.interface";
 import {FileRegistry} from "../../services/file-registry.service";
 import {Subscription} from "rxjs/Rx";
 import {ToolHeaderComponent} from "./tool-header/tool-header.component";
+import {CommandLineComponent} from "../gui-editor/commandline/commandline.component";
 
 require("./tool-container.component.scss");
 
@@ -22,7 +23,8 @@ export type ViewMode = "gui" | "json";
         NgSwitch,
         NgSwitchCase,
         NgSwitchDefault,
-        ToolHeaderComponent
+        ToolHeaderComponent,
+        CommandLineComponent
     ],
     template: `
         <div class="tool-container-component">
@@ -31,6 +33,10 @@ export type ViewMode = "gui" | "json";
             <div class="main-content">
                 <code-editor *ngIf="viewMode === 'json'" [file]="file"></code-editor>
                 <gui-editor *ngIf="viewMode === 'gui'" [file]="file"></gui-editor>
+            </div>
+            
+            <div class="footer">
+                <commandline [content]="commandlineContent"></commandline>
             </div>
         </div>
     `
@@ -41,6 +47,9 @@ export class ToolContainerComponent implements OnInit, DynamicState {
 
     /** File that we will pass to both the gui and JSON editor*/
     private file: FileModel;
+
+    /* TODO: generate the commandline */
+    private commandlineContent: string = "This is the command line";
 
     /** List of subscriptions that should be disposed when destroying this component */
     private subs: Subscription[];

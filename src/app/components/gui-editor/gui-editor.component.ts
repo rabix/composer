@@ -16,6 +16,7 @@ import {BehaviorSubject} from "rxjs/Rx";
 import {CommandLineComponent} from "./commandline/commandline.component";
 import {DockerInputFormComponent} from "../forms/inputs/forms/docker-input-form.component";
 import {BaseCommandFormComponent} from "../forms/inputs/forms/base-command-form.component";
+import {ToolInputsFormComponent} from "../forms/inputs/forms/tool-inputs-form.component";
 
 require("./gui-editor.component.scss");
 
@@ -25,6 +26,7 @@ require("./gui-editor.component.scss");
     directives: [
         DockerInputFormComponent,
         BaseCommandFormComponent,
+        ToolInputsFormComponent,
         EditorSidebarComponent,
         CommandLineComponent,
         REACTIVE_FORM_DIRECTIVES,
@@ -43,7 +45,9 @@ require("./gui-editor.component.scss");
         ])
     ],
     template: `
-            <form (ngSubmit)="onSubmit()" [formGroup]="guiEditorGroup">
+            <form class="gui-editor-group"
+                  (ngSubmit)="onSubmit()"
+                  [formGroup]="guiEditorGroup">
                 <docker-input-form @formPosition="formPosition"
                                 class="input-form" 
                                 [group]="guiEditorGroup"
@@ -55,19 +59,21 @@ require("./gui-editor.component.scss");
                                 [group]="guiEditorGroup"
                                 [baseCommand]="'echo'">
                 </base-command-form>
+                
+                <tool-inputs-form @formPosition="formPosition"
+                                  class="input-form" ></tool-inputs-form>
             </form>
-                  
             <editor-sidebar [sidebarVisibility]="sidebarVisibility"></editor-sidebar>
-          
-            <div class="footer">
-                <commandline [content]="commandlineContent"></commandline>
-            </div>
     `
 })
 export class GuiEditorComponent {
-    /** The file that we are going to use to list the properties*/
+    /** The file that we are going to use to list the properties */
     @Input()
     private file: FileModel;
+
+    /** TODO: change array type to CommandInputParameterModel when we have the models */
+    @Input()
+    private toolInputs: Array<any>;
 
     /** Positions of the listed properties */
     private formPosition: FormPosition = "center";
