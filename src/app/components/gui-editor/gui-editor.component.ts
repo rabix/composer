@@ -61,7 +61,7 @@ require("./gui-editor.component.scss");
                 </base-command-form>
                 
                 <tool-inputs-form @formPosition="formPosition"
-                                  class="input-form" ></tool-inputs-form>
+                                  class="input-form"></tool-inputs-form>
             </form>
             <editor-sidebar [sidebarVisibility]="sidebarVisibility"></editor-sidebar>
     `

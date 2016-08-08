@@ -22,7 +22,7 @@ require("./form.components.scss");
                         <expression-input [inputControl]="baseCommandForm.controls['baseCommand']"
                                             [expression]="baseCommand">
                         </expression-input>
-                    <button type="button" class="btn btn-secondary expression-form-btn">Add base command</button>
+                    <button type="button" class="btn btn-secondary add-input-btn">Add base command</button>
                 </fieldset>
              </form>
     `

@@ -1,1 +1,1 @@
-export type SidebarType = "expression" | "editor";
+export type SidebarType = "expression" | "object-inspector";

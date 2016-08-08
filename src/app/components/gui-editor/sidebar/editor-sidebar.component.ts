@@ -48,7 +48,7 @@ require ("./editor-sidebar.component.scss");
                         Expression
                     </span>
                     
-                    <object-inspector [hidden]="sidebarType !== 'editor'">
+                    <object-inspector [hidden]="sidebarType !== 'object-inspector'">
                     </object-inspector>
                 </div>
             </div>

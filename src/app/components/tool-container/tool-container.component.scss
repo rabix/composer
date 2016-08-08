@@ -10,6 +10,12 @@
         position: relative;
         min-height: calc(100% - #{$editor-footer-height} - #{$editor-header-height} - #{$editor-padding-top});
         height: calc(100% - #{$editor-footer-height} - #{$editor-header-height} - #{$editor-padding-top});
+
+        .gui-editor-component {
+            position: absolute;
+            display: block;
+            width: 100%;
+        }
     }
 }
 
