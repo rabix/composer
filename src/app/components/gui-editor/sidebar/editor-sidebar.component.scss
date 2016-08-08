@@ -6,7 +6,7 @@
     padding-left: 10px;
     position: absolute;
     background: #000000;
-    height: calc(100% - #{$editor-footer-height});
+    height: 100%;
 }
 
 .collapse-icon {
@@ -21,5 +21,5 @@
     width: calc(100% - 30px);
     height: 100%;
     padding-top: 5px;
-    position: absolute
+    position: relative;
 }
