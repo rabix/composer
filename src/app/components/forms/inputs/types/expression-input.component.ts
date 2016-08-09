@@ -1,7 +1,8 @@
 import {Component, Input} from "@angular/core";
 import {FormControl, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 import {GuiEditorService} from "../../../gui-editor/shared/gui-editor.service";
-import {ShowSidebarEvent} from "../../../gui-editor/shared/gui-editor.events";
+import {SidebarEvent} from "../../../gui-editor/shared/gui-editor.events";
+import {SidebarType} from "../../../gui-editor/shared/sidebar.enums";
 
 require("./expression-input.component.scss");
 
@@ -38,9 +39,9 @@ export class ExpressionInputComponent {
     constructor(private guiEditorService: GuiEditorService) { }
 
     openExpressionSidebar() {
-        let showSidebarEvent: ShowSidebarEvent = {
+        let showSidebarEvent: SidebarEvent = {
             data: {
-                sidebarType: "expression"
+                sidebarType: SidebarType.Expression
             }
         };
 

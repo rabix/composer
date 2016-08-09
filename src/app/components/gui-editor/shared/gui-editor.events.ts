@@ -1,7 +1,7 @@
-import {SidebarType} from "./sidebar.types";
+import {SidebarType} from "./sidebar.enums";
 
-export interface ShowSidebarEvent {
+export interface SidebarEvent {
     data: {
-        sidebarType: SidebarType
+        sidebarType: SidebarType;
     }
 }

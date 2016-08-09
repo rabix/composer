@@ -10,9 +10,9 @@ import {
 } from "@angular/core";
 import {GuiEditorService} from "../shared/gui-editor.service";
 import {VisibilityState} from "../animation.states";
-import {ShowSidebarEvent} from "../shared/gui-editor.events";
+import {SidebarEvent} from "../shared/gui-editor.events";
 import {BehaviorSubject} from "rxjs/Rx";
-import {SidebarType} from "../shared/sidebar.types.ts"
+import {SidebarType} from "../shared/sidebar.enums.ts"
 import {ObjectInspectorComponent} from "../../object-inpsector/object-insepctor.component";
 
 require ("./editor-sidebar.component.scss");
@@ -44,11 +44,11 @@ require ("./editor-sidebar.component.scss");
                 </div>
                 <div class="sidebar-content">
                     <!--TODO: add expression editor here-->
-                    <span [hidden]="sidebarType !== 'expression'">
+                    <span [hidden]="sidebar !== sideBarType.Expression">
                         Expression
                     </span>
                     
-                    <object-inspector [hidden]="sidebarType !== 'object-inspector'">
+                    <object-inspector [hidden]="sidebar !== sideBarType.ObjectInspector">
                     </object-inspector>
                 </div>
             </div>
@@ -62,13 +62,17 @@ export class EditorSidebarComponent implements OnInit {
     /** State of the sidebar animation */
     private sidebarState: VisibilityState;
 
-    private sidebarType: SidebarType;
+    /** The sidebar enum reference that we use in the template for comparison */
+    private sideBarType = SidebarType;
+
+    /** The type of the sidebar */
+    private sidebar: SidebarType;
 
     constructor(private guiEditorService: GuiEditorService) {
-        this.guiEditorService.publishedSidebarEvents.subscribe((event: ShowSidebarEvent) => {
-            this.sidebarType = event.data.sidebarType;
-            this.showSideBar();
-        });
+        this.guiEditorService.publishedSidebarEvents.subscribe((event: SidebarEvent) => {
+                this.sidebar = event.data.sidebarType;
+                this.showSideBar();
+            });
     }
 
     ngOnInit(): void {
@@ -78,10 +82,10 @@ export class EditorSidebarComponent implements OnInit {
     }
 
     showSideBar(): void {
-        this.sidebarVisibility.next("visible");
+        this.sidebarVisibility.next<VisibilityState>("visible");
     }
 
     collapseSidebar(): void {
-        this.sidebarVisibility.next("hidden");
+        this.sidebarVisibility.next<VisibilityState>("hidden");
     }
 }

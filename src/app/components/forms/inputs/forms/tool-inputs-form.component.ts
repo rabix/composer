@@ -1,6 +1,7 @@
 import {Component} from "@angular/core";
 import {GuiEditorService} from "../../../gui-editor/shared/gui-editor.service";
-import {ShowSidebarEvent} from "../../../gui-editor/shared/gui-editor.events";
+import {SidebarEvent} from "../../../gui-editor/shared/gui-editor.events";
+import {SidebarType} from "../../../gui-editor/shared/sidebar.enums";
 
 require("./form.components.scss");
 require("./tool-inputs-form.component.scss");
@@ -65,9 +66,9 @@ export class ToolInputsFormComponent {
     constructor(private guiEditorService: GuiEditorService) { }
 
     openObjectInspector() {
-        let showSidebarEvent: ShowSidebarEvent = {
+        let showSidebarEvent: SidebarEvent = {
             data: {
-                sidebarType: "object-inspector"
+                sidebarType: SidebarType.ObjectInspector
             }
         };
 
