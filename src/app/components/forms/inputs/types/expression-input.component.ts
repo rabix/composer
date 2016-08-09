@@ -1,8 +1,8 @@
 import {Component, Input} from "@angular/core";
 import {FormControl, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
-import {GuiEditorService} from "../../../gui-editor/shared/gui-editor.service";
-import {SidebarEvent} from "../../../gui-editor/shared/gui-editor.events";
-import {SidebarType} from "../../../gui-editor/shared/sidebar.enums";
+import {GuiEditorService} from "../../../clt-editor/shared/gui-editor.service";
+import {SidebarEvent} from "../../../clt-editor/shared/gui-editor.events";
+import {SidebarType} from "../../../clt-editor/shared/sidebar.enums";
 
 require("./expression-input.component.scss");
 

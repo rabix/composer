@@ -1,6 +1,6 @@
 import {Component} from "@angular/core";
-import {ExpressionInputComponent} from "../forms/inputs/types/expression-input.component";
 import {Validators, FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
+import {ExpressionInputComponent} from "../../forms/inputs/types/expression-input.component";
 
 require ("./object-inpsector.component.scss");
 

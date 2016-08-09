@@ -3,12 +3,12 @@ import {NgSwitch, NgSwitchCase, NgSwitchDefault} from "@angular/common";
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {FileModel} from "../../store/models/fs.models";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
-import {GuiEditorComponent} from "../gui-editor/gui-editor.component";
+import {CltEditorComponent} from "../clt-editor/clt-editor.component";
 import {DynamicState} from "../runtime-compiler/dynamic-state.interface";
 import {FileRegistry} from "../../services/file-registry.service";
 import {Subscription} from "rxjs/Rx";
 import {ToolHeaderComponent} from "./tool-header/tool-header.component";
-import {CommandLineComponent} from "../gui-editor/commandline/commandline.component";
+import {CommandLineComponent} from "../clt-editor/commandline/commandline.component";
 
 require("./tool-container.component.scss");
 
@@ -18,7 +18,7 @@ export type ViewMode = "gui" | "json";
     selector: "tool-container",
     directives: [
         CodeEditorComponent,
-        GuiEditorComponent,
+        CltEditorComponent,
         BlockLoaderComponent,
         NgSwitch,
         NgSwitchCase,

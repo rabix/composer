@@ -1,19 +1,10 @@
-import {
-    Component,
-    OnInit,
-    style,
-    animate,
-    state,
-    transition,
-    trigger,
-    Input
-} from "@angular/core";
-import {GuiEditorService} from "../shared/gui-editor.service";
-import {VisibilityState} from "../animation.states";
-import {SidebarEvent} from "../shared/gui-editor.events";
+import {Component, OnInit, style, animate, state, transition, trigger, Input} from "@angular/core";
 import {BehaviorSubject} from "rxjs/Rx";
-import {SidebarType} from "../shared/sidebar.enums.ts"
-import {ObjectInspectorComponent} from "../../object-inpsector/object-insepctor.component";
+import {ObjectInspectorComponent} from "./object-inpsector/object-insepctor.component";
+import {VisibilityState} from "../clt-editor/animation.states";
+import {SidebarType} from "../clt-editor/shared/sidebar.enums";
+import {GuiEditorService} from "../clt-editor/shared/gui-editor.service";
+import {SidebarEvent} from "../clt-editor/shared/gui-editor.events";
 
 require ("./editor-sidebar.component.scss");
 
@@ -25,7 +16,7 @@ require ("./editor-sidebar.component.scss");
             state("visible", style({
                 width:"40%",
                 display: "block",
-                overflowY: "auto"
+                overflowY: "auto",
             })),
             state("hidden", style({
                 width: "10%",
@@ -82,10 +73,10 @@ export class EditorSidebarComponent implements OnInit {
     }
 
     showSideBar(): void {
-        this.sidebarVisibility.next<VisibilityState>("visible");
+        this.sidebarVisibility.next("visible");
     }
 
     collapseSidebar(): void {
-        this.sidebarVisibility.next<VisibilityState>("hidden");
+        this.sidebarVisibility.next("hidden");
     }
 }

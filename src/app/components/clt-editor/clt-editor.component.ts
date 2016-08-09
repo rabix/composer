@@ -10,15 +10,15 @@ import {
 import {FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 import {FileModel} from "../../store/models/fs.models";
 import {GuiEditorService} from "./shared/gui-editor.service";
-import {EditorSidebarComponent} from "./sidebar/editor-sidebar.component";
+import {EditorSidebarComponent} from "../sidebar/editor-sidebar.component";
 import {FormPosition, VisibilityState} from "./animation.states";
 import {BehaviorSubject} from "rxjs/Rx";
 import {CommandLineComponent} from "./commandline/commandline.component";
 import {DockerInputFormComponent} from "../forms/inputs/forms/docker-input-form.component";
 import {BaseCommandFormComponent} from "../forms/inputs/forms/base-command-form.component";
-import {ToolInputsFormComponent} from "../forms/inputs/forms/tool-inputs-form.component";
+import {InputPortsFormComponent} from "../forms/inputs/forms/input-ports-form.component";
 
-require("./gui-editor.component.scss");
+require("./clt-editor.component.scss");
 
 @Component({
     selector: "gui-editor",
@@ -26,7 +26,7 @@ require("./gui-editor.component.scss");
     directives: [
         DockerInputFormComponent,
         BaseCommandFormComponent,
-        ToolInputsFormComponent,
+        InputPortsFormComponent,
         EditorSidebarComponent,
         CommandLineComponent,
         REACTIVE_FORM_DIRECTIVES,
@@ -45,7 +45,7 @@ require("./gui-editor.component.scss");
         ])
     ],
     template: `
-            <form class="gui-editor-group"
+            <form class="clt-editor-group"
                   (ngSubmit)="onSubmit()"
                   [formGroup]="guiEditorGroup">
                 <docker-input-form @formPosition="formPosition"
@@ -60,13 +60,13 @@ require("./gui-editor.component.scss");
                                 [baseCommand]="'echo'">
                 </base-command-form>
                 
-                <tool-inputs-form @formPosition="formPosition"
-                                  class="input-form"></tool-inputs-form>
+                <inputs-ports-form @formPosition="formPosition"
+                                  class="input-form"></inputs-ports-form>
             </form>
             <editor-sidebar [sidebarVisibility]="sidebarVisibility"></editor-sidebar>
     `
 })
-export class GuiEditorComponent {
+export class CltEditorComponent {
     /** The file that we are going to use to list the properties */
     @Input()
     private file: FileModel;

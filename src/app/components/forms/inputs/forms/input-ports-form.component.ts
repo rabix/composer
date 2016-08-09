@@ -1,13 +1,13 @@
 import {Component} from "@angular/core";
-import {GuiEditorService} from "../../../gui-editor/shared/gui-editor.service";
-import {SidebarEvent} from "../../../gui-editor/shared/gui-editor.events";
-import {SidebarType} from "../../../gui-editor/shared/sidebar.enums";
+import {GuiEditorService} from "../../../clt-editor/shared/gui-editor.service";
+import {SidebarEvent} from "../../../clt-editor/shared/gui-editor.events";
+import {SidebarType} from "../../../clt-editor/shared/sidebar.enums";
 
 require("./form.components.scss");
-require("./tool-inputs-form.component.scss");
+require("./input-ports-form.component.scss");
 
 @Component({
-    selector: 'tool-inputs-form',
+    selector: 'inputs-ports-form',
     template: `
         <form>
          <fieldset class="form-group">
@@ -61,7 +61,7 @@ require("./tool-inputs-form.component.scss");
         </form>
     `
 })
-export class ToolInputsFormComponent {
+export class InputPortsFormComponent {
 
     constructor(private guiEditorService: GuiEditorService) { }
 
