@@ -5,6 +5,7 @@ import {VisibilityState} from "../clt-editor/animation.states";
 import {SidebarType} from "../clt-editor/shared/sidebar.type";
 import {GuiEditorService} from "../clt-editor/shared/gui-editor.service";
 import {SidebarEvent} from "../clt-editor/shared/gui-editor.events";
+import {ExpressionEditorComponent} from "./expression-editor/expression-editor.component";
 
 require ("./editor-sidebar.component.scss");
 
@@ -26,17 +27,20 @@ require ("./editor-sidebar.component.scss");
             transition("visible => hidden", animate("100ms ease-out"))
         ])
     ],
-    directives: [ObjectInspectorComponent],
+    directives: [
+        ObjectInspectorComponent,
+        ExpressionEditorComponent
+    ],
     template: `
             <div class="editor-sidebar-component" @sidebarState="sidebarState">
-                <div class="collapse-icon">
-                    <i class="fa fa-lg fa-caret-left" (click)="collapseSidebar()"></i>
-                </div>
                 <div class="sidebar-content">
-                    <!--TODO: add expression editor here-->
-                    <span *ngIf="sidebar === sideBarType.Expression">
-                        Expression
-                    </span>
+                    
+                    <div class="collapse-icon" (click)="collapseSidebar()">
+                        <i class="fa fa-lg fa-caret-left" 
+                           [ngClass]="{'black': sidebar === sideBarType.ObjectInspector}"></i>
+                    </div>
+                    <expression-editor *ngIf="sidebar === sideBarType.Expression">
+                    </expression-editor>
                     
                     <object-inspector *ngIf="sidebar === sideBarType.ObjectInspector"
                                       [data]="sidebarData">

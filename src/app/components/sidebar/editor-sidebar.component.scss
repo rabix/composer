@@ -1,25 +1,30 @@
 @import "../../../assets/sass/variables";
 
+.black {
+    color: #000000;
+}
+
 .editor-sidebar-component {
     right: 0;
     top: 0;
-    padding-left: 10px;
     position: absolute;
-    background: #000000;
     height: 100%;
 }
 
 .collapse-icon {
-    padding-top: 5px;
+    text-align: center;
     height: 100%;
-    position: absolute;
     cursor: pointer;
+    width: $collapse-icon-width;
+    position: relative;
+    float: left;
+    z-index: 1;
+    background: transparent;
 }
 
 .sidebar-content {
-    left: 30px;
-    width: calc(100% - 30px);
     height: 100%;
+    width: 100%;
     padding-top: 5px;
     position: relative;
 }

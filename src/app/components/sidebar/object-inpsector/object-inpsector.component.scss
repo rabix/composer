@@ -1,9 +1,14 @@
+@import "../../../../assets/sass/variables";
+
 .object-inspector-component {
     background: #ffffff;
     height: 100%;
-    width: 100%;
-    padding: 10px 5px 0 5px;
+    padding: 0 5px 0 $collapse-icon-width;
     color: #000000;
+    top: 0;
+    width: 100%;
+    border: solid #333333;
+    border-width: 0 0 0 2px;
 }
 
 .edit-text {
