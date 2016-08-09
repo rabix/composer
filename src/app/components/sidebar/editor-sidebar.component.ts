@@ -2,13 +2,12 @@ import {Component, OnInit, style, animate, state, transition, trigger, Input} fr
 import {BehaviorSubject} from "rxjs/Rx";
 import {ObjectInspectorComponent} from "./object-inpsector/object-insepctor.component";
 import {VisibilityState} from "../clt-editor/animation.states";
-import {SidebarType} from "../clt-editor/shared/sidebar.enums";
+import {SidebarType} from "../clt-editor/shared/sidebar.type";
 import {GuiEditorService} from "../clt-editor/shared/gui-editor.service";
 import {SidebarEvent} from "../clt-editor/shared/gui-editor.events";
 
 require ("./editor-sidebar.component.scss");
 
-/** TODO: make this switch between an expression editor and an object inspector*/
 @Component({
     selector: "editor-sidebar",
     animations: [
@@ -35,11 +34,12 @@ require ("./editor-sidebar.component.scss");
                 </div>
                 <div class="sidebar-content">
                     <!--TODO: add expression editor here-->
-                    <span [hidden]="sidebar !== sideBarType.Expression">
+                    <span *ngIf="sidebar === sideBarType.Expression">
                         Expression
                     </span>
                     
-                    <object-inspector [hidden]="sidebar !== sideBarType.ObjectInspector">
+                    <object-inspector *ngIf="sidebar === sideBarType.ObjectInspector"
+                                      [data]="sidebarData">
                     </object-inspector>
                 </div>
             </div>
@@ -59,11 +59,15 @@ export class EditorSidebarComponent implements OnInit {
     /** The type of the sidebar */
     private sidebar: SidebarType;
 
+    /** Data that we are passing to the sidebar */
+    private sidebarData: Object;
+
     constructor(private guiEditorService: GuiEditorService) {
         this.guiEditorService.publishedSidebarEvents.subscribe((event: SidebarEvent) => {
-                this.sidebar = event.data.sidebarType;
-                this.showSideBar();
-            });
+            this.sidebarData = event.data || {};
+            this.sidebar = event.sidebarType;
+            this.showSideBar();
+        });
     }
 
     ngOnInit(): void {

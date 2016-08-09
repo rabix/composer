@@ -1,13 +1,17 @@
-import {Component} from "@angular/core";
+import {Component, Input, OnInit} from "@angular/core";
 import {GuiEditorService} from "../../../clt-editor/shared/gui-editor.service";
+import {InputPort} from "../../../../models/input-port.model";
+import {InputPortListComponent} from "../types/input-port-list.component";
+import {SidebarType} from "../../../clt-editor/shared/sidebar.type";
 import {SidebarEvent} from "../../../clt-editor/shared/gui-editor.events";
-import {SidebarType} from "../../../clt-editor/shared/sidebar.enums";
+import {EventType} from "../../../clt-editor/shared/event.type";
 
 require("./form.components.scss");
 require("./input-ports-form.component.scss");
 
 @Component({
     selector: 'inputs-ports-form',
+    directives: [InputPortListComponent],
     template: `
         <form>
          <fieldset class="form-group">
@@ -15,61 +19,41 @@ require("./input-ports-form.component.scss");
             
             <button type="button" class="btn btn-secondary hide-btn">Hide</button>
 
-            <div class="container">
-                <div class="row">
-                    <div class="col-sm-2">
-                    </div>
-                    <div class="col-sm-3">
-                        ID               
-                    </div>
-                    <div class="col-sm-1">
-                        Type
-                    </div>
-                    <div class="col-sm-4">
-                        Value
-                    </div>
-                </div>
-                
-                <!--TODO: move this-->
-                <div class="row tool-input-row">
-                    <div class="col-sm-2">
-                        <i class="fa fa-align-justify tool-input-icon" aria-hidden="true"></i>
-                    </div>
-                    <div class="col-sm-3">
-                        input_bam_files               
-                    </div>
-                    <div class="col-sm-1">
-                        int
-                    </div>
-                    
-                    <div class="col-sm-4">
-                        Not defined
-                    </div>
-                    <div class="col-sm-1 icons-right-side">
-                        <i class="fa fa-pencil tool-input-icon" 
-                           aria-hidden="true" 
-                           (click)="openObjectInspector()"></i>
-                    </div>
-                    <div class="col-sm-1 icons-right-side tool-input-icon">
-                        <i class="fa fa-times" aria-hidden="true"></i>
-                    </div>
-                </div>
+            <div *ngIf="inputPorts.length === 0" class="col-sm-12">
+                No input ports defined.
+            </div>
+
+            <div class="container" *ngIf="inputPorts.length > 0">
+                <input-port-list [portList]="inputPorts"></input-port-list>
             </div>
             
             </fieldset>
-            <button type="button" class="btn btn-secondary add-input-btn">Add Input</button>
+            <button type="button" class="btn btn-secondary add-input-btn" 
+                    (click)="addInput()">Add Input</button>
         </form>
     `
 })
-export class InputPortsFormComponent {
+export class InputPortsFormComponent implements OnInit {
+
+    @Input()
+    private inputPorts: Array<InputPort> = [];
 
     constructor(private guiEditorService: GuiEditorService) { }
 
-    openObjectInspector() {
+    ngOnInit(): void {
+        /*let mockInputPort = new InputPort({
+         id: "input_bam_files",
+         type: "int",
+         value: "Not defined"
+         });
+
+         this.inputPorts.push(mockInputPort);*/
+    }
+
+    addInput(): void {
         let showSidebarEvent: SidebarEvent = {
-            data: {
-                sidebarType: SidebarType.ObjectInspector
-            }
+            eventType: EventType.Add,
+            sidebarType: SidebarType.ObjectInspector
         };
 
         this.guiEditorService.publishSidebarEvent(showSidebarEvent);

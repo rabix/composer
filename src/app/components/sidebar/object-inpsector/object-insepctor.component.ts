@@ -1,10 +1,9 @@
-import {Component} from "@angular/core";
+import {Component, Input} from "@angular/core";
 import {Validators, FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 import {ExpressionInputComponent} from "../../forms/inputs/types/expression-input.component";
 
 require ("./object-inpsector.component.scss");
 
-/** TODO: make this switch between an expression editor and an object inspector*/
 @Component({
     selector: "object-inspector",
     directives: [
@@ -21,11 +20,16 @@ require ("./object-inpsector.component.scss");
             
                 <div class="form-group">
                     <label for="inputId">ID</label>
-                    <input type="text" id="inputId" class="form-control">
+                    <input type="text" 
+                           name="inputId" 
+                           class="form-control"
+                           [(ngModel)]="data.id">
                 </div>
                 
                 <div class="form-group">
                     <label for="inputType">Type</label>
+                    
+                    <!--TODO: add a list of possible types -->
                     <select class="form-control">
                     </select>
                 </div>
@@ -33,7 +37,7 @@ require ("./object-inpsector.component.scss");
                 <div class="form-group">
                     <label for="inputValue">Value</label>
                     <expression-input [inputControl]="objectInspectorForm.controls['expression']"
-                                      [expression]="propertyValue">
+                                      [expression]="data.value">
                     </expression-input>
                 </div>
             </form>
@@ -41,8 +45,9 @@ require ("./object-inpsector.component.scss");
 })
 export class ObjectInspectorComponent {
 
-    /** The value of the property that we are editing */
-    private propertyValue: string;
+    /** The object that we are editing */
+    @Input()
+    private data: Object;
 
     private objectInspectorForm: FormGroup;
 

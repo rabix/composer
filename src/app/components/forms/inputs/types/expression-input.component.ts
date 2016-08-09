@@ -2,7 +2,8 @@ import {Component, Input} from "@angular/core";
 import {FormControl, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 import {GuiEditorService} from "../../../clt-editor/shared/gui-editor.service";
 import {SidebarEvent} from "../../../clt-editor/shared/gui-editor.events";
-import {SidebarType} from "../../../clt-editor/shared/sidebar.enums";
+import {SidebarType} from "../../../clt-editor/shared/sidebar.type";
+import {EventType} from "../../../clt-editor/shared/event.type";
 
 require("./expression-input.component.scss");
 
@@ -40,9 +41,8 @@ export class ExpressionInputComponent {
 
     openExpressionSidebar() {
         let showSidebarEvent: SidebarEvent = {
-            data: {
-                sidebarType: SidebarType.Expression
-            }
+            eventType: EventType.Edit,
+            sidebarType: SidebarType.Expression
         };
 
         this.guiEditorService.publishSidebarEvent(showSidebarEvent);
