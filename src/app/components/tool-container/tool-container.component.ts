@@ -32,7 +32,7 @@ export type ViewMode = "gui" | "json";
         
             <div class="main-content">
                 <code-editor *ngIf="viewMode === 'json'" [file]="file"></code-editor>
-                <gui-editor class="gui-editor-component" *ngIf="viewMode === 'gui'" [file]="file"></gui-editor>
+                <clt-editor class="gui-editor-component" *ngIf="viewMode === 'gui'" [file]="file"></clt-editor>
             </div>
             
             <div class="footer">

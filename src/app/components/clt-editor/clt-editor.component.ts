@@ -21,7 +21,7 @@ import {InputPortsFormComponent} from "../forms/inputs/forms/input-ports-form.co
 require("./clt-editor.component.scss");
 
 @Component({
-    selector: "gui-editor",
+    selector: "clt-editor",
     providers: [GuiEditorService],
     directives: [
         DockerInputFormComponent,
@@ -46,7 +46,6 @@ require("./clt-editor.component.scss");
     ],
     template: `
             <form class="clt-editor-group"
-                  (ngSubmit)="onSubmit()"
                   [formGroup]="guiEditorGroup">
                 <docker-input-form @formPosition="formPosition"
                                 class="input-form" 
