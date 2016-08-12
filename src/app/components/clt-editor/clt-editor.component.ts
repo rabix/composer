@@ -1,28 +1,20 @@
-import {
-    Component,
-    Input,
-    trigger,
-    style,
-    animate,
-    state,
-    transition
-} from "@angular/core";
+import {Component, Input, trigger, style, animate, state, transition} from "@angular/core";
 import {FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 import {FileModel} from "../../store/models/fs.models";
-import {GuiEditorService} from "./shared/gui-editor.service";
+import {CltEditorService} from "./shared/clt-editor.service";
 import {EditorSidebarComponent} from "../sidebar/editor-sidebar.component";
-import {FormPosition, VisibilityState} from "./animation.states";
-import {BehaviorSubject} from "rxjs/Rx";
+import {FormPosition} from "./animation.states";
 import {CommandLineComponent} from "./commandline/commandline.component";
 import {DockerInputFormComponent} from "../forms/inputs/forms/docker-input-form.component";
 import {BaseCommandFormComponent} from "../forms/inputs/forms/base-command-form.component";
 import {InputPortsFormComponent} from "../forms/inputs/forms/input-ports-form.component";
+import {SidebarEvent, SidebarEventType} from "../sidebar/shared/sidebar.events";
 
 require("./clt-editor.component.scss");
 
 @Component({
     selector: "clt-editor",
-    providers: [GuiEditorService],
+    providers: [CltEditorService],
     directives: [
         DockerInputFormComponent,
         BaseCommandFormComponent,
@@ -62,7 +54,7 @@ require("./clt-editor.component.scss");
                 <inputs-ports-form @formPosition="formPosition"
                                   class="input-form"></inputs-ports-form>
             </form>
-            <editor-sidebar [sidebarVisibility]="sidebarVisibility"></editor-sidebar>
+            <editor-sidebar></editor-sidebar>
     `
 })
 export class CltEditorComponent {
@@ -82,15 +74,14 @@ export class CltEditorComponent {
 
     /** ControlGroup that encapsulates the validation for all the nested forms */
     private guiEditorGroup: FormGroup;
-
-    private sidebarVisibility: BehaviorSubject<VisibilityState>;
-
-    constructor(private formBuilder: FormBuilder) {
+    
+    constructor(private formBuilder: FormBuilder,
+                private guiEditorService: CltEditorService) {
         this.guiEditorGroup = this.formBuilder.group({});
-        this.sidebarVisibility = new BehaviorSubject<VisibilityState>("hidden");
 
-        this.sidebarVisibility.subscribe((state: VisibilityState) => {
-            this.formPosition = state === "hidden" ? "center": "left";
+        this.guiEditorService.publishedSidebarEvents.subscribe((event: SidebarEvent) => {
+            let event = event.sidebarEventType;
+            this.formPosition = event === SidebarEventType.Hide ? "center": "left";
         });
     }
 }

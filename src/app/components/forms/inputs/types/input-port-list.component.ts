@@ -1,13 +1,15 @@
-import {Component, Input} from "@angular/core";
-import {InputPort} from "../../../../models/input-port.model";
-import {SidebarType} from "../../../clt-editor/shared/sidebar.type";
-import {SidebarEvent} from "../../../clt-editor/shared/gui-editor.events";
-import {GuiEditorService} from "../../../clt-editor/shared/gui-editor.service";
-import {EventType} from "../../../clt-editor/shared/event.type";
+import {Component, Input, Output, EventEmitter} from "@angular/core";
+import {InputProperty} from "../../../../models/input-property.model";
+import {SidebarType} from "../../../sidebar/shared/sidebar.type";
+import {SidebarEvent, SidebarEventType} from "../../../sidebar/shared/sidebar.events";
+import {CltEditorService} from "../../../clt-editor/shared/clt-editor.service";
+import {BehaviorSubject} from "rxjs";
 
 @Component({
     selector: "input-port-list",
     template: `
+            <div *ngIf="portList.length > 0">
+            
                 <div class="row">
                     <div class="col-sm-2">
                     </div>
@@ -44,28 +46,59 @@ import {EventType} from "../../../clt-editor/shared/event.type";
                     </div>
                     
                     <div class="col-sm-1 icons-right-side tool-input-icon">
-                        <i class="fa fa-times" aria-hidden="true"></i>
+                        <i class="fa fa-times" 
+                           aria-hidden="true"
+                           (click)="removeProperty(inputPort)"></i>
                     </div>
                 </div>
+                
+        </div> <!-- List end -->
+        
+         <div *ngIf="portList.length === 0" class="col-sm-12">
+                No input ports defined.
+        </div>
     `
 })
 export class InputPortListComponent {
     @Input()
-    private portList: Array<InputPort>;
+    private portList: Array<InputProperty>;
 
-    constructor(private guiEditorService: GuiEditorService) { }
+    @Output()
+    private portListChange: EventEmitter<Array<InputProperty>> = new EventEmitter<Array<InputProperty>>();
 
-    editProperty(inputPort: InputPort): void {
+    private selectedInputPort: BehaviorSubject<InputProperty> = new BehaviorSubject<InputProperty>(null);
+
+    constructor(private guiEditorService: CltEditorService) { }
+
+    editProperty(inputPort: InputProperty): void {
+        this.selectedInputPort.next(inputPort);
+
         let editPropertySidebarEvent: SidebarEvent = {
-            eventType: EventType.Edit,
+            sidebarEventType: SidebarEventType.Show,
             sidebarType: SidebarType.ObjectInspector,
             data: {
-                id: inputPort.id,
-                type: inputPort.type,
-                value: inputPort.value
+                stream: this.selectedInputPort
             }
         };
 
+        this.guiEditorService.publishSidebarEvent(editPropertySidebarEvent);
+    }
+
+    removeProperty(inputPort: InputProperty): void {
+        /** TODO: figure out how we want to identify our inputs */
+        if (!inputPort.id) {
+            return;
+        }
+
+        this.portList = this.portList.filter((prop: InputProperty) => {
+            return inputPort.id !== prop.id;
+        });
+
+        let editPropertySidebarEvent: SidebarEvent = {
+            sidebarEventType: SidebarEventType.Hide
+        };
+
+        this.portListChange.emit(this.portList);
         this.guiEditorService.publishSidebarEvent(editPropertySidebarEvent);
     }
 }

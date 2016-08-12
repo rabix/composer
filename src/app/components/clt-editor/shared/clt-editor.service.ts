@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Subject }    from 'rxjs/Subject';
-import {SidebarEvent} from "./gui-editor.events";
+import {SidebarEvent} from "../../sidebar/shared/sidebar.events";
 
 @Injectable()
-export class GuiEditorService {
+export class CltEditorService {
     // Observable sources
     private sidebarEvents = new Subject<SidebarEvent>();
     

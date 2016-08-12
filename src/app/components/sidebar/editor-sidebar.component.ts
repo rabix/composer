@@ -1,11 +1,12 @@
-import {Component, OnInit, style, animate, state, transition, trigger, Input} from "@angular/core";
+import {Component, style, animate, state, transition, trigger} from "@angular/core";
 import {BehaviorSubject} from "rxjs/Rx";
 import {ObjectInspectorComponent} from "./object-inpsector/object-insepctor.component";
 import {VisibilityState} from "../clt-editor/animation.states";
-import {SidebarType} from "../clt-editor/shared/sidebar.type";
-import {GuiEditorService} from "../clt-editor/shared/gui-editor.service";
-import {SidebarEvent} from "../clt-editor/shared/gui-editor.events";
+import {SidebarType} from "./shared/sidebar.type";
+import {CltEditorService} from "../clt-editor/shared/clt-editor.service";
+import {SidebarEvent, SidebarEventType} from "./shared/sidebar.events";
 import {ExpressionEditorComponent} from "./expression-editor/expression-editor.component";
+import {InputProperty} from "../../models/input-property.model";
 
 require ("./editor-sidebar.component.scss");
 
@@ -43,17 +44,13 @@ require ("./editor-sidebar.component.scss");
                     </expression-editor>
                     
                     <object-inspector *ngIf="sidebar === sideBarType.ObjectInspector"
-                                      [data]="sidebarData">
+                                      [(inputModelStream)]="sidebarData">
                     </object-inspector>
                 </div>
             </div>
     `
 })
-export class EditorSidebarComponent implements OnInit {
-    /** Emit changes of the sidebar animation to the parent component */
-    @Input()
-    private sidebarVisibility: BehaviorSubject<VisibilityState>;
-
+export class EditorSidebarComponent {
     /** State of the sidebar animation */
     private sidebarState: VisibilityState;
 
@@ -64,27 +61,27 @@ export class EditorSidebarComponent implements OnInit {
     private sidebar: SidebarType;
 
     /** Data that we are passing to the sidebar */
-    private sidebarData: Object;
+    private sidebarData: BehaviorSubject<InputProperty>;
 
-    constructor(private guiEditorService: GuiEditorService) {
+    constructor(private guiEditorService: CltEditorService) {
         this.guiEditorService.publishedSidebarEvents.subscribe((event: SidebarEvent) => {
-            this.sidebarData = event.data || {};
-            this.sidebar = event.sidebarType;
-            this.showSideBar();
+
+            if (event.sidebarEventType === SidebarEventType.Show) {
+                this.sidebarData = event.data.stream;
+                this.sidebar = event.sidebarType;
+                this.sidebarState = "visible";
+            } else {
+                this.sidebarState = "hidden";
+            }
         });
     }
 
-    ngOnInit(): void {
-        this.sidebarVisibility.subscribe((state: VisibilityState) => {
-            this.sidebarState = state;
-        });
-    }
-
-    showSideBar(): void {
-        this.sidebarVisibility.next("visible");
-    }
 
     collapseSidebar(): void {
-        this.sidebarVisibility.next("hidden");
+        let editPropertySidebarEvent: SidebarEvent = {
+            sidebarEventType: SidebarEventType.Hide
+        };
+
+        this.guiEditorService.publishSidebarEvent(editPropertySidebarEvent);
     }
 }

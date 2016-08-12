@@ -1,9 +1,9 @@
-import {Component, Input} from "@angular/core";
+import {Component, Input, Output, EventEmitter} from "@angular/core";
 import {FormControl, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
-import {GuiEditorService} from "../../../clt-editor/shared/gui-editor.service";
-import {SidebarEvent} from "../../../clt-editor/shared/gui-editor.events";
-import {SidebarType} from "../../../clt-editor/shared/sidebar.type";
-import {EventType} from "../../../clt-editor/shared/event.type";
+import {CltEditorService} from "../../../clt-editor/shared/clt-editor.service";
+import {SidebarEvent, SidebarEventType} from "../../../sidebar/shared/sidebar.events";
+import {SidebarType} from "../../../sidebar/shared/sidebar.type";
+import {BehaviorSubject} from "rxjs";
 
 require("./expression-input.component.scss");
 
@@ -15,7 +15,9 @@ require("./expression-input.component.scss");
     ],
     template: `
             <div class="input-group expression-input-group">
-                <input name="expression"
+                <input #expressionInput 
+                    (keyup)="onInputChange(expressionInput.value)"
+                    name="expression"
                     type="text" 
                     class="form-control"
                     [formControl]="inputControl"
@@ -33,16 +35,30 @@ export class ExpressionInputComponent {
     @Input()
     private expression: string;
 
+    @Output()
+    private expressionChange: EventEmitter<string> = new EventEmitter<string>();
+
     /** The form control passed from the parent */
     @Input()
     private inputControl: FormControl;
 
-    constructor(private guiEditorService: GuiEditorService) { }
+    private expressionStream: BehaviorSubject<string> = new BehaviorSubject(null);
+
+    constructor(private guiEditorService: CltEditorService) { }
+
+    onInputChange(expression: string) {
+        this.expressionChange.emit(expression);
+    }
 
     openExpressionSidebar() {
+        this.expressionStream.next(this.expression);
+        
         let showSidebarEvent: SidebarEvent = {
-            eventType: EventType.Edit,
-            sidebarType: SidebarType.Expression
+            sidebarEventType: SidebarEventType.Show,
+            sidebarType: SidebarType.Expression,
+            data: {
+                stream: this.expressionStream
+            }
         };
 
         this.guiEditorService.publishSidebarEvent(showSidebarEvent);

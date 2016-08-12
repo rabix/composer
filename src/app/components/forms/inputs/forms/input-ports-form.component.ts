@@ -1,10 +1,10 @@
-import {Component, Input, OnInit} from "@angular/core";
-import {GuiEditorService} from "../../../clt-editor/shared/gui-editor.service";
-import {InputPort} from "../../../../models/input-port.model";
+import {Component, Input} from "@angular/core";
+import {CltEditorService} from "../../../clt-editor/shared/clt-editor.service";
+import {InputProperty} from "../../../../models/input-property.model";
 import {InputPortListComponent} from "../types/input-port-list.component";
-import {SidebarType} from "../../../clt-editor/shared/sidebar.type";
-import {SidebarEvent} from "../../../clt-editor/shared/gui-editor.events";
-import {EventType} from "../../../clt-editor/shared/event.type";
+import {SidebarType} from "../../../sidebar/shared/sidebar.type";
+import {SidebarEvent, SidebarEventType} from "../../../sidebar/shared/sidebar.events";
+import {BehaviorSubject} from "rxjs";
 
 require("./form.components.scss");
 require("./input-ports-form.component.scss");
@@ -19,13 +19,11 @@ require("./input-ports-form.component.scss");
             
             <button type="button" class="btn btn-secondary hide-btn">Hide</button>
 
-            <div *ngIf="inputPorts.length === 0" class="col-sm-12">
-                No input ports defined.
-            </div>
+           
 
-            <div class="container" *ngIf="inputPorts.length > 0">
-                <input-port-list [portList]="inputPorts"></input-port-list>
-            </div>
+            <!--<div class="container" *ngIf="inputPorts.length > 0">-->
+                <input-port-list [(portList)]="inputPorts"></input-port-list>
+          <!--  </div>-->
             
             </fieldset>
             <button type="button" class="btn btn-secondary add-input-btn" 
@@ -33,27 +31,29 @@ require("./input-ports-form.component.scss");
         </form>
     `
 })
-export class InputPortsFormComponent implements OnInit {
+export class InputPortsFormComponent {
 
     @Input()
-    private inputPorts: Array<InputPort> = [];
+    private inputPorts: Array<InputProperty> = [];
 
-    constructor(private guiEditorService: GuiEditorService) { }
+    private selectedInputPort: BehaviorSubject<InputProperty> = new BehaviorSubject<InputProperty>(null);
 
-    ngOnInit(): void {
-        /*let mockInputPort = new InputPort({
-         id: "input_bam_files",
-         type: "int",
-         value: "Not defined"
-         });
+    constructor(private guiEditorService: CltEditorService) {
 
-         this.inputPorts.push(mockInputPort);*/
     }
 
     addInput(): void {
+        let mockInputPort = new InputProperty({});
+
+        this.selectedInputPort.next(mockInputPort);
+        this.inputPorts.push(mockInputPort);
+
         let showSidebarEvent: SidebarEvent = {
-            eventType: EventType.Add,
-            sidebarType: SidebarType.ObjectInspector
+            sidebarEventType: SidebarEventType.Show,
+            sidebarType: SidebarType.ObjectInspector,
+            data: {
+                stream: this.selectedInputPort
+            }
         };
 
         this.guiEditorService.publishSidebarEvent(showSidebarEvent);
