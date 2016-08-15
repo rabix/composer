@@ -80,8 +80,8 @@ export class CltEditorComponent {
         this.guiEditorGroup = this.formBuilder.group({});
 
         this.guiEditorService.publishedSidebarEvents.subscribe((event: SidebarEvent) => {
-            let event = event.sidebarEventType;
-            this.formPosition = event === SidebarEventType.Hide ? "center": "left";
+            let eventType = event.sidebarEventType;
+            this.formPosition = eventType === SidebarEventType.Hide ? "center": "left";
         });
     }
 }

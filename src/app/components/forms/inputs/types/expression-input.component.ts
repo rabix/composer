@@ -53,6 +53,7 @@ export class ExpressionInputComponent {
 
         expressionStream.subscribe((expression) => {
             this.expression = expression;
+            this.expressionChange.emit(this.expression);
         });
 
         let showSidebarEvent: SidebarEvent = {
