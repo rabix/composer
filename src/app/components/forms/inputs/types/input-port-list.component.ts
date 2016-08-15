@@ -66,7 +66,7 @@ export class InputPortListComponent {
     @Output()
     private portListChange: EventEmitter<Array<InputProperty>> = new EventEmitter<Array<InputProperty>>();
 
-    private selectedInputPort: BehaviorSubject<InputProperty> = new BehaviorSubject<InputProperty>(null);
+    private selectedInputPort: BehaviorSubject<InputProperty> = new BehaviorSubject<InputProperty>(undefined);
 
     constructor(private guiEditorService: CltEditorService) { }
 
