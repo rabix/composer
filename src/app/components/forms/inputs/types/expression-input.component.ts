@@ -42,8 +42,6 @@ export class ExpressionInputComponent {
     @Input()
     private inputControl: FormControl;
 
-    private expressionStream: BehaviorSubject<string> = new BehaviorSubject(null);
-
     constructor(private guiEditorService: CltEditorService) { }
 
     onInputChange(expression: string) {
@@ -51,13 +49,17 @@ export class ExpressionInputComponent {
     }
 
     openExpressionSidebar() {
-        this.expressionStream.next(this.expression);
-        
+        let expressionStream: BehaviorSubject<string> = new BehaviorSubject(this.expression);
+
+        expressionStream.subscribe((expression) => {
+            this.expression = expression;
+        });
+
         let showSidebarEvent: SidebarEvent = {
             sidebarEventType: SidebarEventType.Show,
             sidebarType: SidebarType.Expression,
             data: {
-                stream: this.expressionStream
+                stream: expressionStream
             }
         };
 

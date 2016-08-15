@@ -94,11 +94,10 @@ export class InputPortListComponent {
             return inputPort.id !== prop.id;
         });
 
-        let editPropertySidebarEvent: SidebarEvent = {
-            sidebarEventType: SidebarEventType.Hide
-        };
-
         this.portListChange.emit(this.portList);
-        this.guiEditorService.publishSidebarEvent(editPropertySidebarEvent);
+        
+        this.guiEditorService.publishSidebarEvent({
+            sidebarEventType: SidebarEventType.Hide
+        });
     }
 }
