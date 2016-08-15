@@ -24,11 +24,17 @@ export type ViewMode = "gui" | "json";
         NgSwitchCase,
         NgSwitchDefault,
         ToolHeaderComponent,
-        CommandLineComponent
+        CommandLineComponent,
     ],
     template: `
-        <div class="tool-container-component">
-            <tool-header class="tool-header" [viewMode]="viewMode" (viewModeChanged)="setViewMode($event)"></tool-header>
+        <block-loader *ngIf="!isLoaded"></block-loader>
+        
+        <div class="tool-container-component" *ngIf="isLoaded">
+            <tool-header class="tool-header" 
+                        [file]="file"
+                        [viewMode]="viewMode"
+                        (viewModeChanged)="setViewMode($event)">
+            </tool-header>
         
             <div class="main-content">
                 <code-editor *ngIf="viewMode === 'json'" [file]="file"></code-editor>
@@ -43,7 +49,7 @@ export type ViewMode = "gui" | "json";
 })
 export class ToolContainerComponent implements OnInit, DynamicState {
     /** Default view mode. TODO: change type */
-    private viewMode: ViewMode = "gui";
+    private viewMode: ViewMode = "json";
 
     /** File that we will pass to both the gui and JSON editor*/
     private file: FileModel;
@@ -54,8 +60,12 @@ export class ToolContainerComponent implements OnInit, DynamicState {
     /** List of subscriptions that should be disposed when destroying this component */
     private subs: Subscription[];
 
+    /** Flag that determines if the spinner should be shown */
+    private isLoaded: boolean;
+    
     constructor(private fileRegistry: FileRegistry) {
         this.subs = [];
+        this.isLoaded = false;
     }
 
     ngOnInit(): void {
@@ -65,10 +75,11 @@ export class ToolContainerComponent implements OnInit, DynamicState {
         // bring our own file up to date
         this.subs.push(fileStream.subscribe(file => {
             this.file = file;
+            this.isLoaded = true;
         }));
     }
 
-    setViewMode(viewMode): void {
+    private setViewMode(viewMode): void {
         this.viewMode = viewMode;
     }
 
