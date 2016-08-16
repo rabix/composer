@@ -6,8 +6,7 @@ export class ToolValidator {
 
     private supportedFileType = [".js", ".yaml", ".yml", ".cwl", ".json"];
 
-    /* TODO: Check for tool type as well, when we have the data */
-    public isSupportedFileFormat(file: FileModel) {
+    public isSupportedFileFormat(file: FileModel): boolean {
         let fileTypeIndex: number = this.supportedFileType.indexOf(file.type);
         return fileTypeIndex > -1;
     }
