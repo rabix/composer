@@ -37,8 +37,8 @@ export class FileModel extends FSItemModel {
 
     constructor(attr: {
         name: string | FileName,
-        relativePath?: string
-        absolutePath?: string
+        relativePath?: string,
+        absolutePath?: string,
         content?: string,
         type?: string
     }) {
