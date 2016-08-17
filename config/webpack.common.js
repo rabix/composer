@@ -1,5 +1,16 @@
 const webpack = require('webpack');
 const helpers = require('./helpers');
+let appConfig = {};
+
+try {
+    appConfig = require('./config.json');
+} catch (ex) {
+    console.error("\x1b[31m", `
+    We couldn’t the “config/config.json” file.
+    Please check the “config/config.example.json” for instructions on how to make your own configuration.  
+    `, "\x1b[0m");
+    process.exit(1);
+}
 
 /*
  * Webpack Plugins
@@ -23,6 +34,8 @@ const METADATA = {
  * See: http://webpack.github.io/docs/configuration.html#cli
  */
 module.exports = {
+
+    appConfig,
 
     /*
      * Static metadata for index.html

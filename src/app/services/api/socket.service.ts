@@ -18,12 +18,8 @@ export class SocketService {
 
     constructor(@Inject(APP_CONFIG) private config: AppConfig) {
 
-        let host        = `http://${config.hostname}:${config.port}`;
+        let host        = config.webroot;
         this.connection = this.createConnectionStream(host);
-    }
-
-    public getDataStream(): Observable<SocketMessage> {
-        return this.connection;
     }
 
     public request(eventName: string, data: any = {}): Observable<any> {

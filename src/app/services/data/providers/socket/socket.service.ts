@@ -18,7 +18,7 @@ export class SocketService implements BackendService {
     constructor(@Inject(APP_CONFIG)
                 private config: AppConfig) {
 
-        this.io    = io(`http://${config.hostname}:${config.port}`);
+        this.io    = io(config.webroot);
         this.emits = new Subject<any>();
     }
 

@@ -1,9 +1,7 @@
 import {OpaqueToken} from "@angular/core";
 
 export interface AppConfig {
-    hostname?: string;
-    port?: number;
-    protocol?: string;
+    webroot: string;
 }
 
 declare const APP_ENV_CONFIG;

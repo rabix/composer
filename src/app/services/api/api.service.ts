@@ -12,7 +12,7 @@ export class ApiService {
     constructor(private http: Http,
                 @Inject(APP_CONFIG) private config: AppConfig) {
 
-        this.endpoint = `${config.protocol}://${config.hostname}:${config.port}/api`;
+        this.endpoint = `${config.webroot}/api`;
 
     }
 
