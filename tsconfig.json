@@ -1,0 +1,35 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "sourceMap": true,
+        "noEmitHelpers": true,
+        "lib": ["dom", "es6"],
+        "types": [
+            "core-js",
+            "jasmine",
+            "node",
+            "jquery",
+            "ace",
+            "socket.io-client"
+        ]
+    },
+    "exclude": [
+        "./node_modules"
+    ],
+    "filesGlob": [
+        "./src/**/*.ts",
+        "node_modules/zone.js/dist/zone.js.d.ts"
+    ],
+    "awesomeTypescriptLoaderOptions": {
+        "resolveGlobs": true,
+        "forkChecker": true
+    },
+    "compileOnSave": false,
+    "buildOnSave": false,
+    "atom": {
+        "rewriteTsconfig": false
+    }
+}

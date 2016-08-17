@@ -1,0 +1,23 @@
+@import "../../../assets/sass/variables";
+
+ct-menu {
+    background: rgba(192, 192, 192, .98);
+    border-radius: 4px;
+    display: block;
+    left: 0;
+    min-width: 200px;
+    padding: 4px 0;
+    position: absolute;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+
+    &.nested {
+        margin-top: -4px;
+    }
+
+    ct-menu-item {
+        display: block;
+    }
+}
+

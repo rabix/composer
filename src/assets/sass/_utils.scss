@@ -1,0 +1,36 @@
+.clickable {
+    cursor: pointer;
+}
+
+.full-size-table-display {
+    display: table;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}
+
+.vertically-aligned-cell {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.unselectable {
+    -webkit-user-select: none; /* webkit (safari, chrome) browsers */
+    -moz-user-select: none; /* mozilla browsers */
+    -ms-user-select: none; /* IE10+ */
+    user-select: none;
+}
+
+.deep-unselectable {
+    * {
+        -webkit-user-select: none; /* webkit (safari, chrome) browsers */
+        -moz-user-select: none; /* mozilla browsers */
+        -ms-user-select: none; /* IE10+ */
+        user-select: none;
+    }
+}
+
+.zero-size {
+    font-size: 0px;
+
+}

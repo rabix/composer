@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <title><%= webpackConfig.metadata.title %></title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="<%= webpackConfig.metadata.title %>">
+
+    <link type="text/css" rel="stylesheet" href="https://golden-layout.com/files/latest/css/goldenlayout-base.css"/>
+    <link type="text/css" rel="stylesheet"
+          href="https://golden-layout.com/files/latest/css/goldenlayout-dark-theme.css"/>
+    <link rel="stylesheet" href="">
+
+    <!-- base url -->
+    <base href="<%= webpackConfig.metadata.baseUrl %>">
+    <script>
+
+    </script>
+
+</head>
+
+<body>
+
+<cottontail>
+    <div class="loading-spinner">
+        <div class="icon">
+            <i class="fa fa-gear fa-4x fa-spin"></i>
+            <p>Loading...</p>
+        </div>
+    </div>
+</cottontail>
+
+<% if (webpackConfig.metadata.ENV === 'development') { %>
+<script src="/webpack-dev-server.js"></script>
+<% } %>
+
+</body>
+</html>
