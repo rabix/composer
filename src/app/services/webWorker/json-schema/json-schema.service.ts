@@ -1,26 +1,29 @@
-/// <reference no-default-lib="true"/>
-const {draft3, draft4} = require("cwlts/lib");
-const Validator = require("jsonschema").Validator;
+//this method is here to avoid linting errors
+declare function postMessage(message);
 
-declare function postMessage(message): void;
+// This class should only be used inside a WebWorker,
+// because it relies on the WebWorkers postMessage method
+export class JsonSchemaService {
+    private draft3;
+    private draft4;
+    private Validator;
 
-class JsonSchemaWorker {
-
-    constructor() {
-        const self = this;
-
-        onmessage = (e) => {
-            let cotent: string = e.data;
-            self.validateJson(cotent);
-        }
+    constructor(attr: {
+        draft3: Object,
+        draft4: Object,
+        Validator: Object
+    }) {
+        this.draft3 = attr.draft3;
+        this.draft4 = attr.draft4;
+        this.Validator = attr.Validator;
     }
 
     getJsonSchemaContainer(versionString: string) {
         switch(versionString) {
             case "draft-3":
-                return draft3;
+                return this.draft3;
             case "draft-4":
-                return draft4;
+                return this.draft4;
         }
     }
 
@@ -34,12 +37,12 @@ class JsonSchemaWorker {
 
 
     isValidCwlJson(json: any) {
-        if (json !== null && json.cwlVersion && json.class) {
+        if (json !== undefined && json.cwlVersion && json.class) {
 
             let isValid = this.isClassValid(json.class) && this.isCwlVersionValid(json.cwlVersion);
             if (!isValid) {
                 postMessage({
-                    data: null,
+                    data: undefined,
                     isValid: false,
                     error: 'cwlVersion or class is not valid'
                 });
@@ -49,7 +52,7 @@ class JsonSchemaWorker {
 
         } else {
             postMessage({
-                data: null,
+                data: undefined,
                 isValid: false,
                 error: 'JSON is missing "cwlVersion" or "class"'
             });
@@ -59,37 +62,37 @@ class JsonSchemaWorker {
     }
 
     validateJson(jsonText: string) {
-        let validator = new Validator();
-        let json = null;
-        let cwlVersion = null;
-        let jsonClass = null;
+        let validator = new this.Validator();
+        let cwlJson: {cwlVersion: string, class: string} = undefined;
+        let cwlVersion = undefined;
+        let jsonClass = undefined;
 
         try {
-            json = JSON.parse(jsonText);
+            cwlJson = JSON.parse(jsonText);
         } catch (e) {
             postMessage({
-                data: null,
+                data: undefined,
                 isValid: false,
                 error: jsonText + ' is not a valid JSON'
             });
         }
 
-        if (json !== null && this.isValidCwlJson(json)) {
-            cwlVersion = json.cwlVersion;
-            jsonClass = json.class;
+        if (cwlJson !== undefined && this.isValidCwlJson(cwlJson)) {
+            cwlVersion = cwlJson.cwlVersion;
+            jsonClass = cwlJson.class;
 
             let schemaContainer = this.getJsonSchemaContainer(cwlVersion);
             let result: any;
 
             switch(jsonClass) {
                 case 'Workflow':
-                    result = validator.validate(json, schemaContainer.wfSchema);
+                    result = validator.validate(cwlJson, schemaContainer.wfSchema);
                     break;
                 case 'CommandLineTool':
-                    result = validator.validate(json, schemaContainer.cltSchema);
+                    result = validator.validate(cwlJson, schemaContainer.cltSchema);
                     break;
                 case 'ExpressionTool':
-                    result = validator.validate(json, schemaContainer.etSchema);
+                    result = validator.validate(cwlJson, schemaContainer.etSchema);
                     break;
             }
 
@@ -100,6 +103,3 @@ class JsonSchemaWorker {
         }
     }
 }
-
-// create an instance so this worker actually runs
-new JsonSchemaWorker();

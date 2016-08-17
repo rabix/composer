@@ -1,7 +1,7 @@
-import {ValidationMessage} from "./json-schema.interfaces";
+import {ValidationMessage} from "./json-schema/json-schema.interfaces";
 import {Observable} from "rxjs/Rx";
 
-const JsonSchemaWorker = require("worker!./json-schema.worker.ts");
+const JsonSchemaWorker = require("worker!./json-schema/json-schema.worker.ts");
 
 export interface ValidationResponse {
     isValid: boolean,
