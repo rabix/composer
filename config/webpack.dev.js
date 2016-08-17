@@ -3,7 +3,7 @@
 const helpers = require('./helpers');
 const webpackMerge = require('webpack-merge'); // used to merge webpack configs
 const commonConfig = require('./webpack.common.js'); // the settings that are common to prod and dev
-const appConfig =  require('../../config/config.dev.json');
+
 /**
  * Webpack Plugins
  */
@@ -20,7 +20,7 @@ const METADATA = webpackMerge(commonConfig.metadata, {
     port: 3000,
     ENV: ENV,
     HMR: HMR,
-    APP_ENV_CONFIG: appConfig
+    APP_ENV_CONFIG: commonConfig.appConfig
 });
 
 /**

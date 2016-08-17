@@ -1,7 +1,6 @@
 
 const webpack = require('webpack');
 const helpers = require('./helpers');
-const appConfig =  require('../../config/config.test.json');
 /**
  * Webpack Plugins
  */
@@ -192,7 +191,7 @@ module.exports = {
         new DefinePlugin({
             'ENV': JSON.stringify(ENV),
             'HMR': false,
-            'APP_ENV_CONFIG': JSON.stringify(appConfig),
+            // 'APP_ENV_CONFIG': JSON.stringify(appConfig),
             'process.env': {
                 'ENV': JSON.stringify(ENV),
                 'NODE_ENV': JSON.stringify(ENV),
