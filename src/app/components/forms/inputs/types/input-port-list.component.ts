@@ -61,10 +61,10 @@ import {BehaviorSubject} from "rxjs";
 })
 export class InputPortListComponent {
     @Input()
-    private portList: Array<InputProperty>;
+    public portList: Array<InputProperty>;
 
     @Output()
-    private portListChange: EventEmitter<Array<InputProperty>> = new EventEmitter<Array<InputProperty>>();
+    public portListChange: EventEmitter<Array<InputProperty>> = new EventEmitter<Array<InputProperty>>();
 
     private selectedInputPort: BehaviorSubject<InputProperty> = new BehaviorSubject<InputProperty>(undefined);
 

@@ -68,7 +68,7 @@ export class ToolContainerComponent implements OnInit, DynamicState {
         }));
     }
 
-    setViewMode(viewMode): void {
+    private setViewMode(viewMode): void {
         this.viewMode = viewMode;
     }
 

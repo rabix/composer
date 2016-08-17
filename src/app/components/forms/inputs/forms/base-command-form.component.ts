@@ -29,11 +29,11 @@ require("./form.components.scss");
 })
 export class BaseCommandFormComponent implements OnInit {
     @Input()
-    private baseCommand: string;
+    public baseCommand: string;
 
     /** The parent forms group */
     @Input()
-    private group: FormGroup;
+    public group: FormGroup;
 
     private baseCommandForm: FormGroup;
 

@@ -30,7 +30,7 @@ require("./input-ports-form.component.scss");
 export class InputPortsFormComponent {
 
     @Input()
-    private inputPorts: Array<InputProperty> = [];
+    public inputPorts: Array<InputProperty> = [];
 
     private selectedInputPort: BehaviorSubject<InputProperty> = new BehaviorSubject<InputProperty>(undefined);
 

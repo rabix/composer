@@ -60,11 +60,11 @@ require("./clt-editor.component.scss");
 export class CltEditorComponent {
     /** The file that we are going to use to list the properties */
     @Input()
-    private file: FileModel;
+§    public file: FileModel;
 
     /** TODO: change array type to CommandInputParameterModel when we have the models */
     @Input()
-    private toolInputs: Array<any>;
+    public toolInputs: Array<any>;
 
     /** Positions of the listed properties */
     private formPosition: FormPosition = "center";

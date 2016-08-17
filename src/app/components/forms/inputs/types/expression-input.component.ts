@@ -33,14 +33,14 @@ require("./expression-input.component.scss");
 })
 export class ExpressionInputComponent {
     @Input()
-    private expression: string;
+    public expression: string;
 
     @Output()
-    private expressionChange: EventEmitter<string> = new EventEmitter<string>();
+    public expressionChange: EventEmitter<string> = new EventEmitter<string>();
 
     /** The form control passed from the parent */
     @Input()
-    private inputControl: FormControl;
+    public inputControl: FormControl;
 
     constructor(private guiEditorService: CltEditorService) { }
 
