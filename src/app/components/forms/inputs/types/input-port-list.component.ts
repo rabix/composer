@@ -81,7 +81,7 @@ export class InputPortListComponent {
             }
         };
 
-        this.guiEditorService.publishSidebarEvent(editPropertySidebarEvent);
+        this.guiEditorService.sidebarEvents.next(editPropertySidebarEvent);
     }
 
     removeProperty(inputPort: InputProperty): void {
@@ -96,7 +96,7 @@ export class InputPortListComponent {
 
         this.portListChange.emit(this.portList);
         
-        this.guiEditorService.publishSidebarEvent({
+        this.guiEditorService.sidebarEvents.next({
             sidebarEventType: SidebarEventType.Hide
         });
     }

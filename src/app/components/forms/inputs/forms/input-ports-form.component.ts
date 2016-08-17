@@ -52,6 +52,6 @@ export class InputPortsFormComponent {
             }
         };
 
-        this.guiEditorService.publishSidebarEvent(showSidebarEvent);
+        this.guiEditorService.sidebarEvents.next(showSidebarEvent);
     }
 }

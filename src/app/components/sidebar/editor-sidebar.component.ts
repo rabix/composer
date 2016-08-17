@@ -64,24 +64,24 @@ export class EditorSidebarComponent {
     private sidebarData: BehaviorSubject<InputProperty>;
 
     constructor(private guiEditorService: CltEditorService) {
-        this.guiEditorService.publishedSidebarEvents.subscribe((event: SidebarEvent) => {
-
-            if (event.sidebarEventType === SidebarEventType.Show) {
-                this.sidebarData = event.data.stream;
-                this.sidebar = event.sidebarType;
-                this.sidebarState = "visible";
-            } else {
-                this.sidebarState = "hidden";
-            }
-        });
+        this.guiEditorService.sidebarEvents
+            .filter(ev => ev !== undefined)
+            .subscribe((event: SidebarEvent) => {
+                if (event.sidebarEventType === SidebarEventType.Show) {
+                    this.sidebarData = event.data.stream;
+                    this.sidebar = event.sidebarType;
+                    this.sidebarState = "visible";
+                } else {
+                    this.sidebarState = "hidden";
+                }
+            });
     }
-
-
+    
     collapseSidebar(): void {
         let editPropertySidebarEvent: SidebarEvent = {
             sidebarEventType: SidebarEventType.Hide
         };
 
-        this.guiEditorService.publishSidebarEvent(editPropertySidebarEvent);
+        this.guiEditorService.sidebarEvents.next(editPropertySidebarEvent);
     }
 }

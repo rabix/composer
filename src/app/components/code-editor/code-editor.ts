@@ -6,7 +6,6 @@ import Editor = AceAjax.Editor;
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import {ValidationResponse, WebWorkerService} from "../../services/webWorker/web-worker.service";
-import {EventEmitter} from "events";
 
 export class CodeEditor {
     /** Holds an instance of the AceEditor */

@@ -64,6 +64,6 @@ export class ExpressionInputComponent {
             }
         };
 
-        this.guiEditorService.publishSidebarEvent(showSidebarEvent);
+        this.guiEditorService.sidebarEvents.next(showSidebarEvent);
     }
 }

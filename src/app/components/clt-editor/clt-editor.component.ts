@@ -74,14 +74,16 @@ export class CltEditorComponent {
 
     /** ControlGroup that encapsulates the validation for all the nested forms */
     private guiEditorGroup: FormGroup;
-    
+
     constructor(private formBuilder: FormBuilder,
                 private guiEditorService: CltEditorService) {
         this.guiEditorGroup = this.formBuilder.group({});
 
-        this.guiEditorService.publishedSidebarEvents.subscribe((event: SidebarEvent) => {
-            let eventType = event.sidebarEventType;
-            this.formPosition = eventType === SidebarEventType.Hide ? "center": "left";
-        });
+        this.guiEditorService.sidebarEvents
+            .filter(ev => ev !== undefined)
+            .subscribe((event: SidebarEvent) => {
+                let eventType = event.sidebarEventType;
+                this.formPosition = eventType === SidebarEventType.Hide ? "center": "left";
+            });
     }
 }
