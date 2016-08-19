@@ -19,9 +19,9 @@ require("./form.components.scss");
                         <label>Base Command</label>
                         <label class="secondary-label">What command do you want to call from the image</label>
                         
-                        <expression-input [inputControl]="baseCommandForm.controls['baseCommand']"
-                                            [expression]="baseCommand">
+                        <expression-input [inputControl]="baseCommandForm.controls['baseCommand']">
                         </expression-input>
+                        
                     <button type="button" class="btn btn-secondary add-input-btn">Add base command</button>
                 </fieldset>
              </form>
@@ -34,16 +34,21 @@ export class BaseCommandFormComponent implements OnInit {
     /** The parent forms group */
     @Input()
     public group: FormGroup;
-
+    
     private baseCommandForm: FormGroup;
 
-    constructor(private formBuilder: FormBuilder) {
-        this.baseCommandForm = this.formBuilder.group({
-            baseCommand: ['', Validators.compose([Validators.required, Validators.minLength(1)])]
-        });
-    }
+    constructor(private formBuilder: FormBuilder) { }
 
     ngOnInit(): void {
+        this.baseCommandForm = this.formBuilder.group({
+            baseCommand: [this.baseCommand, Validators.compose([Validators.required, Validators.minLength(1)])]
+        });
+
+       this.baseCommandForm.controls['baseCommand'].valueChanges.subscribe(value => {
+            this.baseCommand = value;
+        });
+
+
         this.group.addControl('baseCommand', this.baseCommandForm.controls['baseCommand']);
     }
 }
