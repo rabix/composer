@@ -1,6 +1,6 @@
 import {Component, style, animate, state, transition, trigger} from "@angular/core";
 import {BehaviorSubject} from "rxjs/Rx";
-import {ObjectInspectorComponent} from "./object-inpsector/object-insepctor.component";
+import {ObjectInspectorComponent} from "./object-inpsector/object-inspector.component";
 import {VisibilityState} from "../clt-editor/animation.states";
 import {SidebarType} from "./shared/sidebar.type";
 import {ExpressionEditorComponent} from "./expression-editor/expression-editor.component";

@@ -44,16 +44,16 @@ require("./clt-editor.component.scss");
     ],
     template: `
             <form class="clt-editor-group"
-                  [formGroup]="guiEditorGroup">
+                  [formGroup]="cltEditorGroup">
                 <docker-input-form @formPosition="formPosition"
                                 class="input-form" 
-                                [group]="guiEditorGroup"
+                                [group]="cltEditorGroup"
                                 [dockerPull]="'some.docker.image.com'">
                 </docker-input-form>
                                 
                 <base-command-form @formPosition="formPosition"
                                 class="input-form" 
-                                [group]="guiEditorGroup"
+                                [group]="cltEditorGroup"
                                 [baseCommand]="'echo'">
                 </base-command-form>
                 
@@ -82,11 +82,11 @@ export class CltEditorComponent {
     private commandlineContent: string = "This is the command line";
 
     /** ControlGroup that encapsulates the validation for all the nested forms */
-    private guiEditorGroup: FormGroup;
+    private cltEditorGroup: FormGroup;
 
     constructor(private formBuilder: FormBuilder,
                 private eventHubService: EventHubService) {
-        this.guiEditorGroup = this.formBuilder.group({});
+        this.cltEditorGroup = this.formBuilder.group({});
 
         this.eventHubService.on(OpenInputInspector)
             .subscribe(() => {

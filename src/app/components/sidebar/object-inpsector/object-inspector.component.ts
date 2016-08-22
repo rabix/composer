@@ -1,10 +1,10 @@
-import {Component, Input, OnChanges} from "@angular/core";
+import {Component, Input, OnInit} from "@angular/core";
 import {Validators, FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 import {ExpressionInputComponent} from "../../forms/inputs/types/expression-input.component";
 import {BehaviorSubject} from "rxjs";
 import {InputProperty} from "../../../models/input-property.model";
 
-require ("./object-inpsector.component.scss");
+require ("./object-inspector.component.scss");
 
 @Component({
     selector: "object-inspector",
@@ -15,7 +15,7 @@ require ("./object-inpsector.component.scss");
     ],
     template: `
             <form class="object-inspector-component">
-                <div class="formHead">
+                <div>
                      <span class="edit-text">Edit</span>
                     <i class="fa fa-info-circle info-icon"></i>
                 </div>
@@ -23,7 +23,8 @@ require ("./object-inpsector.component.scss");
                 <div class="form-group">
                     <label for="inputId">ID</label>
                     <input type="text" 
-                           name="inputId" 
+                           name="selectedPropertyId" 
+                           id="inputId" 
                            class="form-control"
                            [(ngModel)]="selectedProperty.id">
                 </div>
@@ -32,7 +33,8 @@ require ("./object-inpsector.component.scss");
                     <label for="inputType">Type</label>
                     
                     <select class="form-control" 
-                    name="dataType"
+                    name="selectedPropertyType" 
+                    id="dataType"
                     [(ngModel)]="selectedProperty.type" required>
                         <option *ngFor="let propertyType of propertyTypes" [value]="propertyType">
                             {{propertyType}}
@@ -48,7 +50,7 @@ require ("./object-inpsector.component.scss");
             </form>
     `
 })
-export class ObjectInspectorComponent implements OnChanges {
+export class ObjectInspectorComponent implements OnInit {
 
     /** The object that we are editing */
     @Input()
@@ -61,12 +63,12 @@ export class ObjectInspectorComponent implements OnChanges {
     private objectInspectorForm: FormGroup;
 
     /** Possible property types */
-    private propertyTypes: string[] = ["File", "string", "enum", "int", "float", "boolean", "array", "record", "map"];
+    private propertyTypes = ["File", "string", "enum", "int", "float", "boolean", "array", "record", "map"];
 
-    constructor(private formBuilder: FormBuilder) { }
+    constructor(private formBuilder: FormBuilder) {
+    }
 
-    /** This gets triggered when a data-bound input property value changes, i.e. when we change the inputModelStream. */
-    ngOnChanges(): void {
+    ngOnInit() {
         this.inputModelStream.subscribe((inputPort: InputProperty) => {
             this.selectedProperty = inputPort;
 
