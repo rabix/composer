@@ -3,10 +3,15 @@ import {BehaviorSubject} from "rxjs/Rx";
 import {ObjectInspectorComponent} from "./object-inpsector/object-insepctor.component";
 import {VisibilityState} from "../clt-editor/animation.states";
 import {SidebarType} from "./shared/sidebar.type";
-import {CltEditorService} from "../clt-editor/shared/clt-editor.service";
-import {SidebarEvent, SidebarEventType} from "./shared/sidebar.events";
 import {ExpressionEditorComponent} from "./expression-editor/expression-editor.component";
 import {InputProperty} from "../../models/input-property.model";
+import {
+    OpenInputInspector,
+    OpenExpressionEditor,
+    CloseExpressionEditor,
+    CloseInputInspector
+} from "../../action-events/index";
+import {EventHubService} from "../../services/event-hub/event-hub.service";
 
 require ("./editor-sidebar.component.scss");
 
@@ -63,25 +68,33 @@ export class EditorSidebarComponent {
     /** Data that we are passing to the sidebar */
     private sidebarData: BehaviorSubject<InputProperty>;
 
-    constructor(private guiEditorService: CltEditorService) {
-        this.guiEditorService.sidebarEvents
-            .filter(ev => ev !== undefined)
-            .subscribe((event: SidebarEvent) => {
-                if (event.sidebarEventType === SidebarEventType.Show) {
-                    this.sidebarData = event.data.stream;
-                    this.sidebar = event.sidebarType;
-                    this.sidebarState = "visible";
-                } else {
-                    this.sidebarState = "hidden";
-                }
-            });
-    }
-    
-    collapseSidebar(): void {
-        let editPropertySidebarEvent: SidebarEvent = {
-            sidebarEventType: SidebarEventType.Hide
-        };
+    constructor(private eventHubService: EventHubService) {
 
-        this.guiEditorService.sidebarEvents.next(editPropertySidebarEvent);
+        this.eventHubService.on(OpenInputInspector).subscribe((action) => {
+            this.sidebarData = action.payload;
+            this.sidebar = SidebarType.ObjectInspector;
+            this.sidebarState = "visible";
+        });
+
+        this.eventHubService.on(OpenExpressionEditor).subscribe((action) => {
+            this.sidebarData = action.payload;
+            this.sidebar = SidebarType.Expression;
+            this.sidebarState = "visible";
+        });
+
+        const closeSideBar = this.eventHubService.on(CloseInputInspector)
+            .merge(this.eventHubService.on(CloseExpressionEditor));
+
+        closeSideBar.subscribe(() => {
+            this.sidebarState = "hidden";
+        });
+    }
+
+    private collapseSidebar(): void {
+        if (this.sidebar === SidebarType.Expression) {
+            this.eventHubService.publish(new CloseExpressionEditor());
+        } else {
+            this.eventHubService.publish(new CloseInputInspector());
+        }
     }
 }

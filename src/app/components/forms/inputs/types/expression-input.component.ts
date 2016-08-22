@@ -1,9 +1,8 @@
-import {Component, Input, Output, EventEmitter} from "@angular/core";
+import {Component, Input} from "@angular/core";
 import {FormControl, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
-import {CltEditorService} from "../../../clt-editor/shared/clt-editor.service";
-import {SidebarEvent, SidebarEventType} from "../../../sidebar/shared/sidebar.events";
-import {SidebarType} from "../../../sidebar/shared/sidebar.type";
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {EventHubService} from "../../../../services/event-hub/event-hub.service";
+import {OpenExpressionEditor} from "../../../../action-events/index";
 
 require("./expression-input.component.scss");
 
@@ -15,13 +14,7 @@ require("./expression-input.component.scss");
     ],
     template: `
             <div class="input-group expression-input-group">
-                <input #expressionInput 
-                    (keyup)="onInputChange(expressionInput.value)"
-                    name="expression"
-                    type="text" 
-                    class="form-control"
-                    [formControl]="inputControl"
-                    [(ngModel)]="expression">
+                <input class="form-control" [formControl]="inputControl"/>
                     
                 <span class="input-group-addon add-expression">
                     <button type="button" 
@@ -32,38 +25,24 @@ require("./expression-input.component.scss");
         `
 })
 export class ExpressionInputComponent {
-    @Input()
-    public expression: string;
-
-    @Output()
-    public expressionChange: EventEmitter<string> = new EventEmitter<string>();
 
     /** The form control passed from the parent */
     @Input()
     public inputControl: FormControl;
 
-    constructor(private guiEditorService: CltEditorService) { }
+    constructor(private eventHubService: EventHubService) { }
 
-    onInputChange(expression: string) {
-        this.expressionChange.emit(expression);
-    }
+    private openExpressionSidebar(): void {
+        //TODO(mate): change to observable
+        const expressionStream: BehaviorSubject<string> = new BehaviorSubject<string>(this.inputControl.value);
 
-    openExpressionSidebar() {
-        let expressionStream: BehaviorSubject<string> = new BehaviorSubject(this.expression);
-
-        expressionStream.subscribe((expression) => {
-            this.expression = expression;
-            this.expressionChange.emit(this.expression);
+        expressionStream.subscribe(expression => {
+            this.inputControl.updateValue(expression, {
+                onlySelf: false,
+                emitEvent: true
+            })
         });
 
-        let showSidebarEvent: SidebarEvent = {
-            sidebarEventType: SidebarEventType.Show,
-            sidebarType: SidebarType.Expression,
-            data: {
-                stream: expressionStream
-            }
-        };
-
-        this.guiEditorService.sidebarEvents.next(showSidebarEvent);
+        this.eventHubService.publish(new OpenExpressionEditor(expressionStream));
     }
 }

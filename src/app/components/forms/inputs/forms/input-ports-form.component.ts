@@ -1,10 +1,9 @@
 import {Component} from "@angular/core";
-import {CltEditorService} from "../../../clt-editor/shared/clt-editor.service";
 import {InputProperty} from "../../../../models/input-property.model";
 import {InputPortListComponent} from "../types/input-port-list.component";
-import {SidebarType} from "../../../sidebar/shared/sidebar.type";
-import {SidebarEvent, SidebarEventType} from "../../../sidebar/shared/sidebar.events";
 import {InputPortService} from "../../../../services/input-port/input-port.service";
+import {EventHubService} from "../../../../services/event-hub/event-hub.service";
+import {OpenInputInspector} from "../../../../action-events/index";
 
 require("./form.components.scss");
 require("./input-ports-form.component.scss");
@@ -30,23 +29,15 @@ require("./input-ports-form.component.scss");
 })
 export class InputPortsFormComponent {
     
-    constructor(private guiEditorService: CltEditorService,
-                private inputPortService: InputPortService) { }
+    constructor(private inputPortService: InputPortService,
+                private eventHubService: EventHubService) { }
 
     private addInput(): void {
         const mockInputPort = new InputProperty({});
 
         this.inputPortService.addInput(mockInputPort);
         this.inputPortService.setSelected(mockInputPort);
-        
-        const showSidebarEvent: SidebarEvent = {
-            sidebarEventType: SidebarEventType.Show,
-            sidebarType: SidebarType.ObjectInspector,
-            data: {
-                stream: this.inputPortService.selectedInputPort
-            }
-        };
 
-        this.guiEditorService.sidebarEvents.next(showSidebarEvent);
+        this.eventHubService.publish(new OpenInputInspector(this.inputPortService.selectedInputPort));
     }
 }

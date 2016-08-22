@@ -1,7 +1,6 @@
-import {Component, Input, DoCheck, OnChanges} from "@angular/core";
+import {Component, Input, OnChanges} from "@angular/core";
 import {Validators, FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 import {ExpressionInputComponent} from "../../forms/inputs/types/expression-input.component";
-import * as _ from "lodash";
 import {BehaviorSubject} from "rxjs";
 import {InputProperty} from "../../../models/input-property.model";
 
@@ -43,14 +42,13 @@ require ("./object-inpsector.component.scss");
                 
                 <div class="form-group">
                     <label for="inputValue">Value</label>
-                    <expression-input [inputControl]="objectInspectorForm.controls['expression']"
-                                      [(expression)]="selectedProperty.value">
+                    <expression-input [inputControl]="objectInspectorForm.controls['expression']">
                     </expression-input>
                 </div>
             </form>
     `
 })
-export class ObjectInspectorComponent implements DoCheck, OnChanges {
+export class ObjectInspectorComponent implements OnChanges {
 
     /** The object that we are editing */
     @Input()
@@ -59,32 +57,26 @@ export class ObjectInspectorComponent implements DoCheck, OnChanges {
     /** The currently displayed property */
     private selectedProperty: InputProperty;
 
-    /** A copy of the property for change detection */
-    private oldProperty: InputProperty;
-
+    /** FormGroup for the ObjectInspector */
     private objectInspectorForm: FormGroup;
 
     /** Possible property types */
-    private propertyTypes: Array<string> = ["File", "string", "enum", "int", "float", "boolean", "array", "record", "map"];
+    private propertyTypes: string[] = ["File", "string", "enum", "int", "float", "boolean", "array", "record", "map"];
 
-    constructor(private formBuilder: FormBuilder) {
-        this.objectInspectorForm = this.formBuilder.group({
-            expression: ['', Validators.compose([Validators.required, Validators.minLength(1)])]
-        });
-    }
+    constructor(private formBuilder: FormBuilder) { }
 
     /** This gets triggered when a data-bound input property value changes, i.e. when we change the inputModelStream. */
     ngOnChanges(): void {
         this.inputModelStream.subscribe((inputPort: InputProperty) => {
             this.selectedProperty = inputPort;
-        });
-    }
 
-    /** Custom change detection needed for objects */
-    ngDoCheck(): void {
-        if (!_.isEqual(this.selectedProperty, this.oldProperty)) {
-            this.oldProperty = _.cloneDeep(this.selectedProperty);
-            this.inputModelStream.next(this.selectedProperty)
-        }
+            this.objectInspectorForm = this.formBuilder.group({
+                expression: [this.selectedProperty.value, Validators.compose([Validators.required, Validators.minLength(1)])]
+            });
+
+            this.objectInspectorForm.controls["expression"].valueChanges.subscribe(value => {
+                this.selectedProperty.value = value;
+            });
+        });
     }
 }

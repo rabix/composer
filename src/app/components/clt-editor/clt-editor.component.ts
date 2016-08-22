@@ -1,20 +1,26 @@
 import {Component, Input, trigger, style, animate, state, transition} from "@angular/core";
 import {FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 import {FileModel} from "../../store/models/fs.models";
-import {CltEditorService} from "./shared/clt-editor.service";
 import {EditorSidebarComponent} from "../sidebar/editor-sidebar.component";
 import {FormPosition} from "./animation.states";
 import {CommandLineComponent} from "./commandline/commandline.component";
 import {DockerInputFormComponent} from "../forms/inputs/forms/docker-input-form.component";
 import {BaseCommandFormComponent} from "../forms/inputs/forms/base-command-form.component";
 import {InputPortsFormComponent} from "../forms/inputs/forms/input-ports-form.component";
-import {SidebarEvent, SidebarEventType} from "../sidebar/shared/sidebar.events";
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {InputProperty} from "../../models/input-property.model";
+import {EventHubService} from "../../services/event-hub/event-hub.service";
+import {
+    OpenInputInspector,
+    OpenExpressionEditor,
+    CloseExpressionEditor,
+    CloseInputInspector
+} from "../../action-events/index";
 
 require("./clt-editor.component.scss");
 
 @Component({
     selector: "clt-editor",
-    providers: [CltEditorService],
     directives: [
         DockerInputFormComponent,
         BaseCommandFormComponent,
@@ -52,7 +58,8 @@ require("./clt-editor.component.scss");
                 </base-command-form>
                 
                 <inputs-ports-form @formPosition="formPosition"
-                                  class="input-form"></inputs-ports-form>
+                                  class="input-form"
+                                  [inputPorts]="toolInputPorts"></inputs-ports-form>
             </form>
             <editor-sidebar></editor-sidebar>
     `
@@ -60,11 +67,13 @@ require("./clt-editor.component.scss");
 export class CltEditorComponent {
     /** The file that we are going to use to list the properties */
     @Input()
-§    public file: FileModel;
+    public file: FileModel;
 
     /** TODO: change array type to CommandInputParameterModel when we have the models */
     @Input()
     public toolInputs: Array<any>;
+
+    private toolInputPorts: BehaviorSubject<InputProperty[]> = new BehaviorSubject<InputProperty[]>([]);
 
     /** Positions of the listed properties */
     private formPosition: FormPosition = "center";
@@ -76,14 +85,26 @@ export class CltEditorComponent {
     private guiEditorGroup: FormGroup;
 
     constructor(private formBuilder: FormBuilder,
-                private guiEditorService: CltEditorService) {
+                private eventHubService: EventHubService) {
         this.guiEditorGroup = this.formBuilder.group({});
 
-        this.guiEditorService.sidebarEvents
-            .filter(ev => ev !== undefined)
-            .subscribe((event: SidebarEvent) => {
-                let eventType = event.sidebarEventType;
-                this.formPosition = eventType === SidebarEventType.Hide ? "center": "left";
+        this.eventHubService.on(OpenInputInspector)
+            .subscribe(() => {
+
             });
+
+        let openSideBar = this.eventHubService.on(OpenInputInspector)
+                            .merge(this.eventHubService.on(OpenExpressionEditor));
+
+        let closeSideBar = this.eventHubService.on(CloseInputInspector)
+                            .merge(this.eventHubService.on(CloseExpressionEditor));
+
+        openSideBar.subscribe(() => {
+            this.formPosition = "left";
+        });
+
+        closeSideBar.subscribe(() => {
+            this.formPosition = "center";
+        });
     }
 }

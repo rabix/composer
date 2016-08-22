@@ -23,7 +23,7 @@ export class InputPortService {
     /** Stream for adding new imports */
     private deletedInputPort: Subject<InputProperty> = new Subject<InputProperty>();
 
-    /** Stream that aggregates all changes on the inputPorts list */
+    /** Stream that aggregates all changes on the exposedList list */
     private inputPortsUpdate: Subject<any> = new Subject<any>();
 
     /** The currently  selected input port */
@@ -33,7 +33,7 @@ export class InputPortService {
     private updateSelectedProperty: BehaviorSubject<InputProperty> = new BehaviorSubject<InputProperty>(undefined);
 
     constructor() {
-        /* Subscribe the inputPorts to inputPortsUpdate */
+        /* Subscribe the exposedList to inputPortsUpdate */
         this.inputPorts = this.inputPortsUpdate
             .scan((inputPorts: InputProperty[], operation: PropertyOperation) => {
                 return operation(inputPorts);

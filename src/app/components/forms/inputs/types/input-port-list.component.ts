@@ -1,9 +1,8 @@
 import {Component} from "@angular/core";
 import {InputProperty} from "../../../../models/input-property.model";
-import {SidebarType} from "../../../sidebar/shared/sidebar.type";
-import {SidebarEvent, SidebarEventType} from "../../../sidebar/shared/sidebar.events";
-import {CltEditorService} from "../../../clt-editor/shared/clt-editor.service";
 import {InputPortService} from "../../../../services/input-port/input-port.service";
+import {CloseInputInspector, OpenInputInspector} from "../../../../action-events/index";
+import {EventHubService} from "../../../../services/event-hub/event-hub.service";
 
 @Component({
     selector: "input-port-list",
@@ -24,7 +23,6 @@ import {InputPortService} from "../../../../services/input-port/input-port.servi
                     </div>
                 </div>
 
-                 <!--<li *ngFor="let item of items | async">{{item}}</li>-->
                  <div class="row tool-input-row" *ngFor="let inputPort of portList">  
                     <div class="col-sm-2">
                         <i class="fa fa-align-justify tool-input-icon" aria-hidden="true"></i>
@@ -66,8 +64,8 @@ export class InputPortListComponent {
 
     private selectedInputPort: InputProperty;
 
-    constructor(private guiEditorService: CltEditorService,
-                private inputPortService: InputPortService) {
+    constructor(private inputPortService: InputPortService,
+                private eventHubService: EventHubService) {
 
         this.inputPortService.inputPorts.subscribe((portList: InputProperty[]) => {
             this.portList = portList;
@@ -80,16 +78,7 @@ export class InputPortListComponent {
 
     private editProperty(inputPort: InputProperty): void {
         this.inputPortService.setSelected(inputPort);
-
-        const editPropertySidebarEvent: SidebarEvent = {
-            sidebarEventType: SidebarEventType.Show,
-            sidebarType: SidebarType.ObjectInspector,
-            data: {
-                stream: this.inputPortService.selectedInputPort
-            }
-        };
-
-        this.guiEditorService.sidebarEvents.next(editPropertySidebarEvent);
+        this.eventHubService.publish(new OpenInputInspector(this.inputPortService.selectedInputPort));
     }
 
     private removeProperty(inputPort: InputProperty): void {
@@ -101,9 +90,7 @@ export class InputPortListComponent {
         this.inputPortService.deleteInputPort(inputPort);
 
         if (this.selectedInputPort.id === inputPort.id) {
-            this.guiEditorService.sidebarEvents.next({
-                sidebarEventType: SidebarEventType.Hide
-            });
+            this.eventHubService.publish(new CloseInputInspector());
         }
     }
 }
