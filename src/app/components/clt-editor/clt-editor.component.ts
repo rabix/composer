@@ -1,7 +1,6 @@
 import {Component, Input, trigger, style, animate, state, transition} from "@angular/core";
 import {FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 import {FileModel} from "../../store/models/fs.models";
-import {EditorSidebarComponent} from "../sidebar/editor-sidebar.component";
 import {FormPosition} from "./animation.states";
 import {CommandLineComponent} from "./commandline/commandline.component";
 import {DockerInputFormComponent} from "../forms/inputs/forms/docker-input-form.component";
@@ -13,8 +12,7 @@ import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {
     OpenInputInspector,
     OpenExpressionEditor,
-    CloseExpressionEditor,
-    CloseInputInspector
+    CloseInputInspector, EventHubAction, CloseExpressionEditor
 } from "../../action-events/index";
 
 require("./clt-editor.component.scss");
@@ -25,7 +23,6 @@ require("./clt-editor.component.scss");
         DockerInputFormComponent,
         BaseCommandFormComponent,
         InputPortsFormComponent,
-        EditorSidebarComponent,
         CommandLineComponent,
         REACTIVE_FORM_DIRECTIVES,
         FORM_DIRECTIVES
@@ -61,7 +58,6 @@ require("./clt-editor.component.scss");
                                   class="input-form"
                                   [inputPorts]="toolInputPorts"></inputs-ports-form>
             </form>
-            <editor-sidebar></editor-sidebar>
     `
 })
 export class CltEditorComponent {
@@ -84,6 +80,8 @@ export class CltEditorComponent {
     /** ControlGroup that encapsulates the validation for all the nested forms */
     private cltEditorGroup: FormGroup;
 
+    private closeSidebarActions = [];
+
     constructor(private formBuilder: FormBuilder,
                 private eventHubService: EventHubService) {
         this.cltEditorGroup = this.formBuilder.group({});
@@ -93,18 +91,34 @@ export class CltEditorComponent {
 
             });
 
-        let openSideBar = this.eventHubService.on(OpenInputInspector)
-                            .merge(this.eventHubService.on(OpenExpressionEditor));
-
-        let closeSideBar = this.eventHubService.on(CloseInputInspector)
-                            .merge(this.eventHubService.on(CloseExpressionEditor));
-
-        openSideBar.subscribe(() => {
+        /* Opening the sidebar */
+        this.eventHubService.on(OpenInputInspector).subscribe(() => {
+            this.closeSidebarActions.push(CloseInputInspector);
             this.formPosition = "left";
         });
 
-        closeSideBar.subscribe(() => {
-            this.formPosition = "center";
+        this.eventHubService.on(OpenExpressionEditor).subscribe(() => {
+            this.closeSidebarActions.push(CloseExpressionEditor);
+            this.formPosition = "left";
         });
+
+        /* Closing the sidebar */
+        this.eventHubService.on(CloseInputInspector).subscribe(() => {
+            this.deleteSidebarActionFromArray(CloseInputInspector);
+        });
+
+        this.eventHubService.on(CloseExpressionEditor).subscribe(() => {
+            this.deleteSidebarActionFromArray(CloseExpressionEditor);
+        });
+    }
+
+    deleteSidebarActionFromArray(action) {
+        this.closeSidebarActions = this.closeSidebarActions.filter(sidebarAction => {
+            return sidebarAction !== action;
+        });
+
+        if (this.closeSidebarActions.length === 0) {
+            this.formPosition = "center";
+        }
     }
 }

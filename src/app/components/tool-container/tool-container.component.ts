@@ -9,6 +9,8 @@ import {FileRegistry} from "../../services/file-registry.service";
 import {Subscription} from "rxjs/Rx";
 import {ToolHeaderComponent} from "./tool-header/tool-header.component";
 import {CommandLineComponent} from "../clt-editor/commandline/commandline.component";
+import {InputInspectorSidebarComponent} from "../sidebar/object-inpsector/input-inspector-sidebar.component";
+import {ExpressionEditorSidebarComponent} from "../sidebar/expression-editor/expression-editor-sidebar.component";
 
 require("./tool-container.component.scss");
 
@@ -24,15 +26,22 @@ export type ViewMode = "gui" | "json";
         NgSwitchCase,
         NgSwitchDefault,
         ToolHeaderComponent,
-        CommandLineComponent
+        CommandLineComponent,
+        InputInspectorSidebarComponent,
+        ExpressionEditorSidebarComponent
     ],
     template: `
         <div class="tool-container-component">
             <tool-header class="tool-header" [viewMode]="viewMode" (viewModeChanged)="setViewMode($event)"></tool-header>
         
-            <div class="main-content">
-                <code-editor *ngIf="viewMode === 'json'" [file]="file"></code-editor>
-                <clt-editor class="gui-editor-component" *ngIf="viewMode === 'gui'" [file]="file"></clt-editor>
+            <div class="scroll-content">
+                <div class="main-content">
+                    <code-editor *ngIf="viewMode === 'json'" [file]="file"></code-editor>
+                    <clt-editor class="gui-editor-component" *ngIf="viewMode === 'gui'" [file]="file"></clt-editor>
+                    
+                    <input-inspector-sidebar-component></input-inspector-sidebar-component>
+                    <expression-editor-sidebar-component></expression-editor-sidebar-component>
+                </div>
             </div>
             
             <div class="footer">

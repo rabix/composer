@@ -4,17 +4,17 @@ import {ExpressionInputComponent} from "../../forms/inputs/types/expression-inpu
 import {BehaviorSubject} from "rxjs";
 import {InputProperty} from "../../../models/input-property.model";
 
-require ("./object-inspector.component.scss");
+require ("./input-inspector.component.scss");
 
 @Component({
-    selector: "object-inspector",
+    selector: "input-inspector",
     directives: [
         ExpressionInputComponent,
         REACTIVE_FORM_DIRECTIVES,
         FORM_DIRECTIVES
     ],
     template: `
-            <form class="object-inspector-component">
+            <form class="input-inspector-component">
                 <div>
                      <span class="edit-text">Edit</span>
                     <i class="fa fa-info-circle info-icon"></i>
@@ -44,13 +44,13 @@ require ("./object-inspector.component.scss");
                 
                 <div class="form-group">
                     <label for="inputValue">Value</label>
-                    <expression-input [inputControl]="objectInspectorForm.controls['expression']">
+                    <expression-input [inputControl]="inputInspectorForm.controls['expression']">
                     </expression-input>
                 </div>
             </form>
     `
 })
-export class ObjectInspectorComponent implements OnInit {
+export class InputInspectorComponent implements OnInit {
 
     /** The object that we are editing */
     @Input()
@@ -60,7 +60,7 @@ export class ObjectInspectorComponent implements OnInit {
     private selectedProperty: InputProperty;
 
     /** FormGroup for the ObjectInspector */
-    private objectInspectorForm: FormGroup;
+    private inputInspectorForm: FormGroup;
 
     /** Possible property types */
     private propertyTypes = ["File", "string", "enum", "int", "float", "boolean", "array", "record", "map"];
@@ -72,11 +72,11 @@ export class ObjectInspectorComponent implements OnInit {
         this.inputModelStream.subscribe((inputPort: InputProperty) => {
             this.selectedProperty = inputPort;
 
-            this.objectInspectorForm = this.formBuilder.group({
+            this.inputInspectorForm = this.formBuilder.group({
                 expression: [this.selectedProperty.value, Validators.compose([Validators.required, Validators.minLength(1)])]
             });
 
-            this.objectInspectorForm.controls["expression"].valueChanges.subscribe(value => {
+            this.inputInspectorForm.controls["expression"].valueChanges.subscribe(value => {
                 this.selectedProperty.value = value;
             });
         });
