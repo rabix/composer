@@ -3,6 +3,7 @@ import {FormControl, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/f
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {EventHubService} from "../../../../services/event-hub/event-hub.service";
 import {OpenExpressionEditor} from "../../../../action-events/index";
+import {ExpressionService} from "../../../../services/expression/expression.service";
 
 require("./expression-input.component.scss");
 
@@ -30,19 +31,19 @@ export class ExpressionInputComponent {
     @Input()
     public inputControl: FormControl;
 
-    constructor(private eventHubService: EventHubService) { }
+    constructor(private eventHubService: EventHubService,
+                private expressionService: ExpressionService) { }
 
     private openExpressionSidebar(): void {
-        //TODO(mate): change to observable
-        const expressionStream: BehaviorSubject<string> = new BehaviorSubject<string>(this.inputControl.value);
+        this.expressionService.setExpression(this.inputControl.value);
 
-        expressionStream.subscribe(expression => {
+        this.expressionService.expression.subscribe(expression => {
             this.inputControl.updateValue(expression, {
                 onlySelf: false,
                 emitEvent: true
             })
         });
 
-        this.eventHubService.publish(new OpenExpressionEditor(expressionStream));
+        this.eventHubService.publish(new OpenExpressionEditor(this.expressionService.expression));
     }
 }
