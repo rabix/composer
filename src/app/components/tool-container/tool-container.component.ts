@@ -58,7 +58,7 @@ export type ViewMode = "gui" | "json";
 })
 export class ToolContainerComponent implements OnInit, DynamicState {
     /** Default view mode. TODO: change type */
-    private viewMode: ViewMode = "gui";
+    private viewMode: ViewMode = "json";
 
     /** File that we will pass to both the gui and JSON editor*/
     private file: FileModel;

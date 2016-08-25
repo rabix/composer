@@ -47,14 +47,13 @@ export class ToolHeaderComponent implements OnInit{
     @Output()
     public viewModeChanged = new EventEmitter();
 
-    private changeViewMode(viewMode: string) {
     constructor(private toolValidator: ToolValidator) { }
 
     ngOnInit(): void {
         this.isValidTool = this.toolValidator.isSupportedFileFormat(this.file);
     }
 
-    changeViewMode(viewMode: string): void {
+    private changeViewMode(viewMode: string): void {
         this.viewModeChanged.emit(viewMode);
     }
 }
