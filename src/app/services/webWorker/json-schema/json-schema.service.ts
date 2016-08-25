@@ -1,12 +1,20 @@
 //this method is here to avoid linting errors
 declare function postMessage(message);
 
+export interface ValidationResponse {
+    isValidatableCwl: boolean,
+    isValidCwl: boolean,
+    errors: Array<any>
+    schema: any
+}
+
 // This class should only be used inside a WebWorker,
 // because it relies on the WebWorkers postMessage method
 export class JsonSchemaService {
     private draft3;
     private draft4;
     private Validator;
+    private errorMessage: string;
 
     constructor(attr: {
         draft3: Object,
@@ -18,7 +26,7 @@ export class JsonSchemaService {
         this.Validator = attr.Validator;
     }
 
-    getJsonSchemaContainer(versionString: string) {
+    private getJsonSchemaContainer(versionString: string) {
         switch(versionString) {
             case "draft-3":
                 return this.draft3;
@@ -27,61 +35,51 @@ export class JsonSchemaService {
         }
     }
 
-    isCwlVersionValid(versionString: string) {
+    private isCwlVersionValid(versionString: string) {
         return versionString === "draft-3" || versionString === "draft-4"
     }
 
-    isClassValid(cwlClass: string) {
+    private isClassValid(cwlClass: string) {
         return cwlClass === "Workflow" || cwlClass === "CommandLineTool" || cwlClass === "ExpressionTool";
     }
 
 
-    isValidCwlJson(json: any) {
+    private isValidCwlJson(json: any) {
         if (json !== undefined && json.cwlVersion && json.class) {
 
-            let isValid = this.isClassValid(json.class) && this.isCwlVersionValid(json.cwlVersion);
+            const isValid = this.isClassValid(json.class) && this.isCwlVersionValid(json.cwlVersion);
             if (!isValid) {
-                postMessage({
-                    data: undefined,
-                    isValid: false,
-                    error: 'cwlVersion or class is not valid'
-                });
+                this.errorMessage = "cwlVersion or class is not valid";
             }
 
             return isValid;
 
         } else {
-            postMessage({
-                data: undefined,
-                isValid: false,
-                error: 'JSON is missing "cwlVersion" or "class"'
-            });
-
+            this.errorMessage = "JSON is missing 'cwlVersion' or 'class'";
             return false;
         }
     }
 
-    validateJson(jsonText: string) {
-        let validator = new this.Validator();
-        let cwlJson: {cwlVersion: string, class: string} = undefined;
-        let cwlVersion = undefined;
-        let jsonClass = undefined;
+    public validateJson(jsonText: string) {
+        const validator = new this.Validator();
+        let cwlJson: {cwlVersion: string, class: string};
+        let cwlVersion;
+        let jsonClass;
 
         try {
             cwlJson = JSON.parse(jsonText);
         } catch (e) {
-            postMessage({
-                data: undefined,
-                isValid: false,
-                error: jsonText + ' is not a valid JSON'
-            });
+            this.sendErrorMessage("Not a valid JSON");
+            return;
         }
 
-        if (cwlJson !== undefined && this.isValidCwlJson(cwlJson)) {
+        if (!this.isValidCwlJson(cwlJson) && this.errorMessage) {
+            this.sendErrorMessage(this.errorMessage);
+        } else {
             cwlVersion = cwlJson.cwlVersion;
             jsonClass = cwlJson.class;
 
-            let schemaContainer = this.getJsonSchemaContainer(cwlVersion);
+            const schemaContainer = this.getJsonSchemaContainer(cwlVersion);
             let result: any;
 
             switch(jsonClass) {
@@ -96,10 +94,25 @@ export class JsonSchemaService {
                     break;
             }
 
-            postMessage({
-                data: result,
-                isValid: result.valid
-            });
+            this.sendValidationResult(result);
         }
+    }
+
+    private sendErrorMessage(errorMessage: string) {
+        postMessage({
+            isValidatableCwl: false,
+            isValidCwl: false,
+            errors: [errorMessage],
+            schema: undefined
+        });
+    }
+
+    private sendValidationResult(result: any) {
+        postMessage({
+            isValidatableCwl: true,
+            isValidCwl: result.valid,
+            errors: result.errors,
+            schema: result.instance
+        });
     }
 }

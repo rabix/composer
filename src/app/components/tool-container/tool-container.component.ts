@@ -57,7 +57,7 @@ export type ViewMode = "gui" | "json";
     `
 })
 export class ToolContainerComponent implements OnInit, DynamicState {
-    /** Default view mode. TODO: change type */
+    /** Default view mode. */
     private viewMode: ViewMode = "json";
 
     /** File that we will pass to both the gui and JSON editor*/
@@ -71,7 +71,7 @@ export class ToolContainerComponent implements OnInit, DynamicState {
 
     /** Flag that determines if the spinner should be shown */
     private isLoaded: boolean;
-    
+
     constructor(private fileRegistry: FileRegistry) {
         this.subs = [];
         this.isLoaded = false;

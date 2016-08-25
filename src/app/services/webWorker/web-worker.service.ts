@@ -1,51 +1,18 @@
-import {ValidationMessage} from "./json-schema/json-schema.interfaces";
-import {Observable} from "rxjs/Rx";
-
+import {Observable} from "rxjs/Observable";
 const JsonSchemaWorker = require("worker!./json-schema/json-schema.worker.ts");
-
-export interface ValidationResponse {
-    isValid: boolean,
-    errors: Array<any>
-    schema: any
-}
 
 /* This class should be instantiated (not injected), every instance will have one WebWorker instance. */
 export class WebWorkerService {
 
-    jsonSchemaWorker: Worker;
+    private jsonSchemaWorker: Worker;
+    public validationResultStream: Observable<any>;
 
     constructor() {
         this.jsonSchemaWorker = new JsonSchemaWorker();
+        this.validationResultStream = Observable.fromEvent(this.jsonSchemaWorker, 'message');
     }
 
-    private postMessage(jsonText: string) {
+    public validateJsonSchema(jsonText: string) {
         this.jsonSchemaWorker.postMessage(jsonText);
-    }
-
-    public validateJsonSchema(jsonText: string): Observable<ValidationResponse> {
-        this.postMessage(jsonText);
-
-        //noinspection TypeScriptUnresolvedFunction
-        return Observable.fromEventPattern((handler) => {
-            this.jsonSchemaWorker.onmessage = e => {
-                handler(e);
-            }}, () => {})
-            .map((res: any) => {
-                let responseMessage: ValidationMessage = res.data;
-                
-                if (responseMessage.error !== undefined) {
-                   throw Error(responseMessage.error);
-                } else {
-                    let isValid = responseMessage.isValid;
-                    let errors = responseMessage.data.errors;
-                    let schema = responseMessage.data.instance;
-
-                    return {
-                        isValid: isValid,
-                        errors: errors,
-                        schema: schema
-                    }
-                }
-            });
     }
 }
