@@ -1,14 +1,19 @@
-@import "../../../assets/sass/variables";
+@import "../../../../assets/sass/variables";
 
 .black {
     color: #000000;
 }
 
-.editor-sidebar-component {
+.sidebar-component {
     right: 0;
     top: 0;
     position: absolute;
     height: 100%;
+    z-index: -1;
+}
+
+.isTopOfStack {
+    z-index: 0;
 }
 
 .collapse-icon {
@@ -25,6 +30,5 @@
 .sidebar-content {
     height: 100%;
     width: 100%;
-    padding-top: 5px;
     position: relative;
 }

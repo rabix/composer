@@ -12,5 +12,4 @@ require ("./expression-editor.component.scss");
 })
 export class ExpressionEditorComponent {
 
-    constructor() { }
 }

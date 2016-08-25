@@ -1,9 +1,8 @@
-import {Component, Input, Output, EventEmitter} from "@angular/core";
+import {Component} from "@angular/core";
 import {InputProperty} from "../../../../models/input-property.model";
-import {SidebarType} from "../../../sidebar/shared/sidebar.type";
-import {SidebarEvent, SidebarEventType} from "../../../sidebar/shared/sidebar.events";
-import {CltEditorService} from "../../../clt-editor/shared/clt-editor.service";
-import {BehaviorSubject} from "rxjs";
+import {InputPortService} from "../../../../services/input-port/input-port.service";
+import {CloseInputInspector, OpenInputInspector} from "../../../../action-events/index";
+import {EventHubService} from "../../../../services/event-hub/event-hub.service";
 
 @Component({
     selector: "input-port-list",
@@ -60,44 +59,38 @@ import {BehaviorSubject} from "rxjs";
     `
 })
 export class InputPortListComponent {
-    @Input()
-    private portList: Array<InputProperty>;
 
-    @Output()
-    private portListChange: EventEmitter<Array<InputProperty>> = new EventEmitter<Array<InputProperty>>();
+    public portList: Array<InputProperty> = [];
 
-    private selectedInputPort: BehaviorSubject<InputProperty> = new BehaviorSubject<InputProperty>(undefined);
+    private selectedInputPort: InputProperty;
 
-    constructor(private guiEditorService: CltEditorService) { }
+    constructor(private inputPortService: InputPortService,
+                private eventHubService: EventHubService) {
 
-    editProperty(inputPort: InputProperty): void {
-        this.selectedInputPort.next(inputPort);
+        this.inputPortService.inputPorts.subscribe((portList: InputProperty[]) => {
+            this.portList = portList;
+        });
 
-        let editPropertySidebarEvent: SidebarEvent = {
-            sidebarEventType: SidebarEventType.Show,
-            sidebarType: SidebarType.ObjectInspector,
-            data: {
-                stream: this.selectedInputPort
-            }
-        };
-
-        this.guiEditorService.publishSidebarEvent(editPropertySidebarEvent);
+        this.inputPortService.selectedInputPort.subscribe(inputPort => {
+            this.selectedInputPort = inputPort;
+        });
     }
 
-    removeProperty(inputPort: InputProperty): void {
+    private editProperty(inputPort: InputProperty): void {
+        this.inputPortService.setSelected(inputPort);
+        this.eventHubService.publish(new OpenInputInspector(this.inputPortService.selectedInputPort));
+    }
+
+    private removeProperty(inputPort: InputProperty): void {
         /** TODO: figure out how we want to identify our inputs */
         if (!inputPort.id) {
             return;
         }
 
-        this.portList = this.portList.filter((prop: InputProperty) => {
-            return inputPort.id !== prop.id;
-        });
+        this.inputPortService.deleteInputPort(inputPort);
 
-        this.portListChange.emit(this.portList);
-        
-        this.guiEditorService.publishSidebarEvent({
-            sidebarEventType: SidebarEventType.Hide
-        });
+        if (this.selectedInputPort.id === inputPort.id) {
+            this.eventHubService.publish(new CloseInputInspector());
+        }
     }
 }

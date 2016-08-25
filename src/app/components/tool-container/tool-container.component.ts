@@ -9,6 +9,8 @@ import {FileRegistry} from "../../services/file-registry.service";
 import {Subscription} from "rxjs/Rx";
 import {ToolHeaderComponent} from "./tool-header/tool-header.component";
 import {CommandLineComponent} from "../clt-editor/commandline/commandline.component";
+import {InputInspectorSidebarComponent} from "../sidebar/object-inpsector/input-inspector-sidebar.component";
+import {ExpressionEditorSidebarComponent} from "../sidebar/expression-editor/expression-editor-sidebar.component";
 
 require("./tool-container.component.scss");
 
@@ -25,6 +27,8 @@ export type ViewMode = "gui" | "json";
         NgSwitchDefault,
         ToolHeaderComponent,
         CommandLineComponent,
+        InputInspectorSidebarComponent,
+        ExpressionEditorSidebarComponent
     ],
     template: `
         <block-loader *ngIf="!isLoaded"></block-loader>
@@ -36,9 +40,14 @@ export type ViewMode = "gui" | "json";
                         (viewModeChanged)="setViewMode($event)">
             </tool-header>
         
-            <div class="main-content">
-                <code-editor *ngIf="viewMode === 'json'" [file]="file"></code-editor>
-                <clt-editor class="gui-editor-component" *ngIf="viewMode === 'gui'" [file]="file"></clt-editor>
+            <div class="scroll-content">
+                <div class="main-content">
+                    <code-editor *ngIf="viewMode === 'json'" [file]="file"></code-editor>
+                    <clt-editor class="gui-editor-component" *ngIf="viewMode === 'gui'" [file]="file"></clt-editor>
+                    
+                    <input-inspector-sidebar-component></input-inspector-sidebar-component>
+                    <expression-editor-sidebar-component></expression-editor-sidebar-component>
+                </div>
             </div>
             
             <div class="footer">
@@ -49,7 +58,7 @@ export type ViewMode = "gui" | "json";
 })
 export class ToolContainerComponent implements OnInit, DynamicState {
     /** Default view mode. TODO: change type */
-    private viewMode: ViewMode = "json";
+    private viewMode: ViewMode = "gui";
 
     /** File that we will pass to both the gui and JSON editor*/
     private file: FileModel;

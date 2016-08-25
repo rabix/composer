@@ -1,5 +1,7 @@
 import {FileModel} from "../store/models/fs.models";
 import {CwlFileTemplate} from "../types/file-template.type";
+import {InputProperty} from "../models/input-property.model";
+import {Observable} from "rxjs/Observable";
 
 export class EventHubAction {
     public type: string;
@@ -98,5 +100,29 @@ export class CreateFileResponse extends EventHubAction {
 export class ApiError extends EventHubAction {
     constructor(error: any) {
         super("api_error", error);
+    }
+}
+
+export class OpenInputInspector extends EventHubAction {
+    constructor(input: Observable<InputProperty>) {
+        super("open_input_inspector", input);
+    }
+}
+
+export class CloseInputInspector extends EventHubAction {
+    constructor() {
+        super("close_input_inspector", undefined);
+    }
+}
+
+export class OpenExpressionEditor extends EventHubAction {
+    constructor(input: any) {
+        super("open_expression_editor", input);
+    }
+}
+
+export class CloseExpressionEditor extends EventHubAction {
+    constructor() {
+        super("close_expression_editor", undefined);
     }
 }

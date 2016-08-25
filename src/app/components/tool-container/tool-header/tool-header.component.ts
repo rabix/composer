@@ -36,17 +36,18 @@ require("./tool-header.component.scss");
 export class ToolHeaderComponent implements OnInit{
     /** The current view mode is needed for styling the selected button */
     @Input()
-    private viewMode: ViewMode;
+    public viewMode: ViewMode;
 
     @Input()
-    private file: FileModel;
+    public file: FileModel;
 
     private isValidTool: boolean;
 
     /** Emit changes of the view mode */
     @Output()
-    private viewModeChanged = new EventEmitter();
+    public viewModeChanged = new EventEmitter();
 
+    private changeViewMode(viewMode: string) {
     constructor(private toolValidator: ToolValidator) { }
 
     ngOnInit(): void {
