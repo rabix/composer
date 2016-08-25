@@ -3,7 +3,10 @@ import {Observable} from "rxjs/Rx";
 import {InputInspectorComponent} from "./input-inspector.component";
 import {VisibilityState} from "../../clt-editor/animation.states";
 import {InputProperty} from "../../../models/input-property.model";
-import {OpenInputInspector, CloseInputInspector} from "../../../action-events/index";
+import {
+    OpenInputInspector, CloseInputInspector, OpenExpressionEditor,
+    CloseExpressionEditor
+} from "../../../action-events/index";
 import {EventHubService} from "../../../services/event-hub/event-hub.service";
 
 require ("../shared/editor-sidebar.component.scss");
@@ -30,7 +33,7 @@ require ("../shared/editor-sidebar.component.scss");
         InputInspectorComponent
     ],
     template: `
-            <div class="sidebar-component" @sidebarState="sidebarState">
+            <div class="sidebar-component" @sidebarState="sidebarState" [ngClass]="{isTopOfStack: isShown}">
                 <div class="sidebar-content">
                     
                     <div class="collapse-icon" (click)="collapseSidebar()">
@@ -50,15 +53,26 @@ export class InputInspectorSidebarComponent {
     /** Data that we are passing to the sidebar */
     private sidebarData: Observable<InputProperty>;
 
+    private isShown: boolean;
+
     constructor(private eventHubService: EventHubService) {
 
         this.eventHubService.on(OpenInputInspector).subscribe((action) => {
             this.sidebarData = action.payload;
             this.sidebarState = "visible";
+            this.isShown = true;
         });
 
         this.eventHubService.on(CloseInputInspector).subscribe(() => {
             this.sidebarState = "hidden";
+        });
+
+        this.eventHubService.on(OpenExpressionEditor).subscribe((action) => {
+            this.isShown = false;
+        });
+        
+        this.eventHubService.on(CloseExpressionEditor).subscribe(() => {
+            this.isShown = true;
         });
     }
 
