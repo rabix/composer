@@ -1,17 +1,15 @@
 import {
     Component,
-    EventEmitter,
     Input,
-    Output,
     OnInit
 } from "@angular/core";
 import {NgSelectOption} from "@angular/common";
-import {ViewMode} from "../tool-container.component";
 import {FileModel} from "../../../store/models/fs.models";
 import {ToolValidator} from "../../../validators/tool.validator";
 import {CwlValidationResult} from "../../../action-events/index";
 import {EventHubService} from "../../../services/event-hub/event-hub.service";
 import {ValidationResponse} from "../../../services/webWorker/json-schema/json-schema.service";
+import {ViewModeService} from "../services/view-mode.service";
 
 require("./tool-header.component.scss");
 
@@ -38,8 +36,7 @@ require("./tool-header.component.scss");
 })
 export class ToolHeaderComponent implements OnInit{
     /** The current view mode is needed for styling the selected button */
-    @Input()
-    public viewMode: ViewMode;
+    private viewMode: string;
 
     @Input()
     public file: FileModel;
@@ -48,12 +45,13 @@ export class ToolHeaderComponent implements OnInit{
     
     private isSupportedFileFormat: boolean;
 
-    /** Emit changes of the view mode */
-    @Output()
-    public viewModeChanged = new EventEmitter();
-
     constructor(private toolValidator: ToolValidator,
-                private eventHubService: EventHubService) {
+                private eventHubService: EventHubService,
+                private viewModeService: ViewModeService) {
+
+        this.viewModeService.viewMode.subscribe(viewMode => {
+            this.viewMode = viewMode;
+        });
     }
 
     ngOnInit(): void {
@@ -66,6 +64,6 @@ export class ToolHeaderComponent implements OnInit{
     }
 
     private changeViewMode(viewMode: string): void {
-        this.viewModeChanged.emit(viewMode);
+        this.viewModeService.setViewMode(viewMode);
     }
 }
