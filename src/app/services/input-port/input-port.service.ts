@@ -54,7 +54,13 @@ export class InputPortService {
         this.deletedInputPort
             .map((inputPortToDelete: InputProperty): PropertyOperation => {
                 return (inputPorts: InputProperty[]) => {
-                    return inputPorts.filter((port) => port.id !== inputPortToDelete.id);
+                    const index = inputPorts.indexOf(inputPortToDelete);
+                    
+                    if(index !== -1) {
+                        inputPorts.splice(index, 1);
+                    }
+
+                    return inputPorts;
                 };
             })
             .subscribe(this.inputPortsUpdate);

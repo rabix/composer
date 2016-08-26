@@ -86,11 +86,6 @@ export class CltEditorComponent {
                 private eventHubService: EventHubService) {
         this.cltEditorGroup = this.formBuilder.group({});
 
-        this.eventHubService.on(OpenInputInspector)
-            .subscribe(() => {
-
-            });
-
         /* Opening the sidebar */
         this.eventHubService.on(OpenInputInspector).subscribe(() => {
             this.closeSidebarActions.push(CloseInputInspector);
