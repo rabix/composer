@@ -9,7 +9,11 @@ export class WebWorkerService {
 
     constructor() {
         this.jsonSchemaWorker = new JsonSchemaWorker();
-        this.validationResultStream = Observable.fromEvent(this.jsonSchemaWorker, 'message');
+        this.validationResultStream = Observable
+                                    .fromEvent(this.jsonSchemaWorker, 'message')
+                                    .map((result: any) => {
+                                        return result.data;
+                                    });
     }
 
     public validateJsonSchema(jsonText: string) {
