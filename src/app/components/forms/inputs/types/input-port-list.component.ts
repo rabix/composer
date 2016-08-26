@@ -82,14 +82,9 @@ export class InputPortListComponent {
     }
 
     private removeProperty(inputPort: InputProperty): void {
-        /** TODO: figure out how we want to identify our inputs */
-        if (!inputPort.id) {
-            return;
-        }
-
         this.inputPortService.deleteInputPort(inputPort);
 
-        if (this.selectedInputPort.id === inputPort.id) {
+        if (this.selectedInputPort === inputPort) {
             this.eventHubService.publish(new CloseInputInspector());
         }
     }
