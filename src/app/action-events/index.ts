@@ -126,3 +126,9 @@ export class CloseExpressionEditor extends EventHubAction {
         super("close_expression_editor", undefined);
     }
 }
+
+export class CwlValidationResult extends EventHubAction {
+    constructor(validationResult: any) {
+        super("cwl_validation_result", validationResult);
+    }
+}

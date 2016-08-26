@@ -9,6 +9,9 @@ import {NgSelectOption} from "@angular/common";
 import {ViewMode} from "../tool-container.component";
 import {FileModel} from "../../../store/models/fs.models";
 import {ToolValidator} from "../../../validators/tool.validator";
+import {CwlValidationResult} from "../../../action-events/index";
+import {EventHubService} from "../../../services/event-hub/event-hub.service";
+import {ValidationResponse} from "../../../services/webWorker/json-schema/json-schema.service";
 
 require("./tool-header.component.scss");
 
@@ -42,15 +45,24 @@ export class ToolHeaderComponent implements OnInit{
     public file: FileModel;
 
     private isValidTool: boolean;
+    
+    private isSupportedFileFormat: boolean;
 
     /** Emit changes of the view mode */
     @Output()
     public viewModeChanged = new EventEmitter();
 
-    constructor(private toolValidator: ToolValidator) { }
+    constructor(private toolValidator: ToolValidator,
+                private eventHubService: EventHubService) {
+    }
 
     ngOnInit(): void {
-        this.isValidTool = this.toolValidator.isSupportedFileFormat(this.file);
+        this.isSupportedFileFormat = this.toolValidator.isSupportedFileFormat(this.file);
+
+        this.eventHubService.onValueFrom(CwlValidationResult)
+            .subscribe((validationResult: ValidationResponse) => {
+                this.isValidTool = this.isSupportedFileFormat && validationResult.isValidCwl;
+            });
     }
 
     private changeViewMode(viewMode: string): void {

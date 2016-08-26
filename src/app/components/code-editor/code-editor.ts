@@ -25,6 +25,7 @@ export class CodeEditor {
 
     public contentChanges: Observable<FileModel>;
 
+    public validationResult: Observable<ValidationResponse>;
 
     constructor(editor: Editor, fileStream: Observable<FileModel>) {
         this.editor = editor;
@@ -56,15 +57,8 @@ export class CodeEditor {
                 return Object.assign(file, {content});
             }).share();
 
+        this.validationResult = this.webWorkerService.validationResultStream;
         this._attachJsonValidation();
-
-        this.webWorkerService.validationResultStream
-            .map((result: any) => {
-                return result.data;
-            })
-            .subscribe((res: ValidationResponse) => {
-                console.dir(res);
-            });
     }
 
     private _attachJsonValidation(): void {
@@ -72,8 +66,6 @@ export class CodeEditor {
             .map(file => {
                 return file.content;
             })
-            .distinctUntilChanged()
-            .debounceTime(500)
             .subscribe((content: string) => {
                 this.validateJsonSchema(content);
             });
