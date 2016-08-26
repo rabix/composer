@@ -62,9 +62,6 @@ export class CodeEditorComponent implements OnInit {
         });
 
         this.editor.validationResult
-            .map((result: any) => {
-                return result.data;
-            })
             .subscribe((result: ValidationResponse) => {
                 this.eventHub.publish(new CwlValidationResult(result));
             });

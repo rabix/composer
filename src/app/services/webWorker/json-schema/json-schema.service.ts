@@ -26,7 +26,7 @@ export class JsonSchemaService {
         this.Validator = attr.Validator;
     }
 
-    private getJsonSchemaContainer(versionString: string) {
+    public getJsonSchemaContainer(versionString: string) {
         switch(versionString) {
             case "draft-3":
                 return this.draft3;
@@ -35,16 +35,16 @@ export class JsonSchemaService {
         }
     }
 
-    private isCwlVersionValid(versionString: string) {
+    public isCwlVersionValid(versionString: string) {
         return versionString === "draft-3" || versionString === "draft-4"
     }
 
-    private isClassValid(cwlClass: string) {
+    public isClassValid(cwlClass: string) {
         return cwlClass === "Workflow" || cwlClass === "CommandLineTool" || cwlClass === "ExpressionTool";
     }
 
 
-    private isValidCwlJson(json: any) {
+    public isValidCwlJson(json: any) {
         if (json !== undefined && json.cwlVersion && json.class) {
 
             const isValid = this.isClassValid(json.class) && this.isCwlVersionValid(json.cwlVersion);

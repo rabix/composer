@@ -3,13 +3,13 @@ import {JsonSchemaService} from "./json-schema.service";
 
 const {draft3, draft4} = require("cwlts/lib");
 
-const mockValidationResult =  {
-    valid: false
-};
-
 class MockValidator {
-    validate() {
-        return mockValidationResult;
+    validate(jsonSchema) {
+        return {
+            valid: false,
+            errors: ["mockValidationErrorMessage"],
+            instance: jsonSchema
+        };
     }
 }
 
@@ -82,24 +82,16 @@ describe("JsonSchemaService", () => {
 
     describe("isValidCwlJson", () => {
         it("Should return false if we pass an undefined value", () => {
-
             const re1 = jsonSchemaService.isValidCwlJson(undefined);
-
-            expect(window.postMessage).toHaveBeenCalledWith({
-                data: undefined,
-                isValid: false,
-                error: 'JSON is missing "cwlVersion" or "class"'
-            });
-
             expect(re1).toBe(false);
         });
 
         it("Should return false if we pass an object without 'cwlVersion' or 'class'", () => {
-
             const res1 = jsonSchemaService.isValidCwlJson({
                 prop1: 123,
                 prop2: 123
             });
+            
             expect(res1).toBe(false);
         });
     });
@@ -107,14 +99,15 @@ describe("JsonSchemaService", () => {
     describe("validateJson", () => {
         it("Should call postMessage with an error if the JSON can't be parsed", () => {
 
-            const jsonText = "{this is: not a valid } json 123";
+            const jsonText = "Not a valid JSON";
 
             jsonSchemaService.validateJson(jsonText);
 
             expect(window.postMessage).toHaveBeenCalledWith({
-                data: undefined,
-                isValid: false,
-                error: jsonText + ' is not a valid JSON'
+                isValidatableCwl: false,
+                isValidCwl: false,
+                errors: [ "Not a valid JSON"],
+                schema: undefined
             });
         });
 
@@ -124,11 +117,12 @@ describe("JsonSchemaService", () => {
             jsonSchemaService.validateJson(jsonText);
 
             expect(window.postMessage).toHaveBeenCalledWith({
-                data: mockValidationResult,
-                isValid: false
+                isValidatableCwl: true,
+                isValidCwl: false,
+                errors: ["mockValidationErrorMessage"],
+                schema: JSON.parse(jsonText)
             });
         });
-        
         
     });
 
