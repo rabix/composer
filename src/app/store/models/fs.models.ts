@@ -36,9 +36,9 @@ export class FileModel extends FSItemModel {
     readonly originalContent: string;
 
     constructor(attr: {
-        name?: string | FileName,
-        relativePath?: string
-        absolutePath?: string
+        name: string | FileName,
+        relativePath?: string,
+        absolutePath?: string,
         content?: string,
         type?: string
     }) {

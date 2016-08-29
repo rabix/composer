@@ -1,15 +1,27 @@
 @import "../../../assets/sass/variables";
 
+.scroll-content {
+    overflow-y: auto;
+    min-height: calc(100% - #{$editor-footer-height} - #{$editor-header-height} - #{$editor-padding-top});
+    height: calc(100% - #{$editor-footer-height} - #{$editor-header-height} - #{$editor-padding-top});
+}
+
 .tool-container-component {
-    position: relative;
     display: block;
     height: 100%;
     width: 100%;
 
     .main-content {
         position: relative;
-        min-height: 500px;
-        height: calc(100% - #{$editor-footer-height} - #{$editor-padding-top});
+        height: 100%;
+
+        .gui-editor-component {
+            position: absolute;
+            display: block;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+        }
     }
 }
 
@@ -19,4 +31,11 @@
     padding-top: $editor-padding-top;
     position: relative;
     display: block;
+}
+
+.footer {
+    height: $editor-footer-height;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
 }

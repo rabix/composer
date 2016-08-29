@@ -18,3 +18,17 @@ button.hide-btn {
     color: $button-blue-text;
     border: 0;
 }
+
+.btn-secondary.add-input-btn, .btn-secondary.expression-form-btn {
+    font-size: 0.9em;
+
+    /* Large screens */
+    @media only screen  and (min-width : 1824px) {
+        font-size: 1em;
+    }
+
+    padding: 0;
+    border: 0;
+    background: #ffffff;
+    color: $button-blue-text;
+}

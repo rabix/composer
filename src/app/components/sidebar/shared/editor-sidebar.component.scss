@@ -1,0 +1,34 @@
+@import "../../../../assets/sass/variables";
+
+.black {
+    color: #000000;
+}
+
+.sidebar-component {
+    right: 0;
+    top: 0;
+    position: absolute;
+    height: 100%;
+    z-index: -1;
+}
+
+.isTopOfStack {
+    z-index: 0;
+}
+
+.collapse-icon {
+    text-align: center;
+    height: 100%;
+    cursor: pointer;
+    width: $collapse-icon-width;
+    position: relative;
+    float: left;
+    z-index: 1;
+    background: transparent;
+}
+
+.sidebar-content {
+    height: 100%;
+    width: 100%;
+    position: relative;
+}

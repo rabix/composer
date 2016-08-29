@@ -29,11 +29,11 @@ require("./form.components.scss");
 })
 export class DockerInputFormComponent implements OnInit {
     @Input()
-    private dockerPull: string;
+    public dockerPull: string;
 
     /** The parent forms control group */
     @Input()
-    private group: FormGroup;
+    public group: FormGroup;
 
     private dockerInputForm: FormGroup;
 

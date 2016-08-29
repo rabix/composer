@@ -1,44 +1,46 @@
 @keyframes tree-node-come-in {
-  0% {
-    opacity: .5;
-    margin-left: -4px;
-  }
+    0% {
+        opacity: .5;
+        margin-left: -4px;
+    }
 
-  100% {
-    opacity: 1;
-    margin-left: 0;
-  }
+    100% {
+        opacity: 1;
+        margin-left: 0;
+    }
 
 }
 
 tree-view {
-  color: white;
-  display: block;
-  margin-left: 20px;
+    color: white;
+    display: block;
+    margin-left: 20px;
+    overflow-y: auto;
+    height: 100%;
 
-  .tree-node {
+    .tree-node {
 
-    font-size: .95em !important;
-    cursor: pointer;
-    -webkit-user-select: none; /* webkit (safari, chrome) browsers */
-    -moz-user-select: none; /* mozilla browsers */
-    -ms-user-select: none; /* IE10+ */
-    user-select: none;
+        font-size: .95em !important;
+        cursor: pointer;
+        -webkit-user-select: none; /* webkit (safari, chrome) browsers */
+        -moz-user-select: none; /* mozilla browsers */
+        -ms-user-select: none; /* IE10+ */
+        user-select: none;
 
-    animation: tree-node-come-in;
-    animation-iteration-count: 1;
-    animation-duration: .15s;
-  }
+        animation: tree-node-come-in;
+        animation-iteration-count: 1;
+        animation-duration: .15s;
+    }
 
-  .expander {
-    display: inline-block;
-    //padding: 0 0 0 6px;
-    width: 10px;
-    margin: 0 0 0 0;
-  }
+    .expander {
+        display: inline-block;
+        //padding: 0 0 0 6px;
+        width: 10px;
+        margin: 0 0 0 0;
+    }
 
-  .node-icon {
-    margin-right: 4px;
-  }
+    .node-icon {
+        margin-right: 4px;
+    }
 }
 

@@ -20,6 +20,8 @@ import {WebWorkerService} from "../../services/webWorker/web-worker.service";
 import {WorkspaceComponent} from "../workspace/workspace.component";
 import {WorkspaceService} from "../workspace/workspace.service";
 import {ContextService} from "../../services/context/context.service";
+import {InputPortService} from "../../services/input-port/input-port.service";
+import {ExpressionService} from "../../services/expression/expression.service";
 
 require("./../../../assets/sass/main.scss");
 require("./main.component.scss");
@@ -56,7 +58,9 @@ require("./main.component.scss");
         SocketService,
         UrlValidator,
         WorkspaceService,
-        WebWorkerService
+        WebWorkerService,
+        InputPortService,
+        ExpressionService
     ]
 })
 export class MainComponent implements AfterViewInit {

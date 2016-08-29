@@ -1,17 +1,22 @@
 import {
     Component,
-    EventEmitter,
     Input,
-    Output
+    OnInit
 } from "@angular/core";
 import {NgSelectOption} from "@angular/common";
-import {ViewMode} from "../tool-container.component";
+import {FileModel} from "../../../store/models/fs.models";
+import {ToolValidator} from "../../../validators/tool.validator";
+import {CwlValidationResult} from "../../../action-events/index";
+import {EventHubService} from "../../../services/event-hub/event-hub.service";
+import {ValidationResponse} from "../../../services/webWorker/json-schema/json-schema.service";
+import {ViewModeService} from "../services/view-mode.service";
 
 require("./tool-header.component.scss");
 
 @Component({
     selector: "tool-header",
     directives: [NgSelectOption],
+    providers: [ToolValidator],
     template: `
             <span class="gui-json-buttons">
                 <button type="button"
@@ -21,6 +26,7 @@ require("./tool-header.component.scss");
 
                 <button type="button"
                         class="btn btn-secondary btn-sm"
+                        [disabled]="!isValidTool"
                         [ngClass]="{selected: viewMode === 'gui'}"
                         (click)="changeViewMode('gui')">GUI</button>
             </span>
@@ -28,16 +34,36 @@ require("./tool-header.component.scss");
             <button type="button" class="btn btn-secondary btn-sm save-button">Save</button>
     `
 })
-export class ToolHeaderComponent {
+export class ToolHeaderComponent implements OnInit{
     /** The current view mode is needed for styling the selected button */
+    private viewMode: string;
+
     @Input()
-    private viewMode: ViewMode;
+    public file: FileModel;
 
-    /** Emit changes of the view mode */
-    @Output()
-    private viewModeChanged = new EventEmitter();
+    private isValidTool: boolean;
+    
+    private isSupportedFileFormat: boolean;
 
-    changeViewMode(viewMode: string) {
-        this.viewModeChanged.emit(viewMode);
+    constructor(private toolValidator: ToolValidator,
+                private eventHubService: EventHubService,
+                private viewModeService: ViewModeService) {
+
+        this.viewModeService.viewMode.subscribe(viewMode => {
+            this.viewMode = viewMode;
+        });
+    }
+
+    ngOnInit(): void {
+        this.isSupportedFileFormat = this.toolValidator.isSupportedFileFormat(this.file);
+
+        this.eventHubService.onValueFrom(CwlValidationResult)
+            .subscribe((validationResult: ValidationResponse) => {
+                this.isValidTool = this.isSupportedFileFormat && validationResult.isValidCwl;
+            });
+    }
+
+    private changeViewMode(viewMode: string): void {
+        this.viewModeService.setViewMode(viewMode);
     }
 }

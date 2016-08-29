@@ -3,53 +3,82 @@ import {NgSwitch, NgSwitchCase, NgSwitchDefault} from "@angular/common";
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {FileModel} from "../../store/models/fs.models";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
-import {GuiEditorComponent} from "../gui-editor/gui-editor.component";
+import {CltEditorComponent} from "../clt-editor/clt-editor.component";
 import {DynamicState} from "../runtime-compiler/dynamic-state.interface";
 import {FileRegistry} from "../../services/file-registry.service";
 import {Subscription} from "rxjs/Rx";
 import {ToolHeaderComponent} from "./tool-header/tool-header.component";
+import {CommandLineComponent} from "../clt-editor/commandline/commandline.component";
+import {InputInspectorSidebarComponent} from "../sidebar/object-inpsector/input-inspector-sidebar.component";
+import {ExpressionEditorSidebarComponent} from "../sidebar/expression-editor/expression-editor-sidebar.component";
+import {ViewModeService} from "./services/view-mode.service";
 
 require("./tool-container.component.scss");
 
-export type ViewMode = "gui" | "json";
-
 @Component({
     selector: "tool-container",
+    providers: [ViewModeService],
     directives: [
         CodeEditorComponent,
-        GuiEditorComponent,
+        CltEditorComponent,
         BlockLoaderComponent,
         NgSwitch,
         NgSwitchCase,
         NgSwitchDefault,
-        ToolHeaderComponent
+        ToolHeaderComponent,
+        CommandLineComponent,
+        InputInspectorSidebarComponent,
+        ExpressionEditorSidebarComponent
     ],
     template: `
-        <div class="tool-container-component">
-            <tool-header class="tool-header" [viewMode]="viewMode" (viewModeChanged)="setViewMode($event)"></tool-header>
+        <block-loader *ngIf="!isLoaded"></block-loader>
         
-            <div class="main-content">
-                <div [ngSwitch]="viewMode">
-                    <block-loader *ngIf="!file"></block-loader>
-                    <gui-editor *ngSwitchCase="'gui'" [file]="file"></gui-editor>
-                    <code-editor *ngSwitchCase="'json'" [file]="file"></code-editor>
+        <div class="tool-container-component" *ngIf="isLoaded">
+            <tool-header class="tool-header" 
+                        [file]="file">
+            </tool-header>
+        
+            <div class="scroll-content">
+                <div class="main-content">
+                    <code-editor *ngIf="viewMode === 'json'" [file]="file"></code-editor>
+                    <clt-editor class="gui-editor-component" *ngIf="viewMode === 'gui'" [file]="file"></clt-editor>
+                    
+                    <input-inspector-sidebar-component></input-inspector-sidebar-component>
+                    <expression-editor-sidebar-component></expression-editor-sidebar-component>
                 </div>
+            </div>
+            
+            <div class="footer">
+                <commandline [content]="commandlineContent"></commandline>
             </div>
         </div>
     `
 })
 export class ToolContainerComponent implements OnInit, DynamicState {
-    /** Default view mode. TODO: change type */
-    private viewMode: ViewMode = "gui";
+    /** Default view mode. */
+    private viewMode: string;
 
     /** File that we will pass to both the gui and JSON editor*/
     private file: FileModel;
 
+    /* TODO: generate the commandline */
+    private commandlineContent: string = "This is the command line";
+
     /** List of subscriptions that should be disposed when destroying this component */
     private subs: Subscription[];
 
-    constructor(private fileRegistry: FileRegistry) {
+    /** Flag that determines if the spinner should be shown */
+    private isLoaded: boolean;
+
+    constructor(private fileRegistry: FileRegistry,
+                private viewModeService: ViewModeService) {
         this.subs = [];
+        this.isLoaded = false;
+        
+        this.viewModeService.setViewMode("json");
+        this.viewModeService.viewMode.subscribe(viewMode => {
+           this.viewMode = viewMode; 
+        });
     }
 
     ngOnInit(): void {
@@ -58,12 +87,9 @@ export class ToolContainerComponent implements OnInit, DynamicState {
 
         // bring our own file up to date
         this.subs.push(fileStream.subscribe(file => {
-            this.file     = file;
+            this.file = file;
+            this.isLoaded = true;
         }));
-    }
-
-    setViewMode(viewMode): void {
-        this.viewMode = viewMode;
     }
 
     public setState(state: {fileInfo}): void {

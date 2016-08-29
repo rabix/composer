@@ -5,9 +5,10 @@ import {FileModel} from "../../store/models/fs.models";
 import {FileRegistry} from "../../services/file-registry.service";
 import {Subscription} from "rxjs/Rx";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
-import {UpdateFileAction} from "../../action-events/index";
+import {UpdateFileAction, CwlValidationResult} from "../../action-events/index";
 import Editor = AceAjax.Editor;
 import TextMode = AceAjax.TextMode;
+import {ValidationResponse} from "../../services/webWorker/json-schema/json-schema.service";
 
 require('./code-editor.component.scss');
 
@@ -58,8 +59,12 @@ export class CodeEditorComponent implements OnInit {
 
         this.editor.contentChanges.skip(1).subscribe((file) => {
             this.eventHub.publish(new UpdateFileAction(file));
-        })
+        });
 
+        this.editor.validationResult
+            .subscribe((result: ValidationResponse) => {
+                this.eventHub.publish(new CwlValidationResult(result));
+            });
     }
 
     ngOnDestroy(): void {
@@ -67,5 +72,5 @@ export class CodeEditorComponent implements OnInit {
         console.debug("Disposing code editor");
         this.subs.forEach(sub => sub.unsubscribe());
     }
-    
+
 }

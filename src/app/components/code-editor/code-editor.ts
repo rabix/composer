@@ -5,8 +5,8 @@ import {FileModel} from "../../store/models/fs.models";
 import Editor = AceAjax.Editor;
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
-import {ValidationResponse, WebWorkerService} from "../../services/webWorker/web-worker.service";
-import {EventEmitter} from "events";
+import {WebWorkerService} from "../../services/webWorker/web-worker.service";
+import {ValidationResponse} from "../../services/webWorker/json-schema/json-schema.service";
 
 export class CodeEditor {
     /** Holds an instance of the AceEditor */
@@ -25,6 +25,7 @@ export class CodeEditor {
 
     public contentChanges: Observable<FileModel>;
 
+    public validationResult: Observable<ValidationResponse>;
 
     constructor(editor: Editor, fileStream: Observable<FileModel>) {
         this.editor = editor;
@@ -44,6 +45,7 @@ export class CodeEditor {
                 .subscribe(file => {
                     this.setMode(file.type || ".txt");
                     this.setText(file.content);
+                    this.validateJsonSchema(file.content);
                 })
         );
 
@@ -55,6 +57,7 @@ export class CodeEditor {
                 return Object.assign(file, {content});
             }).share();
 
+        this.validationResult = this.webWorkerService.validationResultStream;
         this._attachJsonValidation();
     }
 
@@ -63,16 +66,13 @@ export class CodeEditor {
             .map(file => {
                 return file.content;
             })
-            .distinctUntilChanged()
-            .debounceTime(500)
             .subscribe((content: string) => {
-                this.webWorkerService.validateJsonSchema(content)
-                    .subscribe((res: ValidationResponse) => {
-                        console.dir(res);
-                    }, err => {
-                        console.log(err);
-                    });
+                this.validateJsonSchema(content);
             });
+    }
+
+    private validateJsonSchema(content: string) {
+        this.webWorkerService.validateJsonSchema(content);
     }
 
     private setText(text: string): void {

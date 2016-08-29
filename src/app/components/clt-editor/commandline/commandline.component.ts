@@ -47,12 +47,12 @@ require ("./commandline.component.scss");
 export class CommandLineComponent {
     /** Content of the command line */
     @Input()
-    private content: string;
+    public content: string;
 
     /** Sate of the commandline animation */
     private commandlineState: VisibilityState = "hidden";
 
-    toggleCommandLine(): void {
+    private toggleCommandLine(): void {
         this.commandlineState = this.commandlineState === "hidden" ? "visible": "hidden";
     }
 }

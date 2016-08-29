@@ -1,0 +1,11 @@
+@import "../../../../../assets/sass/variables";
+
+.expression-input-group {
+    z-index: 0;
+
+    .add-expression {
+        background: #ffffff;
+        padding: 0;
+        width: 20%;
+    }
+}
