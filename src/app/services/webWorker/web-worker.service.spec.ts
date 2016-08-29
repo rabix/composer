@@ -9,8 +9,8 @@ describe("WebWorkerService", () => {
 
     describe("validateJsonSchema", () => {
         it("should return an observable emitting the validation result", (done) => {
-            let webWorkerService = new WebWorkerService();
-            let mockJson:string = '{"cwlVersion": "draft-3", "class": "CommandLineTool"}';
+            const webWorkerService = new WebWorkerService();
+            const mockJson:string = '{"cwlVersion": "draft-3", "class": "CommandLineTool"}';
 
             webWorkerService.validateJsonSchema(mockJson);
 
@@ -24,8 +24,8 @@ describe("WebWorkerService", () => {
         });
 
         it("should return an Error message if the string is not a JSON", (done) => {
-            let webWorkerService = new WebWorkerService();
-            let text:string = "I am not a JSON";
+            const webWorkerService = new WebWorkerService();
+            const text:string = "I am not a JSON";
 
             webWorkerService.validateJsonSchema(text);
 
