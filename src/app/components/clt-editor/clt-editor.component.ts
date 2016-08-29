@@ -42,21 +42,20 @@ require("./clt-editor.component.scss");
     template: `
             <form class="clt-editor-group"
                   [formGroup]="cltEditorGroup">
-                <docker-input-form @formPosition="formPosition"
+                <docker-input-form [@formPosition]="formPosition"
                                 class="input-form" 
                                 [group]="cltEditorGroup"
                                 [dockerPull]="'some.docker.image.com'">
                 </docker-input-form>
                                 
-                <base-command-form @formPosition="formPosition"
+                <base-command-form [@formPosition]="formPosition"
                                 class="input-form" 
                                 [group]="cltEditorGroup"
                                 [baseCommand]="'echo'">
                 </base-command-form>
                 
-                <inputs-ports-form @formPosition="formPosition"
-                                  class="input-form"
-                                  [inputPorts]="toolInputPorts"></inputs-ports-form>
+                <inputs-ports-form [@formPosition]="formPosition"
+                                  class="input-form"></inputs-ports-form>
             </form>
     `
 })
@@ -68,8 +67,6 @@ export class CltEditorComponent {
     /** TODO: change array type to CommandInputParameterModel when we have the models */
     @Input()
     public toolInputs: Array<any>;
-
-    private toolInputPorts: BehaviorSubject<InputProperty[]> = new BehaviorSubject<InputProperty[]>([]);
 
     /** Positions of the listed properties */
     private formPosition: FormPosition = "center";

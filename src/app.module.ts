@@ -1,10 +1,11 @@
 import {NgModule} from "@angular/core";
 import {MainComponent} from "./app/components/main/main.component";
 import {BrowserModule} from "@angular/platform-browser";
-import {FormsModule} from "@angular/forms";
+import {FormsModule, FormBuilder} from "@angular/forms";
 
 @NgModule({
-    providers: [],
+    providers: [FormBuilder],
+
     declarations: [MainComponent],
     imports: [BrowserModule, FormsModule],
     bootstrap: [MainComponent]

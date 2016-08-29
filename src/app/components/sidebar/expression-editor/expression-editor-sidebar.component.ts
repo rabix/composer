@@ -33,7 +33,7 @@ require ("../shared/editor-sidebar.component.scss");
         ExpressionEditorComponent
     ],
     template: `
-            <div class="sidebar-component" @sidebarState="sidebarState" [ngClass]="{isTopOfStack: isShown}">
+            <div class="sidebar-component" [@sidebarState]="sidebarState" [ngClass]="{isTopOfStack: isShown}">
                 <div class="sidebar-content">
                     
                     <div class="collapse-icon" (click)="collapseSidebar()">
