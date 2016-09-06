@@ -1,7 +1,11 @@
 import {Component, Input} from "@angular/core";
 import {FormControl, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 import {EventHubService} from "../../../../services/event-hub/event-hub.service";
-import {OpenExpressionEditor, UpdateBaseExpression} from "../../../../action-events/index";
+import {
+    OpenExpressionEditor, 
+    UpdateBaseCommandExpression,
+    UpdateInputPortExpression
+} from "../../../../action-events/index";
 import {ExpressionInputService} from "../../../../services/expression-input/expression-input.service";
 
 require("./expression-input.component.scss");
@@ -52,9 +56,10 @@ export class ExpressionInputComponent {
 
         switch(this.expressionType) {
             case "baseCommand":
-                this.updateAction = (expression) => new UpdateBaseExpression(expression);
+                this.updateAction = (expression) => new UpdateBaseCommandExpression(expression);
                 break;
             case "inputPortValue":
+                this.updateAction = (expression) => new UpdateInputPortExpression(expression);
                 break;
         }
 

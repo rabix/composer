@@ -9,7 +9,7 @@ import {
 } from "@angular/forms";
 import {ExpressionInputComponent, ExpressionInputType} from "../types/expression-input.component";
 import {EventHubService} from "../../../../services/event-hub/event-hub.service";
-import {UpdateBaseExpression} from "../../../../action-events/index";
+import {UpdateBaseCommandExpression} from "../../../../action-events/index";
 
 require("./form.components.scss");
 
@@ -63,12 +63,12 @@ export class BaseCommandFormComponent implements OnInit {
 
         this.group.addControl('baseCommand', this.baseCommandForm.controls['baseCommand']);
 
-        this.eventHubService.onValueFrom(UpdateBaseExpression)
+        this.eventHubService.onValueFrom(UpdateBaseCommandExpression)
             .subscribe((expression: string) => {
-                const baseCommand: FormControl = <FormControl>this.baseCommandForm.controls['baseCommand'];
+                const baseCommandControl: FormControl = <FormControl>this.baseCommandForm.controls['baseCommand'];
                 
                 //TODO: update the actual model
-                baseCommand.updateValue(expression);
+                baseCommandControl.updateValue(expression);
             });
     }
 }

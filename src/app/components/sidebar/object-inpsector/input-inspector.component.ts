@@ -1,8 +1,17 @@
 import {Component, Input, OnInit} from "@angular/core";
-import {Validators, FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
-import {ExpressionInputComponent} from "../../forms/inputs/types/expression-input.component";
+import {
+    Validators,
+    FormBuilder,
+    FormGroup,
+    REACTIVE_FORM_DIRECTIVES,
+    FORM_DIRECTIVES,
+    FormControl
+} from "@angular/forms";
+import {ExpressionInputComponent, ExpressionInputType} from "../../forms/inputs/types/expression-input.component";
 import {BehaviorSubject} from "rxjs";
 import {InputProperty} from "../../../models/input-property.model";
+import {EventHubService} from "../../../services/event-hub/event-hub.service";
+import {UpdateInputPortExpression} from "../../../action-events/index";
 
 require ("./input-inspector.component.scss");
 
@@ -44,8 +53,11 @@ require ("./input-inspector.component.scss");
                 
                 <div class="form-group">
                     <label for="inputValue">Value</label>
-                    <expression-input [inputControl]="inputInspectorForm.controls['expression']">
+                    
+                    <expression-input [inputControl]="inputInspectorForm.controls['expression']"
+                                    [expressionType]="expressionInputType">
                     </expression-input>
+               
                 </div>
             </form>
     `
@@ -65,7 +77,10 @@ export class InputInspectorComponent implements OnInit {
     /** Possible property types */
     private propertyTypes = ["File", "string", "enum", "int", "float", "boolean", "array", "record", "map"];
 
-    constructor(private formBuilder: FormBuilder) {
+    private expressionInputType: ExpressionInputType = "inputPortValue";
+
+    constructor(private formBuilder: FormBuilder,
+                private eventHubService: EventHubService) {
     }
 
     ngOnInit() {
@@ -79,6 +94,12 @@ export class InputInspectorComponent implements OnInit {
             this.inputInspectorForm.controls["expression"].valueChanges.subscribe(value => {
                 this.selectedProperty.value = value;
             });
+
+            this.eventHubService.onValueFrom(UpdateInputPortExpression)
+                .subscribe((expression: string) => {
+                    const expressionControl: FormControl = <FormControl>this.inputInspectorForm.controls['expression'];
+                    expressionControl.updateValue(expression);
+                });
         });
     }
 }

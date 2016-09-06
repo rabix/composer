@@ -134,8 +134,14 @@ export class CwlValidationResult extends EventHubAction {
     }
 }
 
-export class UpdateBaseExpression extends EventHubAction {
+export class UpdateBaseCommandExpression extends EventHubAction {
     constructor(expression: string) {
         super("update_expression", expression);
+    }
+}
+
+export class UpdateInputPortExpression extends EventHubAction {
+    constructor(expression: string) {
+        super("update_input_port", expression);
     }
 }
