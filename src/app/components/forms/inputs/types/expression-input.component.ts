@@ -1,11 +1,12 @@
 import {Component, Input} from "@angular/core";
 import {FormControl, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {EventHubService} from "../../../../services/event-hub/event-hub.service";
-import {OpenExpressionEditor} from "../../../../action-events/index";
-import {ExpressionService} from "../../../../services/expression/expression.service";
+import {OpenExpressionEditor, UpdateBaseExpression} from "../../../../action-events/index";
+import {ExpressionInputService} from "../../../../services/expression-input/expression-input.service";
 
 require("./expression-input.component.scss");
+
+export type ExpressionInputType = "baseCommand" | "inputPortValue";
 
 @Component({
     selector: 'expression-input',
@@ -31,19 +32,35 @@ export class ExpressionInputComponent {
     @Input()
     public inputControl: FormControl;
 
+    @Input()
+    public expressionType: any;
+
+    private updateAction: any;
+
     constructor(private eventHubService: EventHubService,
-                private expressionService: ExpressionService) { }
+                private expressionInputService: ExpressionInputService) { }
 
     private openExpressionSidebar(): void {
-        this.expressionService.setExpression(this.inputControl.value);
+        this.expressionInputService.setExpression(this.inputControl.value);
 
-        this.expressionService.expression.subscribe(expression => {
+        this.expressionInputService.expression.subscribe(expression => {
             this.inputControl.updateValue(expression, {
                 onlySelf: false,
                 emitEvent: true
-            })
+            });
         });
 
-        this.eventHubService.publish(new OpenExpressionEditor(this.expressionService.expression));
+        switch(this.expressionType) {
+            case "baseCommand":
+                this.updateAction = (expression) => new UpdateBaseExpression(expression);
+                break;
+            case "inputPortValue":
+                break;
+        }
+
+        this.eventHubService.publish(new OpenExpressionEditor({
+            expression: this.expressionInputService.expression,
+            updateAction: this.updateAction
+        }));
     }
 }

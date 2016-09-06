@@ -1,10 +1,12 @@
-import {Component, ElementRef, ViewChild, Input} from "@angular/core";
+import {Component, ElementRef, ViewChild} from "@angular/core";
 import {ExpressionEditor} from "./expression-editor";
 import {Observable} from "rxjs/Observable";
+import {EventHubService} from "../../../services/event-hub/event-hub.service";
+import {ExpressionEditorData} from "../../../models/expression-editor-data.model";
+import {OpenExpressionEditor} from "../../../action-events/index";
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import TextMode = AceAjax.TextMode;
-import {EventHubService} from "../../../services/event-hub/event-hub.service";
 
 require ("./expression-editor.component.scss");
 
@@ -17,11 +19,10 @@ require ("./expression-editor.component.scss");
  `
 })
 export class ExpressionEditorComponent {
-    @Input()
+
     private expression: Observable<string>;
 
-    @Input()
-    private updateAction: any;
+    private updateAction: Function;
 
     /** Reference to the element in which we want to instantiate the Ace editor */
     @ViewChild("ace")
@@ -32,10 +33,17 @@ export class ExpressionEditorComponent {
     constructor(private eventHub: EventHubService) { }
 
     ngOnInit(): any {
-        this.editor = new ExpressionEditor(ace.edit(this.aceContainer.nativeElement), this.expression);
 
-        this.editor.expressionChanges.subscribe(expression => {
-            this.eventHub.publish(this.updateAction(expression));
-        });
+        this.eventHub.onValueFrom(OpenExpressionEditor)
+            .subscribe((data: ExpressionEditorData) => {
+                this.expression = data.expression;
+                this.updateAction = data.updateAction;
+
+                this.editor = new ExpressionEditor(ace.edit(this.aceContainer.nativeElement), this.expression);
+
+                this.editor.expressionChanges.subscribe(expression => {
+                    this.eventHub.publish(this.updateAction(expression));
+                });
+            });
     }
 }

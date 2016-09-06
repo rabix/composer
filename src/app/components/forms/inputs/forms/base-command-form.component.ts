@@ -1,6 +1,15 @@
 import {Component, Input, OnInit} from "@angular/core";
-import {Validators, FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
-import {ExpressionInputComponent} from "../types/expression-input.component";
+import {
+    Validators,
+    FormBuilder,
+    FormGroup,
+    FormControl,
+    REACTIVE_FORM_DIRECTIVES,
+    FORM_DIRECTIVES
+} from "@angular/forms";
+import {ExpressionInputComponent, ExpressionInputType} from "../types/expression-input.component";
+import {EventHubService} from "../../../../services/event-hub/event-hub.service";
+import {UpdateBaseExpression} from "../../../../action-events/index";
 
 require("./form.components.scss");
 
@@ -19,7 +28,8 @@ require("./form.components.scss");
                         <label>Base Command</label>
                         <label class="secondary-label">What command do you want to call from the image</label>
                         
-                        <expression-input [inputControl]="baseCommandForm.controls['baseCommand']">
+                        <expression-input [inputControl]="baseCommandForm.controls['baseCommand']"
+                                          [expressionType]="expressionInputType">
                         </expression-input>
                         
                     <button type="button" class="btn btn-secondary add-input-btn">Add base command</button>
@@ -34,21 +44,31 @@ export class BaseCommandFormComponent implements OnInit {
     /** The parent forms group */
     @Input()
     public group: FormGroup;
-    
+
     private baseCommandForm: FormGroup;
 
-    constructor(private formBuilder: FormBuilder) { }
+    private expressionInputType: ExpressionInputType = "baseCommand";
+
+    constructor(private formBuilder: FormBuilder,
+                private eventHubService: EventHubService) { }
 
     ngOnInit(): void {
         this.baseCommandForm = this.formBuilder.group({
             baseCommand: [this.baseCommand, Validators.compose([Validators.required, Validators.minLength(1)])]
         });
 
-       this.baseCommandForm.controls['baseCommand'].valueChanges.subscribe(value => {
+        this.baseCommandForm.controls['baseCommand'].valueChanges.subscribe(value => {
             this.baseCommand = value;
         });
 
-
         this.group.addControl('baseCommand', this.baseCommandForm.controls['baseCommand']);
+
+        this.eventHubService.onValueFrom(UpdateBaseExpression)
+            .subscribe((expression: string) => {
+                const baseCommand: FormControl = <FormControl>this.baseCommandForm.controls['baseCommand'];
+                
+                //TODO: update the actual model
+                baseCommand.updateValue(expression);
+            });
     }
 }

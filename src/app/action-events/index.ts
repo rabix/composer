@@ -2,7 +2,7 @@ import {FileModel} from "../store/models/fs.models";
 import {CwlFileTemplate} from "../types/file-template.type";
 import {InputProperty} from "../models/input-property.model";
 import {Observable} from "rxjs/Observable";
-import {ExpressionEditorEvent} from "../models/expression-editor-event.model";
+import {ExpressionEditorData} from "../models/expression-editor-data.model";
 
 export class EventHubAction {
     public type: string;
@@ -117,7 +117,7 @@ export class CloseInputInspector extends EventHubAction {
 }
 
 export class OpenExpressionEditor extends EventHubAction {
-    constructor(expressionEditorEvent: ExpressionEditorEvent) {
+    constructor(expressionEditorEvent: ExpressionEditorData) {
         super("open_expression_editor", expressionEditorEvent);
     }
 }
