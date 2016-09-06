@@ -2,6 +2,7 @@ import {FileModel} from "../store/models/fs.models";
 import {CwlFileTemplate} from "../types/file-template.type";
 import {InputProperty} from "../models/input-property.model";
 import {Observable} from "rxjs/Observable";
+import {ExpressionEditorEvent} from "../models/expression-editor-event.model";
 
 export class EventHubAction {
     public type: string;
@@ -116,8 +117,8 @@ export class CloseInputInspector extends EventHubAction {
 }
 
 export class OpenExpressionEditor extends EventHubAction {
-    constructor(input: any) {
-        super("open_expression_editor", input);
+    constructor(expressionEditorEvent: ExpressionEditorEvent) {
+        super("open_expression_editor", expressionEditorEvent);
     }
 }
 
@@ -130,5 +131,11 @@ export class CloseExpressionEditor extends EventHubAction {
 export class CwlValidationResult extends EventHubAction {
     constructor(validationResult: any) {
         super("cwl_validation_result", validationResult);
+    }
+}
+
+export class UpdateBaseExpression extends EventHubAction {
+    constructor(expression: string) {
+        super("update_expression", expression);
     }
 }
