@@ -1,6 +1,8 @@
 
 const webpack = require('webpack');
 const helpers = require('./helpers');
+const commonConfig = require('./webpack.common.js'); // the settings that are common to prod and dev
+
 /**
  * Webpack Plugins
  */
@@ -191,7 +193,7 @@ module.exports = {
         new DefinePlugin({
             'ENV': JSON.stringify(ENV),
             'HMR': false,
-            // 'APP_ENV_CONFIG': JSON.stringify(appConfig),
+            'APP_ENV_CONFIG': JSON.stringify(commonConfig.appConfig),
             'process.env': {
                 'ENV': JSON.stringify(ENV),
                 'NODE_ENV': JSON.stringify(ENV),
