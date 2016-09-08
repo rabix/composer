@@ -2,8 +2,8 @@
 
 .scroll-content {
     overflow-y: auto;
-    min-height: calc(100% - #{$editor-footer-height} - #{$editor-header-height} - #{$editor-padding-top});
-    height: calc(100% - #{$editor-footer-height} - #{$editor-header-height} - #{$editor-padding-top});
+    min-height: calc(100% - #{$editor-footer-height} - #{$editor-header-height});
+    height: calc(100% - #{$editor-footer-height} - #{$editor-header-height});
 }
 
 .tool-container-component {
