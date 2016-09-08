@@ -2,7 +2,7 @@ import {Component, Input} from "@angular/core";
 import {FormControl, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 import {EventHubService} from "../../../../services/event-hub/event-hub.service";
 import {
-    OpenExpressionEditor, 
+    OpenExpressionEditor,
     UpdateBaseCommandExpression,
     UpdateInputPortExpression
 } from "../../../../action-events/index";
@@ -41,8 +41,11 @@ export class ExpressionInputComponent {
 
     private updateAction: any;
 
-    constructor(private eventHubService: EventHubService,
-                private expressionInputService: ExpressionInputService) { }
+    private expressionInputService: ExpressionInputService;
+
+    constructor(private eventHubService: EventHubService) {
+        this.expressionInputService = new ExpressionInputService();
+    }
 
     private openExpressionSidebar(): void {
         this.expressionInputService.setExpression(this.inputControl.value);
