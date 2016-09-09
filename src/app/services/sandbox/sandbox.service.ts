@@ -9,11 +9,18 @@ export interface SandboxResponse {
 
 export class SandboxService {
 
+    /** External Job exposed to the jailedApi */
+    public exposedJob: Object;
+
+    public exposedSelf: Object;
+
+    /** Object exposed to Jailed */
     private jailedApi: Object;
 
     /** Jailed plugin instance */
     private plugin: any;
 
+    /** Result of the expression evaluation */
     public expressionResult: Observable<SandboxResponse>;
 
     private updateExpressionResult: BehaviorSubject<SandboxResponse> = new BehaviorSubject<SandboxResponse>(undefined);
@@ -44,9 +51,13 @@ export class SandboxService {
         //make sure the code is a string
         const codeToExecute: string = JSON.stringify(code);
 
+        const job: string = this.exposedJob ? JSON.stringify(this.exposedJob): undefined;
+        const self: string = this.exposedSelf ? JSON.stringify(this.exposedSelf): undefined;
+
         // protects even the worker scope from being accessed
         const expressionCode = `
-         function runHidden(code) {
+            function runHidden(code, $job, $self) {
+            
                 const indexedDB = null;
                 const location = null;
                 const navigator = null;
@@ -72,28 +83,29 @@ export class SandboxService {
                 const importScripts = null;
                 const console = null;
                 const application = null;
-
+            
                 return eval(code);
             }
             
-            function execute(codeString) {
+            function execute(codeString, job, self) {
+            
                 var result = {
                     output: null,
                     error: null
-                };
-
+                };   
+                
                 try {
-                    result.output = runHidden(codeString);
+                    result.output = runHidden(codeString, job, self);
                 } catch(e) {
                     result.error = e.message;
                 }
-            
-               application.remote.output(result);
+                
+                application.remote.output(result);
             }
             `
             // We don't use a template literal for the code,
             // because we want to evaluate it inside the worker.
-            + "execute(" + codeToExecute + ")";
+            + "execute(" + codeToExecute + "," + job + "," + self + ")";
 
         this.plugin = new jailed.DynamicPlugin(expressionCode, this.jailedApi);
     }
