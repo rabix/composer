@@ -80,14 +80,14 @@ describe("JsonSchemaService", () => {
         });
     });
 
-    describe("isValidCwlJson", () => {
+    describe("isValidCWLClass", () => {
         it("Should return false if we pass an undefined value", () => {
-            const re1 = jsonSchemaService.isValidCwlJson(undefined);
+            const re1 = jsonSchemaService.isValidCWLClass(undefined);
             expect(re1).toBe(false);
         });
 
         it("Should return false if we pass an object without 'cwlVersion' or 'class'", () => {
-            const res1 = jsonSchemaService.isValidCwlJson({
+            const res1 = jsonSchemaService.isValidCWLClass({
                 prop1: 123,
                 prop2: 123
             });

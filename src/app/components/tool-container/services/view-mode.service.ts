@@ -16,7 +16,7 @@ export class ViewModeService {
             .refCount();
     }
 
-    public setViewMode(viewMode: string): void {
+    public setViewMode(viewMode: 'json' | 'gui'): void {
         this.updateViewMode.next(viewMode);
     }
 }

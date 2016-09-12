@@ -1,0 +1,6 @@
+@import "../../../../../assets/sass/variables";
+@import "../../../../../assets/sass/mixins";
+
+base-command-form.input-form {
+  @include cli-border($base-cmd-color);
+}

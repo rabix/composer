@@ -2,7 +2,7 @@ import {Component, Input, OnInit} from "@angular/core";
 import {Validators, FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 import {ExpressionInputComponent} from "../types/expression-input.component";
 
-require("./form.components.scss");
+require("./base-command-form.components.scss");
 
 @Component({
     selector: 'base-command-form',

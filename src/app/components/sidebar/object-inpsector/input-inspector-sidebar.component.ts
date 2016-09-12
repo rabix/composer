@@ -2,12 +2,12 @@ import {Component, style, animate, state, transition, trigger} from "@angular/co
 import {Observable} from "rxjs/Rx";
 import {InputInspectorComponent} from "./input-inspector.component";
 import {VisibilityState} from "../../clt-editor/animation.states";
-import {InputProperty} from "../../../models/input-property.model";
 import {
     OpenInputInspector, CloseInputInspector, OpenExpressionEditor,
     CloseExpressionEditor
 } from "../../../action-events/index";
 import {EventHubService} from "../../../services/event-hub/event-hub.service";
+import {CommandInputParameterModel as InputProperty} from "cwlts/lib/models/d2sb";
 
 require ("../shared/editor-sidebar.component.scss");
 

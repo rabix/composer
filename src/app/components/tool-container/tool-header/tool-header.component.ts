@@ -56,14 +56,20 @@ export class ToolHeaderComponent implements OnInit{
 
     ngOnInit(): void {
         this.isSupportedFileFormat = this.toolValidator.isSupportedFileFormat(this.file);
+        let loadedGUI = false;
 
         this.eventHubService.onValueFrom(CwlValidationResult)
+            .distinctUntilChanged()
             .subscribe((validationResult: ValidationResponse) => {
                 this.isValidTool = this.isSupportedFileFormat && validationResult.isValidCwl;
+                if(this.isValidTool && !loadedGUI) {
+                    this.viewModeService.setViewMode('gui');
+                    loadedGUI = true;
+                }
             });
     }
 
-    private changeViewMode(viewMode: string): void {
+    private changeViewMode(viewMode: 'json' | 'gui'): void {
         this.viewModeService.setViewMode(viewMode);
     }
 }

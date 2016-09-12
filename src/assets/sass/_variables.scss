@@ -7,14 +7,13 @@ $gui-base-gray: rgb(51, 51, 51);
 $body-bg: #000;
 $body-color: ghostwhite;
 
-$brand-primary: $gray;
+$brand-primary: #337cb9;
 $btn-primary-bg: $brand-primary;
-$btn-primary-border: $gray-dark;
 
 /**
 * Layout Size Variables
 */
-$action-bar-height: 50px;
+$action-bar-height: 25px;
 $sidebar-width: 70px;
 
 /**
@@ -29,7 +28,9 @@ $modal-content-color: $body-color;
 * Form Variables
 */
 
-$input-bg: #ccc;
+$input-bg: #fff;
+$input-border-focus: #c7c7c7;
+$input-border-color: #c7c7c7;
 $input-color-placeholder: $gray-dark;
 
 
@@ -47,3 +48,26 @@ $collapse-icon-width: 20px;
 $editor-padding-top: 10px;
 $editor-header-height: 40px;
 $editor-footer-height: 50px;
+
+
+/**
+*  SBG Variables
+*/
+
+$text-muted: #999;
+$border-color: #ccc;
+$light-border-color: #eee;
+$background-grey: #f9f9f9;
+$text-dark: #333;
+
+$padding-sm: 10px;
+$padding-md: 15px;
+
+
+/**
+* CLI colors
+*/
+
+$base-cmd-color: #7AC24D;
+$input-port-color: #A77ED7;
+$arg-color: #FDA365;

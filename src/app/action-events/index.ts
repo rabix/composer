@@ -1,6 +1,6 @@
 import {FileModel} from "../store/models/fs.models";
 import {CwlFileTemplate} from "../types/file-template.type";
-import {InputProperty} from "../models/input-property.model";
+import {CommandInputParameterModel as InputProperty} from "cwlts/lib/models/d2sb";
 import {Observable} from "rxjs/Observable";
 
 export class EventHubAction {

@@ -83,8 +83,16 @@ module.exports = {
 
         // remove other default values
         modulesDirectories: ['node_modules'],
+
+        fallback: helpers.root("node_modules")
     },
     devtool: "source-map",
+
+    resolveLoader: {
+        root: helpers.root("node_modules"),
+
+        fallback: [helpers.root("node_modules")]
+    },
 
     /*
      * Options affecting the normal modules.
