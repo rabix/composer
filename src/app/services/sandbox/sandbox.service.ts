@@ -34,7 +34,8 @@ export class SandboxService {
 
         this.jailedApi = {
             output: function(data) {
-                const output: string = self.escape(self.stringify(data.output));
+
+                const output: string = self.stringify(data.output);
                 const error: string = data.error;
 
                 self.updateExpressionResult.next({
@@ -51,77 +52,73 @@ export class SandboxService {
         //make sure the code is a string
         const codeToExecute: string = JSON.stringify(code);
 
-        const job: string = this.exposedJob ? JSON.stringify(this.exposedJob): undefined;
-        const self: string = this.exposedSelf ? JSON.stringify(this.exposedSelf): undefined;
+        const $job: string = this.exposedJob ? JSON.stringify(this.exposedJob): undefined;
+        const $self: string = this.exposedSelf ? JSON.stringify(this.exposedSelf): undefined;
 
-        // protects even the worker scope from being accessed
-        const expressionCode = `
-            function runHidden(code, $job, $self) {
-            
-                const indexedDB = null;
-                const location = null;
-                const navigator = null;
-                const onerror = null;
-                const onmessage = null;
-                const performance = null;
-                const self = null;
-                const webkitIndexedDB = null;
-                const postMessage = null;
-                const close = null;
-                const openDatabase = null;
-                const openDatabaseSync = null;
-                const webkitRequestFileSystem = null;
-                const webkitRequestFileSystemSync = null;
-                const webkitResolveLocalFileSystemSyncURL = null;
-                const webkitResolveLocalFileSystemURL = null;
-                const addEventListener = null;
-                const dispatchEvent = null;
-                const removeEventListener = null;
-                const dump = null;
-                const onoffline = null;
-                const ononline = null;
-                const importScripts = null;
-                const console = null;
-                const application = null;
-            
-                return eval(code);
-            }
-            
-            function execute(codeString, job, self) {
+        //Not using ES6 here, because this code is loaded at runtime, and we can't be sure that the browser supports ES6
+        const expressionCode = this.createExpressionCode(codeToExecute, $job, $self);
+
+        this.plugin = new jailed.DynamicPlugin(expressionCode, this.jailedApi);
+    }
+
+    private createExpressionCode(codeToExecute, $job, $self) {
+        return `var runHidden = ${this.runHidden};
+           
+            var execute = function(codeString, job, self) {
             
                 var result = {
-                    output: null,
-                    error: null
-                };   
-                
+                    output: undefined,
+                    error: undefined
+                };
+
                 try {
                     result.output = runHidden(codeString, job, self);
                 } catch(e) {
                     result.error = e.message;
                 }
-                
+
                 application.remote.output(result);
             }
             `
             // We don't use a template literal for the code,
             // because we want to evaluate it inside the worker.
-            + "execute(" + codeToExecute + "," + job + "," + self + ")";
-
-        this.plugin = new jailed.DynamicPlugin(expressionCode, this.jailedApi);
+            + "execute(" + codeToExecute + "," + $job + "," + $self + ")";
     }
 
-    // prepares the string to be printed on the terminal
-    private escape(msg: string): string {
-        return msg.
-        replace(/&/g,'&amp;').
-        replace(/</g,'&lt;').
-        replace(/>/g,'&gt;').
-        replace(/\n/g, '<br/>').
-        replace(/ /g, '&nbsp;');
+    // protects even the worker scope from being accessed
+    public runHidden(code, $job?, $self?) {
+
+        const indexedDB = undefined;
+        const location = undefined;
+        const navigator = undefined;
+        const onerror = undefined;
+        const onmessage = undefined;
+        const performance = undefined;
+        const self = undefined;
+        const webkitIndexedDB = undefined;
+        const postMessage = undefined;
+        const close = undefined;
+        const openDatabase = undefined;
+        const openDatabaseSync = undefined;
+        const webkitRequestFileSystem = undefined;
+        const webkitRequestFileSystemSync = undefined;
+        const webkitResolveLocalFileSystemSyncURL = undefined;
+        const webkitResolveLocalFileSystemURL = undefined;
+        const addEventListener = undefined;
+        const dispatchEvent = undefined;
+        const removeEventListener = undefined;
+        const dump = undefined;
+        const onoffline = undefined;
+        const ononline = undefined;
+        const importScripts = undefined;
+        const console = undefined;
+        const application = undefined;
+
+        return eval(code);
     }
 
     // converts the output into a string
-    private stringify(output: any): string {
+    public stringify(output: any): string {
         let result: any;
 
         if (typeof output === "string") {

@@ -61,17 +61,15 @@ export class ExpressionEditorComponent implements OnInit {
         this.eventHub.onValueFrom(OpenExpressionEditor)
             .subscribe((data:ExpressionEditorData) => {
                 this.initSandbox();
+
                 this.expressionStream = data.expression;
                 this.updateAction = data.updateAction;
-
                 this.editor = new ExpressionEditor(ace.edit(this.aceContainer.nativeElement), this.expressionStream);
 
                 this.editor.expressionChanges.subscribe(expression => {
                     this.codeToEvaluate = expression;
                     this.eventHub.publish(this.updateAction(expression));
                 });
-
-                this.listenToSandboxResult();
             });
     }
 
@@ -79,9 +77,7 @@ export class ExpressionEditorComponent implements OnInit {
         this.sandboxService = new SandboxService();
         this.codeToEvaluate = '';
         this.evaluatedExpression = '';
-    }
 
-    private listenToSandboxResult(): void {
         this.sandboxService.expressionResult
             .filter(result => result !== undefined)
             .subscribe((result: SandboxResponse) => {
