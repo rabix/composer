@@ -123,7 +123,6 @@ export class CltEditorComponent implements OnInit {
 
     ngOnInit() {
         if (this.file.content) {
-            this.model = new CommandLineToolModel(JSON.parse(this.file.content));
             this.commandlineContent = this.model.getCommandLine();
         }
     }

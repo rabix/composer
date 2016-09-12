@@ -1,5 +1,17 @@
 @import "../../../../assets/sass/variables";
 
+.input-cli {
+  color: $input-port-color;
+}
+
+.baseCmd-cli {
+    color: $base-cmd-color;
+}
+
+.arg-cli {
+    color: $arg-color;
+}
+
 .footer-buttons {
     position: absolute;
     bottom: 0;

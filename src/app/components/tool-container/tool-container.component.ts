@@ -12,6 +12,7 @@ import {CommandLineComponent} from "../clt-editor/commandline/commandline.compon
 import {InputInspectorSidebarComponent} from "../sidebar/object-inpsector/input-inspector-sidebar.component";
 import {ExpressionEditorSidebarComponent} from "../sidebar/expression-editor/expression-editor-sidebar.component";
 import {ViewModeService} from "./services/view-mode.service";
+import {CommandLineToolModel} from "cwlts/lib/models/d2sb";
 
 require("./tool-container.component.scss");
 
@@ -41,7 +42,7 @@ require("./tool-container.component.scss");
             <div class="scroll-content">
                 <div class="main-content">
                     <code-editor *ngIf="viewMode === 'json'" [file]="file"></code-editor>
-                    <clt-editor class="gui-editor-component" *ngIf="viewMode === 'gui'" [file]="file"></clt-editor>
+                    <clt-editor class="gui-editor-component" [model]="model" *ngIf="viewMode === 'gui'" [file]="file"></clt-editor>
                     
                     <input-inspector-sidebar-component></input-inspector-sidebar-component>
                     <expression-editor-sidebar-component></expression-editor-sidebar-component>
@@ -61,8 +62,9 @@ export class ToolContainerComponent implements OnInit, DynamicState {
     /** File that we will pass to both the gui and JSON editor*/
     private file: FileModel;
 
-    /* TODO: generate the commandline */
-    private commandlineContent: string = "This is the command line";
+    private model: CommandLineToolModel;
+
+    private commandlineContent: string = '';
 
     /** List of subscriptions that should be disposed when destroying this component */
     private subs: Subscription[];
@@ -72,12 +74,12 @@ export class ToolContainerComponent implements OnInit, DynamicState {
 
     constructor(private fileRegistry: FileRegistry,
                 private viewModeService: ViewModeService) {
-        this.subs = [];
+        this.subs     = [];
         this.isLoaded = false;
-        
+
         this.viewModeService.setViewMode("json");
         this.viewModeService.viewMode.subscribe(viewMode => {
-           this.viewMode = viewMode; 
+            this.viewMode = viewMode;
         });
     }
 
@@ -87,7 +89,9 @@ export class ToolContainerComponent implements OnInit, DynamicState {
 
         // bring our own file up to date
         this.subs.push(fileStream.subscribe(file => {
-            this.file = file;
+            this.file     = file;
+            this.model    = new CommandLineToolModel(JSON.parse(this.file.content));
+            this.commandlineContent = this.model.getCommandLine();
             this.isLoaded = true;
         }));
     }

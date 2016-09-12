@@ -1,4 +1,3 @@
-import {it, describe, beforeEach} from "@angular/core/testing";
 import {JsonSchemaService} from "./json-schema.service";
 
 const {draft3, draft4} = require("cwlts/lib");
