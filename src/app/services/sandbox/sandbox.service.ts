@@ -43,7 +43,7 @@ export class SandboxService {
                     error: error
                 });
 
-                self.dissconect();
+                self.disconnect();
             }
         };
     }
@@ -70,11 +70,11 @@ export class SandboxService {
     private waitFoResponse(): void {
         setTimeout(() => {
             console.log("Sandbox response timed out.");
-            this.dissconect();
+            this.disconnect();
         }, 3000);
     }
 
-    private dissconect(): void {
+    private disconnect(): void {
         this.plugin.disconnect();
     }
 
