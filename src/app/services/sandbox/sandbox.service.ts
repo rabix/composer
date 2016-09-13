@@ -42,6 +42,8 @@ export class SandboxService {
                     output: output,
                     error: error
                 });
+
+                self.dissconect();
             }
         };
     }
@@ -59,9 +61,24 @@ export class SandboxService {
         const expressionCode = this.createExpressionCode(codeToExecute, $job, $self);
 
         this.plugin = new jailed.DynamicPlugin(expressionCode, this.jailedApi);
+
+        this.plugin.whenConnected(() => {
+            this.waitFoResponse();
+        });
     }
 
-    private createExpressionCode(codeToExecute, $job, $self) {
+    private waitFoResponse(): void {
+        setTimeout(() => {
+            console.log("Sandbox response timed out.");
+            this.dissconect();
+        }, 3000);
+    }
+
+    private dissconect(): void {
+        this.plugin.disconnect();
+    }
+
+    private createExpressionCode(codeToExecute, $job, $self): void {
         return `var runHidden = ${this.runHidden};
            
             var execute = function(codeString, job, self) {
@@ -86,7 +103,7 @@ export class SandboxService {
     }
 
     // protects even the worker scope from being accessed
-    public runHidden(code, $job?, $self?) {
+    public runHidden(code, $job?, $self?): any {
 
         const indexedDB = undefined;
         const location = undefined;
