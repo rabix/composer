@@ -1,4 +1,4 @@
-import {Component, style, animate, state, transition, trigger} from "@angular/core";
+import {Component, style, animate, state, transition, trigger, OnDestroy} from "@angular/core";
 import {VisibilityState} from "../../clt-editor/animation.states";
 import {ExpressionEditorComponent} from "../expression-editor/expression-editor.component";
 import {
@@ -8,6 +8,7 @@ import {
     CloseInputInspector
 } from "../../../action-events/index";
 import {EventHubService} from "../../../services/event-hub/event-hub.service";
+import {Subscription} from "rxjs/Subscription";
 
 require ("../shared/editor-sidebar.component.scss");
 
@@ -31,7 +32,7 @@ require ("../shared/editor-sidebar.component.scss");
         ExpressionEditorComponent
     ],
     template: `
-            <div class="sidebar-component" @sidebarState="sidebarState" [ngClass]="{isTopOfStack: isShown}">
+            <div class="sidebar-component" @sidebarState="sidebarState" [ngClass]="{isTopOfStack: isTop}">
                 <div class="sidebar-content">
                     
                     <div class="collapse-icon" (click)="collapseSidebar()">
@@ -43,33 +44,40 @@ require ("../shared/editor-sidebar.component.scss");
             </div>
     `
 })
-export class ExpressionEditorSidebarComponent {
+export class ExpressionEditorSidebarComponent implements OnDestroy {
     /** State of the sidebar animation */
     private sidebarState: VisibilityState = "hidden";
 
-    private isShown: boolean;
+    private isTop: boolean;
+
+    private subs: Subscription[];
 
     constructor(private eventHubService: EventHubService) {
+        this.subs = [];
 
-        this.eventHubService.on(OpenExpressionEditor).subscribe(() => {
+        this.subs.push(this.eventHubService.on(OpenExpressionEditor).subscribe(() => {
             this.sidebarState = "visible";
-            this.isShown = true;
-        });
+            this.isTop = true;
+        }));
 
-        this.eventHubService.on(CloseExpressionEditor).subscribe(() => {
+        this.subs.push(this.eventHubService.on(CloseExpressionEditor).subscribe(() => {
             this.sidebarState = "hidden";
-        });
+        }));
 
-        this.eventHubService.on(OpenInputInspector).subscribe(() => {
-            this.isShown = false;
-        });
+        this.subs.push(this.eventHubService.on(OpenInputInspector).subscribe(() => {
+            this.isTop = false;
+        }));
 
-        this.eventHubService.on(CloseInputInspector).subscribe(() => {
-            this.isShown = true;
-        });
+        this.subs.push(this.eventHubService.on(CloseInputInspector).subscribe(() => {
+            this.isTop = true;
+        }));
     }
 
     private collapseSidebar(): void {
         this.eventHubService.publish(new CloseExpressionEditor());
+    }
+
+    ngOnDestroy(): void {
+        this.subs.forEach(sub => sub.unsubscribe());
     }
 }

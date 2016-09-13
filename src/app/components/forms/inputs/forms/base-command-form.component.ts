@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, Input, OnInit, OnDestroy} from "@angular/core";
 import {
     Validators,
     FormBuilder,
@@ -10,6 +10,7 @@ import {
 import {ExpressionInputComponent, ExpressionInputType} from "../types/expression-input.component";
 import {EventHubService} from "../../../../services/event-hub/event-hub.service";
 import {UpdateBaseCommandExpression} from "../../../../action-events/index";
+import {Subscription} from "rxjs/Subscription";
 
 require("./form.components.scss");
 
@@ -37,7 +38,7 @@ require("./form.components.scss");
              </form>
     `
 })
-export class BaseCommandFormComponent implements OnInit {
+export class BaseCommandFormComponent implements OnInit, OnDestroy {
     @Input()
     public baseCommand: string;
 
@@ -49,26 +50,38 @@ export class BaseCommandFormComponent implements OnInit {
 
     private expressionInputType: ExpressionInputType = "baseCommand";
 
+    private subs: Subscription[];
+
     constructor(private formBuilder: FormBuilder,
-                private eventHubService: EventHubService) { }
+                private eventHubService: EventHubService) {
+
+        this.subs = [];
+    }
 
     ngOnInit(): void {
         this.baseCommandForm = this.formBuilder.group({
             baseCommand: [this.baseCommand, Validators.compose([Validators.required, Validators.minLength(1)])]
         });
 
-        this.baseCommandForm.controls['baseCommand'].valueChanges.subscribe(value => {
+        let baseCommandValueChanges = this.baseCommandForm.controls['baseCommand'].valueChanges.subscribe(value => {
             this.baseCommand = value;
         });
 
         this.group.addControl('baseCommand', this.baseCommandForm.controls['baseCommand']);
 
-        this.eventHubService.onValueFrom(UpdateBaseCommandExpression)
+        let updateBaseCommandExpression = this.eventHubService.onValueFrom(UpdateBaseCommandExpression)
             .subscribe((expression: string) => {
                 const baseCommandControl: FormControl = <FormControl>this.baseCommandForm.controls['baseCommand'];
-                
+
                 //TODO: update the actual model
                 baseCommandControl.updateValue(expression);
             });
+
+        this.subs.push(baseCommandValueChanges);
+        this.subs.push(updateBaseCommandExpression);
+    }
+
+    ngOnDestroy(): void {
+        this.subs.forEach(sub => sub.unsubscribe());
     }
 }

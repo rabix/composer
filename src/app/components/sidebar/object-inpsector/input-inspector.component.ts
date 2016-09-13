@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, Input, OnInit, OnDestroy} from "@angular/core";
 import {
     Validators,
     FormBuilder,
@@ -12,6 +12,7 @@ import {BehaviorSubject} from "rxjs";
 import {InputProperty} from "../../../models/input-property.model";
 import {EventHubService} from "../../../services/event-hub/event-hub.service";
 import {UpdateInputPortExpression} from "../../../action-events/index";
+import {Subscription} from "rxjs/Subscription";
 
 require ("./input-inspector.component.scss");
 
@@ -62,7 +63,7 @@ require ("./input-inspector.component.scss");
             </form>
     `
 })
-export class InputInspectorComponent implements OnInit {
+export class InputInspectorComponent implements OnInit, OnDestroy {
 
     /** The object that we are editing */
     @Input()
@@ -79,12 +80,16 @@ export class InputInspectorComponent implements OnInit {
 
     private expressionInputType: ExpressionInputType = "inputPortValue";
 
+    private subs: Subscription[];
+
     constructor(private formBuilder: FormBuilder,
                 private eventHubService: EventHubService) {
+
+        this.subs = [];
     }
 
     ngOnInit() {
-        this.inputModelStream.subscribe((inputPort: InputProperty) => {
+        let inputModelStreamUpdate = this.inputModelStream.subscribe((inputPort: InputProperty) => {
             this.selectedProperty = inputPort;
 
             this.inputInspectorForm = this.formBuilder.group({
@@ -95,11 +100,24 @@ export class InputInspectorComponent implements OnInit {
                 this.selectedProperty.value = value;
             });
 
-            this.eventHubService.onValueFrom(UpdateInputPortExpression)
-                .subscribe((expression: string) => {
-                    const expressionControl: FormControl = <FormControl>this.inputInspectorForm.controls['expression'];
-                    expressionControl.updateValue(expression);
-                });
+            this.listenToInputPortUpdate();
         });
+
+        this.subs.push(inputModelStreamUpdate);
+    }
+
+    private listenToInputPortUpdate() {
+
+        let updateInputPortExpression = this.eventHubService.onValueFrom(UpdateInputPortExpression)
+            .subscribe((expression: string) => {
+                const expressionControl: FormControl = <FormControl>this.inputInspectorForm.controls['expression'];
+                expressionControl.updateValue(expression);
+            });
+
+        this.subs.push(updateInputPortExpression);
+    }
+
+    ngOnDestroy(): void {
+        this.subs.forEach(sub => sub.unsubscribe());
     }
 }

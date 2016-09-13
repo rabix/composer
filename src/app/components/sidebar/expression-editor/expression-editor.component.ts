@@ -1,10 +1,11 @@
-import {Component, ElementRef, ViewChild, OnInit} from "@angular/core";
+import {Component, ElementRef, ViewChild, OnInit, OnDestroy} from "@angular/core";
 import {ExpressionEditor} from "./expression-editor";
 import {Observable} from "rxjs/Observable";
 import {EventHubService} from "../../../services/event-hub/event-hub.service";
 import {ExpressionEditorData} from "../../../models/expression-editor-data.model";
 import {OpenExpressionEditor} from "../../../action-events/index";
 import {SandboxService, SandboxResponse} from "../../../services/sandbox/sandbox.service";
+import {Subscription} from "rxjs/Subscription";
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import TextMode = AceAjax.TextMode;
@@ -32,7 +33,7 @@ require ("./expression-editor.component.scss");
          </div>
  `
 })
-export class ExpressionEditorComponent implements OnInit {
+export class ExpressionEditorComponent implements OnInit, OnDestroy {
 
     /** Expression stream coming form the tool */
     private expressionStream: Observable<string>;
@@ -54,23 +55,34 @@ export class ExpressionEditorComponent implements OnInit {
 
     private sandboxService: SandboxService;
 
+    private subs: Subscription[];
+
     constructor(private eventHub: EventHubService) {
+        this.subs = [];
     }
 
     ngOnInit(): any {
-        this.eventHub.onValueFrom(OpenExpressionEditor)
+        let openExpressionEditor = this.eventHub.onValueFrom(OpenExpressionEditor)
             .subscribe((data:ExpressionEditorData) => {
                 this.initSandbox();
 
                 this.expressionStream = data.expression;
                 this.updateAction = data.updateAction;
-                this.editor = new ExpressionEditor(ace.edit(this.aceContainer.nativeElement), this.expressionStream);
 
-                this.editor.expressionChanges.subscribe(expression => {
-                    this.codeToEvaluate = expression;
-                    this.eventHub.publish(this.updateAction(expression));
-                });
+                this.editor = new ExpressionEditor(ace.edit(this.aceContainer.nativeElement), this.expressionStream);
+                this.listenToExpressionChanges();
             });
+
+        this.subs.push(openExpressionEditor);
+    }
+
+    private listenToExpressionChanges(): void {
+        let expressionChanges = this.editor.expressionChanges.subscribe(expression => {
+            this.codeToEvaluate = expression;
+            this.eventHub.publish(this.updateAction(expression));
+        });
+
+        this.subs.push(expressionChanges);
     }
 
     private initSandbox(): void {
@@ -78,7 +90,7 @@ export class ExpressionEditorComponent implements OnInit {
         this.codeToEvaluate = '';
         this.evaluatedExpression = '';
 
-        this.sandboxService.expressionResult
+        let expressionResult = this.sandboxService.expressionResult
             .filter(result => result !== undefined)
             .subscribe((result: SandboxResponse) => {
 
@@ -89,9 +101,15 @@ export class ExpressionEditorComponent implements OnInit {
                     this.evaluatedExpression = result.output;
                 }
             });
+
+        this.subs.push(expressionResult);
     }
 
     private execute(): void {
         this.sandboxService.submit(this.codeToEvaluate);
+    }
+
+    ngOnDestroy(): void {
+        this.subs.forEach(sub => sub.unsubscribe());
     }
 }
