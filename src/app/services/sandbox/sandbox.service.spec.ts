@@ -4,8 +4,12 @@ import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import * as jailed from "jailed";
 
 describe("SandboxService", () => {
-    let sandboxService = new SandboxService();
+    const sandboxService = new SandboxService();
 
+    const fakePlugin = {
+        whenConnected: () => { }  
+    };
+    
     describe("stringify", () => {
 
         it("should convert it's parameters to strings", () => {
@@ -70,6 +74,8 @@ describe("SandboxService", () => {
                         expect(result).toEqual({ output: 3, error: undefined });
                         done();
                     });
+                
+                return fakePlugin;
             });
 
             sandboxService.submit(1 + 2);
