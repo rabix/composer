@@ -78,7 +78,7 @@ export class SandboxService {
         this.plugin.disconnect();
     }
 
-    private createExpressionCode(codeToExecute, $job, $self): void {
+    private createExpressionCode(codeToExecute, $job, $self): string {
         return `var runHidden = ${this.runHidden};
            
             var execute = function(codeString, job, self) {
