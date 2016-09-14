@@ -7,9 +7,9 @@ describe("SandboxService", () => {
     const sandboxService = new SandboxService();
 
     const fakePlugin = {
-        whenConnected: () => { }  
+        whenConnected: () => { }
     };
-    
+
     describe("stringify", () => {
 
         it("should convert it's parameters to strings", () => {
@@ -54,13 +54,12 @@ describe("SandboxService", () => {
 
             let updateExpressionResult: BehaviorSubject<SandboxResponse> = new BehaviorSubject<SandboxResponse>(undefined);
 
+            sandboxService.expressionResult = updateExpressionResult
+                .publishReplay(1)
+                .refCount();
+
             spyOn(sandboxService, "createExpressionCode").and.callFake(code => code);
-
             spyOn(jailed, "DynamicPlugin").and.callFake(expressionCode => {
-                sandboxService.expressionResult = updateExpressionResult
-                    .publishReplay(1)
-                    .refCount();
-
                 const mockResult = eval(expressionCode);
 
                 updateExpressionResult.next({
@@ -68,17 +67,17 @@ describe("SandboxService", () => {
                     error: undefined
                 });
 
-                sandboxService.expressionResult
-                    .filter(result => result !== undefined)
-                    .subscribe((result: SandboxResponse) => {
-                        expect(result).toEqual({ output: 3, error: undefined });
-                        done();
-                    });
-                
                 return fakePlugin;
             });
 
             sandboxService.submit(1 + 2);
+
+            sandboxService.expressionResult
+                .filter(result => result !== undefined)
+                .subscribe((result: SandboxResponse) => {
+                    expect(result).toEqual({ output: 3, error: undefined });
+                    done();
+                });
         });
     });
 
