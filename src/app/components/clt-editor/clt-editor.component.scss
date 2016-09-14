@@ -1,22 +1,22 @@
 @import "../../../assets/sass/variables";
 
 clt-editor {
-    background: $background-grey;
+    height: 100%;
     color: $text-dark;
     padding: 20px;
+    display: block;
 }
 
 .input-form {
-    background: #ffffff;
+    display: block;
+    background: $background-light;
     margin-bottom: 20px;
     width: 60%;
     border: 1px solid $border-color;
     padding: $padding-md;
     color: $text-dark;
-    display: block;
 
     .secondary-label {
-        display: block;
         color:  #808080;
         font-size: small;
     }

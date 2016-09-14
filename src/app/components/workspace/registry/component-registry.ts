@@ -4,6 +4,7 @@ import {Observable} from "rxjs/Rx";
 import {CodeEditorComponent} from "../../code-editor/code-editor.component";
 import {FileModel} from "../../../store/models/fs.models";
 import {ToolContainerComponent} from "../../tool-container/tool-container.component";
+import {TabManagerComponent} from "../../tab-manager/tab-manager.component";
 
 export class ComponentRegistry {
 
@@ -92,15 +93,15 @@ export class ComponentRegistry {
         });
     }
 
-    public findToolContainerTab(file: FileModel) {
-        return this.getToolContainerTabs().find(item => item.config.componentState.fileInfo.id === file.id);
+    public findTab(file: FileModel) {
+        return this.getTabManagers().find(item => item.config.componentState.fileInfo.id === file.id);
     }
     
-    public getToolContainerTabs() {
-        return this.getToolContainerStack().contentItems.filter(item => item.componentName === ToolContainerComponent);
+    public getTabManagers() {
+        return this.getTabStack().contentItems.filter(item => item.componentName === TabManagerComponent);
     }
 
-    public getToolContainerStack() {
+    public getTabStack() {
         return this.layout.root.contentItems[0].contentItems[1];
     }
 }

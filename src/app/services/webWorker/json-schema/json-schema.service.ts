@@ -90,6 +90,8 @@ export class JsonSchemaService {
                     break;
             }
 
+            result.class = jsonClass;
+
             this.sendValidationResult(result);
         }
     }
@@ -108,6 +110,7 @@ export class JsonSchemaService {
             isValidatableCwl: true,
             isValidCwl: result.valid,
             errors: result.errors,
+            class: result.class,
             schema: result.instance
         });
     }

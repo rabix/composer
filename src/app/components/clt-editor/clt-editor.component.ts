@@ -16,6 +16,7 @@ import {
 } from "../../action-events/index";
 
 import {CommandInputParameterModel as InputProperty, CommandLineToolModel} from "cwlts/lib/models/d2sb";
+import {Observable} from "rxjs";
 
 require("./clt-editor.component.scss");
 
@@ -66,7 +67,8 @@ require("./clt-editor.component.scss");
 export class CltEditorComponent implements OnInit {
     /** The file that we are going to use to list the properties */
     @Input()
-    public file: FileModel;
+    public fileStream: Observable<FileModel>;
+    private file: FileModel;
     @Input()
     public toolInputs: Array<InputProperty>;
 
@@ -122,8 +124,9 @@ export class CltEditorComponent implements OnInit {
     }
 
     ngOnInit() {
-        if (this.file.content) {
+        this.fileStream.first(file => {
+            this.file = file;
             this.commandlineContent = this.model.getCommandLine();
-        }
+        });
     }
 }

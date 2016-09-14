@@ -16,7 +16,7 @@ export class WebWorkerService {
                                     });
     }
 
-    public validateJsonSchema(jsonText: string) {
+    public validateJsonSchema(jsonText: string): void {
         this.jsonSchemaWorker.postMessage(jsonText);
     }
 }
