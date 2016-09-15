@@ -7,7 +7,6 @@ import {WorkspaceService} from "./workspace.service";
 import {FileEditorPlaceholderComponent} from "../placeholders/file-editor/file-editor-placeholder.component";
 import * as GoldenLayout from "golden-layout";
 import {FileRegistry} from "../../services/file-registry.service";
-import {ToolContainerComponent} from "../tool-container/tool-container.component";
 import {TabManagerComponent} from "../tab-manager/tab-manager.component";
 
 require("./workspace.component.scss");
@@ -42,7 +41,7 @@ export class WorkspaceComponent implements OnDestroy {
 
         Observable.fromEvent(this.layout, "componentCreated")
             .filter((event: any) => {
-                return event.config.componentName === ToolContainerComponent
+                return event.config.componentName === TabManagerComponent
                     && event.parent.contentItems.length === 1
                     && event.parent.contentItems[0].config.componentName === FileEditorPlaceholderComponent
             })
@@ -51,7 +50,7 @@ export class WorkspaceComponent implements OnDestroy {
             });
 
         Observable.fromEvent(this.layout, "itemDestroyed").filter((event: any) => {
-            return event.config.componentName === ToolContainerComponent
+            return event.config.componentName === TabManagerComponent
                 && event.parent.contentItems.length === 1
         }).subscribe((event: any) => {
             event.parent.addChild({
@@ -93,7 +92,7 @@ export class WorkspaceComponent implements OnDestroy {
         });
 
         Observable.fromEvent(this.layout, "tabCreated")
-            .filter((tab: any) => tab.contentItem.componentName === ToolContainerComponent)
+            .filter((tab: any) => tab.contentItem.componentName === TabManagerComponent)
             .subscribe((tab: any) => {
                 const componentState = tab.contentItem.config.componentState;
                 const file           = componentState.fileInfo;
