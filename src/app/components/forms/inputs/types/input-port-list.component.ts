@@ -1,8 +1,9 @@
-import {Component} from "@angular/core";
+import {Component, OnDestroy} from "@angular/core";
 import {InputPortService} from "../../../../services/input-port/input-port.service";
 import {CloseInputInspector, OpenInputInspector} from "../../../../action-events/index";
 import {EventHubService} from "../../../../services/event-hub/event-hub.service";
 import {CommandInputParameterModel as InputProperty} from "cwlts/lib/models/d2sb";
+import {Subscription} from "rxjs/Subscription";
 
 @Component({
     selector: "input-port-list",
@@ -52,22 +53,29 @@ import {CommandInputParameterModel as InputProperty} from "cwlts/lib/models/d2sb
         </div>
     `
 })
-export class InputPortListComponent {
+export class InputPortListComponent implements OnDestroy {
 
     private portList: Array<InputProperty> = [];
 
     private selectedInputPort: InputProperty;
 
+    private subs: Subscription[];
+
     constructor(private inputPortService: InputPortService,
                 private eventHubService: EventHubService) {
 
-        this.inputPortService.inputPorts.subscribe((portList: InputProperty[]) => {
+        this.subs = [];
+
+        let updatePortList = this.inputPortService.inputPorts.subscribe((portList: InputProperty[]) => {
             this.portList = portList;
         });
 
-        this.inputPortService.selectedInputPort.subscribe(inputPort => {
+        let updateSelectedInputPort = this.inputPortService.selectedInputPort.subscribe(inputPort => {
             this.selectedInputPort = inputPort;
         });
+
+        this.subs.push(updatePortList);
+        this.subs.push(updateSelectedInputPort);
     }
 
     private editProperty(inputPort: InputProperty): void {
@@ -81,5 +89,9 @@ export class InputPortListComponent {
         if (this.selectedInputPort === inputPort) {
             this.eventHubService.publish(new CloseInputInspector());
         }
+    }
+
+    ngOnDestroy(): void {
+        this.subs.forEach(sub => sub.unsubscribe());
     }
 }

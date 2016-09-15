@@ -1,6 +1,16 @@
-import {Component, Input, OnInit} from "@angular/core";
-import {Validators, FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
-import {ExpressionInputComponent} from "../types/expression-input.component";
+import {Component, Input, OnInit, OnDestroy} from "@angular/core";
+import {
+    Validators,
+    FormBuilder,
+    FormGroup,
+    FormControl,
+    REACTIVE_FORM_DIRECTIVES,
+    FORM_DIRECTIVES
+} from "@angular/forms";
+import {ExpressionInputComponent, ExpressionInputType} from "../types/expression-input.component";
+import {EventHubService} from "../../../../services/event-hub/event-hub.service";
+import {UpdateBaseCommandExpression} from "../../../../action-events/index";
+import {Subscription} from "rxjs/Subscription";
 
 require("./base-command-form.components.scss");
 
@@ -19,7 +29,8 @@ require("./base-command-form.components.scss");
                         <label>Base Command</label>
                         <label class="secondary-label">What command do you want to call from the image</label>
                         
-                        <expression-input [inputControl]="baseCommandForm.controls['baseCommand']">
+                        <expression-input [inputControl]="baseCommandForm.controls['baseCommand']"
+                                          [expressionType]="expressionInputType">
                         </expression-input>
                         
                     <button type="button" class="btn btn-secondary add-input-btn">Add base command</button>
@@ -27,28 +38,50 @@ require("./base-command-form.components.scss");
              </form>
     `
 })
-export class BaseCommandFormComponent implements OnInit {
+export class BaseCommandFormComponent implements OnInit, OnDestroy {
     @Input()
     public baseCommand: string;
 
     /** The parent forms group */
     @Input()
     public group: FormGroup;
-    
+
     private baseCommandForm: FormGroup;
 
-    constructor(private formBuilder: FormBuilder) { }
+    private expressionInputType: ExpressionInputType = "baseCommand";
+
+    private subs: Subscription[];
+
+    constructor(private formBuilder: FormBuilder,
+                private eventHubService: EventHubService) {
+
+        this.subs = [];
+    }
 
     ngOnInit(): void {
         this.baseCommandForm = this.formBuilder.group({
             baseCommand: [this.baseCommand, Validators.compose([Validators.required, Validators.minLength(1)])]
         });
 
-       this.baseCommandForm.controls['baseCommand'].valueChanges.subscribe(value => {
+        let baseCommandValueChanges = this.baseCommandForm.controls['baseCommand'].valueChanges.subscribe(value => {
             this.baseCommand = value;
         });
 
-
         this.group.addControl('baseCommand', this.baseCommandForm.controls['baseCommand']);
+
+        let updateBaseCommandExpression = this.eventHubService.onValueFrom(UpdateBaseCommandExpression)
+            .subscribe((expression: string) => {
+                const baseCommandControl: FormControl = <FormControl>this.baseCommandForm.controls['baseCommand'];
+
+                //TODO: update the actual model
+                baseCommandControl.updateValue(expression);
+            });
+
+        this.subs.push(baseCommandValueChanges);
+        this.subs.push(updateBaseCommandExpression);
+    }
+
+    ngOnDestroy(): void {
+        this.subs.forEach(sub => sub.unsubscribe());
     }
 }

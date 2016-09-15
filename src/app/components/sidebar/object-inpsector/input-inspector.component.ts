@@ -1,14 +1,18 @@
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, Input, OnInit, OnDestroy} from "@angular/core";
 import {
     Validators,
     FormBuilder,
     FormGroup,
     REACTIVE_FORM_DIRECTIVES,
-    FORM_DIRECTIVES
+    FORM_DIRECTIVES,
+    FormControl
 } from "@angular/forms";
-import {ExpressionInputComponent} from "../../forms/inputs/types/expression-input.component";
+import {ExpressionInputComponent, ExpressionInputType} from "../../forms/inputs/types/expression-input.component";
 import {BehaviorSubject} from "rxjs";
 import {CommandInputParameterModel as InputProperty} from "cwlts/lib/models/d2sb";
+import {EventHubService} from "../../../services/event-hub/event-hub.service";
+import {UpdateInputPortExpression} from "../../../action-events/index";
+import {Subscription} from "rxjs/Subscription";
 
 require("./input-inspector.component.scss");
 
@@ -50,13 +54,16 @@ require("./input-inspector.component.scss");
                 
                 <div class="form-group">
                     <label for="inputValue">Value</label>
-                    <expression-input [inputControl]="inputInspectorForm.controls['expression']">
+                    
+                    <expression-input [inputControl]="inputInspectorForm.controls['expression']"
+                                    [expressionType]="expressionInputType">
                     </expression-input>
+               
                 </div>
             </form>
     `
 })
-export class InputInspectorComponent implements OnInit {
+export class InputInspectorComponent implements OnInit, OnDestroy {
 
     /** The object that we are editing */
     @Input()
@@ -71,11 +78,18 @@ export class InputInspectorComponent implements OnInit {
     /** Possible property types */
     private propertyTypes = ["File", "string", "enum", "int", "float", "boolean", "array", "record", "map"];
 
-    constructor(private formBuilder: FormBuilder) {
+    private expressionInputType: ExpressionInputType = "inputPortValue";
+
+    private subs: Subscription[];
+
+    constructor(private formBuilder: FormBuilder,
+                private eventHubService: EventHubService) {
+
+        this.subs = [];
     }
 
     ngOnInit() {
-        this.inputModelStream.subscribe((inputPort: InputProperty) => {
+        let inputModelStreamUpdate = this.inputModelStream.subscribe((inputPort: InputProperty) => {
             this.selectedProperty = inputPort;
 
             this.inputInspectorForm = this.formBuilder.group({
@@ -86,5 +100,24 @@ export class InputInspectorComponent implements OnInit {
         this.inputInspectorForm.controls["expression"].valueChanges.subscribe(value => {
             this.selectedProperty.setValueFrom(value);
         });
+        
+        this.listenToInputPortUpdate();
+
+        this.subs.push(inputModelStreamUpdate);
+    }
+
+    private listenToInputPortUpdate() {
+
+        let updateInputPortExpression = this.eventHubService.onValueFrom(UpdateInputPortExpression)
+            .subscribe((expression: string) => {
+                const expressionControl: FormControl = <FormControl>this.inputInspectorForm.controls['expression'];
+                expressionControl.updateValue(expression);
+            });
+
+        this.subs.push(updateInputPortExpression);
+    }
+
+    ngOnDestroy(): void {
+        this.subs.forEach(sub => sub.unsubscribe());
     }
 }

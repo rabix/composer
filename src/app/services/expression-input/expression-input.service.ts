@@ -1,11 +1,8 @@
-import {Injectable} from "@angular/core";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {Observable} from "rxjs/Observable";
 
-@Injectable()
-export class ExpressionService {
+export class ExpressionInputService {
 
-    /** The input ports stream we expose */
     public expression: Observable<string>;
 
     private updateExpression: BehaviorSubject<string> = new BehaviorSubject<string>(undefined);

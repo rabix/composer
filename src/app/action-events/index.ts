@@ -2,6 +2,7 @@ import {FileModel} from "../store/models/fs.models";
 import {CwlFileTemplate} from "../types/file-template.type";
 import {CommandInputParameterModel as InputProperty} from "cwlts/lib/models/d2sb";
 import {Observable} from "rxjs/Observable";
+import {ExpressionEditorData} from "../models/expression-editor-data.model";
 
 export class EventHubAction {
     public type: string;
@@ -116,8 +117,8 @@ export class CloseInputInspector extends EventHubAction {
 }
 
 export class OpenExpressionEditor extends EventHubAction {
-    constructor(input: any) {
-        super("open_expression_editor", input);
+    constructor(expressionEditorEvent: ExpressionEditorData) {
+        super("open_expression_editor", expressionEditorEvent);
     }
 }
 
@@ -130,5 +131,17 @@ export class CloseExpressionEditor extends EventHubAction {
 export class CwlValidationResult extends EventHubAction {
     constructor(validationResult: any) {
         super("cwl_validation_result", validationResult);
+    }
+}
+
+export class UpdateBaseCommandExpression extends EventHubAction {
+    constructor(expression: string) {
+        super("update_expression", expression);
+    }
+}
+
+export class UpdateInputPortExpression extends EventHubAction {
+    constructor(expression: string) {
+        super("update_input_port", expression);
     }
 }
