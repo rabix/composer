@@ -9,12 +9,12 @@ import {
 } from "@angular/forms";
 import {ExpressionInputComponent, ExpressionInputType} from "../../forms/inputs/types/expression-input.component";
 import {BehaviorSubject} from "rxjs";
-import {InputProperty} from "../../../models/input-property.model";
+import {CommandInputParameterModel as InputProperty} from "cwlts/lib/models/d2sb";
 import {EventHubService} from "../../../services/event-hub/event-hub.service";
 import {UpdateInputPortExpression} from "../../../action-events/index";
 import {Subscription} from "rxjs/Subscription";
 
-require ("./input-inspector.component.scss");
+require("./input-inspector.component.scss");
 
 @Component({
     selector: "input-inspector",
@@ -24,7 +24,7 @@ require ("./input-inspector.component.scss");
         FORM_DIRECTIVES
     ],
     template: `
-            <form class="input-inspector-component">
+            <form class="input-inspector-component object-inspector">
                 <div>
                      <span class="edit-text">Edit</span>
                     <i class="fa fa-info-circle info-icon"></i>
@@ -93,15 +93,15 @@ export class InputInspectorComponent implements OnInit, OnDestroy {
             this.selectedProperty = inputPort;
 
             this.inputInspectorForm = this.formBuilder.group({
-                expression: [this.selectedProperty.value, Validators.compose([Validators.required, Validators.minLength(1)])]
+                expression: [this.selectedProperty.getValueFrom(), Validators.compose([Validators.required, Validators.minLength(1)])]
             });
-
-            this.inputInspectorForm.controls["expression"].valueChanges.subscribe(value => {
-                this.selectedProperty.value = value;
-            });
-
-            this.listenToInputPortUpdate();
         });
+
+        this.inputInspectorForm.controls["expression"].valueChanges.subscribe(value => {
+            this.selectedProperty.setValueFrom(value);
+        });
+        
+        this.listenToInputPortUpdate();
 
         this.subs.push(inputModelStreamUpdate);
     }

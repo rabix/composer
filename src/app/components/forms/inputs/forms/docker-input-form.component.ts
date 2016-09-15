@@ -1,7 +1,12 @@
 import {Component, Input, OnInit} from "@angular/core";
-import {Validators, FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
-
-require("./form.components.scss");
+import {
+    Validators,
+    FormBuilder,
+    FormGroup,
+    REACTIVE_FORM_DIRECTIVES,
+    FORM_DIRECTIVES
+} from "@angular/forms";
+import {CommandLineToolModel} from "cwlts/lib/models/d2sb";
 
 @Component({
     selector: 'docker-input-form',
@@ -12,12 +17,12 @@ require("./form.components.scss");
     template: `
             <form [formGroup]="dockerInputForm">
                 <fieldset class="form-group">
-                      <button type="button" class="btn btn-secondary hide-btn">Hide</button>
+                    <button type="button" class="btn btn-secondary hide-btn">Hide</button>
                
                         <label>Docker image</label>
                         <label class="secondary-label">Docker Repository</label>
                         
-                       <input name="dockerPull"
+                        <input name="dockerPull"
                             type="text"
                             class="form-control"
                             id="dockerImage"
@@ -30,6 +35,9 @@ require("./form.components.scss");
 export class DockerInputFormComponent implements OnInit {
     @Input()
     public dockerPull: string;
+
+    @Input()
+    public cltModel: CommandLineToolModel;
 
     /** The parent forms control group */
     @Input()

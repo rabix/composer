@@ -2,40 +2,62 @@
 
 .scroll-content {
     overflow-y: auto;
+    position: relative;
     min-height: calc(100% - #{$editor-footer-height} - #{$editor-header-height});
     height: calc(100% - #{$editor-footer-height} - #{$editor-header-height});
 }
 
 .tool-container-component {
-    display: block;
     height: 100%;
-    width: 100%;
-
-    .main-content {
-        position: relative;
-        height: 100%;
-
-        .gui-editor-component {
-            position: absolute;
-            display: block;
-            width: 100%;
-            height: 100%;
-            overflow-y: auto;
-        }
-    }
+    background: $background-grey;
+    display: block;
 }
 
 .tool-header {
-    width: 100%;
-    height: $editor-header-height;
-    padding-top: $editor-padding-top;
-    position: relative;
+    background: $background-light;
+    display: block;
+    padding: 10px;
+    border-bottom: 1px solid $border-color;
+}
+
+.tool-footer, commandline {
+    border-top: 1px solid $border-color;
+    background: $background-light;
+}
+
+
+.input-cli {
+    color: $input-port-color;
+}
+
+.baseCmd-cli {
+    color: $base-cmd-color;
+}
+
+.arg-cli {
+    color: $arg-color;
+}
+
+commandline {
     display: block;
 }
 
-.footer {
-    height: $editor-footer-height;
+.footer-buttons {
     width: 100%;
+    padding: 10px;
+
+    button {
+        margin-right: 5px;
+    }
+}
+
+.commandline-component {
     position: absolute;
-    bottom: 0;
+    background: #000000;
+    height: 70px;
+    width: 100%;
+    font-family: monospace;
+    opacity: 0.9;
+    padding-bottom: 14px;
+    bottom: $editor-footer-height - 8px;
 }

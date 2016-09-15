@@ -1,14 +1,12 @@
 @import "../../../../assets/sass/variables";
 
-.input-inspector-component {
-    background: #ffffff;
+.object-inspector {
+    background: #fff;
     height: 100%;
     padding: 0 5px 0 $collapse-icon-width;
-    color: #000000;
-    top: 0;
+    color: $text-dark;
     width: 100%;
-    border: solid #333333;
-    border-width: 0 0 0 2px;
+    border-left: 1px solid $border-color;
 }
 
 .edit-text {

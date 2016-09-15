@@ -1,8 +1,8 @@
 import {Component, OnDestroy} from "@angular/core";
-import {InputProperty} from "../../../../models/input-property.model";
 import {InputPortService} from "../../../../services/input-port/input-port.service";
 import {CloseInputInspector, OpenInputInspector} from "../../../../action-events/index";
 import {EventHubService} from "../../../../services/event-hub/event-hub.service";
+import {CommandInputParameterModel as InputProperty} from "cwlts/lib/models/d2sb";
 import {Subscription} from "rxjs/Subscription";
 
 @Component({
@@ -11,7 +11,8 @@ import {Subscription} from "rxjs/Subscription";
             <div *ngIf="portList.length > 0">
             
                 <div class="row">
-                    <div class="col-sm-2">
+                    <div class="col-sm-4">
+                        Value
                     </div>
                     <div class="col-sm-3">
                         ID               
@@ -19,34 +20,27 @@ import {Subscription} from "rxjs/Subscription";
                     <div class="col-sm-1">
                         Type
                     </div>
-                    <div class="col-sm-4">
-                        Value
-                    </div>
                 </div>
 
-                 <div class="row tool-input-row" *ngFor="let inputPort of portList">  
-                    <div class="col-sm-2">
-                        <i class="fa fa-align-justify tool-input-icon" aria-hidden="true"></i>
+                 <div class="tool-input-row" 
+                      *ngFor="let inputPort of portList"  
+                      (click)="editProperty(inputPort)">  
+                 
+                      
+                    <div class="col-sm-4">
+                        {{inputPort.value}}     
                     </div>
+                      
                     <div class="col-sm-3">
                         {{inputPort.id}}         
                     </div>
+                    
                     <div class="col-sm-1">
                         {{inputPort.type}}      
                     </div>
                     
-                    <div class="col-sm-4">
-                        {{inputPort.value}}     
-                    </div>
-                    
-                    <div class="col-sm-1 icons-right-side">
-                        <i class="fa fa-pencil tool-input-icon" 
-                           aria-hidden="true" 
-                           (click)="editProperty(inputPort)"></i>
-                    </div>
-                    
-                    <div class="col-sm-1 icons-right-side tool-input-icon">
-                        <i class="fa fa-times" 
+                    <div class="col-sm-1 pull-right tool-input-icon">
+                        <i class="fa fa-trash" 
                            aria-hidden="true"
                            (click)="removeProperty(inputPort)"></i>
                     </div>
@@ -61,7 +55,7 @@ import {Subscription} from "rxjs/Subscription";
 })
 export class InputPortListComponent implements OnDestroy {
 
-    public portList: Array<InputProperty> = [];
+    private portList: Array<InputProperty> = [];
 
     private selectedInputPort: InputProperty;
 

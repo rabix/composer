@@ -1,9 +1,59 @@
 @import "../../../assets/sass/variables";
 
-.input-form {
-    background: #ffffff;
-    width: 60%;
+clt-editor {
+    height: 100%;
+    color: $text-dark;
+    padding: 20px;
     display: block;
-    padding: 20px 20px 30px 20px;
-    color: #000000;
+}
+
+.input-form {
+    display: block;
+    background: $background-light;
+    margin-bottom: 20px;
+    width: 60%;
+    border: 1px solid $border-color;
+    padding: $padding-md;
+    color: $text-dark;
+
+    .secondary-label {
+        color:  #808080;
+        font-size: small;
+    }
+
+    button.hide-btn {
+        font-size: 0.9em;
+
+        /* Large screens */
+        @media only screen  and (min-width : 1824px) {
+            font-size: 1em;
+        }
+
+        float: right;
+        color: $button-blue-text;
+        border: 0;
+    }
+
+    .btn-secondary.add-input-btn, .btn-secondary.expression-form-btn {
+        font-size: 0.9em;
+
+        /* Large screens */
+        @media only screen  and (min-width : 1824px) {
+            font-size: 1em;
+        }
+
+        padding: 0;
+        border: 0;
+        background: #ffffff;
+        color: $button-blue-text;
+    }
+}
+
+.tool-sidebar {
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 40%;
+    height: 100%;
 }

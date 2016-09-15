@@ -8,6 +8,7 @@ import {FileEditorPlaceholderComponent} from "../placeholders/file-editor/file-e
 import * as GoldenLayout from "golden-layout";
 import {FileRegistry} from "../../services/file-registry.service";
 import {ToolContainerComponent} from "../tool-container/tool-container.component";
+import {TabManagerComponent} from "../tab-manager/tab-manager.component";
 
 require("./workspace.component.scss");
 
@@ -63,13 +64,13 @@ export class WorkspaceComponent implements OnDestroy {
         });
 
         this.workspaceService.onLoadFile.subscribe(file => {
-            this.registry.registerComponent(ToolContainerComponent);
+            this.registry.registerComponent(TabManagerComponent);
             const tabs = this.layout.root.contentItems[0].contentItems[1];
 
             tabs.addChild({
                 type: "component",
                 title: file.name + (file.isModified ? " (modified)" : ""),
-                componentName: ToolContainerComponent,
+                componentName: TabManagerComponent,
                 width: 70,
                 componentState: {
                     fileInfo: file,
@@ -80,15 +81,15 @@ export class WorkspaceComponent implements OnDestroy {
         this.workspaceService.selectedFile.subscribe(file => {
 
             if (file) {
-                let activeTab = this.registry.findToolContainerTab(file);
+                let activeTab = this.registry.findTab(file);
                 activeTab.setTitle(file.name + (file.isModified ? "*" : ""));
-                this.registry.getToolContainerStack().setActiveContentItem(activeTab);
+                this.registry.getTabStack().setActiveContentItem(activeTab);
             }
 
         });
 
         this.workspaceService.onCloseFile.subscribe(file => {
-            this.registry.findToolContainerTab(file).remove();
+            this.registry.findTab(file).remove();
         });
 
         Observable.fromEvent(this.layout, "tabCreated")

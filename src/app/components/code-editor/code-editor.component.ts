@@ -3,7 +3,7 @@ import {CodeEditor} from "./code-editor";
 import {Component, OnInit, ElementRef, ViewChild, Input} from "@angular/core";
 import {FileModel} from "../../store/models/fs.models";
 import {FileRegistry} from "../../services/file-registry.service";
-import {Subscription} from "rxjs/Rx";
+import {Subscription, Observable} from "rxjs/Rx";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {UpdateFileAction, CwlValidationResult} from "../../action-events/index";
 import Editor = AceAjax.Editor;
@@ -23,7 +23,10 @@ require('./code-editor.component.scss');
 })
 export class CodeEditorComponent implements OnInit {
     /** Provided file that we should open in the editor */
-    @Input() file: FileModel;
+    @Input()
+    fileStream: Observable<FileModel>;
+
+    private file: FileModel;
 
     /** Holds the reference to the CodeEditor service/component */
     private editor: CodeEditor;
@@ -46,13 +49,13 @@ export class CodeEditorComponent implements OnInit {
 
     ngOnInit(): any {
         // This file that we need to show, check it out from the file repository
-        const fileStream = this.fileRegistry.getFile(this.file);
+        // const fileStream = this.fileRegistry.getFile(this.file);
 
         // Instantiate the editor and give it the stream through which the file will come through
-        this.editor = new CodeEditor(ace.edit(this.aceContainer.nativeElement), fileStream);
+        this.editor = new CodeEditor(ace.edit(this.aceContainer.nativeElement), this.fileStream);
 
         // Also, we want to turn off the loading spinner and might as well bring our own file up to date
-        this.subs.push(fileStream.subscribe(file => {
+        this.subs.push(this.fileStream.subscribe(file => {
             this.isLoaded = true;
             this.file     = file;
         }));

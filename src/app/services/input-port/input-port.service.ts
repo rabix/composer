@@ -1,8 +1,8 @@
 import {Injectable} from "@angular/core";
-import {InputProperty} from "../../models/input-property.model";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {Subject} from "rxjs/Subject";
 import {Observable} from "rxjs/Observable";
+import {CommandInputParameterModel as InputProperty} from "cwlts/lib/models/d2sb";
 
 interface PropertyOperation extends Function {
     (inputProperty: InputProperty[]): InputProperty[];
@@ -79,5 +79,11 @@ export class InputPortService {
 
     public setSelected(inputPort: InputProperty): void {
         this.updateSelectedProperty.next(inputPort);
+    }
+
+    setInputs(inputs: Array<InputProperty>): void {
+        inputs.forEach(input => {
+            this.newInputPorts.next(input);
+        })
     }
 }

@@ -12,7 +12,7 @@ import {EventHubService} from "../../../../services/event-hub/event-hub.service"
 import {UpdateBaseCommandExpression} from "../../../../action-events/index";
 import {Subscription} from "rxjs/Subscription";
 
-require("./form.components.scss");
+require("./base-command-form.components.scss");
 
 @Component({
     selector: 'base-command-form',

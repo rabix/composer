@@ -11,32 +11,27 @@ export interface ValidationResponse {
 // This class should only be used inside a WebWorker,
 // because it relies on the WebWorkers postMessage method
 export class JsonSchemaService {
-    private draft3;
-    private draft4;
     private Validator;
     private errorMessage: string;
+    private schemas: {
+        "draft-2": any,
+        "draft-3": any,
+        "draft-4": any
+    };
 
     constructor(attr: {
         draft3: Object,
         draft4: Object,
+        draft2: Object,
         Validator: Object
     }) {
-        this.draft3 = attr.draft3;
-        this.draft4 = attr.draft4;
         this.Validator = attr.Validator;
-    }
 
-    public getJsonSchemaContainer(versionString: string) {
-        switch(versionString) {
-            case "draft-3":
-                return this.draft3;
-            case "draft-4":
-                return this.draft4;
+        this.schemas = {
+            "draft-2": attr.draft2,
+            "draft-3": attr.draft3,
+            "draft-4": attr.draft4
         }
-    }
-
-    public isCwlVersionValid(versionString: string) {
-        return versionString === "draft-3" || versionString === "draft-4"
     }
 
     public isClassValid(cwlClass: string) {
@@ -44,12 +39,13 @@ export class JsonSchemaService {
     }
 
 
-    public isValidCwlJson(json: any) {
-        if (json !== undefined && json.cwlVersion && json.class) {
+    public isValidCWLClass(json: any) {
+        if (json !== undefined && json.class) {
 
-            const isValid = this.isClassValid(json.class) && this.isCwlVersionValid(json.cwlVersion);
+            const isValid = this.isClassValid(json.class);
+
             if (!isValid) {
-                this.errorMessage = "cwlVersion or class is not valid";
+                this.errorMessage = "CWL Class is not valid";
             }
 
             return isValid;
@@ -73,13 +69,13 @@ export class JsonSchemaService {
             return;
         }
 
-        if (!this.isValidCwlJson(cwlJson) && this.errorMessage) {
+        if (!this.isValidCWLClass(cwlJson) && this.errorMessage) {
             this.sendErrorMessage(this.errorMessage);
         } else {
-            cwlVersion = cwlJson.cwlVersion;
+            cwlVersion = cwlJson.cwlVersion || 'draft-2';
             jsonClass = cwlJson.class;
 
-            const schemaContainer = this.getJsonSchemaContainer(cwlVersion);
+            const schemaContainer = this.schemas[cwlVersion];
             let result: any;
 
             switch(jsonClass) {
@@ -93,6 +89,8 @@ export class JsonSchemaService {
                     result = validator.validate(cwlJson, schemaContainer.etSchema);
                     break;
             }
+
+            result.class = jsonClass;
 
             this.sendValidationResult(result);
         }
@@ -112,6 +110,7 @@ export class JsonSchemaService {
             isValidatableCwl: true,
             isValidCwl: result.valid,
             errors: result.errors,
+            class: result.class,
             schema: result.instance
         });
     }
