@@ -127,6 +127,7 @@ export class CltEditorComponent implements OnInit {
         this.fileStream.first(file => {
             this.file = file;
             this.commandlineContent = this.model.getCommandLine();
+            return true;
         });
     }
 }

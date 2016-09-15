@@ -37,16 +37,15 @@ require("./tool-container.component.scss");
             <tool-header class="tool-header"></tool-header>
         
             <div class="scroll-content">
-                <div class="main-content">
-                    <code-editor *ngIf="viewMode === 'json'" [fileStream]="fileStream"></code-editor>
-                    <clt-editor class="gui-editor-component" [model]="model" *ngIf="viewMode === 'gui'" [fileStream]="fileStream"></clt-editor>
-                    
-                    <input-inspector-sidebar-component></input-inspector-sidebar-component>
-                    <expression-editor-sidebar-component></expression-editor-sidebar-component>
-                </div>
+                <code-editor *ngIf="viewMode === 'json'" [fileStream]="fileStream"></code-editor>
+                <clt-editor class="gui-editor-component" [model]="model" *ngIf="viewMode === 'gui'" [fileStream]="fileStream"></clt-editor>
+                
+                <input-inspector-sidebar-component class="tool-sidebar"></input-inspector-sidebar-component>
+                <expression-editor-sidebar-component class="tool-sidebar"></expression-editor-sidebar-component>
+
             </div>
             
-            <tool-footer [commandLine]="commandlineContent"></tool-footer>
+            <tool-footer class="tool-footer" [commandLine]="commandlineContent"></tool-footer>
         </div>
     `
 })

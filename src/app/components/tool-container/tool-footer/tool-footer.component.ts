@@ -7,7 +7,6 @@ import {CommandLineComponent} from "../../clt-editor/commandline/commandline.com
     directives: [CommandLineComponent],
     template: `
         <commandline [content]="commandlineContent"></commandline>
-        
 `
 })
 export class ToolFooterComponent implements OnInit {
