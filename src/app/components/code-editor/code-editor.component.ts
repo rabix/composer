@@ -72,7 +72,6 @@ export class CodeEditorComponent implements OnInit {
 
     ngOnDestroy(): void {
         this.editor.dispose();
-        console.debug("Disposing code editor");
         this.subs.forEach(sub => sub.unsubscribe());
     }
 

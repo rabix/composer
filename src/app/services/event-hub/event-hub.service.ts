@@ -43,7 +43,6 @@ export class EventHubService {
                     .filter(ev => ev.action === action)
                     .flatMap(ev => {
                         const msg = ev.message || ev.error || "A mysterious error crossed our paths.";
-                        console.debug("Should return an error", msg, ev);
                         return ev.error ? Observable.throw(msg) : Observable.of(ev.response)
                     })
                     .first();

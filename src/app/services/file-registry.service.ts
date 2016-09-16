@@ -16,7 +16,6 @@ export class FileRegistry {
         this.fileCache = new HashCache<FileModel>({}, (a, b) => a.isChangedSince(b));
 
         this.eventHub.onValueFrom(OpenFileRequestAction)
-            .do(data => console.debug("Received", data))
             .subscribe(file => this.fileCache.put(file.id, file));
 
         this.eventHub.onValueFrom(UpdateFileAction)

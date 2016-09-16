@@ -39,7 +39,6 @@ export class TreeViewComponent {
 
     ngAfterViewInit(){
         this.children.changes.subscribe(ch => {
-            console.debug("Children changed", ch);
         });
     }
 

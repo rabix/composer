@@ -8,7 +8,6 @@ import {Observable} from "rxjs";
 import {WebWorkerService} from "../../services/webWorker/web-worker.service";
 
 @Component({
-    moduleId: module.id,
     selector: 'tab-manager',
     directives: [CodeEditorComponent, ToolContainerComponent],
     template: `

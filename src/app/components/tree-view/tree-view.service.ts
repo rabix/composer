@@ -23,26 +23,18 @@ export class TreeViewService {
             .map(event => event.which)
             .scan((acc, key) => {
                 const letter = String.fromCharCode(key).toLowerCase();
-                console.debug("Code:", key);
 
                 if (key === 8) {
-                    console.debug("Slicing");
                     return acc.slice(0, -1);
                 } else if (letter !== "") {
-                    console.debug("Adding", letter.length, letter);
                     return acc + letter;
                 }
 
             }, "")
             .distinctUntilChanged((a, b) => {
-                console.debug("Are same?", a == b);
                 return a == b;
             })
             .subscribe(this.searchTerm);
-
-        this.searchTerm.subscribe(term => {
-            console.debug("Searching:", term);
-        });
     }
 
     public highlight(node: TreeNode) {
@@ -51,9 +43,5 @@ export class TreeViewService {
 
     public isHighlighted(node: TreeNode) {
         return this.highlightedNode.map(highlighted => node === highlighted);
-    }
-
-    public searchKeypress(event: KeyboardEvent) {
-
     }
 }

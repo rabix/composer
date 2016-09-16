@@ -53,14 +53,13 @@ require("./clt-editor.component.scss");
                 <base-command-form [@formPosition]="formPosition"
                                 class="input-form" 
                                 [group]="cltEditorGroup"
-                                [cltModel]="model"
                                 [baseCommand]="'echo'">
                 </base-command-form>
                 
                 <inputs-ports-form [@formPosition]="formPosition"
-                                  class="input-form"
-                                  [cltModel]="model"
-                                  [inputPorts]="toolInputPorts"></inputs-ports-form>
+                                   [cltModel]="model"
+                                   class="input-form">
+                </inputs-ports-form>
             </form>
     `
 })
@@ -68,14 +67,16 @@ export class CltEditorComponent implements OnInit {
     /** The file that we are going to use to list the properties */
     @Input()
     public fileStream: Observable<FileModel>;
-    private file: FileModel;
+
     @Input()
     public toolInputs: Array<InputProperty>;
 
-    private toolInputPorts: BehaviorSubject<InputProperty[]> = new BehaviorSubject<InputProperty[]>([]);
-
     @Input()
     private model: CommandLineToolModel;
+
+    private file: FileModel;
+
+    private toolInputPorts: BehaviorSubject<InputProperty[]> = new BehaviorSubject<InputProperty[]>([]);
 
     /** Positions of the listed properties */
     private formPosition: FormPosition = "center";

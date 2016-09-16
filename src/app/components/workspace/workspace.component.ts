@@ -66,7 +66,8 @@ export class WorkspaceComponent implements OnDestroy {
 
         this.workspaceService.onLoadFile.subscribe(file => {
             this.registry.registerComponent(TabManagerComponent);
-            const tabs = this.layout.root.contentItems[0].contentItems[0];
+
+            const tabs = this.registry.getTabStack();
 
             tabs.addChild({
                 type: "component",

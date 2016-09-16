@@ -2,7 +2,6 @@ import {ApplicationRef, ComponentRef, ComponentResolver, Injector} from "@angula
 import {DynamicState, hasDynamicState} from "../../runtime-compiler/dynamic-state.interface";
 import {Observable} from "rxjs/Rx";
 import {FileModel} from "../../../store/models/fs.models";
-import {ToolContainerComponent} from "../../tool-container/tool-container.component";
 import {TabManagerComponent} from "../../tab-manager/tab-manager.component";
 
 export class ComponentRegistry {
