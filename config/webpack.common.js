@@ -72,8 +72,16 @@ module.exports = {
 
         // remove other default values
         modulesDirectories: ['node_modules'],
+
+        fallback: helpers.root("node_modules")
     },
     devtool: "source-map",
+
+    resolveLoader: {
+        root: helpers.root("node_modules"),
+
+        fallback: [helpers.root("node_modules")]
+    },
 
     /*
      * Options affecting the normal modules.
@@ -198,6 +206,12 @@ module.exports = {
             to: 'assets'
         }]),
 
+        /* Copy the jailed plugin files, because it requires _JailedSite.js to be separated */
+        new CopyWebpackPlugin([{
+            from: 'node_modules/jailed/lib',
+            to: ''
+        }]),
+
         /*
          * Plugin: HtmlWebpackPlugin
          * Description: Simplifies creation of HTML files to serve your webpack bundles.
@@ -212,7 +226,7 @@ module.exports = {
         }),
 
         new webpack.ProvidePlugin({
-            io: 'socket.io-client',
+            io: 'socket.io-client'
         })
 
     ],

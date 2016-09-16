@@ -1,4 +1,4 @@
-import {Component, Input, trigger, style, animate, state, transition} from "@angular/core";
+import {Component, Input, trigger, style, animate, state, transition, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 import {FileModel} from "../../store/models/fs.models";
 import {FormPosition} from "./animation.states";
@@ -7,13 +7,16 @@ import {DockerInputFormComponent} from "../forms/inputs/forms/docker-input-form.
 import {BaseCommandFormComponent} from "../forms/inputs/forms/base-command-form.component";
 import {InputPortsFormComponent} from "../forms/inputs/forms/input-ports-form.component";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {InputProperty} from "../../models/input-property.model";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {
     OpenInputInspector,
     OpenExpressionEditor,
-    CloseInputInspector, EventHubAction, CloseExpressionEditor
+    CloseInputInspector,
+    CloseExpressionEditor
 } from "../../action-events/index";
+
+import {CommandInputParameterModel as InputProperty, CommandLineToolModel} from "cwlts/lib/models/d2sb";
+import {Observable} from "rxjs";
 
 require("./clt-editor.component.scss");
 
@@ -25,15 +28,13 @@ require("./clt-editor.component.scss");
         InputPortsFormComponent,
         CommandLineComponent,
         REACTIVE_FORM_DIRECTIVES,
-        FORM_DIRECTIVES
+        FORM_DIRECTIVES,
     ],
     animations: [
         trigger("formPosition", [
             state("left", style({
-                margin: "20px 0 0 0"
             })),
             state("center", style({
-                margin: "20px auto"
             })),
             transition("hidden => visible", animate("100ms ease-in")),
             transition("visible => hidden", animate("100ms ease-out"))
@@ -45,34 +46,42 @@ require("./clt-editor.component.scss");
                 <docker-input-form [@formPosition]="formPosition"
                                 class="input-form" 
                                 [group]="cltEditorGroup"
+                                [cltModel]="model"
                                 [dockerPull]="'some.docker.image.com'">
                 </docker-input-form>
                                 
                 <base-command-form [@formPosition]="formPosition"
                                 class="input-form" 
                                 [group]="cltEditorGroup"
+                                [cltModel]="model"
                                 [baseCommand]="'echo'">
                 </base-command-form>
                 
                 <inputs-ports-form [@formPosition]="formPosition"
-                                  class="input-form"></inputs-ports-form>
+                                  class="input-form"
+                                  [cltModel]="model"
+                                  [inputPorts]="toolInputPorts"></inputs-ports-form>
             </form>
     `
 })
-export class CltEditorComponent {
+export class CltEditorComponent implements OnInit {
     /** The file that we are going to use to list the properties */
     @Input()
-    public file: FileModel;
-
-    /** TODO: change array type to CommandInputParameterModel when we have the models */
+    public fileStream: Observable<FileModel>;
+    private file: FileModel;
     @Input()
-    public toolInputs: Array<any>;
+    public toolInputs: Array<InputProperty>;
+
+    private toolInputPorts: BehaviorSubject<InputProperty[]> = new BehaviorSubject<InputProperty[]>([]);
+
+    @Input()
+    private model: CommandLineToolModel;
 
     /** Positions of the listed properties */
     private formPosition: FormPosition = "center";
 
     /* TODO: generate the commandline */
-    private commandlineContent: string = "This is the command line";
+    private commandlineContent: string;
 
     /** ControlGroup that encapsulates the validation for all the nested forms */
     private cltEditorGroup: FormGroup;
@@ -112,5 +121,13 @@ export class CltEditorComponent {
         if (this.closeSidebarActions.length === 0) {
             this.formPosition = "center";
         }
+    }
+
+    ngOnInit() {
+        this.fileStream.first(file => {
+            this.file = file;
+            this.commandlineContent = this.model.getCommandLine();
+            return true;
+        });
     }
 }

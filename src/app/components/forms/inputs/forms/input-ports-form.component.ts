@@ -1,11 +1,11 @@
-import {Component} from "@angular/core";
-import {InputProperty} from "../../../../models/input-property.model";
+import {Component, Input, OnInit} from "@angular/core";
 import {InputPortListComponent} from "../types/input-port-list.component";
 import {InputPortService} from "../../../../services/input-port/input-port.service";
 import {EventHubService} from "../../../../services/event-hub/event-hub.service";
 import {OpenInputInspector} from "../../../../action-events/index";
+import {CommandLineToolModel} from "cwlts/lib/models/d2sb";
 
-require("./form.components.scss");
+// require("./form.components.scss");
 require("./input-ports-form.component.scss");
 
 @Component({
@@ -26,17 +26,23 @@ require("./input-ports-form.component.scss");
         </form>
     `
 })
-export class InputPortsFormComponent {
+export class InputPortsFormComponent implements OnInit {
+    @Input()
+    public cltModel: CommandLineToolModel;
     
     constructor(private inputPortService: InputPortService,
                 private eventHubService: EventHubService) { }
 
     private addInput(): void {
-        const mockInputPort = new InputProperty({});
+        const newInput = this.cltModel.addInput();
 
-        this.inputPortService.addInput(mockInputPort);
-        this.inputPortService.setSelected(mockInputPort);
+        this.inputPortService.addInput(newInput);
+        this.inputPortService.setSelected(newInput);
 
         this.eventHubService.publish(new OpenInputInspector(this.inputPortService.selectedInputPort));
+    }
+
+    ngOnInit() {
+        this.inputPortService.setInputs(this.cltModel.inputs);
     }
 }

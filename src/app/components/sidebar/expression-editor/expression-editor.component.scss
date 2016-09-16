@@ -1,5 +1,43 @@
+@import "../../../../assets/sass/variables";
+
+$execute-btn-width: 90px;
+
 .expression-editor-component {
     background: #000000;
     height: 100%;
     width: 100%;
+    position: relative;
+
+    .ace-editor {
+        height: 85%;
+        width: calc(100% - #{$collapse-icon-width});
+        position: absolute;
+        margin-left: $collapse-icon-width;
+        top: 0;
+        right: 0;
+    }
+
+    .expression-result-container {
+        width: 100%;
+        height: 15%;
+        bottom: 0;
+        display: block;
+        position: absolute;
+
+        .code-preview {
+            padding-left: $collapse-icon-width;
+            display: inline-block;
+            height: 100%;
+            width: calc(98% - #{$execute-btn-width});
+        }
+
+        .execute-btn {
+            width: 90px;
+            display: inline;
+            height: 28px;
+            right: 0;
+            top: calc(50% - 14px);
+            position: absolute;
+        }
+    }
 }

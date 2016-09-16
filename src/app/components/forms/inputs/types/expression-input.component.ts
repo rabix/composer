@@ -1,11 +1,17 @@
-import {Component, Input} from "@angular/core";
+import {Component, Input, OnDestroy} from "@angular/core";
 import {FormControl, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {EventHubService} from "../../../../services/event-hub/event-hub.service";
-import {OpenExpressionEditor} from "../../../../action-events/index";
-import {ExpressionService} from "../../../../services/expression/expression.service";
+import {
+    OpenExpressionEditor,
+    UpdateBaseCommandExpression,
+    UpdateInputPortExpression
+} from "../../../../action-events/index";
+import {ExpressionInputService} from "../../../../services/expression-input/expression-input.service";
+import {Subscription} from "rxjs/Subscription";
 
 require("./expression-input.component.scss");
+
+export type ExpressionInputType = "baseCommand" | "inputPortValue";
 
 @Component({
     selector: 'expression-input',
@@ -25,25 +31,54 @@ require("./expression-input.component.scss");
             </div>
         `
 })
-export class ExpressionInputComponent {
+export class ExpressionInputComponent implements OnDestroy {
 
     /** The form control passed from the parent */
     @Input()
     public inputControl: FormControl;
 
-    constructor(private eventHubService: EventHubService,
-                private expressionService: ExpressionService) { }
+    @Input()
+    public expressionType: any;
+
+    private updateAction: any;
+
+    private expressionInputService: ExpressionInputService;
+
+    private subs: Subscription[];
+
+    constructor(private eventHubService: EventHubService) {
+        this.expressionInputService = new ExpressionInputService();
+        this.subs = [];
+    }
 
     private openExpressionSidebar(): void {
-        this.expressionService.setExpression(this.inputControl.value);
+        this.expressionInputService.setExpression(this.inputControl.value);
 
-        this.expressionService.expression.subscribe(expression => {
+        let updateExpressionValue = this.expressionInputService.expression.subscribe(expression => {
             this.inputControl.updateValue(expression, {
                 onlySelf: false,
                 emitEvent: true
-            })
+            });
         });
 
-        this.eventHubService.publish(new OpenExpressionEditor(this.expressionService.expression));
+        switch(this.expressionType) {
+            case "baseCommand":
+                this.updateAction = (expression) => new UpdateBaseCommandExpression(expression);
+                break;
+            case "inputPortValue":
+                this.updateAction = (expression) => new UpdateInputPortExpression(expression);
+                break;
+        }
+
+        this.eventHubService.publish(new OpenExpressionEditor({
+            expression: this.expressionInputService.expression,
+            updateAction: this.updateAction
+        }));
+
+        this.subs.push(updateExpressionValue);
+    }
+
+    ngOnDestroy(): void {
+        this.subs.forEach(sub => sub.unsubscribe());
     }
 }

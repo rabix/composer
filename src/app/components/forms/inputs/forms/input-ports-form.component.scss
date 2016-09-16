@@ -1,12 +1,16 @@
+@import "../../../../../assets/sass/variables";
+@import "../../../../../assets/sass/mixins";
+
+inputs-ports-form.input-form {
+    @include cli-border($input-port-color);
+}
+
+
 .tool-input-row {
-    border: thin solid #000000;
-    padding: 7px 0 7px 0;
-
-    .tool-input-icon {
-        cursor: pointer;
-    }
-
-    .icons-right-side {
-        text-align: center;
-    }
+    cursor: pointer;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    overflow: hidden;
+    padding: 7px 0;
+    margin-bottom: 10px;
 }

@@ -1,15 +1,21 @@
-@import "../../../../assets/sass/variables";
+@import "../../../assets/sass/variables";
+
+.tool-sidebar {
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 40%;
+    height: 100%;
+    z-index: -1;
+}
 
 .black {
     color: #000000;
 }
 
 .sidebar-component {
-    right: 0;
-    top: 0;
-    position: absolute;
     height: 100%;
-    z-index: -1;
 }
 
 .isTopOfStack {
