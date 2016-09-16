@@ -1,14 +1,13 @@
 const webpack = require('webpack');
 const helpers = require('./helpers');
-let appConfig = {};
 
 try {
-    appConfig = require('./config.json');
+    envConfig = require('./env.json');
 } catch (ex) {
-    console.error("\x1b[31m", `
-    We couldn’t the “config/config.json” file.
-    Please check the “config/config.example.json” for instructions on how to make your own configuration.  
-    `, "\x1b[0m");
+    console.error("\x1b[95m", `
+    We couldn’t the “config/env.json” file.
+    Please check the “config/env.example.json” for a sample on how to make your own configuration.  
+    `);
     process.exit(1);
 }
 
@@ -21,28 +20,18 @@ const ForkCheckerPlugin = require('awesome-typescript-loader').ForkCheckerPlugin
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 /*
- * Webpack Constants
- */
-const METADATA = {
-    title: 'Cottontail Editor',
-    baseUrl: '/'
-};
-
-/*
  * Webpack configuration
  *
  * See: http://webpack.github.io/docs/configuration.html#cli
  */
 module.exports = {
 
-    appConfig,
-
     /*
      * Static metadata for index.html
      *
      * See: (custom attribute)
      */
-    metadata: METADATA,
+    metadata: Object.assign(envConfig, envConfig.server),
 
     /*
      * Cache generated modules and chunks to improve performance for multiple incremental builds.

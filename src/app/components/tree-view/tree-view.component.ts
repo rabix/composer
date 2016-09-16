@@ -1,46 +1,50 @@
-import {Component, Input, Injector, Output} from "@angular/core";
-import {TreeNodeComponent} from "./structure/tree-node.component";
-import {AsyncPipe, NgFor} from "@angular/common";
-import {BehaviorSubject, Observable} from "rxjs/Rx";
-import {ComponentFactoryProviderFn} from "./interfaces/tree-data-provider";
-import "./tree-view.component.scss";
-import {ComponentCompilerDirective} from "../runtime-compiler/component-compiler.directive";
-import {DynamicComponentContext} from "../runtime-compiler/dynamic-component-context";
+import {BlockLoaderComponent} from "../block-loader/block-loader.component";
+import {Component, ChangeDetectionStrategy, Input, ViewChildren, QueryList} from "@angular/core";
+import {TreeNode} from "./types";
+import {TreeNodeComponent} from "./tree-node.component";
+import {TreeViewService} from "./tree-view.service";
+
+require("./tree-view.component.scss");
+
 @Component({
-    selector: "tree-view",
+    selector: "ct-tree-view",
+    directives: [BlockLoaderComponent, TreeNodeComponent],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [TreeViewService],
     template: `
-        <!--This <div class="tree-node"> exists as a CSS specificity convenience-->
-        <div class="tree-container">
-            <div *ngFor="let context of (componentContexts | async)" 
-                 class="tree-node" 
-                 [component-compiler]="context">
-            </div>
+        <div [ngClass]="{'hidden': searchTerm.length === 0}" class="search-term">
+            Matching: <span class="term">"{{ tree.searchTerm | async }}"</span>
         </div>
-    `,
-    directives: [TreeViewComponent, TreeNodeComponent, ComponentCompilerDirective, NgFor],
-    pipes: [AsyncPipe]
+        <ct-tree-node *ngFor="let node of nodes" [node]="node"></ct-tree-node>
+    `
 })
 export class TreeViewComponent {
 
-    @Input() dataProvider: ComponentFactoryProviderFn;
-    @Input() injector: Injector;
+    @Input()
+    public nodes: TreeNode[];
 
-    @Output() onDataLoad: BehaviorSubject<any>;
+    @ViewChildren(TreeNodeComponent, {descendants: true})
+    private children: QueryList<TreeNodeComponent>;
 
+    private searchTerm = "";
 
-    private isExpanded = false;
-    private componentContexts: Observable<DynamicComponentContext<any>[]>;
+    private subs = [];
 
-    constructor() {
-        this.onDataLoad = new BehaviorSubject(null);
+    constructor(private tree: TreeViewService) {
+
+        this.subs.push(tree.searchTerm.subscribe(term => {
+            this.searchTerm = term;
+        }));
+    }
+
+    ngAfterViewInit(){
+        this.children.changes.subscribe(ch => {
+        });
     }
 
 
-    toggleExpansion(expanded) {
-        this.isExpanded = expanded;
-    }
 
-    ngOnInit() {
-        this.componentContexts = this.dataProvider().do(data => this.onDataLoad.next(data));
+    ngOnDestroy() {
+        this.subs.forEach(sub => sub.unsubscribe());
     }
 }

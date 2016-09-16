@@ -1,5 +1,5 @@
 import {Observable} from "rxjs/Observable";
-const JsonSchemaWorker = require("worker!./json-schema/json-schema.worker.ts");
+const JsonSchemaWorker = require("worker?inline!./json-schema/json-schema.worker.ts");
 
 /* This class should be instantiated (not injected), every instance will have one WebWorker instance. */
 export class WebWorkerService {

@@ -1,46 +1,100 @@
-@keyframes tree-node-come-in {
-  0% {
-    opacity: .5;
-    margin-left: -4px;
-  }
+@import "../../../assets/sass/variables";
 
-  100% {
-    opacity: 1;
-    margin-left: 0;
-  }
-
-}
-
-tree-view {
+ct-tree-view {
   color: white;
   display: block;
-  margin-left: 20px;
+  padding: 4px;
+  overflow-y: auto;
   height: 100%;
-  overflow: auto;
+  background: $brand-primary-bg;
 
-  .tree-node {
-
-    font-size: .95em !important;
-    cursor: pointer;
-    -webkit-user-select: none; /* webkit (safari, chrome) browsers */
-    -moz-user-select: none; /* mozilla browsers */
-    -ms-user-select: none; /* IE10+ */
-    user-select: none;
-
-    animation: tree-node-come-in;
-    animation-iteration-count: 1;
-    animation-duration: .15s;
+  & > ct-tree-node > .main {
+    font-family: $font-family-title;
+    font-weight: 300;
+    text-transform: uppercase;
   }
 
-  .expander {
+  ct-tree-node {
+    font-size: $font-size-sm;
+    display: block;
+  }
+
+  .main {
+    padding: 3px 12px;
+    border-radius: 4px;
+    display: flex;
+    outline: none;
+
+    .name {
+      display: inline-block;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    &:hover {
+      background: $brand-primary-bg-dark;
+
+    }
+
+    &.selected {
+      background: $brand-primary-bg-bright;
+      color: white;
+    }
+  }
+
+  .children {
+    padding-left: 20px;
+  }
+
+  .icon-space {
     display: inline-block;
     //padding: 0 0 0 6px;
-    width: 10px;
+    width: 20px;
     margin: 0 0 0 0;
   }
 
   .node-icon {
     margin-right: 4px;
   }
+
+  .highlighted {
+
+  }
 }
 
+.name-container {
+  display: inline-block;
+
+  .name {
+    display: inline-block;
+    border: 1px solid transparent;
+    white-space: pre;
+  }
+
+  .name:first-child:not(:only-child) {
+    color: $brand-primary;
+    background: linear-gradient(to bottom, #fcfac0, #f6f283);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#fcfac0, endColorstr=#f6f283);
+    border-radius: 4px;
+    border: 1px solid orange;
+    box-sizing: border-box;
+  }
+}
+
+.search-term {
+  &.hidden {
+    height: 0;
+    opacity: 0;
+    padding-left: 10px;
+  }
+  .term {
+    white-space: pre;
+  }
+  height: 24px;
+  opacity: 1;
+  padding: 4px 14px;
+  font-size: $font-size-xs;
+  font-style: italic;
+  transition: all .2s;
+}

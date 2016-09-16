@@ -39,9 +39,9 @@ import {EventHubService} from "../../../services/event-hub/event-hub.service";
 export class ExpressionEditorSidebarComponent {
     /** State of the sidebar animation */
     private sidebarState: VisibilityState = "hidden";
-    
+
     constructor(private eventHubService: EventHubService) { }
-    
+
     private collapseSidebar(): void {
         this.eventHubService.publish(new CloseExpressionEditor());
     }

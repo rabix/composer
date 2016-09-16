@@ -1,42 +1,95 @@
-import {BlockLoaderComponent} from "../block-loader/block-loader.component";
-import {Component, provide} from "@angular/core";
-import {DataService} from "../../services/data/data.service";
-import {DirectoryDataProviderFactory} from "./types";
-import {EventMonitors} from "../../services/api/event-monitor.service";
-import {FileTreeService} from "./file-tree.service";
-import {TreeViewService, TreeViewComponent} from "../tree-view";
+import {Component, ChangeDetectionStrategy} from "@angular/core";
+import {TreeViewComponent} from "../tree-view/tree-view.component";
+import {TreeNode} from "../tree-view/types";
+import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
+import {ReplaySubject, Observable} from "rxjs";
+import {EventHubService} from "../../services/event-hub/event-hub.service";
+import {OpenFileRequestAction} from "../../action-events/index";
+import {FileModel} from "../../store/models/fs.models";
 
 @Component({
-    selector: "file-tree",
-    directives: [TreeViewComponent, BlockLoaderComponent],
-    providers: [
-        TreeViewService,
-        DataService,
-        provide(EventMonitors, {
-            useValue: "hello World",
-            multi: true
-        })],
+    selector: 'ct-file-tree',
+    directives: [TreeViewComponent],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-        <block-loader *ngIf="treeIsLoading"></block-loader>
-        
-        <tree-view class="deep-unselectable" 
-                   [dataProvider]="dataProviderFn" 
-                   (onDataLoad)="onDataLoad($event)"></tree-view>
+        <ct-tree-view [nodes]="nodes"></ct-tree-view>
     `
 })
 export class FileTreeComponent {
 
-    private dataProviderFn: DirectoryDataProviderFactory;
-    private treeIsLoading: boolean;
+    private nodes: TreeNode[];
 
-    constructor(private treeService: FileTreeService, monitors: EventMonitors) {
+    constructor(private platform: PlatformAPI, private eventHub: EventHubService) {
 
-        this.treeIsLoading  = true;
-        this.dataProviderFn = treeService.createDataProviderForDirectory("");
-    }
+        this.nodes = [
+            {
+                name: "Projects",
+                icon: "angle",
+                childrenProvider: () => {
+                    const cached = new ReplaySubject(1);
 
+                    Observable.zip(this.platform.getOwnProjects(), this.platform.getApps(), (projects, apps) => {
+                        const appMap = apps.map(app => ({
+                            name: app.label,
+                            model: app,
+                            icon: app.class || "file",
+                            openHandler: (node) => {
 
-    onDataLoad(data) {
-        this.treeIsLoading = data === null;
+                                node.icon = "loader";
+                                return this.platform.getAppCWL(app).subscribe(data => {
+                                    node.icon = app.class || "file";
+                                    this.eventHub.publish(new OpenFileRequestAction(new FileModel({
+                                        name: app.label,
+                                        absolutePath: app.id,
+                                        content: data,
+                                        type: "json"
+                                    })));
+                                });
+
+                            }
+                        })).reduce((acc, app) => {
+                            acc[app.model["sbg:project"]] = [].concat.apply(acc[app.model["sbg:project"]] || [], [app]);
+                            return acc;
+                        }, {});
+
+                        return projects.map(project => ({
+                            name: project.name,
+                            model: project,
+                            icon: "folder",
+                            childrenProvider: () => Observable.of(appMap[project.path] || [])
+                        }))
+                    }).subscribe(cached);
+
+                    return cached;
+                }
+
+            },
+            {
+                name: "Public Apps",
+                icon: "angle",
+                childrenProvider: () => {
+                    const cached = new ReplaySubject(1);
+                    this.platform.getPublicApps().map(apps => apps.map(app => ({
+                        name: app.label,
+                        model: app,
+                        icon: app.class || "file",
+                        openHandler: (item) => {
+                            item.icon = "loader";
+                            return this.platform.getAppCWL(app).subscribe(data => {
+                                item.icon = app.class || "file";
+                                this.eventHub.publish(new OpenFileRequestAction(new FileModel({
+                                    name: app.label,
+                                    absolutePath: app.id,
+                                    content: data,
+                                    type: "json"
+                                })));
+                            })
+                        }
+                    }))).subscribe(cached);
+
+                    return cached;
+                }
+            }
+        ];
     }
 }
