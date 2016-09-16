@@ -67,7 +67,7 @@ export class InputInspectorComponent implements OnInit, OnDestroy {
 
     /** The object that we are editing */
     @Input()
-    private inputModelStream: BehaviorSubject<InputProperty>;
+    public inputModelStream: BehaviorSubject<InputProperty>;
 
     /** The currently displayed property */
     private selectedProperty: InputProperty;
@@ -84,7 +84,6 @@ export class InputInspectorComponent implements OnInit, OnDestroy {
 
     constructor(private formBuilder: FormBuilder,
                 private eventHubService: EventHubService) {
-
         this.subs = [];
     }
 
@@ -100,13 +99,13 @@ export class InputInspectorComponent implements OnInit, OnDestroy {
         this.inputInspectorForm.controls["expression"].valueChanges.subscribe(value => {
             this.selectedProperty.setValueFrom(value);
         });
-        
+
         this.listenToInputPortUpdate();
 
         this.subs.push(inputModelStreamUpdate);
     }
 
-    private listenToInputPortUpdate() {
+    private listenToInputPortUpdate(): void {
 
         let updateInputPortExpression = this.eventHubService.onValueFrom(UpdateInputPortExpression)
             .subscribe((expression: string) => {
