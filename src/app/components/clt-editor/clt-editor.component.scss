@@ -1,6 +1,7 @@
 @import "../../../assets/sass/variables";
 
 clt-editor {
+    overflow-y: auto;
     height: 100%;
     color: $text-dark;
     padding: 20px;
@@ -47,13 +48,4 @@ clt-editor {
         background: #ffffff;
         color: $button-blue-text;
     }
-}
-
-.tool-sidebar {
-    display: block;
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 40%;
-    height: 100%;
 }

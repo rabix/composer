@@ -7,11 +7,10 @@ import {CltEditorComponent} from "../clt-editor/clt-editor.component";
 import {DynamicState} from "../runtime-compiler/dynamic-state.interface";
 import {Subscription, Observable} from "rxjs/Rx";
 import {ToolHeaderComponent} from "./tool-header/tool-header.component";
-import {InputInspectorSidebarComponent} from "../sidebar/object-inpsector/input-inspector-sidebar.component";
-import {ExpressionEditorSidebarComponent} from "../sidebar/expression-editor/expression-editor-sidebar.component";
 import {ViewModeService} from "./services/view-mode.service";
 import {CommandLineToolModel} from "cwlts/lib/models/d2sb";
 import {ToolFooterComponent} from "./tool-footer/tool-footer.component";
+import {SidebarComponent} from "../sidebar/sidebar.component";
 
 require("./tool-container.component.scss");
 
@@ -27,8 +26,7 @@ require("./tool-container.component.scss");
         NgSwitchDefault,
         ToolHeaderComponent,
         ToolFooterComponent,
-        InputInspectorSidebarComponent,
-        ExpressionEditorSidebarComponent
+        SidebarComponent
     ],
     template: `
         <block-loader *ngIf="!isLoaded"></block-loader>
@@ -40,9 +38,7 @@ require("./tool-container.component.scss");
                 <code-editor *ngIf="viewMode === 'json'" [fileStream]="fileStream"></code-editor>
                 <clt-editor class="gui-editor-component" [model]="model" *ngIf="viewMode === 'gui'" [fileStream]="fileStream"></clt-editor>
                 
-                <input-inspector-sidebar-component class="tool-sidebar"></input-inspector-sidebar-component>
-                <expression-editor-sidebar-component class="tool-sidebar"></expression-editor-sidebar-component>
-
+                <sidebar-component></sidebar-component>
             </div>
             
             <tool-footer class="tool-footer" [commandLine]="commandlineContent"></tool-footer>
