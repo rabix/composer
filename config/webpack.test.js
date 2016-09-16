@@ -191,7 +191,7 @@ module.exports = {
         new DefinePlugin({
             'ENV': JSON.stringify(ENV),
             'HMR': false,
-            // 'APP_ENV_CONFIG': JSON.stringify(appConfig),
+            // 'APP_ENV_CONFIG': JSON.stringify(envConfig),
             'process.env': {
                 'ENV': JSON.stringify(ENV),
                 'NODE_ENV': JSON.stringify(ENV),

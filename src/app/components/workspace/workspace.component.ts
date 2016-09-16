@@ -1,13 +1,13 @@
-import {Component, ElementRef, OnDestroy} from "@angular/core";
+import {Component, ElementRef, OnDestroy, Input} from "@angular/core";
 import {ComponentRegistryFactoryService} from "./registry/component-registry-factory.service";
 import {ComponentRegistry} from "./registry/component-registry";
-import {FileTreeComponent} from "../file-tree/file-tree.component";
 import {Observable} from "rxjs/Rx";
 import {WorkspaceService} from "./workspace.service";
 import {FileEditorPlaceholderComponent} from "../placeholders/file-editor/file-editor-placeholder.component";
 import * as GoldenLayout from "golden-layout";
 import {FileRegistry} from "../../services/file-registry.service";
 import {ToolContainerComponent} from "../tool-container/tool-container.component";
+import {FileTreeComponent} from "../file-tree/file-tree.component";
 
 require("./workspace.component.scss");
 
@@ -17,6 +17,9 @@ require("./workspace.component.scss");
     providers: [WorkspaceService]
 })
 export class WorkspaceComponent implements OnDestroy {
+
+    @Input("resize")
+    private surroundingResize: Observable;
 
     private layout: any;
     private registry: ComponentRegistry;
@@ -36,7 +39,7 @@ export class WorkspaceComponent implements OnDestroy {
 
         const el = this.el.nativeElement;
         Observable.fromEvent(window, "resize")
-            .debounceTime(50)
+            .merge(this.surroundingResize)
             .subscribe(_ => this.layout.updateSize(el.clientWidth, el.clientHeight));
 
         Observable.fromEvent(this.layout, "componentCreated")
@@ -64,7 +67,7 @@ export class WorkspaceComponent implements OnDestroy {
 
         this.workspaceService.onLoadFile.subscribe(file => {
             this.registry.registerComponent(ToolContainerComponent);
-            const tabs = this.layout.root.contentItems[0].contentItems[1];
+            const tabs = this.layout.root.contentItems[0].contentItems[0];
 
             tabs.addChild({
                 type: "component",
@@ -124,24 +127,16 @@ export class WorkspaceComponent implements OnDestroy {
                 selectionEnabled: false,
                 popoutWholeStack: false,
                 showPopoutIcon: false,
-                showMaximiseIcon: true,
+                showMaximiseIcon: false,
                 showCloseIcon: true,
             },
             content: [{
                 type: "row",
-                content: [
-                    {
+                content: [{
                         type: "component",
-                        componentName: FileTreeComponent,
-                        title: "Project Navigation",
-                        width: 30,
-                        isClosable: false
-                    },
-                    {
-                        type: "component",
-                        title: "Usage Tip",
+                        title: "Welcome",
                         componentName: FileEditorPlaceholderComponent,
-                        width: 70,
+                        width: 100,
                         isClosable: false
                     }
                 ]

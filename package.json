@@ -29,7 +29,8 @@
         "prebuild:dev": "npm run clean:dist",
         "build:dev": "webpack --config config/webpack.dev.js --progress --profile --colors --display-error-details --display-cached",
         "prebuild:prod": "npm run clean:dist",
-        "build:prod": "webpack --config config/webpack.prod.js  --progress --profile --colors --display-error-details --display-cached --bail",
+        "build:prod": "webpack --config config/webpack.prod.js  --progress --profile --colors --display-error-details --display-cached",
+        "build:camellia": "webpack --config config/webpack.camellia.js  --progress --profile --colors --display-error-details --display-cached",
         "server": "npm run server:dev",
         "server:dev": "webpack-dev-server --config config/webpack.dev.js --inline --progress --profile --colors --watch --display-error-details --display-cached --content-base src/",
         "server:dev:hmr": "npm run server:dev -- --hot",
@@ -43,13 +44,13 @@
         "debug:test": "npm run watch:test -- --debug"
     },
     "dependencies": {
-        "@angular/common": "^2.0.0-rc.5",
-        "@angular/compiler": "^2.0.0-rc.5",
-        "@angular/core": "^2.0.0-rc.5",
+        "@angular/common": "2.0.0-rc.5",
+        "@angular/compiler": "2.0.0-rc.5",
+        "@angular/core": "2.0.0-rc.5",
         "@angular/forms": "^0.3.0",
-        "@angular/http": "^2.0.0-rc.5",
-        "@angular/platform-browser": "^2.0.0-rc.5",
-        "@angular/platform-browser-dynamic": "^2.0.0-rc.5",
+        "@angular/http": "2.0.0-rc.5",
+        "@angular/platform-browser": "2.0.0-rc.5",
+        "@angular/platform-browser-dynamic": "2.0.0-rc.5",
         "@types/ace": "0.0.31",
         "@types/core-js": "^0.9.28",
         "@types/jasmine": "^2.2.30",
@@ -67,7 +68,7 @@
         "rxjs": "5.0.0-beta.6",
         "socket.io-client": "^1.4.6",
         "source-map-inline-loader": "github:blackbaud-bobbyearl/source-map-inline-loader",
-        "zone.js": "^0.6.12"
+        "zone.js": "^0.6.17"
     },
     "devDependencies": {
         "awesome-typescript-loader": "^1.1.1",
