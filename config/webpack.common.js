@@ -1,15 +1,18 @@
 const webpack = require('webpack');
 const helpers = require('./helpers');
-let appConfig = {};
+let appConfig = {
+    webroot: "localhost:9000",
+};
 
 try {
     appConfig = require('./config.json');
 } catch (ex) {
-    console.error("\x1b[31m", `
+    console.error("\x1b[95m", `
     We couldn’t the “config/config.json” file.
-    Please check the “config/config.example.json” for instructions on how to make your own configuration.  
+    Please check the “config/config.example.json” for a sample on how to make your own configuration.  
+    For now, we will assume some defaults:
+        ${Object.keys(appConfig).map(k => `${k}: ${appConfig[k]}`).join("\n\t")} 
     `, "\x1b[0m");
-    process.exit(1);
 }
 
 /*
