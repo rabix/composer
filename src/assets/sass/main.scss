@@ -5,10 +5,13 @@
 @import "utils";
 @import "~font-awesome/scss/font-awesome";
 @import "../../app/components/block-loader/block-loader.component";
-@import "_typography";
+@import "typography";
+@import "vectors";
 @import "forms";
 
-@import url(https://fonts.googleapis.com/css?family=Montserrat);
+@import "themes/seven-bridges";
+
+@import url(https://fonts.googleapis.com/css?family=Montserrat:400,700);
 
 html, body {
   width: 100%;

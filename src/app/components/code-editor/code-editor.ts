@@ -38,7 +38,7 @@ export class CodeEditor {
         this.fileStream = fileStream;
         this.webWorkerService = new WebWorkerService();
 
-        this.setTheme('twilight');
+        this.setTheme('chrome');
 
         this.subs.push(
             this.fileStream.filter(file => file.content !== this.document.getValue())

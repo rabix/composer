@@ -1,5 +1,3 @@
-
-
 const helpers = require('./helpers');
 const webpackMerge = require('webpack-merge'); // used to merge webpack configs
 const commonConfig = require('./webpack.common.js'); // the settings that are common to prod and dev
@@ -13,14 +11,9 @@ const DefinePlugin = require('webpack/lib/DefinePlugin');
  * Webpack Constants
  */
 const ENV = process.env.ENV = process.env.NODE_ENV = 'development';
-const HMR = helpers.hasProcessFlag('hot');
 
 const METADATA = webpackMerge(commonConfig.metadata, {
-    host: 'localhost',
-    port: 3000,
     ENV: ENV,
-    HMR: HMR,
-    APP_ENV_CONFIG: commonConfig.appConfig
 });
 
 /**
@@ -50,7 +43,7 @@ module.exports = webpackMerge(commonConfig, {
      * See: http://webpack.github.io/docs/configuration.html#devtool
      * See: https://github.com/webpack/docs/wiki/build-performance#sourcemaps
      */
-    devtool: '#eval-cheap-module-source-map',
+    devtool: '#eval',
 
     /**
      * Options affecting the output of the compilation.
@@ -59,7 +52,7 @@ module.exports = webpackMerge(commonConfig, {
      */
     output: {
 
-        publicPath: 'http://localhost:3000/',
+        publicPath: `http://${METADATA.server.host}:${METADATA.server.port}/`,
 
         /**
          * The output directory as absolute path (required).
@@ -107,12 +100,10 @@ module.exports = webpackMerge(commonConfig, {
         // NOTE: when adding more properties, make sure you include them in custom-typings.d.ts
         new DefinePlugin({
             'ENV': JSON.stringify(METADATA.ENV),
-            'HMR': METADATA.HMR,
-            "APP_ENV_CONFIG": JSON.stringify(METADATA.APP_ENV_CONFIG),
+            "ENV_PARAMS": JSON.stringify(METADATA),
             'process.env': {
                 'ENV': JSON.stringify(METADATA.ENV),
                 'NODE_ENV': JSON.stringify(METADATA.ENV),
-                'HMR': METADATA.HMR
             }
         })
     ],
@@ -126,7 +117,7 @@ module.exports = webpackMerge(commonConfig, {
     // tslint: {
     //     emitErrors: false,
     //     failOnHint: false,
-    //     resourcePath: 'src'
+    //     resourcePath: 'src'S),
     // },
 
     /**

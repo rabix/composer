@@ -4,11 +4,19 @@ $font-size-root: 15px;
 $font-family-title: "Montserrat", "Helvetica Neue", sans-serif;
 
 $gui-base-gray: rgb(51, 51, 51);
-$body-bg: #000;
+$body-bg-background: #f3f3f3;
+$body-bg-foreground: white;
 $body-color: ghostwhite;
 
-$brand-primary: #337cb9;
+$brand-primary: #2e3e4e;
 $btn-primary-bg: $brand-primary;
+
+// Custom Brand Stuff
+$brand-primary-bg: #22313F;
+$brand-primary-bg-dark: #1B2833;
+$brand-primary-bg-bright: #34495E;
+
+
 
 /**
 * Layout Size Variables
@@ -19,7 +27,7 @@ $sidebar-width: 70px;
 /**
 * Modal Variables
 */
-$modal-header-border-color: rgba(0,0,0,.3);
+$modal-header-border-color: rgba(0, 0, 0, .3);
 $modal-footer-border-color: $modal-header-border-color;
 $modal-content-bg: $gui-base-gray;
 $modal-content-color: $body-color;
@@ -32,7 +40,6 @@ $input-bg: #fff;
 $input-border-focus: #c7c7c7;
 $input-border-color: #c7c7c7;
 $input-color-placeholder: $gray-dark;
-
 
 $border-radius: 2px;
 $input-border-radius: $border-radius;

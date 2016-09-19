@@ -15,6 +15,8 @@ require("./menu-bar.component.scss");
 @Component({
     selector: "ct-menu-bar",
     directives: [MenuComponent, MenuItemComponent],
+    providers: [
+    ],
     template: `
         <ct-menu-item *ngFor="let item of menuItems" [item]="item"></ct-menu-item>
     `

@@ -32,7 +32,7 @@ require ("./commandline.component.scss");
     ],
     template: `
             <div class="commandline-component"
-                @commandlineState="commandlineState">
+                [@commandlineState]="commandlineState">
                 {{content}}
             </div>
             

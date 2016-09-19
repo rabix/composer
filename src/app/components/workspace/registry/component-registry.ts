@@ -1,9 +1,7 @@
 import {ApplicationRef, ComponentRef, ComponentResolver, Injector} from "@angular/core";
 import {DynamicState, hasDynamicState} from "../../runtime-compiler/dynamic-state.interface";
 import {Observable} from "rxjs/Rx";
-import {CodeEditorComponent} from "../../code-editor/code-editor.component";
 import {FileModel} from "../../../store/models/fs.models";
-import {ToolContainerComponent} from "../../tool-container/tool-container.component";
 import {TabManagerComponent} from "../../tab-manager/tab-manager.component";
 
 export class ComponentRegistry {
@@ -102,6 +100,6 @@ export class ComponentRegistry {
     }
 
     public getTabStack() {
-        return this.layout.root.contentItems[0].contentItems[1];
+        return this.layout.root.contentItems[0].contentItems[0];
     }
 }

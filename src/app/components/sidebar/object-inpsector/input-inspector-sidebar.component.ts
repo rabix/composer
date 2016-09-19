@@ -29,7 +29,7 @@ export class InputInspectorSidebarComponent implements OnDestroy {
 
     /** Data that we are passing to the sidebar */
     private sidebarData: Observable<InputProperty>;
-    
+
     private subs: Subscription[];
 
     constructor(private eventHubService: EventHubService) {

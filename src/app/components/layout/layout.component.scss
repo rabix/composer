@@ -1,0 +1,31 @@
+@import "../../../assets/sass/variables";
+
+.flex-box {
+  display: flex;
+  height: 100%;
+  margin: 0;
+  width: 100%;
+
+  .flex-col {
+    display: flex;
+    flex: 0.5;
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex-direction: column;
+  }
+  .handle {
+    width: 8px;
+    display: inline-block;
+    background: $brand-primary-bg-dark;
+    cursor: col-resize;
+  }
+}
+
+.top-bar {
+  height: 44px;
+  background: $brand-primary-bg-dark;
+}
+
+.flex-row:not(.fixed) {
+  flex: 1;
+}
