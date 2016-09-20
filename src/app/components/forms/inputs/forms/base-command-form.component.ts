@@ -73,8 +73,7 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
             .subscribe((expression: string) => {
                 const baseCommandControl: FormControl = <FormControl>this.baseCommandForm.controls['baseCommand'];
 
-                //TODO: update the actual model
-                baseCommandControl.updateValue(expression);
+                baseCommandControl.setValue(expression);
             });
 
         this.subs.push(baseCommandValueChanges);
