@@ -1,15 +1,18 @@
-import {it, inject, describe, beforeEach, addProviders} from "@angular/core/testing";
+import {inject} from "@angular/core/testing";
 import {InputPortService} from "./input-port.service";
-import {InputProperty} from "../../models/input-property.model";
+import {CommandInputParameterModel as InputProperty} from "cwlts/lib/models/d2sb";
+import {TestBed} from "@angular/core/testing/test_bed";
 
 describe("InputPortService", () => {
 
     let inputPortService: InputPortService;
 
     beforeEach(() => {
-        addProviders([
-            InputPortService
-        ]);
+        TestBed.configureTestingModule({
+            providers: [
+                { provide: InputPortService, useClass: InputPortService }
+            ]
+        });
     });
 
     beforeEach(inject([InputPortService], (inputPorts: InputPortService) => {
@@ -17,9 +20,8 @@ describe("InputPortService", () => {
     }));
 
     describe("addInput", () => {
-
         it("should add the item to the inputPorts stream", (done) => {
-            const mockInputPort = new InputProperty({});
+            const mockInputPort = new InputProperty();
 
             inputPortService.addInput(mockInputPort);
 
@@ -31,10 +33,10 @@ describe("InputPortService", () => {
         });
     });
 
-    describe("deleteInputPort", () => {
+   describe("deleteInputPort", () => {
         it("should remove an item for the list and update the inputPorts stream", (done) => {
-            const mockInputPort1 = new InputProperty({ id: "1" });
-            const mockInputPort2 = new InputProperty({ id: "2" });
+            const mockInputPort1 = new InputProperty({ id: "a", type: "string" });
+            const mockInputPort2 = new InputProperty({ id: "b", type: "string" });
 
             inputPortService.addInput(mockInputPort1);
             inputPortService.addInput(mockInputPort2);
@@ -53,7 +55,7 @@ describe("InputPortService", () => {
 
     describe("setSelected", () => {
         it("should update the selectedInputPort stream", (done) => {
-            const mockInputPort1 = new InputProperty({ id: "1" });
+            const mockInputPort1 = new InputProperty({ id: "a", type: "string" });
 
             inputPortService.setSelected(mockInputPort1);
 
