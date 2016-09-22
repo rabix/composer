@@ -65,7 +65,6 @@ export class WorkboxComponent implements OnInit {
             });
             this.activeTab = this.tabs[this.tabs.length - 1];
         }));
-
     }
 
     /**
@@ -83,5 +82,4 @@ export class WorkboxComponent implements OnInit {
     ngOnDestroy(){
         this.subs.forEach(s => s.unsubscribe());
     }
-
 }
