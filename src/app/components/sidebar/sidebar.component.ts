@@ -36,7 +36,7 @@ declare type sidebarType = "input-inspector" | "expression-editor";
         ])
     ],
     template: `
-            <div @sidebarState="sidebarState">
+            <div [@sidebarState]="sidebarState">
                 <input-inspector-sidebar-component class="tool-sidebar" 
                                                   [ngClass]="{isTopOfStack: currentSidebar === 'input-inspector'}">
                 </input-inspector-sidebar-component>

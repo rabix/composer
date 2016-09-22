@@ -1,6 +1,4 @@
 'use strict';
-
-import {it, describe} from "@angular/core/testing";
 import {WebWorkerService} from "./web-worker.service";
 import {ValidationResponse} from "./json-schema/json-schema.service";
 
