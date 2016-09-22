@@ -44,6 +44,10 @@
     position: relative;
     box-shadow: inset 1px 1px 0 $brand-primary-bg-bright, -4px 0px 4px rgba(0, 0, 0, 0.1);
 
+    &:first-child {
+      margin-left: 22px;
+    }
+
     .title {
       margin-top: -5px;
       overflow: hidden;
@@ -103,8 +107,4 @@
   display: inline-block;
   padding-left: 5px;
   padding-right: 5px;
-}
-
-.ct-workbox-tab:first-child {
-  margin-left: 22px;
 }
