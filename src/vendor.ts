@@ -4,5 +4,4 @@ import '@angular/core';
 import '@angular/common';
 import '@angular/http';
 
-import "golden-layout";
 import "brace";

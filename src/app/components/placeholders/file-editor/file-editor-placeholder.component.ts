@@ -5,7 +5,7 @@ require("./file-editor-placeholder.component.scss");
     selector: "file-editor-placeholder",
     template: `
        <div class="full-size-table-display">
-            
+                yoyoyoyo
        </div>
     `
 })
