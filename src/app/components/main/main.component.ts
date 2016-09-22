@@ -15,7 +15,7 @@ import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {FileTreeComponent} from "../file-tree/file-tree.component";
 import {LayoutComponent} from "../layout/layout.component";
 import {ExpressionInputService} from "../../services/expression-input/expression-input.service";
-import {WorkboxComponent} from "../workbox-tab.component.ts/workbox.component";
+import {WorkboxComponent} from "../workbox/workbox.component";
 
 require("./../../../assets/sass/main.scss");
 

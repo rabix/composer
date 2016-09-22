@@ -1,5 +1,5 @@
-import {Component, OnInit, ViewChild, ElementRef, Input, Output} from "@angular/core";
-import {Subscription, Observable, Subject} from "rxjs";
+import {Component, OnInit, ViewChild, ElementRef, Input} from "@angular/core";
+import {Observable} from "rxjs";
 
 require("./layout.component.scss");
 
