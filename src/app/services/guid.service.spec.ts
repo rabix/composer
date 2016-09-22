@@ -1,8 +1,15 @@
-import {it, inject, describe, beforeEachProviders} from "@angular/core/testing";
+import {inject} from "@angular/core/testing";
 import {GuidService} from "./guid.service";
+import {TestBed} from "@angular/core/testing/test_bed";
 
 describe("GUID Generator Service", () => {
-    beforeEachProviders(() => [GuidService]);
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            providers: [
+                { provide: GuidService, useClass: GuidService }
+            ]
+        });
+    });
 
     it("Should have a generator function to generate IDs",
         inject([GuidService], (guid: GuidService) => {

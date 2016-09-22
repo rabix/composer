@@ -4,10 +4,13 @@ import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import TextMode = AceAjax.TextMode;
 import {AbstractCodeEditorService} from "../../../services/abstract-code-editor/abstract-code-editor.service";
+import {Subscription} from "rxjs/Subscription";
 
 require ("./expression-editor.component.scss");
 
 export class ExpressionEditor extends AbstractCodeEditorService {
+
+    private subs: Subscription[] = [];
 
     public expressionChanges: Observable<string>;
 
@@ -26,9 +29,11 @@ export class ExpressionEditor extends AbstractCodeEditorService {
         this.setTheme('twilight');
         this.setMode("javascript");
 
-        this.expressionStream.subscribe((expression: string) => {
-            this.setText(expression);
-        });
+        this.subs.push(
+            this.expressionStream.subscribe((expression: string) => {
+                this.setText(expression);
+            })
+        );
 
         this.expressionChanges = Observable.fromEvent(this.editor as any, "change")
             .debounceTime(300)
@@ -36,5 +41,9 @@ export class ExpressionEditor extends AbstractCodeEditorService {
             .distinctUntilChanged()
             .withLatestFrom(this.expressionStream, (expression) => expression)
             .share();
+    }
+
+    public dispose(): void {
+        this.subs.forEach(sub => sub.unsubscribe());
     }
 }
