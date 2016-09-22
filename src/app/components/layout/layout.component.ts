@@ -45,7 +45,18 @@ export class LayoutComponent implements OnInit {
         const move = Observable.fromEvent(document, "mousemove");
         const drag = down.flatMap(_ => move.map(e => e.clientX).takeUntil(up));
 
-        drag.map(x => x < 200 ? 200 : x).subscribe(x => {
+        drag.map(x => {
+            const leftMargin  = 200;
+            const rightMargin = document.body.clientWidth - 200;
+
+            if (x < leftMargin) {
+                return leftMargin;
+            } else if (x > rightMargin) {
+                return rightMargin
+            }
+
+            return x;
+        }).subscribe(x => {
 
             const docWidth = document.body.clientWidth;
 

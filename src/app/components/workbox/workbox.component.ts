@@ -15,12 +15,12 @@ require("./workbox.component.scss");
     template: `
         <div class="ct-workbox-head">
             <ul class="list-inline ct-tab-bar inset-panel" tabindex="-1">
-                <li *ngFor="let tab of tabs"
+                <li *ngFor="let tab of tabs; let i = index;"
                     (click)="activeTab = tab"
                     [class.active]="tab === activeTab"
                     class="ct-workbox-tab clickable">
                     <div class="title">{{ tab.title }}</div>
-                    <div (click)="removeTab(index)" class="close-icon">×</div>
+                    <div (click)="removeTab(i)" class="close-icon">×</div>
                 </li>
             </ul>
         </div>
