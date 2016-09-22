@@ -18,7 +18,7 @@ require("./workspace.component.scss");
 export class WorkspaceComponent implements OnDestroy {
 
     @Input("resize")
-    private surroundingResize: Observable;
+    private surroundingResize: Observable<any>;
 
     private layout: any;
     private registry: ComponentRegistry;
