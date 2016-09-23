@@ -5,7 +5,6 @@ import {EventHubService} from "../../../../services/event-hub/event-hub.service"
 import {OpenInputInspector} from "../../../../action-events/index";
 import {CommandLineToolModel} from "cwlts/lib/models/d2sb";
 
-// require("./form.components.scss");
 require("./input-ports-form.component.scss");
 
 @Component({
@@ -29,7 +28,7 @@ require("./input-ports-form.component.scss");
 export class InputPortsFormComponent implements OnInit {
     @Input()
     public cltModel: CommandLineToolModel;
-    
+
     constructor(private inputPortService: InputPortService,
                 private eventHubService: EventHubService) { }
 

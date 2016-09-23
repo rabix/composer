@@ -110,7 +110,7 @@ export class InputInspectorComponent implements OnInit, OnDestroy {
         let updateInputPortExpression = this.eventHubService.onValueFrom(UpdateInputPortExpression)
             .subscribe((expression: string) => {
                 const expressionControl: FormControl = <FormControl>this.inputInspectorForm.controls['expression'];
-                expressionControl.updateValue(expression);
+                expressionControl.setValue(expression);
             });
 
         this.subs.push(updateInputPortExpression);
