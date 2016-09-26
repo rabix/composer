@@ -10,7 +10,7 @@ import {TreeViewService} from "./tree-view.service";
     directives: [ContextDirective],
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-        <div class="deep-unselectable clickable main node-base"
+        <div class="deep-unselectable clickable main"
              [tabindex]="nodeIndex"
              (click)="selectNode($event)"
              [class.selected]="isHighlighted | async"
@@ -20,9 +20,9 @@ import {TreeViewService} from "./tree-view.service";
                 <i class="fa fa-fw" [ngClass]="getIconRules()"></i>
             </span>
             
-            <div *ngIf="node" class="name-container">
+            <span *ngIf="node" class="name-container">
                 <span class="name" *ngFor="let namePart of nameParts">{{ namePart }}</span>
-            </div>
+            </span>
             
             
         </div>

@@ -1,0 +1,44 @@
+@import "../../../assets/sass/_variables.scss";
+
+ct-panel-container {
+  display: flex;
+  flex-direction: column;
+  background: $brand-primary-bg;
+
+  .panel {
+    display: flex;
+    flex: 1;
+
+    &.hidden {
+      flex: 0 !important;
+      display: none;
+    }
+  }
+
+  ct-panel-handle {
+    cursor: row-resize;
+    display: block;
+    height: 4px;
+    background: $brand-primary-bg-dark;
+    width: 100%;
+
+    &.hidden {
+      height: 0;
+    }
+  }
+}
+
+ct-panel-toolbar {
+  display: flex;
+  box-sizing: content-box;
+  background: $brand-primary-bg-bright;
+  color: white;
+  font-size: $font-size-sm;
+  padding: 4px 8px;
+  justify-content: space-between;
+  flex-direction: row;
+
+  .title, .tools {
+    display: flex;
+  }
+}

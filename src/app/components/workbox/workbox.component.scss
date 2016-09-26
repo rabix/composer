@@ -9,8 +9,10 @@
 
 .ct-workbox-body {
   background: $body-bg-background;
-  height: 100%;
+  height: calc(100% - 44px);
   color: $text-dark;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .inset-panel {
