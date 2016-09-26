@@ -47,8 +47,6 @@ require("./main.component.scss");
         UrlValidator,
         WorkspaceService,
         WebWorkerService,
-        InputPortService,
-        ExpressionInputService,
         PlatformAPI
     ]
 })
