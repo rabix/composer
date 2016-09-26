@@ -72,6 +72,7 @@
         "zone.js": "^0.6.17"
     },
     "devDependencies": {
+        "ajv": "^4.7.3",
         "awesome-typescript-loader": "^1.1.1",
         "bootstrap": "^4.0.0-alpha.3",
         "codelyzer": "0.0.15",
@@ -94,7 +95,6 @@
         "istanbul-instrumenter-loader": "^0.2.0",
         "jasmine-core": "^2.5.0",
         "json-loader": "^0.5.4",
-        "jsonschema": "^1.1.0",
         "karma": "^0.13.22",
         "karma-chrome-launcher": "^0.2.3",
         "karma-coverage": "^0.5.5",

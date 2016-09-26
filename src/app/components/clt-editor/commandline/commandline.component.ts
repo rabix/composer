@@ -1,42 +1,22 @@
-import {
-    Component,
-    style,
-    animate,
-    state,
-    transition,
-    trigger,
-    Input
-} from "@angular/core";
-import {VisibilityState} from "../animation.states";
+import {Component, Input} from "@angular/core";
 
 /** TODO: make this switch between an expression editor and an object inspector*/
 @Component({
     selector: "commandline",
-    animations: [
-        trigger("commandlineState", [
-            state("visible", style({
-                height: 70,
-                display: "block",
-                overflowY: "auto"
-            })),
-            state("hidden", style({
-                height: 20,
-                display: "none",
-                overflowY: "hidden"
-            })),
-            transition("hidden => visible", animate("100ms ease-in")),
-            transition("visible => hidden", animate("100ms ease-out"))
-        ])
-    ],
     template: `
-            <div class="commandline-component"
-                [@commandlineState]="commandlineState">
-                {{content}}
+            <div class="console-component" [ngClass]="{show: showCommandLine}">
+                <div class="console-content">
+                    {{content}}
+                </div>
             </div>
             
             <button type="button" 
             class="btn btn-sm"
-            (click)="toggleCommandLine()">Resulting Command <i class="fa fa-angle-right"></i></button>
+            (click)="toggleCommandLine()">Resulting Command 
+                <i class="fa" 
+                   [ngClass]="{'fa-angle-right': !showCommandLine, 'fa-angle-up': showCommandLine}">
+                </i>
+            </button>
     `
 })
 export class CommandLineComponent {
@@ -44,10 +24,9 @@ export class CommandLineComponent {
     @Input()
     public content: string;
 
-    /** Sate of the commandline animation */
-    private commandlineState: VisibilityState = "hidden";
+    private showCommandLine = false;
 
     private toggleCommandLine(): void {
-        this.commandlineState = this.commandlineState === "hidden" ? "visible": "hidden";
+        this.showCommandLine = !this.showCommandLine;
     }
 }

@@ -4,40 +4,52 @@ declare function postMessage(message);
 export interface ValidationResponse {
     isValidatableCwl: boolean,
     isValidCwl: boolean,
-    errors: Array<any>
-    schema: any
+    errors: Array<any>,
+    warnings: Array<any>
 }
 
 // This class should only be used inside a WebWorker,
 // because it relies on the WebWorkers postMessage method
 export class JsonSchemaService {
-    private Validator;
+    private validator;
     private errorMessage: string;
-    private schemas: {
-        "draft-2": any,
-        "draft-3": any,
-        "draft-4": any
-    };
 
     constructor(attr: {
-        draft3: Object,
-        draft4: Object,
-        draft2: Object,
-        Validator: Object
+        draft3: any,
+        draft4: any,
+        draft2: any,
+        validator: any
     }) {
-        this.Validator = attr.Validator;
+        this.validator = attr.validator;
 
-        this.schemas = {
-            "draft-2": attr.draft2,
-            "draft-3": attr.draft3,
-            "draft-4": attr.draft4
-        }
+        const schemas = {
+            "draft-2": {
+                CommandLineTool: attr.draft2.cltSchema,
+                Workflow: attr.draft2.wfSchema,
+                ExpressionTool: attr.draft2.etSchema
+            },
+            "draft-3": {
+                CommandLineTool: attr.draft3.cltSchema,
+                Workflow: attr.draft3.wfSchema,
+                ExpressionTool: attr.draft3.etSchema
+            },
+            "draft-4": {
+                CommandLineTool: attr.draft3.cltSchema,
+                Workflow: attr.draft3.wfSchema,
+                ExpressionTool: attr.draft3.etSchema
+            }
+        };
+
+        Object.keys(schemas).forEach((key) => {
+            this.validator.addSchema(schemas[key].CommandLineTool, key + "CommandLineTool");
+            this.validator.addSchema(schemas[key].Workflow, key + "Workflow");
+            this.validator.addSchema(schemas[key].ExpressionTool, key + "ExpressionTool");
+        })
     }
 
     public isClassValid(cwlClass: string) {
         return cwlClass === "Workflow" || cwlClass === "CommandLineTool" || cwlClass === "ExpressionTool";
     }
-
 
     public isValidCWLClass(json: any) {
         if (json !== undefined && json.class) {
@@ -51,13 +63,14 @@ export class JsonSchemaService {
             return isValid;
 
         } else {
-            this.errorMessage = "JSON is missing 'cwlVersion' or 'class'";
+            this.errorMessage = "JSON is missing 'class' property";
             return false;
         }
     }
 
     public validateJson(jsonText: string) {
-        const validator = new this.Validator();
+        const validator = this.validator;
+
         let cwlJson: {cwlVersion: string, class: string};
         let cwlVersion;
         let jsonClass;
@@ -75,23 +88,14 @@ export class JsonSchemaService {
             cwlVersion = cwlJson.cwlVersion || 'draft-2';
             jsonClass = cwlJson.class;
 
-            const schemaContainer = this.schemas[cwlVersion];
-            let result: any;
+            let result:any = {};
 
-            switch(jsonClass) {
-                case 'Workflow':
-                    result = validator.validate(cwlJson, schemaContainer.wfSchema);
-                    break;
-                case 'CommandLineTool':
-                    result = validator.validate(cwlJson, schemaContainer.cltSchema);
-                    break;
-                case 'ExpressionTool':
-                    result = validator.validate(cwlJson, schemaContainer.etSchema);
-                    break;
-            }
-
+            result.valid = validator.validate(cwlVersion + jsonClass, cwlJson);
+            result.errors = validator.errors;
+            result.errorText = validator.errorsText();
             result.class = jsonClass;
 
+            console.log("json schema service result", result);
             this.sendValidationResult(result);
         }
     }
@@ -101,7 +105,7 @@ export class JsonSchemaService {
             isValidatableCwl: false,
             isValidCwl: false,
             errors: [errorMessage],
-            schema: undefined
+            warnings: []
         });
     }
 
@@ -109,9 +113,10 @@ export class JsonSchemaService {
         postMessage({
             isValidatableCwl: true,
             isValidCwl: result.valid,
-            errors: result.errors,
+            errors: result.errors || [],
+            warnings: [],
+            errorText: result.errorText,
             class: result.class,
-            schema: result.instance
         });
     }
 }

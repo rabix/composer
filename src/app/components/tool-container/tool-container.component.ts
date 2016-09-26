@@ -13,6 +13,7 @@ import {SidebarComponent} from "../sidebar/sidebar.component";
 import {CommandLineComponent} from "../clt-editor/commandline/commandline.component";
 import {ViewSwitcherComponent} from "../view-switcher/view-switcher.component";
 import {ValidationResponse} from "../../services/webWorker/json-schema/json-schema.service";
+import {ValidationIssuesComponent} from "../validation-issues/validation-issues.component";
 
 require("./tool-container.component.scss");
 
@@ -29,7 +30,8 @@ require("./tool-container.component.scss");
         ToolHeaderComponent,
         CommandLineComponent,
         SidebarComponent,
-        ViewSwitcherComponent
+        ViewSwitcherComponent,
+        ValidationIssuesComponent
     ],
     template: `
         <block-loader *ngIf="!isLoaded"></block-loader>
@@ -45,8 +47,13 @@ require("./tool-container.component.scss");
             </div>
             
             <div class="status-bar-footer">
-                <commandline [content]="commandlineContent"></commandline>
-                <view-switcher [viewMode]="viewMode" [disabled]="!isValid"></view-switcher>
+                <div class="left-side">
+                    <validation-issues [issues]="schemaValidationStream"></validation-issues>
+                    <commandline [content]="commandlineContent"></commandline>
+                </div>
+                <div class="right-side">
+                    <view-switcher [viewMode]="viewMode" [disabled]="!isValid"></view-switcher>
+                </div>
             </div>
         </div>
     `

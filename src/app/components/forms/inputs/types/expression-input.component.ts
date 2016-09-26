@@ -55,7 +55,7 @@ export class ExpressionInputComponent implements OnDestroy {
         this.expressionInputService.setExpression(this.inputControl.value);
 
         let updateExpressionValue = this.expressionInputService.expression.subscribe(expression => {
-            this.inputControl.updateValue(expression, {
+            this.inputControl.setValue(expression, {
                 onlySelf: false,
                 emitEvent: true
             });

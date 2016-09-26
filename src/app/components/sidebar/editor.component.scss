@@ -14,11 +14,22 @@
     color: #000000;
 }
 
+sidebar-component {
+    > div {
+        width: 0;
+        transition: width 300ms;
+
+        &.show {
+            width: 100%;
+        }
+    }
+}
+
 .sidebar-component {
     height: 100%;
 }
 
-.isTopOfStack {
+.top-of-stack {
     z-index: 0;
 }
 
