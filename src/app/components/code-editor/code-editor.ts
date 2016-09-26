@@ -6,9 +6,9 @@ import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import {WebWorkerService} from "../../services/webWorker/web-worker.service";
 import {ValidationResponse} from "../../services/webWorker/json-schema/json-schema.service";
-import {AbstractCodeEditorService} from "../../services/abstract-code-editor/abstract-code-editor.service";
+import {AbstractCodeEditor} from "../abstract-code-editor/abstract-code-editor";
 
-export class CodeEditor extends AbstractCodeEditorService {
+export class CodeEditor extends AbstractCodeEditor {
 
     private fileStream: Observable<FileModel>;
 

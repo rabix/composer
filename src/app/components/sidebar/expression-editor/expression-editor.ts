@@ -3,12 +3,12 @@ import Editor = AceAjax.Editor;
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import TextMode = AceAjax.TextMode;
-import {AbstractCodeEditorService} from "../../../services/abstract-code-editor/abstract-code-editor.service";
+import {AbstractCodeEditor} from "../../abstract-code-editor/abstract-code-editor";
 import {Subscription} from "rxjs/Subscription";
 
 require ("./expression-editor.component.scss");
 
-export class ExpressionEditor extends AbstractCodeEditorService {
+export class ExpressionEditor extends AbstractCodeEditor {
 
     private subs: Subscription[] = [];
 
