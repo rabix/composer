@@ -19,7 +19,7 @@ import {ValidationResponse} from "../../services/webWorker/json-schema/json-sche
     <code-editor [fileStream]="file" *ngSwitchCase="'text'"></code-editor>
 </div>`
 })
-export class TabManagerComponent implements OnInit {
+export class TabManagerComponent {
 
     @Input()
     private file: Observable<FileModel>;
