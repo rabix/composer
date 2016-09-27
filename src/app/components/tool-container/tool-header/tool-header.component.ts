@@ -1,7 +1,5 @@
 import {Component} from "@angular/core";
 
-require("./tool-header.component.scss");
-
 @Component({
     selector: "tool-header",
     template: `

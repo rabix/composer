@@ -1,44 +1,48 @@
-import {Component} from '@angular/core';
-import {CodeEditorComponent} from "../code-editor/code-editor.component";
-import {DynamicState} from "../runtime-compiler/dynamic-state.interface";
+import {Component, Input} from "@angular/core";
 import {FileModel} from "../../store/models/fs.models";
-import {FileRegistry} from "../../services/file-registry.service";
-import {Observable, ReplaySubject} from "rxjs";
+import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {ToolContainerComponent} from "../tool-container/tool-container.component";
+import {Observable, Subscription, ReplaySubject} from "rxjs";
 import {WebWorkerService} from "../../services/webWorker/web-worker.service";
 import {WorkflowContainerComponent} from "../workflow-container/workflow-container.component";
 import {ValidationResponse} from "../../services/webWorker/json-schema/json-schema.service";
 
 @Component({
-    selector: 'tab-manager',
+    selector: "tab-manager",
     directives: [CodeEditorComponent, ToolContainerComponent, WorkflowContainerComponent],
     template: `
 <block-loader *ngIf="isLoading"></block-loader>
 
 <div [ngSwitch]="type" style="height: 100%">
-    <tool-container [fileStream]="fileStream" *ngSwitchCase="'tool'" [schemaValidationStream]="validationStream"></tool-container>
-    <workflow-container [fileStream]="fileStream" *ngSwitchCase="'workflow'"></workflow-container>
-    <code-editor [fileStream]="fileStream" *ngSwitchCase="'text'"></code-editor>
+    <tool-container [fileStream]="file" *ngSwitchCase="'tool'" [schemaValidationStream]="validationStream"></tool-container>
+    <workflow-container [fileStream]="file" *ngSwitchCase="'workflow'"></workflow-container>
+    <code-editor [fileStream]="file" *ngSwitchCase="'text'"></code-editor>
 </div>`
 })
-export class TabManagerComponent implements DynamicState {
-    private fileStream: Observable<FileModel>;
+export class TabManagerComponent {
+
+    @Input()
+    private file: Observable<FileModel>;
+
     private type: "text" | "workflow" | "tool";
+
     private webWorkerService: WebWorkerService;
     private validationStream: ReplaySubject<ValidationResponse>;
     private isLoading = true;
 
-    constructor(private fileRegistry: FileRegistry) {
+    private subs: Subscription[] = [];
+
+    constructor() {
         this.webWorkerService = new WebWorkerService();
     }
 
-    setState(state) {
-        this.fileStream = this.fileRegistry.getFile(state.fileInfo);
+    ngOnInit() {
 
         this.validationStream = new ReplaySubject();
         this.webWorkerService.validationResultStream.subscribe(this.validationStream);
 
-        this.webWorkerService.validationResultStream.first().subscribe(val => {
+
+        this.subs.push(this.webWorkerService.validationResultStream.subscribe(val => {
             switch (val.class) {
                 case "CommandLineTool":
                     this.type = "tool";
@@ -52,11 +56,14 @@ export class TabManagerComponent implements DynamicState {
             }
 
             this.isLoading = false;
-        });
+        }));
 
-        this.fileStream.subscribe(file => {
+        this.subs.push(this.file.subscribe(file => {
             this.webWorkerService.validateJsonSchema(file.content);
-        });
+        }));
     }
 
+    ngOnDestroy() {
+        this.subs.forEach(s => s.unsubscribe());
+    }
 }
