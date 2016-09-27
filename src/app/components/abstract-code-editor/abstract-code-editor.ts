@@ -1,9 +1,9 @@
-import {ACE_MODES_MAP} from "../../components/code-editor/code-editor-modes-map";
+import {ACE_MODES_MAP} from "../code-editor/code-editor-modes-map";
 import Editor = AceAjax.Editor;
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 
-export abstract class AbstractCodeEditorService {
+export abstract class AbstractCodeEditor {
     /** Holds an instance of the AceEditor */
     protected editor: Editor;
 

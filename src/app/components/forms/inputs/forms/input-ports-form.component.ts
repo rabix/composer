@@ -9,6 +9,7 @@ require("./input-ports-form.component.scss");
 
 @Component({
     selector: 'inputs-ports-form',
+    providers: [InputPortService],
     directives: [InputPortListComponent],
     template: `
         <form>
