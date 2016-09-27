@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy} from "@angular/core";
 import {DynamicState} from "../runtime-compiler/dynamic-state.interface";
 import {FileModel} from "../../store/models/fs.models";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
@@ -9,6 +9,7 @@ import {WebWorkerService} from "../../services/webWorker/web-worker.service";
 
 @Component({
     selector: 'tab-manager',
+    providers: [WebWorkerService],
     directives: [CodeEditorComponent, ToolContainerComponent],
     template: `
 <block-loader *ngIf="isLoading"></block-loader>
@@ -20,18 +21,14 @@ import {WebWorkerService} from "../../services/webWorker/web-worker.service";
 
 </div>`
 })
-export class TabManagerComponent implements OnInit, DynamicState {
+export class TabManagerComponent implements DynamicState, OnDestroy {
     private fileStream: Observable<FileModel>;
     private type: "text" | "workflow" | "tool";
     private webWorkerService: WebWorkerService;
     private isLoading = true;
 
-    constructor(private fileRegistry: FileRegistry) {
-        this.webWorkerService = new WebWorkerService();
-    }
-
-    ngOnInit() {
-    }
+    constructor(private fileRegistry: FileRegistry,
+                private webWorkerService: WebWorkerService) { }
 
     setState(state) {
         this.fileStream = this.fileRegistry.getFile(state.fileInfo);
@@ -57,4 +54,7 @@ export class TabManagerComponent implements OnInit, DynamicState {
         });
     }
 
+    ngOnDestroy(): void {
+        this.webWorkerService.dispose();
+    }
 }

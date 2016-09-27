@@ -1,8 +1,4 @@
-import {
-    Component,
-    Input,
-    OnInit
-} from "@angular/core";
+import {Component, Input, OnInit} from "@angular/core";
 import {NgSelectOption} from "@angular/common";
 import {FileModel} from "../../../store/models/fs.models";
 import {ToolValidator} from "../../../validators/tool.validator";

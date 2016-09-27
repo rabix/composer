@@ -20,7 +20,10 @@ export class CodeEditor extends AbstractCodeEditor {
 
     public validationResult: Observable<ValidationResponse>;
 
-    constructor(editor: Editor, fileStream: Observable<FileModel>) {
+    constructor(private editor: Editor,
+                private fileStream: Observable<FileModel>,
+                private webWorkerService: WebWorkerService) {
+
         super();
         this.editor = editor;
 
@@ -30,7 +33,6 @@ export class CodeEditor extends AbstractCodeEditor {
         this.session    = editor.getSession();
         this.document   = this.session.getDocument();
         this.fileStream = fileStream;
-        this.webWorkerService = new WebWorkerService();
 
         this.setTheme('chrome');
 
@@ -56,20 +58,23 @@ export class CodeEditor extends AbstractCodeEditor {
     }
 
     private _attachJsonValidation(): void {
-        this.contentChanges
-            .map(file => {
-                return file.content;
-            })
-            .subscribe((content: string) => {
-                this.validateJsonSchema(content);
-            });
+        this.subs.push(
+            this.contentChanges
+                .map(file => {
+                    return file.content;
+                })
+                .subscribe((content: string) => {
+                    this.validateJsonSchema(content);
+                })
+        );
     }
 
-    private validateJsonSchema(content: string) {
+    private validateJsonSchema(content: string): void {
         this.webWorkerService.validateJsonSchema(content);
     }
 
     public dispose(): void {
+        this.editor.destroy();
         this.subs.forEach(sub => sub.unsubscribe());
     }
 }

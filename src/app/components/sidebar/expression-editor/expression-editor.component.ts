@@ -110,7 +110,10 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.editor.dispose();
+        if (this.editor) {
+            this.editor.dispose();
+        }
+
         this.subs.forEach(sub => sub.unsubscribe());
     }
 }

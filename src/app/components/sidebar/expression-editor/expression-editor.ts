@@ -30,9 +30,11 @@ export class ExpressionEditor extends AbstractCodeEditor {
         this.setMode("javascript");
 
         this.subs.push(
-            this.expressionStream.subscribe((expression: string) => {
-                this.setText(expression);
-            })
+            this.expressionStream
+                .filter(expression => expression.length > 0)
+                .subscribe((expression: string) => {
+                    this.setText(expression);
+                })
         );
 
         this.expressionChanges = Observable.fromEvent(this.editor as any, "change")
@@ -44,6 +46,7 @@ export class ExpressionEditor extends AbstractCodeEditor {
     }
 
     public dispose(): void {
+        this.editor.destroy();
         this.subs.forEach(sub => sub.unsubscribe());
     }
 }
