@@ -1,12 +1,16 @@
-import {Component, Input} from "@angular/core";
+import {Component, Input, ChangeDetectionStrategy} from "@angular/core";
+import {CommandLinePart} from "cwlts/lib/models/helpers/CommandLinePart";
 
 /** TODO: make this switch between an expression editor and an object inspector*/
 @Component({
     selector: "commandline",
+    changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
             <div class="console-component" [ngClass]="{show: showCommandLine}">
                 <div class="console-content">
-                    {{content}}
+                    <span [ngClass]="getClass(p)" *ngFor="let p of commandLineParts">
+                        {{ p.value }}
+                    </span>
                 </div>
             </div>
             
@@ -20,11 +24,18 @@ import {Component, Input} from "@angular/core";
     `
 })
 export class CommandLineComponent {
-    /** Content of the command line */
     @Input()
-    public content: string;
+    public commandLineParts: CommandLinePart[];
 
     private showCommandLine = false;
+
+    private getClass(part: CommandLinePart) {
+        return {
+            "arg-cli": part.type === "argument",
+            "baseCmd-cli": part.type === "baseCommand",
+            "input-cli": part.type === "input"
+        }
+    }
 
     private toggleCommandLine(): void {
         this.showCommandLine = !this.showCommandLine;

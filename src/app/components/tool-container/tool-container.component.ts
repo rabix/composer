@@ -14,6 +14,7 @@ import {CommandLineComponent} from "../clt-editor/commandline/commandline.compon
 import {ViewSwitcherComponent} from "../view-switcher/view-switcher.component";
 import {ValidationResponse} from "../../services/webWorker/json-schema/json-schema.service";
 import {ValidationIssuesComponent} from "../validation-issues/validation-issues.component";
+import {CommandLinePart} from "cwlts/lib/models/helpers/CommandLinePart";
 
 require("./tool-container.component.scss");
 
@@ -49,7 +50,7 @@ require("./tool-container.component.scss");
             <div class="status-bar-footer">
                 <div class="left-side">
                     <validation-issues [issues]="schemaValidationStream"></validation-issues>
-                    <commandline [content]="commandlineContent"></commandline>
+                    <commandline [commandLineParts]="commandLineParts"></commandline>
                 </div>
                 <div class="right-side">
                     <view-switcher [viewMode]="viewMode" [disabled]="!isValid"></view-switcher>
@@ -68,12 +69,13 @@ export class ToolContainerComponent implements OnInit, DynamicState, OnDestroy {
     /** Default view mode. */
     private viewMode: ReplaySubject<'gui' | 'json'>;
 
-    /** File that we will pass to both the gui and JSON editor*/
+    /** File that we will pass to both the gui and JSON editor */
     private file: FileModel;
 
+    /** Model that generates command line and does validation */
     private model: CommandLineToolModel;
 
-    private commandlineContent: string = '';
+    private commandLineParts: CommandLinePart[];
 
     /** List of subscriptions that should be disposed when destroying this component */
     private subs: Subscription[];
@@ -100,7 +102,7 @@ export class ToolContainerComponent implements OnInit, DynamicState, OnDestroy {
             // while the file is being edited, attempt to recreate the model
             try {
                 this.model              = new CommandLineToolModel(JSON.parse(this.file.content));
-                this.commandlineContent = this.model.getCommandLine();
+                this.commandLineParts = this.model.getCommandLineParts();
 
                 // if the file isn't valid JSON, do nothing
             } catch (ex) {
