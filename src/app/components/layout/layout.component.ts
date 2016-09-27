@@ -1,12 +1,11 @@
-import {Component, OnInit, ViewChild, ElementRef, Input, Output} from "@angular/core";
-import {WorkspaceComponent} from "../workspace/workspace.component";
-import {Subscription, Observable, Subject} from "rxjs";
+import {Component, OnInit, ViewChild, ElementRef, Input} from "@angular/core";
+import {Observable} from "rxjs";
 
 require("./layout.component.scss");
 
 @Component({
     selector: "ct-layout",
-    directives: [WorkspaceComponent],
+    directives: [],
     template: `
         <div class="flex-box">
             <div class="flex-col" #tree [style.flex]="treeSize">
@@ -17,7 +16,7 @@ require("./layout.component.scss");
             </div>
             <div class="handle" #handle></div>
             <div class="flex-col" #tabs [style.flex]="tabsSize">
-                <workspace class="flex-row" [resize]="resize"></workspace>
+                <ct-workbox class="flex-row"></ct-workbox>
             </div>
         </div>
     `
@@ -28,26 +27,16 @@ export class LayoutComponent implements OnInit {
     private tree: ElementRef;
 
     @Input()
-    private treeSize = 0.35;
+    private treeSize = .2;
 
     @ViewChild("tabs")
     private tabs: ElementRef;
 
     @Input()
-    private tabsSize = 0.65;
+    private tabsSize = .8;
 
     @ViewChild("handle")
     private handle: ElementRef;
-
-    @Output()
-    private resize: Subject<{treeSize: number, tabsSize: number}>;
-
-    private subs: Subscription[] = [];
-
-    constructor() {
-        this.resize = new Subject();
-
-    }
 
     ngOnInit() {
 
@@ -56,17 +45,23 @@ export class LayoutComponent implements OnInit {
         const move = Observable.fromEvent(document, "mousemove");
         const drag = down.flatMap(_ => move.map(e => e.clientX).takeUntil(up));
 
-        drag.map(x => x < 200 ? 200 : x).subscribe(x => {
+        drag.map(x => {
+            const leftMargin  = 200;
+            const rightMargin = document.body.clientWidth - 200;
+
+            if (x < leftMargin) {
+                return leftMargin;
+            } else if (x > rightMargin) {
+                return rightMargin
+            }
+
+            return x;
+        }).subscribe(x => {
 
             const docWidth = document.body.clientWidth;
 
             this.treeSize = x;
             this.tabsSize = docWidth - x;
-
-            this.resize.next({
-                treeSize: this.treeSize,
-                tabsSize: this.tabsSize
-            });
         });
     }
 

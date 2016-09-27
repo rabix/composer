@@ -3,17 +3,16 @@ import {ContextDirective} from "../../services/context/context.directive";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {FileRegistry} from "../../services/file-registry.service";
 import {FileStateService} from "../../state/file.state.service";
-import {MenuBarComponent} from "../menu/menu-bar.component";
-import {ModalService} from "../modal/modal.service";
+import {MenuBarComponent} from "../menu";
+import {ModalService} from "../modal";
 import {Observable} from "rxjs/Rx";
 import {Component, ViewChild, ViewContainerRef, AfterViewInit} from "@angular/core";
 import {UrlValidator} from "../../validators/url.validator";
-import {WorkspaceComponent} from "../workspace/workspace.component";
-import {WorkspaceService} from "../workspace/workspace.service";
 import {ContextService} from "../../services/context/context.service";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {FileTreeComponent} from "../file-tree/file-tree.component";
 import {LayoutComponent} from "../layout/layout.component";
+import {WorkboxComponent} from "../workbox/workbox.component";
 
 require("./../../../assets/sass/main.scss");
 
@@ -29,10 +28,10 @@ require("./main.component.scss");
     `,
     directives: [
         MenuBarComponent,
-        WorkspaceComponent,
         ContextDirective,
         FileTreeComponent,
-        LayoutComponent
+        LayoutComponent,
+        WorkboxComponent
     ],
     providers: [
         ComponentRegistryFactoryService,
@@ -42,7 +41,6 @@ require("./main.component.scss");
         FileStateService,
         ModalService,
         UrlValidator,
-        WorkspaceService,
         PlatformAPI
     ]
 })
