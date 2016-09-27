@@ -1,4 +1,4 @@
-import {Component, OnInit, Input} from "@angular/core";
+import {Component, OnInit, Input, OnDestroy} from "@angular/core";
 import {FileModel} from "../../store/models/fs.models";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {ToolContainerComponent} from "../tool-container/tool-container.component";
@@ -32,8 +32,7 @@ export class TabManagerComponent implements OnInit, OnDestroy {
 
     private subs: Subscription[] = [];
 
-    constructor(private fileRegistry: FileRegistry,
-                private webWorkerService: WebWorkerService) { }
+    constructor(private webWorkerService: WebWorkerService) { }
 
     ngOnInit() {
 
