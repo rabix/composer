@@ -1,48 +1,59 @@
 import {Injectable} from "@angular/core";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {TreeNode} from "./types";
-import {Observable} from "rxjs";
+import {TreeNodeComponent} from "./tree-node.component";
 
 @Injectable()
 export class TreeViewService {
 
-    private highlightedNode: BehaviorSubject<TreeNode>;
+    public selectedNode = new BehaviorSubject<TreeNodeComponent>(null);
 
-    public searchTerm: BehaviorSubject<string>;
+    public searchTerm = new BehaviorSubject("");
 
+    public nodes = new Map();
+
+    public highlightedNodes = new BehaviorSubject<TreeNodeComponent[]>([]);
 
     constructor() {
 
-        this.highlightedNode = new BehaviorSubject<TreeNode>(null);
+        this.observeNodesMatchingSearch().subscribe(this.highlightedNodes);
 
-        this.searchTerm = new BehaviorSubject("");
+        this.observeFirstNodeMatchingSearch().subscribe(this.selectedNode);
+    }
 
-        Observable.fromEvent(document, "keydown")
-            .filter((event: KeyboardEvent) => event.srcElement.classList.contains("node-base"))
-            .do(ev => ev.preventDefault())
-            .filter((event: KeyboardEvent) => {
-                return (event.keyCode > 47 && event.keyCode < 58) || // number keys
-                    (event.keyCode == 32 || event.keyCode == 8) || // spacebar & backspace
-                    (event.keyCode > 64 && event.keyCode < 91) || // letter keys
-                    (event.keyCode > 95 && event.keyCode < 112) || // numpad keys
-                    (event.keyCode > 185 && event.keyCode < 193) || // ;=,-./` (in order)
-                    (event.keyCode > 218 && event.keyCode < 223);
-            })
-            .scan((acc, event: KeyboardEvent) => {
-                if (event.which === 8) {
-                    return acc.slice(0, -1);
+    private observeFirstNodeMatchingSearch() {
+        return this.highlightedNodes.filter(arr => arr.length).map(arr => arr[0]);
+    }
+
+    private observeNodesMatchingSearch() {
+        return this.searchTerm.map(term => {
+            const matchingNodes = [];
+
+            this.nodes.forEach((n: TreeNodeComponent) => {
+                let matchingCharacters = 0;
+                if (n.node.name.toLowerCase().indexOf(term.toLowerCase()) === 0) {
+                    matchingCharacters = term.length;
                 }
-                return acc + event.key;
-            }, "")
-            .distinctUntilChanged((a, b) => a == b)
-            .subscribe(this.searchTerm);
+
+                if (matchingCharacters !== n.highlightedCharacterCount.getValue()) {
+                    n.highlightedCharacterCount.next(matchingCharacters);
+                }
+
+                if (matchingCharacters > 0) {
+                    matchingNodes.push(n);
+                }
+            });
+
+            return matchingNodes;
+        });
     }
 
-    public highlight(node: TreeNode) {
-        this.highlightedNode.next(node);
+    public addNode(node: TreeNodeComponent) {
+        this.nodes.set(node.nodeIndex, node);
     }
 
-    public isHighlighted(node: TreeNode) {
-        return this.highlightedNode.map(highlighted => node === highlighted);
+    public removeNode(node: TreeNodeComponent) {
+        this.nodes.delete(node.nodeIndex);
     }
+
+
 }

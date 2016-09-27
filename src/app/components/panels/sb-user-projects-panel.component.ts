@@ -16,7 +16,7 @@ import {PanelToolbarComponent} from "./panel-toolbar.component";
         <ct-panel-toolbar>
             <name>Projects</name>
         </ct-panel-toolbar>
-        <div *ngIf="isLoading" class="main node-base">
+        <div *ngIf="isLoading" class="node-base node-base">
             <span class="icon-space">
                 <i class="fa fa-fw fa-spinner fa-spin"></i>
             </span>

@@ -3,6 +3,7 @@ import {Observable, BehaviorSubject} from "rxjs";
 import {WorkboxComponent} from "../workbox/workbox.component";
 import {PanelSwitcherComponent} from "../panels/panel-switcher.component";
 import {PanelContainerComponent} from "../panels/panel-container.component";
+import {DomEventService} from "../../services/dom/dom-event.service";
 
 require("./layout.component.scss");
 
@@ -14,8 +15,12 @@ require("./layout.component.scss");
             <div class="panel-switch-col">
                 <div class="top-bar"></div>
                 <div class="left-panel-bar">
-                    <ct-panel-switcher [panels]="(panelSwitches | async)?.top" (statusChange)="onPanelSwitch($event, 'top')"></ct-panel-switcher>
-                    <ct-panel-switcher [panels]="(panelSwitches | async)?.bottom" (statusChange)="onPanelSwitch($event, 'bottom')"></ct-panel-switcher>
+                
+                    <ct-panel-switcher [panels]="(panelSwitches | async)?.top" 
+                                       (statusChange)="onPanelSwitch($event, 'top')"></ct-panel-switcher>
+                    
+                    <ct-panel-switcher [panels]="(panelSwitches | async)?.bottom" 
+                                       (statusChange)="onPanelSwitch($event, 'bottom')"></ct-panel-switcher>
                 </div>
             </div>
             <div #tree 
@@ -61,15 +66,19 @@ export class LayoutComponent implements OnInit {
 
     protected panelSwitches = new BehaviorSubject({top: [], bottom: []});
 
-    constructor() {
+    private el: Element;
+
+    constructor(private domEvents: DomEventService, el: ElementRef) {
+        this.el = el.nativeElement;
+
         this.panelSwitches.next({
             top: [
-                {id: "sb_user_projects", name: "Projects", icon: "folder", active: true},
-                {id: "sb_public_apps", name: "Public Apps", icon: "code", active: false},
+                {id: "sb_user_projects", name: "1: Projects", icon: "folder", active: true, shortcut: "alt+1"},
+                {id: "sb_public_apps", name: "2: Public Apps", icon: "code", active: false, shortcut: "alt+2"},
             ],
             bottom: [
-                {id: "structure", name: "Structure", icon: "list", active: false},
-                {id: "revisions", name: "Revisions", icon: "history", active: false}
+                {id: "structure", name: "7: Structure", icon: "list", active: false, shortcut: "alt+7"},
+                {id: "revisions", name: "8: Revisions", icon: "history", active: false, shortcut: "alt+8"}
             ]
         });
     }
@@ -100,13 +109,39 @@ export class LayoutComponent implements OnInit {
 
         this.panelSwitches.map(panels => [].concat(panels.top, panels.bottom)).subscribe(this.panels);
 
-        this.panelSwitches
-            .map(panels => [
-                    panels.top.find(p => p.active),
-                    panels.bottom.find(p => p.active)
-                ].filter(p => p)
-            )
-            .subscribe(this.visiblePanels);
+        this.panelSwitches.map(panels => [
+                panels.top.find(p => p.active),
+                panels.bottom.find(p => p.active)
+            ].filter(p => p)
+        ).subscribe(this.visiblePanels);
+
+
+        this.panels.first().subscribe(panels => {
+            panels.forEach(p => {
+                this.domEvents.onShortcut(p.shortcut).subscribe(k => {
+                    this.switchPanel(p.id);
+                });
+            })
+        })
+    }
+
+    public switchPanel(panelId) {
+        const panels = Object.assign({}, this.panelSwitches.getValue());
+        Object.keys(panels).forEach(region => {
+            const panel = panels[region].find(p => p.id === panelId);
+            if (!panel) {
+                return;
+            }
+            const newState = !panel.active;
+
+            if (newState === true) {
+                panels[region].forEach(p => p.active = false);
+            }
+
+            panel.active = newState;
+        });
+
+        this.panelSwitches.next(panels);
     }
 
     private onPanelSwitch(panels, position: "top"|"bottom") {

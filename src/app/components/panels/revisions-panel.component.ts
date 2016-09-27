@@ -8,7 +8,7 @@ import {PanelToolbarComponent} from "./panel-toolbar.component";
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <ct-panel-toolbar>
-            <name>Document Revisions</name>
+            <name>App Revisions</name>
         </ct-panel-toolbar>
     `
 })

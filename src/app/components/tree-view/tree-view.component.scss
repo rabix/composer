@@ -15,7 +15,7 @@ ct-tree-view {
 
   }
 
-  .main {
+  .node-base {
     line-height: 18px;
     padding: 2px 4px;
     //line-height: 16px;
@@ -31,7 +31,6 @@ ct-tree-view {
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
-      width: calc(100% - 10px);
     }
 
     &:hover {

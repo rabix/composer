@@ -8,6 +8,7 @@ ct-panel-container {
   .panel {
     display: flex;
     flex: 1;
+    overflow:hidden;
 
     &.hidden {
       flex: 0 !important;
@@ -26,6 +27,7 @@ ct-panel-container {
       height: 0;
     }
   }
+
 }
 
 ct-panel-toolbar {
@@ -40,5 +42,9 @@ ct-panel-toolbar {
 
   .title, .tools {
     display: flex;
+  }
+
+  & + ct-tree-view {
+    height: calc(100% - 28px); // Bound to the ct-panel-toolbar padding/height
   }
 }

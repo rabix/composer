@@ -15,6 +15,7 @@ import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {LayoutComponent} from "../layout/layout.component";
 import {ExpressionInputService} from "../../services/expression-input/expression-input.service";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
+import {DomEventService} from "../../services/dom/dom-event.service";
 
 require("./../../../assets/sass/main.scss");
 
@@ -39,6 +40,7 @@ require("./main.component.scss");
         EventHubService,
         FileRegistry,
         FileStateService,
+        DomEventService,
         ModalService,
         UrlValidator,
         WebWorkerService,
