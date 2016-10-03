@@ -54,7 +54,7 @@ export class PanelContainerComponent {
 
     ngOnInit() {
         Observable.fromEvent(document, "resize").map(_ => document.body.clientHeight).subscribe(this.totalPanelSize);
-        this.panelList.map(panels => panels.filter(p => p.active).length).subscribe(this.visiblePanelCount);
+        this.panelList.map(statuses => statuses.filter(p => p.active).length).subscribe(this.visiblePanelCount);
     }
 
     ngAfterViewInit() {

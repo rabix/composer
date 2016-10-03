@@ -4,11 +4,7 @@ import {Observable} from "rxjs";
 @Injectable()
 export class DomEventService {
 
-    private registeredShortcuts = new Set();
-
-    constructor() {
-
-    }
+    private registeredShortcuts = new Map<Array, Observable<any>>();
 
     public on(eventName: string, component?: Element, preventDefault = false) {
         return Observable.fromEvent(document, eventName).filter((ev: Event) => {
@@ -26,16 +22,11 @@ export class DomEventService {
 
     public onShortcut(shortcut: string, component?: Element) {
 
+
         const normalized = shortcut.split("+").sort();
-        const reordered  = normalized.join("+");
-
-        if (this.registeredShortcuts.has(reordered)) {
-            throw `Shortcut "${shortcut}" is already registered. 
-            Registering it twice would produce unexpected behaviour.`;
+        if (this.registeredShortcuts.has(normalized)) {
+            return this.registeredShortcuts.get(normalized);
         }
-
-        this.registeredShortcuts.add(reordered);
-
 
         const modifierValues = {
             alt: false,
@@ -53,8 +44,8 @@ export class DomEventService {
             throw `Invalid shortcut "${shortcut}". It can't be made only of control characters.`;
         }
 
-        return this.on("keyup", component).filter((ev: KeyboardEvent) => {
-            const isMainKey    = String.fromCharCode(ev.keyCode) === mainKey;
+        const listener = this.on("keyup", component).filter((ev: KeyboardEvent) => {
+            const isMainKey      = String.fromCharCode(ev.keyCode) === mainKey;
             const modifiersMatch = modifiers.reduce((outcome, mod) => {
                 if (outcome === false) {
                     return false;
@@ -64,7 +55,19 @@ export class DomEventService {
             }, true);
 
             return isMainKey && modifiersMatch;
-        });
+        }).share();
+
+        this.registeredShortcuts.set(normalized, listener);
+
+        return listener;
     }
+
+    public onDrag(element: Element): Observable<MouseEvent> {
+        const down = Observable.fromEvent(element, "mousedown");
+        const up   = Observable.fromEvent(document, "mouseup");
+        const move = Observable.fromEvent(document, "mousemove");
+        return down.flatMap(_ => move.takeUntil(up));
+    }
+
 
 }
