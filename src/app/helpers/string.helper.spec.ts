@@ -1,4 +1,3 @@
-import {it, describe, expect} from "@angular/core/testing";
 import {StringHelper} from "./string.helper";
 
 describe("StringHelper", () => {

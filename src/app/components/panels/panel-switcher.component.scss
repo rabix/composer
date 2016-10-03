@@ -1,0 +1,53 @@
+@import "../../../assets/sass/_variables.scss";
+
+
+.left-panel-bar {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 44px);
+  justify-content: space-between;
+  background: $brand-primary-bg-dark;
+
+}
+
+ct-panel-switcher {
+  display: inline-block;
+  width: 26px;
+  border-right: 2px solid $brand-primary-bg-dark;
+
+  .switcher {
+
+    display: block;
+    padding: 20px 10px;
+    background: $brand-primary-bg-dark;
+    border: 0;
+    position: relative;
+    height: 120px;
+    border-radius: 2px;
+
+    &:hover {
+      background: lighten($brand-primary-bg-dark, 5%);
+    }
+
+    &.active {
+      background: $brand-primary-bg-bright;
+    }
+
+    .switcher-text {
+      font-size: $font-size-sm;
+      left: 50%;
+      line-height: 0;
+      margin-top: -1px;
+      position: absolute;
+      text-align: center;
+      top: 50%;
+      transform: translateX(-50%) rotate(-90deg);
+      white-space: nowrap;
+    }
+
+    .switcher-icon {
+      color: #f0ad4e;
+    }
+  }
+
+}

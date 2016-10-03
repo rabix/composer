@@ -1,3 +1,112 @@
-ct-workbox {
+@import "../../../assets/sass/_variables.scss";
 
+.ct-workbox-head {
+  color: white;
+  height: 44px;
+  width: 100%;
+  background: $brand-primary-bg;
+}
+
+.ct-workbox-body {
+  background: $body-bg-background;
+  height: calc(100% - 44px);
+  color: $text-dark;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.inset-panel {
+  position: relative;
+  background-color: #161719;
+  border-radius: 2px;
+}
+
+.ct-tab-bar {
+  display: flex;
+  -webkit-user-select: none;
+  margin: 0;
+  background: $brand-primary-bg-bright;
+  font-size: $font-size-xs;
+  height: 100%;
+  background: $brand-primary-bg-dark;
+  box-shadow: inset 0 -8px 8px -4px rgba(0, 0, 0, 0.15);
+  padding: 0 10px 0 25px;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  .ct-workbox-tab {
+    border: none;
+    flex: 1;
+    font-size: $font-size-xs;
+    line-height: 34px;
+    margin: 10px 20px 0 5px;
+    max-width: 275px;
+    min-width: 40px;
+    padding: 0 24px 10px 0;
+    position: relative;
+    box-shadow: inset 1px 1px 0 $brand-primary-bg-bright, -4px 0px 4px rgba(0, 0, 0, 0.1);
+
+    &:first-child {
+      margin-left: 22px;
+    }
+
+    .title {
+      margin-top: -5px;
+      overflow: hidden;
+      padding-right: 10px;
+      padding-top: 5px;
+      position: relative;
+      text-overflow: ellipsis;
+      white-space: pre;
+      z-index: 1;
+    }
+
+    .close-icon {
+      position: absolute;
+      top: 0;
+      right: -10px;
+      width: 20px;
+      font-size: 16px;
+      z-index: 10;
+    }
+
+    &.active, &.active:before, &.active:after {
+      z-index: 1;
+      color: $brand-primary;
+      background-image: -webkit-linear-gradient(top, $body-bg-foreground, $body-bg-background);
+    }
+
+    &, &:before, &:after {
+      height: 34px;
+      background-image: -webkit-linear-gradient(top, lighten($brand-primary-bg-bright, 5%), $brand-primary-bg-bright);
+    }
+
+    &:before, &:after {
+      content: '';
+      position: absolute;
+      top: 0;
+      width: 25px;
+      height: 35px;
+    }
+
+    &:before {
+      left: -14px;
+      border-top-left-radius: 3px;
+      box-shadow: inset 1px 1px 0 $brand-primary-bg-bright, -4px 0px 4px rgba(0, 0, 0, 0.1);
+      -webkit-transform: skewX(-30deg);
+    }
+
+    &:after {
+      right: -14px;
+      border-top-right-radius: 3px;
+      box-shadow: inset -1px 1px 0 $brand-primary-bg-bright, 4px 0px 4px rgba(0, 0, 0, 0.1);
+      -webkit-transform: skewX(30deg);
+    }
+  }
+}
+
+.list-inline > li {
+  display: inline-block;
+  padding-left: 5px;
+  padding-right: 5px;
 }

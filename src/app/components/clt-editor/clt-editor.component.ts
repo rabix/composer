@@ -53,7 +53,7 @@ require("./clt-editor.component.scss");
                 <base-command-form [@formPosition]="formPosition"
                                 class="input-form" 
                                 [group]="cltEditorGroup"
-                                [baseCommand]="'echo'">
+                                [baseCommand]="model.baseCommand">
                 </base-command-form>
                 
                 <inputs-ports-form [@formPosition]="formPosition"
@@ -91,6 +91,7 @@ export class CltEditorComponent implements OnInit {
 
     constructor(private formBuilder: FormBuilder,
                 private eventHubService: EventHubService) {
+
         this.cltEditorGroup = this.formBuilder.group({});
 
         /* Opening the sidebar */
