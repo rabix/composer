@@ -9,8 +9,6 @@ import {
 } from "@angular/core";
 import {VisibilityState} from "../animation.states";
 
-require ("./commandline.component.scss");
-
 /** TODO: make this switch between an expression editor and an object inspector*/
 @Component({
     selector: "commandline",
@@ -36,12 +34,9 @@ require ("./commandline.component.scss");
                 {{content}}
             </div>
             
-            <div class="footer-buttons">
-                <button type="button" class="btn btn-secondary btn-sm">Issues</button>
-                <button type="button" 
-                class="btn btn-secondary btn-sm"
-                (click)="toggleCommandLine()">Resulting Command</button>
-            </div>
+            <button type="button" 
+            class="btn btn-sm"
+            (click)="toggleCommandLine()">Resulting Command <i class="fa fa-angle-right"></i></button>
     `
 })
 export class CommandLineComponent {

@@ -1,16 +1,18 @@
-import {Component, OnInit, Input} from "@angular/core";
+import {Component, OnInit, Input, OnDestroy} from "@angular/core";
 import {NgSwitch, NgSwitchCase, NgSwitchDefault} from "@angular/common";
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {FileModel} from "../../store/models/fs.models";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {CltEditorComponent} from "../clt-editor/clt-editor.component";
 import {DynamicState} from "../runtime-compiler/dynamic-state.interface";
-import {Subscription, Observable} from "rxjs/Rx";
+import {Subscription, Observable, ReplaySubject} from "rxjs/Rx";
 import {ToolHeaderComponent} from "./tool-header/tool-header.component";
 import {ViewModeService} from "./services/view-mode.service";
 import {CommandLineToolModel} from "cwlts/lib/models/d2sb";
-import {ToolFooterComponent} from "./tool-footer/tool-footer.component";
 import {SidebarComponent} from "../sidebar/sidebar.component";
+import {CommandLineComponent} from "../clt-editor/commandline/commandline.component";
+import {ViewSwitcherComponent} from "../view-switcher/view-switcher.component";
+import {ValidationResponse} from "../../services/webWorker/json-schema/json-schema.service";
 
 require("./tool-container.component.scss");
 
@@ -25,8 +27,9 @@ require("./tool-container.component.scss");
         NgSwitchCase,
         NgSwitchDefault,
         ToolHeaderComponent,
-        ToolFooterComponent,
-        SidebarComponent
+        CommandLineComponent,
+        SidebarComponent,
+        ViewSwitcherComponent
     ],
     template: `
         <block-loader *ngIf="!isLoaded"></block-loader>
@@ -35,22 +38,28 @@ require("./tool-container.component.scss");
             <tool-header class="tool-header"></tool-header>
         
             <div class="scroll-content">
-                <code-editor *ngIf="viewMode === 'json'" [fileStream]="fileStream"></code-editor>
-                <clt-editor class="gui-editor-component" [model]="model" *ngIf="viewMode === 'gui'" [fileStream]="fileStream"></clt-editor>
+                <code-editor *ngIf="(viewMode | async) === 'json'" [fileStream]="fileStream"></code-editor>
+                <clt-editor class="gui-editor-component" [model]="model" *ngIf="(viewMode | async) === 'gui'" [fileStream]="fileStream"></clt-editor>
                 
                 <sidebar-component></sidebar-component>
             </div>
             
-            <tool-footer class="tool-footer" [commandLine]="commandlineContent"></tool-footer>
+            <div class="status-bar-footer">
+                <commandline [content]="commandlineContent"></commandline>
+                <view-switcher [viewMode]="viewMode" [disabled]="!isValid"></view-switcher>
+            </div>
         </div>
     `
 })
-export class ToolContainerComponent implements OnInit, DynamicState {
+export class ToolContainerComponent implements OnInit, DynamicState, OnDestroy {
     @Input()
     public fileStream: Observable<FileModel>;
 
+    @Input()
+    public schemaValidationStream: ReplaySubject<ValidationResponse>;
+
     /** Default view mode. */
-    private viewMode: string;
+    private viewMode: ReplaySubject<'gui' | 'json'>;
 
     /** File that we will pass to both the gui and JSON editor*/
     private file: FileModel;
@@ -65,27 +74,42 @@ export class ToolContainerComponent implements OnInit, DynamicState {
     /** Flag that determines if the spinner should be shown */
     private isLoaded: boolean;
 
-    constructor(private viewModeService: ViewModeService) {
+    /** Flag for validity of CWL document */
+    private isValid: boolean;
+
+    constructor() {
         this.subs     = [];
         this.isLoaded = false;
 
-        this.viewModeService.setViewMode("json");
-        this.viewModeService.viewMode.subscribe(viewMode => {
-            this.viewMode = viewMode;
-        });
+        this.viewMode = new ReplaySubject<'json' | 'gui'>();
+        this.viewMode.next('json');
     }
 
     ngOnInit(): void {
-        // This file that we need to show, check it out from the file repository
-        // const fileStream = this.fileRegistry.getFile(this.file);
-
         // bring our own file up to date
         this.subs.push(this.fileStream.subscribe(file => {
-            this.file  = file;
-            this.model = new CommandLineToolModel(JSON.parse(this.file.content));
-            this.commandlineContent = this.model.getCommandLine();
-            this.isLoaded           = true;
+            this.file = file;
+
+            // while the file is being edited, attempt to recreate the model
+            try {
+                this.model              = new CommandLineToolModel(JSON.parse(this.file.content));
+                this.commandlineContent = this.model.getCommandLine();
+
+                // if the file isn't valid JSON, do nothing
+            } catch (ex) {
+            }
+
+            this.isLoaded = true;
         }));
+
+        // enable GUI switch when file is valid CWL
+        this.subs.push(this.schemaValidationStream.subscribe((err: ValidationResponse) => {
+            this.isValid = err.isValidCwl;
+        }));
+    }
+
+    ngOnDestroy(): void {
+        this.subs.forEach(sub => sub.unsubscribe());
     }
 
     public setState(state: {fileInfo}): void {
