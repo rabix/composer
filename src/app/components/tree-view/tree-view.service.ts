@@ -1,47 +1,59 @@
 import {Injectable} from "@angular/core";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {TreeNode} from "./types";
-import {Observable} from "rxjs";
+import {TreeNodeComponent} from "./tree-node.component";
 
 @Injectable()
 export class TreeViewService {
 
-    private highlightedNode: BehaviorSubject<TreeNode>;
+    public selectedNode = new BehaviorSubject<TreeNodeComponent>(null);
 
-    public searchTerm: BehaviorSubject<string>;
+    public searchTerm = new BehaviorSubject("");
 
+    public nodes = new Map();
+
+    public highlightedNodes = new BehaviorSubject<TreeNodeComponent[]>([]);
 
     constructor() {
 
-        this.highlightedNode = new BehaviorSubject<TreeNode>(null);
+        this.observeNodesMatchingSearch().subscribe(this.highlightedNodes);
 
-        this.searchTerm = new BehaviorSubject("");
+        this.observeFirstNodeMatchingSearch().subscribe(this.selectedNode);
+    }
 
-        Observable.fromEvent(document, "keydown")
-            .filter((event: KeyboardEvent) => event.srcElement.classList.contains("node-base"))
-            .do((event: KeyboardEvent) => event.preventDefault())
-            .map((event: KeyboardEvent) => event.which)
-            .scan((acc, key) => {
-                const letter = String.fromCharCode(key).toLowerCase();
+    private observeFirstNodeMatchingSearch() {
+        return this.highlightedNodes.filter(arr => arr.length).map(arr => arr[0]);
+    }
 
-                if (key === 8) {
-                    return acc.slice(0, -1);
-                } else if (letter !== "") {
-                    return acc + letter;
+    private observeNodesMatchingSearch() {
+        return this.searchTerm.map(term => {
+            const matchingNodes = [];
+
+            this.nodes.forEach((n: TreeNodeComponent) => {
+                let matchingCharacters = 0;
+                if (n.node.name.toLowerCase().indexOf(term.toLowerCase()) === 0) {
+                    matchingCharacters = term.length;
                 }
 
-            }, "")
-            .distinctUntilChanged((a, b) => {
-                return a == b;
-            })
-            .subscribe(this.searchTerm);
+                if (matchingCharacters !== n.highlightedCharacterCount.getValue()) {
+                    n.highlightedCharacterCount.next(matchingCharacters);
+                }
+
+                if (matchingCharacters > 0) {
+                    matchingNodes.push(n);
+                }
+            });
+
+            return matchingNodes;
+        });
     }
 
-    public highlight(node: TreeNode) {
-        this.highlightedNode.next(node);
+    public addNode(node: TreeNodeComponent) {
+        this.nodes.set(node.nodeIndex, node);
     }
 
-    public isHighlighted(node: TreeNode) {
-        return this.highlightedNode.map(highlighted => node === highlighted);
+    public removeNode(node: TreeNodeComponent) {
+        this.nodes.delete(node.nodeIndex);
     }
+
+
 }
