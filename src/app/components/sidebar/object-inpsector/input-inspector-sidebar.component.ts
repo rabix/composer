@@ -13,15 +13,12 @@ import {CommandInputParameterModel as InputProperty} from "cwlts/lib/models/d2sb
     ],
     template: `
             <div class="sidebar-component">
-                <div class="sidebar-content">
-                    
-                    <div class="collapse-icon" (click)="collapseSidebar()">
-                        <i class="fa fa-lg fa-caret-left black"></i>
-                    </div>
-                    
-                    <input-inspector *ngIf="sidebarData" [(inputModelStream)]="sidebarData">
-                    </input-inspector>
+                <div class="collapse-icon" (click)="collapseSidebar()">
+                    <i class="fa fa-lg fa-caret-left black"></i>
                 </div>
+                
+                <input-inspector *ngIf="sidebarData" [(inputModelStream)]="sidebarData">
+                </input-inspector>
             </div>
     `
 })

@@ -5,8 +5,8 @@ import {ReplaySubject} from "rxjs";
     selector: 'view-switcher',
     template: `
 <button (click)="toggleView()" class="btn btn-sm" [disabled]="disabled">
-    <i class="fa" [ngClass]="classes"></i>    
     {{ mode }}
+    <i class="fa" [ngClass]="classes"></i>    
 </button>
 `
 })

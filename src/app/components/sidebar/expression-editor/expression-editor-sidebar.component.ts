@@ -10,14 +10,12 @@ import {EventHubService} from "../../../services/event-hub/event-hub.service";
     ],
     template: `
             <div class="sidebar-component">
-                <div class="sidebar-content">
                     
                     <div class="collapse-icon" (click)="collapseSidebar()">
                         <i class="fa fa-lg fa-caret-left"></i>
                     </div>
                     
                     <expression-editor></expression-editor>
-                </div>
             </div>
     `
 })

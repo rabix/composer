@@ -21,13 +21,13 @@ declare type sidebarType = "input-inspector" | "expression-editor";
         ExpressionEditorSidebarComponent
     ],
     template: `
-            <div [ngClass]="{show: show}">
-                <input-inspector-sidebar-component class="tool-sidebar" 
-                                                  [ngClass]="{'top-of-stack': currentSidebar === 'input-inspector'}">
+            <div [ngClass]="{show: show}" class="sidebar-container">
+                <input-inspector-sidebar-component class="tool-sidebar"
+                                                    [hidden]="currentSidebar !== 'input-inspector'">
                 </input-inspector-sidebar-component>
                 
                 <expression-editor-sidebar-component class="tool-sidebar" 
-                                                    [ngClass]="{'top-of-stack': currentSidebar === 'expression-editor'}">
+                                                    [hidden]="currentSidebar !== 'expression-editor'">
                 </expression-editor-sidebar-component>
             </div>
     `
@@ -50,6 +50,9 @@ export class SidebarComponent implements OnDestroy {
     }
 
     //TODO (Mate): make this simpler
+    //@todo: there are bugs when working with multiple tools at once:
+    // 1. opening tools will give the correct initial state (no sidebar)
+    // 2. sidebar state will synchronize across all open tools
     private initInputInspectorListener(): void {
         this.subs.push(this.eventHubService.on(OpenInputInspector).subscribe(() => {
             this.closeSidebarActions.push(CloseInputInspector);

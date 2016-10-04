@@ -1,11 +1,10 @@
-import {Component, Input, trigger, style, animate, state, transition, OnInit} from "@angular/core";
+import {Component, Input, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 import {FileModel} from "../../store/models/fs.models";
 import {CommandLineComponent} from "./commandline/commandline.component";
 import {DockerInputFormComponent} from "../forms/inputs/forms/docker-input-form.component";
 import {BaseCommandFormComponent} from "../forms/inputs/forms/base-command-form.component";
 import {InputPortsFormComponent} from "../forms/inputs/forms/input-ports-form.component";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {
     OpenInputInspector,
@@ -13,8 +12,10 @@ import {
     CloseInputInspector,
     CloseExpressionEditor
 } from "../../action-events/index";
-
-import {CommandInputParameterModel as InputProperty, CommandLineToolModel} from "cwlts/lib/models/d2sb";
+import {
+    CommandInputParameterModel as InputProperty,
+    CommandLineToolModel
+} from "cwlts/lib/models/d2sb";
 import {Observable} from "rxjs";
 
 require("./clt-editor.component.scss");
@@ -28,9 +29,6 @@ require("./clt-editor.component.scss");
         CommandLineComponent,
         REACTIVE_FORM_DIRECTIVES,
         FORM_DIRECTIVES,
-    ],
-    animations: [
-
     ],
     template: `
             <form class="clt-editor-group"
@@ -64,8 +62,6 @@ export class CltEditorComponent implements OnInit {
     private model: CommandLineToolModel;
 
     private file: FileModel;
-
-    private toolInputPorts: BehaviorSubject<InputProperty[]> = new BehaviorSubject<InputProperty[]>([]);
 
     /* TODO: generate the commandline */
     private commandlineContent: string;
