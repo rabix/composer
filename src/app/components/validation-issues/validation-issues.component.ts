@@ -1,5 +1,5 @@
-import {Component, Input, OnInit} from "@angular/core";
-import {Observable} from "rxjs";
+import {Component, Input, OnInit, OnDestroy} from "@angular/core";
+import {Observable, Subscription} from "rxjs";
 import {ValidationResponse} from "../../services/webWorker/json-schema/json-schema.service";
 
 @Component({
@@ -8,7 +8,7 @@ import {ValidationResponse} from "../../services/webWorker/json-schema/json-sche
             <div class="console-component" [ngClass]="{show: showConsole}">
                 <div class="console-content">
                     <p class="errors">
-                        {{ (issues | async)?.errorText }}
+                        {{ issues?.errorText }}
                     </p>
                 </div>
             </div>  
@@ -16,16 +16,16 @@ import {ValidationResponse} from "../../services/webWorker/json-schema/json-sche
             <button type="button" 
             class="btn btn-sm"
             (click)="toggleConsole()">
-                <span *ngIf="(issues | async)?.errors?.length > 0">
+                <span *ngIf="issues?.errors?.length > 0">
                     <i class="fa fa-times-circle errors">
                     </i>
-                    {{ (issues | async)?.errors?.length }}
+                    {{ issues?.errors?.length }}
 
                 </span>
-                <span *ngIf="(issues | async)?.warnings?.length > 0">
+                <span *ngIf="issues?.warnings?.length > 0">
                     <i class="fa fa-warning warnings">
                     </i>
-                    {{ (issues | async)?.warnings?.length }}
+                    {{ issues?.warnings?.length }}
                 </span>
             
                 
@@ -36,25 +36,32 @@ import {ValidationResponse} from "../../services/webWorker/json-schema/json-sche
             </button>
 `
 })
-export class ValidationIssuesComponent implements OnInit {
+export class ValidationIssuesComponent implements OnInit, OnDestroy {
     @Input()
-    public issues: Observable<ValidationResponse>;
+    public issuesStream: Observable<ValidationResponse>;
 
-    private buttonText = "Issues";
+    private issues      = ValidationResponse;
+    private buttonText  = "Issues";
     private showConsole = false;
+
+    private subs: Subscription[] = [];
 
     private toggleConsole() {
         this.showConsole = !this.showConsole;
     }
 
-    ngOnInit () {
-        this.issues.subscribe(res => {
-            const issues = res.errors.length + res.warnings.length;
+    ngOnInit() {
+        this.subs.push(this.issuesStream.subscribe(res => {
+            this.issues  = res;
+            const number = res.errors.length + res.warnings.length;
 
-            this.buttonText = issues > 0 ? (issues === 1 ? "Issue" : "Issues") : "No Issues";
+            this.buttonText = number > 0 ? (number === 1 ? "Issue" : "Issues") : "No Issues";
 
-        });
+        }));
+    }
 
+    ngOnDestroy() {
+        this.subs.forEach(sub => sub.unsubscribe());
     }
 
 }

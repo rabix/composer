@@ -49,7 +49,7 @@ require("./tool-container.component.scss");
             
             <div class="status-bar-footer">
                 <div class="left-side">
-                    <validation-issues [issues]="schemaValidationStream"></validation-issues>
+                    <validation-issues [issuesStream]="schemaValidationStream"></validation-issues>
                     <commandline [commandLineParts]="commandLineParts"></commandline>
                 </div>
                 <div class="right-side">
