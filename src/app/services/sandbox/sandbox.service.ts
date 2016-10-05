@@ -21,7 +21,7 @@ export class SandboxService {
     private plugin: any;
 
     /** Result of the expression evaluation */
-    public expressionResult: Observable<SandboxResponse>;
+    private expressionResult: Observable<SandboxResponse>;
 
     private updateExpressionResult: BehaviorSubject<SandboxResponse> = new BehaviorSubject<SandboxResponse>(undefined);
 
@@ -29,6 +29,7 @@ export class SandboxService {
         const self = this;
 
         this.expressionResult = this.updateExpressionResult
+            .filter(result => result !== undefined)
             .publishReplay(1)
             .refCount();
 
@@ -49,7 +50,7 @@ export class SandboxService {
     }
 
     // sends the input to the plugin for evaluation
-    public submit(code): void {
+    public submit(code): Observable<SandboxResponse> {
 
         //make sure the code is a string
         const codeToExecute: string = JSON.stringify(code);
@@ -65,6 +66,8 @@ export class SandboxService {
         this.plugin.whenConnected(() => {
             this.waitFoResponse();
         });
+
+        return this.expressionResult;
     }
 
     private waitFoResponse(): void {
