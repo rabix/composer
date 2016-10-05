@@ -15,12 +15,12 @@ export class ExpressionEditor extends AbstractCodeEditor {
     public expressionChanges: Observable<string>;
 
     constructor(protected editor: Editor,
-                private expressionStream: Observable<string>) {
+                private expression: string) {
 
         super();
         this.editor = editor;
 
-        // to disable a warning message from ACE about a deprecated method
+        //to disable a warning message from ACE about a deprecated method
         this.editor.$blockScrolling = Infinity;
 
         this.session = this.editor.getSession();
@@ -29,19 +29,12 @@ export class ExpressionEditor extends AbstractCodeEditor {
         this.setTheme('twilight');
         this.setMode("javascript");
 
-        this.subs.push(
-            this.expressionStream
-                .filter(expression => expression.length > 0)
-                .subscribe((expression: string) => {
-                    this.setText(expression);
-                })
-        );
+        this.setText(this.expression);
 
         this.expressionChanges = Observable.fromEvent(this.editor as any, "change")
             .debounceTime(300)
             .map(_ => this.document.getValue())
             .distinctUntilChanged()
-            .withLatestFrom(this.expressionStream, (expression) => expression)
             .share();
     }
 

@@ -1,14 +1,14 @@
-import {Observable} from "rxjs/Observable";
+import {Subject} from "rxjs/Subject";
 
 export class ExpressionEditorData {
-    expression: Observable<string>;
-    updateAction: any;
+    expression: string;
+    newExpressionChange: Subject<any>;
 
     constructor(attrs: {
-        expression: Observable<string>;
-        updateAction: any;
+        expression: string;
+        newExpressionChange: Subject<any>;
     }) {
         this.expression = attrs.expression;
-        this.updateAction = attrs.updateAction;
+        this.newExpressionChange = attrs.newExpressionChange;
     }
 }

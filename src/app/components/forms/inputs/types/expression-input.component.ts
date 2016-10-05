@@ -1,85 +1,35 @@
-import {Component, Input, OnDestroy} from "@angular/core";
-import {FormControl, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
-import {EventHubService} from "../../../../services/event-hub/event-hub.service";
-import {
-    OpenExpressionEditor,
-    UpdateBaseCommandExpression,
-    UpdateInputPortExpression
-} from "../../../../action-events/index";
-import {ExpressionInputService} from "../../../../services/expression-input/expression-input.service";
-import {Subscription} from "rxjs/Subscription";
+import {Component, Input, Output, EventEmitter} from "@angular/core";
+import {REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES, AbstractControl} from "@angular/forms";
 
 require("./expression-input.component.scss");
 
-export type ExpressionInputType = "baseCommand" | "inputPortValue";
+export type ExpressionInputType = "baseCommands" | "inputPortValue";
 
 @Component({
     selector: 'expression-input',
-    providers: [ExpressionInputService],
     directives: [
         REACTIVE_FORM_DIRECTIVES,
         FORM_DIRECTIVES
     ],
     template: `
-            <div class="input-group expression-input-group">
-                <input class="form-control" [formControl]="inputControl"/>
+            <div class="input-group expression-input-group" *ngIf="control">
+                <input class="form-control" [formControl]="control"/>
                     
-                <span class="input-group-addon add-expression">
-                    <button type="button" 
-                        class="btn btn-secondary expression-form-btn" 
-                        (click)="openExpressionSidebar()">Add expression</button>
+                <span class="input-group-addon add-expression" (click)="openExpressionSidebar()">
+                    <i class="fa fa-2x fa-code expression-form-btn"></i>
                 </span>
             </div>
         `
 })
-export class ExpressionInputComponent implements OnDestroy {
-
-    /** The form control passed from the parent */
-    @Input()
-    public inputControl: FormControl;
+export class ExpressionInputComponent {
 
     @Input()
-    public expressionType: any;
+    public control: AbstractControl;
 
-    private updateAction: any;
-
-    private expressionInputService: ExpressionInputService;
-
-    private subs: Subscription[];
-
-    constructor(private eventHubService: EventHubService) {
-        this.expressionInputService = new ExpressionInputService();
-        this.subs = [];
-    }
+    @Output()
+    public onSelect = new EventEmitter();
 
     private openExpressionSidebar(): void {
-        this.expressionInputService.setExpression(this.inputControl.value);
-
-        let updateExpressionValue = this.expressionInputService.expression.subscribe(expression => {
-            this.inputControl.updateValue(expression, {
-                onlySelf: false,
-                emitEvent: true
-            });
-        });
-
-        switch(this.expressionType) {
-            case "baseCommand":
-                this.updateAction = (expression) => new UpdateBaseCommandExpression(expression);
-                break;
-            case "inputPortValue":
-                this.updateAction = (expression) => new UpdateInputPortExpression(expression);
-                break;
-        }
-
-        this.eventHubService.publish(new OpenExpressionEditor({
-            expression: this.expressionInputService.expression,
-            updateAction: this.updateAction
-        }));
-
-        this.subs.push(updateExpressionValue);
-    }
-
-    ngOnDestroy(): void {
-        this.subs.forEach(sub => sub.unsubscribe());
+        this.onSelect.emit();
     }
 }

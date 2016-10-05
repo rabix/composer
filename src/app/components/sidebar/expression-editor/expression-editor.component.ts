@@ -1,11 +1,11 @@
 import {Component, ElementRef, ViewChild, OnInit, OnDestroy} from "@angular/core";
 import {ExpressionEditor} from "./expression-editor";
-import {Observable} from "rxjs/Observable";
 import {EventHubService} from "../../../services/event-hub/event-hub.service";
 import {ExpressionEditorData} from "../../../models/expression-editor-data.model";
 import {OpenExpressionEditor} from "../../../action-events/index";
 import {SandboxService, SandboxResponse} from "../../../services/sandbox/sandbox.service";
 import {Subscription} from "rxjs/Subscription";
+import {Subject} from "rxjs/Subject";
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import TextMode = AceAjax.TextMode;
@@ -36,10 +36,10 @@ require ("./expression-editor.component.scss");
 export class ExpressionEditorComponent implements OnInit, OnDestroy {
 
     /** Expression stream coming form the tool */
-    private expressionStream: Observable<string>;
+    private expression: string;
 
     /** Update action to be passed to the event hub */
-    private updateAction: Function;
+    private newValueStream: Subject<any>;
 
     /** Reference to the element in which we want to instantiate the Ace editor */
     @ViewChild("ace")
@@ -66,10 +66,10 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
             .subscribe((data:ExpressionEditorData) => {
                 this.initSandbox();
 
-                this.expressionStream = data.expression;
-                this.updateAction = data.updateAction;
+                this.expression = data.expression;
+                this.newValueStream = data.newExpressionChange;
 
-                this.editor = new ExpressionEditor(ace.edit(this.aceContainer.nativeElement), this.expressionStream);
+                this.editor = new ExpressionEditor(ace.edit(this.aceContainer.nativeElement), this.expression);
                 this.listenToExpressionChanges();
             });
 
@@ -79,7 +79,6 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
     private listenToExpressionChanges(): void {
         let expressionChanges = this.editor.expressionChanges.subscribe(expression => {
             this.codeToEvaluate = expression;
-            this.eventHub.publish(this.updateAction(expression));
         });
 
         this.subs.push(expressionChanges);
@@ -89,24 +88,21 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
         this.sandboxService = new SandboxService();
         this.codeToEvaluate = '';
         this.evaluatedExpression = '';
-
-        let expressionResult = this.sandboxService.expressionResult
-            .filter(result => result !== undefined)
-            .subscribe((result: SandboxResponse) => {
-
-                if (result.error) {
-                    //TODO: make error message nicer on the UI
-                    this.evaluatedExpression = result.error;
-                } else {
-                    this.evaluatedExpression = result.output;
-                }
-            });
-
-        this.subs.push(expressionResult);
     }
 
     private execute(): void {
-        this.sandboxService.submit(this.codeToEvaluate);
+        this.subs.push(
+            this.sandboxService.submit(this.codeToEvaluate)
+                .subscribe((result: SandboxResponse) => {
+                    if (result.error) {
+                        //TODO: make error message nicer on the UI
+                        this.evaluatedExpression = result.error;
+                    } else {
+                        this.evaluatedExpression = result.output;
+                        this.newValueStream.next(this.evaluatedExpression);
+                    }
+                })
+        );
     }
 
     ngOnDestroy(): void {
