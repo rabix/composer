@@ -6,6 +6,11 @@ import {ExpressionModel} from "cwlts/lib/models/d2sb";
 
 export type BaseCommand = string | ExpressionModel;
 
+type UpdateBaseCommand = {
+    index: number,
+    newBaseCommand: BaseCommand
+}
+
 interface BaseCommandOperation {
     (baseCommands: BaseCommand[]): BaseCommand[];
 }
@@ -23,19 +28,12 @@ export class BaseCommandService {
     private newBaseCommand: Subject<BaseCommand> = new Subject<BaseCommand>();
 
     /** Stream for adding new imports */
-    private deletedBaseCommand: Subject<BaseCommand> = new Subject<BaseCommand>();
+    private deletedBaseCommand: Subject<number> = new Subject<number>();
 
-    private updatedBaseCommand: Subject<any> = new Subject<any>();
+    private updatedBaseCommand: Subject<UpdateBaseCommand> = new Subject<UpdateBaseCommand>();
 
     /** Stream that aggregates all changes on the exposedList list */
     private baseCommandsUpdate: BehaviorSubject<BaseCommandOperation> = new BehaviorSubject<BaseCommandOperation>(undefined);
-
-    /** The currently  selected input port */
-    public selectedBaseCommand: Observable<BaseCommand>;
-    public lastSelectedBaseCommand: BaseCommand;
-
-    /** Stream for changing the currently selected input port */
-    private changeSelectedCommand: BehaviorSubject<BaseCommand> = new BehaviorSubject<BaseCommand>(undefined);
 
     constructor() {
         /* Subscribe the exposedList to baseCommandsUpdate */
@@ -63,11 +61,9 @@ export class BaseCommandService {
 
         /* Delete input ports */
         this.deletedBaseCommand
-            .map((baseCommandToDelete: BaseCommand): BaseCommandOperation => {
+            .map((index: number): BaseCommandOperation => {
                 return (baseCommands: BaseCommand[]) => {
-                    const index = baseCommands.indexOf(baseCommandToDelete);
-
-                    if (index !== -1) {
+                    if (typeof baseCommands[index] !== 'undefined' && baseCommands[index] !== null) {
                         baseCommands.splice(index, 1);
                     }
 
@@ -92,28 +88,18 @@ export class BaseCommandService {
                 };
             })
             .subscribe(this.baseCommandsUpdate);
-
-        /* Set selected input port */
-        this.selectedBaseCommand = this.changeSelectedCommand.map(baseCommand => {
-            this.lastSelectedBaseCommand = baseCommand;
-            return baseCommand
-        });
     }
 
     public addCommand(baseCommand: BaseCommand): void {
         this.newBaseCommand.next(baseCommand);
     }
 
-    public deleteBaseCommand(baseCommand: BaseCommand): void {
-        this.deletedBaseCommand.next(baseCommand);
-    }
-
-    public setSelectedCommand(baseCommand: BaseCommand): void {
-        this.changeSelectedCommand.next(baseCommand);
+    public deleteBaseCommand(index: number): void {
+        this.deletedBaseCommand.next(index);
     }
 
     public updateCommand(index: number, newBaseCommand: BaseCommand): void {
-        this.updatedBaseCommand.next({
+        this.updatedBaseCommand.next(<UpdateBaseCommand>{
             index: index,
             newCommand: newBaseCommand
         });
@@ -125,8 +111,7 @@ export class BaseCommandService {
         });
     }
 
-    //TODO (mate): make this simpler, too hard to read
-    public baseCommandToInputArray(toolBaseCommand: Array<BaseCommand>): BaseCommand[] {
+    public baseCommandsToFormList(toolBaseCommand: Array<BaseCommand>): BaseCommand[] {
         const commandInputList: BaseCommand[] = [];
 
         if (!toolBaseCommand) {

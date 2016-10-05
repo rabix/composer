@@ -18,7 +18,7 @@ describe("BaseCommandService", () => {
         baseCommandService = baseCommands;
     }));
 
-    describe("baseCommandToInputArray", () => {
+    describe("baseCommandsToFormList", () => {
 
         it("Should put subsequent string items as one list item", () => {
             const inputBaseCommand: Array<string> = [
@@ -27,7 +27,7 @@ describe("BaseCommandService", () => {
                 "string 3"
             ];
 
-            const result: Array<string | Object> = baseCommandService.baseCommandToInputArray(inputBaseCommand);
+            const result: Array<string | Object> = baseCommandService.baseCommandsToFormList(inputBaseCommand);
             expect(result).toEqual(["string 1 string 2 string 3"]);
         });
 
@@ -43,7 +43,7 @@ describe("BaseCommandService", () => {
                 "string 7"
             ];
 
-            const result: Array<BaseCommand> = baseCommandService.baseCommandToInputArray(inputBaseCommand);
+            const result: Array<BaseCommand> = baseCommandService.baseCommandsToFormList(inputBaseCommand);
             expect(result).toEqual([
                 { class: "Expression", engine: "cwl-js-engine", script: "string"},
                 "string 1 string 2",
@@ -56,7 +56,7 @@ describe("BaseCommandService", () => {
 
 
         /*it("Should put a string command input into an array", () => {
-            const result: Array<string | Object> = baseCommandService.baseCommandToInputArray("echo");
+            const result: Array<string | Object> = baseCommandService.baseCommandsToFormList("echo");
             expect(result).toEqual(["echo"]);
         });*/
     });
@@ -99,13 +99,13 @@ describe("BaseCommandService", () => {
         });
     });
 
-    describe("setSelectedCommand", () => {
+    describe("setSelectedIndex", () => {
         it("Should update the selectedBaseCommand stream", (done) => {
             baseCommandService.addCommand("echo");
             baseCommandService.addCommand("cat");
             baseCommandService.addCommand("grep");
 
-            baseCommandService.setSelectedCommand("echo");
+            baseCommandService.setSelectedIndex("echo");
 
             baseCommandService.selectedBaseCommand
                 .subscribe((selectedBaseCommand) => {
@@ -127,7 +127,7 @@ describe("BaseCommandService", () => {
 
             const newCommand = "echo 123";
 
-            //baseCommandService.setSelectedCommand(command1);
+            //baseCommandService.setSelectedIndex(command1);
 
             baseCommandService.updateCommand(0, newCommand);
 
