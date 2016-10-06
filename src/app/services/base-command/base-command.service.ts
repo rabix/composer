@@ -159,4 +159,24 @@ export class BaseCommandService {
 
         return commandInputList;
     }
+
+    public formListToBaseCommandArray(formCommandList: BaseCommand[]) {
+        let commandList: BaseCommand[] = [];
+
+        if (!formCommandList) {
+            return commandList;
+        }
+
+        formCommandList.forEach((command) => {
+            //If it's a string
+            if (typeof command === "string") {
+                const stringArray = command.split(" ");
+                commandList = commandList.concat(stringArray);
+            } else {
+                commandList.push(command);
+            }
+        });
+
+        return commandList;
+    }
 }

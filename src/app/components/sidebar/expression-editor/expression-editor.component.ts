@@ -6,6 +6,8 @@ import {OpenExpressionEditor} from "../../../action-events/index";
 import {SandboxService, SandboxResponse} from "../../../services/sandbox/sandbox.service";
 import {Subscription} from "rxjs/Subscription";
 import {Subject} from "rxjs/Subject";
+import {ExpressionModel} from "cwlts/lib/models/d2sb";
+import {BaseCommand} from "../../../services/base-command/base-command.service";
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import TextMode = AceAjax.TextMode;
@@ -39,7 +41,7 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
     private expression: string;
 
     /** Update action to be passed to the event hub */
-    private newValueStream: Subject<any>;
+    private newValueStream: Subject<BaseCommand>;
 
     /** Reference to the element in which we want to instantiate the Ace editor */
     @ViewChild("ace")
@@ -56,6 +58,8 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
     private sandboxService: SandboxService;
 
     private subs: Subscription[];
+
+    private sandBoxSub: Subscription;
 
     constructor(private eventHub: EventHubService) {
         this.subs = [];
@@ -91,18 +95,33 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
     }
 
     private execute(): void {
-        this.subs.push(
-            this.sandboxService.submit(this.codeToEvaluate)
+        this.removeSandboxSub();
+        this.sandBoxSub = this.sandboxService.submit(this.codeToEvaluate)
                 .subscribe((result: SandboxResponse) => {
                     if (result.error) {
                         //TODO: make error message nicer on the UI
                         this.evaluatedExpression = result.error;
                     } else {
                         this.evaluatedExpression = result.output;
-                        this.newValueStream.next(this.evaluatedExpression);
+
+                        if (this.evaluatedExpression === "undefined" || this.evaluatedExpression === "null") {
+                            this.newValueStream.next("");
+                        } else {
+                            this.newValueStream.next(new ExpressionModel({
+                                script: this.codeToEvaluate,
+                                expressionValue: this.evaluatedExpression
+                            }));
+                        }
+
                     }
-                })
-        );
+                });
+    }
+
+    private removeSandboxSub() {
+        if (this.sandBoxSub) {
+            this.sandBoxSub.unsubscribe();
+            this.sandBoxSub = undefined;
+        }
     }
 
     ngOnDestroy(): void {
@@ -110,6 +129,7 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
             this.editor.dispose();
         }
 
+        this.removeSandboxSub();
         this.subs.forEach(sub => sub.unsubscribe());
     }
 }

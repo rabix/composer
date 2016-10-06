@@ -1,5 +1,5 @@
 import {Observable} from "rxjs/Observable";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {Subject} from "rxjs/Subject";
 const jailed = require('jailed');
 
 export interface SandboxResponse {
@@ -23,19 +23,16 @@ export class SandboxService {
     /** Result of the expression evaluation */
     private expressionResult: Observable<SandboxResponse>;
 
-    private updateExpressionResult: BehaviorSubject<SandboxResponse> = new BehaviorSubject<SandboxResponse>(undefined);
+    private updateExpressionResult: Subject<SandboxResponse> = new Subject<SandboxResponse>(undefined);
 
     constructor() {
         const self = this;
 
         this.expressionResult = this.updateExpressionResult
-            .filter(result => result !== undefined)
-            .publishReplay(1)
-            .refCount();
+            .filter(result => result !== undefined);
 
         this.jailedApi = {
             output: function(data) {
-
                 const output: string = self.stringify(data.output);
                 const error: string = data.error;
 
@@ -57,8 +54,6 @@ export class SandboxService {
 
         const $job: string = this.exposedJob ? JSON.stringify(this.exposedJob): undefined;
         const $self: string = this.exposedSelf ? JSON.stringify(this.exposedSelf): undefined;
-
-        //Not using ES6 here, because this code is loaded at runtime, and we can't be sure that the browser supports ES6
         const expressionCode = this.createExpressionCode(codeToExecute, $job, $self);
 
         this.plugin = new jailed.DynamicPlugin(expressionCode, this.jailedApi);

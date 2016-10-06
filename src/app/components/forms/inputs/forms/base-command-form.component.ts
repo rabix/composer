@@ -12,6 +12,7 @@ import {OpenExpressionEditor, CloseExpressionEditor} from "../../../../action-ev
 import {Subscription} from "rxjs/Subscription";
 import {BaseCommandService, BaseCommand} from "../../../../services/base-command/base-command.service";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {ExpressionModel} from "cwlts/lib/models/d2sb";
 
 require("./base-command-form.components.scss");
 
@@ -75,7 +76,7 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
     private subs: Subscription[];
 
     /** Expression values coming from the expression editor subs */
-    private expressionInputSubs: Subscription[];
+    private expressionInputSub: Subscription;
 
     private selectedIndex: number;
 
@@ -84,7 +85,6 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
                 private formBuilder: FormBuilder) {
 
         this.subs = [];
-        this.expressionInputSubs = [];
     }
 
     ngOnInit(): void {
@@ -101,15 +101,14 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
 
     private createExpressionInputForms(commandList: BaseCommand[]) {
         commandList.forEach((command, index) => {
+            let formValue: string = "";
 
             if (this.baseCommandForm.contains('baseCommand' + index)) {
                 this.baseCommandForm.removeControl('baseCommand' + index);
             }
 
-            let formValue: string = "";
-
-            if (typeof command === "ExpressionModel" && command.expressionValue) {
-                formValue = command.expressionValue;
+            if ((<ExpressionModel>command).expressionValue) {
+                formValue = (<ExpressionModel>command).expressionValue;
             } else if (typeof command === "string") {
                 formValue = command;
             }
@@ -129,58 +128,45 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
             this.eventHubService.publish(new CloseExpressionEditor());
         }
 
-        if (this.selectedIndex > 0) {
+        if (this.selectedIndex > index) {
             this.selectedIndex--;
+        } else if (this.selectedIndex === index) {
+            this.selectedIndex = undefined;
         }
     }
 
     private editBaseCommand(inputControl: AbstractControl, index: number): void {
-        const newBaseCommand: BehaviorSubject<BaseCommand> = new BehaviorSubject<BaseCommand>(undefined);
-        this.selectedIndex = index;
-        this.expressionInputSubs.forEach(sub => sub.unsubscribe());
+        const newExpression: BehaviorSubject<BaseCommand> = new BehaviorSubject<BaseCommand>(undefined);
 
-        this.expressionInputSubs.push(
-            newBaseCommand
-                .filter(command => command !== undefined)
-                .subscribe(command => {
-                    this.baseCommandService.updateCommand(index, command);
-                    inputControl.setValue(command);
-                })
-        );
+        this.selectedIndex = index;
+        this.removeExpressionInputSub();
+
+        this.expressionInputSub = newExpression
+            .filter(expression => expression !== undefined)
+            .subscribe((expression: ExpressionModel) => {
+                this.baseCommandService.updateCommand(index, expression);
+            });
+
 
         this.eventHubService.publish(new OpenExpressionEditor({
             expression: inputControl.value,
-            newExpressionChange: newBaseCommand
+            newExpressionChange: newExpression
         }));
     }
 
     private addBaseCommand(): void {
-        const newBaseCommand: string = "";
-        const newExpressionValue: BehaviorSubject<BaseCommand> = new BehaviorSubject<BaseCommand>(undefined);
-        const index = this.baseCommandFormList.length;
+        this.baseCommandService.addCommand("");
+    }
 
-        this.selectedIndex = index;
-        this.expressionInputSubs.forEach(sub => sub.unsubscribe());
-
-        this.expressionInputSubs.push(
-            newExpressionValue
-                .filter(command => command !== undefined)
-                .subscribe(command => {
-                    this.baseCommandService.updateCommand(index, command);
-                    this.baseCommandForm.controls['baseCommand' + index].setValue(command);
-                })
-        );
-
-        this.baseCommandService.addCommand(newBaseCommand);
-
-        this.eventHubService.publish(new OpenExpressionEditor({
-            expression: newBaseCommand,
-            newExpressionChange: newExpressionValue
-        }));
+    private removeExpressionInputSub(): void {
+        if (this.expressionInputSub) {
+            this.expressionInputSub.unsubscribe();
+            this.expressionInputSub = undefined;
+        }
     }
 
     ngOnDestroy(): void {
-        this.expressionInputSubs.forEach(sub => sub.unsubscribe());
+        this.removeExpressionInputSub();
         this.subs.forEach(sub => sub.unsubscribe());
     }
 }
