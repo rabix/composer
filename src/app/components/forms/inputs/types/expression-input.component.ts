@@ -15,6 +15,7 @@ export type ExpressionInputType = "baseCommand" | "inputPortValue";
 
 @Component({
     selector: 'expression-input',
+    providers: [ExpressionInputService],
     directives: [
         REACTIVE_FORM_DIRECTIVES,
         FORM_DIRECTIVES

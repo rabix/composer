@@ -8,14 +8,11 @@ import {ModalService} from "../modal";
 import {Observable} from "rxjs/Rx";
 import {Component, ViewChild, ViewContainerRef, AfterViewInit} from "@angular/core";
 import {UrlValidator} from "../../validators/url.validator";
-import {WebWorkerService} from "../../services/webWorker/web-worker.service";
 import {ContextService} from "../../services/context/context.service";
-import {InputPortService} from "../../services/input-port/input-port.service";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {LayoutComponent} from "../layout/layout.component";
 import {ExpressionInputService} from "../../services/expression-input/expression-input.service";
-import {UserPreferencesService} from "../../services/storage/user-preferences.service";
-import {DomEventService} from "../../services/dom/dom-event.service";
+import {WorkboxComponent} from "../workbox/workbox.component";
 
 require("./../../../assets/sass/main.scss");
 
@@ -43,9 +40,6 @@ require("./main.component.scss");
         DomEventService,
         ModalService,
         UrlValidator,
-        WebWorkerService,
-        InputPortService,
-        ExpressionInputService,
         PlatformAPI
     ]
 })

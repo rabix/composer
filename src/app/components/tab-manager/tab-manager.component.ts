@@ -1,4 +1,4 @@
-import {Component, Input} from "@angular/core";
+import {Component, OnInit, Input, OnDestroy} from "@angular/core";
 import {FileModel} from "../../store/models/fs.models";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {ToolContainerComponent} from "../tool-container/tool-container.component";
@@ -9,6 +9,7 @@ import {ValidationResponse} from "../../services/webWorker/json-schema/json-sche
 
 @Component({
     selector: "tab-manager",
+    providers: [WebWorkerService],
     directives: [CodeEditorComponent, ToolContainerComponent, WorkflowContainerComponent],
     template: `
 <block-loader *ngIf="isLoading"></block-loader>
@@ -19,7 +20,7 @@ import {ValidationResponse} from "../../services/webWorker/json-schema/json-sche
     <code-editor [fileStream]="file" *ngSwitchCase="'text'"></code-editor>
 </div>`
 })
-export class TabManagerComponent {
+export class TabManagerComponent implements OnInit, OnDestroy {
 
     @Input()
     private file: Observable<FileModel>;
@@ -32,9 +33,7 @@ export class TabManagerComponent {
 
     private subs: Subscription[] = [];
 
-    constructor() {
-        this.webWorkerService = new WebWorkerService();
-    }
+    constructor(private webWorkerService: WebWorkerService) { }
 
     ngOnInit() {
 
@@ -65,5 +64,6 @@ export class TabManagerComponent {
 
     ngOnDestroy() {
         this.subs.forEach(s => s.unsubscribe());
+        this.webWorkerService.dispose();
     }
 }
