@@ -11,11 +11,11 @@ import {
     OpenExpressionEditor,
     CloseInputInspector,
     CloseExpressionEditor
-} from "../../action-events/index";
+} from "../../action-events";
 import {
     CommandInputParameterModel as InputProperty,
     CommandLineToolModel
-} from "cwlts/lib/models/d2sb";
+} from "cwlts/models/d2sb";
 import {Observable} from "rxjs";
 
 require("./clt-editor.component.scss");

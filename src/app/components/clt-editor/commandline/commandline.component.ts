@@ -1,5 +1,5 @@
 import {Component, Input, ChangeDetectionStrategy} from "@angular/core";
-import {CommandLinePart} from "cwlts/lib/models/helpers/CommandLinePart";
+import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
 
 /** TODO: make this switch between an expression editor and an object inspector*/
 @Component({

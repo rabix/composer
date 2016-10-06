@@ -1,6 +1,6 @@
 import {JsonSchemaService} from "./json-schema.service";
 
-const {schemas} = require("cwlts/lib/schemas");
+const {schemas} = require("cwlts/schemas");
 
 class MockValidator {
     validate(jsonSchema) {
@@ -20,7 +20,7 @@ describe("JsonSchemaService", () => {
             draft3: schemas.draft3,
             draft4: schemas.draft4,
             draft2: schemas.draft2,
-            Validator: MockValidator
+            validator: MockValidator
         });
     });
 

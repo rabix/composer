@@ -4,17 +4,17 @@ import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {FileModel} from "../../store/models/fs.models";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {CltEditorComponent} from "../clt-editor/clt-editor.component";
-import {DynamicState} from "../runtime-compiler/dynamic-state.interface";
+import {DynamicState} from "../runtime-compiler";
 import {Subscription, Observable, ReplaySubject} from "rxjs/Rx";
 import {ToolHeaderComponent} from "./tool-header/tool-header.component";
 import {ViewModeService} from "./services/view-mode.service";
-import {CommandLineToolModel} from "cwlts/lib/models/d2sb";
+import {CommandLineToolModel} from "cwlts/models/d2sb";
 import {SidebarComponent} from "../sidebar/sidebar.component";
 import {CommandLineComponent} from "../clt-editor/commandline/commandline.component";
 import {ViewSwitcherComponent} from "../view-switcher/view-switcher.component";
 import {ValidationResponse} from "../../services/webWorker/json-schema/json-schema.service";
 import {ValidationIssuesComponent} from "../validation-issues/validation-issues.component";
-import {CommandLinePart} from "cwlts/lib/models/helpers/CommandLinePart";
+import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
 
 require("./tool-container.component.scss");
 

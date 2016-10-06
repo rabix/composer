@@ -2,9 +2,9 @@ import {Component, OnDestroy} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {Subscription} from "rxjs/Subscription";
 import {InputInspectorComponent} from "./input-inspector.component";
-import {OpenInputInspector, CloseInputInspector} from "../../../action-events/index";
+import {OpenInputInspector, CloseInputInspector} from "../../../action-events";
 import {EventHubService} from "../../../services/event-hub/event-hub.service";
-import {CommandInputParameterModel as InputProperty} from "cwlts/lib/models/d2sb";
+import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 
 @Component({
     selector: "input-inspector-sidebar-component",

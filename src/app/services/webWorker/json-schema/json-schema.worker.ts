@@ -1,6 +1,6 @@
 /// <reference no-default-lib="true"/>
 const {JsonSchemaService} = require("./json-schema.service.ts");
-const {schemas} = require("cwlts/lib/schemas");
+const {schemas} = require("cwlts/schemas");
 const AJV = require("ajv");
 
 let jsonSchemaService = new JsonSchemaService({
