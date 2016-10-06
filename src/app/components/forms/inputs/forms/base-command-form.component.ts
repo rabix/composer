@@ -35,11 +35,12 @@ require("./base-command-form.components.scss");
                                                 
                         <div *ngIf="baseCommandFormList.length > 0">
         
-                            <div *ngFor="let baseCommand of baseCommandFormList; let i = index; trackBy: baseCommand"
+                            <div *ngFor="let baseCommand of baseCommandFormList; let i = index; trackBy:trackByIndex"
                                  class="base-command-list">
                                  
                                 <expression-input class="col-sm-11"
                                                   *ngIf="baseCommandForm.controls['baseCommand' + i]" 
+                                                  [(value)]="baseCommandFormList[i]"
                                                   [control]="baseCommandForm.controls['baseCommand' + i]"
                                                   (onSelect)="editBaseCommand(baseCommandForm.controls['baseCommand' + i], i)">
                                 </expression-input>
@@ -88,18 +89,25 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.baseCommandFormList = this.baseCommandService.baseCommandsToFormList(this.toolBaseCommand);
-        this.baseCommandService.setBaseCommands(this.baseCommandFormList);
+        const commandFormList = this.baseCommandService.baseCommandsToFormList(this.toolBaseCommand);
+        this.baseCommandService.setBaseCommands(commandFormList);
 
         this.subs.push(
             this.baseCommandService.baseCommands.subscribe((commandList: BaseCommand[]) => {
                 this.baseCommandFormList = commandList;
-                this.createExpressionInputForms(this.baseCommandFormList);
+                this.createExpressionInputControls(this.baseCommandFormList);
+
+                //Format the base commands from the inputs, and set the tool baseCommand
+                this.toolBaseCommand = this.baseCommandService.formListToBaseCommandArray(this.baseCommandFormList);
             })
         );
     }
 
-    private createExpressionInputForms(commandList: BaseCommand[]) {
+    private trackByIndex(index: number): any {
+        return index;
+    }
+
+    private createExpressionInputControls(commandList: BaseCommand[]) {
         commandList.forEach((command, index) => {
             let formValue: string = "";
 
@@ -118,10 +126,15 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
             });
 
             this.baseCommandForm.addControl('baseCommand' + index, expressionInputForm.controls['baseCommand' + index]);
+
+            this.baseCommandForm.controls['baseCommand' + index].valueChanges.subscribe(value => {
+                this.baseCommandService.updateCommand(index, value);
+            });
         });
     }
 
     private removeBaseCommand(index: number): void {
+        this.baseCommandForm.removeControl('baseCommand ' + index);
         this.baseCommandService.deleteBaseCommand(index);
 
         if (this.selectedIndex === index) {
@@ -137,7 +150,6 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
 
     private editBaseCommand(inputControl: AbstractControl, index: number): void {
         const newExpression: BehaviorSubject<BaseCommand> = new BehaviorSubject<BaseCommand>(undefined);
-
         this.selectedIndex = index;
         this.removeExpressionInputSub();
 
@@ -146,7 +158,6 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
             .subscribe((expression: ExpressionModel) => {
                 this.baseCommandService.updateCommand(index, expression);
             });
-
 
         this.eventHubService.publish(new OpenExpressionEditor({
             expression: inputControl.value,

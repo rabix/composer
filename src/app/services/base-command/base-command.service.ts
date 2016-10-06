@@ -1,6 +1,5 @@
 import {Injectable} from "@angular/core";
 import {Observable} from "rxjs/Observable";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {Subject} from "rxjs/Subject";
 import {ExpressionModel} from "cwlts/lib/models/d2sb";
 
@@ -33,7 +32,7 @@ export class BaseCommandService {
     private updatedBaseCommand: Subject<UpdateBaseCommand> = new Subject<UpdateBaseCommand>();
 
     /** Stream that aggregates all changes on the exposedList list */
-    private baseCommandsUpdate: BehaviorSubject<BaseCommandOperation> = new BehaviorSubject<BaseCommandOperation>(undefined);
+    private baseCommandsUpdate: Subject<BaseCommandOperation> = new Subject<BaseCommandOperation>();
 
     constructor() {
         /* Subscribe the exposedList to baseCommandsUpdate */
@@ -170,7 +169,11 @@ export class BaseCommandService {
         formCommandList.forEach((command) => {
             //If it's a string
             if (typeof command === "string") {
-                const stringArray = command.split(" ");
+                //Replace subsequent whitespaces with single white space and trim
+                const trimmedCommand = command.replace(/ +(?= )/g,'').trim();
+
+                //Split on spaces
+                const stringArray = trimmedCommand.split(" ");
                 commandList = commandList.concat(stringArray);
             } else {
                 commandList.push(command);
