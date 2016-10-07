@@ -55,10 +55,8 @@ require("./input-inspector.component.scss");
                 <div class="form-group">
                     <label for="inputValue">Value</label>
                     
-                    <expression-input [inputControl]="inputInspectorForm.controls['expression']"
-                                    [expressionType]="expressionInputType">
-                    </expression-input>
-               
+                   <!-- <expression-input>
+                    </expression-input>-->
                 </div>
             </form>
     `
@@ -90,6 +88,7 @@ export class InputInspectorComponent implements OnInit, OnDestroy {
     ngOnInit() {
         let inputModelStreamUpdate = this.inputModelStream.subscribe((inputPort: InputProperty) => {
             this.selectedProperty = inputPort;
+            console.log(inputPort);
 
             this.inputInspectorForm = this.formBuilder.group({
                 expression: [this.selectedProperty.getValueFrom(), Validators.compose([Validators.required, Validators.minLength(1)])]
