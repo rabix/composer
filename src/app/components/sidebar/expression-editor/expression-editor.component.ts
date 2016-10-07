@@ -7,7 +7,6 @@ import {SandboxService, SandboxResponse} from "../../../services/sandbox/sandbox
 import {Subscription} from "rxjs/Subscription";
 import {Subject} from "rxjs/Subject";
 import {ExpressionModel} from "cwlts/lib/models/d2sb";
-import {BaseCommand} from "../../../services/base-command/base-command.service";
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import TextMode = AceAjax.TextMode;
@@ -41,7 +40,7 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
     private expression: string;
 
     /** Update action to be passed to the event hub */
-    private newValueStream: Subject<BaseCommand>;
+    private newValueStream: Subject<string | ExpressionModel>;
 
     /** Reference to the element in which we want to instantiate the Ace editor */
     @ViewChild("ace")
@@ -74,6 +73,7 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
                 this.newValueStream = data.newExpressionChange;
 
                 this.editor = new ExpressionEditor(ace.edit(this.aceContainer.nativeElement), this.expression);
+                this.codeToEvaluate = this.expression;
                 this.listenToExpressionChanges();
             });
 

@@ -159,8 +159,18 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
                 this.baseCommandService.updateCommand(index, expression);
             });
 
+        const selectedExpression = this.baseCommandFormList[index];
+        let expression: string = "";
+
+        if ((<ExpressionModel>selectedExpression).script) {
+            expression = (<ExpressionModel>selectedExpression).script;
+
+        } else if (typeof selectedExpression === "string") {
+            expression = selectedExpression;
+        }
+
         this.eventHubService.publish(new OpenExpressionEditor({
-            expression: inputControl.value,
+            expression: expression,
             newExpressionChange: newExpression
         }));
     }
