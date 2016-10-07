@@ -19,8 +19,8 @@ export class TreeViewService {
 
         Observable.fromEvent(document, "keydown")
             .filter((event: KeyboardEvent) => event.srcElement.classList.contains("node-base"))
-            .do(ev => ev.preventDefault())
-            .map(event => event.which)
+            .do((event: KeyboardEvent) => event.preventDefault())
+            .map((event: KeyboardEvent) => event.which)
             .scan((acc, key) => {
                 const letter = String.fromCharCode(key).toLowerCase();
 

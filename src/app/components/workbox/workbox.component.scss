@@ -2,14 +2,14 @@
 
 .ct-workbox-head {
   color: white;
-  height: 44px;
+  height: $workbox-tabs-height;
   width: 100%;
   background: $brand-primary-bg;
 }
 
 .ct-workbox-body {
-  background: $body-bg-background;
-  height: 100%;
+  background: $body-background;
+  height: calc(100% - #{$workbox-tabs-height});
   color: $text-dark;
 }
 
@@ -71,7 +71,7 @@
     &.active, &.active:before, &.active:after {
       z-index: 1;
       color: $brand-primary;
-      background-image: -webkit-linear-gradient(top, $body-bg-foreground, $body-bg-background);
+      background-image: -webkit-linear-gradient(top, $body-foreground, $body-background);
     }
 
     &, &:before, &:after {
