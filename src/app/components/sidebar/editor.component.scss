@@ -3,23 +3,37 @@
 .tool-sidebar {
     display: block;
     position: absolute;
-    right: 0;
-    top: 0;
-    width: 40%;
+    width: 100%;
     height: 100%;
-    z-index: -1;
 }
 
 .black {
     color: #000000;
 }
 
-.sidebar-component {
+sidebar-component {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 40%;
     height: 100%;
+
+    .sidebar-container {
+        width: 0;
+        float: right;
+        height: 100%;
+        transition: width 300ms;
+
+        &.show {
+            width: 100%;
+        }
+    }
 }
 
-.isTopOfStack {
-    z-index: 0;
+.sidebar-component {
+    height: 100%;
+    width: 100%;
+    position: relative;
 }
 
 .collapse-icon {
@@ -33,8 +47,3 @@
     background: transparent;
 }
 
-.sidebar-content {
-    height: 100%;
-    width: 100%;
-    position: relative;
-}

@@ -1,13 +1,13 @@
 /// <reference no-default-lib="true"/>
 const {JsonSchemaService} = require("./json-schema.service.ts");
-const {schemas} = require("cwlts/lib/schemas");
-const Validator = require("jsonschema").Validator;
+const {schemas} = require("cwlts/schemas");
+const AJV = require("ajv");
 
 let jsonSchemaService = new JsonSchemaService({
     draft3: schemas.draft3,
     draft4: schemas.draft4,
     draft2: schemas.d2sb,
-    Validator: Validator
+    validator: new AJV({})
 });
 
 class JsonSchemaWorker {
