@@ -8,6 +8,8 @@ import {
 } from "@angular/forms";
 import {CommandLineToolModel} from "cwlts/lib/models/d2sb";
 
+require("./shared/form.components.scss");
+
 @Component({
     selector: 'docker-input-form',
     directives: [
@@ -17,7 +19,7 @@ import {CommandLineToolModel} from "cwlts/lib/models/d2sb";
     template: `
             <form [formGroup]="dockerInputForm">
                 <fieldset class="form-group">
-                    <button type="button" class="btn btn-secondary hide-btn">Hide</button>
+                    <button type="button" class="btn btn-link hide-btn">Hide</button>
                
                         <label>Docker image</label>
                         <label class="secondary-label">Docker Repository</label>

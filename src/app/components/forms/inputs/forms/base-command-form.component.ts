@@ -1,12 +1,5 @@
 import {Component, Input, OnInit, OnDestroy} from "@angular/core";
-import {
-    FormGroup,
-    REACTIVE_FORM_DIRECTIVES,
-    FORM_DIRECTIVES,
-    Validators,
-    FormBuilder,
-    AbstractControl
-} from "@angular/forms";
+import {FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES, Validators, FormBuilder} from "@angular/forms";
 import {EventHubService} from "../../../../services/event-hub/event-hub.service";
 import {OpenExpressionEditor, CloseExpressionEditor} from "../../../../action-events/index";
 import {Subscription} from "rxjs/Subscription";
@@ -15,6 +8,7 @@ import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {ExpressionModel} from "cwlts/lib/models/d2sb";
 
 require("./base-command-form.components.scss");
+require("./shared/form.components.scss");
 
 @Component({
     selector: 'base-command-form',
@@ -28,7 +22,7 @@ require("./base-command-form.components.scss");
     template: `
              <form *ngIf="baseCommandForm" [formGroup]="baseCommandForm">
                 <fieldset class="form-group">
-                        <button type="button" class="btn btn-secondary hide-btn">Hide</button>
+                        <button type="button" class="btn btn-link hide-btn">Hide</button>
                
                         <label>Base Command</label>
                         <label class="secondary-label">What command do you want to call from the image</label>
@@ -42,7 +36,7 @@ require("./base-command-form.components.scss");
                                                   *ngIf="baseCommandForm.controls['baseCommand' + i]" 
                                                   [(value)]="baseCommandFormList[i]"
                                                   [control]="baseCommandForm.controls['baseCommand' + i]"
-                                                  (onSelect)="editBaseCommand(baseCommandForm.controls['baseCommand' + i], i)">
+                                                  (onSelect)="editBaseCommand(i)">
                                 </expression-input>
                               
                                 <span class="close-icon col-sm-1">
@@ -148,7 +142,7 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
         }
     }
 
-    private editBaseCommand(inputControl: AbstractControl, index: number): void {
+    private editBaseCommand(index: number): void {
         const newExpression: BehaviorSubject<BaseCommand> = new BehaviorSubject<BaseCommand>(undefined);
         this.selectedIndex = index;
         this.removeExpressionInputSub();

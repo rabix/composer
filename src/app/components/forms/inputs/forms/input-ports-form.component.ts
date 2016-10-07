@@ -6,6 +6,7 @@ import {OpenInputInspector} from "../../../../action-events/index";
 import {CommandLineToolModel} from "cwlts/lib/models/d2sb";
 
 require("./input-ports-form.component.scss");
+require("./shared/form.components.scss");
 
 @Component({
     selector: 'inputs-ports-form',
@@ -16,7 +17,7 @@ require("./input-ports-form.component.scss");
             <fieldset class="form-group">
                 <label>Input ports</label>
                 
-                <button type="button" class="btn btn-secondary hide-btn">Hide</button>
+                <button type="button" class="btn btn-link hide-btn">Hide</button>
     
                 <input-port-list></input-port-list>
             </fieldset>

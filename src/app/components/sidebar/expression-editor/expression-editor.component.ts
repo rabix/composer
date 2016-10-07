@@ -2,7 +2,7 @@ import {Component, ElementRef, ViewChild, OnInit, OnDestroy} from "@angular/core
 import {ExpressionEditor} from "./expression-editor";
 import {EventHubService} from "../../../services/event-hub/event-hub.service";
 import {ExpressionEditorData} from "../../../models/expression-editor-data.model";
-import {OpenExpressionEditor} from "../../../action-events/index";
+import {OpenExpressionEditor, CloseExpressionEditor} from "../../../action-events/index";
 import {SandboxService, SandboxResponse} from "../../../services/sandbox/sandbox.service";
 import {Subscription} from "rxjs/Subscription";
 import {Subject} from "rxjs/Subject";
@@ -17,6 +17,24 @@ require ("./expression-editor.component.scss");
     selector: "expression-editor",
     template: `
          <div class="expression-editor-component">
+                <div class="expression-editor-header">
+                
+                    <span class="expression-head-text">
+                        Argument value expression
+                        <i class="fa fa-info-circle"></i>
+                    </span>
+                    
+                    <span class="expression-buttons-container">
+                        <button type="button"
+                            class="btn btn-secondary expression-editor-btn"
+                            (click)="cancel()">Cancel</button>
+                        
+                        <button type="button" 
+                            class="btn btn-success expression-editor-btn"
+                            (click)="save()">Save</button>
+                    </span>
+                </div>
+                
                 <div #ace class="ace-editor"></div>
                 
                 <div class="expression-result-container">
@@ -26,9 +44,9 @@ require ("./expression-editor.component.scss");
                             {{evaluatedExpression}}
                         </div>
                     </div>
-                        
+                    
                     <button type="button" 
-                            class="execute-btn"
+                            class="btn btn-primary expression-editor-btn execute-btn"
                             (click)="execute()">Execute</button>
                 </div>
          </div>
@@ -36,10 +54,10 @@ require ("./expression-editor.component.scss");
 })
 export class ExpressionEditorComponent implements OnInit, OnDestroy {
 
-    /** Expression stream coming form the tool */
-    private expression: string;
+    /** Expression coming form the tool */
+    private initialExpressionScript: string;
 
-    /** Update action to be passed to the event hub */
+    /** Evaluated expressions */
     private newValueStream: Subject<string | ExpressionModel>;
 
     /** Reference to the element in which we want to instantiate the Ace editor */
@@ -69,11 +87,12 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
             .subscribe((data:ExpressionEditorData) => {
                 this.initSandbox();
 
-                this.expression = data.expression;
+                this.initialExpressionScript = data.expression;
                 this.newValueStream = data.newExpressionChange;
 
-                this.editor = new ExpressionEditor(ace.edit(this.aceContainer.nativeElement), this.expression);
-                this.codeToEvaluate = this.expression;
+                this.editor = new ExpressionEditor(ace.edit(this.aceContainer.nativeElement), this.initialExpressionScript);
+                this.codeToEvaluate = this.initialExpressionScript;
+
                 this.listenToExpressionChanges();
             });
 
@@ -103,18 +122,25 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
                         this.evaluatedExpression = result.error;
                     } else {
                         this.evaluatedExpression = result.output;
-
-                        if (this.evaluatedExpression === "undefined" || this.evaluatedExpression === "null") {
-                            this.newValueStream.next("");
-                        } else {
-                            this.newValueStream.next(new ExpressionModel({
-                                script: this.codeToEvaluate,
-                                expressionValue: this.evaluatedExpression
-                            }));
-                        }
-
                     }
                 });
+    }
+
+    private cancel() {
+        this.editor.setText(this.initialExpressionScript);
+        this.codeToEvaluate = this.initialExpressionScript;
+        this.eventHub.publish(new CloseExpressionEditor());
+    }
+
+    private save() {
+        if (this.evaluatedExpression === "undefined" || this.evaluatedExpression === "null") {
+            this.newValueStream.next("");
+        } else {
+            this.newValueStream.next(new ExpressionModel({
+                script: this.codeToEvaluate,
+                expressionValue: this.evaluatedExpression
+            }));
+        }
     }
 
     private removeSandboxSub() {
