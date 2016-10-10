@@ -10,9 +10,8 @@ import {Component, ViewChild, ViewContainerRef, AfterViewInit} from "@angular/co
 import {UrlValidator} from "../../validators/url.validator";
 import {ContextService} from "../../services/context/context.service";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
-import {FileTreeComponent} from "../file-tree/file-tree.component";
 import {LayoutComponent} from "../layout/layout.component";
-import {WorkboxComponent} from "../workbox/workbox.component";
+import {DomEventService} from "../../services/dom/dom-event.service";
 
 require("./../../../assets/sass/main.scss");
 
@@ -29,9 +28,7 @@ require("./main.component.scss");
     directives: [
         MenuBarComponent,
         ContextDirective,
-        FileTreeComponent,
         LayoutComponent,
-        WorkboxComponent
     ],
     providers: [
         ComponentRegistryFactoryService,
@@ -39,6 +36,7 @@ require("./main.component.scss");
         EventHubService,
         FileRegistry,
         FileStateService,
+        DomEventService,
         ModalService,
         UrlValidator,
         PlatformAPI

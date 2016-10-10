@@ -1,29 +1,30 @@
 @import "../../../assets/sass/variables";
 
 ct-tree-view {
+  background: $brand-primary-bg;
   color: white;
   display: block;
-  padding: 4px;
-  overflow-y: auto;
   height: 100%;
-  background: $brand-primary-bg;
-
-  & > ct-tree-node > .main {
-    font-family: $font-family-title;
-    font-weight: 300;
-    text-transform: uppercase;
-  }
+  overflow-y: auto;
+  padding: 4px;
+  width: 100%;
 
   ct-tree-node {
     font-size: $font-size-sm;
     display: block;
+
   }
 
-  .main {
-    padding: 3px 12px;
-    border-radius: 4px;
-    display: flex;
+  .node-base {
+    line-height: 18px;
+    padding: 2px 4px;
+    //line-height: 16px;
+    border-radius: 2px;
+    display: inline-block;
     outline: none;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
 
     .name {
       display: inline-block;
@@ -49,7 +50,6 @@ ct-tree-view {
 
   .icon-space {
     display: inline-block;
-    //padding: 0 0 0 6px;
     width: 20px;
     margin: 0 0 0 0;
   }
@@ -65,6 +65,8 @@ ct-tree-view {
 
 .name-container {
   display: inline-block;
+  width: calc(100% - 10px);
+  vertical-align: middle;
 
   .name {
     display: inline-block;
@@ -86,7 +88,7 @@ ct-tree-view {
   &.hidden {
     height: 0;
     opacity: 0;
-    padding-left: 10px;
+    padding: 0 0 0 10px;
   }
   .term {
     white-space: pre;
