@@ -1,24 +1,72 @@
 @import "~bootstrap/scss/variables";
 
+// bootstrap overrides
+$enable-print-styles: false;
+
 $font-size-root: 15px;
-$font-family-title: "Montserrat", "Helvetica Neue", sans-serif;
+$font-family-base: "Ariel", sans-serif;
+$font-family-title: "Montserrat", "Helvetica Neue", "Ariel", sans-serif;
 
 $gui-base-gray: rgb(51, 51, 51);
 $body-background: #f3f3f3; // background color of negative space around components
 $body-foreground: white; // background color of components
+
 $text-dark: #333;
 $text-light: ghostwhite;
 $body-color: #333;
 
-$brand-primary: #2e3e4e;
-$btn-primary-bg: $brand-primary;
+//$brand-primary: #2e3e4e;
+//$btn-primary-bg: $brand-primary;
 
 // Custom Brand Stuff
 $brand-primary-bg: #22313F;
 $brand-primary-bg-dark: #1B2833;
 $brand-primary-bg-bright: #34495E;
 
+/**
+*  SBG Variables
+*/
 
+$text-muted: #999;
+$border-color: #ccc;
+$light-border-color: #eee;
+$form-elements-border-color: #c7c7c7;
+$background-grey: #f9f9f9;
+$background-light: #fff;
+
+/**
+* SBG colors
+*/
+$brand-success: #3eb157;
+$brand-primary: #337cb9;
+$brand-danger: #d8000c;
+$brand-warning: #f89406;
+$brand-info: #f3f8fc;
+
+/**
+* SBG sizes
+*/
+$btn-padding-y-sm: 0.4rem;
+$input-padding-y: 0.4rem;
+
+/**
+* SBG buttons
+*/
+$btn-secondary-color: $body-color;
+$btn-secondary-bg: #f9f9f9;
+$btn-secondary-border: #c7c7c7;
+
+
+$btn-success-border: #328e46;
+
+$btn-primary-bg: #337cb9;
+$btn-primary-border: #296394;
+
+$btn-danger-bg: #d8000c;
+$btn-danger-border: #804c03; // not according to style guide
+
+$btn-warning-bg: #f89406;
+$btn-warning-border: #bc7e20; // not according to style guide
 
 /**
 * Layout Size Variables
@@ -39,8 +87,8 @@ $modal-content-color: $body-color;
 */
 
 $input-bg: #fff;
-$input-border-focus: #c7c7c7;
-$input-border-color: #c7c7c7;
+$input-border-focus: $form-elements-border-color;
+$input-border-color: $form-elements-border-color;
 $input-color-placeholder: $gray-dark;
 
 $border-radius: 2px;
@@ -62,16 +110,6 @@ $editor-header-height: $header-padding * 2 + $btn-padding-y-sm * 2 + $btn-line-h
 */
 $workbox-tabs-height: 44px;
 
-
-/**
-*  SBG Variables
-*/
-
-$text-muted: #999;
-$border-color: #ccc;
-$light-border-color: #eee;
-$background-grey: #f9f9f9;
-$background-light: #fff;
 
 $padding-sm: 10px;
 $padding-md: 15px;
