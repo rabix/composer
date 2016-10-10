@@ -11,6 +11,8 @@
   background: $body-background;
   height: calc(100% - #{$workbox-tabs-height});
   color: $text-dark;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .inset-panel {

@@ -4,15 +4,17 @@ import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {FileModel} from "../../store/models/fs.models";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {CltEditorComponent} from "../clt-editor/clt-editor.component";
-import {DynamicState} from "../runtime-compiler/dynamic-state.interface";
+import {DynamicState} from "../runtime-compiler";
 import {Subscription, Observable, ReplaySubject} from "rxjs/Rx";
 import {ToolHeaderComponent} from "./tool-header/tool-header.component";
 import {ViewModeService} from "./services/view-mode.service";
-import {CommandLineToolModel} from "cwlts/lib/models/d2sb";
+import {CommandLineToolModel} from "cwlts/models/d2sb";
 import {SidebarComponent} from "../sidebar/sidebar.component";
 import {CommandLineComponent} from "../clt-editor/commandline/commandline.component";
 import {ViewSwitcherComponent} from "../view-switcher/view-switcher.component";
 import {ValidationResponse} from "../../services/webWorker/json-schema/json-schema.service";
+import {ValidationIssuesComponent} from "../validation-issues/validation-issues.component";
+import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
 
 require("./tool-container.component.scss");
 
@@ -29,7 +31,8 @@ require("./tool-container.component.scss");
         ToolHeaderComponent,
         CommandLineComponent,
         SidebarComponent,
-        ViewSwitcherComponent
+        ViewSwitcherComponent,
+        ValidationIssuesComponent
     ],
     template: `
         <block-loader *ngIf="!isLoaded"></block-loader>
@@ -45,8 +48,13 @@ require("./tool-container.component.scss");
             </div>
             
             <div class="status-bar-footer">
-                <commandline [content]="commandlineContent"></commandline>
-                <view-switcher [viewMode]="viewMode" [disabled]="!isValid"></view-switcher>
+                <div class="left-side">
+                    <validation-issues [issuesStream]="schemaValidationStream"></validation-issues>
+                    <commandline [commandLineParts]="commandLineParts"></commandline>
+                </div>
+                <div class="right-side">
+                    <view-switcher [viewMode]="viewMode" [disabled]="!isValid"></view-switcher>
+                </div>
             </div>
         </div>
     `
@@ -61,12 +69,13 @@ export class ToolContainerComponent implements OnInit, DynamicState, OnDestroy {
     /** Default view mode. */
     private viewMode: ReplaySubject<'gui' | 'json'>;
 
-    /** File that we will pass to both the gui and JSON editor*/
+    /** File that we will pass to both the gui and JSON editor */
     private file: FileModel;
 
+    /** Model that generates command line and does validation */
     private model: CommandLineToolModel;
 
-    private commandlineContent: string = '';
+    private commandLineParts: CommandLinePart[];
 
     /** List of subscriptions that should be disposed when destroying this component */
     private subs: Subscription[];
@@ -93,7 +102,7 @@ export class ToolContainerComponent implements OnInit, DynamicState, OnDestroy {
             // while the file is being edited, attempt to recreate the model
             try {
                 this.model              = new CommandLineToolModel(JSON.parse(this.file.content));
-                this.commandlineContent = this.model.getCommandLine();
+                this.commandLineParts = this.model.getCommandLineParts();
 
                 // if the file isn't valid JSON, do nothing
             } catch (ex) {

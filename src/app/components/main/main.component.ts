@@ -8,14 +8,10 @@ import {ModalService} from "../modal";
 import {Observable} from "rxjs/Rx";
 import {Component, ViewChild, ViewContainerRef, AfterViewInit} from "@angular/core";
 import {UrlValidator} from "../../validators/url.validator";
-import {WebWorkerService} from "../../services/webWorker/web-worker.service";
 import {ContextService} from "../../services/context/context.service";
-import {InputPortService} from "../../services/input-port/input-port.service";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
-import {FileTreeComponent} from "../file-tree/file-tree.component";
 import {LayoutComponent} from "../layout/layout.component";
-import {ExpressionInputService} from "../../services/expression-input/expression-input.service";
-import {WorkboxComponent} from "../workbox/workbox.component";
+import {DomEventService} from "../../services/dom/dom-event.service";
 
 require("./../../../assets/sass/main.scss");
 
@@ -32,9 +28,7 @@ require("./main.component.scss");
     directives: [
         MenuBarComponent,
         ContextDirective,
-        FileTreeComponent,
         LayoutComponent,
-        WorkboxComponent
     ],
     providers: [
         ComponentRegistryFactoryService,
@@ -42,11 +36,9 @@ require("./main.component.scss");
         EventHubService,
         FileRegistry,
         FileStateService,
+        DomEventService,
         ModalService,
         UrlValidator,
-        WebWorkerService,
-        InputPortService,
-        ExpressionInputService,
         PlatformAPI
     ]
 })

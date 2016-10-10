@@ -1,5 +1,6 @@
 @import "../../../assets/sass/variables";
 
+
 .flex-box {
   display: flex;
   height: 100%;
@@ -8,17 +9,37 @@
 
   .flex-col {
     display: flex;
-    flex: 0.5;
-    overflow-y: auto;
-    overflow-x: hidden;
     flex-direction: column;
+    flex: 1;
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    &.hidden {
+      flex: 0 !important;
+    }
+
+    &.workbox-col {
+      overflow: hidden;
+    }
   }
-  .handle {
-    width: 8px;
-    display: inline-block;
+
+  .handle-vertical {
     background: $brand-primary-bg-dark;
     cursor: col-resize;
+    display: inline-block;
+    width: 8px;
+
+    &.hidden {
+      width: 1px;
+    }
+
   }
+
+}
+
+.panel-switch-col {
+  width: 26px;
+  overflow: hidden;
 }
 
 .top-bar {
@@ -26,6 +47,13 @@
   background: $brand-primary-bg-dark;
 }
 
+.flex-row {
+  display: flex;
+}
+
 .flex-row:not(.fixed) {
   flex: 1;
+  overflow: hidden;
+  //overflow-x: hidden;
+  //overflow-y: auto;
 }
