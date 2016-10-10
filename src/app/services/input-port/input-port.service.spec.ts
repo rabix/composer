@@ -1,6 +1,6 @@
 import {inject} from "@angular/core/testing";
 import {InputPortService} from "./input-port.service";
-import {CommandInputParameterModel as InputProperty} from "cwlts/lib/models/d2sb";
+import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 import {TestBed} from "@angular/core/testing/test_bed";
 
 describe("InputPortService", () => {

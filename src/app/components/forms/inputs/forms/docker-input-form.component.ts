@@ -6,7 +6,7 @@ import {
     REACTIVE_FORM_DIRECTIVES,
     FORM_DIRECTIVES
 } from "@angular/forms";
-import {CommandLineToolModel} from "cwlts/lib/models/d2sb";
+import {CommandLineToolModel} from "cwlts/models/d2sb";
 
 require("./shared/form.components.scss");
 

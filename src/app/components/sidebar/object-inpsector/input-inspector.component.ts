@@ -9,9 +9,9 @@ import {
 } from "@angular/forms";
 import {ExpressionInputComponent, ExpressionInputType} from "../../forms/inputs/types/expression-input.component";
 import {BehaviorSubject} from "rxjs";
-import {CommandInputParameterModel as InputProperty} from "cwlts/lib/models/d2sb";
+import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 import {EventHubService} from "../../../services/event-hub/event-hub.service";
-import {UpdateInputPortExpression} from "../../../action-events/index";
+import {UpdateInputPortExpression} from "../../../action-events";
 import {Subscription} from "rxjs/Subscription";
 
 require("./input-inspector.component.scss");

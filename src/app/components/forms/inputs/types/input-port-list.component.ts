@@ -1,8 +1,8 @@
 import {Component, OnDestroy} from "@angular/core";
 import {InputPortService} from "../../../../services/input-port/input-port.service";
-import {CloseInputInspector, OpenInputInspector} from "../../../../action-events/index";
+import {CloseInputInspector, OpenInputInspector} from "../../../../action-events";
 import {EventHubService} from "../../../../services/event-hub/event-hub.service";
-import {CommandInputParameterModel as InputProperty} from "cwlts/lib/models/d2sb";
+import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 import {Subscription} from "rxjs/Subscription";
 
 @Component({
