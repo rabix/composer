@@ -25,7 +25,8 @@ const METADATA = webpackMerge(commonConfig.metadata, {
     host: HOST,
     port: PORT,
     ENV: ENV,
-    HMR: false
+    HMR: false,
+    APP_ENV_CONFIG: {}
 });
 
 module.exports = webpackMerge(commonConfig, {
@@ -123,6 +124,7 @@ module.exports = webpackMerge(commonConfig, {
         new DefinePlugin({
             'ENV': JSON.stringify(METADATA.ENV),
             'HMR': METADATA.HMR,
+            "APP_ENV_CONFIG": JSON.stringify(METADATA.APP_ENV_CONFIG),
             'process.env': {
                 'ENV': JSON.stringify(METADATA.ENV),
                 'NODE_ENV': JSON.stringify(METADATA.ENV),

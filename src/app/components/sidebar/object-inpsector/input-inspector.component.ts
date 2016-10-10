@@ -9,9 +9,9 @@ import {
 } from "@angular/forms";
 import {ExpressionInputComponent, ExpressionInputType} from "../../forms/inputs/types/expression-input.component";
 import {BehaviorSubject} from "rxjs";
-import {CommandInputParameterModel as InputProperty} from "cwlts/lib/models/d2sb";
+import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 import {EventHubService} from "../../../services/event-hub/event-hub.service";
-import {UpdateInputPortExpression} from "../../../action-events/index";
+import {UpdateInputPortExpression} from "../../../action-events";
 import {Subscription} from "rxjs/Subscription";
 
 require("./input-inspector.component.scss");
@@ -67,7 +67,7 @@ export class InputInspectorComponent implements OnInit, OnDestroy {
 
     /** The object that we are editing */
     @Input()
-    private inputModelStream: BehaviorSubject<InputProperty>;
+    public inputModelStream: BehaviorSubject<InputProperty>;
 
     /** The currently displayed property */
     private selectedProperty: InputProperty;
@@ -84,7 +84,6 @@ export class InputInspectorComponent implements OnInit, OnDestroy {
 
     constructor(private formBuilder: FormBuilder,
                 private eventHubService: EventHubService) {
-
         this.subs = [];
     }
 
@@ -100,13 +99,13 @@ export class InputInspectorComponent implements OnInit, OnDestroy {
         this.inputInspectorForm.controls["expression"].valueChanges.subscribe(value => {
             this.selectedProperty.setValueFrom(value);
         });
-        
+
         this.listenToInputPortUpdate();
 
         this.subs.push(inputModelStreamUpdate);
     }
 
-    private listenToInputPortUpdate() {
+    private listenToInputPortUpdate(): void {
 
         let updateInputPortExpression = this.eventHubService.onValueFrom(UpdateInputPortExpression)
             .subscribe((expression: string) => {

@@ -16,6 +16,5 @@ export class BlankFileFormComponent {
     }
 
     public onSubmit(){
-        console.debug("Submitting", arguments);
     }
 }

@@ -1,6 +1,6 @@
 import {JsonSchemaService} from "./json-schema.service";
 
-const {draft3, draft4} = require("cwlts/lib");
+const {schemas} = require("cwlts/schemas");
 
 class MockValidator {
     validate(jsonSchema) {
@@ -17,9 +17,10 @@ describe("JsonSchemaService", () => {
 
     beforeEach(() => {
         jsonSchemaService = new JsonSchemaService({
-            draft3: draft3,
-            draft4: draft4,
-            Validator: MockValidator
+            draft3: schemas.draft3,
+            draft4: schemas.draft4,
+            draft2: schemas.draft2,
+            validator: MockValidator
         });
     });
 
@@ -27,38 +28,6 @@ describe("JsonSchemaService", () => {
     // so it needs to mocked on the window object
     beforeEach(() => {
         spyOn(window, 'postMessage');
-    });
-
-    describe("getJsonSchemaContainer", () => {
-        it("Should return the JSON schema container object with all its properties", () => {
-
-            const res1 = jsonSchemaService.getJsonSchemaContainer("draft-3");
-            expect(res1).toBe(draft3);
-
-            const res2 = jsonSchemaService.getJsonSchemaContainer("draft-4");
-            expect(res2).toBe(draft4);
-
-            const res3 = jsonSchemaService.getJsonSchemaContainer("draft-123");
-            expect(res3).toBe(undefined);
-        });
-    });
-
-    describe("isCwlVersionValid", () => {
-        it("Should return true if the CwlVersion is valid", () => {
-
-            const res1 = jsonSchemaService.isCwlVersionValid("draft-3");
-            expect(res1).toBe(true);
-
-            const res2 = jsonSchemaService.isCwlVersionValid("draft-4");
-            expect(res2).toBe(true);
-        });
-
-        it("Should return false if the CwlVersion is not valid", () => {
-
-            const res = jsonSchemaService.isCwlVersionValid("draft-5");
-            expect(res).toBe(false);
-        });
-
     });
 
     describe("isClassValid", () => {
@@ -90,7 +59,7 @@ describe("JsonSchemaService", () => {
                 prop1: 123,
                 prop2: 123
             });
-            
+
             expect(res1).toBe(false);
         });
     });
@@ -119,10 +88,11 @@ describe("JsonSchemaService", () => {
                 isValidatableCwl: true,
                 isValidCwl: false,
                 errors: ["mockValidationErrorMessage"],
+                class: "Workflow",
                 schema: JSON.parse(jsonText)
             });
         });
-        
+
     });
 
 });

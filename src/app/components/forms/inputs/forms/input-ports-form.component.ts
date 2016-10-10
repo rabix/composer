@@ -2,14 +2,14 @@ import {Component, Input, OnInit} from "@angular/core";
 import {InputPortListComponent} from "../types/input-port-list.component";
 import {InputPortService} from "../../../../services/input-port/input-port.service";
 import {EventHubService} from "../../../../services/event-hub/event-hub.service";
-import {OpenInputInspector} from "../../../../action-events/index";
-import {CommandLineToolModel} from "cwlts/lib/models/d2sb";
+import {OpenInputInspector} from "../../../../action-events";
+import {CommandLineToolModel} from "cwlts/models/d2sb";
 
-// require("./form.components.scss");
 require("./input-ports-form.component.scss");
 
 @Component({
     selector: 'inputs-ports-form',
+    providers: [InputPortService],
     directives: [InputPortListComponent],
     template: `
         <form>
@@ -29,7 +29,7 @@ require("./input-ports-form.component.scss");
 export class InputPortsFormComponent implements OnInit {
     @Input()
     public cltModel: CommandLineToolModel;
-    
+
     constructor(private inputPortService: InputPortService,
                 private eventHubService: EventHubService) { }
 

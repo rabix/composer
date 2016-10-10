@@ -1,7 +1,8 @@
 import {Observable} from "rxjs/Observable";
-const JsonSchemaWorker = require("worker!./json-schema/json-schema.worker.ts");
+import {Injectable} from "@angular/core";
+const JsonSchemaWorker = require("worker?name=json-schema.worker!./json-schema/json-schema.worker.ts");
 
-/* This class should be instantiated (not injected), every instance will have one WebWorker instance. */
+@Injectable()
 export class WebWorkerService {
 
     private jsonSchemaWorker: Worker;
@@ -9,14 +10,25 @@ export class WebWorkerService {
 
     constructor() {
         this.jsonSchemaWorker = new JsonSchemaWorker();
+
         this.validationResultStream = Observable
-                                    .fromEvent(this.jsonSchemaWorker, 'message')
-                                    .map((result: any) => {
-                                        return result.data;
-                                    });
+            .fromEvent(this.jsonSchemaWorker, 'message')
+            .map((result: any) => {
+                return result.data;
+            });
     }
 
     public validateJsonSchema(jsonText: string): void {
-        this.jsonSchemaWorker.postMessage(jsonText);
+        if (this.jsonSchemaWorker) {
+            this.jsonSchemaWorker.postMessage(jsonText);
+        }
+    }
+
+    //This should be called on the same component where the provider is defined
+    public dispose(): void {
+        if (this.jsonSchemaWorker) {
+            this.jsonSchemaWorker.terminate();
+            this.jsonSchemaWorker = undefined;
+        }
     }
 }

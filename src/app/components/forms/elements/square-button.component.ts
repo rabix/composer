@@ -40,7 +40,6 @@ export class SquareButtonComponent implements RadioButtonInterface{
     @HostListener("click")
     public onHostClick() {
         this.isSelected = true;
-        console.debug("Clicked on this button!");
         (this.onClick as Subject).next(this);
     }
 }

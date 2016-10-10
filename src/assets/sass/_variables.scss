@@ -4,11 +4,21 @@ $font-size-root: 15px;
 $font-family-title: "Montserrat", "Helvetica Neue", sans-serif;
 
 $gui-base-gray: rgb(51, 51, 51);
-$body-bg: #000;
-$body-color: ghostwhite;
+$body-background: #f3f3f3; // background color of negative space around components
+$body-foreground: white; // background color of components
+$text-dark: #333;
+$text-light: ghostwhite;
+$body-color: #333;
 
-$brand-primary: #337cb9;
+$brand-primary: #2e3e4e;
 $btn-primary-bg: $brand-primary;
+
+// Custom Brand Stuff
+$brand-primary-bg: #22313F;
+$brand-primary-bg-dark: #1B2833;
+$brand-primary-bg-bright: #34495E;
+
+
 
 /**
 * Layout Size Variables
@@ -19,7 +29,7 @@ $sidebar-width: 70px;
 /**
 * Modal Variables
 */
-$modal-header-border-color: rgba(0,0,0,.3);
+$modal-header-border-color: rgba(0, 0, 0, .3);
 $modal-footer-border-color: $modal-header-border-color;
 $modal-content-bg: $gui-base-gray;
 $modal-content-color: $body-color;
@@ -33,11 +43,9 @@ $input-border-focus: #c7c7c7;
 $input-border-color: #c7c7c7;
 $input-color-placeholder: $gray-dark;
 
-
 $border-radius: 2px;
 $input-border-radius: $border-radius;
 $input-border-radius-sm: $border-radius;
-$input-border-color: $gray-light;
 
 $button-blue-text: #0275d8;
 
@@ -46,8 +54,13 @@ $button-blue-text: #0275d8;
 */
 $collapse-icon-width: 20px;
 $editor-padding-top: 10px;
-$editor-header-height: 40px;
-$editor-footer-height: 50px;
+$header-padding: .625rem;
+$editor-header-height: $header-padding * 2 + $btn-padding-y-sm * 2 + $btn-line-height;
+
+/**
+* Workbox
+*/
+$workbox-tabs-height: 44px;
 
 
 /**
@@ -59,7 +72,6 @@ $border-color: #ccc;
 $light-border-color: #eee;
 $background-grey: #f9f9f9;
 $background-light: #fff;
-$text-dark: #333;
 
 $padding-sm: 10px;
 $padding-md: 15px;
@@ -72,3 +84,10 @@ $padding-md: 15px;
 $base-cmd-color: #7AC24D;
 $input-port-color: #A77ED7;
 $arg-color: #FDA365;
+
+/**
+* Status Bar
+*/
+$status-bar-vertical-padding: 8px;
+$status-bar-line-height: 18px;
+$status-bar-height: $status-bar-line-height + 2*$status-bar-vertical-padding;

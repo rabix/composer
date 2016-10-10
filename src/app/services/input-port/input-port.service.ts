@@ -2,9 +2,9 @@ import {Injectable} from "@angular/core";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {Subject} from "rxjs/Subject";
 import {Observable} from "rxjs/Observable";
-import {CommandInputParameterModel as InputProperty} from "cwlts/lib/models/d2sb";
+import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 
-interface PropertyOperation extends Function {
+interface PropertyOperation {
     (inputProperty: InputProperty[]): InputProperty[];
 }
 
@@ -24,7 +24,7 @@ export class InputPortService {
     private deletedInputPort: Subject<InputProperty> = new Subject<InputProperty>();
 
     /** Stream that aggregates all changes on the exposedList list */
-    private inputPortsUpdate: Subject<any> = new Subject<any>();
+    private inputPortsUpdate: BehaviorSubject<PropertyOperation> = new BehaviorSubject<PropertyOperation>(undefined);
 
     /** The currently  selected input port */
     public selectedInputPort: Observable<InputProperty>;
@@ -35,12 +35,18 @@ export class InputPortService {
     constructor() {
         /* Subscribe the exposedList to inputPortsUpdate */
         this.inputPorts = this.inputPortsUpdate
+            .filter(update => update !== undefined)
             .scan((inputPorts: InputProperty[], operation: PropertyOperation) => {
                 return operation(inputPorts);
             }, this.initialInputPorts)
             .publishReplay(1)
             .refCount();
-
+        
+        /* Update the initialInputPorts when the inputPorts steam changes */
+        this.inputPorts.subscribe((portList: InputProperty[]) => {
+            this.initialInputPorts = portList;
+        });
+        
         /* Add new input ports */
         this.newInputPorts
             .map((inputPort: InputProperty): PropertyOperation => {

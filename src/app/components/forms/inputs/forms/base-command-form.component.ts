@@ -60,7 +60,7 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.baseCommandForm = this.formBuilder.group({
-            baseCommand: [this.baseCommand, Validators.compose([Validators.required, Validators.minLength(1)])]
+            baseCommand: [this.baseCommand, [Validators.required, Validators.minLength(1)]]
         });
 
         let baseCommandValueChanges = this.baseCommandForm.controls['baseCommand'].valueChanges.subscribe(value => {
@@ -73,8 +73,7 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
             .subscribe((expression: string) => {
                 const baseCommandControl: FormControl = <FormControl>this.baseCommandForm.controls['baseCommand'];
 
-                //TODO: update the actual model
-                baseCommandControl.updateValue(expression);
+                baseCommandControl.setValue(expression);
             });
 
         this.subs.push(baseCommandValueChanges);

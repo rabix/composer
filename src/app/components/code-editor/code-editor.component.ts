@@ -1,6 +1,6 @@
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {CodeEditor} from "./code-editor";
-import {Component, OnInit, ElementRef, ViewChild, Input} from "@angular/core";
+import {Component, OnInit, ElementRef, ViewChild, Input, OnDestroy} from "@angular/core";
 import {FileModel} from "../../store/models/fs.models";
 import {FileRegistry} from "../../services/file-registry.service";
 import {Subscription, Observable} from "rxjs/Rx";
@@ -9,6 +9,7 @@ import {UpdateFileAction, CwlValidationResult} from "../../action-events/index";
 import Editor = AceAjax.Editor;
 import TextMode = AceAjax.TextMode;
 import {ValidationResponse} from "../../services/webWorker/json-schema/json-schema.service";
+import {WebWorkerService} from "../../services/webWorker/web-worker.service";
 
 require('./code-editor.component.scss');
 
@@ -21,7 +22,7 @@ require('./code-editor.component.scss');
              <div #ace class="editor"></div>
         </div>`,
 })
-export class CodeEditorComponent implements OnInit {
+export class CodeEditorComponent implements OnInit, OnDestroy {
     /** Provided file that we should open in the editor */
     @Input()
     fileStream: Observable<FileModel>;
@@ -37,12 +38,16 @@ export class CodeEditorComponent implements OnInit {
     /** List of subscriptions that should be disposed when destroying this component */
     private subs: Subscription[];
 
+    private webWorkerService: WebWorkerService;
+
     /** Reference to the element in which we want to instantiate the Ace editor */
     @ViewChild("ace")
     private aceContainer: ElementRef;
 
     constructor(private fileRegistry: FileRegistry,
-                private eventHub: EventHubService) {
+                private eventHub: EventHubService,
+                private webWorkerService: WebWorkerService) {
+
         this.subs     = [];
         this.isLoaded = false;
     }
@@ -52,7 +57,7 @@ export class CodeEditorComponent implements OnInit {
         // const fileStream = this.fileRegistry.getFile(this.file);
 
         // Instantiate the editor and give it the stream through which the file will come through
-        this.editor = new CodeEditor(ace.edit(this.aceContainer.nativeElement), this.fileStream);
+        this.editor = new CodeEditor(ace.edit(this.aceContainer.nativeElement), this.fileStream, this.webWorkerService);
 
         // Also, we want to turn off the loading spinner and might as well bring our own file up to date
         this.subs.push(this.fileStream.subscribe(file => {
@@ -60,19 +65,22 @@ export class CodeEditorComponent implements OnInit {
             this.file     = file;
         }));
 
-        this.editor.contentChanges.skip(1).subscribe((file) => {
-            this.eventHub.publish(new UpdateFileAction(file));
-        });
+        this.subs.push(
+            this.editor.contentChanges.skip(1).subscribe((file) => {
+                this.eventHub.publish(new UpdateFileAction(file));
+            })
+        );
 
-        this.editor.validationResult
-            .subscribe((result: ValidationResponse) => {
-                this.eventHub.publish(new CwlValidationResult(result));
-            });
+        this.subs.push(
+            this.editor.validationResult
+                .subscribe((result: ValidationResponse) => {
+                    this.eventHub.publish(new CwlValidationResult(result));
+                })
+        );
     }
 
     ngOnDestroy(): void {
         this.editor.dispose();
-        console.debug("Disposing code editor");
         this.subs.forEach(sub => sub.unsubscribe());
     }
 
