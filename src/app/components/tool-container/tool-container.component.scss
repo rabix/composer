@@ -9,6 +9,7 @@
 
 .tool-container-component {
     height: 100%;
+    position: relative;
     background: $gui-editor-bg;
     display: block;
 }
@@ -96,10 +97,10 @@
 .console-component {
     position: absolute;
     bottom: $status-bar-height - 6px;
-    z-index: 5;
+    z-index: 9;
 
     height: 0;
-    width: 100%;
+    min-width: 100%;
     overflow: auto;
 
     background: #000000;
@@ -114,6 +115,6 @@
     }
 
     &.show {
-        height: 70px;
+        height: 90px;
     }
 }

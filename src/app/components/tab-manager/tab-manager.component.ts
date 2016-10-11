@@ -16,7 +16,7 @@ import {ValidationResponse} from "../../services/web-worker/json-schema/json-sch
 
 <div [ngSwitch]="type" style="height: 100%">
     <tool-container [fileStream]="file" *ngSwitchCase="'tool'" [schemaValidationStream]="validationStream"></tool-container>
-    <workflow-container [fileStream]="file" *ngSwitchCase="'workflow'"></workflow-container>
+    <workflow-container [fileStream]="file" *ngSwitchCase="'workflow'" [schemaValidationStream]="validationStream"></workflow-container>
     <code-editor [fileStream]="file" *ngSwitchCase="'text'"></code-editor>
 </div>`
 })

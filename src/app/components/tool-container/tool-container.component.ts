@@ -53,7 +53,7 @@ require("./tool-container.component.scss");
                     <commandline [commandLineParts]="commandLineParts"></commandline>
                 </div>
                 <div class="right-side">
-                    <view-switcher [viewMode]="viewMode" [disabled]="!isValid"></view-switcher>
+                    <!--<view-switcher [viewMode]="viewMode" [disabled]="!isValid"></view-switcher>-->
                 </div>
             </div>
         </div>
