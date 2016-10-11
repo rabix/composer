@@ -1,8 +1,9 @@
 @import "../../../assets/sass/variables";
+@import "../../../assets/sass/icons";
 
 ct-tree-view {
-  background: $brand-primary-bg;
-  color: white;
+  background: $panel-bg;
+  color: $panel-item-color;
   display: block;
   height: 100%;
   overflow-y: auto;
@@ -34,13 +35,17 @@ ct-tree-view {
     }
 
     &:hover {
-      background: $brand-primary-bg-dark;
-
+      background: $panel-item-hover-bg;
+      color: $panel-item-hover-color;
     }
 
     &.selected {
-      background: $brand-primary-bg-bright;
-      color: white;
+      background: $panel-item-select-bg;
+      color: $panel-item-select-color;
+
+      .icon-space .fa {
+        color: $panel-item-icon-select-color;
+      }
     }
   }
 
@@ -52,6 +57,16 @@ ct-tree-view {
     display: inline-block;
     width: 20px;
     margin: 0 0 0 0;
+    position: relative;
+
+    .icon-command-line-tool, .icon-workflow {
+      position: relative;
+      top: 2px;
+    }
+
+    [class*='fa-angle'] {
+      @extend .icon-angle;
+    }
   }
 
   .node-icon {
@@ -88,13 +103,13 @@ ct-tree-view {
   &.hidden {
     height: 0;
     opacity: 0;
-    padding: 0 0 0 10px;
   }
   .term {
     white-space: pre;
   }
   height: 24px;
   opacity: 1;
+  overflow: hidden;
   padding: 4px 14px;
   font-size: $font-size-xs;
   font-style: italic;

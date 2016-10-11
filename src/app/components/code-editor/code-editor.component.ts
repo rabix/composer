@@ -8,8 +8,8 @@ import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {UpdateFileAction, CwlValidationResult} from "../../action-events/index";
 import Editor = AceAjax.Editor;
 import TextMode = AceAjax.TextMode;
-import {ValidationResponse} from "../../services/webWorker/json-schema/json-schema.service";
-import {WebWorkerService} from "../../services/webWorker/web-worker.service";
+import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
+import {WebWorkerService} from "../../services/web-worker/web-worker.service";
 
 require('./code-editor.component.scss');
 

@@ -4,8 +4,8 @@ import {FileModel} from "../../store/models/fs.models";
 import Editor = AceAjax.Editor;
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
-import {WebWorkerService} from "../../services/webWorker/web-worker.service";
-import {ValidationResponse} from "../../services/webWorker/json-schema/json-schema.service";
+import {WebWorkerService} from "../../services/web-worker/web-worker.service";
+import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
 import {AbstractCodeEditor} from "../abstract-code-editor/abstract-code-editor";
 
 export class CodeEditor extends AbstractCodeEditor {

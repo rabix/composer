@@ -3,9 +3,9 @@ import {FileModel} from "../../store/models/fs.models";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {ToolContainerComponent} from "../tool-container/tool-container.component";
 import {Observable, Subscription, ReplaySubject} from "rxjs";
-import {WebWorkerService} from "../../services/webWorker/web-worker.service";
+import {WebWorkerService} from "../../services/web-worker/web-worker.service";
 import {WorkflowContainerComponent} from "../workflow-container/workflow-container.component";
-import {ValidationResponse} from "../../services/webWorker/json-schema/json-schema.service";
+import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
 
 @Component({
     selector: "tab-manager",
@@ -16,7 +16,7 @@ import {ValidationResponse} from "../../services/webWorker/json-schema/json-sche
 
 <div [ngSwitch]="type" style="height: 100%">
     <tool-container [fileStream]="file" *ngSwitchCase="'tool'" [schemaValidationStream]="validationStream"></tool-container>
-    <workflow-container [fileStream]="file" *ngSwitchCase="'workflow'"></workflow-container>
+    <workflow-container [fileStream]="file" *ngSwitchCase="'workflow'" [schemaValidationStream]="validationStream"></workflow-container>
     <code-editor [fileStream]="file" *ngSwitchCase="'text'"></code-editor>
 </div>`
 })
@@ -25,7 +25,7 @@ export class TabManagerComponent implements OnInit, OnDestroy {
     @Input()
     private file: Observable<FileModel>;
 
-    private type: "text" | "workflow" | "tool";
+    private type: "text" | "workflow" | "tool" = "text";
 
     private webWorkerService: WebWorkerService;
     private validationStream: ReplaySubject<ValidationResponse>;
@@ -41,7 +41,9 @@ export class TabManagerComponent implements OnInit, OnDestroy {
         this.webWorkerService.validationResultStream.subscribe(this.validationStream);
 
 
-        this.subs.push(this.webWorkerService.validationResultStream.subscribe(val => {
+        this.subs.push(this.webWorkerService.validationResultStream
+            .filter(val => val.isValidJSON) // only switch views if JSON is valid to avoid jerky interface
+            .subscribe(val => {
             switch (val.class) {
                 case "CommandLineTool":
                     this.type = "tool";

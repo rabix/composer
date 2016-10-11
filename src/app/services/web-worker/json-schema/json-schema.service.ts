@@ -1,11 +1,14 @@
 //this method is here to avoid linting errors
-declare function postMessage(message);
+declare function postMessage(message: ValidationResponse);
 
 export interface ValidationResponse {
     isValidatableCwl: boolean,
     isValidCwl: boolean,
+    isValidJSON: boolean,
     errors: Array<any>,
-    warnings: Array<any>
+    warnings: Array<any>,
+    errorText?: string,
+    class?: "CommandLineTool" | "Workflow"
 }
 
 // This class should only be used inside a WebWorker,
@@ -78,45 +81,45 @@ export class JsonSchemaService {
         try {
             cwlJson = JSON.parse(jsonText);
         } catch (e) {
-            this.sendErrorMessage("Not a valid JSON");
+            this.sendValidationResult({
+                isValidatableCwl: false,
+                isValidCwl: false,
+                isValidJSON: false,
+                errors: ["Not valid JSON"],
+                warnings: [],
+                errorText: "Not valid JSON"
+            });
             return;
         }
 
         if (!this.isValidCWLClass(cwlJson) && this.errorMessage) {
-            this.sendErrorMessage(this.errorMessage);
+            this.sendValidationResult({
+                isValidCwl: false,
+                isValidJSON: true,
+                isValidatableCwl: false,
+                errors: [this.errorMessage],
+                warnings: [],
+                errorText: this.errorMessage
+            });
         } else {
             cwlVersion = cwlJson.cwlVersion || 'draft-2';
             jsonClass = cwlJson.class;
 
-            let result:any = {};
+            let result:ValidationResponse= {
+                isValidJSON: true,
+                isValidatableCwl: true,
+                isValidCwl: validator.validate(cwlVersion + jsonClass, cwlJson),
+                errors: validator.errors || [],
+                warnings: [],
+                errorText: validator.errorsText(),
+                class: jsonClass
+            };
 
-            result.valid = validator.validate(cwlVersion + jsonClass, cwlJson);
-            result.errors = validator.errors;
-            result.errorText = validator.errorsText();
-            result.class = jsonClass;
-
-            console.log("json schema service result", result);
             this.sendValidationResult(result);
         }
     }
 
-    private sendErrorMessage(errorMessage: string) {
-        postMessage({
-            isValidatableCwl: false,
-            isValidCwl: false,
-            errors: [errorMessage],
-            warnings: []
-        });
-    }
-
-    private sendValidationResult(result: any) {
-        postMessage({
-            isValidatableCwl: true,
-            isValidCwl: result.valid,
-            errors: result.errors || [],
-            warnings: [],
-            errorText: result.errorText,
-            class: result.class,
-        });
+    private sendValidationResult(result: ValidationResponse) {
+        postMessage(result);
     }
 }

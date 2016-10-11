@@ -17,7 +17,7 @@ import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
             <button type="button" 
             class="btn btn-sm"
             (click)="toggleCommandLine()">Resulting Command 
-                <i class="fa" 
+                <i class="fa icon-angle" 
                    [ngClass]="{'fa-angle-right': !showCommandLine, 'fa-angle-up': showCommandLine}">
                 </i>
             </button>
