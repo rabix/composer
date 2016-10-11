@@ -2,12 +2,9 @@ import {Component, OnDestroy} from "@angular/core";
 import {Subscription} from "rxjs/Subscription";
 import {ExpressionEditorSidebarComponent} from "./expression-editor/expression-editor-sidebar.component";
 import {InputInspectorSidebarComponent} from "./object-inpsector/input-inspector-sidebar.component";
-import {ExpressionSidebarService} from "../../services/sidebars/expression-sidebar.service";
-import {InputSidebarService} from "../../services/sidebars/input-sidebar.service";
+import {ToolSidebarService, SidebarType} from "../../services/sidebars/tool-sidebar.service";
 
 require("./editor.component.scss");
-
-declare type sidebarType = "input-inspector" | "expression-editor";
 
 @Component({
     selector: "sidebar-component",
@@ -22,70 +19,33 @@ declare type sidebarType = "input-inspector" | "expression-editor";
                 </input-inspector-sidebar-component>
                 
                 <expression-editor-sidebar-component class="tool-sidebar" 
-                                                    [hidden]="currentSidebar !== 'expression-editor'">
+                                                    [hidden]="currentSidebar !== 'expression-sidebar'">
                 </expression-editor-sidebar-component>
             </div>
     `
 })
 export class SidebarComponent implements OnDestroy {
 
-    private currentSidebar: sidebarType;
-
-    private sidebarStack = [];
+    private currentSidebar: SidebarType;
 
     private show = false;
 
     private subs: Subscription[];
 
-    constructor(private expressionSidebarService: ExpressionSidebarService,
-                private inputSidebarService: InputSidebarService) {
+    constructor(private toolSidebarService: ToolSidebarService) {
+
         this.subs = [];
 
-        this.initInputInspectorListener();
-        this.initExpressionEditorListener();
-    }
-
-    //TODO (Mate): move this to a service
-    private initInputInspectorListener(): void {
-        this.inputSidebarService.isOpen.subscribe((isOpen: boolean) => {
-            if (isOpen) {
-                if (this.sidebarStack.indexOf("input-inspector") === -1) {
-                    this.sidebarStack.unshift("input-inspector");
-                }
-                this.currentSidebar = "input-inspector";
+        this.subs.push(
+            this.toolSidebarService.sidebarStackStream.subscribe((sidebarStack: SidebarType[]) => {
+                this.currentSidebar = sidebarStack.length > 0 ? sidebarStack[0] : undefined;
                 this.setSidebarState();
-            } else {
-                this.removeSidebarFromStack("input-inspector");
-                this.currentSidebar = this.sidebarStack.length > 0 ? this.sidebarStack[0] : undefined;
-                this.setSidebarState();
-            }
-        });
-    }
-
-    private initExpressionEditorListener(): void {
-        this.expressionSidebarService.isOpen.subscribe((isOpen: boolean) => {
-            if (isOpen) {
-                if (this.sidebarStack.indexOf("expression-editor") === -1) {
-                    this.sidebarStack.unshift("expression-editor");
-                }
-                this.currentSidebar = "expression-editor";
-                this.setSidebarState();
-            } else {
-                this.removeSidebarFromStack("expression-editor");
-                this.currentSidebar = this.sidebarStack.length > 0 ? this.sidebarStack[0] : undefined;
-                this.setSidebarState();
-            }
-        });
-    }
-
-    private removeSidebarFromStack(sidebar): void {
-        this.sidebarStack = this.sidebarStack.filter(sidebarName => {
-            return sidebarName !== sidebar;
-        });
+            })
+        );
     }
 
     private setSidebarState(): void {
-        this.show = this.sidebarStack.length !== 0;
+        this.show = this.currentSidebar !== undefined;
     }
 
     ngOnDestroy(): void {

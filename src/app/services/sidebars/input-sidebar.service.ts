@@ -1,6 +1,7 @@
 import {Injectable} from "@angular/core";
 import {Observable, BehaviorSubject} from "rxjs/Rx";
 import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
+import {ToolSidebarService} from "./tool-sidebar.service";
 
 @Injectable()
 export class InputSidebarService {
@@ -15,7 +16,8 @@ export class InputSidebarService {
     /** Update the input port */
     private updateInputPortStream: BehaviorSubject<InputProperty> = new BehaviorSubject<InputProperty>(undefined);
 
-    constructor() {
+    constructor(private toolSidebarService: ToolSidebarService) {
+
         this.inputPortStream = this.updateInputPortStream
             .filter(update => update !== undefined)
             .publishReplay(1)
@@ -29,9 +31,11 @@ export class InputSidebarService {
     public openInputInspector(inputProperty: InputProperty) {
         this.updateInputPortStream.next(inputProperty);
         this.updateOpenState.next(true);
+        this.toolSidebarService.addSideBarOnTopOfStack("input-inspector");
     }
 
     public closeInputInspector() {
         this.updateOpenState.next(false);
+        this.toolSidebarService.removeSideBarFromStack("input-inspector");
     }
 }

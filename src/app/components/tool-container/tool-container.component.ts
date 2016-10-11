@@ -17,6 +17,7 @@ import {ValidationIssuesComponent} from "../validation-issues/validation-issues.
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
 import {ExpressionSidebarService} from "../../services/sidebars/expression-sidebar.service";
 import {InputSidebarService} from "../../services/sidebars/input-sidebar.service";
+import {ToolSidebarService} from "../../services/sidebars/tool-sidebar.service";
 
 require("./tool-container.component.scss");
 
@@ -25,7 +26,8 @@ require("./tool-container.component.scss");
     providers: [
         ViewModeService,
         ExpressionSidebarService,
-        InputSidebarService
+        InputSidebarService,
+        ToolSidebarService
     ],
     directives: [
         CodeEditorComponent,
