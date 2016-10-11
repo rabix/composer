@@ -6,10 +6,6 @@ import {ToolSidebarService} from "./tool-sidebar.service";
 @Injectable()
 export class ExpressionSidebarService {
 
-    public isOpen: Observable<boolean>;
-
-    private updateOpenState: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-
     /** The current expression */
     public expressionDataStream: Observable<ExpressionEditorData>;
 
@@ -22,20 +18,14 @@ export class ExpressionSidebarService {
             .filter(update => update !== undefined)
             .publishReplay(1)
             .refCount();
-
-        this.isOpen = this.updateOpenState
-            .publishReplay(1)
-            .refCount();
     }
 
     public openExpressionEditor(expressionEditorData: ExpressionEditorData) {
         this.updateExpressionEditorData.next(expressionEditorData);
-        this.updateOpenState.next(true);
         this.toolSidebarService.addSideBarOnTopOfStack("expression-sidebar")
     }
 
     public closeExpressionEditor() {
-        this.updateOpenState.next(false);
         this.toolSidebarService.removeSideBarFromStack("expression-sidebar")
     }
 }
