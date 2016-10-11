@@ -6,7 +6,7 @@ import {OpenExpressionEditor, CloseExpressionEditor} from "../../../action-event
 import {SandboxService, SandboxResponse} from "../../../services/sandbox/sandbox.service";
 import {Subscription} from "rxjs/Subscription";
 import {Subject} from "rxjs/Subject";
-import {ExpressionModel} from "cwlts/lib/models/d2sb";
+import {ExpressionModel} from "cwlts/models/d2sb";
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import TextMode = AceAjax.TextMode;

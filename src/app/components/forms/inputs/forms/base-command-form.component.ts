@@ -5,7 +5,7 @@ import {OpenExpressionEditor, CloseExpressionEditor} from "../../../../action-ev
 import {Subscription} from "rxjs/Subscription";
 import {BaseCommandService, BaseCommand} from "../../../../services/base-command/base-command.service";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {ExpressionModel} from "cwlts/lib/models/d2sb";
+import {ExpressionModel} from "cwlts/models/d2sb";
 
 require("./base-command-form.components.scss");
 require("./shared/form.components.scss");
