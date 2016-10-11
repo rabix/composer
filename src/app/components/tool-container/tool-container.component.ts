@@ -12,7 +12,7 @@ import {CommandLineToolModel} from "cwlts/models/d2sb";
 import {SidebarComponent} from "../sidebar/sidebar.component";
 import {CommandLineComponent} from "../clt-editor/commandline/commandline.component";
 import {ViewSwitcherComponent} from "../view-switcher/view-switcher.component";
-import {ValidationResponse} from "../../services/webWorker/json-schema/json-schema.service";
+import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
 import {ValidationIssuesComponent} from "../validation-issues/validation-issues.component";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
 
