@@ -1,4 +1,3 @@
-import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {Component, ChangeDetectionStrategy, Input, ElementRef, QueryList, ViewChildren} from "@angular/core";
 import {TreeNode} from "./types";
 import {TreeNodeComponent} from "./tree-node.component";
@@ -10,7 +9,7 @@ require("./tree-view.component.scss");
 
 @Component({
     selector: "ct-tree-view",
-    directives: [BlockLoaderComponent, TreeNodeComponent],
+    directives: [TreeNodeComponent],
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [TreeViewService],
     template: `

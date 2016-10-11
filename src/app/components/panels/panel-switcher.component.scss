@@ -6,32 +6,40 @@
   flex-direction: column;
   height: calc(100% - 44px);
   justify-content: space-between;
-  background: $brand-primary-bg-dark;
+  background: $panel-side-tab-zone-bg;
 
 }
 
 ct-panel-switcher {
   display: inline-block;
   width: 26px;
-  border-right: 2px solid $brand-primary-bg-dark;
+  border-right: 2px solid $panel-side-tab-zone-border;
   color: white;
 
   .switcher {
 
     display: block;
     padding: 20px 10px;
-    background: $brand-primary-bg-dark;
+    background: $panel-side-tab-bg;
     border: 0;
     position: relative;
     height: 120px;
     border-radius: 2px;
 
     &:hover {
-      background: lighten($brand-primary-bg-dark, 5%);
+      background: $panel-side-tab-hover-bg;
+      color: $panel-side-tab-hover-color;
+      .switcher-icon {
+        color: $panel-side-tab-hover-icon-color;
+      }
     }
 
     &.active {
-      background: $brand-primary-bg-bright;
+      background: $panel-side-tab-select-bg;
+      color: $panel-side-tab-select-color;
+      .switcher-icon {
+        color: $panel-side-tab-select-icon-color;
+      }
     }
 
     .switcher-text {
@@ -47,7 +55,7 @@ ct-panel-switcher {
     }
 
     .switcher-icon {
-      color: #f0ad4e;
+      color: $panel-side-tab-icon-color;
     }
   }
 

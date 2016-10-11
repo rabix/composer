@@ -9,20 +9,20 @@
 
 .tool-container-component {
     height: 100%;
-    background: $background-grey;
+    background: $gui-editor-bg;
     display: block;
 }
 
 .tool-header {
-    background: $background-light;
+    background: $gui-editor-header-bg;
     overflow: hidden;
     display: block;
     padding: $header-padding;
-    border-bottom: 1px solid $border-color;
+    border-bottom: 1px solid $gui-editor-header-border;
 }
 
 .status-bar-footer {
-    background: $text-dark;
+    background: $gui-editor-status-bar-bg;
 
     .left-side {
         display: inline-block;
@@ -41,19 +41,15 @@
         border: none;
         margin-right: 5px;
         background: none;
-        color: $text-light;
-        padding-top: $status-bar-vertical-padding;
-        padding-bottom: $status-bar-vertical-padding;
+        color: $gui-editor-status-bar-color;
+        padding-top: $status-bar-padding-y;
+        padding-bottom: $status-bar-padding-y;
 
         &:focus, &:active, &:focus:active {
             outline: none;
         }
 
-        [class^="fa fa-angle"] {
-            color: #656565;
-            font-weight: bold;
-            font-size:17px;
-            line-height: 10px;
+        [class*="fa-angle"] {
             margin-left: 7px;
         }
     }
@@ -99,7 +95,7 @@
 
 .console-component {
     position: absolute;
-    bottom: $status-bar-height - 3px;
+    bottom: $status-bar-height - 6px;
     z-index: 5;
 
     height: 0;
@@ -110,7 +106,7 @@
     opacity: 0.9;
     transition: height 300ms;
 
-    color: $text-light;
+    color: $console-default-color;
     font-family: monospace;
 
     .console-content {

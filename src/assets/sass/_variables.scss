@@ -95,8 +95,6 @@ $border-radius: 2px;
 $input-border-radius: $border-radius;
 $input-border-radius-sm: $border-radius;
 
-$button-blue-text: #0275d8;
-
 /**
 * Tool Editor
 */
@@ -114,18 +112,11 @@ $workbox-tabs-height: 44px;
 $padding-sm: 10px;
 $padding-md: 15px;
 
-
-/**
-* CLI colors
-*/
-
-$base-cmd-color: #7AC24D;
-$input-port-color: #A77ED7;
-$arg-color: #FDA365;
-
 /**
 * Status Bar
 */
-$status-bar-vertical-padding: 8px;
+$status-bar-padding-y: 8px;
 $status-bar-line-height: 18px;
-$status-bar-height: $status-bar-line-height + 2*$status-bar-vertical-padding;
+$status-bar-height: $status-bar-line-height + 2*$status-bar-padding-y;
+
+@import "theme-variables";
