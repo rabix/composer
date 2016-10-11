@@ -5,17 +5,7 @@ import {CommandLineComponent} from "./commandline/commandline.component";
 import {DockerInputFormComponent} from "../forms/inputs/forms/docker-input-form.component";
 import {BaseCommandFormComponent} from "../forms/inputs/forms/base-command-form.component";
 import {InputPortsFormComponent} from "../forms/inputs/forms/input-ports-form.component";
-import {EventHubService} from "../../services/event-hub/event-hub.service";
-import {
-    OpenInputInspector,
-    OpenExpressionEditor,
-    CloseInputInspector,
-    CloseExpressionEditor
-} from "../../action-events";
-import {
-    CommandInputParameterModel as InputProperty,
-    CommandLineToolModel
-} from "cwlts/models/d2sb";
+import {CommandLineToolModel} from "cwlts/models/d2sb";
 import {Observable} from "rxjs";
 
 require("./clt-editor.component.scss");
@@ -62,44 +52,13 @@ export class CltEditorComponent implements OnInit {
 
     private file: FileModel;
 
-    /** Positions of the listed properties */
-    private formPosition: FormPosition = "center";
-
     /* TODO: generate the commandline */
     private commandlineContent: string;
 
     /** ControlGroup that encapsulates the validation for all the nested forms */
     private cltEditorGroup: FormGroup;
 
-    private closeSidebarActions = [];
-
-    constructor(private formBuilder: FormBuilder,
-                private eventHubService: EventHubService) {
-
-        /* Opening the sidebar */
-        this.eventHubService.on(OpenInputInspector).subscribe(() => {
-            this.closeSidebarActions.push(CloseInputInspector);
-        });
-
-        this.eventHubService.on(OpenExpressionEditor).subscribe(() => {
-            this.closeSidebarActions.push(CloseExpressionEditor);
-        });
-
-        /* Closing the sidebar */
-        this.eventHubService.on(CloseInputInspector).subscribe(() => {
-            this.deleteSidebarActionFromArray(CloseInputInspector);
-        });
-
-        this.eventHubService.on(CloseExpressionEditor).subscribe(() => {
-            this.deleteSidebarActionFromArray(CloseExpressionEditor);
-        });
-    }
-
-    deleteSidebarActionFromArray(action) {
-        this.closeSidebarActions = this.closeSidebarActions.filter(sidebarAction => {
-            return sidebarAction !== action;
-        });
-    }
+    constructor(private formBuilder: FormBuilder) { }
 
     ngOnInit() {
         this.fileStream.first(file => {
