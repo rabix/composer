@@ -1,16 +1,11 @@
 import {Component, OnDestroy} from "@angular/core";
 import {Subscription} from "rxjs/Subscription";
-import {
-    OpenInputInspector,
-    CloseInputInspector,
-    OpenExpressionEditor,
-    CloseExpressionEditor
-} from "../../action-events/index";
-import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {ExpressionEditorSidebarComponent} from "./expression-editor/expression-editor-sidebar.component";
 import {InputInspectorSidebarComponent} from "./object-inpsector/input-inspector-sidebar.component";
+import {ExpressionSidebarService} from "../../services/sidebars/expression-sidebar.service";
+import {InputSidebarService} from "../../services/sidebars/input-sidebar.service";
 
-require ("./editor.component.scss");
+require("./editor.component.scss");
 
 declare type sidebarType = "input-inspector" | "expression-editor";
 
@@ -18,7 +13,7 @@ declare type sidebarType = "input-inspector" | "expression-editor";
     selector: "sidebar-component",
     directives: [
         InputInspectorSidebarComponent,
-        ExpressionEditorSidebarComponent
+        ExpressionEditorSidebarComponent,
     ],
     template: `
             <div [ngClass]="{show: show}" class="sidebar-container">
@@ -36,59 +31,61 @@ export class SidebarComponent implements OnDestroy {
 
     private currentSidebar: sidebarType;
 
-    private closeSidebarActions = [];
+    private sidebarStack = [];
 
     private show = false;
-    
+
     private subs: Subscription[];
 
-    constructor(private eventHubService: EventHubService) {
+    constructor(private expressionSidebarService: ExpressionSidebarService,
+                private inputSidebarService: InputSidebarService) {
         this.subs = [];
 
         this.initInputInspectorListener();
         this.initExpressionEditorListener();
     }
 
-    //TODO (Mate): make this simpler
-    //@todo: there are bugs when working with multiple tools at once:
-    // 1. opening tools will give the correct initial state (no sidebar)
-    // 2. sidebar state will synchronize across all open tools
+    //TODO (Mate): move this to a service
     private initInputInspectorListener(): void {
-        this.subs.push(this.eventHubService.on(OpenInputInspector).subscribe(() => {
-            this.closeSidebarActions.push(CloseInputInspector);
-            this.currentSidebar = "input-inspector";
-            this.setSidebarState();
-        }));
-
-        this.subs.push(this.eventHubService.on(CloseInputInspector).subscribe(() => {
-            this.deleteSidebarActionFromArray(CloseInputInspector);
-            this.currentSidebar = this.closeSidebarActions[0] === CloseExpressionEditor ? "expression-editor" : undefined;
-            this.setSidebarState();
-        }));
+        this.inputSidebarService.isOpen.subscribe((isOpen: boolean) => {
+            if (isOpen) {
+                if (this.sidebarStack.indexOf("input-inspector") === -1) {
+                    this.sidebarStack.unshift("input-inspector");
+                }
+                this.currentSidebar = "input-inspector";
+                this.setSidebarState();
+            } else {
+                this.removeSidebarFromStack("input-inspector");
+                this.currentSidebar = this.sidebarStack.length > 0 ? this.sidebarStack[0] : undefined;
+                this.setSidebarState();
+            }
+        });
     }
 
     private initExpressionEditorListener(): void {
-        this.subs.push(this.eventHubService.on(OpenExpressionEditor).subscribe(() => {
-            this.closeSidebarActions.push(CloseExpressionEditor);
-            this.currentSidebar = "expression-editor";
-            this.setSidebarState();
-        }));
-
-        this.subs.push(this.eventHubService.on(CloseExpressionEditor).subscribe(() => {
-            this.deleteSidebarActionFromArray(CloseExpressionEditor);
-            this.currentSidebar = this.closeSidebarActions[0] === CloseInputInspector ? "input-inspector" : undefined;
-            this.setSidebarState();
-        }));
+        this.expressionSidebarService.isOpen.subscribe((isOpen: boolean) => {
+            if (isOpen) {
+                if (this.sidebarStack.indexOf("expression-editor") === -1) {
+                    this.sidebarStack.unshift("expression-editor");
+                }
+                this.currentSidebar = "expression-editor";
+                this.setSidebarState();
+            } else {
+                this.removeSidebarFromStack("expression-editor");
+                this.currentSidebar = this.sidebarStack.length > 0 ? this.sidebarStack[0] : undefined;
+                this.setSidebarState();
+            }
+        });
     }
 
-    private deleteSidebarActionFromArray(action): void {
-        this.closeSidebarActions = this.closeSidebarActions.filter(sidebarAction => {
-            return sidebarAction !== action;
+    private removeSidebarFromStack(sidebar): void {
+        this.sidebarStack = this.sidebarStack.filter(sidebarName => {
+            return sidebarName !== sidebar;
         });
     }
 
     private setSidebarState(): void {
-        this.show = this.closeSidebarActions.length !== 0;
+        this.show = this.sidebarStack.length !== 0;
     }
 
     ngOnDestroy(): void {

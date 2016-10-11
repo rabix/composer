@@ -15,12 +15,18 @@ import {ViewSwitcherComponent} from "../view-switcher/view-switcher.component";
 import {ValidationResponse} from "../../services/webWorker/json-schema/json-schema.service";
 import {ValidationIssuesComponent} from "../validation-issues/validation-issues.component";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
+import {ExpressionSidebarService} from "../../services/sidebars/expression-sidebar.service";
+import {InputSidebarService} from "../../services/sidebars/input-sidebar.service";
 
 require("./tool-container.component.scss");
 
 @Component({
     selector: "tool-container",
-    providers: [ViewModeService],
+    providers: [
+        ViewModeService,
+        ExpressionSidebarService,
+        InputSidebarService
+    ],
     directives: [
         CodeEditorComponent,
         CltEditorComponent,

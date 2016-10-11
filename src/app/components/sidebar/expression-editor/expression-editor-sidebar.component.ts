@@ -1,7 +1,6 @@
 import {Component} from "@angular/core";
 import {ExpressionEditorComponent} from "../expression-editor/expression-editor.component";
-import {CloseExpressionEditor} from "../../../action-events/index";
-import {EventHubService} from "../../../services/event-hub/event-hub.service";
+import {ExpressionSidebarService} from "../../../services/sidebars/expression-sidebar.service";
 
 @Component({
     selector: "expression-editor-sidebar-component",
@@ -20,9 +19,9 @@ import {EventHubService} from "../../../services/event-hub/event-hub.service";
     `
 })
 export class ExpressionEditorSidebarComponent {
-    constructor(private eventHubService: EventHubService) { }
+    constructor(private expressionSidebarService: ExpressionSidebarService) { }
 
     private collapseSidebar(): void {
-        this.eventHubService.publish(new CloseExpressionEditor());
+        this.expressionSidebarService.closeExpressionEditor();
     }
 }
