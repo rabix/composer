@@ -7,6 +7,7 @@ import {SandboxService, SandboxResponse} from "../../../services/sandbox/sandbox
 import {Subscription} from "rxjs/Subscription";
 import {Subject} from "rxjs/Subject";
 import {ExpressionModel} from "cwlts/models/d2sb";
+import {Observable} from "rxjs";
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import TextMode = AceAjax.TextMode;
@@ -47,7 +48,7 @@ require ("./expression-editor.component.scss");
                     
                     <button type="button" 
                             class="btn btn-primary expression-editor-btn execute-btn"
-                            (click)="execute()">Execute</button>
+                            (click)="evaluateExpression()">Execute</button>
                 </div>
          </div>
  `
@@ -69,7 +70,7 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
     /** Code String that we send to the sandbox */
     private codeToEvaluate: string;
 
-    /** Result we get back from the sandbox */
+    /** String we display as the result */
     private evaluatedExpression: string;
 
     private sandboxService: SandboxService;
@@ -109,41 +110,51 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
 
     private initSandbox(): void {
         this.sandboxService = new SandboxService();
-        this.codeToEvaluate = '';
-        this.evaluatedExpression = '';
+        this.codeToEvaluate = "";
+        this.evaluatedExpression = "";
     }
 
-    private execute(): void {
+    private evaluateExpression(): Observable<SandboxResponse> {
         this.removeSandboxSub();
+        let responseResult: Subject<SandboxResponse> = new Subject<SandboxResponse>();
+
         this.sandBoxSub = this.sandboxService.submit(this.codeToEvaluate)
-                .subscribe((result: SandboxResponse) => {
-                    if (result.error) {
-                        //TODO: make error message nicer on the UI
-                        this.evaluatedExpression = result.error;
-                    } else {
-                        this.evaluatedExpression = result.output;
-                    }
-                });
+            .subscribe((result: SandboxResponse) => {
+                if (result.error) {
+                    //TODO: make error message nicer on the UI
+                    this.evaluatedExpression = result.error;
+                } else {
+                    this.evaluatedExpression = result.output;
+                }
+
+                responseResult.next(result);
+            });
+
+        return responseResult;
     }
 
-    private cancel() {
+    private cancel(): void {
         this.editor.setText(this.initialExpressionScript);
         this.codeToEvaluate = this.initialExpressionScript;
         this.eventHub.publish(new CloseExpressionEditor());
     }
 
-    private save() {
-        if (this.evaluatedExpression === "undefined" || this.evaluatedExpression === "null") {
-            this.newValueStream.next("");
-        } else {
-            this.newValueStream.next(new ExpressionModel({
-                script: this.codeToEvaluate,
-                expressionValue: this.evaluatedExpression
-            }));
-        }
+    private save(): void {
+        this.evaluateExpression()
+            .subscribe((result: SandboxResponse) => {
+            if (result.error || result.output === "undefined" || result.output === "null") {
+                this.newValueStream.next(this.initialExpressionScript);
+
+            } else {
+                this.newValueStream.next(new ExpressionModel({
+                    script: this.codeToEvaluate,
+                    expressionValue: result.output
+                }));
+            }
+        });
     }
 
-    private removeSandboxSub() {
+    private removeSandboxSub(): void {
         if (this.sandBoxSub) {
             this.sandBoxSub.unsubscribe();
             this.sandBoxSub = undefined;
