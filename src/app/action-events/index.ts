@@ -1,8 +1,5 @@
 import {FileModel} from "../store/models/fs.models";
 import {CwlFileTemplate} from "../types/file-template.type";
-import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
-import {Observable} from "rxjs/Observable";
-import {ExpressionEditorData} from "../models/expression-editor-data.model";
 
 export class EventHubAction {
     public type: string;
@@ -101,47 +98,5 @@ export class CreateFileResponse extends EventHubAction {
 export class ApiError extends EventHubAction {
     constructor(error: any) {
         super("api_error", error);
-    }
-}
-
-export class OpenInputInspector extends EventHubAction {
-    constructor(input: Observable<InputProperty>) {
-        super("open_input_inspector", input);
-    }
-}
-
-export class CloseInputInspector extends EventHubAction {
-    constructor() {
-        super("close_input_inspector", undefined);
-    }
-}
-
-export class OpenExpressionEditor extends EventHubAction {
-    constructor(expressionEditorEvent: ExpressionEditorData) {
-        super("open_expression_editor", expressionEditorEvent);
-    }
-}
-
-export class CloseExpressionEditor extends EventHubAction {
-    constructor() {
-        super("close_expression_editor", undefined);
-    }
-}
-
-export class CwlValidationResult extends EventHubAction {
-    constructor(validationResult: any) {
-        super("cwl_validation_result", validationResult);
-    }
-}
-
-export class UpdateBaseCommandExpression extends EventHubAction {
-    constructor(expression: string) {
-        super("update_expression", expression);
-    }
-}
-
-export class UpdateInputPortExpression extends EventHubAction {
-    constructor(expression: string) {
-        super("update_input_port", expression);
     }
 }

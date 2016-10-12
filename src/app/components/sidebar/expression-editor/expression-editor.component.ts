@@ -1,13 +1,11 @@
 import {Component, ElementRef, ViewChild, OnInit, OnDestroy} from "@angular/core";
 import {ExpressionEditor} from "./expression-editor";
-import {EventHubService} from "../../../services/event-hub/event-hub.service";
 import {ExpressionEditorData} from "../../../models/expression-editor-data.model";
-import {OpenExpressionEditor, CloseExpressionEditor} from "../../../action-events/index";
 import {SandboxService, SandboxResponse} from "../../../services/sandbox/sandbox.service";
 import {Subscription} from "rxjs/Subscription";
 import {Subject} from "rxjs/Subject";
 import {ExpressionModel} from "cwlts/models/d2sb";
-import {Observable} from "rxjs";
+import {ExpressionSidebarService} from "../../../services/sidebars/expression-sidebar.service";
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import TextMode = AceAjax.TextMode;
@@ -79,13 +77,13 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
 
     private sandBoxSub: Subscription;
 
-    constructor(private eventHub: EventHubService) {
+    constructor(private expressionSidebarService: ExpressionSidebarService) {
         this.subs = [];
     }
 
     ngOnInit(): any {
-        let openExpressionEditor = this.eventHub.onValueFrom(OpenExpressionEditor)
-            .subscribe((data:ExpressionEditorData) => {
+        this.subs.push(
+            this.expressionSidebarService.expressionDataStream.subscribe((data:ExpressionEditorData) => {
                 this.initSandbox();
 
                 this.initialExpressionScript = data.expression;
@@ -95,9 +93,8 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
                 this.codeToEvaluate = this.initialExpressionScript;
 
                 this.listenToExpressionChanges();
-            });
-
-        this.subs.push(openExpressionEditor);
+            })
+        );
     }
 
     private listenToExpressionChanges(): void {
@@ -114,10 +111,8 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
         this.evaluatedExpression = "";
     }
 
-    private evaluateExpression(): Observable<SandboxResponse> {
+    private execute(): void {
         this.removeSandboxSub();
-        let responseResult: Subject<SandboxResponse> = new Subject<SandboxResponse>();
-
         this.sandBoxSub = this.sandboxService.submit(this.codeToEvaluate)
             .subscribe((result: SandboxResponse) => {
                 if (result.error) {
@@ -126,17 +121,13 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
                 } else {
                     this.evaluatedExpression = result.output;
                 }
-
-                responseResult.next(result);
             });
-
-        return responseResult;
     }
 
     private cancel(): void {
         this.editor.setText(this.initialExpressionScript);
         this.codeToEvaluate = this.initialExpressionScript;
-        this.eventHub.publish(new CloseExpressionEditor());
+        this.expressionSidebarService.closeExpressionEditor();
     }
 
     private save(): void {

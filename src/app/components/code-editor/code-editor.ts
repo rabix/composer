@@ -1,12 +1,10 @@
 import {Observable} from "rxjs/Observable";
 import {Subscription} from "rxjs/Subscription";
 import {FileModel} from "../../store/models/fs.models";
+import {AbstractCodeEditor} from "../abstract-code-editor/abstract-code-editor";
 import Editor = AceAjax.Editor;
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
-import {WebWorkerService} from "../../services/webWorker/web-worker.service";
-import {ValidationResponse} from "../../services/webWorker/json-schema/json-schema.service";
-import {AbstractCodeEditor} from "../abstract-code-editor/abstract-code-editor";
 
 export class CodeEditor extends AbstractCodeEditor {
 
@@ -14,15 +12,10 @@ export class CodeEditor extends AbstractCodeEditor {
 
     private subs: Subscription[] = [];
 
-    private webWorkerService: WebWorkerService;
-
     public contentChanges: Observable<FileModel>;
 
-    public validationResult: Observable<ValidationResponse>;
-
     constructor(private editor: Editor,
-                private fileStream: Observable<FileModel>,
-                private webWorkerService: WebWorkerService) {
+                private fileStream: Observable<FileModel>) {
 
         super();
         this.editor = editor;
@@ -41,7 +34,6 @@ export class CodeEditor extends AbstractCodeEditor {
                 .subscribe(file => {
                     this.setMode(file.type || ".txt");
                     this.setText(file.content);
-                    this.validateJsonSchema(file.content);
                 })
         );
 
@@ -52,25 +44,6 @@ export class CodeEditor extends AbstractCodeEditor {
             .withLatestFrom(this.fileStream, (content, file) => {
                 return Object.assign(file, {content});
             }).share();
-
-        this.validationResult = this.webWorkerService.validationResultStream;
-        this._attachJsonValidation();
-    }
-
-    private _attachJsonValidation(): void {
-        this.subs.push(
-            this.contentChanges
-                .map(file => {
-                    return file.content;
-                })
-                .subscribe((content: string) => {
-                    this.validateJsonSchema(content);
-                })
-        );
-    }
-
-    private validateJsonSchema(content: string): void {
-        this.webWorkerService.validateJsonSchema(content);
     }
 
     public dispose(): void {

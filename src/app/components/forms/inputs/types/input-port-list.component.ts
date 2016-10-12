@@ -1,9 +1,8 @@
 import {Component, OnDestroy} from "@angular/core";
 import {InputPortService} from "../../../../services/input-port/input-port.service";
-import {CloseInputInspector, OpenInputInspector} from "../../../../action-events/index";
-import {EventHubService} from "../../../../services/event-hub/event-hub.service";
 import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 import {Subscription} from "rxjs/Subscription";
+import {InputSidebarService} from "../../../../services/sidebars/input-sidebar.service";
 
 @Component({
     selector: "input-port-list",
@@ -62,7 +61,7 @@ export class InputPortListComponent implements OnDestroy {
     private subs: Subscription[];
 
     constructor(private inputPortService: InputPortService,
-                private eventHubService: EventHubService) {
+                private inputSidebarService: InputSidebarService) {
 
         this.subs = [];
 
@@ -80,14 +79,14 @@ export class InputPortListComponent implements OnDestroy {
 
     private editProperty(inputPort: InputProperty): void {
         this.inputPortService.setSelected(inputPort);
-        this.eventHubService.publish(new OpenInputInspector(this.inputPortService.selectedInputPort));
+        this.inputSidebarService.openInputInspector(inputPort);
     }
 
     private removeProperty(inputPort: InputProperty): void {
         this.inputPortService.deleteInputPort(inputPort);
 
         if (this.selectedInputPort === inputPort) {
-            this.eventHubService.publish(new CloseInputInspector());
+            this.inputSidebarService.closeInputInspector();
         }
     }
 

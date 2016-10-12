@@ -8,6 +8,7 @@ interface PropertyOperation {
     (inputProperty: InputProperty[]): InputProperty[];
 }
 
+//TODO (Mate): refactor this to work with indexes
 @Injectable()
 export class InputPortService {
 

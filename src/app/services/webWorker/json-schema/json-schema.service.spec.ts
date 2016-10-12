@@ -20,7 +20,7 @@ describe("JsonSchemaService", () => {
             draft3: schemas.draft3,
             draft4: schemas.draft4,
             draft2: schemas.draft2,
-            Validator: MockValidator
+            validator: MockValidator
         });
     });
 

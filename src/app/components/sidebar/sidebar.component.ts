@@ -1,109 +1,51 @@
-import {Component, style, animate, state, transition, trigger, OnDestroy} from "@angular/core";
+import {Component, OnDestroy} from "@angular/core";
 import {Subscription} from "rxjs/Subscription";
-import {VisibilityState} from "../clt-editor/animation.states";
-import {
-    OpenInputInspector,
-    CloseInputInspector,
-    OpenExpressionEditor,
-    CloseExpressionEditor
-} from "../../action-events/index";
-import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {ExpressionEditorSidebarComponent} from "./expression-editor/expression-editor-sidebar.component";
 import {InputInspectorSidebarComponent} from "./object-inpsector/input-inspector-sidebar.component";
+import {ToolSidebarService, SidebarType} from "../../services/sidebars/tool-sidebar.service";
 
-require ("./editor.component.scss");
-
-declare type sidebarType = "input-inspector" | "expression-editor";
+require("./editor.component.scss");
 
 @Component({
     selector: "sidebar-component",
     directives: [
         InputInspectorSidebarComponent,
-        ExpressionEditorSidebarComponent
-    ],
-    animations: [
-        trigger("sidebarState", [
-            state("visible", style({
-                display: "block",
-                overflowY: "auto",
-            })),
-            state("hidden", style({
-                display: "none",
-                overflowY: "hidden"
-            })),
-            transition("hidden => visible", animate("100ms ease-in")),
-            transition("visible => hidden", animate("100ms ease-out"))
-        ])
+        ExpressionEditorSidebarComponent,
     ],
     template: `
-            <div [@sidebarState]="sidebarState">
-                <input-inspector-sidebar-component class="tool-sidebar" 
-                                                  [ngClass]="{isTopOfStack: currentSidebar === 'input-inspector'}">
+            <div [ngClass]="{show: show}" class="sidebar-container">
+                <input-inspector-sidebar-component class="tool-sidebar"
+                                                    [hidden]="currentSidebar !== 'input-inspector'">
                 </input-inspector-sidebar-component>
                 
                 <expression-editor-sidebar-component class="tool-sidebar" 
-                                                    [ngClass]="{isTopOfStack: currentSidebar === 'expression-editor'}">
+                                                    [hidden]="currentSidebar !== 'expression-sidebar'">
                 </expression-editor-sidebar-component>
             </div>
     `
 })
 export class SidebarComponent implements OnDestroy {
 
-    private sidebarState: VisibilityState = "hidden";
-    private currentSidebar: sidebarType;
+    private currentSidebar: SidebarType;
 
-    private closeSidebarActions = [];
+    private show = false;
 
     private subs: Subscription[];
 
-    constructor(private eventHubService: EventHubService) {
+    constructor(private toolSidebarService: ToolSidebarService) {
+
         this.subs = [];
 
-        this.initInputInspectorListener();
-        this.initExpressionEditorListener();
-    }
-
-    //TODO (Mate): make this simpler
-    private initInputInspectorListener(): void {
-        this.subs.push(this.eventHubService.on(OpenInputInspector).subscribe(() => {
-            this.closeSidebarActions.push(CloseInputInspector);
-            this.currentSidebar = "input-inspector";
-            this.setSidebarState();
-        }));
-
-        this.subs.push(this.eventHubService.on(CloseInputInspector).subscribe(() => {
-            this.deleteSidebarActionFromArray(CloseInputInspector);
-            this.currentSidebar = this.closeSidebarActions[0] === CloseExpressionEditor ? "expression-editor" : undefined;
-            this.setSidebarState();
-        }));
-    }
-
-    private initExpressionEditorListener(): void {
-        this.subs.push(this.eventHubService.on(OpenExpressionEditor).subscribe(() => {
-            this.closeSidebarActions.push(CloseExpressionEditor);
-            this.currentSidebar = "expression-editor";
-            this.setSidebarState();
-        }));
-
-        this.subs.push(this.eventHubService.on(CloseExpressionEditor).subscribe(() => {
-            this.deleteSidebarActionFromArray(CloseExpressionEditor);
-            this.currentSidebar = this.closeSidebarActions[0] === CloseInputInspector ? "input-inspector" : undefined;
-            this.setSidebarState();
-        }));
-    }
-
-    private deleteSidebarActionFromArray(action): void {
-        this.closeSidebarActions = this.closeSidebarActions.filter(sidebarAction => {
-            return sidebarAction !== action;
-        });
+        this.subs.push(
+            this.toolSidebarService.sidebarStackStream.subscribe((sidebarStack: SidebarType[]) => {
+                this.currentSidebar = sidebarStack.length > 0 ? sidebarStack[0] : undefined;
+                this.setSidebarState();
+            })
+        );
     }
 
     private setSidebarState(): void {
-        if (this.closeSidebarActions.length === 0) {
-            this.sidebarState = "hidden";
-        } else {
-            this.sidebarState = "visible";
-        }
+        this.show = this.currentSidebar !== undefined;
     }
 
     ngOnDestroy(): void {
