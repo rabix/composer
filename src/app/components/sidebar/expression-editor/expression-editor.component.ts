@@ -9,6 +9,7 @@ import {ExpressionSidebarService} from "../../../services/sidebars/expression-si
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import TextMode = AceAjax.TextMode;
+import {Observable} from "rxjs/Observable";
 
 require ("./expression-editor.component.scss");
 
@@ -111,8 +112,10 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
         this.evaluatedExpression = "";
     }
 
-    private execute(): void {
+    private evaluateExpression(): Observable<SandboxResponse> {
         this.removeSandboxSub();
+        let responseResult: Subject<SandboxResponse> = new Subject<SandboxResponse>();
+
         this.sandBoxSub = this.sandboxService.submit(this.codeToEvaluate)
             .subscribe((result: SandboxResponse) => {
                 if (result.error) {
@@ -121,7 +124,11 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
                 } else {
                     this.evaluatedExpression = result.output;
                 }
+
+                responseResult.next(result);
             });
+
+        return responseResult;
     }
 
     private cancel(): void {
