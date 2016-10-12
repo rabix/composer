@@ -30,6 +30,7 @@
         "build:dev": "webpack --config config/webpack.dev.js --progress --profile --colors --display-error-details --display-cached",
         "prebuild:prod": "npm run clean:dist",
         "build:prod": "webpack --config config/webpack.prod.js  --progress --profile --colors --display-error-details --display-cached",
+        "build:electron": "npm run clean:dist && npm run build:prod && ./scripts/electron-build.sh",
         "build:camellia": "webpack --config config/webpack.camellia.js  --progress --profile --colors --display-error-details --display-cached",
         "server": "npm run server:dev",
         "server:dev": "webpack-dev-server --config config/webpack.dev.js --inline --progress --profile --colors --watch --display-error-details --display-cached --content-base src/",
@@ -57,11 +58,13 @@
         "jailed": "^0.3.1",
         "reflect-metadata": "^0.1.8",
         "rxjs": "5.0.0-beta.6",
-        "zone.js": "^0.6.17"
+        "zone.js": "^0.6.17",
+        "cwlts": "^1.4.0"
     },
     "devDependencies": {
         "@types/ace": "0.0.31",
         "@types/core-js": "^0.9.28",
+        "@types/electron": "^1.4.24",
         "@types/jasmine": "^2.2.30",
         "@types/node": "^6.0.38",
         "ajv": "^4.7.3",
@@ -71,7 +74,8 @@
         "compression-webpack-plugin": "^0.3.1",
         "copy-webpack-plugin": "^3.0.0",
         "css-loader": "^0.23.1",
-        "cwlts": "^1.4.0",
+        "electron": "^1.4.3",
+        "electron-packager": "^8.1.0",
         "es6-promise": "^3.1.2",
         "es6-promise-loader": "^1.0.1",
         "es6-shim": "^0.35.0",

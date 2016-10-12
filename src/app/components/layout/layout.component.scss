@@ -51,6 +51,10 @@
   display: flex;
 }
 
+.flex-row {
+  display: flex;
+}
+
 .flex-row:not(.fixed) {
   flex: 1;
   overflow: hidden;

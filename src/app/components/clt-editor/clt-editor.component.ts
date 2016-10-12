@@ -21,7 +21,7 @@ import {Observable} from "rxjs";
 require("./clt-editor.component.scss");
 
 @Component({
-    selector: "clt-editor",
+    selector: "ct-clt-editor",
     directives: [
         DockerInputFormComponent,
         BaseCommandFormComponent,
@@ -50,7 +50,7 @@ require("./clt-editor.component.scss");
             </form>
     `
 })
-export class CltEditorComponent implements OnInit {
+export class CltEditorComponent {
     /** The file that we are going to use to list the properties */
     @Input()
     public fileStream: Observable<FileModel>;
@@ -98,14 +98,6 @@ export class CltEditorComponent implements OnInit {
     deleteSidebarActionFromArray(action) {
         this.closeSidebarActions = this.closeSidebarActions.filter(sidebarAction => {
             return sidebarAction !== action;
-        });
-    }
-
-    ngOnInit() {
-        this.fileStream.first(file => {
-            this.file = file;
-            this.commandlineContent = this.model.getCommandLine();
-            return true;
         });
     }
 }

@@ -47,7 +47,7 @@ export class ModalService {
      *
      * @returns {Promise} Promise that will resolve if user confirms the prompt and reject if user cancels
      */
-    public confirm(params: {
+    public confirm (params: {
         title?: string
         content: string,
         confirmationLabel?: string,

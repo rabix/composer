@@ -103,6 +103,8 @@ ct-tree-view {
   &.hidden {
     height: 0;
     opacity: 0;
+    padding: 0 0 0 10px;
+    font-size: 0;
   }
   .term {
     white-space: pre;

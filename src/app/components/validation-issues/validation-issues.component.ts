@@ -1,6 +1,6 @@
 import {Component, Input, OnInit, OnDestroy} from "@angular/core";
 import {Observable, Subscription} from "rxjs";
-import {ValidationResponse} from "../../services/webWorker/json-schema/json-schema.service";
+import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
 
 @Component({
     selector: "validation-issues",
@@ -30,7 +30,7 @@ import {ValidationResponse} from "../../services/webWorker/json-schema/json-sche
             
                 
                 {{ buttonText }} 
-                <i class="fa" 
+                <i class="fa icon-angle" 
                    [ngClass]="{'fa-angle-right': !showConsole, 'fa-angle-up': showConsole}">
                 </i>
             </button>

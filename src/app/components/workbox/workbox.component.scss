@@ -27,6 +27,7 @@
   background: $main-header-bg;
   font-size: $font-size-xs;
   height: 100%;
+  width: calc(100% - 50px);
   box-shadow: inset 0 -8px 8px -4px rgba(0, 0, 0, 0.15);
   padding: 0 10px 0 25px;
   overflow-x: auto;
@@ -68,7 +69,7 @@
       z-index: 10;
     }
 
-    &.active, &.active:before, &.active:after {
+    &.active, &.active:before, &.active:after, .settings-button {
       z-index: 1;
       color: $tab-select-color;
       background-image: -webkit-linear-gradient(top, $tab-select-bg, $tab-select-bg);
@@ -109,4 +110,15 @@
   display: inline-block;
   padding-left: 5px;
   padding-right: 5px;
+}
+
+ct-settings-button {
+  position: absolute;
+  top: 9px;
+  right: 9px
+}
+
+ct-tab-manager, ct-tool-editor {
+  display: block;
+  height: 100%;
 }

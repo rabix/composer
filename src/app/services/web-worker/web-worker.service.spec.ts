@@ -15,7 +15,6 @@ describe("WebWorkerService", () => {
             webWorkerService.validationResultStream.subscribe((res:ValidationResponse) => {
                 expect(res.isValidCwl).toBe(false);
                 expect(res.isValidatableCwl).toBe(true);
-                expect(res.schema).toEqual(JSON.parse(mockJson));
                 expect(res.errors.length).toBe(3);
                 done();
             }, err => console.log(err));

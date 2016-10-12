@@ -3,12 +3,12 @@
 .scroll-content {
     overflow-y: auto;
     position: relative;
-    min-height: calc(100% - #{$status-bar-height} - #{$workbox-tabs-height});
     height: calc(100% - #{$status-bar-height} - #{$workbox-tabs-height});
 }
 
-.tool-container-component {
+.editor-container {
     height: 100%;
+    position: relative;
     background: $gui-editor-bg;
     display: block;
 }
@@ -54,7 +54,8 @@
         }
     }
 
-    view-switcher {
+    ct-view-mode-switch {
+
         button {
             text-transform: uppercase;
 
@@ -96,10 +97,10 @@
 .console-component {
     position: absolute;
     bottom: $status-bar-height - 6px;
-    z-index: 5;
+    z-index: 9;
 
     height: 0;
-    width: 100%;
+    min-width: 100%;
     overflow: auto;
 
     background: #000000;
@@ -114,6 +115,6 @@
     }
 
     &.show {
-        height: 70px;
+        height: 90px;
     }
 }

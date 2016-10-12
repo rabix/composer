@@ -35,13 +35,13 @@ export class ComponentRegistry {
     /**
      * Extracts the Components from the GL's component hierarchy.
      *
-     * @param content GL's "content" attribute which contains a tree of rows/columns/components
+     * @param content GL's "tabData" attribute which contains a tree of rows/columns/components
      * @returns {any[]}
      *
      */
     private extractComponents(content: any[]) {
 
-        // We'll split nodes in the "content" tree into these two groups
+        // We'll split nodes in the "tabData" tree into these two groups
         const components = [], // We need to extract these
               structures = []; // And traverse into these so we can find more components
 
@@ -49,7 +49,7 @@ export class ComponentRegistry {
         content.forEach(item => item.type === "component" ? components.push(item) : structures.push(item));
 
         // Then recurse into structures and find more components.
-        return components.concat(...structures.map(structure => this.extractComponents(structure.content), []));
+        return components.concat(...structures.map(structure => this.extractComponents(structure.tabData), []));
     }
 
     /**
