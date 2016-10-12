@@ -10,14 +10,17 @@ import {WebWorkerService} from "../../services/web-worker/web-worker.service";
     directives: [CodeEditorComponent],
     template: `
         <div class="editor-container">
-            <tool-header class="tool-header"></tool-header>
+            <tool-header class="tool-header"
+                         (save)="save($event)"
+                         [fileIsValid]="isValidCwl"
+                         [data]="data"></tool-header>
         
             <div class="scroll-content">
                 <ct-code-editor [hidden]="viewMode !== 'code'"
                                 (contentChanges)="onEditorContentChange($event)"
                                 [content]="data.content"
-                                [language]="data.language">
-                </ct-code-editor>
+                                [readOnly]="!data.isWritable"
+                                [language]="data.language"></ct-code-editor>
         
                 <div>Workflow Editor Coming Soon</div>
             </div>
@@ -28,9 +31,8 @@ import {WebWorkerService} from "../../services/web-worker/web-worker.service";
                 </div>
                 <div class="right-side">
                     <ct-view-mode-switch [viewMode]="viewMode"
-                                         [disabled]="!guiAvailable"
-                                         (onSwitch)="viewMode = $event">
-                    </ct-view-mode-switch>
+                                         [disabled]="!isValidCwl"
+                                         (onSwitch)="viewMode = $event"></ct-view-mode-switch>
                 </div>
             </div>
         </div>
@@ -46,7 +48,7 @@ export class WorkflowEditorComponent implements OnInit, OnDestroy {
     private viewMode: "code"|"gui" = "code";
 
     /** Flag for validity of CWL document */
-    private guiAvailable = true;
+    private isValidCwl = true;
 
     /** List of subscriptions that should be disposed when destroying this component */
     private subs: Subscription[] = [];
@@ -65,7 +67,7 @@ export class WorkflowEditorComponent implements OnInit, OnDestroy {
             .subscribe(this.schemaValidation);
 
         this.webWorkerService.validationResultStream.subscribe(err => {
-            this.guiAvailable = err.isValidCwl;
+            this.isValidCwl = err.isValidCwl;
         });
     }
 
@@ -77,5 +79,12 @@ export class WorkflowEditorComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.subs.forEach(sub => sub.unsubscribe());
+    }
+
+    private save(revisionNote){
+
+        this.data.save(JSON.parse(this.rawEditorContent.getValue()), revisionNote).subscribe(data => {
+
+        });
     }
 }

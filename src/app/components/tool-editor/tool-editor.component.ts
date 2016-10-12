@@ -36,12 +36,16 @@ require("./tool-editor.component.scss");
     ],
     template: `
         <div class="editor-container">
-            <tool-header class="tool-header"></tool-header>
+            <tool-header class="tool-header"
+                         (save)="save($event)"
+                         [fileIsValid]="isValidCwl"
+                         [data]="data"></tool-header>
         
             <div class="scroll-content">
                 <ct-code-editor [hidden]="viewMode !== 'code'"
                                 (contentChanges)="onEditorContentChange($event)"
                                 [content]="data.content"
+                                [readOnly]="!data.isWritable"
                                 [language]="data.language">
                 </ct-code-editor>
         
@@ -60,7 +64,7 @@ require("./tool-editor.component.scss");
                 </div>
                 <div class="right-side">
                     <ct-view-mode-switch [viewMode]="viewMode"
-                                         [disabled]="!guiAvailable"
+                                         [disabled]="!isValidCwl"
                                          (onSwitch)="viewMode = $event">
                     </ct-view-mode-switch>
                 </div>
@@ -82,7 +86,7 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
     private commandLineParts: CommandLinePart[];
 
     /** Flag for validity of CWL document */
-    private guiAvailable = true;
+    private isValidCwl = true;
 
     /** List of subscriptions that should be disposed when destroying this component */
     private subs: Subscription[] = [];
@@ -110,7 +114,7 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
         });
 
         this.webWorkerService.validationResultStream.subscribe(err => {
-            this.guiAvailable = err.isValidCwl;
+            this.isValidCwl = err.isValidCwl;
         });
     }
 
@@ -118,6 +122,13 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
         this.webWorkerService.validateJsonSchema(content);
         this.rawEditorContent.next(content);
 
+    }
+
+    private save(revisionNote){
+
+        this.data.save(JSON.parse(this.rawEditorContent.getValue()), revisionNote).subscribe(data => {
+
+        });
     }
 
     ngOnDestroy(): void {

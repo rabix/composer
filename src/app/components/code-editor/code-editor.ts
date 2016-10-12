@@ -1,5 +1,3 @@
-import {WebWorkerService} from "../../services/web-worker/web-worker.service";
-import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
 import {AbstractCodeEditor} from "../abstract-code-editor/abstract-code-editor";
 import {Subject, Observable, Subscription} from "rxjs";
 import Editor = AceAjax.Editor;
@@ -11,10 +9,6 @@ import IEditSession = AceAjax.IEditSession;
 
 export class CodeEditor extends AbstractCodeEditor {
 
-    private webWorkerService: WebWorkerService;
-
-    public validationResult: Observable<ValidationResponse>;
-
     public contentChanges = new Subject<string>();
 
     private subs: Subscription[] = [];
@@ -22,10 +16,11 @@ export class CodeEditor extends AbstractCodeEditor {
     constructor(private editor: Editor,
                 private content: Subject<string>,
                 private contentType: Observable<string>,
-                private webWorkerService: WebWorkerService) {
+                options = {}) {
 
         super();
         this.editor = editor;
+        this.editor.setOptions(options);
 
         // to disable a warning message from ACE about a deprecated method
         this.editor.$blockScrolling = Infinity;
@@ -41,7 +36,6 @@ export class CodeEditor extends AbstractCodeEditor {
 
         this.content.subscribe(rawText => {
             this.document.setValue(rawText);
-            // this.validateJsonSchema(rawText);
         });
 
         Observable.fromEvent(this.editor as EventTarget, "change")
@@ -49,34 +43,8 @@ export class CodeEditor extends AbstractCodeEditor {
             .map(_ => this.document.getValue())
             .subscribe(this.contentChanges);
 
-        // this.contentChanges = Observable.fromEvent(this.editor as any, "change")
-        //     .debounceTime(300)
-        //     .map(_ => this.document.getValue())
-        //     .distinctUntilChanged()
-        //     .withLatestFrom(this.content, (content, file) => {
-        //         return Object.assign(file, {content});
-        //     }).share();
-
-        // this.validationResult = this.webWorkerService.validationResultStream;
-        // this._attachJsonValidation();
     }
 
-    // private _attachJsonValidation(): void {
-    //     this.subs.push(
-    //         this.contentChanges
-    //             .map(file => {
-    //                 return file.content;
-    //             })
-    //             .subscribe((content: string) => {
-    //                 this.validateJsonSchema(content);
-    //             })
-    //     );
-    // }
-    //
-    // private validateJsonSchema(content: string): void {
-    //     this.webWorkerService.validateJsonSchema(content);
-    // }
-    //
     public dispose(): void {
         this.editor.destroy();
         this.subs.forEach(sub => sub.unsubscribe());

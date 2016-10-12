@@ -25,6 +25,9 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
     @Input()
     public language: Observable<string>;
 
+    @Input()
+    public readOnly = false;
+
     @Output()
     public contentChanges = new Subject<string>();
 
@@ -51,7 +54,9 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
             ace.edit(this.aceContainer.nativeElement),
             this.rawInput,
             this.language,
-            this.webWorkerService
+            {
+                readOnly: this.readOnly
+            }
         );
 
         this.editor.contentChanges.subscribe(this.contentChanges);
