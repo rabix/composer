@@ -5,9 +5,10 @@ import * as jailed from "jailed";
 describe("SandboxService", () => {
     const sandboxService = new SandboxService();
 
-    const fakePlugin = {
-        whenConnected: () => { }
-    };
+    class FakePlugin {
+        public whenConnected() { }
+        public disconnect() { }
+    }
 
     describe("stringify", () => {
 
@@ -49,34 +50,29 @@ describe("SandboxService", () => {
 
     describe("submit", () => {
 
-        it("should update the expressionResult with the result of the expression", done => {
-
-            let updateExpressionResult: BehaviorSubject<SandboxResponse> = new BehaviorSubject<SandboxResponse>(undefined);
-
-            sandboxService.expressionResult = updateExpressionResult
-                .publishReplay(1)
-                .refCount();
+        it("should update the expressionResult with the result of the expression", (done) => {
 
             spyOn(sandboxService, "createExpressionCode").and.callFake(code => code);
-            spyOn(jailed, "DynamicPlugin").and.callFake(expressionCode => {
+            spyOn(jailed, "DynamicPlugin").and.callFake((expressionCode, jailedApi) => {
                 const mockResult = eval(expressionCode);
 
-                updateExpressionResult.next({
-                    output: mockResult,
-                    error: undefined
-                });
+                //output() needs to be called after the class has returned
+                setTimeout(() => {
+                    jailedApi.output({
+                        output: mockResult,
+                        error: undefined
+                    });
+                }, 0);
 
-                return fakePlugin;
+                return new FakePlugin();
             });
 
-            sandboxService.submit(1 + 2);
-
-            sandboxService.expressionResult
-                .filter(result => result !== undefined)
+            sandboxService.submit(1 + 2)
                 .subscribe((result: SandboxResponse) => {
-                    expect(result).toEqual({ output: 3, error: undefined });
+                    expect(result).toEqual({ output: '3', error: undefined });
                     done();
                 });
+
         });
     });
 
