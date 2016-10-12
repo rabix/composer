@@ -1,22 +1,22 @@
+import {Component, ViewChild, ViewContainerRef, AfterViewInit} from "@angular/core";
 import {ComponentRegistryFactoryService} from "../workspace/registry/component-registry-factory.service";
 import {ContextDirective} from "../../services/context/context.directive";
+import {ContextService} from "../../services/context/context.service";
+import {DomEventService} from "../../services/dom/dom-event.service";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
+import {ExpressionInputService} from "../../services/expression-input/expression-input.service";
 import {FileRegistry} from "../../services/file-registry.service";
+import {InputPortService} from "../../services/input-port/input-port.service";
+import {LayoutComponent} from "../layout/layout.component";
 import {MenuBarComponent} from "../menu";
 import {ModalService} from "../modal";
 import {Observable} from "rxjs/Rx";
-import {Component, ViewChild, ViewContainerRef, AfterViewInit} from "@angular/core";
-import {UrlValidator} from "../../validators/url.validator";
-import {WebWorkerService} from "../../services/webWorker/web-worker.service";
-import {ContextService} from "../../services/context/context.service";
-import {InputPortService} from "../../services/input-port/input-port.service";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
-import {LayoutComponent} from "../layout/layout.component";
-import {ExpressionInputService} from "../../services/expression-input/expression-input.service";
-import {DomEventService} from "../../services/dom/dom-event.service";
 import {SBPlatformDataSource} from "../../sources/sbg";
 import {SettingsService} from "../../services/settings/settings.service";
+import {UrlValidator} from "../../validators/url.validator";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
+import {WebWorkerService} from "../../services/web-worker/web-worker.service";
 
 require("./../../../assets/sass/main.scss");
 

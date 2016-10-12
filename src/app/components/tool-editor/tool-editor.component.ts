@@ -3,27 +3,24 @@ import {NgSwitch, NgSwitchCase, NgSwitchDefault} from "@angular/common";
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {CltEditorComponent} from "../clt-editor/clt-editor.component";
-import {Subscription, Observable, ReplaySubject, BehaviorSubject} from "rxjs/Rx";
+import {Subscription, ReplaySubject, BehaviorSubject} from "rxjs/Rx";
 import {ToolHeaderComponent} from "./tool-header/tool-header.component";
 import {ViewModeService} from "./services/view-mode.service";
 import {CommandLineToolModel} from "cwlts/models/d2sb";
 import {SidebarComponent} from "../sidebar/sidebar.component";
 import {CommandLineComponent} from "../clt-editor/commandline/commandline.component";
 import {ViewModeSwitchComponent} from "../view-switcher/view-switcher.component";
-import {ValidationResponse} from "../../services/webWorker/json-schema/json-schema.service";
 import {DataEntrySource} from "../../sources/common/interfaces";
-import {WebWorkerService} from "../../services/webWorker/web-worker.service";
-import {ViewSwitcherComponent} from "../view-switcher/view-switcher.component";
 import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
 import {ValidationIssuesComponent} from "../validation-issues/validation-issues.component";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
+import {WebWorkerService} from "../../services/web-worker/web-worker.service";
 
-require("./tool-container.component.scss");
-
+require("./tool-editor.component.scss");
 
 @Component({
     selector: "ct-tool-editor",
-    providers: [ViewModeService],
+    providers: [ViewModeService, WebWorkerService],
     directives: [
         CodeEditorComponent,
         CltEditorComponent,
@@ -38,12 +35,13 @@ require("./tool-container.component.scss");
         ValidationIssuesComponent
     ],
     template: `
-        <div class="tool-container-component">
+        <div class="editor-container">
             <tool-header class="tool-header"></tool-header>
         
             <div class="scroll-content">
-                <ct-code-editor *ngIf="viewMode === 'code'"
-                                [content]="textContent"
+                <ct-code-editor [hidden]="viewMode !== 'code'"
+                                (contentChanges)="onEditorContentChange($event)"
+                                [content]="data.content"
                                 [language]="data.language">
                 </ct-code-editor>
         
@@ -57,13 +55,13 @@ require("./tool-container.component.scss");
             </div>
             <div class="status-bar-footer">
                 <div class="left-side">
-                    <validation-issues [issuesStream]="schemaValidationStream"></validation-issues>
+                    <validation-issues [issuesStream]="schemaValidation"></validation-issues>
                     <commandline [commandLineParts]="commandLineParts"></commandline>
                 </div>
                 <div class="right-side">
                     <ct-view-mode-switch [viewMode]="viewMode"
-                                     [disabled]="!isValid"
-                                     (onSwitch)="viewMode = $event">
+                                         [disabled]="!guiAvailable"
+                                         (onSwitch)="viewMode = $event">
                     </ct-view-mode-switch>
                 </div>
             </div>
@@ -74,22 +72,22 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
     @Input()
     public data: DataEntrySource;
 
-    public schemaValidation: ReplaySubject<ValidationResponse>;
-
-    private textContent = new BehaviorSubject("");
+    public schemaValidation = new ReplaySubject<ValidationResponse>(1);
 
     /** Default view mode. */
     private viewMode: "code"|"gui" = "code";
 
-    private toolModel: CommandLineToolModel;
+    private toolModel = new CommandLineToolModel();
 
     private commandLineParts: CommandLinePart[];
 
     /** Flag for validity of CWL document */
-    private isValid = true;
+    private guiAvailable = true;
 
     /** List of subscriptions that should be disposed when destroying this component */
     private subs: Subscription[] = [];
+
+    private rawEditorContent = new BehaviorSubject("");
 
     constructor(private webWorkerService: WebWorkerService) {
 
@@ -97,40 +95,29 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
 
-        this.data.content.subscribe(this.textContent);
+        this.data.content.subscribe(this.rawEditorContent);
 
-        this.textContent.subscribe(rawText => {
+        this.webWorkerService.validationResultStream
+            .subscribe(this.schemaValidation);
+
+        this.rawEditorContent.subscribe(raw => {
             try {
-                this.toolModel = new CommandLineToolModel(JSON.parse(rawText));
+                this.toolModel = new CommandLineToolModel(JSON.parse(raw));
                 this.commandLineParts = this.toolModel.getCommandLineParts();
-
-                // if the file isn't valid JSON, do nothing
             } catch (ex) {
+                // if the file isn't valid JSON, do nothing
             }
         });
 
-        // this.webWorkerService.validationResultStream
-        //     .do(data => console.debug("Validation", data))
-        //     .subscribe(this.schemaValidation);
-        // // bring our own file up to date
-        // this.subs.push(this.tabData.subscribe(file => {
-        //     this.file = file;
-        //
-        //     // while the file is being edited, attempt to recreate the model
-        //     try {
-        //         this.model              = new CommandLineToolModel(JSON.parse(this.file.content));
-        //         this.commandlineContent = this.model.getCommandLine();
-        //
-        //         // if the file isn't valid JSON, do nothing
-        //     } catch (ex) {
-        //     }
-        //
-        // }));
-        //
-        // // enable GUI switch when file is valid CWL
-        // this.subs.push(this.schemaValidation.subscribe((err: ValidationResponse) => {
-        //     this.isValid = err.isValidCwl;
-        // }));
+        this.webWorkerService.validationResultStream.subscribe(err => {
+            this.guiAvailable = err.isValidCwl;
+        });
+    }
+
+    private onEditorContentChange(content: string){
+        this.webWorkerService.validateJsonSchema(content);
+        this.rawEditorContent.next(content);
+
     }
 
     ngOnDestroy(): void {

@@ -1,15 +1,10 @@
-import {Observable} from "rxjs/Observable";
-import {Subscription} from "rxjs/Subscription";
-import {WebWorkerService} from "../../services/webWorker/web-worker.service";
-import {ValidationResponse} from "../../services/webWorker/json-schema/json-schema.service";
-import {FileModel} from "../../store/models/fs.models";
-import Editor = AceAjax.Editor;
-import Document = AceAjax.Document;
-import IEditSession = AceAjax.IEditSession;
 import {WebWorkerService} from "../../services/web-worker/web-worker.service";
 import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
 import {AbstractCodeEditor} from "../abstract-code-editor/abstract-code-editor";
-import {Subject} from "rxjs";
+import {Subject, Observable, Subscription} from "rxjs";
+import Editor = AceAjax.Editor;
+import Document = AceAjax.Document;
+import IEditSession = AceAjax.IEditSession;
 import Editor = AceAjax.Editor;
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
@@ -20,7 +15,7 @@ export class CodeEditor extends AbstractCodeEditor {
 
     public validationResult: Observable<ValidationResponse>;
 
-    public contentChange = new Subject<string>();
+    public contentChanges = new Subject<string>();
 
     private subs: Subscription[] = [];
 
@@ -49,10 +44,10 @@ export class CodeEditor extends AbstractCodeEditor {
             // this.validateJsonSchema(rawText);
         });
 
-        Observable.fromEvent(this.editor, "change")
+        Observable.fromEvent(this.editor as EventTarget, "change")
             .debounceTime(500)
             .map(_ => this.document.getValue())
-            .subscribe(this.contentChange);
+            .subscribe(this.contentChanges);
 
         // this.contentChanges = Observable.fromEvent(this.editor as any, "change")
         //     .debounceTime(300)

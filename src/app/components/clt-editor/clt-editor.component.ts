@@ -50,7 +50,7 @@ require("./clt-editor.component.scss");
             </form>
     `
 })
-export class CltEditorComponent implements OnInit {
+export class CltEditorComponent {
     /** The file that we are going to use to list the properties */
     @Input()
     public fileStream: Observable<FileModel>;
@@ -99,9 +99,5 @@ export class CltEditorComponent implements OnInit {
         this.closeSidebarActions = this.closeSidebarActions.filter(sidebarAction => {
             return sidebarAction !== action;
         });
-    }
-
-    ngOnInit() {
-        this.commandlineContent = this.model.getCommandLine();
     }
 }

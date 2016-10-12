@@ -6,7 +6,7 @@
     height: calc(100% - #{$status-bar-height} - #{$workbox-tabs-height});
 }
 
-.tool-container-component {
+.editor-container {
     height: 100%;
     position: relative;
     background: $gui-editor-bg;

@@ -1,20 +1,21 @@
 import {Component, OnInit, Input, OnDestroy} from "@angular/core";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {Subscription, ReplaySubject} from "rxjs";
-import {WebWorkerService} from "../../services/webWorker/web-worker.service";
-import {ValidationResponse} from "../../services/webWorker/json-schema/json-schema.service";
 import {TabData} from "../workbox/tab-data.interface";
-import {ToolEditorComponent} from "../tool-container/tool-container.component";
 import {SettingsComponent} from "../settings";
+import {WebWorkerService} from "../../services/web-worker/web-worker.service";
+import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
+import {ToolEditorComponent} from "../tool-editor/tool-editor.component";
+import {WorkflowEditorComponent} from "../workflow-editor/workflow-editor.component";
 
 @Component({
     selector: "ct-tab-manager",
     providers: [WebWorkerService],
-    directives: [CodeEditorComponent, ToolEditorComponent, SettingsComponent],
+    directives: [CodeEditorComponent, ToolEditorComponent, WorkflowEditorComponent, SettingsComponent],
     template: `
         <div [ngSwitch]="tab?.contentType | async" class="full-height">
             <ct-tool-editor *ngSwitchCase="'CommandLineTool'" [data]="tab.contentData"></ct-tool-editor>
-            <!--<ct-workflow-editor [fileStream]="tab" *ngSwitchCase="'Workflow'"></ct-workflow-editor>-->
+            <ct-workflow-editor [data]="tab.contentData" *ngSwitchCase="'Workflow'"></ct-workflow-editor>
             <ct-code-editor *ngSwitchCase="'Code'" 
                             [content]="tab.contentData.content" 
                             [language]="tab.contentData.language" 

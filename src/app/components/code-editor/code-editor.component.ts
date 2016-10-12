@@ -1,8 +1,8 @@
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {CodeEditor} from "./code-editor";
-import {Component, OnInit, ElementRef, ViewChild, Input, OnDestroy} from "@angular/core";
-import {Subscription, Observable} from "rxjs/Rx";
-import {WebWorkerService} from "../../services/webWorker/web-worker.service";
+import {Component, OnInit, ElementRef, ViewChild, Input, OnDestroy, Output} from "@angular/core";
+import {Subscription, Observable, Subject} from "rxjs/Rx";
+import {WebWorkerService} from "../../services/web-worker/web-worker.service";
 import Editor = AceAjax.Editor;
 import TextMode = AceAjax.TextMode;
 
@@ -19,11 +19,15 @@ require('./code-editor.component.scss');
 })
 export class CodeEditorComponent implements OnInit, OnDestroy {
 
-    @Input()
-    public content: Observable<string>;
+    @Input("content")
+    public rawInput: Observable<string>;
 
     @Input()
     public language: Observable<string>;
+
+    @Output()
+    public contentChanges = new Subject<string>();
+
 
     /** Holds the reference to the CodeEditor service/component */
     private editor: CodeEditor;
@@ -45,10 +49,12 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
         // Instantiate the editor and give it the stream through which the file will come through
         this.editor = new CodeEditor(
             ace.edit(this.aceContainer.nativeElement),
-            this.content,
+            this.rawInput,
             this.language,
             this.webWorkerService
         );
+
+        this.editor.contentChanges.subscribe(this.contentChanges);
 
         // this.subs.push(
         //     this.editor.contentChanges.skip(1).subscribe((file) => {
