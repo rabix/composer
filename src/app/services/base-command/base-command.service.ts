@@ -75,7 +75,7 @@ export class BaseCommandService {
         this.updatedBaseCommand
             .map(({
                 index: index,
-                newCommand: newBaseCommand
+                newBaseCommand: newBaseCommand
             }): BaseCommandOperation => {
 
                 return (baseCommands: BaseCommand[]) => {
@@ -100,7 +100,7 @@ export class BaseCommandService {
     public updateCommand(index: number, newBaseCommand: BaseCommand): void {
         this.updatedBaseCommand.next(<UpdateBaseCommand>{
             index: index,
-            newCommand: newBaseCommand
+            newBaseCommand: newBaseCommand
         });
     }
 
@@ -112,41 +112,30 @@ export class BaseCommandService {
 
     public baseCommandsToFormList(toolBaseCommand: Array<BaseCommand>): BaseCommand[] {
         const commandInputList: BaseCommand[] = [];
+        let newCommandInput = "";
 
         if (!toolBaseCommand) {
             return commandInputList;
         }
 
-        let lastItemType = "string" | "object";
-        let newCommandInput: string = "";
-
         toolBaseCommand.forEach((command, index) => {
             //If it's a string
             if (typeof command === "string") {
-                lastItemType = "string";
+                let commandToAdd: string;
 
-                if (lastItemType === "string") {
-                    let commandToAdd: string;
-
-                    if (index < toolBaseCommand.length - 1) {
-                        commandToAdd = command + " ";
-                    } else {
-                        commandToAdd = command;
-                    }
-
-                    newCommandInput = newCommandInput.concat(commandToAdd);
-
+                if (index < toolBaseCommand.length - 1) {
+                    commandToAdd = command + " ";
                 } else {
-                    newCommandInput = command;
+                    commandToAdd = command;
                 }
+
+                newCommandInput = newCommandInput.concat(commandToAdd);
 
                 if (index === toolBaseCommand.length - 1) {
                     commandInputList.push(newCommandInput);
                 }
 
             } else {
-                lastItemType = "object";
-
                 if (newCommandInput !== "") {
                     commandInputList.push(newCommandInput.slice(0, -1));
                 }
@@ -169,17 +158,30 @@ export class BaseCommandService {
         formCommandList.forEach((command) => {
             //If it's a string
             if (typeof command === "string") {
-                //Replace subsequent whitespaces with single white space and trim
-                const trimmedCommand = command.replace(/ +(?= )/g,'').trim();
 
-                //Split on spaces
-                const stringArray = trimmedCommand.split(" ");
-                commandList = commandList.concat(stringArray);
+                if (this.hasQuotes(command)) {
+                    commandList.push(command);
+                } else {
+                    //Replace subsequent whitespaces with single white space and trim
+                    const trimmedCommand = command.replace(/ +(?= )/g,'').trim();
+
+                    //Split on spaces
+                    const stringArray = trimmedCommand.split(" ");
+                    commandList = commandList.concat(stringArray);
+                }
             } else {
                 commandList.push(command);
             }
         });
 
         return commandList;
+    }
+
+    public hasQuotes(text: string) {
+        if (text.charAt(0) === "'" && text.charAt(text.length - 1) >= "'" ) {
+            return true;
+        }
+
+        return text.charAt(0) === '"' && text.charAt(text.length - 1) >= '"';
     }
 }

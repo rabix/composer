@@ -1,6 +1,7 @@
 import {inject} from "@angular/core/testing";
 import {BaseCommandService, BaseCommand} from "./base-command.service";
 import {TestBed} from "@angular/core/testing/test_bed";
+import {ExpressionModel} from "cwlts/models/d2sb";
 
 describe("BaseCommandService", () => {
     let baseCommandService: BaseCommandService;
@@ -21,44 +22,48 @@ describe("BaseCommandService", () => {
     describe("baseCommandsToFormList", () => {
 
         it("Should put subsequent string items as one list item", () => {
-            const inputBaseCommand: Array<string> = [
+            const inputBaseCommand: Array<BaseCommand> = [
                 "string 1",
                 "string 2",
                 "string 3"
             ];
 
-            const result: Array<string | Object> = baseCommandService.baseCommandsToFormList(inputBaseCommand);
+            const result: Array<BaseCommand> = baseCommandService.baseCommandsToFormList(inputBaseCommand);
             expect(result).toEqual(["string 1 string 2 string 3"]);
         });
 
         it("Should put objects separately form subsequent strings", () => {
-            const inputBaseCommand: Array<string | Object> = [
-                { class: "Expression", engine: "cwl-js-engine", script: "string"},
+
+            const inputBaseCommand: Array<BaseCommand> = [
+                new ExpressionModel({
+                    script: "111",
+                    expressionValue: "111"
+                }),
                 "string 1",
                 "string 2",
-                { class: "Expression", engine: "cwl-js-engine", script: "string 3"},
+                new ExpressionModel({
+                    script: "222",
+                    expressionValue: "222"
+                }),
                 "string 4",
                 "string 5",
-                { class: "Expression", engine: "cwl-js-engine", script: "string 6"},
+                new ExpressionModel({
+                    script: "333",
+                    expressionValue: "333"
+                }),
                 "string 7"
             ];
 
             const result: Array<BaseCommand> = baseCommandService.baseCommandsToFormList(inputBaseCommand);
             expect(result).toEqual([
-                { class: "Expression", engine: "cwl-js-engine", script: "string"},
+                new ExpressionModel({ engine: 'cwl-js-engine', script: '111', expressionValue: '111' }),
                 "string 1 string 2",
-                { class: "Expression", engine: "cwl-js-engine", script: "string 3"},
+                new ExpressionModel({ engine: 'cwl-js-engine', script: '222', expressionValue: '222' }),
                 "string 4 string 5",
-                { class: "Expression", engine: "cwl-js-engine", script: "string 6"},
+                new ExpressionModel({ engine: 'cwl-js-engine', script: '333', expressionValue: '333' }),
                 "string 7"
             ]);
         });
-
-
-        /*it("Should put a string command input into an array", () => {
-            const result: Array<string | Object> = baseCommandService.baseCommandsToFormList("echo");
-            expect(result).toEqual(["echo"]);
-        });*/
     });
 
 
@@ -69,7 +74,7 @@ describe("BaseCommandService", () => {
             baseCommandService.addCommand("grep");
 
             baseCommandService.baseCommands
-                .subscribe((baseCommands: BaseCommand) => {
+                .subscribe((baseCommands: BaseCommand[]) => {
                     expect(baseCommands).toEqual([
                         "echo",
                         "cat",
@@ -80,16 +85,17 @@ describe("BaseCommandService", () => {
         });
     });
 
+
     describe("deleteBaseCommand", () => {
         it("Should remove the selected command from the baseCommands stream", (done) => {
             baseCommandService.addCommand("echo");
             baseCommandService.addCommand("cat");
             baseCommandService.addCommand("grep");
 
-            baseCommandService.deleteBaseCommand("echo");
+            baseCommandService.deleteBaseCommand(0);
 
             baseCommandService.baseCommands
-                .subscribe((baseCommands: BaseCommand) => {
+                .subscribe((baseCommands: BaseCommand[]) => {
                     expect(baseCommands).toEqual([
                         "cat",
                         "grep"
@@ -99,44 +105,23 @@ describe("BaseCommandService", () => {
         });
     });
 
-    describe("setSelectedIndex", () => {
-        it("Should update the selectedBaseCommand stream", (done) => {
-            baseCommandService.addCommand("echo");
-            baseCommandService.addCommand("cat");
-            baseCommandService.addCommand("grep");
-
-            baseCommandService.setSelectedIndex("echo");
-
-            baseCommandService.selectedBaseCommand
-                .subscribe((selectedBaseCommand) => {
-                    expect(selectedBaseCommand).toEqual("echo");
-                    done();
-                });
-        });
-    });
 
     describe("updateSelectedCommand", () => {
         it("Should update the selectedBaseCommand stream with the new value", (done) => {
-            const command1 = "echo";
-            const command2 = "cat";
-            const command3 = "cat";
 
-            baseCommandService.addCommand(command1);
-            baseCommandService.addCommand(command2);
-            baseCommandService.addCommand(command3);
+            baseCommandService.addCommand("echo");
+            baseCommandService.addCommand("cat");
+            baseCommandService.addCommand("cat");
 
             const newCommand = "echo 123";
-
-            //baseCommandService.setSelectedIndex(command1);
-
             baseCommandService.updateCommand(0, newCommand);
 
             baseCommandService.baseCommands
-                .subscribe((baseCommands: BaseCommand) => {
+                .subscribe((baseCommands: BaseCommand[]) => {
                     expect(baseCommands).toEqual([
                         newCommand,
-                        command2,
-                        command3
+                        "cat",
+                        "cat"
                     ]);
                     done();
                 });
@@ -150,10 +135,52 @@ describe("BaseCommandService", () => {
             baseCommandService.setBaseCommands(["echo", "grep", "cat"]);
 
             baseCommandService.baseCommands
-                .subscribe((baseCommands: BaseCommand) => {
+                .subscribe((baseCommands: BaseCommand[]) => {
                     expect(baseCommands).toEqual(["echo", "grep", "cat"]);
                     done();
                 });
+        });
+    });
+
+    describe("formListToBaseCommandArray", () => {
+        it("Should change the form list to the cwl model format", () => {
+
+            const formList: BaseCommand[] = [
+                new ExpressionModel({ engine: 'cwl-js-engine', script: '111', expressionValue: '111' }),
+                "string1 string2",
+                new ExpressionModel({ engine: 'cwl-js-engine', script: '222', expressionValue: '222' }),
+                "string4 string5",
+                new ExpressionModel({ engine: 'cwl-js-engine', script: '333', expressionValue: '333' }),
+                "string7",
+                "'string with quotes'",
+                "\"string with quotes 2\""
+            ];
+
+            const expectedCommandArray: BaseCommand[] = [
+                new ExpressionModel({
+                    script: "111",
+                    expressionValue: "111"
+                }),
+                "string1",
+                "string2",
+                new ExpressionModel({
+                    script: "222",
+                    expressionValue: "222"
+                }),
+                "string4",
+                "string5",
+                new ExpressionModel({
+                    script: "333",
+                    expressionValue: "333"
+                }),
+                "string7",
+                "'string with quotes'",
+                "\"string with quotes 2\""
+            ];
+
+            let result = baseCommandService.formListToBaseCommandArray(formList);
+
+            expect(result).toEqual(expectedCommandArray);
         });
     });
 
