@@ -3,6 +3,7 @@ import {CwlFileTemplate} from "../types/file-template.type";
 import {CommandInputParameterModel as InputProperty} from "cwlts/lib/models/d2sb";
 import {Observable} from "rxjs/Observable";
 import {ExpressionEditorData} from "../models/expression-editor-data.model";
+import {TabData} from "../components/workbox/tab-data.interface";
 
 export class EventHubAction {
     public type: string;
@@ -14,24 +15,36 @@ export class EventHubAction {
     }
 }
 
+/**
+ * @deprecated
+ */
 export class OpenFileRequestAction extends EventHubAction {
     constructor(file: FileModel) {
         super("open_file_request", file);
     }
 }
 
+/**
+ * @deprecated
+ */
 export class FetchFileRequestAction extends EventHubAction {
     constructor(file: FileModel) {
         super("fetch_file_request", file);
     }
 }
 
+/**
+ * @deprecated
+ */
 export class SelectFileAction extends EventHubAction {
     constructor(file: FileModel) {
         super("select_file", file);
     }
 }
 
+/**
+ * @deprecated
+ */
 export class CloseFileAction extends EventHubAction {
     constructor(file: FileModel) {
         super("close_file", file);
@@ -143,5 +156,11 @@ export class UpdateBaseCommandExpression extends EventHubAction {
 export class UpdateInputPortExpression extends EventHubAction {
     constructor(expression: string) {
         super("update_input_port", expression);
+    }
+}
+
+export class OpenTabAction extends EventHubAction {
+    constructor(tab: TabData){
+        super("open_tab", tab);
     }
 }

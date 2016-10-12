@@ -3,7 +3,6 @@
 .scroll-content {
     overflow-y: auto;
     position: relative;
-    min-height: calc(100% - #{$status-bar-height} - #{$workbox-tabs-height});
     height: calc(100% - #{$status-bar-height} - #{$workbox-tabs-height});
 }
 
@@ -14,7 +13,7 @@
 }
 
 .tool-header {
-    background: $background-light;
+    background: $body-background;
     overflow: hidden;
     display: block;
     padding: $header-padding;
@@ -50,7 +49,7 @@
         }
     }
 
-    view-switcher {
+    ct-view-mode-switch {
         float: right;
 
         button {

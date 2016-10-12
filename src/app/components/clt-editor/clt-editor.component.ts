@@ -14,14 +14,13 @@ import {
     CloseInputInspector,
     CloseExpressionEditor
 } from "../../action-events/index";
-
 import {CommandInputParameterModel as InputProperty, CommandLineToolModel} from "cwlts/lib/models/d2sb";
 import {Observable} from "rxjs";
 
 require("./clt-editor.component.scss");
 
 @Component({
-    selector: "clt-editor",
+    selector: "ct-clt-editor",
     directives: [
         DockerInputFormComponent,
         BaseCommandFormComponent,
@@ -32,10 +31,8 @@ require("./clt-editor.component.scss");
     ],
     animations: [
         trigger("formPosition", [
-            state("left", style({
-            })),
-            state("center", style({
-            })),
+            state("left", style({})),
+            state("center", style({})),
             transition("hidden => visible", animate("100ms ease-in")),
             transition("visible => hidden", animate("100ms ease-out"))
         ])
@@ -126,10 +123,6 @@ export class CltEditorComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.fileStream.first(file => {
-            this.file = file;
-            this.commandlineContent = this.model.getCommandLine();
-            return true;
-        });
+        this.commandlineContent = this.model.getCommandLine();
     }
 }

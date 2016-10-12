@@ -36,50 +36,60 @@ export class TreeViewComponent {
 
     constructor(private tree: TreeViewService, el: ElementRef, private domEvents: DomEventService) {
         this.el = el.nativeElement;
+
         this.subs.push(tree.searchTerm.subscribe(term => {
             this.searchTerm = term;
         }));
 
-        this.observeArrowNavigation().withLatestFrom(
-            this.tree.selectedNode.filter(n => n),
-            (dir, node) => ({dir, node}))
-            .subscribe((data) => {
+        this.subs.push(
+            this.observeArrowNavigation().withLatestFrom(
+                this.tree.selectedNode.filter(n => n),
+                (dir, node) => ({dir, node}))
+                .subscribe((data) => {
 
-                // Get all nodes underneath this tree as dom elements
-                const domNodes = (Array.from(document.getElementsByClassName("node-base")) as Array)
-                    .filter((el: Element) => this.el === el || this.el.contains(el));
+                    // Get all nodes underneath this tree as dom elements
+                    const domNodes = (Array.from(document.getElementsByClassName("node-base")) as Array)
+                        .filter((el: Element) => this.el === el || this.el.contains(el));
 
-                // Find the currently selected element within
-                const selected = domNodes.findIndex((el: Element) => el.classList.contains("selected"));
+                    // Find the currently selected element within
+                    const selected = domNodes.findIndex((el: Element) => el.classList.contains("selected"));
 
-                // Determine which node is to be selected next, depending on the keystroke
-                const nextNode: Element = data.dir === "up" ? domNodes[selected - 1] : domNodes[selected + 1];
+                    // Determine which node is to be selected next, depending on the keystroke
+                    const nextNode: Element = data.dir === "up" ? domNodes[selected - 1] : domNodes[selected + 1];
 
-                // If there's no previous or next node, nothing should be done
-                if (!nextNode) {
-                    return;
-                }
+                    // If there's no previous or next node, nothing should be done
+                    if (!nextNode) {
+                        return;
+                    }
 
-                // Take all top-level tree-node components
-                const treeNodes = this.treeNodes.toArray();
+                    // Take all top-level tree-node components
+                    const treeNodes = this.treeNodes.toArray();
 
-                // Recursively find all their children
-                const next = [].concat.apply(treeNodes, treeNodes.map(node => node.getChildren().toArray()))
-                    .find(node => node.nodeIndex == nextNode.getAttribute("data-index"));
+                    // Recursively find all their children
+                    const next = [].concat.apply(treeNodes, treeNodes.map(node => node.getChildren().toArray()))
+                        .find(node => node.nodeIndex == nextNode.getAttribute("data-index"));
 
-                // Select the component that matches the index
-                this.tree.selectedNode.next(next);
-            });
+                    // Select the component that matches the index
+                    this.tree.selectedNode.next(next);
+                })
+        );
 
-        this.observeArrowToggling().withLatestFrom(this.tree.selectedNode, (action, node) => ({action, node}))
-            .subscribe(data => data.action === "open" ? data.node.open() : data.node.close());
+        this.subs.push(
+            this.observeArrowToggling().withLatestFrom(this.tree.selectedNode, (action, node) => ({action, node}))
+                .subscribe(data => data.action === "open" ? data.node.open() : data.node.close())
+        );
 
-        this.observeSearchTerm().subscribe(tree.searchTerm);
 
-        this.observeNodeOpening().subscribe(node => {
-            node.toggle();
-            this.tree.searchTerm.next("");
-        });
+        this.subs.push(
+            this.observeSearchTerm().subscribe(tree.searchTerm)
+        );
+
+        this.subs.push(
+            this.observeNodeOpening().subscribe(node => {
+                node.toggle();
+                this.tree.searchTerm.next("");
+            })
+        );
 
     }
 
@@ -90,6 +100,10 @@ export class TreeViewComponent {
     private observeSearchTerm(): Observable<string> {
         return this.domEvents.on("keydown", this.el, true)
             .filter((event: KeyboardEvent) => {
+                if (event.ctrlKey || event.altKey || event.metaKey) {
+                    return false;
+                }
+
                 return (event.keyCode > 47 && event.keyCode < 58) || // number keys
                     ([32, 8].indexOf(event.keyCode) !== -1) || // enter, spacebar & backspace
                     (event.keyCode > 64 && event.keyCode < 91) || // letter keys

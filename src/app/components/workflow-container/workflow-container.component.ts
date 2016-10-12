@@ -4,7 +4,7 @@ import {Observable, Subscription} from "rxjs";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
 
 @Component({
-    selector: 'workflow-container',
+    selector: 'ct-workflow-editor',
     directives: [CodeEditorComponent],
     template: `
     <block-loader *ngIf="!isLoaded"></block-loader>
@@ -13,7 +13,7 @@ import {CodeEditorComponent} from "../code-editor/code-editor.component";
             <tool-header class="tool-header"></tool-header>
         
             <div class="scroll-content">
-                <code-editor *ngIf="viewMode === 'json'" [fileStream]="fileStream"></code-editor>
+                <ct-code-editor *ngIf="viewMode === 'json'" [fileStream]="fileStream"></ct-code-editor>
                 <div class="gui-editor-component" *ngIf="viewMode === 'gui'"> 
                     Workflow Editor Coming Soon
                 </div>

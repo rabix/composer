@@ -32,10 +32,10 @@ export class FileRegistry {
         //     });
         //
         // this.eventHub.onValueFrom(SaveFileRequestAction)
-        //     .flatMap(file => this.files.updateFile(file.relativePath, file.content).map(_ => file))
+        //     .flatMap(file => this.files.updateFile(file.relativePath, file.tabData).map(_ => file))
         //     .subscribe(file => {
         //         this.fileCache.put(file.id, Object.assign(file, {
-        //             originalContent: file.content,
+        //             originalContent: file.tabData,
         //             isModified: false
         //         }));
         //     });

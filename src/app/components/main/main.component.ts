@@ -2,17 +2,21 @@ import {ComponentRegistryFactoryService} from "../workspace/registry/component-r
 import {ContextDirective} from "../../services/context/context.directive";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {FileRegistry} from "../../services/file-registry.service";
-import {FileStateService} from "../../state/file.state.service";
 import {MenuBarComponent} from "../menu";
 import {ModalService} from "../modal";
 import {Observable} from "rxjs/Rx";
 import {Component, ViewChild, ViewContainerRef, AfterViewInit} from "@angular/core";
 import {UrlValidator} from "../../validators/url.validator";
+import {WebWorkerService} from "../../services/webWorker/web-worker.service";
 import {ContextService} from "../../services/context/context.service";
+import {InputPortService} from "../../services/input-port/input-port.service";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {LayoutComponent} from "../layout/layout.component";
 import {ExpressionInputService} from "../../services/expression-input/expression-input.service";
-import {WorkboxComponent} from "../workbox/workbox.component";
+import {DomEventService} from "../../services/dom/dom-event.service";
+import {SBPlatformDataSource} from "../../sources/sbg";
+import {SettingsService} from "../../services/settings/settings.service";
+import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 
 require("./../../../assets/sass/main.scss");
 
@@ -36,11 +40,16 @@ require("./main.component.scss");
         ContextService,
         EventHubService,
         FileRegistry,
-        FileStateService,
         DomEventService,
         ModalService,
         UrlValidator,
-        PlatformAPI
+        WebWorkerService,
+        InputPortService,
+        ExpressionInputService,
+        PlatformAPI,
+        SBPlatformDataSource,
+        SettingsService,
+        UserPreferencesService
     ]
 })
 export class MainComponent implements AfterViewInit {

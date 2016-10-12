@@ -1,36 +1,28 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, Output, ChangeDetectionStrategy} from "@angular/core";
 import {ReplaySubject} from "rxjs";
 
 @Component({
-    selector: 'view-switcher',
+    selector: 'ct-view-mode-switch',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-<button (click)="toggleView()" class="btn btn-sm" [disabled]="disabled">
-    <i class="fa" [ngClass]="classes"></i>    
-    {{ mode }}
-</button>
-`
+        <button (click)="toggleView()" class="btn btn-sm" [disabled]="disabled">
+            {{ viewMode }}
+            <i class="fa fa-toggle-off" [class.fa-toggle-on]="viewMode === 'gui'"></i>    
+        </button>
+    `
 })
-export class ViewSwitcherComponent implements OnInit{
-    @Input()
-    disabled: boolean;
+export class ViewModeSwitchComponent {
 
     @Input()
-    viewMode: ReplaySubject<'gui' | 'json'>;
-    private classes = {'fa-toggle-on': false, 'fa-toggle-off': true};
-    private mode: 'gui' | 'json';
+    public disabled: boolean;
 
-    toggleView() {
-        this.viewMode.next(this.mode === 'gui' ? 'json' : 'gui');
-    }
+    @Input()
+    public viewMode: "gui" | "code" = "code";
 
-    ngOnInit(): void {
-        this.viewMode.subscribe(mode => {
-            this.mode = mode;
-            this.classes = {
-                'fa-toggle-on': mode === 'gui',
-                'fa-toggle-off': mode === 'json'
-            };
+    @Output()
+    public onSwitch = new ReplaySubject<string>();
 
-        })
+    private toggleView() {
+        this.onSwitch.next(this.viewMode === "gui" ? "code" : "gui")
     }
 }

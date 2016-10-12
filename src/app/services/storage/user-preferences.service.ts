@@ -16,7 +16,8 @@ export class UserPreferencesService {
 
     public get(key: string, fallback = undefined): any {
         const val = this.storage.getItem(key);
-        if (val === undefined) {
+
+        if (!val && typeof val !== "number") {
             return fallback;
         }
 
