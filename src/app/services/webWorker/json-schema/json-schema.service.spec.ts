@@ -1,6 +1,6 @@
 import {JsonSchemaService} from "./json-schema.service";
 
-const {schemas} = require("cwlts/lib/schemas");
+const {schemas} = require("cwlts/schemas");
 
 class MockValidator {
     validate(jsonSchema) {

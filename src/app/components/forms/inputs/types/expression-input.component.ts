@@ -1,7 +1,7 @@
 import {Component, Input, Output, EventEmitter} from "@angular/core";
 import {REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES, AbstractControl} from "@angular/forms";
 import {BaseCommand} from "../../../../services/base-command/base-command.service";
-import {ExpressionModel} from "cwlts/lib/models/d2sb";
+import {ExpressionModel} from "cwlts/models/d2sb";
 
 require("./expression-input.component.scss");
 

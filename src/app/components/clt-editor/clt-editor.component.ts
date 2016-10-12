@@ -13,7 +13,7 @@ import {
     CloseInputInspector,
     CloseExpressionEditor
 } from "../../action-events/index";
-import {CommandLineToolModel} from "cwlts/lib/models/d2sb";
+import {CommandLineToolModel} from "cwlts/models/d2sb";
 import {Observable} from "rxjs";
 
 require("./clt-editor.component.scss");

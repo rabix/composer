@@ -3,7 +3,7 @@ import {InputPortListComponent} from "../types/input-port-list.component";
 import {InputPortService} from "../../../../services/input-port/input-port.service";
 import {EventHubService} from "../../../../services/event-hub/event-hub.service";
 import {OpenInputInspector} from "../../../../action-events/index";
-import {CommandLineToolModel} from "cwlts/lib/models/d2sb";
+import {CommandLineToolModel} from "cwlts/models/d2sb";
 
 require("./input-ports-form.component.scss");
 require("./shared/form.components.scss");

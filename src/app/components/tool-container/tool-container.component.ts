@@ -8,7 +8,7 @@ import {DynamicState} from "../runtime-compiler/dynamic-state.interface";
 import {Subscription, Observable, ReplaySubject} from "rxjs/Rx";
 import {ToolHeaderComponent} from "./tool-header/tool-header.component";
 import {ViewModeService} from "./services/view-mode.service";
-import {CommandLineToolModel} from "cwlts/lib/models/d2sb";
+import {CommandLineToolModel} from "cwlts/models/d2sb";
 import {SidebarComponent} from "../sidebar/sidebar.component";
 import {CommandLineComponent} from "../clt-editor/commandline/commandline.component";
 import {ViewSwitcherComponent} from "../view-switcher/view-switcher.component";

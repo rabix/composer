@@ -2,7 +2,7 @@ import {Injectable} from "@angular/core";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {Subject} from "rxjs/Subject";
 import {Observable} from "rxjs/Observable";
-import {CommandInputParameterModel as InputProperty} from "cwlts/lib/models/d2sb";
+import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 
 interface PropertyOperation {
     (inputProperty: InputProperty[]): InputProperty[];
