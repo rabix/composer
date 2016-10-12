@@ -1,12 +1,13 @@
 import {Observable} from "rxjs/Observable";
 import {Injectable} from "@angular/core";
+import {ValidationResponse} from "./json-schema/json-schema.service";
 const JsonSchemaWorker = require("worker?name=json-schema.worker!./json-schema/json-schema.worker.ts");
 
 @Injectable()
 export class WebWorkerService {
 
     private jsonSchemaWorker: Worker;
-    public validationResultStream: Observable<any>;
+    public validationResultStream: Observable<ValidationResponse>;
 
     constructor() {
         this.jsonSchemaWorker = new JsonSchemaWorker();

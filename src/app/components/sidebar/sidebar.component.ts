@@ -1,6 +1,5 @@
-import {Component, style, animate, state, transition, trigger, OnDestroy} from "@angular/core";
+import {Component, OnDestroy} from "@angular/core";
 import {Subscription} from "rxjs/Subscription";
-import {VisibilityState} from "../clt-editor/animation.states";
 import {
     OpenInputInspector,
     CloseInputInspector,
@@ -21,39 +20,26 @@ declare type sidebarType = "input-inspector" | "expression-editor";
         InputInspectorSidebarComponent,
         ExpressionEditorSidebarComponent
     ],
-    animations: [
-        trigger("sidebarState", [
-            state("visible", style({
-                display: "block",
-                overflowY: "auto",
-            })),
-            state("hidden", style({
-                display: "none",
-                overflowY: "hidden"
-            })),
-            transition("hidden => visible", animate("100ms ease-in")),
-            transition("visible => hidden", animate("100ms ease-out"))
-        ])
-    ],
     template: `
-            <div [@sidebarState]="sidebarState">
-                <input-inspector-sidebar-component class="tool-sidebar" 
-                                                  [ngClass]="{isTopOfStack: currentSidebar === 'input-inspector'}">
+            <div [ngClass]="{show: show}" class="sidebar-container">
+                <input-inspector-sidebar-component class="tool-sidebar"
+                                                    [hidden]="currentSidebar !== 'input-inspector'">
                 </input-inspector-sidebar-component>
                 
                 <expression-editor-sidebar-component class="tool-sidebar" 
-                                                    [ngClass]="{isTopOfStack: currentSidebar === 'expression-editor'}">
+                                                    [hidden]="currentSidebar !== 'expression-editor'">
                 </expression-editor-sidebar-component>
             </div>
     `
 })
 export class SidebarComponent implements OnDestroy {
 
-    private sidebarState: VisibilityState = "hidden";
     private currentSidebar: sidebarType;
 
     private closeSidebarActions = [];
 
+    private show = false;
+    
     private subs: Subscription[];
 
     constructor(private eventHubService: EventHubService) {
@@ -64,6 +50,9 @@ export class SidebarComponent implements OnDestroy {
     }
 
     //TODO (Mate): make this simpler
+    //@todo: there are bugs when working with multiple tools at once:
+    // 1. opening tools will give the correct initial state (no sidebar)
+    // 2. sidebar state will synchronize across all open tools
     private initInputInspectorListener(): void {
         this.subs.push(this.eventHubService.on(OpenInputInspector).subscribe(() => {
             this.closeSidebarActions.push(CloseInputInspector);
@@ -99,11 +88,7 @@ export class SidebarComponent implements OnDestroy {
     }
 
     private setSidebarState(): void {
-        if (this.closeSidebarActions.length === 0) {
-            this.sidebarState = "hidden";
-        } else {
-            this.sidebarState = "visible";
-        }
+        this.show = this.closeSidebarActions.length !== 0;
     }
 
     ngOnDestroy(): void {

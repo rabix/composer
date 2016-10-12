@@ -8,49 +8,53 @@
 
 .tool-container-component {
     height: 100%;
-    background: $background-grey;
+    position: relative;
+    background: $gui-editor-bg;
     display: block;
 }
 
 .tool-header {
-    background: $body-background;
+    background: $gui-editor-header-bg;
     overflow: hidden;
     display: block;
     padding: $header-padding;
-    border-bottom: 1px solid $border-color;
+    border-bottom: 1px solid $gui-editor-header-border;
 }
 
 .status-bar-footer {
-    border-top: 1px solid $border-color;
-    background: $text-dark;
+    background: $gui-editor-status-bar-bg;
+
+    .left-side {
+        display: inline-block;
+
+        & > *:not(:last-child) button {
+            border-right: 1px solid #131313;
+        }
+    }
+
+    .right-side {
+        display: inline-block;
+        float: right;
+    }
 
     button {
         border: none;
         margin-right: 5px;
         background: none;
-        color: $text-light;
-        padding-top: $status-bar-vertical-padding;
-        padding-bottom: $status-bar-vertical-padding;
+        color: $gui-editor-status-bar-color;
+        padding-top: $status-bar-padding-y;
+        padding-bottom: $status-bar-padding-y;
 
         &:focus, &:active, &:focus:active {
             outline: none;
         }
 
-        .fa-angle-right {
-            color: #656565;
-            font-weight: bold;
-            font-size:17px;
-            line-height: 10px;
+        [class*="fa-angle"] {
             margin-left: 7px;
-        }
-
-        &:not(:last-child) {
-            border-right: 1px solid #131313;
         }
     }
 
     ct-view-mode-switch {
-        float: right;
 
         button {
             text-transform: uppercase;
@@ -64,6 +68,16 @@
 
         .fa {
             color: #6DABED;
+        }
+    }
+
+    validation-issues {
+        .warning {
+            color: $brand-warning;
+        }
+
+        .errors {
+            color: $brand-danger;
         }
     }
 }
@@ -80,14 +94,27 @@
     color: $arg-color;
 }
 
-.commandline-component {
-    z-index: 5;
+.console-component {
     position: absolute;
+    bottom: $status-bar-height - 6px;
+    z-index: 9;
+
+    height: 0;
+    min-width: 100%;
+    overflow: auto;
+
     background: #000000;
-    height: 70px;
-    width: 100%;
-    font-family: monospace;
     opacity: 0.9;
-    padding-bottom: 14px;
-    bottom: $status-bar-height - 3px;
+    transition: height 300ms;
+
+    color: $console-default-color;
+    font-family: monospace;
+
+    .console-content {
+        padding: 14px;
+    }
+
+    &.show {
+        height: 90px;
+    }
 }

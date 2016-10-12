@@ -1,6 +1,6 @@
 import {FileModel} from "../store/models/fs.models";
 import {CwlFileTemplate} from "../types/file-template.type";
-import {CommandInputParameterModel as InputProperty} from "cwlts/lib/models/d2sb";
+import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 import {Observable} from "rxjs/Observable";
 import {ExpressionEditorData} from "../models/expression-editor-data.model";
 import {TabData} from "../components/workbox/tab-data.interface";

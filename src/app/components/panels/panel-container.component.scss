@@ -3,7 +3,8 @@
 ct-panel-container {
   display: flex;
   flex-direction: column;
-  background: $brand-primary-bg;
+  background: $panel-bg;
+  color: $panel-item-color;
 
   .panel {
     display: flex;
@@ -20,7 +21,7 @@ ct-panel-container {
     cursor: row-resize;
     display: block;
     height: 4px;
-    background: $brand-primary-bg-dark;
+    background: $panel-resize-handle-color;
     width: 100%;
 
     &.hidden {
@@ -33,8 +34,8 @@ ct-panel-container {
 ct-panel-toolbar {
   display: flex;
   box-sizing: content-box;
-  background: $brand-primary-bg-bright;
-  color: white;
+  background: $panel-header-bg;
+  color: $panel-header-color;
   font-size: $font-size-sm;
   padding: 4px 8px;
   justify-content: space-between;

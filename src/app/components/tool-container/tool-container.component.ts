@@ -3,16 +3,20 @@ import {NgSwitch, NgSwitchCase, NgSwitchDefault} from "@angular/common";
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {CltEditorComponent} from "../clt-editor/clt-editor.component";
-import {Subscription, ReplaySubject, BehaviorSubject} from "rxjs/Rx";
+import {Subscription, Observable, ReplaySubject, BehaviorSubject} from "rxjs/Rx";
 import {ToolHeaderComponent} from "./tool-header/tool-header.component";
 import {ViewModeService} from "./services/view-mode.service";
-import {CommandLineToolModel} from "cwlts/lib/models/d2sb";
+import {CommandLineToolModel} from "cwlts/models/d2sb";
 import {SidebarComponent} from "../sidebar/sidebar.component";
 import {CommandLineComponent} from "../clt-editor/commandline/commandline.component";
 import {ViewModeSwitchComponent} from "../view-switcher/view-switcher.component";
 import {ValidationResponse} from "../../services/webWorker/json-schema/json-schema.service";
 import {DataEntrySource} from "../../sources/common/interfaces";
 import {WebWorkerService} from "../../services/webWorker/web-worker.service";
+import {ViewSwitcherComponent} from "../view-switcher/view-switcher.component";
+import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
+import {ValidationIssuesComponent} from "../validation-issues/validation-issues.component";
+import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
 
 require("./tool-container.component.scss");
 
@@ -30,7 +34,8 @@ require("./tool-container.component.scss");
         ToolHeaderComponent,
         CommandLineComponent,
         SidebarComponent,
-        ViewModeSwitchComponent
+        ViewModeSwitchComponent,
+        ValidationIssuesComponent
     ],
     template: `
         <div class="tool-container-component">
@@ -51,13 +56,16 @@ require("./tool-container.component.scss");
                 <sidebar-component></sidebar-component>
             </div>
             <div class="status-bar-footer">
-                <commandline [content]="commandlineContent"></commandline>
-        
-                <ct-view-mode-switch [viewMode]="viewMode"
+                <div class="left-side">
+                    <validation-issues [issuesStream]="schemaValidationStream"></validation-issues>
+                    <commandline [commandLineParts]="commandLineParts"></commandline>
+                </div>
+                <div class="right-side">
+                    <ct-view-mode-switch [viewMode]="viewMode"
                                      [disabled]="!isValid"
                                      (onSwitch)="viewMode = $event">
-                </ct-view-mode-switch>
-        
+                    </ct-view-mode-switch>
+                </div>
             </div>
         </div>
     `
@@ -75,7 +83,7 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
 
     private toolModel: CommandLineToolModel;
 
-    private commandlineContent: string = '';
+    private commandLineParts: CommandLinePart[];
 
     /** Flag for validity of CWL document */
     private isValid = true;
@@ -93,8 +101,10 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
 
         this.textContent.subscribe(rawText => {
             try {
-                this.toolModel          = new CommandLineToolModel(JSON.parse(rawText));
-                this.commandlineContent = this.toolModel.getCommandLine();
+                this.toolModel = new CommandLineToolModel(JSON.parse(rawText));
+                this.commandLineParts = this.toolModel.getCommandLineParts();
+
+                // if the file isn't valid JSON, do nothing
             } catch (ex) {
             }
         });

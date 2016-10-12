@@ -24,10 +24,10 @@
   }
 
   .handle-vertical {
-    background: $brand-primary-bg-dark;
+    background: $panel-resize-handle-color;
     cursor: col-resize;
     display: inline-block;
-    width: 8px;
+    width: 4px;
 
     &.hidden {
       width: 1px;
@@ -44,7 +44,11 @@
 
 .top-bar {
   height: 44px;
-  background: $brand-primary-bg-dark;
+  background: $main-header-bg;
+}
+
+.flex-row {
+  display: flex;
 }
 
 .flex-row {
