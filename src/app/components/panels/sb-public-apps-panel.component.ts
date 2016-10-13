@@ -15,12 +15,19 @@ import {PlatformAppEntry} from "../../services/api/platforms/platform-api.types"
         <ct-panel-toolbar>
             <name>Public Apps</name>
         </ct-panel-toolbar>
+        
+        <div *ngIf="isLoading">
+             <div class="text-xs-center"><small>Fetching Public Apps&hellip;</small></div>
+            <progress class="progress progress-striped" value="100" max="100"></progress>
+        </div>
         <ct-tree-view [nodes]="nodes"></ct-tree-view>
     `
 })
 export class SBPublicAppsPanelComponent {
 
     private nodes = [];
+
+    private isLoading = false;
 
     constructor(private platform: PlatformAPI,
                 private eventHub: EventHubService,
@@ -29,7 +36,9 @@ export class SBPublicAppsPanelComponent {
 
     ngOnInit() {
 
-        this.settings.platformConfiguration.flatMap(_ => this.platform.getPublicApps().map(apps => {
+        this.settings.platformConfiguration
+            .do(_ => this.isLoading = true)
+            .flatMap(_ => this.platform.getPublicApps().map(apps => {
 
 
             const categorized = apps.map(app => {
@@ -73,6 +82,7 @@ export class SBPublicAppsPanelComponent {
             return nodes;
 
         })).subscribe(categories => {
+            this.isLoading = false;
             this.nodes = categories;
         });
     }
