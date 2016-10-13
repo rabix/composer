@@ -54,6 +54,7 @@ export class SBPublicAppsPanelComponent {
                 };
 
             }).reduce((acc, app: PlatformAppEntry) => {
+                //noinspection TypeScriptUnresolvedVariable
                 acc[app.toolkit] = [].concat.apply(acc[app.toolkit] || [], [app]);
                 return acc;
             }, {});

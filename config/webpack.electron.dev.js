@@ -36,6 +36,12 @@ module.exports = webpackMerge(commonConfig, {
      * See: http://webpack.github.io/docs/configuration.html#debug
      */
     debug: true,
+    entry: {
+
+        'polyfills': './src/polyfills.ts',
+        'vendor': './src/vendor.ts',
+        'main': './src/main.electron.ts'
+    },
 
     /**
      * Developer tool to enhance debugging
@@ -45,11 +51,11 @@ module.exports = webpackMerge(commonConfig, {
      */
     devtool: '#eval',
 
-    entry: {
-
-        'polyfills': './src/polyfills.ts',
-        'vendor': './src/vendor.ts',
-        'main': './src/main.browser.ts'
+    node: {
+        console: 'empty',
+        fs: 'empty',
+        net: 'empty',
+        tls: 'empty'
     },
 
     /**
