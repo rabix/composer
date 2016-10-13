@@ -16,5 +16,18 @@ html, body {
   height: 100%;
   background: $body-bg;
   color: $body-color;
+
+  background-repeat: repeat;
+  background-position: center center;
+  background-size: auto auto;
+  background-image: linear-gradient(225deg,$brand-primary-bg 0%,$brand-primary-bg-dark 100%);
 }
 
+.loading-image {
+  margin-top: calc(50% - 250px);
+
+  img {
+    margin: 0 auto;
+    display: block;
+  }
+}
