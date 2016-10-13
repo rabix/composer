@@ -1,9 +1,9 @@
 import {Component, Input, OnInit} from "@angular/core";
 import {InputPortListComponent} from "../types/input-port-list.component";
 import {InputPortService} from "../../../../services/input-port/input-port.service";
-import {CommandLineToolModel} from "cwlts/models/d2sb";
+import {CommandLineToolModel, CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 import {InputSidebarService} from "../../../../services/sidebars/input-sidebar.service";
-import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
+import {Subscription} from "rxjs/Subscription";
 
 require("./input-ports-form.component.scss");
 require("./shared/form.components.scss");
@@ -19,7 +19,7 @@ require("./shared/form.components.scss");
                 
                 <button type="button" class="btn btn-link hide-btn">Hide</button>
     
-                <input-port-list></input-port-list>
+                <input-port-list [selectedIndex]="selectedIndex"></input-port-list>
             </fieldset>
             
             <button type="button" class="btn btn-secondary add-input-btn" 
@@ -31,15 +31,28 @@ export class InputPortsFormComponent implements OnInit {
     @Input()
     public cltModel: CommandLineToolModel;
 
+    private portList: Array<InputProperty> = [];
+
+    private subs: Subscription[];
+
+    private selectedIndex: number;
+
     constructor(private inputPortService: InputPortService,
-                private inputSidebarService: InputSidebarService) { }
+                private inputSidebarService: InputSidebarService) {
+
+        this.subs = [];
+        this.subs.push(
+            this.inputPortService.inputPorts.subscribe((portList: InputProperty[]) => {
+                this.portList = portList;
+            })
+        );
+    }
 
     private addInput(): void {
+        this.selectedIndex = this.portList.length;
         const newInput = this.cltModel.addInput();
 
         this.inputPortService.addInput(newInput);
-        this.inputPortService.setSelected(newInput);
-
         this.inputSidebarService.openInputInspector(newInput);
     }
 

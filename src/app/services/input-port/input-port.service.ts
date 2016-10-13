@@ -22,16 +22,11 @@ export class InputPortService {
     private newInputPorts: Subject<InputProperty> = new Subject<InputProperty>();
 
     /** Stream for adding new imports */
-    private deletedInputPort: Subject<InputProperty> = new Subject<InputProperty>();
+    private deletedInputPort: Subject<number> = new Subject<number>();
 
     /** Stream that aggregates all changes on the exposedList list */
     private inputPortsUpdate: BehaviorSubject<PropertyOperation> = new BehaviorSubject<PropertyOperation>(undefined);
 
-    /** The currently  selected input port */
-    public selectedInputPort: Observable<InputProperty>;
-
-    /** Stream for updating the currently selected input port */
-    private updateSelectedProperty: BehaviorSubject<InputProperty> = new BehaviorSubject<InputProperty>(undefined);
 
     constructor() {
         /* Subscribe the exposedList to inputPortsUpdate */
@@ -59,33 +54,23 @@ export class InputPortService {
 
         /* Delete input ports */
         this.deletedInputPort
-            .map((inputPortToDelete: InputProperty): PropertyOperation => {
+            .map((index: number): PropertyOperation => {
                 return (inputPorts: InputProperty[]) => {
-                    const index = inputPorts.indexOf(inputPortToDelete);
-
-                    if(index !== -1) {
+                    if (typeof inputPorts[index] !== 'undefined' && inputPorts[index] !== null) {
                         inputPorts.splice(index, 1);
                     }
-
                     return inputPorts;
                 };
             })
             .subscribe(this.inputPortsUpdate);
-
-        /* Set selected input port */
-        this.selectedInputPort = this.updateSelectedProperty.map(inputPort => inputPort);
     }
 
     public addInput(inputPort: InputProperty): void {
         this.newInputPorts.next(inputPort);
     }
 
-    public deleteInputPort(inputPort: InputProperty): void {
-        this.deletedInputPort.next(inputPort);
-    }
-
-    public setSelected(inputPort: InputProperty): void {
-        this.updateSelectedProperty.next(inputPort);
+    public deleteInputPort(index: number): void {
+        this.deletedInputPort.next(index);
     }
 
     public setInputs(inputs: Array<InputProperty>): void {

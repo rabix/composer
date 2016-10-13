@@ -41,30 +41,15 @@ describe("InputPortService", () => {
             inputPortService.addInput(mockInputPort1);
             inputPortService.addInput(mockInputPort2);
 
-            inputPortService.deleteInputPort(mockInputPort1);
+            inputPortService.deleteInputPort(0);
 
             inputPortService.inputPorts
                 .subscribe((portList: InputProperty[]) => {
-
-                    expect(portList.length).toBe(1);
-                    expect(portList[0]).toBe(mockInputPort2);
+                    expect(portList.length).toEqual(1);
+                    expect(portList[0]).toEqual(mockInputPort2);
                     done();
                 });
         });
-    });
-
-    describe("setSelected", () => {
-        it("should update the selectedInputPort stream", (done) => {
-            const mockInputPort1 = new InputProperty({ id: "a", type: "string" });
-
-            inputPortService.setSelected(mockInputPort1);
-
-            inputPortService.selectedInputPort
-                .subscribe((inputProp: InputProperty) => {
-                    expect(inputProp).toBe(mockInputPort1);
-                    done();
-                });
-        })
     });
 
 });

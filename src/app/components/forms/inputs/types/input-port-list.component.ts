@@ -1,4 +1,4 @@
-import {Component, OnDestroy} from "@angular/core";
+import {Component, OnDestroy, Input} from "@angular/core";
 import {InputPortService} from "../../../../services/input-port/input-port.service";
 import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 import {Subscription} from "rxjs/Subscription";
@@ -22,10 +22,9 @@ import {InputSidebarService} from "../../../../services/sidebars/input-sidebar.s
                 </div>
 
                  <div class="tool-input-row" 
-                      *ngFor="let inputPort of portList"  
-                      (click)="editProperty(inputPort)">  
+                      *ngFor="let inputPort of portList; let i = index; trackBy:trackByIndex"  
+                      (click)="editProperty(i)">  
                  
-                      
                     <div class="col-sm-4">
                         {{inputPort.value}}     
                     </div>
@@ -41,7 +40,7 @@ import {InputSidebarService} from "../../../../services/sidebars/input-sidebar.s
                     <div class="col-sm-1 pull-right tool-input-icon">
                         <i class="fa fa-trash" 
                            aria-hidden="true"
-                           (click)="removeProperty(inputPort)"></i>
+                           (click)="removeProperty($event, i)"></i>
                     </div>
                 </div>
                 
@@ -56,37 +55,45 @@ export class InputPortListComponent implements OnDestroy {
 
     private portList: Array<InputProperty> = [];
 
-    private selectedInputPort: InputProperty;
+    @Input()
+    private selectedIndex: number;
 
     private subs: Subscription[];
 
     constructor(private inputPortService: InputPortService,
                 private inputSidebarService: InputSidebarService) {
-
         this.subs = [];
 
-        let updatePortList = this.inputPortService.inputPorts.subscribe((portList: InputProperty[]) => {
-            this.portList = portList;
-        });
-
-        let updateSelectedInputPort = this.inputPortService.selectedInputPort.subscribe(inputPort => {
-            this.selectedInputPort = inputPort;
-        });
-
-        this.subs.push(updatePortList);
-        this.subs.push(updateSelectedInputPort);
+        this.subs.push(
+            this.inputPortService.inputPorts.subscribe((portList: InputProperty[]) => {
+                this.portList = portList;
+            })
+        );
     }
 
-    private editProperty(inputPort: InputProperty): void {
-        this.inputPortService.setSelected(inputPort);
-        this.inputSidebarService.openInputInspector(inputPort);
+    private trackByIndex(index: number): any {
+        return index;
     }
 
-    private removeProperty(inputPort: InputProperty): void {
-        this.inputPortService.deleteInputPort(inputPort);
+    private editProperty(index: number): void {
+        const selectedInputPort = this.portList[index];
+        this.selectedIndex = index;
 
-        if (this.selectedInputPort === inputPort) {
+        this.inputSidebarService.openInputInspector(selectedInputPort);
+    }
+
+    private removeProperty(event: Event, index: number) {
+        event.stopPropagation();
+        this.inputPortService.deleteInputPort(index);
+
+        if (this.selectedIndex === index) {
             this.inputSidebarService.closeInputInspector();
+        }
+
+        if (this.selectedIndex > index) {
+            this.selectedIndex--;
+        } else if (this.selectedIndex === index) {
+            this.selectedIndex = undefined;
         }
     }
 
