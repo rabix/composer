@@ -1,5 +1,8 @@
 @import "../../../assets/sass/variables";
+@import "../../../assets/sass/mixins";
 
+
+//@todo(maya) reorganize this file
 .scroll-content {
     overflow-y: auto;
     position: relative;
@@ -13,7 +16,7 @@
     display: block;
 }
 
-.tool-header {
+.editor-header {
     background: $gui-editor-header-bg;
     overflow: hidden;
     display: block;
@@ -94,6 +97,40 @@
     color: $arg-color;
 }
 
+//@todo(maya) belongs with tool editor or form components
+.gui-section-list-item {
+    border: $gui-section-list-item-border-size solid $gui-section-list-item-border;
+    background: $gui-section-list-item-bg;
+    color: $gui-section-list-item-color;
+    border-radius: $gui-section-list-item-border-radius;
+    overflow: hidden;
+    padding: 7px 0;
+    margin-bottom: 10px;
+
+    .fa {
+        color: $gui-section-list-item-icon-color;
+    }
+
+    &:hover {
+        border-color: $gui-section-list-item-hover-border;
+        background: $gui-section-list-item-hover-bg;
+        color: $gui-section-list-item-hover-color;
+        .fa {
+            color: $gui-section-list-item-hover-icon-color;
+        }
+    }
+
+    &.selected {
+        border-color: $gui-section-list-item-select-bg;
+        background: $gui-section-list-item-select-bg;
+        color: $gui-section-list-item-select-color;
+        .fa {
+            color: $gui-section-list-item-select-icon-color;
+        }
+    }
+}
+
+//@todo(maya) belongs with status bar component
 .console-component {
     position: absolute;
     bottom: $status-bar-height - 6px;

@@ -10,7 +10,7 @@ import {WebWorkerService} from "../../services/web-worker/web-worker.service";
     directives: [CodeEditorComponent],
     template: `
         <div class="editor-container">
-            <tool-header class="tool-header"></tool-header>
+            <tool-header class="editor-header"></tool-header>
         
             <div class="scroll-content">
                 <ct-code-editor [hidden]="viewMode !== 'code'"

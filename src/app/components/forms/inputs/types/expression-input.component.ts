@@ -21,13 +21,13 @@ export type ExpressionInputType = "baseCommand" | "inputPortValue";
         FORM_DIRECTIVES
     ],
     template: `
-            <div class="input-group expression-input-group">
+            <div class="input-group">
                 <input class="form-control" [formControl]="inputControl"/>
                     
-                <span class="input-group-addon add-expression">
+                <span class="input-group-btn">
                     <button type="button" 
-                        class="btn btn-secondary expression-form-btn" 
-                        (click)="openExpressionSidebar()">Add expression</button>
+                        class="btn btn-secondary" 
+                        (click)="openExpressionSidebar()"><i class="fa fa-code"></i></button>
                 </span>
             </div>
         `

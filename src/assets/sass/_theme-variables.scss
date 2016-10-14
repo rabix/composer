@@ -7,8 +7,37 @@ $gui-editor-status-bar-bg: $text-dark;
 $gui-editor-status-bar-color: $text-light;
 
 $gui-section-bg: $body-foreground;
+$gui-section-border: $border-color;
 
+$gui-section-padding: $padding-md;
 
+$gui-section-header-color: $text-dark;
+$gui-section-header-size: 1.25rem;
+
+$gui-section-subheader-color: $text-muted;
+$gui-section-subheader-size: $font-size-h5;
+
+$gui-section-list-item-border: $light-border-color;
+$gui-section-list-item-bg: $light-border-color;
+$gui-section-list-item-color: $body-color;
+$gui-section-list-item-icon-color: #9D9D9D;
+
+$gui-section-list-item-hover-border: $brand-primary;
+$gui-section-list-item-hover-bg: $light-border-color;
+$gui-section-list-item-hover-color: $body-color;
+$gui-section-list-item-hover-icon-color: $gui-section-list-item-icon-color;
+
+$gui-section-list-item-select-border: $brand-primary;
+$gui-section-list-item-select-bg: $brand-primary;
+$gui-section-list-item-select-color: white;
+$gui-section-list-item-select-icon-color: $gui-section-list-item-icon-color;
+
+$gui-section-list-item-border-size: 2px;
+$gui-section-list-item-border-radius: $border-radius;
+
+// TAB COMPONENTS
+$editor-bg: $body-background;
+$editor-color: $text-dark;
 
 // RESULTING COMMAND LINE
 $console-default-color: $text-light;

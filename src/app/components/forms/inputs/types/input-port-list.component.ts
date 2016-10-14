@@ -7,50 +7,52 @@ import {Subscription} from "rxjs/Subscription";
 
 @Component({
     selector: "input-port-list",
-    template: `
-            <div *ngIf="portList.length > 0">
-            
-                <div class="row">
-                    <div class="col-sm-4">
-                        Value
-                    </div>
-                    <div class="col-sm-3">
-                        ID               
-                    </div>
-                    <div class="col-sm-1">
-                        Type
-                    </div>
-                </div>
+    template: `<div *ngIf="portList.length > 0">
 
-                 <div class="tool-input-row" 
-                      *ngFor="let inputPort of portList"  
-                      (click)="editProperty(inputPort)">  
-                 
-                      
-                    <div class="col-sm-4">
-                        {{inputPort.value}}     
-                    </div>
-                      
-                    <div class="col-sm-3">
-                        {{inputPort.id}}         
-                    </div>
-                    
-                    <div class="col-sm-1">
-                        {{inputPort.type}}      
-                    </div>
-                    
-                    <div class="col-sm-1 pull-right tool-input-icon">
-                        <i class="fa fa-trash" 
-                           aria-hidden="true"
-                           (click)="removeProperty(inputPort)"></i>
-                    </div>
-                </div>
-                
-        </div> <!-- List end -->
-        
-         <div *ngIf="portList.length === 0" class="col-sm-12">
-                No input ports defined.
+    <div class="gui-section-list-title">
+        <div class="col-sm-7">
+            ID
         </div>
+        <div class="col-sm-2">
+            Type
+        </div>
+        <div class="col-sm-3">
+            Value
+        </div>
+    </div>
+
+    <ul class="gui-section-list">
+
+        <li class="gui-section-list-item clickable"
+            *ngFor="let inputPort of portList"
+            (click)="editProperty(inputPort)">
+
+            <div class="col-sm-7" title="{{inputPort.id}}">
+                <div class="ellipsis">
+                    {{inputPort.id}}
+                </div>
+            </div>
+
+            <div class="col-sm-2" title="{{inputPort.type}}">
+                {{inputPort.type}}
+            </div>
+            
+            <div class="col-sm-2" title="{{inputPort.value}}">
+                {{inputPort.value}}
+            </div>
+
+            <div class="col-sm-1 pull-right tool-input-icon">
+                <i class="fa fa-trash"
+                   aria-hidden="true"
+                   (click)="removeProperty(inputPort)"></i>
+            </div>
+        </li>
+    </ul>
+</div> <!-- List end -->
+
+<div *ngIf="portList.length === 0" class="col-sm-12">
+    No input ports defined.
+</div>
     `
 })
 export class InputPortListComponent implements OnDestroy {

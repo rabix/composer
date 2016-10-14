@@ -11,6 +11,7 @@ import {ExpressionInputComponent, ExpressionInputType} from "../types/expression
 import {EventHubService} from "../../../../services/event-hub/event-hub.service";
 import {UpdateBaseCommandExpression} from "../../../../action-events/index";
 import {Subscription} from "rxjs/Subscription";
+import {FormSectionComponent} from "../../../form-section/form-section.component";
 
 require("./base-command-form.components.scss");
 
@@ -19,23 +20,29 @@ require("./base-command-form.components.scss");
     directives: [
         ExpressionInputComponent,
         REACTIVE_FORM_DIRECTIVES,
-        FORM_DIRECTIVES
+        FORM_DIRECTIVES,
+        FormSectionComponent
     ],
     template: `
-             <form [formGroup]="baseCommandForm">
-                <fieldset class="form-group">
-                      <button type="button" class="btn btn-secondary hide-btn">Hide</button>
-               
-                        <label>Base Command</label>
-                        <label class="secondary-label">What command do you want to call from the image</label>
-                        
-                        <expression-input [inputControl]="baseCommandForm.controls['baseCommand']"
-                                          [expressionType]="expressionInputType">
-                        </expression-input>
-                        
-                    <button type="button" class="btn btn-secondary add-input-btn">Add base command</button>
-                </fieldset>
-             </form>
+<ct-form-section>
+    <header>
+        Base Command
+    </header>
+    <body>
+        <form [formGroup]="baseCommandForm">
+
+            <label class="form-control-label">What command do you want to call from the image</label>
+            <expression-input [inputControl]="baseCommandForm.controls['baseCommand']"
+                              [expressionType]="expressionInputType">
+            </expression-input>
+
+            <button type="button" class="btn btn-link add-btn-link">
+                <i class="fa fa-plus"></i> Add base command
+            </button>
+        </form>
+    </body>
+</ct-form-section>
+
     `
 })
 export class BaseCommandFormComponent implements OnInit, OnDestroy {

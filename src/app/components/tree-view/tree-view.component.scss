@@ -1,4 +1,5 @@
 @import "../../../assets/sass/variables";
+@import "../../../assets/sass/mixins";
 @import "../../../assets/sass/icons";
 
 ct-tree-view {
@@ -28,10 +29,8 @@ ct-tree-view {
     white-space: nowrap;
 
     .name {
+      @include ellipsis();
       display: inline-block;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      overflow: hidden;
     }
 
     &:hover {

@@ -33,19 +33,16 @@ require("./clt-editor.component.scss");
     template: `
             <form class="clt-editor-group"
                   [formGroup]="cltEditorGroup">
-                <docker-input-form class="input-form" 
-                                [group]="cltEditorGroup"
+                <docker-input-form [group]="cltEditorGroup"
                                 [cltModel]="model"
                                 [dockerPull]="'some.docker.image.com'">
                 </docker-input-form>
                                 
-                <base-command-form class="input-form" 
-                                [group]="cltEditorGroup"
+                <base-command-form [group]="cltEditorGroup"
                                 [baseCommand]="model.baseCommand">
                 </base-command-form>
                 
-                <inputs-ports-form [cltModel]="model"
-                                   class="input-form">
+                <inputs-ports-form [cltModel]="model">
                 </inputs-ports-form>
             </form>
     `
