@@ -1,14 +1,20 @@
-import {Injectable} from "@angular/core";
+import {Injectable, Inject} from "@angular/core";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {Subject} from "rxjs/Subject";
 import {Observable} from "rxjs/Observable";
 import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
+import {ExpressionModel} from "cwlts";
+import {SandboxService, SandboxResponse} from "../sandbox/sandbox.service";
+
+export type InputPropertyViewModel = {
+    value: string,
+    inputProperty: InputProperty
+}
 
 interface PropertyOperation {
     (inputProperty: InputProperty[]): InputProperty[];
 }
 
-//TODO (Mate): refactor this to work with indexes
 @Injectable()
 export class InputPortService {
 
@@ -27,8 +33,12 @@ export class InputPortService {
     /** Stream that aggregates all changes on the exposedList list */
     private inputPortsUpdate: BehaviorSubject<PropertyOperation> = new BehaviorSubject<PropertyOperation>(undefined);
 
+    private sandboxService: SandboxService;
 
-    constructor() {
+    constructor(@Inject(SandboxService) sandboxService) {
+
+        this.sandboxService = sandboxService;
+
         /* Subscribe the exposedList to inputPortsUpdate */
         this.inputPorts = this.inputPortsUpdate
             .filter(update => update !== undefined)
@@ -77,5 +87,43 @@ export class InputPortService {
         inputs.forEach(input => {
             this.newInputPorts.next(input);
         })
+    }
+
+    public inputPortListToViewModelList(inputProperties: InputProperty[]): Observable<InputPropertyViewModel[]> {
+        const result: BehaviorSubject<InputPropertyViewModel[]> = new BehaviorSubject<InputPropertyViewModel[]>(undefined);
+        const inputPropertiesStream: Observable<InputProperty> = Observable.from(inputProperties);
+        const viewModelList: InputPropertyViewModel[] = [];
+
+        inputPropertiesStream.subscribe((property: InputProperty) => {
+            const propInputBinding = property.getValueFrom();
+
+            if ((<ExpressionModel>propInputBinding).script) {
+                this.sandboxService.submit((<ExpressionModel>propInputBinding).script)
+                    .subscribe((response: SandboxResponse) => {
+                        viewModelList.push({
+                            value: response.output,
+                            inputProperty: property
+                        });
+                    });
+
+            } else if (typeof propInputBinding === "string") {
+                viewModelList.push({
+                    value: propInputBinding,
+                    inputProperty: property
+                });
+            }
+        }, (err) => {
+            console.log('Error: %s', err);
+        }, () => {
+            result.next(viewModelList);
+        });
+
+        return result.filter(res => res !== undefined);
+    }
+
+    public viewModelListToInputPortList(viewModelList: InputPropertyViewModel[]) {
+        return viewModelList.map((inputPropVm: InputPropertyViewModel) => {
+            return inputPropVm.inputProperty;
+        });
     }
 }
