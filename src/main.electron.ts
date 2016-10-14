@@ -1,8 +1,8 @@
 import {platformBrowserDynamic} from "@angular/platform-browser-dynamic";
 import {AppModule} from "./app.module";
-import {PlatformProvider} from "./app/platform-providers/platform-provider.abstract";
-import {ElectronPlatformProviderService} from "./app/platform-providers/electron.service";
+import {SystemService} from "./app/platform-providers/system.service";
+import {ElectronSystemService} from "./app/platform-providers/electron-system.service";
 
 platformBrowserDynamic([
-    {provide: PlatformProvider, useClass: ElectronPlatformProviderService}
+    {provide: SystemService, useClass: ElectronSystemService}
 ]).bootstrapModule(AppModule).catch(err => console.error(err));

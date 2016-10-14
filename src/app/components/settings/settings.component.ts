@@ -3,7 +3,7 @@ import {SettingsService, PlatformSettings} from "../../services/settings/setting
 import {FormGroup, FormBuilder, Validators, AbstractControl} from "@angular/forms";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {Subscription} from "rxjs";
-import {PlatformProvider} from "../../platform-providers/platform-provider.abstract";
+import {SystemService} from "../../platform-providers/system.service";
 
 @Component({
     selector: "ct-settings",
@@ -74,7 +74,10 @@ export class SettingsComponent implements OnInit {
 
     private subs: Subscription[] = [];
 
-    constructor(private settings: SettingsService, formBuilder: FormBuilder, private api: PlatformAPI, private platform: PlatformProvider) {
+    constructor(private settings: SettingsService,
+                private api: PlatformAPI,
+                private system: SystemService,
+                formBuilder: FormBuilder) {
 
         this.form = formBuilder.group({
             url: ["", [Validators.required, Validators.pattern("https://[^/?]+\.[^.]+\\.sbgenomics\\.com")]],
@@ -136,14 +139,14 @@ export class SettingsComponent implements OnInit {
     private onSubmit() {
         this.settings.platformConfiguration.next(this.form.value);
     }
-    
-    private openTokenPage(){
+
+    private openTokenPage() {
         let url = "https://igor.sbgenomics.com/account/#developer";
-        if(this.form.controls["url"].valid){
+        if (this.form.controls["url"].valid) {
             url = this.form.controls["url"].value + "/account/#developer";
         }
 
-        this.platform.openLink(url);
+        this.system.openLink(url);
     }
 
     /**

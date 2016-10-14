@@ -1,3 +1,3 @@
-export abstract class PlatformProvider {
+export abstract class SystemService {
     public abstract openLink(url: string): void;
 }

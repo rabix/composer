@@ -1,10 +1,10 @@
 import {Injectable} from "@angular/core";
-import {PlatformProvider} from "./platform-provider.abstract";
+import {SystemService} from "./system.service";
 
 const {shell} = window.require("electron");
 
 @Injectable()
-export class ElectronPlatformProviderService extends PlatformProvider {
+export class ElectronSystemService extends SystemService {
 
     public openLink(url: string) {
         shell.openExternal(url);

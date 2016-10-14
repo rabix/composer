@@ -1,8 +1,8 @@
 import {Injectable} from "@angular/core";
-import {PlatformProvider} from "./platform-provider.abstract";
+import {SystemService} from "./system.service";
 
 @Injectable()
-export class BrowserPlatformProviderService implements PlatformProvider {
+export class BrowserSystemService extends SystemService {
 
 
     public openLink(url: string) {
