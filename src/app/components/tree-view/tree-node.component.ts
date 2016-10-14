@@ -5,13 +5,12 @@ import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     QueryList,
-    ViewChildren
+    ViewChildren, ElementRef
 } from "@angular/core";
 import {ContextDirective} from "../../services/context/context.directive";
 import {TreeNode} from "./types";
 import {Observable, BehaviorSubject} from "rxjs";
 import {TreeViewService} from "./tree-view.service";
-
 
 @Component({
     selector: "ct-tree-node",
@@ -21,11 +20,11 @@ import {TreeViewService} from "./tree-view.service";
         <div class="deep-unselectable clickable node-base"
              [attr.data-index]="nodeIndex"
              [tabindex]="nodeIndex"
-             (click)="selectNode($event)"
+             (click)="onClick($event)"
              [class.selected]="isHighlighted | async"
              (dblclick)="toggle()">
             
-            <span *ngIf="node.icon" class="icon-space">
+            <span *ngIf="node.icon" class="icon-space" (click)="toggle()">
                 <i class="fa fa-fw" [ngClass]="getIconRules()"></i>
             </span>
             
@@ -69,12 +68,15 @@ export class TreeNodeComponent implements OnInit {
 
     private nameParts: String[] = [];
 
+    public el: Element;
+
     @ViewChildren(TreeNodeComponent)
     private children: QueryList<TreeNodeComponent>;
 
-    public constructor(private tree: TreeViewService, private detector: ChangeDetectorRef) {
+    public constructor(private tree: TreeViewService, private detector: ChangeDetectorRef, el: ElementRef) {
 
         this.nodeIndex = TreeNodeComponent.NODE_COUNT++;
+        this.el = el.nativeElement;
     }
 
     ngOnInit() {
@@ -146,6 +148,8 @@ export class TreeNodeComponent implements OnInit {
             "fa-folder-open": this.node.icon === "folder" && this.isExpanded,
             "fa-angle-right": this.node.icon === "angle" && !this.isExpanded,
             "fa-angle-down": this.node.icon === "angle" && this.isExpanded,
+            "fa-caret-right": this.node.icon === "caret" && !this.isExpanded,
+            "fa-caret-down": this.node.icon === "caret" && this.isExpanded,
             "fa-circle-o-notch fa-spin": this.isLoading || this.node.icon === "loader",
             "app-type-icon": ["CommandLineTool", "Workflow"].indexOf(this.node.icon) !== -1,
             "icon-command-line-tool": this.node.icon === "CommandLineTool",
@@ -153,6 +157,11 @@ export class TreeNodeComponent implements OnInit {
         };
 
         return rules;
+    }
+
+    private onClick(event: MouseEvent){
+        this.selectNode(event);
+        this.tree.searchTerm.next("");
     }
 
     ngOnDestroy() {

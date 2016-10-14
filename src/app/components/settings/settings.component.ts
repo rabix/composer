@@ -76,8 +76,6 @@ export class SettingsComponent implements OnInit {
 
     constructor(private settings: SettingsService, formBuilder: FormBuilder, private api: PlatformAPI, private platform: PlatformProvider) {
 
-        console.debug("Got platform provider", this.platform);
-
         this.form = formBuilder.group({
             url: ["", [Validators.required, Validators.pattern("https://[^/?]+\.[^.]+\\.sbgenomics\\.com")]],
             key: ["", [(control) => {
@@ -106,7 +104,6 @@ export class SettingsComponent implements OnInit {
     }
 
     ngOnInit() {
-        console.debug("Initializing settings component");
         this.form.statusChanges.debounceTime(300)
             .filter(status => status === "VALID")
             .flatMap(_ => this.api.checkToken(this.form.value.url, this.form.value.key).map(res => {
@@ -128,6 +125,8 @@ export class SettingsComponent implements OnInit {
             .subscribe(err => {
                 this.form.setErrors(err);
             });
+
+        this.form.statusChanges.map(s => s === "VALID").subscribe(this.settings.validity);
     }
 
     ngOnDestroy() {
@@ -141,7 +140,6 @@ export class SettingsComponent implements OnInit {
     private openTokenPage(){
         let url = "https://igor.sbgenomics.com/account/#developer";
         if(this.form.controls["url"].valid){
-            console.debug("Url is valid");
             url = this.form.controls["url"].value + "/account/#developer";
         }
 

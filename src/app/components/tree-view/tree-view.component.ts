@@ -1,5 +1,5 @@
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
-import {Component, ChangeDetectionStrategy, Input, ElementRef, QueryList, ViewChildren} from "@angular/core";
+import {Component, Input, ElementRef, QueryList, ViewChildren} from "@angular/core";
 import {TreeNode} from "./types";
 import {TreeNodeComponent} from "./tree-node.component";
 import {TreeViewService} from "./tree-view.service";
@@ -11,13 +11,17 @@ require("./tree-view.component.scss");
 @Component({
     selector: "ct-tree-view",
     directives: [BlockLoaderComponent, TreeNodeComponent],
-    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [TreeViewService],
     template: `
-        <div [ngClass]="{'hidden': searchTerm.length === 0}" class="search-term">
-            Matching: <span class="term">"{{ tree.searchTerm | async }}"</span>
+        <div class="search-term-container" *ngIf="searchTerm.length > 0">
+            <div class="search-term">
+                Matching: <span class="term">"{{ searchTerm }}"</span>
+            </div>
+        
         </div>
-        <ct-tree-node *ngFor="let node of nodes" [node]="node"></ct-tree-node>
+        <div [class.m-t-2]="searchTerm.length > 0">
+            <ct-tree-node class="root-node" *ngFor="let node of nodes" [node]="node"></ct-tree-node>
+        </div>
     `
 })
 export class TreeViewComponent {
@@ -25,21 +29,22 @@ export class TreeViewComponent {
     @Input()
     public nodes: TreeNode[];
 
-    private searchTerm = "";
-
     private subs = [];
 
     private el: Element;
+
+    private searchTerm = "";
 
     @ViewChildren(TreeNodeComponent)
     private treeNodes: QueryList<TreeNodeComponent>;
 
     constructor(private tree: TreeViewService, el: ElementRef, private domEvents: DomEventService) {
-        this.el = el.nativeElement;
 
-        this.subs.push(tree.searchTerm.subscribe(term => {
+        this.tree.searchTerm.subscribe(term => {
             this.searchTerm = term;
-        }));
+        });
+
+        this.el = el.nativeElement;
 
         this.subs.push(
             this.observeArrowNavigation().withLatestFrom(
@@ -81,7 +86,7 @@ export class TreeViewComponent {
 
 
         this.subs.push(
-            this.observeSearchTerm().subscribe(tree.searchTerm)
+            this.captureSearchTerm().subscribe(tree.searchTerm)
         );
 
         this.subs.push(
@@ -91,13 +96,31 @@ export class TreeViewComponent {
             })
         );
 
+        this.subs.push(
+            this.tree.selectedNode.filter(c => c).map(comp => comp.el).subscribe(el => {
+                const nodeRect       = el.getBoundingClientRect();
+                const treeRect       = this.el.getBoundingClientRect();
+                const nodeFromAbove  = nodeRect.top - treeRect.top;
+                const nodeFromBelow  = treeRect.height - nodeFromAbove - nodeRect.height;
+                const isAboveTheFold = nodeFromAbove < 0;
+                const isBelowTheFold = nodeFromBelow < 0;
+
+
+                if (isAboveTheFold) {
+                    this.el.scrollTop += nodeFromAbove;
+                } else if (isBelowTheFold) {
+                    this.el.scrollTop -= nodeFromBelow;
+                }
+            })
+        );
+
     }
 
     ngOnDestroy() {
         this.subs.forEach(sub => sub.unsubscribe());
     }
 
-    private observeSearchTerm(): Observable<string> {
+    private captureSearchTerm(): Observable<string> {
         return this.domEvents.on("keydown", this.el, true)
             .filter((event: KeyboardEvent) => {
                 if (event.ctrlKey || event.altKey || event.metaKey) {
@@ -105,18 +128,21 @@ export class TreeViewComponent {
                 }
 
                 return (event.keyCode > 47 && event.keyCode < 58) || // number keys
-                    ([32, 8].indexOf(event.keyCode) !== -1) || // enter, spacebar & backspace
+                    ([32, 8, 27].indexOf(event.keyCode) !== -1) ||
                     (event.keyCode > 64 && event.keyCode < 91) || // letter keys
                     (event.keyCode > 95 && event.keyCode < 112) || // numpad keys
                     (event.keyCode > 185 && event.keyCode < 193) || // ;=,-./` (in order)
                     (event.keyCode > 218 && event.keyCode < 223);
             })
-            .scan((acc, event: KeyboardEvent) => {
+            .withLatestFrom(this.tree.searchTerm, (event: KeyboardEvent, latestTerm: string) => {
+
                 if (event.which === 8) {
-                    return acc.slice(0, -1);
+                    return latestTerm.slice(0, -1);
+                } else if (event.which === 27){
+                    return "";
                 }
-                return acc + event.key;
-            }, "")
+                return latestTerm + event.key;
+            })
             .distinctUntilChanged((a, b) => a == b);
     }
 

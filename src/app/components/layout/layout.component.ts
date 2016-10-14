@@ -32,7 +32,7 @@ require("./layout.component.scss");
                                        (statusChange)="onPanelSwitch($event, 'bottom')"></ct-panel-switcher>
                 </div>
             </div>
-            <div class="flex-col" 
+            <div class="flex-col col-panels" 
                  [style.flex]="treeSize" 
                  [class.hidden]="(visiblePanels | async).length === 0">
                  

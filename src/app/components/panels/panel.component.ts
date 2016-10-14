@@ -1,6 +1,8 @@
 import {OnInit, Component, Input, ElementRef, Renderer} from "@angular/core";
 import {Observable} from "rxjs";
 
+require("./panel.component.scss");
+
 @Component({
     host: {
         "class": "panel"
@@ -8,6 +10,7 @@ import {Observable} from "rxjs";
     selector: "ct-panel",
     template: `<ng-content></ng-content>`
 })
+
 export class PanelComponent implements OnInit {
 
     @Input()

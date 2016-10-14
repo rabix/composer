@@ -12,13 +12,15 @@ import {SettingsService} from "../../services/settings/settings.service";
 @Component({
     selector: "ct-sb-user-projects-panel",
     directives: [TreeViewComponent, BlockLoaderComponent, PanelToolbarComponent],
+    host: {class: "block"},
     template: `
         <ct-panel-toolbar>
             <name>Projects</name>
         </ct-panel-toolbar>
+        
         <div *ngIf="isLoading">
              <div class="text-xs-center"><small>Preparing Your Projects&hellip;</small></div>
-            <progress class="progress progress-striped" value="100" max="100"></progress>
+            <progress class="progress progress-striped progress-animated" value="100" max="100"></progress>
         </div>
             
         <ct-tree-view [nodes]="nodes | async"></ct-tree-view>
@@ -44,7 +46,7 @@ export class SBUserProjectsPanelComponent {
                     return this.dataSource.load().map(entries => {
                         return entries.map(entry => ({
                             name: entry.data.name,
-                            icon: entry.type || "angle",
+                            icon: entry.type || "caret",
                             isExpandable: true,
                             childrenProvider: _ => entry.childrenProvider()
                                 .map(childrenApps => childrenApps.map((source: DataEntrySource) => ({
@@ -64,6 +66,8 @@ export class SBUserProjectsPanelComponent {
                 }).subscribe(data => {
                 this.isLoading = false;
                 this.nodes.next(data);
+            }, err => {
+                this.isLoading = false;
             })
         );
     }
