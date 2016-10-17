@@ -77,7 +77,7 @@ export class SBPublicAppsPanelComponent {
 
                 return Object.keys(categorized).map(key => ({
                     name: key,
-                    icon: "caret",
+                    icon: "angle",
                     isExpandable: true,
                     childrenProvider: _ => Observable.of(categorized[key])
                 })).sort(sortingMethod).concat(noToolkits.sort(sortingMethod));

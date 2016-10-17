@@ -6,7 +6,7 @@
 .scroll-content {
     overflow-y: auto;
     position: relative;
-    height: calc(100% - #{$status-bar-height} - #{$workbox-tabs-height});
+    height: calc(100% - #{$status-bar-height} - #{$gui-editor-header-height} + 3px);
 }
 
 .editor-container {
@@ -19,6 +19,7 @@
 .editor-header {
     background: $gui-editor-header-bg;
     overflow: hidden;
+    height: $gui-editor-header-height;
     display: block;
     padding: $header-padding;
     border-bottom: 1px solid $gui-editor-header-border;

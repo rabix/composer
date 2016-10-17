@@ -18,11 +18,11 @@ import {FormSectionComponent} from "../../../form-section/form-section.component
     ],
     template: `
 <ct-form-section>
-    <header>
+    <fs-header>
         Docker Image
-    </header>
+    </fs-header>
 
-    <body>
+    <fs-body>
         <form [formGroup]="dockerInputForm">
 
             <label for="docker_image" class="form-control-label">Docker Repository</label>
@@ -33,7 +33,7 @@ import {FormSectionComponent} from "../../../form-section/form-section.component
                    [formControl]="dockerInputForm.controls['dockerInput']"
                    [(ngModel)]="dockerPull">
         </form>
-    </body>
+    </fs-body>
 </ct-form-section>
             
     `

@@ -25,10 +25,10 @@ require("./base-command-form.components.scss");
     ],
     template: `
 <ct-form-section>
-    <header>
+    <fs-header>
         Base Command
-    </header>
-    <body>
+    </fs-header>
+    <fs-body>
         <form [formGroup]="baseCommandForm">
 
             <label class="form-control-label">What command do you want to call from the image</label>
@@ -40,7 +40,7 @@ require("./base-command-form.components.scss");
                 <i class="fa fa-plus"></i> Add base command
             </button>
         </form>
-    </body>
+    </fs-body>
 </ct-form-section>
 
     `
