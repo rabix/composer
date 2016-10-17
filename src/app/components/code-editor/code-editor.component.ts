@@ -44,9 +44,6 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
     @ViewChild("ace")
     private aceContainer: ElementRef;
 
-    constructor(private webWorkerService: WebWorkerService) {
-    }
-
     ngOnInit(): any {
 
         // Instantiate the editor and give it the stream through which the file will come through
@@ -60,19 +57,6 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
         );
 
         this.editor.contentChanges.subscribe(this.contentChanges);
-
-        // this.subs.push(
-        //     this.editor.contentChanges.skip(1).subscribe((file) => {
-        //         this.eventHub.publish(new UpdateFileAction(file));
-        //     })
-        // );
-        //
-        // this.subs.push(
-        //     this.editor.validationResult
-        //         .subscribe((result: ValidationResponse) => {
-        //             this.eventHub.publish(new CwlValidationResult(result));
-        //         })
-        // );
     }
 
     ngOnDestroy(): void {

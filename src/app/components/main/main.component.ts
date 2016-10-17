@@ -1,6 +1,4 @@
 import {Component, ViewChild, ViewContainerRef, AfterViewInit} from "@angular/core";
-import {ComponentRegistryFactoryService} from "../workspace/registry/component-registry-factory.service";
-import {ContextDirective} from "../../services/context/context.directive";
 import {ContextService} from "../../services/context/context.service";
 import {DomEventService} from "../../services/dom/dom-event.service";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
@@ -8,7 +6,6 @@ import {ExpressionInputService} from "../../services/expression-input/expression
 import {FileRegistry} from "../../services/file-registry.service";
 import {InputPortService} from "../../services/input-port/input-port.service";
 import {LayoutComponent} from "../layout/layout.component";
-import {MenuBarComponent} from "../menu";
 import {ModalService} from "../modal";
 import {Observable} from "rxjs/Rx";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
@@ -31,12 +28,9 @@ require("./main.component.scss");
         <div #contextMenuAnchor></div>
     `,
     directives: [
-        MenuBarComponent,
-        ContextDirective,
         LayoutComponent,
     ],
     providers: [
-        ComponentRegistryFactoryService,
         ContextService,
         EventHubService,
         FileRegistry,
