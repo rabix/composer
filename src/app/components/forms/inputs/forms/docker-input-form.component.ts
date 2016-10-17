@@ -17,7 +17,7 @@ import {CommandLineToolModel} from "cwlts/models/d2sb";
     template: `
             <form [formGroup]="dockerInputForm">
                 <fieldset class="form-group">
-                    <button type="button" class="btn btn-secondary hide-btn">Hide</button>
+                    <button type="button" class="btn btn-link hide-btn">Hide</button>
                
                         <label>Docker image</label>
                         <label class="secondary-label">Docker Repository</label>

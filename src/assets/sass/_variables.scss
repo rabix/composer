@@ -19,7 +19,6 @@ $brand-primary-bg-dark: #1B2833;
 $brand-primary-bg-bright: #34495E;
 
 
-
 /**
 * Layout Size Variables
 */
@@ -91,3 +90,15 @@ $arg-color: #FDA365;
 $status-bar-vertical-padding: 8px;
 $status-bar-line-height: 18px;
 $status-bar-height: $status-bar-line-height + 2*$status-bar-vertical-padding;
+
+
+/**
+* Buttons
+*/
+$btn-secondary-bg: #f9f9f9;
+
+/**
+* Expression editor
+*/
+$expression-editor-bg: #000000;
+$expression-editor-head-text: #ffffff;

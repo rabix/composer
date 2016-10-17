@@ -1,20 +1,46 @@
 @import "../../../../assets/sass/variables";
 
 $execute-btn-width: 90px;
+$header-height: 40px;
+$button-height: 30px;
 
 .expression-editor-component {
-    background: #000000;
+    background: $expression-editor-bg;
     height: 100%;
     width: 100%;
     position: relative;
 
-    .ace-editor {
-        height: 85%;
-        width: calc(100% - #{$collapse-icon-width});
-        position: absolute;
-        margin-left: $collapse-icon-width;
+    .expression-head-text {
+        color: $text-light;
+        top: 25%;
+        position: relative;
+
+        /* Large screens */
+        @media only screen  and (min-width : 1824px) {
+            margin-left: 40px;
+        }
+
+        i {
+            margin-left: 5px;
+            color: $text-light;
+        }
+    }
+
+    .expression-editor-header {
+        height: $header-height;
+        position: relative;
+        width: 100%;
+        display: block;
+        color: $expression-editor-head-text;
         top: 0;
         right: 0;
+    }
+
+    .ace-editor {
+        height: calc(85% - #{$header-height});
+        width: calc(100% - 20px);
+        margin-left: $collapse-icon-width;
+        display: block;
     }
 
     .expression-result-container {
@@ -30,14 +56,27 @@ $execute-btn-width: 90px;
             height: 100%;
             width: calc(98% - #{$execute-btn-width});
         }
+    }
+}
 
-        .execute-btn {
-            width: 90px;
-            display: inline;
-            height: 28px;
-            right: 0;
-            top: calc(50% - 14px);
-            position: absolute;
-        }
+.expression-buttons-container {
+    float: right;
+    top: calc(50% - #{$button-height}/2);
+    position: relative;
+}
+
+.expression-editor-btn {
+    width: 90px;
+    display: inline;
+    height: $button-height;
+    margin-right: 5px;
+    padding: 0 !important;
+
+    &.execute-btn {
+        width: $execute-btn-width;
+        right: 0;
+        padding: 0;
+        top: calc(50% -  #{$button-height}/2);
+        position: absolute;
     }
 }

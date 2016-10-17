@@ -2,10 +2,11 @@ import {Component, Input, OnInit} from "@angular/core";
 import {InputPortListComponent} from "../types/input-port-list.component";
 import {InputPortService} from "../../../../services/input-port/input-port.service";
 import {EventHubService} from "../../../../services/event-hub/event-hub.service";
-import {OpenInputInspector} from "../../../../action-events";
+import {OpenInputInspector} from "../../../../action-events/index";
 import {CommandLineToolModel} from "cwlts/models/d2sb";
 
 require("./input-ports-form.component.scss");
+require("./shared/form.components.scss");
 
 @Component({
     selector: 'inputs-ports-form',
@@ -16,7 +17,7 @@ require("./input-ports-form.component.scss");
             <fieldset class="form-group">
                 <label>Input ports</label>
                 
-                <button type="button" class="btn btn-secondary hide-btn">Hide</button>
+                <button type="button" class="btn btn-link hide-btn">Hide</button>
     
                 <input-port-list></input-port-list>
             </fieldset>

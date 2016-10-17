@@ -16,36 +16,4 @@ clt-editor {
     border: 1px solid $border-color;
     padding: $padding-md;
     color: $text-dark;
-
-    .secondary-label {
-        color:  #808080;
-        font-size: small;
-    }
-
-    button.hide-btn {
-        font-size: 0.9em;
-
-        /* Large screens */
-        @media only screen  and (min-width : 1824px) {
-            font-size: 1em;
-        }
-
-        float: right;
-        color: $button-blue-text;
-        border: 0;
-    }
-
-    .btn-secondary.add-input-btn, .btn-secondary.expression-form-btn {
-        font-size: 0.9em;
-
-        /* Large screens */
-        @media only screen  and (min-width : 1824px) {
-            font-size: 1em;
-        }
-
-        padding: 0;
-        border: 0;
-        background: #ffffff;
-        color: $button-blue-text;
-    }
 }

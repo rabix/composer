@@ -1,21 +1,21 @@
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, Input, trigger, style, animate, state, transition, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 import {FileModel} from "../../store/models/fs.models";
+import {FormPosition} from "./animation.states";
 import {CommandLineComponent} from "./commandline/commandline.component";
 import {DockerInputFormComponent} from "../forms/inputs/forms/docker-input-form.component";
 import {BaseCommandFormComponent} from "../forms/inputs/forms/base-command-form.component";
 import {InputPortsFormComponent} from "../forms/inputs/forms/input-ports-form.component";
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {
     OpenInputInspector,
     OpenExpressionEditor,
     CloseInputInspector,
     CloseExpressionEditor
-} from "../../action-events";
-import {
-    CommandInputParameterModel as InputProperty,
-    CommandLineToolModel
-} from "cwlts/models/d2sb";
+} from "../../action-events/index";
+
+import {CommandInputParameterModel as InputProperty, CommandLineToolModel} from "cwlts/lib/models/d2sb";
 import {Observable} from "rxjs";
 
 require("./clt-editor.component.scss");
@@ -30,6 +30,16 @@ require("./clt-editor.component.scss");
         REACTIVE_FORM_DIRECTIVES,
         FORM_DIRECTIVES,
     ],
+    animations: [
+        trigger("formPosition", [
+            state("left", style({
+            })),
+            state("center", style({
+            })),
+            transition("hidden => visible", animate("100ms ease-in")),
+            transition("visible => hidden", animate("100ms ease-out"))
+        ])
+    ],
     template: `
             <form class="clt-editor-group"
                   [formGroup]="cltEditorGroup">
@@ -40,8 +50,8 @@ require("./clt-editor.component.scss");
                 </docker-input-form>
                                 
                 <base-command-form class="input-form" 
-                                [group]="cltEditorGroup"
-                                [baseCommand]="model.baseCommand">
+                                [toolBaseCommand]="model.baseCommand"
+                                [baseCommandForm]="cltEditorGroup.controls.baseCommandGroup">
                 </base-command-form>
                 
                 <inputs-ports-form [cltModel]="model"
@@ -56,12 +66,12 @@ export class CltEditorComponent implements OnInit {
     public fileStream: Observable<FileModel>;
 
     @Input()
-    public toolInputs: Array<InputProperty>;
-
-    @Input()
     private model: CommandLineToolModel;
 
     private file: FileModel;
+
+    /** Positions of the listed properties */
+    private formPosition: FormPosition = "center";
 
     /* TODO: generate the commandline */
     private commandlineContent: string;
@@ -73,8 +83,6 @@ export class CltEditorComponent implements OnInit {
 
     constructor(private formBuilder: FormBuilder,
                 private eventHubService: EventHubService) {
-
-        this.cltEditorGroup = this.formBuilder.group({});
 
         /* Opening the sidebar */
         this.eventHubService.on(OpenInputInspector).subscribe(() => {
@@ -106,6 +114,12 @@ export class CltEditorComponent implements OnInit {
             this.file = file;
             this.commandlineContent = this.model.getCommandLine();
             return true;
+        });
+
+        this.cltEditorGroup = this.formBuilder.group({
+            dockerInputGroup: this.formBuilder.group({}),
+            baseCommandGroup: this.formBuilder.group({}),
+            inputPortsGroup: this.formBuilder.group({})
         });
     }
 }
