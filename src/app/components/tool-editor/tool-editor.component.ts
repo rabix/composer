@@ -17,6 +17,7 @@ import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
 import {WebWorkerService} from "../../services/web-worker/web-worker.service";
 
 require("./tool-editor.component.scss");
+require("script!../../../../node_modules/yamljs/dist/yaml.min");
 
 @Component({
     selector: "ct-tool-editor",
@@ -102,7 +103,9 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
 
         this.rawEditorContent.subscribe(raw => {
             try {
-                this.toolModel = new CommandLineToolModel(JSON.parse(raw));
+                //noinspection TypeScriptUnresolvedVariable
+                const obj = JSON.parse(raw) || YAML.parse(raw);
+                this.toolModel = new CommandLineToolModel(obj);
                 this.commandLineParts = this.toolModel.getCommandLineParts();
             } catch (ex) {
                 // if the file isn't valid JSON, do nothing
