@@ -21,8 +21,8 @@ export class SBPlatformDataSource {
                     id: app.id,
                     data: app,
                     type: "file",
-                    save: () => {
-                        // this.platform.
+                    save: (jsonContent, revisionNote) => {
+                        return this.platform.saveApp(jsonContent, revisionNote);
                     },
                     content: this.platform.getAppCWL(app).switchMap(cwl => new BehaviorSubject(cwl)),
                     language: Observable.of("json")

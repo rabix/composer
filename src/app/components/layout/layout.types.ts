@@ -27,7 +27,7 @@ export class PanelGroup {
 
         // If the panel doesn't exist, throw an exception, it's probably a mistake in the code
         if (index === -1) {
-            throw `Trying to toggle non-existing panel “${id}”. 
+            throw `Trying to toggle non-existing panel “${id}”.
                    Available panels are ${this.panels.map(p => p.id).join(", ")}`;
         }
 

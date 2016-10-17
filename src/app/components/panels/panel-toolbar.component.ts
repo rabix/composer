@@ -7,10 +7,8 @@ import {Component, OnInit} from "@angular/core";
             <ng-content select="name"></ng-content>
         </div>
         <div class="tools">
-            <span class="clickable"><i class="fa fa-fw fa-cog"></i></span>
-            <span class="clickable"><i class="fa fa-fw fa-sort"></i></span>
+            <!--<span class="clickable"><i class="fa fa-fw fa-cog"></i></span>-->
         </div>
-              
     `
 })
 export class PanelToolbarComponent implements OnInit {

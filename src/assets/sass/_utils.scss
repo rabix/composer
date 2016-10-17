@@ -47,3 +47,7 @@
 .ellipsis {
   @include ellipsis();
 }
+
+.block {
+  display: block;
+}

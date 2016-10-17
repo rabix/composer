@@ -1,4 +1,5 @@
 import {Observable} from "rxjs";
+import {Response} from "@angular/http";
 
 export type SB_PLATFORM_SOURCE_ID = "sb_platform";
 export type SB_PUBLIC_SOURCE_ID = "sb_public";
@@ -14,6 +15,7 @@ export interface DataEntrySource<T, K> {
     data: T;
     type: "file" | "folder",
     isWritable: boolean;
+    save: (...args: any[])=>Observable<Response>
     sourceId: DATA_SOURCE_ID;
     content: Observable<string>,
     language: Observable<string>,

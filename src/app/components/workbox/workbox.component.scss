@@ -115,10 +115,16 @@
 ct-settings-button {
   position: absolute;
   top: 9px;
-  right: 9px
+  right: 9px;
+
+  .warning {
+
+  }
 }
 
 ct-tab-manager, ct-tool-editor {
   display: block;
   height: 100%;
 }
+
+

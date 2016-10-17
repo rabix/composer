@@ -1,6 +1,6 @@
 import {Component} from "@angular/core";
-import {ExpressionEditorComponent} from "../expression-editor/expression-editor.component";
-import {CloseExpressionEditor} from "../../../action-events/index";
+import {ExpressionEditorComponent} from "./expression-editor.component";
+import {CloseExpressionEditor} from "../../../action-events";
 import {EventHubService} from "../../../services/event-hub/event-hub.service";
 
 @Component({

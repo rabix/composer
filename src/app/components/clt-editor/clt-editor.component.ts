@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, Input} from "@angular/core";
 import {FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 import {FileModel} from "../../store/models/fs.models";
 import {CommandLineComponent} from "./commandline/commandline.component";
@@ -12,10 +12,7 @@ import {
     CloseInputInspector,
     CloseExpressionEditor
 } from "../../action-events";
-import {
-    CommandInputParameterModel as InputProperty,
-    CommandLineToolModel
-} from "cwlts/models/d2sb";
+import {CommandInputParameterModel as InputProperty, CommandLineToolModel} from "cwlts/models/d2sb";
 import {Observable} from "rxjs";
 
 require("./clt-editor.component.scss");

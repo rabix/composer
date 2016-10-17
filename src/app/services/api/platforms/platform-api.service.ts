@@ -143,22 +143,21 @@ export class PlatformAPI {
         // Take the App id without the revision id
         let appPath = app["sbg:id"].split("/");
         appPath.pop();
-        appPath.join("/");
+        appPath = appPath.join("/");
 
         // Checkout the newest version of this App to get the latest revision
-        return this.getApp(appPath).flatMap(latestApp => {
-
-            const nextRevision = latestApp["sbg:latestRevision"] + 1;
+        return this.sessionID.switchMap(sessionID => this.getApp(appPath).flatMap(latestApp => {
+            const nextRevision = (latestApp["sbg:latestRevision"] || 0) + 1;
             const endpoint     = `${this.platformServices.brood}/apps/${appPath}/${nextRevision}`;
 
             return this.http.post(endpoint, Object.assign({}, app, {
                 "sbg:revisionNotes": revisionNote
             }), {
                 headers: new Headers({
-                    "session-id": this.sessionID
+                    "session-id": sessionID
                 })
             }).map(r => r.json());
-        });
+        }));
     }
 
     // private getAllEntries<T>(requestOptions: RequestOptions, mapFn?: (response: Response) => T) {

@@ -3,6 +3,7 @@ import {SettingsService, PlatformSettings} from "../../services/settings/setting
 import {FormGroup, FormBuilder, Validators, AbstractControl} from "@angular/forms";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {Subscription} from "rxjs";
+import {SystemService} from "../../platform-providers/system.service";
 
 @Component({
     selector: "ct-settings",
@@ -46,18 +47,9 @@ import {Subscription} from "rxjs";
                 <small class="form-text text-muted">
                     You can generate and see the key on the
                      
-                    <a *ngIf="form.controls.url.invalid" 
-                        target="_blank" 
-                        href="https://igor.sbgenomics.com/account/#developer">
+                    <a href="" (click)="$event.preventDefault(); openTokenPage()">
                         Seven Bridges Platform
                     </a>
-                    
-                    <a *ngIf="form.controls.url.valid" 
-                       target="_blank" 
-                       href="{{ form.controls.url.value }}/account/#developer">
-                       Seven Bridges Platform
-                   </a>
-                   
                 </small>
             </div>
             
@@ -82,10 +74,13 @@ export class SettingsComponent implements OnInit {
 
     private subs: Subscription[] = [];
 
-    constructor(private settings: SettingsService, formBuilder: FormBuilder, private platform: PlatformAPI) {
+    constructor(private settings: SettingsService,
+                private api: PlatformAPI,
+                private system: SystemService,
+                formBuilder: FormBuilder) {
 
         this.form = formBuilder.group({
-            url: ["", [Validators.pattern("https://[^/?]+\.[^.]+\\.sbgenomics\\.com")]],
+            url: ["", [Validators.required, Validators.pattern("https://[^/?]+\.[^.]+\\.sbgenomics\\.com")]],
             key: ["", [(control) => {
 
                 if (control.value.length === 32) {
@@ -112,10 +107,9 @@ export class SettingsComponent implements OnInit {
     }
 
     ngOnInit() {
-        console.debug("Initializing settings component");
         this.form.statusChanges.debounceTime(300)
             .filter(status => status === "VALID")
-            .flatMap(_ => this.platform.checkToken(this.form.value.url, this.form.value.key).map(res => {
+            .flatMap(_ => this.api.checkToken(this.form.value.url, this.form.value.key).map(res => {
                 if (res === true) {
                     return null;
                 }
@@ -134,6 +128,8 @@ export class SettingsComponent implements OnInit {
             .subscribe(err => {
                 this.form.setErrors(err);
             });
+
+        this.form.statusChanges.map(s => s === "VALID").subscribe(this.settings.validity);
     }
 
     ngOnDestroy() {
@@ -142,6 +138,15 @@ export class SettingsComponent implements OnInit {
 
     private onSubmit() {
         this.settings.platformConfiguration.next(this.form.value);
+    }
+
+    private openTokenPage() {
+        let url = "https://igor.sbgenomics.com/account/#developer";
+        if (this.form.controls["url"].valid) {
+            url = this.form.controls["url"].value + "/account/#developer";
+        }
+
+        this.system.openLink(url);
     }
 
     /**

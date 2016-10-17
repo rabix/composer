@@ -1,10 +1,9 @@
-import {Component, OnInit, Input, OnDestroy} from "@angular/core";
+import {Component, Input, OnDestroy} from "@angular/core";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
-import {Subscription, ReplaySubject} from "rxjs";
+import {Subscription} from "rxjs";
 import {TabData} from "../workbox/tab-data.interface";
 import {SettingsComponent} from "../settings";
 import {WebWorkerService} from "../../services/web-worker/web-worker.service";
-import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
 import {ToolEditorComponent} from "../tool-editor/tool-editor.component";
 import {WorkflowEditorComponent} from "../workflow-editor/workflow-editor.component";
 
@@ -26,45 +25,14 @@ import {WorkflowEditorComponent} from "../workflow-editor/workflow-editor.compon
         </div>
     `
 })
-export class TabManagerComponent implements OnInit, OnDestroy {
+export class TabManagerComponent implements OnDestroy {
 
     @Input()
     public tab: TabData;
 
-    private webWorkerService: WebWorkerService;
-    private validationStream: ReplaySubject<ValidationResponse>;
-
     private subs: Subscription[] = [];
-
-    constructor(private webWorkerService: WebWorkerService) {
-    }
-
-
-    ngOnInit() {
-
-        // this.subs.push(this.webWorkerService.validationResultStream.subscribe(val => {
-        //     switch (val.class) {
-        //         case "CommandLineTool":
-        //             this.type = "tool";
-        //             break;
-        //         case "Workflow":
-        //             this.type = "workflow";
-        //             break;
-        //         default:
-        //             this.type = "text";
-        //             break;
-        //     }
-        //
-        //     this.isLoading = false;
-        // }));
-
-        // this.subs.push(this.tab.subscribe(file => {
-        //     this.webWorkerService.validateJsonSchema(file.tabData);
-        // }));
-    }
 
     ngOnDestroy() {
         this.subs.forEach(s => s.unsubscribe());
-        // this.webWorkerService.dispose();
     }
 }

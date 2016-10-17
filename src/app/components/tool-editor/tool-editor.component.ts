@@ -36,12 +36,16 @@ require("./tool-editor.component.scss");
     ],
     template: `
         <div class="editor-container">
-            <tool-header class="editor-header"></tool-header>
+            <tool-header class="editor-header"
+                         (save)="save($event)"
+                         [fileIsValid]="isValidCwl"
+                         [data]="data"></tool-header>
         
             <div class="scroll-content">
                 <ct-code-editor [hidden]="viewMode !== 'code'"
                                 (contentChanges)="onEditorContentChange($event)"
                                 [content]="data.content"
+                                [readOnly]="!data.isWritable"
                                 [language]="data.language">
                 </ct-code-editor>
         
@@ -118,6 +122,13 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
         this.webWorkerService.validateJsonSchema(content);
         this.rawEditorContent.next(content);
 
+    }
+
+    private save(revisionNote){
+
+        this.data.save(JSON.parse(this.rawEditorContent.getValue()), revisionNote).subscribe(data => {
+
+        });
     }
 
     ngOnDestroy(): void {

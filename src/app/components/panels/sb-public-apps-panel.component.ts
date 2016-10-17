@@ -1,21 +1,26 @@
-import {Component, ChangeDetectionStrategy} from "@angular/core";
+import {Component} from "@angular/core";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
-import {FileModel} from "../../store/models/fs.models";
-import {ReplaySubject} from "rxjs";
-import {OpenFileRequestAction} from "../../action-events";
-import {TreeViewComponent} from "../tree-view/tree-view.component";
+import {Observable, BehaviorSubject} from "rxjs";
+import {OpenTabAction} from "../../action-events";
+import {TreeViewComponent} from "../tree-view";
 import {PanelToolbarComponent} from "./panel-toolbar.component";
-import {SettingsService, PlatformSettings} from "../../services/settings/settings.service";
+import {SettingsService} from "../../services/settings/settings.service";
+import {PlatformAppEntry} from "../../services/api/platforms/platform-api.types";
 
 @Component({
     selector: "ct-sb-public-apps-panel",
     directives: [TreeViewComponent, PanelToolbarComponent],
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    host: {class: "block"},
     template: `
         <ct-panel-toolbar>
             <name>Public Apps</name>
         </ct-panel-toolbar>
+        
+        <div *ngIf="isLoading">
+             <div class="text-xs-center"><small>Fetching Public Apps&hellip;</small></div>
+            <progress class="progress progress-striped progress-animated" value="100" max="100"></progress>
+        </div>
         <ct-tree-view [nodes]="nodes"></ct-tree-view>
     `
 })
@@ -23,43 +28,66 @@ export class SBPublicAppsPanelComponent {
 
     private nodes = [];
 
-    constructor(private platform: PlatformAPI, private eventHub: EventHubService, private settings: SettingsService) {
+    private isLoading = false;
 
-        // this.settings.platformConfiguration.subscribe((config: PlatformSettings) => {
-        //     console.debug("Updated platform connection");
-        // });
-        //
-        // this.nodes = [
-        //     {
-        //         name: "Public Apps",
-        //         icon: "angle",
-        //         childrenProvider: () => {
-        //             const cached = new ReplaySubject(1);
-        //             this.platform.getPublicApps().map(apps => apps.map(app => ({
-        //                 name: app.label,
-        //                 model: app,
-        //                 icon: app.class || "file",
-        //                 openHandler: (item) => {
-        //                     item.icon = "loader";
-        //                     return this.platform.getAppCWL(app).subscribe(data => {
-        //                         item.icon = app.class || "file";
-        //                         this.eventHub.publish(new OpenFileRequestAction(new FileModel({
-        //                             name: app.label,
-        //                             absolutePath: app.id,
-        //                             content: data,
-        //                             type: "json"
-        //                         })));
-        //                     })
-        //                 }
-        //             }))).subscribe(cached);
-        //
-        //             return cached;
-        //         }
-        //     }
-        // ]
+    constructor(private platform: PlatformAPI,
+                private eventHub: EventHubService,
+                private settings: SettingsService) {
     }
 
     ngOnInit() {
+
+        const sortingMethod = (a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+
+        this.settings.platformConfiguration
+            .do(_ => this.isLoading = true)
+            .flatMap(_ => this.platform.getPublicApps().map(apps => {
+
+
+                const categorized = apps.map(app => {
+                    return {
+                        name: app.label,
+                        icon: app.class || "file",
+                        isExpandable: false,
+                        toolkit: app["sbg:toolkit"],
+                        openHandler: _ => {
+                            this.eventHub.publish(new OpenTabAction({
+                                id: app.id,
+                                title: Observable.of(app.label),
+                                contentType: Observable.of(app.class),
+                                contentData: {
+                                    data: app,
+                                    isWritable: false,
+                                    content: this.platform.getAppCWL(app).switchMap(cwl => new BehaviorSubject(cwl)),
+                                    language: Observable.of("json")
+                                }
+                            }));
+                        }
+                    };
+
+                }).reduce((acc, app: PlatformAppEntry) => {
+                    //noinspection TypeScriptUnresolvedVariable
+                    acc[app.toolkit] = [].concat.apply(acc[app.toolkit] || [], [app]);
+                    return acc;
+                }, {});
+
+                const noToolkits = (categorized["undefined"] || []).sort(sortingMethod);
+                delete categorized["undefined"];
+
+
+                return Object.keys(categorized).map(key => ({
+                    name: key,
+                    icon: "caret",
+                    isExpandable: true,
+                    childrenProvider: _ => Observable.of(categorized[key])
+                })).sort(sortingMethod).concat(noToolkits.sort(sortingMethod));
+
+            })).subscribe(categories => {
+            this.isLoading = false;
+            this.nodes     = categories;
+        }, err => {
+            this.isLoading = false;
+        });
     }
 
 }

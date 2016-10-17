@@ -2,7 +2,6 @@ import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {CodeEditor} from "./code-editor";
 import {Component, OnInit, ElementRef, ViewChild, Input, OnDestroy, Output} from "@angular/core";
 import {Subscription, Observable, Subject} from "rxjs/Rx";
-import {WebWorkerService} from "../../services/web-worker/web-worker.service";
 import Editor = AceAjax.Editor;
 import TextMode = AceAjax.TextMode;
 
@@ -25,6 +24,9 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
     @Input()
     public language: Observable<string>;
 
+    @Input()
+    public readOnly = false;
+
     @Output()
     public contentChanges = new Subject<string>();
 
@@ -35,14 +37,9 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
     /** List of subscriptions that should be disposed when destroying this component */
     private subs: Subscription[] = [];
 
-    private webWorkerService: WebWorkerService;
-
     /** Reference to the element in which we want to instantiate the Ace editor */
     @ViewChild("ace")
     private aceContainer: ElementRef;
-
-    constructor(private webWorkerService: WebWorkerService) {
-    }
 
     ngOnInit(): any {
 
@@ -51,23 +48,12 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
             ace.edit(this.aceContainer.nativeElement),
             this.rawInput,
             this.language,
-            this.webWorkerService
+            {
+                readOnly: this.readOnly
+            }
         );
 
         this.editor.contentChanges.subscribe(this.contentChanges);
-
-        // this.subs.push(
-        //     this.editor.contentChanges.skip(1).subscribe((file) => {
-        //         this.eventHub.publish(new UpdateFileAction(file));
-        //     })
-        // );
-        //
-        // this.subs.push(
-        //     this.editor.validationResult
-        //         .subscribe((result: ValidationResponse) => {
-        //             this.eventHub.publish(new CwlValidationResult(result));
-        //         })
-        // );
     }
 
     ngOnDestroy(): void {
