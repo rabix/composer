@@ -14,7 +14,7 @@ export class InputPortService {
     /** The input ports stream we expose */
     public inputPorts: Observable<InputProperty[]>;
 
-    /** Initial content of the input port list */
+    /** Initial tabData of the input port list */
     private initialInputPorts: InputProperty[] = [];
 
     /** Stream for adding new imports */

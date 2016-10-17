@@ -8,29 +8,31 @@ ct-tree-view {
   height: 100%;
   overflow-y: auto;
   padding: 4px;
+  position: relative;
   width: 100%;
 
   ct-tree-node {
-    font-size: $font-size-sm;
     display: block;
-
+    font-size: $font-size-sm;
+    position: relative;
   }
 
   .node-base {
-    line-height: 18px;
-    padding: 2px 4px;
-    //line-height: 16px;
+    height: 22px;
+    font-size: $font-size-sm;
+    font-weight: 300;
     border-radius: 2px;
     display: inline-block;
     outline: none;
     width: 100%;
     overflow: hidden;
     white-space: nowrap;
+    padding-left:20px;
 
     .name {
       display: inline-block;
       text-overflow: ellipsis;
-      white-space: nowrap;
+      white-space: pre;
       overflow: hidden;
     }
 
@@ -49,8 +51,8 @@ ct-tree-view {
     }
   }
 
-  .children {
-    padding-left: 20px;
+  .root-node > .node-base {
+    padding-left: 0;
   }
 
   .icon-space {
@@ -80,7 +82,6 @@ ct-tree-view {
 
 .name-container {
   display: inline-block;
-  width: calc(100% - 10px);
   vertical-align: middle;
 
   .name {
@@ -96,13 +97,29 @@ ct-tree-view {
     border-radius: 4px;
     border: 1px solid orange;
     box-sizing: border-box;
+    font-weight:400;
   }
 }
 
+.search-term-container {
+  height: 24px;
+  position: absolute;
+  width: 100%;
+  background: $brand-primary-bg-dark;
+  display: block;
+  margin-top: -4px;
+  margin-left: -4px;
+  z-index: 10;
+}
+
 .search-term {
+  display: block;
+
   &.hidden {
     height: 0;
     opacity: 0;
+    padding: 0 0 0 10px;
+    font-size: 0;
   }
   .term {
     white-space: pre;

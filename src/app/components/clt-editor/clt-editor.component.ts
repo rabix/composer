@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, Input} from "@angular/core";
 import {FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 import {FileModel} from "../../store/models/fs.models";
 import {CommandLineComponent} from "./commandline/commandline.component";
@@ -12,16 +12,13 @@ import {
     CloseInputInspector,
     CloseExpressionEditor
 } from "../../action-events";
-import {
-    CommandInputParameterModel as InputProperty,
-    CommandLineToolModel
-} from "cwlts/models/d2sb";
+import {CommandInputParameterModel as InputProperty, CommandLineToolModel} from "cwlts/models/d2sb";
 import {Observable} from "rxjs";
 
 require("./clt-editor.component.scss");
 
 @Component({
-    selector: "clt-editor",
+    selector: "ct-clt-editor",
     directives: [
         DockerInputFormComponent,
         BaseCommandFormComponent,
@@ -50,7 +47,7 @@ require("./clt-editor.component.scss");
             </form>
     `
 })
-export class CltEditorComponent implements OnInit {
+export class CltEditorComponent {
     /** The file that we are going to use to list the properties */
     @Input()
     public fileStream: Observable<FileModel>;
@@ -98,14 +95,6 @@ export class CltEditorComponent implements OnInit {
     deleteSidebarActionFromArray(action) {
         this.closeSidebarActions = this.closeSidebarActions.filter(sidebarAction => {
             return sidebarAction !== action;
-        });
-    }
-
-    ngOnInit() {
-        this.fileStream.first(file => {
-            this.file = file;
-            this.commandlineContent = this.model.getCommandLine();
-            return true;
         });
     }
 }

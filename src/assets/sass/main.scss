@@ -9,6 +9,11 @@
 @import "icons";
 @import "forms";
 
+@keyframes progress-bar-stripes {
+  0% { margin-left: 20px; background-position: 20px 0; }
+  100% { margin-left: 0px; background-position: 0 0; }
+}
+
 @import url(https://fonts.googleapis.com/css?family=Montserrat:400,700);
 
 html, body {
@@ -16,5 +21,17 @@ html, body {
   height: 100%;
   background: $body-bg;
   color: $body-color;
+
+  background-repeat: repeat;
+  background-position: center center;
+  background-size: auto auto;
+  background-image: linear-gradient(225deg,$brand-primary-bg 0%,$brand-primary-bg-dark 100%);
 }
 
+.loading-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
