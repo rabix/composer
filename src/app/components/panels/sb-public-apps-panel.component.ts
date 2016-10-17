@@ -75,14 +75,12 @@ export class SBPublicAppsPanelComponent {
                 delete categorized["undefined"];
 
 
-                const nodes = Object.keys(categorized).map(key => ({
+                return Object.keys(categorized).map(key => ({
                     name: key,
                     icon: "caret",
                     isExpandable: true,
                     childrenProvider: _ => Observable.of(categorized[key])
                 })).sort(sortingMethod).concat(noToolkits.sort(sortingMethod));
-
-                return nodes;
 
             })).subscribe(categories => {
             this.isLoading = false;

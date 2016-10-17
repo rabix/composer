@@ -3,7 +3,7 @@ import {ExpressionEditor} from "./expression-editor";
 import {Observable} from "rxjs/Observable";
 import {EventHubService} from "../../../services/event-hub/event-hub.service";
 import {ExpressionEditorData} from "../../../models/expression-editor-data.model";
-import {OpenExpressionEditor} from "../../../action-events/index";
+import {OpenExpressionEditor} from "../../../action-events";
 import {SandboxService, SandboxResponse} from "../../../services/sandbox/sandbox.service";
 import {Subscription} from "rxjs/Subscription";
 import Document = AceAjax.Document;

@@ -142,7 +142,7 @@ export class TreeNodeComponent implements OnInit {
     }
 
     private getIconRules() {
-        const rules = {
+        return {
             "fa-file": this.node.icon === "file",
             "fa-folder": this.node.icon === "folder" && !this.isExpanded,
             "fa-folder-open": this.node.icon === "folder" && this.isExpanded,
@@ -155,8 +155,6 @@ export class TreeNodeComponent implements OnInit {
             "icon-command-line-tool": this.node.icon === "CommandLineTool",
             "icon-workflow": this.node.icon === "Workflow",
         };
-
-        return rules;
     }
 
     private onClick(event: MouseEvent){

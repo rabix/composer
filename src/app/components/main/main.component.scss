@@ -13,8 +13,7 @@
   z-index: 1000;
   display: block;
   position: fixed;
-  background-image: url("../../../assets/img/runny.gif");
-  background-repeat: no-repeat;
+  background: url("../../../assets/img/runny.gif") no-repeat;
   background-size: contain;
 
   &.active {

@@ -2,7 +2,6 @@ import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {CodeEditor} from "./code-editor";
 import {Component, OnInit, ElementRef, ViewChild, Input, OnDestroy, Output} from "@angular/core";
 import {Subscription, Observable, Subject} from "rxjs/Rx";
-import {WebWorkerService} from "../../services/web-worker/web-worker.service";
 import Editor = AceAjax.Editor;
 import TextMode = AceAjax.TextMode;
 
@@ -37,8 +36,6 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
 
     /** List of subscriptions that should be disposed when destroying this component */
     private subs: Subscription[] = [];
-
-    private webWorkerService: WebWorkerService;
 
     /** Reference to the element in which we want to instantiate the Ace editor */
     @ViewChild("ace")

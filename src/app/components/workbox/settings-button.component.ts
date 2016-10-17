@@ -1,6 +1,6 @@
 import {Component} from "@angular/core";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
-import {Observable, BehaviorSubject} from "rxjs";
+import {Observable} from "rxjs";
 import {OpenTabAction} from "../../action-events";
 import {SettingsService} from "../../services/settings/settings.service";
 
