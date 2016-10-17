@@ -5,13 +5,13 @@ import {ExpressionEditorData} from "../../../models/expression-editor-data.model
 import {OpenExpressionEditor, CloseExpressionEditor} from "../../../action-events/index";
 import {SandboxService, SandboxResponse} from "../../../services/sandbox/sandbox.service";
 import {Subscription} from "rxjs/Subscription";
-import {Subject} from "rxjs/Subject";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import TextMode = AceAjax.TextMode;
+import {Observable, Subject} from "rxjs";
 
-require ("./expression-editor.component.scss");
+require("./expression-editor.component.scss");
 
 @Component({
     selector: "expression-editor",
@@ -54,11 +54,11 @@ require ("./expression-editor.component.scss");
 })
 export class ExpressionEditorComponent implements OnInit, OnDestroy {
 
-    /** Expression stream coming form the tool */
-    private expressionStream: Observable<string>;
+    /** Expression coming form the tool */
+    private initialExpressionScript: string;
 
-    /** Update action to be passed to the event hub */
-    private updateAction: Function;
+    /** Evaluated expressions */
+    private newValueStream: Subject<string | ExpressionModel>;
 
     /** Reference to the element in which we want to instantiate the Ace editor */
     @ViewChild("ace")
@@ -84,13 +84,13 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
 
     ngOnInit(): any {
         let openExpressionEditor = this.eventHub.onValueFrom(OpenExpressionEditor)
-            .subscribe((data:ExpressionEditorData) => {
+            .subscribe((data: ExpressionEditorData) => {
                 this.initSandbox();
 
                 this.initialExpressionScript = data.expression;
-                this.newValueStream = data.newExpressionChange;
+                this.newValueStream          = data.newExpressionChange;
 
-                this.editor = new ExpressionEditor(ace.edit(this.aceContainer.nativeElement), this.initialExpressionScript);
+                this.editor         = new ExpressionEditor(ace.edit(this.aceContainer.nativeElement), this.initialExpressionScript);
                 this.codeToEvaluate = this.initialExpressionScript;
 
                 this.listenToExpressionChanges();

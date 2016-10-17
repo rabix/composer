@@ -52,8 +52,6 @@ export class CltEditorComponent {
     @Input()
     private model: CommandLineToolModel;
 
-    private file: FileModel;
-
     /* TODO: generate the commandline */
     private commandlineContent: string;
 
@@ -91,11 +89,6 @@ export class CltEditorComponent {
     }
 
     ngOnInit() {
-        this.fileStream.first(file => {
-            this.file = file;
-            return true;
-        });
-
         this.cltEditorGroup = this.formBuilder.group({
             dockerInputGroup: this.formBuilder.group({}),
             baseCommandGroup: this.formBuilder.group({}),

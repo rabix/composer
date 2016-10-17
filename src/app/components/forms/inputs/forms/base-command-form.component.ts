@@ -7,9 +7,9 @@ import {FormSectionComponent} from "../../../form-section/form-section.component
 import {BaseCommandService, BaseCommand} from "../../../../services/base-command/base-command.service";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {ExpressionModel} from "cwlts/models/d2sb";
+import {ExpressionInputComponent} from "../types/expression-input.component";
 
 require("./base-command-form.components.scss");
-require("./shared/form.components.scss");
 
 @Component({
     selector: 'base-command-form',
@@ -22,56 +22,38 @@ require("./shared/form.components.scss");
         FORM_DIRECTIVES,
         FormSectionComponent
     ],
-    template: `
-<ct-form-section>
+    template: `<ct-form-section>
     <fs-header>
         Base Command
     </fs-header>
     <fs-body>
-    <form *ngIf="baseCommandForm" [formGroup]="baseCommandForm">
-                <fieldset class="form-group">
-                        <button type="button" class="btn btn-link hide-btn">Hide</button>
-               
-                        <label>Base Command</label>
-                        <label class="secondary-label">What command do you want to call from the image</label>
-                                                
-                        <div *ngIf="baseCommandFormList.length > 0">
-        
-                            <div *ngFor="let baseCommand of baseCommandFormList; let i = index; trackBy:trackByIndex"
-                                 class="base-command-list">
-                                 
-                                <expression-input class="col-sm-11"
-                                                  *ngIf="baseCommandForm.controls['baseCommand' + i]" 
-                                                  [(value)]="baseCommandFormList[i]"
-                                                  [control]="baseCommandForm.controls['baseCommand' + i]"
-                                                  (onSelect)="editBaseCommand(i)">
-                                </expression-input>
-                              
-                                <span class="close-icon col-sm-1">
+        <form *ngIf="baseCommandForm" [formGroup]="baseCommandForm">
+            <div *ngIf="baseCommandFormList.length > 0">
+
+                <div *ngFor="let baseCommand of baseCommandFormList; let i = index; trackBy:trackByIndex"
+                     class="base-command-list">
+
+                    <expression-input class="col-sm-11"
+                                      *ngIf="baseCommandForm.controls['baseCommand' + i]"
+                                      [(value)]="baseCommandFormList[i]"
+                                      [control]="baseCommandForm.controls['baseCommand' + i]"
+                                      (onSelect)="editBaseCommand(i)">
+                    </expression-input>
+
+                    <span class="close-icon col-sm-1">
                                     <i class="fa fa-times" (click)="removeBaseCommand(i)"></i>
                                 </span>
-                            </div> <!-- base-command-list-->
-                        </div> <!-- list container-->
-        
-                        <div *ngIf="baseCommandFormList.length === 0" class="col-sm-12">
-                                No base command defined.
-                        </div>
-                </fieldset>
-                
-                 <button type="button" 
-                         class="btn btn-secondary add-input-btn"
-                         (click)="addBaseCommand()">Add base command</button>
-             </form>
-        <form [formGroup]="baseCommandForm">
+                </div> <!-- base-command-list-->
+            </div> <!-- list container-->
 
-            <label class="form-control-label">What command do you want to call from the image</label>
-            <expression-input [inputControl]="baseCommandForm.controls['baseCommand']"
-                              [expressionType]="expressionInputType">
-            </expression-input>
+            <div *ngIf="baseCommandFormList.length === 0" class="col-sm-12">
+                No base command defined.
+            </div>
 
-            <button type="button" class="btn btn-link add-btn-link">
+            <button type="button" class="btn btn-link add-btn-link" (click)="addBaseCommand()">
                 <i class="fa fa-plus"></i> Add base command
             </button>
+
         </form>
     </fs-body>
 </ct-form-section>

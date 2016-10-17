@@ -7,7 +7,6 @@ import {CommandLineToolModel} from "cwlts/models/d2sb";
 import {FormSectionComponent} from "../../../form-section/form-section.component";
 
 require("./input-ports-form.component.scss");
-require("./shared/form.components.scss");
 
 @Component({
     selector: 'inputs-ports-form',
