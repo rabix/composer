@@ -45,6 +45,13 @@ module.exports = webpackMerge(commonConfig, {
      */
     devtool: '#eval',
 
+    entry: {
+
+        'polyfills': './src/polyfills.ts',
+        'vendor': './src/vendor.ts',
+        'main': './src/main.browser.ts'
+    },
+
     /**
      * Options affecting the output of the compilation.
      *

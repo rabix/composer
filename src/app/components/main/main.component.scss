@@ -5,13 +5,6 @@
   height: 100%;
 }
 
-workspace {
-  float: left;
-  overflow: hidden;
-  height: 100%;
-  width: 100%;
-}
-
 #runnix {
   left: 100%;
   bottom: -50px;
@@ -20,8 +13,7 @@ workspace {
   z-index: 1000;
   display: block;
   position: fixed;
-  background-image: url("../../../assets/img/runny.gif");
-  background-repeat: no-repeat;
+  background: url("../../../assets/img/runny.gif") no-repeat;
   background-size: contain;
 
   &.active {

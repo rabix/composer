@@ -44,9 +44,9 @@ require ("./expression-editor.component.scss");
                             {{evaluatedExpression}}
                         </div>
                     </div>
-                    
+                        
                     <button type="button" 
-                            class="btn btn-primary expression-editor-btn execute-btn"
+                            class="execute-btn"
                             (click)="execute()">Execute</button>
                 </div>
          </div>
@@ -54,11 +54,11 @@ require ("./expression-editor.component.scss");
 })
 export class ExpressionEditorComponent implements OnInit, OnDestroy {
 
-    /** Expression coming form the tool */
-    private initialExpressionScript: string;
+    /** Expression stream coming form the tool */
+    private expressionStream: Observable<string>;
 
-    /** Evaluated expressions */
-    private newValueStream: Subject<string | ExpressionModel>;
+    /** Update action to be passed to the event hub */
+    private updateAction: Function;
 
     /** Reference to the element in which we want to instantiate the Ace editor */
     @ViewChild("ace")

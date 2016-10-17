@@ -4,6 +4,7 @@ import {InputPortService} from "../../../../services/input-port/input-port.servi
 import {EventHubService} from "../../../../services/event-hub/event-hub.service";
 import {OpenInputInspector} from "../../../../action-events/index";
 import {CommandLineToolModel} from "cwlts/models/d2sb";
+import {FormSectionComponent} from "../../../form-section/form-section.component";
 
 require("./input-ports-form.component.scss");
 require("./shared/form.components.scss");
@@ -11,20 +12,23 @@ require("./shared/form.components.scss");
 @Component({
     selector: 'inputs-ports-form',
     providers: [InputPortService],
-    directives: [InputPortListComponent],
+    directives: [InputPortListComponent, FormSectionComponent],
     template: `
+<ct-form-section>
+    <fs-header>Input Ports</fs-header>
+    <fs-body>
         <form>
-            <fieldset class="form-group">
-                <label>Input ports</label>
-                
-                <button type="button" class="btn btn-link hide-btn">Hide</button>
-    
-                <input-port-list></input-port-list>
-            </fieldset>
-            
-            <button type="button" class="btn btn-secondary add-input-btn" 
-                    (click)="addInput()">Add Input</button>
+            <input-port-list></input-port-list>
+
+            <button type="button" 
+                    class="btn btn-link add-btn-link"
+                    (click)="addInput()">
+                    <i class="fa fa-plus"></i> Add Input
+            </button>
         </form>
+    </fs-body>
+</ct-form-section>
+        
     `
 })
 export class InputPortsFormComponent implements OnInit {

@@ -1,4 +1,4 @@
-import {Component, Input, trigger, style, animate, state, transition, OnInit} from "@angular/core";
+import {Component, Input} from "@angular/core";
 import {FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 import {FileModel} from "../../store/models/fs.models";
 import {CommandLineComponent} from "./commandline/commandline.component";
@@ -11,15 +11,14 @@ import {
     OpenExpressionEditor,
     CloseInputInspector,
     CloseExpressionEditor
-} from "../../action-events/index";
-
+} from "../../action-events";
 import {CommandInputParameterModel as InputProperty, CommandLineToolModel} from "cwlts/models/d2sb";
 import {Observable} from "rxjs";
 
 require("./clt-editor.component.scss");
 
 @Component({
-    selector: "clt-editor",
+    selector: "ct-clt-editor",
     directives: [
         DockerInputFormComponent,
         BaseCommandFormComponent,
@@ -31,24 +30,21 @@ require("./clt-editor.component.scss");
     template: `
             <form class="clt-editor-group"
                   [formGroup]="cltEditorGroup">
-                <docker-input-form class="input-form" 
-                                [group]="cltEditorGroup"
+                <docker-input-form [group]="cltEditorGroup"
                                 [cltModel]="model"
                                 [dockerPull]="'some.docker.image.com'">
                 </docker-input-form>
                                 
-                <base-command-form class="input-form" 
-                                [toolBaseCommand]="model.baseCommand"
+                <base-command-form [toolBaseCommand]="model.baseCommand"
                                 [baseCommandForm]="cltEditorGroup.controls.baseCommandGroup">
                 </base-command-form>
                 
-                <inputs-ports-form [cltModel]="model"
-                                   class="input-form">
+                <inputs-ports-form [cltModel]="model">
                 </inputs-ports-form>
             </form>
     `
 })
-export class CltEditorComponent implements OnInit {
+export class CltEditorComponent {
     /** The file that we are going to use to list the properties */
     @Input()
     public fileStream: Observable<FileModel>;

@@ -1,0 +1,92 @@
+// GUI EDITOR
+$gui-editor-bg: $background-grey;
+$gui-editor-header-bg: $background-light;
+$gui-editor-header-border: $border-color;
+
+$gui-editor-status-bar-bg: $text-dark;
+$gui-editor-status-bar-color: $text-light;
+
+$gui-section-bg: $body-foreground;
+$gui-section-border: $border-color;
+
+$gui-section-padding: $padding-md;
+
+$gui-section-header-color: $text-dark;
+$gui-section-header-size: 1.25rem;
+
+$gui-editor-header-height: 40px;
+
+$gui-section-subheader-color: $text-muted;
+$gui-section-subheader-size: $font-size-h5;
+
+$gui-section-list-item-border: $light-border-color;
+$gui-section-list-item-bg: $light-border-color;
+$gui-section-list-item-color: $body-color;
+$gui-section-list-item-icon-color: #9D9D9D;
+
+$gui-section-list-item-hover-border: $brand-primary;
+$gui-section-list-item-hover-bg: $light-border-color;
+$gui-section-list-item-hover-color: $body-color;
+$gui-section-list-item-hover-icon-color: $gui-section-list-item-icon-color;
+
+$gui-section-list-item-select-border: $brand-primary;
+$gui-section-list-item-select-bg: $brand-primary;
+$gui-section-list-item-select-color: white;
+$gui-section-list-item-select-icon-color: $gui-section-list-item-icon-color;
+
+$gui-section-list-item-border-size: 2px;
+$gui-section-list-item-border-radius: $border-radius;
+
+// TAB COMPONENTS
+$editor-bg: $body-background;
+$editor-color: $text-dark;
+
+// RESULTING COMMAND LINE
+$console-default-color: $text-light;
+$base-cmd-color: #7AC24D;
+$input-port-color: #A77ED7;
+$arg-color: #FDA365;
+
+// FILE TABS
+$main-header-bg: $brand-primary-bg-dark;
+$tab-bg: $brand-primary-bg-bright;
+$tab-color: $text-light;
+
+$tab-hover-bg: $tab-bg;
+$tab-hover-color: white;
+
+$tab-select-bg: white;
+$tab-select-color: $brand-primary-bg-dark;
+
+// SIDE PANELS
+$panel-bg: $brand-primary-bg;
+$panel-resize-handle-color: $brand-primary-bg-dark;
+$panel-header-bg: $brand-primary-bg-bright;
+$panel-header-color: white;
+
+// PANEL ITEMS
+$panel-item-color: white;
+$panel-item-icon-color: $panel-item-color;
+
+$panel-item-hover-bg: $brand-primary-bg-dark;
+$panel-item-hover-color: $panel-item-color;
+
+$panel-item-select-bg: $brand-primary-bg-bright;
+$panel-item-select-color: white;
+$panel-item-icon-select-color: $panel-item-select-color;
+
+// PANEL TABS
+$panel-side-tab-zone-bg: $brand-primary-bg-dark;
+$panel-side-tab-zone-border: $brand-primary-bg-dark;
+
+$panel-side-tab-bg: $brand-primary-bg-dark;
+$panel-side-tab-color: white;
+$panel-side-tab-icon-color: #f0ad4e;
+
+$panel-side-tab-hover-bg: lighten($brand-primary-bg-dark, 5%);
+$panel-side-tab-hover-color: $panel-side-tab-color;
+$panel-side-tab-hover-icon-color: $panel-side-tab-icon-color;
+
+$panel-side-tab-select-bg: $brand-primary-bg-bright;
+$panel-side-tab-select-color: $panel-side-tab-color;
+$panel-side-tab-select-icon-color: $panel-side-tab-icon-color;

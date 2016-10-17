@@ -14,14 +14,16 @@ export type ExpressionInputType = "baseCommands" | "inputPortValue";
         FORM_DIRECTIVES
     ],
     template: `
-            <div class="input-group expression-input-group" *ngIf="control">
+            <div class="input-group" *ngIf="control">
                 <input class="form-control"
                         (keyup)="modelChange($event)"
                         [formControl]="control"
                         [readonly]="value.expressionValue ? 'true' : null"/>
                     
-                <span class="input-group-addon add-expression" (click)="openExpressionSidebar()">
-                    <i class="fa fa-2x fa-code expression-form-btn"></i>
+                <span class="input-group-btn">
+                    <button type="button" 
+                        class="btn btn-secondary" 
+                        (click)="openExpressionSidebar()"><i class="fa fa-code"></i></button>
                 </span>
             </div>
         `

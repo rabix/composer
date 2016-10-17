@@ -1,19 +1,13 @@
 @import "../../../assets/sass/variables";
 
-clt-editor {
+ct-clt-editor {
     overflow-y: auto;
     height: 100%;
     color: $text-dark;
     padding: 20px;
     display: block;
-}
 
-.input-form {
-    display: block;
-    background: $background-light;
-    margin-bottom: 20px;
-    width: 60%;
-    border: 1px solid $border-color;
-    padding: $padding-md;
-    color: $text-dark;
+    .clt-editor-group {
+        width: 60%;
+    }
 }

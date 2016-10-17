@@ -3,6 +3,7 @@ import {FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES, Validators, FormBu
 import {EventHubService} from "../../../../services/event-hub/event-hub.service";
 import {OpenExpressionEditor, CloseExpressionEditor} from "../../../../action-events/index";
 import {Subscription} from "rxjs/Subscription";
+import {FormSectionComponent} from "../../../form-section/form-section.component";
 import {BaseCommandService, BaseCommand} from "../../../../services/base-command/base-command.service";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {ExpressionModel} from "cwlts/models/d2sb";
@@ -16,11 +17,18 @@ require("./shared/form.components.scss");
         BaseCommandService
     ],
     directives: [
+        ExpressionInputComponent,
         REACTIVE_FORM_DIRECTIVES,
-        FORM_DIRECTIVES
+        FORM_DIRECTIVES,
+        FormSectionComponent
     ],
     template: `
-             <form *ngIf="baseCommandForm" [formGroup]="baseCommandForm">
+<ct-form-section>
+    <fs-header>
+        Base Command
+    </fs-header>
+    <fs-body>
+    <form *ngIf="baseCommandForm" [formGroup]="baseCommandForm">
                 <fieldset class="form-group">
                         <button type="button" class="btn btn-link hide-btn">Hide</button>
                
@@ -54,6 +62,20 @@ require("./shared/form.components.scss");
                          class="btn btn-secondary add-input-btn"
                          (click)="addBaseCommand()">Add base command</button>
              </form>
+        <form [formGroup]="baseCommandForm">
+
+            <label class="form-control-label">What command do you want to call from the image</label>
+            <expression-input [inputControl]="baseCommandForm.controls['baseCommand']"
+                              [expressionType]="expressionInputType">
+            </expression-input>
+
+            <button type="button" class="btn btn-link add-btn-link">
+                <i class="fa fa-plus"></i> Add base command
+            </button>
+        </form>
+    </fs-body>
+</ct-form-section>
+
     `
 })
 export class BaseCommandFormComponent implements OnInit, OnDestroy {

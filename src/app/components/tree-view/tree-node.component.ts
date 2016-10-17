@@ -1,28 +1,36 @@
-import {Component, Input, OnInit, ChangeDetectionStrategy, ChangeDetectorRef} from "@angular/core";
+import {
+    Component,
+    Input,
+    OnInit,
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
+    QueryList,
+    ViewChildren, ElementRef
+} from "@angular/core";
 import {ContextDirective} from "../../services/context/context.directive";
 import {TreeNode} from "./types";
-import {Observable} from "rxjs";
+import {Observable, BehaviorSubject} from "rxjs";
 import {TreeViewService} from "./tree-view.service";
-
 
 @Component({
     selector: "ct-tree-node",
     directives: [ContextDirective],
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-        <div class="deep-unselectable clickable main node-base"
+        <div class="deep-unselectable clickable node-base"
+             [attr.data-index]="nodeIndex"
              [tabindex]="nodeIndex"
-             (click)="selectNode($event)"
+             (click)="onClick($event)"
              [class.selected]="isHighlighted | async"
-             (dblclick)="onDoubleClick()">
+             (dblclick)="toggle()">
             
-            <span *ngIf="node.icon" class="icon-space">
+            <span *ngIf="node.icon" class="icon-space" (click)="toggle()">
                 <i class="fa fa-fw" [ngClass]="getIconRules()"></i>
             </span>
             
-            <div *ngIf="node" class="name-container">
+            <span *ngIf="node" class="name-container">
                 <span class="name" *ngFor="let namePart of nameParts">{{ namePart }}</span>
-            </div>
+            </span>
             
             
         </div>
@@ -46,72 +54,87 @@ export class TreeNodeComponent implements OnInit {
 
     public isExpandable = false;
 
+    public highlightedCharacterCount = new BehaviorSubject(0);
+
+    public readonly nodeIndex = 0;
+
     private isExpanded = false;
 
     private isLoading = false;
 
-    private isHighlighted: Observable<boolean>;
+    private isHighlighted = new BehaviorSubject(false);
 
     private nodeChildren: Observable<TreeNode[]>;
 
-    private nodeIndex = 0;
-
-    private highlightCount = 0;
-
     private nameParts: String[] = [];
 
-    public constructor(private tree: TreeViewService, private detector: ChangeDetectorRef) {
+    public el: Element;
+
+    @ViewChildren(TreeNodeComponent)
+    private children: QueryList<TreeNodeComponent>;
+
+    public constructor(private tree: TreeViewService, private detector: ChangeDetectorRef, el: ElementRef) {
 
         this.nodeIndex = TreeNodeComponent.NODE_COUNT++;
+        this.el = el.nativeElement;
     }
 
     ngOnInit() {
 
-        this.isExpandable  = typeof this.node.childrenProvider === "function";
-        this.isHighlighted = this.tree.isHighlighted(this.node);
+        this.isExpandable = typeof this.node.childrenProvider === "function";
+        this.tree.selectedNode.map(node => node === this).subscribe(this.isHighlighted);
 
         this.nameParts = [this.node.name];
 
-        this.tree.searchTerm.subscribe(term => {
-            let count = 0;
-
-            if (this.node.name.toLowerCase().indexOf(term.toLowerCase()) === 0) {
-                count = term.length;
-            }
-
-            if (count !== this.highlightCount) {
-                this.highlightCount = count;
-
-                this.nameParts = [this.node.name];
-                if (count > 0) {
-                    this.nameParts = [this.node.name.substr(0, count), this.node.name.substr(count)];
-                }
-
+        this.highlightedCharacterCount.subscribe(charCount => {
+            this.nameParts = [this.node.name];
+            if (charCount > 0) {
+                this.nameParts = [this.node.name.substr(0, charCount), this.node.name.substr(charCount)];
             }
             this.detector.markForCheck();
         });
+
+        this.tree.addNode(this);
     }
 
     public toggleExpansion() {
         this.isExpanded = !this.isExpanded;
+        this.detector.markForCheck();
 
         if (this.isExpanded && !this.nodeChildren) {
             this.nodeChildren = this.node.childrenProvider(this.node);
         }
 
         this.isLoading = true;
-        this.nodeChildren.first().subscribe(_ => this.isLoading = false);
+        this.nodeChildren.first().subscribe(_ => {
+            this.isLoading = false;
+            this.detector.markForCheck();
+        });
     }
 
     public selectNode(event: MouseEvent) {
-        this.tree.highlight(this.node);
+        this.tree.selectedNode.next(this);
     }
 
-    private onDoubleClick() {
+    public open() {
+        if (!this.isExpanded) {
+            this.toggle();
+        }
+    }
+
+    public close() {
+        if (this.isExpanded) {
+            this.toggle();
+        }
+    }
+
+    public toggle() {
+
         if (this.isExpandable) {
             this.toggleExpansion();
         } else if (typeof this.node.openHandler === "function") {
             const progress = this.node.openHandler(this.node);
+            this.detector.markForCheck();
             if (progress) {
                 progress.add(_ => this.detector.markForCheck());
             }
@@ -119,7 +142,7 @@ export class TreeNodeComponent implements OnInit {
     }
 
     private getIconRules() {
-        const rules = {
+        return {
             "fa-file": this.node.icon === "file",
             "fa-folder": this.node.icon === "folder" && !this.isExpanded,
             "fa-folder-open": this.node.icon === "folder" && this.isExpanded,
@@ -130,7 +153,19 @@ export class TreeNodeComponent implements OnInit {
             "icon-command-line-tool": this.node.icon === "CommandLineTool",
             "icon-workflow": this.node.icon === "Workflow",
         };
-
-        return rules;
     }
+
+    private onClick(event: MouseEvent){
+        this.selectNode(event);
+        this.tree.searchTerm.next("");
+    }
+
+    ngOnDestroy() {
+        this.tree.removeNode(this);
+    }
+
+    public getChildren(): QueryList<TreeNodeComponent> {
+        return this.children;
+    }
+
 }

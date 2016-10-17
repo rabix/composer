@@ -1,0 +1,158 @@
+@import "../../../assets/sass/variables";
+@import "../../../assets/sass/mixins";
+
+
+//@todo(maya) reorganize this file
+.scroll-content {
+    overflow-y: auto;
+    position: relative;
+    height: calc(100% - #{$status-bar-height} - #{$gui-editor-header-height} + 3px);
+}
+
+.editor-container {
+    height: 100%;
+    position: relative;
+    background: $gui-editor-bg;
+    display: block;
+}
+
+.editor-header {
+    background: $gui-editor-header-bg;
+    overflow: hidden;
+    height: $gui-editor-header-height;
+    display: block;
+    padding: $header-padding;
+    border-bottom: 1px solid $gui-editor-header-border;
+}
+
+.status-bar-footer {
+    background: $gui-editor-status-bar-bg;
+
+    .left-side {
+        display: inline-block;
+
+        & > *:not(:last-child) button {
+            border-right: 1px solid #131313;
+        }
+    }
+
+    .right-side {
+        display: inline-block;
+        float: right;
+    }
+
+    button {
+        border: none;
+        margin-right: 5px;
+        background: none;
+        color: $gui-editor-status-bar-color;
+        padding-top: $status-bar-padding-y;
+        padding-bottom: $status-bar-padding-y;
+
+        &:focus, &:active, &:focus:active {
+            outline: none;
+        }
+
+        [class*="fa-angle"] {
+            margin-left: 7px;
+        }
+    }
+
+    ct-view-mode-switch {
+
+        button {
+            text-transform: uppercase;
+
+            &[disabled] {
+                .fa {
+                    color: #555;
+                }
+            }
+        }
+
+        .fa {
+            color: #6DABED;
+        }
+    }
+
+    validation-issues {
+        .warning {
+            color: $brand-warning;
+        }
+
+        .errors {
+            color: $brand-danger;
+        }
+    }
+}
+
+.input-cli {
+    color: $input-port-color;
+}
+
+.baseCmd-cli {
+    color: $base-cmd-color;
+}
+
+.arg-cli {
+    color: $arg-color;
+}
+
+//@todo(maya) belongs with tool editor or form components
+.gui-section-list-item {
+    border: $gui-section-list-item-border-size solid $gui-section-list-item-border;
+    background: $gui-section-list-item-bg;
+    color: $gui-section-list-item-color;
+    border-radius: $gui-section-list-item-border-radius;
+    overflow: hidden;
+    padding: 7px 0;
+    margin-bottom: 10px;
+
+    .fa {
+        color: $gui-section-list-item-icon-color;
+    }
+
+    &:hover {
+        border-color: $gui-section-list-item-hover-border;
+        background: $gui-section-list-item-hover-bg;
+        color: $gui-section-list-item-hover-color;
+        .fa {
+            color: $gui-section-list-item-hover-icon-color;
+        }
+    }
+
+    &.selected {
+        border-color: $gui-section-list-item-select-bg;
+        background: $gui-section-list-item-select-bg;
+        color: $gui-section-list-item-select-color;
+        .fa {
+            color: $gui-section-list-item-select-icon-color;
+        }
+    }
+}
+
+//@todo(maya) belongs with status bar component
+.console-component {
+    position: absolute;
+    bottom: $status-bar-height - 6px;
+    z-index: 9;
+
+    height: 0;
+    min-width: 100%;
+    overflow: auto;
+
+    background: #000000;
+    opacity: 0.9;
+    transition: height 300ms;
+
+    color: $console-default-color;
+    font-family: monospace;
+
+    .console-content {
+        padding: 14px;
+    }
+
+    &.show {
+        height: 90px;
+    }
+}
