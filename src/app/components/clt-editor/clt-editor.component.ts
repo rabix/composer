@@ -13,6 +13,7 @@ import {
     CloseExpressionEditor
 } from "../../action-events";
 import {CommandInputParameterModel as InputProperty, CommandLineToolModel} from "cwlts/models/d2sb";
+import {CommandLineToolModel} from "cwlts/models/d2sb";
 import {Observable} from "rxjs";
 
 require("./clt-editor.component.scss");
@@ -30,7 +31,9 @@ require("./clt-editor.component.scss");
     template: `
             <form class="clt-editor-group"
                   [formGroup]="cltEditorGroup">
-                <docker-input-form [group]="cltEditorGroup"
+                
+                <docker-input-form class="input-form" 
+                                [group]="cltEditorGroup"
                                 [cltModel]="model"
                                 [dockerPull]="'some.docker.image.com'">
                 </docker-input-form>
@@ -58,35 +61,7 @@ export class CltEditorComponent {
     /** ControlGroup that encapsulates the validation for all the nested forms */
     private cltEditorGroup: FormGroup;
 
-    private closeSidebarActions = [];
-
-    constructor(private formBuilder: FormBuilder,
-                private eventHubService: EventHubService) {
-
-        /* Opening the sidebar */
-        this.eventHubService.on(OpenInputInspector).subscribe(() => {
-            this.closeSidebarActions.push(CloseInputInspector);
-        });
-
-        this.eventHubService.on(OpenExpressionEditor).subscribe(() => {
-            this.closeSidebarActions.push(CloseExpressionEditor);
-        });
-
-        /* Closing the sidebar */
-        this.eventHubService.on(CloseInputInspector).subscribe(() => {
-            this.deleteSidebarActionFromArray(CloseInputInspector);
-        });
-
-        this.eventHubService.on(CloseExpressionEditor).subscribe(() => {
-            this.deleteSidebarActionFromArray(CloseExpressionEditor);
-        });
-    }
-
-    deleteSidebarActionFromArray(action) {
-        this.closeSidebarActions = this.closeSidebarActions.filter(sidebarAction => {
-            return sidebarAction !== action;
-        });
-    }
+    constructor(private formBuilder: FormBuilder) { }
 
     ngOnInit() {
         this.cltEditorGroup = this.formBuilder.group({

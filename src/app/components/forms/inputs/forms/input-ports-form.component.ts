@@ -5,6 +5,8 @@ import {EventHubService} from "../../../../services/event-hub/event-hub.service"
 import {OpenInputInspector} from "../../../../action-events/index";
 import {CommandLineToolModel} from "cwlts/models/d2sb";
 import {FormSectionComponent} from "../../../form-section/form-section.component";
+import {InputSidebarService} from "../../../../services/sidebars/input-sidebar.service";
+import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 
 require("./input-ports-form.component.scss");
 
@@ -35,7 +37,7 @@ export class InputPortsFormComponent implements OnInit {
     public cltModel: CommandLineToolModel;
 
     constructor(private inputPortService: InputPortService,
-                private eventHubService: EventHubService) { }
+                private inputSidebarService: InputSidebarService) { }
 
     private addInput(): void {
         const newInput = this.cltModel.addInput();
@@ -43,7 +45,7 @@ export class InputPortsFormComponent implements OnInit {
         this.inputPortService.addInput(newInput);
         this.inputPortService.setSelected(newInput);
 
-        this.eventHubService.publish(new OpenInputInspector(this.inputPortService.selectedInputPort));
+        this.inputSidebarService.openInputInspector(newInput);
     }
 
     ngOnInit() {

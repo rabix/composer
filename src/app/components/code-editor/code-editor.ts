@@ -1,5 +1,9 @@
 import {AbstractCodeEditor} from "../abstract-code-editor/abstract-code-editor";
 import {Subject, Observable, Subscription} from "rxjs";
+import {Observable} from "rxjs/Observable";
+import {Subscription} from "rxjs/Subscription";
+import {FileModel} from "../../store/models/fs.models";
+import {AbstractCodeEditor} from "../abstract-code-editor/abstract-code-editor";
 import Editor = AceAjax.Editor;
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;

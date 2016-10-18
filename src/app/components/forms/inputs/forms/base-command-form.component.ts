@@ -1,13 +1,13 @@
 import {Component, Input, OnInit, OnDestroy} from "@angular/core";
 import {FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES, Validators, FormBuilder} from "@angular/forms";
-import {EventHubService} from "../../../../services/event-hub/event-hub.service";
-import {OpenExpressionEditor, CloseExpressionEditor} from "../../../../action-events/index";
 import {Subscription} from "rxjs/Subscription";
 import {FormSectionComponent} from "../../../form-section/form-section.component";
 import {BaseCommandService, BaseCommand} from "../../../../services/base-command/base-command.service";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ExpressionInputComponent} from "../types/expression-input.component";
+import {ExpressionModel} from "cwlts/models/d2sb";
+import {ExpressionSidebarService} from "../../../../services/sidebars/expression-sidebar.service";
 
 require("./base-command-form.components.scss");
 
@@ -79,9 +79,9 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
 
     private selectedIndex: number;
 
-    constructor(private eventHubService: EventHubService,
-                private baseCommandService: BaseCommandService,
-                private formBuilder: FormBuilder) {
+    constructor(private baseCommandService: BaseCommandService,
+                private formBuilder: FormBuilder,
+                private expressionSidebarService: ExpressionSidebarService) {
 
         this.subs = [];
     }
@@ -136,7 +136,7 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
         this.baseCommandService.deleteBaseCommand(index);
 
         if (this.selectedIndex === index) {
-            this.eventHubService.publish(new CloseExpressionEditor());
+            this.expressionSidebarService.closeExpressionEditor();
         }
 
         if (this.selectedIndex > index) {
@@ -167,10 +167,10 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
             expression = selectedExpression;
         }
 
-        this.eventHubService.publish(new OpenExpressionEditor({
+        this.expressionSidebarService.openExpressionEditor({
             expression: expression,
             newExpressionChange: newExpression
-        }));
+        });
     }
 
     private addBaseCommand(): void {
