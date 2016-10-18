@@ -1,5 +1,4 @@
 import {Component, OnInit, Input, OnDestroy} from "@angular/core";
-import {NgSwitch, NgSwitchCase, NgSwitchDefault} from "@angular/common";
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {CltEditorComponent} from "../clt-editor/clt-editor.component";
@@ -15,19 +14,21 @@ import {ValidationResponse} from "../../services/web-worker/json-schema/json-sch
 import {ValidationIssuesComponent} from "../validation-issues/validation-issues.component";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
 import {WebWorkerService} from "../../services/web-worker/web-worker.service";
+import {ToolSidebarService} from "../../services/sidebars/tool-sidebar.service";
+
+import {ExpressionSidebarService} from "../../services/sidebars/expression-sidebar.service";
+import {InputSidebarService} from "../../services/sidebars/input-sidebar.service";
+
 
 require("./tool-editor.component.scss");
 
 @Component({
     selector: "ct-tool-editor",
-    providers: [ViewModeService, WebWorkerService],
+    providers: [ViewModeService, WebWorkerService, ToolSidebarService, ExpressionSidebarService, InputSidebarService],
     directives: [
         CodeEditorComponent,
         CltEditorComponent,
         BlockLoaderComponent,
-        NgSwitch,
-        NgSwitchCase,
-        NgSwitchDefault,
         ToolHeaderComponent,
         CommandLineComponent,
         SidebarComponent,
