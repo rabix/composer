@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {DataEntrySource} from "../common/interfaces";
-import {Observable, ReplaySubject, BehaviorSubject, Subscriber} from "rxjs";
+import {Observable, ReplaySubject, Subscriber} from "rxjs";
 import {Stats} from "fs";
 import {FileName} from "../../components/forms/models";
 
