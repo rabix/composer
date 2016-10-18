@@ -16,23 +16,26 @@ require("./expression-editor.component.scss");
 
 @Component({
     selector: "expression-editor",
+    host: {
+        class: "block"
+    },
     template: `
          <div class="expression-editor-component">
                 <div class="expression-editor-header">
                 
                     <span class="expression-head-text">
                         Argument value expression
-                        <i class="fa fa-info-circle"></i>
+                        <i class="fa fa-info-circle help-icon"></i>
                     </span>
                     
                     <span class="expression-buttons-container">
                         <button type="button"
-                            class="btn btn-secondary expression-editor-btn"
+                            class="btn btn-sm btn-outline-secondary"
                             (click)="cancel()">Cancel</button>
                         
                         <button type="button" 
-                            class="btn btn-success expression-editor-btn"
-                            (click)="save()">Save</button>
+                            class="btn btn-sm btn-success"
+                            (click)="save()">Add</button>
                     </span>
                 </div>
                 
@@ -40,15 +43,22 @@ require("./expression-editor.component.scss");
                 
                 <div class="expression-result-container">
                     <div class="code-preview">
-                         Code preview:
-                        <div>
-                            {{evaluatedExpression}}
+                         Code preview
+                    </div>
+                    
+                    <div class="expression-result-value">
+                           {{evaluatedExpression}}
+                    </div>
+                   
+                    <div class="expression-result-overlay">
+                        <div class="execute-button-container">
+                            <button type="button" 
+                                    class="btn btn-sm btn-outline-secondary execute-button"
+                                    (click)="execute()"><i class="fa fa-refresh"></i> Update</button>
                         </div>
                     </div>
-                        
-                    <button type="button" 
-                            class="execute-btn"
-                            (click)="execute()">Execute</button>
+                   
+                   
                 </div>
          </div>
  `

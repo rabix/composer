@@ -26,7 +26,7 @@ export class ExpressionEditor extends AbstractCodeEditor {
         this.session = this.editor.getSession();
         this.document = this.session.getDocument();
 
-        this.setTheme('twilight');
+        this.setTheme("monokai");
         this.setMode("javascript");
 
         this.setText(this.expression);

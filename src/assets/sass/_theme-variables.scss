@@ -92,5 +92,10 @@ $panel-side-tab-select-color: $panel-side-tab-color;
 $panel-side-tab-select-icon-color: $panel-side-tab-icon-color;
 
 // EXPRESSION EDITOR
-$expression-editor-bg: #282C34;
+$expression-editor-bg: #272822; // should be the same as the code editor background
 $expression-editor-head-text: $font-size-base;
+$expression-editor-color: ghostwhite;
+$expression-editor-help-icon-color: #818286;
+$expression-editor-border: #3B3F46;
+
+$expression-editor-text-muted: #555658;
