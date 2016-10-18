@@ -6,10 +6,10 @@ import {Subscription} from "rxjs/Subscription";
 import {Subject} from "rxjs/Subject";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ExpressionSidebarService} from "../../../services/sidebars/expression-sidebar.service";
+import {Observable} from "rxjs/Observable";
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import TextMode = AceAjax.TextMode;
-import {Observable} from "rxjs/Observable";
 
 require ("./expression-editor.component.scss");
 
@@ -82,7 +82,7 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
         this.subs = [];
     }
 
-    ngOnInit(): any {
+    ngOnInit(): void {
         this.subs.push(
             this.expressionSidebarService.expressionDataStream.subscribe((data:ExpressionEditorData) => {
                 this.initSandbox();
@@ -140,16 +140,18 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
     private save(): void {
         this.evaluateExpression()
             .subscribe((result: SandboxResponse) => {
-            if (result.error || result.output === "undefined" || result.output === "null") {
-                this.newValueStream.next(this.initialExpressionScript);
 
-            } else {
-                this.newValueStream.next(new ExpressionModel({
-                    script: this.codeToEvaluate,
-                    expressionValue: result.output
-                }));
-            }
-        });
+                if (result.error === undefined) {
+                    if (result.output === "undefined" || result.output === "null") {
+                        this.newValueStream.next("");
+                    } else {
+                        this.newValueStream.next(new ExpressionModel({
+                            script: this.codeToEvaluate,
+                            expressionValue: result.output
+                        }));
+                    }
+                }
+            });
     }
 
     private removeSandboxSub(): void {
