@@ -14,6 +14,7 @@ import {SettingsService} from "../../services/settings/settings.service";
 import {UrlValidator} from "../../validators/url.validator";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {WebWorkerService} from "../../services/web-worker/web-worker.service";
+import {LocalDataSourceService} from "../../sources/local/local.source.service";
 
 require("./../../../assets/sass/main.scss");
 
@@ -43,7 +44,8 @@ require("./main.component.scss");
         PlatformAPI,
         SBPlatformDataSource,
         SettingsService,
-        UserPreferencesService
+        UserPreferencesService,
+        LocalDataSourceService
     ]
 })
 export class MainComponent implements AfterViewInit {
@@ -57,11 +59,14 @@ export class MainComponent implements AfterViewInit {
     private contextMenuAnchor: ViewContainerRef;
 
     constructor(private context: ContextService,
+                private local: LocalDataSourceService,
                 private modal: ModalService) {
         this.runnix = Observable.fromEvent(document, "keyup").map((e: KeyboardEvent) => e.keyCode).bufferCount(10, 1)
             .filter(seq => seq.toString() == [38, 38, 40, 40, 37, 39, 37, 39, 66, 65].toString())
             .map(seq => Observable.of(true).concat(Observable.of(false).delay(3000)))
             .concatAll();
+
+        local.load();
     }
 
     ngAfterViewInit() {
