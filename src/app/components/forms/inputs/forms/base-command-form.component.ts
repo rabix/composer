@@ -82,12 +82,11 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        const commandFormList = this.baseCommandService.baseCommandsToFormList(this.toolBaseCommand);
-        this.baseCommandService.setBaseCommands(commandFormList);
+        this.baseCommandService.setBaseCommands(this.toolBaseCommand);
 
         this.subs.push(
             this.baseCommandService.baseCommands.subscribe((commandList: BaseCommand[]) => {
-                this.baseCommandFormList = commandList;
+                this.baseCommandFormList = this.baseCommandService.baseCommandsToFormList(commandList);
                 this.createExpressionInputControls(this.baseCommandFormList);
 
                 //Format the base commands from the inputs, and set the tool baseCommand
