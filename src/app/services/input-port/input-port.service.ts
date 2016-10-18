@@ -8,6 +8,7 @@ interface PropertyOperation {
     (inputProperty: InputProperty[]): InputProperty[];
 }
 
+//TODO (Mate): refactor this to work with indexes
 @Injectable()
 export class InputPortService {
 
@@ -41,12 +42,12 @@ export class InputPortService {
             }, this.initialInputPorts)
             .publishReplay(1)
             .refCount();
-        
-        /* Update the initialInputPorts when the inputPorts steam changes */
+
+        /* Update the initialInputPorts when the inputPorts stream changes */
         this.inputPorts.subscribe((portList: InputProperty[]) => {
             this.initialInputPorts = portList;
         });
-        
+
         /* Add new input ports */
         this.newInputPorts
             .map((inputPort: InputProperty): PropertyOperation => {
@@ -61,7 +62,7 @@ export class InputPortService {
             .map((inputPortToDelete: InputProperty): PropertyOperation => {
                 return (inputPorts: InputProperty[]) => {
                     const index = inputPorts.indexOf(inputPortToDelete);
-                    
+
                     if(index !== -1) {
                         inputPorts.splice(index, 1);
                     }
@@ -87,7 +88,7 @@ export class InputPortService {
         this.updateSelectedProperty.next(inputPort);
     }
 
-    setInputs(inputs: Array<InputProperty>): void {
+    public setInputs(inputs: Array<InputProperty>): void {
         inputs.forEach(input => {
             this.newInputPorts.next(input);
         })

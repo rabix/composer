@@ -15,7 +15,7 @@ export abstract class AbstractCodeEditor {
 
     protected document: Document;
 
-    protected setText(text: string): void {
+    public setText(text: string): void {
         this.document.setValue(text);
     }
 

@@ -10,7 +10,7 @@ import {WebWorkerService} from "../../services/web-worker/web-worker.service";
     directives: [CodeEditorComponent],
     template: `
         <div class="editor-container">
-            <tool-header class="tool-header"
+            <tool-header class="editor-header"
                          (save)="save($event)"
                          [fileIsValid]="isValidCwl"
                          [data]="data"></tool-header>
@@ -31,7 +31,7 @@ import {WebWorkerService} from "../../services/web-worker/web-worker.service";
                 </div>
                 <div class="right-side">
                     <ct-view-mode-switch [viewMode]="viewMode"
-                                         [disabled]="!isValidCwl"
+                                         [disabled]="!guiAvailable"
                                          (onSwitch)="viewMode = $event"></ct-view-mode-switch>
                 </div>
             </div>
@@ -48,7 +48,7 @@ export class WorkflowEditorComponent implements OnInit, OnDestroy {
     private viewMode: "code"|"gui" = "code";
 
     /** Flag for validity of CWL document */
-    private isValidCwl = true;
+    private guiAvailable = true;
 
     /** List of subscriptions that should be disposed when destroying this component */
     private subs: Subscription[] = [];
@@ -67,7 +67,7 @@ export class WorkflowEditorComponent implements OnInit, OnDestroy {
             .subscribe(this.schemaValidation);
 
         this.webWorkerService.validationResultStream.subscribe(err => {
-            this.isValidCwl = err.isValidCwl;
+            this.guiAvailable = err.isValidCwl;
         });
     }
 

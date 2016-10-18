@@ -13,6 +13,7 @@ import {
     CloseExpressionEditor
 } from "../../action-events";
 import {CommandInputParameterModel as InputProperty, CommandLineToolModel} from "cwlts/models/d2sb";
+import {CommandLineToolModel} from "cwlts/models/d2sb";
 import {Observable} from "rxjs";
 
 require("./clt-editor.component.scss");
@@ -30,19 +31,18 @@ require("./clt-editor.component.scss");
     template: `
             <form class="clt-editor-group"
                   [formGroup]="cltEditorGroup">
+                
                 <docker-input-form class="input-form" 
                                 [group]="cltEditorGroup"
                                 [cltModel]="model"
                                 [dockerPull]="'some.docker.image.com'">
                 </docker-input-form>
                                 
-                <base-command-form class="input-form" 
-                                [group]="cltEditorGroup"
-                                [baseCommand]="model.baseCommand">
+                <base-command-form [toolBaseCommand]="model.baseCommand"
+                                [baseCommandForm]="cltEditorGroup.controls.baseCommandGroup">
                 </base-command-form>
                 
-                <inputs-ports-form [cltModel]="model"
-                                   class="input-form">
+                <inputs-ports-form [cltModel]="model">
                 </inputs-ports-form>
             </form>
     `
@@ -53,12 +53,7 @@ export class CltEditorComponent {
     public fileStream: Observable<FileModel>;
 
     @Input()
-    public toolInputs: Array<InputProperty>;
-
-    @Input()
     private model: CommandLineToolModel;
-
-    private file: FileModel;
 
     /* TODO: generate the commandline */
     private commandlineContent: string;
@@ -66,35 +61,13 @@ export class CltEditorComponent {
     /** ControlGroup that encapsulates the validation for all the nested forms */
     private cltEditorGroup: FormGroup;
 
-    private closeSidebarActions = [];
+    constructor(private formBuilder: FormBuilder) { }
 
-    constructor(private formBuilder: FormBuilder,
-                private eventHubService: EventHubService) {
-
-        this.cltEditorGroup = this.formBuilder.group({});
-
-        /* Opening the sidebar */
-        this.eventHubService.on(OpenInputInspector).subscribe(() => {
-            this.closeSidebarActions.push(CloseInputInspector);
-        });
-
-        this.eventHubService.on(OpenExpressionEditor).subscribe(() => {
-            this.closeSidebarActions.push(CloseExpressionEditor);
-        });
-
-        /* Closing the sidebar */
-        this.eventHubService.on(CloseInputInspector).subscribe(() => {
-            this.deleteSidebarActionFromArray(CloseInputInspector);
-        });
-
-        this.eventHubService.on(CloseExpressionEditor).subscribe(() => {
-            this.deleteSidebarActionFromArray(CloseExpressionEditor);
-        });
-    }
-
-    deleteSidebarActionFromArray(action) {
-        this.closeSidebarActions = this.closeSidebarActions.filter(sidebarAction => {
-            return sidebarAction !== action;
+    ngOnInit() {
+        this.cltEditorGroup = this.formBuilder.group({
+            dockerInputGroup: this.formBuilder.group({}),
+            baseCommandGroup: this.formBuilder.group({}),
+            inputPortsGroup: this.formBuilder.group({})
         });
     }
 }

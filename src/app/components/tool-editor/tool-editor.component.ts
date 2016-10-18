@@ -1,5 +1,4 @@
 import {Component, OnInit, Input, OnDestroy} from "@angular/core";
-import {NgSwitch, NgSwitchCase, NgSwitchDefault} from "@angular/common";
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {CltEditorComponent} from "../clt-editor/clt-editor.component";
@@ -15,19 +14,21 @@ import {ValidationResponse} from "../../services/web-worker/json-schema/json-sch
 import {ValidationIssuesComponent} from "../validation-issues/validation-issues.component";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
 import {WebWorkerService} from "../../services/web-worker/web-worker.service";
+import {ToolSidebarService} from "../../services/sidebars/tool-sidebar.service";
+
+import {ExpressionSidebarService} from "../../services/sidebars/expression-sidebar.service";
+import {InputSidebarService} from "../../services/sidebars/input-sidebar.service";
+
 
 require("./tool-editor.component.scss");
 
 @Component({
     selector: "ct-tool-editor",
-    providers: [ViewModeService, WebWorkerService],
+    providers: [ViewModeService, WebWorkerService, ToolSidebarService, ExpressionSidebarService, InputSidebarService],
     directives: [
         CodeEditorComponent,
         CltEditorComponent,
         BlockLoaderComponent,
-        NgSwitch,
-        NgSwitchCase,
-        NgSwitchDefault,
         ToolHeaderComponent,
         CommandLineComponent,
         SidebarComponent,
@@ -36,7 +37,7 @@ require("./tool-editor.component.scss");
     ],
     template: `
         <div class="editor-container">
-            <tool-header class="tool-header"
+            <tool-header class="editor-header"
                          (save)="save($event)"
                          [fileIsValid]="isValidCwl"
                          [data]="data"></tool-header>
@@ -64,7 +65,7 @@ require("./tool-editor.component.scss");
                 </div>
                 <div class="right-side">
                     <ct-view-mode-switch [viewMode]="viewMode"
-                                         [disabled]="!isValidCwl"
+                                         [disabled]="!guiAvailable"
                                          (onSwitch)="viewMode = $event">
                     </ct-view-mode-switch>
                 </div>
@@ -86,7 +87,7 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
     private commandLineParts: CommandLinePart[];
 
     /** Flag for validity of CWL document */
-    private isValidCwl = true;
+    private guiAvailable = true;
 
     /** List of subscriptions that should be disposed when destroying this component */
     private subs: Subscription[] = [];
@@ -114,7 +115,7 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
         });
 
         this.webWorkerService.validationResultStream.subscribe(err => {
-            this.isValidCwl = err.isValidCwl;
+            this.guiAvailable = err.isValidCwl;
         });
     }
 

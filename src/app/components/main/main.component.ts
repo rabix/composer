@@ -2,7 +2,6 @@ import {Component, ViewChild, ViewContainerRef, AfterViewInit} from "@angular/co
 import {ContextService} from "../../services/context/context.service";
 import {DomEventService} from "../../services/dom/dom-event.service";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
-import {ExpressionInputService} from "../../services/expression-input/expression-input.service";
 import {FileRegistry} from "../../services/file-registry.service";
 import {InputPortService} from "../../services/input-port/input-port.service";
 import {LayoutComponent} from "../layout/layout.component";
@@ -39,7 +38,6 @@ require("./main.component.scss");
         UrlValidator,
         WebWorkerService,
         InputPortService,
-        ExpressionInputService,
         PlatformAPI,
         SBPlatformDataSource,
         SettingsService,

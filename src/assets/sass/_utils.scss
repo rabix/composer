@@ -1,3 +1,5 @@
+@import "./mixins";
+
 .clickable {
   cursor: pointer;
 }
@@ -40,6 +42,10 @@
 
 .full-height {
   height: 100%;
+}
+
+.ellipsis {
+  @include ellipsis();
 }
 
 .block {

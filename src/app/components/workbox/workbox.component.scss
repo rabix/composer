@@ -4,13 +4,13 @@
   color: white;
   height: $workbox-tabs-height;
   width: 100%;
-  background: $brand-primary-bg;
+  background: $main-header-bg;
 }
 
 .ct-workbox-body {
-  background: $body-background;
+  background: $editor-bg;
   height: calc(100% - #{$workbox-tabs-height});
-  color: $text-dark;
+  color: $editor-color;
   overflow-x: hidden;
   overflow-y: auto;
 }

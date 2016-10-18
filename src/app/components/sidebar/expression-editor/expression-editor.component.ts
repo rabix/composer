@@ -1,45 +1,75 @@
 import {Component, ElementRef, ViewChild, OnInit, OnDestroy} from "@angular/core";
 import {ExpressionEditor} from "./expression-editor";
-import {Observable} from "rxjs/Observable";
-import {EventHubService} from "../../../services/event-hub/event-hub.service";
 import {ExpressionEditorData} from "../../../models/expression-editor-data.model";
-import {OpenExpressionEditor} from "../../../action-events";
 import {SandboxService, SandboxResponse} from "../../../services/sandbox/sandbox.service";
 import {Subscription} from "rxjs/Subscription";
+import {Subject} from "rxjs/Subject";
+import {ExpressionModel} from "cwlts/models/d2sb";
+import {ExpressionSidebarService} from "../../../services/sidebars/expression-sidebar.service";
+import {ExpressionModel} from "cwlts/models/d2sb";
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import TextMode = AceAjax.TextMode;
+import {Observable, Subject} from "rxjs";
 
-require ("./expression-editor.component.scss");
+require("./expression-editor.component.scss");
 
 @Component({
     selector: "expression-editor",
+    host: {
+        class: "block"
+    },
     template: `
          <div class="expression-editor-component">
+                <div class="expression-editor-header">
+                
+                    <span class="expression-head-text">
+                        Argument value expression
+                        <i class="fa fa-info-circle help-icon"></i>
+                    </span>
+                    
+                    <span class="expression-buttons-container">
+                        <button type="button"
+                            class="btn btn-sm btn-outline-secondary"
+                            (click)="cancel()">Cancel</button>
+                        
+                        <button type="button" 
+                            class="btn btn-sm btn-success"
+                            (click)="save()">Add</button>
+                    </span>
+                </div>
+                
                 <div #ace class="ace-editor"></div>
                 
                 <div class="expression-result-container">
                     <div class="code-preview">
-                         Code preview:
-                        <div>
-                            {{evaluatedExpression}}
+                         Code preview
+                    </div>
+                    
+                    <div class="expression-result-value">
+                           {{evaluatedExpression}}
+                    </div>
+                   
+                    <div class="expression-result-overlay">
+                        <div class="execute-button-container">
+                            <button type="button" 
+                                    class="btn btn-sm btn-outline-secondary execute-button"
+                                    (click)="execute()"><i class="fa fa-refresh"></i> Update</button>
                         </div>
                     </div>
-                        
-                    <button type="button" 
-                            class="execute-btn"
-                            (click)="execute()">Execute</button>
+                   
+                   
                 </div>
          </div>
  `
 })
 export class ExpressionEditorComponent implements OnInit, OnDestroy {
 
-    /** Expression stream coming form the tool */
-    private expressionStream: Observable<string>;
+    /** Expression coming form the tool */
+    private initialExpressionScript: string;
 
-    /** Update action to be passed to the event hub */
-    private updateAction: Function;
+    /** Evaluated expressions */
+    private newValueStream: Subject<string | ExpressionModel>;
 
     /** Reference to the element in which we want to instantiate the Ace editor */
     @ViewChild("ace")
@@ -57,29 +87,31 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
 
     private subs: Subscription[];
 
-    constructor(private eventHub: EventHubService) {
+    private sandBoxSub: Subscription;
+
+    constructor(private expressionSidebarService: ExpressionSidebarService) {
         this.subs = [];
     }
 
     ngOnInit(): any {
-        let openExpressionEditor = this.eventHub.onValueFrom(OpenExpressionEditor)
-            .subscribe((data:ExpressionEditorData) => {
+        this.subs.push(
+            this.expressionSidebarService.expressionDataStream.subscribe((data:ExpressionEditorData) => {
                 this.initSandbox();
 
-                this.expressionStream = data.expression;
-                this.updateAction = data.updateAction;
+                this.initialExpressionScript = data.expression;
+                this.newValueStream          = data.newExpressionChange;
 
-                this.editor = new ExpressionEditor(ace.edit(this.aceContainer.nativeElement), this.expressionStream);
+                this.editor         = new ExpressionEditor(ace.edit(this.aceContainer.nativeElement), this.initialExpressionScript);
+                this.codeToEvaluate = this.initialExpressionScript;
+
                 this.listenToExpressionChanges();
-            });
-
-        this.subs.push(openExpressionEditor);
+            })
+        );
     }
 
     private listenToExpressionChanges(): void {
         let expressionChanges = this.editor.expressionChanges.subscribe(expression => {
             this.codeToEvaluate = expression;
-            this.eventHub.publish(this.updateAction(expression));
         });
 
         this.subs.push(expressionChanges);
@@ -89,11 +121,12 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
         this.sandboxService = new SandboxService();
         this.codeToEvaluate = '';
         this.evaluatedExpression = '';
+    }
 
-        let expressionResult = this.sandboxService.expressionResult
-            .filter(result => result !== undefined)
+    private execute(): void {
+        this.removeSandboxSub();
+        this.sandBoxSub = this.sandboxService.submit(this.codeToEvaluate)
             .subscribe((result: SandboxResponse) => {
-
                 if (result.error) {
                     //TODO: make error message nicer on the UI
                     this.evaluatedExpression = result.error;
@@ -101,12 +134,30 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
                     this.evaluatedExpression = result.output;
                 }
             });
-
-        this.subs.push(expressionResult);
     }
 
-    private execute(): void {
-        this.sandboxService.submit(this.codeToEvaluate);
+    private cancel() {
+        this.editor.setText(this.initialExpressionScript);
+        this.codeToEvaluate = this.initialExpressionScript;
+        this.expressionSidebarService.closeExpressionEditor();
+    }
+
+    private save() {
+        if (this.evaluatedExpression === "undefined" || this.evaluatedExpression === "null") {
+            this.newValueStream.next("");
+        } else {
+            this.newValueStream.next(new ExpressionModel({
+                script: this.codeToEvaluate,
+                expressionValue: this.evaluatedExpression
+            }));
+        }
+    }
+
+    private removeSandboxSub() {
+        if (this.sandBoxSub) {
+            this.sandBoxSub.unsubscribe();
+            this.sandBoxSub = undefined;
+        }
     }
 
     ngOnDestroy(): void {
@@ -114,6 +165,11 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
             this.editor.dispose();
         }
 
+        this.removeSandboxSub();
         this.subs.forEach(sub => sub.unsubscribe());
     }
 }
+
+//@todo remove update button when expression is evaluated
+//@todo add update button when expression is changed
+//@todo evaluate expression in input field, populate result before expression editor is loaded

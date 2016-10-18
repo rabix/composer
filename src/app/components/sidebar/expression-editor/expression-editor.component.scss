@@ -1,43 +1,70 @@
 @import "../../../../assets/sass/variables";
 
-$execute-btn-width: 90px;
+expression-editor {
+    height: 100%;
+}
 
 .expression-editor-component {
-    background: #000000;
+    background: $expression-editor-bg;
+    color: $expression-editor-color;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
     height: 100%;
-    width: 100%;
-    position: relative;
+
+    .help-icon {
+        color: $expression-editor-help-icon-color;
+    }
+
+    .expression-editor-header {
+        flex-basis: 40px;
+        width: 100%;
+        padding: $padding-md;
+        border-bottom: 1px solid $expression-editor-border;
+    }
 
     .ace-editor {
-        height: 85%;
-        width: calc(100% - #{$collapse-icon-width});
-        position: absolute;
-        margin-left: $collapse-icon-width;
-        top: 0;
-        right: 0;
+        display: block;
+        flex-grow: 1;
+        width: 100%;
     }
 
     .expression-result-container {
-        width: 100%;
-        height: 15%;
-        bottom: 0;
-        display: block;
-        position: absolute;
+        flex-basis: 150px;
+        position: relative;
+        border-top: 1px solid $expression-editor-border;
+        padding: $padding-md;
+
+        .expression-result-overlay {
+            display: table;
+            position: absolute; // because it's an overlay, must go above result
+            top: 0;
+            right: 0;
+            height: 100%;
+            width: 100%;
+            background: rgba(0, 0, 0, .5);
+
+            .execute-button-container {
+                display: table-cell;
+                text-align: center;
+                vertical-align: middle;
+            }
+        }
 
         .code-preview {
-            padding-left: $collapse-icon-width;
-            display: inline-block;
-            height: 100%;
-            width: calc(98% - #{$execute-btn-width});
+            z-index: 2;
+            position: absolute; // except for the code preview label, should be above the overlay
+            color: $expression-editor-text-muted;
+            font-size: $font-size-sm;
         }
 
-        .execute-btn {
-            width: 90px;
-            display: inline;
-            height: 28px;
-            right: 0;
-            top: calc(50% - 14px);
-            position: absolute;
+        .expression-result-value {
+            margin-top: 17px; // so results stay under the code preview label
         }
+
     }
+}
+
+.expression-buttons-container {
+    float: right;
 }

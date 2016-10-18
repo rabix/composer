@@ -1,24 +1,16 @@
 import {Component, OnDestroy} from "@angular/core";
 import {Subscription} from "rxjs/Subscription";
-import {
-    OpenInputInspector,
-    CloseInputInspector,
-    OpenExpressionEditor,
-    CloseExpressionEditor
-} from "../../action-events/index";
-import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {ExpressionEditorSidebarComponent} from "./expression-editor/expression-editor-sidebar.component";
 import {InputInspectorSidebarComponent} from "./object-inpsector/input-inspector-sidebar.component";
+import {ToolSidebarService, SidebarType} from "../../services/sidebars/tool-sidebar.service";
 
-require ("./editor.component.scss");
-
-declare type sidebarType = "input-inspector" | "expression-editor";
+require("./editor.component.scss");
 
 @Component({
     selector: "sidebar-component",
     directives: [
         InputInspectorSidebarComponent,
-        ExpressionEditorSidebarComponent
+        ExpressionEditorSidebarComponent,
     ],
     template: `
             <div [ngClass]="{show: show}" class="sidebar-container">
@@ -27,68 +19,33 @@ declare type sidebarType = "input-inspector" | "expression-editor";
                 </input-inspector-sidebar-component>
                 
                 <expression-editor-sidebar-component class="tool-sidebar" 
-                                                    [hidden]="currentSidebar !== 'expression-editor'">
+                                                    [hidden]="currentSidebar !== 'expression-sidebar'">
                 </expression-editor-sidebar-component>
             </div>
     `
 })
 export class SidebarComponent implements OnDestroy {
 
-    private currentSidebar: sidebarType;
-
-    private closeSidebarActions = [];
+    private currentSidebar: SidebarType;
 
     private show = false;
-    
+
     private subs: Subscription[];
 
-    constructor(private eventHubService: EventHubService) {
+    constructor(private toolSidebarService: ToolSidebarService) {
+
         this.subs = [];
 
-        this.initInputInspectorListener();
-        this.initExpressionEditorListener();
-    }
-
-    //TODO (Mate): make this simpler
-    //@todo: there are bugs when working with multiple tools at once:
-    // 1. opening tools will give the correct initial state (no sidebar)
-    // 2. sidebar state will synchronize across all open tools
-    private initInputInspectorListener(): void {
-        this.subs.push(this.eventHubService.on(OpenInputInspector).subscribe(() => {
-            this.closeSidebarActions.push(CloseInputInspector);
-            this.currentSidebar = "input-inspector";
-            this.setSidebarState();
-        }));
-
-        this.subs.push(this.eventHubService.on(CloseInputInspector).subscribe(() => {
-            this.deleteSidebarActionFromArray(CloseInputInspector);
-            this.currentSidebar = this.closeSidebarActions[0] === CloseExpressionEditor ? "expression-editor" : undefined;
-            this.setSidebarState();
-        }));
-    }
-
-    private initExpressionEditorListener(): void {
-        this.subs.push(this.eventHubService.on(OpenExpressionEditor).subscribe(() => {
-            this.closeSidebarActions.push(CloseExpressionEditor);
-            this.currentSidebar = "expression-editor";
-            this.setSidebarState();
-        }));
-
-        this.subs.push(this.eventHubService.on(CloseExpressionEditor).subscribe(() => {
-            this.deleteSidebarActionFromArray(CloseExpressionEditor);
-            this.currentSidebar = this.closeSidebarActions[0] === CloseInputInspector ? "input-inspector" : undefined;
-            this.setSidebarState();
-        }));
-    }
-
-    private deleteSidebarActionFromArray(action): void {
-        this.closeSidebarActions = this.closeSidebarActions.filter(sidebarAction => {
-            return sidebarAction !== action;
-        });
+        this.subs.push(
+            this.toolSidebarService.sidebarStackStream.subscribe((sidebarStack: SidebarType[]) => {
+                this.currentSidebar = sidebarStack.length > 0 ? sidebarStack[0] : undefined;
+                this.setSidebarState();
+            })
+        );
     }
 
     private setSidebarState(): void {
-        this.show = this.closeSidebarActions.length !== 0;
+        this.show = this.currentSidebar !== undefined;
     }
 
     ngOnDestroy(): void {

@@ -1,0 +1,187 @@
+import {Injectable} from "@angular/core";
+import {Observable} from "rxjs/Observable";
+import {Subject} from "rxjs/Subject";
+import {ExpressionModel} from "cwlts/models/d2sb";
+
+export type BaseCommand = string | ExpressionModel;
+
+type UpdateBaseCommand = {
+    index: number,
+    newBaseCommand: BaseCommand
+}
+
+interface BaseCommandOperation {
+    (baseCommands: BaseCommand[]): BaseCommand[];
+}
+
+@Injectable()
+export class BaseCommandService {
+
+    /** The input ports stream we expose */
+    public baseCommands: Observable<BaseCommand[]>;
+
+    /** Initial content of the input port list */
+    private initialBaseCommands: BaseCommand[] = [];
+
+    /** Stream for adding new imports */
+    private newBaseCommand: Subject<BaseCommand> = new Subject<BaseCommand>();
+
+    /** Stream for adding new imports */
+    private deletedBaseCommand: Subject<number> = new Subject<number>();
+
+    private updatedBaseCommand: Subject<UpdateBaseCommand> = new Subject<UpdateBaseCommand>();
+
+    /** Stream that aggregates all changes on the exposedList list */
+    private baseCommandsUpdate: Subject<BaseCommandOperation> = new Subject<BaseCommandOperation>();
+
+    constructor() {
+        /* Subscribe the exposedList to baseCommandsUpdate */
+        this.baseCommands = this.baseCommandsUpdate
+            .filter(update => update !== undefined)
+            .scan((baseCommands: Array<BaseCommand>, operation: BaseCommandOperation) => {
+                return operation(baseCommands);
+            }, this.initialBaseCommands)
+            .publishReplay(1)
+            .refCount();
+
+        /* Update the initialBaseCommands when the baseCommands stream changes */
+        this.baseCommands.subscribe((commandList: Array<BaseCommand>) => {
+            this.initialBaseCommands = commandList;
+        });
+
+        /* Add new base command */
+        this.newBaseCommand
+            .map((baseCommand: BaseCommand): BaseCommandOperation => {
+                return (baseCommands: BaseCommand[]) => {
+                    return baseCommands.concat(baseCommand);
+                };
+            })
+            .subscribe(this.baseCommandsUpdate);
+
+        /* Delete input ports */
+        this.deletedBaseCommand
+            .map((index: number): BaseCommandOperation => {
+                return (baseCommands: BaseCommand[]) => {
+                    if (typeof baseCommands[index] !== 'undefined' && baseCommands[index] !== null) {
+                        baseCommands.splice(index, 1);
+                    }
+
+                    return baseCommands;
+                };
+            })
+            .subscribe(this.baseCommandsUpdate);
+
+        /* Update input ports */
+        this.updatedBaseCommand
+            .map(({
+                index: index,
+                newBaseCommand: newBaseCommand
+            }): BaseCommandOperation => {
+
+                return (baseCommands: BaseCommand[]) => {
+                    if (typeof baseCommands[index] !== 'undefined' && baseCommands[index] !== null) {
+                        baseCommands[index] = newBaseCommand;
+                    }
+
+                    return baseCommands;
+                };
+            })
+            .subscribe(this.baseCommandsUpdate);
+    }
+
+    public addCommand(baseCommand: BaseCommand): void {
+        this.newBaseCommand.next(baseCommand);
+    }
+
+    public deleteBaseCommand(index: number): void {
+        this.deletedBaseCommand.next(index);
+    }
+
+    public updateCommand(index: number, newBaseCommand: BaseCommand): void {
+        this.updatedBaseCommand.next(<UpdateBaseCommand>{
+            index: index,
+            newBaseCommand: newBaseCommand
+        });
+    }
+
+    public setBaseCommands(baseCommands: BaseCommand[]): void {
+        baseCommands.forEach(command => {
+            this.newBaseCommand.next(command);
+        });
+    }
+
+    public baseCommandsToFormList(toolBaseCommand: Array<BaseCommand>): BaseCommand[] {
+        const commandInputList: BaseCommand[] = [];
+        let newCommandInput = "";
+
+        if (!toolBaseCommand) {
+            return commandInputList;
+        }
+
+        toolBaseCommand.forEach((command, index) => {
+            //If it's a string
+            if (typeof command === "string") {
+                let commandToAdd: string;
+
+                if (index < toolBaseCommand.length - 1) {
+                    commandToAdd = command + " ";
+                } else {
+                    commandToAdd = command;
+                }
+
+                newCommandInput = newCommandInput.concat(commandToAdd);
+
+                if (index === toolBaseCommand.length - 1) {
+                    commandInputList.push(newCommandInput);
+                }
+
+            } else {
+                if (newCommandInput !== "") {
+                    commandInputList.push(newCommandInput.slice(0, -1));
+                }
+
+                commandInputList.push(command);
+                newCommandInput = "";
+            }
+        });
+
+        return commandInputList;
+    }
+
+    public formListToBaseCommandArray(formCommandList: BaseCommand[]) {
+        let commandList: BaseCommand[] = [];
+
+        if (!formCommandList) {
+            return commandList;
+        }
+
+        formCommandList.forEach((command) => {
+            //If it's a string
+            if (typeof command === "string") {
+
+                if (this.hasQuotes(command)) {
+                    commandList.push(command);
+                } else {
+                    //Replace subsequent whitespaces with single white space and trim
+                    const trimmedCommand = command.replace(/ +(?= )/g,'').trim();
+
+                    //Split on spaces
+                    const stringArray = trimmedCommand.split(" ");
+                    commandList = commandList.concat(stringArray);
+                }
+            } else {
+                commandList.push(command);
+            }
+        });
+
+        return commandList;
+    }
+
+    public hasQuotes(text: string) {
+        if (text.charAt(0) === "'" && text.charAt(text.length - 1) >= "'" ) {
+            return true;
+        }
+
+        return text.charAt(0) === '"' && text.charAt(text.length - 1) >= '"';
+    }
+}

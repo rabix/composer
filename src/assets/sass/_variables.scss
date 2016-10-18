@@ -46,7 +46,7 @@ $brand-info: #f3f8fc;
 /**
 * SBG sizes
 */
-$btn-padding-y-sm: 0.4rem;
+$btn-padding-y: 0.4rem;
 $input-padding-y: 0.4rem;
 
 /**
@@ -91,7 +91,7 @@ $input-border-focus: $form-elements-border-color;
 $input-border-color: $form-elements-border-color;
 $input-color-placeholder: $gray-dark;
 
-$border-radius: 2px;
+$border-radius: .25rem;
 $input-border-radius: $border-radius;
 $input-border-radius-sm: $border-radius;
 
@@ -118,5 +118,12 @@ $padding-md: 15px;
 $status-bar-padding-y: 8px;
 $status-bar-line-height: 18px;
 $status-bar-height: $status-bar-line-height + 2*$status-bar-padding-y;
+
+
+/**
+* Form variables
+*/
+$input-label-color: #808080;
+$input-label-size: $font-size-sm;
 
 @import "theme-variables";

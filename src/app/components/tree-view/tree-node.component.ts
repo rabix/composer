@@ -154,8 +154,6 @@ export class TreeNodeComponent implements OnInit {
             "fa-folder-open": this.node.icon === "folder" && this.isExpanded,
             "fa-angle-right": this.node.icon === "angle" && !this.isExpanded,
             "fa-angle-down": this.node.icon === "angle" && this.isExpanded,
-            "fa-caret-right": this.node.icon === "caret" && !this.isExpanded,
-            "fa-caret-down": this.node.icon === "caret" && this.isExpanded,
             "fa-circle-o-notch fa-spin": this.isLoading || this.node.icon === "loader",
             "app-type-icon": ["CommandLineTool", "Workflow"].indexOf(this.node.icon) !== -1,
             "icon-command-line-tool": this.node.icon === "CommandLineTool",

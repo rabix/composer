@@ -46,7 +46,7 @@ export class SBUserProjectsPanelComponent {
                     return this.dataSource.load().map(entries => {
                         return entries.map(entry => ({
                             name: entry.data.name,
-                            icon: entry.type || "caret",
+                            icon: entry.type || "angle",
                             isExpandable: true,
                             childrenProvider: _ => entry.childrenProvider()
                                 .map(childrenApps => childrenApps.map((source: DataEntrySource) => ({
