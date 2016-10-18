@@ -169,3 +169,7 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
         this.subs.forEach(sub => sub.unsubscribe());
     }
 }
+
+//@todo remove update button when expression is evaluated
+//@todo add update button when expression is changed
+//@todo evaluate expression in input field, populate result before expression editor is loaded
