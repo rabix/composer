@@ -12,22 +12,22 @@ export type InputPropertyViewModel = {
 }
 
 interface PropertyOperation {
-    (inputProperty: InputProperty[]): InputProperty[];
+    (inputProperty: InputPropertyViewModel[]): InputPropertyViewModel[];
 }
 
 @Injectable()
 export class InputPortService {
 
     /** The input ports stream we expose */
-    public inputPorts: Observable<InputProperty[]>;
+    public inputPorts: Observable<InputPropertyViewModel[]>;
 
     /** Initial content of the input port list */
-    private initialInputPorts: InputProperty[] = [];
+    private initialInputPorts: InputPropertyViewModel[] = [];
 
-    /** Stream for adding new imports */
-    private newInputPorts: Subject<InputProperty> = new Subject<InputProperty>();
+    /** Stream for adding new input ports */
+    private newInputPorts: Subject<InputPropertyViewModel> = new Subject<InputPropertyViewModel>();
 
-    /** Stream for adding new imports */
+    /** Stream for adding new input port */
     private deletedInputPort: Subject<number> = new Subject<number>();
 
     /** Stream that aggregates all changes on the exposedList list */
@@ -42,21 +42,21 @@ export class InputPortService {
         /* Subscribe the exposedList to inputPortsUpdate */
         this.inputPorts = this.inputPortsUpdate
             .filter(update => update !== undefined)
-            .scan((inputPorts: InputProperty[], operation: PropertyOperation) => {
+            .scan((inputPorts: InputPropertyViewModel[], operation: PropertyOperation) => {
                 return operation(inputPorts);
             }, this.initialInputPorts)
             .publishReplay(1)
             .refCount();
 
         /* Update the initialInputPorts when the inputPorts stream changes */
-        this.inputPorts.subscribe((portList: InputProperty[]) => {
+        this.inputPorts.subscribe((portList: InputPropertyViewModel[]) => {
             this.initialInputPorts = portList;
         });
 
         /* Add new input ports */
         this.newInputPorts
-            .map((inputPort: InputProperty): PropertyOperation => {
-                return (inputPorts: InputProperty[]) => {
+            .map((inputPort: InputPropertyViewModel): PropertyOperation => {
+                return (inputPorts: InputPropertyViewModel[]) => {
                     return inputPorts.concat(inputPort);
                 };
             })
@@ -65,7 +65,7 @@ export class InputPortService {
         /* Delete input ports */
         this.deletedInputPort
             .map((index: number): PropertyOperation => {
-                return (inputPorts: InputProperty[]) => {
+                return (inputPorts: InputPropertyViewModel[]) => {
                     if (typeof inputPorts[index] !== 'undefined' && inputPorts[index] !== null) {
                         inputPorts.splice(index, 1);
                     }
@@ -75,7 +75,7 @@ export class InputPortService {
             .subscribe(this.inputPortsUpdate);
     }
 
-    public addInput(inputPort: InputProperty): void {
+    public addInput(inputPort: InputPropertyViewModel): void {
         this.newInputPorts.next(inputPort);
     }
 
@@ -83,10 +83,10 @@ export class InputPortService {
         this.deletedInputPort.next(index);
     }
 
-    public setInputs(inputs: Array<InputProperty>): void {
+    public setInputs(inputs: InputPropertyViewModel[]): void {
         inputs.forEach(input => {
             this.newInputPorts.next(input);
-        })
+        });
     }
 
     public inputPortListToViewModelList(inputProperties: InputProperty[]): Observable<InputPropertyViewModel[]> {

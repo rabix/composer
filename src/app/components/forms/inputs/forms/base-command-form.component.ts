@@ -33,7 +33,7 @@ require("./shared/form.components.scss");
                                  
                                 <expression-input class="col-sm-11"
                                                   *ngIf="baseCommandForm.controls['baseCommand' + i]" 
-                                                  [(value)]="baseCommandFormList[i]"
+                                                  [(expression)]="baseCommandFormList[i]"
                                                   [control]="baseCommandForm.controls['baseCommand' + i]"
                                                   (onSelect)="editBaseCommand(i)">
                                 </expression-input>
@@ -143,6 +143,9 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
 
     private editBaseCommand(index: number): void {
         const newExpression: BehaviorSubject<BaseCommand> = new BehaviorSubject<BaseCommand>(undefined);
+        const selectedExpression = this.baseCommandFormList[index];
+        let expression: string = "";
+
         this.selectedIndex = index;
         this.removeExpressionInputSub();
 
@@ -151,9 +154,6 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
             .subscribe((expression: ExpressionModel) => {
                 this.baseCommandService.updateCommand(index, expression);
             });
-
-        const selectedExpression = this.baseCommandFormList[index];
-        let expression: string = "";
 
         if ((<ExpressionModel>selectedExpression).script) {
             expression = (<ExpressionModel>selectedExpression).script;

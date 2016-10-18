@@ -1,16 +1,17 @@
 import {Component, Input, OnInit} from "@angular/core";
 import {InputPortListComponent} from "../types/input-port-list.component";
-import {InputPortService} from "../../../../services/input-port/input-port.service";
-import {CommandLineToolModel, CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
+import {InputPortService, InputPropertyViewModel} from "../../../../services/input-port/input-port.service";
+import {CommandLineToolModel} from "cwlts/models/d2sb";
 import {InputSidebarService} from "../../../../services/sidebars/input-sidebar.service";
 import {Subscription} from "rxjs/Subscription";
+import {SandboxService} from "../../../../services/sandbox/sandbox.service";
 
 require("./input-ports-form.component.scss");
 require("./shared/form.components.scss");
 
 @Component({
     selector: 'inputs-ports-form',
-    providers: [InputPortService],
+    providers: [InputPortService, SandboxService],
     directives: [InputPortListComponent],
     template: `
         <form>
@@ -31,7 +32,7 @@ export class InputPortsFormComponent implements OnInit {
     @Input()
     public cltModel: CommandLineToolModel;
 
-    private portList: Array<InputProperty> = [];
+    private portList: InputPropertyViewModel[] = [];
 
     private subs: Subscription[];
 
@@ -42,7 +43,7 @@ export class InputPortsFormComponent implements OnInit {
 
         this.subs = [];
         this.subs.push(
-            this.inputPortService.inputPorts.subscribe((portList: InputProperty[]) => {
+            this.inputPortService.inputPorts.subscribe((portList: InputPropertyViewModel[]) => {
                 this.portList = portList;
             })
         );
@@ -52,11 +53,21 @@ export class InputPortsFormComponent implements OnInit {
         this.selectedIndex = this.portList.length;
         const newInput = this.cltModel.addInput();
 
-        this.inputPortService.addInput(newInput);
-        this.inputSidebarService.openInputInspector(newInput);
+        const newViewModel = {
+            value: "",
+            inputProperty: newInput
+        };
+
+        this.inputPortService.addInput(newViewModel);
+        this.inputSidebarService.openInputInspector(newViewModel);
     }
 
     ngOnInit() {
-        this.inputPortService.setInputs(this.cltModel.inputs);
+        this.subs.push(
+            this.inputPortService.inputPortListToViewModelList(this.cltModel.inputs)
+                .subscribe((viewModelPortList: InputPropertyViewModel[]) => {
+                    this.inputPortService.setInputs(viewModelPortList)
+                })
+        );
     }
 }

@@ -1,13 +1,12 @@
 import {Component, OnDestroy, Input} from "@angular/core";
-import {InputPortService} from "../../../../services/input-port/input-port.service";
-import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
+import {InputPortService, InputPropertyViewModel} from "../../../../services/input-port/input-port.service";
 import {Subscription} from "rxjs/Subscription";
 import {InputSidebarService} from "../../../../services/sidebars/input-sidebar.service";
 
 @Component({
     selector: "input-port-list",
     template: `
-            <div *ngIf="portList.length > 0">
+            <div *ngIf="viewModelPortList.length > 0">
             
                 <div class="row">
                     <div class="col-sm-4">
@@ -22,19 +21,19 @@ import {InputSidebarService} from "../../../../services/sidebars/input-sidebar.s
                 </div>
 
                  <div class="tool-input-row" 
-                      *ngFor="let inputPort of portList; let i = index; trackBy:trackByIndex"  
+                      *ngFor="let inputPortVm of viewModelPortList; let i = index; trackBy:trackByIndex"  
                       (click)="editProperty(i)">  
                  
                     <div class="col-sm-4">
-                        {{inputPort.value}}     
+                        {{inputPortVm.value}}
                     </div>
                       
                     <div class="col-sm-3">
-                        {{inputPort.id}}         
+                        {{inputPortVm.inputProperty.id}}         
                     </div>
                     
                     <div class="col-sm-1">
-                        {{inputPort.type}}      
+                        {{inputPortVm.inputProperty.type}}      
                     </div>
                     
                     <div class="col-sm-1 pull-right tool-input-icon">
@@ -43,20 +42,22 @@ import {InputSidebarService} from "../../../../services/sidebars/input-sidebar.s
                            (click)="removeProperty($event, i)"></i>
                     </div>
                 </div>
-                
         </div> <!-- List end -->
         
-         <div *ngIf="portList.length === 0" class="col-sm-12">
+        <div *ngIf="viewModelPortList.length === 0" class="col-sm-12">
                 No input ports defined.
         </div>
     `
 })
 export class InputPortListComponent implements OnDestroy {
 
-    private portList: Array<InputProperty> = [];
-
     @Input()
     private selectedIndex: number;
+
+    //TODO
+    //private portList: Array<InputProperty> = [];
+
+    private viewModelPortList: Array<InputPropertyViewModel> = [];
 
     private subs: Subscription[];
 
@@ -64,11 +65,9 @@ export class InputPortListComponent implements OnDestroy {
                 private inputSidebarService: InputSidebarService) {
         this.subs = [];
 
-        this.subs.push(
-            this.inputPortService.inputPorts.subscribe((portList: InputProperty[]) => {
-                this.portList = portList;
-            })
-        );
+        this.inputPortService.inputPorts.subscribe((viewModelPortList: InputPropertyViewModel[]) => {
+            this.viewModelPortList = viewModelPortList;
+        });
     }
 
     private trackByIndex(index: number): any {
@@ -76,8 +75,8 @@ export class InputPortListComponent implements OnDestroy {
     }
 
     private editProperty(index: number): void {
-        const selectedInputPort = this.portList[index];
         this.selectedIndex = index;
+        const selectedInputPort = this.viewModelPortList[index];
 
         this.inputSidebarService.openInputInspector(selectedInputPort);
     }

@@ -1,11 +1,8 @@
 import {Component, Input, Output, EventEmitter} from "@angular/core";
 import {REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES, AbstractControl} from "@angular/forms";
-import {BaseCommand} from "../../../../services/base-command/base-command.service";
 import {ExpressionModel} from "cwlts/models/d2sb";
 
 require("./expression-input.component.scss");
-
-export type ExpressionInputType = "baseCommands" | "inputPortValue";
 
 @Component({
     selector: 'expression-input',
@@ -18,7 +15,7 @@ export type ExpressionInputType = "baseCommands" | "inputPortValue";
                 <input class="form-control"
                         (keyup)="modelChange($event)"
                         [formControl]="control"
-                        [readonly]="value.expressionValue ? 'true' : null"/>
+                        [readonly]="expression.script ? 'true' : null"/>
                     
                 <span class="input-group-addon add-expression" (click)="openExpressionSidebar()">
                     <i class="fa fa-2x fa-code expression-form-btn"></i>
@@ -32,10 +29,10 @@ export class ExpressionInputComponent {
     public control: AbstractControl;
 
     @Input()
-    public value: BaseCommand;
+    public expression: string | ExpressionModel;
 
     @Output()
-    public valueChange: EventEmitter<string> = new EventEmitter<string>();
+    public expressionChange: EventEmitter<string | ExpressionModel> = new EventEmitter<string | ExpressionModel>();
 
     @Output()
     public onSelect = new EventEmitter();
@@ -46,8 +43,8 @@ export class ExpressionInputComponent {
 
     private modelChange(event: any) {
         //Only emit if the value was not set to an expression
-        if (!(<ExpressionModel>this.value).expressionValue) {
-            this.valueChange.emit(event.target.value);
+        if (!(<ExpressionModel>this.expression).expressionValue) {
+            this.expressionChange.emit(event.target.value);
         }
     }
 }
