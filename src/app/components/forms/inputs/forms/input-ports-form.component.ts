@@ -1,12 +1,11 @@
 import {Component, Input, OnInit} from "@angular/core";
 import {InputPortListComponent} from "../types/input-port-list.component";
-import {InputPortService} from "../../../../services/input-port/input-port.service";
-import {EventHubService} from "../../../../services/event-hub/event-hub.service";
-import {OpenInputInspector} from "../../../../action-events/index";
+import {InputPortService, InputPropertyViewModel} from "../../../../services/input-port/input-port.service";
 import {CommandLineToolModel} from "cwlts/models/d2sb";
 import {FormSectionComponent} from "../../../form-section/form-section.component";
 import {InputSidebarService} from "../../../../services/sidebars/input-sidebar.service";
-import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
+import {SandboxService} from "../../../../services/sandbox/sandbox.service";
+import {Subscription} from "rxjs/Subscription";
 
 require("./input-ports-form.component.scss");
 
