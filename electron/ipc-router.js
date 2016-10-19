@@ -43,29 +43,28 @@ const handlers = {
             })
             .reduce((acc, item) => acc.concat(item), [])
             .subscribe(listing => {
-                reply(listing);
-                // const promises = listing
-                //     .filter(item => {
-                //         const ext = item.name.split(".").pop();
-                //         const mightBeCWL = ["cwl", "json", "yml", "yaml"].indexOf(ext) !== -1;
-                //
-                //         return item.isFile && mightBeCWL;
-                //     })
-                //     .map(item => {
-                //         return Rx.Observable
-                //             .bindNodeCallback(fs.readFile)(item.path, "utf8")
-                //             .map(raw => (yaml.safeLoad(raw)["class"]))
-                //             .catch(err => {
-                //                 console.log("Caught an error on parsing ", item.path);
-                //                 return Observable.of("");
-                //             })
-                //             .do(cls => item.type = cls)
-                //             .toPromise()
-                //     });
-                //
-                // Promise.all(promises).then(_ => {
-                //     reply(listing);
-                // });
+                const promises = listing
+                    .filter(item => {
+                        const ext = item.name.split(".").pop();
+                        const mightBeCWL = ["cwl", "json", "yml", "yaml"].indexOf(ext) !== -1;
+
+                        return item.isFile && mightBeCWL;
+                    })
+                    .map(item => {
+                        return Rx.Observable
+                            .bindNodeCallback(fs.readFile)(item.path, "utf8")
+                            .map(raw => (yaml.safeLoad(raw)["class"]))
+                            .catch(err => {
+                                console.log("Caught an error on parsing ", item.path);
+                                return Observable.of("");
+                            })
+                            .do(cls => item.type = cls)
+                            .toPromise()
+                    });
+
+                Promise.all(promises).then(_ => {
+                    reply(listing);
+                });
             });
     }
 };
