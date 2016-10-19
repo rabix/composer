@@ -3,7 +3,7 @@ import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {Subject} from "rxjs/Subject";
 import {Observable} from "rxjs/Observable";
 import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
-import {ExpressionModel} from "cwlts";
+import {Expression} from "cwlts/mappings/d2sb/Expression";
 import {SandboxService, SandboxResponse} from "../sandbox/sandbox.service";
 
 export type InputPropertyViewModel = {
@@ -97,8 +97,8 @@ export class InputPortService {
         inputPropertiesStream.subscribe((property: InputProperty) => {
             const propInputBinding = property.getValueFrom();
 
-            if ((<ExpressionModel>propInputBinding).script) {
-                this.sandboxService.submit((<ExpressionModel>propInputBinding).script)
+            if ((<Expression>propInputBinding).script) {
+                this.sandboxService.submit((<Expression>propInputBinding).script)
                     .subscribe((response: SandboxResponse) => {
                         viewModelList.push({
                             value: response.output,
