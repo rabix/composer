@@ -13,6 +13,7 @@ import {SettingsService} from "../../services/settings/settings.service";
 import {UrlValidator} from "../../validators/url.validator";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {WebWorkerService} from "../../services/web-worker/web-worker.service";
+import {GuidService} from "../../services/guid.service";
 
 require("./../../../assets/sass/main.scss");
 
@@ -41,7 +42,8 @@ require("./main.component.scss");
         PlatformAPI,
         SBPlatformDataSource,
         SettingsService,
-        UserPreferencesService
+        UserPreferencesService,
+        GuidService
     ]
 })
 export class MainComponent implements AfterViewInit {

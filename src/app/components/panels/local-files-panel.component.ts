@@ -5,11 +5,12 @@ import {LocalDataSourceService} from "../../sources/local/local.source.service";
 import {Observable, BehaviorSubject} from "rxjs";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {OpenTabAction} from "../../action-events";
+import {IpcService} from "../../services/ipc.service";
 
 @Component({
     selector: "ct-local-files-panel",
     directives: [TreeViewComponent, PanelToolbarComponent],
-    providers: [LocalDataSourceService],
+    providers: [LocalDataSourceService, IpcService],
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: {class: "block"},
     template: `
@@ -32,7 +33,9 @@ export class LocalFilesPanelComponent {
 
     constructor(private fs: LocalDataSourceService,
                 private detector: ChangeDetectorRef,
+                private ipc: IpcService,
                 private eventHub: EventHubService) {
+
 
         this.recursivelyMapChildrenToNodes(() => this.fs.load())().subscribe(nodes => {
             this.isLoading = false;
@@ -50,11 +53,12 @@ export class LocalFilesPanelComponent {
             return undefined;
         }
 
-        return () => childrenProvider().flatMap(Observable.from)
-            .map(item => ({
+        return () => childrenProvider().flatMap(Observable.from).map(item => {
+            return {
                 name: item.name,
                 icon: item.isDir ? "folder" : (item.type || "file"),
                 isExpandable: item.isDir,
+
                 childrenProvider: this.recursivelyMapChildrenToNodes(item.childrenProvider),
                 openHandler: () => {
                     this.eventHub.publish(new OpenTabAction({
@@ -69,7 +73,7 @@ export class LocalFilesPanelComponent {
                         }
                     }));
                 }
-            }))
-            .reduce((acc, node) => acc.concat(node), []);
+            }
+        }).reduce((acc, node) => acc.concat(node), []);
     }
 }

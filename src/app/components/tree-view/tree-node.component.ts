@@ -26,7 +26,7 @@ import {TreeViewService} from "./tree-view.service";
              (dblclick)="toggle()">
             
             <span *ngIf="node.icon" class="icon-space" (click)="toggle()">
-                <i class="fa fa-fw" [ngClass]="getIconRules()"></i>
+                <i class="fa fa-fw" [ngClass]="getIconRules(node.icon)"></i>
             </span>
             
             <span *ngIf="node" class="name-container">
@@ -147,17 +147,17 @@ export class TreeNodeComponent implements OnInit {
         }
     }
 
-    private getIconRules() {
+    private getIconRules(icon) {
         return {
-            "fa-file": this.node.icon === "file",
-            "fa-folder": this.node.icon === "folder" && !this.isExpanded,
-            "fa-folder-open": this.node.icon === "folder" && this.isExpanded,
-            "fa-angle-right": this.node.icon === "angle" && !this.isExpanded,
-            "fa-angle-down": this.node.icon === "angle" && this.isExpanded,
-            "fa-circle-o-notch fa-spin": this.isLoading || this.node.icon === "loader",
-            "app-type-icon": ["CommandLineTool", "Workflow"].indexOf(this.node.icon) !== -1,
-            "icon-command-line-tool": this.node.icon === "CommandLineTool",
-            "icon-workflow": this.node.icon === "Workflow",
+            "fa-file": icon === "file",
+            "fa-folder": icon === "folder" && !this.isExpanded,
+            "fa-folder-open": icon === "folder" && this.isExpanded,
+            "fa-angle-right": icon === "angle" && !this.isExpanded,
+            "fa-angle-down": icon === "angle" && this.isExpanded,
+            "fa-circle-o-notch fa-spin": this.isLoading || icon === "loader",
+            "app-type-icon": ["CommandLineTool", "Workflow"].indexOf(icon) !== -1,
+            "icon-command-line-tool": icon === "CommandLineTool",
+            "icon-workflow": icon === "Workflow",
         };
     }
 
