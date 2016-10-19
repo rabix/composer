@@ -73,4 +73,9 @@ export class InputPortsFormComponent implements OnInit {
                 })
         );
     }
+
+    ngOnDestroy(): void {
+        this.inputPortService.disposeSubs();
+        this.subs.forEach(sub => sub.unsubscribe());
+    }
 }

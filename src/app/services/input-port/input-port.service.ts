@@ -5,6 +5,7 @@ import {Observable} from "rxjs/Observable";
 import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 import {Expression} from "cwlts/mappings/d2sb/Expression";
 import {SandboxService, SandboxResponse} from "../sandbox/sandbox.service";
+import {Subscription} from "rxjs";
 
 export type InputPropertyViewModel = {
     value: string,
@@ -34,6 +35,8 @@ export class InputPortService {
     private inputPortsUpdate: BehaviorSubject<PropertyOperation> = new BehaviorSubject<PropertyOperation>(undefined);
 
     private sandboxService: SandboxService;
+
+    private subs: Subscription[] = [];
 
     constructor(@Inject(SandboxService) sandboxService) {
 
@@ -90,6 +93,8 @@ export class InputPortService {
     }
 
     public inputPortListToViewModelList(inputProperties: InputProperty[]): Observable<InputPropertyViewModel[]> {
+        this.disposeSubs();
+
         const result: BehaviorSubject<InputPropertyViewModel[]> = new BehaviorSubject<InputPropertyViewModel[]>(undefined);
         const inputPropertiesStream: Observable<InputProperty> = Observable.from(inputProperties);
         const viewModelList: InputPropertyViewModel[] = [];
@@ -98,13 +103,16 @@ export class InputPortService {
             const propInputBinding = property.getValueFrom();
 
             if ((<Expression>propInputBinding).script) {
-                this.sandboxService.submit((<Expression>propInputBinding).script)
-                    .subscribe((response: SandboxResponse) => {
-                        viewModelList.push({
-                            value: response.output,
-                            inputProperty: property
-                        });
-                    });
+
+                this.subs.push(
+                    this.sandboxService.submit((<Expression>propInputBinding).script)
+                        .subscribe((response: SandboxResponse) => {
+                            viewModelList.push({
+                                value: response.output,
+                                inputProperty: property
+                            });
+                        })
+                );
 
             } else if (typeof propInputBinding === "string") {
                 viewModelList.push({
@@ -125,5 +133,9 @@ export class InputPortService {
         return viewModelList.map((inputPropVm: InputPropertyViewModel) => {
             return inputPropVm.inputProperty;
         });
+    }
+
+    disposeSubs(): void {
+        this.subs.forEach(sub => sub.unsubscribe());
     }
 }
