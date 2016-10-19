@@ -3,6 +3,9 @@ import Editor = AceAjax.Editor;
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 
+// allows search within document
+require('brace/ext/searchbox');
+
 export abstract class AbstractCodeEditor {
     /** Holds an instance of the AceEditor */
     protected editor: Editor;

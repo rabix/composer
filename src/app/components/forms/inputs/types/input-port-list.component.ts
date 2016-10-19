@@ -1,52 +1,57 @@
-import {Component, OnDestroy, Input} from "@angular/core";
-import {InputPortService, InputPropertyViewModel} from "../../../../services/input-port/input-port.service";
+import {Component, OnDestroy} from "@angular/core";
+import {InputPortService} from "../../../../services/input-port/input-port.service";
+import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 import {Subscription} from "rxjs/Subscription";
 import {InputSidebarService} from "../../../../services/sidebars/input-sidebar.service";
 
 @Component({
     selector: "input-port-list",
-    template: `
-            <div *ngIf="viewModelPortList.length > 0">
-            
-                <div class="row">
-                    <div class="col-sm-4">
-                        Value
-                    </div>
-                    <div class="col-sm-3">
-                        ID               
-                    </div>
-                    <div class="col-sm-1">
-                        Type
-                    </div>
-                </div>
+    template: `<div *ngIf="portList.length > 0">
 
-                 <div class="tool-input-row" 
-                      *ngFor="let inputPortVm of viewModelPortList; let i = index; trackBy:trackByIndex"  
-                      (click)="editProperty(i)">  
-                 
-                    <div class="col-sm-4">
-                        {{inputPortVm.value}}
-                    </div>
-                      
-                    <div class="col-sm-3">
-                        {{inputPortVm.inputProperty.id}}         
-                    </div>
-                    
-                    <div class="col-sm-1">
-                        {{inputPortVm.inputProperty.type}}      
-                    </div>
-                    
-                    <div class="col-sm-1 pull-right tool-input-icon">
-                        <i class="fa fa-trash" 
-                           aria-hidden="true"
-                           (click)="removeProperty($event, i)"></i>
-                    </div>
-                </div>
-        </div> <!-- List end -->
-        
-        <div *ngIf="viewModelPortList.length === 0" class="col-sm-12">
-                No input ports defined.
+    <div class="gui-section-list-title">
+        <div class="col-sm-7">
+            ID
         </div>
+        <div class="col-sm-2">
+            Type
+        </div>
+        <div class="col-sm-3">
+            Value
+        </div>
+    </div>
+
+    <ul class="gui-section-list">
+
+        <li class="gui-section-list-item clickable"
+            *ngFor="let inputPort of portList"
+            (click)="editProperty(inputPort)">
+
+            <div class="col-sm-7" title="{{inputPort.id}}">
+                <div class="ellipsis">
+                    {{inputPortVm.inputProperty.id}}
+                </div>
+            </div>
+
+            <div class="col-sm-2" title="{{inputPort.type}}">
+                {{inputPortVm.inputProperty.type}}
+            </div>
+            
+            <div class="col-sm-2" title="{{inputPort.value}}">
+               {{inputPortVm.value}}
+            </div>
+
+            <div class="col-sm-1 pull-right tool-input-icon">
+                <i class="fa fa-trash"
+                   aria-hidden="true"
+                   (click)="removeProperty($event, i)"></i>
+            </div>
+        </li>
+    </ul>
+</div> <!-- List end -->
+
+<div *ngIf="portList.length === 0" class="col-sm-12">
+    No input ports defined.
+</div>
     `
 })
 export class InputPortListComponent implements OnDestroy {

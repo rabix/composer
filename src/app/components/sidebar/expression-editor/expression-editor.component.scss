@@ -1,82 +1,70 @@
 @import "../../../../assets/sass/variables";
 
-$execute-btn-width: 90px;
-$header-height: 40px;
-$button-height: 30px;
+expression-editor {
+    height: 100%;
+}
 
 .expression-editor-component {
     background: $expression-editor-bg;
+    color: $expression-editor-color;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
     height: 100%;
-    width: 100%;
-    position: relative;
 
-    .expression-head-text {
-        color: $text-light;
-        top: 25%;
-        position: relative;
-
-        /* Large screens */
-        @media only screen  and (min-width : 1824px) {
-            margin-left: 40px;
-        }
-
-        i {
-            margin-left: 5px;
-            color: $text-light;
-        }
+    .help-icon {
+        color: $expression-editor-help-icon-color;
     }
 
     .expression-editor-header {
-        height: $header-height;
-        position: relative;
+        flex-basis: 40px;
         width: 100%;
-        display: block;
-        color: $expression-editor-head-text;
-        top: 0;
-        right: 0;
+        padding: $padding-md;
+        border-bottom: 1px solid $expression-editor-border;
     }
 
     .ace-editor {
-        height: calc(85% - #{$header-height});
-        width: calc(100% - 20px);
-        margin-left: $collapse-icon-width;
         display: block;
+        flex-grow: 1;
+        width: 100%;
     }
 
     .expression-result-container {
-        width: 100%;
-        height: 15%;
-        bottom: 0;
-        display: block;
-        position: absolute;
+        flex-basis: 150px;
+        position: relative;
+        border-top: 1px solid $expression-editor-border;
+        padding: $padding-md;
+
+        .expression-result-overlay {
+            display: table;
+            position: absolute; // because it's an overlay, must go above result
+            top: 0;
+            right: 0;
+            height: 100%;
+            width: 100%;
+            background: rgba(0, 0, 0, .5);
+
+            .execute-button-container {
+                display: table-cell;
+                text-align: center;
+                vertical-align: middle;
+            }
+        }
 
         .code-preview {
-            padding-left: $collapse-icon-width;
-            display: inline-block;
-            height: 100%;
-            width: calc(98% - #{$execute-btn-width});
+            z-index: 2;
+            position: absolute; // except for the code preview label, should be above the overlay
+            color: $expression-editor-text-muted;
+            font-size: $font-size-sm;
         }
+
+        .expression-result-value {
+            margin-top: 17px; // so results stay under the code preview label
+        }
+
     }
 }
 
 .expression-buttons-container {
     float: right;
-    top: calc(50% - #{$button-height}/2);
-    position: relative;
-}
-
-.expression-editor-btn {
-    width: 90px;
-    display: inline;
-    height: $button-height;
-    margin-right: 5px;
-    padding: 0 !important;
-
-    &.execute-btn {
-        width: $execute-btn-width;
-        right: 0;
-        padding: 0;
-        top: calc(50% -  #{$button-height}/2);
-        position: absolute;
-    }
 }

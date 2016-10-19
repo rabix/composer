@@ -30,7 +30,11 @@
  */
 
 declare module "*"
-;
+
+
+interface Window {
+    require: NodeRequire
+}
 
 // Extra variables that live on Global that will be replaced by webpack DefinePlugin
 declare let ENV: string;

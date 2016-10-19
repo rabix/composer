@@ -1,6 +1,7 @@
-import {Component, OnInit, OnDestroy} from "@angular/core";
+import {Component, Input, OnInit, OnDestroy} from "@angular/core";
 import {Validators, FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 import {ExpressionInputComponent} from "../../forms/inputs/types/expression-input.component";
+import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {Subscription} from "rxjs/Subscription";
 import {InputSidebarService} from "../../../services/sidebars/input-sidebar.service";

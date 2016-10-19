@@ -1,17 +1,25 @@
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, Input} from "@angular/core";
 import {FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 import {FileModel} from "../../store/models/fs.models";
 import {CommandLineComponent} from "./commandline/commandline.component";
 import {DockerInputFormComponent} from "../forms/inputs/forms/docker-input-form.component";
 import {BaseCommandFormComponent} from "../forms/inputs/forms/base-command-form.component";
 import {InputPortsFormComponent} from "../forms/inputs/forms/input-ports-form.component";
+import {EventHubService} from "../../services/event-hub/event-hub.service";
+import {
+    OpenInputInspector,
+    OpenExpressionEditor,
+    CloseInputInspector,
+    CloseExpressionEditor
+} from "../../action-events";
+import {CommandInputParameterModel as InputProperty, CommandLineToolModel} from "cwlts/models/d2sb";
 import {CommandLineToolModel} from "cwlts/models/d2sb";
 import {Observable} from "rxjs";
 
 require("./clt-editor.component.scss");
 
 @Component({
-    selector: "clt-editor",
+    selector: "ct-clt-editor",
     directives: [
         DockerInputFormComponent,
         BaseCommandFormComponent,
@@ -22,8 +30,7 @@ require("./clt-editor.component.scss");
     ],
     template: `
             <form class="clt-editor-group"
-                *ngIf="cltEditorGroup"
-                [formGroup]="cltEditorGroup">
+                  [formGroup]="cltEditorGroup">
                 
                 <docker-input-form class="input-form" 
                                 [group]="cltEditorGroup"
@@ -31,26 +38,22 @@ require("./clt-editor.component.scss");
                                 [dockerPull]="'some.docker.image.com'">
                 </docker-input-form>
                                 
-                <base-command-form class="input-form"
-                                [toolBaseCommand]="model.baseCommand"
+                <base-command-form [toolBaseCommand]="model.baseCommand"
                                 [baseCommandForm]="cltEditorGroup.controls.baseCommandGroup">
                 </base-command-form>
                 
-                <inputs-ports-form [cltModel]="model"
-                                   class="input-form">
+                <inputs-ports-form [cltModel]="model">
                 </inputs-ports-form>
             </form>
     `
 })
-export class CltEditorComponent implements OnInit {
+export class CltEditorComponent {
     /** The file that we are going to use to list the properties */
     @Input()
     public fileStream: Observable<FileModel>;
 
     @Input()
     private model: CommandLineToolModel;
-
-    private file: FileModel;
 
     /* TODO: generate the commandline */
     private commandlineContent: string;
@@ -61,12 +64,6 @@ export class CltEditorComponent implements OnInit {
     constructor(private formBuilder: FormBuilder) { }
 
     ngOnInit() {
-        this.fileStream.first(file => {
-            this.file = file;
-            this.commandlineContent = this.model.getCommandLine();
-            return true;
-        });
-
         this.cltEditorGroup = this.formBuilder.group({
             dockerInputGroup: this.formBuilder.group({}),
             baseCommandGroup: this.formBuilder.group({}),

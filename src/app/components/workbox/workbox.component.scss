@@ -4,18 +4,19 @@
   color: white;
   height: $workbox-tabs-height;
   width: 100%;
-  background: $brand-primary-bg;
+  background: $main-header-bg;
 }
 
 .ct-workbox-body {
-  background: $body-background;
+  background: $editor-bg;
   height: calc(100% - #{$workbox-tabs-height});
-  color: $text-dark;
+  color: $editor-color;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .inset-panel {
   position: relative;
-  background-color: #161719;
   border-radius: 2px;
 }
 
@@ -23,10 +24,10 @@
   display: flex;
   -webkit-user-select: none;
   margin: 0;
-  background: $brand-primary-bg-bright;
+  background: $main-header-bg;
   font-size: $font-size-xs;
   height: 100%;
-  background: $brand-primary-bg-dark;
+  width: calc(100% - 50px);
   box-shadow: inset 0 -8px 8px -4px rgba(0, 0, 0, 0.15);
   padding: 0 10px 0 25px;
   overflow-x: auto;
@@ -42,7 +43,7 @@
     min-width: 40px;
     padding: 0 24px 10px 0;
     position: relative;
-    box-shadow: inset 1px 1px 0 $brand-primary-bg-bright, -4px 0px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 1px 1px 0 $tab-bg, -4px 0px 4px rgba(0, 0, 0, 0.1);
 
     &:first-child {
       margin-left: 22px;
@@ -68,15 +69,15 @@
       z-index: 10;
     }
 
-    &.active, &.active:before, &.active:after {
+    &.active, &.active:before, &.active:after, .settings-button {
       z-index: 1;
-      color: $brand-primary;
-      background-image: -webkit-linear-gradient(top, $body-foreground, $body-background);
+      color: $tab-select-color;
+      background-image: -webkit-linear-gradient(top, $tab-select-bg, $tab-select-bg);
     }
 
     &, &:before, &:after {
       height: 34px;
-      background-image: -webkit-linear-gradient(top, lighten($brand-primary-bg-bright, 5%), $brand-primary-bg-bright);
+      background-image: -webkit-linear-gradient(top, lighten($tab-bg, 5%), $tab-bg);
     }
 
     &:before, &:after {
@@ -87,17 +88,19 @@
       height: 35px;
     }
 
+    // triangle to left
     &:before {
       left: -14px;
       border-top-left-radius: 3px;
-      box-shadow: inset 1px 1px 0 $brand-primary-bg-bright, -4px 0px 4px rgba(0, 0, 0, 0.1);
+      box-shadow: inset 1px 1px 0 $tab-bg, -4px 0px 4px rgba(0, 0, 0, 0.1);
       -webkit-transform: skewX(-30deg);
     }
 
+    // triangle to right
     &:after {
       right: -14px;
       border-top-right-radius: 3px;
-      box-shadow: inset -1px 1px 0 $brand-primary-bg-bright, 4px 0px 4px rgba(0, 0, 0, 0.1);
+      box-shadow: inset -1px 1px 0 $tab-bg, 4px 0px 4px rgba(0, 0, 0, 0.1);
       -webkit-transform: skewX(30deg);
     }
   }
@@ -108,3 +111,20 @@
   padding-left: 5px;
   padding-right: 5px;
 }
+
+ct-settings-button {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+
+  .warning {
+
+  }
+}
+
+ct-tab-manager, ct-tool-editor {
+  display: block;
+  height: 100%;
+}
+
+

@@ -132,7 +132,7 @@ module.exports = {
 
             /**
              * Raw loader support for *.css files
-             * Returns file content as string
+             * Returns file tabData as string
              *
              * See: https://github.com/webpack/raw-loader
              */
@@ -140,7 +140,7 @@ module.exports = {
 
             /**
              * Raw loader support for *.html
-             * Returns file content as string
+             * Returns file tabData as string
              *
              * See: https://github.com/webpack/raw-loader
              */

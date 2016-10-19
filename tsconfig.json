@@ -12,6 +12,7 @@
             "jasmine",
             "node",
             "jquery",
+            "electron",
             "ace",
             "socket.io-client"
         ]

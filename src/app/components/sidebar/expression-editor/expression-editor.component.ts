@@ -6,32 +6,36 @@ import {Subscription} from "rxjs/Subscription";
 import {Subject} from "rxjs/Subject";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ExpressionSidebarService} from "../../../services/sidebars/expression-sidebar.service";
-import {Observable} from "rxjs/Observable";
+import {ExpressionModel} from "cwlts/models/d2sb";
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import TextMode = AceAjax.TextMode;
+import {Observable, Subject} from "rxjs";
 
-require ("./expression-editor.component.scss");
+require("./expression-editor.component.scss");
 
 @Component({
     selector: "expression-editor",
+    host: {
+        class: "block"
+    },
     template: `
          <div class="expression-editor-component">
                 <div class="expression-editor-header">
                 
                     <span class="expression-head-text">
                         Argument value expression
-                        <i class="fa fa-info-circle"></i>
+                        <i class="fa fa-info-circle help-icon"></i>
                     </span>
                     
                     <span class="expression-buttons-container">
                         <button type="button"
-                            class="btn btn-secondary expression-editor-btn"
+                            class="btn btn-sm btn-outline-secondary"
                             (click)="cancel()">Cancel</button>
                         
                         <button type="button" 
-                            class="btn btn-success expression-editor-btn"
-                            (click)="save()">Save</button>
+                            class="btn btn-sm btn-success"
+                            (click)="save()">Add</button>
                     </span>
                 </div>
                 
@@ -39,15 +43,22 @@ require ("./expression-editor.component.scss");
                 
                 <div class="expression-result-container">
                     <div class="code-preview">
-                         Code preview:
-                        <div>
-                            {{evaluatedExpression}}
-                        </div>
+                         Code preview
                     </div>
                     
-                    <button type="button" 
-                            class="btn btn-primary expression-editor-btn execute-btn"
-                            (click)="evaluateExpression()">Execute</button>
+                    <div class="expression-result-value">
+                           {{evaluatedExpression}}
+                    </div>
+                   
+                    <div class="expression-result-overlay">
+                        <div class="execute-button-container">
+                            <button type="button" 
+                                    class="btn btn-sm btn-outline-secondary execute-button"
+                                    (click)="evaluateExpression()"><i class="fa fa-refresh"></i> Update</button>
+                        </div>
+                    </div>
+                   
+                   
                 </div>
          </div>
  `
@@ -88,9 +99,9 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
                 this.initSandbox();
 
                 this.initialExpressionScript = data.expression;
-                this.newValueStream = data.newExpressionChange;
+                this.newValueStream          = data.newExpressionChange;
 
-                this.editor = new ExpressionEditor(ace.edit(this.aceContainer.nativeElement), this.initialExpressionScript);
+                this.editor         = new ExpressionEditor(ace.edit(this.aceContainer.nativeElement), this.initialExpressionScript);
                 this.codeToEvaluate = this.initialExpressionScript;
 
                 this.listenToExpressionChanges();
@@ -174,3 +185,7 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
         this.subs.forEach(sub => sub.unsubscribe());
     }
 }
+
+//@todo remove update button when expression is evaluated
+//@todo add update button when expression is changed
+//@todo evaluate expression in input field, populate result before expression editor is loaded

@@ -1,57 +1,75 @@
 @import "../../../assets/sass/variables";
+@import "../../../assets/sass/mixins";
+@import "../../../assets/sass/icons";
 
 ct-tree-view {
-  color: white;
+  background: $panel-bg;
+  color: $panel-item-color;
   display: block;
-  padding: 4px;
-  overflow-y: auto;
   height: 100%;
-  background: $brand-primary-bg;
-
-  & > ct-tree-node > .main {
-    font-family: $font-family-title;
-    font-weight: 300;
-    text-transform: uppercase;
-  }
+  overflow-y: auto;
+  padding: 4px;
+  position: relative;
+  width: 100%;
 
   ct-tree-node {
-    font-size: $font-size-sm;
     display: block;
+    font-size: $font-size-sm;
+    position: relative;
   }
 
-  .main {
-    padding: 3px 12px;
-    border-radius: 4px;
-    display: flex;
+  .node-base {
+    height: 22px;
+    font-size: $font-size-sm;
+    font-weight: 300;
+    border-radius: 2px;
+    display: inline-block;
     outline: none;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    padding-left:2em;
 
     .name {
       display: inline-block;
       text-overflow: ellipsis;
-      white-space: nowrap;
+      white-space: pre;
       overflow: hidden;
     }
 
     &:hover {
-      background: $brand-primary-bg-dark;
-
+      background: $panel-item-hover-bg;
+      color: $panel-item-hover-color;
     }
 
     &.selected {
-      background: $brand-primary-bg-bright;
-      color: white;
+      background: $panel-item-select-bg;
+      color: $panel-item-select-color;
+
+      .icon-space .fa {
+        color: $panel-item-icon-select-color;
+      }
     }
   }
 
-  .children {
-    padding-left: 20px;
+  .root-node > .node-base {
+    padding-left: 0;
   }
 
   .icon-space {
     display: inline-block;
-    //padding: 0 0 0 6px;
     width: 20px;
     margin: 0 0 0 0;
+    position: relative;
+
+    .icon-command-line-tool, .icon-workflow {
+      position: relative;
+      top: 2px;
+    }
+
+    [class*='fa-angle'] {
+      @extend .icon-angle;
+    }
   }
 
   .node-icon {
@@ -65,6 +83,7 @@ ct-tree-view {
 
 .name-container {
   display: inline-block;
+  vertical-align: middle;
 
   .name {
     display: inline-block;
@@ -79,20 +98,36 @@ ct-tree-view {
     border-radius: 4px;
     border: 1px solid orange;
     box-sizing: border-box;
+    font-weight:400;
   }
 }
 
+.search-term-container {
+  height: 24px;
+  position: absolute;
+  width: 100%;
+  background: $brand-primary-bg-dark;
+  display: block;
+  margin-top: -4px;
+  margin-left: -4px;
+  z-index: 10;
+}
+
 .search-term {
+  display: block;
+
   &.hidden {
     height: 0;
     opacity: 0;
-    padding-left: 10px;
+    padding: 0 0 0 10px;
+    font-size: 0;
   }
   .term {
     white-space: pre;
   }
   height: 24px;
   opacity: 1;
+  overflow: hidden;
   padding: 4px 14px;
   font-size: $font-size-xs;
   font-style: italic;
