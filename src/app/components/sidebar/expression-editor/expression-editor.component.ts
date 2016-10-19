@@ -143,12 +143,16 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
 
                 if (result.error === undefined) {
                     if (result.output === "undefined" || result.output === "null") {
-                        this.newValueStream.next("");
-                    } else {
                         this.newValueStream.next(new ExpressionModel({
-                            script: this.codeToEvaluate,
-                            expressionValue: result.output
+                            value: "",
+                            evaluatedValue: "",
                         }));
+                    } else {
+                        const newExpression = new ExpressionModel({});
+                        newExpression.setValueToExpression(this.codeToEvaluate);
+                        newExpression.setEvaluatedValue(result.output);
+
+                        this.newValueStream.next(newExpression)
                     }
                 }
             });

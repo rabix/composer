@@ -77,11 +77,10 @@ export class InputPortListComponent implements OnDestroy {
     private editProperty(index: number): void {
         this.selectedIndex = index;
         const selectedInputPort = this.viewModelPortList[index];
-
         this.inputSidebarService.openInputInspector(selectedInputPort);
     }
 
-    private removeProperty(event: Event, index: number) {
+    private removeProperty(event: Event, index: number): void {
         event.stopPropagation();
         this.inputPortService.deleteInputPort(index);
 

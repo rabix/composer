@@ -2,29 +2,30 @@ import {Injectable} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {ExpressionModel} from "cwlts/models/d2sb";
+import {Expression} from "cwlts/mappings/d2sb/Expression";
 
-export type BaseCommand = string | ExpressionModel;
+export type BaseCommand = string | Expression;
 
 type UpdateBaseCommand = {
     index: number,
-    newBaseCommand: BaseCommand
+    newBaseCommand: ExpressionModel
 }
 
 interface BaseCommandOperation {
-    (baseCommands: BaseCommand[]): BaseCommand[];
+    (baseCommands: ExpressionModel[]): ExpressionModel[];
 }
 
 @Injectable()
 export class BaseCommandService {
 
     /** The input ports stream we expose */
-    public baseCommands: Observable<BaseCommand[]>;
+    public baseCommands: Observable<ExpressionModel[]>;
 
     /** Initial content of the input port list */
-    private initialBaseCommands: BaseCommand[] = [];
+    private initialBaseCommands: ExpressionModel[] = [];
 
     /** Stream for adding new imports */
-    private newBaseCommand: Subject<BaseCommand> = new Subject<BaseCommand>();
+    private newBaseCommand: Subject<ExpressionModel> = new Subject<ExpressionModel>();
 
     /** Stream for adding new imports */
     private deletedBaseCommand: Subject<number> = new Subject<number>();
@@ -38,21 +39,21 @@ export class BaseCommandService {
         /* Subscribe the exposedList to baseCommandsUpdate */
         this.baseCommands = this.baseCommandsUpdate
             .filter(update => update !== undefined)
-            .scan((baseCommands: Array<BaseCommand>, operation: BaseCommandOperation) => {
+            .scan((baseCommands: Array<ExpressionModel>, operation: BaseCommandOperation) => {
                 return operation(baseCommands);
             }, this.initialBaseCommands)
             .publishReplay(1)
             .refCount();
 
         /* Update the initialBaseCommands when the baseCommands stream changes */
-        this.baseCommands.subscribe((commandList: Array<BaseCommand>) => {
+        this.baseCommands.subscribe((commandList: ExpressionModel[]) => {
             this.initialBaseCommands = commandList;
         });
 
         /* Add new base command */
         this.newBaseCommand
-            .map((baseCommand: BaseCommand): BaseCommandOperation => {
-                return (baseCommands: BaseCommand[]) => {
+            .map((baseCommand: ExpressionModel): BaseCommandOperation => {
+                return (baseCommands: ExpressionModel[]) => {
                     return baseCommands.concat(baseCommand);
                 };
             })
@@ -61,7 +62,7 @@ export class BaseCommandService {
         /* Delete input ports */
         this.deletedBaseCommand
             .map((index: number): BaseCommandOperation => {
-                return (baseCommands: BaseCommand[]) => {
+                return (baseCommands: ExpressionModel[]) => {
                     if (typeof baseCommands[index] !== 'undefined' && baseCommands[index] !== null) {
                         baseCommands.splice(index, 1);
                     }
@@ -78,7 +79,7 @@ export class BaseCommandService {
                 newBaseCommand: newBaseCommand
             }): BaseCommandOperation => {
 
-                return (baseCommands: BaseCommand[]) => {
+                return (baseCommands: ExpressionModel[]) => {
                     if (typeof baseCommands[index] !== 'undefined' && baseCommands[index] !== null) {
                         baseCommands[index] = newBaseCommand;
                     }
@@ -89,7 +90,7 @@ export class BaseCommandService {
             .subscribe(this.baseCommandsUpdate);
     }
 
-    public addCommand(baseCommand: BaseCommand): void {
+    public addCommand(baseCommand: ExpressionModel): void {
         this.newBaseCommand.next(baseCommand);
     }
 
@@ -97,28 +98,28 @@ export class BaseCommandService {
         this.deletedBaseCommand.next(index);
     }
 
-    public updateCommand(index: number, newBaseCommand: BaseCommand): void {
+    public updateCommand(index: number, newBaseCommand: ExpressionModel): void {
         this.updatedBaseCommand.next(<UpdateBaseCommand>{
             index: index,
             newBaseCommand: newBaseCommand
         });
     }
 
-    public setBaseCommands(baseCommands: BaseCommand[]): void {
+    public setBaseCommands(baseCommands: ExpressionModel[]): void {
         baseCommands.forEach(command => {
             this.newBaseCommand.next(command);
         });
     }
 
-    public baseCommandsToFormList(toolBaseCommand: Array<BaseCommand>): BaseCommand[] {
-        const commandInputList: BaseCommand[] = [];
+    public baseCommandsToFormList(toolBaseCommand: BaseCommand[]): ExpressionModel[] {
+        const commandInputList: ExpressionModel[] = [];
         let newCommandInput = "";
 
         if (!toolBaseCommand) {
             return commandInputList;
         }
 
-        toolBaseCommand.forEach((command, index) => {
+        toolBaseCommand.forEach((command: BaseCommand, index: number) => {
             //If it's a string
             if (typeof command === "string") {
                 let commandToAdd: string;
@@ -132,15 +133,26 @@ export class BaseCommandService {
                 newCommandInput = newCommandInput.concat(commandToAdd);
 
                 if (index === toolBaseCommand.length - 1) {
-                    commandInputList.push(newCommandInput);
+                    commandInputList.push(new ExpressionModel({
+                        value: newCommandInput,
+                        evaluatedValue: newCommandInput,
+                    }));
                 }
 
             } else {
                 if (newCommandInput !== "") {
-                    commandInputList.push(newCommandInput.slice(0, -1));
+                    const newValue = newCommandInput.slice(0, -1);
+                    commandInputList.push(new ExpressionModel({
+                        value: newValue,
+                        evaluatedValue: newValue,
+                    }));
                 }
 
-                commandInputList.push(command);
+                commandInputList.push(new ExpressionModel({
+                    value: command,
+                    evaluatedValue: newCommandInput,
+                }));
+
                 newCommandInput = "";
             }
         });
@@ -148,7 +160,7 @@ export class BaseCommandService {
         return commandInputList;
     }
 
-    public formListToBaseCommandArray(formCommandList: BaseCommand[]) {
+    public formListToBaseCommandArray(formCommandList: ExpressionModel[]): BaseCommand[] {
         let commandList: BaseCommand[] = [];
 
         if (!formCommandList) {
@@ -156,21 +168,23 @@ export class BaseCommandService {
         }
 
         formCommandList.forEach((command) => {
-            //If it's a string
-            if (typeof command === "string") {
+            const cwlCommand = command.serialize();
 
-                if (this.hasQuotes(command)) {
-                    commandList.push(command);
+            //If it's a string
+            if (typeof cwlCommand === "string") {
+
+                if (this.hasQuotes(cwlCommand)) {
+                    commandList.push(cwlCommand);
                 } else {
                     //Replace subsequent whitespaces with single white space and trim
-                    const trimmedCommand = command.replace(/ +(?= )/g,'').trim();
+                    const trimmedCommand = cwlCommand.replace(/ +(?= )/g,'').trim();
 
                     //Split on spaces
                     const stringArray = trimmedCommand.split(" ");
                     commandList = commandList.concat(stringArray);
                 }
             } else {
-                commandList.push(command);
+                commandList.push(cwlCommand);
             }
         });
 

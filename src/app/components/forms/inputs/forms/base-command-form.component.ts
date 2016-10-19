@@ -65,7 +65,7 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
     public baseCommandForm: FormGroup;
 
     /** The formatted list that we are going to display to the user*/
-    private baseCommandFormList: BaseCommand[];
+    private baseCommandFormList: ExpressionModel[] = [];
 
     private subs: Subscription[];
 
@@ -82,11 +82,13 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.baseCommandService.setBaseCommands(this.toolBaseCommand);
+
+        const inputBaseCommands = this.baseCommandService.baseCommandsToFormList(this.toolBaseCommand);
+        this.baseCommandService.setBaseCommands(inputBaseCommands);
 
         this.subs.push(
-            this.baseCommandService.baseCommands.subscribe((commandList: BaseCommand[]) => {
-                this.baseCommandFormList = this.baseCommandService.baseCommandsToFormList(commandList);
+            this.baseCommandService.baseCommands.subscribe((commandList: ExpressionModel[]) => {
+                this.baseCommandFormList = commandList;
                 this.createExpressionInputControls(this.baseCommandFormList);
 
                 //Format the base commands from the inputs, and set the tool baseCommand
@@ -99,20 +101,13 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
         return index;
     }
 
-    private createExpressionInputControls(commandList: BaseCommand[]) {
+    private createExpressionInputControls(commandList: ExpressionModel[]) {
         commandList.forEach((command, index) => {
-            let formValue: string = "";
-
             if (this.baseCommandForm.contains('baseCommand' + index)) {
                 this.baseCommandForm.removeControl('baseCommand' + index);
             }
 
-            if ((<ExpressionModel>command).expressionValue) {
-                formValue = (<ExpressionModel>command).expressionValue;
-            } else if (typeof command === "string") {
-                formValue = command;
-            }
-
+            const formValue: string = command.getEvaluatedValue();
             const expressionInputForm: FormGroup = this.formBuilder.group({
                 ['baseCommand' + index]: [formValue, Validators.compose([Validators.required, Validators.minLength(1)])]
             });
@@ -120,7 +115,10 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
             this.baseCommandForm.addControl('baseCommand' + index, expressionInputForm.controls['baseCommand' + index]);
 
             this.baseCommandForm.controls['baseCommand' + index].valueChanges.subscribe(value => {
-                this.baseCommandService.updateCommand(index, value);
+                this.baseCommandService.updateCommand(index, new ExpressionModel({
+                    value: value,
+                    evaluatedValue: value
+                }));
             });
         });
     }
@@ -141,9 +139,8 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
     }
 
     private editBaseCommand(index: number): void {
-        const newExpression: BehaviorSubject<BaseCommand> = new BehaviorSubject<BaseCommand>(undefined);
-        const selectedExpression = this.baseCommandFormList[index];
-        let expression: string = "";
+        const newExpression: BehaviorSubject<ExpressionModel> = new BehaviorSubject<ExpressionModel>(undefined);
+        const selectedBaseCommand = this.baseCommandFormList[index];
 
         this.selectedIndex = index;
         this.removeExpressionInputSub();
@@ -154,21 +151,17 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
                 this.baseCommandService.updateCommand(index, expression);
             });
 
-        if ((<ExpressionModel>selectedExpression).script) {
-            expression = (<ExpressionModel>selectedExpression).script;
-
-        } else if (typeof selectedExpression === "string") {
-            expression = selectedExpression;
-        }
-
         this.expressionSidebarService.openExpressionEditor({
-            expression: expression,
+            expression: selectedBaseCommand.getExpressionScript(),
             newExpressionChange: newExpression
         });
     }
 
     private addBaseCommand(): void {
-        this.baseCommandService.addCommand("");
+        this.baseCommandService.addCommand(new ExpressionModel({
+            value: "",
+            evaluatedValue: ""
+        }));
     }
 
     private removeExpressionInputSub(): void {

@@ -1,6 +1,7 @@
 import {Component, Input, Output, EventEmitter} from "@angular/core";
 import {REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES, AbstractControl} from "@angular/forms";
 import {ExpressionModel} from "cwlts/models/d2sb";
+import {Expression} from "cwlts/mappings/d2sb/Expression";
 
 require("./expression-input.component.scss");
 
@@ -15,7 +16,7 @@ require("./expression-input.component.scss");
                 <input class="form-control"
                         (keyup)="modelChange($event)"
                         [formControl]="control"
-                        [readonly]="expression.script ? 'true' : null"/>
+                        [readonly]="expression.serialize().script ? 'true' : null"/>
                     
                 <span class="input-group-addon add-expression" (click)="openExpressionSidebar()">
                     <i class="fa fa-2x fa-code expression-form-btn"></i>
@@ -29,7 +30,7 @@ export class ExpressionInputComponent {
     public control: AbstractControl;
 
     @Input()
-    public expression: string | ExpressionModel;
+    public expression: ExpressionModel;
 
     @Output()
     public expressionChange: EventEmitter<string | ExpressionModel> = new EventEmitter<string | ExpressionModel>();
@@ -41,10 +42,10 @@ export class ExpressionInputComponent {
         this.onSelect.emit();
     }
 
-    private modelChange(event: any) {
+    private modelChange() {
         //Only emit if the value was not set to an expression
-        if (!(<ExpressionModel>this.expression).expressionValue) {
-            this.expressionChange.emit(event.target.value);
+        if (!(<Expression>this.expression.serialize()).script) {
+            this.expressionChange.emit(this.expression);
         }
     }
 }
