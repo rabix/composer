@@ -18,6 +18,7 @@ import {TreeViewService} from "./tree-view.service";
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <div class="deep-unselectable clickable node-base"
+             [style.paddingLeft.em]="level * 2"
              [attr.data-index]="nodeIndex"
              [tabindex]="nodeIndex"
              (click)="onClick($event)"
@@ -31,13 +32,11 @@ import {TreeViewService} from "./tree-view.service";
             <span *ngIf="node" class="name-container">
                 <span class="name" *ngFor="let namePart of nameParts">{{ namePart }}</span>
             </span>
-            
-            
         </div>
         
-        <div *ngIf="isExpanded" class="children">
-            <ct-tree-node *ngFor="let node of (nodeChildren | async)" [node]="node"></ct-tree-node>
-            <div *ngIf="(nodeChildren | async)?.length === 0">
+        <div *ngIf="isExpanded && nodeChildren" class="children">
+            <ct-tree-node [level]="level + 1" *ngFor="let node of nodeChildren" [node]="node"></ct-tree-node>
+            <div *ngIf="nodeChildren.length === 0">
                 <span class="icon-space"></span>
                 <i class="text-muted">empty </i>    
             </div>
@@ -52,6 +51,9 @@ export class TreeNodeComponent implements OnInit {
     @Input()
     public node: TreeNode;
 
+    @Input()
+    public level = 0;
+
     public isExpandable = false;
 
     public highlightedCharacterCount = new BehaviorSubject(0);
@@ -64,7 +66,7 @@ export class TreeNodeComponent implements OnInit {
 
     private isHighlighted = new BehaviorSubject(false);
 
-    private nodeChildren: Observable<TreeNode[]>;
+    private nodeChildren;
 
     private nameParts: String[] = [];
 
@@ -76,7 +78,7 @@ export class TreeNodeComponent implements OnInit {
     public constructor(private tree: TreeViewService, private detector: ChangeDetectorRef, el: ElementRef) {
 
         this.nodeIndex = TreeNodeComponent.NODE_COUNT++;
-        this.el = el.nativeElement;
+        this.el        = el.nativeElement;
     }
 
     ngOnInit() {
@@ -99,17 +101,21 @@ export class TreeNodeComponent implements OnInit {
 
     public toggleExpansion() {
         this.isExpanded = !this.isExpanded;
-        this.detector.markForCheck();
 
         if (this.isExpanded && !this.nodeChildren) {
-            this.nodeChildren = this.node.childrenProvider(this.node);
+            setTimeout(() => this.isLoading = true, 20);
+
+            this.node.childrenProvider(this.node).subscribe(children => {
+                setTimeout(() => this.isLoading = false, 20);
+                this.nodeChildren = children;
+
+                this.detector.markForCheck();
+                this.detector.detectChanges();
+            })
         }
 
-        this.isLoading = true;
-        this.nodeChildren.first().subscribe(_ => {
-            this.isLoading = false;
-            this.detector.markForCheck();
-        });
+
+        this.detector.markForCheck();
     }
 
     public selectNode(event: MouseEvent) {
@@ -155,7 +161,7 @@ export class TreeNodeComponent implements OnInit {
         };
     }
 
-    private onClick(event: MouseEvent){
+    private onClick(event: MouseEvent) {
         this.selectNode(event);
         this.tree.searchTerm.next("");
     }

@@ -54,14 +54,16 @@
         "@angular/http": "2.0.0-rc.5",
         "@angular/platform-browser": "2.0.0-rc.5",
         "@angular/platform-browser-dynamic": "2.0.0-rc.5",
+        "ajv": "^4.7.3",
         "brace": "^0.8.0",
         "core-js": "^2.4.0",
+        "cwlts": "^1.4.0",
         "font-awesome": "^4.6.1",
         "jailed": "^0.3.1",
+        "js-yaml": "^3.6.1",
         "reflect-metadata": "^0.1.8",
         "rxjs": "5.0.0-beta.6",
-        "zone.js": "^0.6.17",
-        "cwlts": "^1.4.0"
+        "zone.js": "^0.6.17"
     },
     "devDependencies": {
         "@types/ace": "0.0.31",
@@ -69,7 +71,6 @@
         "@types/electron": "^1.4.24",
         "@types/jasmine": "^2.2.30",
         "@types/node": "^6.0.38",
-        "ajv": "^4.7.3",
         "awesome-typescript-loader": "^1.1.1",
         "bootstrap": "^4.0.0-alpha.3",
         "codelyzer": "0.0.15",

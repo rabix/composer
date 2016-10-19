@@ -45,7 +45,7 @@ require("./tool-editor.component.scss");
             <div class="scroll-content">
                 <ct-code-editor [hidden]="viewMode !== 'code'"
                                 (contentChanges)="onEditorContentChange($event)"
-                                [content]="data.content"
+                                [content]="rawEditorContent"
                                 [readOnly]="!data.isWritable"
                                 [language]="data.language">
                 </ct-code-editor>
@@ -107,7 +107,7 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
 
         this.rawEditorContent.subscribe(raw => {
             try {
-                this.toolModel = new CommandLineToolModel(JSON.parse(raw));
+                this.toolModel        = new CommandLineToolModel(JSON.parse(raw));
                 this.commandLineParts = this.toolModel.getCommandLineParts();
             } catch (ex) {
                 // if the file isn't valid JSON, do nothing
@@ -119,17 +119,20 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
         });
     }
 
-    private onEditorContentChange(content: string){
+    private onEditorContentChange(content: string) {
         this.webWorkerService.validateJsonSchema(content);
         this.rawEditorContent.next(content);
-
     }
 
-    private save(revisionNote){
+    private save(revisionNote) {
 
-        this.data.save(JSON.parse(this.rawEditorContent.getValue()), revisionNote).subscribe(data => {
+        if (this.data.data.sourceId === "local") {
+            this.data.data.save(this.rawEditorContent.getValue());
+        } else {
+            this.data.save(JSON.parse(this.rawEditorContent.getValue()), revisionNote).subscribe(data => {
 
-        });
+            });
+        }
     }
 
     ngOnDestroy(): void {
