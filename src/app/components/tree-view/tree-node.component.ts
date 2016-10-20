@@ -103,10 +103,11 @@ export class TreeNodeComponent implements OnInit {
         this.isExpanded = !this.isExpanded;
 
         if (this.isExpanded && !this.nodeChildren) {
-            setTimeout(() => this.isLoading = true, 20);
+
+            this.isLoading = true;
 
             this.node.childrenProvider(this.node).subscribe(children => {
-                setTimeout(() => this.isLoading = false, 20);
+                this.isLoading = false;
                 this.nodeChildren = children;
 
                 this.detector.markForCheck();

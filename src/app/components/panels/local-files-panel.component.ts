@@ -15,7 +15,7 @@ import {IpcService} from "../../services/ipc.service";
     host: {class: "block"},
     template: `
         <ct-panel-toolbar>
-            <template class="tc-name">Local Files</template>
+            <span class="tc-name">Local Files</span>
         </ct-panel-toolbar>
         <div *ngIf="isLoading">
              <div class="text-xs-center"><small>Listing Local Files…</small></div>
