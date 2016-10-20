@@ -4,10 +4,10 @@ import {ReplaySubject, Observable, Subscription} from "rxjs";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {PanelToolbarComponent} from "./panel-toolbar.component";
-import {SBPlatformDataSource} from "../../sources/sbg";
 import {OpenTabAction} from "../../action-events";
 import {DataEntrySource} from "../../sources/common/interfaces";
 import {SettingsService} from "../../services/settings/settings.service";
+import {SBPlatformDataSourceService} from "../../sources/sbg/sb-platform.source.service";
 
 @Component({
     selector: "ct-sb-user-projects-panel",
@@ -34,7 +34,7 @@ export class SBUserProjectsPanelComponent {
 
     private subs: Subscription[] = [];
 
-    constructor(private dataSource: SBPlatformDataSource,
+    constructor(private dataSource: SBPlatformDataSourceService,
                 private eventHub: EventHubService,
                 private settings: SettingsService) {
 

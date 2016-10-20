@@ -6,12 +6,12 @@ import {InputPortService} from "../../services/input-port/input-port.service";
 import {LayoutComponent} from "../layout/layout.component";
 import {Observable} from "rxjs/Rx";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
-import {SBPlatformDataSource} from "../../sources/sbg";
 import {SettingsService} from "../../services/settings/settings.service";
 import {UrlValidator} from "../../validators/url.validator";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {WebWorkerService} from "../../services/web-worker/web-worker.service";
 import {GuidService} from "../../services/guid.service";
+import {SBPlatformDataSourceService} from "../../sources/sbg/sb-platform.source.service";
 
 require("./../../../assets/sass/main.scss");
 
@@ -34,7 +34,7 @@ require("./main.component.scss");
         WebWorkerService,
         InputPortService,
         PlatformAPI,
-        SBPlatformDataSource,
+        SBPlatformDataSourceService,
         SettingsService,
         UserPreferencesService,
         GuidService
