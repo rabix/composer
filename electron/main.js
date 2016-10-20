@@ -1,4 +1,4 @@
-const main = require("./main.common");
+const main = require("./src/main.common");
 
 main.start({
     url: "http://localhost:9000",
