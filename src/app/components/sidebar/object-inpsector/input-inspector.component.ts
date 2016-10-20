@@ -108,17 +108,19 @@ export class InputInspectorComponent implements OnInit, OnDestroy {
                     this.expressionInputForm = this.formBuilder.group({
                         ['expressionInput']: [formValue, Validators.compose([Validators.required, Validators.minLength(1)])]
                     });
+
+                    const inputValueChange = this.expressionInputForm.controls['expressionInput'].valueChanges.subscribe((value) => {
+                        if (typeof this.expressionInput.serialize() === "string") {
+                            this.expressionInput.setValueToString(value);
+                            this.expressionInput.setEvaluatedValue(value);
+
+                            this.selectedProperty.value = value;
+                            this.selectedProperty.inputProperty.setValueFrom(value);
+                        }
+                    });
+
+                    this.subs.push(inputValueChange);
                 }
-
-                this.expressionInputForm.controls['expressionInput'].valueChanges.subscribe((value) => {
-                    if (typeof this.expressionInput.serialize() === "string") {
-                        this.expressionInput.setValueToString(value);
-                        this.expressionInput.setEvaluatedValue(value);
-
-                        this.selectedProperty.value = value;
-                        this.selectedProperty.inputProperty.setValueFrom(value);
-                    }
-                });
 
             })
         );
