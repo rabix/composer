@@ -1,12 +1,11 @@
 import {Component, Input, OnInit, OnDestroy} from "@angular/core";
-import {FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES, Validators, FormBuilder} from "@angular/forms";
+import {FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES, Validators, FormControl} from "@angular/forms";
 import {Subscription} from "rxjs/Subscription";
 import {FormSectionComponent} from "../../../form-section/form-section.component";
 import {BaseCommandService, BaseCommand} from "../../../../services/base-command/base-command.service";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ExpressionInputComponent} from "../types/expression-input.component";
-import {ExpressionModel} from "cwlts/models/d2sb";
 import {ExpressionSidebarService} from "../../../../services/sidebars/expression-sidebar.service";
 
 require("./base-command-form.components.scss");
@@ -80,7 +79,6 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
     private selectedIndex: number;
 
     constructor(private baseCommandService: BaseCommandService,
-                private formBuilder: FormBuilder,
                 private expressionSidebarService: ExpressionSidebarService) {
 
         this.subs = [];
@@ -112,12 +110,13 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
                 this.baseCommandForm.removeControl('baseCommand' + index);
             }
 
-            const formValue: string = command.getEvaluatedValue();
-            const expressionInputForm: FormGroup = this.formBuilder.group({
-                ['baseCommand' + index]: [formValue, Validators.compose([Validators.required, Validators.minLength(1)])]
-            });
-
-            this.baseCommandForm.addControl('baseCommand' + index, expressionInputForm.controls['baseCommand' + index]);
+            this.baseCommandForm.addControl(
+                'baseCommand' + index,
+                new FormControl(
+                    command.getEvaluatedValue(),
+                    Validators.compose([Validators.required, Validators.minLength(1)])
+                )
+            );
 
             this.baseCommandForm.controls['baseCommand' + index].valueChanges.subscribe(value => {
                 this.baseCommandService.updateCommand(index, new ExpressionModel({
