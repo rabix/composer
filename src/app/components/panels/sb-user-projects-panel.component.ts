@@ -15,7 +15,7 @@ import {SettingsService} from "../../services/settings/settings.service";
     host: {class: "block"},
     template: `
         <ct-panel-toolbar>
-            <name>Projects</name>
+            <span class="tc-name">Projects</span>
         </ct-panel-toolbar>
         
         <div *ngIf="isLoading">

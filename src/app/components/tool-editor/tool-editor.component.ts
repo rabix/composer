@@ -52,8 +52,7 @@ require("./tool-editor.component.scss");
         
                 <ct-clt-editor *ngIf="viewMode === 'gui'"
                                class="gui-editor-component"
-                               [model]="toolModel"
-                               [fileStream]="tabData">
+                               [model]="toolModel">
                 </ct-clt-editor>
         
                 <sidebar-component></sidebar-component>
@@ -127,11 +126,14 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
     private save(revisionNote) {
 
         if (this.data.data.sourceId === "local") {
-            this.data.data.save(this.rawEditorContent.getValue());
-        } else {
-            this.data.save(JSON.parse(this.rawEditorContent.getValue()), revisionNote).subscribe(data => {
-
+            this.data.data.save(this.rawEditorContent.getValue())
+                .subscribe(_ => {
             });
+        } else {
+            this.data.save(JSON.parse(this.rawEditorContent.getValue()), revisionNote)
+                .subscribe(data => {
+
+                });
         }
     }
 

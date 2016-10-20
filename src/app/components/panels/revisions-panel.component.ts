@@ -5,7 +5,7 @@ import {Component, ChangeDetectionStrategy} from "@angular/core";
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <ct-panel-toolbar>
-            <name>App Revisions</name>
+            <span class="tc-name">App Revisions</span>
         </ct-panel-toolbar>
     `
 })

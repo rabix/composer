@@ -16,8 +16,8 @@ require("./input-ports-form.component.scss");
     directives: [InputPortListComponent, FormSectionComponent],
     template: `
 <ct-form-section>
-    <fs-header>Input Ports</fs-header>
-    <fs-body>
+    <div class="fs-header">Input Ports</div>
+    <div class="fs-body">
         <form>
             <input-port-list></input-port-list>
 
@@ -27,7 +27,7 @@ require("./input-ports-form.component.scss");
                     <i class="fa fa-plus"></i> Add Input
             </button>
         </form>
-    </fs-body>
+    </div>
 </ct-form-section>
         
     `

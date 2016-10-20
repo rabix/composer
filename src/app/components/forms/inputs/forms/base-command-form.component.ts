@@ -23,10 +23,10 @@ require("./base-command-form.components.scss");
         FormSectionComponent
     ],
     template: `<ct-form-section>
-    <fs-header>
+    <div class="fs-header">
         Base Command
-    </fs-header>
-    <fs-body>
+    </div>
+    <div class="fs-body">
         <form *ngIf="baseCommandForm" [formGroup]="baseCommandForm">
             <div *ngIf="baseCommandFormList.length > 0">
 
@@ -55,7 +55,7 @@ require("./base-command-form.components.scss");
             </button>
 
         </form>
-    </fs-body>
+    </div>
 </ct-form-section>
 
     `
