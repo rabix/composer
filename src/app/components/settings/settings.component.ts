@@ -8,7 +8,7 @@ import {SystemService} from "../../platform-providers/system.service";
 @Component({
     selector: "ct-settings",
     template: `
-    <div class="m-a-1">
+    <div class="m-1">
         <form class="m-t-1" 
               (ngSubmit)="onSubmit()" 
               [formGroup]="form" 
