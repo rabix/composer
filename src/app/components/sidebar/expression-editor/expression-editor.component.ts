@@ -153,18 +153,17 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
             .subscribe((result: SandboxResponse) => {
 
                 if (result.error === undefined) {
-                    if (result.output === "undefined" || result.output === "null") {
-                        this.newValueStream.next(new ExpressionModel({
-                            value: "",
-                            evaluatedValue: "",
-                        }));
-                    } else {
-                        const newExpression = new ExpressionModel({});
-                        newExpression.setValueToExpression(this.codeToEvaluate);
-                        newExpression.setEvaluatedValue(result.output);
+                    const newExpression: ExpressionModel = new ExpressionModel({});
+                    const responseValue = this.sandboxService.getValueFromSandBoxResponse(result);
+                    newExpression.setEvaluatedValue(responseValue);
 
-                        this.newValueStream.next(newExpression)
+                    if (responseValue === "") {
+                        newExpression.setValueToString("");
+                    } else {
+                        newExpression.setValueToExpression(this.codeToEvaluate);
                     }
+
+                    this.newValueStream.next(newExpression);
                 }
             });
     }

@@ -150,4 +150,12 @@ export class SandboxService {
 
         return result;
     }
+
+    public getValueFromSandBoxResponse(sandboxResponse: SandboxResponse): string {
+        if (sandboxResponse.output === "undefined" || sandboxResponse.output === "null") {
+            return "";
+        } else {
+            return sandboxResponse.output;
+        }
+    }
 }

@@ -1,13 +1,14 @@
 import {Component, OnDestroy, Input} from "@angular/core";
-import {InputPortService, InputPropertyViewModel} from "../../../../services/input-port/input-port.service";
+import {InputPortService} from "../../../../services/input-port/input-port.service";
 import {Subscription} from "rxjs/Subscription";
 import {InputSidebarService} from "../../../../services/sidebars/input-sidebar.service";
+import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 
 @Component({
     selector: "input-port-list",
     template: `
 
-    <div *ngIf="viewModelPortList.length > 0">
+    <div *ngIf="portList.length > 0">
 
             <div class="gui-section-list-title">
                 <div class="col-sm-7">
@@ -17,28 +18,28 @@ import {InputSidebarService} from "../../../../services/sidebars/input-sidebar.s
                     Type
                 </div>
                 <div class="col-sm-3">
-                    Value
+                    Required
                 </div>
             </div>
         
             <ul class="gui-section-list">
         
                 <li class="gui-section-list-item clickable"
-                    *ngFor="let inputPortVm of viewModelPortList; let i = index; trackBy:trackByIndex"
+                    *ngFor="let inputProp of portList; let i = index; trackBy:trackByIndex"
                     (click)="editProperty(i)">
         
-                    <div class="col-sm-7" title="{{inputPortVm.inputProperty.id}}">
+                    <div class="col-sm-7" title="{{inputProp.id}}">
                         <div class="ellipsis">
-                            {{inputPortVm.inputProperty.id}}
+                            {{inputProp.id}}
                         </div>
                     </div>
         
-                    <div class="col-sm-2" title="{{inputPortVm.inputProperty.type}}">
-                        {{inputPortVm.inputProperty.type}}
+                    <div class="col-sm-2" title="{{inputProp.type}}">
+                        {{inputProp.type}}
                     </div>
                     
-                    <div class="col-sm-2" title="{{inputPortVm.value}}">
-                       {{inputPortVm.value}}
+                    <div class="col-sm-2" title="{{inputProp.isRequired}}">
+                       {{inputProp.isRequired}}
                     </div>
         
                     <div class="col-sm-1 pull-right tool-input-icon">
@@ -50,7 +51,7 @@ import {InputSidebarService} from "../../../../services/sidebars/input-sidebar.s
             </ul>
         </div> <!-- List end -->
         
-        <div *ngIf="viewModelPortList.length === 0" class="col-sm-12">
+        <div *ngIf="portList.length === 0" class="col-sm-12">
             No input ports defined.
         </div>
     `
@@ -60,10 +61,7 @@ export class InputPortListComponent implements OnDestroy {
     @Input()
     private selectedIndex: number;
 
-    //TODO
-    //private portList: Array<InputProperty> = [];
-
-    private viewModelPortList: Array<InputPropertyViewModel> = [];
+    private portList: Array<InputProperty> = [];
 
     private subs: Subscription[];
 
@@ -71,8 +69,8 @@ export class InputPortListComponent implements OnDestroy {
                 private inputSidebarService: InputSidebarService) {
         this.subs = [];
 
-        this.inputPortService.inputPorts.subscribe((viewModelPortList: InputPropertyViewModel[]) => {
-            this.viewModelPortList = viewModelPortList;
+        this.inputPortService.inputPorts.subscribe((viewModelPortList: InputProperty[]) => {
+            this.portList = viewModelPortList;
         });
     }
 
@@ -82,7 +80,7 @@ export class InputPortListComponent implements OnDestroy {
 
     private editProperty(index: number): void {
         this.selectedIndex = index;
-        const selectedInputPort = this.viewModelPortList[index];
+        const selectedInputPort = this.portList[index];
         this.inputSidebarService.openInputInspector(selectedInputPort);
     }
 

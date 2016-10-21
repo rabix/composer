@@ -1,32 +1,24 @@
-import {Injectable, Inject} from "@angular/core";
+import {Injectable} from "@angular/core";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {Subject} from "rxjs/Subject";
 import {Observable} from "rxjs/Observable";
 import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
-import {Expression} from "cwlts/mappings/d2sb/Expression";
-import {SandboxService, SandboxResponse} from "../sandbox/sandbox.service";
-import {Subscription} from "rxjs";
-
-export type InputPropertyViewModel = {
-    value: string,
-    inputProperty: InputProperty
-}
 
 interface PropertyOperation {
-    (inputProperty: InputPropertyViewModel[]): InputPropertyViewModel[];
+    (inputProperty: InputProperty[]): InputProperty[];
 }
 
 @Injectable()
 export class InputPortService {
 
     /** The input ports stream we expose */
-    public inputPorts: Observable<InputPropertyViewModel[]>;
+    public inputPorts: Observable<InputProperty[]>;
 
     /** Initial content of the input port list */
-    private initialInputPorts: InputPropertyViewModel[] = [];
+    private initialInputPorts: InputProperty[] = [];
 
     /** Stream for adding new input ports */
-    private newInputPorts: Subject<InputPropertyViewModel> = new Subject<InputPropertyViewModel>();
+    private newInputPorts: Subject<InputProperty> = new Subject<InputProperty>();
 
     /** Stream for adding new input port */
     private deletedInputPort: Subject<number> = new Subject<number>();
@@ -34,32 +26,26 @@ export class InputPortService {
     /** Stream that aggregates all changes on the exposedList list */
     private inputPortsUpdate: BehaviorSubject<PropertyOperation> = new BehaviorSubject<PropertyOperation>(undefined);
 
-    private sandboxService: SandboxService;
-
-    private subs: Subscription[] = [];
-
-    constructor(@Inject(SandboxService) sandboxService) {
-
-        this.sandboxService = sandboxService;
+    constructor() {
 
         /* Subscribe the exposedList to inputPortsUpdate */
         this.inputPorts = this.inputPortsUpdate
             .filter(update => update !== undefined)
-            .scan((inputPorts: InputPropertyViewModel[], operation: PropertyOperation) => {
+            .scan((inputPorts: InputProperty[], operation: PropertyOperation) => {
                 return operation(inputPorts);
             }, this.initialInputPorts)
             .publishReplay(1)
             .refCount();
 
         /* Update the initialInputPorts when the inputPorts stream changes */
-        this.inputPorts.subscribe((portList: InputPropertyViewModel[]) => {
+        this.inputPorts.subscribe((portList: InputProperty[]) => {
             this.initialInputPorts = portList;
         });
 
         /* Add new input ports */
         this.newInputPorts
-            .map((inputPort: InputPropertyViewModel): PropertyOperation => {
-                return (inputPorts: InputPropertyViewModel[]) => {
+            .map((inputPort: InputProperty): PropertyOperation => {
+                return (inputPorts: InputProperty[]) => {
                     return inputPorts.concat(inputPort);
                 };
             })
@@ -68,7 +54,7 @@ export class InputPortService {
         /* Delete input ports */
         this.deletedInputPort
             .map((index: number): PropertyOperation => {
-                return (inputPorts: InputPropertyViewModel[]) => {
+                return (inputPorts: InputProperty[]) => {
                     if (typeof inputPorts[index] !== 'undefined' && inputPorts[index] !== null) {
                         inputPorts.splice(index, 1);
                     }
@@ -78,7 +64,7 @@ export class InputPortService {
             .subscribe(this.inputPortsUpdate);
     }
 
-    public addInput(inputPort: InputPropertyViewModel): void {
+    public addInput(inputPort: InputProperty): void {
         this.newInputPorts.next(inputPort);
     }
 
@@ -86,56 +72,9 @@ export class InputPortService {
         this.deletedInputPort.next(index);
     }
 
-    public setInputs(inputs: InputPropertyViewModel[]): void {
+    public setInputs(inputs: InputProperty[]): void {
         inputs.forEach(input => {
             this.newInputPorts.next(input);
         });
-    }
-
-    public inputPortListToViewModelList(inputProperties: InputProperty[]): Observable<InputPropertyViewModel[]> {
-        this.disposeSubs();
-
-        const result: BehaviorSubject<InputPropertyViewModel[]> = new BehaviorSubject<InputPropertyViewModel[]>(undefined);
-        const inputPropertiesStream: Observable<InputProperty> = Observable.from(inputProperties);
-        const viewModelList: InputPropertyViewModel[] = [];
-
-        inputPropertiesStream.subscribe((property: InputProperty) => {
-            const propInputBinding = property.getValueFrom();
-
-            if ((<Expression>propInputBinding).script) {
-
-                this.subs.push(
-                    this.sandboxService.submit((<Expression>propInputBinding).script)
-                        .subscribe((response: SandboxResponse) => {
-                            viewModelList.push({
-                                value: response.output,
-                                inputProperty: property
-                            });
-                        })
-                );
-
-            } else if (typeof propInputBinding === "string") {
-                viewModelList.push({
-                    value: propInputBinding,
-                    inputProperty: property
-                });
-            }
-        }, (err) => {
-            console.log('Error: %s', err);
-        }, () => {
-            result.next(viewModelList);
-        });
-
-        return result.filter(res => res !== undefined);
-    }
-
-    public viewModelListToInputPortList(viewModelList: InputPropertyViewModel[]) {
-        return viewModelList.map((inputPropVm: InputPropertyViewModel) => {
-            return inputPropVm.inputProperty;
-        });
-    }
-
-    disposeSubs(): void {
-        this.subs.forEach(sub => sub.unsubscribe());
     }
 }
