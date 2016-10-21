@@ -39,7 +39,7 @@ require("./tool-editor.component.scss");
         <div class="editor-container">
             <tool-header class="editor-header"
                          (save)="save($event)"
-                         [fileIsValid]="isValidCwl"
+                         [fileIsValid]="isValidCWL"
                          [data]="data"></tool-header>
         
             <div class="scroll-content">
@@ -64,7 +64,7 @@ require("./tool-editor.component.scss");
                 </div>
                 <div class="right-side">
                     <ct-view-mode-switch [viewMode]="viewMode"
-                                         [disabled]="!guiAvailable"
+                                         [disabled]="!isValidCWL"
                                          (onSwitch)="viewMode = $event">
                     </ct-view-mode-switch>
                 </div>
@@ -86,7 +86,7 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
     private commandLineParts: CommandLinePart[];
 
     /** Flag for validity of CWL document */
-    private guiAvailable = true;
+    private isValidCWL = true;
 
     /** List of subscriptions that should be disposed when destroying this component */
     private subs: Subscription[] = [];
@@ -114,7 +114,7 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
         });
 
         this.webWorkerService.validationResultStream.subscribe(err => {
-            this.guiAvailable = err.isValidCwl;
+            this.isValidCWL = err.isValidCwl;
         });
     }
 
