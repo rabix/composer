@@ -21,6 +21,11 @@ export class UserPreferencesService {
             return fallback;
         }
 
+        if(val === "undefined"){
+            this.storage.removeItem(key);
+            return fallback;
+        }
+
         return JSON.parse(val);
     }
 }

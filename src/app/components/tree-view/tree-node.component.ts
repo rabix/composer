@@ -32,6 +32,10 @@ import {TreeViewService} from "./tree-view.service";
             <span *ngIf="node" class="name-container">
                 <span class="name" *ngFor="let namePart of nameParts">{{ namePart }}</span>
             </span>
+            
+            <span *ngIf="node.onClose" class="pull-right">
+                <button type="button" class="text-primary btn-link clickable" (click)="node.onClose()">&times;</button>
+            </span>
         </div>
         
         <div *ngIf="isExpanded && nodeChildren" class="children">

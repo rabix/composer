@@ -11,9 +11,9 @@ export class SBPlatformDataSourceService {
 
     }
 
-    public load(): Observable<DataEntrySource[]> {
+    public getProjects(): Observable<DataEntrySource[]> {
 
-        const projects = this.platform.getOwnProjects()
+        return this.platform.getOwnProjects()
             .flatMap(Observable.from as any)
             .map(project => {
                 return {
@@ -23,12 +23,6 @@ export class SBPlatformDataSourceService {
                 }
             })
             .reduce((acc, p) => acc.concat(p), []);
-
-        return projects;
-    }
-
-    public getSourceID() {
-        return SB_PLATFORM_SOURCE_ID;
     }
 
     private makeChildrenProvider(project: PlatformProjectEntry) {
