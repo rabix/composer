@@ -12,7 +12,7 @@ import {WebWorkerService} from "../../services/web-worker/web-worker.service";
         <div class="editor-container">
             <tool-header class="editor-header"
                          (save)="save($event)"
-                         [fileIsValid]="isValidCwl"
+                         [fileIsValid]="isValidCWL"
                          [data]="data"></tool-header>
         
             <div class="scroll-content">
@@ -31,7 +31,7 @@ import {WebWorkerService} from "../../services/web-worker/web-worker.service";
                 </div>
                 <div class="right-side">
                     <ct-view-mode-switch [viewMode]="viewMode"
-                                         [disabled]="!guiAvailable"
+                                         [disabled]="!isValidCWL"
                                          (onSwitch)="viewMode = $event"></ct-view-mode-switch>
                 </div>
             </div>
@@ -48,7 +48,7 @@ export class WorkflowEditorComponent implements OnInit, OnDestroy {
     private viewMode: "code"|"gui" = "code";
 
     /** Flag for validity of CWL document */
-    private guiAvailable = true;
+    private isValidCWL = true;
 
     /** List of subscriptions that should be disposed when destroying this component */
     private subs: Subscription[] = [];
@@ -67,7 +67,7 @@ export class WorkflowEditorComponent implements OnInit, OnDestroy {
             .subscribe(this.schemaValidation);
 
         this.webWorkerService.validationResultStream.subscribe(err => {
-            this.guiAvailable = err.isValidCwl;
+            this.isValidCWL = err.isValidCwl;
         });
     }
 
@@ -83,8 +83,13 @@ export class WorkflowEditorComponent implements OnInit, OnDestroy {
 
     private save(revisionNote){
 
-        this.data.save(JSON.parse(this.rawEditorContent.getValue()), revisionNote).subscribe(data => {
+        if (this.data.data.source === "local") {
+            this.data.data.save(this.rawEditorContent.getValue()).subscribe(_ => {
+            });
+        } else {
+            this.data.save(JSON.parse(this.rawEditorContent.getValue()), revisionNote).subscribe(data => {
+            });
+        }
 
-        });
     }
 }

@@ -9,7 +9,7 @@ const handlers = {
     saveFileContent: (reply, options) => {
         const {path, content} = options;
         fs.writeFile(path, content, {encoding: "utf8"}, (error, success) => {
-            if (err) reply({error});
+            if (error) reply({error});
 
             reply({success});
         });

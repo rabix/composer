@@ -125,15 +125,12 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
 
     private save(revisionNote) {
 
-        if (this.data.data.sourceId === "local") {
-            this.data.data.save(this.rawEditorContent.getValue())
-                .subscribe(_ => {
+        if (this.data.data.source === "local") {
+            this.data.data.save(this.rawEditorContent.getValue()).subscribe(_ => {
             });
         } else {
-            this.data.save(JSON.parse(this.rawEditorContent.getValue()), revisionNote)
-                .subscribe(data => {
-
-                });
+            this.data.save(JSON.parse(this.rawEditorContent.getValue()), revisionNote).subscribe(data => {
+            });
         }
     }
 

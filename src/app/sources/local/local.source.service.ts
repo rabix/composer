@@ -28,6 +28,7 @@ export class LocalDataSourceService {
 
         return this.ipc.request("readDirectory", dir).flatMap(Observable.from)
             .map(entry => Object.assign(entry,{
+                source: "local",
                 childrenProvider: entry.isDir ? this.getChildrenProviderFunction(entry.path) : undefined,
                 content: !entry.isFile ? undefined : new Observable(sub => {
                     this.readFileContent(entry.path).take(1).subscribe(content => {
