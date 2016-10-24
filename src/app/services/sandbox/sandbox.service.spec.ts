@@ -53,11 +53,7 @@ describe("SandboxService", () => {
 
             let updateExpressionResult: BehaviorSubject<SandboxResponse> = new BehaviorSubject<SandboxResponse>(undefined);
 
-            sandboxService.expressionResult = updateExpressionResult
-                .publishReplay(1)
-                .refCount();
-
-            spyOn(sandboxService, "createExpressionCode").and.callFake(code => code);
+            spyOn(sandboxService, "initializeEngine").and.callFake(code => code);
             spyOn(jailed, "DynamicPlugin").and.callFake(expressionCode => {
                 const mockResult = eval(expressionCode);
 
@@ -69,14 +65,10 @@ describe("SandboxService", () => {
                 return fakePlugin;
             });
 
-            sandboxService.submit(1 + 2);
-
-            sandboxService.expressionResult
-                .filter(result => result !== undefined)
-                .subscribe((result: SandboxResponse) => {
-                    expect(result).toEqual({ output: 3, error: undefined });
-                    done();
-                });
+            sandboxService.submit(1 + 2).subscribe((result: SandboxResponse) => {
+                expect(result).toEqual({ output: 3, error: undefined });
+                done();
+            });
         });
     });
 

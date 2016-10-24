@@ -5,8 +5,6 @@ import {ExpressionModel} from "cwlts/models/d2sb";
 
 require("./expression-input.component.scss");
 
-export type ExpressionInputType = "baseCommands" | "inputPortValue";
-
 @Component({
     selector: 'expression-input',
     directives: [
@@ -34,7 +32,10 @@ export class ExpressionInputComponent {
     public control: AbstractControl;
 
     @Input()
-    public value: BaseCommand;
+    public value: ExpressionModel;
+
+    @Input()
+    public context: any;
 
     @Output()
     public valueChange: EventEmitter<string> = new EventEmitter<string>();

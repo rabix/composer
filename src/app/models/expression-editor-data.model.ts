@@ -4,12 +4,15 @@ import {ExpressionModel} from "cwlts/models/d2sb";
 export class ExpressionEditorData {
     expression: string;
     newExpressionChange: Subject<string | ExpressionModel>;
+    context: any;
 
     constructor(attrs: {
         expression: string;
         newExpressionChange: Subject<string | ExpressionModel>;
+        context?: any
     }) {
         this.expression = attrs.expression;
         this.newExpressionChange = attrs.newExpressionChange;
+        this.context = attrs.context;
     }
 }

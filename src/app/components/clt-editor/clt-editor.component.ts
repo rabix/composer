@@ -26,11 +26,15 @@ require("./clt-editor.component.scss");
                 </docker-input-form>
                                 
                 <base-command-form [toolBaseCommand]="model.baseCommand"
-                                   [baseCommandForm]="cltEditorGroup.controls.baseCommandGroup">
+                                   [context]="{$job: model.job}"
+                                   [baseCommandForm]="cltEditorGroup.controls.baseCommandGroup"
+                                   (onUpdate)="setBaseCommand($event)">
                 </base-command-form>
                 
                 <inputs-ports-form [cltModel]="model"></inputs-ports-form>
             </form>
+
+            <sidebar-component></sidebar-component>
     `
 })
 export class CltEditorComponent {
@@ -41,15 +45,17 @@ export class CltEditorComponent {
     /** ControlGroup that encapsulates the validation for all the nested forms */
     private cltEditorGroup: FormGroup;
 
-    constructor(private formBuilder: FormBuilder) {
+    constructor(private formBuilder: FormBuilder) { }
+
+    private setBaseCommand(cmd) {
+        this.model.baseCommand = cmd;
+    }
+
+    ngOnInit() {
         this.cltEditorGroup = this.formBuilder.group({
             dockerInputGroup: this.formBuilder.group({}),
             baseCommandGroup: this.formBuilder.group({}),
             inputPortsGroup: this.formBuilder.group({})
         });
     }
-
-    ngOnInit() {
-    }
-
 }

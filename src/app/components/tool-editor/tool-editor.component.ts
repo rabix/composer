@@ -54,8 +54,6 @@ require("./tool-editor.component.scss");
                                class="gui-editor-component"
                                [model]="toolModel">
                 </ct-clt-editor>
-        
-                <sidebar-component></sidebar-component>
             </div>
             <div class="status-bar-footer">
                 <div class="left-side">
@@ -65,7 +63,7 @@ require("./tool-editor.component.scss");
                 <div class="right-side">
                     <ct-view-mode-switch [viewMode]="viewMode"
                                          [disabled]="!isValidCWL"
-                                         (onSwitch)="viewMode = $event">
+                                         (onSwitch)="onSwitchView($event)">
                     </ct-view-mode-switch>
                 </div>
             </div>
@@ -86,7 +84,7 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
     private commandLineParts: CommandLinePart[];
 
     /** Flag for validity of CWL document */
-    private isValidCWL = true;
+    private isValidCWL = false;
 
     /** List of subscriptions that should be disposed when destroying this component */
     private subs: Subscription[] = [];
@@ -131,6 +129,13 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
         } else {
             this.data.save(JSON.parse(this.rawEditorContent.getValue()), revisionNote).subscribe(data => {
             });
+        }
+    }
+
+    private onSwitchView(ev) {
+        this.viewMode = ev;
+        if (ev === "code") {
+            this.rawEditorContent.next(JSON.stringify(this.toolModel.serialize(), null, 4));
         }
     }
 
