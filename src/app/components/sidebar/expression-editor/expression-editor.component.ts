@@ -151,9 +151,13 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
     private save(): void {
         this.evaluateExpression()
             .subscribe((result: SandboxResponse) => {
+                const newExpression: ExpressionModel = new ExpressionModel({});
 
-                if (result.error === undefined) {
-                    const newExpression: ExpressionModel = new ExpressionModel({});
+                if (result.error) {
+                    newExpression.setEvaluatedValue(this.codeToEvaluate);
+                    newExpression.setValueToExpression(this.codeToEvaluate);
+
+                } else {
                     const responseValue = this.sandboxService.getValueFromSandBoxResponse(result);
                     newExpression.setEvaluatedValue(responseValue);
 
@@ -162,9 +166,10 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
                     } else {
                         newExpression.setValueToExpression(this.codeToEvaluate);
                     }
-
-                    this.newValueStream.next(newExpression);
                 }
+
+                this.newValueStream.next(newExpression);
+
             });
     }
 
@@ -172,6 +177,7 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
         if (this.sandBoxSub) {
             this.sandBoxSub.unsubscribe();
             this.sandBoxSub = undefined;
+            this.sandboxService = undefined;
         }
     }
 

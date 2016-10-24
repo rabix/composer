@@ -81,13 +81,10 @@ export class InputInspectorComponent implements OnInit, OnDestroy {
 
     private sandboxService: SandboxService;
 
-    private sandBoxSub: Subscription;
-
     constructor(private formBuilder: FormBuilder,
                 private inputSidebarService: InputSidebarService,
                 private expressionSidebarService: ExpressionSidebarService) {
         this.subs = [];
-
         this.sandboxService = new SandboxService();
     }
 
@@ -100,25 +97,27 @@ export class InputInspectorComponent implements OnInit, OnDestroy {
         );
 
         this.subs.push(
-            this.inputBinding.subscribe((expression: string | Expression) => {
-                let codeToEvaluate: string = "";
+            this.inputBinding
+                .mergeMap((expression: string | Expression) => {
+                    let codeToEvaluate: string = "";
+                    if ((<Expression>expression).script) {
+                        codeToEvaluate = (<Expression>expression).script;
+                        this.expressionInput.setValueToExpression(codeToEvaluate);
+                    } else {
+                        codeToEvaluate = <string>expression;
+                        this.expressionInput.setValueToString(codeToEvaluate);
+                    }
 
-                if ((<Expression>expression).script) {
-                    codeToEvaluate = (<Expression>expression).script;
-                    this.expressionInput.setValueToExpression(codeToEvaluate);
-                } else {
-                    codeToEvaluate = <string>expression;
-                    this.expressionInput.setValueToString(codeToEvaluate);
-                }
-
-                this.sandBoxSub = this.sandboxService.submit(codeToEvaluate)
-                    .subscribe((result: SandboxResponse) => {
-                        if (result.error === undefined) {
-                            this.expressionInput.setEvaluatedValue(this.sandboxService.getValueFromSandBoxResponse(result));
-                            this.createExpressionInputForm(this.expressionInput.getEvaluatedValue());
-                        }
-                    });
-            })
+                    return this.sandboxService.submit(codeToEvaluate)
+                })
+                .subscribe((result: SandboxResponse) => {
+                    if (result.error) {
+                        this.expressionInput.setEvaluatedValue(this.expressionInput.getExpressionScript());
+                    } else {
+                        this.expressionInput.setEvaluatedValue(this.sandboxService.getValueFromSandBoxResponse(result));
+                    }
+                    this.createExpressionInputForm(this.expressionInput.getEvaluatedValue());
+                })
         );
     }
 
@@ -131,8 +130,11 @@ export class InputInspectorComponent implements OnInit, OnDestroy {
             .subscribe((newExpression: ExpressionModel) => {
                 if ((<Expression>newExpression.serialize()).script) {
                     this.selectedProperty.setValueFrom(newExpression.serialize());
+                    this.expressionInput = newExpression;
+                    this.createExpressionInputForm(this.expressionInput.getEvaluatedValue())
+                } else {
+                    this.inputBinding.next(newExpression.serialize());
                 }
-                this.inputBinding.next(newExpression.serialize());
             });
 
         this.expressionSidebarService.openExpressionEditor({
