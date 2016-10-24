@@ -10,7 +10,7 @@ npm install
 
 ## Starting the dev environment
 ```bash
-cp config/env.example.json config/env.json // Modify env.json if needed
+cp config/env.example.json config/env.json # only once, modify if needed
 npm run start:electron
 ./scripts/electron-start.sh
 ```
