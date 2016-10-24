@@ -14,6 +14,7 @@ require("./expression-input.component.scss");
     template: `
             <div class="input-group" *ngIf="control">
                 <input class="form-control"
+                        [disabled]="disabled"
                         (keyup)="modelChange($event)"
                         [formControl]="control"
                         [readonly]="expression.serialize().script ? 'true' : null"/>
@@ -27,6 +28,9 @@ require("./expression-input.component.scss");
         `
 })
 export class ExpressionInputComponent {
+
+    @Input()
+    public disabled: boolean;
 
     @Input()
     public control: AbstractControl;
