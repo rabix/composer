@@ -115,10 +115,8 @@ export class BasicInputSectionComponent implements OnInit {
 
         this.subs.push(
             this.inputBinding
-                .filter(expression => expression !== undefined)
                 .mergeMap((expression: string | Expression) => {
                     let codeToEvaluate: string = "";
-
                     if ((<Expression>expression).script) {
                         codeToEvaluate = (<Expression>expression).script;
                         this.expressionInput.setValueToExpression(codeToEvaluate);
@@ -127,13 +125,15 @@ export class BasicInputSectionComponent implements OnInit {
                         this.expressionInput.setValueToString(codeToEvaluate);
                     }
 
-                    return this.sandboxService.submit(codeToEvaluate);
+                    return this.sandboxService.submit(codeToEvaluate)
                 })
                 .subscribe((result: SandboxResponse) => {
-                    if (result.error === undefined) {
+                    if (result.error) {
+                        this.expressionInput.setEvaluatedValue(this.expressionInput.getExpressionScript());
+                    } else {
                         this.expressionInput.setEvaluatedValue(this.sandboxService.getValueFromSandBoxResponse(result));
-                        this.createExpressionInputForm(this.expressionInput.getEvaluatedValue());
                     }
+                    this.createExpressionInputForm(this.expressionInput.getEvaluatedValue());
                 })
         );
     }
@@ -147,8 +147,11 @@ export class BasicInputSectionComponent implements OnInit {
             .subscribe((newExpression: ExpressionModel) => {
                 if ((<Expression>newExpression.serialize()).script) {
                     this.selectedProperty.setValueFrom(newExpression.serialize());
+                    this.expressionInput = newExpression;
+                    this.createExpressionInputForm(this.expressionInput.getEvaluatedValue())
+                } else {
+                    this.inputBinding.next(newExpression.serialize());
                 }
-                this.inputBinding.next(newExpression.serialize());
             });
 
         this.expressionSidebarService.openExpressionEditor({
