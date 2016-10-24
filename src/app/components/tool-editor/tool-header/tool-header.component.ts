@@ -8,7 +8,7 @@ import {Subject} from "rxjs";
         <div *ngIf="!actionPending">
             <button *ngIf="data.isWritable"
                     [disabled]="!fileIsValid" 
-                    (click)="actionPending = 'revision_note'" 
+                    (click)="saveAction()" 
                     type="button" 
                     class="btn btn-secondary btn-sm save-button">
                     Save
@@ -49,8 +49,18 @@ export class ToolHeaderComponent {
     @Input()
     public fileIsValid = true;
 
+
     public onSubmit(data) {
         this.actionPending = null;
         this.save.next(data);
+    }
+
+    private saveAction() {
+        if (this.data.data.sourceId !== "local") {
+            this.actionPending = 'revision_note';
+            return;
+        }
+
+        this.save.next("");
     }
 }
