@@ -11,6 +11,7 @@ import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import TextMode = AceAjax.TextMode;
 import {Observable, Subject} from "rxjs";
+import {Expression} from "cwlts/mappings/d2sb/Expression";
 
 require("./expression-editor.component.scss");
 
@@ -101,9 +102,13 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
                 .mergeMap((data:ExpressionEditorData) => {
                     this.codeToEvaluate = "";
                     this.evaluatedExpression = "";
+                    this.initialExpressionScript = "";
 
-                    this.initialExpressionScript = data.expression;
-                    this.newValueStream          = data.newExpressionChange;
+                    if ((<Expression>data.expression.serialize()).script) {
+                        this.initialExpressionScript = data.expression.getExpressionScript();
+                    }
+
+                    this.newValueStream = data.newExpressionChange;
 
                     this.editor         = new ExpressionEditor(ace.edit(this.aceContainer.nativeElement), this.initialExpressionScript);
                     this.codeToEvaluate = this.initialExpressionScript;

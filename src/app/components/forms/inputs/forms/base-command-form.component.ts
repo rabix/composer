@@ -156,7 +156,7 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
             });
 
         this.expressionSidebarService.openExpressionEditor({
-            expression: selectedBaseCommand.getExpressionScript(),
+            expression: selectedBaseCommand,
             newExpressionChange: newExpression
         });
     }

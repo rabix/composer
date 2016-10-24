@@ -138,7 +138,7 @@ export class InputInspectorComponent implements OnInit, OnDestroy {
             });
 
         this.expressionSidebarService.openExpressionEditor({
-            expression: this.expressionInput.getExpressionScript(),
+            expression: this.expressionInput,
             newExpressionChange: newExpression
         });
     }
