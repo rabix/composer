@@ -36,7 +36,6 @@ require("./main.component.scss");
         DomEventService,
         ModalService,
         UrlValidator,
-        WebWorkerService,
         InputPortService,
         PlatformAPI,
         SBPlatformDataSource,
