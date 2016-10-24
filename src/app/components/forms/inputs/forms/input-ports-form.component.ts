@@ -4,7 +4,6 @@ import {InputPortService} from "../../../../services/input-port/input-port.servi
 import {CommandLineToolModel} from "cwlts/models/d2sb";
 import {FormSectionComponent} from "../../../form-section/form-section.component";
 import {InputSidebarService} from "../../../../services/sidebars/input-sidebar.service";
-import {SandboxService} from "../../../../services/sandbox/sandbox.service";
 import {Subscription} from "rxjs/Subscription";
 import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 
@@ -12,7 +11,7 @@ require("./input-ports-form.component.scss");
 
 @Component({
     selector: 'inputs-ports-form',
-    providers: [InputPortService, SandboxService],
+    providers: [InputPortService],
     directives: [InputPortListComponent, FormSectionComponent],
     template: `
 <ct-form-section>

@@ -17,8 +17,7 @@ import {WorkflowEditorComponent} from "../workflow-editor/workflow-editor.compon
             <ct-workflow-editor [data]="tab.contentData" *ngSwitchCase="'Workflow'"></ct-workflow-editor>
             <ct-code-editor *ngSwitchCase="'Code'" 
                             [content]="tab.contentData.content" 
-                            [language]="tab.contentData.language" 
-                            >
+                            [language]="tab.contentData.language">
             </ct-code-editor>
             <ct-settings *ngSwitchCase="'Settings'"></ct-settings>
             <block-loader *ngSwitchDefault></block-loader>
@@ -32,7 +31,10 @@ export class TabManagerComponent implements OnDestroy {
 
     private subs: Subscription[] = [];
 
+    constructor(private webWorkerService: WebWorkerService) {}
+
     ngOnDestroy() {
+        this.webWorkerService.dispose();
         this.subs.forEach(s => s.unsubscribe());
     }
 }

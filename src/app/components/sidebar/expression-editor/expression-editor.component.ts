@@ -94,27 +94,23 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this.initSandbox();
+
         this.subs.push(
-            this.expressionSidebarService.expressionDataStream.subscribe((data:ExpressionEditorData) => {
-                this.initSandbox();
+            this.expressionSidebarService.expressionDataStream
+                .mergeMap((data:ExpressionEditorData) => {
+                    this.initialExpressionScript = data.expression;
+                    this.newValueStream          = data.newExpressionChange;
 
-                this.initialExpressionScript = data.expression;
-                this.newValueStream          = data.newExpressionChange;
+                    this.editor         = new ExpressionEditor(ace.edit(this.aceContainer.nativeElement), this.initialExpressionScript);
+                    this.codeToEvaluate = this.initialExpressionScript;
 
-                this.editor         = new ExpressionEditor(ace.edit(this.aceContainer.nativeElement), this.initialExpressionScript);
-                this.codeToEvaluate = this.initialExpressionScript;
-
-                this.listenToExpressionChanges();
-            })
+                    return this.editor.expressionChanges;
+                })
+                .subscribe(expression => {
+                    this.codeToEvaluate = expression;
+                })
         );
-    }
-
-    private listenToExpressionChanges(): void {
-        let expressionChanges = this.editor.expressionChanges.subscribe(expression => {
-            this.codeToEvaluate = expression;
-        });
-
-        this.subs.push(expressionChanges);
     }
 
     private initSandbox(): void {
@@ -151,9 +147,13 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
     private save(): void {
         this.evaluateExpression()
             .subscribe((result: SandboxResponse) => {
+                const newExpression: ExpressionModel = new ExpressionModel({});
 
-                if (result.error === undefined) {
-                    const newExpression: ExpressionModel = new ExpressionModel({});
+                if (result.error) {
+                    newExpression.setEvaluatedValue(this.codeToEvaluate);
+                    newExpression.setValueToExpression(this.codeToEvaluate);
+
+                } else {
                     const responseValue = this.sandboxService.getValueFromSandBoxResponse(result);
                     newExpression.setEvaluatedValue(responseValue);
 
@@ -162,9 +162,10 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
                     } else {
                         newExpression.setValueToExpression(this.codeToEvaluate);
                     }
-
-                    this.newValueStream.next(newExpression);
                 }
+
+                this.newValueStream.next(newExpression);
+
             });
     }
 

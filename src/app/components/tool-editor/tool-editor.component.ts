@@ -24,7 +24,7 @@ require("./tool-editor.component.scss");
 
 @Component({
     selector: "ct-tool-editor",
-    providers: [ViewModeService, WebWorkerService, ToolSidebarService, ExpressionSidebarService, InputSidebarService],
+    providers: [ViewModeService, ToolSidebarService, ExpressionSidebarService, InputSidebarService],
     directives: [
         CodeEditorComponent,
         CltEditorComponent,
