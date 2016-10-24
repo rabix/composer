@@ -58,7 +58,11 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
             }
         );
 
-        this.editor.contentChanges.subscribe(this.contentChanges);
+        this.subs.push(this.rawInput.subscribe((text) => {
+            this.editor.setText(text);
+        }));
+
+        this.subs.push(this.editor.contentChanges.subscribe(this.contentChanges));
     }
 
     ngOnDestroy(): void {

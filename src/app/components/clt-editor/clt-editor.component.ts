@@ -5,14 +5,6 @@ import {CommandLineComponent} from "./commandline/commandline.component";
 import {DockerInputFormComponent} from "../forms/inputs/forms/docker-input-form.component";
 import {BaseCommandFormComponent} from "../forms/inputs/forms/base-command-form.component";
 import {InputPortsFormComponent} from "../forms/inputs/forms/input-ports-form.component";
-import {EventHubService} from "../../services/event-hub/event-hub.service";
-import {
-    OpenInputInspector,
-    OpenExpressionEditor,
-    CloseInputInspector,
-    CloseExpressionEditor
-} from "../../action-events";
-import {CommandInputParameterModel as InputProperty, CommandLineToolModel} from "cwlts/models/d2sb";
 import {CommandLineToolModel} from "cwlts/models/d2sb";
 import {Observable} from "rxjs";
 
@@ -39,12 +31,16 @@ require("./clt-editor.component.scss");
                 </docker-input-form>
                                 
                 <base-command-form [toolBaseCommand]="model.baseCommand"
-                                [baseCommandForm]="cltEditorGroup.controls.baseCommandGroup">
+                                   [context]="{$job: model.job}"
+                                   [baseCommandForm]="cltEditorGroup.controls.baseCommandGroup"
+                                   (onUpdate)="setBaseCommand($event)">
                 </base-command-form>
                 
                 <inputs-ports-form [cltModel]="model">
                 </inputs-ports-form>
             </form>
+
+            <sidebar-component></sidebar-component>
     `
 })
 export class CltEditorComponent {
@@ -55,13 +51,14 @@ export class CltEditorComponent {
     @Input()
     private model: CommandLineToolModel;
 
-    /* TODO: generate the commandline */
-    private commandlineContent: string;
-
     /** ControlGroup that encapsulates the validation for all the nested forms */
     private cltEditorGroup: FormGroup;
 
     constructor(private formBuilder: FormBuilder) { }
+
+    private setBaseCommand(cmd) {
+        this.model.baseCommand = cmd;
+    }
 
     ngOnInit() {
         this.cltEditorGroup = this.formBuilder.group({
