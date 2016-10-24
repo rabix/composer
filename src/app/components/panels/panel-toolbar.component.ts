@@ -4,10 +4,10 @@ import {Component, OnInit} from "@angular/core";
     selector: "ct-panel-toolbar",
     template: `
         <div class="title">
-            <ng-content select="name"></ng-content>
+            <ng-content select=".tc-name"></ng-content>
         </div>
         <div class="tools">
-            <!--<span class="clickable"><i class="fa fa-fw fa-cog"></i></span>-->
+            <ng-content select=".tc-tools"></ng-content>
         </div>
     `
 })

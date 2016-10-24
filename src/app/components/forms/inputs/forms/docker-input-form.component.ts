@@ -3,42 +3,39 @@ import {
     Validators,
     FormBuilder,
     FormGroup,
-    REACTIVE_FORM_DIRECTIVES,
-    FORM_DIRECTIVES
 } from "@angular/forms";
 import {CommandLineToolModel} from "cwlts/models/d2sb";
 import {FormSectionComponent} from "../../../form-section/form-section.component";
+import {AfterViewInit} from "../../../../../../node_modules/@angular/core/src/metadata/lifecycle_hooks";
 
 @Component({
     selector: 'docker-input-form',
     directives: [
-        REACTIVE_FORM_DIRECTIVES,
-        FORM_DIRECTIVES,
         FormSectionComponent
     ],
     template: `
-<ct-form-section>
-    <fs-header>
-        Docker Image
-    </fs-header>
-
-    <fs-body>
-        <form [formGroup]="dockerInputForm">
-
-            <label for="docker_image" class="form-control-label">Docker Repository</label>
-            <input name="dockerPull"
-                   type="text"
-                   class="form-control"
-                   id="docker_image"
-                   [formControl]="dockerInputForm.controls['dockerInput']"
-                   [(ngModel)]="dockerPull">
-        </form>
-    </fs-body>
-</ct-form-section>
+        <ct-form-section>
+            <div class="fs-header">
+                Docker Image
+            </div>
+        
+            <div class="fs-body">
+                <form [formGroup]="dockerInputForm">
+        
+                    <label for="docker_image" class="form-control-label">Docker Repository</label>
+                    <input name="dockerPull"
+                           type="text"
+                           class="form-control"
+                           id="docker_image"
+                           [formControl]="dockerInputForm.controls['dockerInput']"
+                           [(ngModel)]="dockerPull">
+                </form>
+            </div>
+        </ct-form-section>
             
     `
 })
-export class DockerInputFormComponent implements OnInit {
+export class DockerInputFormComponent implements AfterViewInit {
     @Input()
     public dockerPull: string;
 
@@ -55,9 +52,11 @@ export class DockerInputFormComponent implements OnInit {
         this.dockerInputForm = this.formBuilder.group({
             dockerInput: ['', Validators.compose([Validators.required, Validators.minLength(1)])]
         });
+
     }
 
-    ngOnInit(): void {
+    ngAfterViewInit(): void {
         this.group.addControl('dockerInput', this.dockerInputForm.controls['dockerInput']);
+
     }
 }

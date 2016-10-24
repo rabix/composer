@@ -10,11 +10,11 @@ require('./form-section.component.scss');
        (click)="toggleBody()"    
        [ngClass]="{'fa-caret-down': show, 'fa-caret-up': !show}"></i>
     <h3 class="gui-section-header">
-        <ng-content select="fs-header"></ng-content>
+        <ng-content select=".fs-header"></ng-content>
     </h3>
     
     <div [ngClass]="{show: show}" class="gui-section-body">
-        <ng-content select="fs-body"></ng-content>
+        <ng-content select=".fs-body"></ng-content>
     </div>
 </div>
 `

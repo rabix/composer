@@ -1,10 +1,5 @@
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {CodeEditor} from "./code-editor";
-import {Component, OnInit, ElementRef, ViewChild, Input, OnDestroy} from "@angular/core";
-import {FileModel} from "../../store/models/fs.models";
-import {Subscription, Observable} from "rxjs/Rx";
-import {EventHubService} from "../../services/event-hub/event-hub.service";
-import {UpdateFileAction} from "../../action-events/index";
 import {Component, OnInit, ElementRef, ViewChild, Input, OnDestroy, Output} from "@angular/core";
 import {Subscription, Observable, Subject} from "rxjs/Rx";
 import Editor = AceAjax.Editor;

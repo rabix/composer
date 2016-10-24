@@ -14,7 +14,7 @@ import {PlatformAppEntry} from "../../services/api/platforms/platform-api.types"
     host: {class: "block"},
     template: `
         <ct-panel-toolbar>
-            <name>Public Apps</name>
+            <span class="tc-name">Public Apps</span>
         </ct-panel-toolbar>
         
         <div *ngIf="isLoading">

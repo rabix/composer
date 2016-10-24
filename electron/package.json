@@ -1,5 +1,9 @@
 {
-  "name": "rabix-editor",
-  "version": "0.1.0",
-  "main": "main.js"
+    "name": "rabix-editor",
+    "version": "0.1.0",
+    "main": "main.js",
+    "dependencies": {
+        "rxjs": "5.0.0-beta.12",
+        "js-yaml": "^3.6.1"
+    }
 }
