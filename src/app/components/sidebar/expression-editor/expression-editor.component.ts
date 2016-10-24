@@ -94,27 +94,23 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this.initSandbox();
+
         this.subs.push(
-            this.expressionSidebarService.expressionDataStream.subscribe((data:ExpressionEditorData) => {
-                this.initSandbox();
+            this.expressionSidebarService.expressionDataStream
+                .mergeMap((data:ExpressionEditorData) => {
+                    this.initialExpressionScript = data.expression;
+                    this.newValueStream          = data.newExpressionChange;
 
-                this.initialExpressionScript = data.expression;
-                this.newValueStream          = data.newExpressionChange;
+                    this.editor         = new ExpressionEditor(ace.edit(this.aceContainer.nativeElement), this.initialExpressionScript);
+                    this.codeToEvaluate = this.initialExpressionScript;
 
-                this.editor         = new ExpressionEditor(ace.edit(this.aceContainer.nativeElement), this.initialExpressionScript);
-                this.codeToEvaluate = this.initialExpressionScript;
-
-                this.listenToExpressionChanges();
-            })
+                    return this.editor.expressionChanges;
+                })
+                .subscribe(expression => {
+                    this.codeToEvaluate = expression;
+                })
         );
-    }
-
-    private listenToExpressionChanges(): void {
-        let expressionChanges = this.editor.expressionChanges.subscribe(expression => {
-            this.codeToEvaluate = expression;
-        });
-
-        this.subs.push(expressionChanges);
     }
 
     private initSandbox(): void {
@@ -177,7 +173,6 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
         if (this.sandBoxSub) {
             this.sandBoxSub.unsubscribe();
             this.sandBoxSub = undefined;
-            this.sandboxService = undefined;
         }
     }
 
