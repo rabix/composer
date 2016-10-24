@@ -83,8 +83,8 @@ export class LayoutComponent implements OnInit {
         this.el = el.nativeElement;
 
         const top = new PanelGroup([
-            new PanelStatus(PANEL_LOCAL_FILES, "1: Local Files", "folder", false, "alt+1"),
-            new PanelStatus(PANEL_USER_PROJECTS, "2: Projects", "folder", true, "alt+2"),
+            new PanelStatus(PANEL_LOCAL_FILES, "1: Local Files", "folder", true, "alt+1"),
+            new PanelStatus(PANEL_USER_PROJECTS, "2: Projects", "folder", false, "alt+2"),
             new PanelStatus(PANEL_PUBLIC_APPS, "3: Public Apps", "code", false, "alt+3"),
         ]);
 
