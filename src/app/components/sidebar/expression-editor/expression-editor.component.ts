@@ -94,11 +94,14 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.initSandbox();
+        this.sandboxService = new SandboxService();
 
         this.subs.push(
             this.expressionSidebarService.expressionDataStream
                 .mergeMap((data:ExpressionEditorData) => {
+                    this.codeToEvaluate = "";
+                    this.evaluatedExpression = "";
+
                     this.initialExpressionScript = data.expression;
                     this.newValueStream          = data.newExpressionChange;
 
@@ -111,12 +114,6 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
                     this.codeToEvaluate = expression;
                 })
         );
-    }
-
-    private initSandbox(): void {
-        this.sandboxService = new SandboxService();
-        this.codeToEvaluate = "";
-        this.evaluatedExpression = "";
     }
 
     private evaluateExpression(): Observable<SandboxResponse> {
