@@ -30,7 +30,7 @@ import {TreeViewService} from "./tree-view.service";
             </span>
             
             <span *ngIf="node" class="name-container">
-                <span class="name" *ngFor="let namePart of nameParts">{{ namePart }}</span>
+                <span class="name" *ngFor="let namePart of nameParts" [title]="nameParts">{{ namePart }}</span>
             </span>
             
             <span *ngIf="node.onClose" class="pull-right">
