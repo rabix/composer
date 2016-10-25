@@ -1,5 +1,5 @@
 import {Subject} from "rxjs/Subject";
-import {ExpressionModel} from "cwlts/models/d2sb";
+import {ExpressionModel} from "cwlts";
 
 export class ExpressionEditorData {
     expression: ExpressionModel;

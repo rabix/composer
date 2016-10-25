@@ -4,7 +4,7 @@ import {Subscription} from "rxjs/Subscription";
 import {FormSectionComponent} from "../../../form-section/form-section.component";
 import {BaseCommandService, BaseCommand} from "../../../../services/base-command/base-command.service";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {ExpressionModel} from "cwlts/models/d2sb";
+import {ExpressionModel} from "cwlts";
 import {ExpressionInputComponent} from "../types/expression-input.component";
 import {ExpressionSidebarService} from "../../../../services/sidebars/expression-sidebar.service";
 
@@ -113,16 +113,13 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
             this.baseCommandForm.addControl(
                 'baseCommand' + index,
                 new FormControl(
-                    command.getEvaluatedValue(),
+                    command.getExpressionScript(),
                     Validators.compose([Validators.required, Validators.minLength(1)])
                 )
             );
 
             this.baseCommandForm.controls['baseCommand' + index].valueChanges.subscribe(value => {
-                this.baseCommandService.updateCommand(index, new ExpressionModel({
-                    value: value,
-                    evaluatedValue: value
-                }));
+                this.baseCommandService.updateCommand(index, new ExpressionModel(value));
             });
         });
     }
@@ -162,10 +159,7 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
     }
 
     private addBaseCommand(): void {
-        this.baseCommandService.addCommand(new ExpressionModel({
-            value: "",
-            evaluatedValue: ""
-        }));
+        this.baseCommandService.addCommand(new ExpressionModel(""));
     }
 
     private removeExpressionInputSub(): void {
