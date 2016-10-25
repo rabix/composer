@@ -53,9 +53,12 @@ const handlers = {
                     .map(item => {
                         return Rx.Observable
                             .bindNodeCallback(fs.readFile)(item.path, "utf8")
-                            .map(raw => (yaml.safeLoad(raw)["class"]))
+                            .map(raw => {
+                                const loaded = yaml.safeLoad(raw);
+                                return loaded ? loaded["class"] : undefined;
+                            })
                             .catch(err => {
-                                console.log("Caught an error on parsing ", item.path);
+                                console.log("Caught an error on parsing ", item.path, err);
                                 return Observable.of("");
                             })
                             .do(cls => item.type = cls)
