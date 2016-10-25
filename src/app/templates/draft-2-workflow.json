@@ -1,0 +1,10 @@
+{
+    "id": "{{ id }}",
+    "label": "{{ label }}",
+    "description": "{{ description }}",
+    "class": "Workflow",
+    "steps": [],
+    "dataLinks": [],
+    "inputs": [],
+    "outputs": []
+}

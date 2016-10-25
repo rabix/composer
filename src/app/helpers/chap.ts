@@ -6,7 +6,7 @@ export module Component {
      */
     export function assign(properties: Object, componentInstance: Object) {
 
-        const metadata = Reflect.getMetadata(DECORATOR_KEY_ASSIGNABLE, Reflect.getPrototypeOf(componentInstance));
+        const metadata = Reflect.getMetadata(DECORATOR_KEY_ASSIGNABLE, Object.getPrototypeOf(componentInstance));
 
         if (!metadata) {
             return console.error(

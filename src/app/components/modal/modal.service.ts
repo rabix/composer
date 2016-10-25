@@ -1,45 +1,42 @@
-import {Injectable, ComponentResolver, ViewContainerRef, ComponentRef} from "@angular/core";
+import {Injectable, ComponentFactoryResolver, ViewContainerRef, ComponentRef, ApplicationRef} from "@angular/core";
 import {ModalComponent, ModalOptions} from "./modal.component";
-import {ConfirmComponent} from "./common/confirm.component";
 import {Subject} from "rxjs";
+import {ConfirmComponent} from "./common/confirm.component";
 
 @Injectable()
 export class ModalService {
 
-    private anchor: ViewContainerRef;
+    private rootViewRef: ViewContainerRef;
     private modalComponentRef: ComponentRef<ModalComponent>;
-    private isOpen: boolean;
-    private onClose: Subject<any>;
 
-    constructor(private resolver: ComponentResolver) {
-        this.isOpen  = false;
-        this.onClose = new Subject<any>();
+    private onClose = new Subject<any>();
 
-        this.onClose.filter(_ => this.isOpen).subscribe(_ => this.closeAndClean());
-    }
+    constructor(private resolver: ComponentFactoryResolver,
+                private appRef: ApplicationRef) {
 
-    public setAnchor(anchor: ViewContainerRef) {
-        this.anchor = anchor;
-    }
+        // https://github.com/angular/angular/issues/9293
+        this.rootViewRef = this.appRef["_changeDetectorRefs"][0]["_view"]["_appEl_0"].vcRef;
 
-    public show<T>(component: Function, options?: ModalOptions<T>): Promise<ComponentRef<T>> {
-
-        this.close();
-        this.isOpen = true;
-
-        return new Promise((resolve, reject) => {
-            this.resolver.resolveComponent(ModalComponent).then(modalFactory => {
-                this.modalComponentRef  = this.anchor.createComponent(modalFactory);
-                const componentInstance = this.modalComponentRef.instance;
-
-                componentInstance.configure<T>(options || {});
-                return this.resolver.resolveComponent(component).then(componentFactory => {
-                    const ref = componentInstance.produce<T>(componentFactory, options.componentState || {});
-                    resolve(ref);
-                }, reject);
-            }, reject);
+        this.onClose.subscribe(_ => {
+            this.closeAndClean();
         });
+    }
 
+    public show<T>(component, options?: ModalOptions): T {
+
+        // If some other modal is open, close it
+        this.close();
+
+
+        const modalFactory     = this.resolver.resolveComponentFactory(ModalComponent);
+        const componentFactory = this.resolver.resolveComponentFactory(component);
+
+        this.modalComponentRef = this.rootViewRef.createComponent(modalFactory);
+        this.modalComponentRef.instance.configure<any>(options);
+
+        const componentRef = this.modalComponentRef.instance.produce<T>(componentFactory, options.componentState || {});
+
+        return componentRef.instance;
     }
 
     /**
@@ -47,27 +44,36 @@ export class ModalService {
      *
      * @returns {Promise} Promise that will resolve if user confirms the prompt and reject if user cancels
      */
-    public confirm (params: {
-        title?: string
-        content: string,
-        confirmationLabel?: string,
-        cancellationLabel?: string
+    public confirm(params = {
+        title: "Confirm",
+        content: "Are you sure?",
+        confirmationLabel: "Yes",
+        cancellationLabel: "Cancel"
     }): Promise<any> {
 
         const insideClosings = new Promise((resolve, reject) => {
-            this.show<ConfirmComponent>(ConfirmComponent, {title: params.title, componentState: params})
-                .then(componentRef => {
-                    const cmp = componentRef.instance;
 
-                    cmp.confirm.first().subscribe(_ => {
-                        resolve(true);
-                        this.close();
-                    });
-                    cmp.cancel.first().subscribe(_ => {
-                        reject();
-                        this.close();
-                    });
+            const {content, confirmationLabel, cancellationLabel} = params;
+
+            this.show<ConfirmComponent>(ConfirmComponent, {
+                title: params.title,
+                componentState: {
+                    content,
+                    confirmationLabel,
+                    cancellationLabel
+                }
+            }).then(componentRef => {
+                const cmp = componentRef.instance;
+
+                cmp.confirm.first().subscribe(_ => {
+                    resolve(true);
+                    this.close();
                 });
+                cmp.cancel.first().subscribe(_ => {
+                    reject();
+                    this.close();
+                });
+            });
         });
 
         const outsideClosings = new Promise((resolve, reject) => {
@@ -82,7 +88,8 @@ export class ModalService {
     }
 
     private closeAndClean() {
-        this.modalComponentRef.destroy();
-        this.isOpen = false;
+        if (this.modalComponentRef) {
+            this.modalComponentRef.destroy();
+        }
     }
 }

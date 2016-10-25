@@ -1,6 +1,6 @@
 import {Component, Input, Output} from "@angular/core";
 import {Subject} from "rxjs";
-import any = jasmine.any;
+import {assignable} from "../../../decorators/index";
 @Component({
     selector: "ct-modal-confirm",
     template: `
@@ -17,18 +17,23 @@ import any = jasmine.any;
 })
 export class ConfirmComponent {
 
+    @assignable()
     @Input()
     public content: string;
 
+    @assignable()
     @Input()
     public cancellationLabel: string;
 
+    @assignable()
     @Input()
     public confirmationLabel: string;
 
+    @assignable("next")
     @Output()
     public confirm: Subject<any>;
 
+    @assignable("next")
     @Output()
     public cancel: Subject<any>;
 

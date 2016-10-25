@@ -10,6 +10,9 @@ import {SettingsService} from "../../services/settings/settings.service";
 import {SBPlatformDataSourceService} from "../../sources/sbg/sb-platform.source.service";
 import {PlatformProjectEntry} from "../../services/api/platforms/platform-api.types";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
+import {MenuItem} from "../menu/menu-item";
+import {ModalService} from "../modal/modal.service";
+import {NewFileModalComponent} from "../modal/custom/new-file-modal.component";
 
 @Component({
     selector: "ct-sb-user-projects-panel",
@@ -73,6 +76,7 @@ export class SBUserProjectsPanelComponent {
     constructor(private dataSource: SBPlatformDataSourceService,
                 private eventHub: EventHubService,
                 private preferences: UserPreferencesService,
+                private modal: ModalService,
                 private settings: SettingsService) {
 
         this.settings.platformConfiguration
@@ -82,7 +86,6 @@ export class SBUserProjectsPanelComponent {
                 .sort((a, b) => a.data.name.toLowerCase().localeCompare(b.data.name.toLowerCase()))
                 .map(entry => this.mapProjectToNode(entry))
             ).withLatestFrom(
-
             this.settings.platformConfiguration,
             Observable.of(this.preferences.get("open_projects", {})),
 
@@ -128,7 +131,13 @@ export class SBUserProjectsPanelComponent {
             name: project.data.name,
             icon: project.type || "angle",
             isExpandable: true,
-            onClose: () =>{
+            contextMenu: [
+                new MenuItem("New App...", {
+                    click: () => this.openNewFileModal(project.data)
+                }),
+                new MenuItem("Remove from Workspace")
+            ],
+            onClose: () => {
                 this.setProjectStatus(project.data.id, false);
             },
             childrenProvider: _ => project.childrenProvider()
@@ -147,6 +156,16 @@ export class SBUserProjectsPanelComponent {
         }
     }
 
+    private openNewFileModal(project: PlatformProjectEntry) {
+        const component = this.modal.show<NewFileModalComponent>(NewFileModalComponent, {
+            title: "Create new File...",
+            closeOnOutsideClick: true,
+            closeOnEscape: true
+        });
+
+
+    }
+
 
     private setProjectStatus(projectID, isOpen) {
         this.projectUpdates.next(
@@ -159,7 +178,7 @@ export class SBUserProjectsPanelComponent {
             }));
     }
 
-    private addProjectToWorkspace(projectID){
+    private addProjectToWorkspace(projectID) {
         this.setProjectStatus(projectID, true);
         this.showProjectSelectionToolbar = false;
     }

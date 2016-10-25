@@ -11,7 +11,8 @@ import {
     PANEL_PUBLIC_APPS,
     PANEL_STRUCTURE,
     PANEL_REVISIONS,
-    PanelGroupMap, PANEL_LOCAL_FILES
+    PanelGroupMap,
+    PANEL_LOCAL_FILES
 } from "./layout.types";
 
 require("./layout.component.scss");
