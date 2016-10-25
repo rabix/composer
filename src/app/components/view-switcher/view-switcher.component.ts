@@ -20,9 +20,9 @@ export class ViewModeSwitchComponent {
     public viewMode: "gui" | "code" = "code";
 
     @Output()
-    public onSwitch = new ReplaySubject<string>();
+    public switch = new ReplaySubject<string>();
 
     private toggleView() {
-        this.onSwitch.next(this.viewMode === "gui" ? "code" : "gui")
+        this.switch.next(this.viewMode === "gui" ? "code" : "gui")
     }
 }
