@@ -4,7 +4,7 @@ import {Subscription} from "rxjs/Subscription";
 import {FormSectionComponent} from "../../../form-section/form-section.component";
 import {BaseCommandService, BaseCommand} from "../../../../services/base-command/base-command.service";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {ExpressionModel} from "cwlts";
+import {ExpressionModel} from "cwlts/models/d2sb";
 import {ExpressionInputComponent} from "../types/expression-input.component";
 import {ExpressionSidebarService} from "../../../../services/sidebars/expression-sidebar.service";
 

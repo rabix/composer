@@ -149,15 +149,12 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
     private save(): void {
         this.evaluateExpression()
             .subscribe((result: SandboxResponse) => {
-                const newExpression: ExpressionModel = new ExpressionModel({});
+                const newExpression: ExpressionModel = new ExpressionModel(undefined);
 
                 if (result.error) {
-                    newExpression.setEvaluatedValue(this.codeToEvaluate);
                     newExpression.setValueToExpression(this.codeToEvaluate);
-
                 } else {
                     const responseValue = this.sandboxService.getValueFromSandBoxResponse(result);
-                    newExpression.setEvaluatedValue(responseValue);
 
                     if (responseValue === "") {
                         newExpression.setValueToString("");
