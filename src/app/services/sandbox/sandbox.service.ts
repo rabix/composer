@@ -9,9 +9,6 @@ export interface SandboxResponse {
 
 export class SandboxService {
 
-    /** Object exposed to Jailed */
-    private jailedApi: Object;
-
     /** Jailed plugin instance */
     private plugin: any;
 
@@ -21,24 +18,8 @@ export class SandboxService {
     private updateExpressionResult: Subject<SandboxResponse> = new Subject<SandboxResponse>();
 
     constructor() {
-        const self = this;
-
         this.expressionResult = this.updateExpressionResult
             .filter(result => result !== undefined);
-
-        this.jailedApi = {
-            output: function(data) {
-                const output: string = self.stringify(data.output);
-                const error: string = data.error;
-
-                self.updateExpressionResult.next({
-                    output: output,
-                    error: error
-                });
-
-                self.disconnect();
-            }
-        };
     }
 
     // sends the input to the plugin for evaluation
@@ -52,11 +33,12 @@ export class SandboxService {
             codeToExecute = "(function()" + code + ")()";
         }
 
-        this.plugin = new jailed.DynamicPlugin( this.initializeEngine(), this.jailedApi);
+        this.plugin = new jailed.DynamicPlugin( this.initializeEngine());
 
         this.plugin.whenConnected(() => {
             this.plugin.remote.execute(codeToExecute, context, (res) => {
                 this.updateExpressionResult.next(res);
+                this.disconnect();
             });
             this.waitFoResponse();
         });
