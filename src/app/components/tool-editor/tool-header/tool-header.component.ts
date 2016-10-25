@@ -56,7 +56,9 @@ export class ToolHeaderComponent {
     }
 
     private saveAction() {
-        if (this.data.data.sourceId !== "local") {
+        console.debug("Data", this.data);
+
+        if (this.data.data.source !== "local") {
             this.actionPending = 'revision_note';
             return;
         }

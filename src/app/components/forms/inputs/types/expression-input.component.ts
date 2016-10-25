@@ -34,6 +34,9 @@ export class ExpressionInputComponent {
     @Input()
     public expression: ExpressionModel;
 
+    @Input()
+    public context: any;
+
     @Output()
     public expressionChange: EventEmitter<string | ExpressionModel> = new EventEmitter<string | ExpressionModel>();
 

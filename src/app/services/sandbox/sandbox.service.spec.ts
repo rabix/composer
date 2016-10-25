@@ -50,10 +50,12 @@ describe("SandboxService", () => {
 
     describe("submit", () => {
 
-        it("should update the expressionResult with the result of the expression", (done) => {
+        it("should update the expressionResult with the result of the expression", done => {
 
-            spyOn(sandboxService, "createExpressionCode").and.callFake(code => code);
-            spyOn(jailed, "DynamicPlugin").and.callFake((expressionCode, jailedApi) => {
+            let updateExpressionResult: BehaviorSubject<SandboxResponse> = new BehaviorSubject<SandboxResponse>(undefined);
+
+            spyOn(sandboxService, "initializeEngine").and.callFake(code => code);
+            spyOn(jailed, "DynamicPlugin").and.callFake(expressionCode => {
                 const mockResult = eval(expressionCode);
 
                 //output() needs to be called after the class has returned

@@ -1,3 +1,30 @@
+@import "../../../assets/sass/variables";
+
 ct-panel {
   position: relative;
+}
+
+ct-sb-user-projects-panel {
+  .project-selector-container .project-selection-input-group {
+    width: 100%;
+
+    .project-selector,
+    .project-selection-submit-button {
+      color: white;
+      font: inherit;
+      font-size: $font-size-sm;
+      background: linear-gradient($brand-primary-bg-bright, darken($brand-primary-bg-bright, 5));
+    }
+
+    .input-group-btn {
+      width: 1px;
+    }
+
+    .project-selector.form-control {
+      height: calc(2.5rem - 4px);
+      width: 100%;
+    }
+
+
+  }
 }

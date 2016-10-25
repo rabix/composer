@@ -1,4 +1,4 @@
-import {Component, ElementRef, ViewChild, OnInit, OnDestroy} from "@angular/core";
+import {Component, ElementRef, ViewChild, OnInit, OnDestroy, Input} from "@angular/core";
 import {ExpressionEditor} from "./expression-editor";
 import {ExpressionEditorData} from "../../../models/expression-editor-data.model";
 import {SandboxService, SandboxResponse} from "../../../services/sandbox/sandbox.service";
@@ -6,7 +6,7 @@ import {Subscription} from "rxjs/Subscription";
 import {Subject} from "rxjs/Subject";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ExpressionSidebarService} from "../../../services/sidebars/expression-sidebar.service";
-import {ExpressionModel} from "cwlts/models/d2sb";
+import {Subject} from "rxjs";
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import TextMode = AceAjax.TextMode;
@@ -36,7 +36,7 @@ require("./expression-editor.component.scss");
                         
                         <button type="button" 
                             class="btn btn-sm btn-success"
-                            (click)="save()">Add</button>
+                            (click)="save()">Save</button>
                     </span>
                 </div>
                 
@@ -78,6 +78,9 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
 
     private editor: ExpressionEditor;
 
+    /** Global context in which expression should be evaluated */
+    private context: any;
+
     /** Code String that we send to the sandbox */
     private codeToEvaluate: string;
 
@@ -103,6 +106,7 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
                     this.codeToEvaluate = "";
                     this.evaluatedExpression = "";
                     this.initialExpressionScript = "";
+                    this.context = data.context;
 
                     if ((<Expression>data.expression.serialize()).script) {
                         this.initialExpressionScript = data.expression.getExpressionScript();
@@ -125,7 +129,7 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
         this.removeSandboxSub();
         let responseResult: Subject<SandboxResponse> = new Subject<SandboxResponse>();
 
-        this.sandBoxSub = this.sandboxService.submit(this.codeToEvaluate)
+        this.sandBoxSub = this.sandboxService.submit(this.codeToEvaluate, this.context)
             .subscribe((result: SandboxResponse) => {
                 if (result.error) {
                     //TODO: make error message nicer on the UI

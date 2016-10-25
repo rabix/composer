@@ -39,7 +39,7 @@ require("./tool-editor.component.scss");
         <div class="editor-container">
             <tool-header class="editor-header"
                          (save)="save($event)"
-                         [fileIsValid]="isValidCwl"
+                         [fileIsValid]="isValidCWL"
                          [data]="data"></tool-header>
         
             <div class="scroll-content">
@@ -52,11 +52,8 @@ require("./tool-editor.component.scss");
         
                 <ct-clt-editor *ngIf="viewMode === 'gui'"
                                class="gui-editor-component"
-                               [model]="toolModel"
-                               [fileStream]="tabData">
+                               [model]="toolModel">
                 </ct-clt-editor>
-        
-                <sidebar-component></sidebar-component>
             </div>
             <div class="status-bar-footer">
                 <div class="left-side">
@@ -65,8 +62,8 @@ require("./tool-editor.component.scss");
                 </div>
                 <div class="right-side">
                     <ct-view-mode-switch [viewMode]="viewMode"
-                                         [disabled]="!guiAvailable"
-                                         (onSwitch)="viewMode = $event">
+                                         [disabled]="!isValidCWL"
+                                         (onSwitch)="onSwitchView($event)">
                     </ct-view-mode-switch>
                 </div>
             </div>
@@ -87,7 +84,7 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
     private commandLineParts: CommandLinePart[];
 
     /** Flag for validity of CWL document */
-    private guiAvailable = true;
+    private isValidCWL = false;
 
     /** List of subscriptions that should be disposed when destroying this component */
     private subs: Subscription[] = [];
@@ -115,7 +112,7 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
         });
 
         this.webWorkerService.validationResultStream.subscribe(err => {
-            this.guiAvailable = err.isValidCwl;
+            this.isValidCWL = err.isValidCwl;
         });
     }
 
@@ -126,12 +123,19 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
 
     private save(revisionNote) {
 
-        if (this.data.data.sourceId === "local") {
-            this.data.data.save(this.rawEditorContent.getValue());
+        if (this.data.data.source === "local") {
+            this.data.data.save(this.rawEditorContent.getValue()).subscribe(_ => {
+            });
         } else {
             this.data.save(JSON.parse(this.rawEditorContent.getValue()), revisionNote).subscribe(data => {
-
             });
+        }
+    }
+
+    private onSwitchView(ev) {
+        this.viewMode = ev;
+        if (ev === "code") {
+            this.rawEditorContent.next(JSON.stringify(this.toolModel.serialize(), null, 4));
         }
     }
 

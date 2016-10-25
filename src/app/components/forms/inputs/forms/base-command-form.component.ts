@@ -1,5 +1,5 @@
-import {Component, Input, OnInit, OnDestroy} from "@angular/core";
-import {FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES, Validators, FormControl} from "@angular/forms";
+import {Component, Input, OnInit, OnDestroy, Output} from "@angular/core";
+import {FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES, Validators, FormBuilder} from "@angular/forms";
 import {Subscription} from "rxjs/Subscription";
 import {FormSectionComponent} from "../../../form-section/form-section.component";
 import {BaseCommandService, BaseCommand} from "../../../../services/base-command/base-command.service";
@@ -7,6 +7,7 @@ import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ExpressionInputComponent} from "../types/expression-input.component";
 import {ExpressionSidebarService} from "../../../../services/sidebars/expression-sidebar.service";
+import {ReplaySubject} from "rxjs";
 
 require("./base-command-form.components.scss");
 
@@ -22,10 +23,10 @@ require("./base-command-form.components.scss");
         FormSectionComponent
     ],
     template: `<ct-form-section>
-    <fs-header>
+    <div class="fs-header">
         Base Command
-    </fs-header>
-    <fs-body>
+    </div>
+    <div class="fs-body">
         <form *ngIf="baseCommandForm" [formGroup]="baseCommandForm">
             <div *ngIf="baseCommandFormList.length > 0">
 
@@ -33,6 +34,7 @@ require("./base-command-form.components.scss");
                      class="base-command-list">
 
                      <expression-input class="col-sm-11"
+                                  [context]="context"
                                   *ngIf="baseCommandForm.controls['baseCommand' + i]" 
                                   [(expression)]="baseCommandFormList[i]"
                                   [control]="baseCommandForm.controls['baseCommand' + i]"
@@ -54,7 +56,7 @@ require("./base-command-form.components.scss");
             </button>
 
         </form>
-    </fs-body>
+    </div>
 </ct-form-section>
 
     `
@@ -67,6 +69,12 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
     /** The parent forms group, we pass this to the list */
     @Input()
     public baseCommandForm: FormGroup;
+
+    @Output()
+    public onUpdate = new ReplaySubject<BaseCommand[]>();
+
+    @Input()
+    public context: any;
 
     /** The formatted list that we are going to display to the user*/
     private baseCommandFormList: ExpressionModel[] = [];
@@ -95,7 +103,7 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
                 this.createExpressionInputControls(this.baseCommandFormList);
 
                 //Format the base commands from the inputs, and set the tool baseCommand
-                this.toolBaseCommand = this.baseCommandService.formListToBaseCommandArray(this.baseCommandFormList);
+                this.onUpdate.next(this.baseCommandService.formListToBaseCommandArray(this.baseCommandFormList));
             })
         );
     }
@@ -154,7 +162,8 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
 
         this.expressionSidebarService.openExpressionEditor({
             expression: selectedBaseCommand,
-            newExpressionChange: newExpression
+            newExpressionChange: newExpression,
+            context: this.context
         });
     }
 
