@@ -66,7 +66,6 @@ export class SandboxService {
 
     private waitFoResponse(): void {
         setTimeout(() => {
-            console.log("Sandbox response timed out.");
             this.disconnect();
         }, 3000);
     }

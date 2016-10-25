@@ -1,5 +1,5 @@
 import {Component, Input, OnInit, OnDestroy, Output} from "@angular/core";
-import {FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES, Validators, FormBuilder} from "@angular/forms";
+import {FormGroup, Validators, FormControl} from "@angular/forms";
 import {Subscription} from "rxjs/Subscription";
 import {FormSectionComponent} from "../../../form-section/form-section.component";
 import {BaseCommandService, BaseCommand} from "../../../../services/base-command/base-command.service";
@@ -18,11 +18,10 @@ require("./base-command-form.components.scss");
     ],
     directives: [
         ExpressionInputComponent,
-        REACTIVE_FORM_DIRECTIVES,
-        FORM_DIRECTIVES,
         FormSectionComponent
     ],
-    template: `<ct-form-section>
+    template: `
+<ct-form-section>
     <div class="fs-header">
         Base Command
     </div>
@@ -54,7 +53,6 @@ require("./base-command-form.components.scss");
             <button type="button" class="btn btn-link add-btn-link" (click)="addBaseCommand()">
                 <i class="fa fa-plus"></i> Add base command
             </button>
-
         </form>
     </div>
 </ct-form-section>
@@ -88,12 +86,10 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
 
     constructor(private baseCommandService: BaseCommandService,
                 private expressionSidebarService: ExpressionSidebarService) {
-
         this.subs = [];
     }
 
     ngOnInit(): void {
-
         const inputBaseCommands = this.baseCommandService.baseCommandsToFormList(this.toolBaseCommand);
         this.baseCommandService.setBaseCommands(inputBaseCommands);
 
@@ -108,11 +104,11 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
         );
     }
 
-    private trackByIndex(index: number): any {
+    private trackByIndex(index: number): number {
         return index;
     }
 
-    private createExpressionInputControls(commandList: ExpressionModel[]) {
+    private createExpressionInputControls(commandList: ExpressionModel[]): void {
         commandList.forEach((command, index) => {
             if (this.baseCommandForm.contains('baseCommand' + index)) {
                 this.baseCommandForm.removeControl('baseCommand' + index);

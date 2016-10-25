@@ -18,7 +18,8 @@ require("./input-ports-form.component.scss");
     <div class="fs-header">Input Ports</div>
     <div class="fs-body">
         <form>
-            <input-port-list [selectedIndex]="selectedIndex"></input-port-list>
+            <input-port-list [context]="context" 
+                            [selectedIndex]="selectedIndex"></input-port-list>
 
             <button type="button" 
                     class="btn btn-link add-btn-link"
@@ -34,6 +35,8 @@ require("./input-ports-form.component.scss");
 export class InputPortsFormComponent implements OnInit {
     @Input()
     public cltModel: CommandLineToolModel;
+
+    public context: any;
 
     private portList: InputProperty[] = [];
 
@@ -51,16 +54,20 @@ export class InputPortsFormComponent implements OnInit {
         );
     }
 
-    private addInput(): void {
-        this.selectedIndex = this.portList.length;
-        const newInput = this.cltModel.addInput();
-
-        this.inputPortService.addInput(newInput);
-        this.inputSidebarService.openInputInspector(newInput);
-    }
-
     ngOnInit() {
         this.inputPortService.setInputs(this.cltModel.inputs);
+        this.context = {$job: this.cltModel.job}
+    }
+
+    private addInput(): void {
+        this.selectedIndex = this.portList.length;
+        const newInput: InputProperty = this.cltModel.addInput();
+
+        this.inputPortService.addInput(newInput);
+        this.inputSidebarService.openInputInspector({
+            inputProperty: newInput,
+            context: this.context
+        });
     }
 
     ngOnDestroy(): void {

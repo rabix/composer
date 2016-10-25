@@ -1,9 +1,9 @@
 import {Component, OnInit, OnDestroy} from "@angular/core";
-import {Validators, FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
+import {Validators, FormBuilder, FormGroup} from "@angular/forms";
 import {ExpressionInputComponent} from "../../forms/inputs/types/expression-input.component";
 import {ExpressionModel, CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 import {Subscription} from "rxjs/Subscription";
-import {InputSidebarService} from "../../../services/sidebars/input-sidebar.service";
+import {InputSidebarService, InputInspectorData} from "../../../services/sidebars/input-sidebar.service";
 import {Subject} from "rxjs/Subject";
 import {ExpressionSidebarService} from "../../../services/sidebars/expression-sidebar.service";
 import {BehaviorSubject} from "rxjs";
@@ -14,9 +14,7 @@ require("./input-inspector.component.scss");
 @Component({
     selector: "input-inspector",
     directives: [
-        ExpressionInputComponent,
-        REACTIVE_FORM_DIRECTIVES,
-        FORM_DIRECTIVES
+        ExpressionInputComponent
     ],
     template: `
             <form class="input-inspector-component object-inspector" *ngIf="selectedProperty">
@@ -62,6 +60,8 @@ require("./input-inspector.component.scss");
 })
 export class InputInspectorComponent implements OnInit, OnDestroy {
 
+    public context: any;
+
     /** The currently displayed property */
     private selectedProperty: InputProperty;
 
@@ -86,8 +86,9 @@ export class InputInspectorComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.subs.push(
-            this.inputSidebarService.inputPortDataStream.subscribe((input: InputProperty) => {
-                this.selectedProperty = input;
+            this.inputSidebarService.inputPortDataStream.subscribe((data: InputInspectorData) => {
+                this.selectedProperty = data.inputProperty;
+                this.context = data.context;
                 this.inputBinding.next(this.selectedProperty.getValueFrom());
             })
         );
@@ -127,7 +128,8 @@ export class InputInspectorComponent implements OnInit, OnDestroy {
 
         this.expressionSidebarService.openExpressionEditor({
             expression: this.expressionInput,
-            newExpressionChange: newExpression
+            newExpressionChange: newExpression,
+            context: this.context
         });
     }
 
