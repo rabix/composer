@@ -29,8 +29,8 @@ import {TreeViewService} from "./tree-view.service";
                 <i class="fa fa-fw" [ngClass]="getIconRules(node.icon)"></i>
             </span>
             
-            <span *ngIf="node" class="name-container">
-                <span class="name" *ngFor="let namePart of nameParts" [title]="nameParts">{{ namePart }}</span>
+            <span *ngIf="node" class="name-container" [title]="node.name">
+                <span class="name" *ngFor="let namePart of nameParts">{{ namePart }}</span>
             </span>
             
             <span *ngIf="node.onClose" class="pull-right">
