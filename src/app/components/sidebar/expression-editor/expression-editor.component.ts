@@ -1,4 +1,4 @@
-import {Component, ElementRef, ViewChild, OnInit, OnDestroy, Input} from "@angular/core";
+import {Component, ElementRef, ViewChild, OnInit, OnDestroy} from "@angular/core";
 import {ExpressionEditor} from "./expression-editor";
 import {ExpressionEditorData} from "../../../models/expression-editor-data.model";
 import {SandboxService, SandboxResponse} from "../../../services/sandbox/sandbox.service";
@@ -6,12 +6,11 @@ import {Subscription} from "rxjs/Subscription";
 import {Subject} from "rxjs/Subject";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ExpressionSidebarService} from "../../../services/sidebars/expression-sidebar.service";
-import {Subject} from "rxjs";
+import {Subject, Observable} from "rxjs";
+import {Expression} from "cwlts/mappings/d2sb/Expression";
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import TextMode = AceAjax.TextMode;
-import {Observable, Subject} from "rxjs";
-import {Expression} from "cwlts/mappings/d2sb/Expression";
 
 require("./expression-editor.component.scss");
 
@@ -44,11 +43,11 @@ require("./expression-editor.component.scss");
                 
                 <div class="expression-result-container">
                     <div class="code-preview">
-                         Code preview
+                        Code preview
                     </div>
                     
                     <div class="expression-result-value">
-                           {{evaluatedExpression}}
+                       {{evaluatedExpression}}
                     </div>
                    
                     <div class="expression-result-overlay">
@@ -113,7 +112,6 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
                     }
 
                     this.newValueStream = data.newExpressionChange;
-
                     this.editor         = new ExpressionEditor(ace.edit(this.aceContainer.nativeElement), this.initialExpressionScript);
                     this.codeToEvaluate = this.initialExpressionScript;
 
@@ -158,9 +156,7 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
                 if (result.error) {
                     newExpression.setValueToExpression(this.codeToEvaluate);
                 } else {
-                    const responseValue = this.sandboxService.getValueFromSandBoxResponse(result);
-
-                    if (responseValue === "") {
+                    if (result === undefined) {
                         newExpression.setValueToString("");
                     } else {
                         newExpression.setValueToExpression(this.codeToEvaluate);
@@ -168,7 +164,6 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
                 }
 
                 this.newValueStream.next(newExpression);
-
             });
     }
 

@@ -36,9 +36,9 @@ require("./input-inspector.component.scss");
                     <label for="inputType">Type</label>
                     
                     <select class="form-control" 
-                    name="selectedPropertyType" 
-                    id="dataType"
-                    [(ngModel)]="selectedProperty.type" required>
+                            name="selectedPropertyType" 
+                            id="dataType"
+                            [(ngModel)]="selectedProperty.type" required>
                         <option *ngFor="let propertyType of propertyTypes" [value]="propertyType">
                             {{propertyType}}
                         </option>
@@ -117,8 +117,9 @@ export class InputInspectorComponent implements OnInit, OnDestroy {
         this.expressionInputSub = newExpression
             .filter(expression => expression !== undefined)
             .subscribe((newExpression: ExpressionModel) => {
+                this.selectedProperty.setValueFrom(newExpression.serialize());
+
                 if ((<Expression>newExpression.serialize()).script) {
-                    this.selectedProperty.setValueFrom(newExpression.serialize());
                     this.expressionInput = newExpression;
                     this.createExpressionInputForm(this.expressionInput.getExpressionScript())
                 } else {
@@ -152,7 +153,6 @@ export class InputInspectorComponent implements OnInit, OnDestroy {
             const inputValueChange = this.expressionInputForm.controls['expressionInput'].valueChanges.subscribe((value) => {
                 if (typeof this.expressionInput.serialize() === "string") {
                     this.expressionInput.setValueToString(value);
-
                     this.selectedProperty.setValueFrom(value);
                 }
             });

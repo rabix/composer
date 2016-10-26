@@ -1,4 +1,4 @@
-import {Component, Input, ChangeDetectionStrategy} from "@angular/core";
+import {Component, Input} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {CommandLineComponent} from "./commandline/commandline.component";
 import {DockerInputFormComponent} from "../forms/inputs/forms/docker-input-form.component";
@@ -16,7 +16,6 @@ require("./clt-editor.component.scss");
         InputPortsFormComponent,
         CommandLineComponent,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
             <form class="clt-editor-group" [formGroup]="cltEditorGroup">
                 

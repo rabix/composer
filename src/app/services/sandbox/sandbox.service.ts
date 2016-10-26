@@ -33,7 +33,7 @@ export class SandboxService {
             codeToExecute = "(function()" + code + ")()";
         }
 
-        this.plugin = new jailed.DynamicPlugin( this.initializeEngine());
+        this.plugin = new jailed.DynamicPlugin(this.initializeEngine());
 
         this.plugin.whenConnected(() => {
             this.plugin.remote.execute(codeToExecute, context, (res) => {
@@ -113,14 +113,6 @@ export class SandboxService {
             return "undefined";
         } else {
             return output.toString(); // everything except undefined will be a string
-        }
-    }
-
-    public getValueFromSandBoxResponse(sandboxResponse: SandboxResponse): string {
-        if (sandboxResponse.output === "undefined" || sandboxResponse.output === "null") {
-            return "";
-        } else {
-            return sandboxResponse.output;
         }
     }
 }

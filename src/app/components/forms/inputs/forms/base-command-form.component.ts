@@ -41,8 +41,8 @@ require("./base-command-form.components.scss");
                     </expression-input>
 
                     <span class="close-icon col-sm-1">
-                                    <i class="fa fa-times" (click)="removeBaseCommand(i)"></i>
-                                </span>
+                        <i class="fa fa-times" (click)="removeBaseCommand(i)"></i>
+                    </span>
                 </div> <!-- base-command-list-->
             </div> <!-- list container-->
 
@@ -92,15 +92,19 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         const inputBaseCommands = this.baseCommandService.baseCommandsToFormList(this.toolBaseCommand);
         this.baseCommandService.setBaseCommands(inputBaseCommands);
+        this.baseCommandFormList = inputBaseCommands;
+        this.createExpressionInputControls(this.baseCommandFormList);
 
         this.subs.push(
-            this.baseCommandService.baseCommands.subscribe((commandList: ExpressionModel[]) => {
-                this.baseCommandFormList = commandList;
-                this.createExpressionInputControls(this.baseCommandFormList);
+            this.baseCommandService.baseCommands
+                .skip(1)
+                .subscribe((commandList: ExpressionModel[]) => {
+                    this.baseCommandFormList = commandList;
+                    this.createExpressionInputControls(this.baseCommandFormList);
 
-                //Format the base commands from the inputs, and set the tool baseCommand
-                this.onUpdate.next(this.baseCommandService.formListToBaseCommandArray(this.baseCommandFormList));
-            })
+                    //Format the base commands from the inputs, and set the tool baseCommand
+                    this.onUpdate.next(this.baseCommandService.formListToBaseCommandArray(this.baseCommandFormList));
+                })
         );
     }
 
