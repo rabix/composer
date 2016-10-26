@@ -1,6 +1,7 @@
 export const ACE_MODES_MAP = {
     java: "java",
     js: "javascript",
+    javascript: "javascript",
     json: "json",
     md: "markdown",
     py: "python",
