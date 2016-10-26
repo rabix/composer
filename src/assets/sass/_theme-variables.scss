@@ -56,23 +56,26 @@ $arg-color: #FDA365;
 /**
  * FILE TABS
  */
-$main-header-bg: $brand-primary-bg-dark;
-$tab-bg: $brand-primary-bg-bright;
+$main-header-bg: #333;
+$main-header-height: 44px;
+$tab-bg: $chrome-dark-bg-secondary;
 $tab-color: $text-light;
 
 $tab-hover-bg: $tab-bg;
 $tab-hover-color: white;
 
-$tab-select-bg: white;
-$tab-select-color: $brand-primary-bg-dark;
+$tab-select-bg: $body-bg;
+$tab-select-color: $body-color;
 
 /**
  * SIDE PANELS
  */
-$panel-bg: $brand-primary-bg;
-$panel-resize-handle-color: $brand-primary-bg-dark;
-$panel-header-bg: $brand-primary-bg-bright;
-$panel-header-color: white;
+$panel-resize-handle-width: 4px;
+$panel-resize-handle-color: $chrome-dark-bg;
+
+$panel-bg: $chrome-dark-bg;
+$panel-header-bg: $chrome-dark-bg-secondary;
+$panel-header-color: $chrome-dark-text;
 
 /**
  * PANEL ITEMS
@@ -80,28 +83,28 @@ $panel-header-color: white;
 $panel-item-color: white;
 $panel-item-icon-color: $panel-item-color;
 
-$panel-item-hover-bg: $brand-primary-bg-dark;
+$panel-item-hover-bg: lighten($panel-bg, 5%);
 $panel-item-hover-color: $panel-item-color;
 
-$panel-item-select-bg: $brand-primary-bg-bright;
+$panel-item-select-bg: $chrome-dark-bg-secondary;
 $panel-item-select-color: white;
 $panel-item-icon-select-color: $panel-item-select-color;
 
 /**
  * PANEL TABS
  */
-$panel-side-tab-zone-bg: $brand-primary-bg-dark;
-$panel-side-tab-zone-border: $brand-primary-bg-dark;
+$panel-side-tab-zone-bg: $chrome-dark-bg;
+$panel-side-tab-zone-border: $panel-side-tab-zone-bg;
 
-$panel-side-tab-bg: $brand-primary-bg-dark;
+$panel-side-tab-bg: $panel-side-tab-zone-bg;
 $panel-side-tab-color: white;
 $panel-side-tab-icon-color: #f0ad4e;
 
-$panel-side-tab-hover-bg: lighten($brand-primary-bg-dark, 5%);
+$panel-side-tab-hover-bg: lighten($panel-side-tab-zone-bg, 5%);
 $panel-side-tab-hover-color: $panel-side-tab-color;
 $panel-side-tab-hover-icon-color: $panel-side-tab-icon-color;
 
-$panel-side-tab-select-bg: $brand-primary-bg-bright;
+$panel-side-tab-select-bg: $chrome-dark-bg-secondary;
 $panel-side-tab-select-color: $panel-side-tab-color;
 $panel-side-tab-select-icon-color: $panel-side-tab-icon-color;
 

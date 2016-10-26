@@ -2,14 +2,14 @@
 
 .ct-workbox-head {
   color: white;
-  height: $workbox-tabs-height;
+  height: $main-header-height;
   width: 100%;
   background: $main-header-bg;
 }
 
 .ct-workbox-body {
   background: $editor-bg;
-  height: calc(100% - #{$workbox-tabs-height});
+  height: calc(100% - #{$main-header-height});
   color: $editor-color;
   overflow-x: hidden;
   overflow-y: auto;

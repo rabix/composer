@@ -34,6 +34,11 @@ $form-elements-border-color: #c7c7c7;
 $background-grey: #f9f9f9;
 $background-light: #fff;
 
+$chrome-dark-bg: #333;
+$chrome-dark-bg-secondary: #4F4F4F;
+$chrome-dark-text: #fff;
+$chrome-dark-highlight: $brand-primary;
+
 /**
 * SBG colors
 */
@@ -83,11 +88,6 @@ $collapse-icon-width: 20px;
 $editor-padding-top: 10px;
 $header-padding: .625rem;
 $editor-header-height: $header-padding * 2 + $btn-padding-y-sm * 2 + $btn-line-height;
-
-/**
-* Workbox
-*/
-$workbox-tabs-height: 44px;
 
 
 $padding-sm: 10px;
