@@ -29,12 +29,12 @@ import {TreeViewService} from "./tree-view.service";
                 <i class="fa fa-fw" [ngClass]="getIconRules(node.icon)"></i>
             </span>
             
-            <span *ngIf="node" class="name-container">
+            <span *ngIf="node" class="name-container" [title]="node.name">
                 <span class="name" *ngFor="let namePart of nameParts">{{ namePart }}</span>
             </span>
             
             <span *ngIf="node.onClose" class="pull-right">
-                <button type="button" class="text-primary btn-link clickable" (click)="node.onClose()">&times;</button>
+                <button type="button" class="text-primary btn-link no-underline-hover clickable" (click)="node.onClose()">&times;</button>
             </span>
         </div>
         

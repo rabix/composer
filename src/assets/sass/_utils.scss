@@ -32,6 +32,11 @@
   }
 }
 
+.no-underline-hover:hover,
+.no-underline-hover:focus {
+  text-decoration: none;
+}
+
 .zero-size {
   font-size: 0px;
 }
