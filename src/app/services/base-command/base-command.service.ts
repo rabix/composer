@@ -133,26 +133,16 @@ export class BaseCommandService {
                 newCommandInput = newCommandInput.concat(commandToAdd);
 
                 if (index === toolBaseCommand.length - 1) {
-                    commandInputList.push(new ExpressionModel({
-                        value: newCommandInput,
-                        evaluatedValue: newCommandInput,
-                    }));
+                    commandInputList.push(new ExpressionModel(newCommandInput));
                 }
 
             } else {
                 if (newCommandInput !== "") {
                     const newValue = newCommandInput.slice(0, -1);
-                    commandInputList.push(new ExpressionModel({
-                        value: newValue,
-                        evaluatedValue: newValue,
-                    }));
+                    commandInputList.push(new ExpressionModel(newValue));
                 }
 
-                commandInputList.push(new ExpressionModel({
-                    value: command,
-                    evaluatedValue: newCommandInput,
-                }));
-
+                commandInputList.push(new ExpressionModel(command));
                 newCommandInput = "";
             }
         });
