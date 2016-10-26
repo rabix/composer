@@ -17,7 +17,7 @@ const {app} = window.require("electron").remote;
     directives: [TreeViewComponent, PanelToolbarComponent],
     providers: [LocalDataSourceService, IpcService],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    host: {class: "block"},
+    host: {"class": "block"},
     template: `
         <ct-panel-toolbar>
             <span class="tc-name">Local Files</span>
@@ -31,14 +31,13 @@ export class LocalFilesPanelComponent {
     @Input()
     private nodes = new BehaviorSubject([]);
 
-    private isLoading = true;
-
     constructor(private fs: LocalDataSourceService,
-                private detector: ChangeDetectorRef,
                 private modal: ModalService,
                 private eventHub: EventHubService) {
 
+        // Gets the absolute path to the current user's Home folder
         const homePath = app.getPath("home");
+
         this.nodes.next([
             {
                 name: "Home",
@@ -46,12 +45,58 @@ export class LocalFilesPanelComponent {
                 childrenProvider: this.recursivelyMapChildrenToNodes(() => this.fs.watch(homePath)),
                 contextMenu: [
                     new MenuItem("New File...", {
-                        click: () => this.createNewFileModal(homePath),
-
+                        click: () => this.createNewFileModal(homePath)
+                    }),
+                    new MenuItem("Remove from Workspace", {
+                        click: () => {
+                        }
                     })
                 ],
             }
         ]);
+    }
+
+
+    /**
+     * Produces an array of menu items that should appear as the context menu for a particular item
+     * @param item
+     * @returns {MenuItem[]}
+     */
+    private createContextMenu(item): MenuItem[] {
+
+        const items = [];
+
+        const newFile = new MenuItem("New File...", {
+            click: () => this.createNewFileModal(item.isDir ? item.path : item.dirname)
+        });
+
+        const newFolder = new MenuItem("New Folder...", {
+            click: () => {
+            }
+        });
+
+        const remove = new MenuItem("Delete", {
+            click: () => {
+                this.modal.confirm({
+                    title: "Really Delete?",
+                    content: `Are you sure that you want to delete “${item.path}”?`,
+                    cancellationLabel: "No, keep it",
+                    confirmationLabel: "Yes, delete it"
+                }).then(confirm => {
+                    console.log("Delete the file");
+                }, cancel => {
+                    console.log("Keep the file");
+                })
+            }
+        });
+
+        items.push(newFile);
+        if (item.isDir) {
+            items.push(newFolder);
+        }
+        items.push(remove);
+
+        return items;
     }
 
     private recursivelyMapChildrenToNodes(childrenProvider) {
@@ -64,12 +109,7 @@ export class LocalFilesPanelComponent {
                 name: item.name,
                 icon: item.isDir ? "folder" : (item.type || "file"),
                 isExpandable: item.isDir,
-                contextMenu: [
-                    new MenuItem("New File...", {
-                        click: () => this.createNewFileModal(item.isDir ? item.path : item.dirname),
-
-                    })
-                ],
+                contextMenu: this.createContextMenu(item),
                 childrenProvider: this.recursivelyMapChildrenToNodes(item.childrenProvider),
                 openHandler: () => {
                     this.eventHub.publish(this.createOpenFileTabAction(item))
@@ -98,7 +138,6 @@ export class LocalFilesPanelComponent {
     }
 
     private createOpenFileTabAction(file) {
-        console.log("Opening", file);
         return new OpenTabAction({
             id: file.id,
             title: Observable.of(file.name),

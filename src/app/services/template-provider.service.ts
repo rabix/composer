@@ -5,7 +5,7 @@ const templates = {
     "draft-2-command-line-tool": require("../templates/draft-2-command-line-tool.json")
 };
 
-type TemplateType = "draft-2-workflow" | "draft-2-command-line-tool";
+type TemplateType = "draft-2-workflow" | "draft-2-command-line-tool" | string;
 
 @Injectable()
 export class TemplateProviderService {

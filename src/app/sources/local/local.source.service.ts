@@ -85,6 +85,12 @@ export class LocalDataSourceService {
         return creation;
     }
 
+    public remove(path): Observable<any> {
+        const deletion = this.ipc.request("deletePath", {path}).share();
+
+        return deletion;
+    }
+
     private wrapFileEntry(entry) {
         let content, save = undefined;
 

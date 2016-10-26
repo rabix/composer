@@ -2,6 +2,7 @@ import {Injectable, ComponentFactoryResolver, ViewContainerRef, ComponentRef, Ap
 import {ModalComponent, ModalOptions} from "./modal.component";
 import {Subject} from "rxjs";
 import {ConfirmComponent} from "./common/confirm.component";
+import {noop} from "../../lib/utils.lib";
 
 @Injectable()
 export class ModalService {
@@ -55,25 +56,20 @@ export class ModalService {
 
             const {content, confirmationLabel, cancellationLabel} = params;
 
-            this.show<ConfirmComponent>(ConfirmComponent, {
+            const comp = this.show<ConfirmComponent>(ConfirmComponent, {
                 title: params.title,
                 componentState: {
                     content,
                     confirmationLabel,
                     cancellationLabel
                 }
-            }).then(componentRef => {
-                const cmp = componentRef.instance;
-
-                cmp.confirm.first().subscribe(_ => {
-                    resolve(true);
-                    this.close();
-                });
-                cmp.cancel.first().subscribe(_ => {
-                    reject();
-                    this.close();
-                });
             });
+            comp.decision.subscribe(
+                accepted => {
+                    this.close();
+                    accepted ? resolve(true) : reject();
+                });
+
         });
 
         const outsideClosings = new Promise((resolve, reject) => {

@@ -124,12 +124,10 @@ export class NewFileModalComponent {
         const template = this.template.compile(templateParams.id, templateParams.params);
 
         this.save(path, template).subscribe(result => {
-            console.debug("Got result", result);
             this.isCreatingFile = false;
             this.modal.close();
         }, err => {
-            console.debug("Got error", err);
-            this.error          = {message: err};
+            this.error          = err;
             this.isCreatingFile = false;
         });
     }

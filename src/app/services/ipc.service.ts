@@ -13,7 +13,13 @@ export class IpcService {
         ipcRenderer.on("data-reply", (sender, response) => {
 
             console.debug("Data reply received", response);
-            this.pendingRequests[response.id].next(response.data);
+            const request: AsyncSubject<any> = this.pendingRequests[response.id];
+
+            if (response.error) {
+                request.error(response.error);
+            }
+            request.next(response.data);
+
             this.pendingRequests[response.id].complete();
             delete this.pendingRequests[response.id];
 
@@ -24,19 +30,13 @@ export class IpcService {
         const messageID = this.guid.generate();
 
         this.pendingRequests[messageID] = new AsyncSubject();
-        console.trace("Sending", message , "(", messageID,")", data);
+        console.trace("Sending", message, "(", messageID, ")", data);
         ipcRenderer.send("data-request", {
             id: messageID,
             message,
             data
         });
 
-        return this.pendingRequests[messageID].flatMap(response => {
-            if (response.error) {
-                return Observable.throw(response.error);
-            }
-
-            return Observable.of(response);
-        });
+        return this.pendingRequests[messageID];
     }
 }
