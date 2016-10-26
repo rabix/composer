@@ -34,7 +34,7 @@ import {TreeViewService} from "./tree-view.service";
             </span>
             
             <span *ngIf="node.onClose" class="pull-right">
-                <button type="button" class="text-primary btn-link clickable" (click)="node.onClose()">&times;</button>
+                <button type="button" class="text-primary btn-link no-underline-hover clickable" (click)="node.onClose()">&times;</button>
             </span>
         </div>
         
