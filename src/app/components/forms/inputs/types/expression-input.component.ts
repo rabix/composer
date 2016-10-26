@@ -9,8 +9,9 @@ require("./expression-input.component.scss");
     selector: 'expression-input',
     template: `
             <div class="input-group" *ngIf="control">
+            
+            <!--TODO: [disabled]="disabled" -->
                 <input class="form-control"
-                        [disabled]="disabled"
                         (keyup)="modelChange($event)"
                         [formControl]="control"
                         [readonly]="expression.serialize().script ? 'true' : null"/>

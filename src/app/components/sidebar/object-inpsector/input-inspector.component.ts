@@ -2,7 +2,7 @@ import {Component, OnInit, OnDestroy} from "@angular/core";
 import {ExpressionInputComponent} from "../../forms/inputs/types/expression-input.component";
 import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 import {Subscription} from "rxjs/Subscription";
-import {InputSidebarService} from "../../../services/sidebars/input-sidebar.service";
+import {InputSidebarService, InputInspectorData} from "../../../services/sidebars/input-sidebar.service";
 import {BasicInputSectionComponent} from "./basic-section/basic-input-section.component";
 
 require("./input-inspector.component.scss");
@@ -20,7 +20,8 @@ require("./input-inspector.component.scss");
                     <i class="fa fa-info-circle info-icon"></i>
                 </div>
             
-                <basic-input-section [selectedProperty]="selectedProperty"></basic-input-section>
+                <basic-input-section [selectedProperty]="selectedProperty"
+                                     [context]="context"></basic-input-section>
             </form>
     `
 })
@@ -31,12 +32,15 @@ export class InputInspectorComponent implements OnInit, OnDestroy {
 
     private subs: Subscription[] = [];
 
+    private context: any;
+
     constructor(private inputSidebarService: InputSidebarService) { }
 
     ngOnInit(): void {
         this.subs.push(
-            this.inputSidebarService.inputPortDataStream.subscribe((input: InputProperty) => {
-                this.selectedProperty = input;
+            this.inputSidebarService.inputPortDataStream.subscribe((data: InputInspectorData) => {
+                this.selectedProperty = data.inputProperty;
+                this.context = data.context;
             })
         );
     }

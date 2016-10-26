@@ -40,6 +40,8 @@ import {ToolHeaderComponent} from "./app/components/tool-editor/tool-header/tool
 import {CommandLineComponent} from "./app/components/clt-editor/commandline/commandline.component";
 import {InputInspectorComponent} from "./app/components/sidebar/object-inpsector/input-inspector.component";
 import {ExpressionEditorComponent} from "./app/components/sidebar/expression-editor/expression-editor.component";
+import {BasicInputSectionComponent} from "./app/components/sidebar/object-inpsector/basic-section/basic-input-section.component";
+import {ToggleComponent} from "./app/components/common/toggle-slider/toggle-slider.component";
 
 @NgModule({
     providers: [
@@ -59,6 +61,7 @@ import {ExpressionEditorComponent} from "./app/components/sidebar/expression-edi
         ExpressionInputComponent,
         FormSectionComponent,
         InputInspectorComponent,
+        BasicInputSectionComponent,
         InputInspectorSidebarComponent,
         InputPortListComponent,
         InputPortsFormComponent,
@@ -87,6 +90,7 @@ import {ExpressionEditorComponent} from "./app/components/sidebar/expression-edi
         ViewModeSwitchComponent,
         WorkboxComponent,
         WorkflowEditorComponent,
+        ToggleComponent
     ],
     imports: [BrowserModule, FormsModule, HttpModule, ReactiveFormsModule],
     bootstrap: [MainComponent]
