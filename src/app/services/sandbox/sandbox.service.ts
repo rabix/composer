@@ -9,9 +9,6 @@ export interface SandboxResponse {
 
 export class SandboxService {
 
-    /** Jailed plugin instance */
-    private plugin: any;
-
     /** Result of the expression evaluation */
     private expressionResult: Observable<SandboxResponse>;
 
@@ -24,7 +21,6 @@ export class SandboxService {
 
     // sends the input to the plugin for evaluation
     public submit(code: string, context?: any): Observable<SandboxResponse> {
-
         //make sure the code is a string
         let codeToExecute = code;
 
@@ -33,27 +29,30 @@ export class SandboxService {
             codeToExecute = "(function()" + code + ")()";
         }
 
-        this.plugin = new jailed.DynamicPlugin(this.initializeEngine());
+        const plugin = new jailed.DynamicPlugin(this.initializeEngine());
 
-        this.plugin.whenConnected(() => {
-            this.plugin.remote.execute(codeToExecute, context, (res) => {
-                this.updateExpressionResult.next(res);
-                this.disconnect();
-            });
-            this.waitFoResponse();
+        plugin.whenConnected(() => {
+            if (plugin.remote) {
+                plugin.remote.execute(codeToExecute, context, (res) => {
+                    this.updateExpressionResult.next(res);
+                    this.disconnect(plugin);
+                });
+            }
+
+            this.waitFoResponse(plugin);
         });
 
         return this.expressionResult;
     }
 
-    private waitFoResponse(): void {
+    private waitFoResponse(plugin): void {
         setTimeout(() => {
-            this.disconnect();
+            this.disconnect(plugin);
         }, 3000);
     }
 
-    private disconnect(): void {
-        this.plugin.disconnect();
+    private disconnect(plugin): void {
+        plugin.disconnect();
     }
 
     private initializeEngine(): string {
@@ -76,7 +75,6 @@ export class SandboxService {
 
     // protects even the worker scope from being accessed
     public runHidden(code): any {
-
         const indexedDB = undefined;
         const location = undefined;
         const navigator = undefined;
@@ -108,7 +106,6 @@ export class SandboxService {
 
     // converts the output into a string
     public stringify(output: any): string {
-
         if (typeof output === "undefined") {
             return "undefined";
         } else {

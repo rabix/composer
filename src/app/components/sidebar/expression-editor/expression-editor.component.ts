@@ -49,16 +49,6 @@ require("./expression-editor.component.scss");
                     <div class="expression-result-value">
                        {{evaluatedExpression}}
                     </div>
-                   
-                    <div class="expression-result-overlay">
-                        <div class="execute-button-container">
-                            <button type="button" 
-                                    class="btn btn-sm btn-outline-secondary execute-button"
-                                    (click)="evaluateExpression()"><i class="fa fa-refresh"></i> Update</button>
-                        </div>
-                    </div>
-                   
-                   
                 </div>
          </div>
  `
@@ -119,6 +109,7 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
                 })
                 .subscribe(expression => {
                     this.codeToEvaluate = expression;
+                    this.evaluateExpression();
                 })
         );
     }
