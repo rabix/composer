@@ -18,6 +18,7 @@ import {ToolSidebarService} from "../../services/sidebars/tool-sidebar.service";
 
 import {ExpressionSidebarService} from "../../services/sidebars/expression-sidebar.service";
 import {InputSidebarService} from "../../services/sidebars/input-sidebar.service";
+import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 
 
 require("./tool-editor.component.scss");
@@ -33,10 +34,13 @@ require("./tool-editor.component.scss");
         CommandLineComponent,
         SidebarComponent,
         ViewModeSwitchComponent,
-        ValidationIssuesComponent
+        ValidationIssuesComponent,
     ],
     template: `
-        <div class="editor-container">
+        <block-loader *ngIf="isLoading"></block-loader>
+
+
+        <div class="editor-container" *ngIf="!isLoading">
             <tool-header class="editor-header"
                          (save)="save($event)"
                          [fileIsValid]="isValidCWL"
@@ -79,8 +83,12 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
     /** Default view mode. */
     private viewMode: "code"|"gui" = "code";
 
+    private isLoading = true;
+
+    private promptOnGui: boolean;
+
     /** Flag for bottom panel, shows validation-issues, commandline, or neither */
-    //@todo(maya) consider using ct-panel-switcher instead
+            //@todo(maya) consider using ct-panel-switcher instead
     private bottomPanel: "validation"|"commandLine"|null;
 
     private toolModel = new CommandLineToolModel();
@@ -95,8 +103,8 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
 
     private rawEditorContent = new BehaviorSubject("");
 
-    constructor(private webWorkerService: WebWorkerService) {
-
+    constructor(private webWorkerService: WebWorkerService, private userPrefService: UserPreferencesService) {
+        this.promptOnGui = this.userPrefService.get("promptOnGuiFormat");
     }
 
     ngOnInit(): void {
@@ -107,8 +115,19 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
             .subscribe(this.schemaValidation);
 
         this.rawEditorContent.subscribe(raw => {
+            this.isLoading = false;
             try {
-                this.toolModel        = new CommandLineToolModel(JSON.parse(raw));
+                let json              = JSON.parse(raw);
+
+                if (this.promptOnGui === undefined) {
+                    this.promptOnGui = json["ct:modified"] === undefined;
+                }
+
+                if (!this.promptOnGui) {
+                    json["ct:modified"] = true;
+                }
+
+                this.toolModel        = new CommandLineToolModel(json);
                 this.commandLineParts = this.toolModel.getCommandLineParts();
             } catch (ex) {
                 // if the file isn't valid JSON, do nothing
@@ -137,10 +156,21 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
     }
 
     private switchView(ev) {
-        this.viewMode = ev;
-        if (ev === "code") {
-            this.rawEditorContent.next(JSON.stringify(this.toolModel.serialize(), null, 4));
+        if (ev === "gui" && this.promptOnGui) {
+            this.promptOnGui = !confirm(`Activating GUI mode might change the formatting of this document. Do you wish to continue?`);
         }
+
+        if (ev === "code") {
+            let json = this.toolModel.serialize();
+
+            if (!this.promptOnGui) {
+                json["ct:modified"] = true;
+            }
+
+            this.rawEditorContent.next(JSON.stringify(json, null, 4));
+        }
+
+        this.viewMode = ev;
     }
 
     private selectBottomPanel(panel: "validation"|"commandLineTool") {

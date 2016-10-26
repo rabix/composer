@@ -22,7 +22,9 @@ import {WebWorkerService} from "../../services/web-worker/web-worker.service";
                                 [readOnly]="!data.isWritable"
                                 [language]="data.language"></ct-code-editor>
         
-                <div>Workflow Editor Coming Soon</div>
+                <div [hidden]="viewMode !== 'gui'">
+                    Workflow Editor Coming Soon
+                </div>
             </div>
         
             <div class="status-bar-footer">
