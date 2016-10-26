@@ -55,12 +55,19 @@ const handlers = {
                             .bindNodeCallback(fs.readFile)(item.path, "utf8")
                             .map(raw => {
                                 const loaded = yaml.safeLoad(raw);
-                                return loaded ? loaded["class"] : undefined;
+                                if (loaded && ["CommandLineTool", "Workflow", "ExpressionTool"]
+                                        .indexOf(loaded["class"]) !== -1) {
+                                    return loaded["class"];
+                                }
+
+                                return undefined;
                             })
                             .catch(err => {
+                                // Handle errors?
                                 console.log("Caught an error on parsing ", item.path, err);
                                 return Observable.of("");
                             })
+                            .onErrorResumeNext()
                             .do(cls => item.type = cls)
                             .toPromise()
                     });
