@@ -1,5 +1,4 @@
 import {Component, OnInit, OnDestroy} from "@angular/core";
-import {REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
 import {ExpressionInputComponent} from "../../forms/inputs/types/expression-input.component";
 import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 import {Subscription} from "rxjs/Subscription";
@@ -11,8 +10,6 @@ require("./input-inspector.component.scss");
 @Component({
     selector: "input-inspector",
     directives: [
-        REACTIVE_FORM_DIRECTIVES,
-        FORM_DIRECTIVES,
         ExpressionInputComponent,
         BasicInputSectionComponent
     ],

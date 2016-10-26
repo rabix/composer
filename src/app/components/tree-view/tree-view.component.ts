@@ -68,7 +68,7 @@ export class TreeViewComponent {
                     }
 
                     // Take all top-level tree-node components
-                    const treeNodes = this.treeNodes.toArray();
+                    const treeNodes: Array = this.treeNodes.toArray();
 
                     // Recursively find all their children
                     const next = [].concat.apply(treeNodes, treeNodes.map(node => node.getChildren().toArray()))
@@ -97,7 +97,7 @@ export class TreeViewComponent {
         );
 
         this.subs.push(
-            this.tree.selectedNode.filter(c => c).map(comp => comp.el).subscribe(el => {
+            this.tree.selectedNode.filter(c => c).map(comp => comp.el.querySelector(".node-base")).subscribe(el => {
                 const nodeRect       = el.getBoundingClientRect();
                 const treeRect       = this.el.getBoundingClientRect();
                 const nodeFromAbove  = nodeRect.top - treeRect.top;

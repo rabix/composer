@@ -9,100 +9,72 @@ export interface SandboxResponse {
 
 export class SandboxService {
 
-    /** External Job exposed to the jailedApi */
-    public exposedJob: Object;
-
-    public exposedSelf: Object;
-
-    /** Object exposed to Jailed */
-    private jailedApi: Object;
-
-    /** Jailed plugin instance */
-    private plugin: any;
-
     /** Result of the expression evaluation */
     private expressionResult: Observable<SandboxResponse>;
 
-    private updateExpressionResult: Subject<SandboxResponse> = new Subject<SandboxResponse>(undefined);
+    private updateExpressionResult: Subject<SandboxResponse> = new Subject<SandboxResponse>();
 
     constructor() {
-        const self = this;
-
         this.expressionResult = this.updateExpressionResult
             .filter(result => result !== undefined);
-
-        this.jailedApi = {
-            output: function(data) {
-                const output: string = self.stringify(data.output);
-                const error: string = data.error;
-
-                self.updateExpressionResult.next({
-                    output: output,
-                    error: error
-                });
-
-                self.disconnect();
-            }
-        };
     }
 
     // sends the input to the plugin for evaluation
-    public submit(code): Observable<SandboxResponse> {
-
+    public submit(code: string, context?: any): Observable<SandboxResponse> {
         //make sure the code is a string
-        const codeToExecute: string = JSON.stringify(code);
+        let codeToExecute = code;
 
-        const $job: string = this.exposedJob ? JSON.stringify(this.exposedJob): undefined;
-        const $self: string = this.exposedSelf ? JSON.stringify(this.exposedSelf): undefined;
-        const expressionCode = this.createExpressionCode(codeToExecute, $job, $self);
+        //@todo(maya) check should be replaced with CWL-TS expression evaluator
+        if (code.charAt(0) === '{') {
+            codeToExecute = "(function()" + code + ")()";
+        }
 
-        this.plugin = new jailed.DynamicPlugin(expressionCode, this.jailedApi);
+        const plugin = new jailed.DynamicPlugin(this.initializeEngine());
 
-        this.plugin.whenConnected(() => {
-            this.waitFoResponse();
+        plugin.whenConnected(() => {
+            if (plugin.remote) {
+                plugin.remote.execute(codeToExecute, context, (res) => {
+                    this.updateExpressionResult.next(res);
+                    this.disconnect(plugin);
+                });
+            }
+
+            this.waitFoResponse(plugin);
         });
 
         return this.expressionResult;
     }
 
-    private waitFoResponse(): void {
+    private waitFoResponse(plugin): void {
         setTimeout(() => {
-            console.log("Sandbox response timed out.");
-            this.disconnect();
+            this.disconnect(plugin);
         }, 3000);
     }
 
-    private disconnect(): void {
-        this.plugin.disconnect();
+    private disconnect(plugin): void {
+        plugin.disconnect();
     }
 
-    private createExpressionCode(codeToExecute, $job, $self): string {
+    private initializeEngine(): string {
         return `var runHidden = ${this.runHidden};
-           
-            var execute = function(codeString, job, self) {
-            
-                var result = {
-                    output: undefined,
-                    error: undefined
-                };
 
-                try {
-                    result.output = runHidden(codeString, job, self);
-                } catch(e) {
-                    result.error = e.message;
+            application.setInterface({
+                execute: function (codeString, context, cb) {
+                    // populate global self with context
+                    self = Object.assign(self, context);
+                    
+                    try {
+                        var res = runHidden(codeString);
+                        cb({output: res});
+                    } catch(e) {
+                        cb({error: e.message});
+                    }
                 }
-
-                application.remote.output(result);
-            }
-            `
-            // We don't use a template literal for the code,
-            // because we want to evaluate it inside the worker.
-            + "execute(" + codeToExecute + "," + $job + "," + $self + ")";
+            })`;
     }
 
     // protects even the worker scope from being accessed
-    public runHidden(code, $job?, $self?): any {
-
+    public runHidden(code): any {
         const indexedDB = undefined;
         const location = undefined;
         const navigator = undefined;
@@ -134,28 +106,10 @@ export class SandboxService {
 
     // converts the output into a string
     public stringify(output: any): string {
-        let result: any;
-
-        if (typeof output === "string") {
-            return output
-        }
-
         if (typeof output === "undefined") {
-            result = "undefined";
-        } else if (output === null) {
-            result = "null";
+            return "undefined";
         } else {
-            result = JSON.stringify(output) || output.toString();
-        }
-
-        return result;
-    }
-
-    public getValueFromSandBoxResponse(sandboxResponse: SandboxResponse): string {
-        if (sandboxResponse.output === "undefined" || sandboxResponse.output === "null") {
-            return "";
-        } else {
-            return sandboxResponse.output;
+            return output.toString(); // everything except undefined will be a string
         }
     }
 }

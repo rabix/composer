@@ -15,7 +15,7 @@ export interface DataEntrySource {
     data?: any;
     type?: "file" | "folder",
     isWritable?: boolean;
-    save?: any | ((...args: any[])=> void | Observable<any>)
+    save?: ((...args: any[])=> Observable<any>)
     sourceId?: DATA_SOURCE_ID;
     content?: Observable<string> | any,
     language?: Observable<string> | any,

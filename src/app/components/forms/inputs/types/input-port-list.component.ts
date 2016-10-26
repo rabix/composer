@@ -61,6 +61,9 @@ export class InputPortListComponent implements OnDestroy {
     @Input()
     private selectedIndex: number;
 
+    @Input()
+    private context: any;
+
     private portList: Array<InputProperty> = [];
 
     private subs: Subscription[];
@@ -81,7 +84,10 @@ export class InputPortListComponent implements OnDestroy {
     private editProperty(index: number): void {
         this.selectedIndex = index;
         const selectedInputPort = this.portList[index];
-        this.inputSidebarService.openInputInspector(selectedInputPort);
+        this.inputSidebarService.openInputInspector({
+            inputProperty: selectedInputPort,
+            context: this.context
+        });
     }
 
     private removeProperty(event: Event, index: number): void {

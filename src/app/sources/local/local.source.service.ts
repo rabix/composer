@@ -1,8 +1,7 @@
 import {Injectable} from "@angular/core";
 import {DataEntrySource} from "../common/interfaces";
-import {Observable, ReplaySubject, Subscriber} from "rxjs";
-import {Stats} from "fs";
-import {FileName} from "../../components/forms/models";
+import {Observable, ReplaySubject} from "rxjs";
+import {IpcService} from "../../services/ipc.service";
 
 const fs    = window.require("fs");
 const {app} = window.require("electron").remote;
@@ -22,77 +21,37 @@ export class LocalDataSourceService {
         return data;
     }
 
+    constructor(private ipc: IpcService) {
+    }
+
     private getChildrenProvider(dir: string) {
-        const readDir = Observable.bindNodeCallback(fs.readdir);
-        const stat    = Observable.bindNodeCallback(fs.lstat);
 
-        return readDir(dir)
-            .flatMap(Observable.from as any)
-            .filter(name => name.charAt(0) !== ".")
-            .flatMap(name => {
-                const path = `${dir}/${name}`;
-
-                const content = new Observable((subscriber: Subscriber) => {
-                    this.readFileContent(path).first().subscribe(content => {
-                        subscriber.next(content);
-                    });
-                });
-
-                return stat(path).map((s: Stats) => ({
-                    name,
-                    path,
-                    isDir: s.isDirectory(),
-                    isFile: s.isFile(),
-                    isWritable: true,
-                    childrenProvider: s.isDirectory() ? this.getChildrenProviderFunction(path) : undefined,
-                    content: s.isFile() ? content : undefined,
-                    save: s.isFile() ? this.getContentSavingFunction(path) : undefined,
-                    id: "local_" + path,
-                    language: new FileName(path).extension,
-                    type: this.determineContentType(path),
-                    sourceId: "local"
-
-                }) as DataEntrySource)
-            })
-            .reduce((acc, stat) => acc.concat(stat), []);
+        return this.ipc.request("readDirectory", dir).flatMap(Observable.from)
+            .map(entry => Object.assign(entry,{
+                source: "local",
+                childrenProvider: entry.isDir ? this.getChildrenProviderFunction(entry.path) : undefined,
+                content: !entry.isFile ? undefined : new Observable(sub => {
+                    this.readFileContent(entry.path).take(1).subscribe(content => {
+                        sub.next(content)
+                    })
+                }),
+                save: entry.isFile ? this.getContentSavingFunction(entry.path) : undefined
+            }))
+            .reduce((acc, item) => acc.concat(item), [])
     }
 
     private readFileContent(path) {
 
-        return Observable.bindNodeCallback(fs.readFile)(path, "utf8");
+        return this.ipc.request("readFileContent", path);
     }
 
     private getContentSavingFunction(path) {
 
-        return content => {
-            const start = new ReplaySubject();
-            fs.writeFile(path, content, {
-                encoding: "utf8",
-            }, (err, success) => {
-                start.next(arguments);
-            });
-            return start;
-        };
+        return content => this.ipc.request("saveFileContent", {path, content});
 
     }
 
     private getChildrenProviderFunction(path) {
         return _ => this.getChildrenProvider(path);
-    }
-
-    private determineContentType(path) {
-
-        const ext = new FileName(path).extension;
-
-        if (["yml", "yaml", "json", "cwl"].indexOf(ext) === -1) {
-            return ""
-        }
-
-        const loaded = yaml.safeLoad(fs.readFileSync(path, "utf8"), {
-            onError: () => {
-            }
-        });
-
-        return loaded["class"];
     }
 }

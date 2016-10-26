@@ -6,11 +6,11 @@ import {Subscription} from "rxjs/Subscription";
 import {Subject} from "rxjs/Subject";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ExpressionSidebarService} from "../../../services/sidebars/expression-sidebar.service";
-import {ExpressionModel} from "cwlts/models/d2sb";
+import {Subject, Observable} from "rxjs";
+import {Expression} from "cwlts/mappings/d2sb/Expression";
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import TextMode = AceAjax.TextMode;
-import {Observable, Subject} from "rxjs";
 
 require("./expression-editor.component.scss");
 
@@ -35,7 +35,7 @@ require("./expression-editor.component.scss");
                         
                         <button type="button" 
                             class="btn btn-sm btn-success"
-                            (click)="save()">Add</button>
+                            (click)="save()">Save</button>
                     </span>
                 </div>
                 
@@ -43,22 +43,12 @@ require("./expression-editor.component.scss");
                 
                 <div class="expression-result-container">
                     <div class="code-preview">
-                         Code preview
+                        Code preview
                     </div>
                     
                     <div class="expression-result-value">
-                           {{evaluatedExpression}}
+                       {{evaluatedExpression}}
                     </div>
-                   
-                    <div class="expression-result-overlay">
-                        <div class="execute-button-container">
-                            <button type="button" 
-                                    class="btn btn-sm btn-outline-secondary execute-button"
-                                    (click)="evaluateExpression()"><i class="fa fa-refresh"></i> Update</button>
-                        </div>
-                    </div>
-                   
-                   
                 </div>
          </div>
  `
@@ -76,6 +66,9 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
     private aceContainer: ElementRef;
 
     private editor: ExpressionEditor;
+
+    /** Global context in which expression should be evaluated */
+    private context: any;
 
     /** Code String that we send to the sandbox */
     private codeToEvaluate: string;
@@ -101,10 +94,14 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
                 .mergeMap((data:ExpressionEditorData) => {
                     this.codeToEvaluate = "";
                     this.evaluatedExpression = "";
+                    this.initialExpressionScript = "";
+                    this.context = data.context;
 
-                    this.initialExpressionScript = data.expression;
-                    this.newValueStream          = data.newExpressionChange;
+                    if ((<Expression>data.expression.serialize()).script) {
+                        this.initialExpressionScript = data.expression.getExpressionScript();
+                    }
 
+                    this.newValueStream = data.newExpressionChange;
                     this.editor         = new ExpressionEditor(ace.edit(this.aceContainer.nativeElement), this.initialExpressionScript);
                     this.codeToEvaluate = this.initialExpressionScript;
 
@@ -112,6 +109,7 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
                 })
                 .subscribe(expression => {
                     this.codeToEvaluate = expression;
+                    this.evaluateExpression();
                 })
         );
     }
@@ -120,7 +118,7 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
         this.removeSandboxSub();
         let responseResult: Subject<SandboxResponse> = new Subject<SandboxResponse>();
 
-        this.sandBoxSub = this.sandboxService.submit(this.codeToEvaluate)
+        this.sandBoxSub = this.sandboxService.submit(this.codeToEvaluate, this.context)
             .subscribe((result: SandboxResponse) => {
                 if (result.error) {
                     //TODO: make error message nicer on the UI
@@ -144,17 +142,12 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
     private save(): void {
         this.evaluateExpression()
             .subscribe((result: SandboxResponse) => {
-                const newExpression: ExpressionModel = new ExpressionModel({});
+                const newExpression: ExpressionModel = new ExpressionModel(undefined);
 
                 if (result.error) {
-                    newExpression.setEvaluatedValue(this.codeToEvaluate);
                     newExpression.setValueToExpression(this.codeToEvaluate);
-
                 } else {
-                    const responseValue = this.sandboxService.getValueFromSandBoxResponse(result);
-                    newExpression.setEvaluatedValue(responseValue);
-
-                    if (responseValue === "") {
+                    if (result.output === undefined) {
                         newExpression.setValueToString("");
                     } else {
                         newExpression.setValueToExpression(this.codeToEvaluate);
@@ -162,7 +155,6 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
                 }
 
                 this.newValueStream.next(newExpression);
-
             });
     }
 

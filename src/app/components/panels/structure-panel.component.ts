@@ -5,7 +5,7 @@ import {Component, ChangeDetectionStrategy} from "@angular/core";
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <ct-panel-toolbar>
-            <name>Document Structure</name>
+            <span class="tc-name">Document Structure</span>
         </ct-panel-toolbar>
     `
 })
