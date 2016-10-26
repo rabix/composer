@@ -156,7 +156,7 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
                 if (result.error) {
                     newExpression.setValueToExpression(this.codeToEvaluate);
                 } else {
-                    if (result === undefined) {
+                    if (result.output === undefined) {
                         newExpression.setValueToString("");
                     } else {
                         newExpression.setValueToExpression(this.codeToEvaluate);

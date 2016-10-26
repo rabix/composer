@@ -89,12 +89,19 @@ export class InputInspectorComponent implements OnInit, OnDestroy {
             this.inputSidebarService.inputPortDataStream.subscribe((data: InputInspectorData) => {
                 this.selectedProperty = data.inputProperty;
                 this.context = data.context;
-                this.inputBinding.next(this.selectedProperty.getValueFrom());
+                const valueFrom = this.selectedProperty.getValueFrom();
+
+                if (valueFrom === undefined) {
+                    this.inputBinding.next("");
+                } else {
+                    this.inputBinding.next(valueFrom);
+                }
             })
         );
 
         this.subs.push(
             this.inputBinding
+                .filter(expression => expression !== undefined)
                 .subscribe((expression: string | Expression) => {
                     let codeToEvaluate: string = "";
                     if ((<Expression>expression).script) {
