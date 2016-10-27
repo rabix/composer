@@ -27,7 +27,16 @@
     background: $panel-resize-handle-color;
     cursor: col-resize;
     display: inline-block;
-    width: 4px;
+    width: $panel-resize-handle-width;
+
+    &:before {
+      content: '';
+      display: block;
+      position: relative;
+      background-color: $main-header-bg;
+      width: $panel-resize-handle-width;
+      height: $main-header-height;
+    }
 
     &.hidden {
       width: 1px;
@@ -43,7 +52,7 @@
 }
 
 .top-bar {
-  height: 44px;
+  height: $main-header-height;
   background: $main-header-bg;
 }
 

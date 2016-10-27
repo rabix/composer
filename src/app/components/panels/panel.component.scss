@@ -13,7 +13,7 @@ ct-sb-user-projects-panel {
       color: white;
       font: inherit;
       font-size: $font-size-sm;
-      background: linear-gradient($brand-primary-bg-bright, darken($brand-primary-bg-bright, 5));
+      background: $panel-header-bg;
     }
 
     .input-group-btn {

@@ -34,6 +34,11 @@ $form-elements-border-color: #c7c7c7;
 $background-grey: #f9f9f9;
 $background-light: #fff;
 
+$chrome-dark-bg: #333;
+$chrome-dark-bg-secondary: #4F4F4F;
+$chrome-dark-text: #fff;
+$chrome-dark-highlight: $brand-primary;
+
 /**
 * SBG colors
 */
@@ -48,25 +53,6 @@ $brand-info: #f3f8fc;
 */
 $btn-padding-y: 0.4rem;
 $input-padding-y: 0.4rem;
-
-/**
-* SBG buttons
-*/
-$btn-secondary-color: $body-color;
-$btn-secondary-bg: #f9f9f9;
-$btn-secondary-border: #c7c7c7;
-
-
-$btn-success-border: #328e46;
-
-$btn-primary-bg: #337cb9;
-$btn-primary-border: #296394;
-
-$btn-danger-bg: #d8000c;
-$btn-danger-border: #804c03; // not according to style guide
-
-$btn-warning-bg: #f89406;
-$btn-warning-border: #bc7e20; // not according to style guide
 
 /**
 * Layout Size Variables
@@ -102,11 +88,6 @@ $collapse-icon-width: 20px;
 $editor-padding-top: 10px;
 $header-padding: .625rem;
 $editor-header-height: $header-padding * 2 + $btn-padding-y-sm * 2 + $btn-line-height;
-
-/**
-* Workbox
-*/
-$workbox-tabs-height: 44px;
 
 
 $padding-sm: 10px;

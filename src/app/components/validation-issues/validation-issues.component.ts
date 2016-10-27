@@ -1,11 +1,11 @@
-import {Component, Input, OnInit, OnDestroy} from "@angular/core";
-import {Observable, Subscription} from "rxjs";
+import {Component, Input, OnInit, OnDestroy, Output} from "@angular/core";
+import {Observable, Subscription, ReplaySubject} from "rxjs";
 import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
 
 @Component({
     selector: "validation-issues",
     template: `
-            <div class="console-component" [ngClass]="{show: showConsole}">
+            <div class="console-component" [ngClass]="{show: show}">
                 <div class="console-content">
                     <p class="errors">
                         {{ issues?.errorText }}
@@ -31,7 +31,7 @@ import {ValidationResponse} from "../../services/web-worker/json-schema/json-sch
                 
                 {{ buttonText }} 
                 <i class="fa icon-angle" 
-                   [ngClass]="{'fa-angle-right': !showConsole, 'fa-angle-up': showConsole}">
+                   [ngClass]="{'fa-angle-right': !show, 'fa-angle-up': show}">
                 </i>
             </button>
 `
@@ -40,14 +40,19 @@ export class ValidationIssuesComponent implements OnInit, OnDestroy {
     @Input()
     public issuesStream: Observable<ValidationResponse>;
 
+    @Input()
+    public show: boolean;
+
+    @Output()
+    public select = new ReplaySubject<"validation">();
+
     private issues      = ValidationResponse;
-    private buttonText  = "Issues";
-    private showConsole = false;
+    private buttonText  = "No Issues";
 
     private subs: Subscription[] = [];
 
     private toggleConsole() {
-        this.showConsole = !this.showConsole;
+        this.select.next("validation");
     }
 
     ngOnInit() {
@@ -63,5 +68,4 @@ export class ValidationIssuesComponent implements OnInit, OnDestroy {
     ngOnDestroy() {
         this.subs.forEach(sub => sub.unsubscribe());
     }
-
 }
