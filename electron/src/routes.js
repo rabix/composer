@@ -13,6 +13,9 @@ module.exports = {
     },
     readFileContent: (path, callback) => {
         fsController.readFileContent(path, callback);
+    },
+    deletePath: (path, callback) => {
+        fsController.deletePath(path, callback);
     }
 
 };

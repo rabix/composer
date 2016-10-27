@@ -9,6 +9,7 @@ import {ModalService} from "../modal/modal.service";
 import {NewFileModalComponent} from "../modal/custom/new-file-modal.component";
 import {MenuItem} from "../menu/menu-item";
 import {OpenTabAction} from "../../action-events/index";
+import {noop} from "../../lib/utils.lib";
 
 const {app} = window.require("electron").remote;
 
@@ -82,11 +83,7 @@ export class LocalFilesPanelComponent {
                     content: `Are you sure that you want to delete “${item.path}”?`,
                     cancellationLabel: "No, keep it",
                     confirmationLabel: "Yes, delete it"
-                }).then(confirm => {
-                    console.log("Delete the file");
-                }, cancel => {
-                    console.log("Keep the file");
-                })
+                }).then(() => this.fs.remove(item.path), noop);
             }
         });
 
@@ -111,9 +108,7 @@ export class LocalFilesPanelComponent {
                 isExpandable: item.isDir,
                 contextMenu: this.createContextMenu(item),
                 childrenProvider: this.recursivelyMapChildrenToNodes(item.childrenProvider),
-                openHandler: () => {
-                    this.eventHub.publish(this.createOpenFileTabAction(item))
-                }
+                openHandler: () => this.eventHub.publish(this.createOpenFileTabAction(item))
             }
         }));
     }
@@ -129,10 +124,8 @@ export class LocalFilesPanelComponent {
         component.save = (path, content) => {
             const creation = this.fs.createFile(path, content).share();
 
-            creation.subscribe(file => {
-                this.eventHub.publish(this.createOpenFileTabAction(file));
-            }, err => {
-            });
+            creation.subscribe(file => this.eventHub.publish(this.createOpenFileTabAction(file)), noop);
+
             return creation;
         }
     }
