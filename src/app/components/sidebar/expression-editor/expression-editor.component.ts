@@ -92,9 +92,9 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
         this.subs.push(
             this.expressionSidebarService.expressionDataStream
                 .mergeMap((data:ExpressionEditorData) => {
-                    this.lastExpression = undefined;
+                    this.lastExpression          = undefined;
                     this.initialExpressionScript = "";
-                    this.context = data.context;
+                    this.context                 = data.context;
 
                     if ((<Expression>data.expression.serialize()).script) {
                         this.initialExpressionScript = data.expression.getExpressionScript();
@@ -114,7 +114,7 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
 
     private evaluateExpression(expression: string): Observable<SandboxResponse> {
         this.removeSandboxSub();
-        let responseResult: BehaviorSubject<SandboxResponse> = new BehaviorSubject<SandboxResponse>(undefined);
+        const responseResult: BehaviorSubject<SandboxResponse> = new BehaviorSubject<SandboxResponse>(undefined);
 
         if (this.lastExpression === expression) {
             responseResult.next({
@@ -122,19 +122,12 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
                 output: this.evaluatedExpression
             });
         } else {
-            this.sandBoxSub = this.sandboxService.submit(expression, this.context)
+            this.lastExpression = expression;
+            this.sandBoxSub     = this.sandboxService.submit(expression, this.context)
                 .subscribe((result: SandboxResponse) => {
-                    if (result.error) {
-                        //TODO: make error message nicer on the UI
-                        this.evaluatedExpression = result.error;
-                    } else {
-                        this.evaluatedExpression = result.output;
-                    }
-
+                    this.evaluatedExpression = result.error ? result.error: result.output;
                     responseResult.next(result);
                 });
-
-            this.lastExpression = expression;
         }
 
         return responseResult.filter(response => response !== undefined);
@@ -149,14 +142,10 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
             .subscribe((result: SandboxResponse) => {
                 const newExpression: ExpressionModel = new ExpressionModel(undefined);
 
-                if (result.error) {
-                    newExpression.setValueToExpression(this.lastExpression);
+                if (result.output === undefined) {
+                    newExpression.setValueToString("");
                 } else {
-                    if (result.output === undefined) {
-                        newExpression.setValueToString("");
-                    } else {
-                        newExpression.setValueToExpression(this.lastExpression);
-                    }
+                    newExpression.setValueToExpression(this.lastExpression);
                 }
 
                 this.newValueStream.next(newExpression);
