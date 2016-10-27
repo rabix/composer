@@ -3,6 +3,7 @@ import {ModalComponent, ModalOptions} from "./modal.component";
 import {Subject} from "rxjs";
 import {ConfirmComponent} from "./common/confirm.component";
 import {noop} from "../../lib/utils.lib";
+import {PromptComponent} from "./common/prompt.component";
 
 @Injectable()
 export class ModalService {
@@ -59,6 +60,30 @@ export class ModalService {
 
             ref.decision.subscribe(accepted => {
                 accepted ? resolve(true) : reject();
+                this.close();
+            });
+        });
+
+        const outsideClosings = new Promise((resolve, reject) => {
+            this.onClose.first().subscribe(reject);
+        });
+
+        return Promise.race([insideClosings, outsideClosings]);
+    }
+
+    public prompt(params = {
+        title: "Confirm",
+        content: "Are you sure?",
+        confirmationLabel: "Yes",
+        cancellationLabel: "Cancel"
+    }) {
+        const insideClosings = new Promise((resolve, reject) => {
+
+            const ref = this.show<PromptComponent>(PromptComponent, {title: params.title});
+            Object.assign(ref, params);
+
+            ref.decision.subscribe(content => {
+                content !== false ? resolve(content) : reject();
                 this.close();
             });
         });

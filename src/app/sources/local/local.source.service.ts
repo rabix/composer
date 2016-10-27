@@ -113,4 +113,15 @@ export class LocalDataSourceService {
             childrenProvider: entry.isDir ? () => this.watch(entry.path) : undefined,
         });
     }
+
+    public createDirectory(path) {
+        const creation = this.ipc.request("createDirectory", path).share();
+
+        creation.switchMap(info => this.getDirContent(info.dirname).map(listing => ({listing, info})))
+            .subscribe(data => {
+                this.fileUpdates.next(all => Object.assign({}, all, {[data.info.dirname]: data.listing}));
+            });
+
+        return creation;
+    }
 }

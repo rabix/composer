@@ -16,6 +16,9 @@ module.exports = {
     },
     deletePath: (path, callback) => {
         fsController.deletePath(path, callback);
+    },
+    createDirectory: (path, callback) => {
+        fsController.createDirectory(path, callback);
     }
 
 };

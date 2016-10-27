@@ -4,6 +4,7 @@ const tmp = require("tmp");
 const assert = chai.assert;
 const fs = require("fs");
 const path = require("path");
+const rimraf = require("rimraf");
 
 tmp.setGracefulCleanup();
 
@@ -350,6 +351,41 @@ describe("FS Controller", () => {
                     });
                 });
             });
+        });
+    });
+
+    describe("Endpoint: createFolder()", () => {
+
+        it("should create folders recursively if direct parent doesn't exist");
+
+        it("should return an error if folder exists", (done) => {
+
+            tmp.dir((err, path, cleanup) => {
+
+                ctrl.createDirectory(path, (err) => {
+
+                   assert.instanceOf(err, Error);
+
+                   cleanup();
+                   done();
+                });
+            });
+        });
+
+        it("should create an empty folder", (done) =>{
+
+            tmp.tmpName((err, path) => {
+
+                ctrl.createDirectory(path, (err, info) => {
+
+                    assert.isNull(err);
+                    assertStandardEntryInfo(info);
+
+                    rimraf(path, () => {
+                        done();
+                    });
+                });
+           });
         });
     });
 });

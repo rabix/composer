@@ -162,6 +162,18 @@ module.exports = {
 
             callback(null);
         })
+    },
+
+    createDirectory: (path, callback) => {
+        fs.mkdir(path, 0o755, (err) => {
+            if (err) return callback(err);
+
+            getFileOutputInfo(path, (err, info) => {
+                if(err) return callback(err);
+
+                callback(null, info);
+            });
+        });
     }
 };
 

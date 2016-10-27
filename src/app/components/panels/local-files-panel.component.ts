@@ -64,6 +64,18 @@ export class LocalFilesPanelComponent {
 
         const newFolder = new MenuItem("New Folder...", {
             click: () => {
+
+                this.modal.prompt({
+                    title: "New Folder",
+                    cancellationLabel: "Cancel",
+                    confirmationLabel: "Create",
+                    content: "Folder Name",
+                }).then((name) =>{
+                    const fullPath = [item.path, name].join("/");
+                    this.fs.createDirectory(fullPath).subscribe(() => {
+                        this.triggerChange();
+                    });
+                }, noop);
             }
         });
 
