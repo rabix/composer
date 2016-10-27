@@ -101,14 +101,48 @@ export class LocalFilesPanelComponent {
             return undefined;
         }
 
-        return () => childrenProvider().map(items => (items).map(item => {
+        const sortTypes = (a, b) => {
+            // If one is a directory and the other one isn't, directory goes to the top
+            if (a.isDir && !b.isDir) {
+                return -1;
+            } else if (!a.isDir && b.isDir) {
+                return 1;
+            }
+
+            // If one is a workflow, and the other one isn't workflow goes up
+            if(a.type === "Workflow" && b.type !== "Workflow"){
+                return -1;
+            } else if(a.type !== "Workflow" && b.type === "Workflow"){
+                return 1;
+            }
+
+            // If one is a CLT and the other one isn't, CLT goes up
+            if(a.type === "CommandLineTool" && b.type !== "CommandLineTool"){
+                return -1;
+            } else if(a.type !== "CommandLineTool" && b.type === "CommandLineTool") {
+                return 1;
+            }
+
+            return 0;
+        };
+
+        const sortNames = (a, b) => {
+            return a.isDir && b.isDir && a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+        };
+
+        return () => childrenProvider().map(items => items
+            .sort(sortNames)
+            .sort(sortTypes)
+            .map(item => {
             return {
                 name: item.name,
                 icon: item.isDir ? "folder" : (item.type || "file"),
                 isExpandable: item.isDir,
                 contextMenu: this.createContextMenu(item),
                 childrenProvider: this.recursivelyMapChildrenToNodes(item.childrenProvider),
-                openHandler: () => this.eventHub.publish(this.createOpenFileTabAction(item))
+                openHandler: () => {
+                    this.eventHub.publish(this.createOpenFileTabAction(item));
+                }
             }
         }));
     }
