@@ -262,4 +262,64 @@ describe("FS Controller", () => {
         });
     });
 
+    describe("Endpoint: deletePath()", () => {
+        it("should return success if the path does not exist", (done) => {
+            tmp.tmpName((err, path) => {
+                ctrl.deletePath(path, (err) => {
+                    assert.isNull(err);
+                    done();
+                });
+            });
+
+        });
+
+        it("should delete a file", (done) => {
+            tmp.file((err, path, fd, cleanup) => {
+                ctrl.deletePath(path, (err) => {
+
+                    assert.isNull(err);
+
+                    fs.access(path, fs.F_OK, (err) => {
+                        assert.instanceOf(err, Error);
+
+                        if (!err) {
+                            cleanup();
+                        }
+                        done();
+                    });
+
+                });
+            });
+        });
+
+        it("should recursively delete a folder", (done) => {
+            tmp.dir((err, parentDir, cleanParent) => {
+                if (err) throw err;
+
+                tmp.dir((err, childDir, cleanChild) => {
+                    if (err) throw err;
+
+                    tmp.file({template: childDir + "/tmp-XXXXXX"}, (err, path, fd, cleanFile) => {
+                        if (err) throw err;
+
+
+                        ctrl.deletePath(parentDir, (err) => {
+                            assert.isNull(err);
+
+                            fs.access(parentDir, fs.F_OK, (err) => {
+                                assert.instanceOf(err, Error);
+
+                                if (!err) {
+                                    cleanFile();
+                                    cleanChild();
+                                    cleanParent();
+                                }
+                                done();
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
 });

@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const rimraf = require("rimraf");
 
 function findCWLClass(content) {
     const checker = /"class":\s*?"(CommandLineTool|Workflow)"/;
@@ -76,7 +77,7 @@ module.exports = {
             callback = content;
             content = "";
         }
-        console.log("Opening path", path, content);
+
         // "wx" creates the file if it doesn't exist, but fails if it exists.
         fs.open(path, "wx", (err, fd) => {
             if (err) return callback(err);
@@ -134,6 +135,16 @@ module.exports = {
                 rejection => callback(rejection)
             );
         });
+    },
+
+    deletePath: (path, callback) => {
+        rimraf(path, {
+            disableFlob: true
+        }, (err) => {
+            if (err) return callback(err);
+
+            callback(null);
+        })
     }
 };
 
