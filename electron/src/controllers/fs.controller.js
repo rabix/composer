@@ -36,16 +36,29 @@ function getFileOutputInfo(filePath, callback) {
         getPotentialCWLClassFromFile(filePath, (err, cwlClass) => {
             if (err) return callback(err);
 
-            callback(null, {
-                type: cwlClass,
-                path: filePath,
-                name: path.basename(filePath),
-                isDir: stats.isDirectory(),
-                isFile: stats.isFile(),
-                dirname: path.dirname(filePath),
-                language: stats.isFile() ? filePath.split(".").pop() : "",
-                isWritable: true
+            let isReadable = true;
+            let isWritable = true;
+
+            fs.access(filePath, fs.constants.R_OK, (err) => {
+                if (err) isReadable = false;
+
+                fs.access(filePath, fs.constants.W_OK, (err) => {
+                    if (err) isWritable = false;
+
+                    callback(null, {
+                        type: cwlClass,
+                        path: filePath,
+                        name: path.basename(filePath),
+                        isDir: stats.isDirectory(),
+                        isFile: stats.isFile(),
+                        dirname: path.dirname(filePath),
+                        language: stats.isFile() ? filePath.split(".").pop() : "",
+                        isWritable,
+                        isReadable
+                    });
+                });
             });
+
         });
 
 
@@ -60,7 +73,6 @@ module.exports = {
             callback = content;
             content = "";
         }
-
 
         // Open file for writing. Fails if file doesn't exist
         fs.writeFile(path, content, {encoding: "utf8", flag: "r+"}, (err) => {

@@ -162,7 +162,10 @@ export class TreeNodeComponent implements OnInit {
     }
 
     private getIconRules(icon) {
-        return {
+
+        const reserved = ["file", "folder", "angle", "loader", "Workflow", "CommandLineTool"];
+
+        const predefs = {
             "fa-file": icon === "file",
             "fa-folder": icon === "folder" && !this.isExpanded,
             "fa-folder-open": icon === "folder" && this.isExpanded,
@@ -173,6 +176,11 @@ export class TreeNodeComponent implements OnInit {
             "icon-command-line-tool": icon === "CommandLineTool",
             "icon-workflow": icon === "Workflow",
         };
+
+        predefs[icon] = reserved.indexOf(icon) === -1;
+
+
+        return predefs;
     }
 
     private onClick(event: MouseEvent) {

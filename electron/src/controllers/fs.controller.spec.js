@@ -13,7 +13,17 @@ describe("FS Controller", () => {
         assert.isObject(entry);
         values = values || {};
 
-        const mandatoryKeys = ["type", "path", "name", "dirname", "language", "isDir", "isFile"];
+        const mandatoryKeys = [
+            "type",
+            "path",
+            "name",
+            "dirname",
+            "language",
+            "isDir",
+            "isFile",
+            "isReadable",
+            "isWritable"
+        ];
 
         mandatoryKeys.forEach(key => {
             values[key]
@@ -105,6 +115,9 @@ describe("FS Controller", () => {
     });
 
     describe("Utility: getFileOutputInfo()", () => {
+
+        it("should give exact read/write permission information");
+
         it("should give information about a file", (done) => {
 
             tmp.file({postfix: ".json"}, (err, fpath, fd, cleanup) => {
