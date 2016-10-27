@@ -55,19 +55,13 @@ require("./basic-input-section.component.scss");
                     </select>
                 </div>
                 
-                <div class="form-group">
+                <div class="form-group" [formGroup]="expressionInputForm">
                     <label>Value</label>
                     
-                    <!--TODO: add disabled 
-                    [   disabled]="hasInputBinding === false"
-                    -->
-                    
                     <expression-input *ngIf="expressionInputForm && expressionInputForm.controls['expressionInput']"
-                                    [(expression)]="expressionInput"
                                     [control]="expressionInputForm.controls['expressionInput']"
                                     (onSelect)="addExpression()">
                     </expression-input>
-                    
                 </div>
                 
                 <div class="form-group flex-container">
@@ -91,9 +85,8 @@ export class BasicInputSectionComponent implements OnInit {
     @Input()
     public context: any;
 
-    private inputBinding: BehaviorSubject<string | Expression> = new BehaviorSubject<string | Expression>(undefined);
-
-    private expressionInput: ExpressionModel = new ExpressionModel(undefined);
+    /** The current expression model */
+    private expressionModel: ExpressionModel;
 
     /** Possible property types */
     private propertyTypes = ["File", "string", "enum", "int", "float", "boolean", "array", "record", "map"];
@@ -117,7 +110,6 @@ export class BasicInputSectionComponent implements OnInit {
 
     ngOnInit(): void {
         this.hasInputBinding = this.selectedProperty.hasInputBinding();
-        this.inputBinding.next(this.selectedProperty.getValueFrom());
 
         this.subs.push(
             this.inputSidebarService.inputPortDataStream.subscribe((data: InputInspectorData) => {
@@ -126,28 +118,11 @@ export class BasicInputSectionComponent implements OnInit {
                 const valueFrom = this.selectedProperty.getValueFrom();
 
                 if (valueFrom === undefined) {
-                    this.inputBinding.next("");
+                    this.createExpressionInputForm("");
                 } else {
-                    this.inputBinding.next(valueFrom);
+                    this.createExpressionInputForm(valueFrom);
                 }
             })
-        );
-
-        this.subs.push(
-            this.inputBinding
-                .filter(expression => expression !== undefined)
-                .subscribe((expression: string | Expression) => {
-                    let codeToEvaluate: string = "";
-                    if ((<Expression>expression).script) {
-                        codeToEvaluate = (<Expression>expression).script;
-                        this.expressionInput.setValueToExpression(codeToEvaluate);
-                    } else {
-                        codeToEvaluate = <string>expression;
-                        this.expressionInput.setValueToString(codeToEvaluate);
-                    }
-
-                    this.createExpressionInputForm(this.expressionInput.getExpressionScript());
-                })
         );
     }
 
@@ -158,18 +133,11 @@ export class BasicInputSectionComponent implements OnInit {
         this.expressionInputSub = newExpression
             .filter(expression => expression !== undefined)
             .subscribe((newExpression: ExpressionModel) => {
-                this.selectedProperty.setValueFrom(newExpression.serialize());
-
-                if ((<Expression>newExpression.serialize()).script) {
-                    this.expressionInput = newExpression;
-                    this.createExpressionInputForm(this.expressionInput.getExpressionScript())
-                } else {
-                    this.inputBinding.next(newExpression.serialize());
-                }
+                this.updateExpressionInputValue(newExpression.serialize());
             });
 
         this.expressionSidebarService.openExpressionEditor({
-            expression: this.expressionInput,
+            expression: new ExpressionModel(this.selectedProperty.getValueFrom()),
             newExpressionChange: newExpression,
             context: this.context
         });
@@ -182,29 +150,59 @@ export class BasicInputSectionComponent implements OnInit {
         }
     }
 
-    private createExpressionInputForm(formValue: string) {
+    private createExpressionInputForm(expression: string | Expression) {
+        this.expressionModel = new ExpressionModel(expression);
+        this.setSelectedProperty(expression);
+
+        this.expressionInputForm = this.formBuilder.group({
+            'expressionInput': [
+                {value: this.expressionModel.getExpressionScript(), disabled: !this.hasInputBinding},
+                Validators.compose([Validators.required, Validators.minLength(1)])
+            ]
+        });
+
+        this.listenToInputChanges();
+    }
+
+    private updateExpressionInputValue(expression: string | Expression) {
+        this.expressionModel = new ExpressionModel(expression);
 
         if (this.expressionInputForm && this.expressionInputForm.controls['expressionInput']) {
-            this.expressionInputForm.controls['expressionInput'].setValue(formValue);
-        } else {
-            this.expressionInputForm = this.formBuilder.group({
-                ['expressionInput']: [formValue, Validators.compose([Validators.required, Validators.minLength(1)])]
-            });
+            this.expressionInputForm.controls['expressionInput'].setValue(this.expressionModel.getExpressionScript());
+        }
+    }
 
-            const inputValueChange = this.expressionInputForm.controls['expressionInput'].valueChanges.subscribe((value) => {
-                if (typeof this.expressionInput.serialize() === "string") {
-                    this.expressionInput.setValueToString(value);
-                    this.selectedProperty.setValueFrom(value);
-                }
-            });
+    private listenToInputChanges(): void {
+        const inputValueChange = this.expressionInputForm.controls['expressionInput'].valueChanges.subscribe((value) => {
+            if ((<Expression>this.expressionModel.serialize()).script) {
+                this.expressionInputForm.controls['expressionInput'].disable({
+                    onlySelf: true,
+                    emitEvent: false
+                });
 
-            this.subs.push(inputValueChange);
+            } else {
+                this.expressionModel.setValueToString(value);
+            }
+
+            this.setSelectedProperty(this.expressionModel.serialize());
+        });
+
+        this.subs.push(inputValueChange);
+    }
+
+    private setSelectedProperty(value: string | Expression) {
+        if (this.hasInputBinding) {
+            this.selectedProperty.setValueFrom(value);
         }
     }
 
     private toggleInputBinding(hasBinding: boolean) {
         if (!hasBinding) {
-            this.selectedProperty.hasInputBinding();
+            this.updateExpressionInputValue("");
+            this.expressionInputForm.disable();
+            this.selectedProperty.removeInputBinding();
+        } else {
+            this.expressionInputForm.enable();
         }
     }
 
