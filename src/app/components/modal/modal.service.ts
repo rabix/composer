@@ -54,22 +54,13 @@ export class ModalService {
 
         const insideClosings = new Promise((resolve, reject) => {
 
-            const {content, confirmationLabel, cancellationLabel} = params;
+            const ref = this.show<ConfirmComponent>(ConfirmComponent, {title: params.title});
+            Object.assign(ref, params);
 
-            const comp = this.show<ConfirmComponent>(ConfirmComponent, {
-                title: params.title,
-                componentState: {
-                    content,
-                    confirmationLabel,
-                    cancellationLabel
-                }
+            ref.decision.subscribe(accepted => {
+                accepted ? resolve(true) : reject();
+                this.close();
             });
-            comp.decision.subscribe(
-                accepted => {
-                    this.close();
-                    accepted ? resolve(true) : reject();
-                });
-
         });
 
         const outsideClosings = new Promise((resolve, reject) => {
