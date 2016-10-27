@@ -139,7 +139,7 @@ export class LocalFilesPanelComponent {
 
     private createOpenFileTabAction(file) {
         return new OpenTabAction({
-            id: file.id,
+            id: file.path,
             title: Observable.of(file.name),
             contentType: Observable.of(file.type || "Code"),
             contentData: {
