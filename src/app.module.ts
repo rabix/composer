@@ -40,6 +40,17 @@ import {ToolHeaderComponent} from "./app/components/tool-editor/tool-header/tool
 import {CommandLineComponent} from "./app/components/clt-editor/commandline/commandline.component";
 import {InputInspectorComponent} from "./app/components/sidebar/object-inpsector/input-inspector.component";
 import {ExpressionEditorComponent} from "./app/components/sidebar/expression-editor/expression-editor.component";
+import {ContextDirective} from "./app/services/context/context.directive";
+import {MenuComponent} from "./app/components/menu/menu.component";
+import {MenuItemComponent} from "./app/components/menu/menu-item.component";
+import {ModalComponent} from "./app/components/modal/modal.component";
+import {ConfirmComponent} from "./app/components/modal/common/confirm.component";
+import {ModalService} from "./app/components/modal/modal.service";
+import {RadioGroupComponent} from "./app/components/forms/elements/radio-group.component";
+import {InputComponent} from "./app/components/forms/elements/input.component";
+import {RadioButtonComponent} from "./app/components/forms/elements/radio-button.component";
+import {NewFileModalComponent} from "./app/components/modal/custom/new-file-modal.component";
+import {TemplateProviderService} from "./app/services/template-provider.service";
 
 @NgModule({
     providers: [
@@ -53,11 +64,14 @@ import {ExpressionEditorComponent} from "./app/components/sidebar/expression-edi
         CltEditorComponent,
         CodeEditorComponent,
         CommandLineComponent,
+        ConfirmComponent,
+        ContextDirective,
         DockerInputFormComponent,
         ExpressionEditorComponent,
         ExpressionEditorSidebarComponent,
         ExpressionInputComponent,
         FormSectionComponent,
+        InputComponent,
         InputInspectorComponent,
         InputInspectorSidebarComponent,
         InputPortListComponent,
@@ -65,12 +79,17 @@ import {ExpressionEditorComponent} from "./app/components/sidebar/expression-edi
         LayoutComponent,
         LocalFilesPanelComponent,
         MainComponent,
-        MainComponent,
+        MenuComponent,
+        MenuItemComponent,
+        ModalComponent,
+        NewFileModalComponent,
         PanelComponent,
         PanelContainerComponent,
         PanelHandleComponent,
         PanelSwitcherComponent,
         PanelToolbarComponent,
+        RadioButtonComponent,
+        RadioGroupComponent,
         RevisionsPanelComponent,
         SBPublicAppsPanelComponent,
         SBUserProjectsPanelComponent,
@@ -87,7 +106,16 @@ import {ExpressionEditorComponent} from "./app/components/sidebar/expression-edi
         ViewModeSwitchComponent,
         WorkboxComponent,
         WorkflowEditorComponent,
+        AlertComponent,
     ],
+    entryComponents: [
+        MenuComponent,
+        MenuItemComponent,
+        NewFileModalComponent,
+        ModalComponent,
+        ConfirmComponent
+    ],
+    providers: [ModalService, TemplateProviderService],
     imports: [BrowserModule, FormsModule, HttpModule, ReactiveFormsModule],
     bootstrap: [MainComponent]
 })

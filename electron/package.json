@@ -1,9 +1,19 @@
 {
-    "name": "rabix-editor",
-    "version": "0.1.0",
-    "main": "main.js",
-    "dependencies": {
-        "rxjs": "5.0.0-beta.12",
-        "js-yaml": "^3.6.1"
-    }
+  "name": "rabix-editor",
+  "version": "0.1.0",
+  "main": "main.js",
+  "scripts": {
+    "test": "mocha src/**/*.spec.js"
+  },
+  "dependencies": {
+    "rxjs": "5.0.0-beta.12",
+    "js-yaml": "^3.6.1"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.1.2",
+    "proxyquire": "^1.7.10",
+    "sinon": "^1.17.6",
+    "tmp": "0.0.29"
+  }
 }
