@@ -6,6 +6,9 @@
 git clone https://github.com/rabix/cottontail-frontend
 cd cottontail-frontend
 npm install
+
+cd electron
+npm install
 ```
 
 ## Starting the dev environment
