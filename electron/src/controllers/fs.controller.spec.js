@@ -54,7 +54,16 @@ describe("FS Controller", () => {
             tmp.file({postfix: ".json"}, (err, path, fd, cleanup) => {
                 if (err) throw err;
 
-                fs.writeFile(fd, `{ "label": "Ariana Sans", "class": "CommandLineTool" }`, null, (err) => {
+                fs.writeFile(fd, `
+                    { 
+                        "label": "Ariana Sans", 
+                        "nested": { 
+                            "class": "Workflow"
+                        }, 
+                        "class": "CommandLineTool" 
+                    }
+                `, null, (err) => {
+
                     if (err) throw err;
 
                     ctrl.getPotentialCWLClassFromFile(path, (err, cls) => {
@@ -71,7 +80,15 @@ describe("FS Controller", () => {
         it("should return “Workflow” if file has that class", (done) => {
             tmp.file({postfix: ".json"}, (err, path, fd, cleanup) => {
                 if (err) throw err;
-                fs.writeFile(fd, `{ "class": "Workflow" }`, null, (err) => {
+                fs.writeFile(fd, `
+                    { 
+                        "label": "Gerard Grande", 
+                        "nested": { 
+                            "class": "CommandLineTool"
+                        }, 
+                        "class": "Workflow" 
+                    }
+                `, null, (err) => {
 
                     if (err) throw err;
 

@@ -1,12 +1,17 @@
 const fs = require("fs");
 const path = require("path");
 const rimraf = require("rimraf");
+const yaml = require("js-yaml");
 
 function findCWLClass(content) {
-    const checker = /"class":\s*?"(CommandLineTool|Workflow)"/;
-    const [,cls = ""] = checker.exec(content) || [];
+    try {
+        const cwlClasses = ["Workflow", "CommandLineTool"];
+        const found = yaml.safeLoad(content, {json: true})["class"] || "";
 
-    return cls;
+        return cwlClasses.indexOf(found) !== -1 ? found : ""
+    } catch (err) {
+        return "";
+    }
 
 }
 
