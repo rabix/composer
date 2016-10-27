@@ -1,16 +1,18 @@
-import {Component, ChangeDetectorRef, ChangeDetectionStrategy, Input} from "@angular/core";
+import {Component, ChangeDetectionStrategy, Input, ChangeDetectorRef} from "@angular/core";
 import {TreeViewComponent} from "../tree-view";
 import {PanelToolbarComponent} from "./panel-toolbar.component";
 import {LocalDataSourceService} from "../../sources/local/local.source.service";
-import {BehaviorSubject, Observable} from "rxjs";
+import {Observable} from "rxjs";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {IpcService} from "../../services/ipc.service";
 import {ModalService} from "../modal/modal.service";
 import {NewFileModalComponent} from "../modal/custom/new-file-modal.component";
 import {MenuItem} from "../menu/menu-item";
 import {OpenTabAction} from "../../action-events/index";
+import {noop} from "../../lib/utils.lib";
+import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 
-const {app} = window.require("electron").remote;
+const {app, dialog} = window.require("electron").remote;
 
 @Component({
     selector: "ct-local-files-panel",
@@ -21,39 +23,29 @@ const {app} = window.require("electron").remote;
     template: `
         <ct-panel-toolbar>
             <span class="tc-name">Local Files</span>
+            <span class="tc-tools clickable" title="Add Directory to Workspace..." (click)="promptForDirectory()">
+                <i class="fa fa-fw fa-plus-circle"></i>
+            </span>
         </ct-panel-toolbar>
         
-        <ct-tree-view [nodes]="nodes | async"></ct-tree-view>
+        <ct-tree-view [nodes]="nodes"></ct-tree-view>
     `
 })
 export class LocalFilesPanelComponent {
 
     @Input()
-    private nodes = new BehaviorSubject([]);
+    private nodes = [];
 
-    constructor(private fs: LocalDataSourceService,
-                private modal: ModalService,
-                private eventHub: EventHubService) {
+    constructor(private modal: ModalService,
+                private eventHub: EventHubService,
+                private fs: LocalDataSourceService,
+                private detector: ChangeDetectorRef,
+                private preferences: UserPreferencesService) {
 
-        // Gets the absolute path to the current user's Home folder
-        const homePath = app.getPath("home");
+    }
 
-        this.nodes.next([
-            {
-                name: "Home",
-                icon: "folder",
-                childrenProvider: this.recursivelyMapChildrenToNodes(() => this.fs.watch(homePath)),
-                contextMenu: [
-                    new MenuItem("New File...", {
-                        click: () => this.createNewFileModal(homePath)
-                    }),
-                    new MenuItem("Remove from Workspace", {
-                        click: () => {
-                        }
-                    })
-                ],
-            }
-        ]);
+    private ngOnInit() {
+        this.addDirectory(...this.preferences.get("local_open_folders", []));
     }
 
 
@@ -72,6 +64,18 @@ export class LocalFilesPanelComponent {
 
         const newFolder = new MenuItem("New Folder...", {
             click: () => {
+
+                this.modal.prompt({
+                    title: "New Folder",
+                    cancellationLabel: "Cancel",
+                    confirmationLabel: "Create",
+                    content: "Folder Name",
+                }).then((name) =>{
+                    const fullPath = [item.path, name].join("/");
+                    this.fs.createDirectory(fullPath).subscribe(() => {
+                        this.triggerChange();
+                    });
+                }, noop);
             }
         });
 
@@ -82,11 +86,7 @@ export class LocalFilesPanelComponent {
                     content: `Are you sure that you want to delete “${item.path}”?`,
                     cancellationLabel: "No, keep it",
                     confirmationLabel: "Yes, delete it"
-                }).then(confirm => {
-                    console.log("Delete the file");
-                }, cancel => {
-                    console.log("Keep the file");
-                })
+                }).then(() => this.fs.remove(item.path), noop);
             }
         });
 
@@ -104,18 +104,58 @@ export class LocalFilesPanelComponent {
             return undefined;
         }
 
-        return () => childrenProvider().map(items => (items).map(item => {
-            return {
-                name: item.name,
-                icon: item.isDir ? "folder" : (item.type || "file"),
-                isExpandable: item.isDir,
-                contextMenu: this.createContextMenu(item),
-                childrenProvider: this.recursivelyMapChildrenToNodes(item.childrenProvider),
-                openHandler: () => {
-                    this.eventHub.publish(this.createOpenFileTabAction(item))
-                }
+        const sortTypes = (a, b) => {
+            // If one is a directory and the other one isn't, directory goes to the top
+            if (a.isDir && !b.isDir) {
+                return -1;
+            } else if (!a.isDir && b.isDir) {
+                return 1;
             }
-        }));
+
+            // If one is a workflow, and the other one isn't workflow goes up
+            if (a.type === "Workflow" && b.type !== "Workflow") {
+                return -1;
+            } else if (a.type !== "Workflow" && b.type === "Workflow") {
+                return 1;
+            }
+
+            // If one is a CLT and the other one isn't, CLT goes up
+            if (a.type === "CommandLineTool" && b.type !== "CommandLineTool") {
+                return -1;
+            } else if (a.type !== "CommandLineTool" && b.type === "CommandLineTool") {
+                return 1;
+            }
+
+            return 0;
+        };
+
+        const sortNames = (a, b) => {
+            return a.isDir && b.isDir && a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+        };
+
+        return () => childrenProvider().map(items => items
+            .sort(sortNames)
+            .sort(sortTypes)
+            .map(item => {
+                let icon = item.isDir ? "folder" : (item.type || "file");
+                if (!item.isReadable) {
+                    icon = "fa-ban text-danger";
+                } else if (!item.isWritable) {
+                    icon = "fa-lock text-warning";
+                }
+
+
+                return {
+                    name: item.name,
+                    icon,
+                    isExpandable: item.isDir,
+                    contextMenu: this.createContextMenu(item),
+                    childrenProvider: item.isReadable ? this.recursivelyMapChildrenToNodes(item.childrenProvider) : undefined,
+                    openHandler: item.isReadable ? () => {
+                        this.eventHub.publish(this.createOpenFileTabAction(item));
+                    } : undefined
+                }
+            }));
     }
 
     private createNewFileModal(path) {
@@ -129,10 +169,8 @@ export class LocalFilesPanelComponent {
         component.save = (path, content) => {
             const creation = this.fs.createFile(path, content).share();
 
-            creation.subscribe(file => {
-                this.eventHub.publish(this.createOpenFileTabAction(file));
-            }, err => {
-            });
+            creation.subscribe(file => this.eventHub.publish(this.createOpenFileTabAction(file)), noop);
+
             return creation;
         }
     }
@@ -149,5 +187,61 @@ export class LocalFilesPanelComponent {
                 language: Observable.of(file.language)
             }
         })
+    }
+
+    private promptForDirectory() {
+        dialog.showOpenDialog({
+            title: "Choose a Directory",
+            defaultPath: app.getPath("home"),
+            buttonLabel: "Add to Workspace",
+            properties: ["openDirectory", "multiSelections"]
+        }, (paths) => {
+            this.addDirectory(...paths);
+        });
+    }
+
+    private addDirectory(...paths: string[]) {
+        if (!paths) {
+            return;
+        }
+
+        paths.filter(path => !this.nodes.find(item => item.id === path)).forEach(path => {
+
+            const node = {
+                id: path,
+                name: path.split("/").pop(),
+                icon: "folder",
+                childrenProvider: this.recursivelyMapChildrenToNodes(() => this.fs.watch(path)),
+                contextMenu: [
+                    new MenuItem("New File...", {
+                        click: () => this.createNewFileModal(path)
+                    }),
+                    new MenuItem("Remove from Workspace", {
+                        click: () => {
+                            this.removeDirectory(path);
+                        }
+                    })
+                ],
+            };
+
+            this.nodes.push(node);
+        });
+
+        this.triggerChange();
+        this.saveWorkspacePreferences();
+    }
+
+    private removeDirectory(path) {
+        this.nodes = this.nodes.filter(i => i.id !== path);
+        this.saveWorkspacePreferences();
+    }
+
+    private saveWorkspacePreferences() {
+        this.preferences.put("local_open_folders", this.nodes.map(node => node.id));
+    }
+
+    private triggerChange() {
+        this.detector.markForCheck();
+        this.detector.detectChanges();
     }
 }

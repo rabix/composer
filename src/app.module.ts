@@ -51,6 +51,7 @@ import {InputComponent} from "./app/components/forms/elements/input.component";
 import {RadioButtonComponent} from "./app/components/forms/elements/radio-button.component";
 import {NewFileModalComponent} from "./app/components/modal/custom/new-file-modal.component";
 import {TemplateProviderService} from "./app/services/template-provider.service";
+import {PromptComponent} from "./app/components/modal/common/prompt.component";
 
 @NgModule({
     providers: [
@@ -88,6 +89,7 @@ import {TemplateProviderService} from "./app/services/template-provider.service"
         PanelHandleComponent,
         PanelSwitcherComponent,
         PanelToolbarComponent,
+        PromptComponent,
         RadioButtonComponent,
         RadioGroupComponent,
         RevisionsPanelComponent,
@@ -106,14 +108,14 @@ import {TemplateProviderService} from "./app/services/template-provider.service"
         ViewModeSwitchComponent,
         WorkboxComponent,
         WorkflowEditorComponent,
-        AlertComponent,
     ],
     entryComponents: [
         MenuComponent,
         MenuItemComponent,
         NewFileModalComponent,
         ModalComponent,
-        ConfirmComponent
+        ConfirmComponent,
+        PromptComponent
     ],
     providers: [ModalService, TemplateProviderService],
     imports: [BrowserModule, FormsModule, HttpModule, ReactiveFormsModule],

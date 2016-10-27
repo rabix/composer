@@ -9,7 +9,7 @@ import {
     ElementRef
 } from "@angular/core";
 import {ContextDirective} from "../../services/context/context.directive";
-import {TreeNode} from "./types";
+import {TreeNode, ParentTreeNode, OpenableTreeNode} from "./types";
 import {BehaviorSubject, Subscription} from "rxjs";
 import {TreeViewService} from "./tree-view.service";
 
@@ -104,9 +104,8 @@ export class TreeNodeComponent implements OnInit {
                     this.nameParts = [this.node.name.substr(0, charCount), this.node.name.substr(charCount)];
                 }
                 this.detector.markForCheck();
-            });
-    )
-        ;
+            })
+        );
 
         this.tree.addNode(this);
     }
@@ -155,15 +154,18 @@ export class TreeNodeComponent implements OnInit {
             this.toggleExpansion();
         } else if (typeof this.node.openHandler === "function") {
             const progress = this.node.openHandler(this.node);
-            this.detector.markForCheck();
             if (progress) {
-                progress.add(_ => this.detector.markForCheck());
+                this.detector.markForCheck();
+                progress.take(1).subscribe(_ => this.detector.markForCheck());
             }
         }
     }
 
     private getIconRules(icon) {
-        return {
+
+        const reserved = ["file", "folder", "angle", "loader", "Workflow", "CommandLineTool"];
+
+        const predefs = {
             "fa-file": icon === "file",
             "fa-folder": icon === "folder" && !this.isExpanded,
             "fa-folder-open": icon === "folder" && this.isExpanded,
@@ -174,6 +176,11 @@ export class TreeNodeComponent implements OnInit {
             "icon-command-line-tool": icon === "CommandLineTool",
             "icon-workflow": icon === "Workflow",
         };
+
+        predefs[icon] = reserved.indexOf(icon) === -1;
+
+
+        return predefs;
     }
 
     private onClick(event: MouseEvent) {

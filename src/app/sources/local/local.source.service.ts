@@ -2,6 +2,7 @@ import {Injectable} from "@angular/core";
 import {DataEntrySource} from "../common/interfaces";
 import {Observable, Subject} from "rxjs";
 import {IpcService} from "../../services/ipc.service";
+import {noop} from "../../lib/utils.lib";
 
 const fs   = window.require("fs");
 const path = window.require("path");
@@ -48,7 +49,7 @@ export class LocalDataSourceService {
     }
 
     private getDirContent(dir: string) {
-        return this.ipc.request("readDirectory", dir).flatMap(Observable.from)
+        return this.ipc.request("readDirectory", dir).flatMap(Observable.from as any)
             .map(entry => this.wrapFileEntry(entry))
             .reduce((acc, item) => acc.concat(item), [])
             .map(dir => dir.sort((a, b) => a.isDir ? -1 : 1));
@@ -79,14 +80,19 @@ export class LocalDataSourceService {
             });
         }).subscribe(data => {
             this.fileUpdates.next((all) => Object.assign({}, all, {[data.dir]: data.content}));
-        }, err => {
-        });
+        }, noop);
 
         return creation;
     }
 
-    public remove(path): Observable<any> {
-        const deletion = this.ipc.request("deletePath", {path}).share();
+    public remove(dirPath): Observable<any> {
+        const deletion = this.ipc.request("deletePath", dirPath).share();
+
+        const parentPath = path.dirname(dirPath);
+
+        deletion.switchMap(_ => this.getDirContent(parentPath)).subscribe(listing => {
+            this.fileUpdates.next(all => Object.assign({}, all, {[parentPath]: listing}));
+        });
 
         return deletion;
     }
@@ -106,5 +112,16 @@ export class LocalDataSourceService {
             source: "local",
             childrenProvider: entry.isDir ? () => this.watch(entry.path) : undefined,
         });
+    }
+
+    public createDirectory(path) {
+        const creation = this.ipc.request("createDirectory", path).share();
+
+        creation.switchMap(info => this.getDirContent(info.dirname).map(listing => ({listing, info})))
+            .subscribe(data => {
+                this.fileUpdates.next(all => Object.assign({}, all, {[data.info.dirname]: data.listing}));
+            });
+
+        return creation;
     }
 }

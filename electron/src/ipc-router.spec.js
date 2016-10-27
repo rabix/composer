@@ -23,12 +23,8 @@ describe("IPC Router", () => {
     it("should call the appropriate controller function when required and return the response", (done) => {
         const send = sinon.spy();
 
-
         const testRouteEndpoint = sinon.spy((data, callback) => {
-            console.log("This is here");
-            callback(null, {
-                name: "Zoro"
-            });
+            callback(null, {name: "Zoro"});
         });
 
         const event = {sender: {send}};

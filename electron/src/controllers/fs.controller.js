@@ -1,11 +1,17 @@
 const fs = require("fs");
 const path = require("path");
+const rimraf = require("rimraf");
+const yaml = require("js-yaml");
 
 function findCWLClass(content) {
-    const checker = /"class":\s*?"(CommandLineTool|Workflow)"/;
-    const [,cls = ""] = checker.exec(content) || [];
+    try {
+        const cwlClasses = ["Workflow", "CommandLineTool"];
+        const found = yaml.safeLoad(content, {json: true})["class"] || "";
 
-    return cls;
+        return cwlClasses.indexOf(found) !== -1 ? found : ""
+    } catch (err) {
+        return "";
+    }
 
 }
 
@@ -30,16 +36,29 @@ function getFileOutputInfo(filePath, callback) {
         getPotentialCWLClassFromFile(filePath, (err, cwlClass) => {
             if (err) return callback(err);
 
-            callback(null, {
-                type: cwlClass,
-                path: filePath,
-                name: path.basename(filePath),
-                isDir: stats.isDirectory(),
-                isFile: stats.isFile(),
-                dirname: path.dirname(filePath),
-                language: stats.isFile() ? filePath.split(".").pop() : "",
-                isWritable: true
+            let isReadable = true;
+            let isWritable = true;
+
+            fs.access(filePath, fs.constants.R_OK, (err) => {
+                if (err) isReadable = false;
+
+                fs.access(filePath, fs.constants.W_OK, (err) => {
+                    if (err) isWritable = false;
+
+                    callback(null, {
+                        type: cwlClass,
+                        path: filePath,
+                        name: path.basename(filePath),
+                        isDir: stats.isDirectory(),
+                        isFile: stats.isFile(),
+                        dirname: path.dirname(filePath),
+                        language: stats.isFile() ? filePath.split(".").pop() : "",
+                        isWritable,
+                        isReadable
+                    });
+                });
             });
+
         });
 
 
@@ -54,7 +73,6 @@ module.exports = {
             callback = content;
             content = "";
         }
-
 
         // Open file for writing. Fails if file doesn't exist
         fs.writeFile(path, content, {encoding: "utf8", flag: "r+"}, (err) => {
@@ -76,7 +94,7 @@ module.exports = {
             callback = content;
             content = "";
         }
-        console.log("Opening path", path, content);
+
         // "wx" creates the file if it doesn't exist, but fails if it exists.
         fs.open(path, "wx", (err, fd) => {
             if (err) return callback(err);
@@ -133,6 +151,28 @@ module.exports = {
                 resolution => callback(null, resolution),
                 rejection => callback(rejection)
             );
+        });
+    },
+
+    deletePath: (path, callback) => {
+        rimraf(path, {
+            disableFlob: true
+        }, (err) => {
+            if (err) return callback(err);
+
+            callback(null);
+        })
+    },
+
+    createDirectory: (path, callback) => {
+        fs.mkdir(path, 0o755, (err) => {
+            if (err) return callback(err);
+
+            getFileOutputInfo(path, (err, info) => {
+                if(err) return callback(err);
+
+                callback(null, info);
+            });
         });
     }
 };
