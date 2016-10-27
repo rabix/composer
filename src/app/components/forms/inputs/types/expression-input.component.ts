@@ -8,13 +8,11 @@ require("./expression-input.component.scss");
     selector: 'expression-input',
     template: `
             <div class="input-group" *ngIf="control">
-                <input class="form-control"
-                        (keyup)="modelChange($event)"
-                        [formControl]="control"/>
+                <input class="form-control" [formControl]="control"/>
                     
                 <span class="input-group-btn">
                     <button type="button" 
-                        [disabled]="control.disabled"
+                        [disabled]="disableEdit"
                         class="btn btn-secondary" 
                         (click)="openExpressionSidebar()"><i class="fa fa-code"></i></button>
                 </span>
@@ -25,6 +23,9 @@ export class ExpressionInputComponent {
 
     @Input()
     public control: AbstractControl;
+
+    @Input()
+    public disableEdit: boolean;
 
     @Input()
     public expression: ExpressionModel;

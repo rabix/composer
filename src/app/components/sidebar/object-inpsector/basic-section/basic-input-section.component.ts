@@ -59,6 +59,7 @@ require("./basic-input-section.component.scss");
                     <label>Value</label>
                     
                     <expression-input *ngIf="expressionInputForm && expressionInputForm.controls['expressionInput']"
+                                    [disableEdit]="!hasInputBinding"
                                     [control]="expressionInputForm.controls['expressionInput']"
                                     (onSelect)="addExpression()">
                     </expression-input>
@@ -179,9 +180,12 @@ export class BasicInputSectionComponent implements OnInit {
                     onlySelf: true,
                     emitEvent: false
                 });
-
             } else {
                 this.expressionModel.setValueToString(value);
+                this.expressionInputForm.controls['expressionInput'].enable({
+                    onlySelf: true,
+                    emitEvent: false
+                });
             }
 
             this.setSelectedProperty(this.expressionModel.serialize());
@@ -199,10 +203,10 @@ export class BasicInputSectionComponent implements OnInit {
     private toggleInputBinding(hasBinding: boolean) {
         if (!hasBinding) {
             this.updateExpressionInputValue("");
-            this.expressionInputForm.disable();
             this.selectedProperty.removeInputBinding();
+            this.expressionInputForm.controls['expressionInput'].disable();
         } else {
-            this.expressionInputForm.enable();
+            this.expressionInputForm.controls['expressionInput'].enable();
         }
     }
 
