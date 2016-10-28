@@ -1,0 +1,14 @@
+.toggle-button {
+    background-color: #ffffff;
+    height: 30px;
+    padding: 0;
+    border: 0;
+
+    i {
+        color: #0069bd;
+    }
+}
+
+.toggle-button:focus, .toggle-button:focus{
+    outline: none;
+}
