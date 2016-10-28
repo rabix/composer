@@ -1,3 +1,0 @@
-describe('New File Modal', () => {
-
-});

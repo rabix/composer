@@ -1,4 +1,4 @@
-import {Directive, HostListener, ElementRef, Input} from "@angular/core";
+import {Directive, HostListener, Input, ViewContainerRef} from "@angular/core";
 import {ContextService} from "./context.service";
 import {MenuItem} from "../../components/menu/menu-item";
 @Directive({
@@ -9,17 +9,17 @@ export class ContextDirective {
     @Input("ct-context")
     private contextMenuItems: MenuItem[];
 
-    /** Native element that holds the directive */
-    private el: HTMLElement;
-
-    constructor(el: ElementRef, private context: ContextService) {
-        this.el = el.nativeElement;
+    constructor(private context: ContextService,
+                private viewContainer: ViewContainerRef) {
     }
 
     @HostListener("contextmenu", ["$event"])
     private onRightClick(event: MouseEvent) {
         event.preventDefault();
+        if(!this.contextMenuItems){
+            return;
+        }
 
-        this.context.showAt(this.contextMenuItems, {x: event.clientX, y: event.clientY});
+        this.context.showAt(this.viewContainer, this.contextMenuItems, {x: event.clientX, y: event.clientY});
     }
 }

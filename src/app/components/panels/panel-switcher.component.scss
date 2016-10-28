@@ -4,7 +4,7 @@
 .left-panel-bar {
   display: flex;
   flex-direction: column;
-  height: calc(100% - 44px);
+  height: calc(100% - #{$main-header-height});
   justify-content: space-between;
   background: $panel-side-tab-zone-bg;
 

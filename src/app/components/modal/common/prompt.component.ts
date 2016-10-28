@@ -2,12 +2,16 @@ import {Component, Input, Output} from "@angular/core";
 import {Subject} from "rxjs";
 import {assignable} from "../../../decorators/index";
 @Component({
-    selector: "ct-modal-confirm",
+    selector: "ct-modal-prompt",
     template: `
-        <form (ngSubmit)="decision.next(true)">
+        <form (ngSubmit)="decision.next(answer.value)">
             <div class="modal-body">
-                <span [innerHTML]="content"></span>
+                <div class="form-group">
+                    <label [innerHTML]="content"></label>
+                    <input #answer class="form-control"/>
+                </div>
             </div>
+            
             <div class="modal-footer">
                 <button class="btn btn-secondary btn-sm" (click)="decision.next(false)" type="button">{{ cancellationLabel }}</button>
                 <button class="btn btn-primary btn-sm" type="submit" >{{ confirmationLabel }}</button>
@@ -15,7 +19,7 @@ import {assignable} from "../../../decorators/index";
         </form>
     `
 })
-export class ConfirmComponent {
+export class PromptComponent {
 
     @assignable()
     @Input()

@@ -7,6 +7,7 @@ export class FileTemplate {
 
 export class CwlFileTemplate extends FileTemplate {
 
+    public readonly id: string;
     public readonly cwlVersion: CwlFileTemplateVersion;
     public readonly type: CwlFileTemplateType;
     public readonly params: Object;
@@ -18,7 +19,20 @@ export class CwlFileTemplate extends FileTemplate {
         this.type       = type || "blank";
         this.params     = params;
 
+        this.params["id"] = this.makeID(this.params["label"]);
+
         // Blank type will be unversioned, but the others shouldn't be
-        this.id = this.type === "blank" ? "blank" : `${this.cwlVersion}_${this.type}`;
+        this.id = "blank";
+        if (this.type !== "blank") {
+            this.id = this.cwlVersion + "-" + this.type;
+        }
     }
+
+    private makeID(str) {
+        str = str.replace(/([a-z])([A-Z])/g, '$1-$2');
+        str = str.replace(/[ \t\W]/g, '-');
+        str = str.replace(/^-+|-+$/g, '');
+        return str.toLowerCase();
+    }
+
 }

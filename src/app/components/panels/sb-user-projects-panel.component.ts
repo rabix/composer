@@ -10,11 +10,14 @@ import {SettingsService} from "../../services/settings/settings.service";
 import {SBPlatformDataSourceService} from "../../sources/sbg/sb-platform.source.service";
 import {PlatformProjectEntry} from "../../services/api/platforms/platform-api.types";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
+import {MenuItem} from "../menu/menu-item";
+import {ModalService} from "../modal/modal.service";
+import {NewFileModalComponent} from "../modal/custom/new-file-modal.component";
 
 @Component({
     selector: "ct-sb-user-projects-panel",
     directives: [TreeViewComponent, BlockLoaderComponent, PanelToolbarComponent],
-    host: {class: "block"},
+    host: {"class": "block"},
     template: `
         <ct-panel-toolbar>
             <span class="tc-name">Projects</span>
@@ -26,20 +29,21 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
         </ct-panel-toolbar>
         
         <div class="project-selector-container" *ngIf="showProjectSelectionToolbar && (closedProjects | async)?.length">
-            <form class="form-inline" 
-                  #form 
-                  (submit)="addProjectToWorkspace(projectSelection.value)">
+            <form class="form-inline" #form>
         
                 <div class="input-group project-selection-input-group">
-                    <select #projectSelection class="project-selector form-control custom-select" required>
+                    <select #projectSelection class="project-selector form-control custom-select" (change)="addProjectToWorkspace(projectSelection.value)" required>
                         <option value="" disabled [selected]="true">Choose a Project...</option>
                         <option *ngFor="let p of (closedProjects | async)" [value]="p.id">{{ p.name }}</option>
                     </select>
-                    <span class="input-group-btn ">
-                        <button class="btn project-selection-submit-button" type="submit">+</button>
-                    </span>
                 </div>
             </form>
+        </div>
+        
+        <div *ngIf="!isLoading && (openProjects | async)?.length === 0 && !showProjectSelectionToolbar"
+             class="alert alert-info m-1">
+             <i class="fa fa-info-circle alert-icon"></i>
+            There are no open projects. Select projects to open by clicking the plus above.
         </div>
         
         <div *ngIf="isLoading">
@@ -73,6 +77,7 @@ export class SBUserProjectsPanelComponent {
     constructor(private dataSource: SBPlatformDataSourceService,
                 private eventHub: EventHubService,
                 private preferences: UserPreferencesService,
+                private modal: ModalService,
                 private settings: SettingsService) {
 
         this.settings.platformConfiguration
@@ -82,7 +87,6 @@ export class SBUserProjectsPanelComponent {
                 .sort((a, b) => a.data.name.toLowerCase().localeCompare(b.data.name.toLowerCase()))
                 .map(entry => this.mapProjectToNode(entry))
             ).withLatestFrom(
-
             this.settings.platformConfiguration,
             Observable.of(this.preferences.get("open_projects", {})),
 
@@ -93,7 +97,7 @@ export class SBUserProjectsPanelComponent {
             })
             .subscribe(this.allProjects);
 
-        this.allProjects.map(projects => {
+        this.allProjects.map((projects: any[]) => {
             return projects.reduce((acc, curr) => {
                 acc[curr.isOpen ? "open" : "closed"].push(curr);
                 return acc;
@@ -128,7 +132,13 @@ export class SBUserProjectsPanelComponent {
             name: project.data.name,
             icon: project.type || "angle",
             isExpandable: true,
-            onClose: () =>{
+            contextMenu: [
+                new MenuItem("New App...", {
+                    click: () => this.openNewFileModal(project.data)
+                }),
+                new MenuItem("Remove from Workspace")
+            ],
+            onClose: () => {
                 this.setProjectStatus(project.data.id, false);
             },
             childrenProvider: _ => project.childrenProvider()
@@ -147,6 +157,16 @@ export class SBUserProjectsPanelComponent {
         }
     }
 
+    private openNewFileModal(project: PlatformProjectEntry) {
+        const component = this.modal.show<NewFileModalComponent>(NewFileModalComponent, {
+            title: "Create new File...",
+            closeOnOutsideClick: true,
+            closeOnEscape: true
+        });
+
+
+    }
+
 
     private setProjectStatus(projectID, isOpen) {
         this.projectUpdates.next(
@@ -159,7 +179,7 @@ export class SBUserProjectsPanelComponent {
             }));
     }
 
-    private addProjectToWorkspace(projectID){
+    private addProjectToWorkspace(projectID) {
         this.setProjectStatus(projectID, true);
         this.showProjectSelectionToolbar = false;
     }

@@ -35,7 +35,7 @@ export class CodeEditor extends AbstractCodeEditor {
         this.setTheme("chrome");
 
         this.contentType.subscribe(type => {
-            this.setMode("json");
+            this.setMode(type || "json");
         });
 
         this.content.subscribe(rawText => {

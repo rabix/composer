@@ -42,6 +42,18 @@ import {InputInspectorComponent} from "./app/components/sidebar/object-inpsector
 import {ExpressionEditorComponent} from "./app/components/sidebar/expression-editor/expression-editor.component";
 import {BasicInputSectionComponent} from "./app/components/sidebar/object-inpsector/basic-section/basic-input-section.component";
 import {ToggleComponent} from "./app/components/common/toggle-slider/toggle-slider.component";
+import {ContextDirective} from "./app/services/context/context.directive";
+import {MenuComponent} from "./app/components/menu/menu.component";
+import {MenuItemComponent} from "./app/components/menu/menu-item.component";
+import {ModalComponent} from "./app/components/modal/modal.component";
+import {ConfirmComponent} from "./app/components/modal/common/confirm.component";
+import {ModalService} from "./app/components/modal/modal.service";
+import {RadioGroupComponent} from "./app/components/forms/elements/radio-group.component";
+import {InputComponent} from "./app/components/forms/elements/input.component";
+import {RadioButtonComponent} from "./app/components/forms/elements/radio-button.component";
+import {NewFileModalComponent} from "./app/components/modal/custom/new-file-modal.component";
+import {TemplateProviderService} from "./app/services/template-provider.service";
+import {PromptComponent} from "./app/components/modal/common/prompt.component";
 
 @NgModule({
     providers: [
@@ -55,11 +67,14 @@ import {ToggleComponent} from "./app/components/common/toggle-slider/toggle-slid
         CltEditorComponent,
         CodeEditorComponent,
         CommandLineComponent,
+        ConfirmComponent,
+        ContextDirective,
         DockerInputFormComponent,
         ExpressionEditorComponent,
         ExpressionEditorSidebarComponent,
         ExpressionInputComponent,
         FormSectionComponent,
+        InputComponent,
         InputInspectorComponent,
         BasicInputSectionComponent,
         InputInspectorSidebarComponent,
@@ -68,12 +83,18 @@ import {ToggleComponent} from "./app/components/common/toggle-slider/toggle-slid
         LayoutComponent,
         LocalFilesPanelComponent,
         MainComponent,
-        MainComponent,
+        MenuComponent,
+        MenuItemComponent,
+        ModalComponent,
+        NewFileModalComponent,
         PanelComponent,
         PanelContainerComponent,
         PanelHandleComponent,
         PanelSwitcherComponent,
         PanelToolbarComponent,
+        PromptComponent,
+        RadioButtonComponent,
+        RadioGroupComponent,
         RevisionsPanelComponent,
         SBPublicAppsPanelComponent,
         SBUserProjectsPanelComponent,
@@ -92,6 +113,15 @@ import {ToggleComponent} from "./app/components/common/toggle-slider/toggle-slid
         WorkflowEditorComponent,
         ToggleComponent
     ],
+    entryComponents: [
+        MenuComponent,
+        MenuItemComponent,
+        NewFileModalComponent,
+        ModalComponent,
+        ConfirmComponent,
+        PromptComponent
+    ],
+    providers: [ModalService, TemplateProviderService],
     imports: [BrowserModule, FormsModule, HttpModule, ReactiveFormsModule],
     bootstrap: [MainComponent]
 })

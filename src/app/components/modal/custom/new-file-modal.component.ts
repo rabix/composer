@@ -1,34 +1,25 @@
-import {AlertComponent} from "./alert.component";
-import {assignable} from "../../decorators";
-import {BlockLoaderComponent} from "../block-loader/block-loader.component";
-import {Component, ViewChild} from "@angular/core";
-import {CreateFileRequestAction} from "../../action-events";
-import {CwlFileTemplate, CwlFileTemplateType} from "../../types/file-template.type";
-import {EventHubService} from "../../services/event-hub/event-hub.service";
-import {FileName} from "../forms/models/file-name";
-import {InputComponent} from "../forms/elements/input.component";
-import {ModalService} from "../modal";
-import {NgStyle, ControlGroup} from "@angular/common";
-import {Observable, Subscription} from "rxjs";
-import {RadioButtonComponent} from "../forms/elements/radio-button.component";
-import {RadioGroupComponent, GroupItem} from "../forms/elements/radio-group.component";
-import {Validators, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES, FormBuilder, FormGroup} from "@angular/forms";
+import {assignable} from "../../../decorators/index";
+import {Component, ViewChild, Input} from "@angular/core";
+import {CwlFileTemplateType, CwlFileTemplate} from "../../../types/file-template.type";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {InputComponent} from "../../forms/elements/input.component";
+import {RadioButtonComponent} from "../../forms/elements/radio-button.component";
+import {RadioGroupComponent, GroupItem} from "../../forms/elements/radio-group.component";
+import {ModalService} from "../modal.service";
+import {Subscription, Observable} from "rxjs";
+import {FileName} from "../../forms/models/file-name";
+import {TemplateProviderService} from "../../../services/template-provider.service";
 
 @Component({
-    selector: 'new-file-modal',
+    selector: 'ct-new-file-modal',
     directives: [
-        BlockLoaderComponent,
-        NgStyle,
         RadioButtonComponent,
         RadioGroupComponent,
-        AlertComponent,
         InputComponent,
-        REACTIVE_FORM_DIRECTIVES,
-        FORM_DIRECTIVES,
     ],
     template: `
-        <block-loader class="overlay" *ngIf="isCreatingFile"></block-loader>
         <div>
+            <block-loader class="overlay" *ngIf="isCreatingFile"></block-loader>
             <form (ngSubmit)="onSubmit(newFileForm)" [formGroup]="newFileForm" class="flex-form">
                 <div class="modal-body">
                     <ct-radio-group #tpl class="flex-container" [items]="fileTypes"></ct-radio-group>
@@ -50,7 +41,6 @@ import {Validators, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES, FormBuilder, Form
                     <button class="btn btn-secondary btn-sm" type="button" (click)="onCancel()">Cancel</button>
                     <button class="btn btn-primary btn-sm" type="submit" [disabled]="!newFileForm.valid">Create</button>
                 </div>
-        
             </form>
         </div>
 `
@@ -59,7 +49,11 @@ export class NewFileModalComponent {
 
     /** Base directory path prefix for newly created file */
     @assignable()
-    public basePath: string;
+    @Input()
+    public basePath = "";
+
+    @Input()
+    public save: (path: string, content: string) => Observable<any>;
 
     /** Switch for showing the cog overlay, is active between submitting the form and the API response */
     private isCreatingFile: boolean;
@@ -74,7 +68,7 @@ export class NewFileModalComponent {
     private cwlExtrasForm: FormGroup;
 
     /** Whether the CWLExtras form should be shown */
-    private showCwlExtrasForm: boolean;
+    private showCwlExtrasForm = false;
 
     /** List of file templates */
     private fileTypes: GroupItem<string>[];
@@ -84,19 +78,15 @@ export class NewFileModalComponent {
     private fileTypeRadio: RadioGroupComponent<CwlFileTemplateType>;
 
     /** Subscriptions that should be disposed upon destroying the component */
-    private subs: Subscription[];
+    private subs: Subscription[] = [];
 
     constructor(private formBuilder: FormBuilder,
-                private eventHub: EventHubService,
+                private template: TemplateProviderService,
                 private modal: ModalService) {
-
-        this.showCwlExtrasForm = false;
-        this.subs              = [];
-        this.basePath          = "";
 
         this.fileTypes = [
             {name: "Blank File", value: "blank", icon: "file-text-o", selected: true},
-            {name: "Command Line Tool", value: "command_line_tool", icon: "terminal"},
+            {name: "Command Line Tool", value: "command-line-tool", icon: "terminal"},
             {name: "Workflow", value: "workflow", icon: "share-alt"},
         ];
 
@@ -112,7 +102,7 @@ export class NewFileModalComponent {
         this.subs.push(this.newFileForm.valueChanges.subscribe(_ => this.error = undefined));
     }
 
-    private onSubmit(form: ControlGroup) {
+    private onSubmit() {
 
         // If the overlay is shown right away, user working locally would just see
         // flashing darkening over the modal, so avoid that, but keep the delay low enough
@@ -120,7 +110,7 @@ export class NewFileModalComponent {
         Observable.of(1).delay(50).filter(_ => this.error === undefined).subscribe(_ => this.isCreatingFile = true);
 
         const fileType = this.fileTypeRadio.getSelectedValue();
-        let fileName   = new FileName(form.controls["filename"].value);
+        let fileName   = new FileName(this.newFileForm.controls["filename"].value);
 
         if (fileType === "workflow" || fileType === "command_line_tool") {
             fileName = fileName.ensureExtension("json");
@@ -129,12 +119,14 @@ export class NewFileModalComponent {
         const path = this.basePath.length ? `${this.basePath}/${fileName.fullPath}` : fileName.fullPath;
 
         // Currently all files will be created for draft-2 until we make a switch button and v1 templates
-        const template = new CwlFileTemplate(fileType, "draft-2", this.cwlExtrasForm.value);
-        const action   = new CreateFileRequestAction({path, template});
+        const templateParams = new CwlFileTemplate(fileType, "draft-2", this.cwlExtrasForm.value);
 
-        this.eventHub.publish(action).getResponse().subscribe(_ => {
+        const template = this.template.compile(templateParams.id, templateParams.params);
+
+        this.save(path, template).subscribe(result => {
+            this.isCreatingFile = false;
             this.modal.close();
-        }, (err) => {
+        }, err => {
             this.error          = err;
             this.isCreatingFile = false;
         });

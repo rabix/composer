@@ -27,12 +27,12 @@ import {WebWorkerService} from "../../services/web-worker/web-worker.service";
         
             <div class="status-bar-footer">
                 <div class="left-side">
-                    <validation-issues [issuesStream]="schemaValidation"></validation-issues>
+                    <validation-issues [issuesStream]="schemaValidation" [show]="showValidation" (select)="showValidation = !showValidation"></validation-issues>
                 </div>
                 <div class="right-side">
                     <ct-view-mode-switch [viewMode]="viewMode"
                                          [disabled]="!isValidCWL"
-                                         (onSwitch)="viewMode = $event"></ct-view-mode-switch>
+                                         (switch)="viewMode = $event"></ct-view-mode-switch>
                 </div>
             </div>
         </div>
@@ -52,6 +52,10 @@ export class WorkflowEditorComponent implements OnInit, OnDestroy {
 
     /** List of subscriptions that should be disposed when destroying this component */
     private subs: Subscription[] = [];
+
+    /** Flag for showing validation panel. Because it is currently the only panel, there is a flag
+     *  otherwise, WF editor should have same implementation as Tool editor */
+    private showValidation = false;
 
     private rawEditorContent = new BehaviorSubject("");
 

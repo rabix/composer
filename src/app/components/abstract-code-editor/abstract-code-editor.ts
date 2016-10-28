@@ -25,9 +25,7 @@ export abstract class AbstractCodeEditor {
     }
 
     protected setMode(mode: string): void {
-        if (mode.charAt(0) === '.') {
-            mode = ACE_MODES_MAP[mode] ? ACE_MODES_MAP[mode] : 'text';
-        }
+        mode = ACE_MODES_MAP[mode] ? ACE_MODES_MAP[mode] : 'text';
 
         require('brace/mode/' + mode);
         this.session.setMode('ace/mode/' + mode);

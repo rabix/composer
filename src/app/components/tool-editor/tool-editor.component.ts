@@ -57,13 +57,13 @@ require("./tool-editor.component.scss");
             </div>
             <div class="status-bar-footer">
                 <div class="left-side">
-                    <validation-issues [issuesStream]="schemaValidation"></validation-issues>
-                    <commandline [commandLineParts]="commandLineParts"></commandline>
+                    <validation-issues [issuesStream]="schemaValidation" (select)="selectBottomPanel($event)" [show]="bottomPanel === 'validation'"></validation-issues>
+                    <commandline [commandLineParts]="commandLineParts" (select)="selectBottomPanel($event)" [show]="bottomPanel === 'commandLine'"></commandline>
                 </div>
                 <div class="right-side">
                     <ct-view-mode-switch [viewMode]="viewMode"
                                          [disabled]="!isValidCWL"
-                                         (onSwitch)="onSwitchView($event)">
+                                         (switch)="switchView($event)">
                     </ct-view-mode-switch>
                 </div>
             </div>
@@ -78,6 +78,10 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
 
     /** Default view mode. */
     private viewMode: "code"|"gui" = "code";
+
+    /** Flag for bottom panel, shows validation-issues, commandline, or neither */
+    //@todo(maya) consider using ct-panel-switcher instead
+    private bottomPanel: "validation"|"commandLine"|null;
 
     private toolModel = new CommandLineToolModel();
 
@@ -132,11 +136,15 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
         }
     }
 
-    private onSwitchView(ev) {
+    private switchView(ev) {
         this.viewMode = ev;
         if (ev === "code") {
             this.rawEditorContent.next(JSON.stringify(this.toolModel.serialize(), null, 4));
         }
+    }
+
+    private selectBottomPanel(panel: "validation"|"commandLineTool") {
+        this.bottomPanel = this.bottomPanel === panel ? null : panel;
     }
 
     ngOnDestroy(): void {

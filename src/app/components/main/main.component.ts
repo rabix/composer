@@ -12,6 +12,8 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
 import {WebWorkerService} from "../../services/web-worker/web-worker.service";
 import {GuidService} from "../../services/guid.service";
 import {SBPlatformDataSourceService} from "../../sources/sbg/sb-platform.source.service";
+import {ContextService} from "../../services/context/context.service";
+import {TemplateProviderService} from "../../services/template-provider.service";
 
 require("./../../../assets/sass/main.scss");
 
@@ -36,8 +38,9 @@ require("./main.component.scss");
         SBPlatformDataSourceService,
         SettingsService,
         UserPreferencesService,
-        GuidService
-    ]
+        GuidService,
+        ContextService,
+    ],
 })
 export class MainComponent implements AfterViewInit {
 

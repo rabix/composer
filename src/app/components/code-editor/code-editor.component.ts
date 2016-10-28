@@ -30,7 +30,6 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
     @Output()
     public contentChanges = new Subject<string>();
 
-
     /** Holds the reference to the CodeEditor service/component */
     private editor: CodeEditor;
 
