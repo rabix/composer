@@ -117,7 +117,73 @@ describe("FS Controller", () => {
 
     describe("Utility: getFileOutputInfo()", () => {
 
-        it("should give exact read/write permission information");
+        it("should give exact read/write permission information for 0o700", (done) => {
+            tmp.file({mode: 0o700}, (err, fpath, fd, cleanup) => {
+
+                ctrl.getFileOutputInfo(fpath, (err, info) => {
+
+                    assert.isNull(err);
+                    assertStandardEntryInfo(info, {
+                        isReadable: false,
+                        isWritable: false
+                    });
+
+                    cleanup();
+                    done();
+                });
+            });
+        });
+
+        it("should give exact read/write permission information for 0o766", (done) => {
+            tmp.file({mode: 0o766}, (err, fpath, fd, cleanup) => {
+
+                ctrl.getFileOutputInfo(fpath, (err, info) => {
+
+                    assert.isNull(err);
+                    assertStandardEntryInfo(info, {
+                        isReadable: true,
+                        isWritable: true
+                    });
+
+                    cleanup();
+                    done();
+                });
+            });
+        });
+
+        it("should give exact read/write permission information for 0o704", (done) => {
+            tmp.file({mode: 0o704}, (err, fpath, fd, cleanup) => {
+
+                ctrl.getFileOutputInfo(fpath, (err, info) => {
+
+                    assert.isNull(err);
+                    assertStandardEntryInfo(info, {
+                        isReadable: true,
+                        isWritable: false
+                    });
+
+                    cleanup();
+                    done();
+                });
+            });
+        });
+
+        it("should give exact read/write permission information for 0o702", (done) => {
+            tmp.file({mode: 0o702}, (err, fpath, fd, cleanup) => {
+
+                ctrl.getFileOutputInfo(fpath, (err, info) => {
+
+                    assert.isNull(err);
+                    assertStandardEntryInfo(info, {
+                        isReadable: false,
+                        isWritable: true
+                    });
+
+                    cleanup();
+                    done();
+                });
+            });
+        });
 
         it("should give information about a file", (done) => {
 
@@ -356,7 +422,17 @@ describe("FS Controller", () => {
 
     describe("Endpoint: createFolder()", () => {
 
-        it("should create folders recursively if direct parent doesn't exist");
+        it("should create folders recursively if direct parent doesn't exist", (done) => {
+            tmp.tmpName({prefix: "sub1/sub2/sub3/"}, (err, path) => {
+                if (err) throw err;
+
+                ctrl.createDirectory(path, (err, info) => {
+                    assert.isNull(err);
+                    assertStandardEntryInfo(info);
+                    done();
+                });
+            });
+        });
 
         it("should return an error if folder exists", (done) => {
 
@@ -364,15 +440,15 @@ describe("FS Controller", () => {
 
                 ctrl.createDirectory(path, (err) => {
 
-                   assert.instanceOf(err, Error);
+                    assert.instanceOf(err, Error);
 
-                   cleanup();
-                   done();
+                    cleanup();
+                    done();
                 });
             });
         });
 
-        it("should create an empty folder", (done) =>{
+        it("should create an empty folder", (done) => {
 
             tmp.tmpName((err, path) => {
 
@@ -385,7 +461,7 @@ describe("FS Controller", () => {
                         done();
                     });
                 });
-           });
+            });
         });
     });
 });
