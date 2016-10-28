@@ -4,6 +4,7 @@ const tmp = require("tmp");
 const assert = chai.assert;
 const fs = require("fs");
 const path = require("path");
+const rimraf = require("rimraf");
 
 tmp.setGracefulCleanup();
 
@@ -13,7 +14,17 @@ describe("FS Controller", () => {
         assert.isObject(entry);
         values = values || {};
 
-        const mandatoryKeys = ["type", "path", "name", "dirname", "language", "isDir", "isFile"];
+        const mandatoryKeys = [
+            "type",
+            "path",
+            "name",
+            "dirname",
+            "language",
+            "isDir",
+            "isFile",
+            "isReadable",
+            "isWritable"
+        ];
 
         mandatoryKeys.forEach(key => {
             values[key]
@@ -54,7 +65,16 @@ describe("FS Controller", () => {
             tmp.file({postfix: ".json"}, (err, path, fd, cleanup) => {
                 if (err) throw err;
 
-                fs.writeFile(fd, `{ "label": "Ariana Sans", "class": "CommandLineTool" }`, null, (err) => {
+                fs.writeFile(fd, `
+                    { 
+                        "label": "Ariana Sans", 
+                        "nested": { 
+                            "class": "Workflow"
+                        }, 
+                        "class": "CommandLineTool" 
+                    }
+                `, null, (err) => {
+
                     if (err) throw err;
 
                     ctrl.getPotentialCWLClassFromFile(path, (err, cls) => {
@@ -71,7 +91,15 @@ describe("FS Controller", () => {
         it("should return “Workflow” if file has that class", (done) => {
             tmp.file({postfix: ".json"}, (err, path, fd, cleanup) => {
                 if (err) throw err;
-                fs.writeFile(fd, `{ "class": "Workflow" }`, null, (err) => {
+                fs.writeFile(fd, `
+                    { 
+                        "label": "Gerard Grande", 
+                        "nested": { 
+                            "class": "CommandLineTool"
+                        }, 
+                        "class": "Workflow" 
+                    }
+                `, null, (err) => {
 
                     if (err) throw err;
 
@@ -88,6 +116,9 @@ describe("FS Controller", () => {
     });
 
     describe("Utility: getFileOutputInfo()", () => {
+
+        it("should give exact read/write permission information");
+
         it("should give information about a file", (done) => {
 
             tmp.file({postfix: ".json"}, (err, fpath, fd, cleanup) => {
@@ -262,4 +293,99 @@ describe("FS Controller", () => {
         });
     });
 
+    describe("Endpoint: deletePath()", () => {
+        it("should return success if the path does not exist", (done) => {
+            tmp.tmpName((err, path) => {
+                ctrl.deletePath(path, (err) => {
+                    assert.isNull(err);
+                    done();
+                });
+            });
+
+        });
+
+        it("should delete a file", (done) => {
+            tmp.file((err, path, fd, cleanup) => {
+                ctrl.deletePath(path, (err) => {
+
+                    assert.isNull(err);
+
+                    fs.access(path, fs.F_OK, (err) => {
+                        assert.instanceOf(err, Error);
+
+                        if (!err) {
+                            cleanup();
+                        }
+                        done();
+                    });
+
+                });
+            });
+        });
+
+        it("should recursively delete a folder", (done) => {
+            tmp.dir((err, parentDir, cleanParent) => {
+                if (err) throw err;
+
+                tmp.dir((err, childDir, cleanChild) => {
+                    if (err) throw err;
+
+                    tmp.file({template: childDir + "/tmp-XXXXXX"}, (err, path, fd, cleanFile) => {
+                        if (err) throw err;
+
+
+                        ctrl.deletePath(parentDir, (err) => {
+                            assert.isNull(err);
+
+                            fs.access(parentDir, fs.F_OK, (err) => {
+                                assert.instanceOf(err, Error);
+
+                                if (!err) {
+                                    cleanFile();
+                                    cleanChild();
+                                    cleanParent();
+                                }
+                                done();
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
+
+    describe("Endpoint: createFolder()", () => {
+
+        it("should create folders recursively if direct parent doesn't exist");
+
+        it("should return an error if folder exists", (done) => {
+
+            tmp.dir((err, path, cleanup) => {
+
+                ctrl.createDirectory(path, (err) => {
+
+                   assert.instanceOf(err, Error);
+
+                   cleanup();
+                   done();
+                });
+            });
+        });
+
+        it("should create an empty folder", (done) =>{
+
+            tmp.tmpName((err, path) => {
+
+                ctrl.createDirectory(path, (err, info) => {
+
+                    assert.isNull(err);
+                    assertStandardEntryInfo(info);
+
+                    rimraf(path, () => {
+                        done();
+                    });
+                });
+           });
+        });
+    });
 });

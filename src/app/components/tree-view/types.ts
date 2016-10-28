@@ -4,6 +4,8 @@ export interface TreeNode {
     name: string;
     icon?: Observable<string>,
     isExpandable?: boolean;
+    openHandler?: (...any: any[]) => Observable<any>;
+    childrenProvider?: (...any: any[]) => Observable<TreeNode[]>
 }
 
 export interface OpenableTreeNode extends TreeNode {
