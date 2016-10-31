@@ -52,10 +52,6 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
             }
         );
 
-        this.subs.push(this.rawInput.subscribe((text) => {
-            this.editor.setText(text);
-        }));
-
         this.subs.push(this.editor.contentChanges.subscribe(this.contentChanges));
     }
 

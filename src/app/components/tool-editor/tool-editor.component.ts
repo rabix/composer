@@ -1,8 +1,8 @@
-import {Component, OnInit, Input, OnDestroy} from "@angular/core";
+import {Component, OnInit, Input, OnDestroy, AfterViewInit, NgZone} from "@angular/core";
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {CltEditorComponent} from "../clt-editor/clt-editor.component";
-import {Subscription, ReplaySubject, BehaviorSubject} from "rxjs/Rx";
+import {Subscription, ReplaySubject, BehaviorSubject, Observable} from "rxjs/Rx";
 import {ToolHeaderComponent} from "./tool-header/tool-header.component";
 import {ViewModeService} from "./services/view-mode.service";
 import {CommandLineToolModel} from "cwlts/models/d2sb";
@@ -15,17 +15,25 @@ import {ValidationIssuesComponent} from "../validation-issues/validation-issues.
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
 import {WebWorkerService} from "../../services/web-worker/web-worker.service";
 import {ToolSidebarService} from "../../services/sidebars/tool-sidebar.service";
-
 import {ExpressionSidebarService} from "../../services/sidebars/expression-sidebar.service";
 import {InputSidebarService} from "../../services/sidebars/input-sidebar.service";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
+import {ModalService} from "../modal";
+import {CheckboxPromptComponent} from "../modal/common/checkbox-prompt.component";
 
 
 require("./tool-editor.component.scss");
 
 @Component({
     selector: "ct-tool-editor",
-    providers: [ViewModeService, WebWorkerService, ToolSidebarService, ExpressionSidebarService, InputSidebarService],
+    providers: [
+        ViewModeService,
+        WebWorkerService,
+        ToolSidebarService,
+        ExpressionSidebarService,
+        InputSidebarService,
+        ModalService
+    ],
     directives: [
         CodeEditorComponent,
         CltEditorComponent,
@@ -35,10 +43,10 @@ require("./tool-editor.component.scss");
         SidebarComponent,
         ViewModeSwitchComponent,
         ValidationIssuesComponent,
+        CheckboxPromptComponent
     ],
     template: `
         <block-loader *ngIf="isLoading"></block-loader>
-
 
         <div class="editor-container" *ngIf="!isLoading">
             <tool-header class="editor-header"
@@ -56,6 +64,7 @@ require("./tool-editor.component.scss");
         
                 <ct-clt-editor *ngIf="viewMode === 'gui'"
                                class="gui-editor-component"
+                               (isDirty)="modelChanged = $event"
                                [model]="toolModel">
                 </ct-clt-editor>
             </div>
@@ -78,22 +87,21 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
     @Input()
     public data: DataEntrySource;
 
+    /** Stream of ValidationResponse for current document */
     public schemaValidation = new ReplaySubject<ValidationResponse>(1);
 
     /** Default view mode. */
     private viewMode: "code"|"gui" = "code";
 
-    private isLoading = true;
+    /** Flag to indicate the document is loading */
+    private isLoading = false;
 
-    private promptOnGui: boolean;
+    /** Flag for showing reformat prompt on GUI switch */
+    private showReformatPrompt: boolean;
 
     /** Flag for bottom panel, shows validation-issues, commandline, or neither */
-            //@todo(maya) consider using ct-panel-switcher instead
+    //@todo(maya) consider using ct-panel-switcher instead
     private bottomPanel: "validation"|"commandLine"|null;
-
-    private toolModel = new CommandLineToolModel();
-
-    private commandLineParts: CommandLinePart[];
 
     /** Flag for validity of CWL document */
     private isValidCWL = false;
@@ -101,78 +109,130 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
     /** List of subscriptions that should be disposed when destroying this component */
     private subs: Subscription[] = [];
 
+    /** Stream of contents in code editor */
     private rawEditorContent = new BehaviorSubject("");
 
-    constructor(private webWorkerService: WebWorkerService, private userPrefService: UserPreferencesService) {
-        this.promptOnGui = this.userPrefService.get("promptOnGuiFormat");
+    /** Model that's recreated on document change */
+    private toolModel = new CommandLineToolModel();
+
+    /** Flag for dirty status of CLT editor forms */
+    private modelChanged: boolean = false;
+
+    /** Sorted array of resulting command line parts */
+    private commandLineParts: CommandLinePart[];
+
+    constructor(private webWorkerService: WebWorkerService,
+                private userPrefService: UserPreferencesService,
+                private modal: ModalService) {
+        this.showReformatPrompt = this.userPrefService.get("show_reformat_prompt");
+
+        // set default if userPref does not exist
+        if (this.showReformatPrompt === undefined) {
+            this.userPrefService.put("show_reformat_prompt", true);
+            this.showReformatPrompt = true;
+        }
     }
 
+    // @todo(maya) fix block loader
+    // setting this.isLoading to false inside a sub doesn't (always) trigger view update
     ngOnInit(): void {
+        this.subs.push((this.data.content as Observable<string>).subscribe(val => {
+            this.rawEditorContent.next(val);
+        }));
 
-        this.data.content.subscribe(this.rawEditorContent);
+        this.subs.push(this.webWorkerService.validationResultStream
+            .subscribe(this.schemaValidation));
 
-        this.webWorkerService.validationResultStream
-            .subscribe(this.schemaValidation);
-
-        this.rawEditorContent.subscribe(raw => {
-            this.isLoading = false;
-            try {
-                let json              = JSON.parse(raw);
-
-                if (this.promptOnGui === undefined) {
-                    this.promptOnGui = json["ct:modified"] === undefined;
-                }
-
-                if (!this.promptOnGui) {
-                    json["ct:modified"] = true;
-                }
-
-                this.toolModel        = new CommandLineToolModel(json);
-                this.commandLineParts = this.toolModel.getCommandLineParts();
-            } catch (ex) {
-                // if the file isn't valid JSON, do nothing
-            }
-        });
-
-        this.webWorkerService.validationResultStream.subscribe(err => {
+        this.subs.push(this.webWorkerService.validationResultStream.subscribe(err => {
+            console.log('validation', err);
             this.isValidCWL = err.isValidCwl;
-        });
+        }));
     }
 
     private onEditorContentChange(content: string) {
         this.webWorkerService.validateJsonSchema(content);
-        this.rawEditorContent.next(content);
-    }
 
-    private save(revisionNote) {
+        try {
+            let json = JSON.parse(content);
 
-        if (this.data.data.source === "local") {
-            this.data.data.save(this.rawEditorContent.getValue()).subscribe(_ => {
-            });
-        } else {
-            this.data.save(JSON.parse(this.rawEditorContent.getValue()), revisionNote).subscribe(data => {
-            });
-        }
-    }
-
-    private switchView(ev) {
-        if (ev === "gui" && this.promptOnGui) {
-            this.promptOnGui = !confirm(`Activating GUI mode might change the formatting of this document. Do you wish to continue?`);
-        }
-
-        if (ev === "code") {
-            let json = this.toolModel.serialize();
-
-            if (!this.promptOnGui) {
-                json["ct:modified"] = true;
+            // should show prompt, but json is already reformatted
+            if (this.showReformatPrompt && json["ct:modified"]) {
+                this.showReformatPrompt = false;
             }
 
-            this.rawEditorContent.next(JSON.stringify(json, null, 4));
+            this.toolModel        = new CommandLineToolModel(json);
+            this.commandLineParts = this.toolModel.getCommandLineParts();
+        } catch (ex) {
+            // if the file isn't valid JSON, do nothing
         }
-
-        this.viewMode = ev;
     }
 
+    private save(revisionNote: string) {
+        const text = this.modelChanged ? this.getModelText() : this.rawEditorContent.getValue();
+
+        if (this.data.data.source === "local") {
+            this.data.data.save(text).subscribe(_ => {
+            });
+        } else {
+            this.data.save(JSON.parse(text), revisionNote).subscribe(data => {
+            });
+        }
+    }
+
+    /**
+     * Toggles between GUI and Code view. If necessary, it will show a prompt about reformatting
+     * when switching to GUI view.
+     *
+     * @param view
+     */
+    private switchView(view: "gui" | "code") {
+        if (view === "gui") {
+            if (this.showReformatPrompt) {
+                this.modal.checkboxPrompt({
+                    title: "Confirm GUI Formatting",
+                    content: "Activating GUI mode might change the formatting of this document. Do you wish to continue?",
+                    cancellationLabel: "Cancel",
+                    confirmationLabel: "OK",
+                    checkboxLabel: "Don't show this dialog again",
+                }).then(res => {
+                    if (res) this.userPrefService.put("show_reformat_prompt", false);
+
+                    this.showReformatPrompt = false;
+                    this.viewMode           = view;
+                }, _ => {
+                    // do nothing, don't change mode
+                    return;
+                });
+
+            } else {
+                this.viewMode = view;
+            }
+        }
+
+        if (view === "code") {
+            if (this.modelChanged) this.rawEditorContent.next(this.getModelText());
+
+            this.viewMode = view;
+        }
+    }
+
+    /**
+     * Serializes model to text. It also adds ct:modified flag to indicate
+     * the text has been formatted by the GUI editor
+     *
+     * @returns {string}
+     */
+    private getModelText(): string {
+        let json            = this.toolModel.serialize();
+        json["ct:modified"] = true;
+
+        return JSON.stringify(json, null, 4);
+    }
+
+    /**
+     * Toggles the status bar panels
+     * @param panel
+     */
     private selectBottomPanel(panel: "validation"|"commandLineTool") {
         this.bottomPanel = this.bottomPanel === panel ? null : panel;
     }
