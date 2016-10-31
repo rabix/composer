@@ -1,12 +1,17 @@
 @import "../../../../../assets/sass/variables";
 
 .expression-input-group {
-    z-index: 0;
 
-    .add-expression {
-        background: #ffffff;
-        padding: 0;
-        width: 20%;
+    input {
+        cursor: pointer;
+    }
+
+    &:hover {
+        border: 2px solid $btn-primary-bg;
+        border-radius: 5px;
+    }
+
+    .input-group-btn {
         cursor: pointer;
     }
 }

@@ -5,9 +5,10 @@ import * as jailed from "jailed";
 describe("SandboxService", () => {
     const sandboxService = new SandboxService();
 
-    const fakePlugin = {
-        whenConnected: () => { }
-    };
+    class FakePlugin {
+        public whenConnected() { }
+        public disconnect() { }
+    }
 
     describe("stringify", () => {
 
@@ -57,18 +58,23 @@ describe("SandboxService", () => {
             spyOn(jailed, "DynamicPlugin").and.callFake(expressionCode => {
                 const mockResult = eval(expressionCode);
 
-                updateExpressionResult.next({
-                    output: mockResult,
-                    error: undefined
+                //output() needs to be called after the class has returned
+                setTimeout(() => {
+                    jailedApi.output({
+                        output: mockResult,
+                        error: undefined
+                    });
+                }, 0);
+
+                return new FakePlugin();
+            });
+
+            sandboxService.submit(1 + 2)
+                .subscribe((result: SandboxResponse) => {
+                    expect(result).toEqual({ output: '3', error: undefined });
+                    done();
                 });
 
-                return fakePlugin;
-            });
-
-            sandboxService.submit(1 + 2).subscribe((result: SandboxResponse) => {
-                expect(result).toEqual({ output: 3, error: undefined });
-                done();
-            });
         });
     });
 

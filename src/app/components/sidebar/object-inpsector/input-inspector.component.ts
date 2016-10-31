@@ -1,18 +1,20 @@
-import {Component, Input, OnInit, OnDestroy} from "@angular/core";
-import {Validators, FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
+import {Component, OnInit, OnDestroy} from "@angular/core";
+import {Validators, FormBuilder, FormGroup} from "@angular/forms";
 import {ExpressionInputComponent} from "../../forms/inputs/types/expression-input.component";
-import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
+import {ExpressionModel, CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 import {Subscription} from "rxjs/Subscription";
-import {InputSidebarService} from "../../../services/sidebars/input-sidebar.service";
+import {InputSidebarService, InputInspectorData} from "../../../services/sidebars/input-sidebar.service";
+import {Subject} from "rxjs/Subject";
+import {ExpressionSidebarService} from "../../../services/sidebars/expression-sidebar.service";
+import {BehaviorSubject} from "rxjs";
+import {Expression} from "cwlts/mappings/d2sb/Expression";
 
 require("./input-inspector.component.scss");
 
 @Component({
     selector: "input-inspector",
     directives: [
-        ExpressionInputComponent,
-        REACTIVE_FORM_DIRECTIVES,
-        FORM_DIRECTIVES
+        ExpressionInputComponent
     ],
     template: `
             <form class="input-inspector-component object-inspector" *ngIf="selectedProperty">
@@ -34,9 +36,9 @@ require("./input-inspector.component.scss");
                     <label for="inputType">Type</label>
                     
                     <select class="form-control" 
-                    name="selectedPropertyType" 
-                    id="dataType"
-                    [(ngModel)]="selectedProperty.type" required>
+                            name="selectedPropertyType" 
+                            id="dataType"
+                            [(ngModel)]="selectedProperty.type" required>
                         <option *ngFor="let propertyType of propertyTypes" [value]="propertyType">
                             {{propertyType}}
                         </option>
@@ -46,61 +48,131 @@ require("./input-inspector.component.scss");
                 <div class="form-group">
                     <label>Value</label>
                     
-                   <!-- <expression-input>
-                    </expression-input>-->
+                    <expression-input *ngIf="expressionInputForm && expressionInputForm.controls['expressionInput']"
+                                    [(expression)]="expressionInput"
+                                    [control]="expressionInputForm.controls['expressionInput']"
+                                    (onEdit)="addExpression()"
+                                    (onClear)="clearExpression()">
+                    </expression-input>
+                    
                 </div>
             </form>
     `
 })
 export class InputInspectorComponent implements OnInit, OnDestroy {
 
+    public context: any;
+
     /** The currently displayed property */
     private selectedProperty: InputProperty;
 
-    /** FormGroup for the ObjectInspector */
-    private inputInspectorForm: FormGroup;
+    private inputBinding: Subject<string | Expression> = new Subject<string | Expression>();
+
+    private expressionInput: ExpressionModel = new ExpressionModel(undefined);
 
     /** Possible property types */
     private propertyTypes = ["File", "string", "enum", "int", "float", "boolean", "array", "record", "map"];
 
     private subs: Subscription[];
 
+    private expressionInputSub: Subscription;
+
+    private expressionInputForm: FormGroup;
+
     constructor(private formBuilder: FormBuilder,
-                private inputSidebarService: InputSidebarService) {
+                private inputSidebarService: InputSidebarService,
+                private expressionSidebarService: ExpressionSidebarService) {
         this.subs = [];
     }
 
-    ngOnInit() {
+    ngOnInit(): void {
         this.subs.push(
-            this.inputSidebarService.inputPortStream.subscribe((inputPort: InputProperty) => {
-                console.log("InputInspectorComponent");
-                this.selectedProperty = inputPort;
+            this.inputSidebarService.inputPortDataStream.subscribe((data: InputInspectorData) => {
+                this.selectedProperty = data.inputProperty;
+                this.context = data.context;
+                const valueFrom = this.selectedProperty.getValueFrom();
+
+                if (valueFrom === undefined) {
+                    this.inputBinding.next("");
+                } else {
+                    this.inputBinding.next(valueFrom);
+                }
             })
         );
 
-        //TODO (Mate) fix this
-        /*
-        this.inputInspectorForm = this.formBuilder.group({
-            expression: [this.selectedProperty.getValueFrom(), Validators.compose([Validators.required, Validators.minLength(1)])]
-        });
+        this.subs.push(
+            this.inputBinding
+                .filter(expression => expression !== undefined)
+                .subscribe((expression: string | Expression) => {
+                    let codeToEvaluate: string = "";
+                    if ((<Expression>expression).script) {
+                        codeToEvaluate = (<Expression>expression).script;
+                        this.expressionInput.setValueToExpression(codeToEvaluate);
+                    } else {
+                        codeToEvaluate = <string>expression;
+                        this.expressionInput.setValueToString(codeToEvaluate);
+                    }
 
-        this.inputInspectorForm.controls["expression"].valueChanges.subscribe(value => {
-            this.selectedProperty.setValueFrom(value);
-        });*/
-
-        this.listenToInputPortUpdate();
+                    this.createExpressionInputForm(this.expressionInput.getExpressionScript());
+                })
+        );
     }
 
-    //TODO (Mate) fix this
-    private listenToInputPortUpdate(): void {
+    private addExpression(): void {
+        const newExpression: BehaviorSubject<ExpressionModel> = new BehaviorSubject<ExpressionModel>(undefined);
+        this.removeExpressionInputSub();
 
-       /* let updateInputPortExpression = this.eventHubService.onValueFrom(UpdateInputPortExpression)
-            .subscribe((expression: string) => {
-                const expressionControl: FormControl = <FormControl>this.inputInspectorForm.controls['expression'];
-                expressionControl.setValue(expression);
+        this.expressionInputSub = newExpression
+            .filter(expression => expression !== undefined)
+            .subscribe((newExpression: ExpressionModel) => {
+                this.selectedProperty.setValueFrom(newExpression.serialize());
+
+                if ((<Expression>newExpression.serialize()).script) {
+                    this.expressionInput = newExpression;
+                    this.createExpressionInputForm(this.expressionInput.getExpressionScript())
+                } else {
+                    this.inputBinding.next(newExpression.serialize());
+                }
             });
 
-        this.subs.push(updateInputPortExpression);*/
+        this.expressionSidebarService.openExpressionEditor({
+            expression: this.expressionInput,
+            newExpressionChange: newExpression,
+            context: this.context
+        });
+    }
+
+    private clearExpression(): void {
+        const newExpression: ExpressionModel = new ExpressionModel("");
+        this.selectedProperty.setValueFrom(newExpression.serialize());
+        this.inputBinding.next(newExpression.serialize());
+    }
+
+    private removeExpressionInputSub(): void {
+        if (this.expressionInputSub) {
+            this.expressionInputSub.unsubscribe();
+            this.expressionInputSub = undefined;
+        }
+    }
+
+    private createExpressionInputForm(formValue: string) {
+
+        if (this.expressionInputForm && this.expressionInputForm.controls['expressionInput']) {
+            this.expressionInputForm.controls['expressionInput'].setValue(formValue);
+        } else {
+            this.expressionInputForm = this.formBuilder.group({
+                ['expressionInput']: [formValue, Validators.compose([Validators.required, Validators.minLength(1)])]
+            });
+
+            const inputValueChange = this.expressionInputForm.controls['expressionInput'].valueChanges.subscribe((value) => {
+                if (typeof this.expressionInput.serialize() === "string") {
+                    this.expressionInput.setValueToString(value);
+                    this.selectedProperty.setValueFrom(value);
+                }
+            });
+
+            this.subs.push(inputValueChange);
+        }
     }
 
     ngOnDestroy(): void {

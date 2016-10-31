@@ -1,12 +1,11 @@
 import {Component, Input, OnInit, OnDestroy, Output} from "@angular/core";
-import {FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES, Validators, FormBuilder} from "@angular/forms";
+import {FormGroup, Validators, FormControl} from "@angular/forms";
 import {Subscription} from "rxjs/Subscription";
 import {FormSectionComponent} from "../../../form-section/form-section.component";
 import {BaseCommandService, BaseCommand} from "../../../../services/base-command/base-command.service";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ExpressionInputComponent} from "../types/expression-input.component";
-import {ExpressionModel} from "cwlts/models/d2sb";
 import {ExpressionSidebarService} from "../../../../services/sidebars/expression-sidebar.service";
 import {ReplaySubject} from "rxjs";
 
@@ -19,11 +18,10 @@ require("./base-command-form.components.scss");
     ],
     directives: [
         ExpressionInputComponent,
-        REACTIVE_FORM_DIRECTIVES,
-        FORM_DIRECTIVES,
         FormSectionComponent
     ],
-    template: `<ct-form-section>
+    template: `
+<ct-form-section>
     <div class="fs-header">
         Base Command
     </div>
@@ -34,17 +32,18 @@ require("./base-command-form.components.scss");
                 <div *ngFor="let baseCommand of baseCommandFormList; let i = index; trackBy:trackByIndex"
                      class="base-command-list">
 
-                    <expression-input class="col-sm-11"
-                                      [context]="context"
-                                      *ngIf="baseCommandForm.controls['baseCommand' + i]"
-                                      [(value)]="baseCommandFormList[i]"
-                                      [control]="baseCommandForm.controls['baseCommand' + i]"
-                                      (onSelect)="editBaseCommand(i)">
+                     <expression-input class="col-sm-11"
+                                  [context]="context"
+                                  *ngIf="baseCommandForm.controls['baseCommand' + i]" 
+                                  [(expression)]="baseCommandFormList[i]"
+                                  [control]="baseCommandForm.controls['baseCommand' + i]"
+                                  (onEdit)="editBaseCommand(i)"
+                                  (onClear)="clearBaseCommand(i)">
                     </expression-input>
 
-                    <span class="close-icon col-sm-1">
-                                    <i class="fa fa-times" (click)="removeBaseCommand(i)"></i>
-                                </span>
+                    <span class="col-sm-1">
+                        <i class="fa fa-trash clear-icon" (click)="removeBaseCommand(i)"></i>
+                    </span>
                 </div> <!-- base-command-list-->
             </div> <!-- list container-->
 
@@ -55,7 +54,6 @@ require("./base-command-form.components.scss");
             <button type="button" class="btn btn-link add-btn-link" (click)="addBaseCommand()">
                 <i class="fa fa-plus"></i> Add base command
             </button>
-
         </form>
     </div>
 </ct-form-section>
@@ -78,7 +76,7 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
     public context: any;
 
     /** The formatted list that we are going to display to the user*/
-    private baseCommandFormList: BaseCommand[];
+    private baseCommandFormList: ExpressionModel[] = [];
 
     private subs: Subscription[];
 
@@ -88,53 +86,49 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
     private selectedIndex: number;
 
     constructor(private baseCommandService: BaseCommandService,
-                private formBuilder: FormBuilder,
                 private expressionSidebarService: ExpressionSidebarService) {
-
         this.subs = [];
     }
 
     ngOnInit(): void {
-        const commandFormList = this.baseCommandService.baseCommandsToFormList(this.toolBaseCommand);
-        this.baseCommandService.setBaseCommands(commandFormList);
+        const inputBaseCommands = this.baseCommandService.baseCommandsToFormList(this.toolBaseCommand);
+        this.baseCommandService.setBaseCommands(inputBaseCommands);
+        this.baseCommandFormList = inputBaseCommands;
+        this.createExpressionInputControls(this.baseCommandFormList);
 
         this.subs.push(
-            this.baseCommandService.baseCommands.subscribe((commandList: BaseCommand[]) => {
-                this.baseCommandFormList = commandList;
-                this.createExpressionInputControls(this.baseCommandFormList);
+            this.baseCommandService.baseCommands
+                .skip(1)
+                .subscribe((commandList: ExpressionModel[]) => {
+                    this.baseCommandFormList = commandList;
+                    this.createExpressionInputControls(this.baseCommandFormList);
 
-                //Format the base commands from the inputs, and set the tool baseCommand
-                this.onUpdate.next(this.baseCommandService.formListToBaseCommandArray(this.baseCommandFormList));
-            })
+                    //Format the base commands from the inputs, and set the tool baseCommand
+                    this.onUpdate.next(this.baseCommandService.formListToBaseCommandArray(this.baseCommandFormList));
+                })
         );
     }
 
-    private trackByIndex(index: number): any {
+    private trackByIndex(index: number): number {
         return index;
     }
 
-    private createExpressionInputControls(commandList: BaseCommand[]) {
+    private createExpressionInputControls(commandList: ExpressionModel[]): void {
         commandList.forEach((command, index) => {
-            let formValue: string = "";
-
             if (this.baseCommandForm.contains('baseCommand' + index)) {
                 this.baseCommandForm.removeControl('baseCommand' + index);
             }
 
-            if ((<ExpressionModel>command).expressionValue) {
-                formValue = (<ExpressionModel>command).expressionValue;
-            } else if (typeof command === "string") {
-                formValue = command;
-            }
-
-            const expressionInputForm: FormGroup = this.formBuilder.group({
-                ['baseCommand' + index]: [formValue, Validators.compose([Validators.required, Validators.minLength(1)])]
-            });
-
-            this.baseCommandForm.addControl('baseCommand' + index, expressionInputForm.controls['baseCommand' + index]);
+            this.baseCommandForm.addControl(
+                'baseCommand' + index,
+                new FormControl(
+                    command.getExpressionScript(),
+                    Validators.compose([Validators.required, Validators.minLength(1)])
+                )
+            );
 
             this.baseCommandForm.controls['baseCommand' + index].valueChanges.subscribe(value => {
-                this.baseCommandService.updateCommand(index, value);
+                this.baseCommandService.updateCommand(index, new ExpressionModel(value));
             });
         });
     }
@@ -155,7 +149,9 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
     }
 
     private editBaseCommand(index: number): void {
-        const newExpression: BehaviorSubject<BaseCommand> = new BehaviorSubject<BaseCommand>(undefined);
+        const newExpression: BehaviorSubject<ExpressionModel> = new BehaviorSubject<ExpressionModel>(undefined);
+        const selectedBaseCommand = this.baseCommandFormList[index];
+
         this.selectedIndex = index;
         this.removeExpressionInputSub();
 
@@ -165,25 +161,19 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
                 this.baseCommandService.updateCommand(index, expression);
             });
 
-        const selectedExpression = this.baseCommandFormList[index];
-        let expression: string = "";
-
-        if ((<ExpressionModel>selectedExpression).script) {
-            expression = (<ExpressionModel>selectedExpression).script;
-
-        } else if (typeof selectedExpression === "string") {
-            expression = selectedExpression;
-        }
-
         this.expressionSidebarService.openExpressionEditor({
-            expression: expression,
+            expression: selectedBaseCommand,
             newExpressionChange: newExpression,
             context: this.context
         });
     }
 
+    private clearBaseCommand(index: number): void {
+        this.baseCommandService.clearBaseCommand(index);
+    }
+
     private addBaseCommand(): void {
-        this.baseCommandService.addCommand("");
+        this.baseCommandService.addCommand(new ExpressionModel(""));
     }
 
     private removeExpressionInputSub(): void {

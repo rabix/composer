@@ -1,27 +1,30 @@
 import {Component, Input, Output, EventEmitter} from "@angular/core";
-import {REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES, AbstractControl} from "@angular/forms";
-import {BaseCommand} from "../../../../services/base-command/base-command.service";
+import {AbstractControl} from "@angular/forms";
 import {ExpressionModel} from "cwlts/models/d2sb";
+import {Expression} from "cwlts/mappings/d2sb/Expression";
 
 require("./expression-input.component.scss");
 
 @Component({
     selector: 'expression-input',
-    directives: [
-        REACTIVE_FORM_DIRECTIVES,
-        FORM_DIRECTIVES
-    ],
     template: `
-            <div class="input-group" *ngIf="control">
+            <div class="input-group"
+                 [class.expression-input-group]="expression.serialize().script"
+                 *ngIf="control">
                 <input class="form-control"
                         (keyup)="modelChange($event)"
                         [formControl]="control"
-                        [readonly]="value.expressionValue ? 'true' : null"/>
+                        (click)="editExpression($event)"
+                        [readonly]="expression.serialize().script ? 'true' : null"/>
                     
                 <span class="input-group-btn">
                     <button type="button" 
                         class="btn btn-secondary" 
-                        (click)="openExpressionSidebar()"><i class="fa fa-code"></i></button>
+                        (click)="onClick()">
+                        <i class="fa"
+                            [ngClass]="{'fa-times': expression.serialize().script,
+                                        'fa-code': !expression.serialize().script}"></i>
+                    </button>
                 </span>
             </div>
         `
@@ -32,25 +35,42 @@ export class ExpressionInputComponent {
     public control: AbstractControl;
 
     @Input()
-    public value: ExpressionModel;
+    public expression: ExpressionModel;
 
     @Input()
     public context: any;
 
     @Output()
-    public valueChange: EventEmitter<string> = new EventEmitter<string>();
+    public expressionChange: EventEmitter<string | ExpressionModel> = new EventEmitter<string | ExpressionModel>();
 
     @Output()
-    public onSelect = new EventEmitter();
+    public onEdit = new EventEmitter();
 
-    private openExpressionSidebar(): void {
-        this.onSelect.emit();
+    @Output()
+    public onClear = new EventEmitter();
+
+    private editExpression(event?: Event): void {
+        if (event) {
+            event.stopPropagation();
+        }
+
+        if ((<Expression>this.expression.serialize()).script) {
+            this.onEdit.emit();
+        }
     }
 
-    private modelChange(event: any) {
+    private onClick(): void {
+        if ((<Expression>this.expression.serialize()).script) {
+            this.onClear.emit();
+        } else {
+            this.onEdit.emit();
+        }
+    }
+
+    private modelChange() {
         //Only emit if the value was not set to an expression
-        if (!(<ExpressionModel>this.value).expressionValue) {
-            this.valueChange.emit(event.target.value);
+        if (!(<Expression>this.expression.serialize()).script) {
+            this.expressionChange.emit(this.expression);
         }
     }
 }

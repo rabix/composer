@@ -1,94 +1,107 @@
-import {Component, OnDestroy} from "@angular/core";
+import {Component, OnDestroy, Input} from "@angular/core";
 import {InputPortService} from "../../../../services/input-port/input-port.service";
-import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 import {Subscription} from "rxjs/Subscription";
 import {InputSidebarService} from "../../../../services/sidebars/input-sidebar.service";
+import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 
 @Component({
     selector: "input-port-list",
-    template: `<div *ngIf="portList.length > 0">
+    template: `
 
-    <div class="gui-section-list-title">
-        <div class="col-sm-7">
-            ID
-        </div>
-        <div class="col-sm-2">
-            Type
-        </div>
-        <div class="col-sm-3">
-            Value
-        </div>
-    </div>
+    <div *ngIf="portList.length > 0">
 
-    <ul class="gui-section-list">
-
-        <li class="gui-section-list-item clickable"
-            *ngFor="let inputPort of portList"
-            (click)="editProperty(inputPort)">
-
-            <div class="col-sm-7" title="{{inputPort.id}}">
-                <div class="ellipsis">
-                    {{inputPort.id}}
+            <div class="gui-section-list-title">
+                <div class="col-sm-7">
+                    ID
+                </div>
+                <div class="col-sm-2">
+                    Type
+                </div>
+                <div class="col-sm-3">
+                    Required
                 </div>
             </div>
-
-            <div class="col-sm-2" title="{{inputPort.type}}">
-                {{inputPort.type}}
-            </div>
-            
-            <div class="col-sm-2" title="{{inputPort.value}}">
-                {{inputPort.value}}
-            </div>
-
-            <div class="col-sm-1 pull-right tool-input-icon">
-                <i class="fa fa-trash"
-                   aria-hidden="true"
-                   (click)="removeProperty(inputPort)"></i>
-            </div>
-        </li>
-    </ul>
-</div> <!-- List end -->
-
-<div *ngIf="portList.length === 0" class="col-sm-12">
-    No input ports defined.
-</div>
+        
+            <ul class="gui-section-list">
+        
+                <li class="gui-section-list-item clickable"
+                    *ngFor="let inputProp of portList; let i = index; trackBy:trackByIndex"
+                    (click)="editProperty(i)">
+        
+                    <div class="col-sm-7" title="{{inputProp.id}}">
+                        <div class="ellipsis">
+                            {{inputProp.id}}
+                        </div>
+                    </div>
+        
+                    <div class="col-sm-2" title="{{inputProp.type}}">
+                        {{inputProp.type}}
+                    </div>
+                    
+                    <div class="col-sm-2" title="{{inputProp.isRequired}}">
+                       {{inputProp.isRequired}}
+                    </div>
+        
+                    <div class="col-sm-1 pull-right tool-input-icon">
+                        <i class="fa fa-trash"
+                           aria-hidden="true"
+                           (click)="removeProperty($event, i)"></i>
+                    </div>
+                </li>
+            </ul>
+        </div> <!-- List end -->
+        
+        <div *ngIf="portList.length === 0" class="col-sm-12">
+            No input ports defined.
+        </div>
     `
 })
 export class InputPortListComponent implements OnDestroy {
 
-    private portList: Array<InputProperty> = [];
+    @Input()
+    private selectedIndex: number;
 
-    private selectedInputPort: InputProperty;
+    @Input()
+    private context: any;
+
+    private portList: Array<InputProperty> = [];
 
     private subs: Subscription[];
 
     constructor(private inputPortService: InputPortService,
                 private inputSidebarService: InputSidebarService) {
-
         this.subs = [];
 
-        let updatePortList = this.inputPortService.inputPorts.subscribe((portList: InputProperty[]) => {
-            this.portList = portList;
+        this.inputPortService.inputPorts.subscribe((viewModelPortList: InputProperty[]) => {
+            this.portList = viewModelPortList;
         });
-
-        let updateSelectedInputPort = this.inputPortService.selectedInputPort.subscribe(inputPort => {
-            this.selectedInputPort = inputPort;
-        });
-
-        this.subs.push(updatePortList);
-        this.subs.push(updateSelectedInputPort);
     }
 
-    private editProperty(inputPort: InputProperty): void {
-        this.inputPortService.setSelected(inputPort);
-        this.inputSidebarService.openInputInspector(inputPort);
+    private trackByIndex(index: number): any {
+        return index;
     }
 
-    private removeProperty(inputPort: InputProperty): void {
-        this.inputPortService.deleteInputPort(inputPort);
+    private editProperty(index: number): void {
+        this.selectedIndex = index;
+        const selectedInputPort = this.portList[index];
+        this.inputSidebarService.openInputInspector({
+            inputProperty: selectedInputPort,
+            context: this.context
+        });
+    }
 
-        if (this.selectedInputPort === inputPort) {
+    private removeProperty(event: Event, index: number): void {
+        event.stopPropagation();
+        this.inputPortService.deleteInputPort(index);
+
+        if (this.selectedIndex === index) {
             this.inputSidebarService.closeInputInspector();
+        }
+
+        if (this.selectedIndex > index) {
+            this.selectedIndex--;
+        } else if (this.selectedIndex === index) {
+            this.selectedIndex = undefined;
         }
     }
 
