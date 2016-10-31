@@ -37,11 +37,12 @@ require("./base-command-form.components.scss");
                                   *ngIf="baseCommandForm.controls['baseCommand' + i]" 
                                   [(expression)]="baseCommandFormList[i]"
                                   [control]="baseCommandForm.controls['baseCommand' + i]"
-                                  (onSelect)="editBaseCommand(i)">
+                                  (onEdit)="editBaseCommand(i)"
+                                  (onClear)="clearBaseCommand(i)">
                     </expression-input>
 
-                    <span class="close-icon col-sm-1">
-                        <i class="fa fa-times" (click)="removeBaseCommand(i)"></i>
+                    <span class="col-sm-1">
+                        <i class="fa fa-trash clear-icon" (click)="removeBaseCommand(i)"></i>
                     </span>
                 </div> <!-- base-command-list-->
             </div> <!-- list container-->
@@ -165,6 +166,10 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
             newExpressionChange: newExpression,
             context: this.context
         });
+    }
+
+    private clearBaseCommand(index: number): void {
+        this.baseCommandService.clearBaseCommand(index);
     }
 
     private addBaseCommand(): void {

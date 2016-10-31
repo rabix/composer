@@ -51,7 +51,8 @@ require("./input-inspector.component.scss");
                     <expression-input *ngIf="expressionInputForm && expressionInputForm.controls['expressionInput']"
                                     [(expression)]="expressionInput"
                                     [control]="expressionInputForm.controls['expressionInput']"
-                                    (onSelect)="addExpression()">
+                                    (onEdit)="addExpression()"
+                                    (onClear)="clearExpression()">
                     </expression-input>
                     
                 </div>
@@ -139,6 +140,12 @@ export class InputInspectorComponent implements OnInit, OnDestroy {
             newExpressionChange: newExpression,
             context: this.context
         });
+    }
+
+    private clearExpression(): void {
+        const newExpression: ExpressionModel = new ExpressionModel("");
+        this.selectedProperty.setValueFrom(newExpression.serialize());
+        this.inputBinding.next(newExpression.serialize());
     }
 
     private removeExpressionInputSub(): void {
