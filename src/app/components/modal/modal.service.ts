@@ -4,6 +4,7 @@ import {Subject} from "rxjs";
 import {ConfirmComponent} from "./common/confirm.component";
 import {noop} from "../../lib/utils.lib";
 import {PromptComponent} from "./common/prompt.component";
+import {CheckboxPromptComponent} from "./common/checkbox-prompt.component";
 
 @Injectable()
 export class ModalService {
@@ -72,7 +73,7 @@ export class ModalService {
     }
 
     public prompt(params = {
-        title: "Confirm",
+        title: "Prompt",
         content: "Are you sure?",
         confirmationLabel: "Yes",
         cancellationLabel: "Cancel"
@@ -84,6 +85,31 @@ export class ModalService {
 
             ref.decision.subscribe(content => {
                 content !== false ? resolve(content) : reject();
+                this.close();
+            });
+        });
+
+        const outsideClosings = new Promise((resolve, reject) => {
+            this.onClose.first().subscribe(reject);
+        });
+
+        return Promise.race([insideClosings, outsideClosings]);
+    }
+
+    public checkboxPrompt(params = {
+        title: "Confirm",
+        content: "Are you sure?",
+        confirmationLabel: "Yes",
+        cancellationLabel: "Cancel",
+        checkboxLabel: "Don't show this again"
+    }) {
+        const insideClosings = new Promise((resolve, reject) => {
+
+            const ref = this.show<CheckboxPromptComponent>(CheckboxPromptComponent, {title: params.title});
+            Object.assign(ref, params);
+
+            ref.decision.subscribe(content => {
+                content !== null ? resolve(content) : reject();
                 this.close();
             });
         });
