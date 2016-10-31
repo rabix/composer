@@ -1,7 +1,6 @@
 import {Component, Input, Output, EventEmitter} from "@angular/core";
 import {AbstractControl} from "@angular/forms";
 import {ExpressionModel} from "cwlts/models/d2sb";
-import {Expression} from "cwlts/mappings/d2sb/Expression";
 
 require("./expression-input.component.scss");
 
@@ -18,7 +17,8 @@ require("./expression-input.component.scss");
                         [readonly]="expression.serialize().script ? 'true' : null"/>
                     
                 <span class="input-group-btn">
-                    <button type="button" 
+                    <button type="button"
+                        [disabled]="disableEdit"
                         class="btn btn-secondary" 
                         (click)="onClick()">
                         <i class="fa"
@@ -35,13 +35,10 @@ export class ExpressionInputComponent {
     public control: AbstractControl;
 
     @Input()
-    public expression: ExpressionModel;
+    public disableEdit: boolean;
 
     @Input()
-    public context: any;
-
-    @Output()
-    public expressionChange: EventEmitter<string | ExpressionModel> = new EventEmitter<string | ExpressionModel>();
+    public expression: ExpressionModel;
 
     @Output()
     public onEdit = new EventEmitter();
@@ -64,13 +61,6 @@ export class ExpressionInputComponent {
             this.onClear.emit();
         } else {
             this.onEdit.emit();
-        }
-    }
-
-    private modelChange() {
-        //Only emit if the value was not set to an expression
-        if (!(<Expression>this.expression.serialize()).script) {
-            this.expressionChange.emit(this.expression);
         }
     }
 }

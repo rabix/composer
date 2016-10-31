@@ -8,6 +8,7 @@ import {ExpressionModel} from "cwlts/models/d2sb";
 import {ExpressionInputComponent} from "../types/expression-input.component";
 import {ExpressionSidebarService} from "../../../../services/sidebars/expression-sidebar.service";
 import {ReplaySubject} from "rxjs";
+import {Expression} from "cwlts/mappings/d2sb/Expression";
 
 require("./base-command-form.components.scss");
 
@@ -33,9 +34,7 @@ require("./base-command-form.components.scss");
                      class="base-command-list">
 
                      <expression-input class="col-sm-11"
-                                  [context]="context"
                                   *ngIf="baseCommandForm.controls['baseCommand' + i]" 
-                                  [(expression)]="baseCommandFormList[i]"
                                   [control]="baseCommandForm.controls['baseCommand' + i]"
                                   (onEdit)="editBaseCommand(i)"
                                   (onClear)="clearBaseCommand(i)">
@@ -130,6 +129,24 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
             this.baseCommandForm.controls['baseCommand' + index].valueChanges.subscribe(value => {
                 this.baseCommandService.updateCommand(index, new ExpressionModel(value));
             });
+
+            if ((<Expression>command.serialize()).script) {
+                this.disableInput(index);
+            }
+        });
+    }
+
+    private enableInput(index: number): void {
+        this.baseCommandForm.controls['baseCommand' + index].enable({
+            onlySelf: true,
+            emitEvent: false
+        });
+    }
+
+    private disableInput(index: number): void {
+        this.baseCommandForm.controls['baseCommand' + index].disable({
+            onlySelf: true,
+            emitEvent: false
         });
     }
 
@@ -158,6 +175,7 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
         this.expressionInputSub = newExpression
             .filter(expression => expression !== undefined)
             .subscribe((expression: ExpressionModel) => {
+                this.enableInput(index);
                 this.baseCommandService.updateCommand(index, expression);
             });
 
