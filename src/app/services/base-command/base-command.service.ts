@@ -24,11 +24,14 @@ export class BaseCommandService {
     /** Initial content of the input port list */
     private initialBaseCommands: ExpressionModel[] = [];
 
-    /** Stream for adding new imports */
+    /** Stream for adding new inputs */
     private newBaseCommand: Subject<ExpressionModel> = new Subject<ExpressionModel>();
 
-    /** Stream for adding new imports */
+    /** Stream for removing new inputs */
     private deletedBaseCommand: Subject<number> = new Subject<number>();
+
+    /** Clear inputs */
+    private clearCommand: Subject<number> = new Subject<number>();
 
     private updatedBaseCommand: Subject<UpdateBaseCommand> = new Subject<UpdateBaseCommand>();
 
@@ -72,6 +75,18 @@ export class BaseCommandService {
             })
             .subscribe(this.baseCommandsUpdate);
 
+        this.clearCommand
+            .map((index: number): BaseCommandOperation => {
+                return (baseCommands: ExpressionModel[]) => {
+                    if (typeof baseCommands[index] !== 'undefined' && baseCommands[index] !== null) {
+                        baseCommands[index].setValueToString("");
+                    }
+
+                    return baseCommands;
+                };
+            })
+            .subscribe(this.baseCommandsUpdate);
+
         /* Update input ports */
         this.updatedBaseCommand
             .map(({
@@ -96,6 +111,10 @@ export class BaseCommandService {
 
     public deleteBaseCommand(index: number): void {
         this.deletedBaseCommand.next(index);
+    }
+
+    public clearBaseCommand(index: number): void {
+        this.clearCommand.next(index);
     }
 
     public updateCommand(index: number, newBaseCommand: ExpressionModel): void {
