@@ -1,6 +1,5 @@
 import {Component, Input, Output, EventEmitter} from "@angular/core";
 import {AbstractControl} from "@angular/forms";
-import {ExpressionModel} from "cwlts/models/d2sb";
 
 require("./expression-input.component.scss");
 
@@ -8,22 +7,21 @@ require("./expression-input.component.scss");
     selector: 'expression-input',
     template: `
             <div class="input-group"
-                 [class.expression-input-group]="expression.serialize().script"
+                 [class.expression-input-group]="isExpression === true"
                  *ngIf="control">
                 <input class="form-control"
-                        (keyup)="modelChange($event)"
                         [formControl]="control"
                         (click)="editExpression($event)"
-                        [readonly]="expression.serialize().script ? 'true' : null"/>
+                        [readonly]="isExpression === true"/>
                     
                 <span class="input-group-btn">
                     <button type="button"
-                        [disabled]="disableEdit"
                         class="btn btn-secondary" 
-                        (click)="onClick()">
+                        [disabled]="disableEdit"
+                        (click)="onClick($event)">
                         <i class="fa"
-                            [ngClass]="{'fa-times': expression.serialize().script,
-                                        'fa-code': !expression.serialize().script}"></i>
+                            [ngClass]="{'fa-times': isExpression === true,
+                                        'fa-code': isExpression === false}"></i>
                     </button>
                 </span>
             </div>
@@ -38,7 +36,7 @@ export class ExpressionInputComponent {
     public disableEdit: boolean;
 
     @Input()
-    public expression: ExpressionModel;
+    public isExpression: boolean;
 
     @Output()
     public onEdit = new EventEmitter();
@@ -46,18 +44,18 @@ export class ExpressionInputComponent {
     @Output()
     public onClear = new EventEmitter();
 
-    private editExpression(event?: Event): void {
-        if (event) {
-            event.stopPropagation();
-        }
+    private editExpression(event): void {
+        event.stopPropagation();
 
-        if ((<Expression>this.expression.serialize()).script) {
+        if (this.isExpression) {
             this.onEdit.emit();
         }
     }
 
-    private onClick(): void {
-        if ((<Expression>this.expression.serialize()).script) {
+    private onClick(event): void {
+        event.stopPropagation();
+
+        if (this.isExpression) {
             this.onClear.emit();
         } else {
             this.onEdit.emit();

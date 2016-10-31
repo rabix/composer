@@ -58,10 +58,12 @@ require("./basic-input-section.component.scss");
                 <div class="form-group" [formGroup]="expressionInputForm">
                     <label>Value</label>
                     
-                    <expression-input *ngIf="expressionInputForm && expressionInputForm.controls['expressionInput']"
+                     <expression-input *ngIf="expressionInputForm && expressionInputForm.controls['expressionInput']"
                                     [disableEdit]="!hasInputBinding"
+                                    [isExpression]="hasInputBinding && !!selectedProperty.getValueFrom().script"
                                     [control]="expressionInputForm.controls['expressionInput']"
-                                    (onSelect)="addExpression()">
+                                    (onEdit)="addExpression()"
+                                    (onClear)="clearExpression()">
                     </expression-input>
                 </div>
                 
@@ -85,9 +87,6 @@ export class BasicInputSectionComponent implements OnInit {
 
     @Input()
     public context: any;
-
-    /** The current expression model */
-    private expressionModel: ExpressionModel;
 
     /** Possible property types */
     private propertyTypes = ["File", "string", "enum", "int", "float", "boolean", "array", "record", "map"];
@@ -123,6 +122,8 @@ export class BasicInputSectionComponent implements OnInit {
                 } else {
                     this.createExpressionInputForm(valueFrom);
                 }
+
+                this.listenToInputChanges();
             })
         );
     }
@@ -151,44 +152,41 @@ export class BasicInputSectionComponent implements OnInit {
         }
     }
 
+    private clearExpression(): void {
+        const newExpression: ExpressionModel = new ExpressionModel("");
+        this.setSelectedProperty(newExpression.serialize());
+        this.updateExpressionInputValue(newExpression.serialize());
+    }
+
     private createExpressionInputForm(expression: string | Expression) {
-        this.expressionModel = new ExpressionModel(expression);
+        const expressionModel = new ExpressionModel(expression);
         this.setSelectedProperty(expression);
 
         this.expressionInputForm = this.formBuilder.group({
             'expressionInput': [
-                {value: this.expressionModel.getExpressionScript(), disabled: !this.hasInputBinding},
+                {value: expressionModel.getExpressionScript(), disabled: !this.hasInputBinding},
                 Validators.compose([Validators.required, Validators.minLength(1)])
             ]
         });
-
-        this.listenToInputChanges();
     }
 
     private updateExpressionInputValue(expression: string | Expression) {
-        this.expressionModel = new ExpressionModel(expression);
+        const expressionModel = new ExpressionModel(expression);
+        this.setSelectedProperty(expressionModel.serialize());
 
         if (this.expressionInputForm && this.expressionInputForm.controls['expressionInput']) {
-            this.expressionInputForm.controls['expressionInput'].setValue(this.expressionModel.getExpressionScript());
+            this.expressionInputForm.controls['expressionInput'].setValue(
+                expressionModel.getExpressionScript(),
+                {
+                    onlySelf: true,
+                    emitEvent: false,
+                });
         }
     }
 
     private listenToInputChanges(): void {
-        const inputValueChange = this.expressionInputForm.controls['expressionInput'].valueChanges.subscribe((value) => {
-            if ((<Expression>this.expressionModel.serialize()).script) {
-                this.expressionInputForm.controls['expressionInput'].disable({
-                    onlySelf: true,
-                    emitEvent: false
-                });
-            } else {
-                this.expressionModel.setValueToString(value);
-                this.expressionInputForm.controls['expressionInput'].enable({
-                    onlySelf: true,
-                    emitEvent: false
-                });
-            }
-
-            this.setSelectedProperty(this.expressionModel.serialize());
+        const inputValueChange = this.expressionInputForm.controls['expressionInput'].valueChanges.subscribe((value: string) => {
+            this.setSelectedProperty(value);
         });
 
         this.subs.push(inputValueChange);
