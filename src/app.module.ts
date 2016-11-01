@@ -51,6 +51,7 @@ import {NewFileModalComponent} from "./app/components/modal/custom/new-file-moda
 import {TemplateProviderService} from "./app/services/template-provider.service";
 import {PromptComponent} from "./app/components/modal/common/prompt.component";
 import {CheckboxPromptComponent} from "./app/components/modal/common/checkbox-prompt.component";
+import {StandaloneCodeEditorComponent} from "./app/components/standalone-code-editor/standalone-code-editor.component"
 
 @NgModule({
     providers: [
@@ -98,6 +99,7 @@ import {CheckboxPromptComponent} from "./app/components/modal/common/checkbox-pr
         SettingsButtonComponent,
         SettingsComponent,
         SidebarComponent,
+        StandaloneCodeEditorComponent,
         StructurePanelComponent,
         TabManagerComponent,
         ToolEditorComponent,

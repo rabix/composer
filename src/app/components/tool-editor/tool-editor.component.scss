@@ -4,23 +4,31 @@
 
 //@todo(maya) reorganize this file
 .scroll-content {
+    flex-grow: 1;
+    display: flex;
     overflow-y: auto;
-    position: relative;
-    height: calc(100% - #{$status-bar-height} - #{$gui-editor-header-height} + 3px);
+    position: relative; // because of sidebar
 }
 
 .editor-container {
+    display: flex;
+    flex-direction: column;
     height: 100%;
-    position: relative;
     background: $gui-editor-bg;
-    display: block;
+}
+
+ct-clt-editor, ct-code-editor {
+    display: flex;
+    flex-grow: 1;
 }
 
 .editor-header {
+    display: flex;
     background: $gui-editor-header-bg;
     overflow: hidden;
+    flex-grow: 0;
+    flex-shrink: 0;
     height: $gui-editor-header-height;
-    display: block;
     padding: $header-padding;
     border-bottom: 1px solid $gui-editor-header-border;
 }
