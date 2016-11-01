@@ -1,6 +1,6 @@
 import {NgModule} from "@angular/core";
 import {HttpModule} from "@angular/http";
-import {MainComponent} from "./app/components/main/main.component";
+import {MainComponent} from "./app/components/main";
 import {BrowserModule} from "@angular/platform-browser";
 import {FormsModule, FormBuilder, ReactiveFormsModule} from "@angular/forms";
 import {LayoutComponent} from "./app/components/layout/layout.component";
@@ -29,7 +29,7 @@ import {ValidationIssuesComponent} from "./app/components/validation-issues/vali
 import {ViewModeSwitchComponent} from "./app/components/view-switcher/view-switcher.component";
 import {SettingsButtonComponent} from "./app/components/workbox/settings-button.component";
 import {WorkflowEditorComponent} from "./app/components/workflow-editor/workflow-editor.component";
-import {DockerInputFormComponent} from "./app/components/forms/inputs/forms/docker-input-form.component";
+import {DockerImageFormComponent} from "./app/components/forms/inputs/forms/docker-image-form.component";
 import {BaseCommandFormComponent} from "./app/components/forms/inputs/forms/base-command-form.component";
 import {InputPortsFormComponent} from "./app/components/forms/inputs/forms/input-ports-form.component";
 import {ExpressionInputComponent} from "./app/components/forms/inputs/types/expression-input.component";
@@ -40,6 +40,17 @@ import {ToolHeaderComponent} from "./app/components/tool-editor/tool-header/tool
 import {CommandLineComponent} from "./app/components/clt-editor/commandline/commandline.component";
 import {InputInspectorComponent} from "./app/components/sidebar/object-inpsector/input-inspector.component";
 import {ExpressionEditorComponent} from "./app/components/sidebar/expression-editor/expression-editor.component";
+import {ContextDirective} from "./app/services/context/context.directive";
+import {MenuComponent, MenuItemComponent} from "./app/components/menu";
+import {ModalComponent, ModalService} from "./app/components/modal";
+import {ConfirmComponent} from "./app/components/modal/common/confirm.component";
+import {RadioGroupComponent} from "./app/components/forms/elements/radio-group.component";
+import {InputComponent} from "./app/components/forms/elements/input.component";
+import {RadioButtonComponent} from "./app/components/forms/elements/radio-button.component";
+import {NewFileModalComponent} from "./app/components/modal/custom/new-file-modal.component";
+import {TemplateProviderService} from "./app/services/template-provider.service";
+import {PromptComponent} from "./app/components/modal/common/prompt.component";
+import {CheckboxPromptComponent} from "./app/components/modal/common/checkbox-prompt.component";
 
 @NgModule({
     providers: [
@@ -50,14 +61,18 @@ import {ExpressionEditorComponent} from "./app/components/sidebar/expression-edi
         AlertComponent,
         BaseCommandFormComponent,
         BlockLoaderComponent,
+        CheckboxPromptComponent,
         CltEditorComponent,
         CodeEditorComponent,
         CommandLineComponent,
-        DockerInputFormComponent,
+        ConfirmComponent,
+        ContextDirective,
+        DockerImageFormComponent,
         ExpressionEditorComponent,
         ExpressionEditorSidebarComponent,
         ExpressionInputComponent,
         FormSectionComponent,
+        InputComponent,
         InputInspectorComponent,
         InputInspectorSidebarComponent,
         InputPortListComponent,
@@ -65,12 +80,18 @@ import {ExpressionEditorComponent} from "./app/components/sidebar/expression-edi
         LayoutComponent,
         LocalFilesPanelComponent,
         MainComponent,
-        MainComponent,
+        MenuComponent,
+        MenuItemComponent,
+        ModalComponent,
+        NewFileModalComponent,
         PanelComponent,
         PanelContainerComponent,
         PanelHandleComponent,
         PanelSwitcherComponent,
         PanelToolbarComponent,
+        PromptComponent,
+        RadioButtonComponent,
+        RadioGroupComponent,
         RevisionsPanelComponent,
         SBPublicAppsPanelComponent,
         SBUserProjectsPanelComponent,
@@ -88,6 +109,16 @@ import {ExpressionEditorComponent} from "./app/components/sidebar/expression-edi
         WorkboxComponent,
         WorkflowEditorComponent,
     ],
+    entryComponents: [
+        CheckboxPromptComponent,
+        ConfirmComponent,
+        MenuComponent,
+        MenuItemComponent,
+        ModalComponent,
+        NewFileModalComponent,
+        PromptComponent
+    ],
+    providers: [ModalService, TemplateProviderService],
     imports: [BrowserModule, FormsModule, HttpModule, ReactiveFormsModule],
     bootstrap: [MainComponent]
 })

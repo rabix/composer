@@ -30,7 +30,6 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
     @Output()
     public contentChanges = new Subject<string>();
 
-
     /** Holds the reference to the CodeEditor service/component */
     private editor: CodeEditor;
 
@@ -52,10 +51,6 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
                 readOnly: this.readOnly
             }
         );
-
-        this.subs.push(this.rawInput.subscribe((text) => {
-            this.editor.setText(text);
-        }));
 
         this.subs.push(this.editor.contentChanges.subscribe(this.contentChanges));
     }

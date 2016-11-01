@@ -1,15 +1,11 @@
-import {Component, Input, OnInit} from "@angular/core";
-import {
-    Validators,
-    FormBuilder,
-    FormGroup,
-} from "@angular/forms";
+import {Component, Input} from "@angular/core";
+import {Validators, FormBuilder, FormGroup} from "@angular/forms";
 import {CommandLineToolModel} from "cwlts/models/d2sb";
 import {FormSectionComponent} from "../../../form-section/form-section.component";
 import {AfterViewInit} from "../../../../../../node_modules/@angular/core/src/metadata/lifecycle_hooks";
 
 @Component({
-    selector: 'docker-input-form',
+    selector: 'docker-image-form',
     directives: [
         FormSectionComponent
     ],
@@ -35,7 +31,7 @@ import {AfterViewInit} from "../../../../../../node_modules/@angular/core/src/me
             
     `
 })
-export class DockerInputFormComponent implements AfterViewInit {
+export class DockerImageFormComponent implements AfterViewInit {
     @Input()
     public dockerPull: string;
 
@@ -56,7 +52,7 @@ export class DockerInputFormComponent implements AfterViewInit {
     }
 
     ngAfterViewInit(): void {
-        this.group.addControl('dockerInput', this.dockerInputForm.controls['dockerInput']);
+        // this.group.addControl('dockerInput', this.dockerInputForm.controls['dockerInput']);
 
     }
 }

@@ -18,7 +18,7 @@ import {assignable} from "../../decorators";
 
 require("./modal.component.scss");
 
-export interface ModalOptions<T> {
+export interface ModalOptions {
     title?: string,
     backdrop?: boolean,
     closeOnOutsideClick?: boolean,
@@ -95,7 +95,6 @@ export class ModalComponent {
     @HostListener("click", ["$event.target"])
     private onClick(target) {
         const clickInsideTheModal = this.modalWindow.element.nativeElement.contains(target);
-
         if (!clickInsideTheModal && this.closeOnOutsideClick) {
             this.service.close();
         }
@@ -122,13 +121,15 @@ export class ModalComponent {
                     left: left + (event.clientX - startX) + "px"
                 })
             });
+
+        this.reposition();
     }
 
     private onDragEnd(event) {
         this.dragSubscription.unsubscribe();
     }
 
-    public configure<T>(config: ModalOptions<T>) {
+    public configure<T>(config: ModalOptions) {
         this.backdrop = config.backdrop;
         Chap.Component.assign(config, this);
     }
@@ -136,6 +137,7 @@ export class ModalComponent {
     public produce<T>(factory: ComponentFactory<T>, componentState?: Object): ComponentRef<T> {
 
         this.nestedComponentRef = this.nestedComponentContainer.createComponent(factory, 0, this.injector);
+
         if (typeof componentState === "object") {
             Chap.Component.assign(componentState, this.nestedComponentRef.instance);
         }
