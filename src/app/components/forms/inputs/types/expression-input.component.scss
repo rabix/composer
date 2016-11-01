@@ -1,13 +1,14 @@
 @import "../../../../../assets/sass/variables";
 
 .expression-input-group {
+    border: 2px solid transparent;
 
     input {
         cursor: pointer;
     }
 
     &:hover {
-        border: 2px solid $btn-primary-bg;
+        border: 2px solid $gui-section-list-item-hover-border;
         border-radius: 5px;
     }
 
