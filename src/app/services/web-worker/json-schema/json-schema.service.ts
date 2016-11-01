@@ -21,6 +21,7 @@ export class JsonSchemaService {
         draft3: any,
         draft4: any,
         draft2: any,
+        v1: any,
         validator: any
     }) {
         this.validator = attr.validator;
@@ -36,10 +37,10 @@ export class JsonSchemaService {
                 Workflow: attr.draft3.wfSchema,
                 ExpressionTool: attr.draft3.etSchema
             },
-            "draft-4": {
-                CommandLineTool: attr.draft3.cltSchema,
-                Workflow: attr.draft3.wfSchema,
-                ExpressionTool: attr.draft3.etSchema
+            "v1.0": {
+                CommandLineTool: attr.v1.cltSchema,
+                Workflow: attr.v1.wfSchema,
+                ExpressionTool: attr.v1.etSchema
             }
         };
 

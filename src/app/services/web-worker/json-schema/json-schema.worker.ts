@@ -7,6 +7,7 @@ let jsonSchemaService = new JsonSchemaService({
     draft3: schemas.draft3,
     draft4: schemas.draft4,
     draft2: schemas.d2sb,
+    v1: schemas.v1,
     validator: new AJV({})
 });
 
