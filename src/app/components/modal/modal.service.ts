@@ -3,6 +3,7 @@ import {ModalComponent, ModalOptions} from "./modal.component";
 import {Subject} from "rxjs";
 import {ConfirmComponent} from "./common/confirm.component";
 import {PromptComponent} from "./common/prompt.component";
+import {CheckboxPromptComponent} from "./common/checkbox-prompt.component";
 import {PromptParams, ConfirmationParams} from "./types";
 import {refAssign} from "../../lib/object.lib";
 
@@ -102,6 +103,31 @@ export class ModalService {
                 this.close();
             });
         });
+    }
+
+    public checkboxPrompt(params = {
+        title: "Confirm",
+        content: "Are you sure?",
+        confirmationLabel: "Yes",
+        cancellationLabel: "Cancel",
+        checkboxLabel: "Don't show this again"
+    }) {
+        const insideClosings = new Promise((resolve, reject) => {
+
+            const ref = this.show<CheckboxPromptComponent>(CheckboxPromptComponent, {title: params.title});
+            Object.assign(ref, params);
+
+            ref.decision.subscribe(content => {
+                content !== null ? resolve(content) : reject();
+                this.close();
+            });
+        });
+
+        const outsideClosings = new Promise((resolve, reject) => {
+            this.onClose.first().subscribe(reject);
+        });
+
+        return Promise.race([insideClosings, outsideClosings]);
     }
 
     /**

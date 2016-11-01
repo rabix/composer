@@ -1,27 +1,28 @@
 import {Component, Input, Output, EventEmitter} from "@angular/core";
-import {REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES, AbstractControl} from "@angular/forms";
-import {BaseCommand} from "../../../../services/base-command/base-command.service";
-import {ExpressionModel} from "cwlts/models/d2sb";
+import {AbstractControl} from "@angular/forms";
 
 require("./expression-input.component.scss");
 
 @Component({
     selector: 'expression-input',
-    directives: [
-        REACTIVE_FORM_DIRECTIVES,
-        FORM_DIRECTIVES
-    ],
     template: `
-            <div class="input-group" *ngIf="control">
+            <div class="input-group"
+                 [class.expression-input-group]="isExpression === true"
+                 *ngIf="control">
                 <input class="form-control"
-                        (keyup)="modelChange($event)"
                         [formControl]="control"
-                        [readonly]="value.expressionValue ? 'true' : null"/>
+                        (click)="editExpression($event)"
+                        [readonly]="isExpression === true"/>
                     
                 <span class="input-group-btn">
-                    <button type="button" 
+                    <button type="button"
                         class="btn btn-secondary" 
-                        (click)="openExpressionSidebar()"><i class="fa fa-code"></i></button>
+                        [disabled]="disableEdit"
+                        (click)="onClick($event)">
+                        <i class="fa"
+                            [ngClass]="{'fa-times': isExpression === true,
+                                        'fa-code': isExpression === false}"></i>
+                    </button>
                 </span>
             </div>
         `
@@ -32,25 +33,32 @@ export class ExpressionInputComponent {
     public control: AbstractControl;
 
     @Input()
-    public value: ExpressionModel;
+    public disableEdit: boolean;
 
     @Input()
-    public context: any;
+    public isExpression: boolean;
 
     @Output()
-    public valueChange: EventEmitter<string> = new EventEmitter<string>();
+    public onEdit = new EventEmitter();
 
     @Output()
-    public onSelect = new EventEmitter();
+    public onClear = new EventEmitter();
 
-    private openExpressionSidebar(): void {
-        this.onSelect.emit();
+    private editExpression(event): void {
+        event.stopPropagation();
+
+        if (this.isExpression) {
+            this.onEdit.emit();
+        }
     }
 
-    private modelChange(event: any) {
-        //Only emit if the value was not set to an expression
-        if (!(<ExpressionModel>this.value).expressionValue) {
-            this.valueChange.emit(event.target.value);
+    private onClick(event): void {
+        event.stopPropagation();
+
+        if (this.isExpression) {
+            this.onClear.emit();
+        } else {
+            this.onEdit.emit();
         }
     }
 }
