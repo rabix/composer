@@ -1,7 +1,8 @@
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {CodeEditor} from "./code-editor";
-import {Component, OnInit, ElementRef, ViewChild, Input, OnDestroy, Output} from "@angular/core";
-import {Subscription, Observable, Subject} from "rxjs/Rx";
+import {Component, OnInit, ElementRef, ViewChild, Input, OnDestroy} from "@angular/core";
+import {Observable} from "rxjs/Rx";
+import {ComponentBase} from "../common/component-base";
 import Editor = AceAjax.Editor;
 import TextMode = AceAjax.TextMode;
 
@@ -16,7 +17,7 @@ require('./code-editor.component.scss');
         </div>
      `
 })
-export class CodeEditorComponent implements OnInit, OnDestroy {
+export class CodeEditorComponent extends ComponentBase implements OnInit, OnDestroy {
 
     @Input("content")
     public rawInput: Observable<string>;
@@ -27,18 +28,16 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
     @Input()
     public readOnly = false;
 
-    @Output()
-    public contentChanges = new Subject<string>();
-
     /** Holds the reference to the CodeEditor service/component */
     private editor: CodeEditor;
-
-    /** List of subscriptions that should be disposed when destroying this component */
-    private subs: Subscription[] = [];
 
     /** Reference to the element in which we want to instantiate the Ace editor */
     @ViewChild("ace")
     private aceContainer: ElementRef;
+
+    constructor() {
+        super();
+    }
 
     ngOnInit(): any {
 
@@ -51,13 +50,11 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
                 readOnly: this.readOnly
             }
         );
-
-        this.subs.push(this.editor.contentChanges.subscribe(this.contentChanges));
     }
 
     ngOnDestroy(): void {
         this.editor.dispose();
-        this.subs.forEach(sub => sub.unsubscribe());
+        super.ngOnDestroy();
     }
 
 }
