@@ -102,9 +102,10 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
 
         this.data.content.subscribe(this.rawEditorContent);
-
         this.webWorkerService.validationResultStream
-            .subscribe(this.schemaValidation);
+            .subscribe(val => {
+                this.schemaValidation.next(val);
+            });
 
         this.rawEditorContent.subscribe(raw => {
             try {

@@ -180,6 +180,14 @@ module.exports = {
                 callback(null, info);
             });
         });
+    },
+
+    pathExists: (path, callback) => {
+        fs.access(path, fs.constants.F_OK, (err) => {
+            callback(null, {
+                exists: err ? false : true
+            });
+        });
     }
 };
 

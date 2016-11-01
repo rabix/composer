@@ -464,4 +464,38 @@ describe("FS Controller", () => {
             });
         });
     });
+
+    describe("Endpoint: checkIfPathExists", () => {
+
+        it("should return true if the given path is present", (done) => {
+
+            tmp.dir((err, path, cleanup) => {
+
+                ctrl.pathExists(path, (err, info) => {
+
+                    assert.isNull(err);
+                    assert.isObject(info);
+                    assert.propertyVal(info, "exists", true);
+
+                    cleanup();
+                    done();
+                });
+            });
+        });
+
+        it("should return false if the given path is available", (done) => {
+
+            tmp.tmpName((err, path) => {
+
+                ctrl.pathExists(path, (err, info) => {
+
+                    assert.isNull(err);
+                    assert.isObject(info);
+                    assert.propertyVal(info, "exists", false);
+
+                    done();
+                });
+            });
+        });
+    });
 });
