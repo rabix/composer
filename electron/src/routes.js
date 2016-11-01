@@ -19,6 +19,9 @@ module.exports = {
     },
     createDirectory: (path, callback) => {
         fsController.createDirectory(path, callback);
+    },
+    pathExists: (path, callback) => {
+        fsController.pathExists(path, callback);
     }
 
 };

@@ -10,10 +10,10 @@ import {
     ViewContainerRef,
     Injector
 } from "@angular/core";
-import * as Chap from "../../helpers/chap";
 import {ModalService} from "./modal.service";
 import {Subscription, Observable, BehaviorSubject} from "rxjs/Rx";
 import {assignable} from "../../decorators";
+import {assign} from "../../helpers/chap";
 
 
 require("./modal.component.scss");
@@ -131,7 +131,7 @@ export class ModalComponent {
 
     public configure<T>(config: ModalOptions) {
         this.backdrop = config.backdrop;
-        Chap.Component.assign(config, this);
+        assign(config, this);
     }
 
     public produce<T>(factory: ComponentFactory<T>, componentState?: Object): ComponentRef<T> {
@@ -139,7 +139,7 @@ export class ModalComponent {
         this.nestedComponentRef = this.nestedComponentContainer.createComponent(factory, 0, this.injector);
 
         if (typeof componentState === "object") {
-            Chap.Component.assign(componentState, this.nestedComponentRef.instance);
+            assign(componentState, this.nestedComponentRef.instance);
         }
 
         Observable.of("Reposition me right away!")

@@ -12,6 +12,8 @@ import {ContextDirective} from "../../services/context/context.directive";
 import {TreeNode, ParentTreeNode, OpenableTreeNode} from "./types";
 import {BehaviorSubject, Subscription} from "rxjs";
 import {TreeViewService} from "./tree-view.service";
+import {tracked} from "../../decorators/index";
+import {ComponentBase} from "../common/component-base";
 
 @Component({
     selector: "ct-tree-node",
@@ -49,7 +51,7 @@ import {TreeViewService} from "./tree-view.service";
         
     `
 })
-export class TreeNodeComponent implements OnInit {
+export class TreeNodeComponent extends ComponentBase implements OnInit {
 
     public static NODE_COUNT = 0;
 
@@ -77,13 +79,11 @@ export class TreeNodeComponent implements OnInit {
 
     public el: Element;
 
-    private subs: Subscription[] = [];
-
     @ViewChildren(TreeNodeComponent)
     private children: QueryList<TreeNodeComponent>;
 
     public constructor(private tree: TreeViewService, private detector: ChangeDetectorRef, el: ElementRef) {
-
+        super();
         this.nodeIndex = TreeNodeComponent.NODE_COUNT++;
         this.el        = el.nativeElement;
     }
@@ -91,21 +91,18 @@ export class TreeNodeComponent implements OnInit {
     ngOnInit() {
 
         this.isExpandable = typeof this.node.childrenProvider === "function";
-        this.subs.push(
-            this.tree.selectedNode.map(node => node === this).subscribe(this.isHighlighted)
-        );
+
+        this.tracked = this.tree.selectedNode.map(node => node === this).subscribe(this.isHighlighted);
 
         this.nameParts = [this.node.name];
 
-        this.subs.push(
-            this.highlightedCharacterCount.subscribe(charCount => {
-                this.nameParts = [this.node.name];
-                if (charCount > 0) {
-                    this.nameParts = [this.node.name.substr(0, charCount), this.node.name.substr(charCount)];
-                }
-                this.detector.markForCheck();
-            })
-        );
+        this.tracked = this.highlightedCharacterCount.subscribe(charCount => {
+            this.nameParts = [this.node.name];
+            if (charCount > 0) {
+                this.nameParts = [this.node.name.substr(0, charCount), this.node.name.substr(charCount)];
+            }
+            this.detector.markForCheck();
+        });
 
         this.tree.addNode(this);
     }
@@ -117,15 +114,13 @@ export class TreeNodeComponent implements OnInit {
 
             this.isLoading = true;
 
-            this.subs.push(
-                this.node.childrenProvider(this.node).subscribe(children => {
-                    this.isLoading    = false;
-                    this.nodeChildren = children;
+            this.tracked = this.node.childrenProvider(this.node).subscribe(children => {
+                this.isLoading    = false;
+                this.nodeChildren = children;
 
-                    this.detector.markForCheck();
-                    this.detector.detectChanges();
-                })
-            );
+                this.detector.markForCheck();
+                this.detector.detectChanges();
+            });
         }
 
 
@@ -189,8 +184,8 @@ export class TreeNodeComponent implements OnInit {
     }
 
     ngOnDestroy() {
+        super.ngOnDestroy();
         this.tree.removeNode(this);
-        this.subs.forEach(sub => sub.unsubscribe());
     }
 
     public getChildren(): QueryList<TreeNodeComponent> {

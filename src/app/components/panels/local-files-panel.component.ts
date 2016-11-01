@@ -11,6 +11,7 @@ import {MenuItem} from "../menu/menu-item";
 import {OpenTabAction} from "../../action-events/index";
 import {noop} from "../../lib/utils.lib";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
+import {FormControl} from "@angular/forms";
 
 const {app, dialog} = window.require("electron").remote;
 
@@ -39,6 +40,7 @@ export class LocalFilesPanelComponent {
     constructor(private modal: ModalService,
                 private eventHub: EventHubService,
                 private fs: LocalDataSourceService,
+                private ipc: IpcService,
                 private detector: ChangeDetectorRef,
                 private preferences: UserPreferencesService) {
 
@@ -48,56 +50,6 @@ export class LocalFilesPanelComponent {
         this.addDirectory(...this.preferences.get("local_open_folders", []));
     }
 
-
-    /**
-     * Produces an array of menu items that should appear as the context menu for a particular item
-     * @param item
-     * @returns {MenuItem[]}
-     */
-    private createContextMenu(item): MenuItem[] {
-
-        const items = [];
-
-        const newFile = new MenuItem("New File...", {
-            click: () => this.createNewFileModal(item.isDir ? item.path : item.dirname)
-        });
-
-        const newFolder = new MenuItem("New Folder...", {
-            click: () => {
-
-                this.modal.prompt({
-                    title: "New Folder",
-                    cancellationLabel: "Cancel",
-                    confirmationLabel: "Create",
-                    content: "Folder Name",
-                }).then((name) =>{
-                    const fullPath = [item.path, name].join("/");
-                    this.fs.createDirectory(fullPath).subscribe(() => {
-                        this.triggerChange();
-                    });
-                }, noop);
-            }
-        });
-
-        const remove = new MenuItem("Delete", {
-            click: () => {
-                this.modal.confirm({
-                    title: "Really Delete?",
-                    content: `Are you sure that you want to delete “${item.path}”?`,
-                    cancellationLabel: "No, keep it",
-                    confirmationLabel: "Yes, delete it"
-                }).then(() => this.fs.remove(item.path), noop);
-            }
-        });
-
-        items.push(newFile);
-        if (item.isDir) {
-            items.push(newFolder);
-        }
-        items.push(remove);
-
-        return items;
-    }
 
     private recursivelyMapChildrenToNodes(childrenProvider) {
         if (!childrenProvider) {
@@ -144,7 +96,6 @@ export class LocalFilesPanelComponent {
                     icon = "fa-lock text-warning";
                 }
 
-
                 return {
                     name: item.name,
                     icon,
@@ -156,6 +107,43 @@ export class LocalFilesPanelComponent {
                     } : undefined
                 }
             }));
+    }
+
+    /**
+     * Produces an array of menu items that should appear as the context menu for a particular item
+     * @param item
+     * @returns {MenuItem[]}
+     */
+    private createContextMenu(item): MenuItem[] {
+
+        const items = [];
+
+        const newFile = new MenuItem("New File...", {
+            click: () => this.createNewFileModal(item.isDir ? item.path : item.dirname)
+        });
+
+        const newFolder = new MenuItem("New Directory...", {
+            click: () => this.createNewDirectoryModal(item.path)
+        });
+
+        const remove = new MenuItem("Delete", {
+            click: () => {
+                this.modal.confirm({
+                    title: "Really Delete?",
+                    content: `Are you sure that you want to delete “${item.path}”?`,
+                    cancellationLabel: "No, keep it",
+                    confirmationLabel: "Yes, delete it"
+                }).then(() => this.fs.remove(item.path), noop);
+            }
+        });
+
+        items.push(newFile);
+        if (item.isDir) {
+            items.push(newFolder);
+        }
+        items.push(remove);
+
+        return items;
     }
 
     private createNewFileModal(path) {
@@ -173,6 +161,27 @@ export class LocalFilesPanelComponent {
 
             return creation;
         }
+    }
+
+    private createNewDirectoryModal(basePth) {
+        const dirNameInput = new FormControl("",
+            [control => control.value ? null : {err: "Path must not be empty"}],
+            [control => this.ipc.request("pathExists", `${basePth}/${control.value}`).first()
+                .map(r => r.exists ? {err: "That path is taken."} : null)]
+        );
+
+        this.modal.prompt({
+            title: "New Folder",
+            cancellationLabel: "Cancel",
+            confirmationLabel: "Create",
+            content: "Folder Name",
+            formControl: dirNameInput
+        }).then((name) => {
+            const fullPath = [basePth, name].join("/");
+            this.fs.createDirectory(fullPath).subscribe(() => {
+                this.triggerChange();
+            });
+        }, noop);
     }
 
     private createOpenFileTabAction(file) {
@@ -215,6 +224,9 @@ export class LocalFilesPanelComponent {
                 contextMenu: [
                     new MenuItem("New File...", {
                         click: () => this.createNewFileModal(path)
+                    }),
+                    new MenuItem("New Directory...",{
+                        click: () => this.createNewDirectoryModal(path)
                     }),
                     new MenuItem("Remove from Workspace", {
                         click: () => {

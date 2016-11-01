@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const rimraf = require("rimraf");
 const yaml = require("js-yaml");
+const mkdirp = require("mkdirp");
 
 function findCWLClass(content) {
     try {
@@ -165,13 +166,26 @@ module.exports = {
     },
 
     createDirectory: (path, callback) => {
-        fs.mkdir(path, 0o755, (err) => {
+
+        mkdirp(path, (err, made) => {
             if (err) return callback(err);
 
+            if (made === null) {
+                return callback(new Error(`Folder already exists: ${path}`));
+            }
+
             getFileOutputInfo(path, (err, info) => {
-                if(err) return callback(err);
+                if (err) return callback(err);
 
                 callback(null, info);
+            });
+        });
+    },
+
+    pathExists: (path, callback) => {
+        fs.access(path, fs.constants.F_OK, (err) => {
+            callback(null, {
+                exists: err ? false : true
             });
         });
     }

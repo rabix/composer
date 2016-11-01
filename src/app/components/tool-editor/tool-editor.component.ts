@@ -1,8 +1,8 @@
-import {Component, OnInit, Input, OnDestroy, AfterViewInit, NgZone} from "@angular/core";
+import {Component, OnInit, Input, OnDestroy} from "@angular/core";
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {CltEditorComponent} from "../clt-editor/clt-editor.component";
-import {Subscription, ReplaySubject, BehaviorSubject, Observable} from "rxjs/Rx";
+import {Subscription, ReplaySubject, BehaviorSubject} from "rxjs/Rx";
 import {ToolHeaderComponent} from "./tool-header/tool-header.component";
 import {ViewModeService} from "./services/view-mode.service";
 import {CommandLineToolModel} from "cwlts/models/d2sb";
@@ -20,6 +20,8 @@ import {InputSidebarService} from "../../services/sidebars/input-sidebar.service
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {ModalService} from "../modal";
 import {CheckboxPromptComponent} from "../modal/common/checkbox-prompt.component";
+import {ComponentBase} from "../common/component-base";
+import {noop} from "../../lib/utils.lib";
 
 
 require("./tool-editor.component.scss");
@@ -56,22 +58,24 @@ require("./tool-editor.component.scss");
         
             <div class="scroll-content">
                 <ct-code-editor [hidden]="viewMode !== 'code'"
-                                (contentChanges)="onEditorContentChange($event)"
                                 [content]="rawEditorContent"
                                 [readOnly]="!data.isWritable"
-                                [language]="data.language">
-                </ct-code-editor>
+                                [language]="data.language"></ct-code-editor>
         
                 <ct-clt-editor *ngIf="viewMode === 'gui'"
                                class="gui-editor-component"
                                (isDirty)="modelChanged = $event"
-                               [model]="toolModel">
-                </ct-clt-editor>
+                               [model]="toolModel"></ct-clt-editor>
             </div>
             <div class="status-bar-footer">
                 <div class="left-side">
-                    <validation-issues [issuesStream]="schemaValidation" (select)="selectBottomPanel($event)" [show]="bottomPanel === 'validation'"></validation-issues>
-                    <commandline [commandLineParts]="commandLineParts" (select)="selectBottomPanel($event)" [show]="bottomPanel === 'commandLine'"></commandline>
+                    <validation-issues [issuesStream]="schemaValidation" 
+                                       (select)="selectBottomPanel($event)" 
+                                       [show]="bottomPanel === 'validation'"></validation-issues>
+                    
+                    <commandline [commandLineParts]="commandLineParts" 
+                                 (select)="selectBottomPanel($event)" 
+                                 [show]="bottomPanel === 'commandLine'"></commandline>
                 </div>
                 <div class="right-side">
                     <ct-view-mode-switch [viewMode]="viewMode"
@@ -83,7 +87,7 @@ require("./tool-editor.component.scss");
         </div>
     `
 })
-export class ToolEditorComponent implements OnInit, OnDestroy {
+export class ToolEditorComponent extends ComponentBase implements OnInit, OnDestroy {
     @Input()
     public data: DataEntrySource;
 
@@ -106,9 +110,6 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
     /** Flag for validity of CWL document */
     private isValidCWL = false;
 
-    /** List of subscriptions that should be disposed when destroying this component */
-    private subs: Subscription[] = [];
-
     /** Stream of contents in code editor */
     private rawEditorContent = new BehaviorSubject("");
 
@@ -124,6 +125,9 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
     constructor(private webWorkerService: WebWorkerService,
                 private userPrefService: UserPreferencesService,
                 private modal: ModalService) {
+
+        super();
+
         this.showReformatPrompt = this.userPrefService.get("show_reformat_prompt");
 
         // set default if userPref does not exist
@@ -136,20 +140,24 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
     // @todo(maya) fix block loader
     // setting this.isLoading to false inside a sub doesn't (always) trigger view update
     ngOnInit(): void {
-        this.subs.push((this.data.content as Observable<string>).subscribe(val => {
+        this.tracked = this.rawEditorContent.subscribe(latestContent => {
+            this.validateSchema(latestContent);
+        });
+
+        this.tracked = this.data.content.subscribe(val => {
             this.rawEditorContent.next(val);
-        }));
+        });
 
-        this.subs.push(this.webWorkerService.validationResultStream
-            .subscribe(this.schemaValidation));
 
-        this.subs.push(this.webWorkerService.validationResultStream.subscribe(err => {
+        this.tracked = this.webWorkerService.validationResultStream.subscribe(this.schemaValidation);
+
+        this.tracked = this.webWorkerService.validationResultStream.subscribe(err => {
             console.log('validation', err);
             this.isValidCWL = err.isValidCwl;
-        }));
+        });
     }
 
-    private onEditorContentChange(content: string) {
+    private validateSchema(content: string) {
         this.webWorkerService.validateJsonSchema(content);
 
         try {
@@ -199,10 +207,7 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
 
                     this.showReformatPrompt = false;
                     this.viewMode           = view;
-                }, _ => {
-                    // do nothing, don't change mode
-                    return;
-                });
+                }, noop);
 
             } else {
                 this.viewMode = view;
@@ -223,7 +228,7 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
      * @returns {string}
      */
     private getModelText(): string {
-        let json            = this.toolModel.serialize();
+        let json             = this.toolModel.serialize();
         json["rbx:modified"] = true;
 
         return JSON.stringify(json, null, 4);
@@ -235,9 +240,5 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
      */
     private selectBottomPanel(panel: "validation"|"commandLineTool") {
         this.bottomPanel = this.bottomPanel === panel ? null : panel;
-    }
-
-    ngOnDestroy(): void {
-        this.subs.forEach(sub => sub.unsubscribe());
     }
 }

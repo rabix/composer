@@ -13,8 +13,6 @@ import IEditSession = AceAjax.IEditSession;
 
 export class CodeEditor extends AbstractCodeEditor {
 
-    public contentChanges = new Subject<string>();
-
     private subs: Subscription[] = [];
 
     constructor(private editor: Editor,
@@ -38,14 +36,16 @@ export class CodeEditor extends AbstractCodeEditor {
             this.setMode(type || "json");
         });
 
-        this.content.subscribe(rawText => {
-            this.document.setValue(rawText);
-        });
+        this.content
+            .filter(external => external !== this.document.getValue())
+            .subscribe(rawText => {
+                this.document.setValue(rawText);
+            });
 
         Observable.fromEvent(this.editor as EventTarget, "change")
-            .debounceTime(500)
+            .debounceTime(150)
             .map(_ => this.document.getValue())
-            .subscribe(this.contentChanges);
+            .subscribe(this.content);
 
     }
 
