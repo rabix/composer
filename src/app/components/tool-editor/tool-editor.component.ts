@@ -156,7 +156,7 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
             let json = JSON.parse(content);
 
             // should show prompt, but json is already reformatted
-            if (this.showReformatPrompt && json["ct:modified"]) {
+            if (this.showReformatPrompt && json["rbx:modified"]) {
                 this.showReformatPrompt = false;
             }
 
@@ -217,14 +217,14 @@ export class ToolEditorComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * Serializes model to text. It also adds ct:modified flag to indicate
+     * Serializes model to text. It also adds rbx:modified flag to indicate
      * the text has been formatted by the GUI editor
      *
      * @returns {string}
      */
     private getModelText(): string {
         let json            = this.toolModel.serialize();
-        json["ct:modified"] = true;
+        json["rbx:modified"] = true;
 
         return JSON.stringify(json, null, 4);
     }
