@@ -33,7 +33,6 @@ require("./main.component.scss");
         FileRegistry,
         DomEventService,
         UrlValidator,
-        WebWorkerService,
         InputPortService,
         PlatformAPI,
         SBPlatformDataSourceService,

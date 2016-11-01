@@ -33,7 +33,10 @@ export class TabManagerComponent implements OnDestroy {
 
     private subs: Subscription[] = [];
 
+    constructor(private webWorkerService: WebWorkerService) {}
+
     ngOnDestroy() {
+        this.webWorkerService.dispose();
         this.subs.forEach(s => s.unsubscribe());
     }
 }

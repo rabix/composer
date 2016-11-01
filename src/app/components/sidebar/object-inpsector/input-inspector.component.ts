@@ -1,9 +1,9 @@
-import {Component, Input, OnInit, OnDestroy} from "@angular/core";
-import {Validators, FormBuilder, FormGroup, REACTIVE_FORM_DIRECTIVES, FORM_DIRECTIVES} from "@angular/forms";
+import {Component, OnInit, OnDestroy} from "@angular/core";
 import {ExpressionInputComponent} from "../../forms/inputs/types/expression-input.component";
 import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 import {Subscription} from "rxjs/Subscription";
-import {InputSidebarService} from "../../../services/sidebars/input-sidebar.service";
+import {InputSidebarService, InputInspectorData} from "../../../services/sidebars/input-sidebar.service";
+import {BasicInputSectionComponent} from "./basic-section/basic-input-section.component";
 
 require("./input-inspector.component.scss");
 
@@ -11,44 +11,17 @@ require("./input-inspector.component.scss");
     selector: "input-inspector",
     directives: [
         ExpressionInputComponent,
-        REACTIVE_FORM_DIRECTIVES,
-        FORM_DIRECTIVES
+        BasicInputSectionComponent
     ],
     template: `
             <form class="input-inspector-component object-inspector" *ngIf="selectedProperty">
                 <div>
-                     <span class="edit-text">Edit</span>
+                    <span class="input-text">Input</span>
                     <i class="fa fa-info-circle info-icon"></i>
                 </div>
             
-                <div class="form-group">
-                    <label for="inputId">ID</label>
-                    <input type="text" 
-                           name="selectedPropertyId" 
-                           id="inputId" 
-                           class="form-control"
-                           [(ngModel)]="selectedProperty.id">
-                </div>
-                
-                <div class="form-group">
-                    <label for="inputType">Type</label>
-                    
-                    <select class="form-control" 
-                    name="selectedPropertyType" 
-                    id="dataType"
-                    [(ngModel)]="selectedProperty.type" required>
-                        <option *ngFor="let propertyType of propertyTypes" [value]="propertyType">
-                            {{propertyType}}
-                        </option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label>Value</label>
-                    
-                   <!-- <expression-input>
-                    </expression-input>-->
-                </div>
+                <basic-input-section [selectedProperty]="selectedProperty"
+                                     [context]="context"></basic-input-section>
             </form>
     `
 })
@@ -57,50 +30,19 @@ export class InputInspectorComponent implements OnInit, OnDestroy {
     /** The currently displayed property */
     private selectedProperty: InputProperty;
 
-    /** FormGroup for the ObjectInspector */
-    private inputInspectorForm: FormGroup;
+    private subs: Subscription[] = [];
 
-    /** Possible property types */
-    private propertyTypes = ["File", "string", "enum", "int", "float", "boolean", "array", "record", "map"];
+    private context: any;
 
-    private subs: Subscription[];
+    constructor(private inputSidebarService: InputSidebarService) { }
 
-    constructor(private formBuilder: FormBuilder,
-                private inputSidebarService: InputSidebarService) {
-        this.subs = [];
-    }
-
-    ngOnInit() {
+    ngOnInit(): void {
         this.subs.push(
-            this.inputSidebarService.inputPortStream.subscribe((inputPort: InputProperty) => {
-                console.log("InputInspectorComponent");
-                this.selectedProperty = inputPort;
+            this.inputSidebarService.inputPortDataStream.subscribe((data: InputInspectorData) => {
+                this.selectedProperty = data.inputProperty;
+                this.context = data.context;
             })
         );
-
-        //TODO (Mate) fix this
-        /*
-        this.inputInspectorForm = this.formBuilder.group({
-            expression: [this.selectedProperty.getValueFrom(), Validators.compose([Validators.required, Validators.minLength(1)])]
-        });
-
-        this.inputInspectorForm.controls["expression"].valueChanges.subscribe(value => {
-            this.selectedProperty.setValueFrom(value);
-        });*/
-
-        this.listenToInputPortUpdate();
-    }
-
-    //TODO (Mate) fix this
-    private listenToInputPortUpdate(): void {
-
-       /* let updateInputPortExpression = this.eventHubService.onValueFrom(UpdateInputPortExpression)
-            .subscribe((expression: string) => {
-                const expressionControl: FormControl = <FormControl>this.inputInspectorForm.controls['expression'];
-                expressionControl.setValue(expression);
-            });
-
-        this.subs.push(updateInputPortExpression);*/
     }
 
     ngOnDestroy(): void {

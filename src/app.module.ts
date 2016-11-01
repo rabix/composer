@@ -40,6 +40,8 @@ import {ToolHeaderComponent} from "./app/components/tool-editor/tool-header/tool
 import {CommandLineComponent} from "./app/components/clt-editor/commandline/commandline.component";
 import {InputInspectorComponent} from "./app/components/sidebar/object-inpsector/input-inspector.component";
 import {ExpressionEditorComponent} from "./app/components/sidebar/expression-editor/expression-editor.component";
+import {BasicInputSectionComponent} from "./app/components/sidebar/object-inpsector/basic-section/basic-input-section.component";
+import {ToggleComponent} from "./app/components/common/toggle-slider/toggle-slider.component";
 import {ContextDirective} from "./app/services/context/context.directive";
 import {MenuComponent, MenuItemComponent} from "./app/components/menu";
 import {ModalComponent, ModalService} from "./app/components/modal";
@@ -75,6 +77,7 @@ import {StandaloneCodeEditorComponent} from "./app/components/standalone-code-ed
         FormSectionComponent,
         InputComponent,
         InputInspectorComponent,
+        BasicInputSectionComponent,
         InputInspectorSidebarComponent,
         InputPortListComponent,
         InputPortsFormComponent,
@@ -110,6 +113,7 @@ import {StandaloneCodeEditorComponent} from "./app/components/standalone-code-ed
         ViewModeSwitchComponent,
         WorkboxComponent,
         WorkflowEditorComponent,
+        ToggleComponent
     ],
     entryComponents: [
         CheckboxPromptComponent,
