@@ -112,22 +112,16 @@ export class ModalService {
         cancellationLabel: "Cancel",
         checkboxLabel: "Don't show this again"
     }) {
-        const insideClosings = new Promise((resolve, reject) => {
-
+        return this.wrap<boolean>((resolve, reject) => {
             const ref = this.show<CheckboxPromptComponent>(CheckboxPromptComponent, {title: params.title});
-            Object.assign(ref, params);
+            refAssign(ref, params);
 
             ref.decision.subscribe(content => {
                 content !== null ? resolve(content) : reject();
                 this.close();
             });
-        });
 
-        const outsideClosings = new Promise((resolve, reject) => {
-            this.onClose.first().subscribe(reject);
         });
-
-        return Promise.race([insideClosings, outsideClosings]);
     }
 
     /**
