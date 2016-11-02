@@ -7,7 +7,7 @@ import {ValidationResponse} from "../../services/web-worker/json-schema/json-sch
     template: `
             <div class="console-component" [ngClass]="{show: show}">
                 <div class="console-content">
-                    <p class="errors">
+                    <p class="error-text">
                         {{ issues?.errorText }}
                     </p>
                 </div>
@@ -17,13 +17,13 @@ import {ValidationResponse} from "../../services/web-worker/json-schema/json-sch
             class="btn btn-sm"
             (click)="toggleConsole()">
                 <span *ngIf="issues?.errors?.length > 0">
-                    <i class="fa fa-times-circle errors">
+                    <i class="fa fa-times-circle error">
                     </i>
                     {{ issues?.errors?.length }}
 
                 </span>
                 <span *ngIf="issues?.warnings?.length > 0">
-                    <i class="fa fa-warning warnings">
+                    <i class="fa fa-warning warning">
                     </i>
                     {{ issues?.warnings?.length }}
                 </span>

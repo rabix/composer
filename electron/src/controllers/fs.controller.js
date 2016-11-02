@@ -18,7 +18,7 @@ function findCWLClass(content) {
 
 function getPotentialCWLClassFromFile(filePath, callback) {
 
-    if (filePath.split(".").pop() !== "json") {
+    if (["json", "yaml", "yml", "cwl"].indexOf(filePath.split(".").pop()) === -1) {
         return callback(null, "");
     }
 

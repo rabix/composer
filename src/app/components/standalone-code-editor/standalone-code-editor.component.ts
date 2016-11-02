@@ -2,6 +2,7 @@ import {Component, OnInit, Input, OnDestroy} from "@angular/core";
 import {Subscription, BehaviorSubject} from "rxjs";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {DataEntrySource} from "../../sources/common/interfaces";
+import {logop} from "../../lib/utils.lib";
 
 @Component({
     selector: 'ct-standalone-code-editor',
@@ -13,7 +14,7 @@ import {DataEntrySource} from "../../sources/common/interfaces";
                          [data]="data"></tool-header>
         
             <div class="scroll-content">
-                <ct-code-editor [content]="data.content"
+                <ct-code-editor [content]="rawEditorContent"
                                 [readOnly]="!data.isWritable"
                                 [language]="data.language"></ct-code-editor>
             </div>
@@ -35,8 +36,7 @@ export class StandaloneCodeEditorComponent implements OnInit, OnDestroy {
 
     private save(){
         if (this.data.data.source === "local") {
-            this.data.data.save(this.rawEditorContent.getValue()).subscribe(_ => {
-            });
+            this.data.data.save(this.rawEditorContent.getValue()).subscribe(logop);
         }
     }
 

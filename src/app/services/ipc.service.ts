@@ -29,7 +29,7 @@ export class IpcService {
     public request(message: string, data = {}) {
         const messageID = this.guid.generate();
 
-        this.pendingRequests[messageID] = new AsyncSubject();
+        this.pendingRequests[messageID] = new AsyncSubject<any>();
         console.trace("Sending", message, "(", messageID, ")", data);
         ipcRenderer.send("data-request", {
             id: messageID,

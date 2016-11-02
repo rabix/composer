@@ -1,5 +1,6 @@
 //this method is here to avoid linting errors
 declare function postMessage(message: ValidationResponse);
+declare function require(s: string);
 
 export interface ValidationResponse {
     isValidatableCwl: boolean,
@@ -10,6 +11,8 @@ export interface ValidationResponse {
     errorText?: string,
     class?: "CommandLineTool" | "Workflow"
 }
+
+const YAML = require("js-yaml");
 
 // This class should only be used inside a WebWorker,
 // because it relies on the WebWorkers postMessage method
@@ -80,15 +83,15 @@ export class JsonSchemaService {
         let jsonClass;
 
         try {
-            cwlJson = JSON.parse(jsonText);
+            cwlJson = YAML.safeLoad(jsonText, {json: true});
         } catch (e) {
             this.sendValidationResult({
                 isValidatableCwl: false,
                 isValidCwl: false,
                 isValidJSON: false,
-                errors: ["Not valid JSON"],
+                errors: ["Not valid file format"],
                 warnings: [],
-                errorText: "Not valid JSON"
+                errorText: "Not valid file format"
             });
             return;
         }
