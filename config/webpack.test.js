@@ -50,6 +50,12 @@ module.exports = {
 
     },
 
+    resolveLoader: {
+        root: helpers.root("node_modules"),
+
+        fallback: [helpers.root("node_modules")]
+    },
+
     /**
      * Options affecting the normal modules.
      *
