@@ -2,7 +2,7 @@ import {Component, OnInit, Input, OnDestroy} from "@angular/core";
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {CltEditorComponent} from "../clt-editor/clt-editor.component";
-import {Subscription, ReplaySubject, BehaviorSubject} from "rxjs/Rx";
+import {ReplaySubject, BehaviorSubject} from "rxjs/Rx";
 import {ToolHeaderComponent} from "./tool-header/tool-header.component";
 import {ViewModeService} from "./services/view-mode.service";
 import {CommandLineToolModel} from "cwlts/models/d2sb";
@@ -23,7 +23,7 @@ import {CheckboxPromptComponent} from "../modal/common/checkbox-prompt.component
 import {ComponentBase} from "../common/component-base";
 import {noop} from "../../lib/utils.lib";
 
-
+const YAML = require("js-yaml");
 require("./tool-editor.component.scss");
 
 @Component({
@@ -161,7 +161,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
         this.webWorkerService.validateJsonSchema(content);
 
         try {
-            let json = JSON.parse(content);
+            let json = YAML.safeLoad(content, {json: true});
 
             // should show prompt, but json is already reformatted
             if (this.showReformatPrompt && json["rbx:modified"]) {
@@ -179,11 +179,9 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
         const text = this.modelChanged ? this.getModelText() : this.rawEditorContent.getValue();
 
         if (this.data.data.source === "local") {
-            this.data.data.save(text).subscribe(_ => {
-            });
+            this.data.data.save(text).subscribe(noop);
         } else {
-            this.data.save(JSON.parse(text), revisionNote).subscribe(data => {
-            });
+            this.data.save(JSON.parse(text), revisionNote).subscribe(noop);
         }
     }
 
@@ -231,7 +229,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
         let json             = this.toolModel.serialize();
         json["rbx:modified"] = true;
 
-        return JSON.stringify(json, null, 4);
+        return this.data.language === "json" ? JSON.stringify(json, null, 4) : YAML.dump(json);
     }
 
     /**

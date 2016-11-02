@@ -88,8 +88,12 @@ ct-clt-editor, ct-code-editor {
             color: $brand-warning;
         }
 
-        .errors {
-            color: $text-light;
+        .error {
+            color: $brand-danger;
+        }
+
+        .error-text {
+            color: lighten($brand-danger, 30%);
         }
     }
 }
