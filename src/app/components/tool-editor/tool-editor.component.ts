@@ -229,7 +229,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
         let json             = this.toolModel.serialize();
         json["rbx:modified"] = true;
 
-        return JSON.stringify(json, null, 4);
+        return this.data.language === "json" ? JSON.stringify(json, null, 4) : YAML.dump(json);
     }
 
     /**
