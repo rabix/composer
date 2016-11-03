@@ -35,6 +35,7 @@ ct-clt-editor, ct-code-editor {
 
 .status-bar-footer {
     background: $gui-editor-status-bar-bg;
+    position: relative; //because of width of consoles
 
     .left-side {
         display: inline-block;
