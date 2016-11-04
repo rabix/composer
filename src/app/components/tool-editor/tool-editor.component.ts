@@ -4,7 +4,6 @@ import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {CltEditorComponent} from "../clt-editor/clt-editor.component";
 import {ReplaySubject, BehaviorSubject} from "rxjs/Rx";
 import {ToolHeaderComponent} from "./tool-header/tool-header.component";
-import {ViewModeService} from "./services/view-mode.service";
 import {CommandLineToolModel} from "cwlts/models/d2sb";
 import {SidebarComponent} from "../sidebar/sidebar.component";
 import {CommandLineComponent} from "../clt-editor/commandline/commandline.component";
@@ -29,7 +28,6 @@ require("./tool-editor.component.scss");
 @Component({
     selector: "ct-tool-editor",
     providers: [
-        ViewModeService,
         WebWorkerService,
         ToolSidebarService,
         ExpressionSidebarService,

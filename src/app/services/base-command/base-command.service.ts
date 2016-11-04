@@ -130,7 +130,7 @@ export class BaseCommandService {
         });
     }
 
-    public baseCommandsToFormList(toolBaseCommand: BaseCommand[]): ExpressionModel[] {
+    public baseCommandsToFormList(toolBaseCommand: ExpressionModel[]): ExpressionModel[] {
         const commandInputList: ExpressionModel[] = [];
         let newCommandInput = "";
 
@@ -138,35 +138,35 @@ export class BaseCommandService {
             return commandInputList;
         }
 
-        toolBaseCommand.forEach((command: BaseCommand, index: number) => {
-            //If it's a string
-            if (typeof command === "string") {
-                let commandToAdd: string;
+        // toolBaseCommand.forEach((command: BaseCommand, index: number) => {
+        //     //If it's a string
+        //     if (typeof command === "string") {
+        //         let commandToAdd: string;
+        //
+        //         if (index < toolBaseCommand.length - 1) {
+        //             commandToAdd = command + " ";
+        //         } else {
+        //             commandToAdd = command;
+        //         }
+        //
+        //         newCommandInput = newCommandInput.concat(commandToAdd);
+        //
+        //         if (index === toolBaseCommand.length - 1) {
+        //             commandInputList.push(new ExpressionModel(newCommandInput));
+        //         }
+        //
+        //     } else {
+        //         if (newCommandInput !== "") {
+        //             const newValue = newCommandInput.slice(0, -1);
+        //             commandInputList.push(new ExpressionModel(newValue));
+        //         }
+        //
+        //         commandInputList.push(new ExpressionModel(command));
+        //         newCommandInput = "";
+        //     }
+        // });
 
-                if (index < toolBaseCommand.length - 1) {
-                    commandToAdd = command + " ";
-                } else {
-                    commandToAdd = command;
-                }
-
-                newCommandInput = newCommandInput.concat(commandToAdd);
-
-                if (index === toolBaseCommand.length - 1) {
-                    commandInputList.push(new ExpressionModel(newCommandInput));
-                }
-
-            } else {
-                if (newCommandInput !== "") {
-                    const newValue = newCommandInput.slice(0, -1);
-                    commandInputList.push(new ExpressionModel(newValue));
-                }
-
-                commandInputList.push(new ExpressionModel(command));
-                newCommandInput = "";
-            }
-        });
-
-        return commandInputList;
+        return toolBaseCommand;
     }
 
     public formListToBaseCommandArray(formCommandList: ExpressionModel[]): BaseCommand[] {
@@ -177,24 +177,24 @@ export class BaseCommandService {
         }
 
         formCommandList.forEach((command) => {
-            const cwlCommand = command.serialize();
-
-            //If it's a string
-            if (typeof cwlCommand === "string") {
-
-                if (this.hasQuotes(cwlCommand)) {
-                    commandList.push(cwlCommand);
-                } else {
-                    //Replace subsequent whitespaces with single white space and trim
-                    const trimmedCommand = cwlCommand.replace(/ +(?= )/g,'').trim();
-
-                    //Split on spaces
-                    const stringArray = trimmedCommand.split(" ");
-                    commandList = commandList.concat(stringArray);
-                }
-            } else {
-                commandList.push(cwlCommand);
-            }
+            // const cwlCommand = command.serialize();
+            //
+            // //If it's a string
+            // if (typeof cwlCommand === "string") {
+            //
+            //     if (this.hasQuotes(cwlCommand)) {
+            //         commandList.push(cwlCommand);
+            //     } else {
+            //         //Replace subsequent whitespaces with single white space and trim
+            //         const trimmedCommand = cwlCommand.replace(/ +(?= )/g,'').trim();
+            //
+            //         //Split on spaces
+            //         const stringArray = trimmedCommand.split(" ");
+            //         commandList = commandList.concat(stringArray);
+            //     }
+            // } else {
+            //     commandList.push(cwlCommand);
+            // }
         });
 
         return commandList;

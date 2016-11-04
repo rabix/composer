@@ -24,11 +24,6 @@ export class SandboxService {
         //make sure the code is a string
         let codeToExecute = code;
 
-        //@todo(maya) check should be replaced with CWL-TS expression evaluator
-        if (code.charAt(0) === '{') {
-            codeToExecute = "(function()" + code + ")()";
-        }
-
         const plugin = new jailed.DynamicPlugin(this.initializeEngine());
 
         plugin.whenConnected(() => {

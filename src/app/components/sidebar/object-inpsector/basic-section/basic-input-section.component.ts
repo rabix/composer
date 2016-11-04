@@ -139,7 +139,7 @@ export class BasicInputSectionComponent implements OnInit {
             });
 
         this.expressionSidebarService.openExpressionEditor({
-            expression: new ExpressionModel(this.selectedProperty.getValueFrom()),
+            value: new ExpressionModel(this.selectedProperty.getValueFrom()),
             newExpressionChange: newExpression,
             context: this.context
         });

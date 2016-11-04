@@ -6,11 +6,12 @@ import {Subscription} from "rxjs/Subscription";
 import {Subject} from "rxjs/Subject";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ExpressionSidebarService} from "../../../services/sidebars/expression-sidebar.service";
-import {Subject, Observable, BehaviorSubject} from "rxjs";
+import {Subject, Observable, BehaviorSubject, ReplaySubject} from "rxjs";
 import {Expression} from "cwlts/mappings/d2sb/Expression";
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import TextMode = AceAjax.TextMode;
+import {ComponentBase} from "../../common/component-base";
 
 require("./expression-editor.component.scss");
 
@@ -24,7 +25,8 @@ require("./expression-editor.component.scss");
                 <div class="expression-editor-header">
                 
                     <span class="expression-head-text">
-                        Argument value expression
+                        Expression
+                        <!--@todo(maya) path to object where expression lives-->
                         <i class="fa fa-info-circle help-icon"></i>
                     </span>
                     
@@ -43,7 +45,7 @@ require("./expression-editor.component.scss");
                 
                 <div class="expression-result-container">
                     <div class="code-preview">
-                        Code preview
+                        Result
                     </div>
                     
                     <div class="expression-result-value">
@@ -53,13 +55,10 @@ require("./expression-editor.component.scss");
          </div>
  `
 })
-export class ExpressionEditorComponent implements OnInit, OnDestroy {
-
-    /** Expression coming form the tool */
-    private initialExpressionScript: string;
+export class ExpressionEditorComponent extends ComponentBase implements OnInit, OnDestroy {
 
     /** Evaluated expressions */
-    private newValueStream: Subject<string | ExpressionModel>;
+    private newValueStream: Subject<ExpressionModel>;
 
     /** Reference to the element in which we want to instantiate the Ace editor */
     @ViewChild("ace")
@@ -78,59 +77,51 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
 
     private sandboxService: SandboxService;
 
-    private subs: Subscription[];
-
     private sandBoxSub: Subscription;
 
+    private content: string;
+
     constructor(private expressionSidebarService: ExpressionSidebarService) {
-        this.subs = [];
+        super();
     }
 
     ngOnInit(): void {
         this.sandboxService = new SandboxService();
 
-        this.subs.push(
-            this.expressionSidebarService.expressionDataStream
-                .mergeMap((data:ExpressionEditorData) => {
-                    this.lastExpression          = undefined;
-                    this.initialExpressionScript = "";
-                    this.context                 = data.context;
+        this.tracked = this.expressionSidebarService.expressionDataStream
+            .mergeMap((data: ExpressionEditorData) => {
+                debugger;
 
-                    if ((<Expression>data.expression.serialize()).script) {
-                        this.initialExpressionScript = data.expression.getExpressionScript();
-                    }
+                this.content = data.value.getScript() || "";
+                this.context = data.context;
 
-                    this.newValueStream = data.newExpressionChange;
-                    this.editor         = new ExpressionEditor(ace.edit(this.aceContainer.nativeElement), this.initialExpressionScript);
+                this.newValueStream = data.newExpressionChange;
+                this.editor         = new ExpressionEditor(ace.edit(this.aceContainer.nativeElement), this.content);
 
-                    return this.editor.expressionChanges;
-                })
-                .distinctUntilChanged()
-                .subscribe(expression => {
-                    this.evaluateExpression(expression);
-                })
-        );
+                return this.editor.expressionChanges;
+            })
+            .distinctUntilChanged()
+            .subscribe(expression => {
+                this.content = expression;
+                const expr = new ExpressionModel();
+                expr.setValue(this.content, "expression");
+
+                this.evaluateExpression(expr.getScriptForExec());
+            });
+
     }
 
     private evaluateExpression(expression: string): Observable<SandboxResponse> {
         this.removeSandboxSub();
-        const responseResult: BehaviorSubject<SandboxResponse> = new BehaviorSubject<SandboxResponse>(undefined);
+        const responseResult = new ReplaySubject<SandboxResponse>();
 
-        if (this.lastExpression === expression) {
-            responseResult.next({
-                error: undefined,
-                output: this.evaluatedExpression
+        this.sandBoxSub      = this.sandboxService.submit(expression, this.context)
+            .subscribe((result: SandboxResponse) => {
+                this.evaluatedExpression = result.error ? result.error : result.output;
+                responseResult.next(result);
             });
-        } else {
-            this.lastExpression = expression;
-            this.sandBoxSub     = this.sandboxService.submit(expression, this.context)
-                .subscribe((result: SandboxResponse) => {
-                    this.evaluatedExpression = result.error ? result.error: result.output;
-                    responseResult.next(result);
-                });
-        }
 
-        return responseResult.filter(response => response !== undefined);
+        return responseResult;
     }
 
     private cancel(): void {
@@ -138,15 +129,14 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
     }
 
     private save(): void {
-        this.evaluateExpression(this.lastExpression)
-            .subscribe((result: SandboxResponse) => {
-                const newExpression: ExpressionModel = new ExpressionModel(undefined);
+        const expr = new ExpressionModel();
+        expr.setValue(this.content, "expression");
 
-                if (result.output === undefined) {
-                    newExpression.setValueToString("");
-                } else {
-                    newExpression.setValueToExpression(this.lastExpression);
-                }
+        this.tracked = this.evaluateExpression(expr.getScriptForExec())
+            .subscribe((result: SandboxResponse) => {
+                const newExpression = new ExpressionModel("");
+
+                newExpression.setValue(this.content, "expression");
 
                 this.newValueStream.next(newExpression);
             });
@@ -165,10 +155,6 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
         }
 
         this.removeSandboxSub();
-        this.subs.forEach(sub => sub.unsubscribe());
+        super.ngOnDestroy();
     }
 }
-
-//@todo remove update button when expression is evaluated
-//@todo add update button when expression is changed
-//@todo evaluate expression in input field, populate result before expression editor is loaded

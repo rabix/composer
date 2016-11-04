@@ -7,7 +7,7 @@ import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ExpressionInputComponent} from "../types/expression-input.component";
 import {ExpressionSidebarService} from "../../../../services/sidebars/expression-sidebar.service";
-import {ReplaySubject} from "rxjs";
+import {ReplaySubject, Observable} from "rxjs";
 
 require("./base-command-form.components.scss");
 
@@ -15,10 +15,6 @@ require("./base-command-form.components.scss");
     selector: 'base-command-form',
     providers: [
         BaseCommandService
-    ],
-    directives: [
-        ExpressionInputComponent,
-        FormSectionComponent
     ],
     template: `
 <ct-form-section>
@@ -31,16 +27,16 @@ require("./base-command-form.components.scss");
 
                 <div *ngFor="let baseCommand of baseCommandFormList; let i = index; trackBy:trackByIndex"
                      class="base-command-list">
+                     
+                     <pre>touched: {{ baseCommandForm.controls['baseCommand' + i].touched | json }}</pre>
+                     <pre>dirty: {{ baseCommandForm.controls['baseCommand' + i].dirty | json }}</pre>
+                     <pre>value: {{ baseCommandForm.controls['baseCommand' + i].value | json }}</pre>
 
-                     <expression-input class="col-sm-11"
-                                  *ngIf="baseCommandForm.controls['baseCommand' + i]" 
-                                  [control]="baseCommandForm.controls['baseCommand' + i]"
-                                  [isExpression]="!!baseCommand.serialize().script"
-                                  (onEdit)="editBaseCommand(i)"
-                                  (onClear)="clearBaseCommand(i)">
+                     <expression-input
+                                  [control]="baseCommandForm.controls['baseCommand' + i]">
                     </expression-input>
 
-                    <span class="col-sm-1">
+                    <span>
                         <i class="fa fa-trash clear-icon" (click)="removeBaseCommand(i)"></i>
                     </span>
                 </div> <!-- base-command-list-->
@@ -62,7 +58,7 @@ require("./base-command-form.components.scss");
 export class BaseCommandFormComponent implements OnInit, OnDestroy {
 
     @Input()
-    public toolBaseCommand: BaseCommand[];
+    public toolBaseCommand: ExpressionModel[];
 
     /** The parent forms group, we pass this to the list */
     @Input()
@@ -121,13 +117,13 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
             this.baseCommandForm.addControl(
                 'baseCommand' + index,
                 new FormControl(
-                    command.getExpressionScript(),
+                    command,
                     Validators.compose([Validators.required, Validators.minLength(1)])
                 )
             );
 
             this.baseCommandForm.controls['baseCommand' + index].valueChanges.subscribe(value => {
-                this.baseCommandService.updateCommand(index, new ExpressionModel(value));
+                this.baseCommandService.updateCommand(index, value);
             });
         });
     }
@@ -148,23 +144,23 @@ export class BaseCommandFormComponent implements OnInit, OnDestroy {
     }
 
     private editBaseCommand(index: number): void {
-        const newExpression: BehaviorSubject<ExpressionModel> = new BehaviorSubject<ExpressionModel>(undefined);
+        const newExpression = new BehaviorSubject<ExpressionModel>(undefined);
         const selectedBaseCommand = this.baseCommandFormList[index];
 
         this.selectedIndex = index;
         this.removeExpressionInputSub();
 
-        this.expressionInputSub = newExpression
+        this.expressionInputSub = (newExpression as Observable<ExpressionModel>)
             .filter(expression => expression !== undefined)
             .subscribe((expression: ExpressionModel) => {
                 this.baseCommandService.updateCommand(index, expression);
             });
 
-        this.expressionSidebarService.openExpressionEditor({
-            expression: selectedBaseCommand,
-            newExpressionChange: newExpression,
-            context: this.context
-        });
+        // this.expressionSidebarService.openExpressionEditor({
+        //     value: selectedBaseCommand,
+        //     newExpressionChange: newExpression,
+        //     context: this.context
+        // });
     }
 
     private clearBaseCommand(index: number): void {
