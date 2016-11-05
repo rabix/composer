@@ -28,7 +28,6 @@ require("./tool-editor.component.scss");
 @Component({
     selector: "ct-tool-editor",
     providers: [
-        WebWorkerService,
         ToolSidebarService,
         ExpressionSidebarService,
         InputSidebarService,
@@ -62,7 +61,7 @@ require("./tool-editor.component.scss");
         
                 <ct-clt-editor *ngIf="viewMode === 'gui'"
                                class="gui-editor-component"
-                               (isDirty)="modelChanged = $event"
+                               (dirty)="modelChanged = $event"
                                [model]="toolModel"></ct-clt-editor>
             </div>
             <div class="status-bar-footer">
@@ -139,6 +138,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
     // setting this.isLoading to false inside a sub doesn't (always) trigger view update
     ngOnInit(): void {
         this.tracked = this.rawEditorContent.subscribe(latestContent => {
+            console.log("latest content");
             this.validateSchema(latestContent);
         });
 

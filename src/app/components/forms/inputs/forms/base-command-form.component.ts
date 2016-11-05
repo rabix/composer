@@ -1,49 +1,39 @@
 import {Component, Input, OnInit, OnDestroy, Output} from "@angular/core";
 import {FormGroup, Validators, FormControl} from "@angular/forms";
-import {Subscription} from "rxjs/Subscription";
-import {FormSectionComponent} from "../../../form-section/form-section.component";
-import {BaseCommandService, BaseCommand} from "../../../../services/base-command/base-command.service";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {ExpressionModel} from "cwlts/models/d2sb";
-import {ExpressionInputComponent} from "../types/expression-input.component";
-import {ExpressionSidebarService} from "../../../../services/sidebars/expression-sidebar.service";
-import {ReplaySubject, Observable} from "rxjs";
+import {ReplaySubject} from "rxjs";
+import {ComponentBase} from "../../../common/component-base";
+import {GuidService} from "../../../../services/guid.service";
 
 require("./base-command-form.components.scss");
 
 @Component({
     selector: 'base-command-form',
-    providers: [
-        BaseCommandService
-    ],
-    template: `
-<ct-form-section>
+    template: `<ct-form-section>
     <div class="fs-header">
         Base Command
     </div>
     <div class="fs-body">
-        <form *ngIf="baseCommandForm" [formGroup]="baseCommandForm">
-            <div *ngIf="baseCommandFormList.length > 0">
+        <form *ngIf="form" [formGroup]="form">
 
-                <div *ngFor="let baseCommand of baseCommandFormList; let i = index; trackBy:trackByIndex"
-                     class="base-command-list">
-                     
-                     <pre>touched: {{ baseCommandForm.controls['baseCommand' + i].touched | json }}</pre>
-                     <pre>dirty: {{ baseCommandForm.controls['baseCommand' + i].dirty | json }}</pre>
-                     <pre>value: {{ baseCommandForm.controls['baseCommand' + i].value | json }}</pre>
+            <ol *ngIf="formList.length > 0" class="list-unstyled">
 
-                     <expression-input
-                                  [control]="baseCommandForm.controls['baseCommand' + i]">
+                <li *ngFor="let item of formList"
+                     class="removable-form-control">
+
+                    <expression-input
+                            [context]="context"
+                            [formControl]="form.controls[item.id]">
                     </expression-input>
 
-                    <span>
-                        <i class="fa fa-trash clear-icon" (click)="removeBaseCommand(i)"></i>
-                    </span>
-                </div> <!-- base-command-list-->
-            </div> <!-- list container-->
+                    <div class="remove-icon clickable" (click)="removeBaseCommand(item)">
+                        <i class="fa fa-trash"></i>
+                    </div>
+                </li> 
+            </ol>
 
-            <div *ngIf="baseCommandFormList.length === 0" class="col-sm-12">
-                No base command defined.
+            <div *ngIf="formList.length === 0">
+                No baseCommand defined.
             </div>
 
             <button type="button" class="btn btn-link add-btn-link" (click)="addBaseCommand()">
@@ -55,131 +45,66 @@ require("./base-command-form.components.scss");
 
     `
 })
-export class BaseCommandFormComponent implements OnInit, OnDestroy {
-
+export class BaseCommandFormComponent extends ComponentBase implements OnInit, OnDestroy {
+    /** baseCommand property of model */
     @Input()
-    public toolBaseCommand: ExpressionModel[];
+    public baseCommand: ExpressionModel[];
 
-    /** The parent forms group, we pass this to the list */
+    /** The parent forms group which is already in the clt-editor form tree */
     @Input()
-    public baseCommandForm: FormGroup;
+    public form: FormGroup;
 
+    /** Update event triggered on form changes (add, remove, edit) */
     @Output()
-    public onUpdate = new ReplaySubject<BaseCommand[]>();
+    public update = new ReplaySubject<ExpressionModel[]>();
 
+    /** Context in which expression should be evaluated */
     @Input()
-    public context: any;
+    public context: {$job: any};
 
-    /** The formatted list that we are going to display to the user*/
-    private baseCommandFormList: ExpressionModel[] = [];
+    /** List which connects model to forms */
+    private formList: Array<{id: string, model: ExpressionModel}> = [];
 
-    private subs: Subscription[];
-
-    /** Expression values coming from the expression editor subs */
-    private expressionInputSub: Subscription;
-
-    private selectedIndex: number;
-
-    constructor(private baseCommandService: BaseCommandService,
-                private expressionSidebarService: ExpressionSidebarService) {
-        this.subs = [];
+    constructor(private guidService: GuidService) {
+        super();
     }
 
     ngOnInit(): void {
-        const inputBaseCommands = this.baseCommandService.baseCommandsToFormList(this.toolBaseCommand);
-        this.baseCommandService.setBaseCommands(inputBaseCommands);
-        this.baseCommandFormList = inputBaseCommands;
-        this.createExpressionInputControls(this.baseCommandFormList);
+        this.formList = this.baseCommand.map(model => {
+            return {
+                id: this.guidService.generate(), model
+            };
+        });
 
-        this.subs.push(
-            this.baseCommandService.baseCommands
-                .skip(1)
-                .subscribe((commandList: ExpressionModel[]) => {
-                    this.baseCommandFormList = commandList;
-                    this.createExpressionInputControls(this.baseCommandFormList);
+        this.createExpressionInputControls(this.formList);
 
-                    //Format the base commands from the inputs, and set the tool baseCommand
-                    this.onUpdate.next(this.baseCommandService.formListToBaseCommandArray(this.baseCommandFormList));
-                })
-        );
+        this.tracked = this.form.valueChanges.subscribe(change => {
+            const v = Object.keys(change).map(key => change[key]);
+            this.update.next(v);
+        })
     }
 
-    private trackByIndex(index: number): number {
-        return index;
-    }
-
-    private createExpressionInputControls(commandList: ExpressionModel[]): void {
-        commandList.forEach((command, index) => {
-            if (this.baseCommandForm.contains('baseCommand' + index)) {
-                this.baseCommandForm.removeControl('baseCommand' + index);
-            }
-
-            this.baseCommandForm.addControl(
-                'baseCommand' + index,
-                new FormControl(
-                    command,
-                    Validators.compose([Validators.required, Validators.minLength(1)])
-                )
-            );
-
-            this.baseCommandForm.controls['baseCommand' + index].valueChanges.subscribe(value => {
-                this.baseCommandService.updateCommand(index, value);
-            });
+    private createExpressionInputControls(formList: Array<{id: string, model: ExpressionModel}>): void {
+        formList.forEach((item) => {
+            this.form.addControl(item.id, new FormControl(item.model, Validators.required));
         });
     }
 
-    private removeBaseCommand(index: number): void {
-        this.baseCommandForm.removeControl('baseCommand ' + index);
-        this.baseCommandService.deleteBaseCommand(index);
-
-        if (this.selectedIndex === index) {
-            this.expressionSidebarService.closeExpressionEditor();
-        }
-
-        if (this.selectedIndex > index) {
-            this.selectedIndex--;
-        } else if (this.selectedIndex === index) {
-            this.selectedIndex = undefined;
-        }
-    }
-
-    private editBaseCommand(index: number): void {
-        const newExpression = new BehaviorSubject<ExpressionModel>(undefined);
-        const selectedBaseCommand = this.baseCommandFormList[index];
-
-        this.selectedIndex = index;
-        this.removeExpressionInputSub();
-
-        this.expressionInputSub = (newExpression as Observable<ExpressionModel>)
-            .filter(expression => expression !== undefined)
-            .subscribe((expression: ExpressionModel) => {
-                this.baseCommandService.updateCommand(index, expression);
-            });
-
-        // this.expressionSidebarService.openExpressionEditor({
-        //     value: selectedBaseCommand,
-        //     newExpressionChange: newExpression,
-        //     context: this.context
-        // });
-    }
-
-    private clearBaseCommand(index: number): void {
-        this.baseCommandService.clearBaseCommand(index);
+    private removeBaseCommand(ctrl: {id: string, model: ExpressionModel}): void {
+        this.formList = this.formList.filter(item => item.id !== ctrl.id);
+        this.form.removeControl(ctrl.id);
+        this.form.markAsDirty();
     }
 
     private addBaseCommand(): void {
-        this.baseCommandService.addCommand(new ExpressionModel(""));
-    }
+        const newCmd = {
+            id: this.guidService.generate(),
+            model: new ExpressionModel("")
+        };
 
-    private removeExpressionInputSub(): void {
-        if (this.expressionInputSub) {
-            this.expressionInputSub.unsubscribe();
-            this.expressionInputSub = undefined;
-        }
-    }
+        this.form.addControl(newCmd.id, new FormControl(newCmd.model, Validators.required));
+        this.formList.push(newCmd);
 
-    ngOnDestroy(): void {
-        this.removeExpressionInputSub();
-        this.subs.forEach(sub => sub.unsubscribe());
+        this.form.markAsTouched();
     }
 }

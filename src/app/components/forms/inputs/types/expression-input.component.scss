@@ -3,16 +3,16 @@
 .expression-input-group {
     border: 2px solid transparent;
 
-    input {
-        cursor: pointer;
+    .input-group-btn button {
+        width: 46px;
     }
 
-    &:hover {
+    &.expr:hover {
         border: 2px solid $gui-section-list-item-hover-border;
         border-radius: 5px;
-    }
 
-    .input-group-btn {
-        cursor: pointer;
+        .input-group-btn, input {
+            cursor: pointer;
+        }
     }
 }

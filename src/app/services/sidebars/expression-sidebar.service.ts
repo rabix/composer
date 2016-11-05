@@ -14,7 +14,7 @@ export class ExpressionSidebarService {
 
     constructor(private toolSidebarService: ToolSidebarService) {
 
-        this.expressionDataStream = this.updateExpressionEditorData
+        this.expressionDataStream = (this.updateExpressionEditorData as Observable)
             .filter(update => update !== undefined)
             .publishReplay(1)
             .refCount();

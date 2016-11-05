@@ -3,8 +3,9 @@ import {Subject} from "rxjs/Subject";
 const jailed = require('jailed');
 
 export interface SandboxResponse {
-    output: string,
-    error: string
+    output?: string,
+    error?: string,
+    warning?: string
 }
 
 export class SandboxService {
@@ -61,8 +62,12 @@ export class SandboxService {
                     try {
                         var res = runHidden(codeString);
                         cb({output: res});
-                    } catch(e) {
-                        cb({error: e.message});
+                    } catch(ex) {
+                        if (ex.name === "SyntaxError") {
+                            cb({error: ex.toString()});
+                        } else {
+                            cb({warning: ex.toString()});
+                        }
                     }
                 }
             })`;
@@ -97,14 +102,5 @@ export class SandboxService {
         const application = undefined;
 
         return eval(code);
-    }
-
-    // converts the output into a string
-    public stringify(output: any): string {
-        if (typeof output === "undefined") {
-            return "undefined";
-        } else {
-            return output.toString(); // everything except undefined will be a string
-        }
     }
 }

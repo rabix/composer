@@ -118,6 +118,10 @@ $expression-editor-help-icon-color: #818286;
 $expression-editor-border: #3B3F46;
 
 $expression-editor-text-muted: #555658;
+$expression-editor-error-color: lighten($brand-danger, 30%);
+$expression-editor-warning-color: #fdb855;
+
+$expression-editor-result-height: 150px;
 
 /**
  * ALERT OVERRIDES

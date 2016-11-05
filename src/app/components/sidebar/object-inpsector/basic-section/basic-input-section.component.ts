@@ -58,12 +58,9 @@ require("./basic-input-section.component.scss");
                 <div class="form-group" [formGroup]="expressionInputForm">
                     <label>Value</label>
                     
-                     <expression-input *ngIf="expressionInputForm && expressionInputForm.controls['expressionInput']"
-                                    [disableEdit]="!hasInputBinding"
-                                    [isExpression]="hasInputBinding && !!selectedProperty.getValueFrom().script"
-                                    [control]="expressionInputForm.controls['expressionInput']"
-                                    (onEdit)="addExpression()"
-                                    (onClear)="clearExpression()">
+                     <expression-input
+                                    [context]="context"
+                                    [formControl]="expressionInputForm.controls['expressionInput']">
                     </expression-input>
                 </div>
                 
@@ -86,7 +83,7 @@ export class BasicInputSectionComponent implements OnInit {
     public selectedProperty: InputProperty;
 
     @Input()
-    public context: any;
+    public context: {$job: any, $self: any};
 
     /** Possible property types */
     private propertyTypes = ["File", "string", "enum", "int", "float", "boolean", "array", "record", "map"];
@@ -128,6 +125,7 @@ export class BasicInputSectionComponent implements OnInit {
         );
     }
 
+    /** @deprecated */
     private addExpression(): void {
         const newExpression: BehaviorSubject<ExpressionModel> = new BehaviorSubject<ExpressionModel>(undefined);
         this.removeExpressionInputSub();
@@ -145,6 +143,7 @@ export class BasicInputSectionComponent implements OnInit {
         });
     }
 
+    /** @deprecated */
     private removeExpressionInputSub(): void {
         if (this.expressionInputSub) {
             this.expressionInputSub.unsubscribe();
@@ -152,6 +151,7 @@ export class BasicInputSectionComponent implements OnInit {
         }
     }
 
+    /** @deprecated */
     private clearExpression(): void {
         const newExpression: ExpressionModel = new ExpressionModel("");
         this.setSelectedProperty(newExpression.serialize());
