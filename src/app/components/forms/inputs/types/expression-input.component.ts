@@ -154,6 +154,10 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
                 this.expressionSidebarService.closeExpressionEditor();
             });
         }
+    }
 
+    ngOnDestroy(): void {
+        super.ngOnDestroy();
+        this.expressionSidebarService.closeExpressionEditor();
     }
 }
