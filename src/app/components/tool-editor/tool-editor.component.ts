@@ -2,7 +2,7 @@ import {Component, OnInit, Input, OnDestroy} from "@angular/core";
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {CltEditorComponent} from "../clt-editor/clt-editor.component";
-import {ReplaySubject, BehaviorSubject} from "rxjs/Rx";
+import {ReplaySubject, BehaviorSubject, Observable} from "rxjs/Rx";
 import {ToolHeaderComponent} from "./tool-header/tool-header.component";
 import {CommandLineToolModel} from "cwlts/models/d2sb";
 import {SidebarComponent} from "../sidebar/sidebar.component";
@@ -136,11 +136,14 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
 
     // @todo(maya) fix block loader
     // setting this.isLoading to false inside a sub doesn't (always) trigger view update
+    // possible zone problem
     ngOnInit(): void {
-        this.tracked = this.rawEditorContent.subscribe(latestContent => {
-            console.log("latest content");
-            this.validateSchema(latestContent);
-        });
+        this.tracked = (this.rawEditorContent as Observable)
+            .skip(1)
+            .distinctUntilChanged()
+            .subscribe(latestContent => {
+                this.validateSchema(latestContent);
+            });
 
         this.tracked = this.data.content.subscribe(val => {
             this.rawEditorContent.next(val);

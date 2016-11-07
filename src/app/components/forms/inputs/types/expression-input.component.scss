@@ -1,18 +1,76 @@
 @import "../../../../../assets/sass/variables";
 
+@mixin selection-border($color) {
+    &:before {
+        content: '';
+        display: block;
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        z-index: 4;
+        top: 0;
+        right: 0;
+        border: 2px solid $color;
+        border-radius: $input-border-radius;
+    }
+}
+
 .expression-input-group {
-    border: 2px solid transparent;
+    position: relative;
+    border-radius: $input-border-radius;
 
     .input-group-btn button {
         width: 46px;
     }
 
-    &.expr:hover {
-        border: 2px solid $gui-section-list-item-hover-border;
-        border-radius: 5px;
+    &.expr {
+        position: relative;
 
-        .input-group-btn, input {
-            cursor: pointer;
+        .form-control {
+            padding-left: 30px;
         }
+        
+        .expression-icon {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            z-index: 4;
+
+            &.result {
+                color: $text-muted;
+                top: 5px;
+                font-weight: bold;
+            }
+        }
+
+        &.warning {
+            &:hover {
+                @include selection-border($brand-warning);
+
+            }
+
+            .expression-icon {
+                color: $brand-warning;
+            }
+        }
+
+        &.error {
+            &:hover {
+                @include selection-border($brand-danger);
+            }
+
+            .expression-icon {
+                color: $brand-danger;
+            }
+        }
+
+        &:hover {
+            @include selection-border($gui-section-list-item-hover-border);
+
+            .input-group-btn, input {
+                cursor: pointer;
+            }
+        }
+
     }
 }

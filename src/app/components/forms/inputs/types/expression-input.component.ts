@@ -1,10 +1,10 @@
 import {Component, Input, forwardRef} from "@angular/core";
 import {NG_VALUE_ACCESSOR, ControlValueAccessor} from "@angular/forms";
-import {ExpressionModel} from "cwlts";
 import {Subject} from "rxjs";
 import {ExpressionSidebarService} from "../../../../services/sidebars/expression-sidebar.service";
 import {ComponentBase} from "../../../common/component-base";
 import {noop} from "../../../../lib/utils.lib";
+import {ExpressionModel} from "cwlts/models/d2sb";
 
 require("./expression-input.component.scss");
 
@@ -18,27 +18,42 @@ require("./expression-input.component.scss");
         }
     ],
     template: `
-            <div class="input-group expression-input-group"
+            <div class="expression-input-group clickable"
                  [class.expr]="isExpr"
+                 [class.warning]="model.validation.warning.length > 0"
+                 [class.error]="model.validation.error.length > 0"
                  (click)="editExpr(isExpr ? 'edit' : null, $event)">
                  
-                <input class="form-control"
-                        #input
-                        [value]="value?.toString()"
-                        [readonly]="isExpr"
-                        (blur)="onTouch()"
-                        (change)="editString(input.value)"/>
-                    
-                <span class="input-group-btn">
-                    <button type="button"
-                        class="btn btn-secondary" 
-                        (click)="editExpr(isExpr ? 'clear' : 'edit', $event)">
-                        <i class="fa"
-                            [ngClass]="{'fa-times': isExpr,
-                                        'fa-code': !isExpr}"></i>
-                    </button>
-                </span>
+                <i class="fa fa-warning expression-icon"
+                    [title]="model.validation.warning.join('\\n')"
+                    *ngIf="model.validation.warning.length > 0"></i>
+                <i class="fa fa-times-circle expression-icon" 
+                    *ngIf="model.validation.error.length > 0"
+                    [title]="model.validation.error.join('\\n')"></i>
+                <b class="expression-icon result"
+                    *ngIf="model.result"
+                    [title]="model.result">E:</b>
+                
+                <div class="input-group">
+                
+                    <input class="form-control"
+                            #input
+                            [value]="value?.toString()"
+                            [readonly]="isExpr"
+                            (blur)="onTouch()"
+                            (change)="editString(input.value)"/>
+                        
+                    <span class="input-group-btn">
+                        <button type="button"
+                            class="btn btn-secondary" 
+                            (click)="editExpr(isExpr ? 'clear' : 'edit', $event)">
+                            <i class="fa"
+                                [ngClass]="{'fa-times': isExpr,
+                                            'fa-code': !isExpr}"></i>
+                        </button>
+                    </span>  
             </div>
+        </div>
         `
 })
 export class ExpressionInputComponent extends ComponentBase implements ControlValueAccessor {

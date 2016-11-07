@@ -144,6 +144,10 @@ export class ExpressionEditorComponent extends ComponentBase implements OnInit, 
         this.tracked = this.evaluateExpression(expr.getScriptForExec())
             .subscribe((result: SandboxResponse) => {
                 this.expression.setValue(this.content, "expression");
+                // @todo(maya) move execution to model
+                const err = result.error ? [result.error] : [];
+                const warn = result.warning ? [result.warning] : [];
+                this.expression.validation = {error: err, warning: warn};
                 this.newValueStream.next(this.expression);
             });
     }
