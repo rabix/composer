@@ -54,6 +54,7 @@ import {TemplateProviderService} from "./app/services/template-provider.service"
 import {PromptComponent} from "./app/components/modal/common/prompt.component";
 import {CheckboxPromptComponent} from "./app/components/modal/common/checkbox-prompt.component";
 import {StandaloneCodeEditorComponent} from "./app/components/standalone-code-editor/standalone-code-editor.component"
+import {CodeEditorDirective} from "./app/directives/code-editor.directive";
 
 @NgModule({
     providers: [
@@ -113,7 +114,8 @@ import {StandaloneCodeEditorComponent} from "./app/components/standalone-code-ed
         ViewModeSwitchComponent,
         WorkboxComponent,
         WorkflowEditorComponent,
-        ToggleComponent
+        ToggleComponent,
+        CodeEditorDirective
     ],
     entryComponents: [
         CheckboxPromptComponent,
