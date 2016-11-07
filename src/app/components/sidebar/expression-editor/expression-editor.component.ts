@@ -12,6 +12,7 @@ import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import TextMode = AceAjax.TextMode;
 import {Expression} from "cwlts/mappings/d2sb/Expression";
+import {Validation} from "cwlts/models/interfaces";
 
 require("./expression-editor.component.scss");
 
@@ -147,7 +148,8 @@ export class ExpressionEditorComponent extends ComponentBase implements OnInit, 
                 // @todo(maya) move execution to model
                 const err = result.error ? [result.error] : [];
                 const warn = result.warning ? [result.warning] : [];
-                this.expression.validation = {error: err, warning: warn};
+                this.expression.validation = <Validation>{error: err, warning: warn};
+                this.expression.result = result.output;
                 this.newValueStream.next(this.expression);
             });
     }
