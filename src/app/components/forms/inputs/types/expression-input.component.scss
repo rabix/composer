@@ -1,23 +1,9 @@
 @import "../../../../../assets/sass/variables";
 
-@mixin selection-border($color) {
-    &:before {
-        content: '';
-        display: block;
-        height: 100%;
-        width: 100%;
-        position: absolute;
-        z-index: 4;
-        top: 0;
-        right: 0;
-        border: 2px solid $color;
-        border-radius: $input-border-radius;
-    }
-}
-
 .expression-input-group {
     position: relative;
-    border-radius: $input-border-radius;
+    border-radius: .38rem; // needs to round to underlying form
+    border: 2px solid transparent;
 
     .input-group-btn button {
         width: 46px;
@@ -45,8 +31,7 @@
 
         &.warning {
             &:hover {
-                @include selection-border($brand-warning);
-
+                border-color: $brand-warning;
             }
 
             .expression-icon {
@@ -56,7 +41,7 @@
 
         &.error {
             &:hover {
-                @include selection-border($brand-danger);
+                border-color: $brand-danger;
             }
 
             .expression-icon {
@@ -65,7 +50,7 @@
         }
 
         &:hover {
-            @include selection-border($gui-section-list-item-hover-border);
+            border-color: $gui-section-list-item-hover-border;
 
             .input-group-btn, input {
                 cursor: pointer;

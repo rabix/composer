@@ -20,9 +20,9 @@ require("./expression-input.component.scss");
     template: `
             <div class="expression-input-group clickable"
                  [class.expr]="isExpr"
+                 (click)="click($event)"
                  [class.warning]="model.validation.warning.length > 0"
-                 [class.error]="model.validation.error.length > 0"
-                 (click)="editExpr(isExpr ? 'edit' : null, $event)">
+                 [class.error]="model.validation.error.length > 0">
                  
                 <i class="fa fa-warning expression-icon"
                     [title]="model.validation.warning.join('\\n')"
@@ -41,6 +41,7 @@ require("./expression-input.component.scss");
                             [value]="value?.toString()"
                             [readonly]="isExpr"
                             (blur)="onTouch()"
+                            (click)="editExpr(isExpr ? 'edit' : null, $event)"
                             (change)="editString(input.value)"/>
                         
                     <span class="input-group-btn">
@@ -130,6 +131,10 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
         super();
     }
 
+    private click(event: Event) {
+        console.log(event);
+    }
+
     /**
      * Callback for setting string value to model
      * @param str
@@ -145,10 +150,12 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
      * @param event
      */
     private editExpr(action: "clear" | "edit", event: Event): void {
+        console.log('clicking');
         if (!action) return;
 
         if (action === "clear") {
             this.model.setValue("", "string");
+            this.model.result = null;
             this.isExpr = false;
             event.stopPropagation();
             this.onChange(this.model);
