@@ -233,7 +233,7 @@ module.exports = webpackMerge(commonConfig, {
     node: {
         global: 'window',
         crypto: 'empty',
-        process: false,
+        process: true, // Jailed sandbox doesn't work if this is false.
         module: false,
         clearImmediate: false,
         setImmediate: false

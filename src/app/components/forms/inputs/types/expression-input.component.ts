@@ -20,7 +20,6 @@ require("./expression-input.component.scss");
     template: `
             <div class="expression-input-group clickable"
                  [class.expr]="isExpr"
-                 (click)="click($event)"
                  [class.warning]="model.validation.warning.length > 0"
                  [class.error]="model.validation.error.length > 0">
                  
@@ -129,10 +128,6 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
 
     constructor(private expressionSidebarService: ExpressionSidebarService) {
         super();
-    }
-
-    private click(event: Event) {
-        console.log(event);
     }
 
     /**
