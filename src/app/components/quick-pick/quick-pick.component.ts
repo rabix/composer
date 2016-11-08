@@ -13,12 +13,14 @@ require("./quick-pick.component.scss");
         ExpressionInputComponent
     ],
     template: `
-        <form [formGroup]="formGroup" class="button-list">
-      
-           <div class="btn-group" data-toggle="buttons" *ngIf="!formGroup.controls['expressionField']">
+        <form [formGroup]="formGroup"
+             class="button-list content-wrapper"
+             *ngIf="!formGroup.controls['expressionField']">
+        
+           <div class="btn-group" data-toggle="buttons">
                 
                 <label *ngFor="let buttonLabel of buttonList" 
-                       [ngClass]="{'active': buttonLabel === selectedItem}"
+                       [ngClass]="{'active': buttonLabel === (currentValue | async)}"
                        class="btn btn-secondary button-item-label">
                        
                         <input type="radio"
@@ -35,7 +37,9 @@ require("./quick-pick.component.scss");
         </form>
         
         
-        <div class="expression-input-wrapper" *ngIf="formGroup.controls['expressionField']">
+        <div class="expression-input-wrapper content-wrapper"
+             *ngIf="formGroup.controls['expressionField']">
+            
             <expression-input class="col-sm-11 expression-input"
                       [control]="formGroup.controls['expressionField']"
                       [isExpression]="!!expressionModel.serialize().script"
@@ -63,7 +67,7 @@ export class QuickPickComponent {
     @Output()
     public onUpdate = new ReplaySubject<string>(1);
 
-    private selectedItem: String;
+    private currentValue = new BehaviorSubject<string>(undefined);
 
     private expressionModel: ExpressionModel;
 
@@ -71,7 +75,9 @@ export class QuickPickComponent {
 
     private subs: Subscription[] = [];
 
-    constructor(private expressionSidebarService: ExpressionSidebarService) { }
+    constructor(private expressionSidebarService: ExpressionSidebarService) {
+
+    }
 
     ngOnInit() {
         this.formGroup.addControl(
@@ -80,9 +86,16 @@ export class QuickPickComponent {
 
         this.subs.push(
             this.formGroup.controls["radioButtonControl"].valueChanges.subscribe((value: string) => {
-                this.selectedItem = value;
-                this.onUpdate.next(value);
+                this.currentValue.next(value);
             })
+        );
+
+        this.subs.push(
+            this.currentValue
+                .filter(value => value !== undefined)
+                .subscribe((value: string) => {
+                    this.onUpdate.next(value);
+                })
         );
     }
 
@@ -91,6 +104,7 @@ export class QuickPickComponent {
             return;
         }
 
+        this.formGroup.controls["radioButtonControl"].setValue("");
         this.expressionModel = new ExpressionModel("");
 
         this.formGroup.addControl(
@@ -140,16 +154,16 @@ export class QuickPickComponent {
         this.formGroup.controls["expressionField"].setValue(this.expressionModel.getExpressionScript());
     }
 
+    private updateExpressionValue(expressionModel: ExpressionModel) {
+        this.expressionModel = expressionModel;
+        this.currentValue.next(this.expressionModel.getExpressionScript());
+    }
+
     private removeExpressionInputSub(): void {
         if (this.expressionInputSub) {
             this.expressionInputSub.unsubscribe();
             this.expressionInputSub = undefined;
         }
-    }
-
-    private updateExpressionValue(expressionModel: ExpressionModel) {
-        this.expressionModel = expressionModel;
-        this.onUpdate.next(this.expressionModel.getExpressionScript());
     }
 
     ngOnDestroy(): void {
