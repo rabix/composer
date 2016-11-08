@@ -15,12 +15,12 @@ require("./quick-pick.component.scss");
     template: `
         <form [formGroup]="formGroup"
              class="button-list content-wrapper"
-             *ngIf="!formGroup.controls['expressionField']">
+             *ngIf="!formGroup.controls['expressionField'] && formGroup.controls['radioButtonControl']">
         
            <div class="btn-group" data-toggle="buttons">
                 
                 <label *ngFor="let buttonLabel of buttonList" 
-                       [ngClass]="{'active': buttonLabel === (currentValue | async)}"
+                       [ngClass]="{'active': buttonLabel === formGroup.controls['radioButtonControl'].value}"
                        class="btn btn-secondary button-item-label">
                        
                         <input type="radio"
@@ -67,8 +67,6 @@ export class QuickPickComponent {
     @Output()
     public onUpdate = new ReplaySubject<string>(1);
 
-    private currentValue = new BehaviorSubject<string>(undefined);
-
     private expressionModel: ExpressionModel;
 
     private expressionInputSub: Subscription;
@@ -81,21 +79,13 @@ export class QuickPickComponent {
 
     ngOnInit() {
         this.formGroup.addControl(
-            "radioButtonControl", new FormControl()
+            "radioButtonControl", new FormControl("")
         );
 
         this.subs.push(
             this.formGroup.controls["radioButtonControl"].valueChanges.subscribe((value: string) => {
-                this.currentValue.next(value);
+                this.onUpdate.next(value);
             })
-        );
-
-        this.subs.push(
-            this.currentValue
-                .filter(value => value !== undefined)
-                .subscribe((value: string) => {
-                    this.onUpdate.next(value);
-                })
         );
     }
 
@@ -156,7 +146,7 @@ export class QuickPickComponent {
 
     private updateExpressionValue(expressionModel: ExpressionModel) {
         this.expressionModel = expressionModel;
-        this.currentValue.next(this.expressionModel.getExpressionScript());
+        this.onUpdate.next(this.expressionModel.getExpressionScript());
     }
 
     private removeExpressionInputSub(): void {
