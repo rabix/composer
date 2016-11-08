@@ -57,12 +57,10 @@ require("./tool-editor.component.scss");
                          [data]="data"></tool-header>
         
             <div class="scroll-content">
-            <div class="code-editor-container">
-                <div class="editor"
-                     code-editor 
+                <div code-editor
+                     class="editor flex-fill"
                      [content]="rawEditorContent" 
                      [language]="data.language | async"></div>
-            </div>
                      
                 <!--<ct-code-editor [hidden]="viewMode !== 'code'"-->
                                 <!--[content]="rawEditorContent"-->

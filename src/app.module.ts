@@ -55,6 +55,8 @@ import {PromptComponent} from "./app/components/modal/common/prompt.component";
 import {CheckboxPromptComponent} from "./app/components/modal/common/checkbox-prompt.component";
 import {StandaloneCodeEditorComponent} from "./app/components/standalone-code-editor/standalone-code-editor.component"
 import {CodeEditorDirective} from "./app/directives/code-editor.directive";
+import {OutputPortsComponent} from "./app/components/clt-editor/output-ports/output-ports.component";
+import {ToolEditorModule} from "./app/tool-editor/tool-editor.module";
 
 @NgModule({
     providers: [
@@ -115,7 +117,8 @@ import {CodeEditorDirective} from "./app/directives/code-editor.directive";
         WorkboxComponent,
         WorkflowEditorComponent,
         ToggleComponent,
-        CodeEditorDirective
+        CodeEditorDirective,
+        OutputPortsComponent,
     ],
     entryComponents: [
         CheckboxPromptComponent,
@@ -127,7 +130,7 @@ import {CodeEditorDirective} from "./app/directives/code-editor.directive";
         PromptComponent
     ],
     providers: [ModalService, TemplateProviderService],
-    imports: [BrowserModule, FormsModule, HttpModule, ReactiveFormsModule],
+    imports: [BrowserModule, FormsModule, HttpModule, ReactiveFormsModule, ToolEditorModule],
     bootstrap: [MainComponent]
 })
 export class AppModule {

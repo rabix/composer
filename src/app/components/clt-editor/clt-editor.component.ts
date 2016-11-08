@@ -6,6 +6,7 @@ import {BaseCommandFormComponent} from "../forms/inputs/forms/base-command-form.
 import {InputPortsFormComponent} from "../forms/inputs/forms/input-ports-form.component";
 import {CommandLineToolModel} from "cwlts/models/d2sb";
 import {Subscription, ReplaySubject} from "rxjs";
+import {OutputPortsComponent} from "./output-ports/output-ports.component";
 
 require("./clt-editor.component.scss");
 
@@ -16,6 +17,7 @@ require("./clt-editor.component.scss");
         BaseCommandFormComponent,
         InputPortsFormComponent,
         CommandLineComponent,
+        OutputPortsComponent,
     ],
     template: `
             <form class="clt-editor-group" [formGroup]="cltEditorGroup">
@@ -33,12 +35,15 @@ require("./clt-editor.component.scss");
                 </base-command-form>
                 
                 <inputs-ports-form [cltModel]="model"></inputs-ports-form>
+                <ct-output-ports [formGroup]="cltEditorGroup.controls.outputPortsGroup"></ct-output-ports>
+                
+                
             </form>
 
             <sidebar-component></sidebar-component>
     `
 })
-export class CltEditorComponent implements OnDestroy{
+export class CltEditorComponent implements OnDestroy {
 
     @Input()
     public model: CommandLineToolModel;
@@ -55,8 +60,10 @@ export class CltEditorComponent implements OnDestroy{
         this.cltEditorGroup = this.formBuilder.group({
             dockerInputGroup: this.formBuilder.group({}),
             baseCommandGroup: this.formBuilder.group({}),
-            inputPortsGroup: this.formBuilder.group({})
+            inputPortsGroup: this.formBuilder.group({}),
+            outputPortsGroup: this.formBuilder.group({})
         });
+
 
         // very elementary dirty checking for tool editor form
         this.subs.push(this.cltEditorGroup.valueChanges

@@ -11,3 +11,9 @@ ct-clt-editor {
         width: 60%;
     }
 }
+
+ct-output-ports {
+    display: block;
+    border-left: 6px solid $output-port-color;
+}
+
