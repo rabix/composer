@@ -6,7 +6,6 @@ import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {ExpressionSidebarService} from "../../../../services/sidebars/expression-sidebar.service";
 import {Expression} from "cwlts/mappings/d2sb/Expression";
 import {SandboxService} from "../../../../services/sandbox/sandbox.service";
-import {BasicInputSectionComponent} from "../basic-section/basic-input-section.component";
 import {ToggleComponent} from "../../../common/toggle-slider/toggle-slider.component";
 import {InputInspectorData, InputSidebarService} from "../../../../services/sidebars/input-sidebar.service";
 

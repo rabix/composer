@@ -58,7 +58,7 @@ export class SBPublicAppsPanelComponent {
                                 contentData: {
                                     data: app,
                                     isWritable: false,
-                                    content: this.platform.getAppCWL(app).switchMap(cwl => new BehaviorSubject(cwl)),
+                                    content: Observable.of(1).switchMap(_ => this.platform.getAppCWL(app)).switchMap(cwl => new BehaviorSubject(cwl)).share(),
                                     language: Observable.of("json")
                                 }
                             }));

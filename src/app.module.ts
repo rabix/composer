@@ -53,6 +53,13 @@ import {NewFileModalComponent} from "./app/components/modal/custom/new-file-moda
 import {TemplateProviderService} from "./app/services/template-provider.service";
 import {PromptComponent} from "./app/components/modal/common/prompt.component";
 import {CheckboxPromptComponent} from "./app/components/modal/common/checkbox-prompt.component";
+import {StandaloneCodeEditorComponent} from "./app/components/standalone-code-editor/standalone-code-editor.component";
+import {CodeEditorDirective} from "./app/directives/code-editor.directive";
+import {OutputPortsComponent} from "./app/components/clt-editor/output-ports/output-ports.component";
+import {ToolEditorModule} from "./app/tool-editor/tool-editor.module";
+import {CoreModule} from "./app/core/core.module";
+import {CWLModule} from "./app/cwl/cwl.module";
+import {HintListComponent} from "./app/components/clt-editor/hints/hint-list.component";
 import {StandaloneCodeEditorComponent} from "./app/components/standalone-code-editor/standalone-code-editor.component"
 import {QuickPickComponent} from "./app/components/quick-pick/quick-pick.component";
 import {CompactListComponent} from "./app/components/compact-list/compact-list.component";
@@ -66,10 +73,12 @@ import {ContenteditableDirective} from "./app/components/compact-list/directive/
     declarations: [
         AlertComponent,
         BaseCommandFormComponent,
+        BasicInputSectionComponent,
         BlockLoaderComponent,
         CheckboxPromptComponent,
         CltEditorComponent,
         CodeEditorComponent,
+        CodeEditorDirective,
         CommandLineComponent,
         ConfirmComponent,
         ContextDirective,
@@ -78,9 +87,9 @@ import {ContenteditableDirective} from "./app/components/compact-list/directive/
         ExpressionEditorSidebarComponent,
         ExpressionInputComponent,
         FormSectionComponent,
+        HintListComponent,
         InputComponent,
         InputInspectorComponent,
-        BasicInputSectionComponent,
         InputInspectorSidebarComponent,
         InputPortListComponent,
         InputPortsFormComponent,
@@ -91,6 +100,7 @@ import {ContenteditableDirective} from "./app/components/compact-list/directive/
         MenuItemComponent,
         ModalComponent,
         NewFileModalComponent,
+        OutputPortsComponent,
         PanelComponent,
         PanelContainerComponent,
         PanelHandleComponent,
@@ -108,6 +118,7 @@ import {ContenteditableDirective} from "./app/components/compact-list/directive/
         StandaloneCodeEditorComponent,
         StructurePanelComponent,
         TabManagerComponent,
+        ToggleComponent,
         ToolEditorComponent,
         ToolHeaderComponent,
         TreeNodeComponent,
@@ -131,7 +142,15 @@ import {ContenteditableDirective} from "./app/components/compact-list/directive/
         PromptComponent
     ],
     providers: [ModalService, TemplateProviderService],
-    imports: [BrowserModule, FormsModule, HttpModule, ReactiveFormsModule],
+    imports: [
+        BrowserModule,
+        CoreModule,
+        CWLModule,
+        FormsModule,
+        HttpModule,
+        ReactiveFormsModule,
+        ToolEditorModule,
+    ],
     bootstrap: [MainComponent]
 })
 export class AppModule {

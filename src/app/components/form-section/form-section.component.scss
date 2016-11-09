@@ -8,10 +8,20 @@
   padding: $gui-section-padding;
   border: 1px solid $gui-section-border;
 
+  .gui-section-list-title {
+    font-family: $font-family-title;
+    font-size: $font-size-sm;
+    font-weight: 400;
+    text-transform: uppercase;
+  }
+
   .gui-section-header {
+    font-family: $font-family-title;
     color: $gui-section-header-color;
     margin: 0;
-    font-size: 1.25rem;
+    font-size: $font-size-base;
+    font-weight: 400;
+    text-transform: uppercase;
   }
 
   .gui-section-body {

@@ -57,13 +57,15 @@ require("./tool-editor.component.scss");
                          [data]="data"></tool-header>
         
             <div class="scroll-content">
-                <ct-code-editor [hidden]="viewMode !== 'code'"
-                                [content]="rawEditorContent"
-                                [readOnly]="!data.isWritable"
-                                [language]="data.language"></ct-code-editor>
-        
+                <div code-editor
+                     class="editor flex-fill"
+                     [content]="rawEditorContent"
+                     [readonly]="!data.isWritable"
+                     [language]="data.language | async"></div>
+                     
                 <ct-clt-editor *ngIf="viewMode === 'gui'"
                                class="gui-editor-component"
+                               [readonly]="!data.isWritable"
                                (isDirty)="modelChanged = $event"
                                [model]="toolModel"></ct-clt-editor>
             </div>
@@ -152,7 +154,6 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
         this.tracked = this.webWorkerService.validationResultStream.subscribe(this.schemaValidation);
 
         this.tracked = this.webWorkerService.validationResultStream.subscribe(err => {
-            console.log('validation', err);
             this.isValidCWL = err.isValidCwl;
         });
     }
