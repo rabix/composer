@@ -4,6 +4,8 @@ import {ExpressionInputComponent} from "../forms/inputs/types/expression-input.c
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {BehaviorSubject, Subscription, ReplaySubject} from "rxjs";
 import {ExpressionSidebarService} from "../../services/sidebars/expression-sidebar.service";
+import {ComponentBase} from "../common/component-base";
+import {Expression} from "cwlts/mappings/d2sb/Expression";
 
 require("./quick-pick.component.scss");
 
@@ -53,7 +55,7 @@ require("./quick-pick.component.scss");
         </div>
     `
 })
-export class QuickPickComponent {
+export class QuickPickComponent extends ComponentBase {
 
     @Input()
     public buttonList: String[];
@@ -71,10 +73,8 @@ export class QuickPickComponent {
 
     private expressionInputSub: Subscription;
 
-    private subs: Subscription[] = [];
-
     constructor(private expressionSidebarService: ExpressionSidebarService) {
-
+        super();
     }
 
     ngOnInit() {
@@ -82,11 +82,9 @@ export class QuickPickComponent {
             "radioButtonControl", new FormControl("")
         );
 
-        this.subs.push(
-            this.formGroup.controls["radioButtonControl"].valueChanges.subscribe((value: string) => {
-                this.onUpdate.next(value);
-            })
-        );
+        this.tracked = this.formGroup.controls["radioButtonControl"].valueChanges.subscribe((value: string) => {
+            this.onUpdate.next(value);
+        });
     }
 
     private crateExpressionInput(): void {
@@ -102,13 +100,13 @@ export class QuickPickComponent {
             new FormControl(this.expressionModel.serialize(), Validators.compose([Validators.required, Validators.minLength(1)]))
         );
 
-        this.subs.push(
-            this.formGroup.controls["expressionField"].valueChanges
-                .debounceTime(300)
-                .subscribe((value: string) => {
+        this.tracked = this.formGroup.controls["expressionField"].valueChanges
+            .debounceTime(300)
+            .subscribe((value: string) => {
+                if (!(<Expression>this.expressionModel.serialize()).script) {
                     this.updateExpressionValue(new ExpressionModel(value));
-                })
-        );
+                }
+            });
     }
 
     private removeExpressionInput(): void {
@@ -124,12 +122,7 @@ export class QuickPickComponent {
             .filter(expression => expression !== undefined)
             .subscribe((expression: ExpressionModel) => {
                 this.updateExpressionValue(expression);
-
-                this.formGroup.controls["expressionField"].setValue(
-                    this.expressionModel.getExpressionScript(), {
-                        onlySelf: true,
-                        emitEvent: false,
-                    });
+                this.formGroup.controls["expressionField"].setValue(this.expressionModel.getExpressionScript());
             });
 
         this.expressionSidebarService.openExpressionEditor({
@@ -158,6 +151,6 @@ export class QuickPickComponent {
 
     ngOnDestroy(): void {
         this.removeExpressionInputSub();
-        this.subs.forEach(sub => sub.unsubscribe());
+        super.ngOnDestroy();
     }
 }
