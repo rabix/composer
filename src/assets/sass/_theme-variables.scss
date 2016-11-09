@@ -48,11 +48,13 @@ $editor-color: $text-dark;
 /**
  * RESULTING COMMAND LINE
  */
+$uncoded-color: $text-dark;
 $console-default-color: $text-light;
 $base-cmd-color: #7AC24D;
 $input-port-color: #A77ED7;
-$output-port-color: #50b1fd;
+$output-port-color: $uncoded-color;
 $arg-color: #FDA365;
+
 
 /**
  * FILE TABS

@@ -157,7 +157,6 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
         this.tracked = this.webWorkerService.validationResultStream.subscribe(this.schemaValidation);
 
         this.tracked = this.webWorkerService.validationResultStream.subscribe(err => {
-            console.log('validation', err);
             this.isValidCWL = err.isValidCwl;
         });
     }

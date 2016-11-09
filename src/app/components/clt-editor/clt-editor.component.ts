@@ -35,7 +35,8 @@ require("./clt-editor.component.scss");
                 </base-command-form>
                 
                 <inputs-ports-form [cltModel]="model"></inputs-ports-form>
-                <ct-output-ports [formGroup]="cltEditorGroup.controls.outputPortsGroup"></ct-output-ports>
+                
+                <ct-output-ports [entries]="model.outputs"></ct-output-ports>
                 
                 
             </form>
@@ -61,7 +62,6 @@ export class CltEditorComponent implements OnDestroy {
             dockerInputGroup: this.formBuilder.group({}),
             baseCommandGroup: this.formBuilder.group({}),
             inputPortsGroup: this.formBuilder.group({}),
-            outputPortsGroup: this.formBuilder.group({})
         });
 
 
@@ -69,7 +69,8 @@ export class CltEditorComponent implements OnDestroy {
         this.subs.push(this.cltEditorGroup.valueChanges
             .map(_ => this.cltEditorGroup.dirty)
             .distinctUntilChanged()
-            .subscribe(this.isDirty));
+            .subscribe(this.isDirty)
+        );
     }
 
     private setBaseCommand(cmd) {
