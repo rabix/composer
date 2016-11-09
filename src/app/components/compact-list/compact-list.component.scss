@@ -1,0 +1,31 @@
+@import "../../../assets/sass/variables";
+
+.compact-list-form {
+
+}
+
+.compact-list-wrapper {
+    border: 1px solid $border-color;
+    padding: 5px;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.input-tag-list {
+    display: block;
+    min-height: 20px;
+}
+
+.tag-pill {
+    float: left;
+}
+
+.tag-input {
+    border: 0;
+    float: left;
+    display: block;
+
+    &:focus {
+        outline: none;
+    }
+}
