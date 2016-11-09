@@ -59,6 +59,7 @@ import {OutputPortsComponent} from "./app/components/clt-editor/output-ports/out
 import {ToolEditorModule} from "./app/tool-editor/tool-editor.module";
 import {CoreModule} from "./app/core/core.module";
 import {CWLModule} from "./app/cwl/cwl.module";
+import {HintListComponent} from "./app/components/clt-editor/hints/hint-list.component";
 
 @NgModule({
     providers: [
@@ -68,10 +69,12 @@ import {CWLModule} from "./app/cwl/cwl.module";
     declarations: [
         AlertComponent,
         BaseCommandFormComponent,
+        BasicInputSectionComponent,
         BlockLoaderComponent,
         CheckboxPromptComponent,
         CltEditorComponent,
         CodeEditorComponent,
+        CodeEditorDirective,
         CommandLineComponent,
         ConfirmComponent,
         ContextDirective,
@@ -80,9 +83,9 @@ import {CWLModule} from "./app/cwl/cwl.module";
         ExpressionEditorSidebarComponent,
         ExpressionInputComponent,
         FormSectionComponent,
+        HintListComponent,
         InputComponent,
         InputInspectorComponent,
-        BasicInputSectionComponent,
         InputInspectorSidebarComponent,
         InputPortListComponent,
         InputPortsFormComponent,
@@ -93,6 +96,7 @@ import {CWLModule} from "./app/cwl/cwl.module";
         MenuItemComponent,
         ModalComponent,
         NewFileModalComponent,
+        OutputPortsComponent,
         PanelComponent,
         PanelContainerComponent,
         PanelHandleComponent,
@@ -110,6 +114,7 @@ import {CWLModule} from "./app/cwl/cwl.module";
         StandaloneCodeEditorComponent,
         StructurePanelComponent,
         TabManagerComponent,
+        ToggleComponent,
         ToolEditorComponent,
         ToolHeaderComponent,
         TreeNodeComponent,
@@ -118,9 +123,6 @@ import {CWLModule} from "./app/cwl/cwl.module";
         ViewModeSwitchComponent,
         WorkboxComponent,
         WorkflowEditorComponent,
-        ToggleComponent,
-        CodeEditorDirective,
-        OutputPortsComponent,
     ],
     entryComponents: [
         CheckboxPromptComponent,

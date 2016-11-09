@@ -36,9 +36,9 @@ require("./clt-editor.component.scss");
                 
                 <inputs-ports-form [cltModel]="model"></inputs-ports-form>
                 
-                <ct-output-ports [entries]="model.outputs" [readonly]="readonly"></ct-output-ports>
+                <ct-output-ports [entries]="model.outputs || []" [readonly]="readonly"></ct-output-ports>
                 
-                
+                <ct-hint-list [entries]="model.hints || []" [readonly]="readonly"></ct-hint-list>
             </form>
 
             <sidebar-component></sidebar-component>

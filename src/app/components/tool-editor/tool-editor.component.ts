@@ -63,11 +63,6 @@ require("./tool-editor.component.scss");
                      [readonly]="!data.isWritable"
                      [language]="data.language | async"></div>
                      
-                <!--<ct-code-editor [hidden]="viewMode !== 'code'"-->
-                                <!--[content]="rawEditorContent"-->
-                                <!--[readOnly]="!data.isWritable"-->
-                                <!--[language]="data.language"></ct-code-editor>-->
-        
                 <ct-clt-editor *ngIf="viewMode === 'gui'"
                                class="gui-editor-component"
                                [readonly]="!data.isWritable"

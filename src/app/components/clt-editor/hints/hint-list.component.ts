@@ -1,40 +1,30 @@
 import {Component, Input} from "@angular/core";
 import {ComponentBase} from "../../common/component-base";
-import {CommandOutputParameter} from "cwlts";
-import {CommandOutputTypePipe} from "../../../cwl/pipes/command-output-type.pipe";
-import {CommandOutputGlobPipe} from "../../../cwl/pipes/command-output-glob.pipe";
 
 @Component({
-    selector: "ct-output-ports",
-    directives: [CommandOutputTypePipe, CommandOutputGlobPipe],
+    selector: "ct-hint-list",
     template: `
         <ct-form-section>
-            <div class="tc-header">Output Ports</div>
+            <div class="tc-header">Hints</div>
             <div class="tc-body">
-                
+               
                 <div *ngIf="entries.length === 0">
-                    No output ports have been set yet.
+                    No execution hints specified.
                 </div>
      
                 <div *ngIf="entries.length" class="gui-section-list-title">
-                    <div class="col-sm-4">ID</div>
-                    <div class="col-sm-3">Type</div>
-                    <div class="col-sm-5">Glob</div>
+                    <div class="col-sm-5">Class</div>
+                    <div class="col-sm-7">Value</div>
                 </div>
             
                 <ul class="gui-section-list">
                     <li *ngFor="let entry of entries; let i = index"
                         class="gui-section-list-item clickable">
                         
-                        <div class="col-sm-4 ellipsis" [title]="entry?.id">{{ entry?.id }}</div>
-                        <div class="col-sm-3 ellipsis" [title]="entry?.type">{{ entry?.type | commandOutputType}}</div>
-                        <div [ngClass]="{
-                            'col-sm-4': !readonly,
-                            'col-sm-5': readonly
-                        }" class="ellipsis">{{ entry?.outputBinding?.glob | commandOutputGlob }}</div>
+                        <div class="col-sm-5 ellipsis">{{ entry?.class }}</div>
                         
-                                
-            
+                        <div class="ellipsis col-sm-6" [class.col-sm-7]="readonly">{{ entry?.value }}</div>
+                        
                         <div *ngIf="!readonly" class="col-sm-1 align-right">
                             <i title="Delete" class="fa fa-trash text-hover-danger" (click)="removeEntry(index)"></i>
                         </div>
@@ -53,11 +43,11 @@ import {CommandOutputGlobPipe} from "../../../cwl/pipes/command-output-glob.pipe
         </ct-form-section>
     `
 })
-export class OutputPortsComponent extends ComponentBase {
+export class HintListComponent extends ComponentBase {
 
     /** List of entries that should be shown */
     @Input()
-    public entries: CommandOutputParameter[] = [];
+    public entries: {"class": string, value: string}[] = [];
 
     @Input()
     public readonly = false;
