@@ -54,6 +54,7 @@ export class PlatformAPI {
                     })
                 })).subscribe(
                 res => {
+                    console.log("Pushing session ID");
                     this.sessionID.next(res.json().message.session_id);
                 });
         });
@@ -131,14 +132,18 @@ export class PlatformAPI {
         })))).first();
     }
 
-    public getAppCWL(app) {
+    public getAppCWL(app, revision: number) {
 
-        return this.sessionID.switchMap(sessionID => this.http.get(`${this.platformServices.brood}/raw/${app["sbg:id"]}`, {
+        const id = app["sbg:id"].split("/").slice(0, -1).concat(revision).filter(x => x !== undefined).join("/");
+
+        return this.sessionID.switchMap(sessionID => this.http.get(`${this.platformServices.brood}/raw/${id}`, {
             headers: new Headers({
                 "session-id": sessionID
             })
             // Platform CWL files don't come with newlines
-        })).map(r => JSON.stringify(r.json(), null, 4));
+        })).map(r => {
+            return JSON.stringify(r.json(), null, 4)
+        });
     }
 
     public getPublicApps() {

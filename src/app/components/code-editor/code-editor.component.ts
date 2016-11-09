@@ -33,7 +33,7 @@ export class CodeEditorComponent extends ComponentBase implements OnInit, OnDest
 
     /** Reference to the element in which we want to instantiate the Ace editor */
     @ViewChild("ace")
-    private aceContainer: ElementRef;
+    private editorAnchor: ElementRef;
 
     constructor() {
         super();
@@ -41,9 +41,10 @@ export class CodeEditorComponent extends ComponentBase implements OnInit, OnDest
 
     ngOnInit(): any {
 
+
         // Instantiate the editor and give it the stream through which the file will come through
         this.editor = new CodeEditor(
-            ace.edit(this.aceContainer.nativeElement),
+            ace.edit(this.editorAnchor.nativeElement),
             this.rawInput,
             this.language,
             {

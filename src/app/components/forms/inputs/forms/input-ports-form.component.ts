@@ -15,8 +15,8 @@ require("./input-ports-form.component.scss");
     directives: [InputPortListComponent, FormSectionComponent],
     template: `
 <ct-form-section>
-    <div class="fs-header">Input Ports</div>
-    <div class="fs-body">
+    <div class="tc-header">Input Ports</div>
+    <div class="tc-body">
         <form>
             <input-port-list [context]="context" 
                             [selectedIndex]="selectedIndex"></input-port-list>
