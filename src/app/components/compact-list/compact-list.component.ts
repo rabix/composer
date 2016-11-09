@@ -18,12 +18,12 @@ require("./compact-list.component.scss");
                 <div class="input-tag-list">
                     <span *ngFor="let tag of tagList"
                           class="tag tag-pill tag-default">{{tag}}</span>
-                          
-                    
+                                              
                     <span #tagInput 
                           contenteditable="true"
                           class="tag-input"
-                          [(contenteditableModel)]="tagInputValue"
+                          *ngIf="formGroup.controls['compactListControl']"
+                          [formControl]="formGroup.controls['compactListControl']"
                           (keydown)="updateTagList($event)"></span>
                 </div>
             </div>
@@ -53,15 +53,13 @@ export class CompactListComponent extends ComponentBase {
 
     private tagList: string[] = ["asdasd.txt"];
 
-    private tagInputValue: string = "";
-
     constructor(private renderer: Renderer) {
         super();
     }
 
     ngOnInit(): void {
         this.formGroup.addControl(
-            "compactListForm", new FormControl("")
+            "compactListControl", new FormControl("")
         );
     }
 
@@ -76,7 +74,7 @@ export class CompactListComponent extends ComponentBase {
                 event.preventDefault();
             }
 
-            this.addTagToList(this.tagInputValue);
+            this.addTagToList(this.formGroup.controls["compactListControl"].value);
         }
     }
 
@@ -88,7 +86,7 @@ export class CompactListComponent extends ComponentBase {
             this.tagList.push(trimmedValue);
             this.onUpdate.next(this.tagList);
 
-            this.tagInputValue = "";
+            this.formGroup.controls["compactListControl"].setValue("");
         }
     }
 

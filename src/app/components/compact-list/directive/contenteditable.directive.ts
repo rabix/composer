@@ -1,36 +1,46 @@
-import {Directive, Input, Output, OnChanges, EventEmitter, ElementRef} from "@angular/core";
+import {Directive, ElementRef, forwardRef} from "@angular/core";
+import {ControlValueAccessor, NG_VALUE_ACCESSOR, NG_VALIDATORS, FormControl} from "@angular/forms";
 
 @Directive({
     selector: '[contenteditable]',
+    providers: [
+        { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ContenteditableDirective), multi: true },
+        { provide: NG_VALIDATORS, useExisting: forwardRef(() => ContenteditableDirective), multi: true }
+    ],
     host: {
         '(keydown)': 'onKeyDown($event)',
         '(keyup)': 'onKeyUp()'
     }
 })
-export class ContenteditableDirective implements OnChanges {
-    @Input()
-    public contenteditableModel: any;
+export class ContenteditableDirective implements ControlValueAccessor {
 
-    @Output()
-    public contenteditableModelChange = new EventEmitter();
+    private onChange = (_) => { };
+    private onTouched = () => { };
 
-    private lastViewModel: any;
+    private validateFn: any = () => {};
 
-    constructor(private elRef: ElementRef) { }
+    private lastValue: any;
 
-    ngOnChanges(changes): void {
-        const changedProp = changes['contenteditableModel'];
+    constructor(private elRef: ElementRef) {
 
-        if (this.lastViewModel !== changedProp.currentValue) {
-            this.lastViewModel = changedProp.currentValue;
-            this.refreshView();
-        }
+    }
+
+    private writeValue(value: any): void {
+        this.elRef.nativeElement.innerText = value;
+        this.onChange(this.elRef.nativeElement.innerText);
+    }
+
+    private registerOnChange(fn: (_: any) => void): void {
+        this.onChange = fn;
+    }
+
+    private registerOnTouched(fn: () => void): void {
+        this.onTouched = fn;
     }
 
     private onKeyUp(): void {
-        const value = this.elRef.nativeElement.innerText;
-        this.lastViewModel = value;
-        this.contenteditableModelChange.emit(value);
+        this.lastValue = this.elRef.nativeElement.innerText;
+        this.onChange(this.elRef.nativeElement.innerText);
     }
 
     private onKeyDown(event): void {
@@ -42,7 +52,7 @@ export class ContenteditableDirective implements OnChanges {
         }
     }
 
-    private refreshView(): void {
-        this.elRef.nativeElement.innerText = this.contenteditableModel;
+    validate(c: FormControl) {
+        return this.validateFn(c);
     }
 }

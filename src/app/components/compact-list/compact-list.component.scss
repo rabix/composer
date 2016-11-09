@@ -14,16 +14,22 @@
 .input-tag-list {
     display: block;
     min-height: 20px;
-}
 
-.tag-pill {
-    float: left;
+    .tag-pill {
+        padding: 5px;
+        float: left;
+        font-size: 0.9rem;
+        font-weight: 100;
+        margin: 3px;
+    }
 }
 
 .tag-input {
     border: 0;
     float: left;
     display: block;
+    margin: 3px;
+    cursor: text;
 
     &:focus {
         outline: none;
