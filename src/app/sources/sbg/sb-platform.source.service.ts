@@ -1,8 +1,8 @@
-import {Observable, BehaviorSubject} from "rxjs";
-import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
-import {DataEntrySource, SB_PLATFORM_SOURCE_ID} from "../common/interfaces";
-import {PlatformAppEntry, PlatformProjectEntry} from "../../services/api/platforms/platform-api.types";
 import {Injectable} from "@angular/core";
+import {Observable, ReplaySubject} from "rxjs";
+import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
+import {DataEntrySource} from "../common/interfaces";
+import {PlatformProjectEntry} from "../../services/api/platforms/platform-api.types";
 
 @Injectable()
 export class SBPlatformDataSourceService {
@@ -36,7 +36,7 @@ export class SBPlatformDataSourceService {
                 type: "file",
                 language: Observable.of("json"),
                 isWritable: project.membership.write,
-                content: this.platform.getAppCWL(app).switchMap(cwl => new BehaviorSubject(cwl)),
+                content: Observable.of(1).switchMap(_ => this.platform.getAppCWL(app)).publishReplay().refCount(),
                 save: (jsonContent, revisionNote) => {
                     return this.platform.saveApp(jsonContent, revisionNote);
                 }

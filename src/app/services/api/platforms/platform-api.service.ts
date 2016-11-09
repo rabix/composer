@@ -131,9 +131,12 @@ export class PlatformAPI {
         })))).first();
     }
 
-    public getAppCWL(app) {
+    public getAppCWL(app, revision: number) {
 
-        return this.sessionID.switchMap(sessionID => this.http.get(`${this.platformServices.brood}/raw/${app["sbg:id"]}`, {
+        const id = app["sbg:id"].split("/").slice(0, -1).concat(revision).filter(x => x !== undefined).join("/");
+
+        console.log("Getting", id);
+        return this.sessionID.switchMap(sessionID => this.http.get(`${this.platformServices.brood}/raw/${id}`, {
             headers: new Headers({
                 "session-id": sessionID
             })
