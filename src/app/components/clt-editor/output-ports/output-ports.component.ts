@@ -30,15 +30,24 @@ import {CommandOutputGlobPipe} from "../../../cwl/pipes/command-output-glob.pipe
                         
                         <div class="col-sm-4 ellipsis" [title]="entry?.id">{{ entry?.id }}</div>
                         <div class="col-sm-3 ellipsis" [title]="entry?.type">{{ entry?.type | commandOutputType}}</div>
-                        <div class="col-sm-4 ellipsis">{{ entry?.outputBinding?.glob | commandOutputGlob }}</div>
+                        <div [ngClass]="{
+                            'col-sm-4': !readonly,
+                            'col-sm-5': readonly
+                        }" class="ellipsis">{{ entry?.outputBinding?.glob | commandOutputGlob }}</div>
+                        
+                                
             
-                        <div class="col-sm-1 align-right">
+                        <div *ngIf="!readonly" class="col-sm-1 align-right">
                             <i title="Delete" class="fa fa-trash text-hover-danger" (click)="removeEntry(index)"></i>
                         </div>
                     </li>
                 </ul>
                 
-                <button (click)="addEntry()" type="button" class="btn btn-link pull-right no-outline no-underline-hover">
+                <button *ngIf="!readonly" 
+                        (click)="addEntry()" 
+                        type="button" 
+                        class="btn btn-link pull-right no-outline no-underline-hover">
+                        
                     <i class="fa fa-plus"></i> Add Output
                 </button>
             </div>
@@ -50,13 +59,16 @@ export class OutputPortsComponent extends ComponentBase {
 
     /** List of entries that should be shown */
     @Input()
-    private entries: CommandOutputParameter[] = [];
+    public entries: CommandOutputParameter[] = [];
+
+    @Input()
+    public readonly = false;
 
     private addEntry() {
         this.entries.push({} as any);
     }
 
     private removeEntry(index) {
-        this.entries.slice(index, 1);
+        this.entries.splice(index, 1);
     }
 }

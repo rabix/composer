@@ -59,7 +59,8 @@ require("./tool-editor.component.scss");
             <div class="scroll-content">
                 <div code-editor
                      class="editor flex-fill"
-                     [content]="rawEditorContent" 
+                     [content]="rawEditorContent"
+                     [readonly]="!data.isWritable"
                      [language]="data.language | async"></div>
                      
                 <!--<ct-code-editor [hidden]="viewMode !== 'code'"-->
@@ -69,6 +70,7 @@ require("./tool-editor.component.scss");
         
                 <ct-clt-editor *ngIf="viewMode === 'gui'"
                                class="gui-editor-component"
+                               [readonly]="!data.isWritable"
                                (isDirty)="modelChanged = $event"
                                [model]="toolModel"></ct-clt-editor>
             </div>

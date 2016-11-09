@@ -90,7 +90,10 @@ export class CodeEditorDirective extends ComponentBase {
     private editor: Editor;
 
     @Input()
-    private options: AceEditorOptions = {};
+    public options: AceEditorOptions = {};
+
+    @Input()
+    public readonly = false;
 
     constructor(private elementRef: ElementRef) {
         super();
@@ -105,7 +108,9 @@ export class CodeEditorDirective extends ComponentBase {
         this.editor.setTheme("ace/theme/chrome");
         this.editor.session.setMode(`ace/mode/${this.language}`);
 
-        this.editor.setOptions(this.options);
+        this.editor.setOptions(Object.assign(this.options, {
+            readOnly: this.readonly
+        } as AceEditorOptions));
 
         // Hack for disabling the warning message about a deprecated method
         this.editor.$blockScrolling = Infinity;

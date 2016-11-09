@@ -36,7 +36,7 @@ require("./clt-editor.component.scss");
                 
                 <inputs-ports-form [cltModel]="model"></inputs-ports-form>
                 
-                <ct-output-ports [entries]="model.outputs"></ct-output-ports>
+                <ct-output-ports [entries]="model.outputs" [readonly]="readonly"></ct-output-ports>
                 
                 
             </form>
@@ -51,6 +51,9 @@ export class CltEditorComponent implements OnDestroy {
 
     @Output()
     public isDirty: ReplaySubject<any> = new ReplaySubject();
+
+    @Input()
+    public readonly: boolean;
 
     private subs: Subscription[] = [];
 
