@@ -68,14 +68,19 @@ export class CompactListComponent extends ComponentBase {
     @Input()
     public addKeyCode: number;
 
+    /** TODO: Tag type */
+    @Input()
+    public tagType: string;
+
     @Output()
     public onUpdate = new ReplaySubject<TagModel[]>(1);
 
+    //TODO: re-factor once we have the actual tag model
+    @Input()
+    public tagList: TagModel[];
+
     @ViewChild("tagInput")
     private tagInputElement: ElementRef;
-
-    //TODO: re-factor once we have the actual tag model
-    private tagList: TagModel[] = [];
 
     constructor(private renderer: Renderer) {
         super();
