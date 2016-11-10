@@ -1,4 +1,5 @@
 @import "../../../assets/sass/variables";
+@import "~bootstrap/scss/mixins";
 
 .remove-tag-icon {
     cursor: pointer;
@@ -21,6 +22,24 @@
         font-size: 0.9rem;
         font-weight: 100;
         margin: 3px;
+
+        .icon-wrapper {
+            background: $input-bg;
+            display: inline-block;
+            border-radius: 6px;
+            text-align: center;
+            vertical-align: center;
+        }
+
+        .error {
+            color: $brand-danger;
+            display: inline;
+        }
+
+        .warning {
+            color: $brand-warning;
+            display: inline;
+        }
     }
 }
 

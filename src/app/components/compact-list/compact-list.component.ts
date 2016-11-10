@@ -2,7 +2,8 @@ import {Component, Input, Output, ElementRef, Renderer, ViewChild} from "@angula
 import {FormGroup, FormControl, Validators} from "@angular/forms";
 import {ReplaySubject} from "rxjs";
 import {ComponentBase} from "../common/component-base";
-import {ContenteditableDirective} from "./directive/contenteditable.directive";
+import {ContenteditableDirective} from "./directives/contenteditable.directive";
+import {TagModel} from "./tag.model";
 
 require("./compact-list.component.scss");
 
@@ -18,11 +19,29 @@ require("./compact-list.component.scss");
                 <div class="input-tag-list">
                     <span *ngFor="let tag of tagList; let i = index; trackBy:trackByIndex"
                           class="tag tag-pill tag-default">
-                          {{tag}}
+                          
+                          <span *ngIf="tag.validation?.errors?.length > 0"
+                                title="tag.validation.errorText"
+                                class="icon-wrapper">
+                                <i class="fa fa-times-circle error">
+                                </i>
+                          </span>
+                          
+                          <span *ngIf="tag.validation?.warnings?.length > 0"
+                                class="icon-wrapper">
+                                <i class="fa fa-warning warning">
+                                </i>
+                          </span>
+                          
+                          {{tag.value}}
                           <i class="fa fa-times remove-tag-icon"
                              (click)="removeTag(i, $event)"></i>
                     </span>
-                                              
+                   
+                   
+                    <!-- Not using the <input>, 
+                         so that the width can adjust to the text length,
+                         and break into a new line if its long -->
                     <span #tagInput 
                           contenteditable="true"
                           class="tag-input"
@@ -50,12 +69,13 @@ export class CompactListComponent extends ComponentBase {
     public addKeyCode: number;
 
     @Output()
-    public onUpdate = new ReplaySubject<string[]>(1);
+    public onUpdate = new ReplaySubject<TagModel[]>(1);
 
     @ViewChild("tagInput")
     private tagInputElement: ElementRef;
 
-    private tagList: string[] = [];
+    //TODO: re-factor once we have the actual tag model
+    private tagList: TagModel[] = [];
 
     constructor(private renderer: Renderer) {
         super();
@@ -101,9 +121,17 @@ export class CompactListComponent extends ComponentBase {
 
         //make sure value was not a sequence of white spaces
         if (!!trimmedValue) {
-            this.tagList.push(trimmedValue);
-            this.onUpdate.next(this.tagList);
+            //TODO: re-factor once we have the actual tag model
+            this.tagList.push({
+                value: trimmedValue,
+                validation: {
+                    errors: [],
+                    warnings: [],
+                    errorText: ""
+                }
+            });
 
+            this.onUpdate.next(this.tagList);
             this.formGroup.controls["compactListControl"].setValue("");
         }
     }
