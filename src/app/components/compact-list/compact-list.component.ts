@@ -7,6 +7,11 @@ import {TagModel} from "./tag.model";
 
 require("./compact-list.component.scss");
 
+export interface ValidationResponse {
+    isValid: boolean,
+    errorMessage: string
+}
+
 @Component({
     selector: "compact-list",
     directives: [
@@ -46,8 +51,19 @@ require("./compact-list.component.scss");
                           contenteditable="true"
                           class="tag-input"
                           *ngIf="formGroup.controls['compactListControl']"
+                          [ngClass]="{'invalid-input': !isValidInput }"
                           [formControl]="formGroup.controls['compactListControl']"
-                          (keydown)="onTagInputKeyDown($event)"></span>
+                          (keydown)="onTagInputKeyDown($event)">
+                    </span>
+                     
+                      <span *ngIf="isValidInput === false" 
+                            class="tooltip-wrapper">
+                          <i class="fa fa-exclamation-circle input-error-icon"></i>
+                          
+                          <span class="tooltip-text">
+                            {{validationMessage}}
+                          </span>
+                      </span>
                 </div>
             </div>
        </form>
@@ -68,9 +84,10 @@ export class CompactListComponent extends ComponentBase {
     @Input()
     public addKeyCode: number;
 
-    /** TODO: Tag type */
+    //TODO: The inputValidator should probably have an error message
+    //something like the ValidationResponse declared at the top
     @Input()
-    public tagType: string;
+    public inputValidator: Function;
 
     @Output()
     public onUpdate = new ReplaySubject<TagModel[]>(1);
@@ -82,6 +99,10 @@ export class CompactListComponent extends ComponentBase {
     @ViewChild("tagInput")
     private tagInputElement: ElementRef;
 
+    private isValidInput = true;
+
+    private validationMessage: string;
+
     constructor(private renderer: Renderer) {
         super();
     }
@@ -90,6 +111,13 @@ export class CompactListComponent extends ComponentBase {
         this.formGroup.addControl(
             "compactListControl", new FormControl("", Validators.compose([Validators.required, Validators.minLength(1)]))
         );
+
+        this.formGroup.controls["compactListControl"].valueChanges.subscribe((value: string) => {
+            const validatorResponse: ValidationResponse = this.inputValidator(value);
+            this.isValidInput = this.formGroup.controls["compactListControl"].valid && !!validatorResponse.isValid;
+
+            this.validationMessage = !validatorResponse.isValid ? validatorResponse.errorMessage : "Input not valid.";
+        });
     }
 
     private trackByIndex(index: number): number {
@@ -115,7 +143,7 @@ export class CompactListComponent extends ComponentBase {
                 event.preventDefault();
             }
 
-            if (this.formGroup.controls["compactListControl"].valid) {
+            if (!!this.isValidInput) {
                 this.addTag(tagInputValue);
             }
         }
