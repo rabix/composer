@@ -33,6 +33,10 @@ Old code should be updated at our earliest convenience.**
 	Applies for *Components*, *Directives*, *Pipes*, *Services*.
 		
 	> **Why?** It's easier to find files and scan their names visually. There will be multiple types of classes with the same basic name, and a suffix to differentiate them (eg. WorkspaceComponent, WorkspaceService)	
+2. Prefix component selectors with `ct-*`.
+
+    > **Why?** It avoids naming collisions with existing HTML elements and differentiates custom components from standard elements. It also makes for less confusing markup. In contrast to `<my-cool-custom-input>`, `<ct-input>` is succinct, clean and straight-forward. Use it even if there aren't name collisions (`<ct-expression-input>`) for consistency.
+3. Prefix transclusion selectors with `tc-*`. 
 
 ### Files and Directories
 1. Make all file and directory names kebab-cased.

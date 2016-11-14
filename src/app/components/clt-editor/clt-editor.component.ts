@@ -7,6 +7,9 @@ import {InputPortsFormComponent} from "../forms/inputs/forms/input-ports-form.co
 import {CommandLineToolModel, ExpressionModel} from "cwlts/models/d2sb";
 import {ReplaySubject} from "rxjs";
 import {ComponentBase} from "../common/component-base";
+import {CommandLineToolModel} from "cwlts/models/d2sb";
+import {Subscription, ReplaySubject} from "rxjs";
+import {OutputPortsComponent} from "./output-ports/output-ports.component";
 
 require("./clt-editor.component.scss");
 
@@ -17,6 +20,7 @@ require("./clt-editor.component.scss");
         BaseCommandFormComponent,
         InputPortsFormComponent,
         CommandLineComponent,
+        OutputPortsComponent,
     ],
     template: `
             <form class="clt-editor-group" [formGroup]="cltEditorGroup">
@@ -33,6 +37,10 @@ require("./clt-editor.component.scss");
                 </base-command-form>
                 
                 <inputs-ports-form [cltModel]="model"></inputs-ports-form>
+                
+                <ct-output-ports [entries]="model.outputs || []" [readonly]="readonly"></ct-output-ports>
+                
+                <ct-hint-list [entries]="model.hints || []" [readonly]="readonly"></ct-hint-list>
             </form>
 
             <sidebar-component></sidebar-component>
@@ -42,6 +50,9 @@ export class CltEditorComponent extends ComponentBase {
 
     @Input()
     public model: CommandLineToolModel;
+
+    @Input()
+    public readonly: boolean;
 
     @Output()
     public dirty = new ReplaySubject<boolean>();
@@ -57,6 +68,7 @@ export class CltEditorComponent extends ComponentBase {
             baseCommandGroup: this.formBuilder.group({}),
             inputPortsGroup: this.formBuilder.group({})
         });
+
 
         // very elementary dirty checking for tool editor form
         this.tracked = this.cltEditorGroup.valueChanges

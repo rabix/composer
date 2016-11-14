@@ -1,22 +1,20 @@
-import {Component, AfterViewInit} from "@angular/core";
+import {Component} from "@angular/core";
+import {Observable} from "rxjs/Rx";
+
+import {ContextService} from "../../services/context/context.service";
 import {DomEventService} from "../../services/dom/dom-event.service";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {FileRegistry} from "../../services/file-registry.service";
+import {GuidService} from "../../services/guid.service";
 import {InputPortService} from "../../services/input-port/input-port.service";
 import {LayoutComponent} from "../layout/layout.component";
-import {Observable} from "rxjs/Rx";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
+import {SBPlatformDataSourceService} from "../../sources/sbg/sb-platform.source.service";
 import {SettingsService} from "../../services/settings/settings.service";
 import {UrlValidator} from "../../validators/url.validator";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
-import {WebWorkerService} from "../../services/web-worker/web-worker.service";
-import {GuidService} from "../../services/guid.service";
-import {SBPlatformDataSourceService} from "../../sources/sbg/sb-platform.source.service";
-import {ContextService} from "../../services/context/context.service";
-import {TemplateProviderService} from "../../services/template-provider.service";
 
 require("./../../../assets/sass/main.scss");
-
 require("./main.component.scss");
 
 @Component({
@@ -42,7 +40,7 @@ require("./main.component.scss");
         ContextService,
     ],
 })
-export class MainComponent implements AfterViewInit {
+export class MainComponent {
 
     private runnix: Observable<boolean>;
 
@@ -51,8 +49,5 @@ export class MainComponent implements AfterViewInit {
             .filter(seq => seq.toString() == [38, 38, 40, 40, 37, 39, 37, 39, 66, 65].toString())
             .map(seq => Observable.of(true).concat(Observable.of(false).delay(3000)))
             .concatAll();
-    }
-
-    ngAfterViewInit() {
     }
 }

@@ -56,3 +56,22 @@
 .block {
   display: block;
 }
+
+.flex-fill {
+  display: flex;
+  flex-grow: 1;
+}
+
+.text-hover-danger:hover {
+  color: $brand-danger !important;
+}
+
+.text-hover-warning:hover {
+  color: $brand-warning !important;
+}
+
+.no-outline {
+  &, &:focus, &:active {
+    outline: 0;
+  }
+}

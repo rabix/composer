@@ -11,11 +11,11 @@ import {AfterViewInit} from "../../../../../../node_modules/@angular/core/src/me
     ],
     template: `
         <ct-form-section>
-            <div class="fs-header">
+            <div class="tc-header">
                 Docker Image
             </div>
         
-            <div class="fs-body">
+            <div class="tc-body">
                 <form [formGroup]="dockerInputForm">
         
                     <label for="docker_image" class="form-control-label">Docker Repository</label>

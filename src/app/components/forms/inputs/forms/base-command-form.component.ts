@@ -11,10 +11,10 @@ require("./base-command-form.components.scss");
 @Component({
     selector: 'base-command-form',
     template: `<ct-form-section>
-    <div class="fs-header">
+    <div class="tc-header">
         Base Command
     </div>
-    <div class="fs-body">
+    <div class="tc-body">
         <form *ngIf="form" [formGroup]="form">
 
             <ol *ngIf="formList.length > 0" class="list-unstyled">
