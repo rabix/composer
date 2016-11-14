@@ -1,11 +1,11 @@
 module.exports = function (config) {
-    var testWebpackConfig = require('./webpack.test.js');
+    const testWebpackConfig = require('./webpack.test.js');
     
     if (config.debug === true) {
         testWebpackConfig.module.postLoaders = [];
     }
 
-    var coverageReporterConfig = {
+    const coverageReporterConfig = {
         dir: 'coverage/',
             reporters: [
             {type: 'text-summary'},
@@ -83,7 +83,7 @@ module.exports = function (config) {
          * start these browsers
          * available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
          */
-        browsers: config.debug ? ['Chrome'] : ['PhantomJS'],
+        browsers: ['Chrome'],
 
         /*
          * Continuous Integration mode

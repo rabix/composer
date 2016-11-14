@@ -4,20 +4,23 @@ import {ComponentBase} from "../../common/component-base";
 @Component({
     selector: "ct-hint-list",
     template: `
-        <ct-form-section>
-            <div class="tc-header">Hints</div>
-            <div class="tc-body">
+        <ct-form-panel [collapsed]="false">
+            <div class="tc-header">
+                Hints
+            </div>
+            
+            <div class="tc-body container">
                
                 <div *ngIf="entries.length === 0">
                     No execution hints specified.
                 </div>
      
-                <div *ngIf="entries.length" class="gui-section-list-title">
+                <div *ngIf="entries.length" class="gui-section-list-title row">
                     <div class="col-sm-5">Class</div>
                     <div class="col-sm-7">Value</div>
                 </div>
             
-                <ul class="gui-section-list">
+                <ul class="gui-section-list row">
                     <li *ngFor="let entry of entries; let i = index"
                         class="gui-section-list-item clickable">
                         
@@ -40,7 +43,7 @@ import {ComponentBase} from "../../common/component-base";
                 </button>
             </div>
         
-        </ct-form-section>
+        </ct-form-panel>
     `
 })
 export class HintListComponent extends ComponentBase {
