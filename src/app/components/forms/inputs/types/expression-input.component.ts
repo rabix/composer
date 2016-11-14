@@ -1,64 +1,179 @@
-import {Component, Input, Output, EventEmitter} from "@angular/core";
-import {AbstractControl} from "@angular/forms";
+import {Component, Input, forwardRef} from "@angular/core";
+import {NG_VALUE_ACCESSOR, ControlValueAccessor} from "@angular/forms";
+import {Subject} from "rxjs";
+import {ExpressionSidebarService} from "../../../../services/sidebars/expression-sidebar.service";
+import {ComponentBase} from "../../../common/component-base";
+import {noop} from "../../../../lib/utils.lib";
+import {ExpressionModel} from "cwlts/models/d2sb";
 
 require("./expression-input.component.scss");
 
 @Component({
     selector: 'expression-input',
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => ExpressionInputComponent),
+            multi: true
+        }
+    ],
     template: `
-            <div class="input-group"
-                 [class.expression-input-group]="isExpression === true"
-                 *ngIf="control">
-                <input class="form-control"
-                        [formControl]="control"
-                        (click)="editExpression($event)"
-                        [readonly]="isExpression === true"/>
-                    
-                <span class="input-group-btn">
-                    <button type="button"
-                        class="btn btn-secondary" 
-                        [disabled]="disableEdit"
-                        (click)="onClick($event)">
-                        <i class="fa"
-                            [ngClass]="{'fa-times': isExpression === true,
-                                        'fa-code': isExpression === false}"></i>
-                    </button>
-                </span>
+            <div class="expression-input-group clickable"
+                 [class.validatable]="isExpr"
+                 [class.warning]="model.validation.warnings.length"
+                 [class.error]="model.validation.errors.length">
+                 
+                <i class="fa fa-warning validation-icon"
+                    [title]="model.validation.warnings.join('\\n')"
+                    *ngIf="model.validation.warnings.length && isExpr"></i>
+                <i class="fa fa-times-circle validation-icon" 
+                    *ngIf="model.validation.errors.length && isExpr"
+                    [title]="model.validation.errors.join('\\n')"></i>
+                <b class="validation-icon result"
+                    *ngIf="model.result && isExpr"
+                    [title]="model.result">E:</b>
+                
+                <div class="input-group">
+                
+                    <input class="form-control"
+                            #input
+                            [value]="value?.toString()"
+                            [readonly]="isExpr"
+                            (blur)="onTouch()"
+                            (click)="editExpr(isExpr ? 'edit' : null, $event)"
+                            (change)="editString(input.value)"/>
+                        
+                    <span class="input-group-btn">
+                        <button type="button"
+                            class="btn btn-secondary" 
+                            (click)="editExpr(isExpr ? 'clear' : 'edit', $event)">
+                            <i class="fa"
+                                [ngClass]="{'fa-times': isExpr,
+                                            'fa-code': !isExpr}"></i>
+                        </button>
+                    </span>  
             </div>
+        </div>
         `
 })
-export class ExpressionInputComponent {
-
+export class ExpressionInputComponent extends ComponentBase implements ControlValueAccessor {
+    /**
+     * Context in which expression should be executed
+     */
     @Input()
-    public control: AbstractControl;
+    public context: any;
 
-    @Input()
-    public disableEdit: boolean;
+    /** Flag if model is expression or primitive */
+    private isExpr: boolean = false;
 
-    @Input()
-    public isExpression: boolean;
+    /**
+     * Internal ExpressionModel on which changes are made
+     */
+    private model: ExpressionModel;
 
-    @Output()
-    public onEdit = new EventEmitter();
+    /** getter for formControl value */
+    public get value() {
+        return this.model;
+    }
 
-    @Output()
-    public onClear = new EventEmitter();
-
-    private editExpression(event): void {
-        event.stopPropagation();
-
-        if (this.isExpression) {
-            this.onEdit.emit();
+    /** setter for formControl value */
+    public set value(val: ExpressionModel) {
+        if (val !== this.model) {
+            this.model = val;
+            this.onChange(val);
         }
     }
 
-    private onClick(event): void {
-        event.stopPropagation();
-
-        if (this.isExpression) {
-            this.onClear.emit();
+    /**
+     * From ControlValueAccessor
+     * Write a new value to the element when initially loading formControl
+     * @param obj
+     */
+    writeValue(obj: ExpressionModel): void {
+        if (obj) {
+            this.model  = obj;
+            this.isExpr = obj.isExpression;
         } else {
-            this.onEdit.emit();
+            this.model = new ExpressionModel("");
+            this.isExpr = this.model.isExpression;
         }
+    }
+
+    /**
+     * From ControlValueAccessor
+     * @param fn
+     */
+    registerOnChange(fn: any): void {
+        this.onChange = fn;
+    }
+
+    /**
+     * From ControlValueAccessor
+     * @param fn
+     */
+    registerOnTouched(fn: any): void {
+        this.onTouch = fn;
+    }
+
+    /**
+     * Declaration of change function
+     */
+    private onChange = noop;
+
+    /**
+     * Declaration of touch function
+     */
+    private onTouch = noop;
+
+
+    constructor(private expressionSidebarService: ExpressionSidebarService) {
+        super();
+    }
+
+    /**
+     * Callback for setting string value to model
+     * @param str
+     */
+    private editString(str: string) {
+        this.model.setValue(str, "string");
+        this.onChange(this.model);
+    }
+
+    /**
+     * Callback for setting or clearing expression value
+     * @param action
+     * @param event
+     */
+    private editExpr(action: "clear" | "edit", event: Event): void {
+        if (!action) return;
+
+        if (action === "clear") {
+            this.model.setValue("", "string");
+            this.model.result = null;
+            this.isExpr = false;
+            event.stopPropagation();
+            this.onChange(this.model);
+        } else {
+            const newExpression = new Subject<ExpressionModel>();
+
+            this.expressionSidebarService.openExpressionEditor({
+                value: this.model,
+                newExpressionChange: newExpression,
+                context: this.context
+            });
+
+            this.tracked = newExpression.subscribe(val => {
+                this.model = val;
+
+                this.isExpr = val.isExpression;
+                this.onChange(this.model);
+                this.expressionSidebarService.closeExpressionEditor();
+            });
+        }
+    }
+
+    ngOnDestroy(): void {
+        super.ngOnDestroy();
+        this.expressionSidebarService.closeExpressionEditor();
     }
 }

@@ -1,5 +1,4 @@
-import {Component, Input, OnDestroy} from "@angular/core";
-import {Subscription} from "rxjs";
+import {Component, Input} from "@angular/core";
 import {TabData} from "../workbox/tab-data.interface";
 import {SettingsComponent} from "../settings";
 import {WebWorkerService} from "../../services/web-worker/web-worker.service";
@@ -26,17 +25,7 @@ import {StandaloneCodeEditorComponent} from "../standalone-code-editor/standalon
         </div>
     `
 })
-export class TabManagerComponent implements OnDestroy {
-
+export class TabManagerComponent {
     @Input()
     public tab: TabData;
-
-    private subs: Subscription[] = [];
-
-    constructor(private webWorkerService: WebWorkerService) {}
-
-    ngOnDestroy() {
-        this.webWorkerService.dispose();
-        this.subs.forEach(s => s.unsubscribe());
-    }
 }

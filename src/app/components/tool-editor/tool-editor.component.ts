@@ -2,9 +2,8 @@ import {Component, OnInit, Input, OnDestroy} from "@angular/core";
 import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {CltEditorComponent} from "../clt-editor/clt-editor.component";
-import {ReplaySubject, BehaviorSubject} from "rxjs/Rx";
+import {ReplaySubject, BehaviorSubject, Observable} from "rxjs/Rx";
 import {ToolHeaderComponent} from "./tool-header/tool-header.component";
-import {ViewModeService} from "./services/view-mode.service";
 import {CommandLineToolModel} from "cwlts/models/d2sb";
 import {SidebarComponent} from "../sidebar/sidebar.component";
 import {CommandLineComponent} from "../clt-editor/commandline/commandline.component";
@@ -66,7 +65,7 @@ require("./tool-editor.component.scss");
                 <ct-clt-editor *ngIf="viewMode === 'gui'"
                                class="gui-editor-component"
                                [readonly]="!data.isWritable"
-                               (isDirty)="modelChanged = $event"
+                               (dirty)="modelChanged = $event"
                                [model]="toolModel"></ct-clt-editor>
             </div>
             <div class="status-bar-footer">
@@ -141,10 +140,14 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
 
     // @todo(maya) fix block loader
     // setting this.isLoading to false inside a sub doesn't (always) trigger view update
+    // possible zone problem
     ngOnInit(): void {
-        this.tracked = this.rawEditorContent.subscribe(latestContent => {
-            this.validateSchema(latestContent);
-        });
+        this.tracked = (this.rawEditorContent as Observable)
+            .skip(1)
+            .distinctUntilChanged()
+            .subscribe(latestContent => {
+                this.validateSchema(latestContent);
+            });
 
         this.tracked = this.data.content.subscribe(val => {
             this.rawEditorContent.next(val);
@@ -169,7 +172,8 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
                 this.showReformatPrompt = false;
             }
 
-            this.toolModel        = new CommandLineToolModel(json);
+            this.toolModel = new CommandLineToolModel(json);
+            this.toolModel.validate();
             this.commandLineParts = this.toolModel.getCommandLineParts();
         } catch (ex) {
             // if the file isn't valid JSON, do nothing

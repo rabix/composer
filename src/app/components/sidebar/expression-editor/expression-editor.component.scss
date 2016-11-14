@@ -30,7 +30,7 @@ expression-editor {
     }
 
     .expression-result-container {
-        flex-basis: 150px;
+        flex-basis: $expression-editor-result-height;
         position: relative;
         border-top: 1px solid $expression-editor-border;
         padding: $padding-md;
@@ -59,7 +59,18 @@ expression-editor {
         }
 
         .expression-result-value {
+            width: 100%;
+            min-height: 88px; // magical number that doesn't make results jump
+            color: $expression-editor-color;
             margin-top: 17px; // so results stay under the code preview label
+
+            &.has-error {
+                color: $expression-editor-error-color;
+            }
+
+            &.has-warning {
+                color: $expression-editor-warning-color;
+            }
         }
 
     }

@@ -5,6 +5,20 @@ base-command-form .form-section {
     @include cli-border($base-cmd-color);
 }
 
-.clear-icon {
-    cursor: pointer;
+//@todo(maya) fix this, move elsewhere, refactor
+.removable-form-control {
+    overflow: hidden;
+    width: 100%;
+    position: relative;
+
+    expression-input {
+        width: calc(100% - 20px);
+        display: inline-block;
+    }
+
+    .remove-icon {
+        position: relative;
+        top: 6px;
+        float: right;
+    }
 }

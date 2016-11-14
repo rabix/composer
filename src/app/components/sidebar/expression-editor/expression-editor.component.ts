@@ -6,60 +6,61 @@ import {Subscription} from "rxjs/Subscription";
 import {Subject} from "rxjs/Subject";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ExpressionSidebarService} from "../../../services/sidebars/expression-sidebar.service";
-import {Subject, Observable, BehaviorSubject} from "rxjs";
-import {Expression} from "cwlts/mappings/d2sb/Expression";
+import {Subject, Observable, ReplaySubject} from "rxjs";
+import {ComponentBase} from "../../common/component-base";
 import Document = AceAjax.Document;
 import IEditSession = AceAjax.IEditSession;
 import TextMode = AceAjax.TextMode;
+import {Expression} from "cwlts/mappings/d2sb/Expression";
+import {Validation} from "cwlts/models/interfaces";
 
 require("./expression-editor.component.scss");
 
 @Component({
     selector: "expression-editor",
     host: {
-        class: "block"
+        "class": "block"
     },
     template: `
-         <div class="expression-editor-component">
-                <div class="expression-editor-header">
-                
-                    <span class="expression-head-text">
-                        Argument value expression
-                        <i class="fa fa-info-circle help-icon"></i>
-                    </span>
-                    
-                    <span class="expression-buttons-container">
-                        <button type="button"
+        <div class="expression-editor-component">
+            <div class="expression-editor-header">
+                        
+                <span class="expression-head-text">
+                    Expression
+                    <!--@todo(maya) path to object where expression lives-->
+                    <i class="fa fa-info-circle help-icon"></i>
+                </span>
+        
+                <span class="expression-buttons-container">
+                    <button type="button"
                             class="btn btn-sm btn-outline-secondary"
                             (click)="cancel()">Cancel</button>
-                        
-                        <button type="button" 
+                    
+                    <button type="button"
                             class="btn btn-sm btn-success"
                             (click)="save()">Save</button>
-                    </span>
+                </span>
+            </div>
+        
+            <div #ace class="ace-editor"></div>
+        
+            <div class="expression-result-container">
+                <div class="code-preview">
+                    Result
                 </div>
-                
-                <div #ace class="ace-editor"></div>
-                
-                <div class="expression-result-container">
-                    <div class="code-preview">
-                        Code preview
-                    </div>
-                    
-                    <div class="expression-result-value">
-                       {{evaluatedExpression}}
-                    </div>
-                </div>
-         </div>
+        
+                <pre class="expression-result-value" *ngIf="result.output">{{ result.output | json }}</pre>
+                <pre class="expression-result-value has-error" *ngIf="result.error">{{ result.error }}</pre>
+                <pre class="expression-result-value has-warning" *ngIf="result.warning">{{ result.warning }}</pre>
+                 
+            </div>
+        </div>
  `
 })
-export class ExpressionEditorComponent implements OnInit, OnDestroy {
-
-    /** Expression coming form the tool */
-    private initialExpressionScript: string;
+export class ExpressionEditorComponent extends ComponentBase implements OnInit, OnDestroy {
 
     /** Evaluated expressions */
-    private newValueStream: Subject<string | ExpressionModel>;
+    private newValueStream: Subject<ExpressionModel>;
 
     /** Reference to the element in which we want to instantiate the Ace editor */
     @ViewChild("ace")
@@ -70,85 +71,86 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
     /** Global context in which expression should be evaluated */
     private context: any;
 
-    /** The last evaluated code */
-    private lastExpression: string;
-
     /** String we display as the result */
     private evaluatedExpression: string;
 
-    private sandboxService: SandboxService;
+    private result: SandboxResponse = {};
 
-    private subs: Subscription[];
+    private sandboxService: SandboxService;
 
     private sandBoxSub: Subscription;
 
+    private expression: ExpressionModel;
+
+    private originalVal: ExpressionModel;
+    private content: string;
+
     constructor(private expressionSidebarService: ExpressionSidebarService) {
-        this.subs = [];
+        super();
     }
 
     ngOnInit(): void {
         this.sandboxService = new SandboxService();
 
-        this.subs.push(
-            this.expressionSidebarService.expressionDataStream
-                .mergeMap((data:ExpressionEditorData) => {
-                    this.lastExpression          = undefined;
-                    this.initialExpressionScript = "";
-                    this.context                 = data.context;
+        this.tracked = this.expressionSidebarService.expressionDataStream
+            .mergeMap((data: ExpressionEditorData) => {
+                this.originalVal = data.value;
+                const serialized = data.value.serialize();
+                this.content = (serialized as Expression).script || "";
 
-                    if ((<Expression>data.expression.serialize()).script) {
-                        this.initialExpressionScript = data.expression.getExpressionScript();
-                    }
+                this.expression = new ExpressionModel(data.value.loc, data.value.serialize());
+                this.context = data.context;
 
-                    this.newValueStream = data.newExpressionChange;
-                    this.editor         = new ExpressionEditor(ace.edit(this.aceContainer.nativeElement), this.initialExpressionScript);
+                this.newValueStream = data.newExpressionChange;
+                this.editor         = new ExpressionEditor(ace.edit(this.aceContainer.nativeElement), this.content);
 
-                    return this.editor.expressionChanges;
-                })
-                .distinctUntilChanged()
-                .subscribe(expression => {
-                    this.evaluateExpression(expression);
-                })
-        );
+                // initially execute app
+                this.evaluateExpression(this.expression.getScriptForExec());
+
+                return this.editor.expressionChanges;
+            })
+            .distinctUntilChanged()
+            .debounceTime(300)
+            .subscribe(expression => {
+                this.content = expression;
+                this.expression.setValue(this.content, "expression");
+
+                this.evaluateExpression(this.expression.getScriptForExec());
+            });
     }
 
     private evaluateExpression(expression: string): Observable<SandboxResponse> {
         this.removeSandboxSub();
-        const responseResult: BehaviorSubject<SandboxResponse> = new BehaviorSubject<SandboxResponse>(undefined);
+        const responseResult = new ReplaySubject<SandboxResponse>();
 
-        if (this.lastExpression === expression) {
-            responseResult.next({
-                error: undefined,
-                output: this.evaluatedExpression
+        this.sandBoxSub      = this.sandboxService.submit(expression, this.context)
+            .subscribe((result: SandboxResponse) => {
+                this.evaluatedExpression = result.error ? result.error : result.output;
+                this.result = result;
+                responseResult.next(result);
             });
-        } else {
-            this.lastExpression = expression;
-            this.sandBoxSub     = this.sandboxService.submit(expression, this.context)
-                .subscribe((result: SandboxResponse) => {
-                    this.evaluatedExpression = result.error ? result.error: result.output;
-                    responseResult.next(result);
-                });
-        }
 
-        return responseResult.filter(response => response !== undefined);
+        return (responseResult as Observable<SandboxResponse>);
     }
 
     private cancel(): void {
+        this.newValueStream.next(this.originalVal);
         this.expressionSidebarService.closeExpressionEditor();
     }
 
     private save(): void {
-        this.evaluateExpression(this.lastExpression)
+        const expr = new ExpressionModel("");
+        expr.setValue(this.content, "expression");
+
+        this.tracked = this.evaluateExpression(expr.getScriptForExec())
             .subscribe((result: SandboxResponse) => {
-                const newExpression: ExpressionModel = new ExpressionModel(undefined);
-
-                if (result.output === undefined) {
-                    newExpression.setValueToString("");
-                } else {
-                    newExpression.setValueToExpression(this.lastExpression);
-                }
-
-                this.newValueStream.next(newExpression);
+                this.expression.setValue(this.content, "expression");
+                // @todo(maya) move execution to model
+                const err = result.error ? [result.error] : [];
+                const warn = result.warning ? [result.warning] : [];
+                this.expression.validation = <Validation> {errors: err, warnings: warn};
+                this.expression.result = result.output;
+                this.newValueStream.next(this.expression);
             });
     }
 
@@ -165,10 +167,6 @@ export class ExpressionEditorComponent implements OnInit, OnDestroy {
         }
 
         this.removeSandboxSub();
-        this.subs.forEach(sub => sub.unsubscribe());
+        super.ngOnDestroy();
     }
 }
-
-//@todo remove update button when expression is evaluated
-//@todo add update button when expression is changed
-//@todo evaluate expression in input field, populate result before expression editor is loaded
