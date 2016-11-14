@@ -9,14 +9,17 @@
         width: 46px;
     }
 
-    &.expr {
+    &.validatable {
         position: relative;
+        .input-group-btn, input {
+            cursor: pointer;
+        }
 
         .form-control {
             padding-left: 30px;
         }
         
-        .expression-icon {
+        .validation-icon {
             position: absolute;
             top: 8px;
             left: 8px;
@@ -28,34 +31,5 @@
                 font-weight: bold;
             }
         }
-
-        &.warning {
-            &:hover {
-                border-color: $brand-warning;
-            }
-
-            .expression-icon {
-                color: $brand-warning;
-            }
-        }
-
-        &.error {
-            &:hover {
-                border-color: $brand-danger;
-            }
-
-            .expression-icon {
-                color: $brand-danger;
-            }
-        }
-
-        &:hover {
-            border-color: $gui-section-list-item-hover-border;
-
-            .input-group-btn, input {
-                cursor: pointer;
-            }
-        }
-
     }
 }

@@ -19,18 +19,18 @@ require("./expression-input.component.scss");
     ],
     template: `
             <div class="expression-input-group clickable"
-                 [class.expr]="isExpr"
-                 [class.warning]="model.validation.warning.length > 0"
-                 [class.error]="model.validation.error.length > 0">
+                 [class.validatable]="isExpr"
+                 [class.warning]="model.validation.warnings.length"
+                 [class.error]="model.validation.errors.length">
                  
-                <i class="fa fa-warning expression-icon"
-                    [title]="model.validation.warning.join('\\n')"
-                    *ngIf="model.validation.warning.length > 0"></i>
-                <i class="fa fa-times-circle expression-icon" 
-                    *ngIf="model.validation.error.length > 0"
-                    [title]="model.validation.error.join('\\n')"></i>
-                <b class="expression-icon result"
-                    *ngIf="model.result"
+                <i class="fa fa-warning validation-icon"
+                    [title]="model.validation.warnings.join('\\n')"
+                    *ngIf="model.validation.warnings.length && isExpr"></i>
+                <i class="fa fa-times-circle validation-icon" 
+                    *ngIf="model.validation.errors.length && isExpr"
+                    [title]="model.validation.errors.join('\\n')"></i>
+                <b class="validation-icon result"
+                    *ngIf="model.result && isExpr"
                     [title]="model.result">E:</b>
                 
                 <div class="input-group">
@@ -145,7 +145,6 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
      * @param event
      */
     private editExpr(action: "clear" | "edit", event: Event): void {
-        console.log('clicking');
         if (!action) return;
 
         if (action === "clear") {

@@ -4,6 +4,7 @@ import {ExpressionModel} from "cwlts/models/d2sb";
 import {ReplaySubject} from "rxjs";
 import {ComponentBase} from "../../../common/component-base";
 import {GuidService} from "../../../../services/guid.service";
+import {CustomValidators} from "../../../../validators/custom.validator";
 
 require("./base-command-form.components.scss");
 
@@ -86,7 +87,7 @@ export class BaseCommandFormComponent extends ComponentBase implements OnInit, O
 
     private createExpressionInputControls(formList: Array<{id: string, model: ExpressionModel}>): void {
         formList.forEach((item) => {
-            this.form.addControl(item.id, new FormControl(item.model, Validators.required));
+            this.form.addControl(item.id, new FormControl(item.model, [Validators.required, CustomValidators.cwlModel]));
         });
     }
 
@@ -102,7 +103,7 @@ export class BaseCommandFormComponent extends ComponentBase implements OnInit, O
             model: new ExpressionModel("")
         };
 
-        this.form.addControl(newCmd.id, new FormControl(newCmd.model, Validators.required));
+        this.form.addControl(newCmd.id, new FormControl(newCmd.model, [Validators.required, CustomValidators.cwlModel]));
         this.formList.push(newCmd);
 
         this.form.markAsTouched();

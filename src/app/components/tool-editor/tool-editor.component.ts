@@ -169,7 +169,8 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
                 this.showReformatPrompt = false;
             }
 
-            this.toolModel        = new CommandLineToolModel(json);
+            this.toolModel = new CommandLineToolModel(json);
+            this.toolModel.validate();
             this.commandLineParts = this.toolModel.getCommandLineParts();
         } catch (ex) {
             // if the file isn't valid JSON, do nothing

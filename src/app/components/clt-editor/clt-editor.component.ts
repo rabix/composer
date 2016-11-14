@@ -4,7 +4,7 @@ import {CommandLineComponent} from "./commandline/commandline.component";
 import {DockerImageFormComponent} from "../forms/inputs/forms/docker-image-form.component";
 import {BaseCommandFormComponent} from "../forms/inputs/forms/base-command-form.component";
 import {InputPortsFormComponent} from "../forms/inputs/forms/input-ports-form.component";
-import {CommandLineToolModel} from "cwlts/models/d2sb";
+import {CommandLineToolModel, ExpressionModel} from "cwlts/models/d2sb";
 import {ReplaySubject} from "rxjs";
 import {ComponentBase} from "../common/component-base";
 
@@ -20,7 +20,6 @@ require("./clt-editor.component.scss");
     ],
     template: `
             <form class="clt-editor-group" [formGroup]="cltEditorGroup">
-                
                 <docker-image-form class="input-form" 
                                 [group]="cltEditorGroup"
                                 [cltModel]="model"
@@ -67,7 +66,8 @@ export class CltEditorComponent extends ComponentBase {
             .subscribe(this.dirty);
     }
 
-    private setBaseCommand(cmd) {
-        this.model.baseCommand = cmd;
+    private setBaseCommand(list: ExpressionModel[]) {
+        this.model.baseCommand = [];
+        list.forEach(cmd => this.model.addBaseCommand(cmd));
     }
 }

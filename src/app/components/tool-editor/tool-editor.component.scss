@@ -113,7 +113,6 @@ ct-code-editor {
 
 //@todo(maya) belongs with tool editor or form components
 .gui-section-list-item {
-    border: $gui-section-list-item-border-size solid $gui-section-list-item-border;
     background: $gui-section-list-item-bg;
     color: $gui-section-list-item-color;
     border-radius: $gui-section-list-item-border-radius;
@@ -126,7 +125,6 @@ ct-code-editor {
     }
 
     &:hover {
-        border-color: $gui-section-list-item-hover-border;
         background: $gui-section-list-item-hover-bg;
         color: $gui-section-list-item-hover-color;
         .fa {

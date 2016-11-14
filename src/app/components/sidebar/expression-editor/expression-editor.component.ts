@@ -98,7 +98,7 @@ export class ExpressionEditorComponent extends ComponentBase implements OnInit, 
                 const serialized = data.value.serialize();
                 this.content = (serialized as Expression).script || "";
 
-                this.expression = new ExpressionModel(data.value.serialize());
+                this.expression = new ExpressionModel(data.value.loc, data.value.serialize());
                 this.context = data.context;
 
                 this.newValueStream = data.newExpressionChange;
@@ -139,7 +139,7 @@ export class ExpressionEditorComponent extends ComponentBase implements OnInit, 
     }
 
     private save(): void {
-        const expr = new ExpressionModel();
+        const expr = new ExpressionModel("");
         expr.setValue(this.content, "expression");
 
         this.tracked = this.evaluateExpression(expr.getScriptForExec())
@@ -148,7 +148,7 @@ export class ExpressionEditorComponent extends ComponentBase implements OnInit, 
                 // @todo(maya) move execution to model
                 const err = result.error ? [result.error] : [];
                 const warn = result.warning ? [result.warning] : [];
-                this.expression.validation = <Validation>{error: err, warning: warn};
+                this.expression.validation = <Validation> {errors: err, warnings: warn};
                 this.expression.result = result.output;
                 this.newValueStream.next(this.expression);
             });
