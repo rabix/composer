@@ -9,15 +9,9 @@ import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
     template: `<div *ngIf="portList.length > 0">
 
             <div class="gui-section-list-title">
-                <div class="col-sm-7">
-                    ID
-                </div>
-                <div class="col-sm-2">
-                    Type
-                </div>
-                <div class="col-sm-3">
-                    Required
-                </div>
+                <div class="col-sm-4">ID</div>
+                <div class="col-sm-3">Type</div>
+                <div class="col-sm-5">Binding</div>
             </div>
         
             <ul class="gui-section-list">
@@ -26,10 +20,10 @@ import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
                     [class.error]="input.validation.errors.length"
                     [class.warning]="input.validation.warnings.length"
                     [class.selected]="i === selectedIndex"
-                    *ngFor="let input of portList; let i = index"
-                    (click)="editProperty(i)">
+                    *ngFor="let input of portList; let i = index">
+                    <!-- @todo: temporarily removing edit method -->
         
-                    <div class="col-sm-7" title="{{input.id}}">
+                    <div class="col-sm-4" [title]="input.id">
                         <i class="fa fa-warning validation-icon"
                            [title]="input.validation.warnings.join('\\n')"
                            *ngIf="input.validation.warnings.length"></i>
@@ -42,12 +36,12 @@ import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
                         </span>
                     </div>
         
-                    <div class="col-sm-2" title="{{input.type}}">
-                        {{input.type}}
+                    <div class="col-sm-3 ellipsis" [title]="input.type">
+                        {{ input.type | commandParameterType }}
                     </div>
         
-                    <div class="col-sm-2" title="{{input.isRequired}}">
-                        {{input.isRequired}}
+                    <div class="col-sm-4 ellipsis" [title]="input.isRequired">
+                        {{ input.inputBinding | commandInputBinding }}
                     </div>
         
                     <div class="col-sm-1 pull-right tool-input-icon">

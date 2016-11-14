@@ -19,10 +19,12 @@ import {ComponentBase} from "../../common/component-base";
             
                 <ul class="gui-section-list row">
                     <li *ngFor="let entry of entries; let i = index"
-                        class="gui-section-list-item clickable">
+                        class="gui-section-list-item clickable validatable">
                         
                         <div class="col-sm-4 ellipsis" [title]="entry?.id">{{ entry?.id }}</div>
-                        <div class="col-sm-3 ellipsis" [title]="entry?.type">{{ entry?.type | commandOutputType}}</div>
+                        <div class="col-sm-3 ellipsis" [title]="entry?.type">
+                            {{ entry?.type | commandParameterType }}
+                        </div>
                         <div [ngClass]="{
                             'col-sm-4': !readonly,
                             'col-sm-5': readonly
@@ -39,7 +41,7 @@ import {ComponentBase} from "../../common/component-base";
                 <button *ngIf="!readonly" 
                         (click)="addEntry()" 
                         type="button" 
-                        class="btn btn-link pull-right no-outline no-underline-hover">
+                        class="btn btn-link no-outline no-underline-hover">
                         
                     <i class="fa fa-plus"></i> Add Output
                 </button>    

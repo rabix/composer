@@ -1,8 +1,8 @@
 import {Pipe, PipeTransform} from "@angular/core";
 import {TypeResolver} from "cwlts/models/helpers";
 
-@Pipe({name: "commandOutputType"})
-export class CommandOutputTypePipe implements PipeTransform {
+@Pipe({name: "commandParameterType"})
+export class CommandParameterTypePipe implements PipeTransform {
     transform(type): any {
 
         try {

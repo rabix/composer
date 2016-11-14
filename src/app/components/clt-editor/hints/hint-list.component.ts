@@ -37,9 +37,9 @@ import {ComponentBase} from "../../common/component-base";
                 <button *ngIf="!readonly" 
                         (click)="addEntry()" 
                         type="button" 
-                        class="btn btn-link pull-right no-outline no-underline-hover">
+                        class="btn btn-link no-outline no-underline-hover">
                         
-                    <i class="fa fa-plus"></i> Add Output
+                    <i class="fa fa-plus"></i> Add Hint
                 </button>
             </div>
         

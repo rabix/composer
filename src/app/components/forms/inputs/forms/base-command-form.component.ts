@@ -37,7 +37,7 @@ require("./base-command-form.components.scss");
                 No baseCommand defined.
             </div>
 
-            <button type="button" class="btn btn-link add-btn-link" (click)="addBaseCommand()">
+            <button type="button" class="btn btn-link add-btn-link no-underline-hover" (click)="addBaseCommand()">
                 <i class="fa fa-plus"></i> Add base command
             </button>
         </form>
