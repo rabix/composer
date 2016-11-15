@@ -1,6 +1,6 @@
 import {Component, Input, ElementRef, Renderer, ViewChild, forwardRef} from "@angular/core";
 import {FormControl, ControlValueAccessor, NG_VALUE_ACCESSOR, NG_VALIDATORS} from "@angular/forms";
-import {EditableDirective} from "./directives/editable.directive";
+import {EditableDirective} from "../../directives/editable.directive";
 import {TagModel} from "./tag.model";
 
 require("./compact-list.component.scss");

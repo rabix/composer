@@ -67,7 +67,7 @@ import {BlankToolStateComponent} from "./app/components/clt-editor/common/blank-
 import {StandaloneCodeEditorComponent} from "./app/components/standalone-code-editor/standalone-code-editor.component"
 import {QuickPickComponent} from "./app/components/quick-pick/quick-pick.component";
 import {CompactListComponent} from "./app/components/compact-list/compact-list.component";
-import {EditableDirective} from "./app/components/compact-list/directives/editable.directive";
+import {EditableDirective} from "./app/directives/editable.directive";
 
 @NgModule({
     providers: [
