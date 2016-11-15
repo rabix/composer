@@ -1,7 +1,10 @@
 import { Component } from '@angular/core';
 
 require('./form-section.component.scss');
-
+/**
+ * @deprecated Use {@link FormPanelComponent} from the Core module instead.
+ * It's the same as this one. Moving stuff to the core module and writing tests.
+ */
 @Component({
     selector: 'ct-form-section',
     template: `

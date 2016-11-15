@@ -6,40 +6,42 @@ import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 
 @Component({
     selector: "input-port-list",
-    template: `
-
-    <div *ngIf="portList.length > 0">
+    template: `<div *ngIf="portList.length > 0">
 
             <div class="gui-section-list-title">
-                <div class="col-sm-7">
-                    ID
-                </div>
-                <div class="col-sm-2">
-                    Type
-                </div>
-                <div class="col-sm-3">
-                    Required
-                </div>
+                <div class="col-sm-4">ID</div>
+                <div class="col-sm-3">Type</div>
+                <div class="col-sm-5">Binding</div>
             </div>
         
             <ul class="gui-section-list">
         
-                <li class="gui-section-list-item clickable"
-                    *ngFor="let inputProp of portList; let i = index; trackBy:trackByIndex"
-                    (click)="editProperty(i)">
+                <li class="gui-section-list-item clickable validatable"
+                    [class.error]="input.validation.errors.length"
+                    [class.warning]="input.validation.warnings.length"
+                    [class.selected]="i === selectedIndex"
+                    *ngFor="let input of portList; let i = index">
+                    <!-- @todo: temporarily removing edit method -->
         
-                    <div class="col-sm-7" title="{{inputProp.id}}">
-                        <div class="ellipsis">
-                            {{inputProp.id}}
-                        </div>
+                    <div class="col-sm-4" [title]="input.id">
+                        <i class="fa fa-warning validation-icon"
+                           [title]="input.validation.warnings.join('\\n')"
+                           *ngIf="input.validation.warnings.length"></i>
+                        <i class="fa fa-times-circle validation-icon"
+                           *ngIf="input.validation.errors.length"
+                           [title]="input.validation.errors.join('\\n')"></i>
+        
+                        <span class="ellipsis">
+                            {{input.id}}
+                        </span>
                     </div>
         
-                    <div class="col-sm-2" title="{{inputProp.type}}">
-                        {{inputProp.type}}
+                    <div class="col-sm-3 ellipsis" [title]="input.type">
+                        {{ input.type | commandParameterType }}
                     </div>
-                    
-                    <div class="col-sm-2" title="{{inputProp.isRequired}}">
-                       {{inputProp.isRequired}}
+        
+                    <div class="col-sm-4 ellipsis" [title]="input.isRequired">
+                        {{ input.inputBinding | commandInputBinding }}
                     </div>
         
                     <div class="col-sm-1 pull-right tool-input-icon">
