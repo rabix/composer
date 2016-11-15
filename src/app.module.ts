@@ -60,6 +60,7 @@ import {ToolEditorModule} from "./app/tool-editor/tool-editor.module";
 import {CoreModule} from "./app/core/core.module";
 import {CWLModule} from "./app/cwl/cwl.module";
 import {HintListComponent} from "./app/components/clt-editor/hints/hint-list.component";
+import {BlankToolStateComponent} from "./app/components/clt-editor/common/blank-tool-state.component";
 
 @NgModule({
     providers: [
@@ -70,6 +71,7 @@ import {HintListComponent} from "./app/components/clt-editor/hints/hint-list.com
         AlertComponent,
         BaseCommandFormComponent,
         BasicInputSectionComponent,
+        BlankToolStateComponent,
         BlockLoaderComponent,
         CheckboxPromptComponent,
         CltEditorComponent,
