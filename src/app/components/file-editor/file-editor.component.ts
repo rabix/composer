@@ -1,11 +1,12 @@
-import {Component, OnInit, Input, OnDestroy} from "@angular/core";
-import {Subscription, BehaviorSubject} from "rxjs";
+import {Component, OnInit, Input} from "@angular/core";
+import {BehaviorSubject} from "rxjs";
 import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {DataEntrySource} from "../../sources/common/interfaces";
 import {logop} from "../../lib/utils.lib";
+import {ComponentBase} from "../common/component-base";
 
 @Component({
-    selector: 'ct-standalone-code-editor',
+    selector: 'ct-file-editor',
     directives: [CodeEditorComponent],
     template: `
         <div class="editor-container">
@@ -21,26 +22,19 @@ import {logop} from "../../lib/utils.lib";
         </div>
 `
 })
-export class StandaloneCodeEditorComponent implements OnInit, OnDestroy {
+export class FileEditorComponent extends ComponentBase implements OnInit {
     @Input()
     public data: DataEntrySource;
-
-    /** List of subscriptions that should be disposed when destroying this component */
-    private subs: Subscription[] = [];
 
     private rawEditorContent = new BehaviorSubject("");
 
     ngOnInit(): void {
-        this.subs.push(this.data.content.subscribe(this.rawEditorContent));
+        this.tracked = this.data.content.subscribe(this.rawEditorContent);
     }
 
     private save(){
         if (this.data.data.source === "local") {
             this.data.data.save(this.rawEditorContent.getValue()).subscribe(logop);
         }
-    }
-
-    ngOnDestroy(): void {
-        this.subs.forEach(s => s.unsubscribe());
     }
 }

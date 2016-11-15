@@ -1,16 +1,8 @@
 import {Component, OnInit, Input, OnDestroy} from "@angular/core";
-import {BlockLoaderComponent} from "../block-loader/block-loader.component";
-import {CodeEditorComponent} from "../code-editor/code-editor.component";
-import {CltEditorComponent} from "../clt-editor/clt-editor.component";
 import {ReplaySubject, BehaviorSubject, Observable} from "rxjs/Rx";
-import {ToolHeaderComponent} from "./tool-header/tool-header.component";
 import {CommandLineToolModel} from "cwlts/models/d2sb";
-import {SidebarComponent} from "../sidebar/sidebar.component";
-import {CommandLineComponent} from "../clt-editor/commandline/commandline.component";
-import {ViewModeSwitchComponent} from "../view-switcher/view-switcher.component";
 import {DataEntrySource} from "../../sources/common/interfaces";
 import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
-import {ValidationIssuesComponent} from "../validation-issues/validation-issues.component";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
 import {WebWorkerService} from "../../services/web-worker/web-worker.service";
 import {ToolSidebarService} from "../../services/sidebars/tool-sidebar.service";
@@ -18,7 +10,6 @@ import {ExpressionSidebarService} from "../../services/sidebars/expression-sideb
 import {InputSidebarService} from "../../services/sidebars/input-sidebar.service";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {ModalService} from "../modal";
-import {CheckboxPromptComponent} from "../modal/common/checkbox-prompt.component";
 import {ComponentBase} from "../common/component-base";
 import {noop} from "../../lib/utils.lib";
 
@@ -32,17 +23,6 @@ require("./tool-editor.component.scss");
         ExpressionSidebarService,
         InputSidebarService,
         ModalService
-    ],
-    directives: [
-        CodeEditorComponent,
-        CltEditorComponent,
-        BlockLoaderComponent,
-        ToolHeaderComponent,
-        CommandLineComponent,
-        SidebarComponent,
-        ViewModeSwitchComponent,
-        ValidationIssuesComponent,
-        CheckboxPromptComponent
     ],
     template: `
         <block-loader *ngIf="isLoading"></block-loader>
@@ -68,7 +48,7 @@ require("./tool-editor.component.scss");
             </div>
             <div class="status-bar-footer">
                 <div class="left-side">
-                    <validation-issues [issuesStream]="schemaValidation" 
+                    <validation-issues [issuesStream]="validation" 
                                        (select)="selectBottomPanel($event)" 
                                        [show]="bottomPanel === 'validation'"></validation-issues>
                     
@@ -91,7 +71,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
     public data: DataEntrySource;
 
     /** Stream of ValidationResponse for current document */
-    public schemaValidation = new ReplaySubject<ValidationResponse>(1);
+    public validation = new ReplaySubject<ValidationResponse>(1);
 
     /** Default view mode. */
     private viewMode: "code"|"gui" = "code";
@@ -144,7 +124,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
             .skip(1)
             .distinctUntilChanged()
             .subscribe(latestContent => {
-                this.validateSchema(latestContent);
+                this.webWorkerService.validateJsonSchema(latestContent);
             });
 
         this.tracked = this.data.content.subscribe(val => {
@@ -152,30 +132,35 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
         });
 
 
-        this.tracked = this.webWorkerService.validationResultStream.subscribe(this.schemaValidation);
+        this.tracked = this.webWorkerService.validationResultStream
+            .map(r => {
+                if (!r.isValidCwl) return r;
 
-        this.tracked = this.webWorkerService.validationResultStream.subscribe(err => {
+                let json = YAML.safeLoad(this.rawEditorContent.getValue(), {json: true});
+
+                // should show prompt, but json is already reformatted
+                if (this.showReformatPrompt && json["rbx:modified"]) {
+                    this.showReformatPrompt = false;
+                }
+
+                this.toolModel        = new CommandLineToolModel(json);
+                this.commandLineParts = this.toolModel.getCommandLineParts();
+
+                this.toolModel.validate();
+
+                return {
+                    errors: this.toolModel.validation.errors,
+                    warnings: this.toolModel.validation.warnings,
+                    isValidatableCwl: true,
+                    isValidCwl: true,
+                    isValidJSON: true
+                };
+
+            }).subscribe(this.validation);
+
+        this.tracked = this.validation.subscribe(err => {
             this.isValidCWL = err.isValidCwl;
         });
-    }
-
-    private validateSchema(content: string) {
-        this.webWorkerService.validateJsonSchema(content);
-
-        try {
-            let json = YAML.safeLoad(content, {json: true});
-
-            // should show prompt, but json is already reformatted
-            if (this.showReformatPrompt && json["rbx:modified"]) {
-                this.showReformatPrompt = false;
-            }
-
-            this.toolModel = new CommandLineToolModel(json);
-            this.toolModel.validate();
-            this.commandLineParts = this.toolModel.getCommandLineParts();
-        } catch (ex) {
-            // if the file isn't valid JSON, do nothing
-        }
     }
 
     private save(revisionNote: string) {
