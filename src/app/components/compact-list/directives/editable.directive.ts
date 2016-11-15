@@ -2,17 +2,17 @@ import {Directive, ElementRef, forwardRef} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, NG_VALIDATORS, FormControl} from "@angular/forms";
 
 @Directive({
-    selector: '[contenteditable]',
+    selector: '[editable]',
     providers: [
-        { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ContenteditableDirective), multi: true },
-        { provide: NG_VALIDATORS, useExisting: forwardRef(() => ContenteditableDirective), multi: true }
+        { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => EditableDirective), multi: true },
+        { provide: NG_VALIDATORS, useExisting: forwardRef(() => EditableDirective), multi: true }
     ],
     host: {
         '(keydown)': 'onKeyDown($event)',
         '(keyup)': 'onKeyUp()'
     }
 })
-export class ContenteditableDirective implements ControlValueAccessor {
+export class EditableDirective implements ControlValueAccessor {
 
     private propagateChange = (_) => { };
     private onTouched = () => { };

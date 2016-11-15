@@ -1,6 +1,6 @@
 import {Component, Input, ElementRef, Renderer, ViewChild, forwardRef} from "@angular/core";
 import {FormControl, ControlValueAccessor, NG_VALUE_ACCESSOR, NG_VALIDATORS} from "@angular/forms";
-import {ContenteditableDirective} from "./directives/contenteditable.directive";
+import {EditableDirective} from "./directives/editable.directive";
 import {TagModel} from "./tag.model";
 
 require("./compact-list.component.scss");
@@ -8,7 +8,7 @@ require("./compact-list.component.scss");
 @Component({
     selector: "compact-list",
     directives: [
-        ContenteditableDirective
+        EditableDirective
     ],
     providers: [
         { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => CompactListComponent), multi: true },
@@ -44,7 +44,7 @@ require("./compact-list.component.scss");
                     <!-- Not using the <input>, 
                          so that the width can adjust to the text length,
                          and break into a new line if its long -->
-                    <span #tagInput 
+                    <span #tagInput editable
                           contenteditable="true"
                           class="tag-input"
                           *ngIf="tagInputControl"

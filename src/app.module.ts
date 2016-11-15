@@ -63,7 +63,7 @@ import {HintListComponent} from "./app/components/clt-editor/hints/hint-list.com
 import {StandaloneCodeEditorComponent} from "./app/components/standalone-code-editor/standalone-code-editor.component"
 import {QuickPickComponent} from "./app/components/quick-pick/quick-pick.component";
 import {CompactListComponent} from "./app/components/compact-list/compact-list.component";
-import {ContenteditableDirective} from "./app/components/compact-list/directives/contenteditable.directive";
+import {EditableDirective} from "./app/components/compact-list/directives/editable.directive";
 
 @NgModule({
     providers: [
@@ -130,7 +130,7 @@ import {ContenteditableDirective} from "./app/components/compact-list/directives
         ToggleComponent,
         QuickPickComponent,
         CompactListComponent,
-        ContenteditableDirective
+        EditableDirective
     ],
     entryComponents: [
         CheckboxPromptComponent,
