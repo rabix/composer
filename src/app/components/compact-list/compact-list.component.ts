@@ -44,8 +44,7 @@ require("./compact-list.component.scss");
                     <!-- Not using the <input>, 
                          so that the width can adjust to the text length,
                          and break into a new line if its long -->
-                    <span #tagInput editable
-                          contenteditable="true"
+                    <span #tagInput ct-editable contenteditable="true"
                           class="tag-input"
                           *ngIf="tagInputControl"
                           [ngClass]="{'invalid-input': !isValidInput }"

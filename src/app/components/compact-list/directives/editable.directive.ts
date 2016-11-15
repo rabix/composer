@@ -2,7 +2,7 @@ import {Directive, ElementRef, forwardRef} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, NG_VALIDATORS, FormControl} from "@angular/forms";
 
 @Directive({
-    selector: '[editable]',
+    selector: '[ct-editable][contenteditable=true]',
     providers: [
         { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => EditableDirective), multi: true },
         { provide: NG_VALIDATORS, useExisting: forwardRef(() => EditableDirective), multi: true }
