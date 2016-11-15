@@ -8,16 +8,13 @@ import {
     ViewChildren,
     ElementRef
 } from "@angular/core";
-import {ContextDirective} from "../../services/context/context.directive";
-import {TreeNode, ParentTreeNode, OpenableTreeNode} from "./types";
-import {BehaviorSubject, Subscription} from "rxjs";
+import {TreeNode} from "./types";
+import {BehaviorSubject} from "rxjs";
 import {TreeViewService} from "./tree-view.service";
-import {tracked} from "../../decorators/index";
 import {ComponentBase} from "../common/component-base";
 
 @Component({
     selector: "ct-tree-node",
-    directives: [ContextDirective, ContextDirective],
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <div class="deep-unselectable clickable node-base"
@@ -84,6 +81,7 @@ export class TreeNodeComponent extends ComponentBase implements OnInit {
 
     public constructor(private tree: TreeViewService, private detector: ChangeDetectorRef, el: ElementRef) {
         super();
+
         this.nodeIndex = TreeNodeComponent.NODE_COUNT++;
         this.el        = el.nativeElement;
     }
