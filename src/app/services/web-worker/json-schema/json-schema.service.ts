@@ -64,13 +64,13 @@ export class JsonSchemaService {
             const isValid = this.isClassValid(json.class);
 
             if (!isValid) {
-                this.errorMessage = "CWL Class is not valid";
+                this.errorMessage = `CWL class is not valid, expected one of "Workflow", "CommandLineTool", or "ExpressionTool". Instead, got ${json.class}`;
             }
 
             return isValid;
 
         } else {
-            this.errorMessage = "JSON is missing 'class' property";
+            this.errorMessage = "Document is missing 'class' property";
             return false;
         }
     }
@@ -115,7 +115,7 @@ export class JsonSchemaService {
                 isValidCwl: validator.validate(cwlVersion + jsonClass, cwlJson),
                 errors: validator.errors || [],
                 warnings: [],
-                errorText: validator.errorsText(),
+                errorText: validator.errorsText().replace(/^data/gm, "Document").replace(/,\sdata/gm, ", document"),
                 class: jsonClass
             };
 

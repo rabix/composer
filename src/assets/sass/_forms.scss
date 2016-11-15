@@ -1,6 +1,5 @@
 @import "./variables";
 
-
 .flex-container {
   padding: 0;
   margin: 0;
@@ -34,4 +33,46 @@
   color: $input-label-color;
   font-size: $input-label-size;
   margin-bottom: .3em;
+}
+
+.validatable {
+  border: $gui-section-list-item-border-size solid transparent;
+
+  &:hover {
+    border-color: $gui-section-list-item-hover-border;
+  }
+
+  &.error {
+    .validation-icon {
+      color: $brand-danger;
+    }
+
+    &:hover, &.selected {
+      border-color: $brand-danger;
+    }
+
+    &.selected {
+      background-color: $brand-danger;
+    }
+  }
+
+  &.warning {
+    .validation-icon {
+      color: $brand-warning;
+    }
+
+    &:hover, &.selected {
+      border-color: $brand-warning;
+    }
+
+    &.selected {
+      background-color: $brand-warning;
+    }
+  }
+
+  &.selected {
+    .validation-icon {
+      color: $gui-section-list-item-select-icon-color;
+    }
+  }
 }

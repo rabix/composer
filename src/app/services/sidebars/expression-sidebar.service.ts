@@ -10,11 +10,11 @@ export class ExpressionSidebarService {
     public expressionDataStream: Observable<ExpressionEditorData>;
 
     /** Update the current expression */
-    private updateExpressionEditorData: BehaviorSubject<ExpressionEditorData> = new BehaviorSubject<ExpressionEditorData>(undefined);
+    private updateExpressionEditorData = new BehaviorSubject<ExpressionEditorData>(undefined);
 
     constructor(private toolSidebarService: ToolSidebarService) {
 
-        this.expressionDataStream = this.updateExpressionEditorData
+        this.expressionDataStream = (this.updateExpressionEditorData as Observable)
             .filter(update => update !== undefined)
             .publishReplay(1)
             .refCount();

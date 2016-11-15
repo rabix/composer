@@ -1,7 +1,6 @@
-import {AsyncValidatorFn} from "@angular/forms";
+import {AsyncValidatorFn, AbstractControl} from "@angular/forms";
 import {Injectable} from "@angular/core";
 import {Observable, Subject} from "rxjs/Rx";
-import {AbstractControl} from "@angular/common";
 
 @Injectable()
 export class FileValidator {

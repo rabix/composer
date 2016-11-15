@@ -60,6 +60,7 @@ import {ToolEditorModule} from "./app/tool-editor/tool-editor.module";
 import {CoreModule} from "./app/core/core.module";
 import {CWLModule} from "./app/cwl/cwl.module";
 import {HintListComponent} from "./app/components/clt-editor/hints/hint-list.component";
+import {BlankToolStateComponent} from "./app/components/clt-editor/common/blank-tool-state.component";
 import {StandaloneCodeEditorComponent} from "./app/components/standalone-code-editor/standalone-code-editor.component"
 import {QuickPickComponent} from "./app/components/quick-pick/quick-pick.component";
 import {CompactListComponent} from "./app/components/compact-list/compact-list.component";
@@ -74,6 +75,7 @@ import {EditableDirective} from "./app/components/compact-list/directives/editab
         AlertComponent,
         BaseCommandFormComponent,
         BasicInputSectionComponent,
+        BlankToolStateComponent,
         BlockLoaderComponent,
         CheckboxPromptComponent,
         CltEditorComponent,

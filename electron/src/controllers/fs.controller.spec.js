@@ -290,14 +290,19 @@ describe("FS Controller", () => {
     });
 
     describe("Endpoint: saveFileContent", () => {
-        it("should return an error if file doesn't exist", (done) => {
+        it("should create file if it doesn't exist", (done) => {
 
             tmp.tmpName((err, path) => {
                 if (err) throw err;
 
                 ctrl.saveFileContent(path, "", (err, info) => {
-                    assert.instanceOf(err, Error);
-                    done();
+                    assert.isNull(err);
+
+                    fs.access(path, fs.constants.F_OK, (err) => {
+
+                        assert.isNull(err);
+                        done();
+                    });
                 });
             });
 
@@ -305,18 +310,55 @@ describe("FS Controller", () => {
 
         it("should overwrite the file with the given content", (done) => {
             tmp.file({postfix: ".json"}, (err, path, fd, cleanup) => {
+
                 fs.writeFile(fd, "test data", (err) => {
                     if (err) throw err;
 
-                    ctrl.saveFileContent(path, `{ "class": "Workflow" } `, (err, info) => {
+                    const newContent = '{ "class": "Workflow" }';
+
+                    ctrl.saveFileContent(path, newContent, (err, info) => {
                         if (err) throw err;
 
                         assertStandardEntryInfo(info, {
                             type: "Workflow"
                         });
 
-                        cleanup();
-                        done();
+                        fs.readFile(path, "utf8", (err, content) => {
+                            assert.isNull(err);
+                            assert.equal(content, newContent);
+
+                            cleanup();
+                            done();
+
+                        });
+
+                    });
+
+                });
+            });
+        });
+
+        /**
+         * Made to exactly replicate a bug
+         */
+        it("should replace file content when new content is shorter than the old one", (done) => {
+            tmp.file({postfix: ".json"}, (err, path, fd, cleanup) => {
+
+                fs.writeFile(fd, "test data", (err) => {
+                    if (err) throw err;
+
+                    const overwrite = "hello";
+
+                    ctrl.saveFileContent(path, overwrite, (err, info) => {
+                        if (err) throw err;
+
+                        fs.readFile(path, "utf8", (err, content) => {
+                            assert.isNull(err);
+                            assert.equal(content, overwrite);
+
+                            cleanup();
+                            done();
+                        });
                     });
 
                 });
@@ -498,4 +540,5 @@ describe("FS Controller", () => {
             });
         });
     });
+
 });

@@ -1,14 +1,17 @@
 import {NgModule} from "@angular/core";
-import {CommandOutputTypePipe} from "./pipes/command-output-type.pipe";
+import {CommandParameterTypePipe} from "./pipes/command-parameter-type.pipe";
 import {CommandOutputGlobPipe} from "./pipes/command-output-glob.pipe";
+import {CommandInputBindingPipe} from "./pipes/command-input-binding.pipe";
 @NgModule({
     declarations: [
-        CommandOutputTypePipe,
-        CommandOutputGlobPipe
+        CommandParameterTypePipe,
+        CommandOutputGlobPipe,
+        CommandInputBindingPipe
     ],
     exports: [
-        CommandOutputTypePipe,
-        CommandOutputGlobPipe
+        CommandParameterTypePipe,
+        CommandOutputGlobPipe,
+        CommandInputBindingPipe
     ]
 })
 export class CWLModule {
