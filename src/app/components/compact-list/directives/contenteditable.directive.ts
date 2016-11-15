@@ -14,12 +14,12 @@ import {ControlValueAccessor, NG_VALUE_ACCESSOR, NG_VALIDATORS, FormControl} fro
 })
 export class ContenteditableDirective implements ControlValueAccessor {
 
-    private onChange = (_) => { };
+    private propagateChange = (_) => { };
     private onTouched = () => { };
 
-    private validateFn: any = () => {};
+    private validateFn = (_) => {};
 
-    private lastValue: any;
+    private lastValue: string;
 
     constructor(private elRef: ElementRef) {
 
@@ -27,20 +27,20 @@ export class ContenteditableDirective implements ControlValueAccessor {
 
     private writeValue(value: any): void {
         this.elRef.nativeElement.innerText = value;
-        this.onChange(this.elRef.nativeElement.innerText);
+        this.propagateChange(this.elRef.nativeElement.innerText);
     }
 
-    private registerOnChange(fn: (_: any) => void): void {
-        this.onChange = fn;
+    private registerOnChange(fn: any): void {
+        this.propagateChange = fn;
     }
 
-    private registerOnTouched(fn: () => void): void {
+    private registerOnTouched(fn: any): void {
         this.onTouched = fn;
     }
 
     private onKeyUp(): void {
         this.lastValue = this.elRef.nativeElement.innerText;
-        this.onChange(this.elRef.nativeElement.innerText);
+        this.propagateChange(this.elRef.nativeElement.innerText);
     }
 
     private onKeyDown(event): void {
@@ -52,7 +52,7 @@ export class ContenteditableDirective implements ControlValueAccessor {
         }
     }
 
-    validate(c: FormControl) {
+    private validate(c: FormControl) {
         return this.validateFn(c);
     }
 }
