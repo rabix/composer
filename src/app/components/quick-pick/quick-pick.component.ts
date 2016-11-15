@@ -1,32 +1,30 @@
-import {Component, Input, Output} from "@angular/core";
-import {FormGroup, FormControl, Validators} from "@angular/forms";
+import {Component, Input, forwardRef} from "@angular/core";
+import {FormControl, Validators, NG_VALUE_ACCESSOR, ControlValueAccessor} from "@angular/forms";
 import {ExpressionInputComponent} from "../forms/inputs/types/expression-input.component";
 import {ExpressionModel} from "cwlts/models/d2sb";
-import {ReplaySubject} from "rxjs";
 import {ComponentBase} from "../common/component-base";
-import {Expression} from "cwlts/mappings/d2sb/Expression";
 import {CustomValidators} from "../../validators/custom.validator";
+import {Expression} from "cwlts/mappings/d2sb/Expression";
 
 require("./quick-pick.component.scss");
 
 @Component({
     selector: "quick-pick",
+    providers: [
+        { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => QuickPickComponent), multi: true }
+    ],
     directives: [
         ExpressionInputComponent
     ],
     template: `
-        <form [formGroup]="formGroup"
-             class="button-list content-wrapper"
-             *ngIf="!formGroup.controls['expressionField'] && formGroup.controls['radioButtonControl']">
-        
-           <div class="btn-group" data-toggle="buttons">
+           <div class="btn-group" data-toggle="buttons" *ngIf="!expressionControl">
                 
                 <label *ngFor="let buttonLabel of buttonList" 
-                       [ngClass]="{'active': buttonLabel === formGroup.controls['radioButtonControl'].value}"
+                       [ngClass]="{'active': buttonLabel === radioButtonControl.value}"
                        class="btn btn-secondary button-item-label">
                        
                         <input type="radio"
-                               formControlName="radioButtonControl"
+                               [formControl]="radioButtonControl"
                                [value]="buttonLabel">
                                {{buttonLabel}}
                 </label>
@@ -34,17 +32,15 @@ require("./quick-pick.component.scss");
          
           <button type="button" 
                   class="btn btn-primary add-expression-btn"
-                  *ngIf="!formGroup.controls['expressionField']"
-                  (click)="crateExpressionInput()">Add Expression</button>
-        </form>
-        
+                  *ngIf="!expressionControl"
+                  (click)="crateExpressionInput('')">Add Expression</button>
         
         <div class="expression-input-wrapper content-wrapper"
-             *ngIf="formGroup.controls['expressionField']">
+             *ngIf="expressionControl">
              
              <expression-input class="col-sm-11 expression-input"
                     [context]="context"
-                    [formControl]="formGroup.controls['expressionField']">
+                    [formControl]="expressionControl">
              </expression-input>
             
             <span class="col-sm-1">
@@ -53,7 +49,7 @@ require("./quick-pick.component.scss");
         </div>
     `
 })
-export class QuickPickComponent extends ComponentBase {
+export class QuickPickComponent extends ComponentBase implements ControlValueAccessor {
 
     @Input()
     public buttonList: String[];
@@ -61,52 +57,71 @@ export class QuickPickComponent extends ComponentBase {
     @Input()
     public context: any;
 
-    @Input()
-    private formGroup: FormGroup;
+    private radioButtonControl: FormControl;
 
-    @Output()
-    public onUpdate = new ReplaySubject<string | Expression>(1);
+    private expressionControl: FormControl;
+
+    private onTouched = () => { };
+
+    private propagateChange = (_) => {};
 
     constructor() {
         super();
-    }
+        this.radioButtonControl = new FormControl("");
 
-    ngOnInit() {
-        this.formGroup.addControl(
-            "radioButtonControl", new FormControl("")
-        );
-
-        this.tracked = this.formGroup.controls["radioButtonControl"].valueChanges.subscribe((value: string) => {
-            this.onUpdate.next(value);
+        this.tracked = this.radioButtonControl.valueChanges.subscribe((value: string) => {
+            this.propagateChange(value);
         });
     }
 
-    private crateExpressionInput(): void {
-        if (this.formGroup.contains("expressionField")) {
-            return;
+    private writeValue(value: string | ExpressionModel): void {
+        if (typeof value === "string") {
+            const index = this.buttonList.indexOf(<string>value);
+
+            if (index > -1) {
+                this.radioButtonControl.setValue(this.buttonList[index]);
+            } else {
+                this.crateExpressionInput(value);
+            }
+
+        } else {
+            this.crateExpressionInput(value);
+        }
+    }
+
+    private registerOnChange(fn: any): void {
+        this.propagateChange = fn;
+    }
+
+    private registerOnTouched(fn: any): void {
+        this.onTouched = fn;
+    }
+
+    private crateExpressionInput(value: string | ExpressionModel): void {
+        let expressionModel = new ExpressionModel(null, "");
+        this.radioButtonControl.setValue("");
+
+        if (typeof value === "string") {
+            expressionModel.setValue(value, "string")
+        } else {
+            expressionModel.setValue((<Expression>value).script, "expression");
         }
 
-        this.formGroup.controls["radioButtonControl"].setValue("");
-        const expressionModel = new ExpressionModel("");
+        this.expressionControl = new FormControl(expressionModel, [Validators.required, CustomValidators.cwlModel]);
 
-        this.formGroup.addControl(
-            "expressionField",
-            new FormControl(expressionModel, [Validators.required, CustomValidators.cwlModel])
-        );
-
-        this.tracked = this.formGroup.controls["expressionField"].valueChanges
+        this.tracked = this.expressionControl.valueChanges
             .subscribe((expressionModel: ExpressionModel) => {
-                this.onUpdate.next(expressionModel.serialize());
+                this.propagateChange(expressionModel.serialize());
             });
     }
 
     private removeExpressionInput(): void {
         this.clearExpression();
-        this.formGroup.removeControl("expressionField");
+        this.expressionControl = undefined;
     }
 
     private clearExpression(): void {
-        this.formGroup.controls["expressionField"].setValue(new ExpressionModel(""));
+        this.expressionControl.setValue(new ExpressionModel(null, ""));
     }
 
     ngOnDestroy(): void {
