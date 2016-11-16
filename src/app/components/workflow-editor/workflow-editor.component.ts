@@ -1,13 +1,12 @@
 import {Component, OnInit, Input, OnDestroy} from "@angular/core";
 import {Subscription, ReplaySubject, BehaviorSubject} from "rxjs";
-import {CodeEditorComponent} from "../code-editor/code-editor.component";
 import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
 import {DataEntrySource} from "../../sources/common/interfaces";
 import {WebWorkerService} from "../../services/web-worker/web-worker.service";
+import {ViewMode} from "../view-switcher/view-switcher.component";
 
 @Component({
     selector: 'ct-workflow-editor',
-    directives: [CodeEditorComponent],
     template: `
         <div class="editor-container">
             <tool-header class="editor-header"
@@ -16,13 +15,13 @@ import {WebWorkerService} from "../../services/web-worker/web-worker.service";
                          [data]="data"></tool-header>
         
             <div class="scroll-content">
-                <ct-code-editor [hidden]="viewMode !== 'code'"
+                <ct-code-editor [hidden]="viewMode !== __viewModes.Code"
                                 (contentChanges)="onEditorContentChange($event)"
                                 [content]="data.content"
                                 [readOnly]="!data.isWritable"
                                 [language]="data.language"></ct-code-editor>
         
-                <div [hidden]="viewMode !== 'gui'">
+                <div [hidden]="viewMode !== __viewModes.Gui">
                     Workflow Editor Coming Soon
                 </div>
             </div>
@@ -47,7 +46,7 @@ export class WorkflowEditorComponent implements OnInit, OnDestroy {
     public schemaValidation = new ReplaySubject<ValidationResponse>(1);
 
     /** Default view mode. */
-    private viewMode: "code"|"gui" = "code";
+    private viewMode = ViewMode.Code;
 
     /** Flag for validity of CWL document */
     private isValidCWL = true;
@@ -60,6 +59,8 @@ export class WorkflowEditorComponent implements OnInit, OnDestroy {
     private showValidation = false;
 
     private rawEditorContent = new BehaviorSubject("");
+
+    private __viewModes = ViewMode;
 
     constructor(private webWorkerService: WebWorkerService) {
 
@@ -87,7 +88,7 @@ export class WorkflowEditorComponent implements OnInit, OnDestroy {
         this.subs.forEach(sub => sub.unsubscribe());
     }
 
-    private save(revisionNote){
+    private save(revisionNote) {
 
         if (this.data.data.source === "local") {
             this.data.data.save(this.rawEditorContent.getValue()).subscribe(_ => {
