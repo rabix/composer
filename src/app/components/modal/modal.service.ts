@@ -1,4 +1,4 @@
-import {Injectable, ComponentFactoryResolver, ViewContainerRef, ComponentRef, ApplicationRef} from "@angular/core";
+import {Injectable, ComponentFactoryResolver, ViewContainerRef, ComponentRef} from "@angular/core";
 import {Subject} from "rxjs";
 import {CheckboxPromptComponent} from "./common/checkbox-prompt.component";
 import {ConfirmComponent} from "./common/confirm.component";
@@ -10,18 +10,19 @@ import {refAssign} from "../../lib/object.lib";
 @Injectable()
 export class ModalService {
 
-    private rootViewRef: ViewContainerRef;
+    /**
+     * This needs to be hack-set from a component that has the view ref.
+     * Still not gracefully solved with Angular.
+     * {@link MainComponent.constructor}
+     */
+    public rootViewRef: ViewContainerRef;
+
     private modalComponentRef: ComponentRef<ModalComponent>;
 
     private onClose = new Subject<any>();
 
-    constructor(private resolver: ComponentFactoryResolver,
-                private appRef: ApplicationRef) {
-
-        // https://github.com/angular/angular/issues/9293
-        // Update: issue is closed, but problem is not solved yet.
-        this.rootViewRef = this.appRef["_changeDetectorRefs"][0]["_view"]["_vc_0"].vcRef;
-
+    constructor(private resolver: ComponentFactoryResolver) {
+        
         this.onClose.subscribe(_ => {
             this.cleanComponentRef();
         });
