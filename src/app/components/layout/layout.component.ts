@@ -1,8 +1,5 @@
 import {Component, OnInit, ViewChild, ElementRef, Input} from "@angular/core";
 import {BehaviorSubject, Subscription} from "rxjs";
-import {WorkboxComponent} from "../workbox/workbox.component";
-import {PanelSwitcherComponent} from "../panels/panel-switcher.component";
-import {PanelContainerComponent} from "../panels/panel-container.component";
 import {DomEventService} from "../../services/dom/dom-event.service";
 import {
     PanelGroup,
@@ -19,7 +16,6 @@ require("./layout.component.scss");
 
 @Component({
     selector: "ct-layout",
-    directives: [PanelSwitcherComponent, WorkboxComponent, PanelContainerComponent],
     template: `
         <div class="flex-box">
             <div class="panel-switch-col">
