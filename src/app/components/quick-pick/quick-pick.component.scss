@@ -1,0 +1,31 @@
+@import "../../../assets/sass/variables";
+
+.content-wrapper {
+    margin: 5px 0 5px 0;
+    display: flex;
+    align-items: center;
+
+    .btn-group {
+        flex: 1;
+    }
+}
+
+.button-item-label {
+    margin-right: 10px;
+}
+
+.button-list {
+    .button-item-label.active, .button-item-label.active:hover {
+        border: 2px solid $quick-pick-border-color;
+    }
+}
+
+.add-expression-btn {
+    float: right;
+}
+
+.expression-input-wrapper {
+    .expression-input {
+        padding-left: 0;
+    }
+}
