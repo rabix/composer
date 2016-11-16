@@ -65,8 +65,9 @@ import {BlankToolStateComponent} from "./app/components/clt-editor/common/blank-
 @NgModule({
     providers: [
         FormBuilder,
+        ModalService,
+        TemplateProviderService
     ],
-
     declarations: [
         AlertComponent,
         BaseCommandFormComponent,
@@ -135,7 +136,6 @@ import {BlankToolStateComponent} from "./app/components/clt-editor/common/blank-
         NewFileModalComponent,
         PromptComponent
     ],
-    providers: [ModalService, TemplateProviderService],
     imports: [
         BrowserModule,
         CoreModule,
