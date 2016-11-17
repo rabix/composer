@@ -104,7 +104,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
     private rawEditorContent = new BehaviorSubject<string>("");
 
     /** Model that's recreated on document change */
-    private toolModel = new CommandLineToolModel();
+    private toolModel = new CommandLineToolModel("document");
 
     /** Sorted array of resulting command line parts */
     private commandLineParts: CommandLinePart[];
@@ -152,7 +152,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
                     this.showReformatPrompt = false;
                 }
 
-                this.toolModel        = new CommandLineToolModel(json);
+                this.toolModel        = new CommandLineToolModel("document", json);
                 this.commandLineParts = this.toolModel.getCommandLineParts();
 
                 this.toolModel.validate();
