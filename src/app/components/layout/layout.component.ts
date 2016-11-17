@@ -1,6 +1,8 @@
 import {Component, OnInit, ViewChild, ElementRef, Input} from "@angular/core";
 import {BehaviorSubject, Subscription} from "rxjs";
 import {DomEventService} from "../../services/dom/dom-event.service";
+import {UserPreferencesService} from "../../services/storage/user-preferences.service";
+import {ComponentBase} from "../common/component-base";
 import {
     PanelGroup,
     PanelStatus,
@@ -11,6 +13,7 @@ import {
     PanelGroupMap,
     PANEL_LOCAL_FILES
 } from "./layout.types";
+
 
 require("./layout.component.scss");
 
@@ -48,7 +51,7 @@ require("./layout.component.scss");
         </div>
     `
 })
-export class LayoutComponent implements OnInit {
+export class LayoutComponent extends ComponentBase implements OnInit {
 
     /** Flex ratio of the left part of the layout */
     @Input()
@@ -76,11 +79,13 @@ export class LayoutComponent implements OnInit {
 
     private el: Element;
 
-    constructor(private domEvents: DomEventService, el: ElementRef) {
+    constructor(private preferences: UserPreferencesService, private domEvents: DomEventService, el: ElementRef) {
+        super();
+
         this.el = el.nativeElement;
 
         const top = new PanelGroup([
-            new PanelStatus(PANEL_LOCAL_FILES, "1: Local Files", "folder", true, "alt+1"),
+            new PanelStatus(PANEL_LOCAL_FILES, "1: Local Files", "folder", false, "alt+1"),
             new PanelStatus(PANEL_USER_PROJECTS, "2: Projects", "folder", false, "alt+2"),
             new PanelStatus(PANEL_PUBLIC_APPS, "3: Public Apps", "code", false, "alt+3"),
         ]);
@@ -91,67 +96,66 @@ export class LayoutComponent implements OnInit {
         ]);
 
         this.panelSwitches = new BehaviorSubject({top, bottom});
+
+        // Retrieve state of opened panels from local storage
+        const tabsToOpen = this.preferences.get("open-tabs", [top.panels[0].id]);
+        tabsToOpen.forEach(panelId => this.switchPanel(panelId));
     }
 
     ngOnInit() {
 
         // Layout is resizable, so we need to react when user drags the handle
-        this.subs.push(
-            this.domEvents.onDrag(this.handle.nativeElement).map(ev => {
-                const x = ev.clientX;
+        this.tracked = this.domEvents.onDrag(this.handle.nativeElement).map(ev => {
+            const x = ev.clientX;
 
-                // You can't make the left column narrower than 200px
-                const leftMargin = 200;
+            // You can't make the left column narrower than 200px
+            const leftMargin = 200;
 
-                // And you can't make the right column narrower than 200px
-                const rightMargin = document.body.clientWidth - 200;
+            // And you can't make the right column narrower than 200px
+            const rightMargin = document.body.clientWidth - 200;
 
-                // So if you've reached the limit, stop updating the aspect ratio
-                if (x < leftMargin) {
-                    return leftMargin;
-                } else if (x > rightMargin) {
-                    return rightMargin
-                }
+            // So if you've reached the limit, stop updating the aspect ratio
+            if (x < leftMargin) {
+                return leftMargin;
+            } else if (x > rightMargin) {
+                return rightMargin
+            }
 
-                // Otherwise, return how wide the left column should be
-                return x;
-            }).subscribe(x => {
-                // Take the width of the window
-                const docWidth = document.body.clientWidth;
-                // Set tree width to the given x
-                this.treeSize  = x;
-                // And fill document area with the rest
-                this.tabsSize  = docWidth - x;
-            })
-        );
+            // Otherwise, return how wide the left column should be
+            return x;
+        }).subscribe(x => {
+            // Take the width of the window
+            const docWidth = document.body.clientWidth;
+            // Set tree width to the given x
+            this.treeSize = x;
+            // And fill document area with the rest
+            this.tabsSize = docWidth - x;
+        });
+
 
         // Flatten the grouped switches into an array
         const allSwitches = this.panelSwitches.map(p => [].concat(...Object.keys(p).map(k => p[k].panels)));
 
         // Pass all switches down to panels
-        this.subs.push(
-            allSwitches.subscribe(this.panels)
-        );
+        this.tracked = allSwitches.subscribe(this.panels);
+
 
         // Pass only active switches as visible panels
-        this.subs.push(
-            allSwitches.map(panels => panels.filter(p => p.active)).subscribe(this.visiblePanels)
-        );
+        this.tracked = allSwitches.map(panels => panels.filter(p => p.active)).subscribe(this.visiblePanels);
 
         // Whenever panels get changed, we want to register the shortcuts
         // we should unregister the old ones because of the check if a shortcut is already registered
         const shortcutSubs: Subscription[] = [];
-        this.subs.push(
-            this.panels.subscribe(panels => {
-                // Unsubscribe from all previous subscriptions on these shortcuts
-                shortcutSubs.forEach(sub => sub.unsubscribe());
-                shortcutSubs.length = 0;
+        this.tracked = this.panels.subscribe(panels => {
+            // Unsubscribe from all previous subscriptions on these shortcuts
+            shortcutSubs.forEach(sub => sub.unsubscribe());
+            shortcutSubs.length = 0;
 
-                panels.forEach(group => shortcutSubs.push(
-                    this.domEvents.onShortcut(group.shortcut).subscribe(_ => this.switchPanel(group.id)))
-                );
-            })
-        );
+            panels.forEach(group => shortcutSubs.push(
+                this.domEvents.onShortcut(group.shortcut).subscribe(_ => this.switchPanel(group.id)))
+            );
+        });
+
     }
 
     /**
@@ -172,13 +176,14 @@ export class LayoutComponent implements OnInit {
 
     private onPanelSwitch(panels, position) {
 
-        const next     = this.panelSwitches.getValue();
+        const next = this.panelSwitches.getValue();
         next[position] = new PanelGroup(panels);
 
-        this.panelSwitches.next(Object.assign({}, next));
-    }
+        // Preserve state of opened panels in local storage
+        const openedTabsIds = Object.keys(next).reduce((acc, panelGroup) => acc.concat(next[panelGroup].panels), [])
+            .filter(panel => panel.active).map(panel => panel.id);
+        this.preferences.put("open-tabs", openedTabsIds);
 
-    ngOnDestroy() {
-        this.subs.forEach(s => s.unsubscribe())
+        this.panelSwitches.next(Object.assign({}, next));
     }
 }

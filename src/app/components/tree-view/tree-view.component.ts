@@ -1,16 +1,15 @@
-import {BlockLoaderComponent} from "../block-loader/block-loader.component";
 import {Component, Input, ElementRef, QueryList, ViewChildren} from "@angular/core";
+import {Observable} from "rxjs";
 import {TreeNode} from "./types";
 import {TreeNodeComponent} from "./tree-node.component";
 import {TreeViewService} from "./tree-view.service";
 import {DomEventService} from "../../services/dom/dom-event.service";
-import {Observable} from "rxjs";
+import {ComponentBase} from "../common/component-base";
 
 require("./tree-view.component.scss");
 
 @Component({
     selector: "ct-tree-view",
-    directives: [BlockLoaderComponent, TreeNodeComponent],
     providers: [TreeViewService],
     template: `
         <div class="search-term-container" *ngIf="searchTerm.length > 0">
@@ -25,12 +24,10 @@ require("./tree-view.component.scss");
         </div>
     `
 })
-export class TreeViewComponent {
+export class TreeViewComponent extends ComponentBase {
 
     @Input()
     public nodes: TreeNode[];
-
-    private subs = [];
 
     private el: Element;
 
@@ -39,7 +36,8 @@ export class TreeViewComponent {
     @ViewChildren(TreeNodeComponent)
     private treeNodes: QueryList<TreeNodeComponent>;
 
-    constructor(private tree: TreeViewService, el: ElementRef, private domEvents: DomEventService) {
+    constructor(private tree: TreeViewService, private domEvents: DomEventService, el: ElementRef) {
+        super();
 
         this.tree.searchTerm.subscribe(term => {
             this.searchTerm = term;
@@ -47,78 +45,69 @@ export class TreeViewComponent {
 
         this.el = el.nativeElement;
 
-        this.subs.push(
-            this.observeArrowNavigation().withLatestFrom(
-                this.tree.selectedNode.filter(n => n),
-                (dir, node) => ({dir, node}))
-                .subscribe((data) => {
+        this.tracked = this.observeArrowNavigation().withLatestFrom(
+            this.tree.selectedNode.filter(n => !!n),
+            (dir, node) => ({dir, node}))
+            .subscribe((data) => {
 
-                    // Get all nodes underneath this tree as dom elements
-                    const domNodes = (Array.from(document.getElementsByClassName("node-base")) as Array)
-                        .filter((el: Element) => this.el === el || this.el.contains(el));
+                // Get all nodes underneath this tree as dom elements
+                const domNodes = (Array.from(document.getElementsByClassName("node-base")) as Array)
+                    .filter((el: Element) => this.el === el || this.el.contains(el));
 
-                    // Find the currently selected element within
-                    const selected = domNodes.findIndex((el: Element) => el.classList.contains("selected"));
+                // Find the currently selected element within
+                const selected = domNodes.findIndex((el: Element) => el.classList.contains("selected"));
 
-                    // Determine which node is to be selected next, depending on the keystroke
-                    const nextNode: Element = data.dir === "up" ? domNodes[selected - 1] : domNodes[selected + 1];
+                // Determine which node is to be selected next, depending on the keystroke
+                const nextNode: Element = data.dir === "up" ? domNodes[selected - 1] : domNodes[selected + 1];
 
-                    // If there's no previous or next node, nothing should be done
-                    if (!nextNode) {
-                        return;
-                    }
+                // If there's no previous or next node, nothing should be done
+                if (!nextNode) {
+                    return;
+                }
 
-                    // Take all top-level tree-node components
-                    const treeNodes: Array = this.treeNodes.toArray();
+                // Take all top-level tree-node components
+                const treeNodes: Array<TreeNodeComponent> = this.treeNodes.toArray();
 
-                    // Recursively find all their children
-                    const next = [].concat.apply(treeNodes, treeNodes.map(node => node.getChildren().toArray()))
-                        .find(node => node.nodeIndex == nextNode.getAttribute("data-index"));
+                // Recursively find all their children
 
-                    // Select the component that matches the index
-                    this.tree.selectedNode.next(next);
-                })
-        );
+                const expand = nodes =>
+                    nodes.reduce((acc, node) => acc.concat(node, expand(node.getChildren().toArray())), []);
+                const next = expand(treeNodes).find(node => node.nodeIndex == nextNode.getAttribute("data-index"));
 
-        this.subs.push(
-            this.observeArrowToggling().withLatestFrom(this.tree.selectedNode, (action, node) => ({action, node}))
-                .subscribe(data => data.action === "open" ? data.node.open() : data.node.close())
-        );
+                // Select the component that matches the index
+                this.tree.selectedNode.next(next);
+            });
 
 
-        this.subs.push(
-            this.captureSearchTerm().subscribe(tree.searchTerm)
-        );
+        this.tracked = this.observeArrowToggling()
+            .withLatestFrom(this.tree.selectedNode, (action, node) => ({action, node}))
+            .subscribe(data => data.action === "open" ? data.node.open() : data.node.close());
 
-        this.subs.push(
-            this.observeNodeOpening().subscribe(node => {
+
+        this.tracked = this.captureSearchTerm().subscribe(tree.searchTerm);
+
+        this.tracked = this.observeNodeOpening()
+            .subscribe(node => {
                 node.toggle();
                 this.tree.searchTerm.next("");
-            })
-        );
+            });
 
-        this.subs.push(
-            this.tree.selectedNode.filter(c => c).map(comp => comp.el.querySelector(".node-base")).subscribe(el => {
-                const nodeRect       = el.getBoundingClientRect();
-                const treeRect       = this.el.getBoundingClientRect();
-                const nodeFromAbove  = nodeRect.top - treeRect.top;
-                const nodeFromBelow  = treeRect.height - nodeFromAbove - nodeRect.height;
+
+        this.tracked = this.tree.selectedNode.filter(c => !!c)
+            .map(comp => comp.el.querySelector(".node-base")).subscribe(el => {
+                const nodeRect = el.getBoundingClientRect();
+                const treeRect = this.el.getBoundingClientRect();
+                const nodeFromAbove = nodeRect.top - treeRect.top;
+                const nodeFromBelow = treeRect.height - nodeFromAbove - nodeRect.height;
                 const isAboveTheFold = nodeFromAbove < 0;
                 const isBelowTheFold = nodeFromBelow < 0;
-
 
                 if (isAboveTheFold) {
                     this.el.scrollTop += nodeFromAbove;
                 } else if (isBelowTheFold) {
                     this.el.scrollTop -= nodeFromBelow;
                 }
-            })
-        );
-
-    }
-
-    ngOnDestroy() {
-        this.subs.forEach(sub => sub.unsubscribe());
+            });
     }
 
     private captureSearchTerm(): Observable<string> {
@@ -139,7 +128,7 @@ export class TreeViewComponent {
 
                 if (event.which === 8) {
                     return latestTerm.slice(0, -1);
-                } else if (event.which === 27){
+                } else if (event.which === 27) {
                     return "";
                 }
                 return latestTerm + event.key;
@@ -165,6 +154,6 @@ export class TreeViewComponent {
         return this.domEvents.on("keyup", this.el)
             .filter(ev => ev.keyCode === 13)
             .flatMap(_ => this.tree.selectedNode.first())
-            .filter(n => n);
+            .filter(n => !!n);
     }
 }
