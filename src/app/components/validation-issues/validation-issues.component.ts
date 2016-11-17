@@ -6,9 +6,15 @@ import {ValidationResponse} from "../../services/web-worker/json-schema/json-sch
     selector: "validation-issues",
     template: `
             <div class="console-component" [ngClass]="{show: show}">
-                <div class="console-content">
-                    <p class="error-text">
-                        {{ issues?.errorText }}
+                <div class="console-content" *ngIf="issues">
+                    <p class="error-text" *ngFor="let error of issues.errors">
+                        {{ error.loc ? error.loc + ": " : ""}}
+                        {{ error.message }}
+                    </p>
+                    
+                    <p class="warning-text" *ngFor="let warning of issues.warnings">
+                        {{ warning.loc ? warning.loc + ": " : ""}}
+                        {{ warning.message }}
                     </p>
                 </div>
             </div>  
