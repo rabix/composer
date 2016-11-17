@@ -6,7 +6,9 @@ import {
     ChangeDetectorRef,
     QueryList,
     ViewChildren,
-    ElementRef
+    ElementRef,
+    Renderer,
+    ViewChild
 } from "@angular/core";
 import {TreeNode} from "./types";
 import {BehaviorSubject} from "rxjs";
@@ -17,7 +19,8 @@ import {ComponentBase} from "../common/component-base";
     selector: "ct-tree-node",
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-        <div class="deep-unselectable clickable node-base"
+        <div #nodeBase
+             class="deep-unselectable clickable node-base"
              [style.paddingLeft.em]="level * 2"
              [attr.data-index]="nodeIndex"
              [tabindex]="nodeIndex"
@@ -76,10 +79,17 @@ export class TreeNodeComponent extends ComponentBase implements OnInit {
 
     public el: Element;
 
+    @ViewChild("nodeBase", {read: ElementRef})
+    private nodeBase;
+
     @ViewChildren(TreeNodeComponent)
     private children: QueryList<TreeNodeComponent>;
 
-    public constructor(private tree: TreeViewService, private detector: ChangeDetectorRef, el: ElementRef) {
+    public constructor(private tree: TreeViewService,
+                       private detector: ChangeDetectorRef,
+                       private renderer: Renderer,
+                       el: ElementRef) {
+
         super();
 
         this.nodeIndex = TreeNodeComponent.NODE_COUNT++;
@@ -90,7 +100,18 @@ export class TreeNodeComponent extends ComponentBase implements OnInit {
 
         this.isExpandable = typeof this.node.childrenProvider === "function";
 
-        this.tracked = this.tree.selectedNode.map(node => node === this).subscribe(this.isHighlighted);
+        this.tracked = this.tree.selectedNode.map(node => node === this)
+            .subscribe(isSelected => {
+                this.isHighlighted.next(isSelected);
+
+                // This element will lose focus in some cases so we need to refocus it
+                // It would be unfocused when you click & select an element in a subtree, then arrow-navigate
+                // upwards to its parent and close the parent using arrows. So this fixes that.
+                if (isSelected) {
+                    this.renderer.invokeElementMethod(this.nodeBase.nativeElement, "focus");
+                }
+
+            });
 
         this.nameParts = [this.node.name];
 

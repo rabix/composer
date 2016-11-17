@@ -1,7 +1,6 @@
 /// <reference path="../../../../node_modules/typescript/lib/lib.dom.d.ts" />
 /// <reference path="../../../../node_modules/typescript/lib/lib.es6.d.ts" />
-
-import {Component} from "@angular/core";
+import {Component, ViewContainerRef} from "@angular/core";
 import {Observable} from "rxjs/Rx";
 import {ContextService} from "../../services/context/context.service";
 import {DomEventService} from "../../services/dom/dom-event.service";
@@ -14,6 +13,7 @@ import {SBPlatformDataSourceService} from "../../sources/sbg/sb-platform.source.
 import {SettingsService} from "../../services/settings/settings.service";
 import {UrlValidator} from "../../validators/url.validator";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
+import {ModalService} from "../modal/modal.service";
 
 require("./../../../assets/sass/main.scss");
 require("./main.component.scss");
@@ -42,7 +42,13 @@ export class MainComponent {
 
     private runnix: Observable<boolean>;
 
-    constructor() {
+    constructor(modal: ModalService, vcRef: ViewContainerRef) {
+        /**
+         * Hack for angulars' inability to provide the vcRef to a service with DI.
+         * {@link ModalService.rootViewRef}
+         */
+        modal.rootViewRef = vcRef;
+
         this.runnix = Observable.fromEvent(document, "keyup").map((e: KeyboardEvent) => e.keyCode).bufferCount(10, 1)
             .filter(seq => seq.toString() == [38, 38, 40, 40, 37, 39, 37, 39, 66, 65].toString())
             .map(seq => Observable.of(true).concat(Observable.of(false).delay(3000)))

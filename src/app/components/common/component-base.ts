@@ -14,24 +14,27 @@ export abstract class ComponentBase implements OnDestroy {
     public set tracked(track: Object) {
 
         if (track instanceof Subscription) {
-            return this.__disposables.push({
+            this.__disposables.push({
                 track,
                 dispose: "unsubscribe"
             });
+            return;
         }
 
         if (typeof track["destroy"] === "function") {
-            return this.__disposables.push({
+            this.__disposables.push({
                 track,
                 dispose: "destroy"
             });
+            return;
         }
 
         if (typeof track["dispose"] === "function") {
-            return this.__disposables.push({
+            this.__disposables.push({
                 track,
                 dispose: "dispose"
             });
+            return;
         }
 
         throw new Error("Could not find a method that would destroy an object");
