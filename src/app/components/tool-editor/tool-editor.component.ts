@@ -1,27 +1,22 @@
+import * as Yaml from "js-yaml";
 import {Component, OnInit, Input, OnDestroy} from "@angular/core";
-import {BlockLoaderComponent} from "../block-loader/block-loader.component";
-import {CodeEditorComponent} from "../code-editor/code-editor.component";
-import {CltEditorComponent} from "../clt-editor/clt-editor.component";
-import {ReplaySubject, BehaviorSubject, Observable} from "rxjs/Rx";
-import {ToolHeaderComponent} from "./tool-header/tool-header.component";
-import {CommandLineToolModel} from "cwlts/models/d2sb";
-import {SidebarComponent} from "../sidebar/sidebar.component";
-import {CommandLineComponent} from "../clt-editor/commandline/commandline.component";
-import {ViewModeSwitchComponent} from "../view-switcher/view-switcher.component";
-import {DataEntrySource} from "../../sources/common/interfaces";
-import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
-import {ValidationIssuesComponent} from "../validation-issues/validation-issues.component";
+import {FormGroup, FormBuilder} from "@angular/forms";
+import {ReplaySubject, BehaviorSubject} from "rxjs/Rx";
+
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
-import {WebWorkerService} from "../../services/web-worker/web-worker.service";
-import {ToolSidebarService} from "../../services/sidebars/tool-sidebar.service";
+import {CommandLineToolModel} from "cwlts/models/d2sb";
+import {ComponentBase} from "../common/component-base";
+import {DataEntrySource} from "../../sources/common/interfaces";
 import {ExpressionSidebarService} from "../../services/sidebars/expression-sidebar.service";
 import {InputSidebarService} from "../../services/sidebars/input-sidebar.service";
-import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {ModalService} from "../modal";
-import {ComponentBase} from "../common/component-base";
 import {noop} from "../../lib/utils.lib";
+import {ToolSidebarService} from "../../services/sidebars/tool-sidebar.service";
+import {UserPreferencesService} from "../../services/storage/user-preferences.service";
+import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
+import {WebWorkerService} from "../../services/web-worker/web-worker.service";
+import {ViewMode} from "../view-switcher/view-switcher.component";
 
-const YAML = require("js-yaml");
 require("./tool-editor.component.scss");
 
 @Component({
@@ -48,13 +43,14 @@ require("./tool-editor.component.scss");
                      [readonly]="!data.isWritable"
                      [language]="data.language | async"></div>
                      
-                <ct-clt-editor *ngIf="viewMode === 'gui'"
+                <ct-clt-editor *ngIf="viewMode === __modes.Gui"
                                class="gui-editor-component"
                                [readonly]="!data.isWritable"
-                               (dirty)="modelChanged = $event"
+                               [formGroup]="toolGroup"
                                [model]="toolModel"></ct-clt-editor>
             </div>
             <div class="status-bar-footer">
+            
                 <div class="left-side">
                     <validation-issues [issuesStream]="schemaValidation" 
                                        (select)="selectBottomPanel($event)" 
@@ -64,6 +60,7 @@ require("./tool-editor.component.scss");
                                  (select)="selectBottomPanel($event)" 
                                  [show]="bottomPanel === 'commandLine'"></commandline>
                 </div>
+                
                 <div class="right-side">
                     <ct-view-mode-switch [viewMode]="viewMode"
                                          [disabled]="!isValidCWL"
@@ -82,53 +79,51 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
     public schemaValidation = new ReplaySubject<ValidationResponse>(1);
 
     /** Default view mode. */
-    private viewMode: "code"|"gui" = "code";
+    private viewMode = ViewMode.Code;
 
     /** Flag to indicate the document is loading */
     private isLoading = false;
 
     /** Flag for showing reformat prompt on GUI switch */
-    private showReformatPrompt: boolean;
+    private showReformatPrompt = true;
 
     /** Flag for bottom panel, shows validation-issues, commandline, or neither */
-        //@todo(maya) consider using ct-panel-switcher instead
+    //@todo(maya) consider using ct-panel-switcher instead
     private bottomPanel: "validation"|"commandLine"|null;
 
     /** Flag for validity of CWL document */
     private isValidCWL = false;
 
     /** Stream of contents in code editor */
-    private rawEditorContent = new BehaviorSubject("");
+    private rawEditorContent = new BehaviorSubject<string>("");
 
     /** Model that's recreated on document change */
     private toolModel = new CommandLineToolModel();
 
-    /** Flag for dirty status of CLT editor forms */
-    private modelChanged: boolean = false;
-
     /** Sorted array of resulting command line parts */
     private commandLineParts: CommandLinePart[];
 
+    private __modes = ViewMode;
+
+    private toolGroup: FormGroup;
+
     constructor(private webWorkerService: WebWorkerService,
                 private userPrefService: UserPreferencesService,
+                private formBuilder: FormBuilder,
                 private modal: ModalService) {
 
         super();
 
-        this.tracked = this.userPrefService.get("show_reformat_prompt").subscribe(x => this.showReformatPrompt = x);
+        this.toolGroup = formBuilder.group({});
 
-        // set default if userPref does not exist
-        if (this.showReformatPrompt === undefined) {
-            this.userPrefService.put("show_reformat_prompt", true);
-            this.showReformatPrompt = true;
-        }
+        this.tracked = this.userPrefService.get("show_reformat_prompt", true, true).subscribe(x => this.showReformatPrompt = x);
     }
 
     // @todo(maya) fix block loader
     // setting this.isLoading to false inside a sub doesn't (always) trigger view update
     // possible zone problem
     ngOnInit(): void {
-        this.tracked = (this.rawEditorContent as Observable)
+        this.tracked = this.rawEditorContent
             .skip(1)
             .distinctUntilChanged()
             .subscribe(latestContent => {
@@ -138,7 +133,6 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
         this.tracked = this.data.content.subscribe(val => {
             this.rawEditorContent.next(val);
         });
-
 
         this.tracked = this.webWorkerService.validationResultStream.subscribe(this.schemaValidation);
 
@@ -151,7 +145,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
         this.webWorkerService.validateJsonSchema(content);
 
         try {
-            let json = YAML.safeLoad(content, {json: true});
+            let json = Yaml.safeLoad(content, {json: true});
 
             // should show prompt, but json is already reformatted
             if (this.showReformatPrompt && json["rbx:modified"]) {
@@ -167,7 +161,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
     }
 
     private save(revisionNote: string) {
-        const text = this.modelChanged ? this.getModelText() : this.rawEditorContent.getValue();
+        const text = this.toolGroup.dirty ? this.getModelText() : this.rawEditorContent.getValue();
 
         if (this.data.data.source === "local") {
             this.data.data.save(text).subscribe(noop);
@@ -182,8 +176,10 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
      *
      * @param view
      */
-    private switchView(view: "gui" | "code") {
-        if (view === "gui") {
+    private switchView(view: ViewMode) {
+
+        if (view === ViewMode.Gui) {
+
             if (this.showReformatPrompt) {
                 this.modal.checkboxPrompt({
                     title: "Confirm GUI Formatting",
@@ -201,10 +197,10 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
             } else {
                 this.viewMode = view;
             }
-        }
-
-        if (view === "code") {
-            if (this.modelChanged) this.rawEditorContent.next(this.getModelText());
+        } else if (view === ViewMode.Code) {
+            if (this.toolGroup.dirty) {
+                this.rawEditorContent.next(this.getModelText());
+            }
 
             this.viewMode = view;
         }
@@ -213,14 +209,11 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
     /**
      * Serializes model to text. It also adds rbx:modified flag to indicate
      * the text has been formatted by the GUI editor
-     *
-     * @returns {string}
      */
     private getModelText(): string {
-        let json = this.toolModel.serialize();
-        json["rbx:modified"] = true;
+        const modelObject = Object.assign(this.toolModel.serialize(), {"rbx:modified": true});
 
-        return this.data.language.value === "json" ? JSON.stringify(json, null, 4) : YAML.dump(json);
+        return this.data.language.value === "json" ? JSON.stringify(modelObject, null, 4) : Yaml.dump(modelObject);
     }
 
     /**

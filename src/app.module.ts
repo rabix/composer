@@ -60,20 +60,19 @@ import {ToolEditorModule} from "./app/tool-editor/tool-editor.module";
 import {CoreModule} from "./app/core/core.module";
 import {CWLModule} from "./app/cwl/cwl.module";
 import {HintListComponent} from "./app/components/clt-editor/hints/hint-list.component";
-import {BlankToolStateComponent} from "./app/components/clt-editor/common/blank-tool-state.component";
-import {StandaloneCodeEditorComponent} from "./app/components/standalone-code-editor/standalone-code-editor.component";
 import {QuickPickComponent} from "./app/components/quick-pick/quick-pick.component";
+import {EditorCommonModule} from "./app/editor-common/editor-common.module";
 
 @NgModule({
     providers: [
         FormBuilder,
+        ModalService,
+        TemplateProviderService
     ],
-
     declarations: [
         AlertComponent,
         BaseCommandFormComponent,
         BasicInputSectionComponent,
-        BlankToolStateComponent,
         BlockLoaderComponent,
         CheckboxPromptComponent,
         CltEditorComponent,
@@ -139,11 +138,11 @@ import {QuickPickComponent} from "./app/components/quick-pick/quick-pick.compone
         NewFileModalComponent,
         PromptComponent
     ],
-    providers: [ModalService, TemplateProviderService],
     imports: [
         BrowserModule,
         CoreModule,
         CWLModule,
+        EditorCommonModule,
         FormsModule,
         HttpModule,
         ReactiveFormsModule,
