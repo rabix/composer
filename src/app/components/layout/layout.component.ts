@@ -74,9 +74,6 @@ export class LayoutComponent extends ComponentBase implements OnInit {
     /** Tracking the panel switches so we know which ones to highlight and where to put them */
     protected panelSwitches: BehaviorSubject<PanelGroupMap>;
 
-    /** Subscriptions to dispose when component gets destroyed */
-    private subs: Subscription[] = [];
-
     private el: Element;
 
     constructor(private preferences: UserPreferencesService, private domEvents: DomEventService, el: ElementRef) {
@@ -98,8 +95,8 @@ export class LayoutComponent extends ComponentBase implements OnInit {
         this.panelSwitches = new BehaviorSubject({top, bottom});
 
         // Retrieve state of opened panels from local storage
-        const tabsToOpen = this.preferences.get("open-tabs", [top.panels[0].id]);
-        tabsToOpen.forEach(panelId => this.switchPanel(panelId));
+        this.tracked = this.preferences.get("open-tabs", [top.panels[0].id])
+            .subscribe(tabs => tabs.forEach(panelId => this.switchPanel(panelId)));
     }
 
     ngOnInit() {

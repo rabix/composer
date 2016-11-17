@@ -1,9 +1,6 @@
 import {Component} from "@angular/core";
-import {TreeViewComponent} from "../tree-view/tree-view.component";
 import {ReplaySubject, Observable, Subscription, Subject} from "rxjs";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
-import {BlockLoaderComponent} from "../block-loader/block-loader.component";
-import {PanelToolbarComponent} from "./panel-toolbar.component";
 import {OpenTabAction} from "../../action-events";
 import {DataEntrySource} from "../../sources/common/interfaces";
 import {SettingsService} from "../../services/settings/settings.service";
@@ -13,10 +10,10 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
 import {MenuItem} from "../menu/menu-item";
 import {ModalService} from "../modal/modal.service";
 import {NewFileModalComponent} from "../modal/custom/new-file-modal.component";
+import {ComponentBase} from "../common/component-base";
 
 @Component({
     selector: "ct-sb-user-projects-panel",
-    directives: [TreeViewComponent, BlockLoaderComponent, PanelToolbarComponent],
     host: {"class": "block"},
     template: `
         <ct-panel-toolbar>
@@ -56,13 +53,11 @@ import {NewFileModalComponent} from "../modal/custom/new-file-modal.component";
         <ct-tree-view [nodes]="nodes | async"></ct-tree-view>
     `
 })
-export class SBUserProjectsPanelComponent {
+export class SBUserProjectsPanelComponent extends ComponentBase {
 
     private nodes = new ReplaySubject(1);
 
     private isLoading = false;
-
-    private subs: Subscription[] = [];
 
     private allProjects = new ReplaySubject<{id: string, data: PlatformProjectEntry}>();
 
@@ -79,6 +74,7 @@ export class SBUserProjectsPanelComponent {
                 private preferences: UserPreferencesService,
                 private modal: ModalService,
                 private settings: SettingsService) {
+        super();
 
         this.settings.platformConfiguration
             .do(_ => this.isLoading = true)
@@ -88,7 +84,7 @@ export class SBUserProjectsPanelComponent {
                 .map(entry => this.mapProjectToNode(entry))
             ).withLatestFrom(
             this.settings.platformConfiguration,
-            Observable.of(this.preferences.get("open_projects", {})),
+            this.preferences.get("open_projects", {}),
 
             (allProjects, config, openProjectPrefs) => {
                 return allProjects.map(p => Object.assign(p, {
@@ -114,11 +110,12 @@ export class SBUserProjectsPanelComponent {
             .subscribe(data => {
                 this.isLoading = false;
                 this.nodes.next(data.nodes);
-                const openPrefs = this.preferences.get("open_projects", {});
-                this.preferences.put("open_projects", Object.assign(openPrefs, {
-                    [data.conf.url]: data.nodes.map(n => n.id)
-                }))
-
+                this.tracked = this.preferences.get("open_projects", {})
+                    .subscribe(projects =>
+                        this.preferences.put("open_projects", Object.assign(projects, {
+                            [data.conf.url]: data.nodes.map(n => n.id)
+                        }))
+                    );
             });
 
         this.projectUpdates.withLatestFrom(this.allProjects, (update, projects) => update(projects))
@@ -183,9 +180,4 @@ export class SBUserProjectsPanelComponent {
         this.setProjectStatus(projectID, true);
         this.showProjectSelectionToolbar = false;
     }
-
-    ngOnDestroy() {
-        this.subs.forEach(sub => sub.unsubscribe());
-    }
-
 }

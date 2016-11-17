@@ -18,7 +18,6 @@ import {ExpressionSidebarService} from "../../services/sidebars/expression-sideb
 import {InputSidebarService} from "../../services/sidebars/input-sidebar.service";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {ModalService} from "../modal";
-import {CheckboxPromptComponent} from "../modal/common/checkbox-prompt.component";
 import {ComponentBase} from "../common/component-base";
 import {noop} from "../../lib/utils.lib";
 
@@ -32,17 +31,6 @@ require("./tool-editor.component.scss");
         ExpressionSidebarService,
         InputSidebarService,
         ModalService
-    ],
-    directives: [
-        CodeEditorComponent,
-        CltEditorComponent,
-        BlockLoaderComponent,
-        ToolHeaderComponent,
-        CommandLineComponent,
-        SidebarComponent,
-        ViewModeSwitchComponent,
-        ValidationIssuesComponent,
-        CheckboxPromptComponent
     ],
     template: `
         <block-loader *ngIf="isLoading"></block-loader>
@@ -103,7 +91,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
     private showReformatPrompt: boolean;
 
     /** Flag for bottom panel, shows validation-issues, commandline, or neither */
-    //@todo(maya) consider using ct-panel-switcher instead
+        //@todo(maya) consider using ct-panel-switcher instead
     private bottomPanel: "validation"|"commandLine"|null;
 
     /** Flag for validity of CWL document */
@@ -127,7 +115,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
 
         super();
 
-        this.showReformatPrompt = this.userPrefService.get("show_reformat_prompt");
+        this.tracked = this.userPrefService.get("show_reformat_prompt").subscribe(x => this.showReformatPrompt = x);
 
         // set default if userPref does not exist
         if (this.showReformatPrompt === undefined) {
@@ -207,7 +195,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
                     if (res) this.userPrefService.put("show_reformat_prompt", false);
 
                     this.showReformatPrompt = false;
-                    this.viewMode           = view;
+                    this.viewMode = view;
                 }, noop);
 
             } else {
@@ -229,7 +217,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
      * @returns {string}
      */
     private getModelText(): string {
-        let json             = this.toolModel.serialize();
+        let json = this.toolModel.serialize();
         json["rbx:modified"] = true;
 
         return this.data.language.value === "json" ? JSON.stringify(json, null, 4) : YAML.dump(json);
