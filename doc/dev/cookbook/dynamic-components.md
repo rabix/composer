@@ -1,4 +1,4 @@
-# Dynamic Components
+# Dynamic Components (deprecated, needs rewrite)
 By dynamic component, we refer to a component that is not rendered from a parsed template string, but the one that is explicitly created by our code during runtime. 
 For example, when we are creating a modal, we will use the `ModalService.show(<OurComponent>);` statement. In this case, `OurComponent` is to be considered a "dynamic" one.
 

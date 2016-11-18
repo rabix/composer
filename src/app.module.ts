@@ -53,16 +53,15 @@ import {NewFileModalComponent} from "./app/components/modal/custom/new-file-moda
 import {TemplateProviderService} from "./app/services/template-provider.service";
 import {PromptComponent} from "./app/components/modal/common/prompt.component";
 import {CheckboxPromptComponent} from "./app/components/modal/common/checkbox-prompt.component";
-import {StandaloneCodeEditorComponent} from "./app/components/standalone-code-editor/standalone-code-editor.component";
+import {FileEditorComponent} from "./app/components/file-editor/file-editor.component";
 import {CodeEditorDirective} from "./app/directives/code-editor.directive";
 import {OutputPortsComponent} from "./app/components/clt-editor/output-ports/output-ports.component";
 import {ToolEditorModule} from "./app/tool-editor/tool-editor.module";
 import {CoreModule} from "./app/core/core.module";
 import {CWLModule} from "./app/cwl/cwl.module";
 import {HintListComponent} from "./app/components/clt-editor/hints/hint-list.component";
-import {BlankToolStateComponent} from "./app/components/clt-editor/common/blank-tool-state.component";
-import {StandaloneCodeEditorComponent} from "./app/components/standalone-code-editor/standalone-code-editor.component";
 import {QuickPickComponent} from "./app/components/quick-pick/quick-pick.component";
+import {EditorCommonModule} from "./app/editor-common/editor-common.module";
 import {BlankToolStateComponent} from "./app/components/clt-editor/common/blank-tool-state.component";
 import {StandaloneCodeEditorComponent} from "./app/components/standalone-code-editor/standalone-code-editor.component"
 import {QuickPickComponent} from "./app/components/quick-pick/quick-pick.component";
@@ -72,13 +71,13 @@ import {EditableDirective} from "./app/directives/editable.directive";
 @NgModule({
     providers: [
         FormBuilder,
+        ModalService,
+        TemplateProviderService
     ],
-
     declarations: [
         AlertComponent,
         BaseCommandFormComponent,
         BasicInputSectionComponent,
-        BlankToolStateComponent,
         BlockLoaderComponent,
         CheckboxPromptComponent,
         CltEditorComponent,
@@ -120,7 +119,7 @@ import {EditableDirective} from "./app/directives/editable.directive";
         SettingsButtonComponent,
         SettingsComponent,
         SidebarComponent,
-        StandaloneCodeEditorComponent,
+        FileEditorComponent,
         StructurePanelComponent,
         TabManagerComponent,
         ToggleComponent,
@@ -146,11 +145,11 @@ import {EditableDirective} from "./app/directives/editable.directive";
         NewFileModalComponent,
         PromptComponent
     ],
-    providers: [ModalService, TemplateProviderService],
     imports: [
         BrowserModule,
         CoreModule,
         CWLModule,
+        EditorCommonModule,
         FormsModule,
         HttpModule,
         ReactiveFormsModule,

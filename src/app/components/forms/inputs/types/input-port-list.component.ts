@@ -23,7 +23,7 @@ import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
                     *ngFor="let input of portList; let i = index">
                     <!-- @todo: temporarily removing edit method -->
         
-                    <div class="col-sm-4" [title]="input.id">
+                    <div class="col-sm-4 ellipsis" [title]="input.id">
                         <i class="fa fa-warning validation-icon"
                            [title]="input.validation.warnings.join('\\n')"
                            *ngIf="input.validation.warnings.length"></i>
@@ -31,7 +31,7 @@ import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
                            *ngIf="input.validation.errors.length"
                            [title]="input.validation.errors.join('\\n')"></i>
         
-                        <span class="ellipsis">
+                        <span>
                             {{input.id}}
                         </span>
                     </div>

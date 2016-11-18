@@ -8,7 +8,7 @@ import {ExternalLinks} from "../../../cwl/external-links";
     template: `
         <ct-form-panel [collapsed]="false">
             <span class="tc-header">
-                Output Ports
+                Outputs
             </span>
             
             <div class="tc-body">

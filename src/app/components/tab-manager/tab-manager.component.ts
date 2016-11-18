@@ -4,13 +4,13 @@ import {SettingsComponent} from "../settings";
 import {WebWorkerService} from "../../services/web-worker/web-worker.service";
 import {ToolEditorComponent} from "../tool-editor/tool-editor.component";
 import {WorkflowEditorComponent} from "../workflow-editor/workflow-editor.component";
-import {StandaloneCodeEditorComponent} from "../standalone-code-editor/standalone-code-editor.component";
+import {FileEditorComponent} from "../file-editor/file-editor.component";
 
 @Component({
     selector: "ct-tab-manager",
     providers: [WebWorkerService],
     directives: [
-        StandaloneCodeEditorComponent,
+        FileEditorComponent,
         ToolEditorComponent,
         WorkflowEditorComponent,
         SettingsComponent
@@ -19,7 +19,7 @@ import {StandaloneCodeEditorComponent} from "../standalone-code-editor/standalon
         <div [ngSwitch]="tab?.contentType | async" class="full-height">
             <ct-tool-editor *ngSwitchCase="'CommandLineTool'" [data]="tab.contentData"></ct-tool-editor>
             <ct-workflow-editor [data]="tab.contentData" *ngSwitchCase="'Workflow'"></ct-workflow-editor>
-            <ct-standalone-code-editor [data]="tab.contentData" *ngSwitchCase="'Code'"></ct-standalone-code-editor>
+            <ct-file-editor [data]="tab.contentData" *ngSwitchCase="'Code'"></ct-file-editor>
             <ct-settings *ngSwitchCase="'Settings'"></ct-settings>
             <block-loader *ngSwitchDefault></block-loader>
         </div>
