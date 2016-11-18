@@ -16,7 +16,6 @@ import {FormSectionComponent} from "./app/components/form-section/form-section.c
 import {LocalFilesPanelComponent} from "./app/components/panels/local-files-panel.component";
 import {PanelHandleComponent} from "./app/components/panels/panel-handle.component";
 import {PanelToolbarComponent} from "./app/components/panels/panel-toolbar.component";
-import {RevisionsPanelComponent} from "./app/components/panels/revisions-panel.component";
 import {SBPublicAppsPanelComponent} from "./app/components/panels/sb-public-apps-panel.component";
 import {SBUserProjectsPanelComponent} from "./app/components/panels/sb-user-projects-panel.component";
 import {StructurePanelComponent} from "./app/components/panels/structure-panel.component";
@@ -108,7 +107,6 @@ import {EditorCommonModule} from "./app/editor-common/editor-common.module";
         PromptComponent,
         RadioButtonComponent,
         RadioGroupComponent,
-        RevisionsPanelComponent,
         SBPublicAppsPanelComponent,
         SBUserProjectsPanelComponent,
         SettingsButtonComponent,
