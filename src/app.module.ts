@@ -52,7 +52,7 @@ import {NewFileModalComponent} from "./app/components/modal/custom/new-file-moda
 import {TemplateProviderService} from "./app/services/template-provider.service";
 import {PromptComponent} from "./app/components/modal/common/prompt.component";
 import {CheckboxPromptComponent} from "./app/components/modal/common/checkbox-prompt.component";
-import {StandaloneCodeEditorComponent} from "./app/components/standalone-code-editor/standalone-code-editor.component";
+import {FileEditorComponent} from "./app/components/file-editor/file-editor.component";
 import {CodeEditorDirective} from "./app/directives/code-editor.directive";
 import {OutputPortsComponent} from "./app/components/clt-editor/output-ports/output-ports.component";
 import {ToolEditorModule} from "./app/tool-editor/tool-editor.module";
@@ -112,7 +112,7 @@ import {EditorCommonModule} from "./app/editor-common/editor-common.module";
         SettingsButtonComponent,
         SettingsComponent,
         SidebarComponent,
-        StandaloneCodeEditorComponent,
+        FileEditorComponent,
         StructurePanelComponent,
         TabManagerComponent,
         ToggleComponent,
