@@ -142,13 +142,13 @@ export class CompactListComponent implements ControlValueAccessor  {
                 event.preventDefault();
             }
 
-            this.addTagInControl(tagInputValue);
+            this.addTagInControl(trimmedValue);
             this.isValidInput = this.control.valid;
 
             if (!!this.isValidInput) {
                 //TODO: re-factor once we have the actual tag model
                 this.tagList.push({
-                    value: tagInputValue,
+                    value: trimmedValue,
                     validation: {
                         errors: [],
                         warnings: [],
