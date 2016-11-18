@@ -50,6 +50,7 @@ require("./compact-list.component.scss");
                           [ngClass]="{'invalid-input': !isValidInput }"
                           [formControl]="tagInputControl"
                           (keydown)="onTagInputKeyDown($event)"
+                          (keyup)="onTagInputKeyUp()"
                           (blur)="onTagInputBlur()">
                     </span>
                      
@@ -159,6 +160,14 @@ export class CompactListComponent implements ControlValueAccessor  {
             } else {
                 this.propagateChange(newControlList.slice(0, -1));
             }
+        }
+    }
+
+    private onTagInputKeyUp(): void {
+        const tagInputValue: string = this.tagInputControl.value;
+
+        if (tagInputValue.length === 0) {
+            this.isValidInput = true;
         }
     }
 
