@@ -62,8 +62,6 @@ import {CWLModule} from "./app/cwl/cwl.module";
 import {HintListComponent} from "./app/components/clt-editor/hints/hint-list.component";
 import {QuickPickComponent} from "./app/components/quick-pick/quick-pick.component";
 import {EditorCommonModule} from "./app/editor-common/editor-common.module";
-import {BlankToolStateComponent} from "./app/components/clt-editor/common/blank-tool-state.component";
-import {StandaloneCodeEditorComponent} from "./app/components/standalone-code-editor/standalone-code-editor.component"
 import {QuickPickComponent} from "./app/components/quick-pick/quick-pick.component";
 import {CompactListComponent} from "./app/components/compact-list/compact-list.component";
 import {EditableDirective} from "./app/directives/editable.directive";
