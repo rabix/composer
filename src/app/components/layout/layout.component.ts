@@ -32,7 +32,7 @@ require("./layout.component.scss");
                        
                 </div>
                 
-                <div class="toogle-panel-left">
+                <div class="toggle-panel-left">
                     <i aria-hidden="true" class="fa fa-caret-square-o-left" 
                     (click) = "togglePanelLeft()" [class.disabled]="(visiblePanels | async).length === 0"></i>                    
                 </div> 

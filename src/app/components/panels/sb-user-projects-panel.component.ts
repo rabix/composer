@@ -106,16 +106,14 @@ export class SBUserProjectsPanelComponent extends ComponentBase {
             });
 
         this.openProjects
-            .withLatestFrom(this.settings.platformConfiguration, (nodes, conf) => ({nodes, conf}))
+            .withLatestFrom(this.preferences.get("open_projects", {}),
+                this.settings.platformConfiguration, (nodes, projects, conf) => ({nodes, projects, conf}))
             .subscribe(data => {
                 this.isLoading = false;
                 this.nodes.next(data.nodes);
-                this.tracked = this.preferences.get("open_projects", {})
-                    .subscribe(projects =>
-                        this.preferences.put("open_projects", Object.assign(projects, {
-                            [data.conf.url]: data.nodes.map(n => n.id)
-                        }))
-                    );
+                this.preferences.put("open_projects", Object.assign(data.projects, {
+                    [data.conf.url]: data.nodes.map(n => n.id)
+                }));
             });
 
         this.projectUpdates.withLatestFrom(this.allProjects, (update, projects) => update(projects))
