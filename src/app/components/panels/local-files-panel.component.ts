@@ -27,7 +27,7 @@ const {app, dialog} = window.require("electron").remote;
             </span>
         </ct-panel-toolbar>
         
-        <ct-tree-view [nodes]="nodes"></ct-tree-view>
+        <ct-tree-view [nodes]="nodes" [key]="'local-files'"></ct-tree-view>
     `
 })
 export class LocalFilesPanelComponent extends ComponentBase {
@@ -94,6 +94,7 @@ export class LocalFilesPanelComponent extends ComponentBase {
                 }
 
                 return {
+                    id: item.path,
                     name: item.name,
                     icon,
                     isExpandable: item.isDir,
