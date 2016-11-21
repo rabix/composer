@@ -8,7 +8,6 @@ export interface ValidationResponse {
     isValidJSON: boolean,
     errors: Array<any>,
     warnings: Array<any>,
-    errorText?: string,
     class?: "CommandLineTool" | "Workflow"
 }
 
@@ -89,9 +88,8 @@ export class JsonSchemaService {
                 isValidatableCwl: false,
                 isValidCwl: false,
                 isValidJSON: false,
-                errors: ["Not valid file format"],
-                warnings: [],
-                errorText: "Not valid file format"
+                errors: [{message: "Not valid file format", loc: "document"}],
+                warnings: []
             });
             return;
         }
@@ -101,21 +99,21 @@ export class JsonSchemaService {
                 isValidCwl: false,
                 isValidJSON: true,
                 isValidatableCwl: false,
-                errors: [this.errorMessage],
-                warnings: [],
-                errorText: this.errorMessage
+                errors: [{message: this.errorMessage, loc: "document"}],
+                warnings: []
             });
         } else {
-            cwlVersion = cwlJson.cwlVersion || 'draft-2';
-            jsonClass = cwlJson.class;
+            cwlVersion       = cwlJson.cwlVersion || 'draft-2';
+            jsonClass        = cwlJson.class;
+            const isValidCWL = validator.validate(cwlVersion + jsonClass, cwlJson);
+            const errors     = validator.errors || [];
 
-            let result:ValidationResponse= {
+            let result: ValidationResponse = {
                 isValidJSON: true,
                 isValidatableCwl: true,
-                isValidCwl: validator.validate(cwlVersion + jsonClass, cwlJson),
-                errors: validator.errors || [],
+                isValidCwl: isValidCWL,
+                errors: this.formatErrors(errors),
                 warnings: [],
-                errorText: validator.errorsText().replace(/^data/gm, "Document").replace(/,\sdata/gm, ", document"),
                 class: jsonClass
             };
 
@@ -123,7 +121,39 @@ export class JsonSchemaService {
         }
     }
 
+    private formatErrors(errors: AVJResult[]) {
+        return errors.map(err => {
+            let message = err.message;
+            if (err.keyword === "enum") {
+                message += ": " + err.params.allowedValues;
+            }
+
+            return {
+                message: message,
+                loc: `document${err.dataPath}`
+            }
+        }).reduce((acc, curr) => {
+            acc = acc.filter(err => {
+                return err.message !== curr.message || err.loc !== curr.loc
+            });
+
+            acc.push(curr);
+
+            return acc;
+        }, []);
+    }
+
     private sendValidationResult(result: ValidationResponse) {
         postMessage(result);
     }
+}
+
+interface AVJResult {
+    dataPath: string,
+    keyword: string,
+    message: string,
+    params: {
+        allowedValues: string[]
+    },
+    schemaPath: string
 }

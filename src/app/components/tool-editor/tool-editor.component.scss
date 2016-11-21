@@ -96,6 +96,10 @@ ct-code-editor {
         .error-text {
             color: lighten($brand-danger, 30%);
         }
+
+        .warning-text {
+            color: $brand-warning;
+        }
     }
 }
 

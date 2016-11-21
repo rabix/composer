@@ -4,12 +4,18 @@ import {FormGroup, FormBuilder} from "@angular/forms";
 import {ReplaySubject, BehaviorSubject} from "rxjs/Rx";
 
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
+import {ReplaySubject, BehaviorSubject, Observable} from "rxjs/Rx";
 import {CommandLineToolModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../common/component-base";
 import {DataEntrySource} from "../../sources/common/interfaces";
+import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
+import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
+import {WebWorkerService} from "../../services/web-worker/web-worker.service";
+import {ToolSidebarService} from "../../services/sidebars/tool-sidebar.service";
 import {ExpressionSidebarService} from "../../services/sidebars/expression-sidebar.service";
 import {InputSidebarService} from "../../services/sidebars/input-sidebar.service";
 import {ModalService} from "../modal";
+import {ComponentBase} from "../common/component-base";
 import {noop} from "../../lib/utils.lib";
 import {ToolSidebarService} from "../../services/sidebars/tool-sidebar.service";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
@@ -52,7 +58,7 @@ require("./tool-editor.component.scss");
             <div class="status-bar-footer">
             
                 <div class="left-side">
-                    <validation-issues [issuesStream]="schemaValidation" 
+                    <validation-issues [issuesStream]="validation" 
                                        (select)="selectBottomPanel($event)" 
                                        [show]="bottomPanel === 'validation'"></validation-issues>
                     
@@ -76,7 +82,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
     public data: DataEntrySource;
 
     /** Stream of ValidationResponse for current document */
-    public schemaValidation = new ReplaySubject<ValidationResponse>(1);
+    public validation = new ReplaySubject<ValidationResponse>(1);
 
     /** Default view mode. */
     private viewMode = ViewMode.Code;
@@ -98,7 +104,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
     private rawEditorContent = new BehaviorSubject<string>("");
 
     /** Model that's recreated on document change */
-    private toolModel = new CommandLineToolModel("");
+    private toolModel = new CommandLineToolModel("document");
 
     /** Sorted array of resulting command line parts */
     private commandLineParts: CommandLinePart[];
@@ -127,37 +133,43 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
             .skip(1)
             .distinctUntilChanged()
             .subscribe(latestContent => {
-                this.validateSchema(latestContent);
+                this.webWorkerService.validateJsonSchema(latestContent);
             });
 
         this.tracked = this.data.content.subscribe(val => {
             this.rawEditorContent.next(val);
         });
 
-        this.tracked = this.webWorkerService.validationResultStream.subscribe(this.schemaValidation);
 
-        this.tracked = this.webWorkerService.validationResultStream.subscribe(err => {
+        this.tracked = this.webWorkerService.validationResultStream
+            .map(r => {
+                if (!r.isValidCwl) return r;
+
+                let json = Yaml.safeLoad(this.rawEditorContent.getValue(), {json: true});
+
+                // should show prompt, but json is already reformatted
+                if (this.showReformatPrompt && json["rbx:modified"]) {
+                    this.showReformatPrompt = false;
+                }
+
+                this.toolModel        = new CommandLineToolModel("document", json);
+                this.commandLineParts = this.toolModel.getCommandLineParts();
+
+                this.toolModel.validate();
+
+                return {
+                    errors: this.toolModel.validation.errors,
+                    warnings: this.toolModel.validation.warnings,
+                    isValidatableCwl: true,
+                    isValidCwl: true,
+                    isValidJSON: true
+                };
+
+            }).subscribe(this.validation);
+
+        this.tracked = this.validation.subscribe(err => {
             this.isValidCWL = err.isValidCwl;
         });
-    }
-
-    private validateSchema(content: string) {
-        this.webWorkerService.validateJsonSchema(content);
-
-        try {
-            let json = Yaml.safeLoad(content, {json: true});
-
-            // should show prompt, but json is already reformatted
-            if (this.showReformatPrompt && json["rbx:modified"]) {
-                this.showReformatPrompt = false;
-            }
-
-            this.toolModel = new CommandLineToolModel("document", json);
-            this.toolModel.validate();
-            this.commandLineParts = this.toolModel.getCommandLineParts();
-        } catch (ex) {
-            // if the file isn't valid JSON, do nothing
-        }
     }
 
     private save(revisionNote: string) {
