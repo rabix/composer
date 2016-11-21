@@ -1,26 +1,19 @@
 import * as Yaml from "js-yaml";
 import {Component, OnInit, Input, OnDestroy} from "@angular/core";
 import {FormGroup, FormBuilder} from "@angular/forms";
-import {ReplaySubject, BehaviorSubject} from "rxjs/Rx";
-
+import {ReplaySubject, BehaviorSubject, Subscription} from "rxjs/Rx";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
-import {ReplaySubject, BehaviorSubject, Observable} from "rxjs/Rx";
 import {CommandLineToolModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../common/component-base";
 import {DataEntrySource} from "../../sources/common/interfaces";
 import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
-import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
 import {WebWorkerService} from "../../services/web-worker/web-worker.service";
 import {ToolSidebarService} from "../../services/sidebars/tool-sidebar.service";
 import {ExpressionSidebarService} from "../../services/sidebars/expression-sidebar.service";
 import {InputSidebarService} from "../../services/sidebars/input-sidebar.service";
 import {ModalService} from "../modal";
-import {ComponentBase} from "../common/component-base";
 import {noop} from "../../lib/utils.lib";
-import {ToolSidebarService} from "../../services/sidebars/tool-sidebar.service";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
-import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
-import {WebWorkerService} from "../../services/web-worker/web-worker.service";
 import {ViewMode} from "../view-switcher/view-switcher.component";
 
 require("./tool-editor.component.scss");
@@ -43,11 +36,11 @@ require("./tool-editor.component.scss");
                          [data]="data"></tool-header>
         
             <div class="scroll-content">
-                <div code-editor
-                     class="editor flex-fill"
-                     [content]="rawEditorContent"
-                     [readonly]="!data.isWritable"
-                     [language]="data.language | async"></div>
+                 
+                 <ct-code-editor class="editor flex-fill"
+                             [content]="rawEditorContent"
+                             [readonly]="!data.isWritable"
+                             [language]="data.language | async"></ct-code-editor>
                      
                 <ct-clt-editor *ngIf="viewMode === __modes.Gui"
                                class="gui-editor-component"
@@ -113,6 +106,8 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
 
     private toolGroup: FormGroup;
 
+    private saveSubscription: Subscription;
+
     constructor(private webWorkerService: WebWorkerService,
                 private userPrefService: UserPreferencesService,
                 private formBuilder: FormBuilder,
@@ -173,12 +168,14 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
     }
 
     private save(revisionNote: string) {
+        this.clearSaveSubscription();
+
         const text = this.toolGroup.dirty ? this.getModelText() : this.rawEditorContent.getValue();
 
         if (this.data.data.source === "local") {
-            this.data.data.save(text).subscribe(noop);
+           this.saveSubscription = this.data.data.save(text).subscribe(noop);
         } else {
-            this.data.save(JSON.parse(text), revisionNote).subscribe(noop);
+            this.saveSubscription = this.data.save(JSON.parse(text), revisionNote).subscribe(noop);
         }
     }
 
@@ -234,5 +231,17 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
      */
     private selectBottomPanel(panel: "validation"|"commandLineTool") {
         this.bottomPanel = this.bottomPanel === panel ? null : panel;
+    }
+
+    private clearSaveSubscription(): void {
+        if (!!this.saveSubscription) {
+            this.saveSubscription.unsubscribe();
+        }
+    }
+
+    ngOnDestroy(): void {
+        this.clearSaveSubscription();
+        this.webWorkerService.disposeJsonSchemaWorker();
+        super.ngOnDestroy();
     }
 }
