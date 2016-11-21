@@ -1,16 +1,19 @@
 import {NgModule} from "@angular/core";
-import {EditorCommonModule} from "../editor-common/editor-common.module";
 import {BrowserModule} from "@angular/platform-browser";
-import {ArgumentListComponent} from "./sections/arguments/argument-list.component";
 import {CoreModule} from "../core/core.module";
+import {EditorCommonModule} from "../editor-common/editor-common.module";
+import {ArgumentListComponent} from "./sections/arguments/argument-list.component";
+import {FileDefListComponent} from "./sections/file-def-list/file-def-list.component";
 
 
 @NgModule({
     declarations: [
-        ArgumentListComponent
+        ArgumentListComponent,
+        FileDefListComponent,
     ],
     exports: [
-        ArgumentListComponent
+        ArgumentListComponent,
+        FileDefListComponent,
     ],
     imports: [
         BrowserModule,

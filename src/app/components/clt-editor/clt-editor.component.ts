@@ -2,6 +2,7 @@ import {Component, Input, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {CommandLineToolModel, ExpressionModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../common/component-base";
+import {FileDef} from "cwlts/mappings/d2sb/FileDef";
 
 require("./clt-editor.component.scss");
 
@@ -28,6 +29,8 @@ require("./clt-editor.component.scss");
                 <ct-hint-list [entries]="model.hints || []" [readonly]="readonly"></ct-hint-list>
                 
                 <ct-argument-list [entries]="model.arguments || []" [readonly]="readonly"></ct-argument-list>
+                
+                <ct-file-def-list [entries]="fileDefs || []"></ct-file-def-list>
             </form>
 
             <sidebar-component></sidebar-component>
@@ -45,6 +48,8 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
     @Input()
     public formGroup: FormGroup;
 
+    private fileDefs: FileDef[] = [];
+
     constructor(private formBuilder: FormBuilder) {
         super();
     }
@@ -54,6 +59,11 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
         this.formGroup.addControl("dockerInputGroup", this.formBuilder.group({}));
         this.formGroup.addControl("baseCommandGroup", this.formBuilder.group({}));
         this.formGroup.addControl("inputPortsGroup", this.formBuilder.group({}));
+
+        this.fileDefs = this.model.customProps.requirements
+            .filter(req => req.class === "CreateFileRequirement")
+            .map(req => req.fileDef)
+            .reduce((acc, item) => acc.concat(item) , []);
     }
 
     private setBaseCommand(list: ExpressionModel[]) {
