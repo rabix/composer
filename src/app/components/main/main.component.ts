@@ -44,7 +44,7 @@ export class MainComponent {
 
     constructor(modal: ModalService, vcRef: ViewContainerRef) {
         /**
-         * Hack for angulars' inability to provide the vcRef to a service with DI.
+         * Hack for angular's inability to provide the vcRef to a service with DI.
          * {@link ModalService.rootViewRef}
          */
         modal.rootViewRef = vcRef;
