@@ -81,8 +81,7 @@ export class WorkboxComponent extends ComponentBase implements OnInit {
         const tab = this.tabs.splice(index, 1)[0];
 
         this.activeTab = tab;
-        this.tabs = [];
-        this.tabs.push(tab);
+        this.tabs = [tab];
     }
 
     /**
@@ -94,8 +93,6 @@ export class WorkboxComponent extends ComponentBase implements OnInit {
     }
 
     private createContextMenu(index): MenuItem[] {
-        const items = [];
-
         const closeOthers = new MenuItem("Close Others", {
             click: () => this.removeOtherTabs(index)
         });
@@ -104,8 +101,6 @@ export class WorkboxComponent extends ComponentBase implements OnInit {
             click: () => this.removeAllTabs()
         });
 
-        items.push(closeOthers, closeAll);
-
-        return items;
+        return [closeOthers, closeAll];
     }
 }

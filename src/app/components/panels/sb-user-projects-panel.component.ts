@@ -50,7 +50,7 @@ import {ComponentBase} from "../common/component-base";
             <progress class="progress progress-striped progress-animated" value="100" max="100"></progress>
         </div>
         
-        <ct-tree-view [nodes]="nodes | async" [key]="'user-projects'"></ct-tree-view>
+        <ct-tree-view [nodes]="nodes | async" [preferenceKey]="'user-projects'"></ct-tree-view>
     `
 })
 export class SBUserProjectsPanelComponent extends ComponentBase {

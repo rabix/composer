@@ -42,7 +42,7 @@ import {ComponentBase} from "../common/component-base";
         </div>
         
         <div *ngIf="isExpanded && nodeChildren" class="children">
-            <ct-tree-node [level]="level + 1" *ngFor="let node of nodeChildren" [node]="node" [key]="key"></ct-tree-node>
+            <ct-tree-node [level]="level + 1" *ngFor="let node of nodeChildren" [node]="node" [preferenceKey]="preferenceKey"></ct-tree-node>
             <div *ngIf="nodeChildren.length === 0">
                 <span class="icon-space"></span>
                 <i class="text-muted">empty </i>    
@@ -62,7 +62,7 @@ export class TreeNodeComponent extends ComponentBase implements OnInit {
     public level = 0;
 
     @Input()
-    private key;
+    private preferenceKey;
 
     public isExpandable = false;
 
@@ -128,21 +128,24 @@ export class TreeNodeComponent extends ComponentBase implements OnInit {
 
         this.tree.addNode(this);
 
-        this.tree.getExpandedNodes(this.key).subscribe(values => {
-            const found = values.find(value => this.node.id === value);
-            if (found) {
-                // Parameter is false in order not to persist state whether node is expanded or collapsed
-                this.toggleExpansion(false);
-            }
-        });
+        if (this.preferenceKey) {
+            this.tree.getExpandedNodes(this.preferenceKey).subscribe(values => {
+                const found = values.find(value => this.node.id === value);
+                if (found) {
+                    // Parameter is false in order not to persist state whether node is expanded or collapsed
+                    this.toggleExpansion();
+                }
+            });
+        }
+
     }
 
-    public toggleExpansion(toPersist: boolean) {
+    public toggleExpansion(persist = false) {
 
         this.isExpanded = !this.isExpanded;
 
         // Persist whether node is expanded or collapsed in local storage
-        if (toPersist) {
+        if (persist && this.preferenceKey) {
             this.persistToggleState(this.isExpanded);
         }
 
@@ -164,8 +167,8 @@ export class TreeNodeComponent extends ComponentBase implements OnInit {
     }
 
     private persistToggleState(isExpanded: boolean) {
-        this.isExpanded ? this.tree.saveToggleState(this.node.id, this.key)
-            : this.tree.deleteToggleState(this.node.id, this.key);
+        isExpanded ? this.tree.saveToggleState(this.node.id, this.preferenceKey)
+            : this.tree.deleteToggleState(this.node.id, this.preferenceKey);
     }
 
     public selectNode(event: MouseEvent) {
@@ -226,7 +229,7 @@ export class TreeNodeComponent extends ComponentBase implements OnInit {
 
     ngOnDestroy() {
         super.ngOnDestroy();
-        this.tree.removeNode(this);
+        this.tree.removeNode(this, this.preferenceKey);
     }
 
     public getChildren(): QueryList<TreeNodeComponent> {

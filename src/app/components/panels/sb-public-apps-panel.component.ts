@@ -21,7 +21,7 @@ import {PlatformAppEntry} from "../../services/api/platforms/platform-api.types"
              <div class="text-xs-center"><small>Fetching Public Apps&hellip;</small></div>
             <progress class="progress progress-striped progress-animated" value="100" max="100"></progress>
         </div>
-        <ct-tree-view [nodes]="nodes" [key]="'public-apps'"></ct-tree-view>
+        <ct-tree-view [nodes]="nodes" [preferenceKey]="'public-apps'"></ct-tree-view>
     `
 })
 export class SBPublicAppsPanelComponent {

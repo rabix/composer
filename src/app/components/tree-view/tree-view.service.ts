@@ -53,26 +53,28 @@ export class TreeViewService {
         this.nodes.set(node.nodeIndex, node);
     }
 
-    public removeNode(node: TreeNodeComponent) {
-        this.nodes.delete(node.nodeIndex);
+    public removeNode(treeNodeComponent: TreeNodeComponent, preferenceKey: string) {
+        this.nodes.delete(treeNodeComponent.nodeIndex);
+        if (preferenceKey) {
+            this.deleteToggleState(treeNodeComponent.node.id, preferenceKey);
+        }
     }
 
     public getExpandedNodes(key: string) {
         const lsKey = "expand-" + key;
-        return this.preferences.get(lsKey, []);
+        return this.preferences.get(lsKey, []).first();
     }
 
     public saveToggleState(id: string, key: string) {
         const lsKey = "expand-" + key;
-        this.preferences.get(lsKey, []).subscribe(el => {
-            el.push(id);
-            this.preferences.put(lsKey, el);
+        this.preferences.get(lsKey, []).first().subscribe(el => {
+            this.preferences.put(lsKey, el.concat(id));
         });
     }
 
     public deleteToggleState(id: String, key: string) {
         const lsKey = "expand-" + key;
-        this.preferences.get(lsKey, []).subscribe(el => {
+        this.preferences.get(lsKey, []).first().subscribe(el => {
             this.preferences.put(lsKey, el.filter(element => element !== id && !element.startsWith(id)));
         });
     }

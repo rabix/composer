@@ -4,7 +4,7 @@
 .left-panel-bar {
   display: flex;
   flex-direction: column;
-  height: calc(100% - #{$main-header-height} - 26px);
+  height: calc(100% - #{$main-header-height} - #{$panel-item-width});
   justify-content: space-between;
   background: $panel-side-tab-zone-bg;
 
@@ -12,7 +12,7 @@
 
 ct-panel-switcher {
   display: inline-block;
-  width: 26px;
+  width: $panel-item-width;
   border-right: 2px solid $panel-side-tab-zone-border;
   color: white;
 
@@ -66,7 +66,7 @@ ct-panel-switcher {
     border-right: 2px solid $panel-side-tab-zone-border;
     text-align: center;
     padding-top: 1px;
-    height: 26px;
+    height: $panel-item-width;
 
     i {
         color: lighten($gray-dark, 20%);
