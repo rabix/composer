@@ -1,9 +1,11 @@
 import {Component, OnInit, Input, OnDestroy} from "@angular/core";
-import {Subscription, ReplaySubject, BehaviorSubject} from "rxjs";
+import {ReplaySubject, BehaviorSubject, Subscription} from "rxjs";
 import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
 import {DataEntrySource} from "../../sources/common/interfaces";
 import {WebWorkerService} from "../../services/web-worker/web-worker.service";
 import {ViewMode} from "../view-switcher/view-switcher.component";
+import {ComponentBase} from "../common/component-base";
+import {noop} from "../../lib/utils.lib";
 
 @Component({
     selector: 'ct-workflow-editor',
@@ -15,11 +17,11 @@ import {ViewMode} from "../view-switcher/view-switcher.component";
                          [data]="data"></tool-header>
         
             <div class="scroll-content">
-                <ct-code-editor [hidden]="viewMode !== __viewModes.Code"
-                                (contentChanges)="onEditorContentChange($event)"
-                                [content]="data.content"
-                                [readOnly]="!data.isWritable"
-                                [language]="data.language"></ct-code-editor>
+                         <ct-code-editor [hidden]="viewMode !== __viewModes.Code"
+                             class="editor flex-fill"
+                             [content]="rawEditorContent"
+                             [readonly]="!data.isWritable"
+                             [language]="data.language | async"></ct-code-editor>
         
                 <div [hidden]="viewMode !== __viewModes.Gui">
                     Workflow Editor Coming Soon
@@ -39,7 +41,7 @@ import {ViewMode} from "../view-switcher/view-switcher.component";
         </div>
 `
 })
-export class WorkflowEditorComponent implements OnInit, OnDestroy {
+export class WorkflowEditorComponent extends ComponentBase implements OnInit, OnDestroy {
     @Input()
     public data: DataEntrySource;
 
@@ -51,52 +53,60 @@ export class WorkflowEditorComponent implements OnInit, OnDestroy {
     /** Flag for validity of CWL document */
     private isValidCWL = true;
 
-    /** List of subscriptions that should be disposed when destroying this component */
-    private subs: Subscription[] = [];
-
     /** Flag for showing validation panel. Because it is currently the only panel, there is a flag
      *  otherwise, WF editor should have same implementation as Tool editor */
     private showValidation = false;
 
-    private rawEditorContent = new BehaviorSubject("");
+    private rawEditorContent = new BehaviorSubject<string>("");
 
     private __viewModes = ViewMode;
 
-    constructor(private webWorkerService: WebWorkerService) {
+    private saveSubscription: Subscription;
 
+    constructor(private webWorkerService: WebWorkerService) {
+        super();
     }
 
     ngOnInit(): void {
 
-        this.data.content.subscribe(this.rawEditorContent);
+        this.tracked = this.rawEditorContent
+            .skip(1)
+            .distinctUntilChanged()
+            .subscribe(latestContent => {
+                this.webWorkerService.validateJsonSchema(latestContent);
+            });
 
-        this.webWorkerService.validationResultStream
+        this.tracked = this.data.content.subscribe(val => {
+            this.rawEditorContent.next(val);
+        });
+
+        this.tracked = this.webWorkerService.validationResultStream
             .subscribe(this.schemaValidation);
 
-        this.webWorkerService.validationResultStream.subscribe(err => {
+        this.tracked = this.webWorkerService.validationResultStream.subscribe(err => {
             this.isValidCWL = err.isValidCwl;
         });
     }
 
-    private onEditorContentChange(content: string) {
-        this.webWorkerService.validateJsonSchema(content);
-        this.rawEditorContent.next(content);
+    private save(revisionNote): void {
+        this.clearSaveSubscription();
 
+        if (this.data.data.source === "local") {
+            this.saveSubscription = this.data.data.save(this.rawEditorContent.getValue()).subscribe(noop);
+        } else {
+            this.saveSubscription = this.data.save(JSON.parse(this.rawEditorContent.getValue()), revisionNote).subscribe(noop);
+        }
+    }
+
+    private clearSaveSubscription(): void {
+        if (!!this.saveSubscription) {
+            this.saveSubscription.unsubscribe();
+        }
     }
 
     ngOnDestroy(): void {
-        this.subs.forEach(sub => sub.unsubscribe());
-    }
-
-    private save(revisionNote) {
-
-        if (this.data.data.source === "local") {
-            this.data.data.save(this.rawEditorContent.getValue()).subscribe(_ => {
-            });
-        } else {
-            this.data.save(JSON.parse(this.rawEditorContent.getValue()), revisionNote).subscribe(data => {
-            });
-        }
-
+        this.webWorkerService.disposeJsonSchemaWorker();
+        this.clearSaveSubscription();
+        super.ngOnDestroy();
     }
 }

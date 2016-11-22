@@ -26,7 +26,7 @@ export class WebWorkerService {
     }
 
     //This should be called on the same component where the provider is defined
-    public dispose(): void {
+    public disposeJsonSchemaWorker(): void {
         if (this.jsonSchemaWorker) {
             this.jsonSchemaWorker.terminate();
             this.jsonSchemaWorker = undefined;
