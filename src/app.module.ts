@@ -62,6 +62,7 @@ import {CWLModule} from "./app/cwl/cwl.module";
 import {HintListComponent} from "./app/components/clt-editor/hints/hint-list.component";
 import {QuickPickComponent} from "./app/components/quick-pick/quick-pick.component";
 import {EditorCommonModule} from "./app/editor-common/editor-common.module";
+import {TreeNodeIconComponent} from "./app/components/tree-view/tree-node-icon.component";
 
 @NgModule({
     providers: [
@@ -127,6 +128,7 @@ import {EditorCommonModule} from "./app/editor-common/editor-common.module";
         WorkboxComponent,
         WorkflowEditorComponent,
         ToggleComponent,
+        TreeNodeIconComponent,
         QuickPickComponent
     ],
     entryComponents: [

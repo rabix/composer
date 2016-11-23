@@ -1,4 +1,4 @@
-import {Component, Input, ElementRef, QueryList, ViewChildren} from "@angular/core";
+import {Component, Input, ElementRef, QueryList, ViewChildren, ChangeDetectionStrategy} from "@angular/core";
 import {Observable} from "rxjs";
 import {TreeNode} from "./types";
 import {TreeNodeComponent} from "./tree-node.component";
@@ -10,6 +10,7 @@ require("./tree-view.component.scss");
 
 @Component({
     selector: "ct-tree-view",
+    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [TreeViewService],
     template: `
         <div class="search-term-container" *ngIf="searchTerm.length > 0">
@@ -44,7 +45,7 @@ export class TreeViewComponent extends ComponentBase {
         });
 
         this.el = el.nativeElement;
-
+        //
         this.tracked = this.observeArrowNavigation().withLatestFrom(
             this.tree.selectedNode.filter(n => !!n),
             (dir, node) => ({dir, node}))

@@ -1,6 +1,8 @@
 import {NgModule} from "@angular/core";
 import {BrowserModule} from "@angular/platform-browser";
 import {FormPanelComponent} from "./elements/form-panel.component";
+import {IpcService} from "../services/ipc.service";
+import {GuidService} from "../services/guid.service";
 
 @NgModule({
     declarations: [
@@ -8,6 +10,10 @@ import {FormPanelComponent} from "./elements/form-panel.component";
     ],
     exports: [
         FormPanelComponent,
+    ],
+    providers: [
+        IpcService,
+        GuidService
     ],
     imports: [BrowserModule]
 })
