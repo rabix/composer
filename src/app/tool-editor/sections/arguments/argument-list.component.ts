@@ -30,10 +30,10 @@ import {CommandArgumentModel} from "cwlts/models/d2sb";
                         <li *ngFor="let entry of arguments; let i = index"
                             class="gui-section-list-item clickable validatable">
                             
-                            <ct-tooltip-content #ctt *ngIf="entry.value">
-                                <span *ngIf="entry.value[0] !== '{'">{{ entry.value }}</span>
+                            <ct-tooltip-content #ctt>
+                                <span *ngIf="entry.value && entry.value[0] !== '{'">{{ entry.value }}</span>
                                 
-                                <ct-code-preview *ngIf="ctt.isIn && entry.value[0] === '{'"
+                                <ct-code-preview *ngIf="ctt.isIn && entry.value && entry.value[0] === '{'"
                                                  (viewReady)="ctt.show()"
                                                  [content]="entry.value"></ct-code-preview>
                                 
@@ -56,8 +56,9 @@ import {CommandArgumentModel} from "cwlts/models/d2sb";
                                 'col-sm-2': readonly
                             }" >{{ entry.position }}</div>
                             
+                            <ct-tooltip-content #del>Delete</ct-tooltip-content>
                             <div *ngIf="!readonly" class="col-sm-1 align-right">
-                                <i [ct-tooltip]="'Delete'" 
+                                <i [ct-tooltip]="del"
                                    class="fa fa-trash text-hover-danger" 
                                    (click)="removeEntry(i)"></i>
                             </div>

@@ -34,7 +34,7 @@ export class CodePreviewComponent extends ComponentBase {
 
     @Input()
     @HostBinding("style.height.px")
-    public height = 200;
+    public height = 300;
 
     @Output()
     public viewReady;
