@@ -1,18 +1,18 @@
-import {Component, OnInit, Input} from "@angular/core";
-import {Validators, FormBuilder, FormGroup, FormControl} from "@angular/forms";
+import {Component, Input, forwardRef} from "@angular/core";
+import {Validators, FormControl, ControlValueAccessor, NG_VALUE_ACCESSOR, FormGroup, FormBuilder} from "@angular/forms";
 import {ExpressionModel, CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
-import {Subscription} from "rxjs/Subscription";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {ExpressionSidebarService} from "../../../../services/sidebars/expression-sidebar.service";
-import {Expression} from "cwlts/mappings/d2sb/Expression";
 import {SandboxService} from "../../../../services/sandbox/sandbox.service";
 import {ToggleComponent} from "../../../common/toggle-slider/toggle-slider.component";
-import {InputInspectorData, InputSidebarService} from "../../../../services/sidebars/input-sidebar.service";
+import {CustomValidators} from "../../../../validators/custom.validator";
+import {ComponentBase} from "../../../common/component-base";
 
 require("./basic-input-section.component.scss");
 
 @Component({
     selector: "basic-input-section",
+    providers: [
+        { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => BasicInputSectionComponent), multi: true }
+    ],
     directives: [
         ToggleComponent
     ],
@@ -54,160 +54,132 @@ require("./basic-input-section.component.scss");
                     </select>
                 </div>
                 
-                <div class="form-group" [formGroup]="expressionInputForm">
-                    <label>Value</label>
-                    
-                     <expression-input
-                                    [context]="context"
-                                    [formControl]="expressionInputForm.controls['expressionInput']">
-                    </expression-input>
-                </div>
-                
                 <div class="form-group flex-container">
                     <label>Include in command line</label>
                     
                     <span class="align-right">
-                        {{hasInputBinding ? "Yes" : "No"}}
-                        <toggle-slider [(checked)]="hasInputBinding"
-                                        (checkedChange)="toggleInputBinding(hasInputBinding)"></toggle-slider>
+                        {{selectedProperty.isBound ? "Yes" : "No"}}
+                        <toggle-slider [(checked)]="selectedProperty.isBound"
+                                        (checkedChange)="toggleInputBinding(selectedProperty.isBound)"></toggle-slider>
                     </span>
+                </div>
+                
+               <div class="form-group" *ngIf="inputBindingFormGroup">
+                    <label>Value</label>
+                    <expression-input
+                                [context]="context"
+                                [formControl]="inputBindingFormGroup.controls['expressionInput']">
+                    </expression-input>
+                
+                    <label>Position</label>
+                    <input class="form-control"
+                           [formControl]="inputBindingFormGroup.controls['position']"/>
+                
+                    <label>Prefix</label>
+                    <input class="form-control"
+                           [formControl]="inputBindingFormGroup.controls['prefix']"/>
+                           
+                    <label>Separator</label>
+                    
+                   <select class="form-control" 
+                           [formControl]="inputBindingFormGroup.controls['separate']">
+                        <option *ngFor="let separatorOption of separatorOptions" 
+                                [value]="separatorOption.value"
+                                [selected]="separatorOption.value === !!selectedProperty.inputBinding.separate">
+                            {{separatorOption.text}}
+                        </option>
+                   </select>
                 </div>
             </form>
     `
 })
-export class BasicInputSectionComponent implements OnInit {
-
-    /** The currently displayed property */
-    @Input()
-    public selectedProperty: InputProperty;
+export class BasicInputSectionComponent extends ComponentBase implements ControlValueAccessor {
 
     @Input()
     public context: {$job: any, $self: any};
 
+    /** The currently displayed property */
+    private selectedProperty: InputProperty;
+
     /** Possible property types */
     private propertyTypes = ["File", "string", "enum", "int", "float", "boolean", "array", "record", "map"];
 
-    private subs: Subscription[] = [];
-
-    private expressionInputSub: Subscription;
-
-    private expressionInputForm: FormGroup;
+    public inputBindingFormGroup: FormGroup;
 
     private sandboxService: SandboxService;
 
-    private hasInputBinding: boolean = false;
+    private separatorOptions: {text: string, value: boolean }[] = [
+        { text: "space", value: true },
+        { text: "empty string", value: false }
+    ];
 
-    constructor(private formBuilder: FormBuilder,
-                private expressionSidebarService: ExpressionSidebarService,
-                private inputSidebarService: InputSidebarService) {
-        this.subs = [];
+    private onTouched = () => { };
+
+    private propagateChange = (_) => {};
+
+    constructor(private formBuilder: FormBuilder) {
+        super();
         this.sandboxService = new SandboxService();
     }
 
-    ngOnInit(): void {
-        this.hasInputBinding = this.selectedProperty.hasInputBinding();
+    private writeValue(property: InputProperty): void {
+        this.selectedProperty = property;
 
-        this.subs.push(
-            this.inputSidebarService.inputPortDataStream.subscribe((data: InputInspectorData) => {
-                this.selectedProperty = data.inputProperty;
-                this.context = data.context;
-                const valueFrom = this.selectedProperty.getValueFrom();
-
-                if (valueFrom === undefined) {
-                    this.createExpressionInputForm("");
-                } else {
-                    this.createExpressionInputForm(valueFrom);
-                }
-
-                this.listenToInputChanges();
-            })
-        );
-    }
-
-    /** @deprecated */
-    private addExpression(): void {
-        const newExpression: BehaviorSubject<ExpressionModel> = new BehaviorSubject<ExpressionModel>(undefined);
-        this.removeExpressionInputSub();
-
-        this.expressionInputSub = newExpression
-            .filter(expression => expression !== undefined)
-            .subscribe((newExpression: ExpressionModel) => {
-                this.updateExpressionInputValue(newExpression.serialize());
-            });
-
-        this.expressionSidebarService.openExpressionEditor({
-            value: new ExpressionModel(this.selectedProperty.getValueFrom()),
-            newExpressionChange: newExpression,
-            context: this.context
-        });
-    }
-
-    /** @deprecated */
-    private removeExpressionInputSub(): void {
-        if (this.expressionInputSub) {
-            this.expressionInputSub.unsubscribe();
-            this.expressionInputSub = undefined;
-        }
-    }
-
-    /** @deprecated */
-    private clearExpression(): void {
-        const newExpression: ExpressionModel = new ExpressionModel("");
-        this.setSelectedProperty(newExpression.serialize());
-        this.updateExpressionInputValue(newExpression.serialize());
-    }
-
-    private createExpressionInputForm(expression: string | Expression) {
-        const expressionModel = new ExpressionModel(expression);
-        this.setSelectedProperty(expression);
-
-        this.expressionInputForm = this.formBuilder.group({
-            'expressionInput': [
-                {value: expressionModel.getExpressionScript(), disabled: !this.hasInputBinding},
-                Validators.compose([Validators.required, Validators.minLength(1)])
-            ]
-        });
-    }
-
-    private updateExpressionInputValue(expression: string | Expression) {
-        const expressionModel = new ExpressionModel(expression);
-        this.setSelectedProperty(expressionModel.serialize());
-
-        if (this.expressionInputForm && this.expressionInputForm.controls['expressionInput']) {
-            this.expressionInputForm.controls['expressionInput'].setValue(
-                expressionModel.getExpressionScript(),
-                {
-                    onlySelf: true,
-                    emitEvent: false,
-                });
-        }
-    }
-
-    private listenToInputChanges(): void {
-        const inputValueChange = this.expressionInputForm.controls['expressionInput'].valueChanges.subscribe((value: string) => {
-            this.setSelectedProperty(value);
-        });
-
-        this.subs.push(inputValueChange);
-    }
-
-    private setSelectedProperty(value: string | Expression) {
-        if (this.hasInputBinding) {
-            this.selectedProperty.setValueFrom(value);
-        }
-    }
-
-    private toggleInputBinding(hasBinding: boolean) {
-        if (!hasBinding) {
-            this.updateExpressionInputValue("");
-            this.selectedProperty.removeInputBinding();
-            this.expressionInputForm.controls['expressionInput'].disable();
+        if (this.selectedProperty.isBound) {
+            this.createExpressionInputForm(this.selectedProperty);
         } else {
-            this.expressionInputForm.controls['expressionInput'].enable();
+            this.inputBindingFormGroup = undefined;
+        }
+    }
+
+    private registerOnChange(fn: any): void {
+        this.propagateChange = fn;
+    }
+
+    private registerOnTouched(fn: any): void {
+        this.onTouched = fn;
+    }
+
+    private createExpressionInputForm(property: InputProperty): void {
+        const valueFrom = !!property.getValueFrom() ? property.getValueFrom(): new ExpressionModel(null, "");
+
+        this.inputBindingFormGroup = this.formBuilder.group({
+            expressionInput: new FormControl(
+                valueFrom, [Validators.required, CustomValidators.cwlModel]
+            ),
+            position: new FormControl(
+                property.inputBinding.position, [Validators.required]
+            ),
+            prefix: new FormControl(
+                property.inputBinding.prefix, [Validators.required]
+            ),
+            separate: new FormControl(
+                property.inputBinding.separate, [Validators.required]
+            )
+        });
+
+        this.tracked = this.inputBindingFormGroup.valueChanges.subscribe(value => {
+            property.inputBinding.setValueFrom(value.expressionInput.serialize());
+            property.inputBinding.position = Number(value.position);
+            property.inputBinding.prefix = value.prefix;
+            property.inputBinding.separate = JSON.parse(value.separate);
+
+            this.propagateChange(property);
+        });
+    }
+
+    private toggleInputBinding(hasBinding: boolean): void {
+        if (!hasBinding) {
+            this.selectedProperty.createInputBinding();
+            this.createExpressionInputForm(this.selectedProperty);
+        } else {
+            this.inputBindingFormGroup = undefined;
+            this.selectedProperty.removeInputBinding();
+            this.propagateChange(this.selectedProperty);
         }
     }
 
     ngOnDestroy(): void {
-        this.subs.forEach(sub => sub.unsubscribe());
+        super.ngOnDestroy();
     }
 }

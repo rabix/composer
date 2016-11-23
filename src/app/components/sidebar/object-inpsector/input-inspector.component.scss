@@ -7,6 +7,8 @@
     color: $text-dark;
     width: 100%;
     border-left: 1px solid $border-color;
+    overflow: auto;
+    position: absolute;
 }
 
 .input {

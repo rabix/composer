@@ -1,8 +1,8 @@
 import {Component, OnDestroy, Input} from "@angular/core";
 import {InputPortService} from "../../../../services/input-port/input-port.service";
-import {Subscription} from "rxjs/Subscription";
 import {InputSidebarService} from "../../../../services/sidebars/input-sidebar.service";
 import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
+import {ComponentBase} from "../../../common/component-base";
 
 @Component({
     selector: "input-port-list",
@@ -20,8 +20,8 @@ import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
                     [class.error]="input.validation.errors.length"
                     [class.warning]="input.validation.warnings.length"
                     [class.selected]="i === selectedIndex"
-                    *ngFor="let input of portList; let i = index">
-                    <!-- @todo: temporarily removing edit method -->
+                    *ngFor="let input of portList; let i = index"
+                    (click)="editProperty(i)">
         
                     <div class="col-sm-4 ellipsis" [title]="input.id">
                         <i class="fa fa-warning validation-icon"
@@ -58,7 +58,7 @@ import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
         </div>
     `
 })
-export class InputPortListComponent implements OnDestroy {
+export class InputPortListComponent extends ComponentBase implements OnDestroy {
 
     @Input()
     private selectedIndex: number;
@@ -68,13 +68,10 @@ export class InputPortListComponent implements OnDestroy {
 
     private portList: Array<InputProperty> = [];
 
-    private subs: Subscription[];
-
     constructor(private inputPortService: InputPortService,
                 private inputSidebarService: InputSidebarService) {
-        this.subs = [];
-
-        this.inputPortService.inputPorts.subscribe((viewModelPortList: InputProperty[]) => {
+        super();
+        this.tracked = this.inputPortService.inputPorts.subscribe((viewModelPortList: InputProperty[]) => {
             this.portList = viewModelPortList;
         });
     }
@@ -108,6 +105,6 @@ export class InputPortListComponent implements OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.subs.forEach(sub => sub.unsubscribe());
+        super.ngOnDestroy();
     }
 }
