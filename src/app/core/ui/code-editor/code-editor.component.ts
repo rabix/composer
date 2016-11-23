@@ -1,14 +1,16 @@
-import {Directive, Input, Output, ElementRef} from "@angular/core";
+import {Component, Input, Output, ElementRef} from "@angular/core";
 import {Observable, Subject} from "rxjs";
-import {ComponentBase} from "../components/common/component-base";
 import Editor = AceAjax.Editor;
+import {ComponentBase} from "../../../components/common/component-base";
 
 require("brace/ext/searchbox");
 require("brace/mode/javascript");
 require("brace/mode/json");
 require("brace/mode/yaml");
 require("brace/theme/chrome");
+require("brace/theme/monokai");
 
+require("./code-editor.component.scss");
 
 export interface AceEditorOptions {
 
@@ -72,10 +74,11 @@ export interface AceEditorOptions {
     useElasticTabstops?: boolean;
 }
 
-@Directive({
-    selector: "[code-editor]",
+@Component({
+    selector: "ct-code-editor-x",
+    template: ""
 })
-export class CodeEditorDirective extends ComponentBase {
+export class CodeEditorComponent extends ComponentBase {
 
     /** Stream of raw string content that should be displayed in the editor */
     @Input()
@@ -100,18 +103,17 @@ export class CodeEditorDirective extends ComponentBase {
     }
 
     ngOnInit() {
+        console.log("Initializing");
+
         // Instantiate the editor instance inside the target element
         this.editor  = ace.edit(this.elementRef.nativeElement);
-
         this.tracked = this.editor;
 
         // Set the theme and language
         this.editor.setTheme("ace/theme/chrome");
         this.editor.session.setMode(`ace/mode/${this.language}`);
 
-        this.editor.setOptions(Object.assign(this.options, {
-            readOnly: this.readonly
-        } as AceEditorOptions));
+        this.editor.setOptions(this.options);
 
         // Hack for disabling the warning message about a deprecated method
         this.editor.$blockScrolling = Infinity;
@@ -124,10 +126,14 @@ export class CodeEditorDirective extends ComponentBase {
         this.tracked = contentChange.subscribe(text => this.editor.session.setValue(text));
 
         // Listen for changes on the editor, debounce them for 150ms and then push them back into the text stream
-        this.tracked = Observable.fromEvent(<any>this.editor, "change")
+        Observable.fromEvent(<any>this.editor, "change")
             .debounceTime(150)
             .map(_ => this.editor.getValue())
             .subscribe(this.content);
+    }
+
+    ngOnDestroy(){
+        console.log("Destroying");
     }
 
 

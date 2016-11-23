@@ -12,6 +12,6 @@ export class FileDefNamePipe implements PipeTransform {
             return value.script;
         }
 
-        return new String(value);
+        return value || "";
     }
 }

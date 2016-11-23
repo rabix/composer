@@ -2,16 +2,17 @@ import {
     Component,
     Input,
     OnInit,
-    ChangeDetectionStrategy,
     ChangeDetectorRef,
     QueryList,
     ViewChildren,
     ElementRef,
     Renderer,
-    ViewChild
+    ViewChild,
+    NgZone,
+    ChangeDetectionStrategy
 } from "@angular/core";
-import {TreeNode} from "./types";
 import {BehaviorSubject} from "rxjs";
+import {TreeNode} from "./types";
 import {TreeViewService} from "./tree-view.service";
 import {ComponentBase} from "../common/component-base";
 
@@ -28,9 +29,12 @@ import {ComponentBase} from "../common/component-base";
              [class.selected]="isHighlighted | async"
              (dblclick)="toggle()">
             
-            <span *ngIf="node.icon" class="icon-space" (click)="toggle()">
-                <i class="fa fa-fw" [ngClass]="getIconRules(node.icon)"></i>
-            </span>
+            <ct-tree-node-icon *ngIf="node.icon" 
+                               class="icon-space"
+                               [expanded]="isExpanded"
+                               [type]="node.icon"
+                               (click)="toggle()">           
+            </ct-tree-node-icon>
             
             <span *ngIf="node" class="name-container" [ct-context]="node.contextMenu" [title]="node.name">
                 <span class="name" *ngFor="let namePart of nameParts">{{ namePart }}</span>
@@ -53,7 +57,11 @@ import {ComponentBase} from "../common/component-base";
 })
 export class TreeNodeComponent extends ComponentBase implements OnInit {
 
+    /** Used as a helper to create the tab index for the element */
     public static NODE_COUNT = 0;
+
+    /** Used so the node DOM element can be focused */
+    public readonly nodeIndex: number = 0;
 
     @Input()
     public node: TreeNode;
@@ -65,11 +73,9 @@ export class TreeNodeComponent extends ComponentBase implements OnInit {
 
     public highlightedCharacterCount = new BehaviorSubject(0);
 
-    public readonly nodeIndex = 0;
+    public isExpanded = false;
 
-    private isExpanded = false;
-
-    private isLoading = false;
+    public isLoading = false;
 
     private isHighlighted = new BehaviorSubject(false);
 
@@ -88,6 +94,7 @@ export class TreeNodeComponent extends ComponentBase implements OnInit {
     public constructor(private tree: TreeViewService,
                        private detector: ChangeDetectorRef,
                        private renderer: Renderer,
+                       private zone: NgZone,
                        el: ElementRef) {
 
         super();
@@ -102,6 +109,7 @@ export class TreeNodeComponent extends ComponentBase implements OnInit {
 
         this.tracked = this.tree.selectedNode.map(node => node === this)
             .subscribe(isSelected => {
+
                 this.isHighlighted.next(isSelected);
 
                 // This element will lose focus in some cases so we need to refocus it
@@ -109,6 +117,7 @@ export class TreeNodeComponent extends ComponentBase implements OnInit {
                 // upwards to its parent and close the parent using arrows. So this fixes that.
                 if (isSelected) {
                     this.renderer.invokeElementMethod(this.nodeBase.nativeElement, "focus");
+
                 }
 
             });
@@ -127,18 +136,21 @@ export class TreeNodeComponent extends ComponentBase implements OnInit {
     }
 
     public toggleExpansion() {
+
+
         this.isExpanded = !this.isExpanded;
 
         if (this.isExpanded && !this.nodeChildren) {
 
             this.isLoading = true;
-
-            this.tracked = this.node.childrenProvider(this.node).subscribe(children => {
+            this.tracked   = this.node.childrenProvider(this.node).subscribe(children => {
                 this.isLoading    = false;
                 this.nodeChildren = children;
 
+
                 this.detector.markForCheck();
                 this.detector.detectChanges();
+
             });
         }
 
@@ -163,38 +175,17 @@ export class TreeNodeComponent extends ComponentBase implements OnInit {
     }
 
     public toggle() {
-
         if (this.isExpandable) {
             this.toggleExpansion();
         } else if (typeof this.node.openHandler === "function") {
             const progress = this.node.openHandler(this.node);
             if (progress) {
                 this.detector.markForCheck();
-                progress.take(1).subscribe(_ => this.detector.markForCheck());
+                progress.take(1).subscribe(_ => {
+                    this.detector.markForCheck()
+                });
             }
         }
-    }
-
-    private getIconRules(icon) {
-
-        const reserved = ["file", "folder", "angle", "loader", "Workflow", "CommandLineTool"];
-
-        const predefs = {
-            "fa-file": icon === "file",
-            "fa-folder": icon === "folder" && !this.isExpanded,
-            "fa-folder-open": icon === "folder" && this.isExpanded,
-            "fa-angle-right": icon === "angle" && !this.isExpanded,
-            "fa-angle-down": icon === "angle" && this.isExpanded,
-            "fa-circle-o-notch fa-spin": this.isLoading || icon === "loader",
-            "app-type-icon": ["CommandLineTool", "Workflow"].indexOf(icon) !== -1,
-            "icon-command-line-tool": icon === "CommandLineTool",
-            "icon-workflow": icon === "Workflow",
-        };
-
-        predefs[icon] = reserved.indexOf(icon) === -1;
-
-
-        return predefs;
     }
 
     private onClick(event: MouseEvent) {

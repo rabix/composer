@@ -1,0 +1,10 @@
+ct-tooltip-content {
+  display: inline-block;
+
+  .tooltip-inner {
+    box-sizing: content-box;
+    padding: 4px 8px;
+    max-width: none !important;
+    background-color: rgba(0, 0, 0, .8);
+  }
+}

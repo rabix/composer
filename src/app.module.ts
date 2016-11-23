@@ -65,6 +65,7 @@ import {EditorCommonModule} from "./app/editor-common/editor-common.module";
 import {QuickPickComponent} from "./app/components/quick-pick/quick-pick.component";
 import {CompactListComponent} from "./app/components/compact-list/compact-list.component";
 import {EditableDirective} from "./app/directives/editable.directive";
+import {TreeNodeIconComponent} from "./app/components/tree-view/tree-node-icon.component";
 
 @NgModule({
     providers: [
@@ -132,7 +133,8 @@ import {EditableDirective} from "./app/directives/editable.directive";
         ToggleComponent,
         QuickPickComponent,
         CompactListComponent,
-        EditableDirective
+        EditableDirective,
+        TreeNodeIconComponent,
     ],
     entryComponents: [
         CheckboxPromptComponent,
@@ -141,7 +143,7 @@ import {EditableDirective} from "./app/directives/editable.directive";
         MenuItemComponent,
         ModalComponent,
         NewFileModalComponent,
-        PromptComponent
+        PromptComponent,
     ],
     imports: [
         BrowserModule,
