@@ -28,6 +28,10 @@ export class TooltipDirective {
                 private resolver: ComponentFactoryResolver) {
     }
 
+    ngOnInit(){
+        console.log("Content ", this.content);
+    }
+
     @HostListener("focusin")
     @HostListener("mouseenter")
     public show(): void {
@@ -38,6 +42,7 @@ export class TooltipDirective {
         this.visible = true;
 
         let instance = this.content as TooltipContentComponent;
+        console.log("Instance", this.content);
 
         if (typeof this.content === "string") {
 
@@ -46,6 +51,7 @@ export class TooltipDirective {
 
             instance = this.tooltip.instance;
         }
+        console.log("Instance", instance);
 
         instance.hostElement = this.viewContainerRef.element.nativeElement;
         instance.placement   = this.tooltipPlacement;
