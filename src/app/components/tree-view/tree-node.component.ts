@@ -17,6 +17,7 @@ import {ComponentBase} from "../common/component-base";
 
 @Component({
     selector: "ct-tree-node",
+    changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <div #nodeBase
              class="deep-unselectable clickable node-base"
