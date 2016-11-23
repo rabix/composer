@@ -30,7 +30,17 @@ import {CommandArgumentModel} from "cwlts/models/d2sb";
                         <li *ngFor="let entry of arguments; let i = index"
                             class="gui-section-list-item clickable validatable">
                             
-                            <div class="col-sm-4 ellipsis">{{ entry.value }}</div>
+                            <ct-tooltip-content #ctt *ngIf="entry.value">
+                                <span *ngIf="entry.value[0] !== '{'">{{ entry.value }}</span>
+                                
+                                <ct-code-preview *ngIf="ctt.isIn && entry.value[0] === '{'"
+                                                 (viewReady)="ctt.show()"
+                                                 [content]="entry.value"></ct-code-preview>
+                                
+                            </ct-tooltip-content>
+                            <div class="col-sm-4 ellipsis" [ct-tooltip]="ctt" [tooltipPlacement]="'right'">
+                                {{ entry.value }}
+                            </div>
                             
                             <div class="col-sm-3 ellipsis" [title]="entry.prefix">
                                 <span *ngIf="entry.prefix">{{ entry.prefix }}</span>
@@ -47,7 +57,9 @@ import {CommandArgumentModel} from "cwlts/models/d2sb";
                             }" >{{ entry.position }}</div>
                             
                             <div *ngIf="!readonly" class="col-sm-1 align-right">
-                                <i title="Delete" class="fa fa-trash text-hover-danger" (click)="removeEntry(i)"></i>
+                                <i [ct-tooltip]="'Delete'" 
+                                   class="fa fa-trash text-hover-danger" 
+                                   (click)="removeEntry(i)"></i>
                             </div>
                         </li>
                     </ul>
@@ -82,6 +94,10 @@ export class ArgumentListComponent extends ComponentBase implements OnChanges {
 
     private removeEntry(index) {
         this.arguments = this.arguments.slice(0, index).concat(this.arguments.slice(index + 1));
+    }
+
+    private repos() {
+        console.log("Should reposition");
     }
 
     private addEntry() {

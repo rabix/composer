@@ -7,7 +7,7 @@ import {ComponentBase} from "../../../components/common/component-base";
     template: `
         <ct-form-panel [collapsed]="false">
             <span class="tc-header">
-                Outputs
+                Files
             </span>
             
             <div class="tc-body">
@@ -24,10 +24,13 @@ import {ComponentBase} from "../../../components/common/component-base";
                     </div>
                 
                     <ul class="gui-section-list row">
+                    
+                         
+                        
                         <li *ngFor="let entry of entries; let i = index"
                             class="gui-section-list-item clickable validatable">
                             
-                            <div class="col-sm-5 ellipsis" [title]="entry?.filename | fileDefName">
+                            <div class="col-sm-5 ellipsis">
                                 {{ entry?.filename | fileDefName }}
                             </div>
                             
@@ -68,11 +71,13 @@ export class FileDefListComponent extends ComponentBase {
     @Input()
     public readonly = false;
 
+    private hovers = [];
+
     constructor() {
         super();
     }
 
-    ngOnInit(){
+    ngOnInit() {
         console.log("Got entries", this.entries);
     }
 

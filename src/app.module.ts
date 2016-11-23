@@ -138,7 +138,7 @@ import {TreeNodeIconComponent} from "./app/components/tree-view/tree-node-icon.c
         MenuItemComponent,
         ModalComponent,
         NewFileModalComponent,
-        PromptComponent
+        PromptComponent,
     ],
     imports: [
         BrowserModule,
