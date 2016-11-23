@@ -10,6 +10,7 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
 import {MenuItem} from "../menu/menu-item";
 import {ModalService} from "../modal/modal.service";
 import {NewFileModalComponent} from "../modal/custom/new-file-modal.component";
+import {ProjectSelectionModal} from "../modal/custom/project-selection-modal.component";
 import {ComponentBase} from "../common/component-base";
 
 @Component({
@@ -20,24 +21,12 @@ import {ComponentBase} from "../common/component-base";
             <span class="tc-name">Projects</span>
             <span class="tc-tools clickable">
                 <i *ngIf="(closedProjects | async)?.length"
-                   (click)="showProjectSelectionToolbar = true"
+                   (click)="openProjectSelectionModal()"                   
                    class="fa fa-fw fa-plus-circle"></i>
             </span>
         </ct-panel-toolbar>
         
-        <div class="project-selector-container" *ngIf="showProjectSelectionToolbar && (closedProjects | async)?.length">
-            <form class="form-inline" #form>
-        
-                <div class="input-group project-selection-input-group">
-                    <select #projectSelection class="project-selector form-control custom-select" (change)="addProjectToWorkspace(projectSelection.value)" required>
-                        <option value="" disabled [selected]="true">Choose a Project...</option>
-                        <option *ngFor="let p of (closedProjects | async)" [value]="p.id">{{ p.name }}</option>
-                    </select>
-                </div>
-            </form>
-        </div>
-        
-        <div *ngIf="!isLoading && (openProjects | async)?.length === 0 && !showProjectSelectionToolbar"
+        <div *ngIf="!isLoading && (openProjects | async)?.length === 0"
              class="alert alert-info m-1">
              <i class="fa fa-info-circle alert-icon"></i>
             There are no open projects. Select projects to open by clicking the plus above.
@@ -66,8 +55,6 @@ export class SBUserProjectsPanelComponent extends ComponentBase {
     private closedProjects = new ReplaySubject(1);
 
     private projectUpdates = new Subject();
-
-    private showProjectSelectionToolbar = false;
 
     constructor(private dataSource: SBPlatformDataSourceService,
                 private eventHub: EventHubService,
@@ -158,10 +145,21 @@ export class SBUserProjectsPanelComponent extends ComponentBase {
             closeOnOutsideClick: true,
             closeOnEscape: true
         });
-
-
     }
 
+    private openProjectSelectionModal() {
+        const component = this.modal.show<ProjectSelectionModal>(ProjectSelectionModal, {
+            title: "Open Project",
+            closeOnOutsideClick: true,
+            closeOnEscape: true
+        });
+
+        component.closedProjects = this.closedProjects;
+        component.save = (projectID) => {
+            this.setProjectStatus(projectID, true);
+            return this.allProjects.first();
+        }
+    }
 
     private setProjectStatus(projectID, isOpen) {
         this.projectUpdates.next(
@@ -172,10 +170,5 @@ export class SBUserProjectsPanelComponent extends ComponentBase {
 
                 return project;
             }));
-    }
-
-    private addProjectToWorkspace(projectID) {
-        this.setProjectStatus(projectID, true);
-        this.showProjectSelectionToolbar = false;
     }
 }

@@ -61,6 +61,7 @@ import {CWLModule} from "./app/cwl/cwl.module";
 import {HintListComponent} from "./app/components/clt-editor/hints/hint-list.component";
 import {QuickPickComponent} from "./app/components/quick-pick/quick-pick.component";
 import {EditorCommonModule} from "./app/editor-common/editor-common.module";
+import {ProjectSelectionModal} from "./app/components/modal/custom/project-selection-modal.component";
 
 @NgModule({
     providers: [
@@ -104,6 +105,7 @@ import {EditorCommonModule} from "./app/editor-common/editor-common.module";
         PanelHandleComponent,
         PanelSwitcherComponent,
         PanelToolbarComponent,
+        ProjectSelectionModal,
         PromptComponent,
         RadioButtonComponent,
         RadioGroupComponent,
@@ -134,6 +136,7 @@ import {EditorCommonModule} from "./app/editor-common/editor-common.module";
         MenuItemComponent,
         ModalComponent,
         NewFileModalComponent,
+        ProjectSelectionModal,
         PromptComponent
     ],
     imports: [
