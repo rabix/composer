@@ -1,10 +1,10 @@
 import {Component, Input, forwardRef} from "@angular/core";
 import {Validators, FormControl, ControlValueAccessor, NG_VALUE_ACCESSOR, FormGroup, FormBuilder} from "@angular/forms";
 import {ExpressionModel, CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
-import {SandboxService} from "../../../../services/sandbox/sandbox.service";
 import {ToggleComponent} from "../../../common/toggle-slider/toggle-slider.component";
 import {CustomValidators} from "../../../../validators/custom.validator";
 import {ComponentBase} from "../../../common/component-base";
+import {InputTypeSelectComponent} from "../../../forms/common/type-select.component";
 
 require("./basic-input-section.component.scss");
 
@@ -14,7 +14,8 @@ require("./basic-input-section.component.scss");
         { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => BasicInputSectionComponent), multi: true }
     ],
     directives: [
-        ToggleComponent
+        ToggleComponent,
+        InputTypeSelectComponent
     ],
     template: `
           <form class="basic-input-section" *ngIf="selectedProperty">
@@ -24,10 +25,8 @@ require("./basic-input-section.component.scss");
             
                 <div class="form-group flex-container">
                     <label>Required</label>
-                    
                     <span class="align-right">
                         {{selectedProperty.isRequired ? "Yes" : "No"}}
-                       
                         <toggle-slider [(checked)]="selectedProperty.isRequired"></toggle-slider>
                     </span>
                 </div>
@@ -41,17 +40,9 @@ require("./basic-input-section.component.scss");
                            [(ngModel)]="selectedProperty.id">
                 </div>
                 
-                <div class="form-group">
+                <div class="form-group" *ngIf="typeFromControl">
                     <label for="inputType">Type</label>
-                    
-                    <select class="form-control" 
-                            name="selectedPropertyType" 
-                            id="dataType"
-                            [(ngModel)]="selectedProperty.type" required>
-                        <option *ngFor="let propertyType of propertyTypes" [value]="propertyType">
-                            {{propertyType}}
-                        </option>
-                    </select>
+                    <input-type-select [formControl]="typeFromControl"></input-type-select>
                 </div>
                 
                 <div class="form-group flex-container">
@@ -60,7 +51,7 @@ require("./basic-input-section.component.scss");
                     <span class="align-right">
                         {{selectedProperty.isBound ? "Yes" : "No"}}
                         <toggle-slider [(checked)]="selectedProperty.isBound"
-                                        (checkedChange)="toggleInputBinding(selectedProperty.isBound)"></toggle-slider>
+                                       (checkedChange)="toggleInputBinding(selectedProperty.isBound)"></toggle-slider>
                     </span>
                 </div>
                 
@@ -79,8 +70,7 @@ require("./basic-input-section.component.scss");
                     <input class="form-control"
                            [formControl]="inputBindingFormGroup.controls['prefix']"/>
                            
-                    <label>Separator</label>
-                    
+                   <label>Separator</label>
                    <select class="form-control" 
                            [formControl]="inputBindingFormGroup.controls['separate']">
                         <option *ngFor="let separatorOption of separatorOptions" 
@@ -89,6 +79,18 @@ require("./basic-input-section.component.scss");
                             {{separatorOption.text}}
                         </option>
                    </select>
+                   
+                   <div *ngIf="selectedProperty.type.type === 'array'">
+                        <label>Item Separator</label>
+                        <select class="form-control" 
+                                [formControl]="inputBindingFormGroup.controls['itemSeparator']">
+                            <option *ngFor="let itemSeparator of itemSeparators" 
+                                    [value]="itemSeparator.value"
+                                    [selected]="itemSeparator.value == selectedProperty.inputBinding.itemSeparator">
+                                {{itemSeparator.text}}
+                            </option>
+                        </select>
+                   </div>
                 </div>
             </form>
     `
@@ -101,16 +103,21 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
     /** The currently displayed property */
     private selectedProperty: InputProperty;
 
-    /** Possible property types */
-    private propertyTypes = ["File", "string", "enum", "int", "float", "boolean", "array", "record", "map"];
+    private inputBindingFormGroup: FormGroup;
 
-    public inputBindingFormGroup: FormGroup;
+    private typeFromControl: FormControl;
 
-    private sandboxService: SandboxService;
-
-    private separatorOptions: {text: string, value: boolean }[] = [
+    private separatorOptions: {text: string, value: boolean}[] = [
         { text: "space", value: true },
         { text: "empty string", value: false }
+    ];
+
+    private itemSeparators: {text: string, value: string}[] = [
+        { text: "equal", value: "=" },
+        { text: "comma", value: "," },
+        { text: "semicolon", value: ";" },
+        { text: "space", value: " " },
+        { text: "repeat", value: null }
     ];
 
     private onTouched = () => { };
@@ -119,7 +126,6 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
     constructor(private formBuilder: FormBuilder) {
         super();
-        this.sandboxService = new SandboxService();
     }
 
     private writeValue(property: InputProperty): void {
@@ -130,6 +136,23 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
         } else {
             this.inputBindingFormGroup = undefined;
         }
+
+        this.typeFromControl = new FormControl(
+            this.selectedProperty.type,
+            [Validators.required, CustomValidators.cwlModel]
+        );
+
+        this.tracked = this.typeFromControl.valueChanges.subscribe(_ => {
+            if (this.selectedProperty.isBound) {
+                if (this.selectedProperty.type.type !== 'array') {
+                    this.selectedProperty.inputBinding.itemSeparator = undefined;
+                }
+
+                this.createExpressionInputForm(this.selectedProperty);
+            }
+
+            this.propagateChange(this.selectedProperty);
+        });
     }
 
     private registerOnChange(fn: any): void {
@@ -144,28 +167,39 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
         const valueFrom = !!property.getValueFrom() ? property.getValueFrom(): new ExpressionModel(null, "");
 
         this.inputBindingFormGroup = this.formBuilder.group({
-            expressionInput: new FormControl(
-                valueFrom, [Validators.required, CustomValidators.cwlModel]
-            ),
-            position: new FormControl(
-                property.inputBinding.position, [Validators.required]
-            ),
-            prefix: new FormControl(
-                property.inputBinding.prefix, [Validators.required]
-            ),
-            separate: new FormControl(
-                property.inputBinding.separate, [Validators.required]
-            )
+            expressionInput: [valueFrom, [CustomValidators.cwlModel]],
+            position:        [property.inputBinding.position, [Validators.pattern(/^\d+$/)]],
+            prefix:          [property.inputBinding.prefix],
+            separate:        [property.inputBinding.separate],
+            itemSeparator:   [property.inputBinding.itemSeparator]
         });
 
+        this.listenToInputBindingFormChanges();
+    }
+
+    private listenToInputBindingFormChanges(): void {
         this.tracked = this.inputBindingFormGroup.valueChanges.subscribe(value => {
-            property.inputBinding.setValueFrom(value.expressionInput.serialize());
-            property.inputBinding.position = Number(value.position);
-            property.inputBinding.prefix = value.prefix;
-            property.inputBinding.separate = JSON.parse(value.separate);
+            if (this.inputBindingFormGroup.controls['expressionInput'].valid) {
+                this.selectedProperty.inputBinding.setValueFrom(value.expressionInput.serialize());
+            } else {
+                this.selectedProperty.inputBinding.valueFrom = undefined;
+            }
 
-            this.propagateChange(property);
+            this.setInputBindingProperty(this.inputBindingFormGroup, 'position', Number(value.position));
+            this.setInputBindingProperty(this.inputBindingFormGroup, 'prefix', value.prefix);
+            this.setInputBindingProperty(this.inputBindingFormGroup, 'separate', JSON.parse(value.separate));
+            this.setInputBindingProperty(this.inputBindingFormGroup, 'itemSeparator', value.itemSeparator);
+
+            this.propagateChange(this.selectedProperty);
         });
+    }
+
+    private setInputBindingProperty(form: FormGroup, propertyName: string, newValue: any): void {
+        if (form.controls[propertyName].valid) {
+            this.selectedProperty.inputBinding[propertyName] = newValue;
+        } else {
+            this.selectedProperty.inputBinding[propertyName] = undefined;
+        }
     }
 
     private toggleInputBinding(hasBinding: boolean): void {
