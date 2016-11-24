@@ -1,4 +1,4 @@
-@import "../../../../../assets/sass/variables";
+@import "../../../../assets/sass/variables";
 
 .expression-input-group {
     position: relative;
@@ -18,7 +18,7 @@
         .form-control {
             padding-left: 30px;
         }
-        
+
         .validation-icon {
             position: absolute;
             top: 8px;

@@ -1,6 +1,6 @@
 import {Component, Input, forwardRef} from "@angular/core";
 import {FormControl, Validators, NG_VALUE_ACCESSOR, ControlValueAccessor} from "@angular/forms";
-import {ExpressionInputComponent} from "../forms/inputs/types/expression-input.component";
+import {ExpressionInputComponent} from "../../editor-common/components/expression-input/expression-input.component";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../common/component-base";
 import {CustomValidators} from "../../validators/custom.validator";

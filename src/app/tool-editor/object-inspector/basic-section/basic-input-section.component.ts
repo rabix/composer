@@ -1,10 +1,10 @@
 import {Component, Input, forwardRef} from "@angular/core";
 import {Validators, FormControl, ControlValueAccessor, NG_VALUE_ACCESSOR, FormGroup, FormBuilder} from "@angular/forms";
 import {ExpressionModel, CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
-import {ToggleComponent} from "../../../common/toggle-slider/toggle-slider.component";
-import {CustomValidators} from "../../../../validators/custom.validator";
-import {ComponentBase} from "../../../common/component-base";
-import {InputTypeSelectComponent} from "../../../forms/common/type-select.component";
+import {ToggleComponent} from "../../../editor-common/components/toggle-slider/toggle-slider.component";
+import {InputTypeSelectComponent} from "../../common/type-select/type-select.component";
+import {ComponentBase} from "../../../components/common/component-base";
+import {CustomValidators} from "../../../validators/custom.validator";
 
 require("./basic-input-section.component.scss");
 
@@ -95,6 +95,9 @@ require("./basic-input-section.component.scss");
             </form>
     `
 })
+/**
+ * TODO: handle map, record and array types
+ * */
 export class BasicInputSectionComponent extends ComponentBase implements ControlValueAccessor {
 
     @Input()

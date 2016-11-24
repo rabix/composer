@@ -1,9 +1,9 @@
 import {Component, OnInit, OnDestroy} from "@angular/core";
-import {ExpressionInputComponent} from "../../forms/inputs/types/expression-input.component";
+import {ExpressionInputComponent} from "../../../editor-common/components/expression-input/expression-input.component";
 import {InputSidebarService, InputInspectorData} from "../../../services/sidebars/input-sidebar.service";
-import {BasicInputSectionComponent} from "./basic-section/basic-input-section.component";
 import {FormControl} from "@angular/forms";
 import {ComponentBase} from "../../common/component-base";
+import {BasicInputSectionComponent} from "../../../tool-editor/object-inspector/basic-section/basic-input-section.component";
 
 require("./input-inspector.component.scss");
 

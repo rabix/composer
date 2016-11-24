@@ -1,8 +1,8 @@
 import {InputParameterTypeModel} from "cwlts/models/d2sb/InputParameterTypeModel";
 import {Component, forwardRef} from "@angular/core";
-import {ComponentBase} from "../../common/component-base";
 import {ControlValueAccessor, FormControl, Validators, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {PrimitiveParameterType} from "cwlts/models/d2sb/ParameterTypeModel";
+import {ComponentBase} from "../../../components/common/component-base";
 
 @Component({
     selector: 'input-type-select',

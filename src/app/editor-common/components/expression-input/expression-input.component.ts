@@ -1,9 +1,9 @@
 import {Component, Input, forwardRef} from "@angular/core";
 import {NG_VALUE_ACCESSOR, ControlValueAccessor} from "@angular/forms";
 import {Subject} from "rxjs";
-import {ExpressionSidebarService} from "../../../../services/sidebars/expression-sidebar.service";
-import {ComponentBase} from "../../../common/component-base";
-import {noop} from "../../../../lib/utils.lib";
+import {ExpressionSidebarService} from "../../../services/sidebars/expression-sidebar.service";
+import {ComponentBase} from "../../../components/common/component-base";
+import {noop} from "../../../lib/utils.lib";
 import {ExpressionModel} from "cwlts/models/d2sb";
 
 require("./expression-input.component.scss");

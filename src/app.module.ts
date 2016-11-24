@@ -32,7 +32,6 @@ import {WorkflowEditorComponent} from "./app/components/workflow-editor/workflow
 import {DockerImageFormComponent} from "./app/components/forms/inputs/forms/docker-image-form.component";
 import {BaseCommandFormComponent} from "./app/components/forms/inputs/forms/base-command-form.component";
 import {InputPortsFormComponent} from "./app/components/forms/inputs/forms/input-ports-form.component";
-import {ExpressionInputComponent} from "./app/components/forms/inputs/types/expression-input.component";
 import {InputPortListComponent} from "./app/components/forms/inputs/types/input-port-list.component";
 import {InputInspectorSidebarComponent} from "./app/components/sidebar/object-inpsector/input-inspector-sidebar.component";
 import {ExpressionEditorSidebarComponent} from "./app/components/sidebar/expression-editor/expression-editor-sidebar.component";
@@ -40,8 +39,6 @@ import {ToolHeaderComponent} from "./app/components/tool-editor/tool-header/tool
 import {CommandLineComponent} from "./app/components/clt-editor/commandline/commandline.component";
 import {InputInspectorComponent} from "./app/components/sidebar/object-inpsector/input-inspector.component";
 import {ExpressionEditorComponent} from "./app/components/sidebar/expression-editor/expression-editor.component";
-import {BasicInputSectionComponent} from "./app/components/sidebar/object-inpsector/basic-section/basic-input-section.component";
-import {ToggleComponent} from "./app/components/common/toggle-slider/toggle-slider.component";
 import {ContextDirective} from "./app/services/context/context.directive";
 import {MenuComponent, MenuItemComponent} from "./app/components/menu";
 import {ModalComponent, ModalService} from "./app/components/modal";
@@ -72,7 +69,6 @@ import {EditorCommonModule} from "./app/editor-common/editor-common.module";
     declarations: [
         AlertComponent,
         BaseCommandFormComponent,
-        BasicInputSectionComponent,
         BlockLoaderComponent,
         CheckboxPromptComponent,
         CltEditorComponent,
@@ -84,7 +80,6 @@ import {EditorCommonModule} from "./app/editor-common/editor-common.module";
         DockerImageFormComponent,
         ExpressionEditorComponent,
         ExpressionEditorSidebarComponent,
-        ExpressionInputComponent,
         FormSectionComponent,
         HintListComponent,
         InputComponent,
@@ -117,7 +112,6 @@ import {EditorCommonModule} from "./app/editor-common/editor-common.module";
         FileEditorComponent,
         StructurePanelComponent,
         TabManagerComponent,
-        ToggleComponent,
         ToolEditorComponent,
         ToolHeaderComponent,
         TreeNodeComponent,
@@ -126,8 +120,7 @@ import {EditorCommonModule} from "./app/editor-common/editor-common.module";
         ViewModeSwitchComponent,
         WorkboxComponent,
         WorkflowEditorComponent,
-        ToggleComponent,
-        QuickPickComponent
+        QuickPickComponent,
     ],
     entryComponents: [
         CheckboxPromptComponent,
