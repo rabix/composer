@@ -1,5 +1,13 @@
 import {Component, Input, forwardRef} from "@angular/core";
-import {Validators, FormControl, ControlValueAccessor, NG_VALUE_ACCESSOR, FormGroup, FormBuilder} from "@angular/forms";
+import {
+    Validators,
+    FormControl,
+    ControlValueAccessor,
+    NG_VALUE_ACCESSOR,
+    FormGroup,
+    FormBuilder,
+    NG_VALIDATORS
+} from "@angular/forms";
 import {ExpressionModel, CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 import {ToggleComponent} from "../../../editor-common/components/toggle-slider/toggle-slider.component";
 import {InputTypeSelectComponent} from "../../common/type-select/type-select.component";
@@ -11,7 +19,8 @@ require("./basic-input-section.component.scss");
 @Component({
     selector: "basic-input-section",
     providers: [
-        { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => BasicInputSectionComponent), multi: true }
+        { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => BasicInputSectionComponent), multi: true },
+        { provide: NG_VALIDATORS, useExisting: forwardRef(() => BasicInputSectionComponent), multi: true }
     ],
     directives: [
         ToggleComponent,
@@ -19,10 +28,6 @@ require("./basic-input-section.component.scss");
     ],
     template: `
           <form class="basic-input-section" *ngIf="selectedProperty">
-                <div class="section-text">
-                     <span>Basic</span>
-                </div>
-            
                 <div class="form-group flex-container">
                     <label>Required</label>
                     <span class="align-right">
@@ -32,17 +37,15 @@ require("./basic-input-section.component.scss");
                 </div>
             
                 <div class="form-group">
-                    <label for="inputId">ID</label>
+                    <label>ID</label>
                     <input type="text" 
-                           name="selectedPropertyId" 
-                           id="inputId" 
                            class="form-control"
-                           [(ngModel)]="selectedProperty.id">
+                           [formControl]="propertyIdForm">
                 </div>
                 
-                <div class="form-group" *ngIf="typeFromControl">
+                <div class="form-group" *ngIf="typeForm">
                     <label for="inputType">Type</label>
-                    <input-type-select [formControl]="typeFromControl"></input-type-select>
+                    <input-type-select [formControl]="typeForm"></input-type-select>
                 </div>
                 
                 <div class="form-group flex-container">
@@ -64,6 +67,7 @@ require("./basic-input-section.component.scss");
                 
                     <label>Position</label>
                     <input class="form-control"
+                           type="number"
                            [formControl]="inputBindingFormGroup.controls['position']"/>
                 
                     <label>Prefix</label>
@@ -91,8 +95,9 @@ require("./basic-input-section.component.scss");
                             </option>
                         </select>
                    </div>
-                </div>
-            </form>
+                   
+                </div> <!--inputBindingFormGroup-->
+            </form> <!--basic-input-section-->
     `
 })
 /**
@@ -108,7 +113,9 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
     private inputBindingFormGroup: FormGroup;
 
-    private typeFromControl: FormControl;
+    private propertyIdForm: FormControl;
+
+    private typeForm: FormControl;
 
     private separatorOptions: {text: string, value: boolean}[] = [
         { text: "space", value: true },
@@ -133,6 +140,8 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
     private writeValue(property: InputProperty): void {
         this.selectedProperty = property;
+        this.typeForm = new FormControl(this.selectedProperty.type, [Validators.required, CustomValidators.cwlModel]);
+        this.propertyIdForm = new FormControl(this.selectedProperty.id);
 
         if (this.selectedProperty.isBound) {
             this.createExpressionInputForm(this.selectedProperty);
@@ -140,20 +149,14 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
             this.inputBindingFormGroup = undefined;
         }
 
-        this.typeFromControl = new FormControl(
-            this.selectedProperty.type,
-            [Validators.required, CustomValidators.cwlModel]
-        );
-
-        this.tracked = this.typeFromControl.valueChanges.subscribe(_ => {
-            if (this.selectedProperty.isBound) {
-                if (this.selectedProperty.type.type !== 'array') {
-                    this.selectedProperty.inputBinding.itemSeparator = undefined;
-                }
-
-                this.createExpressionInputForm(this.selectedProperty);
+        this.tracked = this.typeForm.valueChanges.subscribe(_ => {
+            if (this.selectedProperty.type.type !== 'array' && this.selectedProperty.isBound) {
+                this.selectedProperty.inputBinding.itemSeparator = undefined;
             }
+            this.propagateChange(this.selectedProperty);
+        });
 
+        this.tracked = this.propertyIdForm.valueChanges.subscribe(_ => {
             this.propagateChange(this.selectedProperty);
         });
     }
@@ -164,6 +167,18 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
     private registerOnTouched(fn: any): void {
         this.onTouched = fn;
+    }
+
+    private validate(c: FormControl) {
+        let isValid = false;
+
+        if (!!this.inputBindingFormGroup) {
+            isValid = this.inputBindingFormGroup.valid && this.typeForm.valid && this.propertyIdForm.valid;
+        } else {
+            isValid = this.typeForm.valid && this.propertyIdForm.valid;
+        }
+
+        return !!isValid ? null: { error: "Basic input section is not valid." }
     }
 
     private createExpressionInputForm(property: InputProperty): void {
@@ -181,20 +196,23 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
     }
 
     private listenToInputBindingFormChanges(): void {
-        this.tracked = this.inputBindingFormGroup.valueChanges.subscribe(value => {
-            if (this.inputBindingFormGroup.controls['expressionInput'].valid) {
-                this.selectedProperty.inputBinding.setValueFrom(value.expressionInput.serialize());
-            } else {
-                this.selectedProperty.inputBinding.valueFrom = undefined;
-            }
+        this.tracked = this.inputBindingFormGroup.valueChanges
+            .distinctUntilChanged()
+            .debounceTime(300)
+            .subscribe(value => {
+                if (this.inputBindingFormGroup.controls['expressionInput'].valid) {
+                    this.selectedProperty.inputBinding.setValueFrom(value.expressionInput.serialize());
+                } else {
+                    this.selectedProperty.inputBinding.valueFrom = undefined;
+                }
 
-            this.setInputBindingProperty(this.inputBindingFormGroup, 'position', Number(value.position));
-            this.setInputBindingProperty(this.inputBindingFormGroup, 'prefix', value.prefix);
-            this.setInputBindingProperty(this.inputBindingFormGroup, 'separate', JSON.parse(value.separate));
-            this.setInputBindingProperty(this.inputBindingFormGroup, 'itemSeparator', value.itemSeparator);
+                this.setInputBindingProperty(this.inputBindingFormGroup, 'position', Number(value.position));
+                this.setInputBindingProperty(this.inputBindingFormGroup, 'prefix', value.prefix);
+                this.setInputBindingProperty(this.inputBindingFormGroup, 'separate', JSON.parse(value.separate));
+                this.setInputBindingProperty(this.inputBindingFormGroup, 'itemSeparator', value.itemSeparator);
 
-            this.propagateChange(this.selectedProperty);
-        });
+                this.propagateChange(this.selectedProperty);
+            });
     }
 
     private setInputBindingProperty(form: FormGroup, propertyName: string, newValue: any): void {
