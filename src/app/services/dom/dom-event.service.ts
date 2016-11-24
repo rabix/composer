@@ -1,10 +1,15 @@
 import {Injectable} from "@angular/core";
 import {Observable} from "rxjs";
 
+type ExtendedMouseEvent = MouseEvent & {
+    ctName?: string;
+    ctData?: any;
+};
+
 @Injectable()
 export class DomEventService {
 
-    private registeredShortcuts = new Map<Array, Observable<any>>();
+    private registeredShortcuts = new Map<string[], Observable<KeyboardEvent>>();
 
     public on(eventName: string, component?: Element, preventDefault = false) {
         return Observable.fromEvent(document, eventName).filter((ev: Event) => {
@@ -13,7 +18,7 @@ export class DomEventService {
             }
 
             return ev.srcElement === component || component.contains(ev.srcElement);
-        }).do(ev => {
+        }).do((ev: Event) => {
             if (preventDefault) {
                 ev.preventDefault();
             }
@@ -57,16 +62,19 @@ export class DomEventService {
             return isMainKey && modifiersMatch;
         }).share();
 
-        this.registeredShortcuts.set(normalized, listener);
+        this.registeredShortcuts.set(normalized, listener as Observable<KeyboardEvent>);
 
         return listener;
     }
 
-    public onDrag(element: Element): Observable<MouseEvent> {
+    /**
+     * Observes the dragging of an element.
+     */
+    public onDrag(element: Element, ctName = "", ctData = {}): Observable<ExtendedMouseEvent> {
         const down = Observable.fromEvent(element, "mousedown");
         const up   = Observable.fromEvent(document, "mouseup");
         const move = Observable.fromEvent(document, "mousemove");
-        return down.flatMap(_ => move.takeUntil(up));
+        return down.flatMap(_ => move.takeUntil(up)).map((ev: MouseEvent) => Object.assign(ev, {ctData}, {ctName}));
     }
 
 
