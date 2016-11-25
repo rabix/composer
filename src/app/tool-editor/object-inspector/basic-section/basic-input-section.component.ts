@@ -31,14 +31,14 @@ require("./basic-input-section.component.scss");
     template: `
 <ct-form-panel>
     <div class="tc-header">Basic</div>
-    <div class="tc-body">
+    <div class="tc-body" *ngIf="selectedProperty">
 
-          <form class="basic-input-section" *ngIf="selectedProperty">
+          <form class="basic-input-section">
                 <div class="form-group flex-container">
                     <label>Required</label>
                     <span class="align-right">
-                        {{selectedProperty.isRequired ? "Yes" : "No"}}
-                        <toggle-slider [(checked)]="selectedProperty.isRequired"></toggle-slider>
+                        {{!selectedProperty.type.isNullable ? "Yes" : "No"}}
+                        <toggle-slider [formControl]="basicSectionForm.controls['isRequired']"></toggle-slider>
                     </span>
                 </div>
             
@@ -46,30 +46,32 @@ require("./basic-input-section.component.scss");
                     <label>ID</label>
                     <input type="text" 
                            class="form-control"
-                           [formControl]="propertyIdForm">
+                           [formControl]="basicSectionForm.controls['propertyIdForm']">
                 </div>
                 
                 <div class="form-group" *ngIf="typeForm">
                     <label for="inputType">Type</label>
-                    <input-type-select [formControl]="typeForm"></input-type-select>
+                    <input-type-select [formControl]="basicSectionForm.controls['typeForm']"></input-type-select>
                 </div>
                 
-                <div class="form-group flex-container">
+                
+                <div class="form-group flex-container" *ngIf="selectedProperty.type.type !== 'map'">
                     <label>Include in command line</label>
-                    
                     <span class="align-right">
                         {{selectedProperty.isBound ? "Yes" : "No"}}
-                        <toggle-slider [(checked)]="selectedProperty.isBound"
-                                       (checkedChange)="toggleInputBinding(selectedProperty.isBound)"></toggle-slider>
+                        <toggle-slider [formControl]="basicSectionForm.controls['isBound']"></toggle-slider>
                     </span>
                 </div>
                 
                <div class="form-group" *ngIf="inputBindingFormGroup">
-                    <label>Value</label>
-                    <expression-input
-                                [context]="context"
-                                [formControl]="inputBindingFormGroup.controls['expressionInput']">
-                    </expression-input>
+                    
+                    <div *ngIf="selectedProperty.type.type !== 'record'">
+                        <label>Value</label>
+                        <expression-input
+                                    [context]="context"
+                                    [formControl]="inputBindingFormGroup.controls['expressionInput']">
+                        </expression-input>
+                    </div>
                 
                     <label>Position</label>
                     <input class="form-control"
@@ -107,24 +109,19 @@ require("./basic-input-section.component.scss");
             
         </div> <!--tc-body-->
 </ct-form-panel>
-    `
+`
 })
-/**
- * TODO: handle map, record and array types
- * */
 export class BasicInputSectionComponent extends ComponentBase implements ControlValueAccessor {
 
     @Input()
-    public context: {$job: any, $self: any};
+    public context: {$job: any, $self: any} = {};
 
     /** The currently displayed property */
     private selectedProperty: InputProperty;
 
     private inputBindingFormGroup: FormGroup;
 
-    private propertyIdForm: FormControl;
-
-    private typeForm: FormControl;
+    private basicSectionForm: FormGroup;
 
     private separatorOptions: {text: string, value: boolean}[] = [
         { text: "space", value: true },
@@ -149,23 +146,33 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
     private writeValue(property: InputProperty): void {
         this.selectedProperty = property;
-        this.typeForm = new FormControl(this.selectedProperty.type, [Validators.required, CustomValidators.cwlModel]);
-        this.propertyIdForm = new FormControl(this.selectedProperty.id);
 
-        if (this.selectedProperty.isBound) {
-            this.createExpressionInputForm(this.selectedProperty);
-        } else {
-            this.inputBindingFormGroup = undefined;
-        }
+        this.basicSectionForm = this.formBuilder.group({
+            typeForm: [this.selectedProperty.type, [Validators.required, CustomValidators.cwlModel]],
+            propertyIdForm: [this.selectedProperty.id],
+            isBound: [!!this.selectedProperty.isBound],
+            isRequired: [!this.selectedProperty.type.isNullable]
+        });
 
-        this.tracked = this.typeForm.valueChanges.subscribe(_ => {
+        this.toggleInputBindingForm(!!this.selectedProperty.isBound);
+
+        this.basicSectionForm.controls['isBound'].valueChanges.subscribe(isBound => {
+            !!isBound ? this.selectedProperty.createInputBinding(): this.selectedProperty.removeInputBinding();
+            this.toggleInputBindingForm(!!isBound);
+        });
+
+        this.basicSectionForm.valueChanges.subscribe(value => {
+            this.selectedProperty.type.isNullable = !value.isRequired;
+
             if (this.selectedProperty.type.type !== 'array' && this.selectedProperty.isBound) {
                 this.selectedProperty.inputBinding.itemSeparator = undefined;
             }
-            this.propagateChange(this.selectedProperty);
-        });
 
-        this.tracked = this.propertyIdForm.valueChanges.subscribe(_ => {
+            if (this.selectedProperty.type.type === 'map' && this.selectedProperty.isBound) {
+                this.selectedProperty.inputBinding = undefined;
+                this.inputBindingFormGroup = undefined;
+            }
+
             this.propagateChange(this.selectedProperty);
         });
     }
@@ -182,15 +189,15 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
         let isValid = false;
 
         if (!!this.inputBindingFormGroup) {
-            isValid = this.inputBindingFormGroup.valid && this.typeForm.valid && this.propertyIdForm.valid;
+            isValid = this.inputBindingFormGroup.valid && this.basicSectionForm;
         } else {
-            isValid = this.typeForm.valid && this.propertyIdForm.valid;
+            isValid = this.basicSectionForm.valid;
         }
 
         return !!isValid ? null: { error: "Basic input section is not valid." }
     }
 
-    private createExpressionInputForm(property: InputProperty): void {
+    private createInputBindingForm(property: InputProperty): void {
         const valueFrom = !!property.getValueFrom() ? property.getValueFrom(): new ExpressionModel(null, "");
 
         this.inputBindingFormGroup = this.formBuilder.group({
@@ -232,14 +239,11 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
         }
     }
 
-    private toggleInputBinding(hasBinding: boolean): void {
-        if (!hasBinding) {
-            this.selectedProperty.createInputBinding();
-            this.createExpressionInputForm(this.selectedProperty);
+    private toggleInputBindingForm(isBound: boolean): void {
+        if (!!isBound) {
+            this.createInputBindingForm(this.selectedProperty);
         } else {
             this.inputBindingFormGroup = undefined;
-            this.selectedProperty.removeInputBinding();
-            this.propagateChange(this.selectedProperty);
         }
     }
 

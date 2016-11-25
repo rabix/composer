@@ -46,6 +46,14 @@ export class InputInspectorComponent extends ComponentBase implements OnInit, On
             this.context = data.context;
             this.basicInputSectionControl = new FormControl(data.inputProperty);
             this.descriptionForm = new FormControl(data.inputProperty);
+
+            this.basicInputSectionControl.valueChanges.subscribe(value => {
+                console.log(data.inputProperty);
+            });
+
+            this.descriptionForm.valueChanges.subscribe(value => {
+                console.log(data.inputProperty);
+            });
         });
     }
 

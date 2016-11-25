@@ -1,25 +1,43 @@
-import {Component, Input, Output, EventEmitter} from "@angular/core";
+import {Component, forwardRef} from "@angular/core";
+import {NG_VALUE_ACCESSOR, ControlValueAccessor} from "@angular/forms";
+import {ComponentBase} from "../../../components/common/component-base";
 
 require("./toggle-slider.component.scss");
 
 @Component({
     selector: "toggle-slider",
+    providers: [
+        { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ToggleComponent), multi: true }
+    ],
     template: `
-        <button class="toggle-button" (click)="toggleCheck()">
-            <i class="fa fa-toggle-off fa-lg" [class.fa-toggle-on]="checked"></i>    
-        </button>
+        <label class="switch">
+              <input type="checkbox" [checked]="isChecked" (change)="toggleCheck()">
+              <div class="slider round"></div>
+        </label>
     `
 })
-export class ToggleComponent {
+export class ToggleComponent extends ComponentBase implements ControlValueAccessor {
 
-    @Input()
-    public checked: boolean;
+    private isChecked: boolean = false;
 
-    @Output()
-    public checkedChange: EventEmitter<boolean> = new EventEmitter<boolean>();
+    private onTouched = () => { };
+
+    private propagateChange = (_) => {};
 
     private toggleCheck(): void {
-        this.checked = !this.checked;
-        this.checkedChange.emit(this.checked);
+        this.isChecked = !this.isChecked;
+        this.propagateChange(this.isChecked);
+    }
+
+    private writeValue(isChecked: boolean): void {
+        this.isChecked = isChecked;
+    }
+
+    private registerOnChange(fn: any): void {
+        this.propagateChange = fn;
+    }
+
+    private registerOnTouched(fn: any): void {
+        this.onTouched = fn;
     }
 }
