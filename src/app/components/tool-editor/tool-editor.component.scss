@@ -123,9 +123,6 @@ ct-code-editor {
     &:hover {
         background: $gui-section-list-item-hover-bg;
         color: $gui-section-list-item-hover-color;
-        .fa {
-            color: $gui-section-list-item-hover-icon-color;
-        }
     }
 
     &.selected {
