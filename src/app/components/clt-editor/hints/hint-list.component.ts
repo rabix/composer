@@ -26,10 +26,10 @@ import {ExternalLinks} from "../../../cwl/external-links";
                         <div class="col-sm-7">Value</div>
                     </div>
 
-                    <ul class="gui-section-list row">
+                    <ul class="gui-section-list">
 
                         <li *ngFor="let entry of entries; let i = index"
-                            class="gui-section-list-item clickable">
+                            class="gui-section-list-item clickable row">
 
                             <div class="col-sm-5 ellipsis">{{ entry?.class }}</div>
 

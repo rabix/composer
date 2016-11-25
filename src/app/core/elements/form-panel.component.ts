@@ -19,7 +19,7 @@ import {Component, Input, ChangeDetectionStrategy} from "@angular/core";
                 </div>
             </div>
 
-            <div [class.show]="!collapsed" class="gui-section-body row">
+            <div *ngIf="!collapsed" class="gui-section-body row show">
                 <div class="col-xs-12">
                     <ng-content select=".tc-body"></ng-content>
                 </div>
@@ -34,5 +34,9 @@ export class FormPanelComponent {
 
     private toggle() {
         this.collapsed = !this.collapsed;
+    }
+
+    ngOnDestroy(){
+        console.log("Destroying panel");
     }
 }

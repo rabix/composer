@@ -1,5 +1,5 @@
 import * as Yaml from "js-yaml";
-import {Component, OnInit, Input, OnDestroy} from "@angular/core";
+import {Component, OnInit, Input, OnDestroy, ChangeDetectionStrategy} from "@angular/core";
 import {FormGroup, FormBuilder} from "@angular/forms";
 import {ReplaySubject, BehaviorSubject} from "rxjs/Rx";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
@@ -28,26 +28,31 @@ require("./tool-editor.component.scss");
     ],
     template: `
         <block-loader *ngIf="isLoading"></block-loader>
-
+        
         <div class="editor-container" *ngIf="!isLoading">
             <tool-header class="editor-header"
                          (save)="save($event)"
                          [fileIsValid]="isValidCWL"
                          [data]="data"></tool-header>
         
-            <div class="scroll-content">
-                <div code-editor
-                     class="editor flex-fill"
-                     [content]="rawEditorContent"
-                     [readonly]="!data.isWritable"
-                     [language]="data.language | async"></div>
+            <div class="scroll-content flex-container">
+                <div class="flex-row">
+                        <div code-editor
+                             *ngIf="viewMode === __modes.Code"
+                             class="editor col-xs-12"
+                             [content]="rawEditorContent"
+                             [readonly]="!data.isWritable"
+                             [language]="data.language | async"></div>
                      
-                <ct-clt-editor *ngIf="viewMode === __modes.Gui"
-                               class="gui-editor-component"
-                               [readonly]="!data.isWritable"
-                               [formGroup]="toolGroup"
-                               [model]="toolModel"></ct-clt-editor>
+                        <ct-clt-editor *ngIf="viewMode === __modes.Gui"
+                                       class="gui-editor-component col-xs-12"
+                                       [readonly]="!data.isWritable"
+                                       [formGroup]="toolGroup"
+                                       [model]="toolModel"></ct-clt-editor>
+                </div>
             </div>
+            
+            
             <div class="status-bar-footer">
             
                 <div class="left-side">
@@ -78,7 +83,8 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
     public validation = new ReplaySubject<ValidationResponse>(1);
 
     /** Default view mode. */
-    private viewMode = ViewMode.Code;
+    @Input()
+    public viewMode = ViewMode.Code;
 
     /** Flag to indicate the document is loading */
     private isLoading = false;
@@ -181,26 +187,26 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
      * @param view
      */
     private switchView(view: ViewMode) {
-
+        console.log("Triggering view", view);
         if (view === ViewMode.Gui) {
 
-            if (this.showReformatPrompt) {
-                this.modal.checkboxPrompt({
-                    title: "Confirm GUI Formatting",
-                    content: "Activating GUI mode might change the formatting of this document. Do you wish to continue?",
-                    cancellationLabel: "Cancel",
-                    confirmationLabel: "OK",
-                    checkboxLabel: "Don't show this dialog again",
-                }).then(res => {
-                    if (res) this.userPrefService.put("show_reformat_prompt", false);
-
-                    this.showReformatPrompt = false;
-                    this.viewMode           = view;
-                }, noop);
-
-            } else {
+            // if (this.showReformatPrompt) {
+            //     this.modal.checkboxPrompt({
+            //         title: "Confirm GUI Formatting",
+            //         content: "Activating GUI mode might change the formatting of this document. Do you wish to continue?",
+            //         cancellationLabel: "Cancel",
+            //         confirmationLabel: "OK",
+            //         checkboxLabel: "Don't show this dialog again",
+            //     }).then(res => {
+            //         if (res) this.userPrefService.put("show_reformat_prompt", false);
+            //
+            //         this.showReformatPrompt = false;
+            //         this.viewMode           = view;
+            //     }, noop);
+            //
+            // } else {
                 this.viewMode = view;
-            }
+            // }
         } else if (view === ViewMode.Code) {
             if (this.toolGroup.dirty) {
                 this.rawEditorContent.next(this.getModelText());

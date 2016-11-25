@@ -26,9 +26,9 @@ import {CommandArgumentModel} from "cwlts/models/d2sb";
                         <div class="col-sm-2">#</div>
                     </div>
                 
-                    <ul class="gui-section-list row">
+                    <ul class="gui-section-list">
                         <li *ngFor="let entry of arguments; let i = index"
-                            class="gui-section-list-item clickable validatable">
+                            class="gui-section-list-item clickable validatable row">
                             
                             <ct-tooltip-content #ctt>
                                 <span *ngIf="entry.value && entry.value[0] !== '{'">{{ entry.value }}</span>

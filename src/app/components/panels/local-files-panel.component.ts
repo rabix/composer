@@ -17,9 +17,8 @@ const {app, dialog} = window.require("electron").remote;
 
 @Component({
     selector: "ct-local-files-panel",
-    directives: [TreeViewComponent, PanelToolbarComponent],
-    providers: [LocalDataSourceService, IpcService],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [LocalDataSourceService],
     host: {"class": "block"},
     template: `
         <ct-panel-toolbar>
@@ -208,6 +207,7 @@ export class LocalFilesPanelComponent {
             this.addDirectory(...paths);
         });
     }
+
 
     private addDirectory(...paths: string[]) {
         if (!paths) {

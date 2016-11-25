@@ -1,8 +1,12 @@
 const {app, Menu, BrowserWindow} = require("electron");
-require("./ipc-router");
+const router = require("./ipc-router");
+const acceleratorProxy = require("./accelerator-proxy");
+
 let win;
 
 function start(config = {}) {
+
+    router.start();
 
     win = new BrowserWindow({width: 1024, height: 768});
 
@@ -15,6 +19,7 @@ function start(config = {}) {
     win.on("closed", () => {
         win = undefined
     });
+
 
     Menu.setApplicationMenu(Menu.buildFromTemplate([
         {
@@ -40,6 +45,24 @@ function start(config = {}) {
                 {label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:"},
                 {label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:"},
                 {label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:"}
+            ]
+        }, {
+            label: "Window",
+            submenu: [
+                {
+                    label: "Editor Tabs",
+                    submenu: [
+                        {
+                            id: "closeActiveTab",
+                            label: "Close Active Tab",
+                            accelerator: "CmdOrCtrl+W",
+                            click: (menu, browser, event) => {
+                                acceleratorProxy.pass(menu, browser, event);
+                            }
+                        }
+                    ]
+                },
+                {label: "Toggle DevTools", role: "toggledevtools"},
             ]
         }
     ]));
@@ -70,5 +93,7 @@ module.exports = {
                 start();
             }
         });
+
+
     }
 };

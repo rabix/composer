@@ -10,6 +10,7 @@ describe("IPC Router", () => {
 
         const electron = {ipcMain: {on: sinon.spy()}};
         const router = proxy("./ipc-router", {electron});
+        router.start();
 
         assert.isTrue(electron.ipcMain.on.calledOnce);
 
@@ -42,6 +43,7 @@ describe("IPC Router", () => {
         };
 
         router = proxy("./ipc-router", {electron, "./routes": routes});
+        router.start();
 
         const [data, callback] = testRouteEndpoint.args[0];
         assert.isTrue(testRouteEndpoint.calledOnce);

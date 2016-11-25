@@ -42,7 +42,6 @@ export class TooltipDirective {
         this.visible = true;
 
         let instance = this.content as TooltipContentComponent;
-        console.log("Instance", this.content);
 
         if (typeof this.content === "string") {
 

@@ -74,9 +74,6 @@ export class LayoutComponent extends ComponentBase implements OnInit {
     /** Tracking the panel switches so we know which ones to highlight and where to put them */
     protected panelSwitches: BehaviorSubject<PanelGroupMap>;
 
-    /** Subscriptions to dispose when component gets destroyed */
-    private subs: Subscription[] = [];
-
     private el: Element;
 
     constructor(private preferences: UserPreferencesService, private domEvents: DomEventService, el: ElementRef) {
@@ -105,7 +102,9 @@ export class LayoutComponent extends ComponentBase implements OnInit {
     ngOnInit() {
 
         // Layout is resizable, so we need to react when user drags the handle
-        this.tracked = this.domEvents.onDrag(this.handle.nativeElement).map(ev => {
+        this.tracked = this.domEvents.onDrag(this.handle.nativeElement)
+            .do(data => console.debug("Got data", data))
+            .map(ev => {
             const x = ev.clientX;
 
             // You can't make the left column narrower than 200px
