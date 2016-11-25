@@ -4,6 +4,7 @@ import {InputSidebarService, InputInspectorData} from "../../../services/sidebar
 import {FormControl} from "@angular/forms";
 import {ComponentBase} from "../../common/component-base";
 import {BasicInputSectionComponent} from "../../../tool-editor/object-inspector/basic-section/basic-input-section.component";
+import {InputDescriptionComponent} from "../../../tool-editor/object-inspector/input-description/input-description.component";
 
 require("./input-inspector.component.scss");
 
@@ -11,7 +12,8 @@ require("./input-inspector.component.scss");
     selector: "input-inspector",
     directives: [
         ExpressionInputComponent,
-        BasicInputSectionComponent
+        BasicInputSectionComponent,
+        InputDescriptionComponent
     ],
     template: `
             <form class="input-inspector-component object-inspector" *ngIf="basicInputSectionControl">
@@ -23,6 +25,8 @@ require("./input-inspector.component.scss");
                 <basic-input-section [formControl]="basicInputSectionControl"
                                      [context]="context">
                 </basic-input-section>
+                
+                <input-description [formControl]="descriptionForm"></input-description>
             </form>
     `
 })
@@ -30,6 +34,8 @@ export class InputInspectorComponent extends ComponentBase implements OnInit, On
     private context: any;
 
     private basicInputSectionControl: FormControl;
+
+    private descriptionForm: FormControl;
 
     constructor(private inputSidebarService: InputSidebarService) {
         super();
@@ -39,6 +45,7 @@ export class InputInspectorComponent extends ComponentBase implements OnInit, On
         this.tracked = this.inputSidebarService.inputPortDataStream.subscribe((data: InputInspectorData) => {
             this.context = data.context;
             this.basicInputSectionControl = new FormControl(data.inputProperty);
+            this.descriptionForm = new FormControl(data.inputProperty);
         });
     }
 

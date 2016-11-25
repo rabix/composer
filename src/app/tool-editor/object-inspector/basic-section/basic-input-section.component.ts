@@ -13,6 +13,7 @@ import {ToggleComponent} from "../../../editor-common/components/toggle-slider/t
 import {InputTypeSelectComponent} from "../../common/type-select/type-select.component";
 import {ComponentBase} from "../../../components/common/component-base";
 import {CustomValidators} from "../../../validators/custom.validator";
+import {FormPanelComponent} from "../../../core/elements/form-panel.component";
 
 require("./basic-input-section.component.scss");
 
@@ -24,9 +25,14 @@ require("./basic-input-section.component.scss");
     ],
     directives: [
         ToggleComponent,
-        InputTypeSelectComponent
+        InputTypeSelectComponent,
+        FormPanelComponent
     ],
     template: `
+<ct-form-panel>
+    <div class="tc-header">Basic</div>
+    <div class="tc-body">
+
           <form class="basic-input-section" *ngIf="selectedProperty">
                 <div class="form-group flex-container">
                     <label>Required</label>
@@ -98,6 +104,9 @@ require("./basic-input-section.component.scss");
                    
                 </div> <!--inputBindingFormGroup-->
             </form> <!--basic-input-section-->
+            
+        </div> <!--tc-body-->
+</ct-form-panel>
     `
 })
 /**

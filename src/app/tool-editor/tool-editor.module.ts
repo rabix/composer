@@ -7,6 +7,7 @@ import {FileDefListComponent} from "./sections/file-def-list/file-def-list.compo
 import {BasicInputSectionComponent} from "./object-inspector/basic-section/basic-input-section.component";
 import {InputTypeSelectComponent} from "./common/type-select/type-select.component";
 import {ReactiveFormsModule, FormsModule} from "@angular/forms";
+import {InputDescriptionComponent} from "./object-inspector/input-description/input-description.component";
 
 @NgModule({
     declarations: [
@@ -14,18 +15,20 @@ import {ReactiveFormsModule, FormsModule} from "@angular/forms";
         FileDefListComponent,
         BasicInputSectionComponent,
         InputTypeSelectComponent,
+        InputDescriptionComponent
     ],
     exports: [
         ArgumentListComponent,
         FileDefListComponent,
-        BasicInputSectionComponent
+        BasicInputSectionComponent,
+        InputDescriptionComponent
     ],
     imports: [
         BrowserModule,
         EditorCommonModule,
         CoreModule,
         FormsModule,
-        ReactiveFormsModule,
+        ReactiveFormsModule
     ]
 })
 export class ToolEditorModule {
