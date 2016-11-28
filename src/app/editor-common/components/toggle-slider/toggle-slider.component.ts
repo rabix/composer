@@ -26,11 +26,11 @@ export class ToggleComponent extends ComponentBase implements ControlValueAccess
 
     private toggleCheck(): void {
         this.isChecked = !this.isChecked;
-        this.propagateChange(this.isChecked);
+        this.propagateChange(!!this.isChecked);
     }
 
     private writeValue(isChecked: boolean): void {
-        this.isChecked = isChecked;
+        this.isChecked = !!isChecked;
     }
 
     private registerOnChange(fn: any): void {

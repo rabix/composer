@@ -1,5 +1,13 @@
 import {Component, forwardRef} from "@angular/core";
-import {NG_VALUE_ACCESSOR, ControlValueAccessor, FormBuilder, Validators, FormGroup} from "@angular/forms";
+import {
+    NG_VALUE_ACCESSOR,
+    ControlValueAccessor,
+    FormBuilder,
+    Validators,
+    FormGroup,
+    NG_VALIDATORS,
+    FormControl
+} from "@angular/forms";
 import {ComponentBase} from "../../../components/common/component-base";
 import {CustomValidators} from "../../../validators/custom.validator";
 import {ExpressionModel, CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
@@ -7,7 +15,8 @@ import {ExpressionModel, CommandInputParameterModel as InputProperty} from "cwlt
 @Component({
     selector: 'input-binding-section',
     providers: [
-        { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => InputBindingSectionComponent), multi: true }
+        { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => InputBindingSectionComponent), multi: true },
+        { provide: NG_VALIDATORS, useExisting: forwardRef(() => InputBindingSectionComponent), multi: true }
     ],
     template: `
     <div class="form-group" *ngIf="inputBindingFormGroup">
@@ -22,7 +31,7 @@ import {ExpressionModel, CommandInputParameterModel as InputProperty} from "cwlt
         
             <label>Position</label>
             <input class="form-control"
-                   type="number"
+                   type="text"
                    [formControl]="inputBindingFormGroup.controls['position']"/>
         
             <label>Prefix</label>
@@ -93,8 +102,18 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
         this.onTouched = fn;
     }
 
+    private validate(c: FormControl) {
+        return !!this.inputBindingFormGroup.valid ? null: { error: "Input binding section is not valid." }
+    }
+
     private createInputBindingForm(property: InputProperty): void {
-        const valueFrom = !!property.getValueFrom() ? property.getValueFrom(): new ExpressionModel(null, "");
+        let valueFrom;
+
+        if (!!property.getValueFrom()) {
+            valueFrom = property.getValueFrom();
+        } else {
+            valueFrom = new ExpressionModel(property.inputBinding.loc, "");
+        }
 
         this.inputBindingFormGroup = this.formBuilder.group({
             expressionInput: [valueFrom, [CustomValidators.cwlModel]],

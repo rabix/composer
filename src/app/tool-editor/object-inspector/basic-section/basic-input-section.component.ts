@@ -66,8 +66,8 @@ require("./basic-input-section.component.scss");
                     </span>
                 </div>
                 
-                <input-binding-section *ngIf="inputBindingForm" 
-                            [formControl]="inputBindingForm"></input-binding-section>
+                <input-binding-section *ngIf="selectedProperty.isBound" 
+                            [formControl]="basicSectionForm.controls['inputBinding']"></input-binding-section>
               
             </form> <!--basic-input-section-->
         </div> <!--tc-body-->
@@ -81,8 +81,6 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
     /** The currently displayed property */
     private selectedProperty: InputProperty;
-
-    private inputBindingForm: FormControl;
 
     private basicSectionForm: FormGroup;
 
@@ -103,22 +101,15 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
             typeForm: [this.selectedProperty.type, [Validators.required, CustomValidators.cwlModel]],
             propertyIdForm: [this.selectedProperty.id],
             isBound: [!!this.selectedProperty.isBound],
-            isRequired: [!this.selectedProperty.type.isNullable]
+            isRequired: [!this.selectedProperty.type.isNullable],
+            inputBinding: [this.selectedProperty]
         });
-
-        if (!!this.selectedProperty.isBound) {
-            this.inputBindingForm = new FormControl(this.selectedProperty);
-            this.listenToInputBindingChanges();
-        }
 
         this.tracked = this.basicSectionForm.controls['isBound'].valueChanges.subscribe(isBound => {
             if (!!isBound) {
                 this.selectedProperty.createInputBinding();
-                this.inputBindingForm = new FormControl(this.selectedProperty);
-                this.listenToInputBindingChanges();
             } else {
                 this.selectedProperty.removeInputBinding();
-                this.inputBindingForm = undefined;
             }
         });
 
@@ -131,6 +122,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
             if (this.selectedProperty.type.type === 'map' && this.selectedProperty.isBound) {
                 this.selectedProperty.removeInputBinding();
+                this.basicSectionForm.controls['isBound'].setValue(this.selectedProperty.isBound);
             }
 
             this.propagateChange(this.selectedProperty);
@@ -146,21 +138,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
     }
 
     private validate(c: FormControl) {
-        let isValid = false;
-
-        if (!!this.inputBindingForm) {
-            isValid = this.inputBindingForm.valid && this.basicSectionForm;
-        } else {
-            isValid = this.basicSectionForm.valid;
-        }
-
-        return !!isValid ? null: { error: "Basic input section is not valid." }
-    }
-
-    private listenToInputBindingChanges(): void {
-        this.inputBindingChanges = this.inputBindingForm.valueChanges.subscribe(_ => {
-            this.propagateChange(this.selectedProperty);
-        });
+        return !!this.basicSectionForm.valid ? null: { error: "Basic input section is not valid." }
     }
 
     ngOnDestroy(): void {
