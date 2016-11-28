@@ -8,12 +8,14 @@ import {
     FormBuilder,
     NG_VALIDATORS
 } from "@angular/forms";
-import {ExpressionModel, CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
+import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 import {ToggleComponent} from "../../../editor-common/components/toggle-slider/toggle-slider.component";
 import {InputTypeSelectComponent} from "../../common/type-select/type-select.component";
 import {ComponentBase} from "../../../components/common/component-base";
 import {CustomValidators} from "../../../validators/custom.validator";
 import {FormPanelComponent} from "../../../core/elements/form-panel.component";
+import {InputBindingSectionComponent} from "../input-binding/input-binding-section.component";
+import {Subscription} from "rxjs";
 
 require("./basic-input-section.component.scss");
 
@@ -26,7 +28,8 @@ require("./basic-input-section.component.scss");
     directives: [
         ToggleComponent,
         InputTypeSelectComponent,
-        FormPanelComponent
+        FormPanelComponent,
+        InputBindingSectionComponent
     ],
     template: `
 <ct-form-panel>
@@ -49,7 +52,7 @@ require("./basic-input-section.component.scss");
                            [formControl]="basicSectionForm.controls['propertyIdForm']">
                 </div>
                 
-                <div class="form-group" *ngIf="typeForm">
+                <div class="form-group">
                     <label for="inputType">Type</label>
                     <input-type-select [formControl]="basicSectionForm.controls['typeForm']"></input-type-select>
                 </div>
@@ -63,50 +66,10 @@ require("./basic-input-section.component.scss");
                     </span>
                 </div>
                 
-               <div class="form-group" *ngIf="inputBindingFormGroup">
-                    
-                    <div *ngIf="selectedProperty.type.type !== 'record'">
-                        <label>Value</label>
-                        <expression-input
-                                    [context]="context"
-                                    [formControl]="inputBindingFormGroup.controls['expressionInput']">
-                        </expression-input>
-                    </div>
-                
-                    <label>Position</label>
-                    <input class="form-control"
-                           type="number"
-                           [formControl]="inputBindingFormGroup.controls['position']"/>
-                
-                    <label>Prefix</label>
-                    <input class="form-control"
-                           [formControl]="inputBindingFormGroup.controls['prefix']"/>
-                           
-                   <label>Separator</label>
-                   <select class="form-control" 
-                           [formControl]="inputBindingFormGroup.controls['separate']">
-                        <option *ngFor="let separatorOption of separatorOptions" 
-                                [value]="separatorOption.value"
-                                [selected]="separatorOption.value === !!selectedProperty.inputBinding.separate">
-                            {{separatorOption.text}}
-                        </option>
-                   </select>
-                   
-                   <div *ngIf="selectedProperty.type.type === 'array'">
-                        <label>Item Separator</label>
-                        <select class="form-control" 
-                                [formControl]="inputBindingFormGroup.controls['itemSeparator']">
-                            <option *ngFor="let itemSeparator of itemSeparators" 
-                                    [value]="itemSeparator.value"
-                                    [selected]="itemSeparator.value == selectedProperty.inputBinding.itemSeparator">
-                                {{itemSeparator.text}}
-                            </option>
-                        </select>
-                   </div>
-                   
-                </div> <!--inputBindingFormGroup-->
+                <input-binding-section *ngIf="inputBindingForm" 
+                            [formControl]="inputBindingForm"></input-binding-section>
+              
             </form> <!--basic-input-section-->
-            
         </div> <!--tc-body-->
 </ct-form-panel>
 `
@@ -119,22 +82,11 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
     /** The currently displayed property */
     private selectedProperty: InputProperty;
 
-    private inputBindingFormGroup: FormGroup;
+    private inputBindingForm: FormControl;
 
     private basicSectionForm: FormGroup;
 
-    private separatorOptions: {text: string, value: boolean}[] = [
-        { text: "space", value: true },
-        { text: "empty string", value: false }
-    ];
-
-    private itemSeparators: {text: string, value: string}[] = [
-        { text: "equal", value: "=" },
-        { text: "comma", value: "," },
-        { text: "semicolon", value: ";" },
-        { text: "space", value: " " },
-        { text: "repeat", value: null }
-    ];
+    private inputBindingChanges: Subscription;
 
     private onTouched = () => { };
 
@@ -154,14 +106,23 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
             isRequired: [!this.selectedProperty.type.isNullable]
         });
 
-        this.toggleInputBindingForm(!!this.selectedProperty.isBound);
+        if (!!this.selectedProperty.isBound) {
+            this.inputBindingForm = new FormControl(this.selectedProperty);
+            this.listenToInputBindingChanges();
+        }
 
-        this.basicSectionForm.controls['isBound'].valueChanges.subscribe(isBound => {
-            !!isBound ? this.selectedProperty.createInputBinding(): this.selectedProperty.removeInputBinding();
-            this.toggleInputBindingForm(!!isBound);
+        this.tracked = this.basicSectionForm.controls['isBound'].valueChanges.subscribe(isBound => {
+            if (!!isBound) {
+                this.selectedProperty.createInputBinding();
+                this.inputBindingForm = new FormControl(this.selectedProperty);
+                this.listenToInputBindingChanges();
+            } else {
+                this.selectedProperty.removeInputBinding();
+                this.inputBindingForm = undefined;
+            }
         });
 
-        this.basicSectionForm.valueChanges.subscribe(value => {
+        this.tracked = this.basicSectionForm.valueChanges.subscribe(value => {
             this.selectedProperty.type.isNullable = !value.isRequired;
 
             if (this.selectedProperty.type.type !== 'array' && this.selectedProperty.isBound) {
@@ -169,8 +130,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
             }
 
             if (this.selectedProperty.type.type === 'map' && this.selectedProperty.isBound) {
-                this.selectedProperty.inputBinding = undefined;
-                this.inputBindingFormGroup = undefined;
+                this.selectedProperty.removeInputBinding();
             }
 
             this.propagateChange(this.selectedProperty);
@@ -188,8 +148,8 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
     private validate(c: FormControl) {
         let isValid = false;
 
-        if (!!this.inputBindingFormGroup) {
-            isValid = this.inputBindingFormGroup.valid && this.basicSectionForm;
+        if (!!this.inputBindingForm) {
+            isValid = this.inputBindingForm.valid && this.basicSectionForm;
         } else {
             isValid = this.basicSectionForm.valid;
         }
@@ -197,57 +157,14 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
         return !!isValid ? null: { error: "Basic input section is not valid." }
     }
 
-    private createInputBindingForm(property: InputProperty): void {
-        const valueFrom = !!property.getValueFrom() ? property.getValueFrom(): new ExpressionModel(null, "");
-
-        this.inputBindingFormGroup = this.formBuilder.group({
-            expressionInput: [valueFrom, [CustomValidators.cwlModel]],
-            position:        [property.inputBinding.position, [Validators.pattern(/^\d+$/)]],
-            prefix:          [property.inputBinding.prefix],
-            separate:        [property.inputBinding.separate],
-            itemSeparator:   [property.inputBinding.itemSeparator]
+    private listenToInputBindingChanges(): void {
+        this.inputBindingChanges = this.inputBindingForm.valueChanges.subscribe(_ => {
+            this.propagateChange(this.selectedProperty);
         });
-
-        this.listenToInputBindingFormChanges();
-    }
-
-    private listenToInputBindingFormChanges(): void {
-        this.tracked = this.inputBindingFormGroup.valueChanges
-            .distinctUntilChanged()
-            .debounceTime(300)
-            .subscribe(value => {
-                if (this.inputBindingFormGroup.controls['expressionInput'].valid) {
-                    this.selectedProperty.inputBinding.setValueFrom(value.expressionInput.serialize());
-                } else {
-                    this.selectedProperty.inputBinding.valueFrom = undefined;
-                }
-
-                this.setInputBindingProperty(this.inputBindingFormGroup, 'position', Number(value.position));
-                this.setInputBindingProperty(this.inputBindingFormGroup, 'prefix', value.prefix);
-                this.setInputBindingProperty(this.inputBindingFormGroup, 'separate', JSON.parse(value.separate));
-                this.setInputBindingProperty(this.inputBindingFormGroup, 'itemSeparator', value.itemSeparator);
-
-                this.propagateChange(this.selectedProperty);
-            });
-    }
-
-    private setInputBindingProperty(form: FormGroup, propertyName: string, newValue: any): void {
-        if (form.controls[propertyName].valid) {
-            this.selectedProperty.inputBinding[propertyName] = newValue;
-        } else {
-            this.selectedProperty.inputBinding[propertyName] = undefined;
-        }
-    }
-
-    private toggleInputBindingForm(isBound: boolean): void {
-        if (!!isBound) {
-            this.createInputBindingForm(this.selectedProperty);
-        } else {
-            this.inputBindingFormGroup = undefined;
-        }
     }
 
     ngOnDestroy(): void {
+        this.inputBindingChanges.unsubscribe();
         super.ngOnDestroy();
     }
 }

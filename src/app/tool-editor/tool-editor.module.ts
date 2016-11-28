@@ -8,6 +8,7 @@ import {BasicInputSectionComponent} from "./object-inspector/basic-section/basic
 import {InputTypeSelectComponent} from "./common/type-select/type-select.component";
 import {ReactiveFormsModule, FormsModule} from "@angular/forms";
 import {InputDescriptionComponent} from "./object-inspector/input-description/input-description.component";
+import {InputBindingSectionComponent} from "./object-inspector/input-binding/input-binding-section.component";
 
 @NgModule({
     declarations: [
@@ -15,7 +16,8 @@ import {InputDescriptionComponent} from "./object-inspector/input-description/in
         FileDefListComponent,
         BasicInputSectionComponent,
         InputTypeSelectComponent,
-        InputDescriptionComponent
+        InputDescriptionComponent,
+        InputBindingSectionComponent
     ],
     exports: [
         ArgumentListComponent,

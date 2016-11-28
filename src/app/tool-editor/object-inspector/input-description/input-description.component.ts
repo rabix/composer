@@ -17,7 +17,7 @@ require("./input-description.component.scss");
     template: `
 <ct-form-panel>
     <div class="tc-header">Description</div>
-    <div class="tc-body">
+    <div class="tc-body" *ngIf="selectedProperty">
     
         <div class="secondary-text">
              This description will be visible when using the tool in the workflow editor.
@@ -64,7 +64,7 @@ export class InputDescriptionComponent extends ComponentBase implements ControlV
         this.labelForm = new FormControl(this.selectedProperty.label);
         this.descriptionForm = new FormControl(this.selectedProperty.description);
 
-        this.labelForm.valueChanges
+        this.tracked = this.labelForm.valueChanges
             .distinctUntilChanged()
             .debounceTime(300)
             .subscribe(value => {
@@ -73,7 +73,7 @@ export class InputDescriptionComponent extends ComponentBase implements ControlV
                 this.propagateChange(this.selectedProperty);
             });
 
-        this.descriptionForm.valueChanges
+        this.tracked = this.descriptionForm.valueChanges
             .distinctUntilChanged()
             .debounceTime(300)
             .subscribe(value => {
