@@ -1,4 +1,4 @@
-import {Component, forwardRef} from "@angular/core";
+import {Component, forwardRef, Input} from "@angular/core";
 import {
     NG_VALUE_ACCESSOR,
     ControlValueAccessor,
@@ -10,7 +10,7 @@ import {
 } from "@angular/forms";
 import {ComponentBase} from "../../../components/common/component-base";
 import {CustomValidators} from "../../../validators/custom.validator";
-import {ExpressionModel, CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
+import {ExpressionModel, CommandLineBindingModel} from "cwlts/models/d2sb";
 
 @Component({
     selector: 'input-binding-section',
@@ -21,11 +21,11 @@ import {ExpressionModel, CommandInputParameterModel as InputProperty} from "cwlt
     template: `
     <div class="form-group" *ngIf="inputBindingFormGroup">
     
-            <div *ngIf="selectedProperty.type.type !== 'record'">
+            <div *ngIf="propertyType !== 'record'">
                 <label>Value</label>
                 <expression-input
                             [context]="context"
-                            [formControl]="inputBindingFormGroup.controls['expressionInput']">
+                            [formControl]="inputBindingFormGroup.controls['valueFrom']">
                 </expression-input>
             </div>
         
@@ -41,20 +41,19 @@ import {ExpressionModel, CommandInputParameterModel as InputProperty} from "cwlt
            <label>Separator</label>
            <select class="form-control" 
                    [formControl]="inputBindingFormGroup.controls['separate']">
+                   
                 <option *ngFor="let separatorOption of separatorOptions" 
-                        [value]="separatorOption.value"
-                        [selected]="separatorOption.value === !!selectedProperty.inputBinding.separate">
+                        [value]="separatorOption.value">
                     {{separatorOption.text}}
                 </option>
            </select>
            
-           <div *ngIf="selectedProperty.type.type === 'array'">
+           <div *ngIf="propertyType === 'array'">
                 <label>Item Separator</label>
                 <select class="form-control" 
                         [formControl]="inputBindingFormGroup.controls['itemSeparator']">
                     <option *ngFor="let itemSeparator of itemSeparators" 
-                            [value]="itemSeparator.value"
-                            [selected]="itemSeparator.value == selectedProperty.inputBinding.itemSeparator">
+                            [value]="itemSeparator.value">
                         {{itemSeparator.text}}
                     </option>
                 </select>
@@ -64,7 +63,13 @@ import {ExpressionModel, CommandInputParameterModel as InputProperty} from "cwlt
 })
 export class InputBindingSectionComponent extends ComponentBase implements ControlValueAccessor {
 
-    private selectedProperty: InputProperty;
+    /** The type of the property as an input, so we can react to changes in the component */
+    @Input()
+    public propertyType: string;
+
+    private inputBinding: CommandLineBindingModel;
+
+    private valueFrom: ExpressionModel;
 
     private inputBindingFormGroup: FormGroup;
 
@@ -89,9 +94,20 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
         super();
     }
 
-    private writeValue(property: InputProperty): void {
-        this.selectedProperty = property;
-        this.createInputBindingForm(this.selectedProperty);
+    private writeValue(value: {inputBinding: CommandLineBindingModel, valueFrom: ExpressionModel}): void {
+        this.inputBinding = value.inputBinding;
+        this.valueFrom = !!value.valueFrom? value.valueFrom: new ExpressionModel(value.inputBinding.loc, "");
+
+        if (!!this.inputBinding && !!this.valueFrom) {
+            this.createInputBindingForm(this.inputBinding, this.valueFrom);
+            this.inputBindingFormGroup.updateValueAndValidity();
+        }
+    }
+
+    private ngOnChanges(): void {
+        if (!!this.inputBindingFormGroup) {
+            this.inputBindingFormGroup.updateValueAndValidity();
+        }
     }
 
     private registerOnChange(fn: any): void {
@@ -103,24 +119,18 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
     }
 
     private validate(c: FormControl) {
-        return !!this.inputBindingFormGroup.valid ? null: { error: "Input binding section is not valid." }
+        if (!!this.inputBindingFormGroup) {
+            return !!this.inputBindingFormGroup.valid ? null: { error: "Input binding section is not valid." }
+        }
     }
 
-    private createInputBindingForm(property: InputProperty): void {
-        let valueFrom;
-
-        if (!!property.getValueFrom()) {
-            valueFrom = property.getValueFrom();
-        } else {
-            valueFrom = new ExpressionModel(property.inputBinding.loc, "");
-        }
-
+    private createInputBindingForm(inputBinding: CommandLineBindingModel, valueFrom: ExpressionModel): void {
         this.inputBindingFormGroup = this.formBuilder.group({
-            expressionInput: [valueFrom, [CustomValidators.cwlModel]],
-            position:        [property.inputBinding.position, [Validators.pattern(/^\d+$/)]],
-            prefix:          [property.inputBinding.prefix],
-            separate:        [property.inputBinding.separate],
-            itemSeparator:   [property.inputBinding.itemSeparator]
+            valueFrom: [valueFrom, [CustomValidators.cwlModel]],
+            position:        [inputBinding.position, [Validators.pattern(/^\d+$/)]],
+            prefix:          [inputBinding.prefix],
+            separate:        [!!inputBinding.separate? inputBinding.separate: true],
+            itemSeparator:   [!!inputBinding.itemSeparator? inputBinding.itemSeparator : null]
         });
 
         this.listenToInputBindingFormChanges();
@@ -131,26 +141,29 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
             .distinctUntilChanged()
             .debounceTime(300)
             .subscribe(value => {
-                if (this.inputBindingFormGroup.controls['expressionInput'].valid) {
-                    this.selectedProperty.inputBinding.setValueFrom(value.expressionInput.serialize());
-                } else {
-                    this.selectedProperty.inputBinding.valueFrom = undefined;
-                }
-
                 this.setInputBindingProperty(this.inputBindingFormGroup, 'position', Number(value.position));
                 this.setInputBindingProperty(this.inputBindingFormGroup, 'prefix', value.prefix);
                 this.setInputBindingProperty(this.inputBindingFormGroup, 'separate', JSON.parse(value.separate));
                 this.setInputBindingProperty(this.inputBindingFormGroup, 'itemSeparator', value.itemSeparator);
 
-                this.propagateChange(this.selectedProperty);
+                if (this.inputBindingFormGroup.controls['valueFrom'].valid) {
+                    this.valueFrom = value.valueFrom;
+                } else {
+                    this.valueFrom = value.undefined;
+                }
+
+                this.propagateChange({
+                    inputBinding: this.inputBinding,
+                    valueFrom: this.valueFrom
+                });
             });
     }
 
     private setInputBindingProperty(form: FormGroup, propertyName: string, newValue: any): void {
         if (form.controls[propertyName].valid) {
-            this.selectedProperty.inputBinding[propertyName] = newValue;
+            this.inputBinding[propertyName] = newValue;
         } else {
-            this.selectedProperty.inputBinding[propertyName] = undefined;
+            this.inputBinding[propertyName] = undefined;
         }
     }
 
