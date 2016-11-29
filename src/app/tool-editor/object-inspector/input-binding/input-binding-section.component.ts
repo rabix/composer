@@ -19,9 +19,9 @@ import {ExpressionModel, CommandLineBindingModel} from "cwlts/models/d2sb";
         { provide: NG_VALIDATORS, useExisting: forwardRef(() => InputBindingSectionComponent), multi: true }
     ],
     template: `
-    <div class="form-group" *ngIf="inputBindingFormGroup">
+    <div class="form-group" *ngIf="inputBindingFormGroup && propertyType">
     
-            <div *ngIf="propertyType !== 'record'">
+            <div class="form-group" *ngIf="propertyType !== 'record'">
                 <label>Value</label>
                 <expression-input
                             [context]="context"
@@ -29,26 +29,32 @@ import {ExpressionModel, CommandLineBindingModel} from "cwlts/models/d2sb";
                 </expression-input>
             </div>
         
-            <label>Position</label>
-            <input class="form-control"
-                   type="text"
-                   [formControl]="inputBindingFormGroup.controls['position']"/>
+            <div class="form-group">
+                <label>Position</label>
+                <input class="form-control"
+                       type="text"
+                       [formControl]="inputBindingFormGroup.controls['position']"/>
+             </div>
         
-            <label>Prefix</label>
-            <input class="form-control"
-                   [formControl]="inputBindingFormGroup.controls['prefix']"/>
+            <div class="form-group">
+                <label>Prefix</label>
+                <input class="form-control"
+                       [formControl]="inputBindingFormGroup.controls['prefix']"/>
+            </div>
                    
-           <label>Separator</label>
-           <select class="form-control" 
-                   [formControl]="inputBindingFormGroup.controls['separate']">
-                   
-                <option *ngFor="let separatorOption of separatorOptions" 
-                        [value]="separatorOption.value">
-                    {{separatorOption.text}}
-                </option>
-           </select>
+           <div class="form-group">
+               <label>Separator</label>
+               <select class="form-control" 
+                       [formControl]="inputBindingFormGroup.controls['separate']">
+                       
+                    <option *ngFor="let separatorOption of separatorOptions" 
+                            [value]="separatorOption.value">
+                        {{separatorOption.text}}
+                    </option>
+               </select>
+           </div>
            
-           <div *ngIf="propertyType === 'array'">
+           <div class="form-group" *ngIf="propertyType === 'array'">
                 <label>Item Separator</label>
                 <select class="form-control" 
                         [formControl]="inputBindingFormGroup.controls['itemSeparator']">

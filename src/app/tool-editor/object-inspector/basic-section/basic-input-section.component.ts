@@ -61,7 +61,7 @@ require("./basic-input-section.component.scss");
                     <input-type-select [formControl]="basicSectionForm.controls['typeForm']"></input-type-select>
                 </div> <!-- Type -->
                 
-                <div *ngIf="selectedProperty.type.type === 'array'">
+                <div class="form-group" *ngIf="selectedProperty.type.type === 'array'">
                     <label>Item Types</label>
                     <select class="form-control" 
                             [formControl]="basicSectionForm.controls['itemType']">
@@ -81,6 +81,11 @@ require("./basic-input-section.component.scss");
                         <toggle-slider [formControl]="basicSectionForm.controls['isBound']"></toggle-slider>
                     </span>
                 </div> <!-- Include in commandline -->
+                
+                <symbols-section class="form-group" 
+                                *ngIf="selectedProperty.type.type === 'enum'"
+                                [formControl]="basicSectionForm.controls['symbols']">
+                </symbols-section>
                 
                 <input-binding-section *ngIf="selectedProperty.isBound" 
                             [propertyType]="selectedProperty.type.type"
@@ -123,28 +128,17 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
                 inputBinding: this.selectedProperty.inputBinding,
                 valueFrom: this.selectedProperty.getValueFrom()
             }],
-            itemType: [!!this.selectedProperty.type.items ? this.selectedProperty.type.items : 'string']
+            itemType: [!!this.selectedProperty.type.items ? this.selectedProperty.type.items: 'string'],
+            symbols: [!!this.selectedProperty.type.symbols ? this.selectedProperty.type.symbols: []]
         });
 
-        this.tracked = this.basicSectionForm.controls['isBound'].valueChanges.subscribe((isBound: boolean) => {
-            if (!!isBound) {
-                this.selectedProperty.createInputBinding();
-                this.basicSectionForm.setControl('inputBinding', new FormControl({
-                    inputBinding: this.selectedProperty.inputBinding,
-                    valueFrom: this.selectedProperty.getValueFrom()
-                }));
-            } else {
-                this.selectedProperty.removeInputBinding();
-                this.basicSectionForm.removeControl('inputBinding');
-            }
-        });
-
+        this.listenToIsBoundChanges();
         this.listenToInputBindingChanges();
-
         this.listenToTypeFormChanges();
 
         this.tracked = this.basicSectionForm.valueChanges.subscribe(value => {
             this.selectedProperty.type.isNullable = !value.isRequired;
+            this.selectedProperty.type.symbols = value.symbols;
             this.propagateChange(this.selectedProperty);
         });
     }
@@ -159,6 +153,21 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
     private validate(c: FormControl) {
         return !!this.basicSectionForm.valid ? null: { error: "Basic input section is not valid." }
+    }
+
+    private listenToIsBoundChanges(): void {
+        this.tracked = this.basicSectionForm.controls['isBound'].valueChanges.subscribe((isBound: boolean) => {
+            if (!!isBound) {
+                this.selectedProperty.createInputBinding();
+                this.basicSectionForm.setControl('inputBinding', new FormControl({
+                    inputBinding: this.selectedProperty.inputBinding,
+                    valueFrom: this.selectedProperty.getValueFrom()
+                }));
+            } else {
+                this.selectedProperty.removeInputBinding();
+                this.basicSectionForm.removeControl('inputBinding');
+            }
+        });
     }
 
     private listenToInputBindingChanges(): void {
