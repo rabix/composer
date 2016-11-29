@@ -17,8 +17,8 @@ require("./symbols.component.scss");
                       
                <ol class="list-unstyled">
                     <li *ngFor="let symbol of symbolsFormList; let i = index;" 
-                         class="removable-form-control">
-    
+                        class="removable-form-control symbol-list-item">
+                    
                         <div *ngIf="!!symbolsForm.controls[symbol.id]">
                             <input required class="form-control symbol-input"
                                   type="text"
