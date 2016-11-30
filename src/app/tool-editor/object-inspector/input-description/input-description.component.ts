@@ -17,7 +17,7 @@ require("./input-description.component.scss");
     template: `
 <ct-form-panel>
     <div class="tc-header">Description</div>
-    <div class="tc-body" *ngIf="selectedProperty && descriptionFormGroup">
+    <div class="tc-body" *ngIf="input && descriptionFormGroup">
     
         <div class="secondary-text">
              This description will be visible when using the tool in the workflow editor.
@@ -38,7 +38,7 @@ require("./input-description.component.scss");
                       [formControl]="descriptionFormGroup.controls['description']"></textarea>
         </div>
         
-         <div *ngIf="selectedProperty.type.type === 'File'">
+         <div *ngIf="input.type.type === 'File'">
             <label>File types</label>
             <input class="form-control"
                    [formControl]="descriptionFormGroup.controls['fileTypes']"/>
@@ -49,7 +49,7 @@ require("./input-description.component.scss");
 })
 export class InputDescriptionComponent extends ComponentBase implements ControlValueAccessor {
 
-    private selectedProperty: InputProperty;
+    private input: InputProperty;
 
     private onTouched = () => { };
 
@@ -61,12 +61,12 @@ export class InputDescriptionComponent extends ComponentBase implements ControlV
         super();
     }
 
-    private writeValue(property: InputProperty): void {
-        this.selectedProperty = property;
+    private writeValue(input: InputProperty): void {
+        this.input = input;
 
         this.descriptionFormGroup = this.formBuilder.group({
-            label: [this.selectedProperty.label],
-            description: [this.selectedProperty.description],
+            label: [this.input.label],
+            description: [this.input.description],
             fileTypes: [""]
         });
 
@@ -77,21 +77,21 @@ export class InputDescriptionComponent extends ComponentBase implements ControlV
 
                 if (!!value.fileTypes) {
                     this.setFileTypes(value.fileTypes);
-                } else if (this.selectedProperty.customProps["sbg:fileTypes"]) {
-                    delete this.selectedProperty.customProps["sbg:fileTypes"];
+                } else if (this.input.customProps["sbg:fileTypes"]) {
+                    delete this.input.customProps["sbg:fileTypes"];
                 }
 
                 this.setTextProperty('label', value.label);
                 this.setTextProperty('description', value.description);
 
-                this.propagateChange(this.selectedProperty);
+                this.propagateChange(this.input);
             });
     }
 
     private setTextProperty(propertyName: string, newValue: string): void {
         if (!!newValue) {
             const trimmedValue = newValue.trim();
-            this.selectedProperty[propertyName] = trimmedValue.length > 0 ? trimmedValue : undefined;
+            this.input[propertyName] = trimmedValue.length > 0 ? trimmedValue : undefined;
         }
     }
 
@@ -99,9 +99,9 @@ export class InputDescriptionComponent extends ComponentBase implements ControlV
         const trimmedFileTypes = fileTypes.trim();
 
         if (trimmedFileTypes.length > 0) {
-            this.selectedProperty.customProps["sbg:fileTypes"] = trimmedFileTypes;
+            this.input.customProps["sbg:fileTypes"] = trimmedFileTypes;
         } else {
-            delete this.selectedProperty.customProps["sbg:fileTypes"];
+            delete this.input.customProps["sbg:fileTypes"];
         }
     }
 

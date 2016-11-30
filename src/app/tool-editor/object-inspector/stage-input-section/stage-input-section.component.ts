@@ -13,9 +13,9 @@ import {FormPanelComponent} from "../../../core/elements/form-panel.component";
         FormPanelComponent
     ],
     template: `
-<ct-form-panel *ngIf="selectedProperty.type.type === 'record' || selectedProperty.type.type === 'File'">
+<ct-form-panel *ngIf="input.type.type === 'record' || input.type.type === 'File'">
     <div class="tc-header">Stage Input</div>
-    <div class="tc-body" *ngIf="selectedProperty && stageInputFormGroup">
+    <div class="tc-body" *ngIf="input && stageInputFormGroup">
     
             <div class="form-group">
                 <label>Stage Input</label>
@@ -32,10 +32,10 @@ import {FormPanelComponent} from "../../../core/elements/form-panel.component";
             
            <!-- 
            TODO
-           <div class="form-group flex-container *ngIf="selectedProperty.type.type === 'File'">
+           <div class="form-group flex-container *ngIf="input.type.type === 'File'">
                 <label>Load Content</label>
                 <span class="align-right">
-                    {{selectedProperty.inputBinding.loadContents ? "Yes" : "No"}}
+                    {{input.inputBinding.loadContents ? "Yes" : "No"}}
                     <toggle-slider [formControl]="stageInputFormGroup.controls['loadContent']"></toggle-slider>
                 </span>
             </div>-->
@@ -50,7 +50,7 @@ import {FormPanelComponent} from "../../../core/elements/form-panel.component";
  * */
 export class StageInputSectionComponent extends ComponentBase implements ControlValueAccessor {
 
-    private selectedProperty: InputProperty;
+    private input: InputProperty;
 
     private onTouched = () => { };
 
@@ -68,11 +68,11 @@ export class StageInputSectionComponent extends ComponentBase implements Control
         super();
     }
 
-    private writeValue(property: InputProperty): void {
-        this.selectedProperty = property;
+    private writeValue(input: InputProperty): void {
+        this.input = input;
 
         this.stageInputFormGroup = this.formBuilder.group({
-            stageInput: [this.selectedProperty["sbg:sbg:stageInput"] || ""],
+            stageInput: [this.input["sbg:sbg:stageInput"] || ""],
             //TODO: add load content
             //loadContent: []
         });
@@ -81,12 +81,12 @@ export class StageInputSectionComponent extends ComponentBase implements Control
             .distinctUntilChanged()
             .subscribe(value => {
                 if (!!value.stageInput) {
-                    this.selectedProperty["sbg:stageInput"] = value.stageInput;
-                } else if (this.selectedProperty["sbg:stageInput"]) {
-                    delete this.selectedProperty["sbg:stageInput"];
+                    this.input["sbg:stageInput"] = value.stageInput;
+                } else if (this.input["sbg:stageInput"]) {
+                    delete this.input["sbg:stageInput"];
                 }
 
-                this.propagateChange(this.selectedProperty);
+                this.propagateChange(this.input);
             });
     }
 
