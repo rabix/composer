@@ -75,8 +75,6 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
 
     private inputBinding: CommandLineBindingModel;
 
-    private valueFrom: ExpressionModel;
-
     private inputBindingFormGroup: FormGroup;
 
     private onTouched = () => { };
@@ -100,12 +98,11 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
         super();
     }
 
-    private writeValue(value: {inputBinding: CommandLineBindingModel, valueFrom: ExpressionModel}): void {
-        this.inputBinding = value.inputBinding;
-        this.valueFrom = !!value.valueFrom? value.valueFrom: new ExpressionModel(value.inputBinding.loc, "");
+    private writeValue(inputBinding: CommandLineBindingModel): void {
+        this.inputBinding = inputBinding;
 
-        if (!!this.inputBinding && !!this.valueFrom) {
-            this.createInputBindingForm(this.inputBinding, this.valueFrom);
+        if (!!this.inputBinding) {
+            this.createInputBindingForm(this.inputBinding);
             this.inputBindingFormGroup.updateValueAndValidity();
         }
     }
@@ -130,9 +127,11 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
         }
     }
 
-    private createInputBindingForm(inputBinding: CommandLineBindingModel, valueFrom: ExpressionModel): void {
+    private createInputBindingForm(inputBinding: CommandLineBindingModel): void {
+        const valueFrom = !!inputBinding.valueFrom? inputBinding.valueFrom: new ExpressionModel(inputBinding.loc, "");
+
         this.inputBindingFormGroup = this.formBuilder.group({
-            valueFrom: [valueFrom, [CustomValidators.cwlModel]],
+            valueFrom: [valueFrom, [Validators.required, CustomValidators.cwlModel]],
             position:        [inputBinding.position, [Validators.pattern(/^\d+$/)]],
             prefix:          [inputBinding.prefix],
             separate:        [!!inputBinding.separate? inputBinding.separate: true],
@@ -152,16 +151,15 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
                 this.setInputBindingProperty(this.inputBindingFormGroup, 'separate', JSON.parse(value.separate));
                 this.setInputBindingProperty(this.inputBindingFormGroup, 'itemSeparator', value.itemSeparator);
 
-                if (this.inputBindingFormGroup.controls['valueFrom'].valid) {
-                    this.valueFrom = value.valueFrom;
+                const trimmedValueFrom: string = value.valueFrom.toString();
+
+                if (!!trimmedValueFrom) {
+                    this.inputBinding.setValueFrom(value.valueFrom.serialize());
                 } else {
-                    this.valueFrom = value.undefined;
+                    this.inputBinding.valueFrom = undefined;
                 }
 
-                this.propagateChange({
-                    inputBinding: this.inputBinding,
-                    valueFrom: this.valueFrom
-                });
+                this.propagateChange(this.inputBinding);
             });
     }
 

@@ -11,7 +11,6 @@ import {
 import {
     CommandInputParameterModel as InputProperty,
     CommandLineBindingModel,
-    ExpressionModel,
     InputParameterTypeModel
 } from "cwlts/models/d2sb";
 import {ToggleComponent} from "../../../editor-common/components/toggle-slider/toggle-slider.component";
@@ -124,10 +123,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
             propertyIdForm: [this.selectedProperty.id],
             isBound: [!!this.selectedProperty.isBound],
             isRequired: [!this.selectedProperty.type.isNullable],
-            inputBinding: [{
-                inputBinding: this.selectedProperty.inputBinding,
-                valueFrom: this.selectedProperty.getValueFrom()
-            }],
+            inputBinding: [this.selectedProperty.inputBinding],
             itemType: [!!this.selectedProperty.type.items ? this.selectedProperty.type.items: 'string'],
             symbols: [!!this.selectedProperty.type.symbols ? this.selectedProperty.type.symbols: []]
         });
@@ -138,7 +134,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
         this.tracked = this.basicSectionForm.valueChanges.subscribe(value => {
             this.selectedProperty.type.isNullable = !value.isRequired;
-            this.selectedProperty.type.symbols = value.symbols;
+            this.selectedProperty.type.symbols = value.symbols.length > 0 ? value.symbols: undefined;
             this.propagateChange(this.selectedProperty);
         });
     }
@@ -159,10 +155,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
         this.tracked = this.basicSectionForm.controls['isBound'].valueChanges.subscribe((isBound: boolean) => {
             if (!!isBound) {
                 this.selectedProperty.createInputBinding();
-                this.basicSectionForm.setControl('inputBinding', new FormControl({
-                    inputBinding: this.selectedProperty.inputBinding,
-                    valueFrom: this.selectedProperty.getValueFrom()
-                }));
+                this.basicSectionForm.setControl('inputBinding', new FormControl(this.selectedProperty.inputBinding));
             } else {
                 this.selectedProperty.removeInputBinding();
                 this.basicSectionForm.removeControl('inputBinding');
@@ -172,12 +165,8 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
     private listenToInputBindingChanges(): void {
         this.tracked = this.basicSectionForm.controls['inputBinding'].valueChanges
-            .subscribe((value: {inputBinding: CommandLineBindingModel, valueFrom: ExpressionModel})  => {
-                if (!!value.valueFrom) {
-                    this.selectedProperty.setValueFrom(value.valueFrom.serialize());
-                }
-
-                this.selectedProperty.inputBinding = value.inputBinding;
+            .subscribe((inputBinding: CommandLineBindingModel)  => {
+                this.selectedProperty.inputBinding = inputBinding;
             });
     }
 

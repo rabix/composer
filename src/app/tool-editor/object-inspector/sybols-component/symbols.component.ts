@@ -11,7 +11,7 @@ require("./symbols.component.scss");
         { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => SymbolsComponent), multi: true }
     ],
     template: `
-        <div class="form-group" *ngIf="symbolsFormList.length > 0">
+        <div class="form-group" *ngIf="symbolsForm">
         <form>
                <label>Symbols</label>
                       
@@ -22,9 +22,12 @@ require("./symbols.component.scss");
                         <div *ngIf="!!symbolsForm.controls[symbol.id]">
                             <input required class="form-control symbol-input"
                                   type="text"
+                                  [ngClass]="{'invalid-input': !symbolsForm.controls[symbol.id].valid }"
                                   [formControl]="symbolsForm.controls[symbol.id]">
         
-                            <div class="remove-icon clickable" (click)="removeSymbol(symbol)">
+                            <div class="remove-icon clickable" 
+                                *ngIf="symbolsFormList.length > 1"
+                                (click)="removeSymbol(symbol)">
                                 <i class="fa fa-trash"></i>
                             </div>
                         </div>
@@ -59,6 +62,7 @@ export class SymbolsComponent extends ComponentBase implements ControlValueAcces
 
         if (symbols.length === 0) {
             this.addSymbol();
+
         } else {
             this.symbolsFormList = symbols.map((value: string) => {
                 return { id: this.guidService.generate(), value };
@@ -67,15 +71,7 @@ export class SymbolsComponent extends ComponentBase implements ControlValueAcces
             this.createFormControls(this.symbolsFormList)
         }
 
-        this.tracked = this.symbolsForm.valueChanges
-            .debounceTime(300)
-            .subscribe(change => {
-                const symbols: string[] = Object.keys(change)
-                    .map(key => change[key].trim())
-                    .filter(value => !!value);
-
-                this.propagateChange(symbols);
-            });
+        this.listenToFormChanges();
     }
 
     private registerOnChange(fn: any): void {
@@ -90,6 +86,20 @@ export class SymbolsComponent extends ComponentBase implements ControlValueAcces
         symbols.forEach((ctrl: {id: string, value: string}) => {
             this.symbolsForm.addControl(ctrl.id, new FormControl(ctrl.value));
         });
+    }
+
+    private listenToFormChanges(): void {
+
+        this.tracked = this.symbolsForm.valueChanges
+            .debounceTime(300)
+            .subscribe(change => {
+
+                const symbols: string[] = Object.keys(change)
+                    .map(key => change[key].trim())
+                    .filter(value => !!value);
+
+                this.propagateChange(symbols);
+            });
     }
 
     private addSymbol(): void {
