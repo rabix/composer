@@ -58,7 +58,7 @@ require("./basic-input-section.component.scss");
                 <div class="form-group">
                     <label for="inputType">Type</label>
                     <input-type-select [formControl]="basicSectionForm.controls['typeForm']"></input-type-select>
-                </div> <!-- Type -->
+                </div> <!-- Input Type -->
                 
                 <div class="form-group" *ngIf="selectedProperty.type.type === 'array'">
                     <label>Item Types</label>

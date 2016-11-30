@@ -5,6 +5,7 @@ import {FormBuilder, FormGroup} from "@angular/forms";
 import {ComponentBase} from "../../common/component-base";
 import {BasicInputSectionComponent} from "../../../tool-editor/object-inspector/basic-section/basic-input-section.component";
 import {InputDescriptionComponent} from "../../../tool-editor/object-inspector/input-description/input-description.component";
+import {StageInputSectionComponent} from "../../../tool-editor/object-inspector/stage-input-section/stage-input-section.component";
 
 require("./input-inspector.component.scss");
 
@@ -13,7 +14,8 @@ require("./input-inspector.component.scss");
     directives: [
         ExpressionInputComponent,
         BasicInputSectionComponent,
-        InputDescriptionComponent
+        InputDescriptionComponent,
+        StageInputSectionComponent
     ],
     template: `
             <form class="input-inspector-component object-inspector" *ngIf="inputInspectorFormGroup">
@@ -27,6 +29,8 @@ require("./input-inspector.component.scss");
                 </basic-input-section>
                 
                 <input-description [formControl]="inputInspectorFormGroup.controls['description']"></input-description>
+                
+                <stage-input [formControl]="inputInspectorFormGroup.controls['stageInputSection']"></stage-input>
             </form>
     `
 })

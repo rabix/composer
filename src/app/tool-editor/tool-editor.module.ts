@@ -10,6 +10,7 @@ import {ReactiveFormsModule, FormsModule} from "@angular/forms";
 import {InputDescriptionComponent} from "./object-inspector/input-description/input-description.component";
 import {InputBindingSectionComponent} from "./object-inspector/input-binding/input-binding-section.component";
 import {SymbolsComponent} from "./object-inspector/sybols-component/symbols.component";
+import {StageInputSectionComponent} from "./object-inspector/stage-input-section/stage-input-section.component";
 
 @NgModule({
     declarations: [
@@ -19,13 +20,15 @@ import {SymbolsComponent} from "./object-inspector/sybols-component/symbols.comp
         InputTypeSelectComponent,
         InputDescriptionComponent,
         InputBindingSectionComponent,
-        SymbolsComponent
+        SymbolsComponent,
+        StageInputSectionComponent
     ],
     exports: [
         ArgumentListComponent,
         FileDefListComponent,
         BasicInputSectionComponent,
         InputDescriptionComponent,
+        StageInputSectionComponent
     ],
     imports: [
         BrowserModule,
