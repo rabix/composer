@@ -111,6 +111,8 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
     private itemTypes: string[] = ["string", "int", "float", "File", "record", "map", "enum", "boolean"];
 
+    private initSymbolsList: string[] = [];
+
     constructor(private formBuilder: FormBuilder) {
         super();
     }
@@ -125,7 +127,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
             isRequired: [!this.input.type.isNullable],
             inputBinding: [this.input.inputBinding],
             itemType: [!!this.input.type.items ? this.input.type.items: 'string'],
-            symbols: [!!this.input.type.symbols ? this.input.type.symbols: []]
+            symbols: [!!this.input.type.symbols ? this.input.type.symbols: this.initSymbolsList]
         });
 
         this.listenToIsBoundChanges();
@@ -134,7 +136,13 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
         this.tracked = this.basicSectionForm.valueChanges.subscribe(value => {
             this.input.type.isNullable = !value.isRequired;
-            this.input.type.symbols = value.symbols.length > 0 ? value.symbols: undefined;
+
+            if (value.symbols.length > 0 && this.input.type.type === 'enum') {
+                this.input.type.symbols = value.symbols;
+            } else {
+                this.input.type.symbols = undefined;
+            }
+
             this.propagateChange(this.input);
         });
     }
@@ -186,9 +194,5 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
                 this.input.type.items = value.items;
             }
         });
-    }
-
-    ngOnDestroy(): void {
-        super.ngOnDestroy();
     }
 }

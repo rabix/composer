@@ -62,12 +62,10 @@ export class SymbolsComponent extends ComponentBase implements ControlValueAcces
 
         if (symbols.length === 0) {
             this.addSymbol();
-
         } else {
             this.symbolsFormList = symbols.map((value: string) => {
                 return { id: this.guidService.generate(), value };
             });
-
             this.createFormControls(this.symbolsFormList)
         }
 
@@ -120,6 +118,7 @@ export class SymbolsComponent extends ComponentBase implements ControlValueAcces
     }
 
     ngOnDestroy(): void {
+        this.symbolsFormList.forEach(item => this.symbolsForm.removeControl(item.id));
         super.ngOnDestroy();
     }
 }

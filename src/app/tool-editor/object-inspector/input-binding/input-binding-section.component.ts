@@ -170,8 +170,4 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
             this.inputBinding[propertyName] = undefined;
         }
     }
-
-    ngOnDestroy(): void {
-        super.ngOnDestroy();
-    }
 }

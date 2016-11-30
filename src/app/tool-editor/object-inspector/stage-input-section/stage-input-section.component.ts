@@ -97,8 +97,4 @@ export class StageInputSectionComponent extends ComponentBase implements Control
     private registerOnTouched(fn: any): void {
         this.onTouched = fn;
     }
-
-    ngOnDestroy(): void {
-        super.ngOnDestroy();
-    }
 }

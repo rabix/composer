@@ -55,8 +55,4 @@ export class InputInspectorComponent extends ComponentBase implements OnInit, On
             });
         });
     }
-
-    ngOnDestroy(): void {
-        super.ngOnDestroy();
-    }
 }

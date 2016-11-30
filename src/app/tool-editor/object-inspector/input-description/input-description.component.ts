@@ -112,8 +112,4 @@ export class InputDescriptionComponent extends ComponentBase implements ControlV
     private registerOnTouched(fn: any): void {
         this.onTouched = fn;
     }
-
-    ngOnDestroy(): void {
-        super.ngOnDestroy();
-    }
 }
