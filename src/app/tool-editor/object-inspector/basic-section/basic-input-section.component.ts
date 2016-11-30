@@ -135,7 +135,10 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
         this.listenToTypeFormChanges();
 
         this.tracked = this.basicSectionForm.valueChanges.subscribe(value => {
+            this.input.id = value.propertyIdForm;
+            this.input.type = value.typeForm;
             this.input.type.isNullable = !value.isRequired;
+            this.input.inputBinding = value.inputBinding;
 
             if (value.symbols.length > 0 && this.input.type.type === 'enum') {
                 this.input.type.symbols = value.symbols;
@@ -180,6 +183,8 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
     private listenToTypeFormChanges(): void {
         this.tracked = this.basicSectionForm.controls['typeForm'].valueChanges.subscribe((value: InputParameterTypeModel) => {
+
+            this.input.type.setType(value.type);
 
             if (value.type !== 'array' && this.input.isBound) {
                 this.input.inputBinding.itemSeparator = undefined;
