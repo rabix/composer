@@ -3,6 +3,7 @@ import {FormBuilder, FormGroup} from "@angular/forms";
 import {CommandLineToolModel, ExpressionModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../common/component-base";
 import {FileDef} from "cwlts/mappings/d2sb/FileDef";
+import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 
 require("./clt-editor.component.scss");
 
@@ -22,7 +23,9 @@ require("./clt-editor.component.scss");
                                    (update)="setBaseCommand($event)">
                 </base-command-form>
                 
-                <inputs-ports-form [cltModel]="model"></inputs-ports-form>
+                <inputs-ports-form [cltModel]="model" 
+                                   [form]="formGroup.controls['inputPortsGroup']"
+                                   (update)="setInputs($event)"></inputs-ports-form>
                 
                 <ct-output-ports [entries]="model.outputs || []" [readonly]="readonly"></ct-output-ports>
                 
@@ -69,5 +72,12 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
     private setBaseCommand(list: ExpressionModel[]) {
         this.model.baseCommand = [];
         list.forEach(cmd => this.model.addBaseCommand(cmd));
+    }
+
+    private setInputs(inputs: InputProperty[]) {
+        this.model.inputs = [];
+        inputs.forEach((input: InputProperty) => {
+            this.model.addInput(input)
+        });
     }
 }

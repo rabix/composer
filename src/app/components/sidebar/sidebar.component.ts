@@ -1,8 +1,8 @@
 import {Component, OnDestroy} from "@angular/core";
-import {Subscription} from "rxjs/Subscription";
 import {ExpressionEditorSidebarComponent} from "./expression-editor/expression-editor-sidebar.component";
 import {InputInspectorSidebarComponent} from "./object-inpsector/input-inspector-sidebar.component";
 import {ToolSidebarService, SidebarType} from "../../services/sidebars/tool-sidebar.service";
+import {ComponentBase} from "../common/component-base";
 
 require("./editor.component.scss");
 
@@ -24,31 +24,22 @@ require("./editor.component.scss");
             </div>
     `
 })
-export class SidebarComponent implements OnDestroy {
+export class SidebarComponent extends ComponentBase implements OnDestroy {
 
     private currentSidebar: SidebarType;
 
     private show = false;
 
-    private subs: Subscription[];
-
     constructor(private toolSidebarService: ToolSidebarService) {
+        super();
 
-        this.subs = [];
-
-        this.subs.push(
-            this.toolSidebarService.sidebarStackStream.subscribe((sidebarStack: SidebarType[]) => {
-                this.currentSidebar = sidebarStack.length > 0 ? sidebarStack[0] : undefined;
-                this.setSidebarState();
-            })
-        );
+        this.tracked = this.toolSidebarService.sidebarStackStream.subscribe((sidebarStack: SidebarType[]) => {
+            this.currentSidebar = sidebarStack.length > 0 ? sidebarStack[0] : undefined;
+            this.setSidebarState();
+        });
     }
 
     private setSidebarState(): void {
         this.show = this.currentSidebar !== undefined;
-    }
-
-    ngOnDestroy(): void {
-        this.subs.forEach(sub => sub.unsubscribe());
     }
 }

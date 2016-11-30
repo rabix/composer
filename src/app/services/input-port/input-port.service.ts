@@ -23,6 +23,9 @@ export class InputPortService {
     /** Stream for adding new input port */
     private deletedInputPort: Subject<number> = new Subject<number>();
 
+    /** Stream to update a specific input */
+    private changeInput: Subject<{index: number, input: InputProperty}> = new Subject<{index: number, input: InputProperty}>();
+
     /** Stream that aggregates all changes on the exposedList list */
     private inputPortsUpdate: BehaviorSubject<PropertyOperation> = new BehaviorSubject<PropertyOperation>(undefined);
 
@@ -62,6 +65,18 @@ export class InputPortService {
                 };
             })
             .subscribe(this.inputPortsUpdate);
+
+        /* Update a specific port */
+        this.changeInput
+            .map(({index: index, input: newValue}): PropertyOperation => {
+                return (inputPorts: InputProperty[]) => {
+                    if (typeof inputPorts[index] !== 'undefined' && inputPorts[index] !== null) {
+                        inputPorts[index] = newValue;
+                    }
+                    return inputPorts;
+                };
+            })
+            .subscribe(this.inputPortsUpdate);
     }
 
     public addInput(inputPort: InputProperty): void {
@@ -70,6 +85,10 @@ export class InputPortService {
 
     public deleteInputPort(index: number): void {
         this.deletedInputPort.next(index);
+    }
+
+    public updateInput(index: number, newValue: InputProperty) {
+        this.changeInput.next({index: index, input: newValue});
     }
 
     public setInputs(inputs: InputProperty[]): void {

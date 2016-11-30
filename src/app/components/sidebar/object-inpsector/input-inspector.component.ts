@@ -6,6 +6,7 @@ import {ComponentBase} from "../../common/component-base";
 import {BasicInputSectionComponent} from "../../../tool-editor/object-inspector/basic-section/basic-input-section.component";
 import {InputDescriptionComponent} from "../../../tool-editor/object-inspector/input-description/input-description.component";
 import {StageInputSectionComponent} from "../../../tool-editor/object-inspector/stage-input-section/stage-input-section.component";
+import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 
 require("./input-inspector.component.scss");
 
@@ -35,7 +36,10 @@ require("./input-inspector.component.scss");
     `
 })
 export class InputInspectorComponent extends ComponentBase implements OnInit, OnDestroy {
+
     private context: any;
+
+    private input: InputProperty;
 
     private inputInspectorFormGroup: FormGroup;
 
@@ -45,14 +49,22 @@ export class InputInspectorComponent extends ComponentBase implements OnInit, On
     }
 
     ngOnInit(): void {
-        this.tracked = this.inputSidebarService.inputPortDataStream.subscribe((data: InputInspectorData) => {
-            this.context = data.context;
+        this.tracked = this.inputSidebarService.inputInspectorDataStream
+            .mergeMap((data: InputInspectorData) => {
+                this.context = data.context;
+                this.input = data.inputProperty;
 
-            this.inputInspectorFormGroup = this.formBuilder.group({
-                basicInputSection: [data.inputProperty],
-                description: [data.inputProperty],
-                stageInputSection: [data.inputProperty]
+                this.inputInspectorFormGroup = this.formBuilder.group({
+                    basicInputSection: [data.inputProperty],
+                    description: [data.inputProperty],
+                    stageInputSection: [data.inputProperty]
+                });
+
+                return this.inputInspectorFormGroup.valueChanges;
+            })
+            .distinctUntilChanged()
+            .subscribe(_ => {
+                this.inputSidebarService.updateInputPort(this.input)
             });
-        });
     }
 }

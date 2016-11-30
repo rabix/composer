@@ -13,24 +13,33 @@ export interface InputInspectorData {
 export class InputSidebarService {
 
     /** The current input port */
-    public inputPortDataStream: Observable<InputInspectorData>;
+    public inputInspectorDataStream: Observable<InputInspectorData>;
 
     /** Update the input port */
-    private updateInputPortData: BehaviorSubject<InputInspectorData> = new BehaviorSubject<InputInspectorData>(undefined);
+    private updateInputInspectorData: BehaviorSubject<InputInspectorData> = new BehaviorSubject<InputInspectorData>(undefined);
+
+    private updateInputStream: BehaviorSubject<InputProperty>;
 
     constructor(private toolSidebarService: ToolSidebarService) {
-        this.inputPortDataStream = this.updateInputPortData
+        this.inputInspectorDataStream = this.updateInputInspectorData
             .filter(update => update !== undefined)
             .publishReplay(1)
             .refCount();
     }
 
-    public openInputInspector(inputProperty: InputInspectorData) {
-        this.updateInputPortData.next(inputProperty);
+    public openInputInspector(inputProperty: InputInspectorData): Observable<InputProperty> {
+        this.updateInputStream = new BehaviorSubject<InputProperty>(undefined);
+        this.updateInputInspectorData.next(inputProperty);
         this.toolSidebarService.addSideBarOnTopOfStack("input-inspector");
+
+        return this.updateInputStream.filter(update => update !== undefined);
     }
 
-    public closeInputInspector() {
+    public updateInputPort(inputProperty: InputProperty): void {
+        this.updateInputStream.next(inputProperty);
+    }
+
+    public closeInputInspector(): void {
         this.toolSidebarService.removeSideBarFromStack("input-inspector");
     }
 }

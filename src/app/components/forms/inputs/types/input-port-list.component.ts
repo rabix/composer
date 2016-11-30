@@ -1,8 +1,10 @@
 import {Component, OnDestroy, Input} from "@angular/core";
 import {InputPortService} from "../../../../services/input-port/input-port.service";
 import {InputSidebarService} from "../../../../services/sidebars/input-sidebar.service";
-import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../common/component-base";
+import {CommandLineToolModel, CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
+import {Subscription} from "rxjs";
+import {FormGroup} from "@angular/forms";
 
 @Component({
     selector: "input-port-list",
@@ -36,12 +38,12 @@ import {ComponentBase} from "../../../common/component-base";
                         </span>
                     </div>
         
-                    <div class="col-sm-3 ellipsis" [title]="input.type">
-                        {{ input.type | commandParameterType }}
+                    <div class="col-sm-3 ellipsis" [title]="input.type.type">
+                        {{ input.type.type }}
                     </div>
         
-                    <div class="col-sm-4 ellipsis" [title]="input.isRequired">
-                        {{ input.inputBinding | commandInputBinding }}
+                    <div class="col-sm-4 ellipsis" [title]="!input.type.isNullable">
+                        {{ !input.type.isNullable }}
                     </div>
         
                     <div class="col-sm-1 pull-right tool-input-icon">
@@ -60,33 +62,48 @@ import {ComponentBase} from "../../../common/component-base";
 })
 export class InputPortListComponent extends ComponentBase implements OnDestroy {
 
+    /** The parent forms group which is already in the clt-editor form tree */
+    @Input()
+    public form: FormGroup;
+
     @Input()
     private selectedIndex: number;
 
     @Input()
     private context: any;
 
+    private inspectorChanges: Subscription;
+
     private portList: Array<InputProperty> = [];
 
     constructor(private inputPortService: InputPortService,
                 private inputSidebarService: InputSidebarService) {
         super();
+
         this.tracked = this.inputPortService.inputPorts.subscribe((viewModelPortList: InputProperty[]) => {
             this.portList = viewModelPortList;
         });
     }
 
-    private trackByIndex(index: number): any {
-        return index;
-    }
-
     private editProperty(index: number): void {
         this.selectedIndex = index;
         const selectedInputPort = this.portList[index];
-        this.inputSidebarService.openInputInspector({
+
+        this.clearInspectorChangeSub();
+        this.inspectorChanges = this.inputSidebarService.openInputInspector({
             inputProperty: selectedInputPort,
             context: this.context
+        }).subscribe((newInput: InputProperty) => {
+            this.inputPortService.updateInput(this.selectedIndex, newInput);
         });
+
+        this.form.markAsDirty();
+    }
+
+    private clearInspectorChangeSub(): void {
+        if (this.inspectorChanges) {
+            this.inspectorChanges.unsubscribe();
+        }
     }
 
     private removeProperty(event: Event, index: number): void {
@@ -102,6 +119,8 @@ export class InputPortListComponent extends ComponentBase implements OnDestroy {
         } else if (this.selectedIndex === index) {
             this.selectedIndex = undefined;
         }
+
+        this.form.markAsDirty();
     }
 
     ngOnDestroy(): void {
