@@ -10,7 +10,7 @@ require("./clt-editor.component.scss");
     selector: "ct-clt-editor",
     template: `
             <form class="clt-editor-group" [formGroup]="formGroup">
-                <docker-image-form [dockerRequirement]="model.hints?.DockerRequirement"
+                <docker-image-form [dockerRequirement]="model.hints.DockerRequirement"
                                    [form]="formGroup.controls['dockerGroup']"
                                    (update)="setRequirement($event, true)">
                 </docker-image-form>
@@ -29,7 +29,7 @@ require("./clt-editor.component.scss");
                 
                 <ct-argument-list [entries]="model.arguments || []" [readonly]="readonly"></ct-argument-list>
                 
-                <ct-file-def-list [entries]="model.requirements?.CreateFileRequirement?.fileDef || []"></ct-file-def-list>
+                <ct-file-def-list [entries]="model.requirements.CreateFileRequirement?.fileDef || []"></ct-file-def-list>
             </form>
 
             <sidebar-component></sidebar-component>

@@ -49,7 +49,7 @@ export class DockerImageFormComponent extends ComponentBase implements OnInit {
         this.tracked = this.form.valueChanges.subscribe(changes => {
             const docker: DockerRequirement = this.dockerRequirement ?
                 this.dockerRequirement.serialize() :
-                <DockerRequirement>{};
+                new DockerRequirementModel();
 
             docker.dockerPull = changes["dockerPull"];
             this.update.next(docker);
