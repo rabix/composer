@@ -20,8 +20,8 @@ import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
                     [class.error]="input.validation.errors.length"
                     [class.warning]="input.validation.warnings.length"
                     [class.selected]="i === selectedIndex"
-                    *ngFor="let input of portList; let i = index">
-                    <!-- @todo: temporarily removing edit method -->
+                    *ngFor="let input of portList; let i = index"
+                    (click)="editProperty(i)">
         
                     <div class="col-sm-4 ellipsis" [title]="input.id">
                         <i class="fa fa-warning validation-icon"

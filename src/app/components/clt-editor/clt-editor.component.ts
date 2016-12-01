@@ -2,7 +2,7 @@ import {Component, Input, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {CommandLineToolModel, ExpressionModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../common/component-base";
-import {FileDef} from "cwlts/mappings/d2sb/FileDef";
+import {ProcessRequirement} from "cwlts/mappings/v1.0";
 
 require("./clt-editor.component.scss");
 
@@ -10,10 +10,9 @@ require("./clt-editor.component.scss");
     selector: "ct-clt-editor",
     template: `
             <form class="clt-editor-group" [formGroup]="formGroup">
-                <docker-image-form class="input-form" 
-                                [group]="formGroup"
-                                [cltModel]="model"
-                                [dockerPull]="'some.docker.image.com'">
+                <docker-image-form [dockerRequirement]="model.hints.DockerRequirement"
+                                   [form]="formGroup.controls['dockerGroup']"
+                                   (update)="setRequirement($event, true)">
                 </docker-image-form>
                                 
                 <base-command-form [baseCommand]="model.baseCommand"
@@ -26,11 +25,11 @@ require("./clt-editor.component.scss");
                 
                 <ct-output-ports [entries]="model.outputs || []" [readonly]="readonly"></ct-output-ports>
                 
-                <ct-hint-list [entries]="model.hints || []" [readonly]="readonly"></ct-hint-list>
+                <ct-hint-list [entries]="model.hints || {}" [readonly]="readonly"></ct-hint-list>
                 
                 <ct-argument-list [entries]="model.arguments || []" [readonly]="readonly"></ct-argument-list>
                 
-                <ct-file-def-list [entries]="fileDefs || []"></ct-file-def-list>
+                <ct-file-def-list [entries]="model.requirements.CreateFileRequirement?.fileDef || []"></ct-file-def-list>
             </form>
 
             <sidebar-component></sidebar-component>
@@ -48,22 +47,18 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
     @Input()
     public formGroup: FormGroup;
 
-    private fileDefs: FileDef[] = [];
-
     constructor(private formBuilder: FormBuilder) {
         super();
     }
 
     ngOnInit() {
-        console.log("Model", this.model);
-        this.formGroup.addControl("dockerInputGroup", this.formBuilder.group({}));
+        this.formGroup.addControl("dockerGroup", this.formBuilder.group({}));
         this.formGroup.addControl("baseCommandGroup", this.formBuilder.group({}));
         this.formGroup.addControl("inputPortsGroup", this.formBuilder.group({}));
+    }
 
-        this.fileDefs = this.model.customProps.requirements
-            .filter(req => req.class === "CreateFileRequirement")
-            .map(req => req.fileDef)
-            .reduce((acc, item) => acc.concat(item) , []);
+    private setRequirement(req: ProcessRequirement, hint: boolean) {
+        this.model.setRequirement(req, hint);
     }
 
     private setBaseCommand(list: ExpressionModel[]) {

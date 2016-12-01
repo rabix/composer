@@ -92,14 +92,6 @@ ct-code-editor {
         .error {
             color: $brand-danger;
         }
-
-        .error-text {
-            color: lighten($brand-danger, 30%);
-        }
-
-        .warning-text {
-            color: $brand-warning;
-        }
     }
 }
 
@@ -131,9 +123,6 @@ ct-code-editor {
     &:hover {
         background: $gui-section-list-item-hover-bg;
         color: $gui-section-list-item-hover-color;
-        .fa {
-            color: $gui-section-list-item-hover-icon-color;
-        }
     }
 
     &.selected {
@@ -165,6 +154,15 @@ ct-code-editor {
 
     .console-content {
         padding: 14px;
+
+
+        .error-text {
+            color: $console-error-color;
+        }
+
+        .warning-text {
+            color: $console-warning-color;
+        }
     }
 
     &.show {

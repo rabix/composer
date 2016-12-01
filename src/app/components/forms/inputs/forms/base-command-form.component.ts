@@ -10,7 +10,7 @@ require("./base-command-form.components.scss");
 
 @Component({
     selector: 'base-command-form',
-    template: `<ct-form-section>
+    template: `<ct-form-panel>
     <div class="tc-header">
         Base Command
     </div>
@@ -42,7 +42,7 @@ require("./base-command-form.components.scss");
             </button>
         </form>
     </div>
-</ct-form-section>
+</ct-form-panel>
 
     `
 })
@@ -77,18 +77,18 @@ export class BaseCommandFormComponent extends ComponentBase implements OnInit, O
             };
         });
 
-        this.createExpressionInputControls(this.formList);
+        this.formList.forEach((item) => {
+            this.form.addControl(
+                item.id,
+                new FormControl(item.model, [Validators.required])
+            );
+        });
+
 
         this.tracked = this.form.valueChanges.subscribe(change => {
             const v = Object.keys(change).map(key => change[key]);
             this.update.next(v);
         })
-    }
-
-    private createExpressionInputControls(formList: Array<{id: string, model: ExpressionModel}>): void {
-        formList.forEach((item) => {
-            this.form.addControl(item.id, new FormControl(item.model, [Validators.required, CustomValidators.cwlModel]));
-        });
     }
 
     private removeBaseCommand(ctrl: {id: string, model: ExpressionModel}): void {
@@ -107,5 +107,10 @@ export class BaseCommandFormComponent extends ComponentBase implements OnInit, O
         this.formList.push(newCmd);
 
         this.form.markAsTouched();
+    }
+
+    ngOnDestroy() {
+        super.ngOnDestroy();
+        this.formList.forEach(item => this.form.removeControl(item.id));
     }
 }
