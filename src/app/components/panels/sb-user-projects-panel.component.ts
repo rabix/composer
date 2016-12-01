@@ -157,8 +157,8 @@ export class SBUserProjectsPanelComponent extends ComponentBase {
         component.closedProjects = this.closedProjects;
         component.save = (projectID) => {
             this.setProjectStatus(projectID, true);
-            return this.allProjects.first();
-        }
+            this.allProjects.first().subscribe(x => component.closeModal());
+        };
     }
 
     private setProjectStatus(projectID, isOpen) {

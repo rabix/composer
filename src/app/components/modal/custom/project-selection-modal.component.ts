@@ -31,10 +31,10 @@ import {PlatformProjectEntry} from "../../../services/api/platforms/platform-api
 export class ProjectSelectionModal {
 
     @Input()
-    private save: (selectedProject: string) => ReplaySubject<{id: string, data: PlatformProjectEntry}>;
+    public save: (selectedProject: string) => ReplaySubject<{id: string, data: PlatformProjectEntry}>;
 
     @Input()
-    private closedProjects: string;
+    public closedProjects: string;
 
     private selectedProject: string;
 
@@ -51,10 +51,14 @@ export class ProjectSelectionModal {
     }
 
     public onSubmit() {
-        this.save(this.selectedProject).subscribe(result => this.modal.close());
+        this.save(this.selectedProject);
     }
 
     public onCancel() {
+        this.closeModal();
+    }
+
+    public closeModal() {
         this.modal.close();
     }
 }

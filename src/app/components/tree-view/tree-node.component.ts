@@ -138,7 +138,7 @@ export class TreeNodeComponent extends ComponentBase implements OnInit {
         this.tree.addNode(this);
 
         if (this.preferenceKey) {
-            this.tree.getExpandedNodes(this.preferenceKey).subscribe(values => {
+            this.tracked = this.tree.getExpandedNodes(this.preferenceKey).subscribe(values => {
                 const found = values.find(value => this.node.id === value);
                 if (found) {
                     // Parameter is false in order not to persist state whether node is expanded or collapsed
@@ -146,7 +146,7 @@ export class TreeNodeComponent extends ComponentBase implements OnInit {
                 }
             });
         }
-
+    }
 
     public toggleExpansion(persist = false) {
 
@@ -160,9 +160,6 @@ export class TreeNodeComponent extends ComponentBase implements OnInit {
         if (this.isExpanded && !this.nodeChildren) {
 
             this.isLoading = true;
-            this.tracked   = this.node.childrenProvider(this.node).subscribe(children => {
-                this.isLoading    = false;
-
             this.tracked = this.node.childrenProvider(this.node).subscribe(children => {
                 this.isLoading = false;
                 this.nodeChildren = children;
@@ -173,7 +170,6 @@ export class TreeNodeComponent extends ComponentBase implements OnInit {
 
             });
         }
-
 
         this.detector.markForCheck();
     }
