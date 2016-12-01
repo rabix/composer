@@ -115,7 +115,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
 
         this.toolGroup = formBuilder.group({});
 
-        this.showReformatPrompt = this.userPrefService.get("show_reformat_prompt", true, true);
+        this.tracked = this.userPrefService.get("show_reformat_prompt", true, true).subscribe(x => this.showReformatPrompt = x);
     }
 
     // @todo(maya) fix block loader
@@ -195,7 +195,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
                     if (res) this.userPrefService.put("show_reformat_prompt", false);
 
                     this.showReformatPrompt = false;
-                    this.viewMode           = view;
+                    this.viewMode = view;
                 }, noop);
 
             } else {

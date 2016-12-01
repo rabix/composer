@@ -21,7 +21,7 @@ require("./tree-view.component.scss");
         </div>
         
         <div [class.m-t-2]="searchTerm.length > 0">
-            <ct-tree-node class="root-node" *ngFor="let node of nodes" [node]="node"></ct-tree-node>
+            <ct-tree-node class="root-node" *ngFor="let node of nodes" [node]="node" [preferenceKey]="preferenceKey"></ct-tree-node>
         </div>
     `
 })
@@ -29,6 +29,9 @@ export class TreeViewComponent extends ComponentBase {
 
     @Input()
     public nodes: TreeNode[];
+
+    @Input()
+    public preferenceKey;
 
     private el: Element;
 

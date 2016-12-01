@@ -16,7 +16,6 @@ import {FormSectionComponent} from "./app/components/form-section/form-section.c
 import {LocalFilesPanelComponent} from "./app/components/panels/local-files-panel.component";
 import {PanelHandleComponent} from "./app/components/panels/panel-handle.component";
 import {PanelToolbarComponent} from "./app/components/panels/panel-toolbar.component";
-import {RevisionsPanelComponent} from "./app/components/panels/revisions-panel.component";
 import {SBPublicAppsPanelComponent} from "./app/components/panels/sb-public-apps-panel.component";
 import {SBUserProjectsPanelComponent} from "./app/components/panels/sb-user-projects-panel.component";
 import {StructurePanelComponent} from "./app/components/panels/structure-panel.component";
@@ -66,6 +65,7 @@ import {QuickPickComponent} from "./app/components/quick-pick/quick-pick.compone
 import {CompactListComponent} from "./app/components/compact-list/compact-list.component";
 import {EditableDirective} from "./app/directives/editable.directive";
 import {TreeNodeIconComponent} from "./app/components/tree-view/tree-node-icon.component";
+import {ProjectSelectionModal} from "./app/components/modal/custom/project-selection-modal.component";
 
 @NgModule({
     providers: [
@@ -109,10 +109,10 @@ import {TreeNodeIconComponent} from "./app/components/tree-view/tree-node-icon.c
         PanelHandleComponent,
         PanelSwitcherComponent,
         PanelToolbarComponent,
+        ProjectSelectionModal,
         PromptComponent,
         RadioButtonComponent,
         RadioGroupComponent,
-        RevisionsPanelComponent,
         SBPublicAppsPanelComponent,
         SBUserProjectsPanelComponent,
         SettingsButtonComponent,
@@ -143,7 +143,8 @@ import {TreeNodeIconComponent} from "./app/components/tree-view/tree-node-icon.c
         MenuItemComponent,
         ModalComponent,
         NewFileModalComponent,
-        PromptComponent,
+        ProjectSelectionModal,
+        PromptComponent
     ],
     imports: [
         BrowserModule,
