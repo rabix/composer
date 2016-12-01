@@ -7,7 +7,10 @@ import {ExpressionSidebarService} from "../../../../services/sidebars/expression
 import {Expression} from "cwlts/mappings/d2sb/Expression";
 import {SandboxService} from "../../../../services/sandbox/sandbox.service";
 import {ToggleComponent} from "../../../common/toggle-slider/toggle-slider.component";
-import {InputInspectorData, InputSidebarService} from "../../../../services/sidebars/input-sidebar.service";
+import {
+    InputInspectorData,
+    InputSidebarService
+} from "../../../../services/sidebars/input-sidebar.service";
 
 require("./basic-input-section.component.scss");
 
@@ -47,30 +50,31 @@ require("./basic-input-section.component.scss");
                     <select class="form-control" 
                             name="selectedPropertyType" 
                             id="dataType"
-                            [(ngModel)]="selectedProperty.type" required>
+                            [(ngModel)]="selectedProperty.type.type" required>
                         <option *ngFor="let propertyType of propertyTypes" [value]="propertyType">
                             {{propertyType}}
                         </option>
                     </select>
                 </div>
                 
-                <div class="form-group" [formGroup]="expressionInputForm">
-                    <label>Value</label>
-                    
-                     <expression-input
-                                    [context]="context"
-                                    [formControl]="expressionInputForm.controls['expressionInput']">
-                    </expression-input>
-                </div>
+     
                 
                 <div class="form-group flex-container">
                     <label>Include in command line</label>
                     
                     <span class="align-right">
-                        {{hasInputBinding ? "Yes" : "No"}}
-                        <toggle-slider [(checked)]="hasInputBinding"
-                                        (checkedChange)="toggleInputBinding(hasInputBinding)"></toggle-slider>
+                        {{selectedProperty.isBound ? "Yes" : "No"}}
+                        <toggle-slider (checkedChange)="toggleInputBinding()"></toggle-slider>
                     </span>
+                    
+                    <div class="form-group" [formGroup]="expressionInputForm" *ngIf="selectedProperty.isBound">
+                        <label>Value</label>
+                        
+                         <expression-input
+                                        [context]="context"
+                                        [formControl]="expressionInputForm.controls['expressionInput']">
+                        </expression-input>
+                </div>
                 </div>
             </form>
     `
@@ -95,8 +99,6 @@ export class BasicInputSectionComponent implements OnInit {
 
     private sandboxService: SandboxService;
 
-    private hasInputBinding: boolean = false;
-
     constructor(private formBuilder: FormBuilder,
                 private expressionSidebarService: ExpressionSidebarService,
                 private inputSidebarService: InputSidebarService) {
@@ -105,23 +107,30 @@ export class BasicInputSectionComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.hasInputBinding = this.selectedProperty.hasInputBinding();
-
         this.subs.push(
             this.inputSidebarService.inputPortDataStream.subscribe((data: InputInspectorData) => {
                 this.selectedProperty = data.inputProperty;
-                this.context = data.context;
-                const valueFrom = this.selectedProperty.getValueFrom();
-
-                if (valueFrom === undefined) {
-                    this.createExpressionInputForm("");
-                } else {
-                    this.createExpressionInputForm(valueFrom);
+                this.context          = data.context;
+                let valueFrom = new ExpressionModel("");
+                if (this.selectedProperty.isBound) {
+                    valueFrom = this.selectedProperty.inputBinding.valueFrom;
                 }
+
+                // if (valueFrom === undefined) {
+                //     this.createExpressionInputForm("");
+                // } else {
+                //     this.createExpressionInputForm(valueFrom);
+                // }
+
+                this.expressionInputForm  = this.formBuilder.group({
+                    'expressionInput': new FormControl(valueFrom)
+                });
 
                 this.listenToInputChanges();
             })
         );
+
+
     }
 
     /** @deprecated */
@@ -136,7 +145,7 @@ export class BasicInputSectionComponent implements OnInit {
             });
 
         this.expressionSidebarService.openExpressionEditor({
-            value: new ExpressionModel(this.selectedProperty.getValueFrom()),
+            value: this.selectedProperty.inputBinding.valueFrom,
             newExpressionChange: newExpression,
             context: this.context
         });
@@ -157,6 +166,7 @@ export class BasicInputSectionComponent implements OnInit {
         this.updateExpressionInputValue(newExpression.serialize());
     }
 
+    /** @deprecated */
     private createExpressionInputForm(expression: string | Expression) {
         const expressionModel = new ExpressionModel(expression);
         this.setSelectedProperty(expression);
@@ -192,18 +202,17 @@ export class BasicInputSectionComponent implements OnInit {
     }
 
     private setSelectedProperty(value: string | Expression) {
-        if (this.hasInputBinding) {
-            this.selectedProperty.setValueFrom(value);
-        }
+        // if (this.hasInputBinding) {
+            // this.selectedProperty.setValueFrom(value);
+        // }
     }
 
-    private toggleInputBinding(hasBinding: boolean) {
-        if (!hasBinding) {
-            this.updateExpressionInputValue("");
-            this.selectedProperty.removeInputBinding();
-            this.expressionInputForm.controls['expressionInput'].disable();
+    private toggleInputBinding() {
+        if (!this.selectedProperty.isBound) {
+            this.selectedProperty.createInputBinding();
+            this.expressionInputForm.controls['expressionInput'].setValue(new ExpressionModel(""));
         } else {
-            this.expressionInputForm.controls['expressionInput'].enable();
+            this.selectedProperty.removeInputBinding();
         }
     }
 

@@ -6,7 +6,6 @@ import {ContextService} from "../../services/context/context.service";
 import {DomEventService} from "../../services/dom/dom-event.service";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {FileRegistry} from "../../services/file-registry.service";
-import {GuidService} from "../../services/guid.service";
 import {InputPortService} from "../../services/input-port/input-port.service";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {SBPlatformDataSourceService} from "../../sources/sbg/sb-platform.source.service";
@@ -34,7 +33,6 @@ require("./main.component.scss");
         SBPlatformDataSourceService,
         SettingsService,
         UserPreferencesService,
-        GuidService,
         ContextService,
     ],
 })
@@ -44,7 +42,7 @@ export class MainComponent {
 
     constructor(modal: ModalService, vcRef: ViewContainerRef) {
         /**
-         * Hack for angulars' inability to provide the vcRef to a service with DI.
+         * Hack for angular's inability to provide the vcRef to a service with DI.
          * {@link ModalService.rootViewRef}
          */
         modal.rootViewRef = vcRef;

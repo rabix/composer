@@ -54,6 +54,8 @@ $base-cmd-color: #7AC24D;
 $input-port-color: #A77ED7;
 $output-port-color: $uncoded-color;
 $arg-color: #FDA365;
+$console-error-color: lighten($brand-danger, 30%);
+$console-warning-color: $brand-warning;
 
 
 /**
@@ -122,8 +124,8 @@ $expression-editor-help-icon-color: #818286;
 $expression-editor-border: #3B3F46;
 
 $expression-editor-text-muted: #555658;
-$expression-editor-error-color: lighten($brand-danger, 30%);
-$expression-editor-warning-color: #fdb855;
+$expression-editor-error-color: $console-error-color;
+$expression-editor-warning-color: $console-warning-color;
 
 $expression-editor-result-height: 150px;
 
