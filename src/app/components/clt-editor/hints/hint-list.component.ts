@@ -30,7 +30,7 @@ import {ExpressionModel} from "cwlts/models/d2sb";
                     <ul class="gui-section-list">
 
                         <li *ngFor="let entry of hints; let i = index"
-                            class="gui-section-list-item clickable">
+                            class="gui-section-list-item clickable row">
 
                             <div class="col-sm-5 ellipsis">{{ entry?.class }}</div>
 

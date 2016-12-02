@@ -1,16 +1,12 @@
+import {Observable} from "rxjs";
 import {Component} from "@angular/core";
-import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
-import {Observable, BehaviorSubject} from "rxjs";
-import {OpenTabAction} from "../../action-events";
-import {TreeViewComponent} from "../tree-view";
-import {PanelToolbarComponent} from "./panel-toolbar.component";
-import {SettingsService} from "../../services/settings/settings.service";
+import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {PlatformAppEntry} from "../../services/api/platforms/platform-api.types";
+import {SettingsService} from "../../services/settings/settings.service";
 
 @Component({
     selector: "ct-sb-public-apps-panel",
-    directives: [TreeViewComponent, PanelToolbarComponent],
     host: {class: "block"},
     template: `
         <ct-panel-toolbar>
@@ -42,7 +38,6 @@ export class SBPublicAppsPanelComponent {
         this.settings.platformConfiguration
             .do(_ => this.isLoading = true)
             .flatMap(_ => this.platform.getPublicApps().map(apps => {
-
 
                 const categorized = apps.map(app => {
                     return {

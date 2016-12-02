@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, ViewChild, ViewContainerRef, ViewRef} from "@angular/core";
+import {Component, Input, OnInit, ViewChild, ViewContainerRef} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {CommandLineToolModel, ExpressionModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../common/component-base";
@@ -70,25 +70,28 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
                 private inspector: EditorInspectorService) {
         super();
 
-        this.tracked = this.inspector.status.subscribe(status => this.showInspector = status);
+        this.tracked = this.inspector
+            .inspectedObject.map(obj => obj !== undefined)
+            .subscribe(show => this.showInspector = show);
     }
 
     ngOnInit() {
         this.formGroup.addControl("dockerGroup", this.formBuilder.group({}));
         this.formGroup.addControl("baseCommandGroup", this.formBuilder.group({}));
         this.formGroup.addControl("inputPortsGroup", this.formBuilder.group({}));
+
+        console.log("Model", this.model);
+        this.fileDefs = [];
+        if (this.model.requirements["CreateFileRequirement"]) {
+            this.fileDefs = this.model.requirements["CreateFileRequirement"].fileDef;
+        }
+
     }
 
-        this.fileDefs = this.model.customProps.requirements
-            .filter(req => req.class === "CreateFileRequirement")
-            .map(req => req.fileDef)
-            .reduce((acc, item) => acc.concat(item), []);
-
-    }
-
-    private setRequirement(req: ProcessRequirement, hint: boolean){
+    private setRequirement(req: ProcessRequirement, hint: boolean) {
         this.model.setRequirement(req, hint);
     }
+
     ngAfterViewInit() {
         this.inspector.setHostView(this.inspectorContent);
     }

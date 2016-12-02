@@ -4,20 +4,18 @@ import {BehaviorSubject} from "rxjs";
 @Injectable()
 export class EditorInspectorService {
 
-    /** Holds whether the inspector should be open or not */
-    public status = new BehaviorSubject(false);
+    /** Holds the reference to the currently inspected object source, can be anything comparable */
+    public readonly inspectedObject = new BehaviorSubject<any>(undefined);
 
     private hostView: ViewContainerRef;
 
-    private inspectedObject: any;
 
     public show(origin) {
-        this.status.next(true);
-        this.inspectedObject = origin;
+        this.inspectedObject.next(origin);
     }
 
     public hide() {
-        this.status.next(false);
+        this.inspectedObject.next(undefined);
     }
 
     public setHostView(view: ViewContainerRef) {
@@ -29,7 +27,7 @@ export class EditorInspectorService {
     }
 
     public isInspecting(obj: any) {
-        return this.inspectedObject !== undefined && this.inspectedObject === obj;
+        return obj === this.inspectedObject.getValue();
     }
 
 

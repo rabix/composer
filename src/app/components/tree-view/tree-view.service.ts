@@ -23,7 +23,7 @@ export class TreeViewService {
     }
 
     private observeFirstNodeMatchingSearch() {
-        return this.highlightedNodes.filter(arr => arr.length).map(arr => arr[0]);
+        return this.highlightedNodes.filter(arr => arr.length > 0).map(arr => arr[0]);
     }
 
     private observeNodesMatchingSearch() {

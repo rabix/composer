@@ -16,7 +16,7 @@ const {app, dialog} = window.require("electron").remote;
 
 @Component({
     selector: "ct-local-files-panel",
-    providers: [LocalDataSourceService, IpcService],
+    providers: [LocalDataSourceService],
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: {"class": "block"},
     template: `
