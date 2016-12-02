@@ -4,6 +4,7 @@ import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {PlatformAppEntry} from "../../services/api/platforms/platform-api.types";
 import {SettingsService} from "../../services/settings/settings.service";
+import {OpenTabAction} from "../../action-events/index";
 
 @Component({
     selector: "ct-sb-public-apps-panel",
