@@ -34,8 +34,7 @@ import {CodePreviewComponent} from "./ui/code-editor/code-preview.component";
 
     ],
     providers: [
-        IpcService,
-        GuidService
+
     ],
     imports: [BrowserModule]
 })

@@ -12,6 +12,7 @@ import {ModalService} from "../modal/modal.service";
 import {NewFileModalComponent} from "../modal/custom/new-file-modal.component";
 import {ProjectSelectionModal} from "../modal/custom/project-selection-modal.component";
 import {ComponentBase} from "../common/component-base";
+import {UserProjectsService} from "../../platform-providers/user-projects/user-projects.service";
 
 @Component({
     selector: "ct-sb-user-projects-panel",
@@ -60,7 +61,8 @@ export class SBUserProjectsPanelComponent extends ComponentBase {
                 private eventHub: EventHubService,
                 private preferences: UserPreferencesService,
                 private modal: ModalService,
-                private settings: SettingsService) {
+                private settings: SettingsService,
+                private contextMenu: UserProjectsService) {
         super();
 
         this.settings.platformConfiguration
@@ -127,6 +129,8 @@ export class SBUserProjectsPanelComponent extends ComponentBase {
                 .map(childrenApps => childrenApps.map((source: DataEntrySource) => ({
                     name: source.data.label,
                     icon: source.data.class || "file",
+                    content: source.content,
+                    contextMenu: this.contextMenu.getContextMenu(source.data.label, source.content),
                     openHandler: _ => {
                         this.eventHub.publish(new OpenTabAction({
                             id: source.data.class + "_" + source.data.label,

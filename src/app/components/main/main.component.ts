@@ -13,6 +13,13 @@ import {SettingsService} from "../../services/settings/settings.service";
 import {UrlValidator} from "../../validators/url.validator";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {ModalService} from "../modal/modal.service";
+import {GuidService} from "../../services/guid.service";
+import {IpcService} from "../../services/ipc.service";
+import {LocalDataSourceService} from "../../sources/local/local.source.service";
+import {PublicAppService} from "../../platform-providers/public-apps/public-app.service";
+import {ElectronPublicAppService} from "../../platform-providers/public-apps/electron-public-app.service";
+import {UserProjectsService} from "../../platform-providers/user-projects/user-projects.service";
+import {ElectronUserProjectsService} from "../../platform-providers/user-projects/electron-user-projects.service";
 
 require("./../../../assets/sass/main.scss");
 require("./main.component.scss");
@@ -34,6 +41,12 @@ require("./main.component.scss");
         SettingsService,
         UserPreferencesService,
         ContextService,
+        // FIXME: this needs to be handled in a system-specific way
+        GuidService,
+        IpcService,
+        LocalDataSourceService,
+        {provide: PublicAppService, useClass: ElectronPublicAppService},
+        {provide: UserProjectsService, useClass: ElectronUserProjectsService}
     ],
 })
 export class MainComponent {

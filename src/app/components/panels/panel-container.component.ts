@@ -11,14 +11,6 @@ require("./panel-container.component.scss");
 
 @Component({
     selector: "ct-panel-container",
-    directives: [
-        LocalFilesPanelComponent,
-        PanelComponent,
-        PanelHandleComponent,
-        SBPublicAppsPanelComponent,
-        SBUserProjectsPanelComponent,
-        StructurePanelComponent,
-    ],
     template: `
         <template ngFor let-panel [ngForOf]="panelList | async" let-isLast="last">
             <ct-panel [size]="totalPanelSize" [class.hidden]="!panel.active">
