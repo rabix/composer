@@ -32,6 +32,7 @@ import {ComponentBase} from "../common/component-base";
             <ct-tree-node-icon *ngIf="node.icon" 
                                class="icon-space"
                                [expanded]="isExpanded"
+                               [isLoading]="isLoading"
                                [type]="node.icon"
                                (click)="toggle()">           
             </ct-tree-node-icon>

@@ -15,19 +15,20 @@ export class IpcService {
     private pendingRequests: {
         [id: string]: {
             type: RequestType,
-            stream: Subject<any>
+            stream: Subject<any>,
+            zone?: NgZone
         }
     } = {};
 
-    constructor(private guid: GuidService, private zone: NgZone) {
+    constructor(private guid: GuidService) {
 
         ipcRenderer.on("data-reply", (sender, response) => {
 
-            this.zone.run(() => {
-                console.debug("Data reply received", response.id, response);
+            console.debug("Data reply received", response.id, response);
 
-                const {stream, type} = this.pendingRequests[response.id];
+            const {stream, type, zone} = this.pendingRequests[response.id];
 
+            const action = () => {
                 if (response.error) {
                     stream.error(response.error);
                 }
@@ -37,18 +38,21 @@ export class IpcService {
                     stream.complete();
                     delete this.pendingRequests[response.id];
                 }
-            });
+            };
+
+            zone ? zone.run(() => action()) : action();
 
         });
     }
 
-    public request(message: string, data = {}) {
+    public request(message: string, data = {}, zone?: NgZone) {
 
         const messageID = this.guid.generate();
 
         this.pendingRequests[messageID] = {
+            zone,
             type: RequestType.Once,
-            stream: new AsyncSubject<any>()
+            stream: new AsyncSubject<any>(),
         };
 
         console.trace("Sending", message, "(", messageID, ")", data);
@@ -61,11 +65,12 @@ export class IpcService {
         return this.pendingRequests[messageID].stream;
     }
 
-    public watch(message: string, data = {}) {
+    public watch(message: string, data = {}, zone?: NgZone) {
 
         const messageID = this.guid.generate();
 
         this.pendingRequests[messageID] = {
+            zone,
             type: RequestType.Watch,
             stream: new Subject<any>()
         };

@@ -1,4 +1,4 @@
-import {Component, ChangeDetectionStrategy, Input, ChangeDetectorRef} from "@angular/core";
+import {Component, ChangeDetectionStrategy, Input, ChangeDetectorRef, NgZone} from "@angular/core";
 import {LocalDataSourceService} from "../../sources/local/local.source.service";
 import {Observable} from "rxjs";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
@@ -40,6 +40,7 @@ export class LocalFilesPanelComponent extends ComponentBase {
                 private fs: LocalDataSourceService,
                 private ipc: IpcService,
                 private detector: ChangeDetectorRef,
+                private zone: NgZone,
                 private preferences: UserPreferencesService) {
         super();
     }
@@ -164,7 +165,7 @@ export class LocalFilesPanelComponent extends ComponentBase {
     private createNewDirectoryModal(basePth) {
         const dirNameInput = new FormControl("",
             [control => control.value ? null : {err: "Path must not be empty"}],
-            [control => this.ipc.request("pathExists", `${basePth}/${control.value}`).first()
+            [control => this.ipc.request("pathExists", `${basePth}/${control.value}`, this.zone).first()
                 .map(r => r.exists ? {err: "That path is taken."} : null)]
         );
 
