@@ -1,4 +1,4 @@
-import {Observable} from "rxjs";
+import {Observable, BehaviorSubject} from "rxjs";
 import {Component} from "@angular/core";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
