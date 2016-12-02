@@ -21,7 +21,7 @@ import {PlatformAppEntry} from "../../services/api/platforms/platform-api.types"
              <div class="text-xs-center"><small>Fetching Public Apps&hellip;</small></div>
             <progress class="progress progress-striped progress-animated" value="100" max="100"></progress>
         </div>
-        <ct-tree-view [nodes]="nodes"></ct-tree-view>
+        <ct-tree-view [nodes]="nodes" [preferenceKey]="'public-apps'"></ct-tree-view>
     `
 })
 export class SBPublicAppsPanelComponent {
@@ -76,6 +76,7 @@ export class SBPublicAppsPanelComponent {
 
 
                 return Object.keys(categorized).map(key => ({
+                    id: key,
                     name: key,
                     icon: "angle",
                     isExpandable: true,
@@ -84,7 +85,7 @@ export class SBPublicAppsPanelComponent {
 
             })).subscribe(categories => {
             this.isLoading = false;
-            this.nodes     = categories;
+            this.nodes = categories;
         }, err => {
             this.isLoading = false;
         });

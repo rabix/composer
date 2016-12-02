@@ -1,6 +1,4 @@
 import {Component, ChangeDetectionStrategy, Input, ChangeDetectorRef} from "@angular/core";
-import {TreeViewComponent} from "../tree-view";
-import {PanelToolbarComponent} from "./panel-toolbar.component";
 import {LocalDataSourceService} from "../../sources/local/local.source.service";
 import {Observable} from "rxjs";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
@@ -12,13 +10,14 @@ import {OpenTabAction} from "../../action-events/index";
 import {noop} from "../../lib/utils.lib";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {FormControl} from "@angular/forms";
+import {ComponentBase} from "../common/component-base";
 
 const {app, dialog} = window.require("electron").remote;
 
 @Component({
     selector: "ct-local-files-panel",
+    providers: [LocalDataSourceService, IpcService],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    providers: [LocalDataSourceService],
     host: {"class": "block"},
     template: `
         <ct-panel-toolbar>
@@ -28,10 +27,10 @@ const {app, dialog} = window.require("electron").remote;
             </span>
         </ct-panel-toolbar>
         
-        <ct-tree-view [nodes]="nodes"></ct-tree-view>
+        <ct-tree-view [nodes]="nodes" [preferenceKey]="'local-files'"></ct-tree-view>
     `
 })
-export class LocalFilesPanelComponent {
+export class LocalFilesPanelComponent extends ComponentBase {
 
     @Input()
     private nodes = [];
@@ -42,13 +41,12 @@ export class LocalFilesPanelComponent {
                 private ipc: IpcService,
                 private detector: ChangeDetectorRef,
                 private preferences: UserPreferencesService) {
-
+        super();
     }
 
     private ngOnInit() {
-        this.addDirectory(...this.preferences.get("local_open_folders", []));
+        this.tracked = this.preferences.get("local_open_folders", []).subscribe(files => this.addDirectory(...files));
     }
-
 
     private recursivelyMapChildrenToNodes(childrenProvider) {
         if (!childrenProvider) {
@@ -96,6 +94,7 @@ export class LocalFilesPanelComponent {
                 }
 
                 return {
+                    id: item.path,
                     name: item.name,
                     icon,
                     isExpandable: item.isDir,
@@ -146,7 +145,7 @@ export class LocalFilesPanelComponent {
     }
 
     private createNewFileModal(path) {
-        const component    = this.modal.show<NewFileModalComponent>(NewFileModalComponent, {
+        const component = this.modal.show<NewFileModalComponent>(NewFileModalComponent, {
             title: "Create new File...",
             closeOnOutsideClick: true,
             closeOnEscape: true
@@ -225,7 +224,7 @@ export class LocalFilesPanelComponent {
                     new MenuItem("New File...", {
                         click: () => this.createNewFileModal(path)
                     }),
-                    new MenuItem("New Directory...",{
+                    new MenuItem("New Directory...", {
                         click: () => this.createNewDirectoryModal(path)
                     }),
                     new MenuItem("Remove from Workspace", {

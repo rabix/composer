@@ -2,6 +2,8 @@ import {Component, Input, ChangeDetectionStrategy, OnChanges, SimpleChanges} fro
 import {ComponentBase} from "../../../components/common/component-base";
 import {CommandArgumentModel} from "cwlts/models/d2sb";
 
+require("./argument-list.component.scss");
+
 @Component({
     selector: "ct-argument-list",
     changeDetection: ChangeDetectionStrategy.OnPush,

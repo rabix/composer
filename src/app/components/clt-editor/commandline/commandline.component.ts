@@ -37,7 +37,9 @@ export class CommandLineComponent {
         return {
             "arg-cli": part.type === "argument",
             "baseCmd-cli": part.type === "baseCommand",
-            "input-cli": part.type === "input"
+            "input-cli": part.type === "input",
+            "error-text": part.type === "error",
+            "warning-text": part.type === "warning"
         }
     }
 

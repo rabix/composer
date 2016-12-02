@@ -4,6 +4,7 @@ import {OpenTabAction} from "../../action-events";
 import {TabData} from "./tab-data.interface";
 import {ComponentBase} from "../common/component-base";
 import {IpcService} from "../../services/ipc.service";
+import {MenuItem} from "../menu/menu-item";
 
 require("./workbox.component.scss");
 
@@ -16,7 +17,8 @@ require("./workbox.component.scss");
                 <li *ngFor="let tab of tabs; let i = index;"
                     (click)="activeTab = tab"
                     [class.active]="tab === activeTab"
-                    class="ct-workbox-tab clickable">
+                    class="ct-workbox-tab clickable"
+                    [ct-context]="createContextMenu(i)">
                     <div class="title">{{ tab.title | async }}</div>
                     <div (click)="removeTab(i)" class="close-icon">×</div>
                 </li>
@@ -42,34 +44,34 @@ export class WorkboxComponent extends ComponentBase implements OnInit {
 
     private el: Element;
 
-    constructor(private eventHub: EventHubService,
+    constructor(private eventHub: EventHubService
                 private ipc: IpcService,
                 el: ElementRef) {
         super();
-
         this.el = el.nativeElement;
     }
 
     ngOnInit() {
 
-        // FIXME: this needs to be handled in a system-specific way
-        // Listen for a shortcut that should close the active tab
-        this.tracked = this.ipc.watch("accelerator", "CmdOrCtrl+W").subscribe(() => {
-            this.removeTab(this.tabs.indexOf(this.activeTab));
-        });
+
+    // FIXME: this needs to be handled in a system-specific way
+    // Listen for a shortcut that should close the active tab
+    this.tracked = this.ipc.watch("accelerator", "CmdOrCtrl+W").subscribe(() => {
+        this.removeTab(this.tabs.indexOf(this.activeTab));
+    });
 
         this.tracked = this.eventHub.onValueFrom(OpenTabAction).subscribe((tab: TabData) => {
-            // Check if that tab id is already open. If so, activate that tab and we're done.
-            const existingTab = this.tabs.find(t => t.id === tab.id);
-            if (existingTab) {
-                this.activeTab = existingTab;
-                return;
-            }
+                // Check if that tab id is already open. If so, activate that tab and we're done.
+                const existingTab = this.tabs.find(t => t.id === tab.id);
+                if (existingTab) {
+                    this.activeTab = existingTab;
+                    return;
+                }
 
-            // Otherwise, we need to create a new tab and activate it.
-            this.tabs.push(tab);
-            this.activeTab = this.tabs[this.tabs.length - 1];
-        });
+                // Otherwise, we need to create a new tab and activate it.
+                this.tabs.push(tab);
+                this.activeTab = this.tabs[this.tabs.length - 1];
+            })
     }
 
     /**
@@ -82,5 +84,36 @@ export class WorkboxComponent extends ComponentBase implements OnInit {
         if (this.activeTab === removedTab) {
             this.activeTab = this.tabs[this.tabs.length > index ? index : 0];
         }
+    }
+
+    /**
+     * Removes all tabs except the tab with index
+     * @param index
+     */
+    private removeOtherTabs(index: Number) {
+        const tab = this.tabs.splice(index, 1)[0];
+
+        this.activeTab = tab;
+        this.tabs = [tab];
+    }
+
+    /**
+     * Removes all tabs
+     * @param index
+     */
+    private removeAllTabs() {
+        this.tabs = [];
+    }
+
+    private createContextMenu(index): MenuItem[] {
+        const closeOthers = new MenuItem("Close Others", {
+            click: () => this.removeOtherTabs(index)
+        });
+
+        const closeAll = new MenuItem("Close All", {
+            click: () => this.removeAllTabs()
+        });
+
+        return [closeOthers, closeAll];
     }
 }

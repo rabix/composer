@@ -1,9 +1,6 @@
 import {Component} from "@angular/core";
-import {TreeViewComponent} from "../tree-view/tree-view.component";
 import {ReplaySubject, Observable, Subscription, Subject} from "rxjs";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
-import {BlockLoaderComponent} from "../block-loader/block-loader.component";
-import {PanelToolbarComponent} from "./panel-toolbar.component";
 import {OpenTabAction} from "../../action-events";
 import {DataEntrySource} from "../../sources/common/interfaces";
 import {SettingsService} from "../../services/settings/settings.service";
@@ -13,34 +10,23 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
 import {MenuItem} from "../menu/menu-item";
 import {ModalService} from "../modal/modal.service";
 import {NewFileModalComponent} from "../modal/custom/new-file-modal.component";
+import {ProjectSelectionModal} from "../modal/custom/project-selection-modal.component";
+import {ComponentBase} from "../common/component-base";
 
 @Component({
     selector: "ct-sb-user-projects-panel",
-    directives: [TreeViewComponent, BlockLoaderComponent, PanelToolbarComponent],
     host: {"class": "block"},
     template: `
         <ct-panel-toolbar>
             <span class="tc-name">Projects</span>
             <span class="tc-tools clickable">
                 <i *ngIf="(closedProjects | async)?.length"
-                   (click)="showProjectSelectionToolbar = true"
+                   (click)="openProjectSelectionModal()"                   
                    class="fa fa-fw fa-plus-circle"></i>
             </span>
         </ct-panel-toolbar>
         
-        <div class="project-selector-container" *ngIf="showProjectSelectionToolbar && (closedProjects | async)?.length">
-            <form class="form-inline" #form>
-        
-                <div class="input-group project-selection-input-group">
-                    <select #projectSelection class="project-selector form-control custom-select" (change)="addProjectToWorkspace(projectSelection.value)" required>
-                        <option value="" disabled [selected]="true">Choose a Project...</option>
-                        <option *ngFor="let p of (closedProjects | async)" [value]="p.id">{{ p.name }}</option>
-                    </select>
-                </div>
-            </form>
-        </div>
-        
-        <div *ngIf="!isLoading && (openProjects | async)?.length === 0 && !showProjectSelectionToolbar"
+        <div *ngIf="!isLoading && (openProjects | async)?.length === 0"
              class="alert alert-info m-1">
              <i class="fa fa-info-circle alert-icon"></i>
             There are no open projects. Select projects to open by clicking the plus above.
@@ -53,16 +39,14 @@ import {NewFileModalComponent} from "../modal/custom/new-file-modal.component";
             <progress class="progress progress-striped progress-animated" value="100" max="100"></progress>
         </div>
         
-        <ct-tree-view [nodes]="nodes | async"></ct-tree-view>
+        <ct-tree-view [nodes]="nodes | async" [preferenceKey]="'user-projects'"></ct-tree-view>
     `
 })
-export class SBUserProjectsPanelComponent {
+export class SBUserProjectsPanelComponent extends ComponentBase {
 
     private nodes = new ReplaySubject(1);
 
     private isLoading = false;
-
-    private subs: Subscription[] = [];
 
     private allProjects = new ReplaySubject<{id: string, data: PlatformProjectEntry}>();
 
@@ -72,13 +56,12 @@ export class SBUserProjectsPanelComponent {
 
     private projectUpdates = new Subject();
 
-    private showProjectSelectionToolbar = false;
-
     constructor(private dataSource: SBPlatformDataSourceService,
                 private eventHub: EventHubService,
                 private preferences: UserPreferencesService,
                 private modal: ModalService,
                 private settings: SettingsService) {
+        super();
 
         this.settings.platformConfiguration
             .do(_ => this.isLoading = true)
@@ -88,7 +71,7 @@ export class SBUserProjectsPanelComponent {
                 .map(entry => this.mapProjectToNode(entry))
             ).withLatestFrom(
             this.settings.platformConfiguration,
-            Observable.of(this.preferences.get("open_projects", {})),
+            this.preferences.get("open_projects", {}),
 
             (allProjects, config, openProjectPrefs) => {
                 return allProjects.map(p => Object.assign(p, {
@@ -110,15 +93,14 @@ export class SBUserProjectsPanelComponent {
             });
 
         this.openProjects
-            .withLatestFrom(this.settings.platformConfiguration, (nodes, conf) => ({nodes, conf}))
+            .withLatestFrom(this.preferences.get("open_projects", {}),
+                this.settings.platformConfiguration, (nodes, projects, conf) => ({nodes, projects, conf}))
             .subscribe(data => {
                 this.isLoading = false;
                 this.nodes.next(data.nodes);
-                const openPrefs = this.preferences.get("open_projects", {});
-                this.preferences.put("open_projects", Object.assign(openPrefs, {
+                this.preferences.put("open_projects", Object.assign(data.projects, {
                     [data.conf.url]: data.nodes.map(n => n.id)
-                }))
-
+                }));
             });
 
         this.projectUpdates.withLatestFrom(this.allProjects, (update, projects) => update(projects))
@@ -163,10 +145,21 @@ export class SBUserProjectsPanelComponent {
             closeOnOutsideClick: true,
             closeOnEscape: true
         });
-
-
     }
 
+    private openProjectSelectionModal() {
+        const component = this.modal.show<ProjectSelectionModal>(ProjectSelectionModal, {
+            title: "Open Project",
+            closeOnOutsideClick: true,
+            closeOnEscape: true
+        });
+
+        component.closedProjects = this.closedProjects;
+        component.save = (projectID) => {
+            this.setProjectStatus(projectID, true);
+            this.allProjects.first().subscribe(x => component.closeModal());
+        };
+    }
 
     private setProjectStatus(projectID, isOpen) {
         this.projectUpdates.next(
@@ -178,14 +171,4 @@ export class SBUserProjectsPanelComponent {
                 return project;
             }));
     }
-
-    private addProjectToWorkspace(projectID) {
-        this.setProjectStatus(projectID, true);
-        this.showProjectSelectionToolbar = false;
-    }
-
-    ngOnDestroy() {
-        this.subs.forEach(sub => sub.unsubscribe());
-    }
-
 }

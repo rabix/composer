@@ -43,7 +43,7 @@ export class LocalDataSourceService {
             this.fileUpdates.next((all) => Object.assign({}, all, patch));
         });
 
-        return this.files.map(index => index[path])
+        return this.files.map(index => index[path]).filter(dir => !!dir)
             .distinctUntilChanged((a, b) => a.length === b.length)
             .publishReplay(1).refCount();
     }

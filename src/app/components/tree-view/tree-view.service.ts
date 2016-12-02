@@ -1,6 +1,8 @@
 import {Injectable} from "@angular/core";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {TreeNodeComponent} from "./tree-node.component";
+import {UserPreferencesService} from "../../services/storage/user-preferences.service";
+
 
 @Injectable()
 export class TreeViewService {
@@ -13,7 +15,7 @@ export class TreeViewService {
 
     public highlightedNodes = new BehaviorSubject<TreeNodeComponent[]>([]);
 
-    constructor() {
+    constructor(private preferences: UserPreferencesService) {
 
         this.observeNodesMatchingSearch().subscribe(this.highlightedNodes);
 
@@ -51,9 +53,29 @@ export class TreeViewService {
         this.nodes.set(node.nodeIndex, node);
     }
 
-    public removeNode(node: TreeNodeComponent) {
-        this.nodes.delete(node.nodeIndex);
+    public removeNode(treeNodeComponent: TreeNodeComponent, preferenceKey: string) {
+        this.nodes.delete(treeNodeComponent.nodeIndex);
+        if (preferenceKey) {
+            this.deleteToggleState(treeNodeComponent.node.id, preferenceKey);
+        }
     }
 
+    public getExpandedNodes(key: string) {
+        const lsKey = "expand-" + key;
+        return this.preferences.get(lsKey, []).first();
+    }
 
+    public saveToggleState(id: string, key: string) {
+        const lsKey = "expand-" + key;
+        this.preferences.get(lsKey, []).first().subscribe(el => {
+            this.preferences.put(lsKey, el.concat(id));
+        });
+    }
+
+    public deleteToggleState(id: String, key: string) {
+        const lsKey = "expand-" + key;
+        this.preferences.get(lsKey, []).first().subscribe(el => {
+            this.preferences.put(lsKey, el.filter(element => element !== id && !element.startsWith(id)));
+        });
+    }
 }
