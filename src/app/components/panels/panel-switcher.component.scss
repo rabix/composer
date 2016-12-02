@@ -73,9 +73,5 @@ ct-panel-switcher {
         cursor: pointer;
         font-size: 17px;
         vertical-align: middle;
-
-        &.disabled {
-            visibility: hidden;
-        }
     }
 }

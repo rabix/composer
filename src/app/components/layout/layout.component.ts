@@ -20,6 +20,7 @@ require("./layout.component.scss");
     selector: "ct-layout",
     template: `
         <div class="flex-box">
+            
             <div class="panel-switch-col">
                 <div class="top-bar"></div>
                 <div class="left-panel-bar">
@@ -34,12 +35,12 @@ require("./layout.component.scss");
                 
                 <div class="toggle-panel-left">
                     <i aria-hidden="true" class="fa fa-caret-square-o-left" 
-                    (click) = "togglePanelLeft()" [class.disabled]="(visiblePanels | async).length === 0"></i>                    
+                    (click) = "togglePanelLeft()"></i>                    
                 </div> 
-                    
             </div>
+            
             <div class="flex-col col-panels" 
-                 [style.flex]="treeSize" 
+                 [style.flex]="treeSize"
                  [class.hidden]="(visiblePanels | async).length === 0">
                  
                 <div class="top-bar fixed">
