@@ -98,7 +98,6 @@ export class TreeNodeComponent extends ComponentBase implements OnInit {
     public constructor(private tree: TreeViewService,
                        private detector: ChangeDetectorRef,
                        private renderer: Renderer,
-                       private zone: NgZone,
                        el: ElementRef) {
 
         super();

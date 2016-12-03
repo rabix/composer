@@ -1,6 +1,6 @@
 import {Component, Input, OnInit, ViewChild, ViewContainerRef} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
-import {CommandLineToolModel, ExpressionModel} from "cwlts/models/d2sb";
+import {CommandLineToolModel, ExpressionModel, CommandInputParameterModel as InputModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../common/component-base";
 import {FileDef} from "cwlts/mappings/d2sb/FileDef";
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
@@ -17,10 +17,10 @@ require("./clt-editor.component.scss");
             <form [class.col-xs-6]="showInspector" 
                   [class.col-xs-12]="!showInspector" 
                   [formGroup]="formGroup">
-                <docker-image-form [dockerRequirement]="model.hints.DockerRequirement"
+                <ct-docker-image-form [dockerRequirement]="model.hints.DockerRequirement"
                                    [form]="formGroup.controls['dockerGroup']"
                                    (update)="setRequirement($event, true)">
-                </docker-image-form>
+                </ct-docker-image-form>
                                 
                 <base-command-form [baseCommand]="model.baseCommand"
                                    [context]="{$job: model.job}"
@@ -28,7 +28,9 @@ require("./clt-editor.component.scss");
                                    (update)="setBaseCommand($event)">
                 </base-command-form>
                 
-                <inputs-ports-form [cltModel]="model"></inputs-ports-form>
+                <!--<inputs-ports-form [cltModel]="model"></inputs-ports-form>-->
+                
+                <ct-tool-input-list [location]="model.loc + '.inputs'" [entries]="model.inputs" (update)="updateModel('inputs', $event)"></ct-tool-input-list>
                 
                 <ct-output-ports [entries]="model.outputs || []" [readonly]="readonly"></ct-output-ports>
                 
@@ -70,22 +72,34 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
                 private inspector: EditorInspectorService) {
         super();
 
-        this.tracked = this.inspector
-            .inspectedObject.map(obj => obj !== undefined)
+        this.tracked = this.inspector.inspectedObject.map(obj => obj !== undefined)
             .subscribe(show => this.showInspector = show);
     }
 
     ngOnInit() {
         this.formGroup.addControl("dockerGroup", this.formBuilder.group({}));
         this.formGroup.addControl("baseCommandGroup", this.formBuilder.group({}));
-        this.formGroup.addControl("inputPortsGroup", this.formBuilder.group({}));
+        this.formGroup.addControl("inputs", this.formBuilder.group({}));
 
         console.log("Model", this.model);
+
         this.fileDefs = [];
         if (this.model.requirements["CreateFileRequirement"]) {
             this.fileDefs = this.model.requirements["CreateFileRequirement"].fileDef;
         }
 
+    }
+
+    private updateModel(category: string, data: any) {
+
+        if (category === "inputs") {
+            this.model.inputs = [];
+            data.forEach(input => this.model.addInput(input));
+        }
+
+        if (this.formGroup.controls[category] instanceof FormGroup) {
+            this.formGroup.controls[category].markAsDirty();
+        }
     }
 
     private setRequirement(req: ProcessRequirement, hint: boolean) {
@@ -100,4 +114,5 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
         this.model.baseCommand = [];
         list.forEach(cmd => this.model.addBaseCommand(cmd));
     }
+
 }

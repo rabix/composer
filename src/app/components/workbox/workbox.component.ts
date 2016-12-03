@@ -60,6 +60,22 @@ export class WorkboxComponent extends ComponentBase implements OnInit {
             this.removeTab(this.tabs.indexOf(this.activeTab));
         });
 
+        // Switch to the tab on the right
+        this.tracked = this.ipc.watch("accelerator", "CmdOrCtrl+Shift+]")
+            .filter(_ => this.activeTab && this.tabs.length > 1)
+            .subscribe(() => {
+                const index    = this.tabs.indexOf(this.activeTab);
+                this.activeTab = index === (this.tabs.length - 1) ? this.tabs[0] : this.tabs[index + 1];
+            });
+
+        // Switch to the tab on the left
+        this.tracked = this.ipc.watch("accelerator", "CmdOrCtrl+Shift+[")
+            .filter(_ => this.activeTab && this.tabs.length > 1)
+            .subscribe(() => {
+                const index    = this.tabs.indexOf(this.activeTab);
+                this.activeTab = index ? this.tabs[index - 1] : this.tabs[this.tabs.length - 1];
+            });
+
         this.tracked = this.eventHub.onValueFrom(OpenTabAction).subscribe((tab: TabData) => {
             // Check if that tab id is already open. If so, activate that tab and we're done.
             const existingTab = this.tabs.find(t => t.id === tab.id);

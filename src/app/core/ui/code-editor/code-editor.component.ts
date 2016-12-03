@@ -1,7 +1,7 @@
 import {Component, Input, Output, ElementRef} from "@angular/core";
 import {Observable, Subject} from "rxjs";
-import Editor = AceAjax.Editor;
 import {ComponentBase} from "../../../components/common/component-base";
+import Editor = AceAjax.Editor;
 
 require("brace/ext/searchbox");
 require("brace/mode/javascript");
@@ -90,7 +90,7 @@ export class CodeEditorComponent extends ComponentBase {
     public language: string;
 
     /* Instance of the Ace editor */
-    private editor: Editor;
+    public editor: Editor;
 
     @Input()
     public options: AceEditorOptions = {};
@@ -98,13 +98,12 @@ export class CodeEditorComponent extends ComponentBase {
     @Input()
     public readonly = false;
 
+
     constructor(private elementRef: ElementRef) {
         super();
     }
 
     ngOnInit() {
-        console.log("Initializing");
-
         // Instantiate the editor instance inside the target element
         this.editor  = ace.edit(this.elementRef.nativeElement);
         this.tracked = this.editor;
@@ -132,8 +131,8 @@ export class CodeEditorComponent extends ComponentBase {
             .subscribe(this.content);
     }
 
-    ngOnDestroy(){
-        console.log("Destroying");
+    public getEditorInstance() {
+        return this.editor;
     }
 
 

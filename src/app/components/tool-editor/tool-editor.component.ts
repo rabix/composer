@@ -187,7 +187,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
      * @param view
      */
     private switchView(view: ViewMode) {
-        console.log("Triggering view", view);
+
         if (view === ViewMode.Gui) {
 
             // if (this.showReformatPrompt) {
@@ -208,9 +208,10 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
                 this.viewMode = view;
             // }
         } else if (view === ViewMode.Code) {
-            if (this.toolGroup.dirty) {
+            console.log("Is tool group dirty", this.toolGroup.dirty);
+            // if (this.toolGroup.dirty) {
                 this.rawEditorContent.next(this.getModelText());
-            }
+            // }
 
             this.viewMode = view;
         }

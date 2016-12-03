@@ -59,6 +59,22 @@ function start(config = {}) {
                             click: (menu, browser, event) => {
                                 acceleratorProxy.pass(menu, browser, event);
                             }
+                        },
+                        {
+                            id: "moveTabRight",
+                            label: "Select the Tab on the Right",
+                            accelerator: "CmdOrCtrl+Shift+]",
+                            click: (menu, browser, event) => {
+                                acceleratorProxy.pass(menu, browser, event);
+                            }
+                        },
+                        {
+                            id: "moveTabLeft",
+                            label: "Select the Tab on the Left",
+                            accelerator: "CmdOrCtrl+Shift+[",
+                            click: (menu, browser, event) => {
+                                acceleratorProxy.pass(menu, browser, event);
+                            }
                         }
                     ]
                 },

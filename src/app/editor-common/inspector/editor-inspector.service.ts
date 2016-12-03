@@ -1,4 +1,4 @@
-import {Injectable, ViewContainerRef} from "@angular/core";
+import {Injectable, ViewContainerRef, EmbeddedViewRef, TemplateRef} from "@angular/core";
 import {BehaviorSubject} from "rxjs";
 
 @Injectable()
@@ -9,26 +9,45 @@ export class EditorInspectorService {
 
     private hostView: ViewContainerRef;
 
+    private embeddedView: EmbeddedViewRef<any>;
 
-    public show(origin) {
-        this.inspectedObject.next(origin);
-    }
 
     public hide() {
+        this.clearView();
         this.inspectedObject.next(undefined);
+
     }
 
     public setHostView(view: ViewContainerRef) {
         this.hostView = view;
     }
 
-    public getHostView() {
-        return this.hostView;
-    }
-
     public isInspecting(obj: any) {
         return obj === this.inspectedObject.getValue();
     }
 
+    public inspect(obj: any){
+        this.inspectedObject.next(obj);
+    }
+
+    public show(template: TemplateRef<any>, inspectedObject?) {
+
+        if (inspectedObject === this.inspectedObject.getValue()) {
+            return;
+        }
+
+        this.clearView();
+        this.embeddedView = this.hostView.createEmbeddedView(template);
+        this.inspectedObject.next(inspectedObject);
+    }
+
+    private clearView() {
+        if (this.embeddedView) {
+            this.embeddedView.destroy();
+            this.embeddedView = undefined;
+        }
+
+        this.hostView.clear();
+    }
 
 }
