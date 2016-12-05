@@ -1,7 +1,8 @@
-import {Component, Input, HostBinding, Output} from "@angular/core";
-import {BehaviorSubject, Observable, Subject, AsyncSubject} from "rxjs";
+import {Component, Input, HostBinding, Output, ViewChild} from "@angular/core";
+import {BehaviorSubject, Observable, Subject} from "rxjs";
 import {TreeNode} from "../../core/ui/tree-view/types";
 import {ComponentBase} from "../../components/common/component-base";
+import {CodeEditorComponent} from "../../core/ui/code-editor/code-editor.component";
 
 require("./expression-editor.component.scss");
 
@@ -14,7 +15,7 @@ require("./expression-editor.component.scss");
                 <div class="flex-col code-col">
                     <div class="title" >Expression:</div>
                     <div class="code-main">
-                        <ct-code-editor-x  [content]="editorContent" [language]="'javascript'" [options]="{
+                        <ct-code-editor-x #editor [content]="editorContent" [language]="'javascript'" [options]="{
                         'theme': 'ace/theme/monokai',
                         'showGutter': false,
                         'wrap': true
@@ -66,12 +67,16 @@ export class ExpressionEditorComponent extends ComponentBase {
     @Input()
     public evaluator: (code: string) => string;
 
+    @Output()
+    public action = new Subject<"close"|"save">();
+
     private previewContent = new BehaviorSubject("");
 
     private contextNodes: TreeNode[];
 
-    @Output()
-    public action = new Subject<"close"|"save">();
+    @ViewChild("editor", {read: CodeEditorComponent})
+    private editor: CodeEditorComponent;
+
 
     ngOnInit() {
         this.tracked = this.editorContent.debounceTime(250)
@@ -85,9 +90,9 @@ export class ExpressionEditorComponent extends ComponentBase {
     }
 
 
-    private transformContext(context: {$job?: Object, $self?: Object}) {
+    private transformContext(context: {$job?: Object, $self?: Object}): TreeNode[] {
 
-        const wrap = (nodes) => Object.keys(nodes).map(key => {
+        const wrap = (nodes, path = "") => Object.keys(nodes).map(key => {
             const node = nodes[key];
 
             let type = typeof node;
@@ -98,11 +103,12 @@ export class ExpressionEditorComponent extends ComponentBase {
             }
 
             const isIterable = type === "array" || type === "object";
+            const isNothing  = node === undefined || node === null;
 
             let typeDisplay = isIterable ? type : `"${node}"`;
-            if (node === undefined || node === null){
+            if (isNothing) {
                 typeDisplay = String(node);
-            } else if(type === "array"){
+            } else if (type === "array") {
                 typeDisplay = type + "[" + node.length + "]";
             }
 
@@ -110,18 +116,29 @@ export class ExpressionEditorComponent extends ComponentBase {
             const name = `<pre>${key}: <i>${typeDisplay}</i></pre>`;
 
             let childrenProvider = undefined;
+            let openHandler      = undefined;
+
+            let trace = [path, key].filter(e => e).join(".");
             if (type === "object") {
-                childrenProvider = () => Observable.of(wrap(node));
+                childrenProvider = () => Observable.of(wrap(node, trace));
             } else if (type === "array") {
                 childrenProvider = () => Observable.of(wrap(node.reduce((acc, item, index) => {
                     return Object.assign(acc, {[index]: item});
-                }, {})));
+                }, {}), trace));
+            } else {
+                openHandler = () => {
+
+
+                    trace = trace.split(".").map(p => (parseInt(p) == p) ? `[${p}]` : p).join(".")
+                        .replace(/\]\.\[/g, "][")
+                        .replace(/\.\[/g, "[");
+                    console.log("Trace is now", trace);
+                    this.editor.editor.session.insert(this.editor.editor.getCursorPosition(), String(trace));
+                };
             }
 
-            return {name, childrenProvider, icon};
+            return {name, childrenProvider, icon, openHandler};
         });
-
-        console.log("Wrapped", wrap(context));
 
         return wrap(context);
 
