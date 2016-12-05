@@ -36,7 +36,9 @@ export class InputSidebarService {
     }
 
     public updateInputPort(inputProperty: InputProperty): void {
-        this.updateInputStream.next(inputProperty);
+        if (!!this.updateInputStream) {
+            this.updateInputStream.next(inputProperty);
+        }
     }
 
     public closeInputInspector(): void {
