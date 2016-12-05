@@ -124,6 +124,7 @@ export class InputPortListComponent extends ComponentBase implements OnDestroy {
     }
 
     ngOnDestroy(): void {
+        this.inputSidebarService.closeInputInspector();
         super.ngOnDestroy();
     }
 }

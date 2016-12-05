@@ -63,7 +63,8 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
         this.formGroup.addControl("baseCommandGroup", this.formBuilder.group({}));
         this.formGroup.addControl("inputPortsGroup", this.formBuilder.group({}));
 
-        this.fileDefs = this.model.customProps.requirements
+        this.fileDefs = Object.keys(this.model.requirements)
+            .map(key => this.model.requirements[key])
             .filter(req => req.class === "CreateFileRequirement")
             .map(req => req.fileDef)
             .reduce((acc, item) => acc.concat(item) , []);

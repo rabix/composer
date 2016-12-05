@@ -133,9 +133,9 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
         this.listenToIsBoundChanges();
         this.listenToInputBindingChanges();
         this.listenToTypeFormChanges();
+        this.listenToIdChanges();
 
         this.tracked = this.basicSectionForm.valueChanges.subscribe(value => {
-            this.input.id = value.propertyIdForm;
             this.input.type = value.typeForm;
             this.input.type.isNullable = !value.isRequired;
             this.input.inputBinding = value.inputBinding;
@@ -172,6 +172,17 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
                 this.basicSectionForm.removeControl('inputBinding');
             }
         });
+    }
+
+    private listenToIdChanges(): void {
+        this.tracked = this.basicSectionForm.controls['propertyIdForm'].valueChanges
+            .subscribe((id: string)  => {
+                this.input.id = id;
+
+                if (this.input.type.type === "enum" || this.input.type.type === "record") {
+                    this.input.type.name = id;
+                }
+            });
     }
 
     private listenToInputBindingChanges(): void {
