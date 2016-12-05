@@ -1,10 +1,10 @@
 import {Component, Input, OnInit, ViewChild, ViewContainerRef} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
-import {CommandLineToolModel, ExpressionModel, CommandInputParameterModel as InputModel} from "cwlts/models/d2sb";
+import {CommandLineToolModel, ExpressionModel, CommandInputParameterModel as InputModel, ResourceRequirementModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../common/component-base";
 import {FileDef} from "cwlts/mappings/d2sb/FileDef";
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
-import {ProcessRequirement} from "cwlts/mappings/v1.0";
+import {ProcessRequirement} from "cwlts/mappings/d2sb/ProcessRequirement";
 
 require("./clt-editor.component.scss");
 
@@ -33,7 +33,13 @@ require("./clt-editor.component.scss");
                 <ct-tool-input-list [location]="model.loc + '.inputs'" [entries]="model.inputs" (update)="updateModel('inputs', $event)"></ct-tool-input-list>
                 
                 <ct-output-ports [entries]="model.outputs || []" [readonly]="readonly"></ct-output-ports>
-                
+                                   
+                <ct-resources [entries]="resources" 
+                              [readonly]="readonly" 
+                              (update)="setResource($event)" 
+                              [context]="{$job: model.job}">
+                </ct-resources>
+
                 <ct-hint-list [entries]="model.hints || {}" [readonly]="readonly"></ct-hint-list>
                 
                 <ct-argument-list [entries]="model.arguments || []" [readonly]="readonly"></ct-argument-list>
@@ -60,7 +66,10 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
     @Input()
     public formGroup: FormGroup;
 
-    private fileDefs: FileDef[] = [];
+    private resources: {
+        "sbg:CPURequirement"?: ResourceRequirementModel,
+        "sbg:MemRequirement"?: ResourceRequirementModel
+    } = {};
 
     @ViewChild("inspector", {read: ViewContainerRef})
     private inspectorContent: ViewContainerRef;
@@ -83,11 +92,10 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
 
         console.log("Model", this.model);
 
-        this.fileDefs = [];
-        if (this.model.requirements["CreateFileRequirement"]) {
-            this.fileDefs = this.model.requirements["CreateFileRequirement"].fileDef;
+        if (this.model.hints) {
+            this.resources["sbg:CPURequirement"] = this.model.hints["sbg:CPURequirement"] || new ResourceRequirementModel({class: "sbg:CPURequirement", value: ""}, "");
+            this.resources["sbg:MemRequirement"] = this.model.hints["sbg:MemRequirement"] || new ResourceRequirementModel({class: "sbg:MemRequirement", value: ""}, "");
         }
-
     }
 
     private updateModel(category: string, data: any) {
@@ -104,6 +112,12 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
 
     private setRequirement(req: ProcessRequirement, hint: boolean) {
         this.model.setRequirement(req, hint);
+        this.formGroup.markAsDirty();
+    }
+
+    private setResource(resource: ResourceRequirementModel) {
+        this.model.setRequirement(resource.serialize(), true);
+        this.formGroup.markAsDirty();
     }
 
     ngAfterViewInit() {
