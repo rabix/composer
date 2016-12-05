@@ -87,6 +87,7 @@ require("./basic-input-section.component.scss");
                 </symbols-section>
                 
                 <input-binding-section *ngIf="input.isBound" 
+                            [context]="context"
                             [propertyType]="input.type.type"
                             [formControl]="basicSectionForm.controls['inputBinding']"></input-binding-section>
               
@@ -121,9 +122,10 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
         this.input = input;
 
         this.basicSectionForm = this.formBuilder.group({
-            typeForm: [this.input.type, [Validators.required, CustomValidators.cwlModel]],
             propertyIdForm: [this.input.id],
+            typeForm: [this.input.type, [Validators.required, CustomValidators.cwlModel]],
             isBound: [!!this.input.isBound],
+            //FIXME: isNullable is undefined when it's not nullable
             isRequired: [!this.input.type.isNullable],
             inputBinding: [this.input.inputBinding],
             itemType: [!!this.input.type.items ? this.input.type.items: 'string'],
@@ -136,7 +138,6 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
         this.listenToIdChanges();
 
         this.tracked = this.basicSectionForm.valueChanges.subscribe(value => {
-            this.input.type = value.typeForm;
             this.input.type.isNullable = !value.isRequired;
             this.input.inputBinding = value.inputBinding;
 

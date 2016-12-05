@@ -73,6 +73,9 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
     @Input()
     public propertyType: string;
 
+    @Input()
+    public context: {$job: any, $self: any} = {};
+
     private inputBinding: CommandLineBindingModel;
 
     private inputBindingFormGroup: FormGroup;

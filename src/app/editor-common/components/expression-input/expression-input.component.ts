@@ -5,8 +5,8 @@ import {ExpressionSidebarService} from "../../../services/sidebars/expression-si
 import {ComponentBase} from "../../../components/common/component-base";
 import {noop} from "../../../lib/utils.lib";
 import {ExpressionModel} from "cwlts/models/d2sb";
-import {ModalService} from "../../../modal/modal.service";
-import {ModelExpressionEditorComponent} from "../../../../editor-common/expression-editor/model-expression-editor.component";
+import {ModalService} from "../../../components/modal/modal.service";
+import {ModelExpressionEditorComponent} from "../../../editor-common/expression-editor/model-expression-editor.component";
 
 require("./expression-input.component.scss");
 
