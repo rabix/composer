@@ -8,13 +8,12 @@ import {
     ElementRef,
     Renderer,
     ViewChild,
-    NgZone,
     ChangeDetectionStrategy
 } from "@angular/core";
 import {BehaviorSubject} from "rxjs";
 import {TreeNode} from "./types";
 import {TreeViewService} from "./tree-view.service";
-import {ComponentBase} from "../common/component-base";
+import {ComponentBase} from "../../../components/common/component-base";
 
 @Component({
     selector: "ct-tree-node",
@@ -29,8 +28,7 @@ import {ComponentBase} from "../common/component-base";
              [class.selected]="isHighlighted | async"
              (dblclick)="toggle()">
             
-            <ct-tree-node-icon *ngIf="node.icon" 
-                               class="icon-space"
+            <ct-tree-node-icon class="icon-space"
                                [expanded]="isExpanded"
                                [isLoading]="isLoading"
                                [type]="node.icon"
@@ -38,7 +36,7 @@ import {ComponentBase} from "../common/component-base";
             </ct-tree-node-icon>
             
             <span *ngIf="node" class="name-container" [ct-context]="node.contextMenu" [title]="node.name">
-                <span class="name" *ngFor="let namePart of nameParts">{{ namePart }}</span>
+                <span class="name" *ngFor="let namePart of nameParts" [innerHTML]="namePart"></span>
             </span>
             
             <span *ngIf="node.onClose" class="pull-right">

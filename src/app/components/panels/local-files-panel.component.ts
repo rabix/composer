@@ -5,12 +5,12 @@ import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {IpcService} from "../../services/ipc.service";
 import {ModalService} from "../modal/modal.service";
 import {NewFileModalComponent} from "../modal/custom/new-file-modal.component";
-import {MenuItem} from "../menu/menu-item";
 import {OpenTabAction} from "../../action-events/index";
 import {noop} from "../../lib/utils.lib";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {FormControl} from "@angular/forms";
 import {ComponentBase} from "../common/component-base";
+import {MenuItem} from "../../core/ui/menu/menu-item";
 
 const {app, dialog} = window.require("electron").remote;
 

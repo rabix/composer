@@ -23,8 +23,7 @@ require("./tool-editor.component.scss");
     providers: [
         ToolSidebarService,
         ExpressionSidebarService,
-        InputSidebarService,
-        ModalService
+        InputSidebarService
     ],
     template: `
         <block-loader *ngIf="isLoading"></block-loader>

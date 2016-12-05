@@ -2,8 +2,6 @@
 /// <reference path="../../../../node_modules/typescript/lib/lib.es6.d.ts" />
 import {Component, ViewContainerRef} from "@angular/core";
 import {Observable} from "rxjs/Rx";
-import {ContextService} from "../../services/context/context.service";
-import {DomEventService} from "../../services/dom/dom-event.service";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {FileRegistry} from "../../services/file-registry.service";
 import {InputPortService} from "../../services/input-port/input-port.service";
@@ -11,8 +9,8 @@ import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {SBPlatformDataSourceService} from "../../sources/sbg/sb-platform.source.service";
 import {SettingsService} from "../../services/settings/settings.service";
 import {UrlValidator} from "../../validators/url.validator";
-import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {ModalService} from "../modal/modal.service";
+import {ContextService} from "../../core/ui/context/context.service";
 
 require("./../../../assets/sass/main.scss");
 require("./main.component.scss");
@@ -26,14 +24,13 @@ require("./main.component.scss");
     providers: [
         EventHubService,
         FileRegistry,
-        DomEventService,
         UrlValidator,
         InputPortService,
         PlatformAPI,
         SBPlatformDataSourceService,
         SettingsService,
-        UserPreferencesService,
-        ContextService,
+        ContextService
+
     ],
 })
 export class MainComponent {

@@ -5,6 +5,8 @@ import {ExpressionSidebarService} from "../../../../services/sidebars/expression
 import {ComponentBase} from "../../../common/component-base";
 import {noop} from "../../../../lib/utils.lib";
 import {ExpressionModel} from "cwlts/models/d2sb";
+import {ModalService} from "../../../modal/modal.service";
+import {ModelExpressionEditorComponent} from "../../../../editor-common/expression-editor/model-expression-editor.component";
 
 require("./expression-input.component.scss");
 
@@ -94,7 +96,7 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
             this.model  = obj;
             this.isExpr = obj.isExpression;
         } else {
-            this.model = new ExpressionModel("");
+            this.model  = new ExpressionModel("");
             this.isExpr = this.model.isExpression;
         }
     }
@@ -126,7 +128,8 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
     private onTouch = noop;
 
 
-    constructor(private expressionSidebarService: ExpressionSidebarService) {
+    constructor(private expressionSidebarService: ExpressionSidebarService,
+                private modal: ModalService) {
         super();
     }
 
@@ -145,12 +148,31 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
      * @param event
      */
     private editExpr(action: "clear" | "edit", event: Event): void {
+
+        const editor = this.modal.show(ModelExpressionEditorComponent, {
+            backdrop: true,
+            closeOnOutsideClick: false,
+            title: "Edit Expression"
+        });
+
+        editor.model = this.model;
+        editor.context = this.context;
+        editor.action.first().subscribe(action => {
+            if(action === "save"){
+                this.model = editor.model;
+            }
+            this.modal.close();
+        });
+
+
+        return;
+
         if (!action) return;
 
         if (action === "clear") {
             this.model.setValue("", "string");
             this.model.result = null;
-            this.isExpr = false;
+            this.isExpr       = false;
             event.stopPropagation();
             this.onChange(this.model);
         } else {

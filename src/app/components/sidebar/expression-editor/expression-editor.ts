@@ -8,6 +8,9 @@ import {Subscription} from "rxjs/Subscription";
 
 require ("./expression-editor.component.scss");
 
+/**
+ * @deprecated
+ */
 export class ExpressionEditor extends AbstractCodeEditor {
 
     private subs: Subscription[] = [];

@@ -1,5 +1,5 @@
 import {Component} from "@angular/core";
-import {ReplaySubject, Observable, Subscription, Subject} from "rxjs";
+import {ReplaySubject, Observable, Subject} from "rxjs";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {OpenTabAction} from "../../action-events";
 import {DataEntrySource} from "../../sources/common/interfaces";
@@ -7,11 +7,11 @@ import {SettingsService} from "../../services/settings/settings.service";
 import {SBPlatformDataSourceService} from "../../sources/sbg/sb-platform.source.service";
 import {PlatformProjectEntry} from "../../services/api/platforms/platform-api.types";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
-import {MenuItem} from "../menu/menu-item";
 import {ModalService} from "../modal/modal.service";
 import {NewFileModalComponent} from "../modal/custom/new-file-modal.component";
 import {ProjectSelectionModal} from "../modal/custom/project-selection-modal.component";
 import {ComponentBase} from "../common/component-base";
+import {MenuItem} from "../../core/ui/menu/menu-item"
 
 @Component({
     selector: "ct-sb-user-projects-panel",
@@ -115,6 +115,7 @@ export class SBUserProjectsPanelComponent extends ComponentBase {
             icon: project.type || "angle",
             isExpandable: true,
             contextMenu: [
+
                 new MenuItem("New App...", {
                     click: () => this.openNewFileModal(project.data)
                 }),

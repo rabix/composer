@@ -4,7 +4,7 @@ import {OpenTabAction} from "../../action-events";
 import {TabData} from "./tab-data.interface";
 import {ComponentBase} from "../common/component-base";
 import {IpcService} from "../../services/ipc.service";
-import {MenuItem} from "../menu/menu-item";
+import {MenuItem} from "../../core/ui/menu/menu-item";
 
 require("./workbox.component.scss");
 
