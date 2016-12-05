@@ -1,10 +1,10 @@
 import {Component, Input, OnInit, ViewChild, ViewContainerRef} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
-import {CommandLineToolModel, ExpressionModel} from "cwlts/models/d2sb";
+import {CommandLineToolModel, ExpressionModel, ResourceRequirementModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../common/component-base";
 import {FileDef} from "cwlts/mappings/d2sb/FileDef";
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
-import {ProcessRequirement} from "cwlts/mappings/v1.0";
+import {ProcessRequirement} from "cwlts/mappings/d2sb/ProcessRequirement";
 
 require("./clt-editor.component.scss");
 
@@ -17,6 +17,10 @@ require("./clt-editor.component.scss");
             <form [class.col-xs-6]="showInspector" 
                   [class.col-xs-12]="!showInspector" 
                   [formGroup]="formGroup">
+
+                <ct-resources [entries]="resources" [readonly]="readonly" (update)="setResource($event)"></ct-resources>
+
+                  
                 <docker-image-form [dockerRequirement]="model.hints.DockerRequirement"
                                    [form]="formGroup.controls['dockerGroup']"
                                    (update)="setRequirement($event, true)">
@@ -58,7 +62,10 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
     @Input()
     public formGroup: FormGroup;
 
-    private fileDefs: FileDef[] = [];
+    private resources: {
+        "sbg:CPURequirement"?: ResourceRequirementModel,
+        "sbg:MemRequirement"?: ResourceRequirementModel
+    } = {};
 
     @ViewChild("inspector", {read: ViewContainerRef})
     private inspectorContent: ViewContainerRef;
@@ -81,15 +88,20 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
         this.formGroup.addControl("inputPortsGroup", this.formBuilder.group({}));
 
         console.log("Model", this.model);
-        this.fileDefs = [];
-        if (this.model.requirements["CreateFileRequirement"]) {
-            this.fileDefs = this.model.requirements["CreateFileRequirement"].fileDef;
-        }
 
+        if (this.model.hints) {
+            this.resources["sbg:CPURequirement"] = this.model.hints["sbg:CPURequirement"] || {};
+            this.resources["sbg:MemRequirement"] = this.model.hints["sbg:MemRequirement"] || {};
+        }
     }
 
     private setRequirement(req: ProcessRequirement, hint: boolean) {
         this.model.setRequirement(req, hint);
+    }
+
+    private setResource(resource: ProcessRequirement) {
+        this.model.setRequirement(resource, true);
+        this.formGroup.markAsDirty();
     }
 
     ngAfterViewInit() {

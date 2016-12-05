@@ -6,6 +6,8 @@ import {FileDefNamePipe} from "./pipes/file-def-name.pipe";
 import {EditorInspectorComponent} from "./inspector/editor-inspector.component";
 import {EditorInspectorContentComponent} from "./inspector/editor-inspector-content.component";
 import {EditorInspectorDirective} from "./inspector/editor-inspector.directive";
+import {QuickPickComponent} from "./components/quick-pick/quick-pick.component";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 @NgModule({
     declarations: [
@@ -14,7 +16,8 @@ import {EditorInspectorDirective} from "./inspector/editor-inspector.directive";
         FileDefNamePipe,
         EditorInspectorDirective,
         EditorInspectorComponent,
-        EditorInspectorContentComponent
+        EditorInspectorContentComponent,
+        QuickPickComponent
     ],
     exports: [
         BlankToolStateComponent,
@@ -22,13 +25,15 @@ import {EditorInspectorDirective} from "./inspector/editor-inspector.directive";
         FileDefNamePipe,
         EditorInspectorDirective,
         EditorInspectorComponent,
-        EditorInspectorContentComponent
+        EditorInspectorContentComponent,
+        QuickPickComponent
+
     ],
     entryComponents: [
         EditorInspectorComponent,
         EditorInspectorContentComponent,
     ],
-    imports: [BrowserModule]
+    imports: [BrowserModule, FormsModule, ReactiveFormsModule]
 })
 export class EditorCommonModule {
 
