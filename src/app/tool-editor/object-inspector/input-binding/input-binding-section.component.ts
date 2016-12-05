@@ -146,10 +146,10 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
             .distinctUntilChanged()
             .debounceTime(300)
             .subscribe(value => {
-                this.setInputBindingProperty(this.inputBindingFormGroup, 'position', Number(value.position));
-                this.setInputBindingProperty(this.inputBindingFormGroup, 'prefix', value.prefix);
-                this.setInputBindingProperty(this.inputBindingFormGroup, 'separate', JSON.parse(value.separate));
-                this.setInputBindingProperty(this.inputBindingFormGroup, 'itemSeparator', value.itemSeparator);
+                this.setInputBindingProperty(this.inputBindingFormGroup, 'position', !!Number(value.position) ? Number(value.position): undefined);
+                this.setInputBindingProperty(this.inputBindingFormGroup, 'prefix', !!value.prefix ? value.prefix: undefined);
+                this.setInputBindingProperty(this.inputBindingFormGroup, 'separate', !!JSON.parse(value.separate) ? JSON.parse(value.separate): undefined);
+                this.setInputBindingProperty(this.inputBindingFormGroup, 'itemSeparator', !!value.itemSeparator ? value.itemSeparator: undefined);
 
                 const trimmedValueFrom: string = value.valueFrom.toString();
 
@@ -167,7 +167,7 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
         if (form.controls[propertyName].valid) {
             this.inputBinding[propertyName] = newValue;
         } else {
-            this.inputBinding[propertyName] = undefined;
+            delete this.inputBinding[propertyName];
         }
     }
 }
