@@ -16,12 +16,14 @@ import {ReplaySubject} from "rxjs";
 
     <div class="tc-body">
     
+        <label class="form-control-label">Memory</label>
         <ct-quick-pick [suggestions]="memSuggest" 
                        [formControl]="memControl"
                        [context]="context"
                        [type]="'number'">
         </ct-quick-pick>
         
+        <label class="form-control-label">CPU</label>
         <ct-quick-pick [suggestions]="cpuSuggest" 
                        [formControl]="cpuControl"
                        [context]="context"
