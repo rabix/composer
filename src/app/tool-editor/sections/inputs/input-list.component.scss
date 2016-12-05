@@ -5,4 +5,30 @@ ct-argument-list .form-section {
   @include cli-border($arg-color);
 }
 
+@import "../../../../assets/sass/variables";
+
+.object-inspector {
+    background: #fff;
+    height: 100%;
+    padding: 0 5px 0 $collapse-icon-width;
+    color: $text-dark;
+    width: 100%;
+    border-left: 1px solid $border-color;
+    overflow: auto;
+    position: absolute;
+}
+
+.input {
+    font-size: 1.2em;
+}
+
+.info-icon {
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.input-text {
+    font-size: 1.2rem;
+}
+
 

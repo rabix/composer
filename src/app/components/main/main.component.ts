@@ -4,7 +4,6 @@ import {Component, ViewContainerRef} from "@angular/core";
 import {Observable} from "rxjs/Rx";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {FileRegistry} from "../../services/file-registry.service";
-import {InputPortService} from "../../services/input-port/input-port.service";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {SBPlatformDataSourceService} from "../../sources/sbg/sb-platform.source.service";
 import {SettingsService} from "../../services/settings/settings.service";
@@ -32,7 +31,6 @@ require("./main.component.scss");
         EventHubService,
         FileRegistry,
         UrlValidator,
-        InputPortService,
         PlatformAPI,
         SBPlatformDataSourceService,
         SettingsService,

@@ -20,7 +20,6 @@ import {SBPublicAppsPanelComponent} from "./app/components/panels/sb-public-apps
 import {SBUserProjectsPanelComponent} from "./app/components/panels/sb-user-projects-panel.component";
 import {StructurePanelComponent} from "./app/components/panels/structure-panel.component";
 import {SettingsComponent} from "./app/components/settings";
-import {SidebarComponent} from "./app/components/sidebar/sidebar.component";
 import {TabManagerComponent} from "./app/components/tab-manager/tab-manager.component";
 import {ToolEditorComponent} from "./app/components/tool-editor/tool-editor.component";
 import {ValidationIssuesComponent} from "./app/components/validation-issues/validation-issues.component";
@@ -29,13 +28,9 @@ import {SettingsButtonComponent} from "./app/components/workbox/settings-button.
 import {WorkflowEditorComponent} from "./app/components/workflow-editor/workflow-editor.component";
 import {DockerImageFormComponent} from "./app/components/forms/inputs/forms/docker-image-form.component";
 import {BaseCommandFormComponent} from "./app/components/forms/inputs/forms/base-command-form.component";
-import {InputPortsFormComponent} from "./app/components/forms/inputs/forms/input-ports-form.component";
-import {InputPortListComponent} from "./app/components/forms/inputs/types/input-port-list.component";
-import {InputInspectorSidebarComponent} from "./app/components/sidebar/object-inpsector/input-inspector-sidebar.component";
 import {ExpressionEditorSidebarComponent} from "./app/components/sidebar/expression-editor/expression-editor-sidebar.component";
 import {ToolHeaderComponent} from "./app/components/tool-editor/tool-header/tool-header.component";
 import {CommandLineComponent} from "./app/components/clt-editor/commandline/commandline.component";
-import {InputInspectorComponent} from "./app/components/sidebar/object-inpsector/input-inspector.component";
 import {ExpressionEditorComponent} from "./app/components/sidebar/expression-editor/expression-editor.component";
 import {ModalComponent, ModalService} from "./app/components/modal";
 import {ConfirmComponent} from "./app/components/modal/common/confirm.component";
@@ -85,10 +80,6 @@ import {DomEventService} from "./app/services/dom/dom-event.service";
         FormSectionComponent,
         HintListComponent,
         InputComponent,
-        InputInspectorComponent,
-        InputInspectorSidebarComponent,
-        InputPortListComponent,
-        InputPortsFormComponent,
         LayoutComponent,
         LocalFilesPanelComponent,
         MainComponent,
@@ -108,7 +99,6 @@ import {DomEventService} from "./app/services/dom/dom-event.service";
         SBUserProjectsPanelComponent,
         SettingsButtonComponent,
         SettingsComponent,
-        SidebarComponent,
         FileEditorComponent,
         StructurePanelComponent,
         TabManagerComponent,
