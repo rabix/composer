@@ -1,9 +1,10 @@
 import {Component, Input, forwardRef, OnInit, Output} from "@angular/core";
-import {FormControl, Validators, NG_VALUE_ACCESSOR, ControlValueAccessor} from "@angular/forms";
+import {FormControl, NG_VALUE_ACCESSOR, ControlValueAccessor} from "@angular/forms";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../components/common/component-base";
 import {noop} from "../../../lib/utils.lib";
 import {BehaviorSubject} from "rxjs";
+import {Expression} from "cwlts/mappings/d2sb/Expression";
 
 require("./quick-pick.component.scss");
 
@@ -17,12 +18,11 @@ require("./quick-pick.component.scss");
         }
     ],
     template: `
-<div>
     <div class="suggestions" *ngIf="!showCustom">
 
         <button class="btn btn-secondary"
-                [class.selected]="value === item.value"
-                (click)="value = item.value; onTouch();"
+                [class.selected]="computedVal === item.value"
+                (click)="setValue(item.value)"
                 *ngFor="let item of list">
             {{ item.label }}
         </button>
@@ -35,14 +35,12 @@ require("./quick-pick.component.scss");
     </button>
 
     <div *ngIf="showCustom" ngSwitch="type" class="removable-form-control">
-        <input *ngSwitchCase="'number'" type="number" class="form-control" [formControl]="customControl">
-        <input *ngSwitchDefault type="text" class="form-control" [formControl]="customControl">
+        <ct-expression-input [context]="context" [formControl]="customControl"></ct-expression-input>
         
         <span class="remove-icon" (click)="removeControl()">
             <i class="fa fa-trash"></i>
         </span>
     </div>
-</div>
     `
 })
 export class QuickPickComponent extends ComponentBase implements ControlValueAccessor, OnInit {
@@ -54,7 +52,7 @@ export class QuickPickComponent extends ComponentBase implements ControlValueAcc
     public context: any;
 
     @Input()
-    public type: "text" | "number" = "text";
+    public type: "string" | "number" = "string";
 
     @Output()
     public update = BehaviorSubject<any>();
@@ -69,6 +67,8 @@ export class QuickPickComponent extends ComponentBase implements ControlValueAcc
 
     private onChange = noop;
 
+    private computedVal: number | string | Expression;
+
     get value(): string|number|ExpressionModel {
         return this._value;
     }
@@ -76,20 +76,37 @@ export class QuickPickComponent extends ComponentBase implements ControlValueAcc
     set value(value: string|number|ExpressionModel) {
         this.onChange(value);
         this._value = value;
+        let val = value;
 
-        if (this.list && value !== '' || value !== null || value !== undefined) {
+        if (value instanceof ExpressionModel && value.type !== "expression") {
+            val = <string | number>value.serialize();
+        }
+
+        if (this.list && val !== '' && val !== null && val !== undefined) {
             this.showCustom = !this.list.filter(item => {
-                return item.value === value;
+                return item.value === val;
             }).length;
         } else {
             if (this.customControl) this.removeControl();
             this.showCustom = false;
         }
 
+        this.computedVal = <string | number> val;
+
         if (this.showCustom) this.createControl(value);
     }
 
     private _value: string | number | ExpressionModel;
+
+    private setValue(val: string | number) {
+        this.onTouch();
+        this.computedVal = val;
+        if (this._value instanceof ExpressionModel) {
+            this.value = new ExpressionModel("", val);
+        } else {
+            this.value = val;
+        }
+    }
 
     ngOnInit() {
         if (this.suggestions) {

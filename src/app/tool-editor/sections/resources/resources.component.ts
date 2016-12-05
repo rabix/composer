@@ -18,11 +18,13 @@ import {ReplaySubject} from "rxjs";
     
         <ct-quick-pick [suggestions]="memSuggest" 
                        [formControl]="memControl"
+                       [context]="context"
                        [type]="'number'">
         </ct-quick-pick>
         
         <ct-quick-pick [suggestions]="cpuSuggest" 
                        [formControl]="cpuControl"
+                       [context]="context"
                        [type]="'number'">
         </ct-quick-pick>
     </div>
@@ -40,6 +42,9 @@ export class ResourcesComponent {
 
     @Input()
     readonly: boolean;
+
+    @Input()
+    context: {$job?: any, $self?: any};
 
     @Output()
     update = new ReplaySubject<any>();
@@ -60,23 +65,19 @@ export class ResourcesComponent {
     };
 
     ngOnInit() {
-        if (this.entries["sbg:MemRequirement"].value) {
-            let mem = this.entries["sbg:MemRequirement"].value;
-            if (mem.type !== "expression") mem = mem.value;
-            this.memControl.setValue(mem);
-        }
-        if (this.entries["sbg:CPURequirement"].value) {
-            let cpu = this.entries["sbg:CPURequirement"].value;
-            if (cpu.type !== "expression") cpu = cpu.value;
-            this.cpuControl.setValue(cpu);
-        }
+        this.memControl.setValue(this.entries["sbg:MemRequirement"].value);
+        this.cpuControl.setValue(this.entries["sbg:CPURequirement"].value);
 
         this.memControl.valueChanges.subscribe(val => {
-            this.update.next(Object.assign({}, this.entries["sbg:MemRequirement"].serialize(), {value: val}));
+            const res = this.entries["sbg:MemRequirement"];
+            res.value = val;
+            this.update.next(res);
         });
 
         this.cpuControl.valueChanges.subscribe(val => {
-            this.update.next(Object.assign({}, this.entries["sbg:CPURequirement"].serialize(), {value: val}));
+            const res = this.entries["sbg:CPURequirement"];
+            res.value = val;
+            this.update.next(res);
         });
     }
 }

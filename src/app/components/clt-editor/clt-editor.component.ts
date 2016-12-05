@@ -33,9 +33,13 @@ require("./clt-editor.component.scss");
                 <ct-tool-input-list [location]="model.loc + '.inputs'" [entries]="model.inputs" (update)="updateModel('inputs', $event)"></ct-tool-input-list>
                 
                 <ct-output-ports [entries]="model.outputs || []" [readonly]="readonly"></ct-output-ports>
-                
-                <ct-resources [entries]="resources" [readonly]="readonly" (update)="setResource($event)"></ct-resources>
-                
+                                   
+                <ct-resources [entries]="resources" 
+                              [readonly]="readonly" 
+                              (update)="setResource($event)" 
+                              [context]="{$job: model.job}">
+                </ct-resources>
+
                 <ct-hint-list [entries]="model.hints || {}" [readonly]="readonly"></ct-hint-list>
                 
                 <ct-argument-list [entries]="model.arguments || []" [readonly]="readonly"></ct-argument-list>
@@ -108,10 +112,11 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
 
     private setRequirement(req: ProcessRequirement, hint: boolean) {
         this.model.setRequirement(req, hint);
+        this.formGroup.markAsDirty();
     }
 
-    private setResource(resource: ProcessRequirement) {
-        this.model.setRequirement(resource, true);
+    private setResource(resource: ResourceRequirementModel) {
+        this.model.setRequirement(resource.serialize(), true);
         this.formGroup.markAsDirty();
     }
 

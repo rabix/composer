@@ -1,17 +1,15 @@
 import {Component, Input, forwardRef} from "@angular/core";
 import {NG_VALUE_ACCESSOR, ControlValueAccessor} from "@angular/forms";
-import {Subject} from "rxjs";
-import {ExpressionSidebarService} from "../../../../services/sidebars/expression-sidebar.service";
-import {ComponentBase} from "../../../common/component-base";
-import {noop} from "../../../../lib/utils.lib";
 import {ExpressionModel} from "cwlts/models/d2sb";
-import {ModalService} from "../../../modal/modal.service";
-import {ModelExpressionEditorComponent} from "../../../../editor-common/expression-editor/model-expression-editor.component";
+import {ComponentBase} from "../../../components/common/component-base";
+import {noop} from "../../../lib/utils.lib";
+import {ModelExpressionEditorComponent} from "../../expression-editor/model-expression-editor.component";
+import {ModalService} from "../../../components/modal/modal.service";
 
 require("./expression-input.component.scss");
 
 @Component({
-    selector: 'expression-input',
+    selector: 'ct-expression-input',
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
@@ -92,6 +90,10 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
      * @param obj
      */
     writeValue(obj: ExpressionModel): void {
+        if (!(obj instanceof ExpressionModel)) {
+            console.warn(`ct-expression-input expected ExpressionModel, instead got ${obj}`)
+        }
+
         if (obj) {
             this.model  = obj;
             this.isExpr = obj.isExpression;
@@ -128,8 +130,7 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
     private onTouch = noop;
 
 
-    constructor(private expressionSidebarService: ExpressionSidebarService,
-                private modal: ModalService) {
+    constructor(private modal: ModalService) {
         super();
     }
 
@@ -149,25 +150,26 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
      */
     private editExpr(action: "clear" | "edit", event: Event): void {
 
-        const editor = this.modal.show(ModelExpressionEditorComponent, {
-            backdrop: true,
-            closeOnOutsideClick: false,
-            title: "Edit Expression"
-        });
-
-        editor.model = this.model;
-        editor.context = this.context;
-        editor.action.first().subscribe(action => {
-            if(action === "save"){
-                this.model.setValue(editor.model.serialize(), editor.model.type);
-                this.model.evaluate(this.context); // to reset validation
-            }
-            this.modal.close();
-        });
-
-
-        return;
         if (!action) return;
+
+        if (action === "edit") {
+            const editor = this.modal.show(ModelExpressionEditorComponent, {
+                backdrop: true,
+                closeOnOutsideClick: false,
+                title: "Edit Expression"
+            });
+
+            editor.model = this.model;
+            editor.context = this.context;
+            editor.action.first().subscribe(action => {
+                if(action === "save"){
+                    this.model = new ExpressionModel(this.model.loc, editor.model.serialize());
+                    this.model.evaluate(this.context); // to reset validation
+                    this.onChange(this.model);
+                }
+                this.modal.close();
+            });
+        }
 
         if (action === "clear") {
             this.model.setValue("", "string");
@@ -175,27 +177,6 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
             this.isExpr       = false;
             event.stopPropagation();
             this.onChange(this.model);
-        } else {
-            const newExpression = new Subject<ExpressionModel>();
-
-            this.expressionSidebarService.openExpressionEditor({
-                value: this.model,
-                newExpressionChange: newExpression,
-                context: this.context
-            });
-
-            this.tracked = newExpression.subscribe(val => {
-                this.model = val;
-
-                this.isExpr = val.isExpression;
-                this.onChange(this.model);
-                this.expressionSidebarService.closeExpressionEditor();
-            });
         }
-    }
-
-    ngOnDestroy(): void {
-        super.ngOnDestroy();
-        this.expressionSidebarService.closeExpressionEditor();
     }
 }

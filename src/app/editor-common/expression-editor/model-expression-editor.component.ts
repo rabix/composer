@@ -28,7 +28,7 @@ export class ModelExpressionEditorComponent {
 
     ngOnInit() {
 
-        this.rawCode.next(this.model.toString());
+        this.rawCode.next(this.model.getScript() || "");
 
         this.evaluator = (content: string) => {
 
@@ -43,7 +43,7 @@ export class ModelExpressionEditorComponent {
                 return err.message + " on " + err.loc;
             }
 
-            return String(result);
+            return JSON.stringify(result, null, 4) || "";
 
         }
     }

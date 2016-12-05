@@ -11,6 +11,7 @@ import {FileDefContentPipe} from "./pipes/file-def-content.pipe";
 import {FileDefNamePipe} from "./pipes/file-def-name.pipe";
 import {CoreModule} from "../core/core.module";
 import {ModelExpressionEditorComponent} from "./expression-editor/model-expression-editor.component";
+import {ExpressionInputComponent} from "./components/expression-input/expression-input.component";
 
 @NgModule({
     declarations: [
@@ -21,6 +22,7 @@ import {ModelExpressionEditorComponent} from "./expression-editor/model-expressi
         FileDefContentPipe,
         FileDefNamePipe,
         EditorInspectorDirective,
+        ExpressionInputComponent,
         QuickPickComponent,
         ModelExpressionEditorComponent,
     ],
@@ -32,6 +34,7 @@ import {ModelExpressionEditorComponent} from "./expression-editor/model-expressi
         ModelExpressionEditorComponent,
         EditorInspectorDirective,
         EditorInspectorComponent,
+        ExpressionInputComponent,
         EditorInspectorContentComponent,
         QuickPickComponent
 

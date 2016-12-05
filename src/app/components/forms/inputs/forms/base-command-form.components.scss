@@ -11,7 +11,7 @@ base-command-form .form-section {
     width: 100%;
     position: relative;
 
-    expression-input, input, input:not([type="radio"]), input:not([type="checkbox"]) {
+    ct-expression-input, input, input:not([type="radio"]), input:not([type="checkbox"]) {
         width: calc(100% - 20px);
         display: inline-block;
     }
