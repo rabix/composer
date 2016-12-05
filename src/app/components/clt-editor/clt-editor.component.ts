@@ -17,9 +17,6 @@ require("./clt-editor.component.scss");
             <form [class.col-xs-6]="showInspector" 
                   [class.col-xs-12]="!showInspector" 
                   [formGroup]="formGroup">
-
-                <ct-resources [entries]="resources" [readonly]="readonly" (update)="setResource($event)"></ct-resources>
-
                   
                 <docker-image-form [dockerRequirement]="model.hints.DockerRequirement"
                                    [form]="formGroup.controls['dockerGroup']"
@@ -35,6 +32,8 @@ require("./clt-editor.component.scss");
                 <inputs-ports-form [cltModel]="model"></inputs-ports-form>
                 
                 <ct-output-ports [entries]="model.outputs || []" [readonly]="readonly"></ct-output-ports>
+                
+                <ct-resources [entries]="resources" [readonly]="readonly" (update)="setResource($event)"></ct-resources>
                 
                 <ct-hint-list [entries]="model.hints || {}" [readonly]="readonly"></ct-hint-list>
                 

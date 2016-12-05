@@ -34,20 +34,12 @@ require("./quick-pick.component.scss");
             (click)="createControl('')">Custom
     </button>
 
-    <div class="expression-input-wrapper content-wrapper"
-         *ngIf="showCustom" ngSwitch="type">
-         
-
+    <div *ngIf="showCustom" ngSwitch="type" class="removable-form-control">
         <input *ngSwitchCase="'number'" type="number" class="form-control" [formControl]="customControl">
-        <input *ngSwitchDefault type="number" class="form-control" [formControl]="customControl">
+        <input *ngSwitchDefault type="text" class="form-control" [formControl]="customControl">
         
-        <!--<expression-input class="col-sm-11 expression-input"-->
-        <!--[context]="context"-->
-        <!--[formControl]="customControl">-->
-        <!--</expression-input>-->
-
-        <span class="col-sm-1">
-            <i class="fa fa-trash clear-icon" (click)="removeControl()"></i>
+        <span class="remove-icon" (click)="removeControl()">
+            <i class="fa fa-trash"></i>
         </span>
     </div>
 </div>

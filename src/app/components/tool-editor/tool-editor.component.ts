@@ -139,14 +139,6 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
             this.rawEditorContent.next(val);
         });
 
-        this.tracked = this.webWorkerService.validationResultStream.first().subscribe(r => {
-            if (r.isValidCwl) {
-                this.toolModel = new CommandLineToolModel("document", Yaml.safeLoad(this.rawEditorContent.getValue(), {json: true}));
-                this.toolModel.validate();
-                this.switchView(ViewMode.Gui);
-            }
-        });
-
         this.tracked = this.webWorkerService.validationResultStream.map(r => {
             if (!r.isValidCwl) return r;
 

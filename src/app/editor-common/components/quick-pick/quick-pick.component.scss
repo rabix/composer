@@ -10,18 +10,20 @@ ct-quick-pick {
             height: $btn-line-height + 2 * $btn-padding-y;
             margin-right: 10px;
 
-            input[type="radio"] {
-                position: absolute;
-                clip: rect(0,0,0,0);
-                pointer-events: none;
-            }
-
             &.selected {
                 line-height: $btn-line-height - .25rem;
                 border: 2px solid $brand-primary;
             }
         }
+    }
 
+    .custom-wrapper {
+        overflow: hidden;
+
+        input {
+            float: left;
+            margin-right: 30px;
+        }
     }
 }
 
