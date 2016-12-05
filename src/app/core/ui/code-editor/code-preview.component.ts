@@ -1,12 +1,13 @@
-import {Component, Input, ChangeDetectionStrategy, HostBinding, Output} from "@angular/core";
+import {Component, Input, ChangeDetectionStrategy, HostBinding, Output, ViewChild} from "@angular/core";
 import {Observable} from "rxjs";
 import {ComponentBase} from "../../../components/common/component-base";
+import {CodeEditorComponent} from "./code-editor.component";
 
 @Component({
     selector: "ct-code-preview",
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-        <ct-code-editor-x 
+        <ct-code-editor-x #editor
           [(content)]="contentStream"
           [language]="language"
           [options]="{
@@ -39,18 +40,25 @@ export class CodePreviewComponent extends ComponentBase {
     @Output()
     public viewReady;
 
+    @ViewChild("editor", {read: CodeEditorComponent})
+    private editor: CodeEditorComponent;
+
     private contentStream: Observable<string>;
 
-    constructor(){
+    constructor() {
         super();
     }
 
     ngOnInit() {
-        console.log("Rendered");
         this.contentStream = Observable.of(this.content);
     }
 
-    ngOnDestroy(){
-        console.log("Destoying");
+    ngAfterViewInit() {
+        const editor     = this.editor.getEditorInstance();
+        const lineNum    = editor.getValue().trim().split(/\r\n|\r|\n/).length;
+        const lineHeight = 16; // Sorry for hardcoding, low priority
+
+        this.height = Math.min(lineNum, 20) * lineHeight;
+        super.ngAfterViewInit();
     }
 }

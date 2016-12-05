@@ -4,7 +4,7 @@ import {OpenTabAction} from "../../action-events";
 import {TabData} from "./tab-data.interface";
 import {ComponentBase} from "../common/component-base";
 import {IpcService} from "../../services/ipc.service";
-import {MenuItem} from "../menu/menu-item";
+import {MenuItem} from "../../core/ui/menu/menu-item";
 
 require("./workbox.component.scss");
 
@@ -59,6 +59,22 @@ export class WorkboxComponent extends ComponentBase implements OnInit {
         this.tracked = this.ipc.watch("accelerator", "CmdOrCtrl+W").subscribe(() => {
             this.removeTab(this.tabs.indexOf(this.activeTab));
         });
+
+        // Switch to the tab on the right
+        this.tracked = this.ipc.watch("accelerator", "CmdOrCtrl+Shift+]")
+            .filter(_ => this.activeTab && this.tabs.length > 1)
+            .subscribe(() => {
+                const index    = this.tabs.indexOf(this.activeTab);
+                this.activeTab = index === (this.tabs.length - 1) ? this.tabs[0] : this.tabs[index + 1];
+            });
+
+        // Switch to the tab on the left
+        this.tracked = this.ipc.watch("accelerator", "CmdOrCtrl+Shift+[")
+            .filter(_ => this.activeTab && this.tabs.length > 1)
+            .subscribe(() => {
+                const index    = this.tabs.indexOf(this.activeTab);
+                this.activeTab = index ? this.tabs[index - 1] : this.tabs[this.tabs.length - 1];
+            });
 
         this.tracked = this.eventHub.onValueFrom(OpenTabAction).subscribe((tab: TabData) => {
             // Check if that tab id is already open. If so, activate that tab and we're done.

@@ -1,38 +1,37 @@
-import {Directive, Input, HostListener, EmbeddedViewRef} from "@angular/core";
-import {EditorInspectorComponent} from "./editor-inspector.component";
+import {Directive, Input, HostListener, TemplateRef, HostBinding, ChangeDetectorRef} from "@angular/core";
 import {EditorInspectorService} from "./editor-inspector.service";
+import {ComponentBase} from "../../components/common/component-base";
 
 @Directive({
     selector: "[ct-editor-inspector]",
 })
-export class EditorInspectorDirective {
+export class EditorInspectorDirective extends ComponentBase {
 
     @Input("ct-editor-inspector")
-    public content: EditorInspectorComponent;
+    public content: TemplateRef<any>;
 
-    private embedded: EmbeddedViewRef<any>;
+    @Input("ct-editor-inspector-target")
+    public target: any = this;
 
-    constructor(private inspector: EditorInspectorService) {
+    @HostBinding("class.ct-inspected")
+    private isInspected = false;
+
+    constructor(private inspector: EditorInspectorService,
+                cdRef: ChangeDetectorRef) {
+        super();
+
+        this.tracked = this.inspector.inspectedObject.map(obj => obj === this.target)
+            .subscribe(selected => {
+                this.isInspected = selected;
+
+                cdRef.markForCheck();
+            });
     }
 
     @HostListener("click")
     public open() {
-
-        if (this.inspector.isInspecting(this)) {
-            return;
-        }
-
-        const hostView = this.inspector.getHostView();
-
-        if (this.embedded) {
-            this.embedded.destroy();
-            this.embedded = undefined;
-        }
-
-        hostView.clear();
-
-        this.embedded = hostView.createEmbeddedView(this.content as any, null, 0);
-        this.inspector.show(this);
+        this.inspector.show(this.content, this.target);
     }
+
 
 }

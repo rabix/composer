@@ -6,25 +6,34 @@ import {ArgumentListComponent} from "./sections/arguments/argument-list.componen
 import {FileDefListComponent} from "./sections/file-def-list/file-def-list.component";
 import {ResourcesComponent} from "./sections/resources/resources.component";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {ToolInputListComponent} from "./sections/inputs/tool-input-list.component";
+import {CWLModule} from "../cwl/cwl.module";
+import {ToolInputInspector} from "./sections/inputs/tool-input-inspector.component";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 
 @NgModule({
     declarations: [
         ArgumentListComponent,
         FileDefListComponent,
+        ToolInputListComponent,
+        ToolInputInspector,
         ResourcesComponent
     ],
     exports: [
         ArgumentListComponent,
         FileDefListComponent,
         ResourcesComponent
+        ToolInputListComponent,
+        ToolInputInspector,
     ],
     imports: [
         BrowserModule,
-        EditorCommonModule,
         CoreModule,
+        CWLModule,
+        EditorCommonModule,
+        ReactiveFormsModule,
         FormsModule,
-        ReactiveFormsModule
     ]
 })
 export class ToolEditorModule {

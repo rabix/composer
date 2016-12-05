@@ -1,7 +1,7 @@
 import {Observable} from "rxjs/Rx";
 
 export interface TreeNode {
-    id: string;
+    id?: string;
     name: string;
     icon?: Observable<string>,
     isExpandable?: boolean;

@@ -40,7 +40,7 @@ require("./argument-list.component.scss");
                                                  [content]="entry.value"></ct-code-preview>
                                 
                             </ct-tooltip-content>
-                            <div class="col-sm-4 ellipsis" [ct-tooltip]="ctt" [tooltipPlacement]="'right'">
+                            <div class="col-sm-4 ellipsis" [ct-tooltip]="ctt" [tooltipPlacement]="'top'">
                                 {{ entry.value }}
                             </div>
                             
@@ -58,9 +58,8 @@ require("./argument-list.component.scss");
                                 'col-sm-2': readonly
                             }" >{{ entry.position }}</div>
                             
-                            <ct-tooltip-content #del>Delete</ct-tooltip-content>
                             <div *ngIf="!readonly" class="col-sm-1 align-right">
-                                <i [ct-tooltip]="del"
+                                <i [ct-tooltip]="'Delete'"
                                    class="fa fa-trash text-hover-danger" 
                                    (click)="removeEntry(i)"></i>
                             </div>

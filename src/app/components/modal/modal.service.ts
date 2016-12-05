@@ -22,7 +22,7 @@ export class ModalService {
     private onClose = new Subject<any>();
 
     constructor(private resolver: ComponentFactoryResolver) {
-        
+
         this.onClose.subscribe(_ => {
             this.cleanComponentRef();
         });
@@ -31,7 +31,15 @@ export class ModalService {
     /**
      * Open a modal window with the given component inside it.
      */
-    public show<T>(component: {new(): T; }, options?: ModalOptions): T {
+    public show<T>(component: {new(): T;}, options?: ModalOptions): T {
+
+        const config = Object.assign({
+            backdrop: false,
+            closeOnEscape: true,
+            closeOnOutsideClick: true,
+            componentState: {},
+            title: "",
+        } as ModalOptions, options);
 
         // If some other modal is open, close it
         this.close();
@@ -40,9 +48,9 @@ export class ModalService {
         const componentFactory = this.resolver.resolveComponentFactory(component);
 
         this.modalComponentRef = this.rootViewRef.createComponent(modalFactory);
-        this.modalComponentRef.instance.configure<any>(options);
+        this.modalComponentRef.instance.configure<T>(config);
 
-        const componentRef = this.modalComponentRef.instance.produce<T>(componentFactory, options.componentState || {});
+        const componentRef = this.modalComponentRef.instance.produce<T>(componentFactory, config.componentState || {});
 
         return componentRef.instance;
     }

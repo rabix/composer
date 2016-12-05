@@ -35,8 +35,4 @@ export class FormPanelComponent {
     private toggle() {
         this.collapsed = !this.collapsed;
     }
-
-    ngOnDestroy(){
-        console.log("Destroying panel");
-    }
 }

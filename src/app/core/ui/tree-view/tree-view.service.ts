@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {TreeNodeComponent} from "./tree-node.component";
-import {UserPreferencesService} from "../../services/storage/user-preferences.service";
+import {UserPreferencesService} from "../../../services/storage/user-preferences.service";
 
 
 @Injectable()

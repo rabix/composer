@@ -7,12 +7,9 @@ import {ComponentBase} from "../../../common/component-base";
 import {DockerRequirement} from "cwlts/mappings/d2sb/DockerRequirement";
 
 @Component({
-    selector: 'docker-image-form',
-    directives: [
-        FormPanelComponent
-    ],
+    selector: 'ct-docker-image-form',
     template: `
-        <ct-form-section>
+        <ct-form-panel>
             <div class="tc-header">
                 Docker Image
             </div>
@@ -28,7 +25,7 @@ import {DockerRequirement} from "cwlts/mappings/d2sb/DockerRequirement";
                            [formControl]="form.controls['dockerPull']">
                 </form>
             </div>
-        </ct-form-section>
+        </ct-form-panel>
     `
 })
 export class DockerImageFormComponent extends ComponentBase implements OnInit {

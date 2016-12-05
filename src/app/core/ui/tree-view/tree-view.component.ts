@@ -3,8 +3,8 @@ import {Observable} from "rxjs";
 import {TreeNode} from "./types";
 import {TreeNodeComponent} from "./tree-node.component";
 import {TreeViewService} from "./tree-view.service";
-import {DomEventService} from "../../services/dom/dom-event.service";
-import {ComponentBase} from "../common/component-base";
+import {ComponentBase} from "../../../components/common/component-base";
+import {DomEventService} from "../../../services/dom/dom-event.service";
 
 require("./tree-view.component.scss");
 
@@ -55,7 +55,7 @@ export class TreeViewComponent extends ComponentBase {
             .subscribe((data) => {
 
                 // Get all nodes underneath this tree as dom elements
-                const domNodes = (Array.from(document.getElementsByClassName("node-base")) as Array)
+                const domNodes = (Array.from(document.getElementsByClassName("node-base")) as Element[])
                     .filter((el: Element) => this.el === el || this.el.contains(el));
 
                 // Find the currently selected element within
@@ -143,20 +143,20 @@ export class TreeViewComponent extends ComponentBase {
     private observeArrowToggling(): Observable<"close"|"open"> {
 
         return this.domEvents.on("keydown", this.el)
-            .filter(ev => [37, 39].indexOf(ev.keyCode) !== -1)
+            .filter((ev: KeyboardEvent) => [37, 39].indexOf(ev.keyCode) !== -1)
             .map((ev: KeyboardEvent) => ev.keyCode === 37 ? "close" : "open");
     }
 
     private observeArrowNavigation(): Observable<"up"|"down"> {
 
         return this.domEvents.on("keydown", this.el)
-            .filter(ev => [38, 40].indexOf(ev.keyCode) !== -1)
+            .filter((ev: KeyboardEvent) => [38, 40].indexOf(ev.keyCode) !== -1)
             .map((ev: KeyboardEvent) => ev.keyCode === 38 ? "up" : "down");
     }
 
     private observeNodeOpening() {
         return this.domEvents.on("keyup", this.el)
-            .filter(ev => ev.keyCode === 13)
+            .filter((ev: KeyboardEvent) => ev.keyCode === 13)
             .flatMap(_ => this.tree.selectedNode.first())
             .filter(n => !!n);
     }

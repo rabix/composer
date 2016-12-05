@@ -34,8 +34,4 @@ export class EditorInspectorContentComponent {
     private close() {
         this.inspector.hide();
     }
-
-    ngOnDestroy(){
-        console.log("DEstroying content");
-    }
 }

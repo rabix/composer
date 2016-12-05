@@ -1,5 +1,5 @@
 import {Subscription, AsyncSubject} from "rxjs";
-import {OnDestroy, Output, EventEmitter} from "@angular/core";
+import {OnDestroy} from "@angular/core";
 
 export abstract class ComponentBase implements OnDestroy {
 

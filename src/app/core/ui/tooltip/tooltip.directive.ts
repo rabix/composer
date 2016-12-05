@@ -1,12 +1,14 @@
 import {Directive, HostListener, ComponentRef, ViewContainerRef, Input, ComponentFactoryResolver} from "@angular/core";
 import {TooltipContentComponent} from "./tooltip-content.component";
 import {TooltipPlacement} from "./types";
+import {ComponentBase} from "../../../components/common/component-base";
+import {Observable} from "rxjs";
 
 
 @Directive({
     selector: "[ct-tooltip]"
 })
-export class TooltipDirective {
+export class TooltipDirective extends ComponentBase {
 
     @Input("ct-tooltip")
     public content: string | TooltipContentComponent;
@@ -26,10 +28,9 @@ export class TooltipDirective {
 
     constructor(private viewContainerRef: ViewContainerRef,
                 private resolver: ComponentFactoryResolver) {
-    }
 
-    ngOnInit(){
-        console.log("Content ", this.content);
+        super();
+
     }
 
     @HostListener("focusin")
@@ -48,15 +49,21 @@ export class TooltipDirective {
             const factory = this.resolver.resolveComponentFactory(TooltipContentComponent);
             this.tooltip  = this.viewContainerRef.createComponent(factory);
 
-            instance = this.tooltip.instance;
+            instance         = this.tooltip.instance;
+            instance.content = this.content;
         }
-        console.log("Instance", instance);
 
         instance.hostElement = this.viewContainerRef.element.nativeElement;
         instance.placement   = this.tooltipPlacement;
         instance.animation   = this.tooltipAnimation;
 
         instance.show();
+
+        this.tracked = Observable.fromEvent(window, "scroll", true).first().subscribe(_ => {
+            console.log("SCrolling");
+            this.hide();
+        });
+
         return;
     }
 

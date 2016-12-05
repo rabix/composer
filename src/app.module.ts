@@ -23,7 +23,6 @@ import {SettingsComponent} from "./app/components/settings";
 import {SidebarComponent} from "./app/components/sidebar/sidebar.component";
 import {TabManagerComponent} from "./app/components/tab-manager/tab-manager.component";
 import {ToolEditorComponent} from "./app/components/tool-editor/tool-editor.component";
-import {TreeNodeComponent, TreeViewComponent} from "./app/components/tree-view";
 import {ValidationIssuesComponent} from "./app/components/validation-issues/validation-issues.component";
 import {ViewModeSwitchComponent} from "./app/components/view-switcher/view-switcher.component";
 import {SettingsButtonComponent} from "./app/components/workbox/settings-button.component";
@@ -41,8 +40,6 @@ import {InputInspectorComponent} from "./app/components/sidebar/object-inpsector
 import {ExpressionEditorComponent} from "./app/components/sidebar/expression-editor/expression-editor.component";
 import {BasicInputSectionComponent} from "./app/components/sidebar/object-inpsector/basic-section/basic-input-section.component";
 import {ToggleComponent} from "./app/components/common/toggle-slider/toggle-slider.component";
-import {ContextDirective} from "./app/services/context/context.directive";
-import {MenuComponent, MenuItemComponent} from "./app/components/menu";
 import {ModalComponent, ModalService} from "./app/components/modal";
 import {ConfirmComponent} from "./app/components/modal/common/confirm.component";
 import {RadioGroupComponent} from "./app/components/forms/elements/radio-group.component";
@@ -62,14 +59,17 @@ import {HintListComponent} from "./app/components/clt-editor/hints/hint-list.com
 import {EditorCommonModule} from "./app/editor-common/editor-common.module";
 import {CompactListComponent} from "./app/components/compact-list/compact-list.component";
 import {EditableDirective} from "./app/directives/editable.directive";
-import {TreeNodeIconComponent} from "./app/components/tree-view/tree-node-icon.component";
 import {ProjectSelectionModal} from "./app/components/modal/custom/project-selection-modal.component";
+import {UserPreferencesService} from "./app/services/storage/user-preferences.service";
+import {DomEventService} from "./app/services/dom/dom-event.service";
 
 @NgModule({
     providers: [
         FormBuilder,
         ModalService,
-        TemplateProviderService
+        TemplateProviderService,
+        UserPreferencesService,
+        DomEventService,
     ],
     declarations: [
         AlertComponent,
@@ -82,7 +82,6 @@ import {ProjectSelectionModal} from "./app/components/modal/custom/project-selec
         CodeEditorDirective,
         CommandLineComponent,
         ConfirmComponent,
-        ContextDirective,
         DockerImageFormComponent,
         ExpressionEditorComponent,
         ExpressionEditorSidebarComponent,
@@ -97,8 +96,6 @@ import {ProjectSelectionModal} from "./app/components/modal/custom/project-selec
         LayoutComponent,
         LocalFilesPanelComponent,
         MainComponent,
-        MenuComponent,
-        MenuItemComponent,
         ModalComponent,
         NewFileModalComponent,
         OutputPortsComponent,
@@ -122,8 +119,6 @@ import {ProjectSelectionModal} from "./app/components/modal/custom/project-selec
         ToggleComponent,
         ToolEditorComponent,
         ToolHeaderComponent,
-        TreeNodeComponent,
-        TreeViewComponent,
         ValidationIssuesComponent,
         ViewModeSwitchComponent,
         WorkboxComponent,
@@ -131,13 +126,10 @@ import {ProjectSelectionModal} from "./app/components/modal/custom/project-selec
         ToggleComponent,
         CompactListComponent,
         EditableDirective,
-        TreeNodeIconComponent,
     ],
     entryComponents: [
         CheckboxPromptComponent,
         ConfirmComponent,
-        MenuComponent,
-        MenuItemComponent,
         ModalComponent,
         NewFileModalComponent,
         ProjectSelectionModal,

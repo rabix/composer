@@ -30,8 +30,7 @@ import {EditorInspectorService} from "../../../editor-common/inspector/editor-in
                     <ul class="gui-section-list">
                         <li *ngFor="let entry of entries; let i = index"
                             [ct-editor-inspector]="inspector"
-                            (click)="selectIndex(i)"
-                            [class.selected]="i === selectedIndex"
+                            (click)="select(entry)"
                             class="gui-section-list-item clickable validatable row">
                             
                             <div class="col-sm-4 ellipsis" [title]="entry?.id">{{ entry?.id }}</div>
@@ -60,12 +59,12 @@ import {EditorInspectorService} from "../../../editor-common/inspector/editor-in
         </ct-form-panel>
         
         <template #inspector>
-            <ct-editor-inspector-content *ngIf="entries[selectedIndex]">
+            <ct-editor-inspector-content *ngIf="selected">
                 <div class="tc-header">
-                    {{ entries[selectedIndex].id}}
+                    {{ selected.id}}
                 </div>
                 <div class="tc-body">
-                    <code>{{ entries[selectedIndex] | json }}</code>
+                    <code>{{ selected | json }}</code>
                 </div>
             </ct-editor-inspector-content>
         </template>
@@ -88,8 +87,9 @@ export class OutputPortsComponent extends ComponentBase {
 
     private helpLink = ExternalLinks.toolOutput;
 
+
     @Input()
-    public selectedIndex;
+    private selected;
 
     constructor(private inspector: EditorInspectorService) {
         super();
@@ -103,7 +103,7 @@ export class OutputPortsComponent extends ComponentBase {
         this.entries = this.entries.slice(0, index).concat(this.entries.slice(index + 1));
     }
 
-    public selectIndex(i) {
-        this.selectedIndex = i;
+    private select(entry){
+        this.selected = entry;
     }
 }
