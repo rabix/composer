@@ -198,6 +198,10 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
             if (!!value.items && this.input.type.type === 'array') {
                 this.input.type.items = value.items;
             }
+
+            if (this.input.type.type === 'enum' || this.input.type.type === 'record') {
+                this.input.type.name = this.input.id;
+            }
         });
     }
 }

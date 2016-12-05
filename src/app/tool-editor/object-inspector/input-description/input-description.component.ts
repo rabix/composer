@@ -101,7 +101,7 @@ export class InputDescriptionComponent extends ComponentBase implements ControlV
         if (trimmedFileTypes.length > 0) {
             this.input.customProps["sbg:fileTypes"] = trimmedFileTypes;
         } else {
-            delete this.input.customProps["sbg:fileTypes"];
+            this.input.customProps["sbg:fileTypes"] = undefined;
         }
     }
 
