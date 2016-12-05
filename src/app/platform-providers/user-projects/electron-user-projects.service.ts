@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
 import {LocalDataSourceService} from "../../sources/local/local.source.service";
-import {MenuItem} from "../../components/menu/menu-item";
 import {UserProjectsService} from "./user-projects.service";
+import {MenuItem} from "../../core/ui/menu/menu-item";
 
 const {app, dialog} = window.require("electron").remote;
 

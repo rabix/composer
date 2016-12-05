@@ -36,9 +36,7 @@ require("./main.component.scss");
         PlatformAPI,
         SBPlatformDataSourceService,
         SettingsService,
-        ContextService
-
-        UserPreferencesService,
+        ContextService,
         // FIXME: this needs to be handled in a system-specific way
         GuidService,
         IpcService,
