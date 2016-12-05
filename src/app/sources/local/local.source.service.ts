@@ -62,7 +62,7 @@ export class LocalDataSourceService {
         return this.ipc.request("readFileContent", path, this.zone);
     }
 
-    private getContentSavingFunction(path) {
+    public getContentSavingFunction(path) {
 
         return content => this.ipc.request("saveFileContent", {path, content}, this.zone);
 
