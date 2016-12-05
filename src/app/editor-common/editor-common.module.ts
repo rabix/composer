@@ -17,21 +17,15 @@ import {ModelExpressionEditorComponent} from "./expression-editor/model-expressi
         BlankToolStateComponent,
         EditorInspectorComponent,
         EditorInspectorContentComponent,
-        EditorInspectorDirective,
         ExpressionEditorComponent,
         FileDefContentPipe,
         FileDefNamePipe,
         EditorInspectorDirective,
-        EditorInspectorComponent,
-        EditorInspectorContentComponent,
-        QuickPickComponent
+        QuickPickComponent,
         ModelExpressionEditorComponent,
     ],
     exports: [
         BlankToolStateComponent,
-        EditorInspectorComponent,
-        EditorInspectorContentComponent,
-        EditorInspectorDirective,
         ExpressionEditorComponent,
         FileDefContentPipe,
         FileDefNamePipe,
@@ -48,8 +42,7 @@ import {ModelExpressionEditorComponent} from "./expression-editor/model-expressi
         ExpressionEditorComponent,
         ModelExpressionEditorComponent,
     ],
-    imports: [CoreModule, BrowserModule]
-    imports: [BrowserModule, FormsModule, ReactiveFormsModule]
+    imports: [BrowserModule, CoreModule, FormsModule, ReactiveFormsModule]
 })
 export class EditorCommonModule {
 
