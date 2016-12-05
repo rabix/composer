@@ -37,6 +37,18 @@ require("./expression-input.component.scss");
                 
                     <input class="form-control"
                             #input
+                            *ngIf="type === 'string'"
+                            type="text"
+                            [value]="value?.toString()"
+                            [readonly]="isExpr"
+                            (blur)="onTouch()"
+                            (click)="editExpr(isExpr ? 'edit' : null, $event)"
+                            (change)="editString(input.value)"/>
+                            
+                    <input class="form-control"
+                            #input
+                            type="number"
+                            *ngIf="type === 'number'"
                             [value]="value?.toString()"
                             [readonly]="isExpr"
                             (blur)="onTouch()"
@@ -62,6 +74,9 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
      */
     @Input()
     public context: any;
+
+    @Input()
+    public type: "string" | "number" = "string";
 
     /** Flag if model is expression or primitive */
     private isExpr: boolean = false;
@@ -138,8 +153,10 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
      * Callback for setting string value to model
      * @param str
      */
-    private editString(str: string) {
-        this.model.setValue(str, "string");
+    private editString(str: number | string) {
+        //@fixme: returning string on change in number field
+        if (this.type === "number") str = Number(str);
+        this.model.setValue(str, this.type);
         this.onChange(this.model);
     }
 
@@ -172,7 +189,7 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
         }
 
         if (action === "clear") {
-            this.model.setValue("", "string");
+            this.model.setValue("", this.type);
             this.model.result = null;
             this.isExpr       = false;
             event.stopPropagation();

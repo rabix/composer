@@ -35,7 +35,10 @@ require("./quick-pick.component.scss");
     </button>
 
     <div *ngIf="showCustom" ngSwitch="type" class="removable-form-control">
-        <ct-expression-input [context]="context" [formControl]="customControl"></ct-expression-input>
+        <ct-expression-input [context]="context" 
+                             [formControl]="customControl" 
+                             [type]="type">
+        </ct-expression-input>
         
         <span class="remove-icon" (click)="removeControl()">
             <i class="fa fa-trash"></i>
