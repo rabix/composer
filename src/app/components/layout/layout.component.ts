@@ -9,7 +9,6 @@ import {
     PANEL_USER_PROJECTS,
     PANEL_PUBLIC_APPS,
     PANEL_STRUCTURE,
-    PANEL_REVISIONS,
     PanelGroupMap,
     PANEL_LOCAL_FILES
 } from "./layout.types";
@@ -21,6 +20,7 @@ require("./layout.component.scss");
     selector: "ct-layout",
     template: `
         <div class="flex-box">
+            
             <div class="panel-switch-col">
                 <div class="top-bar"></div>
                 <div class="left-panel-bar">
@@ -29,11 +29,18 @@ require("./layout.component.scss");
                                        (statusChange)="onPanelSwitch($event, 'top')"></ct-panel-switcher>
                     
                     <ct-panel-switcher [panels]="(panelSwitches | async)?.bottom.panels" 
-                                       (statusChange)="onPanelSwitch($event, 'bottom')"></ct-panel-switcher>
+                                       (statusChange)="onPanelSwitch($event, 'bottom')"></ct-panel-switcher>                                       
+                       
                 </div>
+                
+                <div class="toggle-panel-left">
+                    <i aria-hidden="true" class="fa fa-caret-square-o-left" 
+                    (click) = "togglePanelLeft()"></i>                    
+                </div> 
             </div>
+            
             <div class="flex-col col-panels" 
-                 [style.flex]="treeSize" 
+                 [style.flex]="treeSize"
                  [class.hidden]="(visiblePanels | async).length === 0">
                  
                 <div class="top-bar fixed">
@@ -74,9 +81,6 @@ export class LayoutComponent extends ComponentBase implements OnInit {
     /** Tracking the panel switches so we know which ones to highlight and where to put them */
     protected panelSwitches: BehaviorSubject<PanelGroupMap>;
 
-    /** Subscriptions to dispose when component gets destroyed */
-    private subs: Subscription[] = [];
-
     private el: Element;
 
     constructor(private preferences: UserPreferencesService, private domEvents: DomEventService, el: ElementRef) {
@@ -91,21 +95,22 @@ export class LayoutComponent extends ComponentBase implements OnInit {
         ]);
 
         const bottom = new PanelGroup([
-            new PanelStatus(PANEL_STRUCTURE, "7: Structure", "list", false, "alt+7"),
-            new PanelStatus(PANEL_REVISIONS, "8: Revisions", "history", false, "alt+8")
+            new PanelStatus(PANEL_STRUCTURE, "7: Structure", "list", false, "alt+7")
         ]);
 
         this.panelSwitches = new BehaviorSubject({top, bottom});
 
         // Retrieve state of opened panels from local storage
-        const tabsToOpen = this.preferences.get("open-tabs", [top.panels[0].id]);
-        tabsToOpen.forEach(panelId => this.switchPanel(panelId));
+        this.tracked = this.preferences.get("open-tabs", [top.panels[0].id])
+            .subscribe(tabs => tabs.forEach(panelId => this.switchPanel(panelId)));
     }
 
     ngOnInit() {
 
         // Layout is resizable, so we need to react when user drags the handle
-        this.tracked = this.domEvents.onDrag(this.handle.nativeElement).map(ev => {
+        this.tracked = this.domEvents.onDrag(this.handle.nativeElement)
+            .do(data => console.debug("Got data", data))
+            .map(ev => {
             const x = ev.clientX;
 
             // You can't make the left column narrower than 200px
@@ -185,5 +190,14 @@ export class LayoutComponent extends ComponentBase implements OnInit {
         this.preferences.put("open-tabs", openedTabsIds);
 
         this.panelSwitches.next(Object.assign({}, next));
+    }
+
+    private togglePanelLeft() {
+        const next = this.panelSwitches.getValue();
+        Object.keys(next)
+            .forEach(position => {
+                next[position].panels.forEach(panel => panel.active = false);
+                this.onPanelSwitch(next[position].panels, position)
+            });
     }
 }

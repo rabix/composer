@@ -1,6 +1,9 @@
 const fsController = require("./controllers/fs.controller");
+const acceleratorController = require("./controllers/accelerator.controller");
 
 module.exports = {
+
+    // File System Routes
 
     saveFileContent: (data, callback) => {
         fsController.saveFileContent(data.path, data.content, callback);
@@ -22,6 +25,11 @@ module.exports = {
     },
     pathExists: (path, callback) => {
         fsController.pathExists(path, callback);
+    },
+
+    // Shortcut Routes
+    accelerator: (name, callback) => {
+        acceleratorController.register(name, callback);
     }
 
 };

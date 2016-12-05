@@ -4,6 +4,11 @@ import {CoreModule} from "../core/core.module";
 import {EditorCommonModule} from "../editor-common/editor-common.module";
 import {ArgumentListComponent} from "./sections/arguments/argument-list.component";
 import {FileDefListComponent} from "./sections/file-def-list/file-def-list.component";
+import {ToolInputListComponent} from "./sections/inputs/tool-input-list.component";
+import {CWLModule} from "../cwl/cwl.module";
+import {ToolInputInspector} from "./sections/inputs/tool-input-inspector.component";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+
 import {BasicInputSectionComponent} from "./object-inspector/basic-section/basic-input-section.component";
 import {InputTypeSelectComponent} from "./common/type-select/type-select.component";
 import {ReactiveFormsModule, FormsModule} from "@angular/forms";
@@ -16,6 +21,8 @@ import {StageInputSectionComponent} from "./object-inspector/stage-input-section
     declarations: [
         ArgumentListComponent,
         FileDefListComponent,
+        ToolInputListComponent,
+        ToolInputInspector,
         BasicInputSectionComponent,
         InputTypeSelectComponent,
         InputDescriptionComponent,
@@ -26,16 +33,19 @@ import {StageInputSectionComponent} from "./object-inspector/stage-input-section
     exports: [
         ArgumentListComponent,
         FileDefListComponent,
+        ToolInputListComponent,
+        ToolInputInspector,
         BasicInputSectionComponent,
         InputDescriptionComponent,
         StageInputSectionComponent
     ],
     imports: [
         BrowserModule,
-        EditorCommonModule,
         CoreModule,
+        CWLModule,
+        EditorCommonModule,
         FormsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
     ]
 })
 export class ToolEditorModule {

@@ -1,21 +1,27 @@
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, Input, OnInit, ViewChild, ViewContainerRef} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
-import {CommandLineToolModel, ExpressionModel} from "cwlts/models/d2sb";
+import {CommandLineToolModel, ExpressionModel, CommandInputParameterModel as InputModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../common/component-base";
 import {FileDef} from "cwlts/mappings/d2sb/FileDef";
+import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
+import {ProcessRequirement} from "cwlts/mappings/v1.0";
 import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 
 require("./clt-editor.component.scss");
 
 @Component({
     selector: "ct-clt-editor",
+    providers: [EditorInspectorService],
     template: `
-            <form class="clt-editor-group" [formGroup]="formGroup">
-                <docker-image-form class="input-form" 
-                                [group]="formGroup"
-                                [cltModel]="model"
-                                [dockerPull]="'some.docker.image.com'">
-                </docker-image-form>
+        
+        <div class="row ">       
+            <form [class.col-xs-6]="showInspector" 
+                  [class.col-xs-12]="!showInspector" 
+                  [formGroup]="formGroup">
+                <ct-docker-image-form [dockerRequirement]="model.hints.DockerRequirement"
+                                   [form]="formGroup.controls['dockerGroup']"
+                                   (update)="setRequirement($event, true)">
+                </ct-docker-image-form>
                                 
                 <base-command-form [baseCommand]="model.baseCommand"
                                    [context]="{$job: model.job}"
@@ -23,20 +29,24 @@ require("./clt-editor.component.scss");
                                    (update)="setBaseCommand($event)">
                 </base-command-form>
                 
-                <inputs-ports-form [cltModel]="model" 
-                                   [form]="formGroup.controls['inputPortsGroup']"
-                                   (update)="setInputs($event)"></inputs-ports-form>
+                <!--<inputs-ports-form [cltModel]="model"></inputs-ports-form>-->
+                
+                <ct-tool-input-list [location]="model.loc + '.inputs'" [entries]="model.inputs" (update)="updateModel('inputs', $event)"></ct-tool-input-list>
                 
                 <ct-output-ports [entries]="model.outputs || []" [readonly]="readonly"></ct-output-ports>
                 
-                <ct-hint-list [entries]="model.hints || []" [readonly]="readonly"></ct-hint-list>
+                <ct-hint-list [entries]="model.hints || {}" [readonly]="readonly"></ct-hint-list>
                 
                 <ct-argument-list [entries]="model.arguments || []" [readonly]="readonly"></ct-argument-list>
                 
-                <ct-file-def-list [entries]="fileDefs || []"></ct-file-def-list>
+                <ct-file-def-list [entries]="model.requirements.CreateFileRequirement?.fileDef || []"></ct-file-def-list>
             </form>
+            
+            <ct-editor-inspector class="col-xs-6" [hidden]="!showInspector">
+                <template #inspector></template>
+            </ct-editor-inspector>
+        </div>
 
-            <sidebar-component></sidebar-component>
     `
 })
 export class CltEditorComponent extends ComponentBase implements OnInit {
@@ -53,21 +63,52 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
 
     private fileDefs: FileDef[] = [];
 
-    constructor(private formBuilder: FormBuilder) {
+    @ViewChild("inspector", {read: ViewContainerRef})
+    private inspectorContent: ViewContainerRef;
+
+    @Input()
+    public showInspector = false;
+
+    constructor(private formBuilder: FormBuilder,
+                private inspector: EditorInspectorService) {
         super();
+
+        this.tracked = this.inspector.inspectedObject.map(obj => obj !== undefined)
+            .subscribe(show => this.showInspector = show);
     }
 
     ngOnInit() {
-        console.log("Model", this.model);
-        this.formGroup.addControl("dockerInputGroup", this.formBuilder.group({}));
+        this.formGroup.addControl("dockerGroup", this.formBuilder.group({}));
         this.formGroup.addControl("baseCommandGroup", this.formBuilder.group({}));
-        this.formGroup.addControl("inputPortsGroup", this.formBuilder.group({}));
+        this.formGroup.addControl("inputs", this.formBuilder.group({}));
 
-        this.fileDefs = Object.keys(this.model.requirements)
-            .map(key => this.model.requirements[key])
-            .filter(req => req.class === "CreateFileRequirement")
-            .map(req => req.fileDef)
-            .reduce((acc, item) => acc.concat(item) , []);
+        console.log("Model", this.model);
+
+        this.fileDefs = [];
+        if (this.model.requirements["CreateFileRequirement"]) {
+            this.fileDefs = this.model.requirements["CreateFileRequirement"].fileDef;
+        }
+
+    }
+
+    private updateModel(category: string, data: any) {
+
+        if (category === "inputs") {
+            this.model.inputs = [];
+            data.forEach(input => this.model.addInput(input));
+        }
+
+        if (this.formGroup.controls[category] instanceof FormGroup) {
+            this.formGroup.controls[category].markAsDirty();
+        }
+    }
+
+    private setRequirement(req: ProcessRequirement, hint: boolean) {
+        this.model.setRequirement(req, hint);
+    }
+
+    ngAfterViewInit() {
+        this.inspector.setHostView(this.inspectorContent);
     }
 
     private setBaseCommand(list: ExpressionModel[]) {
@@ -75,10 +116,4 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
         list.forEach(cmd => this.model.addBaseCommand(cmd));
     }
 
-    private setInputs(inputs: InputProperty[]) {
-        this.model.inputs = [];
-        inputs.forEach((input: InputProperty) => {
-            this.model.addInput(input)
-        });
-    }
 }

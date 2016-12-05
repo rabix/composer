@@ -1,19 +1,20 @@
 import {Pipe, PipeTransform} from "@angular/core";
-import {TypeResolver} from "cwlts/models/helpers";
 
-@Pipe({name: "commandParameterType"})
+/**
+ * FIXME: make this pure -> {@link ToolInputListComponent.updateInput}
+ */
+@Pipe({name: "commandParameterType", pure: false})
 export class CommandParameterTypePipe implements PipeTransform {
     transform(type): any {
 
         try {
-            const resolved = TypeResolver.resolveType(type);
-            let output     = resolved.type;
+            let output = type.type;
 
-            if (resolved.type === "array") {
-                output = `Array<${resolved.items}>`;
+            if (type.type === "array") {
+                output = `Array<${type.items}>`;
             }
 
-            return output + (resolved.isRequired ? "" : "?");
+            return output + (type.isNullable ? "?" : "");
         } catch (ex) {
             return "n/a";
         }

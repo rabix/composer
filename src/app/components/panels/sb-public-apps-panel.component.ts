@@ -1,16 +1,15 @@
-import {Component} from "@angular/core";
-import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
-import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {Observable, BehaviorSubject} from "rxjs";
-import {OpenTabAction} from "../../action-events";
-import {TreeViewComponent} from "../tree-view";
-import {PanelToolbarComponent} from "./panel-toolbar.component";
-import {SettingsService} from "../../services/settings/settings.service";
+import {Component} from "@angular/core";
+import {EventHubService} from "../../services/event-hub/event-hub.service";
+import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {PlatformAppEntry} from "../../services/api/platforms/platform-api.types";
-
+import {SettingsService} from "../../services/settings/settings.service";
+import {OpenTabAction} from "../../action-events/index";
+import {OpenTabAction} from "../../action-events/index";
+import {PublicAppService} from "../../platform-providers/public-apps/public-app.service";
+import {MenuItem} from "../../core/ui/menu/menu-item"
 @Component({
     selector: "ct-sb-public-apps-panel",
-    directives: [TreeViewComponent, PanelToolbarComponent],
     host: {class: "block"},
     template: `
         <ct-panel-toolbar>
@@ -21,7 +20,7 @@ import {PlatformAppEntry} from "../../services/api/platforms/platform-api.types"
              <div class="text-xs-center"><small>Fetching Public Apps&hellip;</small></div>
             <progress class="progress progress-striped progress-animated" value="100" max="100"></progress>
         </div>
-        <ct-tree-view [nodes]="nodes"></ct-tree-view>
+        <ct-tree-view [nodes]="nodes" [preferenceKey]="'public-apps'"></ct-tree-view>
     `
 })
 export class SBPublicAppsPanelComponent {
@@ -32,7 +31,8 @@ export class SBPublicAppsPanelComponent {
 
     constructor(private platform: PlatformAPI,
                 private eventHub: EventHubService,
-                private settings: SettingsService) {
+                private settings: SettingsService,
+                private contextMenu: PublicAppService) {
     }
 
     ngOnInit() {
@@ -42,14 +42,16 @@ export class SBPublicAppsPanelComponent {
         this.settings.platformConfiguration
             .do(_ => this.isLoading = true)
             .flatMap(_ => this.platform.getPublicApps().map(apps => {
-
-
                 const categorized = apps.map(app => {
+                    const content = Observable.of(1).switchMap(_ => this.platform.getAppCWL(app))
+                        .switchMap(cwl => new BehaviorSubject(cwl)).share();
                     return {
                         name: app.label,
                         icon: app.class || "file",
                         isExpandable: false,
                         toolkit: app["sbg:toolkit"],
+                        content,
+                        contextMenu: this.contextMenu.getContextMenu(app.label, content),
                         openHandler: _ => {
                             this.eventHub.publish(new OpenTabAction({
                                 id: app.id,
@@ -58,7 +60,7 @@ export class SBPublicAppsPanelComponent {
                                 contentData: {
                                     data: app,
                                     isWritable: false,
-                                    content: Observable.of(1).switchMap(_ => this.platform.getAppCWL(app)).switchMap(cwl => new BehaviorSubject(cwl)).share(),
+                                    content,
                                     language: Observable.of("json")
                                 }
                             }));
@@ -76,6 +78,7 @@ export class SBPublicAppsPanelComponent {
 
 
                 return Object.keys(categorized).map(key => ({
+                    id: key,
                     name: key,
                     icon: "angle",
                     isExpandable: true,
@@ -84,10 +87,9 @@ export class SBPublicAppsPanelComponent {
 
             })).subscribe(categories => {
             this.isLoading = false;
-            this.nodes     = categories;
+            this.nodes = categories;
         }, err => {
             this.isLoading = false;
         });
     }
-
 }

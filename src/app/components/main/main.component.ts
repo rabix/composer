@@ -2,8 +2,6 @@
 /// <reference path="../../../../node_modules/typescript/lib/lib.es6.d.ts" />
 import {Component, ViewContainerRef} from "@angular/core";
 import {Observable} from "rxjs/Rx";
-import {ContextService} from "../../services/context/context.service";
-import {DomEventService} from "../../services/dom/dom-event.service";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {FileRegistry} from "../../services/file-registry.service";
 import {InputPortService} from "../../services/input-port/input-port.service";
@@ -11,8 +9,15 @@ import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {SBPlatformDataSourceService} from "../../sources/sbg/sb-platform.source.service";
 import {SettingsService} from "../../services/settings/settings.service";
 import {UrlValidator} from "../../validators/url.validator";
-import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {ModalService} from "../modal/modal.service";
+import {ContextService} from "../../core/ui/context/context.service";
+import {GuidService} from "../../services/guid.service";
+import {IpcService} from "../../services/ipc.service";
+import {LocalDataSourceService} from "../../sources/local/local.source.service";
+import {PublicAppService} from "../../platform-providers/public-apps/public-app.service";
+import {ElectronPublicAppService} from "../../platform-providers/public-apps/electron-public-app.service";
+import {UserProjectsService} from "../../platform-providers/user-projects/user-projects.service";
+import {ElectronUserProjectsService} from "../../platform-providers/user-projects/electron-user-projects.service";
 
 require("./../../../assets/sass/main.scss");
 require("./main.component.scss");
@@ -26,14 +31,18 @@ require("./main.component.scss");
     providers: [
         EventHubService,
         FileRegistry,
-        DomEventService,
         UrlValidator,
         InputPortService,
         PlatformAPI,
         SBPlatformDataSourceService,
         SettingsService,
-        UserPreferencesService,
         ContextService,
+        // FIXME: this needs to be handled in a system-specific way
+        GuidService,
+        IpcService,
+        LocalDataSourceService,
+        {provide: PublicAppService, useClass: ElectronPublicAppService},
+        {provide: UserProjectsService, useClass: ElectronUserProjectsService}
     ],
 })
 export class MainComponent {

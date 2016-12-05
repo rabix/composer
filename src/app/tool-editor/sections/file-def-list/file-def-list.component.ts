@@ -23,12 +23,9 @@ import {ComponentBase} from "../../../components/common/component-base";
                         <div class="col-sm-7">Content</div>
                     </div>
                 
-                    <ul class="gui-section-list row">
-                    
-                         
-                        
+                    <ul class="gui-section-list">
                         <li *ngFor="let entry of entries; let i = index"
-                            class="gui-section-list-item clickable validatable">
+                            class="gui-section-list-item clickable validatable row">
                             
                             <div class="col-sm-5 ellipsis">
                                 {{ entry?.filename | fileDefName }}

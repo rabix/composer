@@ -1,58 +1,60 @@
-import {Component, Input} from "@angular/core";
-import {Validators, FormBuilder, FormGroup} from "@angular/forms";
-import {CommandLineToolModel} from "cwlts/models/d2sb";
-import {FormSectionComponent} from "../../../form-section/form-section.component";
-import {AfterViewInit} from "../../../../../../node_modules/@angular/core/src/metadata/lifecycle_hooks";
+import {Component, Input, OnInit, Output} from "@angular/core";
+import {FormGroup, FormControl} from "@angular/forms";
+import {DockerRequirementModel} from "cwlts/models/d2sb";
+import {FormPanelComponent} from "../../../../core/elements/form-panel.component";
+import {ReplaySubject} from "rxjs";
+import {ComponentBase} from "../../../common/component-base";
+import {DockerRequirement} from "cwlts/mappings/d2sb/DockerRequirement";
 
 @Component({
-    selector: 'docker-image-form',
-    directives: [
-        FormSectionComponent
-    ],
+    selector: 'ct-docker-image-form',
     template: `
-        <ct-form-section>
+        <ct-form-panel>
             <div class="tc-header">
                 Docker Image
             </div>
         
             <div class="tc-body">
-                <form [formGroup]="dockerInputForm">
+                <form [formGroup]="form" *ngIf="form">
         
                     <label for="docker_image" class="form-control-label">Docker Repository</label>
                     <input name="dockerPull"
                            type="text"
                            class="form-control"
                            id="docker_image"
-                           [formControl]="dockerInputForm.controls['dockerInput']"
-                           [(ngModel)]="dockerPull">
+                           [formControl]="form.controls['dockerPull']">
                 </form>
             </div>
-        </ct-form-section>
-            
+        </ct-form-panel>
     `
 })
-export class DockerImageFormComponent implements AfterViewInit {
+export class DockerImageFormComponent extends ComponentBase implements OnInit {
     @Input()
-    public dockerPull: string;
-
-    @Input()
-    public cltModel: CommandLineToolModel;
+    public dockerRequirement: DockerRequirementModel;
 
     /** The parent forms control group */
     @Input()
-    public group: FormGroup;
+    public form: FormGroup;
 
-    private dockerInputForm: FormGroup;
+    @Output()
+    public update = new ReplaySubject<DockerRequirement>();
 
-    constructor(private formBuilder: FormBuilder) {
-        this.dockerInputForm = this.formBuilder.group({
-            dockerInput: ['', Validators.compose([Validators.required, Validators.minLength(1)])]
+    ngOnInit(): void {
+        const dockerPull = this.dockerRequirement ? this.dockerRequirement.dockerPull : "";
+        this.form.addControl("dockerPull", new FormControl(dockerPull));
+
+        this.tracked = this.form.valueChanges.subscribe(changes => {
+            const docker: DockerRequirement = this.dockerRequirement ?
+                this.dockerRequirement.serialize() :
+                new DockerRequirementModel();
+
+            docker.dockerPull = changes["dockerPull"];
+            this.update.next(docker);
         });
-
     }
 
-    ngAfterViewInit(): void {
-        // this.group.addControl('dockerInput', this.dockerInputForm.controls['dockerInput']);
-
+    ngOnDestroy() {
+        super.ngOnDestroy();
+        this.form.removeControl("dockerPull");
     }
 }

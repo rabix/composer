@@ -13,6 +13,9 @@ import {ExpressionSidebarService} from "../../../services/sidebars/expression-si
             </div>
     `
 })
+/**
+ * @deprecated
+ */
 export class ExpressionEditorSidebarComponent {
     constructor(private expressionSidebarService: ExpressionSidebarService) { }
 

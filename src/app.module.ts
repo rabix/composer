@@ -16,7 +16,6 @@ import {FormSectionComponent} from "./app/components/form-section/form-section.c
 import {LocalFilesPanelComponent} from "./app/components/panels/local-files-panel.component";
 import {PanelHandleComponent} from "./app/components/panels/panel-handle.component";
 import {PanelToolbarComponent} from "./app/components/panels/panel-toolbar.component";
-import {RevisionsPanelComponent} from "./app/components/panels/revisions-panel.component";
 import {SBPublicAppsPanelComponent} from "./app/components/panels/sb-public-apps-panel.component";
 import {SBUserProjectsPanelComponent} from "./app/components/panels/sb-user-projects-panel.component";
 import {StructurePanelComponent} from "./app/components/panels/structure-panel.component";
@@ -24,7 +23,6 @@ import {SettingsComponent} from "./app/components/settings";
 import {SidebarComponent} from "./app/components/sidebar/sidebar.component";
 import {TabManagerComponent} from "./app/components/tab-manager/tab-manager.component";
 import {ToolEditorComponent} from "./app/components/tool-editor/tool-editor.component";
-import {TreeNodeComponent, TreeViewComponent} from "./app/components/tree-view";
 import {ValidationIssuesComponent} from "./app/components/validation-issues/validation-issues.component";
 import {ViewModeSwitchComponent} from "./app/components/view-switcher/view-switcher.component";
 import {SettingsButtonComponent} from "./app/components/workbox/settings-button.component";
@@ -41,6 +39,8 @@ import {InputInspectorComponent} from "./app/components/sidebar/object-inpsector
 import {ExpressionEditorComponent} from "./app/components/sidebar/expression-editor/expression-editor.component";
 import {ContextDirective} from "./app/services/context/context.directive";
 import {MenuComponent, MenuItemComponent} from "./app/components/menu";
+import {BasicInputSectionComponent} from "./app/components/sidebar/object-inpsector/basic-section/basic-input-section.component";
+import {ToggleComponent} from "./app/components/common/toggle-slider/toggle-slider.component";
 import {ModalComponent, ModalService} from "./app/components/modal";
 import {ConfirmComponent} from "./app/components/modal/common/confirm.component";
 import {RadioGroupComponent} from "./app/components/forms/elements/radio-group.component";
@@ -59,16 +59,19 @@ import {CWLModule} from "./app/cwl/cwl.module";
 import {HintListComponent} from "./app/components/clt-editor/hints/hint-list.component";
 import {QuickPickComponent} from "./app/components/quick-pick/quick-pick.component";
 import {EditorCommonModule} from "./app/editor-common/editor-common.module";
-import {QuickPickComponent} from "./app/components/quick-pick/quick-pick.component";
 import {CompactListComponent} from "./app/components/compact-list/compact-list.component";
 import {EditableDirective} from "./app/directives/editable.directive";
-import {TreeNodeIconComponent} from "./app/components/tree-view/tree-node-icon.component";
+import {ProjectSelectionModal} from "./app/components/modal/custom/project-selection-modal.component";
+import {UserPreferencesService} from "./app/services/storage/user-preferences.service";
+import {DomEventService} from "./app/services/dom/dom-event.service";
 
 @NgModule({
     providers: [
         FormBuilder,
         ModalService,
-        TemplateProviderService
+        TemplateProviderService,
+        UserPreferencesService,
+        DomEventService,
     ],
     declarations: [
         AlertComponent,
@@ -80,7 +83,6 @@ import {TreeNodeIconComponent} from "./app/components/tree-view/tree-node-icon.c
         CodeEditorDirective,
         CommandLineComponent,
         ConfirmComponent,
-        ContextDirective,
         DockerImageFormComponent,
         ExpressionEditorComponent,
         ExpressionEditorSidebarComponent,
@@ -94,8 +96,6 @@ import {TreeNodeIconComponent} from "./app/components/tree-view/tree-node-icon.c
         LayoutComponent,
         LocalFilesPanelComponent,
         MainComponent,
-        MenuComponent,
-        MenuItemComponent,
         ModalComponent,
         NewFileModalComponent,
         OutputPortsComponent,
@@ -104,10 +104,10 @@ import {TreeNodeIconComponent} from "./app/components/tree-view/tree-node-icon.c
         PanelHandleComponent,
         PanelSwitcherComponent,
         PanelToolbarComponent,
+        ProjectSelectionModal,
         PromptComponent,
         RadioButtonComponent,
         RadioGroupComponent,
-        RevisionsPanelComponent,
         SBPublicAppsPanelComponent,
         SBUserProjectsPanelComponent,
         SettingsButtonComponent,
@@ -118,8 +118,6 @@ import {TreeNodeIconComponent} from "./app/components/tree-view/tree-node-icon.c
         TabManagerComponent,
         ToolEditorComponent,
         ToolHeaderComponent,
-        TreeNodeComponent,
-        TreeViewComponent,
         ValidationIssuesComponent,
         ViewModeSwitchComponent,
         WorkboxComponent,
@@ -128,16 +126,14 @@ import {TreeNodeIconComponent} from "./app/components/tree-view/tree-node-icon.c
         QuickPickComponent,
         CompactListComponent,
         EditableDirective,
-        TreeNodeIconComponent,
     ],
     entryComponents: [
         CheckboxPromptComponent,
         ConfirmComponent,
-        MenuComponent,
-        MenuItemComponent,
         ModalComponent,
         NewFileModalComponent,
-        PromptComponent,
+        ProjectSelectionModal,
+        PromptComponent
     ],
     imports: [
         BrowserModule,

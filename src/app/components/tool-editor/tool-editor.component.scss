@@ -92,14 +92,6 @@ ct-code-editor {
         .error {
             color: $brand-danger;
         }
-
-        .error-text {
-            color: lighten($brand-danger, 30%);
-        }
-
-        .warning-text {
-            color: $brand-warning;
-        }
     }
 }
 
@@ -117,6 +109,8 @@ ct-code-editor {
 
 //@todo(maya) belongs with tool editor or form components
 .gui-section-list-item {
+    transition: all .2s;
+
     background: $gui-section-list-item-bg;
     color: $gui-section-list-item-color;
     border-radius: $gui-section-list-item-border-radius;
@@ -131,12 +125,9 @@ ct-code-editor {
     &:hover {
         background: $gui-section-list-item-hover-bg;
         color: $gui-section-list-item-hover-color;
-        .fa {
-            color: $gui-section-list-item-hover-icon-color;
-        }
     }
 
-    &.selected {
+    &.selected, &.ct-inspected {
         border-color: $gui-section-list-item-select-bg;
         background: $gui-section-list-item-select-bg;
         color: $gui-section-list-item-select-color;
@@ -165,6 +156,15 @@ ct-code-editor {
 
     .console-content {
         padding: 14px;
+
+
+        .error-text {
+            color: $console-error-color;
+        }
+
+        .warning-text {
+            color: $console-warning-color;
+        }
     }
 
     &.show {

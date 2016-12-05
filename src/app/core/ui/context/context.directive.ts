@@ -1,6 +1,6 @@
 import {Directive, HostListener, Input, ViewContainerRef} from "@angular/core";
 import {ContextService} from "./context.service";
-import {MenuItem} from "../../components/menu/menu-item";
+import {MenuItem} from "../menu/menu-item";
 @Directive({
     selector: "[ct-context]"
 })

@@ -5,6 +5,9 @@ import {Component, ChangeDetectionStrategy, Input} from "@angular/core";
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <i class="fa fa-fw"
+            [class.fa-spin]="isLoading"
+            [class.fa-circle-o-notch]="isLoading"
+            
             [class.fa-file]="type === 'file'"
             
             [class.fa-folder]="type === 'folder'"
@@ -13,13 +16,12 @@ import {Component, ChangeDetectionStrategy, Input} from "@angular/core";
             [class.fa-angle-right]="type === 'angle' && !expanded"
             [class.fa-angle-down]="type === 'angle' && expanded"
             
-            [class.fa-circle-o-notch]="type === 'loader'"
-            [class.fa-spin]="type === 'loader'"
             
             [class.app-type-icon]="type === 'CommandLineTool' || type === 'Workflow'"
             
             [class.icon-command-line-tool]="type === 'CommandLineTool'"
             [class.icon-workflow]="type === 'Workflow'"
+            
         ></i>
     `
 })
@@ -30,5 +32,8 @@ export class TreeNodeIconComponent {
 
     @Input()
     public type: string;
+
+    @Input()
+    public isLoading: boolean;
 
 }

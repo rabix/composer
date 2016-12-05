@@ -1,6 +1,7 @@
 import {Component, Input, ChangeDetectionStrategy} from "@angular/core";
 import {ComponentBase} from "../../common/component-base";
 import {ExternalLinks} from "../../../cwl/external-links";
+import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 
 @Component({
     selector: "ct-output-ports",
@@ -26,9 +27,11 @@ import {ExternalLinks} from "../../../cwl/external-links";
                         <div class="col-sm-5">Glob</div>
                     </div>
                 
-                    <ul class="gui-section-list row">
+                    <ul class="gui-section-list">
                         <li *ngFor="let entry of entries; let i = index"
-                            class="gui-section-list-item clickable validatable">
+                            [ct-editor-inspector]="inspector"
+                            (click)="select(entry)"
+                            class="gui-section-list-item clickable validatable row">
                             
                             <div class="col-sm-4 ellipsis" [title]="entry?.id">{{ entry?.id }}</div>
                             <div class="col-sm-3 ellipsis" [title]="entry?.type">
@@ -44,10 +47,8 @@ import {ExternalLinks} from "../../../cwl/external-links";
                             </div>
                         </li>
                     </ul>
-                
                 </div>
             
-                
                 <button *ngIf="!readonly && entries.length" 
                         (click)="addEntry()" 
                         type="button" 
@@ -56,6 +57,17 @@ import {ExternalLinks} from "../../../cwl/external-links";
                 </button>
             </div>
         </ct-form-panel>
+        
+        <template #inspector>
+            <ct-editor-inspector-content *ngIf="selected">
+                <div class="tc-header">
+                    {{ selected.id}}
+                </div>
+                <div class="tc-body">
+                    <code>{{ selected | json }}</code>
+                </div>
+            </ct-editor-inspector-content>
+        </template>
     `
 })
 export class OutputPortsComponent extends ComponentBase {
@@ -75,7 +87,11 @@ export class OutputPortsComponent extends ComponentBase {
 
     private helpLink = ExternalLinks.toolOutput;
 
-    constructor() {
+
+    @Input()
+    private selected;
+
+    constructor(private inspector: EditorInspectorService) {
         super();
     }
 
@@ -85,5 +101,9 @@ export class OutputPortsComponent extends ComponentBase {
 
     private removeEntry(index) {
         this.entries = this.entries.slice(0, index).concat(this.entries.slice(index + 1));
+    }
+
+    private select(entry){
+        this.selected = entry;
     }
 }

@@ -2,6 +2,8 @@ import {Component, Input, ChangeDetectionStrategy, OnChanges, SimpleChanges} fro
 import {ComponentBase} from "../../../components/common/component-base";
 import {CommandArgumentModel} from "cwlts/models/d2sb";
 
+require("./argument-list.component.scss");
+
 @Component({
     selector: "ct-argument-list",
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -26,9 +28,9 @@ import {CommandArgumentModel} from "cwlts/models/d2sb";
                         <div class="col-sm-2">#</div>
                     </div>
                 
-                    <ul class="gui-section-list row">
+                    <ul class="gui-section-list">
                         <li *ngFor="let entry of arguments; let i = index"
-                            class="gui-section-list-item clickable validatable">
+                            class="gui-section-list-item clickable validatable row">
                             
                             <ct-tooltip-content #ctt>
                                 <span *ngIf="entry.value && entry.value[0] !== '{'">{{ entry.value }}</span>
@@ -38,7 +40,7 @@ import {CommandArgumentModel} from "cwlts/models/d2sb";
                                                  [content]="entry.value"></ct-code-preview>
                                 
                             </ct-tooltip-content>
-                            <div class="col-sm-4 ellipsis" [ct-tooltip]="ctt" [tooltipPlacement]="'right'">
+                            <div class="col-sm-4 ellipsis" [ct-tooltip]="ctt" [tooltipPlacement]="'top'">
                                 {{ entry.value }}
                             </div>
                             
@@ -56,9 +58,8 @@ import {CommandArgumentModel} from "cwlts/models/d2sb";
                                 'col-sm-2': readonly
                             }" >{{ entry.position }}</div>
                             
-                            <ct-tooltip-content #del>Delete</ct-tooltip-content>
                             <div *ngIf="!readonly" class="col-sm-1 align-right">
-                                <i [ct-tooltip]="del"
+                                <i [ct-tooltip]="'Delete'"
                                    class="fa fa-trash text-hover-danger" 
                                    (click)="removeEntry(i)"></i>
                             </div>
