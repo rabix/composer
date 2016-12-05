@@ -93,8 +93,8 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
         console.log("Model", this.model);
 
         if (this.model.hints) {
-            this.resources["sbg:CPURequirement"] = this.model.hints["sbg:CPURequirement"] || {};
-            this.resources["sbg:MemRequirement"] = this.model.hints["sbg:MemRequirement"] || {};
+            this.resources["sbg:CPURequirement"] = this.model.hints["sbg:CPURequirement"] || new ResourceRequirementModel({class: "sbg:CPURequirement", value: ""}, "");
+            this.resources["sbg:MemRequirement"] = this.model.hints["sbg:MemRequirement"] || new ResourceRequirementModel({class: "sbg:MemRequirement", value: ""}, "");
         }
     }
 

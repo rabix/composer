@@ -76,7 +76,7 @@ export class QuickPickComponent extends ComponentBase implements ControlValueAcc
     set value(value: string|number|ExpressionModel) {
         this.onChange(value);
         this._value = value;
-        let val = value;
+        let val     = value;
 
         if (value instanceof ExpressionModel && value.type !== "expression") {
             val = <string | number>value.serialize();
@@ -158,10 +158,16 @@ available types: {[label: string]: string | number} | string[]`)
 
     private removeControl(): void {
         if (this.customControl) {
-            this.customControl.setValue("");
-            this.value         = "";
+            this.computedVal   = "";
             this.showCustom    = false;
             this.customControl = undefined;
+
+            if (this._value instanceof ExpressionModel) {
+                this.value = new ExpressionModel("", "");
+            } else {
+                this.value = "";
+            }
+
         }
     }
 }
