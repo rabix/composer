@@ -64,10 +64,7 @@ export class ToolHeaderComponent {
         this.save.next(data);
     }
 
-
-
     private saveAction() {
-        console.debug("Data", this.data);
 
         if (this.data.data.source !== "local") {
             this.actionPending = 'revision_note';
