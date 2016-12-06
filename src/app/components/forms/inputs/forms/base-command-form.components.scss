@@ -11,13 +11,14 @@ base-command-form .form-section {
     width: 100%;
     position: relative;
 
-    expression-input {
+    ct-expression-input, input, input:not([type="radio"]), input:not([type="checkbox"]) {
         width: calc(100% - 20px);
         display: inline-block;
     }
 
     .remove-icon {
         position: relative;
+        cursor: pointer;
         top: 6px;
         float: right;
     }

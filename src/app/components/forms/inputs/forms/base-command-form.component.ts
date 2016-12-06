@@ -22,10 +22,10 @@ require("./base-command-form.components.scss");
                 <li *ngFor="let item of formList"
                      class="removable-form-control">
 
-                    <expression-input
+                    <ct-expression-input
                             [context]="context"
                             [formControl]="form.controls[item.id]">
-                    </expression-input>
+                    </ct-expression-input>
 
                     <div class="remove-icon clickable" (click)="removeBaseCommand(item)">
                         <i class="fa fa-trash"></i>

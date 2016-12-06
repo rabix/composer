@@ -90,7 +90,7 @@ export class ExpressionEditorComponent extends ComponentBase {
     }
 
 
-    private transformContext(context: {$job?: Object, $self?: Object}): TreeNode[] {
+    private transformContext(context: {$job?: Object, $self?: Object} = {}): TreeNode[] {
 
         const wrap = (nodes, path = "") => Object.keys(nodes).map(key => {
             const node = nodes[key];

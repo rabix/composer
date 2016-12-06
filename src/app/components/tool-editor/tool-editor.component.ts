@@ -138,7 +138,6 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
             this.rawEditorContent.next(val);
         });
 
-
         this.tracked = this.webWorkerService.validationResultStream.map(r => {
             if (!r.isValidCwl) return r;
 
