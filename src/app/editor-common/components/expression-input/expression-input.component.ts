@@ -159,7 +159,8 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
         editor.context = this.context;
         editor.action.first().subscribe(action => {
             if(action === "save"){
-                this.model.setValue(editor.model.toString(), editor.model.isExpression ? "expression" : "string");
+                this.model.setValue(editor.model.serialize(), editor.model.type);
+                this.model.evaluate(this.context); // to reset validation
             }
             this.modal.close();
         });

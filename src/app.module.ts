@@ -48,7 +48,6 @@ import {ToolEditorModule} from "./app/tool-editor/tool-editor.module";
 import {CoreModule} from "./app/core/core.module";
 import {CWLModule} from "./app/cwl/cwl.module";
 import {HintListComponent} from "./app/components/clt-editor/hints/hint-list.component";
-import {QuickPickComponent} from "./app/components/quick-pick/quick-pick.component";
 import {EditorCommonModule} from "./app/editor-common/editor-common.module";
 import {CompactListComponent} from "./app/components/compact-list/compact-list.component";
 import {EditableDirective} from "./app/directives/editable.directive";
@@ -108,7 +107,6 @@ import {DomEventService} from "./app/services/dom/dom-event.service";
         ViewModeSwitchComponent,
         WorkboxComponent,
         WorkflowEditorComponent,
-        QuickPickComponent,
         QuickPickComponent,
         CompactListComponent,
         EditableDirective,
