@@ -23,10 +23,10 @@ import {ExpressionModel, CommandLineBindingModel} from "cwlts/models/d2sb";
     
             <div class="form-group" *ngIf="propertyType !== 'record'">
                 <label>Value</label>
-                <expression-input
+                <ct-expression-input
                             [context]="context"
                             [formControl]="inputBindingFormGroup.controls['valueFrom']">
-                </expression-input>
+                </ct-expression-input>
             </div>
         
             <div class="form-group">

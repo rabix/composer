@@ -1,8 +1,7 @@
 import {Component, Input, OnInit, ViewChild, ViewContainerRef} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
-import {CommandLineToolModel, ExpressionModel, CommandInputParameterModel as InputModel, ResourceRequirementModel} from "cwlts/models/d2sb";
+import {CommandLineToolModel, ExpressionModel, ResourceRequirementModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../common/component-base";
-import {FileDef} from "cwlts/mappings/d2sb/FileDef";
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
 import {ProcessRequirement} from "cwlts/mappings/d2sb/ProcessRequirement";
 
@@ -27,9 +26,7 @@ require("./clt-editor.component.scss");
                                    [form]="formGroup.controls['baseCommandGroup']"
                                    (update)="setBaseCommand($event)">
                 </base-command-form>
-                
-                <!--<inputs-ports-form [cltModel]="model"></inputs-ports-form>-->
-                
+                                
                 <ct-tool-input-list [location]="model.loc + '.inputs'" [entries]="model.inputs" (update)="updateModel('inputs', $event)"></ct-tool-input-list>
                 
                 <ct-output-ports [entries]="model.outputs || []" [readonly]="readonly"></ct-output-ports>

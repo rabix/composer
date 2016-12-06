@@ -5,8 +5,6 @@ ct-argument-list .form-section {
   @include cli-border($arg-color);
 }
 
-@import "../../../../assets/sass/variables";
-
 .object-inspector {
     background: #fff;
     height: 100%;
@@ -30,5 +28,6 @@ ct-argument-list .form-section {
 .input-text {
     font-size: 1.2rem;
 }
+
 
 

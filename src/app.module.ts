@@ -107,7 +107,6 @@ import {DomEventService} from "./app/services/dom/dom-event.service";
         ViewModeSwitchComponent,
         WorkboxComponent,
         WorkflowEditorComponent,
-        QuickPickComponent,
         CompactListComponent,
         EditableDirective,
     ],
