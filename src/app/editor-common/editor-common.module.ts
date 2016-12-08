@@ -14,6 +14,8 @@ import {ExpressionInputComponent} from "./components/expression-input/expression
 import {CoreModule} from "../core/core.module";
 import {ModelExpressionEditorComponent} from "./expression-editor/model-expression-editor.component";
 import {ExpressionInputComponent} from "./components/expression-input/expression-input.component";
+import {CompactListComponent} from "./components/compact-list/compact-list.component";
+import {EditableDirective} from "./directives/editable.directive";
 
 @NgModule({
     declarations: [
@@ -27,8 +29,10 @@ import {ExpressionInputComponent} from "./components/expression-input/expression
         ExpressionInputComponent,
         QuickPickComponent,
         ToggleComponent,
-        ExpressionInputComponent
+        ExpressionInputComponent,
         ModelExpressionEditorComponent,
+        CompactListComponent,
+        EditableDirective
     ],
     exports: [
         BlankToolStateComponent,
@@ -36,14 +40,15 @@ import {ExpressionInputComponent} from "./components/expression-input/expression
         FileDefContentPipe,
         FileDefNamePipe,
         ToggleComponent,
-        ExpressionInputComponent
+        ExpressionInputComponent,
         ModelExpressionEditorComponent,
         EditorInspectorDirective,
         EditorInspectorComponent,
         ExpressionInputComponent,
         EditorInspectorContentComponent,
-        QuickPickComponent
-
+        QuickPickComponent,
+        CompactListComponent,
+        EditableDirective
     ],
     entryComponents: [
         EditorInspectorComponent,
