@@ -7,6 +7,7 @@ import {ExpressionInputComponent} from "../../../editor-common/components/expres
 import {BasicInputSectionComponent} from "../../../tool-editor/object-inspector/basic-section/basic-input-section.component";
 import {InputDescriptionComponent} from "../../../tool-editor/object-inspector/input-description/input-description.component";
 import {StageInputSectionComponent} from "../../../tool-editor/object-inspector/stage-input-section/stage-input-section.component";
+import {SecondaryFilesComponent} from "../../object-inspector/secondary-files/secondary-files.component";
 
 @Component({
     selector: "ct-tool-input-inspector",
@@ -14,7 +15,8 @@ import {StageInputSectionComponent} from "../../../tool-editor/object-inspector/
         ExpressionInputComponent,
         BasicInputSectionComponent,
         InputDescriptionComponent,
-        StageInputSectionComponent
+        StageInputSectionComponent,
+        SecondaryFilesComponent
     ],
     template: `
         <form [formGroup]="form" (ngSubmit)="onSubmit(form)">
@@ -27,11 +29,8 @@ import {StageInputSectionComponent} from "../../../tool-editor/object-inspector/
             
             <stage-input [formControl]="form.controls['stageInputSection']"></stage-input>
            
-            <!--<div class="form-group row">-->
-                <!--<div class="col-xs-12">-->
-                    <!--<button type="submit" class="btn btn-primary">Save</button>-->
-                <!--</div>-->
-            <!--</div>-->
+            <secondary-files [formControl]="form.controls['secondaryFilesSection']"
+                             [context]="context"></secondary-files>
         </form>
 `
 })
@@ -58,6 +57,7 @@ export class ToolInputInspector extends ComponentBase {
             basicInputSection: this.input,
             description: this.input,
             stageInputSection: this.input,
+            secondaryFilesSection: this.input,
         });
 
 

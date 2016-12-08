@@ -18,6 +18,7 @@ import {InputDescriptionComponent} from "./object-inspector/input-description/in
 import {InputBindingSectionComponent} from "./object-inspector/input-binding/input-binding-section.component";
 import {SymbolsComponent} from "./object-inspector/sybols-component/symbols.component";
 import {StageInputSectionComponent} from "./object-inspector/stage-input-section/stage-input-section.component";
+import {SecondaryFilesComponent} from "./object-inspector/secondary-files/secondary-files.component";
 
 @NgModule({
     declarations: [
@@ -30,8 +31,9 @@ import {StageInputSectionComponent} from "./object-inspector/stage-input-section
         InputDescriptionComponent,
         InputBindingSectionComponent,
         SymbolsComponent,
-        StageInputSectionComponent
-        ResourcesComponent
+        StageInputSectionComponent,
+        ResourcesComponent,
+        SecondaryFilesComponent
     ],
     exports: [
         ArgumentListComponent,

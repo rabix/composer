@@ -20,10 +20,9 @@ require("./clt-editor.component.scss");
                                    [form]="formGroup.controls['dockerGroup']"
                                    (update)="setRequirement($event, true)">
                 </ct-docker-image-form>
-                                
+                          
                 <base-command-form [baseCommand]="model.baseCommand"
                                    [context]="{$job: model.job}"
-                                   [form]="formGroup.controls['baseCommandGroup']"
                                    (update)="setBaseCommand($event)">
                 </base-command-form>
                                 
