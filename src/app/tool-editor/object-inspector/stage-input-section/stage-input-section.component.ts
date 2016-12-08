@@ -30,15 +30,13 @@ import {FormPanelComponent} from "../../../core/elements/form-panel.component";
             </div>
                 
             
-           <!-- 
-           TODO
-           <div class="form-group flex-container *ngIf="input.type.type === 'File'">
+           <div class="form-group flex-container" *ngIf="input.type.type === 'File'">
                 <label>Load Content</label>
                 <span class="align-right">
-                    {{input.inputBinding.loadContents ? "Yes" : "No"}}
+                    {{!!stageInputFormGroup.controls['loadContent'].value ? "Yes" : "No"}}
                     <toggle-slider [formControl]="stageInputFormGroup.controls['loadContent']"></toggle-slider>
                 </span>
-            </div>-->
+           </div>
        
     </div> <!--tc-body-->
 </ct-form-panel>
@@ -72,18 +70,18 @@ export class StageInputSectionComponent extends ComponentBase implements Control
         this.input = input;
 
         this.stageInputFormGroup = this.formBuilder.group({
-            stageInput: [this.input["sbg:sbg:stageInput"] || ""],
-            //TODO: add load content
-            //loadContent: []
+            stageInput: [this.input.customProps["sbg:stageInput"] || ""],
+            //TODO: load from input
+            loadContent: false
         });
 
         this.tracked = this.stageInputFormGroup.valueChanges
             .distinctUntilChanged()
             .subscribe(value => {
                 if (!!value.stageInput) {
-                    this.input["sbg:stageInput"] = value.stageInput;
-                } else if (this.input["sbg:stageInput"]) {
-                    delete this.input["sbg:stageInput"];
+                    this.input.customProps["sbg:stageInput"] = value.stageInput;
+                } else if (this.input.customProps["sbg:stageInput"]) {
+                    delete this.input.customProps["sbg:stageInput"];
                 }
 
                 this.propagateChange(this.input);
