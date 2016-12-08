@@ -1,8 +1,7 @@
 @import "../../../../assets/sass/variables";
 @import "../../../../assets/sass/mixins";
 
-ct-input-list .form-section {
-  @include cli-border($input-port-color);
+ct-argument-list .form-section {
+  @include cli-border($arg-color);
 }
-
 
