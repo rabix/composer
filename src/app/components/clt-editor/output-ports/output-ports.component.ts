@@ -2,6 +2,7 @@ import {Component, Input, ChangeDetectionStrategy} from "@angular/core";
 import {ComponentBase} from "../../common/component-base";
 import {ExternalLinks} from "../../../cwl/external-links";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
+import {CommandOutputParameterModel as OutputModel} from "cwlts/models/d2sb";
 
 @Component({
     selector: "ct-output-ports",
@@ -30,17 +31,37 @@ import {EditorInspectorService} from "../../../editor-common/inspector/editor-in
                     <ul class="gui-section-list">
                         <li *ngFor="let entry of entries; let i = index"
                             [ct-editor-inspector]="inspector"
+                            [ct-validation-class]="entry.validation"
                             (click)="select(entry)"
-                            class="gui-section-list-item clickable validatable row">
+                            class="gui-section-list-item clickable row">
                             
-                            <div class="col-sm-4 ellipsis" [title]="entry?.id">{{ entry?.id }}</div>
-                            <div class="col-sm-3 ellipsis" [title]="entry?.type">
-                                {{ entry?.type | commandParameterType }}
+                            <div class="col-sm-4 ellipsis" [title]="entry.id">
+                                <ct-validation-preview [entry]="entry.validation"></ct-validation-preview>
+                                {{ entry.id }}
                             </div>
-                            <div class="ellipsis" [ngClass]="{
-                                'col-sm-4': !readonly,
-                                'col-sm-5': readonly
-                            }" >{{ entry?.outputBinding?.glob | commandOutputGlob }}</div>
+                            <div class="col-sm-3 ellipsis" [title]="entry.type">
+                                {{ entry.type | commandParameterType }}
+                            </div>
+                            
+                             <ct-tooltip-content #ctt>
+                                <span *ngIf="entry.outputBinding.glob && !entry.outputBinding.glob?.isExpression">
+                                    {{ entry.outputBinding.glob.toString() }}
+                                </span>
+                                
+                                <ct-code-preview *ngIf="entry.outputBinding.glob && entry.outputBinding.glob?.isExpression"
+                                                 (viewReady)="ctt.show()"
+                                                 [content]="entry.outputBinding.glob.toString()"></ct-code-preview>
+                            </ct-tooltip-content>
+                            
+                            <div class="ellipsis"
+                                 [ct-tooltip]="ctt" 
+                                 [tooltipPlacement]="'top'"
+                                 [ngClass]="{
+                                     'col-sm-4': !readonly,
+                                     'col-sm-5': readonly
+                                 }">
+                                 {{ entry.outputBinding.glob | commandOutputGlob }}
+                             </div>
                             
                             <div *ngIf="!readonly" class="col-sm-1 align-right">
                                 <i title="Delete" class="fa fa-trash text-hover-danger" (click)="removeEntry(i)"></i>
@@ -96,7 +117,7 @@ export class OutputPortsComponent extends ComponentBase {
     }
 
     private addEntry() {
-        this.entries = this.entries.concat({});
+        this.entries = this.entries.concat(new OutputModel());
     }
 
     private removeEntry(index) {

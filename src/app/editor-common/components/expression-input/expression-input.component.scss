@@ -8,16 +8,16 @@
     .input-group-btn button {
         width: 46px;
     }
-
+    //
     &.validatable {
         position: relative;
         .input-group-btn, input {
             cursor: pointer;
         }
-
-        .form-control {
-            padding-left: 30px;
-        }
+        //
+        //.form-control {
+        //    padding-left: 30px;
+        //}
 
         .validation-icon {
             position: absolute;

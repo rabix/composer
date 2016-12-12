@@ -17,6 +17,9 @@ import {ExpressionInputComponent} from "./components/expression-input/expression
 import {CompactListComponent} from "./components/compact-list/compact-list.component";
 import {EditableDirective} from "./directives/editable.directive";
 import {ExpressionModelListComponent} from "./components/expression-model-list/expression-model-list.componen";
+import {ValidationComponent} from "./components/validation-preview/validation-preview.component";
+import {ValidationTextPipe} from "./pipes/validation-text.pipes";
+import {ValidationClassDirective} from "./components/validation-preview/validation-class.directive";
 
 @NgModule({
     declarations: [
@@ -26,11 +29,13 @@ import {ExpressionModelListComponent} from "./components/expression-model-list/e
         ExpressionEditorComponent,
         FileDefContentPipe,
         FileDefNamePipe,
+        ValidationTextPipe,
         EditorInspectorDirective,
         ExpressionInputComponent,
         QuickPickComponent,
         ToggleComponent,
-        ExpressionInputComponent,
+        ValidationComponent,
+        ValidationClassDirective,
         ModelExpressionEditorComponent,
         CompactListComponent,
         EditableDirective,
@@ -42,7 +47,6 @@ import {ExpressionModelListComponent} from "./components/expression-model-list/e
         FileDefContentPipe,
         FileDefNamePipe,
         ToggleComponent,
-        ExpressionInputComponent,
         ModelExpressionEditorComponent,
         EditorInspectorDirective,
         EditorInspectorComponent,
@@ -52,6 +56,9 @@ import {ExpressionModelListComponent} from "./components/expression-model-list/e
         CompactListComponent,
         EditableDirective,
         ExpressionModelListComponent
+        QuickPickComponent,
+        ValidationComponent,
+        ValidationClassDirective
     ],
     entryComponents: [
         EditorInspectorComponent,
