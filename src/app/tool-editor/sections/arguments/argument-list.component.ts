@@ -35,11 +35,11 @@ require("./argument-list.component.scss");
                             class="gui-section-list-item clickable row">
                             
                             <ct-tooltip-content #ctt>
-                                <span *ngIf="entry.arg && !entry.arg.valueFrom.isExpression">
+                                <span *ngIf="entry.valueFrom && !entry.valueFrom.isExpression">
                                 {{ entry.toString() }}
                                 </span>
                                 
-                                <ct-code-preview *ngIf="ctt.isIn && entry.arg.valueFrom && entry.arg.valueFrom.isExpression"
+                                <ct-code-preview *ngIf="ctt.isIn && entry.valueFrom && entry.valueFrom.isExpression"
                                                  (viewReady)="ctt.show()"
                                                  [content]="entry.toString()"></ct-code-preview>
                             </ct-tooltip-content>
@@ -52,18 +52,18 @@ require("./argument-list.component.scss");
                             </div>
                             
                             <div class="col-sm-3 ellipsis" [title]="entry.prefix">
-                                <span *ngIf="entry.arg.prefix">{{ entry.arg.prefix }}</span>
-                                <i *ngIf="!entry.arg.prefix" class="fa fa-fw fa-times"></i>
+                                <span *ngIf="entry.prefix">{{ entry.prefix }}</span>
+                                <i *ngIf="!entry.prefix" class="fa fa-fw fa-times"></i>
                             </div>
                             
                             <div class="col-sm-3 ellipsis">
-                                <i class="fa fa-fw fa-times" [class.fa-check]="entry.arg.separate"></i>
+                                <i class="fa fa-fw fa-times" [class.fa-check]="entry.separate"></i>
                             </div>
                             
                             <div class="ellipsis" [ngClass]="{
                                 'col-sm-1': !readonly,
                                 'col-sm-2': readonly
-                            }" >{{ entry.arg.position || 0 }}</div>
+                            }" >{{ entry.position || 0 }}</div>
                             
                             <div *ngIf="!readonly" class="col-sm-1 align-right">
                                 <i [ct-tooltip]="'Delete'"
@@ -117,6 +117,6 @@ export class ArgumentListComponent extends ComponentBase implements OnChanges {
     ngOnChanges(changes: SimpleChanges): void {
 
         this.arguments = changes["entries"].currentValue.map(entry => entry)
-            .sort((a, b) => a.arg.position - b.arg.position);
+            .sort((a, b) => a.position - b.position);
     }
 }
