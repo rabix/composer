@@ -1,6 +1,7 @@
 import {Component, Input, ChangeDetectionStrategy, OnChanges, SimpleChanges} from "@angular/core";
 import {ComponentBase} from "../../../components/common/component-base";
 import {CommandArgumentModel} from "cwlts/models/d2sb";
+import {Validation} from "cwlts/models/helpers/validation";
 
 require("./argument-list.component.scss");
 
@@ -30,18 +31,24 @@ require("./argument-list.component.scss");
                 
                     <ul class="gui-section-list">
                         <li *ngFor="let entry of arguments; let i = index"
-                            class="gui-section-list-item clickable validatable row">
+                            [ct-validation-class]="entry.validation"
+                            class="gui-section-list-item clickable row">
                             
                             <ct-tooltip-content #ctt>
-                                <span *ngIf="entry.value && entry.value[0] !== '{'">{{ entry.value }}</span>
+                                <span *ngIf="entry.valueFrom && !entry.valueFrom.isExpression">
+                                {{ entry.toString() }}
+                                </span>
                                 
-                                <ct-code-preview *ngIf="ctt.isIn && entry.value && entry.value[0] === '{'"
+                                <ct-code-preview *ngIf="ctt.isIn && entry.valueFrom && entry.valueFrom.isExpression"
                                                  (viewReady)="ctt.show()"
-                                                 [content]="entry.value"></ct-code-preview>
-                                
+                                                 [content]="entry.toString()"></ct-code-preview>
                             </ct-tooltip-content>
+                            
                             <div class="col-sm-4 ellipsis" [ct-tooltip]="ctt" [tooltipPlacement]="'top'">
-                                {{ entry.value }}
+                                <ct-validation-preview [entry]="entry.validation"></ct-validation-preview>
+                                <span>
+                                    {{ entry.toString() }}
+                                </span>
                             </div>
                             
                             <div class="col-sm-3 ellipsis" [title]="entry.prefix">
@@ -56,7 +63,7 @@ require("./argument-list.component.scss");
                             <div class="ellipsis" [ngClass]="{
                                 'col-sm-1': !readonly,
                                 'col-sm-2': readonly
-                            }" >{{ entry.position }}</div>
+                            }" >{{ entry.position || 0 }}</div>
                             
                             <div *ngIf="!readonly" class="col-sm-1 align-right">
                                 <i [ct-tooltip]="'Delete'"
@@ -87,12 +94,7 @@ export class ArgumentListComponent extends ComponentBase implements OnChanges {
     @Input()
     public readonly = false;
 
-    private arguments: {
-        value: string,
-        prefix: string,
-        position: number,
-        separate: boolean,
-    }[] = [];
+    private arguments: CommandArgumentModel[] = [];
 
     private removeEntry(index) {
         this.arguments = this.arguments.slice(0, index).concat(this.arguments.slice(index + 1));
@@ -103,15 +105,12 @@ export class ArgumentListComponent extends ComponentBase implements OnChanges {
     }
 
     private addEntry() {
-        this.arguments = this.arguments.concat([{} as any]);
+        this.arguments = this.arguments.concat([new CommandArgumentModel()]);
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        this.arguments = changes["entries"].currentValue.map(entry => ({
-            value: typeof entry.arg.valueFrom === "object" ? entry.arg.valueFrom.script : entry.arg.valueFrom,
-            prefix: entry.arg.prefix,
-            position: entry.arg.position || 0,
-            separate: !!entry.arg.separate
-        })).sort((a, b) => a.position - b.position);
+
+        this.arguments = changes["entries"].currentValue.map(entry => entry)
+            .sort((a, b) => a.position - b.position);
     }
 }

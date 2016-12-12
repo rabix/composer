@@ -1,4 +1,5 @@
 import {Pipe, PipeTransform} from "@angular/core";
+import {ExpressionModel} from "cwlts/models/d2sb";
 
 @Pipe({name: "commandOutputGlob"})
 export class CommandOutputGlobPipe implements PipeTransform {
@@ -8,9 +9,10 @@ export class CommandOutputGlobPipe implements PipeTransform {
             return "n/a";
         }
 
-        if (typeof glob === "object") {
-            return glob.script;
+        if (glob instanceof ExpressionModel) {
+            return glob.toString();
         }
+
         return glob;
     }
 
