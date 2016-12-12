@@ -19,16 +19,10 @@ require("./expression-input.component.scss");
     ],
     template: `
             <div class="expression-input-group clickable"
-                 [class.validatable]="isExpr"
-                 [class.warning]="model.validation.warnings.length"
-                 [class.error]="model.validation.errors.length">
+                 [class.expr]="isExpr"
+                 [ct-validation-class]="model.validation">
                  
-                <i class="fa fa-warning validation-icon"
-                    [title]="model.validation.warnings.join('\\n')"
-                    *ngIf="model.validation.warnings.length && isExpr"></i>
-                <i class="fa fa-times-circle validation-icon" 
-                    *ngIf="model.validation.errors.length && isExpr"
-                    [title]="model.validation.errors.join('\\n')"></i>
+                <ct-validation-preview [entry]="model.validation"></ct-validation-preview>
                 <b class="validation-icon result"
                     *ngIf="model.result && isExpr"
                     [title]="model.result">E:</b>
@@ -176,10 +170,10 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
                 title: "Edit Expression"
             });
 
-            editor.model = this.model;
+            editor.model   = this.model;
             editor.context = this.context;
             editor.action.first().subscribe(action => {
-                if(action === "save"){
+                if (action === "save") {
                     this.model = new ExpressionModel(this.model.loc, editor.model.serialize());
                     this.model.evaluate(this.context); // to reset validation
                     this.onChange(this.model);

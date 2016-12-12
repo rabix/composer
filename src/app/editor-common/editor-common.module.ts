@@ -12,6 +12,9 @@ import {FileDefNamePipe} from "./pipes/file-def-name.pipe";
 import {CoreModule} from "../core/core.module";
 import {ModelExpressionEditorComponent} from "./expression-editor/model-expression-editor.component";
 import {ExpressionInputComponent} from "./components/expression-input/expression-input.component";
+import {ValidationComponent} from "./components/validation-preview/validation-preview.component";
+import {ValidationTextPipe} from "./pipes/validation-text.pipes";
+import {ValidationClassDirective} from "./components/validation-preview/validation-class.directive";
 
 @NgModule({
     declarations: [
@@ -21,9 +24,12 @@ import {ExpressionInputComponent} from "./components/expression-input/expression
         ExpressionEditorComponent,
         FileDefContentPipe,
         FileDefNamePipe,
+        ValidationTextPipe,
         EditorInspectorDirective,
         ExpressionInputComponent,
         QuickPickComponent,
+        ValidationComponent,
+        ValidationClassDirective,
         ModelExpressionEditorComponent,
     ],
     exports: [
@@ -36,8 +42,9 @@ import {ExpressionInputComponent} from "./components/expression-input/expression
         EditorInspectorComponent,
         ExpressionInputComponent,
         EditorInspectorContentComponent,
-        QuickPickComponent
-
+        QuickPickComponent,
+        ValidationComponent,
+        ValidationClassDirective
     ],
     entryComponents: [
         EditorInspectorComponent,
