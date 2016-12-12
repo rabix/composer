@@ -31,7 +31,7 @@ import {ValidationClassDirective} from "./components/validation-preview/validati
         ExpressionInputComponent,
         QuickPickComponent,
         ToggleComponent,
-        ExpressionInputComponent
+        ExpressionInputComponent,
         ValidationComponent,
         ValidationClassDirective,
         ModelExpressionEditorComponent,
@@ -42,7 +42,7 @@ import {ValidationClassDirective} from "./components/validation-preview/validati
         FileDefContentPipe,
         FileDefNamePipe,
         ToggleComponent,
-        ExpressionInputComponent
+        ExpressionInputComponent,
         ModelExpressionEditorComponent,
         EditorInspectorDirective,
         EditorInspectorComponent,
