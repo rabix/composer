@@ -100,7 +100,7 @@ export class BaseCommandFormComponent extends ComponentBase implements OnInit, O
     private addBaseCommand(): void {
         const newCmd = {
             id: this.guidService.generate(),
-            model: new ExpressionModel("")
+            model: new ExpressionModel("", "")
         };
 
         this.form.addControl(newCmd.id, new FormControl(newCmd.model, [Validators.required, CustomValidators.cwlModel]));
