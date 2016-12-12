@@ -20,13 +20,9 @@ require("./symbols.component.scss");
                <label>Symbols</label>
                <compact-list *ngIf="symbolsForm" 
                             [addKeyCode]="13"
-                            [formControl]="symbolsForm"></compact-list>
-                      
-                <button type="button" 
-                        class="btn btn-link add-btn-link no-underline-hover" 
-                        (click)="addSymbol()">
-                    <i class="fa fa-plus"></i>Add Symbol
-                </button>
+                            [formControl]="symbolsForm">
+                </compact-list>
+                     
         </form>
         </div>
 `
