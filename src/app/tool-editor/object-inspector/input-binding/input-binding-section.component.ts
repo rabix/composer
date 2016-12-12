@@ -156,7 +156,7 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
 
                 const trimmedValueFrom: string = value.valueFrom.toString();
 
-                if (!!trimmedValueFrom) {
+                if (!!trimmedValueFrom && this.propertyType !== "record") {
                     this.inputBinding.setValueFrom(value.valueFrom.serialize());
                 } else {
                     this.inputBinding.valueFrom = undefined;
