@@ -94,13 +94,7 @@ export class ArgumentListComponent extends ComponentBase implements OnChanges {
     @Input()
     public readonly = false;
 
-    private arguments: {
-        value: string,
-        prefix: string,
-        position: number,
-        separate: boolean,
-        validation: Validation
-    }[] = [];
+    private arguments: CommandArgumentModel[] = [];
 
     private removeEntry(index) {
         this.arguments = this.arguments.slice(0, index).concat(this.arguments.slice(index + 1));
@@ -111,7 +105,7 @@ export class ArgumentListComponent extends ComponentBase implements OnChanges {
     }
 
     private addEntry() {
-        this.arguments = this.arguments.concat([{} as any]);
+        this.arguments = this.arguments.concat([new CommandArgumentModel()]);
     }
 
     ngOnChanges(changes: SimpleChanges): void {
