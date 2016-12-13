@@ -37,7 +37,6 @@ require("./argument-list.component.scss");
                         <li *ngFor="let entry of arguments; let i = index"
                             [ct-validation-class]="entry.validation"
                             class="gui-section-list-item clickable row"
-                            class="gui-section-list-item clickable validatable row"
                             [ct-editor-inspector]="inspector"
                             [ct-editor-inspector-target]="entry">
                             
