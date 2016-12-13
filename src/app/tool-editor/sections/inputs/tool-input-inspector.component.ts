@@ -3,19 +3,9 @@ import {CommandInputParameterModel} from "cwlts/models/d2sb";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {Subject} from "rxjs";
 import {ComponentBase} from "../../../components/common/component-base";
-import {ExpressionInputComponent} from "../../../editor-common/components/expression-input/expression-input.component";
-import {BasicInputSectionComponent} from "../../../tool-editor/object-inspector/basic-section/basic-input-section.component";
-import {InputDescriptionComponent} from "../../../tool-editor/object-inspector/input-description/input-description.component";
-import {StageInputSectionComponent} from "../../../tool-editor/object-inspector/stage-input-section/stage-input-section.component";
 
 @Component({
     selector: "ct-tool-input-inspector",
-    directives: [
-        ExpressionInputComponent,
-        BasicInputSectionComponent,
-        InputDescriptionComponent,
-        StageInputSectionComponent
-    ],
     template: `
         <form [formGroup]="form" (ngSubmit)="onSubmit(form)">
         
@@ -42,7 +32,7 @@ export class ToolInputInspector extends ComponentBase {
 
     /** Context in which expression should be evaluated */
     @Input()
-    public context: {$job: any, $self: any} = {};
+    public context: {$job?: any, $self?: any} = {};
 
     private form: FormGroup;
 
