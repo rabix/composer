@@ -1,9 +1,9 @@
-import {Subject} from "rxjs";
-import {Component, Input, ChangeDetectionStrategy, OnChanges, SimpleChanges, Output} from "@angular/core";
+import {Component, Input, ChangeDetectionStrategy, OnChanges, SimpleChanges} from "@angular/core";
 import {ComponentBase} from "../../../components/common/component-base";
 import {CommandArgumentModel} from "cwlts/models/d2sb";
 import {CommandLineBindingModel} from "cwlts/models/d2sb/CommandLineBindingModel";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
+import {Validation} from "cwlts/models/helpers/validation";
 
 require("./argument-list.component.scss");
 
@@ -33,20 +33,27 @@ require("./argument-list.component.scss");
                 
                     <ul class="gui-section-list">
                         <li *ngFor="let entry of arguments; let i = index"
+                            [ct-validation-class]="entry.validation"
+                            class="gui-section-list-item clickable row">
                             [ct-editor-inspector]="inspector"
                             [ct-editor-inspector-target]="entry.model"
                             class="gui-section-list-item clickable validatable row">
                             
                             <ct-tooltip-content #ctt>
-                                <span *ngIf="entry.value && entry.value[0] !== '{'">{{ entry.value }}</span>
+                                <span *ngIf="entry.valueFrom && !entry.valueFrom.isExpression">
+                                {{ entry.toString() }}
+                                </span>
                                 
-                                <ct-code-preview *ngIf="ctt.isIn && entry.value && entry.value[0] === '{'"
+                                <ct-code-preview *ngIf="ctt.isIn && entry.valueFrom && entry.valueFrom.isExpression"
                                                  (viewReady)="ctt.show()"
-                                                 [content]="entry.value"></ct-code-preview>
-                                
+                                                 [content]="entry.toString()"></ct-code-preview>
                             </ct-tooltip-content>
+                            
                             <div class="col-sm-4 ellipsis" [ct-tooltip]="ctt" [tooltipPlacement]="'top'">
-                                {{ entry.value }}
+                                <ct-validation-preview [entry]="entry.validation"></ct-validation-preview>
+                                <span>
+                                    {{ entry.toString() }}
+                                </span>
                             </div>
                             
                             <div class="col-sm-3 ellipsis" [title]="entry.prefix">
@@ -63,7 +70,7 @@ require("./argument-list.component.scss");
                             <div class="ellipsis" [ngClass]="{
                                 'col-sm-1': !readonly,
                                 'col-sm-2': readonly
-                            }" >{{ entry.position }}</div>
+                            }" >{{ entry.position || 0 }}</div>
                             
                             <div *ngIf="!readonly" class="col-sm-1 align-right">
                                 <i [ct-tooltip]="'Delete'"
@@ -119,6 +126,7 @@ export class ArgumentListComponent extends ComponentBase implements OnChanges {
         separate: boolean,
         model: CommandArgumentModel
     }[] = [];
+    private arguments: CommandArgumentModel[] = [];
 
     @Input()
     public context;
@@ -146,6 +154,7 @@ export class ArgumentListComponent extends ComponentBase implements OnChanges {
     }
 
     private addEntry() {
+        this.arguments = this.arguments.concat([new CommandArgumentModel()]);
         const newEntryLocation = `${this.location}[${this.entries.length}]`;
         const newEntry = new CommandArgumentModel({}, newEntryLocation);
         const entries  = this.entries.concat(newEntry);
@@ -153,6 +162,9 @@ export class ArgumentListComponent extends ComponentBase implements OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
+
+        this.arguments = changes["entries"].currentValue.map(entry => entry)
+            .sort((a, b) => a.position - b.position);
         debugger;
         this.arguments = changes["entries"].currentValue.map(entry => ({
             value: typeof entry.valueFrom.value === "object" ? entry.valueFrom.value.script : entry.valueFrom.value,

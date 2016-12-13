@@ -1,8 +1,8 @@
 import {Component, Input, ChangeDetectionStrategy, Output} from "@angular/core";
 import {ComponentBase} from "../../../components/common/component-base";
 import {CommandInputParameterModel} from "cwlts/models/d2sb";
-import {Subject} from "rxjs";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
+import {Subject} from "rxjs";
 
 require("./input-list.component.scss");
 
@@ -41,10 +41,12 @@ require("./input-list.component.scss");
                         <li *ngFor="let entry of entries; let i = index"
                             [ct-editor-inspector]="inspector"
                             [ct-editor-inspector-target]="entry"
-                            class="gui-section-list-item clickable validatable row">
-                            
+                            [ct-validation-class]="entry.validation"
+                            class="gui-section-list-item clickable row">
+        
                             <!--ID Column-->
                             <div class="col-sm-4 ellipsis">
+                                <ct-validation-preview [entry]="entry.validation"></ct-validation-preview>
                                 {{ entry.id }}
                             </div>
                             
