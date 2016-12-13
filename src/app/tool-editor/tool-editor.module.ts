@@ -10,11 +10,13 @@ import {ToolInputListComponent} from "./sections/inputs/tool-input-list.componen
 import {CWLModule} from "../cwl/cwl.module";
 import {ToolInputInspector} from "./sections/inputs/tool-input-inspector.component";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {ArgumentInspector} from "./sections/arguments/argument-inspector.component";
 
 
 @NgModule({
     declarations: [
         ArgumentListComponent,
+        ArgumentInspector,
         FileDefListComponent,
         ToolInputListComponent,
         ToolInputInspector,
@@ -22,8 +24,9 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
     ],
     exports: [
         ArgumentListComponent,
+        ArgumentInspector,
         FileDefListComponent,
-        ResourcesComponent
+        ResourcesComponent,
         ToolInputListComponent,
         ToolInputInspector,
     ],

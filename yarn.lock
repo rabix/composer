@@ -1032,7 +1032,7 @@ custom-event@~1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/custom-event/-/custom-event-1.0.1.tgz#5d02a46850adf1b4a317946a3928fccb5bfd0425"
 
-cwlts@^1.7.0:
+cwlts@1.9.5:
   version "1.9.5"
   resolved "https://registry.yarnpkg.com/cwlts/-/cwlts-1.9.5.tgz#c98afa7862c63a0ff5547cbba6490f55a1200d0e"
 
