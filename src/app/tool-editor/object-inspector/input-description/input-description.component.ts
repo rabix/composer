@@ -2,7 +2,6 @@ import {Component, forwardRef} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormBuilder, FormGroup} from "@angular/forms";
 import {ComponentBase} from "../../../components/common/component-base";
 import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
-import {FormPanelComponent} from "../../../core/elements/form-panel.component";
 
 require("./input-description.component.scss");
 
@@ -10,9 +9,6 @@ require("./input-description.component.scss");
     selector: 'input-description',
     providers: [
         { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => InputDescriptionComponent), multi: true }
-    ],
-    directives: [
-        FormPanelComponent
     ],
     template: `
 <ct-form-panel>
@@ -61,7 +57,7 @@ export class InputDescriptionComponent extends ComponentBase implements ControlV
         super();
     }
 
-    private writeValue(input: InputProperty): void {
+    writeValue(input: InputProperty): void {
         this.input = input;
 
         this.descriptionFormGroup = this.formBuilder.group({
@@ -105,11 +101,11 @@ export class InputDescriptionComponent extends ComponentBase implements ControlV
         }
     }
 
-    private registerOnChange(fn: any): void {
+    registerOnChange(fn: any): void {
         this.propagateChange = fn;
     }
 
-    private registerOnTouched(fn: any): void {
+    registerOnTouched(fn: any): void {
         this.onTouched = fn;
     }
 }

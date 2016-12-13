@@ -1039,9 +1039,9 @@ custom-event@~1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/custom-event/-/custom-event-1.0.1.tgz#5d02a46850adf1b4a317946a3928fccb5bfd0425"
 
-cwlts@^1.9.8:
-  version "1.9.8"
-  resolved "https://registry.yarnpkg.com/cwlts/-/cwlts-1.9.8.tgz#5f0702c3100c14a61908144f2ba52f23a47be1e6"
+cwlts@^1.9.10:
+  version "1.9.10"
+  resolved "https://registry.yarnpkg.com/cwlts/-/cwlts-1.9.10.tgz#d4bac153f838441c5ef7a7683820f3ed01d01542"
 
 d@^0.1.1, d@~0.1.1:
   version "0.1.1"

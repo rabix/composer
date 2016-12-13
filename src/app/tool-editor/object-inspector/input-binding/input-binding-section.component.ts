@@ -15,8 +15,16 @@ import {ExpressionModel, CommandLineBindingModel} from "cwlts/models/d2sb";
 @Component({
     selector: 'input-binding-section',
     providers: [
-        { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => InputBindingSectionComponent), multi: true },
-        { provide: NG_VALIDATORS, useExisting: forwardRef(() => InputBindingSectionComponent), multi: true }
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => InputBindingSectionComponent),
+            multi: true
+        },
+        {
+            provide: NG_VALIDATORS,
+            useExisting: forwardRef(() => InputBindingSectionComponent),
+            multi: true
+        }
     ],
     template: `
     <div class="form-group" *ngIf="inputBindingFormGroup && propertyType">
@@ -74,34 +82,36 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
     public propertyType: string;
 
     @Input()
-    public context: {$job: any, $self: any} = {};
+    public context: {$job?: any, $self?: any} = {};
 
     private inputBinding: CommandLineBindingModel;
 
     private inputBindingFormGroup: FormGroup;
 
-    private onTouched = () => { };
+    private onTouched = () => {
+    };
 
-    private propagateChange = (_) => {};
+    private propagateChange = (_) => {
+    };
 
     private separatorOptions: {text: string, value: boolean}[] = [
-        { text: "space", value: true },
-        { text: "empty string", value: false }
+        {text: "space", value: true},
+        {text: "empty string", value: false}
     ];
 
     private itemSeparators: {text: string, value: string}[] = [
-        { text: "equal", value: "=" },
-        { text: "comma", value: "," },
-        { text: "semicolon", value: ";" },
-        { text: "space", value: " " },
-        { text: "repeat", value: null }
+        {text: "equal", value: "="},
+        {text: "comma", value: ","},
+        {text: "semicolon", value: ";"},
+        {text: "space", value: " "},
+        {text: "repeat", value: null}
     ];
 
     constructor(private formBuilder: FormBuilder) {
         super();
     }
 
-    private writeValue(inputBinding: CommandLineBindingModel): void {
+    writeValue(inputBinding: CommandLineBindingModel): void {
         this.inputBinding = inputBinding;
 
         if (!!this.inputBinding) {
@@ -116,29 +126,29 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
         }
     }
 
-    private registerOnChange(fn: any): void {
+    registerOnChange(fn: any): void {
         this.propagateChange = fn;
     }
 
-    private registerOnTouched(fn: any): void {
+    registerOnTouched(fn: any): void {
         this.onTouched = fn;
     }
 
-    private validate(c: FormControl) {
+    validate(c: FormControl) {
         if (!!this.inputBindingFormGroup) {
-            return !!this.inputBindingFormGroup.valid ? null: { error: "Input binding section is not valid." }
+            return this.inputBindingFormGroup.valid ? null : {error: "Input binding section is not valid."}
         }
     }
 
     private createInputBindingForm(inputBinding: CommandLineBindingModel): void {
-        const valueFrom = !!inputBinding.valueFrom? inputBinding.valueFrom: new ExpressionModel(inputBinding.loc, "");
+        const valueFrom = !!inputBinding.valueFrom ? inputBinding.valueFrom : new ExpressionModel(inputBinding.loc, "");
 
         this.inputBindingFormGroup = this.formBuilder.group({
             valueFrom: [valueFrom, [Validators.required, CustomValidators.cwlModel]],
-            position:        [inputBinding.position, [Validators.pattern(/^\d+$/)]],
-            prefix:          [inputBinding.prefix],
-            separate:        [!!inputBinding.separate? inputBinding.separate: true],
-            itemSeparator:   [!!inputBinding.itemSeparator? inputBinding.itemSeparator : null]
+            position: [inputBinding.position, [Validators.pattern(/^\d+$/)]],
+            prefix: [inputBinding.prefix],
+            separate: [inputBinding.separate ? inputBinding.separate : true],
+            itemSeparator: [!!inputBinding.itemSeparator ? inputBinding.itemSeparator : null]
         });
 
         this.listenToInputBindingFormChanges();
@@ -149,10 +159,10 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
             .distinctUntilChanged()
             .debounceTime(300)
             .subscribe(value => {
-                this.setInputBindingProperty(this.inputBindingFormGroup, 'position', !!Number(value.position) ? Number(value.position): undefined);
-                this.setInputBindingProperty(this.inputBindingFormGroup, 'prefix', !!value.prefix ? value.prefix: undefined);
-                this.setInputBindingProperty(this.inputBindingFormGroup, 'separate', !!JSON.parse(value.separate) ? JSON.parse(value.separate): undefined);
-                this.setInputBindingProperty(this.inputBindingFormGroup, 'itemSeparator', !!value.itemSeparator ? value.itemSeparator: undefined);
+                this.setInputBindingProperty(this.inputBindingFormGroup, 'position', !!Number(value.position) ? Number(value.position) : undefined);
+                this.setInputBindingProperty(this.inputBindingFormGroup, 'prefix', !!value.prefix ? value.prefix : undefined);
+                this.setInputBindingProperty(this.inputBindingFormGroup, 'separate', !!JSON.parse(value.separate) ? JSON.parse(value.separate) : undefined);
+                this.setInputBindingProperty(this.inputBindingFormGroup, 'itemSeparator', !!value.itemSeparator ? value.itemSeparator : undefined);
 
                 const trimmedValueFrom: string = value.valueFrom.toString();
 

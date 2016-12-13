@@ -107,7 +107,7 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
             this.model  = obj;
             this.isExpr = obj.isExpression;
         } else {
-            this.model  = new ExpressionModel("");
+            this.model  = new ExpressionModel("", "");
             this.isExpr = this.model.isExpression;
         }
     }
@@ -176,6 +176,7 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
                 if (action === "save") {
                     this.model = new ExpressionModel(this.model.loc, editor.model.serialize());
                     this.model.evaluate(this.context); // to reset validation
+                    this.isExpr = this.model.isExpression;
                     this.onChange(this.model);
                 }
                 this.modal.close();

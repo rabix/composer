@@ -28,12 +28,6 @@ require("./basic-input-section.component.scss");
         { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => BasicInputSectionComponent), multi: true },
         { provide: NG_VALIDATORS, useExisting: forwardRef(() => BasicInputSectionComponent), multi: true }
     ],
-    directives: [
-        ToggleComponent,
-        InputTypeSelectComponent,
-        FormPanelComponent,
-        InputBindingSectionComponent
-    ],
     template: `
 <ct-form-panel>
     <div class="tc-header">Basic</div>
@@ -99,7 +93,7 @@ require("./basic-input-section.component.scss");
 export class BasicInputSectionComponent extends ComponentBase implements ControlValueAccessor {
 
     @Input()
-    public context: {$job: any, $self: any} = {};
+    public context: {$job?: any, $self?: any} = {};
 
     /** The currently displayed property */
     private input: InputProperty;
@@ -118,7 +112,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
         super();
     }
 
-    private writeValue(input: InputProperty): void {
+    writeValue(input: InputProperty): void {
         this.input = input;
 
         this.basicSectionForm = this.formBuilder.group({
@@ -151,21 +145,21 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
         });
     }
 
-    private registerOnChange(fn: any): void {
+    registerOnChange(fn: any): void {
         this.propagateChange = fn;
     }
 
-    private registerOnTouched(fn: any): void {
+    registerOnTouched(fn: any): void {
         this.onTouched = fn;
     }
 
     private validate(c: FormControl) {
-        return !!this.basicSectionForm.valid ? null: { error: "Basic input section is not valid." }
+        return this.basicSectionForm.valid ? null: { error: "Basic input section is not valid." }
     }
 
     private listenToIsBoundChanges(): void {
         this.tracked = this.basicSectionForm.controls['isBound'].valueChanges.subscribe((isBound: boolean) => {
-            if (!!isBound) {
+            if (isBound) {
                 this.input.createInputBinding();
                 this.basicSectionForm.setControl('inputBinding', new FormControl(this.input.inputBinding));
             } else {

@@ -34,7 +34,7 @@ export class InputTypeSelectComponent extends ComponentBase implements ControlVa
         super();
     }
 
-    private writeValue(inputParameter: InputParameterTypeModel): void {
+    writeValue(inputParameter: InputParameterTypeModel): void {
         this.inputParameter = inputParameter;
         this.typeSelectControl = new FormControl(this.inputParameter.type, [Validators.required]);
 
@@ -44,11 +44,11 @@ export class InputTypeSelectComponent extends ComponentBase implements ControlVa
         });
     }
 
-    private registerOnChange(fn: any): void {
+    registerOnChange(fn: any): void {
         this.propagateChange = fn;
     }
 
-    private registerOnTouched(fn: any): void {
+    registerOnTouched(fn: any): void {
         this.onTouched = fn;
     }
 

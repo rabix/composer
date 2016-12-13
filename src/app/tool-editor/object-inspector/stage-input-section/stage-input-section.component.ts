@@ -2,15 +2,11 @@ import {Component, forwardRef} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormBuilder, FormGroup} from "@angular/forms";
 import {ComponentBase} from "../../../components/common/component-base";
 import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
-import {FormPanelComponent} from "../../../core/elements/form-panel.component";
 
 @Component({
     selector: 'stage-input',
     providers: [
         { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StageInputSectionComponent), multi: true }
-    ],
-    directives: [
-        FormPanelComponent
     ],
     template: `
 <ct-form-panel *ngIf="input.type.type === 'record' || input.type.type === 'File'">
@@ -68,7 +64,7 @@ export class StageInputSectionComponent extends ComponentBase implements Control
         super();
     }
 
-    private writeValue(input: InputProperty): void {
+    writeValue(input: InputProperty): void {
         this.input = input;
 
         this.stageInputFormGroup = this.formBuilder.group({
@@ -90,11 +86,11 @@ export class StageInputSectionComponent extends ComponentBase implements Control
             });
     }
 
-    private registerOnChange(fn: any): void {
+    registerOnChange(fn: any): void {
         this.propagateChange = fn;
     }
 
-    private registerOnTouched(fn: any): void {
+    registerOnTouched(fn: any): void {
         this.onTouched = fn;
     }
 }
