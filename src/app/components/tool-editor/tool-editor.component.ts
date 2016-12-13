@@ -220,7 +220,6 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
      * the text has been formatted by the GUI editor
      */
     private getModelText(): string {
-        debugger;
         const modelObject = Object.assign(this.toolModel.serialize(), {"rbx:modified": true});
 
         return this.data.language.value === "json" ? JSON.stringify(modelObject, null, 4) : Yaml.dump(modelObject);

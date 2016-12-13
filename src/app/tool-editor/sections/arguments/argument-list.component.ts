@@ -1,9 +1,11 @@
-import {Component, Input, ChangeDetectionStrategy, OnChanges, SimpleChanges} from "@angular/core";
+import {Subject} from "rxjs";
+import {Component, Input, ChangeDetectionStrategy, OnChanges, SimpleChanges, Output} from "@angular/core";
 import {ComponentBase} from "../../../components/common/component-base";
-import {CommandArgumentModel} from "cwlts/models/d2sb";
+import {CommandArgumentModel, ExpressionModel} from "cwlts/models/d2sb";
 import {CommandLineBindingModel} from "cwlts/models/d2sb/CommandLineBindingModel";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
-import {Validation} from "cwlts/models/helpers/validation";
+import {Expression} from "@angular/compiler/src/output/output_ast";
+
 
 require("./argument-list.component.scss");
 
@@ -34,10 +36,10 @@ require("./argument-list.component.scss");
                     <ul class="gui-section-list">
                         <li *ngFor="let entry of arguments; let i = index"
                             [ct-validation-class]="entry.validation"
-                            class="gui-section-list-item clickable row">
+                            class="gui-section-list-item clickable row"
+                            class="gui-section-list-item clickable validatable row"
                             [ct-editor-inspector]="inspector"
-                            [ct-editor-inspector-target]="entry.model"
-                            class="gui-section-list-item clickable validatable row">
+                            [ct-editor-inspector-target]="entry">
                             
                             <ct-tooltip-content #ctt>
                                 <span *ngIf="entry.valueFrom && !entry.valueFrom.isExpression">
@@ -75,7 +77,7 @@ require("./argument-list.component.scss");
                             <div *ngIf="!readonly" class="col-sm-1 align-right">
                                 <i [ct-tooltip]="'Delete'"
                                    class="fa fa-trash text-hover-danger" 
-                                   (click)="removeEntry(entry.model)"></i>
+                                   (click)="removeEntry(entry)"></i>
                             </div>
                             
                             <!--Object Inspector Template -->
@@ -84,8 +86,8 @@ require("./argument-list.component.scss");
                                     <div class="tc-header">Argument</div>
                                     <div class="tc-body">
                                         <ct-argument-inspector 
-                                            (save)="updateArgument($event, entry.model)" 
-                                            [input]="entry.model"
+                                            (save)="updateArgument($event, entry)" 
+                                            [argument]="entry"
                                             [context]="context">                                            
                                         </ct-argument-inspector>
                                     </div>
@@ -119,15 +121,9 @@ export class ArgumentListComponent extends ComponentBase implements OnChanges {
     @Input()
     public location = "";
 
-    private arguments: {
-        value: string,
-        prefix: string,
-        position: number,
-        separate: boolean,
-        model: CommandArgumentModel
-    }[] = [];
     private arguments: CommandArgumentModel[] = [];
 
+    /** Context in which expression should be evaluated */
     @Input()
     public context;
 
@@ -139,6 +135,7 @@ export class ArgumentListComponent extends ComponentBase implements OnChanges {
     }
 
     private removeEntry(entry) {
+
         const index = this.entries.findIndex(x => x == entry);
 
         if (this.inspector.isInspecting(entry)) {
@@ -154,40 +151,31 @@ export class ArgumentListComponent extends ComponentBase implements OnChanges {
     }
 
     private addEntry() {
-        this.arguments = this.arguments.concat([new CommandArgumentModel()]);
+
         const newEntryLocation = `${this.location}[${this.entries.length}]`;
         const newEntry = new CommandArgumentModel({}, newEntryLocation);
-        const entries  = this.entries.concat(newEntry);
+        const entries = this.entries.concat(newEntry);
         this.update.next(entries);
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-
         this.arguments = changes["entries"].currentValue.map(entry => entry)
             .sort((a, b) => a.position - b.position);
-        debugger;
-        this.arguments = changes["entries"].currentValue.map(entry => ({
-            value: typeof entry.valueFrom.value === "object" ? entry.valueFrom.value.script : entry.valueFrom.value,
-            prefix: entry.arg.prefix,
-            position: entry.arg.position || 0,
-            separate: !!entry.arg.separate,
-            model: entry,
-        })).sort((a, b) => a.position - b.position);
     }
 
-    private updateArgument(form: {position: number, prefix: string, separator: boolean, valueFrom: any}, entry: CommandArgumentModel) {
+    private updateArgument(form: {position: number, prefix: string, separate: boolean, valueFrom: any},
+                           entry: CommandArgumentModel) {
 
         const argument = this.entries.find(x => entry == x);
 
-        const stt = new CommandLineBindingModel({
+        argument.updateBinding(new CommandLineBindingModel({
             position: form.position,
-            separate: form.separator,
+            separate: form.separate,
             prefix: form.prefix,
             valueFrom: form.valueFrom.serialize()
-        }, argument.loc);
-
-        argument.updateBinding(stt);
+        }, argument.loc));
 
         this.update.next(this.entries.slice());
+
     }
 }

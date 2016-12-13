@@ -124,7 +124,6 @@ export class ToolInputListComponent extends ComponentBase {
     }
 
     private addEntry() {
-
         const newEntryLocation = `${this.location}[${this.entries.length}]`;
         const newEntry = new CommandInputParameterModel(newEntryLocation, {type: "string"});
         const entries  = this.entries.concat(newEntry);
