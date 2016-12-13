@@ -55,7 +55,7 @@ import {ValidationClassDirective} from "./components/validation-preview/validati
         QuickPickComponent,
         CompactListComponent,
         EditableDirective,
-        ExpressionModelListComponent
+        ExpressionModelListComponent,
         QuickPickComponent,
         ValidationComponent,
         ValidationClassDirective
