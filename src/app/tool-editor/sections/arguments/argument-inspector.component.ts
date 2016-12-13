@@ -7,48 +7,49 @@ import {ComponentBase} from "../../../components/common/component-base";
 @Component({
     selector: "ct-argument-inspector",
     template: `
-        <form [formGroup]="form"> 
- 
-            <!--Prefix Field-->
-            <div class="form-group row">
-                <label for="prefix" class="col-md-3 col-form-label">Prefix:</label>
-                <div class="col-md-9">
-                    <input formControlName="prefix" class="form-control" id="prefix">
-                </div>
-            </div>
+<ct-form-panel [collapsed]="false">
+
+        <span class="tc-header">
+            Basic
+        </span>
+        
+        <div class="tc-body">
+            <form [formGroup]="form">
             
-            <!--Expression Field-->
-            <div class="form-group row">
-                <label for="valueFrom" class="col-md-3 col-form-label">Expression:</label>
-                <div class="col-md-9">
-                <ct-expression-input formControlName="valueFrom" class="form-control" id="valueFrom"
+                <!--Prefix Field-->
+                <div class="form-group">
+                    <label>Prefix:</label>
+                    <input type="text" class="form-control" [formControl]="form.controls['prefix']">
+                </div>
+                
+                <!--Position Field-->
+                <div class="form-group">
+                    <label>Expression:</label>
+                    <ct-expression-input 
                     [context]="context"
-                    [formControl]="form.controls['valueFrom']">
-                </ct-expression-input>
+                    [formControl]="form.controls['valueFrom']">                    
+                    </ct-expression-input>
                 </div>
-            </div>             
-            
-            <!--Separate field-->
-            <div class="form-group row">
-                <label for="separate" class="col-md-3">Separate:</label>
-                <div class="col-md-9">
-                    <div class="form-check">
-                        <label class="form-check-label">
-                            <input formControlName="separate" id="separate" class="form-check-input" type="checkbox">
-                        </label>
-                    </div>
+                
+                <!--Separator field-->            
+                <div class="form-group flex-container">
+                    <label>Separator:</label>
+                    <span class="align-right">
+                        {{form._value.separate? "Yes" : "No"}}
+                        <toggle-slider [formControl]="form.controls['separate']"></toggle-slider>
+                    </span>
                 </div>
-            </div>   
-                    
-            <!--Position Field-->
-            <div class="form-group row">
-                <label for="position" class="col-md-3 col-form-label">Position:</label>
-                <div class="col-md-9">
-                    <input formControlName="position" type="number" class="form-control" id="position">
+                
+                <!--Position Field-->
+                <div class="form-group">
+                    <label>Position:</label>
+                    <input type="text" type="number" class="form-control" [formControl]="form.controls['position']">
                 </div>
-            </div>
-            
-        </form>
+                
+            </form>
+        </div>
+                
+</ct-form-panel>
 `
 })
 export class ArgumentInspector extends ComponentBase {
