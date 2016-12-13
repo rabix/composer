@@ -1,0 +1,14 @@
+@import "../../../../assets/sass/variables";
+
+.symbol-input {
+    display: inline;
+    width: 95%;
+}
+
+.symbol-list-item {
+    margin-bottom: 0.7rem;
+}
+
+.invalid-input {
+    border: 2px solid $brand-danger;
+}

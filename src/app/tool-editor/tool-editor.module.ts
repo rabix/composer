@@ -11,6 +11,13 @@ import {CWLModule} from "../cwl/cwl.module";
 import {ToolInputInspector} from "./sections/inputs/tool-input-inspector.component";
 import {ArgumentInspector} from "./sections/arguments/argument-inspector.component";
 
+import {BasicInputSectionComponent} from "./object-inspector/basic-section/basic-input-section.component";
+import {InputTypeSelectComponent} from "./common/type-select/type-select.component";
+import {ReactiveFormsModule, FormsModule} from "@angular/forms";
+import {InputDescriptionComponent} from "./object-inspector/input-description/input-description.component";
+import {InputBindingSectionComponent} from "./object-inspector/input-binding/input-binding-section.component";
+import {SymbolsComponent} from "./object-inspector/sybols-component/symbols.component";
+import {StageInputSectionComponent} from "./object-inspector/stage-input-section/stage-input-section.component";
 
 @NgModule({
     declarations: [
@@ -19,6 +26,12 @@ import {ArgumentInspector} from "./sections/arguments/argument-inspector.compone
         FileDefListComponent,
         ToolInputListComponent,
         ToolInputInspector,
+        BasicInputSectionComponent,
+        InputTypeSelectComponent,
+        InputDescriptionComponent,
+        InputBindingSectionComponent,
+        SymbolsComponent,
+        StageInputSectionComponent
         ResourcesComponent
     ],
     exports: [
@@ -28,14 +41,17 @@ import {ArgumentInspector} from "./sections/arguments/argument-inspector.compone
         ResourcesComponent,
         ToolInputListComponent,
         ToolInputInspector,
+        BasicInputSectionComponent,
+        InputDescriptionComponent,
+        StageInputSectionComponent
     ],
     imports: [
         BrowserModule,
         CoreModule,
         CWLModule,
         EditorCommonModule,
-        ReactiveFormsModule,
         FormsModule,
+        ReactiveFormsModule,
     ]
 })
 export class ToolEditorModule {

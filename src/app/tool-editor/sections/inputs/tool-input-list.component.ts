@@ -75,6 +75,7 @@ require("./input-list.component.scss");
                                     <div class="tc-body">
                                         <ct-tool-input-inspector 
                                             (save)="updateInput($event, i)" 
+                                            [context]="context"
                                             [input]="entry">
                                         </ct-tool-input-inspector>
                                     </div>
@@ -104,6 +105,10 @@ export class ToolInputListComponent extends ComponentBase {
     @Input()
     public location = "";
 
+    /** Context in which expression should be evaluated */
+    @Input()
+    public context: {$job: any};
+
     @Input()
     public readonly = false;
 
@@ -131,22 +136,16 @@ export class ToolInputListComponent extends ComponentBase {
         this.update.next(entries);
     }
 
-    private updateInput(form: {id: string, required: boolean, type: string, include: boolean}, index: number) {
-
+    private updateInput(newInput: CommandInputParameterModel, index: number) {
 
         // FIXME: cloning an object ditches its prototype chain, but we need it
         const input = this.entries[index];
-        input.id    = form.id;
 
         /**
          * FIXME: input parameter type needs to be able to switch references
          * then make {@link CommandParameterTypePipe} pure again.
          */
-        Object.assign(input.type, {
-            isNullable: !form.required
-        });
-
-        input.type.setType(form.type as any);
+        Object.assign(input, newInput);
 
         this.update.next(this.entries.slice());
     }

@@ -1,5 +1,5 @@
 import * as Yaml from "js-yaml";
-import {Component, OnInit, Input, OnDestroy, ChangeDetectionStrategy} from "@angular/core";
+import {Component, OnInit, Input, OnDestroy} from "@angular/core";
 import {FormGroup, FormBuilder} from "@angular/forms";
 import {ReplaySubject, BehaviorSubject} from "rxjs/Rx";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
@@ -10,7 +10,6 @@ import {ValidationResponse} from "../../services/web-worker/json-schema/json-sch
 import {WebWorkerService} from "../../services/web-worker/web-worker.service";
 import {ToolSidebarService} from "../../services/sidebars/tool-sidebar.service";
 import {ExpressionSidebarService} from "../../services/sidebars/expression-sidebar.service";
-import {InputSidebarService} from "../../services/sidebars/input-sidebar.service";
 import {ModalService} from "../modal";
 import {noop} from "../../lib/utils.lib";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
@@ -23,7 +22,6 @@ require("./tool-editor.component.scss");
     providers: [
         ToolSidebarService,
         ExpressionSidebarService,
-        InputSidebarService
     ],
     template: `
         <block-loader *ngIf="isLoading"></block-loader>
