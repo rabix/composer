@@ -1,63 +1,37 @@
 import {Component, Input, Output} from "@angular/core";
 import {CommandInputParameterModel} from "cwlts/models/d2sb";
-import {FormBuilder, FormGroup, FormControl} from "@angular/forms";
+import {FormBuilder, FormGroup} from "@angular/forms";
 import {Subject} from "rxjs";
 import {ComponentBase} from "../../../components/common/component-base";
+import {ExpressionInputComponent} from "../../../editor-common/components/expression-input/expression-input.component";
+import {BasicInputSectionComponent} from "../../../tool-editor/object-inspector/basic-section/basic-input-section.component";
+import {InputDescriptionComponent} from "../../../tool-editor/object-inspector/input-description/input-description.component";
+import {StageInputSectionComponent} from "../../../tool-editor/object-inspector/stage-input-section/stage-input-section.component";
 
 @Component({
     selector: "ct-tool-input-inspector",
+    directives: [
+        ExpressionInputComponent,
+        BasicInputSectionComponent,
+        InputDescriptionComponent,
+        StageInputSectionComponent
+    ],
     template: `
         <form [formGroup]="form" (ngSubmit)="onSubmit(form)">
         
-            <!--ID Field-->
-            <div class="form-group row">
-                <label for="id" class="col-md-3 col-form-label">ID:</label>
-                <div class="col-md-9">
-                    <input formControlName="id" class="form-control" id="id">
-                </div>
-            </div>
+            <basic-input-section [formControl]="form.controls['basicInputSection']"
+                                 [context]="context">
+            </basic-input-section>
             
-            <!--Type Field-->
-            <div class="form-group row">
-                <label for="type" class="col-md-3 col-form-label">Type:</label>
-                <div class="col-md-9">
-                    <select formControlName="type" class="form-control" id="type">
-                        <option *ngFor="let opt of inputTypeOptions" [value]="opt">{{ opt }}</option>
-                    </select>
-                </div>
-            </div>
+            <input-description [formControl]="form.controls['description']"></input-description>
             
-            <!--Required Field-->
-            <div class="form-group row">
-                <label for="required" class="col-md-3">Required:</label>
-                <div class="col-md-9">
-                    <div class="form-check">
-                        <label class="form-check-label">
-                            <input formControlName="required" id="required" class="form-check-input" type="checkbox">
-                        </label>
-                    </div>
-                </div>
-            </div>
-            
-            <!--Include in Command Line Field-->
-            <div class="form-group row">
-                <label for="include" class="col-md-3">Bound to CL:</label>
-                <div class="col-md-9">
-                    <div class="form-check">
-                        <label class="form-check-label">
-                            <input formControlName="include" id="required" class="form-check-input" type="checkbox">
-                        </label>
-                    </div>
-                </div>
-            </div>
+            <stage-input [formControl]="form.controls['stageInputSection']"></stage-input>
            
             <!--<div class="form-group row">-->
                 <!--<div class="col-xs-12">-->
                     <!--<button type="submit" class="btn btn-primary">Save</button>-->
                 <!--</div>-->
             <!--</div>-->
-            
-            
         </form>
 `
 })
@@ -66,12 +40,14 @@ export class ToolInputInspector extends ComponentBase {
     @Input()
     public input: CommandInputParameterModel;
 
+    /** Context in which expression should be evaluated */
+    @Input()
+    public context: {$job: any, $self: any} = {};
+
     private form: FormGroup;
 
-    private inputTypeOptions = ["File", "string", "enum", "int", "float", "boolean", "array", "record", "map"];
-
     @Output()
-    public save = new Subject<FormGroup>();
+    public save = new Subject<CommandInputParameterModel>();
 
     constructor(private formBuilder: FormBuilder) {
         super();
@@ -79,16 +55,15 @@ export class ToolInputInspector extends ComponentBase {
 
     ngOnInit() {
         this.form = this.formBuilder.group({
-            id: new FormControl(this.input.id || ""),
-            type: new FormControl(this.input.type.type || "string"),
-            include: new FormControl(this.input.isBound),
-
-            // FIXME: isNullable is undefined when it's not nullable
-            required: new FormControl(!this.input.type.isNullable),
+            basicInputSection: this.input,
+            description: this.input,
+            stageInputSection: this.input,
         });
 
 
-        this.tracked = this.form.valueChanges.subscribe(values => this.save.next(values));
+        this.tracked = this.form.valueChanges.subscribe(_ => {
+            this.save.next(this.input);
+        });
     }
 
     private onSubmit(form: FormGroup) {
