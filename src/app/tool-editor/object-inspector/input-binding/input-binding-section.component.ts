@@ -40,7 +40,7 @@ import {ExpressionModel, CommandLineBindingModel} from "cwlts/models/d2sb";
             <div class="form-group">
                 <label>Position</label>
                 <input class="form-control"
-                       type="text"
+                       type="number"
                        [formControl]="inputBindingFormGroup.controls['position']"/>
              </div>
         
@@ -49,29 +49,15 @@ import {ExpressionModel, CommandLineBindingModel} from "cwlts/models/d2sb";
                 <input class="form-control"
                        [formControl]="inputBindingFormGroup.controls['prefix']"/>
             </div>
-                   
-           <div class="form-group">
-               <label>Separator</label>
-               <select class="form-control" 
-                       [formControl]="inputBindingFormGroup.controls['separate']">
-                       
-                    <option *ngFor="let separatorOption of separatorOptions" 
-                            [value]="separatorOption.value">
-                        {{separatorOption.text}}
-                    </option>
-               </select>
-           </div>
-           
-           <div class="form-group" *ngIf="propertyType === 'array'">
-                <label>Item Separator</label>
-                <select class="form-control" 
-                        [formControl]="inputBindingFormGroup.controls['itemSeparator']">
-                    <option *ngFor="let itemSeparator of itemSeparators" 
-                            [value]="itemSeparator.value">
-                        {{itemSeparator.text}}
-                    </option>
-                </select>
-           </div>
+                 
+            <div class="form-group flex-container">
+                <label>Prefix and value separation</label>
+                <span class="align-right">
+                    <toggle-slider [formControl]="inputBindingFormGroup.controls['separate']"
+                                   [on]="'Separate'"
+                                   [off]="'Join'"></toggle-slider>
+                </span>
+            </div>
     </div>
     `
 })
@@ -94,11 +80,6 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
     private propagateChange = (_) => {
     };
 
-    private separatorOptions: {text: string, value: boolean}[] = [
-        {text: "space", value: true},
-        {text: "empty string", value: false}
-    ];
-
     private itemSeparators: {text: string, value: string}[] = [
         {text: "equal", value: "="},
         {text: "comma", value: ","},
@@ -116,13 +97,6 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
 
         if (!!this.inputBinding) {
             this.createInputBindingForm(this.inputBinding);
-            this.inputBindingFormGroup.updateValueAndValidity();
-        }
-    }
-
-    private ngOnChanges(): void {
-        if (!!this.inputBindingFormGroup) {
-            this.inputBindingFormGroup.updateValueAndValidity();
         }
     }
 
@@ -141,13 +115,11 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
     }
 
     private createInputBindingForm(inputBinding: CommandLineBindingModel): void {
-        const valueFrom = !!inputBinding.valueFrom ? inputBinding.valueFrom : new ExpressionModel(inputBinding.loc, "");
-
         this.inputBindingFormGroup = this.formBuilder.group({
-            valueFrom: [valueFrom, [Validators.required, CustomValidators.cwlModel]],
+            valueFrom: [inputBinding.valueFrom, [Validators.required, CustomValidators.cwlModel]],
             position: [inputBinding.position, [Validators.pattern(/^\d+$/)]],
             prefix: [inputBinding.prefix],
-            separate: [inputBinding.separate ? inputBinding.separate : true],
+            separate: [inputBinding.separate !== false],
             itemSeparator: [!!inputBinding.itemSeparator ? inputBinding.itemSeparator : null]
         });
 
@@ -159,28 +131,16 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
             .distinctUntilChanged()
             .debounceTime(300)
             .subscribe(value => {
-                this.setInputBindingProperty(this.inputBindingFormGroup, 'position', !!Number(value.position) ? Number(value.position) : undefined);
-                this.setInputBindingProperty(this.inputBindingFormGroup, 'prefix', !!value.prefix ? value.prefix : undefined);
-                this.setInputBindingProperty(this.inputBindingFormGroup, 'separate', !!JSON.parse(value.separate) ? JSON.parse(value.separate) : undefined);
-                this.setInputBindingProperty(this.inputBindingFormGroup, 'itemSeparator', !!value.itemSeparator ? value.itemSeparator : undefined);
+                const binding = {
+                    position: value.position || undefined,
+                    prefix: value.prefix || undefined,
+                    separate: value.separate,
+                    itemSeparator: value.itemSeparator || undefined,
+                    valueFrom: this.propertyType !== "record" ? value.valueFrom.serialize() : undefined
+                };
 
-                const trimmedValueFrom: string = value.valueFrom.toString();
-
-                if (!!trimmedValueFrom && this.propertyType !== "record") {
-                    this.inputBinding.setValueFrom(value.valueFrom.serialize());
-                } else {
-                    this.inputBinding.valueFrom = undefined;
-                }
-
+                this.inputBinding = new CommandLineBindingModel(binding);
                 this.propagateChange(this.inputBinding);
             });
-    }
-
-    private setInputBindingProperty(form: FormGroup, propertyName: string, newValue: any): void {
-        if (form.controls[propertyName].valid) {
-            this.inputBinding[propertyName] = newValue;
-        } else {
-            delete this.inputBinding[propertyName];
-        }
     }
 }
