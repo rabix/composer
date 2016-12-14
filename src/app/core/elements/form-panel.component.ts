@@ -4,7 +4,7 @@ import {Component, Input, ChangeDetectionStrategy} from "@angular/core";
     selector: "ct-form-panel",
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-        <div class="form-section container">
+        <div class="form-section container" [class.borderless]="borderless">
             <div class="row">
                 <div class="col-xs-12">
                     <i class="fa clickable pull-right"
@@ -28,6 +28,9 @@ import {Component, Input, ChangeDetectionStrategy} from "@angular/core";
 `
 })
 export class FormPanelComponent {
+
+    @Input()
+    public borderless = false;
 
     @Input()
     public collapsed = false;

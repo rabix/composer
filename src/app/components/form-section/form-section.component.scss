@@ -8,6 +8,11 @@
   padding: $gui-section-padding;
   border: 1px solid $gui-section-border;
 
+  .borderless {
+    border: none;
+    padding: 0;
+  }
+
   .gui-section-list-title {
     font-family: $font-family-title;
     font-size: $font-size-sm;

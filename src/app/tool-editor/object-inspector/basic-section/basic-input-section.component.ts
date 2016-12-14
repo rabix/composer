@@ -29,15 +29,12 @@ require("./basic-input-section.component.scss");
         { provide: NG_VALIDATORS, useExisting: forwardRef(() => BasicInputSectionComponent), multi: true }
     ],
     template: `
-<ct-form-panel>
-    <div class="tc-header">Basic</div>
-    <div class="tc-body" *ngIf="input">
 
           <form class="basic-input-section">
                 <div class="form-group flex-container">
                     <label>Required</label>
                     <span class="align-right">
-                        {{!input.type.isNullable ? "Yes" : "No"}}
+                        {{input.type.isNullable ? "No" : "Yes"}}
                         <toggle-slider [formControl]="basicSectionForm.controls['isRequired']"></toggle-slider>
                     </span>
                 </div> <!-- Required -->
@@ -86,8 +83,6 @@ require("./basic-input-section.component.scss");
                             [formControl]="basicSectionForm.controls['inputBinding']"></input-binding-section>
               
             </form> <!--basic-input-section-->
-        </div> <!--tc-body-->
-</ct-form-panel>
 `
 })
 export class BasicInputSectionComponent extends ComponentBase implements ControlValueAccessor {
@@ -118,12 +113,12 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
         this.basicSectionForm = this.formBuilder.group({
             propertyIdForm: [this.input.id],
             typeForm: [this.input.type, [Validators.required, CustomValidators.cwlModel]],
-            isBound: [!!this.input.isBound],
+            isBound: [this.input.isBound],
             //FIXME: isNullable is undefined when it's not nullable
             isRequired: [!this.input.type.isNullable],
-            inputBinding: [this.input.inputBinding],
-            itemType: [!!this.input.type.items ? this.input.type.items: 'string'],
-            symbols: [!!this.input.type.symbols ? this.input.type.symbols: this.initSymbolsList]
+            inputBinding: [this.input.inputBinding, CustomValidators.cwlModel],
+            itemType: [this.input.type.items ? this.input.type.items: 'string'],
+            symbols: [this.input.type.symbols ? this.input.type.symbols: this.initSymbolsList]
         });
 
         this.listenToIsBoundChanges();
@@ -133,7 +128,6 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
         this.tracked = this.basicSectionForm.valueChanges.subscribe(value => {
             this.input.type.isNullable = !value.isRequired;
-            this.input.inputBinding = value.inputBinding;
 
             if (value.symbols.length > 0 && this.input.type.type === 'enum') {
                 this.input.type.symbols = value.symbols;
@@ -141,6 +135,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
                 this.input.type.symbols = undefined;
             }
 
+            this.input.validate();
             this.propagateChange(this.input);
         });
     }
@@ -153,7 +148,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
         this.onTouched = fn;
     }
 
-    private validate(c: FormControl) {
+    validate(c: FormControl) {
         return this.basicSectionForm.valid ? null: { error: "Basic input section is not valid." }
     }
 
@@ -162,6 +157,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
             if (isBound) {
                 this.input.createInputBinding();
                 this.basicSectionForm.setControl('inputBinding', new FormControl(this.input.inputBinding));
+                this.listenToInputBindingChanges();
             } else {
                 this.input.removeInputBinding();
                 this.basicSectionForm.removeControl('inputBinding');
@@ -183,7 +179,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
     private listenToInputBindingChanges(): void {
         this.tracked = this.basicSectionForm.controls['inputBinding'].valueChanges
             .subscribe((inputBinding: CommandLineBindingModel)  => {
-                this.input.inputBinding = inputBinding;
+                this.input.updateInputBinding(inputBinding);
             });
     }
 

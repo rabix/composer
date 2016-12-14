@@ -7,6 +7,8 @@ export class CustomValidators {
         const val    = c.value;
         let res: any = {};
 
+        if (!val || !val.validation) return null;
+
         if (val.validation.errors.length) {
             res.errors = val.validation.errors;
         }
