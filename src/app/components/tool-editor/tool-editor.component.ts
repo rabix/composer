@@ -151,7 +151,6 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
             this.commandLineParts = this.toolModel.getCommandLineParts();
 
             this.toolModel.setValidationCallback((res: Validation) => {
-                console.log("Updating tool validation via callback", res);
                 this.validation.next({
                     errors: res.errors,
                     warnings: res.warnings,
