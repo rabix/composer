@@ -1,11 +1,12 @@
 import {Subject} from "rxjs";
-import {Component, Input, ChangeDetectionStrategy, OnChanges, SimpleChanges, Output} from "@angular/core";
+import {
+    Component, Input, ChangeDetectionStrategy, OnChanges, SimpleChanges, Output, ViewChildren,
+    QueryList, TemplateRef
+} from "@angular/core";
 import {ComponentBase} from "../../../components/common/component-base";
 import {CommandArgumentModel, ExpressionModel} from "cwlts/models/d2sb";
 import {CommandLineBindingModel} from "cwlts/models/d2sb/CommandLineBindingModel";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
-import {Expression} from "@angular/compiler/src/output/output_ast";
-
 
 require("./argument-list.component.scss");
 
@@ -129,6 +130,9 @@ export class ArgumentListComponent extends ComponentBase implements OnChanges {
     @Output()
     public readonly update = new Subject();
 
+    @ViewChildren("inspector", {read: TemplateRef})
+    private inspectorTemplate: QueryList<TemplateRef<any>>;
+
     constructor(private inspector: EditorInspectorService) {
         super();
     }
@@ -155,6 +159,14 @@ export class ArgumentListComponent extends ComponentBase implements OnChanges {
         const newEntry = new CommandArgumentModel({}, newEntryLocation);
         const entries = this.entries.concat(newEntry);
         this.update.next(entries);
+
+        this.inspectorTemplate.changes
+            .take(1)
+            .delay(1)
+            .map(list => list.last)
+            .subscribe(templateRef => {
+                this.inspector.show(templateRef, newEntry);
+            });
     }
 
     ngOnChanges(changes: SimpleChanges): void {
