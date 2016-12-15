@@ -13,12 +13,8 @@ import {
     CommandLineBindingModel,
     InputParameterTypeModel
 } from "cwlts/models/d2sb";
-import {ToggleComponent} from "../../../editor-common/components/toggle-slider/toggle-slider.component";
-import {InputTypeSelectComponent} from "../../common/type-select/type-select.component";
 import {ComponentBase} from "../../../components/common/component-base";
 import {CustomValidators} from "../../../validators/custom.validator";
-import {FormPanelComponent} from "../../../core/elements/form-panel.component";
-import {InputBindingSectionComponent} from "../input-binding/input-binding-section.component";
 
 require("./basic-input-section.component.scss");
 
@@ -34,8 +30,10 @@ require("./basic-input-section.component.scss");
                 <div class="form-group flex-container">
                     <label>Required</label>
                     <span class="align-right">
-                        {{input.type.isNullable ? "No" : "Yes"}}
-                        <toggle-slider [formControl]="basicSectionForm.controls['isRequired']"></toggle-slider>
+                        <toggle-slider [formControl]="basicSectionForm.controls['isRequired']"
+                                       [off]="'No'" 
+                                       [on]="'Yes'">
+                        </toggle-slider>
                     </span>
                 </div> <!-- Required -->
             
@@ -67,8 +65,10 @@ require("./basic-input-section.component.scss");
                         *ngIf="input.type.type !== 'map' && basicSectionForm.controls['isBound']">
                     <label>Include in command line</label>
                     <span class="align-right">
-                        {{input.isBound ? "Yes" : "No"}}
-                        <toggle-slider [formControl]="basicSectionForm.controls['isBound']"></toggle-slider>
+                        <toggle-slider [formControl]="basicSectionForm.controls['isBound']" 
+                                       [off]="'No'" 
+                                       [on]="'Yes'">
+                        </toggle-slider>
                     </span>
                 </div> <!-- Include in commandline -->
                 
