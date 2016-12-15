@@ -52,8 +52,8 @@ export class ValidationIssuesComponent implements OnInit, OnDestroy {
     @Output()
     public select = new ReplaySubject<"validation">();
 
-    private issues      = ValidationResponse;
-    private buttonText  = "No Issues";
+    private issues: ValidationResponse;
+    private buttonText = "No Issues";
 
     private subs: Subscription[] = [];
 

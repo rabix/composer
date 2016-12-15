@@ -14,6 +14,7 @@ import {ModalService} from "../modal";
 import {noop} from "../../lib/utils.lib";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {ViewMode} from "../view-switcher/view-switcher.component";
+import {Validation} from "../../../../node_modules/cwlts/models/helpers/validation/Validation";
 
 require("./tool-editor.component.scss");
 
@@ -149,6 +150,17 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
             this.toolModel        = new CommandLineToolModel("document", json);
             this.commandLineParts = this.toolModel.getCommandLineParts();
 
+            this.toolModel.setValidationCallback((res: Validation) => {
+                console.log("Updating tool validation via callback", res);
+                this.validation.next({
+                    errors: res.errors,
+                    warnings: res.warnings,
+                    isValidatableCwl: true,
+                    isValidCwl: true,
+                    isValidJSON: true
+                });
+            });
+
             this.toolModel.validate();
 
             return {
@@ -186,28 +198,28 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
 
         if (view === ViewMode.Gui) {
 
-            // if (this.showReformatPrompt) {
-            //     this.modal.checkboxPrompt({
-            //         title: "Confirm GUI Formatting",
-            //         content: "Activating GUI mode might change the formatting of this document. Do you wish to continue?",
-            //         cancellationLabel: "Cancel",
-            //         confirmationLabel: "OK",
-            //         checkboxLabel: "Don't show this dialog again",
-            //     }).then(res => {
-            //         if (res) this.userPrefService.put("show_reformat_prompt", false);
-            //
-            //         this.showReformatPrompt = false;
-            //         this.viewMode           = view;
-            //     }, noop);
-            //
-            // } else {
+            if (this.showReformatPrompt) {
+                this.modal.checkboxPrompt({
+                    title: "Confirm GUI Formatting",
+                    content: "Activating GUI mode might change the formatting of this document. Do you wish to continue?",
+                    cancellationLabel: "Cancel",
+                    confirmationLabel: "OK",
+                    checkboxLabel: "Don't show this dialog again",
+                }).then(res => {
+                    if (res) this.userPrefService.put("show_reformat_prompt", false);
+
+                    this.showReformatPrompt = false;
+                    this.viewMode           = view;
+                }, noop);
+
+            } else {
                 this.viewMode = view;
-            // }
+            }
         } else if (view === ViewMode.Code) {
             console.log("Is tool group dirty", this.toolGroup.dirty);
-            // if (this.toolGroup.dirty) {
+            if (this.toolGroup.dirty) {
                 this.rawEditorContent.next(this.getModelText());
-            // }
+            }
 
             this.viewMode = view;
         }
