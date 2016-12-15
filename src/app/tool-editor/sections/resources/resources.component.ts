@@ -3,6 +3,7 @@ import {FormControl} from "@angular/forms";
 import {ResourceRequirementModel} from "cwlts/models/d2sb";
 import {Output} from "@angular/core";
 import {ReplaySubject} from "rxjs";
+import {ExpressionModel} from "../../../../../node_modules/cwlts/models/d2sb/ExpressionModel";
 
 
 @Component({
@@ -38,8 +39,8 @@ import {ReplaySubject} from "rxjs";
 export class ResourcesComponent {
     @Input()
     entries: {
-        "sbg:CPURequirement"?: ResourceRequirementModel,
-        "sbg:MemRequirement"?: ResourceRequirementModel
+        cpu?: ResourceRequirementModel,
+        mem?: ResourceRequirementModel
     };
 
     @Input()
@@ -67,18 +68,24 @@ export class ResourcesComponent {
     };
 
     ngOnInit() {
-        this.memControl.setValue(this.entries["sbg:MemRequirement"].value);
-        this.cpuControl.setValue(this.entries["sbg:CPURequirement"].value);
+        this.memControl.setValue(this.entries.mem ? this.entries.mem.value : "");
+        this.cpuControl.setValue(this.entries.cpu ? this.entries.cpu.value : "");
 
-        this.memControl.valueChanges.subscribe(val => {
-            const res = this.entries["sbg:MemRequirement"];
-            res.value = val;
+        this.memControl.valueChanges.subscribe(value => {
+            if (!(value instanceof ExpressionModel)) {
+               value = new ExpressionModel("", value);
+            }
+            const res = this.entries.mem || new ResourceRequirementModel({class: "sbg:MemRequirement", value}, "");
+            res.value = value;
             this.update.next(res);
         });
 
-        this.cpuControl.valueChanges.subscribe(val => {
-            const res = this.entries["sbg:CPURequirement"];
-            res.value = val;
+        this.cpuControl.valueChanges.subscribe(value => {
+            if (!(value instanceof ExpressionModel)) {
+                value = new ExpressionModel("", value);
+            }
+            const res = this.entries.cpu || new ResourceRequirementModel({class: "sbg:CPURequirement", value}, "");
+            res.value = value;
             this.update.next(res);
         });
     }

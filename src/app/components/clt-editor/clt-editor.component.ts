@@ -16,7 +16,7 @@ require("./clt-editor.component.scss");
             <form [class.col-xs-6]="showInspector" 
                   [class.col-xs-12]="!showInspector" 
                   [formGroup]="formGroup">
-                <ct-docker-image-form [dockerRequirement]="model.hints.DockerRequirement"
+                <ct-docker-image-form [dockerRequirement]="model.docker"
                                    [form]="formGroup.controls['dockerGroup']"
                                    (update)="setRequirement($event, true)">
                 </ct-docker-image-form>
@@ -31,7 +31,7 @@ require("./clt-editor.component.scss");
                 
                 <ct-output-ports [entries]="model.outputs || []" [readonly]="readonly"></ct-output-ports>
                                    
-                <ct-resources [entries]="resources" 
+                <ct-resources [entries]="model.resources" 
                               [readonly]="readonly" 
                               (update)="setResource($event)" 
                               [context]="{$job: model.job}">
@@ -89,10 +89,10 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
 
         console.log("Model", this.model);
 
-        if (this.model.hints) {
-            this.resources["sbg:CPURequirement"] = this.model.hints["sbg:CPURequirement"] || new ResourceRequirementModel({class: "sbg:CPURequirement", value: ""}, "");
-            this.resources["sbg:MemRequirement"] = this.model.hints["sbg:MemRequirement"] || new ResourceRequirementModel({class: "sbg:MemRequirement", value: ""}, "");
-        }
+        // if (this.model.resources) {
+        //     this.resources["sbg:CPURequirement"] = this.model.hints["sbg:CPURequirement"] || new ResourceRequirementModel({class: "sbg:CPURequirement", value: ""}, "");
+        //     this.resources["sbg:MemRequirement"] = this.model.hints["sbg:MemRequirement"] || new ResourceRequirementModel({class: "sbg:MemRequirement", value: ""}, "");
+        // }
     }
 
     private updateModel(category: string, data: any) {
