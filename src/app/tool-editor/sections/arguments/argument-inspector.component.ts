@@ -7,7 +7,7 @@ import {ComponentBase} from "../../../components/common/component-base";
 @Component({
     selector: "ct-argument-inspector",
     template: `
-<ct-form-panel [collapsed]="false">
+<ct-form-panel [borderless]="true" [collapsed]="false">
 
         <span class="tc-header">
             Basic
@@ -22,7 +22,7 @@ import {ComponentBase} from "../../../components/common/component-base";
                     <input type="text" class="form-control" [formControl]="form.controls['prefix']">
                 </div>
                 
-                <!--Position Field-->
+                <!--Expression Field-->
                 <div class="form-group">
                     <label>Expression:</label>
                     <ct-expression-input 
