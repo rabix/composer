@@ -4,7 +4,7 @@ import {Validation} from "cwlts/models/helpers/validation";
 @Directive({
     host: {
         "[class.error]": "errors",
-        "[class.warning]": "warnings",
+        "[class.warning]": "warnings && !errors",
         "[class.validatable]": "'true'"
     },
     selector: "[ct-validation-class]"

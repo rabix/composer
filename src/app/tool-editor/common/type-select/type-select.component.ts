@@ -20,7 +20,7 @@ import {ComponentBase} from "../../../components/common/component-base";
 })
 export class InputTypeSelectComponent extends ComponentBase implements ControlValueAccessor {
 
-    private inputParameter: InputParameterTypeModel;
+    private paramType: InputParameterTypeModel;
 
     private propertyTypes = ["array", "enum", "record", "File", "string", "int", "float", "boolean", "map"];
 
@@ -34,21 +34,27 @@ export class InputTypeSelectComponent extends ComponentBase implements ControlVa
         super();
     }
 
-    private writeValue(inputParameter: InputParameterTypeModel): void {
-        this.inputParameter = inputParameter;
-        this.typeSelectControl = new FormControl(this.inputParameter.type, [Validators.required]);
+    writeValue(paramType: InputParameterTypeModel): void {
+        this.paramType = paramType;
+
+        if (this.paramType.type === undefined) {
+            this.paramType.type = "File";
+            this.propagateChange(this.paramType);
+        }
+
+        this.typeSelectControl = new FormControl(this.paramType.type, [Validators.required]);
 
         this.tracked = this.typeSelectControl.valueChanges.subscribe((value: PrimitiveParameterType) => {
-            this.inputParameter.type = value;
-            this.propagateChange(this.inputParameter);
+            this.paramType.type = value;
+            this.propagateChange(this.paramType);
         });
     }
 
-    private registerOnChange(fn: any): void {
+    registerOnChange(fn: any): void {
         this.propagateChange = fn;
     }
 
-    private registerOnTouched(fn: any): void {
+    registerOnTouched(fn: any): void {
         this.onTouched = fn;
     }
 

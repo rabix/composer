@@ -9,11 +9,8 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {ToolInputListComponent} from "./sections/inputs/tool-input-list.component";
 import {CWLModule} from "../cwl/cwl.module";
 import {ToolInputInspector} from "./sections/inputs/tool-input-inspector.component";
-import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-
 import {BasicInputSectionComponent} from "./object-inspector/basic-section/basic-input-section.component";
 import {InputTypeSelectComponent} from "./common/type-select/type-select.component";
-import {ReactiveFormsModule, FormsModule} from "@angular/forms";
 import {InputDescriptionComponent} from "./object-inspector/input-description/input-description.component";
 import {InputBindingSectionComponent} from "./object-inspector/input-binding/input-binding-section.component";
 import {SymbolsComponent} from "./object-inspector/sybols-component/symbols.component";
@@ -34,11 +31,12 @@ import {SecondaryFilesComponent} from "./object-inspector/secondary-files/second
         StageInputSectionComponent,
         ResourcesComponent,
         SecondaryFilesComponent
+        StageInputSectionComponent
     ],
     exports: [
         ArgumentListComponent,
         FileDefListComponent,
-        ResourcesComponent
+        ResourcesComponent,
         ToolInputListComponent,
         ToolInputInspector,
         BasicInputSectionComponent,

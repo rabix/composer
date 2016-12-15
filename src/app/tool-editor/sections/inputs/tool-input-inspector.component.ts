@@ -41,7 +41,7 @@ export class ToolInputInspector extends ComponentBase {
 
     /** Context in which expression should be evaluated */
     @Input()
-    public context: {$job: any, $self: any} = {};
+    public context: {$job?: any, $self?: any} = {};
 
     private form: FormGroup;
 

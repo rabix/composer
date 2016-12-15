@@ -28,7 +28,6 @@ require("./base-command-form.components.scss");
 
     `
 })
-//TODO: change to custom form
 export class BaseCommandFormComponent extends ComponentBase implements OnInit, OnDestroy {
     /** baseCommand property of model */
     @Input()

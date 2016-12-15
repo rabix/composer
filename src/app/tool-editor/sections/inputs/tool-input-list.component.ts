@@ -1,4 +1,12 @@
-import {Component, Input, ChangeDetectionStrategy, Output} from "@angular/core";
+import {
+    Component,
+    Input,
+    ChangeDetectionStrategy,
+    Output,
+    ViewChildren,
+    TemplateRef,
+    QueryList
+} from "@angular/core";
 import {ComponentBase} from "../../../components/common/component-base";
 import {CommandInputParameterModel} from "cwlts/models/d2sb";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
@@ -30,7 +38,7 @@ require("./input-list.component.scss");
                     <!--List Header Row-->
                     <div class="gui-section-list-title row">
                         <div class="col-sm-4">ID</div>
-                        <div class="col-sm-4">Type</div>
+                        <div class="col-sm-3">Type</div>
                         <div class="col-sm-4">Binding</div>
                     </div>
                 
@@ -51,12 +59,12 @@ require("./input-list.component.scss");
                             </div>
                             
                             <!--Type Column-->
-                            <div class="col-sm-4 ellipsis">
+                            <div class="col-sm-3 ellipsis">
                                 {{ entry.type | commandParameterType }}
                             </div>
                             
                             <!--Binding Column-->
-                            <div class="col-sm-3 ellipsis" [class.col-sm-4]="readonly">
+                            <div class="col-sm-4 ellipsis" [class.col-sm-5]="readonly">
                                 {{ entry.inputBinding | commandInputBinding }}
                             </div>
                             
@@ -70,7 +78,7 @@ require("./input-list.component.scss");
                             <!--Object Inspector Template -->
                             <template #inspector>
                                 <ct-editor-inspector-content>
-                                    <div class="tc-header">Input</div>
+                                    <div class="tc-header">{{ entry.loc || "Input" }}</div>
                                     <div class="tc-body">
                                         <ct-tool-input-inspector 
                                             (save)="updateInput($event, i)" 
@@ -114,6 +122,9 @@ export class ToolInputListComponent extends ComponentBase {
     @Output()
     public readonly update = new Subject();
 
+    @ViewChildren("inspector", {read: TemplateRef})
+    private inspectorTemplate: QueryList<TemplateRef<any>>;
+
     constructor(private inspector: EditorInspectorService) {
         super();
     }
@@ -130,9 +141,17 @@ export class ToolInputListComponent extends ComponentBase {
 
     private addEntry() {
         const newEntryLocation = `${this.location}[${this.entries.length}]`;
-        const newEntry = new CommandInputParameterModel(newEntryLocation, {type: "string"});
-        const entries  = this.entries.concat(newEntry);
+        const newEntry         = new CommandInputParameterModel(newEntryLocation);
+        const entries          = this.entries.concat(newEntry);
         this.update.next(entries);
+
+        this.inspectorTemplate.changes
+            .take(1)
+            .delay(1)
+            .map(list => list.last)
+            .subscribe(templateRef => {
+                this.inspector.show(templateRef, newEntry);
+            });
     }
 
     private updateInput(newInput: CommandInputParameterModel, index: number) {
