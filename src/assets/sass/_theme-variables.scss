@@ -34,7 +34,7 @@ $gui-section-list-item-hover-icon-color: $gui-section-list-item-icon-color;
 $gui-section-list-item-select-border: $brand-primary;
 $gui-section-list-item-select-bg: $brand-primary;
 $gui-section-list-item-select-color: white;
-$gui-section-list-item-select-icon-color: $gui-section-list-item-icon-color;
+$gui-section-list-item-select-icon-color: white;
 
 $gui-section-list-item-border-size: 2px;
 $gui-section-list-item-border-radius: $border-radius;
@@ -48,10 +48,15 @@ $editor-color: $text-dark;
 /**
  * RESULTING COMMAND LINE
  */
+$uncoded-color: $text-dark;
 $console-default-color: $text-light;
 $base-cmd-color: #7AC24D;
 $input-port-color: #A77ED7;
+$output-port-color: $uncoded-color;
 $arg-color: #FDA365;
+$console-error-color: lighten($brand-danger, 30%);
+$console-warning-color: $brand-warning;
+
 
 /**
  * FILE TABS
@@ -80,6 +85,7 @@ $panel-header-color: $chrome-dark-text;
 /**
  * PANEL ITEMS
  */
+$panel-item-width: 26px;
 $panel-item-color: white;
 $panel-item-icon-color: $panel-item-color;
 
@@ -118,6 +124,10 @@ $expression-editor-help-icon-color: #818286;
 $expression-editor-border: #3B3F46;
 
 $expression-editor-text-muted: #555658;
+$expression-editor-error-color: $console-error-color;
+$expression-editor-warning-color: $console-warning-color;
+
+$expression-editor-result-height: 150px;
 
 /**
  * ALERT OVERRIDES
@@ -166,6 +176,11 @@ $alert-danger-icon: $state-danger-border;
 $btn-secondary-color: $body-color;
 $btn-secondary-bg: #f9f9f9;
 $btn-secondary-border: #c7c7c7;
+
+/**
+* Quick-pick component
+*/
+$quick-pick-border-color: $brand-primary;
 
 /** button borders */
 $btn-success-border: #328e46;

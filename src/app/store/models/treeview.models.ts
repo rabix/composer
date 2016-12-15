@@ -5,7 +5,9 @@ export enum NodeExpansionState {
     Contracted,
     NonExpandable
 }
-
+/**
+ * @deprecated
+ */
 export class TreeNode<C> {
 
     protected title;

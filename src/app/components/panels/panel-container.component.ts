@@ -5,22 +5,12 @@ import {PanelHandleComponent} from "./panel-handle.component";
 import {SBUserProjectsPanelComponent} from "./sb-user-projects-panel.component";
 import {SBPublicAppsPanelComponent} from "./sb-public-apps-panel.component";
 import {StructurePanelComponent} from "./structure-panel.component";
-import {RevisionsPanelComponent} from "./revisions-panel.component";
 import {LocalFilesPanelComponent} from "./local-files-panel.component";
 
 require("./panel-container.component.scss");
 
 @Component({
     selector: "ct-panel-container",
-    directives: [
-        LocalFilesPanelComponent,
-        PanelComponent,
-        PanelHandleComponent,
-        RevisionsPanelComponent,
-        SBPublicAppsPanelComponent,
-        SBUserProjectsPanelComponent,
-        StructurePanelComponent,
-    ],
     template: `
         <template ngFor let-panel [ngForOf]="panelList | async" let-isLast="last">
             <ct-panel [size]="totalPanelSize" [class.hidden]="!panel.active">
@@ -28,7 +18,7 @@ require("./panel-container.component.scss");
                 <ct-sb-public-apps-panel class="full-width" *ngIf="panel.id === 'sb_public_apps'"></ct-sb-public-apps-panel>
                 <ct-local-files-panel class="full-width" *ngIf="panel.id === 'local_files'"></ct-local-files-panel>
                 <ct-structure-panel class="full-width" *ngIf="panel.id === 'structure'"></ct-structure-panel>
-                <ct-revisions-panel class="full-width" *ngIf="panel.id === 'revisions'"></ct-revisions-panel>
+                
             </ct-panel>    
             <!--<ct-panel-handle [class.hidden]="isLast || (visiblePanelCount | async) < 2"></ct-panel-handle>-->
         </template>

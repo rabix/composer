@@ -6,9 +6,15 @@ import {ValidationResponse} from "../../services/web-worker/json-schema/json-sch
     selector: "validation-issues",
     template: `
             <div class="console-component" [ngClass]="{show: show}">
-                <div class="console-content">
-                    <p class="errors">
-                        {{ issues?.errorText }}
+                <div class="console-content" *ngIf="issues">
+                    <p class="error-text" *ngFor="let error of issues.errors">
+                        {{ error.loc ? error.loc + ": " : ""}}
+                        {{ error.message }}
+                    </p>
+                    
+                    <p class="warning-text" *ngFor="let warning of issues.warnings">
+                        {{ warning.loc ? warning.loc + ": " : ""}}
+                        {{ warning.message }}
                     </p>
                 </div>
             </div>  
@@ -17,13 +23,13 @@ import {ValidationResponse} from "../../services/web-worker/json-schema/json-sch
             class="btn btn-sm"
             (click)="toggleConsole()">
                 <span *ngIf="issues?.errors?.length > 0">
-                    <i class="fa fa-times-circle errors">
+                    <i class="fa fa-times-circle error">
                     </i>
                     {{ issues?.errors?.length }}
 
                 </span>
                 <span *ngIf="issues?.warnings?.length > 0">
-                    <i class="fa fa-warning warnings">
+                    <i class="fa fa-warning warning">
                     </i>
                     {{ issues?.warnings?.length }}
                 </span>
@@ -46,8 +52,8 @@ export class ValidationIssuesComponent implements OnInit, OnDestroy {
     @Output()
     public select = new ReplaySubject<"validation">();
 
-    private issues      = ValidationResponse;
-    private buttonText  = "No Issues";
+    private issues: ValidationResponse;
+    private buttonText = "No Issues";
 
     private subs: Subscription[] = [];
 

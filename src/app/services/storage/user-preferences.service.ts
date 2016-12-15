@@ -1,4 +1,5 @@
 import {Injectable} from "@angular/core";
+import {Observable} from "rxjs";
 
 
 @Injectable()
@@ -14,18 +15,22 @@ export class UserPreferencesService {
         this.storage.setItem(key, JSON.stringify(value));
     }
 
-    public get(key: string, fallback = undefined): any {
+    public get<T>(key: string, fallback?: T, saveDefault = false): Observable<T> {
+
         const val = this.storage.getItem(key);
 
         if (!val && typeof val !== "number") {
-            return fallback;
+            if (saveDefault) {
+                this.put(key, fallback);
+            }
+            return Observable.of(fallback);
         }
 
-        if(val === "undefined"){
+        if (val === "undefined") {
             this.storage.removeItem(key);
-            return fallback;
+            return Observable.of(fallback);
         }
 
-        return JSON.parse(val);
+        return Observable.of(JSON.parse(val));
     }
 }

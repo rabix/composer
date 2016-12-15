@@ -2,12 +2,8 @@
 
 ct-clt-editor {
     overflow-y: auto;
-    height: 100%;
     color: $text-dark;
+    width: 100%;
     padding: 20px;
     display: block;
-
-    .clt-editor-group {
-        width: 60%;
-    }
 }

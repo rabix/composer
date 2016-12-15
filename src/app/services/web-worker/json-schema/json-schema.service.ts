@@ -1,5 +1,6 @@
 //this method is here to avoid linting errors
 declare function postMessage(message: ValidationResponse);
+declare function require(s: string);
 
 export interface ValidationResponse {
     isValidatableCwl: boolean,
@@ -7,9 +8,10 @@ export interface ValidationResponse {
     isValidJSON: boolean,
     errors: Array<any>,
     warnings: Array<any>,
-    errorText?: string,
     class?: "CommandLineTool" | "Workflow"
 }
+
+const YAML = require("js-yaml");
 
 // This class should only be used inside a WebWorker,
 // because it relies on the WebWorkers postMessage method
@@ -61,13 +63,13 @@ export class JsonSchemaService {
             const isValid = this.isClassValid(json.class);
 
             if (!isValid) {
-                this.errorMessage = "CWL Class is not valid";
+                this.errorMessage = `CWL class is not valid, expected one of "Workflow", "CommandLineTool", or "ExpressionTool". Instead, got ${json.class}`;
             }
 
             return isValid;
 
         } else {
-            this.errorMessage = "JSON is missing 'class' property";
+            this.errorMessage = "Document is missing 'class' property";
             return false;
         }
     }
@@ -80,15 +82,14 @@ export class JsonSchemaService {
         let jsonClass;
 
         try {
-            cwlJson = JSON.parse(jsonText);
+            cwlJson = YAML.safeLoad(jsonText, {json: true});
         } catch (e) {
             this.sendValidationResult({
                 isValidatableCwl: false,
                 isValidCwl: false,
                 isValidJSON: false,
-                errors: ["Not valid JSON"],
-                warnings: [],
-                errorText: "Not valid JSON"
+                errors: [{message: "Not valid file format", loc: "document"}],
+                warnings: []
             });
             return;
         }
@@ -98,21 +99,21 @@ export class JsonSchemaService {
                 isValidCwl: false,
                 isValidJSON: true,
                 isValidatableCwl: false,
-                errors: [this.errorMessage],
-                warnings: [],
-                errorText: this.errorMessage
+                errors: [{message: this.errorMessage, loc: "document"}],
+                warnings: []
             });
         } else {
-            cwlVersion = cwlJson.cwlVersion || 'draft-2';
-            jsonClass = cwlJson.class;
+            cwlVersion       = cwlJson.cwlVersion || 'draft-2';
+            jsonClass        = cwlJson.class;
+            const isValidCWL = validator.validate(cwlVersion + jsonClass, cwlJson);
+            const errors     = validator.errors || [];
 
-            let result:ValidationResponse= {
+            let result: ValidationResponse = {
                 isValidJSON: true,
                 isValidatableCwl: true,
-                isValidCwl: validator.validate(cwlVersion + jsonClass, cwlJson),
-                errors: validator.errors || [],
+                isValidCwl: isValidCWL,
+                errors: this.formatErrors(errors),
                 warnings: [],
-                errorText: validator.errorsText(),
                 class: jsonClass
             };
 
@@ -120,7 +121,39 @@ export class JsonSchemaService {
         }
     }
 
+    private formatErrors(errors: AVJResult[]) {
+        return errors.map(err => {
+            let message = err.message;
+            if (err.keyword === "enum") {
+                message += ": " + err.params.allowedValues;
+            }
+
+            return {
+                message: message,
+                loc: `document${err.dataPath}`
+            }
+        }).reduce((acc, curr) => {
+            acc = acc.filter(err => {
+                return err.message !== curr.message || err.loc !== curr.loc
+            });
+
+            acc.push(curr);
+
+            return acc;
+        }, []);
+    }
+
     private sendValidationResult(result: ValidationResponse) {
         postMessage(result);
     }
+}
+
+interface AVJResult {
+    dataPath: string,
+    keyword: string,
+    message: string,
+    params: {
+        allowedValues: string[]
+    },
+    schemaPath: string
 }

@@ -1,25 +1,27 @@
-import {Injectable, ComponentFactoryResolver, ViewContainerRef, ComponentRef, ApplicationRef} from "@angular/core";
-import {ModalComponent, ModalOptions} from "./modal.component";
+import {Injectable, ComponentFactoryResolver, ViewContainerRef, ComponentRef} from "@angular/core";
 import {Subject} from "rxjs";
-import {ConfirmComponent} from "./common/confirm.component";
-import {PromptComponent} from "./common/prompt.component";
 import {CheckboxPromptComponent} from "./common/checkbox-prompt.component";
+import {ConfirmComponent} from "./common/confirm.component";
+import {ModalComponent, ModalOptions} from "./modal.component";
+import {PromptComponent} from "./common/prompt.component";
 import {PromptParams, ConfirmationParams} from "./types";
 import {refAssign} from "../../lib/object.lib";
 
 @Injectable()
 export class ModalService {
 
-    private rootViewRef: ViewContainerRef;
+    /**
+     * This needs to be hack-set from a component that has the view ref.
+     * Still not gracefully solved with Angular.
+     * {@link MainComponent.constructor}
+     */
+    public rootViewRef: ViewContainerRef;
+
     private modalComponentRef: ComponentRef<ModalComponent>;
 
     private onClose = new Subject<any>();
 
-    constructor(private resolver: ComponentFactoryResolver,
-                private appRef: ApplicationRef) {
-
-        // https://github.com/angular/angular/issues/9293
-        this.rootViewRef = this.appRef["_changeDetectorRefs"][0]["_view"]["_appEl_0"].vcRef;
+    constructor(private resolver: ComponentFactoryResolver) {
 
         this.onClose.subscribe(_ => {
             this.cleanComponentRef();
@@ -29,19 +31,26 @@ export class ModalService {
     /**
      * Open a modal window with the given component inside it.
      */
-    public show<T>(component: Function, options?: ModalOptions): T {
+    public show<T>(component: {new(): T;}, options?: ModalOptions): T {
+
+        const config = Object.assign({
+            backdrop: false,
+            closeOnEscape: true,
+            closeOnOutsideClick: true,
+            componentState: {},
+            title: "",
+        } as ModalOptions, options);
 
         // If some other modal is open, close it
         this.close();
 
-
         const modalFactory     = this.resolver.resolveComponentFactory(ModalComponent);
-        const componentFactory = this.resolver.resolveComponentFactory(component as T);
+        const componentFactory = this.resolver.resolveComponentFactory(component);
 
         this.modalComponentRef = this.rootViewRef.createComponent(modalFactory);
-        this.modalComponentRef.instance.configure<any>(options);
+        this.modalComponentRef.instance.configure<T>(config);
 
-        const componentRef = this.modalComponentRef.instance.produce<T>(componentFactory, options.componentState || {});
+        const componentRef = this.modalComponentRef.instance.produce<T>(componentFactory, config.componentState || {});
 
         return componentRef.instance;
     }
@@ -52,7 +61,7 @@ export class ModalService {
      * @returns {Promise} Promise that will resolve if user confirms the prompt and reject if user cancels
      */
     public confirm(params: ConfirmationParams): Promise<any> {
-        const params = Object.assign({
+        const parameters = Object.assign({
             title: "Confirm",
             content: "Are you sure?",
             confirmationLabel: "Yes",
@@ -62,10 +71,10 @@ export class ModalService {
         return this.wrap<true>((resolve, reject) => {
 
             // Show the ConfirmComponent as a modal
-            const ref = this.show<ConfirmComponent>(ConfirmComponent, {title: params.title});
+            const ref = this.show<ConfirmComponent>(ConfirmComponent, {title: parameters.title});
 
             // Assign passed parameters to it
-            refAssign(ref, params);
+            refAssign(ref, parameters);
 
             // Close the modal when any action is triggered on its output
             ref.decision.subscribe(accepted => {
@@ -81,21 +90,22 @@ export class ModalService {
     public prompt(params: PromptParams): Promise<string> {
 
         // Set the default values for params that are not given
-        const params = Object.assign({
+        const parameters = Object.assign({
             title: "",
             content: "Please enter the value:",
             confirmationLabel: "Submit",
             cancellationLabel: "Cancel",
+            formControl: null
         } as PromptParams, params);
 
         // Handle actions inside the modal that might result in it closing - submission and cancelling
         return this.wrap<string>((resolve, reject) => {
 
             // Show the PromptComponent in the modal
-            const ref = this.show<PromptComponent>(PromptComponent, {title: params.title});
+            const ref = this.show<PromptComponent>(PromptComponent, {title: parameters.title});
 
             // Pass given parameters to the PromptComponent instance
-            refAssign(ref, params);
+            refAssign(ref, parameters);
 
             // Watch for the closing action of the component
             ref.decision.subscribe(content => {
@@ -117,6 +127,7 @@ export class ModalService {
             refAssign(ref, params);
 
             ref.decision.subscribe(content => {
+                console.log("Closing checkbox prompt");
                 content !== null ? resolve(content) : reject();
                 this.close();
             });

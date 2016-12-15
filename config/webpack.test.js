@@ -50,6 +50,12 @@ module.exports = {
 
     },
 
+    resolveLoader: {
+        root: helpers.root("node_modules"),
+
+        fallback: [helpers.root("node_modules")]
+    },
+
     /**
      * Options affecting the normal modules.
      *
@@ -195,15 +201,8 @@ module.exports = {
             'process.env': {
                 'ENV': JSON.stringify(ENV),
                 'NODE_ENV': JSON.stringify(ENV),
-                'HMR': false,
             }
         }),
-
-        new webpack.ProvidePlugin({
-            io: 'socket.io-client'
-        })
-
-
     ],
 
     /**

@@ -10,28 +10,6 @@ describe("SandboxService", () => {
         public disconnect() { }
     }
 
-    describe("stringify", () => {
-
-        it("should convert it's parameters to strings", () => {
-
-            const result = sandboxService.stringify(undefined);
-            expect(result).toEqual("undefined");
-
-            const result2 = sandboxService.stringify(null);
-            expect(result2).toEqual("null");
-
-            const result3 = sandboxService.stringify(123);
-            expect(result3).toEqual("123");
-
-            const result4 = sandboxService.stringify({ asd: 123 });
-            expect(result4).toEqual('{"asd":123}');
-
-            const result5 = sandboxService.stringify("test string");
-            expect(result5).toEqual("test string");
-        });
-
-    });
-
     describe("runHidden", () => {
 
         it("should prevent the worker scope from being accessed", () => {

@@ -1,22 +1,24 @@
-import {Component, AfterViewInit} from "@angular/core";
-import {DomEventService} from "../../services/dom/dom-event.service";
+/// <reference path="../../../../node_modules/typescript/lib/lib.dom.d.ts" />
+/// <reference path="../../../../node_modules/typescript/lib/lib.es6.d.ts" />
+import {Component, ViewContainerRef} from "@angular/core";
+import {Observable} from "rxjs/Rx";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {FileRegistry} from "../../services/file-registry.service";
-import {InputPortService} from "../../services/input-port/input-port.service";
-import {LayoutComponent} from "../layout/layout.component";
-import {Observable} from "rxjs/Rx";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
+import {SBPlatformDataSourceService} from "../../sources/sbg/sb-platform.source.service";
 import {SettingsService} from "../../services/settings/settings.service";
 import {UrlValidator} from "../../validators/url.validator";
-import {UserPreferencesService} from "../../services/storage/user-preferences.service";
-import {WebWorkerService} from "../../services/web-worker/web-worker.service";
+import {ModalService} from "../modal/modal.service";
+import {ContextService} from "../../core/ui/context/context.service";
 import {GuidService} from "../../services/guid.service";
-import {SBPlatformDataSourceService} from "../../sources/sbg/sb-platform.source.service";
-import {ContextService} from "../../services/context/context.service";
-import {TemplateProviderService} from "../../services/template-provider.service";
+import {IpcService} from "../../services/ipc.service";
+import {LocalDataSourceService} from "../../sources/local/local.source.service";
+import {PublicAppService} from "../../platform-providers/public-apps/public-app.service";
+import {ElectronPublicAppService} from "../../platform-providers/public-apps/electron-public-app.service";
+import {UserProjectsService} from "../../platform-providers/user-projects/user-projects.service";
+import {ElectronUserProjectsService} from "../../platform-providers/user-projects/electron-user-projects.service";
 
 require("./../../../assets/sass/main.scss");
-
 require("./main.component.scss");
 
 @Component({
@@ -25,34 +27,36 @@ require("./main.component.scss");
         <ct-layout class="editor-container"></ct-layout>
         <div id="runnix" [class.active]="runnix | async"></div>
     `,
-    directives: [
-        LayoutComponent,
-    ],
     providers: [
         EventHubService,
         FileRegistry,
-        DomEventService,
         UrlValidator,
-        InputPortService,
         PlatformAPI,
         SBPlatformDataSourceService,
         SettingsService,
-        UserPreferencesService,
-        GuidService,
         ContextService,
+        // FIXME: this needs to be handled in a system-specific way
+        GuidService,
+        IpcService,
+        LocalDataSourceService,
+        {provide: PublicAppService, useClass: ElectronPublicAppService},
+        {provide: UserProjectsService, useClass: ElectronUserProjectsService}
     ],
 })
-export class MainComponent implements AfterViewInit {
+export class MainComponent {
 
     private runnix: Observable<boolean>;
 
-    constructor() {
+    constructor(modal: ModalService, vcRef: ViewContainerRef) {
+        /**
+         * Hack for angular's inability to provide the vcRef to a service with DI.
+         * {@link ModalService.rootViewRef}
+         */
+        modal.rootViewRef = vcRef;
+
         this.runnix = Observable.fromEvent(document, "keyup").map((e: KeyboardEvent) => e.keyCode).bufferCount(10, 1)
             .filter(seq => seq.toString() == [38, 38, 40, 40, 37, 39, 37, 39, 66, 65].toString())
             .map(seq => Observable.of(true).concat(Observable.of(false).delay(3000)))
             .concatAll();
-    }
-
-    ngAfterViewInit() {
     }
 }

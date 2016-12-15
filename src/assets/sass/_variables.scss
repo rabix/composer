@@ -2,6 +2,7 @@
 
 // bootstrap overrides
 $enable-print-styles: false;
+$enable-flex: true;
 
 $font-size-root: 14px;
 $font-family-base: sans-serif;
@@ -73,6 +74,7 @@ $modal-content-color: $body-color;
 */
 
 $input-bg: #fff;
+$toggle-bg: #ccc;
 $input-border-focus: $form-elements-border-color;
 $input-border-color: $form-elements-border-color;
 $input-color-placeholder: $gray-dark;

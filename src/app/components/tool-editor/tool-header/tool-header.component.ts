@@ -8,11 +8,20 @@ import {Subject} from "rxjs";
         <div *ngIf="!actionPending">
             <button *ngIf="data.isWritable"
                     [disabled]="!fileIsValid" 
+                    [ct-tooltip]="'Save'"
                     (click)="saveAction()" 
                     type="button" 
                     class="btn btn-secondary btn-sm save-button">
-                    Save
+                    <i class="fa fa-save" ></i>
             </button>
+            
+            <button *ngIf="data.isWritable"
+                    [ct-tooltip]="'Copy...'"
+                    type="button" 
+                    class="btn btn-secondary btn-sm">
+                    <i class="fa fa-files-o"></i>
+            </button>
+                    
             <span *ngIf="!data.isWritable"> 
                 <span class="tag tag-default"><i class="fa fa-lock"></i> LOCKED</span>
             </span>
@@ -56,7 +65,6 @@ export class ToolHeaderComponent {
     }
 
     private saveAction() {
-        console.debug("Data", this.data);
 
         if (this.data.data.source !== "local") {
             this.actionPending = 'revision_note';

@@ -6,15 +6,18 @@
         "experimentalDecorators": true,
         "sourceMap": true,
         "noEmitHelpers": true,
-        "lib": ["dom", "es6"],
+        "lib": [
+            "dom",
+            "es5",
+            "es6",
+            "es7"
+        ],
         "types": [
-            "core-js",
+            "ace",
+            "electron",
             "jasmine",
             "node",
-            "jquery",
-            "electron",
-            "ace",
-            "socket.io-client"
+            "core-js"
         ]
     },
     "exclude": [

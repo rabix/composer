@@ -2,17 +2,17 @@ import {Subject} from "rxjs/Subject";
 import {ExpressionModel} from "cwlts/models/d2sb";
 
 export class ExpressionEditorData {
-    expression: ExpressionModel;
-    newExpressionChange: Subject<string | ExpressionModel>;
+    value: ExpressionModel;
+    newExpressionChange: Subject<ExpressionModel>;
     context: any;
 
     constructor(attrs: {
-        expression: ExpressionModel;
-        newExpressionChange: Subject<string | ExpressionModel>;
+        value: ExpressionModel;
+        newExpressionChange: Subject<ExpressionModel>;
         context?: any
     }) {
-        this.expression = attrs.expression;
+        this.value               = attrs.value;
         this.newExpressionChange = attrs.newExpressionChange;
-        this.context = attrs.context;
+        this.context             = attrs.context;
     }
 }

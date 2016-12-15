@@ -4,7 +4,7 @@
 .left-panel-bar {
   display: flex;
   flex-direction: column;
-  height: calc(100% - #{$main-header-height});
+  height: calc(100% - #{$main-header-height} - #{$panel-item-width});
   justify-content: space-between;
   background: $panel-side-tab-zone-bg;
 
@@ -12,7 +12,7 @@
 
 ct-panel-switcher {
   display: inline-block;
-  width: 26px;
+  width: $panel-item-width;
   border-right: 2px solid $panel-side-tab-zone-border;
   color: white;
 
@@ -59,4 +59,19 @@ ct-panel-switcher {
     }
   }
 
+}
+
+.toggle-panel-left {
+    background: $panel-side-tab-zone-bg;
+    border-right: 2px solid $panel-side-tab-zone-border;
+    text-align: center;
+    padding-top: 1px;
+    height: $panel-item-width;
+
+    i {
+        color: lighten($gray-dark, 20%);
+        cursor: pointer;
+        font-size: 17px;
+        vertical-align: middle;
+    }
 }

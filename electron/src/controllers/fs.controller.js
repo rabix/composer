@@ -18,7 +18,7 @@ function findCWLClass(content) {
 
 function getPotentialCWLClassFromFile(filePath, callback) {
 
-    if (filePath.split(".").pop() !== "json") {
+    if (["json", "yaml", "yml", "cwl"].indexOf(filePath.split(".").pop()) === -1) {
         return callback(null, "");
     }
 
@@ -76,7 +76,7 @@ module.exports = {
         }
 
         // Open file for writing. Fails if file doesn't exist
-        fs.writeFile(path, content, {encoding: "utf8", flag: "r+"}, (err) => {
+        fs.writeFile(path, content, {flag: "w"}, (err) => {
             if (err) return callback(err);
 
             // If we've written successfully to the file, return the info object
@@ -86,6 +86,7 @@ module.exports = {
                 callback(null, info);
             });
         });
+
     },
 
     createFile: (path, content, callback) => {

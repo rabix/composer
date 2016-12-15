@@ -2,7 +2,6 @@ export const PANEL_USER_PROJECTS = "sb_user_projects";
 export const PANEL_PUBLIC_APPS   = "sb_public_apps";
 export const PANEL_LOCAL_FILES   = "local_files";
 export const PANEL_STRUCTURE     = "structure";
-export const PANEL_REVISIONS     = "revisions";
 
 export type PanelGroupMap = { [region: string]: PanelGroup; };
 

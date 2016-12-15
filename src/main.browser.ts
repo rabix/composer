@@ -4,6 +4,5 @@ import {BrowserSystemService} from "./app/platform-providers/browser-system.serv
 import {SystemService} from "./app/platform-providers/system.service";
 
 platformBrowserDynamic([
-    {provide: SystemService, useClass: BrowserSystemService},
-
+    {provide: SystemService, useClass: BrowserSystemService}
 ]).bootstrapModule(AppModule).catch(err => console.error(err));
