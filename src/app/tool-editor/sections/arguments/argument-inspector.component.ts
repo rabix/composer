@@ -6,8 +6,7 @@ import {ComponentBase} from "../../../components/common/component-base";
 
 @Component({
     selector: "ct-argument-inspector",
-    template: `        
-        <div class="tc-body">
+    template: `      
             <form [formGroup]="form">
             
                 <!--Prefix Field-->
@@ -42,7 +41,6 @@ import {ComponentBase} from "../../../components/common/component-base";
                 </div>
                 
             </form>
-        </div>
 `
 })
 export class ArgumentInspector extends ComponentBase {

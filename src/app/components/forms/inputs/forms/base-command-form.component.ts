@@ -23,7 +23,7 @@ require("./base-command-form.components.scss");
                      class="removable-form-control">
 
                     <ct-expression-input
-                            [context]="context"
+                            [context]="context" 
                             [formControl]="baseCommandForm.controls[item.id]">              
                     </ct-expression-input>
 
