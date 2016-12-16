@@ -1,23 +1,17 @@
 import {Component, forwardRef, Input} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormControl} from "@angular/forms";
 import {ComponentBase} from "../../../components/common/component-base";
-import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
-import {FormPanelComponent} from "../../../core/elements/form-panel.component";
-import {ExpressionModelListComponent} from "../../../editor-common/components/expression-model-list/expression-model-list.componen";
+import {ExpressionModel} from "cwlts/models/d2sb";
 
 @Component({
     selector: 'secondary-files',
     providers: [
         { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => SecondaryFilesComponent), multi: true }
     ],
-    directives: [
-        FormPanelComponent,
-        ExpressionModelListComponent
-    ],
     template: `
-<ct-form-panel *ngIf="input.type.type === 'File'">
+<ct-form-panel *ngIf="form" [borderless]="true" [collapsed]="true">
     <div class="tc-header">Secondary Files</div>
-    <div class="tc-body" *ngIf="form">
+    <div class="tc-body">
     
             <expression-model-list 
                 [context]="context"
@@ -35,7 +29,7 @@ export class SecondaryFilesComponent extends ComponentBase implements ControlVal
     @Input()
     public context: {$job: any} = {};
 
-    private input: InputProperty;
+    private secondaryFiles: ExpressionModel[];
 
     private onTouched = () => { };
 
@@ -43,25 +37,22 @@ export class SecondaryFilesComponent extends ComponentBase implements ControlVal
 
     private form: FormControl;
 
-    private writeValue(input: InputProperty): void {
-        this.input = input;
+    writeValue(secondaryFiles: ExpressionModel[]): void {
+        this.secondaryFiles = secondaryFiles;
 
-        //TODO: load secondary files
-        this.form = new FormControl([]);
+        this.form = new FormControl(this.secondaryFiles);
 
-        this.tracked = this.form.valueChanges.subscribe(change => {
-            console.log(change);
-
-            //TODO: propagate
-            //this.propagateChange(change);
+        this.tracked = this.form.valueChanges.subscribe((fileList: ExpressionModel[]) => {
+            const serializedList = fileList.map(file => file.serialize());
+            this.propagateChange(serializedList);
         });
     }
 
-    private registerOnChange(fn: any): void {
+    registerOnChange(fn: any): void {
         this.propagateChange = fn;
     }
 
-    private registerOnTouched(fn: any): void {
+    registerOnTouched(fn: any): void {
         this.onTouched = fn;
     }
 }

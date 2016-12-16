@@ -10,7 +10,7 @@ import {
 } from "@angular/forms";
 import {ComponentBase} from "../../../components/common/component-base";
 import {CustomValidators} from "../../../validators/custom.validator";
-import {ExpressionModel, CommandLineBindingModel} from "cwlts/models/d2sb";
+import {CommandInputParameterModel as InputProperty, CommandLineBindingModel} from "cwlts/models/d2sb";
 
 @Component({
     selector: 'input-binding-section',
@@ -58,6 +58,13 @@ import {ExpressionModel, CommandLineBindingModel} from "cwlts/models/d2sb";
                                    [off]="'Join'"></toggle-slider>
                 </span>
             </div>
+            
+            <stage-input [formControl]="inputBindingFormGroup.controls['stageInputSection']">
+            </stage-input>
+           
+            <secondary-files *ngIf="input.type.type === 'File'"
+                             [formControl]="inputBindingFormGroup.controls['secondaryFilesSection']"
+                             [context]="context"></secondary-files>
     </div>
     `
 })
@@ -70,7 +77,7 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
     @Input()
     public context: {$job?: any, $self?: any} = {};
 
-    private inputBinding: CommandLineBindingModel;
+    private input: InputProperty;
 
     private inputBindingFormGroup: FormGroup;
 
@@ -92,11 +99,11 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
         super();
     }
 
-    writeValue(inputBinding: CommandLineBindingModel): void {
-        this.inputBinding = inputBinding;
+    writeValue(input: InputProperty): void {
+        this.input = input;
 
-        if (!!this.inputBinding) {
-            this.createInputBindingForm(this.inputBinding);
+        if (!!this.input.inputBinding) {
+            this.createInputBindingForm(this.input);
         }
     }
 
@@ -114,13 +121,15 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
         }
     }
 
-    private createInputBindingForm(inputBinding: CommandLineBindingModel): void {
+    private createInputBindingForm(input: InputProperty): void {
         this.inputBindingFormGroup = this.formBuilder.group({
-            valueFrom: [inputBinding.valueFrom, [Validators.required, CustomValidators.cwlModel]],
-            position: [inputBinding.position, [Validators.pattern(/^\d+$/)]],
-            prefix: [inputBinding.prefix],
-            separate: [inputBinding.separate !== false],
-            itemSeparator: [!!inputBinding.itemSeparator ? inputBinding.itemSeparator : null]
+            stageInputSection: [input],
+            secondaryFilesSection: [input.inputBinding.secondaryFiles || []],
+            valueFrom: [input.inputBinding.valueFrom, [Validators.required, CustomValidators.cwlModel]],
+            position: [input.inputBinding.position, [Validators.pattern(/^\d+$/)]],
+            prefix: [input.inputBinding.prefix],
+            separate: [input.inputBinding.separate !== false],
+            itemSeparator: [!!input.inputBinding.itemSeparator ? input.inputBinding.itemSeparator : null]
         });
 
         this.listenToInputBindingFormChanges();
@@ -136,11 +145,16 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
                     prefix: value.prefix || undefined,
                     separate: value.separate,
                     itemSeparator: value.itemSeparator || undefined,
-                    valueFrom: this.propertyType !== "record" ? value.valueFrom.serialize() : undefined
+                    valueFrom: value.valueFrom.serialize(),
+                    loadContents: value.stageInputSection.inputBinding.loadContents,
+                    secondaryFiles: value.secondaryFilesSection
                 };
 
-                this.inputBinding = new CommandLineBindingModel(binding);
-                this.propagateChange(this.inputBinding);
+
+                this.input.inputBinding = new CommandLineBindingModel(binding);
+                Object.assign(this.input.customProps, value.stageInputSection.customProps);
+
+                this.propagateChange(this.input);
             });
     }
 }

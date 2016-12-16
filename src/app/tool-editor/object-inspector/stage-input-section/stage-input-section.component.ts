@@ -25,12 +25,13 @@ import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
                 </select>
             </div>
                 
-            
+           
            <div class="form-group flex-container" *ngIf="input.type.type === 'File'">
                 <label>Load Content</label>
                 <span class="align-right">
-                    {{!!stageInputFormGroup.controls['loadContent'].value ? "Yes" : "No"}}
-                    <toggle-slider [formControl]="stageInputFormGroup.controls['loadContent']"></toggle-slider>
+                    <toggle-slider [formControl]="stageInputFormGroup.controls['loadContent']"
+                                   [off]="'No'" 
+                                   [on]="'Yes'"></toggle-slider>
                 </span>
            </div>
        
@@ -39,9 +40,6 @@ import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
     `
 })
 
-/**
- * TODO: add the load content property on the model
- * */
 export class StageInputSectionComponent extends ComponentBase implements ControlValueAccessor {
 
     private input: InputProperty;
@@ -67,8 +65,7 @@ export class StageInputSectionComponent extends ComponentBase implements Control
 
         this.stageInputFormGroup = this.formBuilder.group({
             stageInput: [this.input.customProps["sbg:stageInput"] || ""],
-            //TODO: load from input
-            loadContent: false
+            loadContent: [!!this.input.inputBinding && this.input.inputBinding.loadContents ? this.input.inputBinding.loadContents: false]
         });
 
         this.tracked = this.stageInputFormGroup.valueChanges
@@ -80,6 +77,7 @@ export class StageInputSectionComponent extends ComponentBase implements Control
                     delete this.input.customProps["sbg:stageInput"];
                 }
 
+                this.input.inputBinding.loadContents = value.loadContent;
                 this.propagateChange(this.input);
             });
     }

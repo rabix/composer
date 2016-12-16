@@ -8,11 +8,7 @@ import {
     FormBuilder,
     NG_VALIDATORS
 } from "@angular/forms";
-import {
-    CommandInputParameterModel as InputProperty,
-    CommandLineBindingModel,
-    InputParameterTypeModel
-} from "cwlts/models/d2sb";
+import {CommandInputParameterModel as InputProperty, InputParameterTypeModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../components/common/component-base";
 import {CustomValidators} from "../../../validators/custom.validator";
 
@@ -116,7 +112,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
             isBound: [this.input.isBound],
             //FIXME: isNullable is undefined when it's not nullable
             isRequired: [!this.input.type.isNullable],
-            inputBinding: [this.input.inputBinding, CustomValidators.cwlModel],
+            inputBinding: [this.input, CustomValidators.cwlModel],
             itemType: [this.input.type.items ? this.input.type.items: 'string'],
             symbols: [this.input.type.symbols ? this.input.type.symbols: this.initSymbolsList]
         });
@@ -156,7 +152,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
         this.tracked = this.basicSectionForm.controls['isBound'].valueChanges.subscribe((isBound: boolean) => {
             if (isBound) {
                 this.input.createInputBinding();
-                this.basicSectionForm.setControl('inputBinding', new FormControl(this.input.inputBinding));
+                this.basicSectionForm.setControl('inputBinding', new FormControl(this.input));
                 this.listenToInputBindingChanges();
             } else {
                 this.input.removeInputBinding();
@@ -178,8 +174,9 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
     private listenToInputBindingChanges(): void {
         this.tracked = this.basicSectionForm.controls['inputBinding'].valueChanges
-            .subscribe((inputBinding: CommandLineBindingModel)  => {
-                this.input.updateInputBinding(inputBinding);
+            .subscribe((input: InputProperty)  => {
+                this.input.updateInputBinding(input.inputBinding);
+                Object.assign(this.input.customProps, input.customProps);
             });
     }
 
