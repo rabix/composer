@@ -27,9 +27,15 @@ require("./clt-editor.component.scss");
                                    (update)="setBaseCommand($event)">
                 </base-command-form>
                                 
-                <ct-tool-input-list [location]="model.loc + '.inputs'" [entries]="model.inputs" (update)="updateModel('inputs', $event)"></ct-tool-input-list>
+                <ct-tool-input-list [location]="model.loc + '.inputs'" [entries]="model.inputs" 
+                              (update)="updateModel('inputs', $event)">                             
+                </ct-tool-input-list>
                 
-                <ct-output-ports [entries]="model.outputs || []" [readonly]="readonly"></ct-output-ports>
+                <ct-tool-output-list [location]="model.loc + '.outputs'" [entries]="model.outputs || []" 
+                              [inputs]="model.inputs || []" 
+                              [readonly]="readonly" 
+                              (update)="updateModel('outputs', $event)">                        
+                </ct-tool-output-list>
                                    
                 <ct-resources [entries]="resources" 
                               [readonly]="readonly" 
@@ -92,6 +98,7 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
         this.formGroup.addControl("dockerGroup", this.formBuilder.group({}));
         this.formGroup.addControl("baseCommandGroup", this.formBuilder.group({}));
         this.formGroup.addControl("inputs", this.formBuilder.group({}));
+        this.formGroup.addControl("outputs", this.formBuilder.group({}));
         this.formGroup.addControl("arguments", this.formBuilder.group({}));
 
         console.log("Model", this.model);
@@ -110,6 +117,9 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
         } else if (category === "arguments") {
             this.model.arguments = [];
             data.forEach(argument => this.model.addArgument(argument));
+        } else if (category === "outputs") {
+            this.model.outputs = [];
+            data.forEach(output => this.model.addOutput(output));
         }
 
         if (this.formGroup.controls[category] instanceof FormGroup) {

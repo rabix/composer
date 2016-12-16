@@ -121,6 +121,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
             symbols: [this.input.type.symbols ? this.input.type.symbols: this.initSymbolsList]
         });
 
+        this.listenToItemTypeFormChanges();
         this.listenToIsBoundChanges();
         this.listenToInputBindingChanges();
         this.listenToTypeFormChanges();
@@ -181,6 +182,14 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
             .subscribe((inputBinding: CommandLineBindingModel)  => {
                 this.input.updateInputBinding(inputBinding);
             });
+    }
+
+    private listenToItemTypeFormChanges(): void {
+        this.tracked = this.basicSectionForm.controls['itemType'].valueChanges.subscribe((value: InputParameterTypeModel) => {
+            if (!!value && this.input.type.type === 'array') {
+                this.input.type.items = value;
+            }
+        });
     }
 
     private listenToTypeFormChanges(): void {

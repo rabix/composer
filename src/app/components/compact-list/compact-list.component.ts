@@ -1,42 +1,23 @@
 import {Component, Input, ElementRef, Renderer, ViewChild, forwardRef} from "@angular/core";
 import {FormControl, ControlValueAccessor, NG_VALUE_ACCESSOR, NG_VALIDATORS} from "@angular/forms";
-import {EditableDirective} from "../../directives/editable.directive";
-import {TagModel} from "./tag.model";
 
 require("./compact-list.component.scss");
 
 @Component({
     selector: "compact-list",
-    directives: [
-        EditableDirective
-    ],
     providers: [
         { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => CompactListComponent), multi: true },
         { provide: NG_VALIDATORS, useExisting: forwardRef(() => CompactListComponent), multi: true }
     ],
     template: `
-            <div class="compact-list-wrapper" (click)="onListWrapperClick()">
+            <div class="compact-list-wrapper">
                 
                 <div class="input-tag-list">
                     
                     <span *ngFor="let tag of tagList; let i = index;"
                           class="tag tag-pill tag-default">
-                          
-                          <span *ngIf="tag.validation?.errors?.length > 0"
-                                title="tag.validation.errorText"
-                                class="icon-wrapper">
-                                <i class="fa fa-times-circle error">
-                                </i>
-                          </span>
-                          
-                          <span *ngIf="tag.validation?.warnings?.length > 0"
-                                class="icon-wrapper">
-                                <i class="fa fa-warning warning">
-                                </i>
-                          </span>
-                          
-                          {{tag.value}}
-                          <i class="fa fa-times remove-tag-icon"
+                          {{tag}}
+                          <i class="fa fa-times remove-tag-icon" 
                              (click)="removeTag(i, $event)"></i>
                     </span>
                    
@@ -44,7 +25,7 @@ require("./compact-list.component.scss");
                     <!-- Not using the <input>, 
                          so that the width can adjust to the text length,
                          and break into a new line if its long -->
-                    <span #tagInput ct-editable contenteditable="true"
+                    <span #tagInput ct-editable contenteditable="true" (click)="onListWrapperClick()"
                           class="tag-input"
                           *ngIf="tagInputControl"
                           [ngClass]="{'invalid-input': !isValidInput }"
@@ -83,8 +64,7 @@ export class CompactListComponent implements ControlValueAccessor  {
     /** The form control for the input */
     public control: FormControl;
 
-    //TODO: re-factor once we have the actual tag model
-    public tagList: TagModel[] = [];
+    public tagList: any[] = [];
 
     /** Last value of the input validity */
     private isValidInput = true;
@@ -102,7 +82,7 @@ export class CompactListComponent implements ControlValueAccessor  {
         this.tagInputControl = new FormControl("");
     }
 
-    private writeValue(value: Array<any>): void {
+    private writeValue(value: any[]): void {
         this.tagList = value.slice();
     }
 
@@ -129,7 +109,7 @@ export class CompactListComponent implements ControlValueAccessor  {
         const tagInputValue: string = this.tagInputControl.value;
         const trimmedValue: string = tagInputValue.trim();
 
-        const newControlList: string[] = [...this.tagList, tagInputValue];
+        const newControlList: string[] = [...this.tagList, trimmedValue];
 
         if (tagInputValue.length === 0 && event.keyCode === backspaceCode) {
             this.removeTag(this.tagList.length - 1);
@@ -146,18 +126,10 @@ export class CompactListComponent implements ControlValueAccessor  {
             this.isValidInput = this.control.valid;
 
             if (!!this.isValidInput) {
-                //TODO: re-factor once we have the actual tag model
-                this.tagList.push({
-                    value: trimmedValue,
-                    validation: {
-                        errors: [],
-                        warnings: [],
-                        errorText: ""
-                    }
-                });
-
+                this.tagList.push(trimmedValue);
                 this.tagInputControl.setValue("");
             } else {
+                //TODO: this will always return a string array
                 this.propagateChange(newControlList.slice(0, -1));
             }
         }
@@ -177,17 +149,7 @@ export class CompactListComponent implements ControlValueAccessor  {
     }
 
     private addTagInControl(tag: string): void {
-        this.propagateChange([
-            ...this.tagList,
-            {
-                value: tag,
-                validation: {
-                    errors: [],
-                    warnings: [],
-                    errorText: ""
-                }
-            }
-        ]);
+        this.propagateChange([...this.tagList, tag]);
     }
 
     private removeTag(index: number, event?: Event): void {

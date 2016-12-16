@@ -30,8 +30,8 @@ import {ComponentBase} from "../../../components/common/component-base";
                     <label class="form-control-label">Separator</label>
                     <span class="align-right">
                         <toggle-slider [formControl]="form.controls['separate']" 
-                                   [on]="'Separate'"
-                                   [off]="'Join'"></toggle-slider>
+                                    [on]="'Separate'"
+                                    [off]="'Join'"></toggle-slider>
                     </span>
                 </div>
                 
