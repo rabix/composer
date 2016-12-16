@@ -1,7 +1,7 @@
 import {Component, forwardRef} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormGroup, FormControl, Validators} from "@angular/forms";
-import {ComponentBase} from "../../../components/common/component-base";
-import {GuidService} from "../../../services/guid.service";
+import {ComponentBase} from "../../../../components/common/component-base";
+import {GuidService} from "../../../../services/guid.service";
 
 require("./symbols.component.scss");
 
@@ -57,7 +57,7 @@ export class SymbolsComponent extends ComponentBase implements ControlValueAcces
         super();
     }
 
-    private writeValue(symbols: string[]): void {
+    writeValue(symbols: string[]): void {
         this.symbolsForm = new FormGroup({});
 
         if (symbols.length === 0) {
@@ -72,11 +72,11 @@ export class SymbolsComponent extends ComponentBase implements ControlValueAcces
         this.listenToFormChanges();
     }
 
-    private registerOnChange(fn: any): void {
+    registerOnChange(fn: any): void {
         this.propagateChange = fn;
     }
 
-    private registerOnTouched(fn: any): void {
+    registerOnTouched(fn: any): void {
         this.onTouched = fn;
     }
 

@@ -156,7 +156,6 @@ export class ToolOutputListComponent extends ComponentBase {
     }
 
     private updateOutput(newInput: CommandOutputParameterModel, index: number) {
-        debugger;
 
         // FIXME: cloning an object ditches its prototype chain, but we need it
         const input = this.entries[index];

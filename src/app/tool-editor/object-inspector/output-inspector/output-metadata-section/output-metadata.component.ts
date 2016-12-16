@@ -1,6 +1,6 @@
 import {Component, forwardRef, Input} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormGroup, FormBuilder} from "@angular/forms";
-import {ComponentBase} from "../../../components/common/component-base";
+import {ComponentBase} from "../../../../components/common/component-base";
 import {CommandInputParameterModel} from "cwlts/models/d2sb";
 import {
     CommandOutputParameterModel as OutputProperty
@@ -9,36 +9,34 @@ import {
 require("./output-metadata.component.scss");
 
 @Component({
-    selector: 'output-metadata-section',
+    selector: 'ct-output-metadata-section',
     providers: [
         { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => OutputMetaDataSectionComponent), multi: true }
     ],
     template: `
 <ct-form-panel *ngIf="output.type.type === 'File' || (output.type.type === 'array' && output.type.items === 'File')" 
-    [borderless]="true" [collapsed]="true">
-    
-        <div class="tc-header">Metadata</div>
-        <div class="tc-body" *ngIf="metadataForm">        
-            <div class="form-group" *ngIf="metadataForm">
-                <form> 
-                                         
-                    <!--Inherit Metadata field-->
-                    <div class="form-group">                
-                        <label class="form-control-label">Inherit</label>
-                        <select class="form-control" 
-                                [formControl]="metadataForm.controls['inheritMetadata']">    
-                            <option value = "">-- none --</option>
-                            <option *ngFor="let item of inputs" 
-                                    [value]="item.id">
-                                {{item.id}}
-                            </option>
-                        </select>
-                    </div> 
-                                     
-                </form>
-            </div>         
+        [borderless]="true" [collapsed]="true">
+
+    <div class="tc-header">Metadata</div>
+    <div class="tc-body" *ngIf="metadataForm">
+        <div class="form-group" *ngIf="metadataForm">
+            <form>
+
+                <!--Inherit Metadata field-->
+                <div class="form-group">
+                    <label class="form-control-label">Inherit</label>
+                    <select class="form-control" [formControl]="metadataForm.controls['inheritMetadata']">
+                        <option value="">-- none --</option>
+                        <option *ngFor="let item of inputs" [value]="item.id">
+                            {{item.id}}
+                        </option>
+                    </select>
+                </div>
+
+            </form>
         </div>
-        
+    </div>
+
 </ct-form-panel>
 `
 })
@@ -50,9 +48,11 @@ export class OutputMetaDataSectionComponent extends ComponentBase implements Con
     /** The currently displayed property */
     private output: OutputProperty;
 
-    private onTouched = () => { };
+    private onTouched = () => {
+    };
 
-    private propagateChange = (_) => {};
+    private propagateChange = (_) => {
+    };
 
     private metadataForm: FormGroup;
 

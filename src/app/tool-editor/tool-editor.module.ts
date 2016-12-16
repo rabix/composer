@@ -14,17 +14,16 @@ import {ToolInputInspector} from "./sections/inputs/tool-input-inspector.compone
 import {ToolOutputInspector} from "./sections/outputs/tool-output-inspector.component";
 import {ArgumentInspector} from "./sections/arguments/argument-inspector.component";
 
-import {BasicInputSectionComponent} from "./object-inspector/basic-section/basic-input-section.component";
-import {BasicOutputSectionComponent} from "./object-inspector/basic-section/basic-output-section.component";
+import {BasicInputSectionComponent} from "./object-inspector/input-inspector/basic-section/basic-input-section.component";
+import {BasicOutputSectionComponent} from "./object-inspector/output-inspector/output-basic-section/basic-output-section.component";
 import {InputTypeSelectComponent} from "./common/type-select/type-select.component";
-import {InputDescriptionComponent} from "./object-inspector/input-description/input-description.component";
-import {OutputDescriptionComponent} from "./object-inspector/output-description/output-description.component";
-import {InputBindingSectionComponent} from "./object-inspector/input-binding/input-binding-section.component";
-import {SymbolsComponent} from "./object-inspector/sybols-component/symbols.component";
-import {SecondaryFilesComponent} from "./object-inspector/secondary-files/secondary-files.component";
-import {OutputMetaDataSectionComponent} from "./object-inspector/output-metadata-section/output-metadata.component";
-import {StageInputSectionComponent} from "./object-inspector/stage-input-section/stage-input-section.component";
-import {OutputEvalSectionComponent} from "./object-inspector/output-eval-section/output-eval.component";
+import {DescriptionComponent} from "./object-inspector/common-sections/description-section/output-description.component";
+import {InputBindingSectionComponent} from "./object-inspector/input-inspector/input-binding/input-binding-section.component";
+import {SymbolsComponent} from "./object-inspector/common-sections/symbols-section/symbols.component";
+import {SecondaryFilesComponent} from "./object-inspector/common-sections/secondary-files-sections/secondary-files.component";
+import {OutputMetaDataSectionComponent} from "./object-inspector/output-inspector/output-metadata-section/output-metadata.component";
+import {StageInputSectionComponent} from "./object-inspector/input-inspector/stage-input-section/stage-input-section.component";
+import {OutputEvalSectionComponent} from "./object-inspector/output-inspector/output-eval-section/output-eval.component";
 import {CompactListComponent} from "../components/compact-list/compact-list.component";
 import {EditableDirective} from "../directives/editable.directive";
 
@@ -42,8 +41,7 @@ import {EditableDirective} from "../directives/editable.directive";
         BasicInputSectionComponent,
         BasicOutputSectionComponent,
         InputTypeSelectComponent,
-        InputDescriptionComponent,
-        OutputDescriptionComponent,
+        DescriptionComponent,
         InputBindingSectionComponent,
         SymbolsComponent,
         SecondaryFilesComponent,
@@ -65,8 +63,7 @@ import {EditableDirective} from "../directives/editable.directive";
         ToolOutputInspector,
         BasicInputSectionComponent,
         BasicOutputSectionComponent,
-        InputDescriptionComponent,
-        OutputDescriptionComponent,
+        DescriptionComponent,
         StageInputSectionComponent,
         OutputEvalSectionComponent,
         OutputMetaDataSectionComponent,

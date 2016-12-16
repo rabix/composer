@@ -9,21 +9,21 @@ import {ComponentBase} from "../../../components/common/component-base";
     template: `
         <form [formGroup]="form" (ngSubmit)="onSubmit(form)">
         
-            <basic-output-section [formControl]="form.controls['basicOutputSection']"
+            <ct-basic-output-section [formControl]="form.controls['basicOutputSection']"
                                  [context]="context">
-            </basic-output-section>
+            </ct-basic-output-section>
             
-            <output-description [formControl]="form.controls['description']">            
-            </output-description>    
+            <ct-description-section [formControl]="form.controls['description']">            
+            </ct-description-section>    
                   
-            <output-metadata-section [inputs]="inputList" [formControl]="form.controls['metaData']">            
-            </output-metadata-section>                  
+            <ct-output-metadata-section [inputs]="inputList" [formControl]="form.controls['metaData']">            
+            </ct-output-metadata-section>                  
             
-            <output-eval [formControl]="form.controls['outputEval']">            
-            </output-eval>   
+            <ct-output-eval [formControl]="form.controls['outputEval']">            
+            </ct-output-eval>   
                      
-            <secondary-file [formControl]="form.controls['secondaryFiles']">            
-            </secondary-file>
+            <ct-secondary-file [formControl]="form.controls['secondaryFiles']">            
+            </ct-secondary-file>
  
         </form>
 `
