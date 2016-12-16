@@ -156,18 +156,17 @@ ct-code-editor {
 
     .console-content {
         padding: 14px;
-
-
-        .error-text {
-            color: $console-error-color;
-        }
-
-        .warning-text {
-            color: $console-warning-color;
-        }
     }
 
     &.show {
         height: 90px;
     }
+}
+
+.error-text {
+    color: $console-error-color;
+}
+
+.warning-text {
+    color: $console-warning-color;
 }

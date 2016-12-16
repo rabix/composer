@@ -16,15 +16,18 @@ require("./clt-editor.component.scss");
             <form [class.col-xs-6]="showInspector" 
                   [class.col-xs-12]="!showInspector" 
                   [formGroup]="formGroup">
-                <ct-docker-image-form [dockerRequirement]="model.hints.DockerRequirement"
+                <ct-docker-image-form [dockerRequirement]="model.docker"
                                    [form]="formGroup.controls['dockerGroup']"
                                    (update)="setRequirement($event, true)">
                 </ct-docker-image-form>
                                 
                 <base-command-form [baseCommand]="model.baseCommand"
                                    [context]="{$job: model.job}"
+                                   [stdin]="model.stdin"
+                                   [stdout]="model.stdout"
                                    [form]="formGroup.controls['baseCommandGroup']"
-                                   (update)="setBaseCommand($event)">
+                                   (updateCmd)="setBaseCommand($event)"
+                                   (updateStreams)="setStreams($event)">
                 </base-command-form>
                                 
                 <ct-tool-input-list [location]="model.loc + '.inputs'" [entries]="model.inputs" 
@@ -37,7 +40,7 @@ require("./clt-editor.component.scss");
                               (update)="updateModel('outputs', $event)">                        
                 </ct-tool-output-list>
                                    
-                <ct-resources [entries]="resources" 
+                <ct-resources [entries]="model.resources" 
                               [readonly]="readonly" 
                               (update)="setResource($event)" 
                               [context]="{$job: model.job}">
@@ -102,11 +105,6 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
         this.formGroup.addControl("arguments", this.formBuilder.group({}));
 
         console.log("Model", this.model);
-
-        if (this.model.hints) {
-            this.resources["sbg:CPURequirement"] = this.model.hints["sbg:CPURequirement"] || new ResourceRequirementModel({class: "sbg:CPURequirement", value: ""}, "");
-            this.resources["sbg:MemRequirement"] = this.model.hints["sbg:MemRequirement"] || new ResourceRequirementModel({class: "sbg:MemRequirement", value: ""}, "");
-        }
     }
 
     private updateModel(category: string, data: any) {
@@ -127,6 +125,12 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
         }
     }
 
+    private setStreams(change) {
+        ["stdin", "stdout"].forEach(str => {
+            if (change[str]) this.model.updateStream(change[str], <"stdin" | "stdout"> str);
+        });
+    }
+
     private setRequirement(req: ProcessRequirement, hint: boolean) {
         this.model.setRequirement(req, hint);
         this.formGroup.markAsDirty();
@@ -137,13 +141,12 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
         this.formGroup.markAsDirty();
     }
 
-    ngAfterViewInit() {
-        this.inspector.setHostView(this.inspectorContent);
-    }
-
     private setBaseCommand(list: ExpressionModel[]) {
         this.model.baseCommand = [];
         list.forEach(cmd => this.model.addBaseCommand(cmd));
     }
 
+    ngAfterViewInit() {
+        this.inspector.setHostView(this.inspectorContent);
+    }
 }
