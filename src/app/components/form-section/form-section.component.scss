@@ -32,6 +32,11 @@
   .gui-section-body {
     height: 0;
 
+    hr { //element selector because that's how bootstrap styles it
+      margin-left: - $grid-gutter-width-base/2;
+      margin-right: - $grid-gutter-width-base/2;
+    }
+
     &.show {
       padding-top: $gui-section-padding;
       height: auto;

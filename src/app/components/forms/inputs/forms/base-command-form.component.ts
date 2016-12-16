@@ -24,7 +24,7 @@ require("./base-command-form.components.scss");
 
                     <ct-expression-input
                             [context]="context"
-                            [formControl]="form.controls[item.id]">
+                            [formControl]="baseCommandForm.controls[item.id]">
                     </ct-expression-input>
 
                     <div class="remove-icon clickable" (click)="removeBaseCommand(item)">
@@ -40,6 +40,26 @@ require("./base-command-form.components.scss");
             <button type="button" class="btn btn-link add-btn-link no-underline-hover" (click)="addBaseCommand()">
                 <i class="fa fa-plus"></i> Add base command
             </button>
+            
+            <hr>
+            <div class="row">
+                <div class="col-xs-12">
+                    <h3 class="gui-section-header">
+                        Streams
+                    </h3>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6">
+                    <label class="form-control-label">Stdin redirect</label>
+                    <ct-expression-input [formControl]="streamsForm.controls['stdin']"></ct-expression-input>
+                </div>
+                <div class="col-xs-6">
+                    <label class="form-control-label">Stdout redirect</label>
+                    <ct-expression-input [formControl]="streamsForm.controls['stdout']"></ct-expression-input>
+                </div>
+            </div>
+            
         </form>
     </div>
 </ct-form-panel>
@@ -51,17 +71,35 @@ export class BaseCommandFormComponent extends ComponentBase implements OnInit, O
     @Input()
     public baseCommand: ExpressionModel[];
 
+    /** Stdin property of model */
+    @Input()
+    public stdin: ExpressionModel;
+
+    /** Stdout property of model */
+    @Input()
+    public stdout: ExpressionModel;
+
     /** The parent forms group which is already in the clt-editor form tree */
     @Input()
     public form: FormGroup;
 
-    /** Update event triggered on form changes (add, remove, edit) */
+    /** Update event triggered on command form changes (add, remove, edit) */
     @Output()
-    public update = new ReplaySubject<ExpressionModel[]>();
+    public updateCmd = new ReplaySubject<ExpressionModel[]>();
+
+    /** Update event triggered on stream changes */
+    @Output()
+    public updateStreams = new ReplaySubject<ExpressionModel[]>();
 
     /** Context in which expression should be evaluated */
     @Input()
     public context: {$job: any};
+
+    /** form group for streams */
+    private streamsForm: FormGroup;
+
+    /** form group for base command */
+    private baseCommandForm: FormGroup;
 
     /** List which connects model to forms */
     private formList: Array<{id: string, model: ExpressionModel}> = [];
@@ -77,18 +115,31 @@ export class BaseCommandFormComponent extends ComponentBase implements OnInit, O
             };
         });
 
+        this.streamsForm = new FormGroup({
+            stdin: new FormControl(this.stdin),
+            stdout: new FormControl(this.stdout)
+        });
+
+        this.baseCommandForm = new FormGroup({});
+
         this.formList.forEach((item) => {
-            this.form.addControl(
+            this.baseCommandForm.addControl(
                 item.id,
                 new FormControl(item.model, [Validators.required])
             );
         });
 
+        this.form.addControl("streams", this.streamsForm);
+        this.form.addControl("baseCommand", this.baseCommandForm);
 
-        this.tracked = this.form.valueChanges.subscribe(change => {
+        this.tracked = this.baseCommandForm.valueChanges.subscribe(change => {
             const v = Object.keys(change).map(key => change[key]);
-            this.update.next(v);
-        })
+            this.updateCmd.next(v);
+        });
+
+        this.tracked = this.streamsForm.valueChanges.subscribe(change => {
+            this.updateStreams.next(change);
+        });
     }
 
     private removeBaseCommand(ctrl: {id: string, model: ExpressionModel}): void {
@@ -111,6 +162,7 @@ export class BaseCommandFormComponent extends ComponentBase implements OnInit, O
 
     ngOnDestroy() {
         super.ngOnDestroy();
-        this.formList.forEach(item => this.form.removeControl(item.id));
+        this.form.removeControl("baseCommand");
+        this.form.removeControl("streams");
     }
 }

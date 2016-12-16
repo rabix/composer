@@ -23,8 +23,11 @@ require("./clt-editor.component.scss");
                                 
                 <base-command-form [baseCommand]="model.baseCommand"
                                    [context]="{$job: model.job}"
+                                   [stdin]="model.stdin"
+                                   [stdout]="model.stdout"
                                    [form]="formGroup.controls['baseCommandGroup']"
-                                   (update)="setBaseCommand($event)">
+                                   (updateCmd)="setBaseCommand($event)"
+                                   (updateStreams)="setStreams($event)">
                 </base-command-form>
                                 
                 <ct-tool-input-list [location]="model.loc + '.inputs'" [entries]="model.inputs" (update)="updateModel('inputs', $event)"></ct-tool-input-list>
@@ -88,11 +91,6 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
         this.formGroup.addControl("inputs", this.formBuilder.group({}));
 
         console.log("Model", this.model);
-
-        // if (this.model.resources) {
-        //     this.resources["sbg:CPURequirement"] = this.model.hints["sbg:CPURequirement"] || new ResourceRequirementModel({class: "sbg:CPURequirement", value: ""}, "");
-        //     this.resources["sbg:MemRequirement"] = this.model.hints["sbg:MemRequirement"] || new ResourceRequirementModel({class: "sbg:MemRequirement", value: ""}, "");
-        // }
     }
 
     private updateModel(category: string, data: any) {
@@ -107,6 +105,12 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
         }
     }
 
+    private setStreams(change) {
+        ["stdin", "stdout"].forEach(str => {
+            if (change[str]) this.model.updateStream(change[str], <"stdin" | "stdout"> str);
+        });
+    }
+
     private setRequirement(req: ProcessRequirement, hint: boolean) {
         this.model.setRequirement(req, hint);
         this.formGroup.markAsDirty();
@@ -117,13 +121,12 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
         this.formGroup.markAsDirty();
     }
 
-    ngAfterViewInit() {
-        this.inspector.setHostView(this.inspectorContent);
-    }
-
     private setBaseCommand(list: ExpressionModel[]) {
         this.model.baseCommand = [];
         list.forEach(cmd => this.model.addBaseCommand(cmd));
     }
 
+    ngAfterViewInit() {
+        this.inspector.setHostView(this.inspectorContent);
+    }
 }
