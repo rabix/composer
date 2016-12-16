@@ -44,22 +44,33 @@ export class HintListInputComponent extends ComponentBase implements ControlValu
 
     private input: RequirementBaseModel;
 
+    private validateClassForm(c: FormControl) {
+
+        if (c.value  === "sbg:MemRequirement"
+            || c.value === "sbg:CPURequirement"
+            || c.value === "DockerRequirement") {
+
+            return {
+                valid: false,
+                message: "Class name is not valid"
+            }
+        }
+
+        return null;
+    }
+
     writeValue(hintInput: RequirementBaseModel): void {
 
         this.input = hintInput;
 
-        this.classForm = new FormControl(hintInput.class);
+        this.classForm = new FormControl(hintInput.class, this.validateClassForm);
         this.valueForm = new FormControl(hintInput.value);
 
         this.tracked = this.classForm.valueChanges
             .debounceTime(300)
             .distinctUntilChanged()
             .subscribe((value: string) => {
-                const isValidClass = value !== "sbg:MemRequirement"
-                    && value !== "sbg:CPURequirement"
-                    && value !== "DockerRequirement";
-
-                this.input['class'] = !!isValidClass ? value : "";
+                this.input['class'] = this.classForm.valid ? value : "";
                 this.propagateChange(this.input);
             });
 
