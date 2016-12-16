@@ -38,28 +38,13 @@ require("./basic-input-section.component.scss");
                 </div> <!-- Required -->
             
                 <div class="form-group">
-                    <label>ID</label>
+                    <label class="form-control-label">ID</label>
                     <input type="text" 
                            class="form-control"
                            [formControl]="basicSectionForm.controls['propertyIdForm']">
                 </div> <!-- ID -->
                 
-                <div class="form-group">
-                    <label for="inputType">Type</label>
-                    <input-type-select [formControl]="basicSectionForm.controls['typeForm']"></input-type-select>
-                </div> <!-- Input Type -->
-                
-                <div class="form-group" *ngIf="input.type.type === 'array'">
-                    <label>Item Types</label>
-                    <select class="form-control" 
-                            [formControl]="basicSectionForm.controls['itemType']">
-                           
-                        <option *ngFor="let item of itemTypes" 
-                                [value]="item">
-                            {{item}}
-                        </option>
-                    </select>
-                </div> <!--Item type-->
+                <input-type-select [formControl]="basicSectionForm.controls['typeForm']"></input-type-select>
                 
                 <div class="form-group flex-container" 
                         *ngIf="input.type.type !== 'map' && basicSectionForm.controls['isBound']">
@@ -99,8 +84,6 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
     private propagateChange = (_) => {};
 
-    private itemTypes: string[] = ["string", "int", "float", "File", "record", "map", "enum", "boolean"];
-
     private initSymbolsList: string[] = [];
 
     constructor(private formBuilder: FormBuilder) {
@@ -117,7 +100,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
             //FIXME: isNullable is undefined when it's not nullable
             isRequired: [!this.input.type.isNullable],
             inputBinding: [this.input.inputBinding, CustomValidators.cwlModel],
-            itemType: [this.input.type.items ? this.input.type.items: 'string'],
+            itemType: [this.input.type.items ? this.input.type.items: 'File'],
             symbols: [this.input.type.symbols ? this.input.type.symbols: this.initSymbolsList]
         });
 
@@ -131,8 +114,6 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
             if (value.symbols.length > 0 && this.input.type.type === 'enum') {
                 this.input.type.symbols = value.symbols;
-            } else {
-                this.input.type.symbols = undefined;
             }
 
             this.input.validate();
@@ -184,7 +165,8 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
     }
 
     private listenToTypeFormChanges(): void {
-        this.tracked = this.basicSectionForm.controls['typeForm'].valueChanges.subscribe((value: InputParameterTypeModel) => {
+        this.tracked = this.basicSectionForm.controls['typeForm'].valueChanges
+            .subscribe((value: InputParameterTypeModel) => {
 
             this.input.type.setType(value.type);
 

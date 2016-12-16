@@ -3,6 +3,8 @@ import {Component, forwardRef} from "@angular/core";
 import {ControlValueAccessor, FormControl, Validators, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {PrimitiveParameterType} from "cwlts/models/d2sb/ParameterTypeModel";
 import {ComponentBase} from "../../../components/common/component-base";
+import {noop} from "../../../lib/utils.lib";
+import {FormGroup} from "@angular/forms";
 
 @Component({
     selector: 'input-type-select',
@@ -10,12 +12,29 @@ import {ComponentBase} from "../../../components/common/component-base";
         { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => InputTypeSelectComponent), multi: true }
     ],
     template: `
-        <select class="form-control" 
-                [formControl]="typeSelectControl">
-            <option *ngFor="let propertyType of propertyTypes" [value]="propertyType">
-                {{propertyType}}
-            </option>
-        </select>
+        <div class="form-group">
+            <label class="form-control-label">Type</label>
+            <select class="form-control"
+                    [formControl]="form.controls['type']">
+                <option *ngFor="let propertyType of propertyTypes" [value]="propertyType">
+                    {{propertyType}}
+                </option>
+            </select>
+        </div><!--Type-->
+        
+        
+        <div class="form-group">
+            <div [hidden]="paramType?.type !== 'array'">
+                <label>Items Type</label>
+                <select class="form-control"
+                        [formControl]="form.controls['items']">
+                    <option *ngFor="let item of itemTypes"
+                            [value]="item">
+                        {{item}}
+                    </option>
+                </select>
+            </div> <!--Item type-->
+        </div>
     `
 })
 export class InputTypeSelectComponent extends ComponentBase implements ControlValueAccessor {
@@ -24,41 +43,46 @@ export class InputTypeSelectComponent extends ComponentBase implements ControlVa
 
     private propertyTypes = ["array", "enum", "record", "File", "string", "int", "float", "boolean", "map"];
 
-    private typeSelectControl: FormControl;
+    private itemTypes =  ["enum", "record", "File", "string", "int", "float", "boolean", "map"];
 
-    private onTouched = () => { };
+    private form: FormGroup = new FormGroup({
+        type: new FormControl(null),
+        items: new FormControl(null)
+    });
 
-    private propagateChange = (_) => {};
+    private onTouched = noop;
 
-    constructor() {
-        super();
-    }
+    private onChange = noop;
 
     writeValue(paramType: InputParameterTypeModel): void {
         this.paramType = paramType;
 
-        if (this.paramType.type === undefined) {
+        if (!this.paramType.type) {
             this.paramType.type = "File";
-            this.propagateChange(this.paramType);
+            this.onChange(this.paramType);
         }
 
-        this.typeSelectControl = new FormControl(this.paramType.type, [Validators.required]);
+        this.form.controls["type"].setValue(this.paramType.type);
+        this.form.controls["items"].setValue(this.paramType.items);
 
-        this.tracked = this.typeSelectControl.valueChanges.subscribe((value: PrimitiveParameterType) => {
-            this.paramType.type = value;
-            this.propagateChange(this.paramType);
+        this.tracked = this.form.valueChanges.subscribe(change => {
+            this.paramType.type = change.type;
+            this.paramType.items = change.items;
+
+            if (this.paramType.type === "array" && !this.paramType.items) {
+                this.paramType.items = "File";
+                this.form.controls["items"].setValue("File");
+            }
+
+            this.onChange(this.paramType);
         });
     }
 
     registerOnChange(fn: any): void {
-        this.propagateChange = fn;
+        this.onChange = fn;
     }
 
     registerOnTouched(fn: any): void {
         this.onTouched = fn;
-    }
-
-    ngOnDestroy(): void {
-        super.ngOnDestroy();
     }
 }

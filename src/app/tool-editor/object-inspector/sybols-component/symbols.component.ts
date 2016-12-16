@@ -13,7 +13,7 @@ require("./symbols.component.scss");
     template: `
         <div class="form-group" *ngIf="symbolsForm">
         <form>
-               <label>Symbols</label>
+               <label class="form-control-label">Symbols</label>
                       
                <ol class="list-unstyled">
                     <li *ngFor="let symbol of symbolsFormList; let i = index;" 
@@ -57,7 +57,7 @@ export class SymbolsComponent extends ComponentBase implements ControlValueAcces
         super();
     }
 
-    private writeValue(symbols: string[]): void {
+    writeValue(symbols: string[]): void {
         this.symbolsForm = new FormGroup({});
 
         if (symbols.length === 0) {
@@ -72,11 +72,11 @@ export class SymbolsComponent extends ComponentBase implements ControlValueAcces
         this.listenToFormChanges();
     }
 
-    private registerOnChange(fn: any): void {
+    registerOnChange(fn: any): void {
         this.propagateChange = fn;
     }
 
-    private registerOnTouched(fn: any): void {
+    registerOnTouched(fn: any): void {
         this.onTouched = fn;
     }
 

@@ -30,7 +30,7 @@ import {ExpressionModel, CommandLineBindingModel} from "cwlts/models/d2sb";
     <div class="form-group" *ngIf="inputBindingFormGroup && propertyType">
     
             <div class="form-group" *ngIf="propertyType !== 'record'">
-                <label>Value</label>
+                <label class="form-control-label">Value</label>
                 <ct-expression-input
                             [context]="context"
                             [formControl]="inputBindingFormGroup.controls['valueFrom']">
@@ -38,14 +38,14 @@ import {ExpressionModel, CommandLineBindingModel} from "cwlts/models/d2sb";
             </div>
         
             <div class="form-group">
-                <label>Position</label>
+                <label class="form-control-label">Position</label>
                 <input class="form-control"
                        type="number"
                        [formControl]="inputBindingFormGroup.controls['position']"/>
              </div>
         
             <div class="form-group">
-                <label>Prefix</label>
+                <label class="form-control-label">Prefix</label>
                 <input class="form-control"
                        [formControl]="inputBindingFormGroup.controls['prefix']"/>
             </div>

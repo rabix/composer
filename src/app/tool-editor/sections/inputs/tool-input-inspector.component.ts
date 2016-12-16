@@ -16,12 +16,6 @@ import {ComponentBase} from "../../../components/common/component-base";
             <input-description [formControl]="form.controls['description']"></input-description>
             
             <stage-input [formControl]="form.controls['stageInputSection']"></stage-input>
-           
-            <!--<div class="form-group row">-->
-                <!--<div class="col-xs-12">-->
-                    <!--<button type="submit" class="btn btn-primary">Save</button>-->
-                <!--</div>-->
-            <!--</div>-->
         </form>
 `
 })
