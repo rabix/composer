@@ -44,7 +44,7 @@ require("./base-command-form.components.scss");
             <hr>
             <div class="row">
                 <div class="col-xs-12">
-                    <h3 class="gui-section-header">
+                    <h3 class="gui-section-header mb-1">
                         Streams
                     </h3>
                 </div>
