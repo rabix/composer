@@ -1,3 +1,4 @@
+import {Subject} from "rxjs";
 import {
     Component,
     Input,

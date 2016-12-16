@@ -6,25 +6,19 @@ import {ComponentBase} from "../../../components/common/component-base";
 
 @Component({
     selector: "ct-argument-inspector",
-    template: `
-<ct-form-panel [borderless]="true" [collapsed]="false">
-
-        <span class="tc-header">
-            Basic
-        </span>
-        
+    template: `        
         <div class="tc-body">
             <form [formGroup]="form">
             
                 <!--Prefix Field-->
                 <div class="form-group">
-                    <label>Prefix:</label>
+                    <label class="form-control-label">Prefix</label>
                     <input type="text" class="form-control" [formControl]="form.controls['prefix']">
                 </div>
                 
                 <!--Expression Field-->
                 <div class="form-group">
-                    <label>Expression:</label>
+                    <label class="form-control-label">Expression</label>
                     <ct-expression-input 
                     [context]="context"
                     [formControl]="form.controls['valueFrom']">                    
@@ -33,23 +27,22 @@ import {ComponentBase} from "../../../components/common/component-base";
                 
                 <!--Separator field-->            
                 <div class="form-group flex-container">
-                    <label>Separator:</label>
+                    <label class="form-control-label">Separator</label>
                     <span class="align-right">
-                        {{form._value.separate? "Yes" : "No"}}
-                        <toggle-slider [formControl]="form.controls['separate']"></toggle-slider>
+                        <toggle-slider [formControl]="form.controls['separate']" 
+                                   [on]="'Separate'"
+                                   [off]="'Join'"></toggle-slider>
                     </span>
                 </div>
                 
                 <!--Position Field-->
                 <div class="form-group">
-                    <label>Position:</label>
-                    <input type="text" type="number" class="form-control" [formControl]="form.controls['position']">
+                    <label class="form-control-label">Position</label>
+                    <input type="number" class="form-control" [formControl]="form.controls['position']">
                 </div>
                 
             </form>
         </div>
-                
-</ct-form-panel>
 `
 })
 export class ArgumentInspector extends ComponentBase {
@@ -73,7 +66,7 @@ export class ArgumentInspector extends ComponentBase {
     ngOnInit() {
         this.form = this.formBuilder.group({
             valueFrom: new FormControl(this.argument.valueFrom),
-            separate: new FormControl(this.argument.separate || false),
+            separate: new FormControl(this.argument.separate !== false),
             position: new FormControl(this.argument.position || 0),
             prefix: new FormControl(this.argument.prefix || ''),
         });
