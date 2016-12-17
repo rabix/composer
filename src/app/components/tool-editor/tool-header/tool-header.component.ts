@@ -7,7 +7,7 @@ import {Subject} from "rxjs";
     template: `
         <div *ngIf="!actionPending">
             <button *ngIf="data.isWritable"
-                    [disabled]="!fileIsValid" 
+                    [disabled]="!fileIsValid && data.data.source !== 'local'" 
                     [ct-tooltip]="'Save'"
                     (click)="saveAction()" 
                     type="button" 
