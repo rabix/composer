@@ -95,10 +95,8 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
             isBound: [this.input.isBound],
             //FIXME: isNullable is undefined when it's not nullable
             isRequired: [!this.input.type.isNullable],
-            inputBinding: [this.input.inputBinding, CustomValidators.cwlModel],
-            itemType: [this.input.type.items ? this.input.type.items: 'File'],
             inputBinding: [this.input, CustomValidators.cwlModel],
-            itemType: [this.input.type.items ? this.input.type.items: 'string'],
+            itemType: [this.input.type.items ? this.input.type.items: 'File'],
             symbols: [this.input.type.symbols ? this.input.type.symbols: this.initSymbolsList]
         });
 

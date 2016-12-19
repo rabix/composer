@@ -2,7 +2,6 @@ import {Component, forwardRef} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormControl} from "@angular/forms";
 import {ComponentBase} from "../../../components/common/component-base";
 import {GuidService} from "../../../services/guid.service";
-import {CompactListComponent} from "../../../editor-common/components/compact-list/compact-list.component";
 
 require("./symbols.component.scss");
 

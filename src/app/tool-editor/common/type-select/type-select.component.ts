@@ -1,10 +1,8 @@
 import {InputParameterTypeModel} from "cwlts/models/d2sb/InputParameterTypeModel";
 import {Component, forwardRef} from "@angular/core";
-import {ControlValueAccessor, FormControl, Validators, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {PrimitiveParameterType} from "cwlts/models/d2sb/ParameterTypeModel";
+import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, FormGroup} from "@angular/forms";
 import {ComponentBase} from "../../../components/common/component-base";
 import {noop} from "../../../lib/utils.lib";
-import {FormGroup} from "@angular/forms";
 
 @Component({
     selector: 'input-type-select',
@@ -67,11 +65,15 @@ export class InputTypeSelectComponent extends ComponentBase implements ControlVa
 
         this.tracked = this.form.valueChanges.subscribe(change => {
             this.paramType.type = change.type;
-            this.paramType.items = change.items;
 
-            if (this.paramType.type === "array" && !this.paramType.items) {
-                this.paramType.items = "File";
-                this.form.controls["items"].setValue("File");
+            if (this.paramType.type === "array") {
+
+                if (!this.paramType.items) {
+                    this.paramType.items = "File";
+                    this.form.controls["items"].setValue("File");
+                } else {
+                    this.paramType.items = change.items;
+                }
             }
 
             this.onChange(this.paramType);

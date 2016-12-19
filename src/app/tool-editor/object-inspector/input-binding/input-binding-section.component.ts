@@ -87,14 +87,6 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
     private propagateChange = (_) => {
     };
 
-    private itemSeparators: {text: string, value: string}[] = [
-        {text: "equal", value: "="},
-        {text: "comma", value: ","},
-        {text: "semicolon", value: ";"},
-        {text: "space", value: " "},
-        {text: "repeat", value: null}
-    ];
-
     constructor(private formBuilder: FormBuilder) {
         super();
     }
