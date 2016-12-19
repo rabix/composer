@@ -8,9 +8,6 @@ require("./symbols.component.scss");
 
 @Component({
     selector: 'symbols-section',
-    directives: [
-        CompactListComponent
-    ],
     providers: [
         { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => SymbolsComponent), multi: true }
     ],

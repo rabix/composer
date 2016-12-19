@@ -40,6 +40,8 @@ $chrome-dark-bg-secondary: #4F4F4F;
 $chrome-dark-text: #fff;
 $chrome-dark-highlight: $brand-primary;
 
+$hr-border-color: $border-color;
+
 /**
 * SBG colors
 */
@@ -106,7 +108,14 @@ $status-bar-height: $status-bar-line-height + 2*$status-bar-padding-y;
 /**
 * Form variables
 */
+//$input-label-color: #808080;
 $input-label-color: #808080;
+$text-muted: #999;
 $input-label-size: $font-size-sm;
+
+/**
+* Help text
+*/
+
 
 @import "theme-variables";

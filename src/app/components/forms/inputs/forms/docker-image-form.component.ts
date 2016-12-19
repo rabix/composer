@@ -1,7 +1,6 @@
 import {Component, Input, OnInit, Output} from "@angular/core";
 import {FormGroup, FormControl} from "@angular/forms";
 import {DockerRequirementModel} from "cwlts/models/d2sb";
-import {FormPanelComponent} from "../../../../core/elements/form-panel.component";
 import {ReplaySubject} from "rxjs";
 import {ComponentBase} from "../../../common/component-base";
 import {DockerRequirement} from "cwlts/mappings/d2sb/DockerRequirement";

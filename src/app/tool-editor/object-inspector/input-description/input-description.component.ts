@@ -15,27 +15,27 @@ require("./input-description.component.scss");
     <div class="tc-header">Description</div>
     <div class="tc-body" *ngIf="input && descriptionFormGroup">
     
-        <div class="secondary-text">
+        <div class="form-text">
              This description will be visible when using the tool in the workflow editor.
              It's best to be concise and informative.
         </div>
         
         <div class="form-group">
-            <label>Label</label>
+            <label class="form-control-label">Label</label>
             <input type="text" 
                    class="form-control"
                    [formControl]="descriptionFormGroup.controls['label']">
         </div>
         
         <div class="form-group">
-            <label>Description</label>        
+            <label class="form-control-label">Description</label>        
             <textarea class="form-control" 
                       rows="4"
                       [formControl]="descriptionFormGroup.controls['description']"></textarea>
         </div>
         
          <div *ngIf="input.type.type === 'File'">
-            <label>File types</label>
+            <label class="form-control-label">File types</label>
             <input class="form-control"
                    [formControl]="descriptionFormGroup.controls['fileTypes']"/>
          </div>
