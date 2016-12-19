@@ -73,7 +73,7 @@ require("./output-list.component.scss");
                             <!--Object Inspector Template -->
                             <template #inspector>
                                 <ct-editor-inspector-content>
-                                    <div class="tc-header">Output</div>
+                                    <div class="tc-header">{{ entry.loc || "Output" }}</div>
                                     <div class="tc-body">
                                         <ct-tool-output-inspector 
                                                    (save)="updateOutput($event, i)" 

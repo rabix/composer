@@ -42,19 +42,12 @@ require("./basic-output-section.component.scss");
 
     <!-- Input Type -->
     <div class="form-group">
-        <label class="form-control-label">Type</label>
         <input-type-select [formControl]="basicSectionForm.controls['typeForm']"></input-type-select>
     </div>
-
-    <!--Item type-->
-    <div class="form-group" *ngIf="output.type.type === 'array'">
-        <label class="form-control-label">Item Types</label>
-        <select class="form-control" [formControl]="basicSectionForm.controls['itemType']">
-            <option *ngFor="let item of itemTypes" [value]="item">
-                {{item}}
-            </option>
-        </select>
-    </div>
+    
+    <!--Symbols-->
+    <symbols-section class="form-group" *ngIf="output.type.type === 'enum'" [formControl]="basicSectionForm.controls['symbols']">
+    </symbols-section>
 
     <!--Glob-->
     <div class="form-group">
@@ -62,11 +55,6 @@ require("./basic-output-section.component.scss");
         <ct-expression-input [context]="context" [formControl]="basicSectionForm.controls['glob']">
         </ct-expression-input>
     </div>
-
-    <!--Symbols-->
-    <symbols-section class="form-group" *ngIf="output.type.type === 'enum'" [formControl]="basicSectionForm.controls['symbols']">
-    </symbols-section>
-
 
 </form>
 <!--ct-basic-output-section-->
@@ -88,8 +76,6 @@ export class BasicOutputSectionComponent extends ComponentBase implements Contro
     private propagateChange = (_) => {
     };
 
-    private itemTypes: string[] = ["string", "int", "float", "File", "record", "map", "enum", "boolean"];
-
     private initSymbolsList: string[] = [];
 
     constructor(private formBuilder: FormBuilder) {
@@ -103,7 +89,6 @@ export class BasicOutputSectionComponent extends ComponentBase implements Contro
             propertyIdForm: [this.output.id],
             typeForm: [this.output.type, [Validators.required, CustomValidators.cwlModel]],
             glob: [this.output.outputBinding.glob],
-            //FIXME: isNullable is undefined when it's not nullable
             isRequired: [!this.output.type.isNullable],
             itemType: [!!this.output.type.items ? this.output.type.items : 'File'],
             symbols: [!!this.output.type.symbols ? this.output.type.symbols : this.initSymbolsList]
@@ -111,7 +96,6 @@ export class BasicOutputSectionComponent extends ComponentBase implements Contro
 
         this.listenToTypeFormChanges();
         this.listenToIdChanges();
-        this.listenToItemTypeFormChanges();
 
         this.tracked = this.basicSectionForm.valueChanges.subscribe(value => {
             this.output.type.isNullable = !value.isRequired;
@@ -119,8 +103,6 @@ export class BasicOutputSectionComponent extends ComponentBase implements Contro
 
             if (value.symbols.length > 0 && this.output.type.type === 'enum') {
                 this.output.type.symbols = value.symbols;
-            } else {
-                this.output.type.symbols = undefined;
             }
 
             this.output.validate();
@@ -149,14 +131,6 @@ export class BasicOutputSectionComponent extends ComponentBase implements Contro
                     this.output.type.name = id;
                 }
             });
-    }
-
-    private listenToItemTypeFormChanges(): void {
-        this.tracked = this.basicSectionForm.controls['itemType'].valueChanges.subscribe((value: OutputParameterTypeModel) => {
-            if (!!value && this.output.type.type === 'array') {
-                this.output.type.items = value;
-            }
-        });
     }
 
     private listenToTypeFormChanges(): void {
