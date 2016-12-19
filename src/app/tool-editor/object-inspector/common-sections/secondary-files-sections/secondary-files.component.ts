@@ -130,4 +130,9 @@ export class SecondaryFilesComponent extends ComponentBase implements ControlVal
     registerOnTouched(fn: any): void {
         this.onTouched = fn;
     }
+
+    ngOnDestroy() {
+        super.ngOnDestroy();
+        this.formList.forEach(item => this.secondaryFilesFormGroup.removeControl(item.id));
+    }
 }
