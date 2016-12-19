@@ -43,7 +43,6 @@ import {PromptComponent} from "./app/components/modal/common/prompt.component";
 import {CheckboxPromptComponent} from "./app/components/modal/common/checkbox-prompt.component";
 import {FileEditorComponent} from "./app/components/file-editor/file-editor.component";
 import {CodeEditorDirective} from "./app/directives/code-editor.directive";
-import {OutputPortsComponent} from "./app/components/clt-editor/output-ports/output-ports.component";
 import {ToolEditorModule} from "./app/tool-editor/tool-editor.module";
 import {CoreModule} from "./app/core/core.module";
 import {CWLModule} from "./app/cwl/cwl.module";
@@ -84,7 +83,6 @@ import {DomEventService} from "./app/services/dom/dom-event.service";
         MainComponent,
         ModalComponent,
         NewFileModalComponent,
-        OutputPortsComponent,
         PanelComponent,
         PanelContainerComponent,
         PanelHandleComponent,
@@ -107,8 +105,7 @@ import {DomEventService} from "./app/services/dom/dom-event.service";
         ViewModeSwitchComponent,
         WorkboxComponent,
         WorkflowEditorComponent,
-        CompactListComponent,
-        EditableDirective,
+        // CompactListComponent,
     ],
     entryComponents: [
         CheckboxPromptComponent,
@@ -128,6 +125,9 @@ import {DomEventService} from "./app/services/dom/dom-event.service";
         ReactiveFormsModule,
         ToolEditorModule,
     ],
+    // exports: [
+    //     CompactListComponent
+    // ],
     bootstrap: [MainComponent]
 })
 export class AppModule {

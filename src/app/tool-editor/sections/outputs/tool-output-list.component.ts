@@ -1,11 +1,14 @@
-import {Component, Input, ChangeDetectionStrategy} from "@angular/core";
-import {ComponentBase} from "../../common/component-base";
+import {Component, Input, ChangeDetectionStrategy, Output, ViewChildren, QueryList, TemplateRef} from "@angular/core";
+import {ComponentBase} from "../../../components/common/component-base";
 import {ExternalLinks} from "../../../cwl/external-links";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
-import {CommandOutputParameterModel as OutputModel} from "cwlts/models/d2sb";
+import {CommandOutputParameterModel, CommandInputParameterModel} from "cwlts/models/d2sb";
+import {Subject} from "rxjs";
+
+require("./output-list.component.scss");
 
 @Component({
-    selector: "ct-output-ports",
+    selector: "ct-tool-output-list",
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <ct-form-panel [collapsed]="false">
@@ -31,8 +34,8 @@ import {CommandOutputParameterModel as OutputModel} from "cwlts/models/d2sb";
                     <ul class="gui-section-list">
                         <li *ngFor="let entry of entries; let i = index"
                             [ct-editor-inspector]="inspector"
+                            [ct-editor-inspector-target]="entry"
                             [ct-validation-class]="entry.validation"
-                            (click)="select(entry)"
                             class="gui-section-list-item clickable row">
                             
                             <div class="col-sm-4 ellipsis" [title]="entry.id">
@@ -48,7 +51,7 @@ import {CommandOutputParameterModel as OutputModel} from "cwlts/models/d2sb";
                                     {{ entry.outputBinding.glob.toString() }}
                                 </span>
                                 
-                                <ct-code-preview *ngIf="entry.outputBinding.glob && entry.outputBinding.glob?.isExpression"
+                                <ct-code-preview *ngIf="ctt.isIn && entry.outputBinding.glob && entry.outputBinding.glob?.isExpression"
                                                  (viewReady)="ctt.show()"
                                                  [content]="entry.outputBinding.glob.toString()"></ct-code-preview>
                             </ct-tooltip-content>
@@ -66,6 +69,21 @@ import {CommandOutputParameterModel as OutputModel} from "cwlts/models/d2sb";
                             <div *ngIf="!readonly" class="col-sm-1 align-right">
                                 <i title="Delete" class="fa fa-trash text-hover-danger" (click)="removeEntry(i)"></i>
                             </div>
+                            
+                            <!--Object Inspector Template -->
+                            <template #inspector>
+                                <ct-editor-inspector-content>
+                                    <div class="tc-header">Output</div>
+                                    <div class="tc-body">
+                                        <ct-tool-output-inspector 
+                                                   (save)="updateOutput($event, i)" 
+                                                   [context]="context"
+                                                   [output]="entry"
+                                                   [inputs]="inputs">
+                                        </ct-tool-output-inspector>
+                                    </div>
+                                </ct-editor-inspector-content>
+                            </template>
                         </li>
                     </ul>
                 </div>
@@ -77,54 +95,78 @@ import {CommandOutputParameterModel as OutputModel} from "cwlts/models/d2sb";
                     <i class="fa fa-plus"></i> Add Output
                 </button>
             </div>
-        </ct-form-panel>
-        
-        <template #inspector>
-            <ct-editor-inspector-content *ngIf="selected">
-                <div class="tc-header">
-                    {{ selected.id}}
-                </div>
-                <div class="tc-body">
-                    <code>{{ selected | json }}</code>
-                </div>
-            </ct-editor-inspector-content>
-        </template>
+        </ct-form-panel>       
     `
 })
-export class OutputPortsComponent extends ComponentBase {
+export class ToolOutputListComponent extends ComponentBase {
 
-    /** List of entries that should be shown */
     @Input()
-    public entries: {
-        id?: string,
-        type?: any,
-        outputBinding?: {
-            glob: any
-        }
-    }[] = [];
+    public inputs: CommandInputParameterModel[] = [];
+
+    @Input()
+    public entries: CommandOutputParameterModel[] = [];
+
+    /** Model location entry, used for tracing the path in the json document */
+    @Input()
+    public location = "";
+
+    /** Context in which expression should be evaluated */
+    @Input()
+    public context: {$job: any};
 
     @Input()
     public readonly = false;
 
-    private helpLink = ExternalLinks.toolOutput;
+    @Output()
+    public readonly update = new Subject();
 
-
-    @Input()
-    private selected;
+    @ViewChildren("inspector", {read: TemplateRef})
+    private inspectorTemplate: QueryList<TemplateRef<any>>;
 
     constructor(private inspector: EditorInspectorService) {
         super();
     }
 
-    private addEntry() {
-        this.entries = this.entries.concat(new OutputModel());
-    }
+    private helpLink = ExternalLinks.toolOutput;
+
 
     private removeEntry(index) {
-        this.entries = this.entries.slice(0, index).concat(this.entries.slice(index + 1));
+
+        if (this.inspector.isInspecting(this.entries[index])) {
+            this.inspector.hide();
+        }
+
+        const entries = this.entries.slice(0, index).concat(this.entries.slice(index + 1));
+        this.update.next(entries);
     }
 
-    private select(entry){
-        this.selected = entry;
+    private addEntry() {
+        const newEntryLocation = `${this.location}[${this.entries.length}]`;
+        const newEntry = new CommandOutputParameterModel(undefined, newEntryLocation);
+        const entries  = this.entries.concat(newEntry);
+        this.update.next(entries);
+
+        this.inspectorTemplate.changes
+            .take(1)
+            .delay(1)
+            .map(list => list.last)
+            .subscribe(templateRef => {
+                this.inspector.show(templateRef, newEntry);
+            });
     }
+
+    private updateOutput(newInput: CommandOutputParameterModel, index: number) {
+
+        // FIXME: cloning an object ditches its prototype chain, but we need it
+        const input = this.entries[index];
+
+        /**
+         * FIXME: input parameter type needs to be able to switch references
+         * then make {@link CommandParameterTypePipe} pure again.
+         */
+        Object.assign(input, newInput);
+
+        this.update.next(this.entries.slice());
+    }
+
 }

@@ -13,7 +13,7 @@ import {ComponentBase} from "../../../components/common/component-base";
                                  [context]="context">
             </basic-input-section>
             
-            <input-description [formControl]="form.controls['description']"></input-description>
+            <ct-description-section [formControl]="form.controls['description']"></ct-description-section>
             
             <stage-input [formControl]="form.controls['stageInputSection']"></stage-input>
         </form>

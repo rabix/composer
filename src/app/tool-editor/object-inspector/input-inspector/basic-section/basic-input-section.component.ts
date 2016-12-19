@@ -13,8 +13,8 @@ import {
     CommandLineBindingModel,
     InputParameterTypeModel
 } from "cwlts/models/d2sb";
-import {ComponentBase} from "../../../components/common/component-base";
-import {CustomValidators} from "../../../validators/custom.validator";
+import {ComponentBase} from "../../../../components/common/component-base";
+import {CustomValidators} from "../../../../validators/custom.validator";
 
 require("./basic-input-section.component.scss");
 
@@ -26,14 +26,12 @@ require("./basic-input-section.component.scss");
     ],
     template: `
 
-          <form class="basic-input-section">
+          <form class="ct-basic-input-section">
                 <div class="form-group flex-container">
                     <label>Required</label>
                     <span class="align-right">
-                        <toggle-slider [formControl]="basicSectionForm.controls['isRequired']"
-                                       [off]="'No'" 
-                                       [on]="'Yes'">
-                        </toggle-slider>
+                        {{input.type.isNullable ? "No" : "Yes"}}
+                        <toggle-slider [formControl]="basicSectionForm.controls['isRequired']"></toggle-slider>
                     </span>
                 </div> <!-- Required -->
             
@@ -50,10 +48,8 @@ require("./basic-input-section.component.scss");
                         *ngIf="input.type.type !== 'map' && basicSectionForm.controls['isBound']">
                     <label>Include in command line</label>
                     <span class="align-right">
-                        <toggle-slider [formControl]="basicSectionForm.controls['isBound']" 
-                                       [off]="'No'" 
-                                       [on]="'Yes'">
-                        </toggle-slider>
+                        {{input.isBound ? "Yes" : "No"}}
+                        <toggle-slider [formControl]="basicSectionForm.controls['isBound']"></toggle-slider>
                     </span>
                 </div> <!-- Include in commandline -->
                 
@@ -104,6 +100,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
             symbols: [this.input.type.symbols ? this.input.type.symbols: this.initSymbolsList]
         });
 
+        this.listenToItemTypeFormChanges();
         this.listenToIsBoundChanges();
         this.listenToInputBindingChanges();
         this.listenToTypeFormChanges();
@@ -162,6 +159,14 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
             .subscribe((inputBinding: CommandLineBindingModel)  => {
                 this.input.updateInputBinding(inputBinding);
             });
+    }
+
+    private listenToItemTypeFormChanges(): void {
+        this.tracked = this.basicSectionForm.controls['itemType'].valueChanges.subscribe((value: InputParameterTypeModel) => {
+            if (!!value && this.input.type.type === 'array') {
+                this.input.type.items = value;
+            }
+        });
     }
 
     private listenToTypeFormChanges(): void {

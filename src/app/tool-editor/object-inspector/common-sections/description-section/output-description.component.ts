@@ -1,19 +1,19 @@
 import {Component, forwardRef} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormBuilder, FormGroup} from "@angular/forms";
-import {ComponentBase} from "../../../components/common/component-base";
-import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
+import {ComponentBase} from "../../../../components/common/component-base";
+import {CommandOutputParameterModel, CommandInputParameterModel} from "cwlts/models/d2sb";
 
-require("./input-description.component.scss");
+require("./output-description.component.scss");
 
 @Component({
-    selector: 'input-description',
+    selector: 'ct-description-section',
     providers: [
-        { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => InputDescriptionComponent), multi: true }
+        { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DescriptionComponent), multi: true }
     ],
     template: `
 <ct-form-panel [borderless]="true" [collapsed]="true">
     <div class="tc-header">Description</div>
-    <div class="tc-body" *ngIf="input && descriptionFormGroup">
+    <div class="tc-body" *ngIf="port && descriptionFormGroup">
     
         <div class="form-text">
              This description will be visible when using the tool in the workflow editor.
@@ -34,7 +34,7 @@ require("./input-description.component.scss");
                       [formControl]="descriptionFormGroup.controls['description']"></textarea>
         </div>
         
-         <div *ngIf="input.type.type === 'File'">
+         <div *ngIf="port.type.type === 'File'">
             <label class="form-control-label">File types</label>
             <input class="form-control"
                    [formControl]="descriptionFormGroup.controls['fileTypes']"/>
@@ -43,13 +43,15 @@ require("./input-description.component.scss");
 </ct-form-panel>
     `
 })
-export class InputDescriptionComponent extends ComponentBase implements ControlValueAccessor {
+export class DescriptionComponent extends ComponentBase implements ControlValueAccessor {
 
-    private input: InputProperty;
+    private port: CommandOutputParameterModel | CommandInputParameterModel;
 
-    private onTouched = () => { };
+    private onTouched = () => {
+    };
 
-    private propagateChange = (_) => {};
+    private propagateChange = (_) => {
+    };
 
     private descriptionFormGroup: FormGroup;
 
@@ -57,13 +59,13 @@ export class InputDescriptionComponent extends ComponentBase implements ControlV
         super();
     }
 
-    writeValue(input: InputProperty): void {
-        this.input = input;
+    writeValue(port: CommandOutputParameterModel | CommandInputParameterModel): void {
+        this.port = port;
 
         this.descriptionFormGroup = this.formBuilder.group({
-            label: [this.input.label],
-            description: [this.input.description],
-            fileTypes: [""]
+            label: [this.port.label],
+            description: [this.port.description],
+            fileTypes: [this.port.customProps["sbg:fileTypes"]]
         });
 
         this.tracked = this.descriptionFormGroup.valueChanges
@@ -73,21 +75,21 @@ export class InputDescriptionComponent extends ComponentBase implements ControlV
 
                 if (!!value.fileTypes) {
                     this.setFileTypes(value.fileTypes);
-                } else if (this.input.customProps["sbg:fileTypes"]) {
-                    delete this.input.customProps["sbg:fileTypes"];
+                } else if (this.port.customProps["sbg:fileTypes"]) {
+                    delete this.port.customProps["sbg:fileTypes"];
                 }
 
                 this.setTextProperty('label', value.label);
                 this.setTextProperty('description', value.description);
 
-                this.propagateChange(this.input);
+                this.propagateChange(this.port);
             });
     }
 
     private setTextProperty(propertyName: string, newValue: string): void {
         if (!!newValue) {
             const trimmedValue = newValue.trim();
-            this.input[propertyName] = trimmedValue.length > 0 ? trimmedValue : undefined;
+            this.port[propertyName] = trimmedValue.length > 0 ? trimmedValue : undefined;
         }
     }
 
@@ -95,9 +97,9 @@ export class InputDescriptionComponent extends ComponentBase implements ControlV
         const trimmedFileTypes = fileTypes.trim();
 
         if (trimmedFileTypes.length > 0) {
-            this.input.customProps["sbg:fileTypes"] = trimmedFileTypes;
+            this.port.customProps["sbg:fileTypes"] = trimmedFileTypes;
         } else {
-            this.input.customProps["sbg:fileTypes"] = undefined;
+            this.port.customProps["sbg:fileTypes"] = undefined;
         }
     }
 

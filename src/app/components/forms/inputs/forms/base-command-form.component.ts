@@ -23,8 +23,8 @@ require("./base-command-form.components.scss");
                      class="removable-form-control">
 
                     <ct-expression-input
-                            [context]="context"
-                            [formControl]="baseCommandForm.controls[item.id]">
+                            [context]="context" 
+                            [formControl]="baseCommandForm.controls[item.id]">              
                     </ct-expression-input>
 
                     <div class="remove-icon clickable" (click)="removeBaseCommand(item)">

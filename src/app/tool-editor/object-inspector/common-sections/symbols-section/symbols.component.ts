@@ -1,7 +1,7 @@
 import {Component, forwardRef} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormGroup, FormControl, Validators} from "@angular/forms";
-import {ComponentBase} from "../../../components/common/component-base";
-import {GuidService} from "../../../services/guid.service";
+import {ComponentBase} from "../../../../components/common/component-base";
+import {GuidService} from "../../../../services/guid.service";
 
 require("./symbols.component.scss");
 

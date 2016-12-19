@@ -8,8 +8,8 @@ import {
     NG_VALIDATORS,
     FormControl
 } from "@angular/forms";
-import {ComponentBase} from "../../../components/common/component-base";
-import {CustomValidators} from "../../../validators/custom.validator";
+import {ComponentBase} from "../../../../components/common/component-base";
+import {CustomValidators} from "../../../../validators/custom.validator";
 import {ExpressionModel, CommandLineBindingModel} from "cwlts/models/d2sb";
 
 @Component({

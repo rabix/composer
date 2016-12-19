@@ -1,3 +1,4 @@
+import {Subject} from "rxjs";
 import {
     Component,
     Input,
@@ -10,7 +11,7 @@ import {
 import {ComponentBase} from "../../../components/common/component-base";
 import {CommandInputParameterModel} from "cwlts/models/d2sb";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
-import {Subject} from "rxjs";
+
 
 require("./input-list.component.scss");
 
