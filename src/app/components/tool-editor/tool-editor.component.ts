@@ -85,7 +85,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
     public viewMode = ViewMode.Code;
 
     /** Flag to indicate the document is loading */
-    private isLoading = false;
+    private isLoading = true;
 
     /** Flag for showing reformat prompt on GUI switch */
     private showReformatPrompt = true;
@@ -122,9 +122,6 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
         this.tracked = this.userPrefService.get("show_reformat_prompt", true, true).subscribe(x => this.showReformatPrompt = x);
     }
 
-    // @todo(maya) fix block loader
-    // setting this.isLoading to false inside a sub doesn't (always) trigger view update
-    // possible zone problem
     ngOnInit(): void {
         this.tracked = this.rawEditorContent
             .skip(1)
@@ -138,8 +135,13 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
         });
 
         this.tracked = this.webWorkerService.validationResultStream.map(r => {
-            if (!r.isValidCwl) return r;
+            if (!r.isValidCwl) {
+                // turn off loader and load document as code
+                this.isLoading = false;
+                return r;
+            }
 
+            // load JSON to generate model
             let json = Yaml.safeLoad(this.rawEditorContent.getValue(), {json: true});
 
             // should show prompt, but json is already reformatted
@@ -147,9 +149,11 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
                 this.showReformatPrompt = false;
             }
 
+            // generate model and get command line parts
             this.toolModel        = new CommandLineToolModel("document", json);
             this.commandLineParts = this.toolModel.getCommandLineParts();
 
+            // update validation stream on model validation updates
             this.toolModel.setValidationCallback((res: Validation) => {
                 this.validation.next({
                     errors: res.errors,
@@ -161,6 +165,12 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
             });
 
             this.toolModel.validate();
+
+            // load document in GUI and turn off loader, only if loader was active
+            if (this.isLoading) {
+                this.viewMode = ViewMode.Gui;
+                this.isLoading = false;
+            }
 
             return {
                 errors: this.toolModel.validation.errors,

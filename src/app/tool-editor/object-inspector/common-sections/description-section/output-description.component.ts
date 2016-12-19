@@ -15,7 +15,7 @@ require("./output-description.component.scss");
     <div class="tc-header">Description</div>
     <div class="tc-body" *ngIf="port && descriptionFormGroup">
     
-        <div class="secondary-text">
+        <div class="form-text">
              This description will be visible when using the tool in the workflow editor.
              It's best to be concise and informative.
         </div>

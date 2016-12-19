@@ -13,7 +13,7 @@ require("./symbols.component.scss");
     template: `
         <div class="form-group" *ngIf="symbolsForm">
         <form>
-               <label>Symbols</label>
+               <label class="form-control-label">Symbols</label>
                       
                <ol class="list-unstyled">
                     <li *ngFor="let symbol of symbolsFormList; let i = index;" 
