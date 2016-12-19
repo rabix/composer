@@ -83,7 +83,7 @@ require("./argument-list.component.scss");
                             <!--Object Inspector Template -->
                             <template #inspector>
                                 <ct-editor-inspector-content>
-                                    <div class="tc-header">Argument</div>
+                                    <div class="tc-header">{{ entry.loc || "Argument"}}</div>
                                     <div class="tc-body">
                                         <ct-argument-inspector 
                                             (save)="updateArgument($event, entry)" 

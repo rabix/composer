@@ -55,7 +55,7 @@ require("./clt-editor.component.scss");
                                   [context]="{$job: model.job}">                
                 </ct-argument-list>
                 
-                <ct-file-def-list [entries]="model.requirements.CreateFileRequirement?.fileDef || []"></ct-file-def-list>
+                <ct-file-def-list [entries]="model.createFileRequirement?.fileDef || []"></ct-file-def-list>
             </form>
             
             <ct-editor-inspector class="col-xs-6" [hidden]="!showInspector">

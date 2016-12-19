@@ -24,16 +24,15 @@ import {ComponentBase} from "../../../components/common/component-base";
                     </ct-expression-input>
                 </div>
                 
-                <!--Separator field-->            
                 <div class="form-group flex-container">
-                    <label class="form-control-label">Separator</label>
+                    <label>Prefix and value separation</label>
                     <span class="align-right">
-                        <toggle-slider [formControl]="form.controls['separate']" 
-                                    [on]="'Separate'"
-                                    [off]="'Join'"></toggle-slider>
+                        <toggle-slider [formControl]="form.controls['separate']"
+                                       [on]="'Separate'"
+                                       [off]="'Join'"></toggle-slider>
                     </span>
                 </div>
-                
+              
                 <!--Position Field-->
                 <div class="form-group">
                     <label class="form-control-label">Position</label>
