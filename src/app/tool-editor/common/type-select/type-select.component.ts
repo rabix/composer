@@ -65,15 +65,13 @@ export class InputTypeSelectComponent extends ComponentBase implements ControlVa
 
         this.tracked = this.form.valueChanges.subscribe(change => {
             this.paramType.type = change.type;
+            if (change.type === "array") {
+                this.paramType.items = change.items;
+            }
 
-            if (this.paramType.type === "array") {
-
-                if (!this.paramType.items) {
-                    this.paramType.items = "File";
-                    this.form.controls["items"].setValue("File");
-                } else {
-                    this.paramType.items = change.items;
-                }
+            if (this.paramType.type === "array" && !this.paramType.items) {
+                this.paramType.items = "File";
+                this.form.controls["items"].setValue("File");
             }
 
             this.onChange(this.paramType);

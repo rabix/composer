@@ -22,7 +22,7 @@ require("./basic-input-section.component.scss");
     ],
     template: `
 
-          <form class="basic-input-section">
+          <form class="ct-basic-input-section">
                 <div class="form-group flex-container">
                     <label>Required</label>
                     <span class="align-right">
@@ -100,6 +100,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
             symbols: [this.input.type.symbols ? this.input.type.symbols: this.initSymbolsList]
         });
 
+        this.listenToItemTypeFormChanges();
         this.listenToIsBoundChanges();
         this.listenToInputBindingChanges();
         this.listenToTypeFormChanges();
@@ -159,6 +160,14 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
                 this.input.updateInputBinding(input.inputBinding);
                 Object.assign(this.input.customProps, input.customProps);
             });
+    }
+
+    private listenToItemTypeFormChanges(): void {
+        this.tracked = this.basicSectionForm.controls['itemType'].valueChanges.subscribe((value: InputParameterTypeModel) => {
+            if (!!value && this.input.type.type === 'array') {
+                this.input.type.items = value;
+            }
+        });
     }
 
     private listenToTypeFormChanges(): void {

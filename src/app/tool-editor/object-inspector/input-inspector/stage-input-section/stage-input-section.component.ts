@@ -1,6 +1,6 @@
 import {Component, forwardRef} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormBuilder, FormGroup} from "@angular/forms";
-import {ComponentBase} from "../../../components/common/component-base";
+import {ComponentBase} from "../../../../components/common/component-base";
 import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 
 @Component({

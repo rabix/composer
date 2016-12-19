@@ -16,6 +16,12 @@ require("./base-command-form.components.scss");
     </div>
     <div class="tc-body">
         <form *ngIf="form" [formGroup]="form">
+        
+            <ct-blank-tool-state *ngIf="!readonly && !formList.length"
+                                 [title]="'Base command for running your tool'"
+                                 [buttonText]="'Add base command'"
+                                 (buttonClick)="addBaseCommand()">
+            </ct-blank-tool-state>
 
             <ol *ngIf="formList.length > 0" class="list-unstyled">
 
@@ -23,8 +29,8 @@ require("./base-command-form.components.scss");
                      class="removable-form-control">
 
                     <ct-expression-input
-                            [context]="context"
-                            [formControl]="baseCommandForm.controls[item.id]">
+                            [context]="context" 
+                            [formControl]="baseCommandForm.controls[item.id]">              
                     </ct-expression-input>
 
                     <div class="remove-icon clickable" (click)="removeBaseCommand(item)">
@@ -32,12 +38,9 @@ require("./base-command-form.components.scss");
                     </div>
                 </li> 
             </ol>
+          
 
-            <div *ngIf="formList.length === 0">
-                No baseCommand defined.
-            </div>
-
-            <button type="button" class="btn btn-link add-btn-link no-underline-hover" (click)="addBaseCommand()">
+            <button type="button" *ngIf="formList.length > 0" class="btn btn-link add-btn-link no-underline-hover" (click)="addBaseCommand()">
                 <i class="fa fa-plus"></i> Add base command
             </button>
             
@@ -63,7 +66,6 @@ require("./base-command-form.components.scss");
         </form>
     </div>
 </ct-form-panel>
-
     `
 })
 export class BaseCommandFormComponent extends ComponentBase implements OnInit, OnDestroy {
@@ -154,7 +156,7 @@ export class BaseCommandFormComponent extends ComponentBase implements OnInit, O
             model: new ExpressionModel("", "")
         };
 
-        this.form.addControl(newCmd.id, new FormControl(newCmd.model, [Validators.required, CustomValidators.cwlModel]));
+        this.baseCommandForm.addControl(newCmd.id, new FormControl(newCmd.model, [Validators.required, CustomValidators.cwlModel]));
         this.formList.push(newCmd);
 
         this.form.markAsTouched();

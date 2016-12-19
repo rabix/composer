@@ -54,8 +54,4 @@ export class SymbolsComponent extends ComponentBase implements ControlValueAcces
             .debounceTime(300)
             .subscribe(symbols => this.propagateChange(symbols));
     }
-
-    ngOnDestroy(): void {
-        super.ngOnDestroy();
-    }
 }

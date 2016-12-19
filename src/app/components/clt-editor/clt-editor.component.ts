@@ -30,9 +30,15 @@ require("./clt-editor.component.scss");
                                    (updateStreams)="setStreams($event)">
                 </base-command-form>
                                 
-                <ct-tool-input-list [location]="model.loc + '.inputs'" [entries]="model.inputs" (update)="updateModel('inputs', $event)"></ct-tool-input-list>
+                <ct-tool-input-list [location]="model.loc + '.inputs'" [entries]="model.inputs" 
+                              (update)="updateModel('inputs', $event)">                             
+                </ct-tool-input-list>
                 
-                <ct-output-ports [entries]="model.outputs || []" [readonly]="readonly"></ct-output-ports>
+                <ct-tool-output-list [location]="model.loc + '.outputs'" [entries]="model.outputs || []" 
+                              [inputs]="model.inputs || []" 
+                              [readonly]="readonly" 
+                              (update)="updateModel('outputs', $event)">                        
+                </ct-tool-output-list>
                                    
                 <ct-resources [entries]="model.resources" 
                               [readonly]="readonly" 
@@ -44,9 +50,14 @@ require("./clt-editor.component.scss");
                               [readonly]="readonly"
                               (update)="setHints($event)"></ct-hint-list>
                 
-                <ct-argument-list [entries]="model.arguments || []" [readonly]="readonly"></ct-argument-list>
+                <ct-argument-list [location]="model.loc + '.arguments'" 
+                                  [entries]="model.arguments || []"     
+                                  [readonly]="readonly"                    
+                                  (update)="updateModel('arguments', $event)"
+                                  [context]="{$job: model.job}">                
+                </ct-argument-list>
                 
-                <ct-file-def-list [entries]="model.requirements.CreateFileRequirement?.fileDef || []"></ct-file-def-list>
+                <ct-file-def-list [entries]="model.createFileRequirement?.fileDef || []"></ct-file-def-list>
             </form>
             
             <ct-editor-inspector class="col-xs-6" [hidden]="!showInspector">
@@ -88,9 +99,12 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
     }
 
     ngOnInit() {
+
         this.formGroup.addControl("dockerGroup", this.formBuilder.group({}));
         this.formGroup.addControl("baseCommandGroup", this.formBuilder.group({}));
         this.formGroup.addControl("inputs", this.formBuilder.group({}));
+        this.formGroup.addControl("outputs", this.formBuilder.group({}));
+        this.formGroup.addControl("arguments", this.formBuilder.group({}));
 
         console.log("Model", this.model);
     }
@@ -100,6 +114,12 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
         if (category === "inputs") {
             this.model.inputs = [];
             data.forEach(input => this.model.addInput(input));
+        } else if (category === "arguments") {
+            this.model.arguments = [];
+            data.forEach(argument => this.model.addArgument(argument));
+        } else if (category === "outputs") {
+            this.model.outputs = [];
+            data.forEach(output => this.model.addOutput(output));
         }
 
         if (this.formGroup.controls[category] instanceof FormGroup) {
