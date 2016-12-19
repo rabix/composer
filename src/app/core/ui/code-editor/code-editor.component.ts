@@ -20,7 +20,7 @@ export interface AceEditorOptions {
     highlightSelectedWord?: boolean;
     readOnly?: boolean;
     cursorStyle?: "ace"|"slim"|"smooth"|"wide";
-    mergeUndoDeltas?: true | false | "always";
+    mergeUndoDeltas?: boolean | "always";
     behavioursEnabled?: boolean;
     wrapBehavioursEnabled?: boolean;
     autoScrollEditorIntoView?: boolean;
