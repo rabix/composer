@@ -48,11 +48,10 @@ import {CoreModule} from "./app/core/core.module";
 import {CWLModule} from "./app/cwl/cwl.module";
 import {HintListComponent} from "./app/components/clt-editor/hints/hint-list.component";
 import {EditorCommonModule} from "./app/editor-common/editor-common.module";
-import {CompactListComponent} from "./app/components/compact-list/compact-list.component";
-import {EditableDirective} from "./app/directives/editable.directive";
 import {ProjectSelectionModal} from "./app/components/modal/custom/project-selection-modal.component";
 import {UserPreferencesService} from "./app/services/storage/user-preferences.service";
 import {DomEventService} from "./app/services/dom/dom-event.service";
+import {HintListInputComponent} from "./app/components/clt-editor/hints/custom-hint-input.component";
 
 @NgModule({
     providers: [
@@ -105,7 +104,7 @@ import {DomEventService} from "./app/services/dom/dom-event.service";
         ViewModeSwitchComponent,
         WorkboxComponent,
         WorkflowEditorComponent,
-        // CompactListComponent,
+        HintListInputComponent
     ],
     entryComponents: [
         CheckboxPromptComponent,
@@ -123,11 +122,8 @@ import {DomEventService} from "./app/services/dom/dom-event.service";
         FormsModule,
         HttpModule,
         ReactiveFormsModule,
-        ToolEditorModule,
+        ToolEditorModule
     ],
-    // exports: [
-    //     CompactListComponent
-    // ],
     bootstrap: [MainComponent]
 })
 export class AppModule {

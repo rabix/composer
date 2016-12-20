@@ -14,6 +14,9 @@ import {ExpressionInputComponent} from "./components/expression-input/expression
 import {CoreModule} from "../core/core.module";
 import {ModelExpressionEditorComponent} from "./expression-editor/model-expression-editor.component";
 import {ExpressionInputComponent} from "./components/expression-input/expression-input.component";
+import {CompactListComponent} from "./components/compact-list/compact-list.component";
+import {EditableDirective} from "./directives/editable.directive";
+import {ExpressionModelListComponent} from "./components/expression-model-list/expression-model-list.componen";
 import {ValidationComponent} from "./components/validation-preview/validation-preview.component";
 import {ValidationTextPipe} from "./pipes/validation-text.pipes";
 import {ValidationClassDirective} from "./components/validation-preview/validation-class.directive";
@@ -31,10 +34,12 @@ import {ValidationClassDirective} from "./components/validation-preview/validati
         ExpressionInputComponent,
         QuickPickComponent,
         ToggleComponent,
-        ExpressionInputComponent,
         ValidationComponent,
         ValidationClassDirective,
         ModelExpressionEditorComponent,
+        CompactListComponent,
+        EditableDirective,
+        ExpressionModelListComponent
     ],
     exports: [
         BlankToolStateComponent,
@@ -42,12 +47,15 @@ import {ValidationClassDirective} from "./components/validation-preview/validati
         FileDefContentPipe,
         FileDefNamePipe,
         ToggleComponent,
-        ExpressionInputComponent,
         ModelExpressionEditorComponent,
         EditorInspectorDirective,
         EditorInspectorComponent,
         ExpressionInputComponent,
         EditorInspectorContentComponent,
+        QuickPickComponent,
+        CompactListComponent,
+        EditableDirective,
+        ExpressionModelListComponent,
         QuickPickComponent,
         ValidationComponent,
         ValidationClassDirective

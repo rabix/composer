@@ -21,9 +21,7 @@ export class EditableDirective implements ControlValueAccessor {
 
     private lastValue: string;
 
-    constructor(private elRef: ElementRef) {
-
-    }
+    constructor(private elRef: ElementRef) { }
 
     private writeValue(value: any): void {
         this.elRef.nativeElement.innerText = value;

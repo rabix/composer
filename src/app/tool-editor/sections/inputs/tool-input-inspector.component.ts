@@ -14,8 +14,6 @@ import {ComponentBase} from "../../../components/common/component-base";
             </basic-input-section>
             
             <ct-description-section [formControl]="form.controls['description']"></ct-description-section>
-            
-            <stage-input [formControl]="form.controls['stageInputSection']"></stage-input>
         </form>
 `
 })
@@ -40,8 +38,7 @@ export class ToolInputInspector extends ComponentBase {
     ngOnInit() {
         this.form = this.formBuilder.group({
             basicInputSection: this.input,
-            description: this.input,
-            stageInputSection: this.input,
+            description: this.input
         });
 
 

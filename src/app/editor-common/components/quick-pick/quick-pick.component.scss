@@ -28,3 +28,11 @@ ct-quick-pick {
     }
 }
 
+.radio-container {
+    display: inline;
+
+    input[type=radio] {
+        display:none;
+    }
+}
+

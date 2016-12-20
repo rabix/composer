@@ -61,14 +61,16 @@ export class ToolOutputInspector extends ComponentBase implements OnChanges{
 
     ngOnInit() {
         this.form = this.formBuilder.group({
-            basicOutputSection: this.output,
-            description: this.output,
-            outputEval: this.output,
-            metaData: this.output,
-            secondaryFiles: this.output || []
+            basicOutputSection: [this.output],
+            description: [this.output],
+            outputEval: [this.output],
+            metaData: [this.output],
+            secondaryFiles: [this.output.outputBinding.secondaryFiles || []]
         });
 
-        this.tracked = this.form.valueChanges.subscribe(_ => {
+        this.tracked = this.form.valueChanges.subscribe(value => {
+            this.output.outputBinding.secondaryFiles = value.secondaryFiles;
+
             this.save.next(this.output);
         });
     }

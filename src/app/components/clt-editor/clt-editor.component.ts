@@ -1,6 +1,6 @@
 import {Component, Input, OnInit, ViewChild, ViewContainerRef} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
-import {CommandLineToolModel, ExpressionModel, ResourceRequirementModel} from "cwlts/models/d2sb";
+import {CommandLineToolModel, ExpressionModel, ResourceRequirementModel, RequirementBaseModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../common/component-base";
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
 import {ProcessRequirement} from "cwlts/mappings/d2sb/ProcessRequirement";
@@ -20,7 +20,7 @@ require("./clt-editor.component.scss");
                                    [form]="formGroup.controls['dockerGroup']"
                                    (update)="setRequirement($event, true)">
                 </ct-docker-image-form>
-                                
+                          
                 <base-command-form [baseCommand]="model.baseCommand"
                                    [context]="{$job: model.job}"
                                    [stdin]="model.stdin"
@@ -46,7 +46,9 @@ require("./clt-editor.component.scss");
                               [context]="{$job: model.job}">
                 </ct-resources>
 
-                <ct-hint-list [entries]="model.hints || {}" [readonly]="readonly"></ct-hint-list>
+                <ct-hint-list [entries]="model.hints || {}" 
+                              [readonly]="readonly"
+                              (update)="setHints($event)"></ct-hint-list>
                 
                 <ct-argument-list [location]="model.loc + '.arguments'" 
                                   [entries]="model.arguments || []"     
@@ -133,6 +135,13 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
 
     private setRequirement(req: ProcessRequirement, hint: boolean) {
         this.model.setRequirement(req, hint);
+        this.formGroup.markAsDirty();
+    }
+
+    private setHints(hints: RequirementBaseModel[]) {
+        this.model.hints = [];
+        hints.forEach(hint => this.setRequirement(hint.serialize(), true));
+
         this.formGroup.markAsDirty();
     }
 
