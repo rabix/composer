@@ -9,8 +9,8 @@ import {
     NG_VALIDATORS
 } from "@angular/forms";
 import {CommandInputParameterModel as InputProperty, InputParameterTypeModel} from "cwlts/models/d2sb";
-import {ComponentBase} from "../../../components/common/component-base";
-import {CustomValidators} from "../../../validators/custom.validator";
+import {ComponentBase} from "../../../../components/common/component-base";
+import {CustomValidators} from "../../../../validators/custom.validator";
 
 require("./basic-input-section.component.scss");
 
@@ -163,7 +163,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
     }
 
     private listenToItemTypeFormChanges(): void {
-        this.tracked = this.basicSectionForm.controls['itemType'].valueChanges.subscribe((value: InputParameterTypeModel) => {
+        this.tracked = this.basicSectionForm.controls['itemType'].valueChanges.subscribe(value => {
             if (!!value && this.input.type.type === 'array') {
                 this.input.type.items = value;
             }

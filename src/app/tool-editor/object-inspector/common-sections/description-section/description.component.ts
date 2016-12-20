@@ -3,7 +3,7 @@ import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormBuilder, FormGroup} from "@
 import {ComponentBase} from "../../../../components/common/component-base";
 import {CommandOutputParameterModel, CommandInputParameterModel} from "cwlts/models/d2sb";
 
-require("./output-description.component.scss");
+require("./description.component.scss");
 
 @Component({
     selector: 'ct-description-section',

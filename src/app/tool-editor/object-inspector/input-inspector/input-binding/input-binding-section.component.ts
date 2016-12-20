@@ -8,9 +8,9 @@ import {
     NG_VALIDATORS,
     FormControl
 } from "@angular/forms";
-import {ComponentBase} from "../../../components/common/component-base";
-import {CustomValidators} from "../../../validators/custom.validator";
 import {CommandInputParameterModel as InputProperty, CommandLineBindingModel} from "cwlts/models/d2sb";
+import {ComponentBase} from "../../../../components/common/component-base";
+import {CustomValidators} from "../../../../validators/custom.validator";
 
 @Component({
     selector: 'input-binding-section',
@@ -62,9 +62,9 @@ import {CommandInputParameterModel as InputProperty, CommandLineBindingModel} fr
             <stage-input [formControl]="inputBindingFormGroup.controls['stageInputSection']">
             </stage-input>
            
-            <secondary-files *ngIf="input.type.type === 'File'"
+            <ct-secondary-file *ngIf="input.type.type === 'File'"
                              [formControl]="inputBindingFormGroup.controls['secondaryFilesSection']"
-                             [context]="context"></secondary-files>
+                             [context]="context"></ct-secondary-file>
     </div>
     `
 })
@@ -132,6 +132,8 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
             .distinctUntilChanged()
             .debounceTime(300)
             .subscribe(value => {
+                const serializedFiles = value.secondaryFilesSection.map(file => file.serialize());
+
                 const binding = {
                     position: value.position || undefined,
                     prefix: value.prefix || undefined,
@@ -139,7 +141,7 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
                     itemSeparator: value.itemSeparator || undefined,
                     valueFrom: value.valueFrom.serialize(),
                     loadContents: value.stageInputSection.inputBinding.loadContents,
-                    secondaryFiles: value.secondaryFilesSection
+                    secondaryFiles: serializedFiles
                 };
 
 

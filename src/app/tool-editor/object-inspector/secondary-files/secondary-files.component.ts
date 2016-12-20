@@ -4,7 +4,7 @@ import {ComponentBase} from "../../../components/common/component-base";
 import {ExpressionModel} from "cwlts/models/d2sb";
 
 @Component({
-    selector: 'secondary-files',
+    selector: 'ct-secondary-file',
     providers: [
         { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => SecondaryFilesComponent), multi: true }
     ],
@@ -12,12 +12,12 @@ import {ExpressionModel} from "cwlts/models/d2sb";
 <ct-form-panel *ngIf="form" [borderless]="true" [collapsed]="true">
     <div class="tc-header">Secondary Files</div>
     <div class="tc-body">
-    
-            <expression-model-list 
-                [context]="context"
-                [emptyListText]="'No files defined.'"
-                [addButtonText]="'Add secondary file'"
-                [formControl]="form"></expression-model-list>
+
+        <expression-model-list
+            [context]="context"
+            [emptyListText]="'No Secondary Files defined.'"
+            [addButtonText]="'Add secondary file'"
+            [formControl]="form"></expression-model-list>
     </div>
 </ct-form-panel>
     `
@@ -43,8 +43,7 @@ export class SecondaryFilesComponent extends ComponentBase implements ControlVal
         this.form = new FormControl(this.secondaryFiles);
 
         this.tracked = this.form.valueChanges.subscribe((fileList: ExpressionModel[]) => {
-            const serializedList = fileList.map(file => file.serialize());
-            this.propagateChange(serializedList);
+            this.propagateChange(fileList);
         });
     }
 

@@ -8,25 +8,21 @@ import {FileDefListComponent} from "./sections/file-def-list/file-def-list.compo
 import {ResourcesComponent} from "./sections/resources/resources.component";
 import {ToolInputListComponent} from "./sections/inputs/tool-input-list.component";
 import {ToolOutputListComponent} from "./sections/outputs/tool-output-list.component";
-
 import {CWLModule} from "../cwl/cwl.module";
 import {ToolInputInspector} from "./sections/inputs/tool-input-inspector.component";
 import {ToolOutputInspector} from "./sections/outputs/tool-output-inspector.component";
 import {ArgumentInspector} from "./sections/arguments/argument-inspector.component";
-
 import {BasicInputSectionComponent} from "./object-inspector/input-inspector/basic-section/basic-input-section.component";
 import {BasicOutputSectionComponent} from "./object-inspector/output-inspector/output-basic-section/basic-output-section.component";
 import {InputTypeSelectComponent} from "./common/type-select/type-select.component";
-import {DescriptionComponent} from "./object-inspector/common-sections/description-section/output-description.component";
+import {DescriptionComponent} from "./object-inspector/common-sections/description-section/description.component";
 import {InputBindingSectionComponent} from "./object-inspector/input-inspector/input-binding/input-binding-section.component";
 import {SymbolsComponent} from "./object-inspector/common-sections/symbols-section/symbols.component";
-import {SecondaryFilesComponent} from "./object-inspector/common-sections/secondary-files-sections/secondary-files.component";
 import {OutputMetaDataSectionComponent} from "./object-inspector/output-inspector/output-metadata-section/output-metadata.component";
 import {StageInputSectionComponent} from "./object-inspector/input-inspector/stage-input-section/stage-input-section.component";
 import {OutputEvalSectionComponent} from "./object-inspector/output-inspector/output-eval-section/output-eval.component";
-import {CompactListComponent} from "../components/compact-list/compact-list.component";
-import {EditableDirective} from "../directives/editable.directive";
-import {InputDescriptionComponent} from "./object-inspector/input-description/input-description.component";
+//import {SecondaryFilesComponent} from "./object-inspector/common-sections/secondary-files-sections/secondary-files.component";
+import {SecondaryFilesComponent} from "./object-inspector/secondary-files/secondary-files.component";
 
 @NgModule({
     declarations: [
@@ -48,8 +44,6 @@ import {InputDescriptionComponent} from "./object-inspector/input-description/in
         StageInputSectionComponent,
         ResourcesComponent,
         OutputEvalSectionComponent,
-        CompactListComponent,
-        EditableDirective
     ],
     exports: [
         ArgumentListComponent,
@@ -65,9 +59,7 @@ import {InputDescriptionComponent} from "./object-inspector/input-description/in
         DescriptionComponent,
         StageInputSectionComponent,
         OutputEvalSectionComponent,
-        OutputMetaDataSectionComponent,
-        CompactListComponent,
-        EditableDirective
+        OutputMetaDataSectionComponent
     ],
     imports: [
         BrowserModule,
@@ -75,7 +67,7 @@ import {InputDescriptionComponent} from "./object-inspector/input-description/in
         CWLModule,
         EditorCommonModule,
         FormsModule,
-        ReactiveFormsModule,
+        ReactiveFormsModule
     ]
 })
 export class ToolEditorModule {
