@@ -8,4 +8,4 @@ cp ./electron/main.prod.js ./dist/main.js
 cp -r ./electron/src ./dist
 cp -r ./electron/node_modules ./dist
 
-./node_modules/.bin/electron-packager ./dist "rabix-editor-$(date +%s)" --overwrite --out build --icon ./electron/rabix-icon.icns --build-version "0.1.0"
+./node_modules/.bin/electron-packager ./dist "rabix-editor" --overwrite --out build --icon ./electron/rabix-icon.icns --build-version "0.1.0"

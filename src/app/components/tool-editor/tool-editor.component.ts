@@ -35,12 +35,10 @@ require("./tool-editor.component.scss");
         
             <div class="scroll-content flex-container">
                 <div class="flex-row">
-                        <div code-editor
-                             *ngIf="viewMode === __modes.Code"
-                             class="editor col-xs-12"
-                             [content]="rawEditorContent"
-                             [readonly]="!data.isWritable"
-                             [language]="data.language | async"></div>
+                        <ct-code-editor-x *ngIf="viewMode === __modes.Code" class="editor col-xs-12" 
+                                          [(content)]="rawEditorContent"
+                                          [language]="data.language | async"
+                                          [readonly]="!data.isWritable"></ct-code-editor-x>
                      
                         <ct-clt-editor *ngIf="viewMode === __modes.Gui"
                                        class="gui-editor-component col-xs-12"
@@ -49,7 +47,6 @@ require("./tool-editor.component.scss");
                                        [model]="toolModel"></ct-clt-editor>
                 </div>
             </div>
-            
             
             <div class="status-bar-footer">
             

@@ -42,14 +42,11 @@ import {TemplateProviderService} from "./app/services/template-provider.service"
 import {PromptComponent} from "./app/components/modal/common/prompt.component";
 import {CheckboxPromptComponent} from "./app/components/modal/common/checkbox-prompt.component";
 import {FileEditorComponent} from "./app/components/file-editor/file-editor.component";
-import {CodeEditorDirective} from "./app/directives/code-editor.directive";
 import {ToolEditorModule} from "./app/tool-editor/tool-editor.module";
 import {CoreModule} from "./app/core/core.module";
 import {CWLModule} from "./app/cwl/cwl.module";
 import {HintListComponent} from "./app/components/clt-editor/hints/hint-list.component";
 import {EditorCommonModule} from "./app/editor-common/editor-common.module";
-import {CompactListComponent} from "./app/components/compact-list/compact-list.component";
-import {EditableDirective} from "./app/directives/editable.directive";
 import {ProjectSelectionModal} from "./app/components/modal/custom/project-selection-modal.component";
 import {UserPreferencesService} from "./app/services/storage/user-preferences.service";
 import {DomEventService} from "./app/services/dom/dom-event.service";
@@ -69,7 +66,6 @@ import {DomEventService} from "./app/services/dom/dom-event.service";
         CheckboxPromptComponent,
         CltEditorComponent,
         CodeEditorComponent,
-        CodeEditorDirective,
         CommandLineComponent,
         ConfirmComponent,
         DockerImageFormComponent,
@@ -105,7 +101,6 @@ import {DomEventService} from "./app/services/dom/dom-event.service";
         ViewModeSwitchComponent,
         WorkboxComponent,
         WorkflowEditorComponent,
-        // CompactListComponent,
     ],
     entryComponents: [
         CheckboxPromptComponent,

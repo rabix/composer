@@ -85,4 +85,8 @@ export class IpcService {
 
         return this.pendingRequests[messageID].stream;
     }
+
+    public notify(message: any): void{
+        ipcRenderer.send("notification", {message});
+    }
 }

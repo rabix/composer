@@ -26,6 +26,8 @@ require("./main.component.scss");
     template: `
         <ct-layout class="editor-container"></ct-layout>
         <div id="runnix" [class.active]="runnix | async"></div>
+        
+        <span data-marker="ready">ready</span>
     `,
     providers: [
         EventHubService,
@@ -47,7 +49,7 @@ export class MainComponent {
 
     private runnix: Observable<boolean>;
 
-    constructor(modal: ModalService, vcRef: ViewContainerRef) {
+    constructor(modal: ModalService, vcRef: ViewContainerRef, private ipc: IpcService) {
         /**
          * Hack for angular's inability to provide the vcRef to a service with DI.
          * {@link ModalService.rootViewRef}
