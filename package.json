@@ -38,7 +38,7 @@
         "start:electron": "npm run server:electron",
         "test": "node --max-old-space-size=4096 node_modules/karma/bin/karma start",
         "test:electron:frontend": "node_modules/.bin/mocha --ui tdd ./tests/electron/**/*.js ",
-        "test:electron:backend": "electron/node_modules/.bin/mocha --ui tdd ./electron/**/*.spec.js ",
+        "test:electron:backend": "export TESTING=true; electron/node_modules/.bin/mocha --ui tdd ./electron/src/**/*.spec.js ",
         "tslint": "node_modules/tslint/bin/tslint",
         "watch": "npm run watch:dev",
         "watch:dev": "npm run build:dev -- --watch",
