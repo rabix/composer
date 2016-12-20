@@ -20,3 +20,6 @@ script:
   - npm run build:electron
   - scripts/electron-build.sh
   - npm run test:electron:frontend
+
+notifications:
+  email: false
