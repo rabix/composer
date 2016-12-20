@@ -4,11 +4,16 @@ const helpers = require('./helpers');
 try {
     envConfig = require('./env.json');
 } catch (ex) {
+
     console.error("\x1b[95m", `
     We couldn’t the “config/env.json” file.
     Please check the “config/env.example.json” for a sample on how to make your own configuration.  
     `);
-    process.exit(1);
+    try {
+        envConfig = require('./env.example.json');
+    } catch (ex) {
+        process.exit(1);
+    }
 }
 
 /*
