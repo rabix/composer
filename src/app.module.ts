@@ -12,7 +12,6 @@ import {BlockLoaderComponent} from "./app/components/block-loader/block-loader.c
 import {CltEditorComponent} from "./app/components/clt-editor/clt-editor.component";
 import {CodeEditorComponent} from "./app/components/code-editor/code-editor.component";
 import {AlertComponent} from "./app/components/common/alert.component";
-import {FormSectionComponent} from "./app/components/form-section/form-section.component";
 import {LocalFilesPanelComponent} from "./app/components/panels/local-files-panel.component";
 import {PanelHandleComponent} from "./app/components/panels/panel-handle.component";
 import {PanelToolbarComponent} from "./app/components/panels/panel-toolbar.component";
@@ -71,7 +70,6 @@ import {DomEventService} from "./app/services/dom/dom-event.service";
         DockerImageFormComponent,
         ExpressionEditorComponent,
         ExpressionEditorSidebarComponent,
-        FormSectionComponent,
         HintListComponent,
         InputComponent,
         LayoutComponent,
@@ -120,9 +118,6 @@ import {DomEventService} from "./app/services/dom/dom-event.service";
         ReactiveFormsModule,
         ToolEditorModule,
     ],
-    // exports: [
-    //     CompactListComponent
-    // ],
     bootstrap: [MainComponent]
 })
 export class AppModule {

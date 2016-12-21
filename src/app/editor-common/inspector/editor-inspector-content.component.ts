@@ -6,7 +6,7 @@ require("./editor-inspector-content.component.scss");
 @Component({
     selector: "ct-editor-inspector-content",
     template: `
-        <div class="form-section container">
+        <div class="form-section container m-0">
             <div class="row">
                 <div class="col-xs-12">
                     <i class="fa clickable pull-right fa-times"

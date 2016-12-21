@@ -24,7 +24,7 @@ require("./main.component.scss");
 @Component({
     selector: "cottontail",
     template: `
-        <ct-layout class="editor-container"></ct-layout>
+        <ct-layout></ct-layout>
         <div id="runnix" [class.active]="runnix | async"></div>
         
         <span data-marker="ready">ready</span>
@@ -49,7 +49,7 @@ export class MainComponent {
 
     private runnix: Observable<boolean>;
 
-    constructor(modal: ModalService, vcRef: ViewContainerRef, private ipc: IpcService) {
+    constructor(modal: ModalService, vcRef: ViewContainerRef) {
         /**
          * Hack for angular's inability to provide the vcRef to a service with DI.
          * {@link ModalService.rootViewRef}

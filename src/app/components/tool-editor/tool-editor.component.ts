@@ -1,5 +1,5 @@
 import * as Yaml from "js-yaml";
-import {Component, OnInit, Input, OnDestroy} from "@angular/core";
+import {Component, OnInit, Input, OnDestroy, ViewChild, ViewContainerRef} from "@angular/core";
 import {FormGroup, FormBuilder} from "@angular/forms";
 import {ReplaySubject, BehaviorSubject} from "rxjs/Rx";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
@@ -14,7 +14,8 @@ import {ModalService} from "../modal";
 import {noop} from "../../lib/utils.lib";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {ViewMode} from "../view-switcher/view-switcher.component";
-import {Validation} from "../../../../node_modules/cwlts/models/helpers/validation/Validation";
+import {Validation} from "cwlts/models/helpers/validation";
+import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
 
 require("./tool-editor.component.scss");
 
@@ -22,51 +23,80 @@ require("./tool-editor.component.scss");
     selector: "ct-tool-editor",
     providers: [
         ToolSidebarService,
+        EditorInspectorService,
         ExpressionSidebarService,
     ],
     template: `
         <block-loader *ngIf="isLoading"></block-loader>
         
-        <div class="editor-container" *ngIf="!isLoading">
-            <tool-header class="editor-header"
+        <div class="editor-container" [hidden]="isLoading">
+                
+                <!--Header & Editor Column-->
+                <div class="flex-col">
+                    
+                    <!--Header Row-->
+                    <tool-header class="editor-header flex-row"
                          (save)="save($event)"
                          [fileIsValid]="isValidCWL"
                          [data]="data"></tool-header>
-        
-            <div class="scroll-content flex-container">
-                <div class="flex-row">
-                        <ct-code-editor-x *ngIf="viewMode === __modes.Code" class="editor col-xs-12" 
-                                          [(content)]="rawEditorContent"
-                                          [language]="data.language | async"
-                                          [readonly]="!data.isWritable"></ct-code-editor-x>
-                     
-                        <ct-clt-editor *ngIf="viewMode === __modes.Gui"
-                                       class="gui-editor-component col-xs-12"
-                                       [readonly]="!data.isWritable"
-                                       [formGroup]="toolGroup"
-                                       [model]="toolModel"></ct-clt-editor>
-                </div>
-            </div>
-            
-            <div class="status-bar-footer">
-            
-                <div class="left-side">
-                    <validation-issues [issuesStream]="validation" 
-                                       (select)="selectBottomPanel($event)" 
-                                       [show]="bottomPanel === 'validation'"></validation-issues>
                     
-                    <commandline [commandLineParts]="commandLineParts" 
-                                 (select)="selectBottomPanel($event)" 
-                                 [show]="bottomPanel === 'commandLine'"></commandline>
+                    <!--Editor Row-->
+                    <div class="flex-row">
+                            <ct-code-editor-x *ngIf="viewMode === __modes.Code" class="editor" 
+                                              [(content)]="rawEditorContent"
+                                              [language]="data.language | async"
+                                              [readonly]="!data.isWritable"></ct-code-editor-x>
+                         
+                            <!--GUI Editor-->
+                            <ct-clt-editor *ngIf="viewMode === __modes.Gui"
+                                           class="gui-editor-component"
+                                           [readonly]="!data.isWritable"
+                                           [formGroup]="toolGroup"
+                                           [model]="toolModel"></ct-clt-editor>
+                    </div>
                 </div>
                 
-                <div class="right-side">
-                    <ct-view-mode-switch [viewMode]="viewMode"
-                                         [disabled]="!isValidCWL"
-                                         (switch)="switchView($event)">
-                    </ct-view-mode-switch>
+                <!--Object Inspector Column-->
+                <div [hidden]="!showInspector" class="flex-col inspector-col" >
+                    <ct-editor-inspector class="tool-inspector">
+                        <template #inspector></template>
+                    </ct-editor-inspector>
                 </div>
-            </div>
+            
+                <!--Document/Tool Editor Scrollable Container-->
+                <!--<div class="scroll-content flex-container">-->
+                    <!--<div class="flex-row">-->
+                           <!---->
+                            <!--&lt;!&ndash;Code Editor&ndash;&gt;-->
+                            
+                    <!--</div>-->
+                <!--</div>-->
+            
+            <!--<div class="inspector-block"></div>-->
+            <!---->
+            <!--<ct-editor-inspector class="col-xs-6">-->
+                <!--<template #inspector></template>-->
+            <!--</ct-editor-inspector>-->
+            <!---->
+            <!--<div class="status-bar-footer">-->
+            <!---->
+                <!--<div class="left-side">-->
+                    <!--<validation-issues [issuesStream]="validation" -->
+                                       <!--(select)="selectBottomPanel($event)" -->
+                                       <!--[show]="bottomPanel === 'validation'"></validation-issues>-->
+                    <!---->
+                    <!--<commandline [commandLineParts]="commandLineParts" -->
+                                 <!--(select)="selectBottomPanel($event)" -->
+                                 <!--[show]="bottomPanel === 'commandLine'"></commandline>-->
+                <!--</div>-->
+                <!---->
+                <!--<div class="right-side">-->
+                    <!--<ct-view-mode-switch [viewMode]="viewMode"-->
+                                         <!--[disabled]="!isValidCWL"-->
+                                         <!--(switch)="switchView($event)">-->
+                    <!--</ct-view-mode-switch>-->
+                <!--</div>-->
+            <!--</div>-->
         </div>
     `
 })
@@ -107,9 +137,16 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
 
     private toolGroup: FormGroup;
 
+    @ViewChild("inspector", {read: ViewContainerRef})
+    private inspectorHostView: ViewContainerRef;
+
+    @Input()
+    public showInspector = false;
+
     constructor(private webWorkerService: WebWorkerService,
                 private userPrefService: UserPreferencesService,
                 private formBuilder: FormBuilder,
+                private inspector: EditorInspectorService,
                 private modal: ModalService) {
 
         super();
@@ -117,9 +154,14 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
         this.toolGroup = formBuilder.group({});
 
         this.tracked = this.userPrefService.get("show_reformat_prompt", true, true).subscribe(x => this.showReformatPrompt = x);
+
+        this.tracked = this.inspector.inspectedObject.map(obj => obj !== undefined)
+            .subscribe(show => this.showInspector = show);
+
     }
 
     ngOnInit(): void {
+        // Whenever the editor content is changed, validate it using a JSON Schema.
         this.tracked = this.rawEditorContent
             .skip(1)
             .distinctUntilChanged()
@@ -127,10 +169,16 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
                 this.webWorkerService.validateJsonSchema(latestContent);
             });
 
+        // Whenever content of a file changes, forward the change to the raw editor content steam.
         this.tracked = this.data.content.subscribe(val => {
             this.rawEditorContent.next(val);
         });
 
+        /**
+         * Track validation results.
+         * If content is not valid CWL, show the code.
+         * If it's a valid CWL, parse it into a model, and show the GUI mode on first load.
+         */
         this.tracked = this.webWorkerService.validationResultStream.map(r => {
             if (!r.isValidCwl) {
                 // turn off loader and load document as code
@@ -165,7 +213,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
 
             // load document in GUI and turn off loader, only if loader was active
             if (this.isLoading) {
-                this.viewMode = ViewMode.Gui;
+                this.viewMode  = ViewMode.Gui;
                 this.isLoading = false;
             }
 
@@ -248,4 +296,10 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
     private selectBottomPanel(panel: "validation"|"commandLineTool") {
         this.bottomPanel = this.bottomPanel === panel ? null : panel;
     }
+
+    ngAfterViewInit() {
+        this.inspector.setHostView(this.inspectorHostView);
+        super.ngAfterViewInit();
+    }
+
 }

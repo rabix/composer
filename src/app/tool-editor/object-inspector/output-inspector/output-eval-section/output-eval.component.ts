@@ -10,7 +10,7 @@ import {CommandOutputBindingModel} from "cwlts/models/d2sb/CommandOutputBindingM
         { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => OutputEvalSectionComponent), multi: true }
     ],
     template: `
-<ct-form-panel [borderless]="true" [collapsed]="true">
+<ct-form-panel class="borderless" [collapsed]="true">
     <div class="tc-header">Output eval</div>
     <div class="tc-body" *ngIf="output && outputEvalFormGroup">
 

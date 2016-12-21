@@ -11,7 +11,7 @@ require("./output-description.component.scss");
         { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DescriptionComponent), multi: true }
     ],
     template: `
-<ct-form-panel [borderless]="true" [collapsed]="true">
+<ct-form-panel class="borderless" [collapsed]="true">
     <div class="tc-header">Description</div>
     <div class="tc-body" *ngIf="port && descriptionFormGroup">
     

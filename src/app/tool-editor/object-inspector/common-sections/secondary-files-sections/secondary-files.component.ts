@@ -15,7 +15,7 @@ import {CustomValidators} from "../../../../validators/custom.validator";
         { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => SecondaryFilesComponent), multi: true }
     ],
     template: `
-<ct-form-panel [borderless]="true" [collapsed]="true">
+<ct-form-panel class="borderless" [collapsed]="true">
     <div class="tc-header">Secondary files</div>
     <div class="tc-body" *ngIf="port && secondaryFilesFormGroup">
 

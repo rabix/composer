@@ -118,7 +118,6 @@ export class TreeNodeComponent extends ComponentBase implements OnInit {
                 // upwards to its parent and close the parent using arrows. So this fixes that.
                 if (isSelected) {
                     this.renderer.invokeElementMethod(this.nodeBase.nativeElement, "focus");
-
                 }
 
             });
