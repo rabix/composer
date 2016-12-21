@@ -1,10 +1,8 @@
 import {Component, forwardRef, Input} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormGroup, FormBuilder} from "@angular/forms";
 import {ComponentBase} from "../../../../components/common/component-base";
-import {CommandInputParameterModel} from "cwlts/models/d2sb";
-import {
-    CommandOutputParameterModel as OutputProperty
-} from "cwlts/models/d2sb";
+import {CommandInputParameterModel, CommandOutputParameterModel as OutputProperty} from "cwlts/models/d2sb";
+import {ExpressionModel} from "cwlts";
 
 require("./output-metadata.component.scss");
 
@@ -34,6 +32,13 @@ require("./output-metadata.component.scss");
                 </div>
 
             </form>
+            
+            
+            <key-value-list 
+                    [addEntryText]="'Add Metadata'"
+                    [emptyListText]="'No metadata defined.'"
+                    [context]="context"
+                    [formControl]="metadataForm.controls['metadataList']"></key-value-list>
         </div>
     </div>
 
@@ -56,6 +61,8 @@ export class OutputMetaDataSectionComponent extends ComponentBase implements Con
 
     private metadataForm: FormGroup;
 
+    private keyValueFormList: {key: string, value: string | ExpressionModel}[] = [];
+
     constructor(private formBuilder: FormBuilder) {
         super();
     }
@@ -63,8 +70,17 @@ export class OutputMetaDataSectionComponent extends ComponentBase implements Con
     writeValue(output: OutputProperty): void {
         this.output = output;
 
+        this.keyValueFormList = Object.keys(this.output.outputBinding.metadata)
+            .map(key => {
+                return {
+                    key: key,
+                    value: this.output.outputBinding.metadata[key]
+                }
+            });
+
         this.metadataForm = this.formBuilder.group({
-            inheritMetadata: [this.output.outputBinding.inheritMetadataFrom || ""]
+            inheritMetadata: [this.output.outputBinding.inheritMetadataFrom || ""],
+            metadataList: [this.keyValueFormList]
         });
 
         this.listenToFormChanges();
@@ -82,9 +98,15 @@ export class OutputMetaDataSectionComponent extends ComponentBase implements Con
         this.tracked = this.metadataForm.valueChanges
             .debounceTime(300)
             .subscribe(change => {
+                const metadataObject = {};
+
+                change.metadataList.forEach((item: {key: string, value: ExpressionModel}) => {
+                    metadataObject[item.key] = item.value;
+                });
+
+                this.output.outputBinding.metadata = metadataObject;
                 this.output.outputBinding.inheritMetadataFrom = change.inheritMetadata;
                 this.propagateChange(change);
             });
-
     }
 }

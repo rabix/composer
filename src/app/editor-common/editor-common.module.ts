@@ -21,6 +21,7 @@ import {ValidationComponent} from "./components/validation-preview/validation-pr
 import {ValidationTextPipe} from "./pipes/validation-text.pipes";
 import {ValidationClassDirective} from "./components/validation-preview/validation-class.directive";
 import {KeyValueInputComponent} from "./components/key-value-component/key-value-input.component";
+import {KeyValueListComponent} from "./components/key-value-component/key-value-list.component";
 
 @NgModule({
     declarations: [
@@ -41,7 +42,8 @@ import {KeyValueInputComponent} from "./components/key-value-component/key-value
         CompactListComponent,
         EditableDirective,
         ExpressionModelListComponent,
-        KeyValueInputComponent
+        KeyValueInputComponent,
+        KeyValueListComponent
     ],
     exports: [
         BlankToolStateComponent,
@@ -61,7 +63,8 @@ import {KeyValueInputComponent} from "./components/key-value-component/key-value
         QuickPickComponent,
         ValidationComponent,
         ValidationClassDirective,
-        KeyValueInputComponent
+        KeyValueInputComponent,
+        KeyValueListComponent
     ],
     entryComponents: [
         EditorInspectorComponent,
