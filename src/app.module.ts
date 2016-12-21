@@ -51,7 +51,6 @@ import {EditorCommonModule} from "./app/editor-common/editor-common.module";
 import {ProjectSelectionModal} from "./app/components/modal/custom/project-selection-modal.component";
 import {UserPreferencesService} from "./app/services/storage/user-preferences.service";
 import {DomEventService} from "./app/services/dom/dom-event.service";
-import {HintListInputComponent} from "./app/components/clt-editor/hints/custom-hint-input.component";
 
 @NgModule({
     providers: [
@@ -103,8 +102,7 @@ import {HintListInputComponent} from "./app/components/clt-editor/hints/custom-h
         ValidationIssuesComponent,
         ViewModeSwitchComponent,
         WorkboxComponent,
-        WorkflowEditorComponent,
-        HintListInputComponent
+        WorkflowEditorComponent
     ],
     entryComponents: [
         CheckboxPromptComponent,

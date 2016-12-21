@@ -46,7 +46,7 @@ require("./clt-editor.component.scss");
                               [context]="{$job: model.job}">
                 </ct-resources>
 
-                <ct-hint-list [entries]="model.hints || {}" 
+                <ct-hint-list [entries]="model.hints || []" 
                               [readonly]="readonly"
                               (update)="setHints($event)"></ct-hint-list>
                 
@@ -140,7 +140,9 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
 
     private setHints(hints: RequirementBaseModel[]) {
         this.model.hints = [];
-        hints.forEach(hint => this.setRequirement(hint.serialize(), true));
+        hints.forEach(hint => {
+            this.setRequirement(hint.serialize(), true);
+        });
 
         this.formGroup.markAsDirty();
     }

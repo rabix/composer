@@ -1,16 +1,15 @@
-import {Component, Input, ChangeDetectionStrategy, Output} from "@angular/core";
+import {Component, Input, Output, ChangeDetectionStrategy} from "@angular/core";
 import {ComponentBase} from "../../common/component-base";
 import {ExternalLinks} from "../../../cwl/external-links";
-import {ExpressionModel, RequirementBaseModel} from "cwlts/models/d2sb";
+import {ExpressionModel} from "cwlts/models/d2sb";
 import {FormGroup, FormControl} from "@angular/forms";
 import {GuidService} from "../../../services/guid.service";
 import {ReplaySubject} from "rxjs";
-import {HintListInputComponent} from "./custom-hint-input.component";
+import {RequirementBaseModel} from "cwlts";
 
 @Component({
     selector: "ct-hint-list",
     changeDetection: ChangeDetectionStrategy.OnPush,
-    directives: [HintListInputComponent],
     template: `
         <ct-form-panel [collapsed]="false">
             <div class="tc-header">
@@ -19,14 +18,14 @@ import {HintListInputComponent} from "./custom-hint-input.component";
 
             <div class="tc-body">
 
-                <ct-blank-tool-state *ngIf="!readonly && !formList.length"
+                <ct-blank-tool-state *ngIf="!readonly && !keyValueFormList.length"
                                      [title]="'Special flags for tool execution'"
                                      [buttonText]="'Add a Hint'"
                                      [learnMoreURL]="helpLink"
                                      (buttonClick)="addEntry()">
                 </ct-blank-tool-state>
 
-                <div *ngIf="formList.length" class="container">
+                <div *ngIf="keyValueFormList.length" class="container">
                     <div class="gui-section-list-title col-sm-12 row">
                         <div class="col-sm-5">Class</div>
                         <div class="col-sm-6">Value</div>
@@ -34,10 +33,11 @@ import {HintListInputComponent} from "./custom-hint-input.component";
 
                     <ul class="gui-section-list">
 
-                        <li ct-hint-list-input *ngFor="let entry of formList; let i = index"
+                        <li ct-key-value-input *ngFor="let entry of keyValueFormList; let i = index"
                                 class="col-sm-12 gui-section-list-item clickable row"
                                 [context]="context"
-                                [formControl]="form.controls[entry.id]">
+                                [formControl]="form.controls[entry.id]"
+                                [keyValidator]="validateClassForm">
                                 
                             <div *ngIf="!!entry" class="col-sm-1 align-right">
                                 <i title="Delete" class="fa fa-trash text-hover-danger" (click)="removeEntry(entry)"></i>
@@ -47,7 +47,7 @@ import {HintListInputComponent} from "./custom-hint-input.component";
                     </ul>
                 </div>
 
-                <button *ngIf="!readonly && formList.length"
+                <button *ngIf="!readonly && keyValueFormList.length"
                         (click)="addEntry()"
                         type="button"
                         class="btn pl-0 btn-link no-outline no-underline-hover">
@@ -65,9 +65,9 @@ export class HintListComponent extends ComponentBase {
 
     /** List of entries that should be shown */
     @Input()
-    public entries: {[id:string]: {"class"?: string, value?: string | ExpressionModel}};
+    public entries: RequirementBaseModel[] = [];
 
-    private formList: {id: string, model: RequirementBaseModel}[] = [];
+    private keyValueFormList: {id: string, model: {"key"?: string, value?: string | ExpressionModel}}[] = [];
 
     @Input()
     public readonly = false;
@@ -83,52 +83,85 @@ export class HintListComponent extends ComponentBase {
         super();
     }
 
-    private addEntry(): void {
-        const newRequirement = {
-            id: this.guidService.generate(),
-            model: new RequirementBaseModel({
-                'class': "",
-                value: new ExpressionModel()
-            }, null)
-        };
-
-        this.formList.push(newRequirement);
-        this.form.addControl(newRequirement.id, new FormControl(newRequirement.model));
-    }
-
     ngOnInit(): void {
-        const entriesCopy = Object.assign({}, this.entries);
+        const entriesCopy: RequirementBaseModel[] = [...this.entries];
 
-        this.formList = Object.keys(entriesCopy).map(key => {
+        this.keyValueFormList = entriesCopy.map((hint: RequirementBaseModel) => {
             return {
                 id: this.guidService.generate(),
-                model: this.entries[key]
-            };
+                model: {
+                    key: hint['class'],
+                    value: hint.value
+                }
+            }
         });
 
-        this.formList.forEach(hint => {
+        this.keyValueFormList.forEach(hint => {
             this.form.addControl(hint.id, new FormControl(hint.model));
         });
 
-        this.tracked = this.form.valueChanges.subscribe(_ => this.propagateHintList());
+        this.listenToFormChanges();
+    }
+
+    private listenToFormChanges(): void {
+
+        this.tracked = this.form.valueChanges.subscribe(change => {
+
+            const newList = Object.keys(change)
+                .filter(key => !!change[key].key.trim())
+                .map(key => {
+                    const newKeyValueObject: {key: string, value?: string | ExpressionModel} = change[key];
+
+                    return new RequirementBaseModel({
+                        'class': newKeyValueObject.key,
+                        value: newKeyValueObject.value
+                    });
+                });
+
+            this.propagateHintList(newList);
+        });
+    }
+
+    private addEntry(): void {
+        const newRequirement = {
+            id: this.guidService.generate(),
+            model: {
+                key: "",
+                value: new ExpressionModel()
+            }
+        };
+
+        this.keyValueFormList.push(newRequirement);
+        this.form.addControl(newRequirement.id, new FormControl(newRequirement.model));
     }
 
     private removeEntry(ctrl: {id: string, model: ExpressionModel}): void {
-        this.formList = this.formList.filter(item => item.id !== ctrl.id);
+        this.keyValueFormList = this.keyValueFormList.filter(item => item.id !== ctrl.id);
         this.form.removeControl(ctrl.id);
         this.form.markAsDirty();
     }
 
-    private propagateHintList(): void {
-        const hintList = this.formList
-            .filter(hint => !!hint.model.class.trim())
-            .map(hint => hint.model);
+    private propagateHintList(newList): void {
+        this.update.next(newList);
+    }
 
-        this.update.next(hintList);
+    private validateClassForm(c: FormControl) {
+
+        if (c.value  === "sbg:MemRequirement"
+            || c.value === "sbg:CPURequirement"
+            || c.value === "DockerRequirement") {
+
+            return {
+                valid: false,
+                message: "Class name is not valid"
+            }
+        }
+
+        return null;
     }
 
     ngOnDestroy() {
-        this.formList.forEach(item => this.form.removeControl(item.id));
+        this.keyValueFormList.forEach(item => this.form.removeControl(item.id));
         super.ngOnDestroy();
     }
 }
