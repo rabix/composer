@@ -4,7 +4,7 @@ import {ExpressionModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../components/common/component-base";
 import {GuidService} from "../../../services/guid.service";
 
-require("./key-value-input.component.scss");
+require("./key-value-list.component.scss");
 
 @Component({
     selector: "key-value-list",
@@ -34,6 +34,7 @@ require("./key-value-input.component.scss");
                         <li ct-key-value-input *ngFor="let entry of keyValueFormList; let i = index"
                                 class="col-sm-12 gui-section-list-item clickable row"
                                 [context]="context"
+                                [class.invalid-entry]="!form.controls[entry.id].valid"
                                 [formControl]="form.controls[entry.id]"
                                 [keyValidator]="keyValidator"
                                 [valueValidator]="valueValidator">

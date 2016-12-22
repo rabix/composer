@@ -76,15 +76,14 @@ export class HintListComponent extends ComponentBase {
         });
     }
 
-    private validateClassForm(c: FormControl) {
+    private validateClassForm(c: FormControl): null | {message: string} {
 
         if (c.value  === "sbg:MemRequirement"
             || c.value === "sbg:CPURequirement"
             || c.value === "DockerRequirement") {
 
             return {
-                valid: false,
-                message: "Class name is not valid"
+                message: "Class name is not valid."
             }
         }
 

@@ -1,7 +1,14 @@
-key-value-list {
-    .hint-class-input {
-        margin-left: 10px;
-        border: 2px solid transparent;
-        border-radius: .38rem;
+@import  "../../../../assets/sass/variables";
+
+.key-input {
+    margin-left: 10px;
+    border: 2px solid transparent;
+    border-radius: .38rem;
+}
+
+.key-container {
+    .key-validation-icon {
+        margin: auto;
+        color: $brand-danger;
     }
 }
