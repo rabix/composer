@@ -49,7 +49,7 @@ export class ExpressionModelListComponent extends ComponentBase implements Contr
 
     /** Context in which expression should be evaluated */
     @Input()
-    public context: {$job: any} = {};
+    public context: {$job: any} = { $job: {} };
 
     /** List which connects model to forms */
     private formList: Array<{id: string, model: ExpressionModel}> = [];
@@ -66,7 +66,7 @@ export class ExpressionModelListComponent extends ComponentBase implements Contr
         super();
     }
 
-    private writeValue(input: ExpressionModel[]): void {
+    writeValue(input: ExpressionModel[]): void {
         this.input = input;
 
         this.formList = this.input.map(model => {
@@ -88,11 +88,11 @@ export class ExpressionModelListComponent extends ComponentBase implements Contr
         })
     }
 
-    private registerOnChange(fn: any): void {
+    registerOnChange(fn: any): void {
         this.propagateChange = fn;
     }
 
-    private registerOnTouched(fn: any): void {
+    registerOnTouched(fn: any): void {
         this.onTouched = fn;
     }
 

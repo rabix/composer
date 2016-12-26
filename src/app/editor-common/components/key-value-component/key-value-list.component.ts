@@ -60,7 +60,7 @@ require("./key-value-list.component.scss");
 export class KeyValueListComponent extends ComponentBase implements ControlValueAccessor {
 
     @Input()
-    public context: {$job: any} = {};
+    public context: {$job: any} = { $job: {} };
 
     @Input()
     public addEntryText = "";

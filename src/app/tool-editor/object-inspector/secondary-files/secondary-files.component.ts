@@ -27,7 +27,7 @@ export class SecondaryFilesComponent extends ComponentBase implements ControlVal
 
     /** Context in which expression should be evaluated */
     @Input()
-    public context: {$job: any} = {};
+    public context: {$job: any} = { $job: {} };
 
     private secondaryFiles: ExpressionModel[];
 

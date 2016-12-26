@@ -33,7 +33,7 @@ export class HintListComponent extends ComponentBase {
 
     /** Context in which expression should be evaluated */
     @Input()
-    public context: {$job: any} = {};
+    public context: {$job: any} = { $job: {} };
 
     /** List of entries that should be shown */
     @Input()

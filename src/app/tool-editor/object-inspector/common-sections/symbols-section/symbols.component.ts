@@ -35,16 +35,16 @@ export class SymbolsComponent extends ComponentBase implements ControlValueAcces
         super();
     }
 
-    private writeValue(symbols: string[]): void {
+    writeValue(symbols: string[]): void {
         this.symbolsForm = new FormControl(symbols || []);
         this.listenToFormChanges();
     }
 
-    private registerOnChange(fn: any): void {
+    registerOnChange(fn: any): void {
         this.propagateChange = fn;
     }
 
-    private registerOnTouched(fn: any): void {
+    registerOnTouched(fn: any): void {
         this.onTouched = fn;
     }
 

@@ -82,15 +82,15 @@ export class CompactListComponent implements ControlValueAccessor  {
         this.tagInputControl = new FormControl("");
     }
 
-    private writeValue(value: any[]): void {
+    writeValue(value: any[]): void {
         this.tagList = value.slice();
     }
 
-    private registerOnChange(fn: any): void {
+    registerOnChange(fn: any): void {
         this.propagateChange = fn;
     }
 
-    private registerOnTouched(fn: any): void {
+    registerOnTouched(fn: any): void {
         this.onTouched = fn;
     }
 

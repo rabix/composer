@@ -57,7 +57,7 @@ require("./key-value-input.component.scss");
 export class KeyValueInputComponent extends ComponentBase implements ControlValueAccessor {
 
     @Input()
-    public context: {$job: any} = {};
+    public context: {$job: any} = { $job: {} };
 
     @Input()
     public keyValidator = () => null;

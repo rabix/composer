@@ -16,7 +16,7 @@ import {ModelExpressionEditorComponent} from "./expression-editor/model-expressi
 import {ExpressionInputComponent} from "./components/expression-input/expression-input.component";
 import {CompactListComponent} from "./components/compact-list/compact-list.component";
 import {EditableDirective} from "./directives/editable.directive";
-import {ExpressionModelListComponent} from "./components/expression-model-list/expression-model-list.componen";
+import {ExpressionModelListComponent} from "./components/expression-model-list/expression-model-list.component";
 import {ValidationComponent} from "./components/validation-preview/validation-preview.component";
 import {ValidationTextPipe} from "./pipes/validation-text.pipes";
 import {ValidationClassDirective} from "./components/validation-preview/validation-class.directive";
