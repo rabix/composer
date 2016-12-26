@@ -15,14 +15,23 @@ import {
 } from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../../components/common/component-base";
 import {CustomValidators} from "../../../../validators/custom.validator";
+import {PrimitiveParameterType} from "../../../../../../node_modules/cwlts/models/d2sb/ParameterTypeModel";
 
 require("./basic-input-section.component.scss");
 
 @Component({
     selector: "basic-input-section",
     providers: [
-        { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => BasicInputSectionComponent), multi: true },
-        { provide: NG_VALIDATORS, useExisting: forwardRef(() => BasicInputSectionComponent), multi: true }
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => BasicInputSectionComponent),
+            multi: true
+        },
+        {
+            provide: NG_VALIDATORS,
+            useExisting: forwardRef(() => BasicInputSectionComponent),
+            multi: true
+        }
     ],
     template: `
 
@@ -76,9 +85,11 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
     private basicSectionForm: FormGroup;
 
-    private onTouched = () => { };
+    private onTouched = () => {
+    };
 
-    private propagateChange = (_) => {};
+    private propagateChange = (_) => {
+    };
 
     private initSymbolsList: string[] = [];
 
@@ -96,8 +107,8 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
             //FIXME: isNullable is undefined when it's not nullable
             isRequired: [!this.input.type.isNullable],
             inputBinding: [this.input.inputBinding, CustomValidators.cwlModel],
-            itemType: [this.input.type.items ? this.input.type.items: 'File'],
-            symbols: [this.input.type.symbols ? this.input.type.symbols: this.initSymbolsList]
+            itemType: [this.input.type.items ? this.input.type.items : 'File'],
+            symbols: [this.input.type.symbols ? this.input.type.symbols : this.initSymbolsList]
         });
 
         this.listenToItemTypeFormChanges();
@@ -127,7 +138,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
     }
 
     validate(c: FormControl) {
-        return this.basicSectionForm.valid ? null: { error: "Basic input section is not valid." }
+        return this.basicSectionForm.valid ? null : {error: "Basic input section is not valid."}
     }
 
     private listenToIsBoundChanges(): void {
@@ -145,7 +156,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
     private listenToIdChanges(): void {
         this.tracked = this.basicSectionForm.controls['propertyIdForm'].valueChanges
-            .subscribe((id: string)  => {
+            .subscribe((id: string) => {
                 this.input.id = id;
 
                 if (this.input.type.type === "enum" || this.input.type.type === "record") {
@@ -156,41 +167,41 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
     private listenToInputBindingChanges(): void {
         this.tracked = this.basicSectionForm.controls['inputBinding'].valueChanges
-            .subscribe((inputBinding: CommandLineBindingModel)  => {
+            .subscribe((inputBinding: CommandLineBindingModel) => {
                 this.input.updateInputBinding(inputBinding);
             });
     }
 
     private listenToItemTypeFormChanges(): void {
-        this.tracked = this.basicSectionForm.controls['itemType'].valueChanges.subscribe((value: InputParameterTypeModel) => {
-            if (!!value && this.input.type.type === 'array') {
-                this.input.type.items = value;
-            }
-        });
+        this.tracked = this.basicSectionForm.controls['itemType'].valueChanges
+            .subscribe((value: PrimitiveParameterType) => {
+                if (!!value && this.input.type.type === 'array') {
+                    this.input.type.items = value;
+                }
+            });
     }
 
     private listenToTypeFormChanges(): void {
         this.tracked = this.basicSectionForm.controls['typeForm'].valueChanges
             .subscribe((value: InputParameterTypeModel) => {
+                this.input.type.setType(value.type);
 
-            this.input.type.setType(value.type);
+                if (value.type !== 'array' && this.input.isBound) {
+                    this.input.inputBinding.itemSeparator = undefined;
+                }
 
-            if (value.type !== 'array' && this.input.isBound) {
-                this.input.inputBinding.itemSeparator = undefined;
-            }
+                if (this.input.type.type === 'map' && this.input.isBound) {
+                    this.input.removeInputBinding();
+                    this.basicSectionForm.controls['isBound'].setValue(this.input.isBound);
+                }
 
-            if (this.input.type.type === 'map' && this.input.isBound) {
-                this.input.removeInputBinding();
-                this.basicSectionForm.controls['isBound'].setValue(this.input.isBound);
-            }
+                if (!!value.items && this.input.type.type === 'array') {
+                    this.input.type.items = value.items;
+                }
 
-            if (!!value.items && this.input.type.type === 'array') {
-                this.input.type.items = value.items;
-            }
-
-            if (this.input.type.type === 'enum' || this.input.type.type === 'record') {
-                this.input.type.name = this.input.id;
-            }
-        });
+                if (this.input.type.type === 'enum' || this.input.type.type === 'record') {
+                    this.input.type.name = this.input.id;
+                }
+            });
     }
 }
