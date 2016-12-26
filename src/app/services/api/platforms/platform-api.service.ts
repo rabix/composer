@@ -33,7 +33,7 @@ export class PlatformAPI {
 
     private sessionID = new ReplaySubject(1);
 
-    private platformServices: {brood: string, watson: string, gatekeeper: string} = {};
+    private platformServices: {brood: string, watson: string, gatekeeper: string} = {} as any;
 
     constructor(private http: Http, private settings: SettingsService) {
 

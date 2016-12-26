@@ -2,21 +2,15 @@ import {assignable} from "../../../decorators/index";
 import {Component, ViewChild, Input} from "@angular/core";
 import {CwlFileTemplateType, CwlFileTemplate} from "../../../types/file-template.type";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {InputComponent} from "../../forms/elements/input.component";
-import {RadioButtonComponent} from "../../forms/elements/radio-button.component";
 import {RadioGroupComponent, GroupItem} from "../../forms/elements/radio-group.component";
 import {ModalService} from "../modal.service";
-import {Subscription, Observable} from "rxjs";
+import {Observable} from "rxjs";
 import {FileName} from "../../forms/models/file-name";
 import {TemplateProviderService} from "../../../services/template-provider.service";
+import {ComponentBase} from "../../common/component-base";
 
 @Component({
     selector: 'ct-new-file-modal',
-    directives: [
-        RadioButtonComponent,
-        RadioGroupComponent,
-        InputComponent,
-    ],
     template: `
         <div>
             <block-loader class="overlay" *ngIf="isCreatingFile"></block-loader>
@@ -45,10 +39,9 @@ import {TemplateProviderService} from "../../../services/template-provider.servi
         </div>
 `
 })
-export class NewFileModalComponent {
+export class NewFileModalComponent extends ComponentBase {
 
     /** Base directory path prefix for newly created file */
-    @assignable()
     @Input()
     public basePath = "";
 
@@ -56,33 +49,32 @@ export class NewFileModalComponent {
     public save: (path: string, content: string) => Observable<any>;
 
     /** Switch for showing the cog overlay, is active between submitting the form and the API response */
-    private isCreatingFile: boolean;
+    public isCreatingFile: boolean;
 
     /** Error object that we will show below the form */
-    private error: {[message: string]: string};
+    public error: {[message: string]: string};
 
     /** Base form for the new file creation */
-    private newFileForm: FormGroup;
+    public newFileForm: FormGroup;
 
     /** Subform that is applicable only to the Workflow and CLT file types */
-    private cwlExtrasForm: FormGroup;
+    public cwlExtrasForm: FormGroup;
 
     /** Whether the CWLExtras form should be shown */
-    private showCwlExtrasForm = false;
+    public showCwlExtrasForm = false;
 
     /** List of file templates */
-    private fileTypes: GroupItem<string>[];
+    public fileTypes: GroupItem<string>[];
 
     /** File Template group switch component */
     @ViewChild(RadioGroupComponent)
     private fileTypeRadio: RadioGroupComponent<CwlFileTemplateType>;
 
-    /** Subscriptions that should be disposed upon destroying the component */
-    private subs: Subscription[] = [];
-
     constructor(private formBuilder: FormBuilder,
                 private template: TemplateProviderService,
                 private modal: ModalService) {
+
+        super();
 
         this.fileTypes = [
             {name: "Blank File", value: "blank", icon: "file-text-o", selected: true},
@@ -99,7 +91,7 @@ export class NewFileModalComponent {
             description: [""]
         });
 
-        this.subs.push(this.newFileForm.valueChanges.subscribe(_ => this.error = undefined));
+        this.tracked = this.newFileForm.valueChanges.subscribe(_ => this.error = undefined);
     }
 
     private onSubmit() {
@@ -136,13 +128,11 @@ export class NewFileModalComponent {
         this.modal.close();
     }
 
-    private ngAfterViewInit() {
-        this.subs.push(this.fileTypeRadio.value.subscribe(val => {
+    ngAfterViewInit() {
+        this.tracked = this.fileTypeRadio.value.subscribe(val => {
             this.showCwlExtrasForm = val !== "blank";
-        }));
-    }
+        });
 
-    private ngOnDestroy() {
-        this.subs.forEach(sub => sub.unsubscribe());
+        super.ngAfterViewInit();
     }
 }

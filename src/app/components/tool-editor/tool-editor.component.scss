@@ -1,23 +1,23 @@
 @import "../../../assets/sass/variables";
 @import "../../../assets/sass/mixins";
 
-
 ct-tool-editor {
-  .tool-inspector {
-    display: block;
-    height: 100%;
-    //background: $body-color;
-    background: white;
-  }
+    .tool-inspector {
+        display: block;
+        height: 100%;
+        //background: $body-color;
+        background: white;
+    }
 }
+
 .editor-container {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: space-between;
     align-items: stretch;
     align-content: stretch;
     background: $gui-editor-bg;
-    position:relative;
+    position: relative;
     height: 100%;
     width: 100%;
 
@@ -40,12 +40,20 @@ ct-tool-editor {
         border-bottom: 1px solid $gui-editor-header-border;
         background: $gui-editor-header-bg;
     }
+    .editor-content {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: stretch;
+        align-content: stretch;
+        height: 100%;
+        width: 100%;
+    }
 
     .inspector-col {
-      flex-grow: .6;
+        flex-grow: .6;
     }
 }
-
 
 .status-bar-footer {
     background: $gui-editor-status-bar-bg;

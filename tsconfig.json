@@ -2,31 +2,20 @@
     "compilerOptions": {
         "target": "es5",
         "module": "commonjs",
+        "moduleResolution": "node",
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "sourceMap": true,
         "noEmitHelpers": true,
-        "lib": [
-            "dom",
-            "es5",
-            "es6",
-            "es7"
-        ],
+        "lib": ["dom","es6"],
         "types": [
             "ace",
             "electron",
-            "jasmine",
-            "node",
-            "core-js"
+            "jasmine"
         ]
+
     },
-    "exclude": [
-        "./node_modules"
-    ],
-    "filesGlob": [
-        "./src/**/*.ts",
-        "node_modules/zone.js/dist/zone.js.d.ts"
-    ],
+    "files": ["src/main.electron.ts", "node_modules/zone.js/dist/zone.js.d.ts"],
     "awesomeTypescriptLoaderOptions": {
         "resolveGlobs": true,
         "forkChecker": true

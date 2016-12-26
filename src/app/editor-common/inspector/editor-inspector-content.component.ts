@@ -6,12 +6,12 @@ require("./editor-inspector-content.component.scss");
 @Component({
     selector: "ct-editor-inspector-content",
     template: `
-        <div class="form-section container m-0">
-            <div class="row">
+        <div class="form-section container">
+            <div class="row header pt-1 pb-1">
                 <div class="col-xs-12">
                     <i class="fa clickable pull-right fa-times"
                        (click)="close()"></i>
-                    <h3 class="gui-section-header">
+                    <h3 class="gui-section-header ">
                         <ng-content select=".tc-header"></ng-content>
                     </h3>
                 </div>

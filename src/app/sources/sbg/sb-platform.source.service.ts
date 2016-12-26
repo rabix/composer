@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {Observable, ReplaySubject} from "rxjs";
+import {Observable} from "rxjs";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {DataEntrySource} from "../common/interfaces";
 import {PlatformProjectEntry} from "../../services/api/platforms/platform-api.types";
@@ -30,7 +30,7 @@ export class SBPlatformDataSourceService {
         return () => this.platform
             .getProjectApps(project.owner_canonical, project.slug)
             .flatMap(Observable.from as any)
-            .map(app => ({
+            .map((app: any) => ({
                 id: app.id,
                 data: app,
                 type: "file",

@@ -2,20 +2,21 @@ import * as Yaml from "js-yaml";
 import {Component, OnInit, Input, OnDestroy, ViewChild, ViewContainerRef} from "@angular/core";
 import {FormGroup, FormBuilder} from "@angular/forms";
 import {ReplaySubject, BehaviorSubject} from "rxjs/Rx";
-import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
-import {CommandLineToolModel} from "cwlts/models/d2sb";
-import {ComponentBase} from "../common/component-base";
-import {DataEntrySource} from "../../sources/common/interfaces";
-import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
-import {WebWorkerService} from "../../services/web-worker/web-worker.service";
-import {ToolSidebarService} from "../../services/sidebars/tool-sidebar.service";
-import {ExpressionSidebarService} from "../../services/sidebars/expression-sidebar.service";
 import {ModalService} from "../modal";
 import {noop} from "../../lib/utils.lib";
-import {UserPreferencesService} from "../../services/storage/user-preferences.service";
-import {ViewMode} from "../view-switcher/view-switcher.component";
+import {CommandLineToolModel} from "cwlts/models/d2sb";
+import {ComponentBase} from "../common/component-base";
 import {Validation} from "cwlts/models/helpers/validation";
+import {DataEntrySource} from "../../sources/common/interfaces";
+import {ViewMode} from "../view-switcher/view-switcher.component";
+import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
+import {WebWorkerService} from "../../services/web-worker/web-worker.service";
+import {ToolSidebarService} from "../../services/sidebars/tool-sidebar.service";
+import {UserPreferencesService} from "../../services/storage/user-preferences.service";
+import {ExpressionSidebarService} from "../../services/sidebars/expression-sidebar.service";
+import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
+import LoadOptions = jsyaml.LoadOptions;
 
 require("./tool-editor.component.scss");
 
@@ -30,38 +31,57 @@ require("./tool-editor.component.scss");
         <block-loader *ngIf="isLoading"></block-loader>
         
         <div class="editor-container" [hidden]="isLoading">
-                
-                <!--Header & Editor Column-->
-                <div class="flex-col">
                     
-                    <!--Header Row-->
-                    <tool-header class="editor-header flex-row"
-                         (save)="save($event)"
-                         [fileIsValid]="isValidCWL"
-                         [data]="data"></tool-header>
+            <!--Header Row-->
+            <tool-header class="editor-header flex-row"
+                 (save)="save($event)"
+                 [fileIsValid]="isValidCWL"
+                 [data]="data"></tool-header>
                     
-                    <!--Editor Row-->
-                    <div class="flex-row">
-                            <ct-code-editor-x *ngIf="viewMode === __modes.Code" class="editor" 
-                                              [(content)]="rawEditorContent"
-                                              [language]="data.language | async"
-                                              [readonly]="!data.isWritable"></ct-code-editor-x>
-                         
-                            <!--GUI Editor-->
-                            <ct-clt-editor *ngIf="viewMode === __modes.Gui"
-                                           class="gui-editor-component"
-                                           [readonly]="!data.isWritable"
-                                           [formGroup]="toolGroup"
-                                           [model]="toolModel"></ct-clt-editor>
+            <!--Header & Editor Column-->
+            <div class="editor-content flex-row">
+                <!--Editor Row-->
+                        <ct-code-editor-x *ngIf="viewMode === __modes.Code" class="editor" 
+                                          [(content)]="rawEditorContent"
+                                          [language]="data.language | async"
+                                          [readonly]="!data.isWritable"></ct-code-editor-x>
+                     
+                        <!--GUI Editor-->
+                        <ct-clt-editor *ngIf="viewMode === __modes.Gui"
+                                       class="gui-editor-component flex-col"
+                                       [readonly]="!data.isWritable"
+                                       [formGroup]="toolGroup"
+                                       [model]="toolModel"></ct-clt-editor>
+                                       
+                                       
+                    <!--Object Inspector Column-->
+                    <div class="flex-col inspector-col" >
+                        <ct-editor-inspector class="tool-inspector">
+                            <template #inspector></template>
+                        </ct-editor-inspector>
                     </div>
+            </div>
+            
+             <div class="status-bar-footer">
+            
+                <div class="left-side">
+                    <validation-issues [issuesStream]="validation" 
+                                       (select)="selectBottomPanel($event)" 
+                                       [show]="bottomPanel === 'validation'"></validation-issues>
+                    
+                    <commandline [commandLineParts]="commandLineParts" 
+                                 (select)="selectBottomPanel($event)" 
+                                 [show]="bottomPanel === 'commandLine'"></commandline>
                 </div>
                 
-                <!--Object Inspector Column-->
-                <div [hidden]="!showInspector" class="flex-col inspector-col" >
-                    <ct-editor-inspector class="tool-inspector">
-                        <template #inspector></template>
-                    </ct-editor-inspector>
+                <div class="right-side">
+                    <ct-view-mode-switch [viewMode]="viewMode"
+                                         [disabled]="!isValidCWL"
+                                         (switch)="switchView($event)">
+                    </ct-view-mode-switch>
                 </div>
+            </div>
+                
             
                 <!--Document/Tool Editor Scrollable Container-->
                 <!--<div class="scroll-content flex-container">-->
@@ -78,25 +98,7 @@ require("./tool-editor.component.scss");
                 <!--<template #inspector></template>-->
             <!--</ct-editor-inspector>-->
             <!---->
-            <!--<div class="status-bar-footer">-->
-            <!---->
-                <!--<div class="left-side">-->
-                    <!--<validation-issues [issuesStream]="validation" -->
-                                       <!--(select)="selectBottomPanel($event)" -->
-                                       <!--[show]="bottomPanel === 'validation'"></validation-issues>-->
-                    <!---->
-                    <!--<commandline [commandLineParts]="commandLineParts" -->
-                                 <!--(select)="selectBottomPanel($event)" -->
-                                 <!--[show]="bottomPanel === 'commandLine'"></commandline>-->
-                <!--</div>-->
-                <!---->
-                <!--<div class="right-side">-->
-                    <!--<ct-view-mode-switch [viewMode]="viewMode"-->
-                                         <!--[disabled]="!isValidCWL"-->
-                                         <!--(switch)="switchView($event)">-->
-                    <!--</ct-view-mode-switch>-->
-                <!--</div>-->
-            <!--</div>-->
+           
         </div>
     `
 })
@@ -187,7 +189,9 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
             }
 
             // load JSON to generate model
-            let json = Yaml.safeLoad(this.rawEditorContent.getValue(), {json: true});
+            let json = Yaml.safeLoad(this.rawEditorContent.getValue(), {
+                json: true
+            } as LoadOptions);
 
             // should show prompt, but json is already reformatted
             if (this.showReformatPrompt && json["rbx:modified"]) {
