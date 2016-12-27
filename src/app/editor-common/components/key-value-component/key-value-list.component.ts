@@ -55,7 +55,6 @@ require("./key-value-list.component.scss");
                 </button>
     `
 })
-
 //TODO: remove duplicate keys
 export class KeyValueListComponent extends ComponentBase implements ControlValueAccessor {
 
@@ -83,7 +82,14 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
     @Input()
     public helpLink = "";
 
-    private keyValueFormList: {id: string, model: {key: string, value: string | ExpressionModel}}[] = [];
+    private keyValueFormList: {
+        id: string,
+        model: {
+            key?: string,
+            value: string | ExpressionModel,
+            readonly?: boolean
+        }
+    }[] = [];
 
     private onTouched = () => { };
 
@@ -95,7 +101,12 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
         super();
     }
 
-    writeValue(keyValueList: {key: string, value: string | ExpressionModel}[]): void {
+    writeValue(keyValueList: {
+        key?: string,
+        value: string | ExpressionModel,
+        readonly?: boolean
+    }[]): void {
+
         this.keyValueFormList = keyValueList.map(entry => {
             return {
                 id: this.guidService.generate(),
@@ -109,15 +120,7 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
 
         this.tracked = this.form.valueChanges.subscribe(change => {
 
-            const newList = Object.keys(change)
-                .filter(key => !!change[key].key.trim())
-                .map(key => {
-                    return {
-                        key: change[key].key,
-                        value: change[key].value
-                    };
-                });
-
+            const newList = Object.keys(change).map(key => change[key]);
             this.propagateChange(newList);
         });
     }
@@ -135,7 +138,8 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
             id: this.guidService.generate(),
             model: {
                 key: "",
-                value: new ExpressionModel()
+                value: new ExpressionModel(null, ""),
+                readonly: false
             }
         };
 

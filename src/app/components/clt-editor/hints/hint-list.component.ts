@@ -1,10 +1,9 @@
 import {Component, Input, Output, ChangeDetectionStrategy} from "@angular/core";
 import {ComponentBase} from "../../common/component-base";
 import {ExternalLinks} from "../../../cwl/external-links";
-import {ExpressionModel} from "cwlts/models/d2sb";
+import {ExpressionModel, RequirementBaseModel} from "cwlts/models/d2sb";
 import {FormControl} from "@angular/forms";
 import {ReplaySubject} from "rxjs";
-import {RequirementBaseModel} from "cwlts";
 
 @Component({
     selector: "ct-hint-list",
@@ -16,7 +15,7 @@ import {RequirementBaseModel} from "cwlts";
             </div>
 
             <div class="tc-body">
-
+            
                 <key-value-list 
                     [addEntryText]="'Add a Hint'"
                     [emptyListText]="'Special flags for tool execution'"
@@ -39,7 +38,11 @@ export class HintListComponent extends ComponentBase {
     @Input()
     public entries: RequirementBaseModel[] = [];
 
-    private keyValueFormList: {key: string, value: string | ExpressionModel}[] = [];
+    private formList: {
+        key?: string,
+        value: string | ExpressionModel,
+        readonly: boolean
+    }[] = [];
 
     @Input()
     public readonly = false;
@@ -49,31 +52,76 @@ export class HintListComponent extends ComponentBase {
 
     private helpLink = ExternalLinks.hints;
 
-    private form: FormControl;
+    private form = new FormControl("");
 
     ngOnInit(): void {
         const entriesCopy: RequirementBaseModel[] = [...this.entries];
 
-        this.keyValueFormList = entriesCopy.map((hint: RequirementBaseModel) => {
-            return {
-                key: hint['class'],
-                value: hint.value
-            }
-        });
-
-        this.form = new FormControl(this.keyValueFormList);
+        this.formList = this.createFormList(entriesCopy);
+        this.form.setValue(this.formList);
 
         this.tracked = this.form.valueChanges.subscribe(keyValueList => {
-
-            const newList = keyValueList.map((item: {key: string, value: ExpressionModel}) => {
-                return new RequirementBaseModel({
-                    'class': item.key,
-                    value: item.value
-                });
-            });
-
+            const newList: Array<RequirementBaseModel | any> = this.createHintList(keyValueList);
             this.update.next(newList);
         });
+    }
+
+
+    private createFormList(entries: RequirementBaseModel[]): {key: string, value: string, readonly: boolean}[] {
+
+        return entries.map((hint: RequirementBaseModel) => {
+                const newHint = {
+                    key: hint['class'],
+                    value: "",
+                    readonly: false
+                };
+
+                if (typeof hint.value === "string" || hint.value instanceof ExpressionModel) {
+                    newHint.value = hint.value;
+
+                } else {
+                    newHint.readonly = true;
+
+                    if (!!hint.customProps && !hint.value) {
+                        newHint.value = JSON.stringify(hint.customProps);
+                    } else if (hint.value) {
+                        newHint.value = JSON.stringify(hint.value);
+                    }
+                }
+
+                return newHint;
+            });
+    }
+
+    private createHintList(formList: {
+        key?: string,
+        value: string | ExpressionModel,
+        readonly: boolean
+    }[]): any[] {
+
+        return formList
+            .map((item): RequirementBaseModel | any => {
+
+                if (item.readonly && typeof item.value === "string") {
+                    if (!!item.key && !!item.key.trim()) {
+                        return new RequirementBaseModel({
+                            'class': item.key,
+                            customProps: JSON.parse(item.value)
+                        }).serialize();
+
+                    } else  if (!item.key) {
+                        return JSON.parse(item.value);
+                    }
+                }
+
+                if (!!item.key && !!item.key.trim() && !item.readonly) {
+                    return new RequirementBaseModel({
+                        'class': item.key,
+                        value: (<ExpressionModel>item.value).serialize()
+                    }).serialize();
+                }
+            })
+            .filter(res => res !== undefined);
     }
 
     private validateClassForm(c: FormControl): null | {message: string} {

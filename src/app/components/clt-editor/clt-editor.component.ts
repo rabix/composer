@@ -141,7 +141,7 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
     private setHints(hints: RequirementBaseModel[]) {
         this.model.hints = [];
         hints.forEach(hint => {
-            this.setRequirement(hint.serialize(), true);
+            this.setRequirement(hint, true);
         });
 
         this.formGroup.markAsDirty();

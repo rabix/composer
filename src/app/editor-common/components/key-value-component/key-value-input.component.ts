@@ -28,7 +28,9 @@ require("./key-value-input.component.scss");
     ],
     template: `
 
-            <div class="key-container col-sm-5 input-group">
+            <div class="key-container col-sm-5" 
+                 *ngIf="form.controls['keyForm'].value !== null">
+                 
                  <i class="col-sm-1 fa fa-times-circle validation-icon key-validation-icon"
                     [ct-tooltip]="keyTooltip"
                     *ngIf="!form.controls['keyForm'].valid"></i>
@@ -38,20 +40,28 @@ require("./key-value-input.component.scss");
                 </ct-tooltip-content>
             
                 <input class="ellipsis form-control key-input"
-                   [class.col-sm-12]="form.controls['keyForm'].valid"
-                   [class.col-sm-11]="!form.controls['keyForm'].valid"
-                   *ngIf="form.controls['keyForm']"
-                   [formControl]="form.controls['keyForm']"/>
+                       [class.col-sm-12]="form.controls['keyForm'].valid"
+                       [class.col-sm-11]="!form.controls['keyForm'].valid"
+                       *ngIf="form.controls['keyForm']"
+                       [formControl]="form.controls['keyForm']"/>
             </div>
                
+           <input *ngIf="form.controls['valueForm'] && readonly"
+                  [class.col-sm-11]="form.controls['keyForm'].value === null"
+                  [class.col-sm-6]="form.controls['keyForm'].value !== null"
+                  [class.half-width-value-input]="form.controls['keyForm'].value !== null"
+                  class="readonly-value-input"
+                  [readonly]="readonly"
+                  [formControl]="form.controls['valueForm']"/>
+               
             <ct-expression-input 
-                    *ngIf="form.controls['valueForm']"
-                    class="ellipsis col-sm-6"
+                    *ngIf="form.controls['valueForm'] && !readonly"
+                    class="col-sm-6"
                     [context]="context"
                     [formControl]="form.controls['valueForm']">
             </ct-expression-input>
             
-            <ng-content></ng-content>
+            <ng-content *ngIf="!readonly"></ng-content>
     `
 })
 export class KeyValueInputComponent extends ComponentBase implements ControlValueAccessor {
@@ -73,6 +83,8 @@ export class KeyValueInputComponent extends ComponentBase implements ControlValu
 
     private errorMessages:string[] = [];
 
+    private readonly = false;
+
     constructor(private formBuilder: FormBuilder) {
         super();
     }
@@ -83,7 +95,7 @@ export class KeyValueInputComponent extends ComponentBase implements ControlValu
         if (!this.form.controls['keyForm'].valid && this.form.controls['keyForm'].errors) {
             const errorMessage = this.form.controls['keyForm'].errors['message'] ?
                                  this.form.controls['keyForm'].errors['message']:
-                                 "Key value is not valid.";
+                                 "Key is not valid.";
 
             this.errorMessages.push(errorMessage);
         }
@@ -99,7 +111,13 @@ export class KeyValueInputComponent extends ComponentBase implements ControlValu
         return this.form.valid ? null: { error: { messages: this.errorMessages }}
     }
 
-    writeValue(input: {key: string, value: string | ExpressionModel}): void {
+    writeValue(input: {
+        key?: string,
+        value: string | ExpressionModel,
+        readonly?: boolean
+    }): void {
+
+        this.readonly = input.readonly || false;
 
         this.form = this.formBuilder.group({
             keyForm: [input.key, this.keyValidator],
@@ -114,7 +132,8 @@ export class KeyValueInputComponent extends ComponentBase implements ControlValu
 
                 this.propagateChange({
                     key: keyValue,
-                    value: valueInput
+                    value: valueInput,
+                    readonly: input.readonly
                 });
             });
     }

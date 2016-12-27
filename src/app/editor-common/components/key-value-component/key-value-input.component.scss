@@ -6,6 +6,16 @@
     border-radius: .38rem;
 }
 
+.readonly-value-input {
+    margin-left: 29px;
+    background: $readonly-input;
+    border: $border-color solid 1px;
+
+    &.half-width-value-input {
+        margin-left: 15px;
+    }
+}
+
 .key-container {
     .key-validation-icon {
         margin: auto;
