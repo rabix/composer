@@ -154,7 +154,7 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
     }
 
     ngOnDestroy() {
-        this.keyValueFormList.forEach(item => this.form.removeControl(item.id));
         super.ngOnDestroy();
+        this.keyValueFormList.forEach(item => this.form.removeControl(item.id));
     }
 }

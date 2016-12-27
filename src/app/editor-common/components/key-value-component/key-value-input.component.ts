@@ -61,7 +61,7 @@ require("./key-value-input.component.scss");
                     [formControl]="form.controls['valueForm']">
             </ct-expression-input>
             
-            <ng-content *ngIf="!readonly"></ng-content>
+            <ng-content></ng-content>
     `
 })
 export class KeyValueInputComponent extends ComponentBase implements ControlValueAccessor {

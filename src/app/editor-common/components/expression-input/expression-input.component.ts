@@ -110,6 +110,10 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
             this.model  = new ExpressionModel("", "");
             this.isExpr = this.model.isExpression;
         }
+
+        if (this.isExpr) {
+            this.model.evaluate(this.context); // to reset validation
+        }
     }
 
     /**
