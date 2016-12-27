@@ -13,7 +13,7 @@ import {ComponentBase} from "../../../components/common/component-base";
 require("./key-value-input.component.scss");
 
 @Component({
-    selector: "[ct-key-value-input]",
+    selector: "ct-key-value-input",
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,

@@ -31,17 +31,20 @@ require("./key-value-list.component.scss");
 
                     <ul class="gui-section-list">
 
-                        <li ct-key-value-input *ngFor="let entry of keyValueFormList; let i = index"
-                                class="col-sm-12 gui-section-list-item clickable row"
-                                [context]="context"
-                                [class.invalid-entry]="!form.controls[entry.id].valid"
-                                [formControl]="form.controls[entry.id]"
-                                [keyValidator]="keyValidator"
-                                [valueValidator]="valueValidator">
-                                
-                            <div *ngIf="!!entry" class="col-sm-1 align-right">
-                                <i title="Delete" class="fa fa-trash text-hover-danger" (click)="removeEntry(entry)"></i>
-                            </div>
+                        <li class="col-sm-12 gui-section-list-item clickable row"
+                            *ngFor="let entry of keyValueFormList; let i = index">
+                        
+                            <ct-key-value-input 
+                                    [context]="context"
+                                    [class.invalid-entry]="!form.controls[entry.id].valid"
+                                    [formControl]="form.controls[entry.id]"
+                                    [keyValidator]="keyValidator"
+                                    [valueValidator]="valueValidator">
+                                            
+                                <div *ngIf="!!entry" class="col-sm-1 align-right">
+                                    <i title="Delete" class="fa fa-trash text-hover-danger" (click)="removeEntry(entry)"></i>
+                                </div>
+                            </ct-key-value-input>
                         </li>
                         
                     </ul>

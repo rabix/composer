@@ -1,5 +1,10 @@
 @import  "../../../../assets/sass/variables";
 
+ct-key-value-input {
+    display: flex;
+    width: 100%;
+}
+
 .key-input {
     margin-left: 10px;
     border: 2px solid transparent;
