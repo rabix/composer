@@ -1,0 +1,34 @@
+@import "../../../../assets/sass/variables";
+
+ct-revision-list {
+
+    .revision-entry {
+        border-bottom: 1px solid $gui-section-border;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+
+        &.active {
+            background-color: $light-border-color;
+        }
+
+        &:hover:not(.active) {
+            background-color: lighten($light-border-color, 5%)
+        }
+
+        .revision-number {
+            flex-basis: 60px;
+            text-align: center;
+            font-family: $font-family-title;
+        }
+
+        .revision-info {
+
+        }
+    }
+
+    .form-section .gui-section-body {
+        padding-top: 0;
+    }
+
+}

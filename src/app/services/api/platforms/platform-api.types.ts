@@ -22,7 +22,7 @@ export interface PlatformAppEntry extends Object {
     "sbg:modifiedOn": number;
     "sbg:project": string;
     "sbg:revision": number;
-    "sbg:revisionInfo": PlatformAppRevisionEntry[];
+    "sbg:revisionsInfo": PlatformAppRevisionEntry[];
     "sbg:sbgMaintained": boolean;
     "sbg:tagline": string;
     "sbg:toolkit": string;

@@ -33,13 +33,6 @@ ct-tool-editor {
         flex-grow: 1;
     }
 
-    .editor-header {
-        padding: 1px;
-        flex-grow: 0;
-        flex-basis: $gui-editor-header-height;
-        border-bottom: 1px solid $gui-editor-header-border;
-        background: $gui-editor-header-bg;
-    }
     .editor-content {
         display: flex;
         flex-direction: row;

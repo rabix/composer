@@ -9,10 +9,6 @@ import {ViewMode} from "../view-switcher/view-switcher.component";
     selector: 'ct-workflow-editor',
     template: `
         <div class="editor-container">
-            <tool-header class="editor-header"
-                         (save)="save($event)"
-                         [fileIsValid]="isValidCWL"
-                         [data]="data"></tool-header>
         
             <div class="scroll-content">
             
