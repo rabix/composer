@@ -1,8 +1,7 @@
 import {Component, forwardRef, Input} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormGroup, FormBuilder} from "@angular/forms";
 import {ComponentBase} from "../../../../components/common/component-base";
-import {CommandInputParameterModel, CommandOutputParameterModel as OutputProperty} from "cwlts/models/d2sb";
-import {ExpressionModel} from "cwlts";
+import {CommandInputParameterModel, CommandOutputParameterModel as OutputProperty, ExpressionModel} from "cwlts/models/d2sb";
 
 require("./output-metadata.component.scss");
 
