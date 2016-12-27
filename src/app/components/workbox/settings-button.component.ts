@@ -1,8 +1,7 @@
 import {Component} from "@angular/core";
-import {EventHubService} from "../../services/event-hub/event-hub.service";
-import {Observable} from "rxjs";
-import {OpenTabAction} from "../../action-events";
 import {SettingsService} from "../../services/settings/settings.service";
+import {WorkboxService} from "./workbox.service";
+import {Observable} from "rxjs";
 
 @Component({
     selector: "ct-settings-button",
@@ -17,19 +16,20 @@ import {SettingsService} from "../../services/settings/settings.service";
 })
 export class SettingsButtonComponent {
 
-    private hasWarning = false;
+    public hasWarning = false;
 
-    constructor(private eventHub: EventHubService, settings: SettingsService) {
+    constructor(private workbox: WorkboxService,
+                settings: SettingsService) {
         settings.validity.subscribe(isValid => this.hasWarning = !isValid);
     }
 
     private openSettings() {
 
-        this.eventHub.publish(new OpenTabAction({
+        this.workbox.openTab({
             id: "settings",
             title: Observable.of("Settings"),
             contentType: Observable.of("Settings"),
             contentData: {}
-        }));
+        });
     }
 }

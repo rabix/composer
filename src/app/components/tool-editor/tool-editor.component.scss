@@ -1,36 +1,58 @@
 @import "../../../assets/sass/variables";
 @import "../../../assets/sass/mixins";
 
-
-//@todo(maya) reorganize this file
-.scroll-content {
-    flex-grow: 1;
-    display: flex;
-    overflow-y: auto;
-    position: relative; // because of sidebar
+ct-tool-editor {
+    .tool-inspector {
+        display: block;
+        height: 100%;
+        //background: $body-color;
+        background: white;
+    }
 }
 
 .editor-container {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    justify-content: space-between;
+    align-items: stretch;
+    align-content: stretch;
     background: $gui-editor-bg;
-}
+    position: relative;
+    height: 100%;
+    width: 100%;
 
-ct-code-editor {
-    display: flex;
-    flex-grow: 1;
-}
+    .flex-row {
+        flex-grow: 1;
+    }
 
-.editor-header {
-    display: flex;
-    background: $gui-editor-header-bg;
-    overflow: hidden;
-    flex-grow: 0;
-    flex-shrink: 0;
-    height: $gui-editor-header-height;
-    padding: $header-padding;
-    border-bottom: 1px solid $gui-editor-header-border;
+    .flex-col {
+        flex-grow: 1
+    }
+
+    .flex-col-item {
+        flex-grow: 1;
+    }
+
+    .editor-header {
+        padding: 1px;
+        flex-grow: 0;
+        flex-basis: $gui-editor-header-height;
+        border-bottom: 1px solid $gui-editor-header-border;
+        background: $gui-editor-header-bg;
+    }
+    .editor-content {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: stretch;
+        align-content: stretch;
+        height: 100%;
+        width: 100%;
+    }
+
+    .inspector-col {
+        flex-grow: .6;
+    }
 }
 
 .status-bar-footer {

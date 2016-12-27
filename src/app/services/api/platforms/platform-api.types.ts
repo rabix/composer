@@ -5,7 +5,7 @@ export interface PlatformAppRevisionEntry {
     "sbg:revisionNotes": string;
 }
 
-export interface PlatformAppEntry {
+export interface PlatformAppEntry extends Object {
     "id": string;
     "label": string;
     "class": string;
@@ -52,7 +52,7 @@ export interface PlatformProjectEntry {
     project_type: "PRIVATE" | "PUBLIC",
     slug: string;
     state: string;
-    tags: Array;
+    tags: Array<any>;
     // Not part of the api response, added on client side
     path: string;
 }

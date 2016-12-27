@@ -1,0 +1,30 @@
+sudo: required
+dist: trusty
+addons:
+  apt:
+    sources:
+      - google-chrome
+    packages:
+      - google-chrome-stable
+language: node_js
+node_js:
+  - "7"
+
+install:
+  - npm run deps:install
+before_script:
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
+  - sleep 3
+script:
+  - npm run build:electron
+  - scripts/electron-build.sh
+  - npm run test:electron:backend
+  - npm run test:electron:frontend
+
+notifications:
+  email: false
+
+branches:
+  only:
+    - master

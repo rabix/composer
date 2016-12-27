@@ -27,7 +27,6 @@ import {Subject} from "rxjs";
             </span>
         </div>
         <div *ngIf="actionPending === 'revision_note'">
-        
             <form (ngSubmit)="onSubmit(revisionNote.value)" #revision="ngForm">
                 <div class="row">
                     <div class="col-sm-8">

@@ -9,7 +9,6 @@ require("./clt-editor.component.scss");
 
 @Component({
     selector: "ct-clt-editor",
-    providers: [EditorInspectorService],
     template: `
         
         <div class="row ">       
@@ -59,10 +58,6 @@ require("./clt-editor.component.scss");
                 
                 <ct-file-def-list [entries]="model.createFileRequirement?.fileDef || []"></ct-file-def-list>
             </form>
-            
-            <ct-editor-inspector class="col-xs-6" [hidden]="!showInspector">
-                <template #inspector></template>
-            </ct-editor-inspector>
         </div>
 
     `
@@ -84,18 +79,10 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
         "sbg:MemRequirement"?: ResourceRequirementModel
     } = {};
 
-    @ViewChild("inspector", {read: ViewContainerRef})
-    private inspectorContent: ViewContainerRef;
-
-    @Input()
-    public showInspector = false;
-
-    constructor(private formBuilder: FormBuilder,
-                private inspector: EditorInspectorService) {
+    constructor(private formBuilder: FormBuilder) {
         super();
 
-        this.tracked = this.inspector.inspectedObject.map(obj => obj !== undefined)
-            .subscribe(show => this.showInspector = show);
+
     }
 
     ngOnInit() {
@@ -158,6 +145,6 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
     }
 
     ngAfterViewInit() {
-        this.inspector.setHostView(this.inspectorContent);
+        // this.inspector.setHostView(this.inspectorContent);
     }
 }

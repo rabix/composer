@@ -11,7 +11,6 @@ export interface GroupItem<T> {
 
 @Component({
     selector: "ct-radio-group",
-    directives: [RadioButtonComponent],
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: {
         class: "form-group"

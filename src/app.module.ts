@@ -10,9 +10,7 @@ import {PanelContainerComponent} from "./app/components/panels/panel-container.c
 import {WorkboxComponent} from "./app/components/workbox/workbox.component";
 import {BlockLoaderComponent} from "./app/components/block-loader/block-loader.component";
 import {CltEditorComponent} from "./app/components/clt-editor/clt-editor.component";
-import {CodeEditorComponent} from "./app/components/code-editor/code-editor.component";
 import {AlertComponent} from "./app/components/common/alert.component";
-import {FormSectionComponent} from "./app/components/form-section/form-section.component";
 import {LocalFilesPanelComponent} from "./app/components/panels/local-files-panel.component";
 import {PanelHandleComponent} from "./app/components/panels/panel-handle.component";
 import {PanelToolbarComponent} from "./app/components/panels/panel-toolbar.component";
@@ -28,10 +26,8 @@ import {SettingsButtonComponent} from "./app/components/workbox/settings-button.
 import {WorkflowEditorComponent} from "./app/components/workflow-editor/workflow-editor.component";
 import {DockerImageFormComponent} from "./app/components/forms/inputs/forms/docker-image-form.component";
 import {BaseCommandFormComponent} from "./app/components/forms/inputs/forms/base-command-form.component";
-import {ExpressionEditorSidebarComponent} from "./app/components/sidebar/expression-editor/expression-editor-sidebar.component";
 import {ToolHeaderComponent} from "./app/components/tool-editor/tool-header/tool-header.component";
 import {CommandLineComponent} from "./app/components/clt-editor/commandline/commandline.component";
-import {ExpressionEditorComponent} from "./app/components/sidebar/expression-editor/expression-editor.component";
 import {ModalComponent, ModalService} from "./app/components/modal";
 import {ConfirmComponent} from "./app/components/modal/common/confirm.component";
 import {RadioGroupComponent} from "./app/components/forms/elements/radio-group.component";
@@ -42,7 +38,6 @@ import {TemplateProviderService} from "./app/services/template-provider.service"
 import {PromptComponent} from "./app/components/modal/common/prompt.component";
 import {CheckboxPromptComponent} from "./app/components/modal/common/checkbox-prompt.component";
 import {FileEditorComponent} from "./app/components/file-editor/file-editor.component";
-import {CodeEditorDirective} from "./app/directives/code-editor.directive";
 import {ToolEditorModule} from "./app/tool-editor/tool-editor.module";
 import {CoreModule} from "./app/core/core.module";
 import {CWLModule} from "./app/cwl/cwl.module";
@@ -66,14 +61,9 @@ import {DomEventService} from "./app/services/dom/dom-event.service";
         BlockLoaderComponent,
         CheckboxPromptComponent,
         CltEditorComponent,
-        CodeEditorComponent,
-        CodeEditorDirective,
         CommandLineComponent,
         ConfirmComponent,
         DockerImageFormComponent,
-        ExpressionEditorComponent,
-        ExpressionEditorSidebarComponent,
-        FormSectionComponent,
         HintListComponent,
         InputComponent,
         LayoutComponent,
@@ -102,7 +92,7 @@ import {DomEventService} from "./app/services/dom/dom-event.service";
         ValidationIssuesComponent,
         ViewModeSwitchComponent,
         WorkboxComponent,
-        WorkflowEditorComponent
+        WorkflowEditorComponent,
     ],
     entryComponents: [
         CheckboxPromptComponent,

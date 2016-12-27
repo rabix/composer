@@ -9,7 +9,7 @@ import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
         { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StageInputSectionComponent), multi: true }
     ],
     template: `
-<ct-form-panel *ngIf="input.type.type === 'record' || input.type.type === 'File'" [borderless]="true" [collapsed]="true">
+<ct-form-panel *ngIf="input.type.type === 'record' || input.type.type === 'File'" class="borderless" [collapsed]="true">
     <div class="tc-header">Stage Input</div>
     <div class="tc-body" *ngIf="input && stageInputFormGroup">
     

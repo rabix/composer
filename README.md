@@ -1,4 +1,8 @@
+
+
 # Cottontail (Rabix Editor)
+[![Build Status](https://travis-ci.org/rabix/cottontail-frontend.svg?branch=master)](https://travis-ci.org/rabix/cottontail-frontend)
+
 
 The Rabix Editor (codename Cottontail) is a graphical and code editor specially designed to work with the [CommonWorkflowLanguage](https://github.com/common-workflow-language/common-workflow-language). It is currently in early development. This repo includes the code for running Cottontail locally in dev mode and for building OS specific binaries.
 

@@ -15,12 +15,10 @@ import {ViewMode} from "../view-switcher/view-switcher.component";
                          [data]="data"></tool-header>
         
             <div class="scroll-content">
-                <ct-code-editor [hidden]="viewMode !== __viewModes.Code"
-                                (contentChanges)="onEditorContentChange($event)"
-                                [content]="data.content"
-                                [readOnly]="!data.isWritable"
-                                [language]="data.language"></ct-code-editor>
-        
+            
+                <!--Code Editor Here-->
+                
+                
                 <div [hidden]="viewMode !== __viewModes.Gui">
                     Workflow Editor Coming Soon
                 </div>

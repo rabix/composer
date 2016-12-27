@@ -1,8 +1,8 @@
-import {Injectable, NgZone} from "@angular/core";
+import {Injectable, NgZone, Optional} from "@angular/core";
 import {GuidService} from "./guid.service";
 import {AsyncSubject, Subject} from "rxjs";
 
-const {ipcRenderer} = window.require("electron");
+const {ipcRenderer} = window["require"]("electron");
 
 enum RequestType {
     Once,
@@ -20,8 +20,7 @@ export class IpcService {
         }
     } = {};
 
-    constructor(private guid: GuidService) {
-
+    constructor(private guid: GuidService, @Optional() private zone: NgZone) {
         ipcRenderer.on("data-reply", (sender, response) => {
 
             console.debug("Data reply received", response.id, response);
@@ -40,8 +39,13 @@ export class IpcService {
                 }
             };
 
-            zone ? zone.run(() => action()) : action();
-
+            if (zone) {
+                zone.run(() => action());
+            } else if (this.zone) {
+                this.zone.run(() => action());
+            } else {
+                action();
+            }
         });
     }
 
@@ -75,8 +79,6 @@ export class IpcService {
             stream: new Subject<any>()
         };
 
-        console.trace("Watching", message, "(", messageID, ")", data);
-
         ipcRenderer.send("data-request", {
             id: messageID,
             message,
@@ -84,5 +86,9 @@ export class IpcService {
         });
 
         return this.pendingRequests[messageID].stream;
+    }
+
+    public notify(message: any): void {
+        ipcRenderer.send("notification", {message});
     }
 }

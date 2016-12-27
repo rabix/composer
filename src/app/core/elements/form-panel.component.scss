@@ -1,19 +1,18 @@
 @import "../../../assets/sass/variables";
 
-ct-editor-inspector-content {
-    overflow-y: auto;
-    overflow-x: hidden;
-
-    .header {
-        border: 1px solid transparent;
-        border-bottom-color: $gui-section-border;
-    }
+ct-form-panel {
+    //.borderless .form-section {
+    //    border: none;
+    //    padding: 0;
+    //}
 
     .form-section {
         position: relative;
         display: block;
         background: $gui-section-bg;
         margin-bottom: 20px;
+        padding: $gui-section-padding;
+        border: 1px solid $gui-section-border;
 
         .borderless & {
             border: none;
@@ -61,13 +60,5 @@ ct-editor-inspector-content {
             margin-top: 10px;
         }
     }
-}
 
-ct-editor-inspector {
-    position: static;
-    display: block;
-    overflow-y: auto;
-    overflow-x: hidden;
-    border: 1px solid transparent;
-    border-left-color: $gui-section-border;
 }
