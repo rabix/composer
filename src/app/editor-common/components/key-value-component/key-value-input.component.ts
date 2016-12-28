@@ -5,7 +5,9 @@ import {
     FormGroup,
     FormBuilder,
     NG_VALIDATORS,
-    FormControl
+    FormControl,
+    ValidatorFn,
+    Validators
 } from "@angular/forms";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../components/common/component-base";
@@ -31,12 +33,12 @@ require("./key-value-input.component.scss");
             <div class="key-container col-sm-5" 
                  *ngIf="form.controls['keyForm'].value !== null">
                  
-                 <i class="col-sm-1 fa fa-times-circle validation-icon key-validation-icon"
+                 <i class="fa fa-times-circle validation-icon key-validation-icon"
                     [ct-tooltip]="keyTooltip"
-                    *ngIf="!form.controls['keyForm'].valid"></i>
+                     *ngIf="errors.length"></i>
                 
                 <ct-tooltip-content #keyTooltip>
-                     <div class="error-text px-1" *ngFor="let error of errorMessages">{{ error }}</div>
+                     <div class="error-text px-1" *ngFor="let error of errors">{{ error }}</div>
                 </ct-tooltip-content>
             
                 <input class="ellipsis form-control key-input"
@@ -70,10 +72,10 @@ export class KeyValueInputComponent extends ComponentBase implements ControlValu
     public context: {$job: any} = { $job: {} };
 
     @Input()
-    public keyValidator = () => null;
+    public keyValidators: ValidatorFn[] = [() => null];
 
     @Input()
-    public valueValidator = () => null;
+    public valueValidators: ValidatorFn[] = [() => null];
 
     private onTouched = () => { };
 
@@ -81,7 +83,7 @@ export class KeyValueInputComponent extends ComponentBase implements ControlValu
 
     private form = new FormGroup({});
 
-    private errorMessages:string[] = [];
+    private errors: string[] = [];
 
     private readonly = false;
 
@@ -90,25 +92,25 @@ export class KeyValueInputComponent extends ComponentBase implements ControlValu
     }
 
     validate(c: FormControl) {
-        this.errorMessages = [];
+        this.errors = [];
 
         if (!this.form.controls['keyForm'].valid && this.form.controls['keyForm'].errors) {
             const errorMessage = this.form.controls['keyForm'].errors['message'] ?
-                                 this.form.controls['keyForm'].errors['message']:
-                                 "Key is not valid.";
+                this.form.controls['keyForm'].errors['message']:
+                "Value is not valid.";
 
-            this.errorMessages.push(errorMessage);
+            this.errors.push(errorMessage);
         }
 
         if (!this.form.controls['valueForm'].valid && this.form.controls['valueForm'].errors) {
             const errorMessage = this.form.controls['valueForm'].errors['message'] ?
-                                 this.form.controls['valueForm'].errors['message']:
-                                 "Value is not valid.";
+                this.form.controls['valueForm'].errors['message']:
+                "Value is not valid.";
 
-            this.errorMessages.push(errorMessage);
+            this.errors.push(errorMessage);
         }
 
-        return this.form.valid ? null: { error: { messages: this.errorMessages }}
+        return this.form.valid ? null: { error: { messages: this.errors }}
     }
 
     writeValue(input: {
@@ -120,8 +122,8 @@ export class KeyValueInputComponent extends ComponentBase implements ControlValu
         this.readonly = input.readonly || false;
 
         this.form = this.formBuilder.group({
-            keyForm: [input.key, this.keyValidator],
-            valueForm: [input.value, this.valueValidator]
+            keyForm: [input.key, Validators.compose(this.keyValidators)],
+            valueForm: [input.value, Validators.compose(this.valueValidators)]
         });
 
         this.tracked = this.form.valueChanges

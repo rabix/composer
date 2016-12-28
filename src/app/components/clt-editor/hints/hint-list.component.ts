@@ -21,7 +21,7 @@ import {ReplaySubject} from "rxjs";
                     [emptyListText]="'Special flags for tool execution'"
                     [keyColumnText]="'Class'"
                     [helpLink]="helpLink"
-                    [keyValidator]="validateClassForm"
+                    [keyValidators]="[validateClassForm]"
                     [context]="context"
                     [formControl]="form"></key-value-list>
             </div>
@@ -70,27 +70,27 @@ export class HintListComponent extends ComponentBase {
     private createFormList(entries: RequirementBaseModel[]): {key: string, value: string, readonly: boolean}[] {
 
         return entries.map((hint: RequirementBaseModel) => {
-                const newHint = {
-                    key: hint['class'],
-                    value: "",
-                    readonly: false
-                };
+            const newHint = {
+                key: hint['class'],
+                value: "",
+                readonly: false
+            };
 
-                if (typeof hint.value === "string" || hint.value instanceof ExpressionModel) {
-                    newHint.value = hint.value;
+            if (typeof hint.value === "string" || hint.value instanceof ExpressionModel) {
+                newHint.value = hint.value;
 
-                } else {
-                    newHint.readonly = true;
+            } else {
+                newHint.readonly = true;
 
-                    if (!!hint.customProps && !hint.value) {
-                        newHint.value = JSON.stringify(hint.customProps);
-                    } else if (hint.value) {
-                        newHint.value = JSON.stringify(hint.value);
-                    }
+                if (!!hint.customProps && !hint.value) {
+                    newHint.value = JSON.stringify(hint.customProps);
+                } else if (hint.value) {
+                    newHint.value = JSON.stringify(hint.value);
                 }
+            }
 
-                return newHint;
-            });
+            return newHint;
+        });
     }
 
     private createHintList(formList: {

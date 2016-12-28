@@ -1,5 +1,5 @@
 import {Component, forwardRef, Input} from "@angular/core";
-import {NG_VALUE_ACCESSOR, ControlValueAccessor, FormGroup, FormControl} from "@angular/forms";
+import {NG_VALUE_ACCESSOR, ControlValueAccessor, FormGroup, FormControl, ValidatorFn} from "@angular/forms";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../components/common/component-base";
 import {GuidService} from "../../../services/guid.service";
@@ -32,14 +32,14 @@ require("./key-value-list.component.scss");
                     <ul class="gui-section-list">
 
                         <li class="col-sm-12 gui-section-list-item clickable row"
-                            *ngFor="let entry of keyValueFormList; let i = index">
+                            *ngFor="let entry of keyValueFormList; let i = index"
+                            [class.invalid-entry]="!form.controls[entry.id].valid">
                         
                             <ct-key-value-input 
                                     [context]="context"
-                                    [class.invalid-entry]="!form.controls[entry.id].valid"
                                     [formControl]="form.controls[entry.id]"
-                                    [keyValidator]="keyValidator"
-                                    [valueValidator]="valueValidator">
+                                    [keyValidators]="keyValidators"
+                                    [valueValidators]="valueValidators">
                                             
                                 <div *ngIf="!!entry" class="col-sm-1 align-right">
                                     <i title="Delete" class="fa fa-trash text-hover-danger" (click)="removeEntry(entry)"></i>
@@ -58,7 +58,6 @@ require("./key-value-list.component.scss");
                 </button>
     `
 })
-//TODO: remove duplicate keys
 export class KeyValueListComponent extends ComponentBase implements ControlValueAccessor {
 
     @Input()
@@ -77,10 +76,10 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
     public valueColumnText = "Value";
 
     @Input()
-    public keyValidator = () => null;
+    public keyValidators: ValidatorFn[] = [() => null];
 
     @Input()
-    public valueValidator = () => null;
+    public valueValidators: ValidatorFn[] = [() => null];
 
     @Input()
     public helpLink = "";
@@ -100,8 +99,18 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
 
     private form = new FormGroup({});
 
+    private currentKeyValueList: {
+        key?: string,
+        value: string | ExpressionModel,
+        readonly?: boolean
+    }[] = [];
+
     constructor(private guidService: GuidService) {
         super();
+    }
+
+    ngOnInit() {
+        this.keyValidators = this.keyValidators.concat(this.duplicateKeyValidator.bind(this));
     }
 
     writeValue(keyValueList: {
@@ -122,9 +131,8 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
         });
 
         this.tracked = this.form.valueChanges.subscribe(change => {
-
-            const newList = Object.keys(change).map(key => change[key]);
-            this.propagateChange(newList);
+            this.currentKeyValueList = Object.keys(change).map(key => change[key]);
+            this.propagateChange(this.currentKeyValueList);
         });
     }
 
@@ -134,6 +142,32 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
 
     registerOnTouched(fn: any): void {
         this.onTouched = fn;
+    }
+
+    private duplicateKeyValidator(c: FormControl): null | {message: string} {
+        /*
+         Here, we insert keys in to the Set and we check if
+         the size before and after adding are the same. If they
+         are the same, it means that we have already seen the current key.
+         */
+
+        let keySet = new Set();
+
+        this.currentKeyValueList.forEach((item) => {
+            if (!!c.value.trim()) {
+                keySet.add(item.key);
+            }
+        });
+
+        const keySetClone = new Set(keySet);
+
+        if (!!c.value.trim() && keySetClone.size === keySet.add(c.value).size) {
+            return {
+                message: "Duplicate keys are not allowed."
+            }
+        }
+
+        return null;
     }
 
     private addEntry(): void {
