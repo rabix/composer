@@ -23,6 +23,8 @@ ct-key-value-input {
 }
 
 .key-container {
+    display: flex;
+
     .key-validation-icon {
         margin: auto;
         color: $brand-danger;

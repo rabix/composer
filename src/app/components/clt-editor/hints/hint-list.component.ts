@@ -23,6 +23,7 @@ import {ReplaySubject} from "rxjs";
                     [helpLink]="helpLink"
                     [keyValidators]="[validateClassForm]"
                     [context]="context"
+                    [allowDuplicateKeys]="false"
                     [formControl]="form"></key-value-list>
             </div>
         </ct-form-panel>

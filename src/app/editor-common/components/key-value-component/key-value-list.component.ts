@@ -82,6 +82,9 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
     public valueValidators: ValidatorFn[] = [() => null];
 
     @Input()
+    public allowDuplicateKeys = true;
+
+    @Input()
     public helpLink = "";
 
     private keyValueFormList: {
@@ -110,7 +113,9 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
     }
 
     ngOnInit() {
-        this.keyValidators = this.keyValidators.concat(this.duplicateKeyValidator.bind(this));
+        if (!this.allowDuplicateKeys) {
+            this.keyValidators = this.keyValidators.concat(this.duplicateKeyValidator.bind(this));
+        }
     }
 
     writeValue(keyValueList: {
