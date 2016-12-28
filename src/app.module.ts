@@ -26,7 +26,6 @@ import {SettingsButtonComponent} from "./app/components/workbox/settings-button.
 import {WorkflowEditorComponent} from "./app/components/workflow-editor/workflow-editor.component";
 import {DockerImageFormComponent} from "./app/components/forms/inputs/forms/docker-image-form.component";
 import {BaseCommandFormComponent} from "./app/components/forms/inputs/forms/base-command-form.component";
-import {ToolHeaderComponent} from "./app/components/tool-editor/tool-header/tool-header.component";
 import {CommandLineComponent} from "./app/components/clt-editor/commandline/commandline.component";
 import {ModalComponent, ModalService} from "./app/components/modal";
 import {ConfirmComponent} from "./app/components/modal/common/confirm.component";
@@ -88,7 +87,6 @@ import {DomEventService} from "./app/services/dom/dom-event.service";
         StructurePanelComponent,
         TabManagerComponent,
         ToolEditorComponent,
-        ToolHeaderComponent,
         ValidationIssuesComponent,
         ViewModeSwitchComponent,
         WorkboxComponent,

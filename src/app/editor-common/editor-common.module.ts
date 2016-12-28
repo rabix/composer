@@ -20,48 +20,53 @@ import {ExpressionModelListComponent} from "./components/expression-model-list/e
 import {ValidationComponent} from "./components/validation-preview/validation-preview.component";
 import {ValidationTextPipe} from "./pipes/validation-text.pipes";
 import {ValidationClassDirective} from "./components/validation-preview/validation-class.directive";
+import {EditorControlsComponent} from "./components/editor-controls/editor-controls.component";
+import {RevisionListComponent} from "./components/revision-list/revision-list.component";
 import {KeyValueInputComponent} from "./components/key-value-component/key-value-input.component";
 import {KeyValueListComponent} from "./components/key-value-component/key-value-list.component";
 
 @NgModule({
     declarations: [
         BlankToolStateComponent,
+        EditorControlsComponent,
         EditorInspectorComponent,
         EditorInspectorContentComponent,
+        EditorInspectorDirective,
         ExpressionEditorComponent,
+        ExpressionInputComponent,
+        ExpressionInputComponent,
         FileDefContentPipe,
         FileDefNamePipe,
-        ValidationTextPipe,
-        EditorInspectorDirective,
-        ExpressionInputComponent,
+        ModelExpressionEditorComponent,
         QuickPickComponent,
         ToggleComponent,
-        ValidationComponent,
         ValidationClassDirective,
-        ModelExpressionEditorComponent,
-        CompactListComponent,
-        EditableDirective,
-        ExpressionModelListComponent,
-        KeyValueInputComponent,
-        KeyValueListComponent
+        ValidationComponent,
+        ValidationTextPipe,
+        RevisionListComponent
     ],
     exports: [
         BlankToolStateComponent,
+        EditorControlsComponent,
+        EditorInspectorComponent,
+        EditorInspectorContentComponent,
+        EditorInspectorDirective,
         ExpressionEditorComponent,
+        ExpressionInputComponent,
+        ExpressionInputComponent,
         FileDefContentPipe,
         FileDefNamePipe,
         ToggleComponent,
         ModelExpressionEditorComponent,
-        EditorInspectorDirective,
-        EditorInspectorComponent,
-        ExpressionInputComponent,
-        EditorInspectorContentComponent,
         QuickPickComponent,
+        ToggleComponent,
+        ValidationClassDirective,
         CompactListComponent,
         EditableDirective,
         ExpressionModelListComponent,
         QuickPickComponent,
         ValidationComponent,
+        RevisionListComponent,
         ValidationClassDirective,
         KeyValueInputComponent,
         KeyValueListComponent

@@ -3,7 +3,7 @@ import {FormControl, NG_VALUE_ACCESSOR, ControlValueAccessor} from "@angular/for
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../components/common/component-base";
 import {noop} from "../../../lib/utils.lib";
-import {BehaviorSubject} from "rxjs";
+import {AsyncSubject} from "rxjs";
 import {Expression} from "cwlts/mappings/d2sb/Expression";
 
 require("./quick-pick.component.scss");
@@ -66,7 +66,7 @@ export class QuickPickComponent extends ComponentBase implements ControlValueAcc
     public type: "string" | "number" = "string";
 
     @Output()
-    public update = BehaviorSubject<any>();
+    public update = new AsyncSubject<any>();
 
     private showCustom = false;
 

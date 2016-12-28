@@ -8,9 +8,6 @@ import {ComponentBase} from "../common/component-base";
     selector: 'ct-file-editor',
     template: `
         <div class="editor-container">
-            <tool-header class="editor-header"
-                         (save)="save($event)"
-                         [data]="data"></tool-header>
         
             <div class="scroll-content">
                 <!--Put Code Editor Here-->

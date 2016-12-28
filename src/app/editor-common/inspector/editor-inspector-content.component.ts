@@ -19,7 +19,7 @@ require("./editor-inspector-content.component.scss");
 
             <div *ngIf="!collapsed" class="gui-section-body row show">
                 <div class="col-xs-12">
-                    <ng-content select=".tc-body"></ng-content>
+                    <ng-content class="col-xs-12" select=".tc-body"></ng-content>
                 </div>
             </div>
         </div>

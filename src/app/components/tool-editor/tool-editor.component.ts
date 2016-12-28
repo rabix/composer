@@ -31,12 +31,35 @@ require("./tool-editor.component.scss");
         <block-loader *ngIf="isLoading"></block-loader>
         
         <div class="editor-container" [hidden]="isLoading">
-                    
-            <!--Header Row-->
-            <tool-header class="editor-header flex-row"
-                 (save)="save($event)"
-                 [fileIsValid]="isValidCWL"
-                 [data]="data"></tool-header>
+        
+            <!--Control Header-->
+            <ct-editor-controls>
+                <!--Revisions-->
+                <button class="btn btn-secondary btn-sm" type="button"
+                        [ct-editor-inspector]="revisions"
+                        *ngIf="toolModel.customProps['sbg:revision']">
+                        Revision: {{ toolModel.customProps['sbg:revision']}}
+                        
+                        <template #revisions>
+                            <ct-revision-list [active]="toolModel.customProps['sbg:revision']" 
+                                              [revisions]="toolModel.customProps['sbg:revisionsInfo']"
+                                              (select)="openRevision($event)">
+                            </ct-revision-list>
+                        </template>
+                </button>
+                
+                <!--Copy-->
+                <button class="btn btn-secondary btn-sm" type="button">
+                    Copy...
+                </button>
+                
+                <!--Save-->
+                <button [disabled]="!data.isWritable" 
+                        class="btn btn-secondary btn-sm" type="button">
+                        Save
+                </button>
+            </ct-editor-controls>
+
                     
             <!--Header & Editor Column-->
             <div class="editor-content flex-row">
@@ -81,24 +104,6 @@ require("./tool-editor.component.scss");
                     </ct-view-mode-switch>
                 </div>
             </div>
-                
-            
-                <!--Document/Tool Editor Scrollable Container-->
-                <!--<div class="scroll-content flex-container">-->
-                    <!--<div class="flex-row">-->
-                           <!---->
-                            <!--&lt;!&ndash;Code Editor&ndash;&gt;-->
-                            
-                    <!--</div>-->
-                <!--</div>-->
-            
-            <!--<div class="inspector-block"></div>-->
-            <!---->
-            <!--<ct-editor-inspector class="col-xs-6">-->
-                <!--<template #inspector></template>-->
-            <!--</ct-editor-inspector>-->
-            <!---->
-           
         </div>
     `
 })
@@ -299,6 +304,10 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
      */
     private selectBottomPanel(panel: "validation"|"commandLineTool") {
         this.bottomPanel = this.bottomPanel === panel ? null : panel;
+    }
+
+    private openRevision(revisionNumber: number) {
+        console.log("Should open revision Number", revisionNumber);
     }
 
     ngAfterViewInit() {

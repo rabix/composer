@@ -1,4 +1,4 @@
-import {Component, ChangeDetectionStrategy, Input, ChangeDetectorRef, NgZone} from "@angular/core";
+import {ChangeDetectionStrategy, Input, ChangeDetectorRef, NgZone, Component} from "@angular/core";
 import {FormControl} from "@angular/forms";
 import {Observable} from "rxjs";
 
