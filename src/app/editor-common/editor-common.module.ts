@@ -13,7 +13,6 @@ import {ToggleComponent} from "./components/toggle-slider/toggle-slider.componen
 import {ExpressionInputComponent} from "./components/expression-input/expression-input.component";
 import {CoreModule} from "../core/core.module";
 import {ModelExpressionEditorComponent} from "./expression-editor/model-expression-editor.component";
-import {ExpressionInputComponent} from "./components/expression-input/expression-input.component";
 import {CompactListComponent} from "./components/compact-list/compact-list.component";
 import {EditableDirective} from "./directives/editable.directive";
 import {ExpressionModelListComponent} from "./components/expression-model-list/expression-model-list.component";
@@ -34,7 +33,6 @@ import {KeyValueListComponent} from "./components/key-value-component/key-value-
         EditorInspectorDirective,
         ExpressionEditorComponent,
         ExpressionInputComponent,
-        ExpressionInputComponent,
         FileDefContentPipe,
         FileDefNamePipe,
         ModelExpressionEditorComponent,
@@ -43,7 +41,12 @@ import {KeyValueListComponent} from "./components/key-value-component/key-value-
         ValidationClassDirective,
         ValidationComponent,
         ValidationTextPipe,
-        RevisionListComponent
+        RevisionListComponent,
+        CompactListComponent,
+        EditableDirective,
+        ExpressionModelListComponent,
+        KeyValueInputComponent,
+        KeyValueListComponent
     ],
     exports: [
         BlankToolStateComponent,
@@ -52,7 +55,6 @@ import {KeyValueListComponent} from "./components/key-value-component/key-value-
         EditorInspectorContentComponent,
         EditorInspectorDirective,
         ExpressionEditorComponent,
-        ExpressionInputComponent,
         ExpressionInputComponent,
         FileDefContentPipe,
         FileDefNamePipe,
