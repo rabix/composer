@@ -29,9 +29,9 @@ require("./clt-editor.component.scss");
                                    (updateStreams)="setStreams($event)">
                 </base-command-form>
                                 
-                <ct-tool-input-list [location]="model.loc + '.inputs'" [entries]="model.inputs" 
+                <ct-tool-input [location]="model.loc + '.inputs'" [entries]="model.inputs" 
                               (update)="updateModel('inputs', $event)">                             
-                </ct-tool-input-list>
+                </ct-tool-input>
                 
                 <ct-tool-output-list [location]="model.loc + '.outputs'" [entries]="model.outputs || []" 
                               [inputs]="model.inputs || []" 

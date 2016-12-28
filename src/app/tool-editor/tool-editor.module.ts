@@ -6,7 +6,8 @@ import {EditorCommonModule} from "../editor-common/editor-common.module";
 import {ArgumentListComponent} from "./sections/arguments/argument-list.component";
 import {FileDefListComponent} from "./sections/file-def-list/file-def-list.component";
 import {ResourcesComponent} from "./sections/resources/resources.component";
-import {ToolInputListComponent} from "./sections/inputs/tool-input-list.component";
+import {ToolInputComponent} from "./sections/inputs/tool-input.component";
+import {ToolInputListComponent} from "./sections/inputs/tool-input-list-component";
 import {ToolOutputListComponent} from "./sections/outputs/tool-output-list.component";
 
 import {CWLModule} from "../cwl/cwl.module";
@@ -34,8 +35,9 @@ import {EditableDirective} from "../directives/editable.directive";
         ArgumentListComponent,
         ArgumentInspector,
         FileDefListComponent,
-        ToolInputListComponent,
+        ToolInputComponent,
         ToolInputInspector,
+        ToolInputListComponent,
         ToolOutputListComponent,
         ToolOutputInspector,
         BasicInputSectionComponent,
@@ -58,6 +60,7 @@ import {EditableDirective} from "../directives/editable.directive";
         FileDefListComponent,
         ResourcesComponent,
         ToolInputListComponent,
+        ToolInputComponent,
         ToolInputInspector,
         ToolOutputListComponent,
         ToolOutputInspector,
