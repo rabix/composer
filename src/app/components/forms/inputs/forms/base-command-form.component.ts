@@ -9,7 +9,7 @@ import {CustomValidators} from "../../../../validators/custom.validator";
 require("./base-command-form.components.scss");
 
 @Component({
-    selector: 'base-command-form',
+    selector: 'ct-base-command-form',
     template: `<ct-form-panel>
     <div class="tc-header">
         Base Command

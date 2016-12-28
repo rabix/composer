@@ -26,6 +26,7 @@ import {StageInputSectionComponent} from "./object-inspector/input-inspector/sta
 import {OutputEvalSectionComponent} from "./object-inspector/output-inspector/output-eval-section/output-eval.component";
 import {CompactListComponent} from "../components/compact-list/compact-list.component";
 import {EditableDirective} from "../directives/editable.directive";
+import {FileDefInspectorComponent} from "./sections/file-def-list/file-def-inspector.component";
 
 
 
@@ -43,6 +44,7 @@ import {EditableDirective} from "../directives/editable.directive";
         InputTypeSelectComponent,
         DescriptionComponent,
         InputBindingSectionComponent,
+        FileDefInspectorComponent,
         SymbolsComponent,
         SecondaryFilesComponent,
         OutputMetaDataSectionComponent,
@@ -63,6 +65,7 @@ import {EditableDirective} from "../directives/editable.directive";
         ToolOutputInspector,
         BasicInputSectionComponent,
         BasicOutputSectionComponent,
+        FileDefInspectorComponent,
         DescriptionComponent,
         StageInputSectionComponent,
         OutputEvalSectionComponent,

@@ -20,7 +20,7 @@ import {PrimitiveParameterType} from "../../../../../../node_modules/cwlts/model
 require("./basic-input-section.component.scss");
 
 @Component({
-    selector: "basic-input-section",
+    selector: "ct-basic-input-section",
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
