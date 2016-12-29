@@ -71,7 +71,7 @@ export class HintListComponent extends ComponentBase {
     private createFormList(entries: RequirementBaseModel[]): {key: string, value: string, readonly: boolean}[] {
 
         return entries.map((hint: RequirementBaseModel) => {
-            const newHint = {
+            let newHint = {
                 key: hint['class'],
                 value: "",
                 readonly: false

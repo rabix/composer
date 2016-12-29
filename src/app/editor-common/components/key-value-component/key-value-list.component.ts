@@ -150,11 +150,9 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
     }
 
     private duplicateKeyValidator(c: FormControl): null | {message: string} {
-        /*
-         Here, we insert keys in to the Set and we check if
-         the size before and after adding are the same. If they
-         are the same, it means that we have already seen the current key.
-         */
+        if (!c.value) {
+            return null;
+        }
 
         let keySet = new Set();
 
