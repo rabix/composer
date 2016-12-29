@@ -122,6 +122,13 @@ ct-tool-editor {
     color: $arg-color;
 }
 
+.input-list-items {
+    border-radius: $gui-section-list-item-border-radius;
+    border:1px solid $gui-section-list-item-bg;
+    margin-bottom: 10px;
+    list-style: none;
+}
+
 //@todo(maya) belongs with tool editor or form components
 .gui-section-list-item {
     transition: all .2s;

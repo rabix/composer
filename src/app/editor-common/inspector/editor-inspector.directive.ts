@@ -28,8 +28,9 @@ export class EditorInspectorDirective extends ComponentBase {
             });
     }
 
-    @HostListener("click")
-    public open() {
+    @HostListener("click", ["$event"])
+    public open(event: any) {
+        event.stopPropagation();
         this.inspector.show(this.content, this.target);
     }
 
