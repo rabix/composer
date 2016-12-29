@@ -131,8 +131,8 @@ export class KeyValueInputComponent extends ComponentBase implements ControlValu
         this.tracked = this.form.valueChanges
             .distinctUntilChanged()
             .subscribe(_ => {
-                const keyValue = this.form.controls['keyForm'].valid ? this.form.controls['keyForm'].value : new ExpressionModel();
-                const valueInput = this.form.controls['valueForm'].valid ? this.form.controls['valueForm'].value : new ExpressionModel();
+                const keyValue = this.form.controls['keyForm'].valid ? this.form.controls['keyForm'].value : "";
+                const valueInput = this.form.controls['valueForm'].valid ? this.form.controls['valueForm'].value : "";
 
                 this.propagateChange({
                     key: keyValue,
