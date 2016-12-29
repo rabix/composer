@@ -8,16 +8,20 @@ import {FileDef} from "cwlts/mappings/d2sb/FileDef";
 @Component({
     selector: 'ct-file-def-inspector',
     template: `<form *ngIf="form">
-    <label class="form-control-label">File Name</label>
-    <ct-expression-input [formControl]="form.controls['filename']"
-                         [context]="context">
-    </ct-expression-input>
-
-    <label class="form-control-label">File Content</label>
-    <ct-literal-expression-input [formControl]="form.controls['fileContent']"
-                         [fileName]="fileName"
-                         [context]="context">
-    </ct-literal-expression-input>
+    <div class="form-group file-name">
+        <label class="form-control-label">File Name</label>
+        <ct-expression-input [formControl]="form.controls['filename']"
+                             [context]="context">
+        </ct-expression-input>
+    </div>
+    
+    <div class="form-group file-content">
+        <label class="form-control-label">File Content</label>
+        <ct-literal-expression-input [formControl]="form.controls['fileContent']"
+                             [fileName]="fileName"
+                             [context]="context">
+        </ct-literal-expression-input> 
+    </div>
 </form>`
 })
 export class FileDefInspectorComponent extends ComponentBase {

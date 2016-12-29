@@ -1,7 +1,5 @@
 import {Component} from "@angular/core";
 import {ReplaySubject, Observable, Subject} from "rxjs";
-import {EventHubService} from "../../services/event-hub/event-hub.service";
-import {OpenTabAction} from "../../action-events";
 import {DataEntrySource} from "../../sources/common/interfaces";
 import {SettingsService} from "../../services/settings/settings.service";
 import {SBPlatformDataSourceService} from "../../sources/sbg/sb-platform.source.service";
@@ -11,8 +9,9 @@ import {ModalService} from "../modal/modal.service";
 import {NewFileModalComponent} from "../modal/custom/new-file-modal.component";
 import {ProjectSelectionModal} from "../modal/custom/project-selection-modal.component";
 import {ComponentBase} from "../common/component-base";
-import {MenuItem} from "../../core/ui/menu/menu-item"
+import {MenuItem} from "../../core/ui/menu/menu-item";
 import {UserProjectsService} from "../../platform-providers/user-projects/user-projects.service";
+import {WorkboxService} from "../workbox/workbox.service";
 
 @Component({
     selector: "ct-sb-user-projects-panel",
@@ -58,7 +57,7 @@ export class SBUserProjectsPanelComponent extends ComponentBase {
     private projectUpdates = new Subject();
 
     constructor(private dataSource: SBPlatformDataSourceService,
-                private eventHub: EventHubService,
+                private workbox: WorkboxService,
                 private preferences: UserPreferencesService,
                 private modal: ModalService,
                 private settings: SettingsService,
@@ -96,7 +95,11 @@ export class SBUserProjectsPanelComponent extends ComponentBase {
 
         this.openProjects
             .withLatestFrom(this.preferences.get("open_projects", {}),
-                this.settings.platformConfiguration, (nodes, projects, conf) => ({nodes, projects, conf}))
+                this.settings.platformConfiguration, (nodes, projects, conf) => ({
+                    nodes,
+                    projects,
+                    conf
+                }))
             .subscribe(data => {
                 this.isLoading = false;
                 this.nodes.next(data.nodes);
@@ -105,7 +108,7 @@ export class SBUserProjectsPanelComponent extends ComponentBase {
                 }));
             });
 
-        this.projectUpdates.withLatestFrom(this.allProjects, (update, projects) => update(projects))
+        this.projectUpdates.withLatestFrom(this.allProjects, (update: Function, projects) => update(projects))
             .subscribe(this.allProjects);
 
     }
@@ -133,12 +136,12 @@ export class SBUserProjectsPanelComponent extends ComponentBase {
                     content: source.content,
                     contextMenu: this.contextMenu.getContextMenu(source.data.label, source.content),
                     openHandler: _ => {
-                        this.eventHub.publish(new OpenTabAction({
+                        this.workbox.openTab({
                             id: source.data.class + "_" + source.data.label,
                             title: Observable.of(source.data.label),
                             contentType: Observable.of(source.data.class),
                             contentData: source
-                        }));
+                        });
                     }
                 })))
         }
@@ -160,7 +163,7 @@ export class SBUserProjectsPanelComponent extends ComponentBase {
         });
 
         component.closedProjects = this.closedProjects;
-        component.save = (projectID) => {
+        component.save           = (projectID) => {
             this.setProjectStatus(projectID, true);
             this.allProjects.first().subscribe(x => component.closeModal());
         };

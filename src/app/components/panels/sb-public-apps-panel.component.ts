@@ -1,13 +1,10 @@
 import {Observable, BehaviorSubject} from "rxjs";
 import {Component} from "@angular/core";
-import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {PlatformAppEntry} from "../../services/api/platforms/platform-api.types";
 import {SettingsService} from "../../services/settings/settings.service";
-import {OpenTabAction} from "../../action-events/index";
-import {OpenTabAction} from "../../action-events/index";
 import {PublicAppService} from "../../platform-providers/public-apps/public-app.service";
-import {MenuItem} from "../../core/ui/menu/menu-item"
+import {WorkboxService} from "../workbox/workbox.service";
 @Component({
     selector: "ct-sb-public-apps-panel",
     host: {class: "block"},
@@ -25,12 +22,12 @@ import {MenuItem} from "../../core/ui/menu/menu-item"
 })
 export class SBPublicAppsPanelComponent {
 
-    private nodes = [];
+    public nodes = [];
 
-    private isLoading = false;
+    public isLoading = false;
 
     constructor(private platform: PlatformAPI,
-                private eventHub: EventHubService,
+                private workbox: WorkboxService,
                 private settings: SettingsService,
                 private contextMenu: PublicAppService) {
     }
@@ -49,11 +46,10 @@ export class SBPublicAppsPanelComponent {
                         name: app.label,
                         icon: app.class || "file",
                         isExpandable: false,
-                        toolkit: app["sbg:toolkit"],
                         content,
                         contextMenu: this.contextMenu.getContextMenu(app.label, content),
                         openHandler: _ => {
-                            this.eventHub.publish(new OpenTabAction({
+                            this.workbox.openTab({
                                 id: app.id,
                                 title: Observable.of(app.label),
                                 contentType: Observable.of(app.class),
@@ -63,13 +59,13 @@ export class SBPublicAppsPanelComponent {
                                     content,
                                     language: Observable.of("json")
                                 }
-                            }));
+                            });
                         }
                     };
 
                 }).reduce((acc, app: PlatformAppEntry) => {
                     //noinspection TypeScriptUnresolvedVariable
-                    acc[app.toolkit] = [].concat.apply(acc[app.toolkit] || [], [app]);
+                    acc[app["sbg:toolkit"]] = [].concat.apply(acc[app["sbg:toolkit"]] || [], [app]);
                     return acc;
                 }, {});
 
@@ -87,7 +83,7 @@ export class SBPublicAppsPanelComponent {
 
             })).subscribe(categories => {
             this.isLoading = false;
-            this.nodes = categories;
+            this.nodes     = categories;
         }, err => {
             this.isLoading = false;
         });

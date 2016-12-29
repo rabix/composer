@@ -1,16 +1,16 @@
-import {Component, ChangeDetectionStrategy, Input, ChangeDetectorRef, NgZone} from "@angular/core";
-import {LocalDataSourceService} from "../../sources/local/local.source.service";
-import {Observable} from "rxjs";
-import {EventHubService} from "../../services/event-hub/event-hub.service";
-import {IpcService} from "../../services/ipc.service";
-import {ModalService} from "../modal/modal.service";
-import {NewFileModalComponent} from "../modal/custom/new-file-modal.component";
-import {OpenTabAction} from "../../action-events/index";
-import {noop} from "../../lib/utils.lib";
-import {UserPreferencesService} from "../../services/storage/user-preferences.service";
+import {ChangeDetectionStrategy, Input, ChangeDetectorRef, NgZone, Component} from "@angular/core";
 import {FormControl} from "@angular/forms";
-import {ComponentBase} from "../common/component-base";
+import {Observable} from "rxjs";
+
+import {noop} from "../../lib/utils.lib";
+import {ModalService} from "../modal/modal.service";
+import {IpcService} from "../../services/ipc.service";
 import {MenuItem} from "../../core/ui/menu/menu-item";
+import {ComponentBase} from "../common/component-base";
+import {WorkboxService} from "../workbox/workbox.service";
+import {NewFileModalComponent} from "../modal/custom/new-file-modal.component";
+import {LocalDataSourceService} from "../../sources/local/local.source.service";
+import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 
 const {app, dialog} = window.require("electron").remote;
 
@@ -35,16 +35,16 @@ export class LocalFilesPanelComponent extends ComponentBase {
     private nodes = [];
 
     constructor(private modal: ModalService,
-                private eventHub: EventHubService,
                 private fs: LocalDataSourceService,
                 private ipc: IpcService,
                 private detector: ChangeDetectorRef,
+                private workbox: WorkboxService,
                 private zone: NgZone,
                 private preferences: UserPreferencesService) {
         super();
     }
 
-    private ngOnInit() {
+    ngOnInit() {
         this.tracked = this.preferences.get("local_open_folders", []).subscribe(files => this.addDirectory(...files));
     }
 
@@ -101,7 +101,7 @@ export class LocalFilesPanelComponent extends ComponentBase {
                     contextMenu: this.createContextMenu(item),
                     childrenProvider: item.isReadable ? this.recursivelyMapChildrenToNodes(item.childrenProvider) : undefined,
                     openHandler: item.isReadable ? () => {
-                        this.eventHub.publish(this.createOpenFileTabAction(item));
+                        this.openTab(item);
                     } : undefined
                 }
             }));
@@ -145,17 +145,20 @@ export class LocalFilesPanelComponent extends ComponentBase {
     }
 
     private createNewFileModal(path) {
-        const component = this.modal.show<NewFileModalComponent>(NewFileModalComponent, {
+        const component = this.modal.show(NewFileModalComponent, {
             title: "Create new File...",
             closeOnOutsideClick: true,
             closeOnEscape: true
         });
+
         component.basePath = path;
 
         component.save = (path, content) => {
             const creation = this.fs.createFile(path, content).share();
 
-            creation.subscribe(file => this.eventHub.publish(this.createOpenFileTabAction(file)), noop);
+            creation.subscribe(file => {
+                this.openTab(file);
+            });
 
             return creation;
         }
@@ -182,8 +185,9 @@ export class LocalFilesPanelComponent extends ComponentBase {
         }, noop);
     }
 
-    private createOpenFileTabAction(file) {
-        return new OpenTabAction({
+    private openTab(file) {
+
+        this.workbox.openTab({
             id: file.path,
             title: Observable.of(file.name),
             contentType: Observable.of(file.type || "Code"),
@@ -193,7 +197,7 @@ export class LocalFilesPanelComponent extends ComponentBase {
                 content: file.content,
                 language: Observable.of(file.language)
             }
-        })
+        });
     }
 
     private promptForDirectory() {

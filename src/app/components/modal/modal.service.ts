@@ -31,7 +31,7 @@ export class ModalService {
     /**
      * Open a modal window with the given component inside it.
      */
-    public show<T>(component: {new(): T;}, options?: ModalOptions): T {
+    public show<T>(component: {new():T;}, options?: ModalOptions): T {
 
         const config = Object.assign({
             backdrop: false,

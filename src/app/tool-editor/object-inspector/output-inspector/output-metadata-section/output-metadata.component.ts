@@ -15,7 +15,7 @@ require("./output-metadata.component.scss");
     ],
     template: `
 <ct-form-panel *ngIf="output.type.type === 'File' || (output.type.type === 'array' && output.type.items === 'File')" 
-        [borderless]="true" [collapsed]="true">
+        class="borderless" [collapsed]="true">
 
     <div class="tc-header">Metadata</div>
     <div class="tc-body" *ngIf="metadataForm">

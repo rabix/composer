@@ -3,6 +3,7 @@
 
 ct-literal-expression-input {
   .textarea-btn-group {
+    height: 100%;
     position: relative;
 
     .btn-group {
@@ -21,10 +22,6 @@ ct-literal-expression-input {
           border-top-right-radius: $border-radius;
         }
       }
-    }
-
-    textarea {
-      height: 500px;
     }
   }
 }

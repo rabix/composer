@@ -18,4 +18,8 @@ import {WebWorkerService} from "../../services/web-worker/web-worker.service";
 export class TabManagerComponent {
     @Input()
     public tab: TabData<any>;
+
+    constructor(){
+        console.log("Constructing a tab thing");
+    }
 }

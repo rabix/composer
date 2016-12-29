@@ -16,40 +16,46 @@ import {ModelExpressionEditorComponent} from "./expression-editor/model-expressi
 import {ValidationComponent} from "./components/validation-preview/validation-preview.component";
 import {ValidationTextPipe} from "./pipes/validation-text.pipes";
 import {ValidationClassDirective} from "./components/validation-preview/validation-class.directive";
+import {EditorControlsComponent} from "./components/editor-controls/editor-controls.component";
+import {RevisionListComponent} from "./components/revision-list/revision-list.component";
 
 @NgModule({
     declarations: [
         BlankToolStateComponent,
+        EditorControlsComponent,
         EditorInspectorComponent,
         EditorInspectorContentComponent,
+        EditorInspectorDirective,
         ExpressionEditorComponent,
+        ExpressionInputComponent,
+        ExpressionInputComponent,
         FileDefContentPipe,
         FileDefNamePipe,
-        ValidationTextPipe,
-        EditorInspectorDirective,
-        ExpressionInputComponent,
+        ModelExpressionEditorComponent,
         QuickPickComponent,
         ToggleComponent,
-        ExpressionInputComponent,
-        ValidationComponent,
         ValidationClassDirective,
-        ModelExpressionEditorComponent,
+        ValidationComponent,
+        ValidationTextPipe,
+        RevisionListComponent
     ],
     exports: [
         BlankToolStateComponent,
+        EditorControlsComponent,
+        EditorInspectorComponent,
+        EditorInspectorContentComponent,
+        EditorInspectorDirective,
         ExpressionEditorComponent,
+        ExpressionInputComponent,
+        ExpressionInputComponent,
         FileDefContentPipe,
         FileDefNamePipe,
-        ToggleComponent,
-        ExpressionInputComponent,
         ModelExpressionEditorComponent,
-        EditorInspectorDirective,
-        EditorInspectorComponent,
-        ExpressionInputComponent,
-        EditorInspectorContentComponent,
         QuickPickComponent,
+        ToggleComponent,
+        ValidationClassDirective,
         ValidationComponent,
-        ValidationClassDirective
+        RevisionListComponent,
     ],
     entryComponents: [
         EditorInspectorComponent,

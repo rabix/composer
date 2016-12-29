@@ -21,7 +21,7 @@ try {
  */
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ForkCheckerPlugin = require('awesome-typescript-loader').ForkCheckerPlugin;
+const CheckerPlugin = require('awesome-typescript-loader').CheckerPlugin;
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 /*
@@ -174,7 +174,7 @@ module.exports = {
          *
          * See: https://github.com/s-panferov/awesome-typescript-loader#forkchecker-boolean-defaultfalse
          */
-        new ForkCheckerPlugin(),
+        new CheckerPlugin(),
 
         /*
          * Plugin: OccurenceOrderPlugin

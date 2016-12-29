@@ -109,15 +109,14 @@ export class LayoutComponent extends ComponentBase implements OnInit {
 
         // Layout is resizable, so we need to react when user drags the handle
         this.tracked = this.domEvents.onDrag(this.handle.nativeElement)
-            .do(data => console.debug("Got data", data))
             .map(ev => {
             const x = ev.clientX;
 
             // You can't make the left column narrower than 200px
             const leftMargin = 200;
 
-            // And you can't make the right column narrower than 200px
-            const rightMargin = document.body.clientWidth - 200;
+            // And you can't make the right column narrower than 400px
+            const rightMargin = document.body.clientWidth - 400;
 
             // So if you've reached the limit, stop updating the aspect ratio
             if (x < leftMargin) {

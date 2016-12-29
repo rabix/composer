@@ -7,11 +7,11 @@ require("./editor-inspector-content.component.scss");
     selector: "ct-editor-inspector-content",
     template: `
         <div class="form-section container">
-            <div class="row">
+            <div class="row header pt-1 pb-1">
                 <div class="col-xs-12">
                     <i class="fa clickable pull-right fa-times"
                        (click)="close()"></i>
-                    <h3 class="gui-section-header">
+                    <h3 class="gui-section-header ">
                         <ng-content select=".tc-header"></ng-content>
                     </h3>
                 </div>
@@ -19,7 +19,7 @@ require("./editor-inspector-content.component.scss");
 
             <div *ngIf="!collapsed" class="gui-section-body row show">
                 <div class="col-xs-12">
-                    <ng-content select=".tc-body"></ng-content>
+                    <ng-content class="col-xs-12" select=".tc-body"></ng-content>
                 </div>
             </div>
         </div>

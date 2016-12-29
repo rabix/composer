@@ -1,0 +1,15 @@
+@import "../../../../assets/sass/variables";
+
+ct-file-def-inspector {
+  display: flex;
+  flex-direction: column;
+
+  .file-content {
+    flex-grow: 1;
+    height: 500px;
+  }
+
+  ct-literal-expression-input {
+
+  }
+}

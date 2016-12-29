@@ -1,5 +1,4 @@
 import {EventHubService} from "./event-hub/event-hub.service";
-import {UpdateFileAction, OpenFileRequestAction} from "../action-events/index";
 import {FileModel} from "../store/models/fs.models";
 import {HashCache} from "../lib/cache.lib";
 import {Injectable} from "@angular/core";
@@ -15,11 +14,11 @@ export class FileRegistry {
 
         this.fileCache = new HashCache<FileModel>({}, (a, b) => a.isChangedSince(b));
 
-        this.eventHub.onValueFrom(OpenFileRequestAction)
-            .subscribe(file => this.fileCache.put(file.id, file));
-
-        this.eventHub.onValueFrom(UpdateFileAction)
-            .subscribe(file => this.fileCache.put(file.id, file));
+        // this.eventHub.onValueFrom(OpenFileRequestAction)
+        //     .subscribe(file => this.fileCache.put(file.id, file));
+        //
+        // this.eventHub.onValueFrom(UpdateFileAction)
+        //     .subscribe(file => this.fileCache.put(file.id, file));
 
         // this.eventHub.on(CreateFileRequestAction)
         //     .flatMap(action => {
