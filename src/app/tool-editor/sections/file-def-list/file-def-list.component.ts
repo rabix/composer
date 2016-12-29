@@ -13,6 +13,8 @@ import {FileDefModel} from "cwlts/models/d2sb";
 import {Subject} from "rxjs";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 
+require("./file-def-inspector.component.scss");
+
 @Component({
     selector: "ct-file-def-list",
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -138,12 +140,7 @@ export class FileDefListComponent extends ComponentBase {
     }
 
     private updateFileDef(newDef: FileDef, index: number) {
-        const def = this.entries[index];
-
-        console.log("def gotten from inspector", newDef);
         this.entries[index] = new FileDefModel(newDef);
-
-        console.log("def written to entries", this.entries[index]);
         this.update.next(this.entries.slice());
     }
 }

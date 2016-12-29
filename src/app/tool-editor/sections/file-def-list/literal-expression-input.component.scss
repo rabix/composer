@@ -1,7 +1,8 @@
 @import "../../../../assets/sass/variables";
 
-
 ct-literal-expression-input {
+  display: block;
+
   .textarea-btn-group {
     height: 100%;
     position: relative;
