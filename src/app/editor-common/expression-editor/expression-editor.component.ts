@@ -9,7 +9,7 @@ require("./expression-editor.component.scss");
 @Component({
     selector: "ct-expression-editor",
     template: `
-        <div class="p-0 flex-row-container" style="width:1024px;height: 600px;">
+        <div class="p-0 flex-row-container modal-large">
             
             <div class="main-row">
                 <div class="flex-col code-col">
@@ -25,7 +25,7 @@ require("./expression-editor.component.scss");
                     <div class="title">Output:</div>
                     <div class="code-preview">
                         
-                        <ct-code-editor-x  [content]="previewContent" [language]="'javascript'" [options]="{
+                        <ct-code-editor-x  [content]="previewContent" [language]="'json'" [options]="{
                             'theme': 'ace/theme/monokai',
                             'showGutter': false,
                             'wrap': true,

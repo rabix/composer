@@ -13,7 +13,6 @@ import {ToggleComponent} from "./components/toggle-slider/toggle-slider.componen
 import {ExpressionInputComponent} from "./components/expression-input/expression-input.component";
 import {CoreModule} from "../core/core.module";
 import {ModelExpressionEditorComponent} from "./expression-editor/model-expression-editor.component";
-import {ExpressionInputComponent} from "./components/expression-input/expression-input.component";
 import {ValidationComponent} from "./components/validation-preview/validation-preview.component";
 import {ValidationTextPipe} from "./pipes/validation-text.pipes";
 import {ValidationClassDirective} from "./components/validation-preview/validation-class.directive";

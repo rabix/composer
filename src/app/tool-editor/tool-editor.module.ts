@@ -27,6 +27,7 @@ import {OutputEvalSectionComponent} from "./object-inspector/output-inspector/ou
 import {CompactListComponent} from "../components/compact-list/compact-list.component";
 import {EditableDirective} from "../directives/editable.directive";
 import {FileDefInspectorComponent} from "./sections/file-def-list/file-def-inspector.component";
+import {LiteralExpressionInputComponent} from "./sections/file-def-list/literal-expression-input.component";
 
 
 
@@ -52,7 +53,8 @@ import {FileDefInspectorComponent} from "./sections/file-def-list/file-def-inspe
         OutputEvalSectionComponent,
         ResourcesComponent,
         CompactListComponent,
-        EditableDirective
+        EditableDirective,
+        LiteralExpressionInputComponent
     ],
     exports: [
         ArgumentListComponent,
@@ -71,7 +73,8 @@ import {FileDefInspectorComponent} from "./sections/file-def-list/file-def-inspe
         OutputEvalSectionComponent,
         OutputMetaDataSectionComponent,
         CompactListComponent,
-        EditableDirective
+        EditableDirective,
+        LiteralExpressionInputComponent
     ],
     imports: [
         BrowserModule,

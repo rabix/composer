@@ -2,11 +2,9 @@ import {Component, Input, Output, ElementRef} from "@angular/core";
 import {Observable, Subject} from "rxjs";
 import {ComponentBase} from "../../../components/common/component-base";
 import Editor = AceAjax.Editor;
+import {ACE_MODES_MAP} from "../../../components/code-editor/code-editor-modes-map";
 
 require("brace/ext/searchbox");
-require("brace/mode/javascript");
-require("brace/mode/json");
-require("brace/mode/yaml");
 require("brace/theme/chrome");
 require("brace/theme/monokai");
 
@@ -87,7 +85,7 @@ export class CodeEditorComponent extends ComponentBase {
 
     /** Language of the textual content, used for syntax highlighting */
     @Input()
-    public language: string;
+    public language: Observable<string> | string;
 
     /* Instance of the Ace editor */
     public editor: Editor;
@@ -110,7 +108,15 @@ export class CodeEditorComponent extends ComponentBase {
 
         // Set the theme and language
         this.editor.setTheme("ace/theme/chrome");
-        this.editor.session.setMode(`ace/mode/${this.language}`);
+
+        if (typeof this.language === "string") {
+            this.editor.session.setMode(`ace/mode/${ACE_MODES_MAP[this.language]}`);
+
+        } else if (this.language.subscribe) {
+            this.tracked = this.language.subscribe(lang => {
+                this.editor.session.setMode(`ace/mode/${ACE_MODES_MAP[lang] || "text"}`);
+            });
+        }
 
         this.editor.setOptions(this.options);
 

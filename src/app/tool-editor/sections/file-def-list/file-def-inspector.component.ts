@@ -14,9 +14,10 @@ import {FileDef} from "cwlts/mappings/d2sb/FileDef";
     </ct-expression-input>
 
     <label class="form-control-label">File Content</label>
-    <ct-expression-input [formControl]="form.controls['fileContent']"
+    <ct-literal-expression-input [formControl]="form.controls['fileContent']"
+                         [fileName]="fileName"
                          [context]="context">
-    </ct-expression-input>
+    </ct-literal-expression-input>
 </form>`
 })
 export class FileDefInspectorComponent extends ComponentBase {
@@ -31,6 +32,20 @@ export class FileDefInspectorComponent extends ComponentBase {
     public save = new Subject<FileDef>();
 
     private form: FormGroup;
+
+    get fileName(): string {
+        const value = this.form.controls['filename'].value;
+
+        if (value) {
+            if (value.result) {
+                return value.result;
+            } else if (typeof value.serialize() === "string") {
+                return value.serialize()
+            }
+        } else {
+            return ""
+        }
+    }
 
     ngOnInit() {
         this.form = new FormGroup({

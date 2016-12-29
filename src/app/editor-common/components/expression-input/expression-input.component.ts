@@ -3,8 +3,8 @@ import {NG_VALUE_ACCESSOR, ControlValueAccessor} from "@angular/forms";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../components/common/component-base";
 import {noop} from "../../../lib/utils.lib";
-import {ModelExpressionEditorComponent} from "../../expression-editor/model-expression-editor.component";
 import {ModalService} from "../../../components/modal/modal.service";
+import {ModelExpressionEditorComponent} from "../../expression-editor/model-expression-editor.component";
 
 require("./expression-input.component.scss");
 
@@ -110,6 +110,9 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
             this.model  = new ExpressionModel("", "");
             this.isExpr = this.model.isExpression;
         }
+
+        //@fixme(maya) might not be the best place for this
+        this.model.evaluate(this.context);
     }
 
     /**
@@ -148,7 +151,6 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
      * @param str
      */
     private editString(str: number | string) {
-        //@fixme: returning string on change in number field
         if (this.type === "number") str = Number(str);
         this.model.setValue(str, this.type);
         this.onChange(this.model);
@@ -164,7 +166,7 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
         if (!action) return;
 
         if (action === "edit") {
-            const editor = this.modal.show(ModelExpressionEditorComponent, {
+            const editor = this.modal.show<ModelExpressionEditorComponent>(ModelExpressionEditorComponent, {
                 backdrop: true,
                 closeOnOutsideClick: false,
                 title: "Edit Expression"
