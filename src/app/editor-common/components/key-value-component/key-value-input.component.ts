@@ -1,14 +1,5 @@
 import {Component, forwardRef, Input} from "@angular/core";
-import {
-    NG_VALUE_ACCESSOR,
-    ControlValueAccessor,
-    FormGroup,
-    FormBuilder,
-    NG_VALIDATORS,
-    FormControl,
-    ValidatorFn,
-    Validators
-} from "@angular/forms";
+import {NG_VALUE_ACCESSOR, ControlValueAccessor, FormGroup, FormBuilder, NG_VALIDATORS} from "@angular/forms";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../components/common/component-base";
 
@@ -35,10 +26,10 @@ require("./key-value-input.component.scss");
                  
                  <i class="fa fa-times-circle validation-icon key-validation-icon"
                     [ct-tooltip]="keyTooltip"
-                     *ngIf="errors.length"></i>
+                     *ngIf="errorMessages.length"></i>
                 
                 <ct-tooltip-content #keyTooltip>
-                     <div class="error-text px-1" *ngFor="let error of errors">{{ error }}</div>
+                     <div class="error-text px-1" *ngFor="let error of errorMessages">{{ error }}</div>
                 </ct-tooltip-content>
             
                 <input class="ellipsis form-control key-input"
@@ -72,10 +63,15 @@ export class KeyValueInputComponent extends ComponentBase implements ControlValu
     public context: {$job: any} = { $job: {} };
 
     @Input()
-    public keyValidators: ValidatorFn[] = [() => null];
+    public keyValidator = () => null;
 
     @Input()
-    public valueValidators: ValidatorFn[] = [() => null];
+    public valueValidator = () => null;
+
+    @Input()
+    public isDuplicate = false;
+
+    public errorMessages: string[] = [];
 
     private onTouched = () => { };
 
@@ -83,23 +79,25 @@ export class KeyValueInputComponent extends ComponentBase implements ControlValu
 
     private form = new FormGroup({});
 
-    private errors: string[] = [];
-
     private readonly = false;
+
+    private duplicateErrorMessage = "Duplicate keys are not allowed.";
 
     constructor(private formBuilder: FormBuilder) {
         super();
     }
 
-    validate(c: FormControl) {
-        this.errors = [];
+    validate() {
+        this.errorMessages = [];
+
+        this.checkIfDuplicate();
 
         if (!this.form.controls['keyForm'].valid && this.form.controls['keyForm'].errors) {
             const errorMessage = this.form.controls['keyForm'].errors['message'] ?
                 this.form.controls['keyForm'].errors['message']:
                 "Value is not valid.";
 
-            this.errors.push(errorMessage);
+            this.errorMessages.push(errorMessage);
         }
 
         if (!this.form.controls['valueForm'].valid && this.form.controls['valueForm'].errors) {
@@ -107,10 +105,14 @@ export class KeyValueInputComponent extends ComponentBase implements ControlValu
                 this.form.controls['valueForm'].errors['message']:
                 "Value is not valid.";
 
-            this.errors.push(errorMessage);
+            this.errorMessages.push(errorMessage);
         }
 
-        return this.form.valid ? null: { error: { messages: this.errors }}
+        return this.form.valid ? null: { messages: this.errorMessages };
+    }
+
+    ngOnChanges() {
+        this.checkIfDuplicate();
     }
 
     writeValue(input: {
@@ -122,15 +124,15 @@ export class KeyValueInputComponent extends ComponentBase implements ControlValu
         this.readonly = input.readonly || false;
 
         this.form = this.formBuilder.group({
-            keyForm: [input.key, Validators.compose(this.keyValidators)],
-            valueForm: [input.value, Validators.compose(this.valueValidators)]
+            keyForm: [input.key, this.keyValidator],
+            valueForm: [input.value, this.valueValidator]
         });
 
         this.tracked = this.form.valueChanges
             .distinctUntilChanged()
             .subscribe(_ => {
-                const keyValue = this.form.controls['keyForm'].valid ? this.form.controls['keyForm'].value : "";
-                const valueInput = this.form.controls['valueForm'].valid ? this.form.controls['valueForm'].value : "";
+                const keyValue = this.form.controls['keyForm'].valid ? this.form.controls['keyForm'].value : new ExpressionModel();
+                const valueInput = this.form.controls['valueForm'].valid ? this.form.controls['valueForm'].value : new ExpressionModel();
 
                 this.propagateChange({
                     key: keyValue,
@@ -138,6 +140,18 @@ export class KeyValueInputComponent extends ComponentBase implements ControlValu
                     readonly: input.readonly
                 });
             });
+    }
+
+    private checkIfDuplicate() {
+        const index = this.errorMessages.indexOf(this.duplicateErrorMessage);
+
+        if (this.isDuplicate && index === -1) {
+            this.errorMessages.push(this.duplicateErrorMessage);
+        }
+
+        if (!this.isDuplicate && index !== -1) {
+            this.errorMessages.splice(index, 1);
+        }
     }
 
     registerOnChange(fn: any): void {

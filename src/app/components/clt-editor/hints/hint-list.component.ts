@@ -21,7 +21,7 @@ import {ReplaySubject} from "rxjs";
                     [emptyListText]="'Special flags for tool execution'"
                     [keyColumnText]="'Class'"
                     [helpLink]="helpLink"
-                    [keyValidators]="[validateClassForm]"
+                    [keyValidator]="validateClassForm"
                     [context]="context"
                     [allowDuplicateKeys]="false"
                     [formControl]="form"></key-value-list>
