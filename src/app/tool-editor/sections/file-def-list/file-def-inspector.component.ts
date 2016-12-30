@@ -44,11 +44,11 @@ export class FileDefInspectorComponent extends ComponentBase {
             if (value.result) {
                 return value.result;
             } else if (typeof value.serialize() === "string") {
-                return value.serialize()
+                return value.serialize();
             }
-        } else {
-            return ""
         }
+
+        return "";
     }
 
     ngOnInit() {
