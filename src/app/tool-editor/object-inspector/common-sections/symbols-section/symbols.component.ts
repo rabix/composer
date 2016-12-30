@@ -1,7 +1,7 @@
 import {Component, forwardRef} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormControl} from "@angular/forms";
 import {ComponentBase} from "../../../../components/common/component-base";
-import {GuidService} from "../../../../services/guid.service";
+import {noop} from "../../../../lib/utils.lib";
 
 require("./symbols.component.scss");
 
@@ -25,15 +25,11 @@ require("./symbols.component.scss");
 })
 export class SymbolsComponent extends ComponentBase implements ControlValueAccessor {
 
-    private onTouched = () => { };
+    private onTouched = noop;
 
-    private propagateChange = (_) => {};
+    private propagateChange = noop;
 
     private symbolsForm: FormControl;
-
-    constructor(private guidService: GuidService) {
-        super();
-    }
 
     writeValue(symbols: string[]): void {
         this.symbolsForm = new FormControl(symbols || []);

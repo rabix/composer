@@ -22,13 +22,8 @@ import {SymbolsComponent} from "./object-inspector/common-sections/symbols-secti
 import {OutputMetaDataSectionComponent} from "./object-inspector/output-inspector/output-metadata-section/output-metadata.component";
 import {StageInputSectionComponent} from "./object-inspector/input-inspector/stage-input-section/stage-input-section.component";
 import {OutputEvalSectionComponent} from "./object-inspector/output-inspector/output-eval-section/output-eval.component";
-import {CompactListComponent} from "../components/compact-list/compact-list.component";
-import {EditableDirective} from "../directives/editable.directive";
 import {FileDefInspectorComponent} from "./sections/file-def-list/file-def-inspector.component";
 import {LiteralExpressionInputComponent} from "./sections/file-def-list/literal-expression-input.component";
-
-
-//import {SecondaryFilesComponent} from "./object-inspector/common-sections/secondary-files-sections/secondary-files.component";
 import {SecondaryFilesComponent} from "./object-inspector/secondary-files/secondary-files.component";
 
 @NgModule({
@@ -53,8 +48,6 @@ import {SecondaryFilesComponent} from "./object-inspector/secondary-files/second
         StageInputSectionComponent,
         ResourcesComponent,
         OutputEvalSectionComponent,
-        CompactListComponent,
-        EditableDirective,
         LiteralExpressionInputComponent
     ],
     exports: [
@@ -74,9 +67,7 @@ import {SecondaryFilesComponent} from "./object-inspector/secondary-files/second
         StageInputSectionComponent,
         OutputEvalSectionComponent,
         OutputMetaDataSectionComponent,
-        CompactListComponent,
-        EditableDirective,
-        LiteralExpressionInputComponent
+        LiteralExpressionInputComponent,
         OutputMetaDataSectionComponent
     ],
     imports: [

@@ -2,6 +2,7 @@ import {Component, forwardRef} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormBuilder, FormGroup} from "@angular/forms";
 import {ComponentBase} from "../../../../components/common/component-base";
 import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
+import {noop} from "../../../../lib/utils.lib";
 
 @Component({
     selector: 'ct-stage-input',
@@ -44,9 +45,9 @@ export class StageInputSectionComponent extends ComponentBase implements Control
 
     private input: InputProperty;
 
-    private onTouched = () => { };
+    private onTouched = noop;
 
-    private propagateChange = (_) => {};
+    private propagateChange = noop;
 
     private stageInputFormGroup: FormGroup;
 

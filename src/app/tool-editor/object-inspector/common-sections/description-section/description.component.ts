@@ -2,6 +2,7 @@ import {Component, forwardRef} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormBuilder, FormGroup} from "@angular/forms";
 import {ComponentBase} from "../../../../components/common/component-base";
 import {CommandOutputParameterModel, CommandInputParameterModel} from "cwlts/models/d2sb";
+import {noop} from "../../../../lib/utils.lib";
 
 require("./description.component.scss");
 
@@ -47,11 +48,9 @@ export class DescriptionComponent extends ComponentBase implements ControlValueA
 
     private port: CommandOutputParameterModel | CommandInputParameterModel;
 
-    private onTouched = () => {
-    };
+    private onTouched = noop;
 
-    private propagateChange = (_) => {
-    };
+    private propagateChange = noop;
 
     private descriptionFormGroup: FormGroup;
 

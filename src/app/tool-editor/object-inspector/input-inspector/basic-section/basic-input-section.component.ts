@@ -10,7 +10,6 @@ import {
 } from "@angular/forms";
 import {
     CommandInputParameterModel as InputProperty,
-    CommandLineBindingModel,
     InputParameterTypeModel
 } from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../../components/common/component-base";

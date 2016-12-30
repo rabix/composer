@@ -2,6 +2,7 @@ import {Component, forwardRef, Input} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormControl} from "@angular/forms";
 import {ComponentBase} from "../../../components/common/component-base";
 import {ExpressionModel} from "cwlts/models/d2sb";
+import {noop} from "../../../lib/utils.lib";
 
 @Component({
     selector: 'ct-secondary-file',
@@ -31,9 +32,9 @@ export class SecondaryFilesComponent extends ComponentBase implements ControlVal
 
     private secondaryFiles: ExpressionModel[];
 
-    private onTouched = () => { };
+    private onTouched = noop;
 
-    private propagateChange = (_) => {};
+    private propagateChange = noop;
 
     private form: FormControl;
 

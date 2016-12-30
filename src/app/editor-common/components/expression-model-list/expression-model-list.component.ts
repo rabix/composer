@@ -4,6 +4,7 @@ import {ExpressionModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../components/common/component-base";
 import {GuidService} from "../../../services/guid.service";
 import {CustomValidators} from "../../../validators/custom.validator";
+import {noop} from "../../../lib/utils.lib";
 
 @Component({
     selector: 'expression-model-list',
@@ -54,9 +55,9 @@ export class ExpressionModelListComponent extends ComponentBase implements Contr
     /** List which connects model to forms */
     private formList: Array<{id: string, model: ExpressionModel}> = [];
 
-    private onTouched = () => { };
+    private onTouched = noop;
 
-    private propagateChange = (_) => {};
+    private propagateChange = noop;
 
     private input: ExpressionModel[];
 

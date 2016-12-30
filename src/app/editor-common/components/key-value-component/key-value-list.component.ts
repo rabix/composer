@@ -3,6 +3,7 @@ import {NG_VALUE_ACCESSOR, ControlValueAccessor, FormGroup, FormControl} from "@
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../components/common/component-base";
 import {GuidService} from "../../../services/guid.service";
+import {noop} from "../../../lib/utils.lib";
 
 require("./key-value-list.component.scss");
 
@@ -93,9 +94,9 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
         }
     }[] = [];
 
-    private onTouched = () => { };
+    private onTouched = noop;
 
-    private propagateChange = (_) => {};
+    private propagateChange = noop;
 
     private form = new FormGroup({}, this.duplicateKeyValidator.bind(this));
 
