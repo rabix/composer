@@ -15,6 +15,7 @@ import {MenuComponent} from "./ui/menu/menu.component";
 import {ContextDirective} from "./ui/context/context.directive";
 import {ContextService} from "./ui/context/context.service";
 import {MdProgressBarModule} from "@angular2-material/progress-bar";
+import {MultilangCodeEditorComponent} from "./ui/code-editor/multilang-code-editor.component";
 
 @NgModule({
     entryComponents: [
@@ -26,11 +27,15 @@ import {MdProgressBarModule} from "@angular2-material/progress-bar";
 
         // Context
         // ContextDirective,
+
+        // Code Editor Components
+        MultilangCodeEditorComponent
     ],
     declarations: [
         // Code Editor Components
         CodeEditorComponent,
         CodePreviewComponent,
+        MultilangCodeEditorComponent,
 
         // Form Components
         FormPanelComponent,
@@ -56,6 +61,7 @@ import {MdProgressBarModule} from "@angular2-material/progress-bar";
         // Code Editor
         CodeEditorComponent,
         CodePreviewComponent,
+        MultilangCodeEditorComponent,
 
         // Forms
         FormPanelComponent,

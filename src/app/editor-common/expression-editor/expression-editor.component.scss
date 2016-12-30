@@ -1,6 +1,6 @@
 @import "../../../assets/sass/variables";
 
-ct-expression-editor {
+ct-expression-editor, ct-multilang-code-editor {
   display: block;
 
   .title {
@@ -12,6 +12,13 @@ ct-expression-editor {
     border-left: 1px transparent;
     border-right: 1px transparent;
 
+  }
+
+  .modal-options {
+    background: $body-color;
+    color: $gray-light;
+    padding: 5px;
+    border-bottom: 1px solid darken($body-color, 10%);
   }
 
   .modal-footer {
