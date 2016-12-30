@@ -7,8 +7,8 @@ import {
     FormGroup,
     NG_VALIDATORS
 } from "@angular/forms";
+import {CommandInputParameterModel as InputProperty, CommandLineBindingModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../../components/common/component-base";
-import {CommandLineBindingModel} from "cwlts/models/d2sb";
 import {noop} from "../../../../lib/utils.lib";
 
 @Component({
@@ -57,6 +57,13 @@ import {noop} from "../../../../lib/utils.lib";
                                    [off]="'Join'"></toggle-slider>
                 </span>
             </div>
+            
+            <ct-stage-input [formControl]="inputBindingFormGroup.controls['stageInputSection']">
+            </ct-stage-input>
+           
+            <ct-secondary-file *ngIf="input.type.type === 'File'"
+                             [formControl]="inputBindingFormGroup.controls['secondaryFilesSection']"
+                             [context]="context"></ct-secondary-file>
     </div>
     `
 })
@@ -69,7 +76,7 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
     @Input()
     public context: {$job?: any, $self?: any} = {};
 
-    private inputBinding: CommandLineBindingModel;
+    private input: InputProperty;
 
     private inputBindingFormGroup: FormGroup;
 
@@ -90,11 +97,11 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
         super();
     }
 
-    writeValue(inputBinding: CommandLineBindingModel): void {
-        this.inputBinding = inputBinding;
+    writeValue(input: InputProperty): void {
+        this.input = input;
 
-        if (!!this.inputBinding) {
-            this.createInputBindingForm(this.inputBinding);
+        if (!!this.input.inputBinding) {
+            this.createInputBindingForm(this.input);
         }
     }
 
@@ -112,13 +119,15 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
         }
     }
 
-    private createInputBindingForm(inputBinding: CommandLineBindingModel): void {
+    private createInputBindingForm(input: InputProperty): void {
         this.inputBindingFormGroup = this.formBuilder.group({
-            valueFrom: [inputBinding.valueFrom, [Validators.required]],
-            position: [inputBinding.position, [Validators.pattern(/^\d+$/)]],
-            prefix: [inputBinding.prefix],
-            separate: [inputBinding.separate !== false],
-            itemSeparator: [!!inputBinding.itemSeparator ? inputBinding.itemSeparator : null]
+            stageInputSection: [input],
+            secondaryFilesSection: [input.inputBinding.secondaryFiles || []],
+            valueFrom: [input.inputBinding.valueFrom, [Validators.required]],
+            position: [input.inputBinding.position, [Validators.pattern(/^\d+$/)]],
+            prefix: [input.inputBinding.prefix],
+            separate: [input.inputBinding.separate !== false],
+            itemSeparator: [!!input.inputBinding.itemSeparator ? input.inputBinding.itemSeparator : null]
         });
 
         this.listenToInputBindingFormChanges();
@@ -129,16 +138,23 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
             .distinctUntilChanged()
             .debounceTime(300)
             .subscribe(value => {
+                const serializedFiles = value.secondaryFilesSection.map(file => file.serialize());
+
                 const binding = {
                     position: value.position || undefined,
                     prefix: value.prefix || undefined,
                     separate: value.separate,
                     itemSeparator: value.itemSeparator || undefined,
-                    valueFrom: this.propertyType !== "record" ? value.valueFrom.serialize() : undefined
+                    valueFrom: value.valueFrom.serialize(),
+                    loadContents: value.stageInputSection.inputBinding.loadContents,
+                    secondaryFiles: serializedFiles
                 };
 
-                this.inputBinding = new CommandLineBindingModel(binding);
-                this.propagateChange(this.inputBinding);
+
+                this.input.inputBinding = new CommandLineBindingModel(binding);
+                Object.assign(this.input.customProps, value.stageInputSection.customProps);
+
+                this.propagateChange(this.input);
             });
     }
 }

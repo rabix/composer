@@ -21,20 +21,18 @@ export class EditableDirective implements ControlValueAccessor {
 
     private lastValue: string;
 
-    constructor(private elRef: ElementRef) {
+    constructor(private elRef: ElementRef) { }
 
-    }
-
-    private writeValue(value: any): void {
+    writeValue(value: any): void {
         this.elRef.nativeElement.innerText = value;
         this.propagateChange(this.elRef.nativeElement.innerText);
     }
 
-    private registerOnChange(fn: any): void {
+    registerOnChange(fn: any): void {
         this.propagateChange = fn;
     }
 
-    private registerOnTouched(fn: any): void {
+    registerOnTouched(fn: any): void {
         this.onTouched = fn;
     }
 

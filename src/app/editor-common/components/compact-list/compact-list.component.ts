@@ -10,7 +10,7 @@ require("./compact-list.component.scss");
         { provide: NG_VALIDATORS, useExisting: forwardRef(() => CompactListComponent), multi: true }
     ],
     template: `
-            <div class="compact-list-wrapper">
+           <div class="compact-list-wrapper" (click)="onListWrapperClick()">
                 
                 <div class="input-tag-list">
                     
@@ -25,7 +25,7 @@ require("./compact-list.component.scss");
                     <!-- Not using the <input>, 
                          so that the width can adjust to the text length,
                          and break into a new line if its long -->
-                    <span #tagInput ct-editable contenteditable="true" (click)="onListWrapperClick()"
+                     <span #tagInput ct-editable contenteditable="true"
                           class="tag-input"
                           *ngIf="tagInputControl"
                           [ngClass]="{'invalid-input': !isValidInput }"

@@ -39,8 +39,10 @@ require("./basic-input-section.component.scss");
                 <div class="form-group flex-container">
                     <label>Required</label>
                     <span class="align-right">
-                        {{input.type.isNullable ? "No" : "Yes"}}
-                        <toggle-slider [formControl]="basicSectionForm.controls['isRequired']"></toggle-slider>
+                        <toggle-slider [formControl]="basicSectionForm.controls['isRequired']"
+                                       [off]="'No'" 
+                                       [on]="'Yes'">
+                        </toggle-slider>
                     </span>
                 </div> <!-- Required -->
             
@@ -57,8 +59,10 @@ require("./basic-input-section.component.scss");
                         *ngIf="input.type.type !== 'map' && basicSectionForm.controls['isBound']">
                     <label>Include in command line</label>
                     <span class="align-right">
-                        {{input.isBound ? "Yes" : "No"}}
-                        <toggle-slider [formControl]="basicSectionForm.controls['isBound']"></toggle-slider>
+                        <toggle-slider [formControl]="basicSectionForm.controls['isBound']" 
+                                       [off]="'No'" 
+                                       [on]="'Yes'">
+                        </toggle-slider>
                     </span>
                 </div> <!-- Include in commandline -->
                 
@@ -142,7 +146,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
         this.tracked = this.basicSectionForm.controls['isBound'].valueChanges.subscribe((isBound: boolean) => {
             if (isBound) {
                 this.input.createInputBinding();
-                this.basicSectionForm.setControl('inputBinding', new FormControl(this.input.inputBinding));
+                this.basicSectionForm.setControl('inputBinding', new FormControl(this.input));
                 this.listenToInputBindingChanges();
             } else {
                 this.input.removeInputBinding();
@@ -164,8 +168,9 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
     private listenToInputBindingChanges(): void {
         this.tracked = this.basicSectionForm.controls['inputBinding'].valueChanges
-            .subscribe((inputBinding: CommandLineBindingModel) => {
-                this.input.updateInputBinding(inputBinding);
+            .subscribe((input: InputProperty)  => {
+                this.input.updateInputBinding(input.inputBinding);
+                Object.assign(this.input.customProps, input.customProps);
             });
     }
 

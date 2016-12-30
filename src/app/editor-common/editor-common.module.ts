@@ -13,12 +13,17 @@ import {ToggleComponent} from "./components/toggle-slider/toggle-slider.componen
 import {ExpressionInputComponent} from "./components/expression-input/expression-input.component";
 import {CoreModule} from "../core/core.module";
 import {ModelExpressionEditorComponent} from "./expression-editor/model-expression-editor.component";
+import {CompactListComponent} from "./components/compact-list/compact-list.component";
+import {EditableDirective} from "./directives/editable.directive";
+import {ExpressionModelListComponent} from "./components/expression-model-list/expression-model-list.component";
 import {ValidationComponent} from "./components/validation-preview/validation-preview.component";
 import {ValidationTextPipe} from "./pipes/validation-text.pipes";
 import {ValidationClassDirective} from "./components/validation-preview/validation-class.directive";
 import {EditorControlsComponent} from "./components/editor-controls/editor-controls.component";
 import {RevisionListComponent} from "./components/revision-list/revision-list.component";
 import {MdProgressBarModule} from "@angular2-material/progress-bar";
+import {KeyValueInputComponent} from "./components/key-value-component/key-value-input.component";
+import {KeyValueListComponent} from "./components/key-value-component/key-value-list.component";
 
 @NgModule({
     declarations: [
@@ -29,7 +34,6 @@ import {MdProgressBarModule} from "@angular2-material/progress-bar";
         EditorInspectorDirective,
         ExpressionEditorComponent,
         ExpressionInputComponent,
-        ExpressionInputComponent,
         FileDefContentPipe,
         FileDefNamePipe,
         ModelExpressionEditorComponent,
@@ -38,7 +42,12 @@ import {MdProgressBarModule} from "@angular2-material/progress-bar";
         ValidationClassDirective,
         ValidationComponent,
         ValidationTextPipe,
-        RevisionListComponent
+        RevisionListComponent,
+        CompactListComponent,
+        EditableDirective,
+        ExpressionModelListComponent,
+        KeyValueInputComponent,
+        KeyValueListComponent
     ],
     exports: [
         BlankToolStateComponent,
@@ -48,15 +57,22 @@ import {MdProgressBarModule} from "@angular2-material/progress-bar";
         EditorInspectorDirective,
         ExpressionEditorComponent,
         ExpressionInputComponent,
-        ExpressionInputComponent,
         FileDefContentPipe,
         FileDefNamePipe,
+        ToggleComponent,
         ModelExpressionEditorComponent,
         QuickPickComponent,
         ToggleComponent,
         ValidationClassDirective,
+        CompactListComponent,
+        EditableDirective,
+        ExpressionModelListComponent,
+        QuickPickComponent,
         ValidationComponent,
         RevisionListComponent,
+        ValidationClassDirective,
+        KeyValueInputComponent,
+        KeyValueListComponent
     ],
     entryComponents: [
         EditorInspectorComponent,

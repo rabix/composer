@@ -40,8 +40,7 @@ export class ToolInputInspector extends ComponentBase {
     ngOnInit() {
         this.form = this.formBuilder.group({
             basicInputSection: this.input,
-            description: this.input,
-            stageInputSection: this.input,
+            description: this.input
         });
 
 

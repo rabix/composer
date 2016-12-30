@@ -1,0 +1,39 @@
+@import  "../../../../assets/sass/variables";
+
+ct-key-value-input {
+    display: flex;
+    width: 100%;
+}
+
+.key-input {
+    display: inline;
+    margin-left: 10px;
+    border: 2px solid transparent;
+    border-radius: .38rem;
+}
+
+.readonly-value-input {
+    margin-left: 29px;
+    background: $readonly-input;
+    border: $border-color solid 1px;
+
+    &.half-width-value-input {
+        margin-left: 15px;
+    }
+}
+
+.key-container {
+    display: flex;
+
+    .error-validation-icon, .warning-validation-icon {
+        margin: auto;
+    }
+
+    .error-validation-icon {
+        color: $brand-danger;
+    }
+
+    .warning-validation-icon {
+        color: $brand-warning;
+    }
+}
