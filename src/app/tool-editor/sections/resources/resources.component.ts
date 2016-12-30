@@ -1,7 +1,6 @@
-import {Component, Input} from "@angular/core";
+import {Component, Input, SimpleChanges, Output} from "@angular/core";
 import {FormControl} from "@angular/forms";
 import {ResourceRequirementModel} from "cwlts/models/d2sb";
-import {Output} from "@angular/core";
 import {ReplaySubject} from "rxjs";
 import {ExpressionModel} from "../../../../../node_modules/cwlts/models/d2sb/ExpressionModel";
 
@@ -67,15 +66,24 @@ export class ResourcesComponent {
         "multi-thread": 0
     };
 
+    ngOnChanges(changes: SimpleChanges) {
+        //@fixme: this code causes an "Expression changed after checked" error
+        // this.memControl.setValue(changes["entries"].currentValue.mem ? changes["entries"].currentValue.mem.value : "");
+        // this.cpuControl.setValue(changes["entries"].currentValue.cpu ? changes["entries"].currentValue.cpu.value : "");
+    }
+
     ngOnInit() {
         this.memControl.setValue(this.entries.mem ? this.entries.mem.value : "");
         this.cpuControl.setValue(this.entries.cpu ? this.entries.cpu.value : "");
 
         this.memControl.valueChanges.subscribe(value => {
             if (!(value instanceof ExpressionModel)) {
-               value = new ExpressionModel("", value);
+                value = new ExpressionModel("", value);
             }
-            const res = this.entries.mem || new ResourceRequirementModel({class: "sbg:MemRequirement", value}, "");
+            const res = this.entries.mem || new ResourceRequirementModel({
+                    "class": "sbg:MemRequirement",
+                    value
+                }, "");
             res.value = value;
             this.update.next(res);
         });
@@ -84,7 +92,10 @@ export class ResourcesComponent {
             if (!(value instanceof ExpressionModel)) {
                 value = new ExpressionModel("", value);
             }
-            const res = this.entries.cpu || new ResourceRequirementModel({class: "sbg:CPURequirement", value}, "");
+            const res = this.entries.cpu || new ResourceRequirementModel({
+                    "class": "sbg:CPURequirement",
+                    value
+                }, "");
             res.value = value;
             this.update.next(res);
         });

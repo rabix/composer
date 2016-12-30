@@ -14,8 +14,8 @@ import {
     InputParameterTypeModel
 } from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../../components/common/component-base";
-import {CustomValidators} from "../../../../validators/custom.validator";
 import {PrimitiveParameterType} from "../../../../../../node_modules/cwlts/models/d2sb/ParameterTypeModel";
+import {noop} from "../../../../lib/utils.lib";
 
 require("./basic-input-section.component.scss");
 
@@ -85,11 +85,9 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
     private basicSectionForm: FormGroup;
 
-    private onTouched = () => {
-    };
+    private onTouched = noop;
 
-    private propagateChange = (_) => {
-    };
+    private propagateChange = noop;
 
     private initSymbolsList: string[] = [];
 
@@ -102,10 +100,10 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
         this.basicSectionForm = this.formBuilder.group({
             propertyIdForm: [this.input.id],
-            typeForm: [this.input.type, [Validators.required, CustomValidators.cwlModel]],
+            typeForm: [this.input.type, [Validators.required]],
             isBound: [this.input.isBound],
             isRequired: [!this.input.type.isNullable],
-            inputBinding: [this.input.inputBinding, CustomValidators.cwlModel],
+            inputBinding: [this.input.inputBinding],
             itemType: [this.input.type.items ? this.input.type.items : "File"],
             symbols: [this.input.type.symbols ? this.input.type.symbols : this.initSymbolsList]
         });
@@ -136,7 +134,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
         this.onTouched = fn;
     }
 
-    validate(c: FormControl) {
+    validate() {
         return this.basicSectionForm.valid ? null : {error: "Basic input section is not valid."}
     }
 

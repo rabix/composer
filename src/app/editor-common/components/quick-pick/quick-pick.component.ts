@@ -34,7 +34,7 @@ require("./quick-pick.component.scss");
             (click)="createControl('')">Custom
     </button>
 
-    <div *ngIf="showCustom" ngSwitch="type" class="removable-form-control">
+    <div *ngIf="showCustom" class="removable-form-control">
         <ct-expression-input [context]="context" 
                              [formControl]="customControl" 
                              [type]="type">
@@ -114,7 +114,7 @@ export class QuickPickComponent extends ComponentBase implements ControlValueAcc
     ngOnInit() {
         if (this.suggestions) {
             if (Array.isArray(this.suggestions)) {
-                let type = typeof this.suggestions[0];
+                const type = typeof this.suggestions[0];
                 if (type !== "string") {
                     console.warn(`Please provide ct-quick-pick with correct suggested value format. Expected "string" got "${type}"`)
                 } else {

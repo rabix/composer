@@ -1,7 +1,6 @@
 import {Component, Input, forwardRef} from "@angular/core";
 import {
     Validators,
-    FormControl,
     ControlValueAccessor,
     NG_VALUE_ACCESSOR,
     FormGroup,
@@ -11,7 +10,7 @@ import {
 import {CommandOutputParameterModel as OutputProperty} from "cwlts/models/d2sb";
 import {OutputParameterTypeModel} from "cwlts/models/d2sb/OutputParameterTypeModel";
 import {ComponentBase} from "../../../../components/common/component-base";
-import {CustomValidators} from "../../../../validators/custom.validator";
+import {noop} from "../../../../lib/utils.lib";
 
 require("./basic-output-section.component.scss");
 
@@ -70,11 +69,9 @@ export class BasicOutputSectionComponent extends ComponentBase implements Contro
 
     private basicSectionForm: FormGroup;
 
-    private onTouched = () => {
-    };
+    private onTouched = noop;
 
-    private propagateChange = (_) => {
-    };
+    private propagateChange = noop;
 
     private initSymbolsList: string[] = [];
 
@@ -87,7 +84,7 @@ export class BasicOutputSectionComponent extends ComponentBase implements Contro
 
         this.basicSectionForm = this.formBuilder.group({
             propertyIdForm: [this.output.id],
-            typeForm: [this.output.type, [Validators.required, CustomValidators.cwlModel]],
+            typeForm: [this.output.type, [Validators.required]],
             glob: [this.output.outputBinding.glob],
             isRequired: [!this.output.type.isNullable],
             itemType: [!!this.output.type.items ? this.output.type.items : 'File'],
@@ -118,7 +115,7 @@ export class BasicOutputSectionComponent extends ComponentBase implements Contro
         this.onTouched = fn;
     }
 
-    validate(c: FormControl) {
+    validate() {
         return this.basicSectionForm.valid ? null : {error: "Basic output section is not valid."}
     }
 

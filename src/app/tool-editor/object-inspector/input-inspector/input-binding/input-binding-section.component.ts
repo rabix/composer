@@ -5,12 +5,11 @@ import {
     FormBuilder,
     Validators,
     FormGroup,
-    NG_VALIDATORS,
-    FormControl
+    NG_VALIDATORS
 } from "@angular/forms";
 import {ComponentBase} from "../../../../components/common/component-base";
-import {CustomValidators} from "../../../../validators/custom.validator";
-import {ExpressionModel, CommandLineBindingModel} from "cwlts/models/d2sb";
+import {CommandLineBindingModel} from "cwlts/models/d2sb";
+import {noop} from "../../../../lib/utils.lib";
 
 @Component({
     selector: 'input-binding-section',
@@ -74,12 +73,11 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
 
     private inputBindingFormGroup: FormGroup;
 
-    private onTouched = () => {
-    };
+    private onTouched = noop;
 
-    private propagateChange = (_) => {
-    };
+    private propagateChange = noop;
 
+    //@todo add itemSeparator field for type array
     private itemSeparators: {text: string, value: string}[] = [
         {text: "equal", value: "="},
         {text: "comma", value: ","},
@@ -108,7 +106,7 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
         this.onTouched = fn;
     }
 
-    validate(c: FormControl) {
+    validate() {
         if (!!this.inputBindingFormGroup) {
             return this.inputBindingFormGroup.valid ? null : {error: "Input binding section is not valid."}
         }
@@ -116,7 +114,7 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
 
     private createInputBindingForm(inputBinding: CommandLineBindingModel): void {
         this.inputBindingFormGroup = this.formBuilder.group({
-            valueFrom: [inputBinding.valueFrom, [Validators.required, CustomValidators.cwlModel]],
+            valueFrom: [inputBinding.valueFrom, [Validators.required]],
             position: [inputBinding.position, [Validators.pattern(/^\d+$/)]],
             prefix: [inputBinding.prefix],
             separate: [inputBinding.separate !== false],

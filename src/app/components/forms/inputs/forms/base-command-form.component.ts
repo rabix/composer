@@ -1,10 +1,9 @@
-import {Component, Input, OnInit, OnDestroy, Output} from "@angular/core";
+import {Component, Input, OnInit, OnDestroy, Output, OnChanges, SimpleChanges} from "@angular/core";
 import {FormGroup, Validators, FormControl} from "@angular/forms";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ReplaySubject} from "rxjs";
 import {ComponentBase} from "../../../common/component-base";
 import {GuidService} from "../../../../services/guid.service";
-import {CustomValidators} from "../../../../validators/custom.validator";
 
 require("./base-command-form.components.scss");
 
@@ -15,7 +14,7 @@ require("./base-command-form.components.scss");
         Base Command
     </div>
     <div class="tc-body">
-        <form *ngIf="form" [formGroup]="form">
+        <form *ngIf="form">
         
             <ct-blank-tool-state *ngIf="!readonly && !formList.length"
                                  [title]="'Base command for running your tool'"
@@ -70,7 +69,7 @@ require("./base-command-form.components.scss");
 </ct-form-panel>
     `
 })
-export class BaseCommandFormComponent extends ComponentBase implements OnInit, OnDestroy {
+export class BaseCommandFormComponent extends ComponentBase implements OnInit, OnDestroy, OnChanges {
     /** baseCommand property of model */
     @Input()
     public baseCommand: ExpressionModel[];
@@ -112,16 +111,20 @@ export class BaseCommandFormComponent extends ComponentBase implements OnInit, O
         super();
     }
 
-    ngOnInit(): void {
-        this.formList = this.baseCommand.map(model => {
+    ngOnChanges(changes: SimpleChanges): void {
+        if (this.streamsForm) {
+            this.streamsForm.controls["stdin"].setValue(changes["stdin"].currentValue);
+            this.streamsForm.controls["stdout"].setValue(changes["stdout"].currentValue);
+        }
+
+        this.initCmdForm(changes["baseCommand"].currentValue);
+    }
+
+    private initCmdForm(cmdList: ExpressionModel[]) {
+        this.formList = cmdList.map(model => {
             return {
                 id: this.guidService.generate(), model
             };
-        });
-
-        this.streamsForm = new FormGroup({
-            stdin: new FormControl(this.stdin),
-            stdout: new FormControl(this.stdout)
         });
 
         this.baseCommandForm = new FormGroup({});
@@ -132,14 +135,29 @@ export class BaseCommandFormComponent extends ComponentBase implements OnInit, O
                 new FormControl(item.model, [Validators.required])
             );
         });
+    }
 
-        this.form.addControl("streams", this.streamsForm);
+
+    public ngOnInit(): void {
+        this.form = new FormGroup({});
+
+        // Base command
+        this.initCmdForm(this.baseCommand);
+
         this.form.addControl("baseCommand", this.baseCommandForm);
 
         this.tracked = this.baseCommandForm.valueChanges.subscribe(change => {
             const v = Object.keys(change).map(key => change[key]);
             this.updateCmd.next(v);
         });
+
+        // Streams
+        this.streamsForm = new FormGroup({
+            stdin: new FormControl(this.stdin),
+            stdout: new FormControl(this.stdout)
+        });
+
+        this.form.addControl("streams", this.streamsForm);
 
         this.tracked = this.streamsForm.valueChanges.subscribe(change => {
             this.updateStreams.next(change);
@@ -158,7 +176,7 @@ export class BaseCommandFormComponent extends ComponentBase implements OnInit, O
             model: new ExpressionModel("", "")
         };
 
-        this.baseCommandForm.addControl(newCmd.id, new FormControl(newCmd.model, [Validators.required, CustomValidators.cwlModel]));
+        this.baseCommandForm.addControl(newCmd.id, new FormControl(newCmd.model, [Validators.required]));
         this.formList.push(newCmd);
 
         this.form.markAsTouched();

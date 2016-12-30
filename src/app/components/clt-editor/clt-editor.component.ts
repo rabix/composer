@@ -1,8 +1,7 @@
-import {Component, Input, OnInit, ViewChild, ViewContainerRef} from "@angular/core";
+import {Component, Input, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {CommandLineToolModel, FileDefModel, ResourceRequirementModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../common/component-base";
-import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
 import {ProcessRequirement} from "cwlts/mappings/d2sb/ProcessRequirement";
 
 require("./clt-editor.component.scss");
@@ -24,7 +23,6 @@ require("./clt-editor.component.scss");
                                    [context]="{$job: model.job}"
                                    [stdin]="model.stdin"
                                    [stdout]="model.stdout"
-                                   [form]="formGroup.controls['baseCommandGroup']"
                                    (updateCmd)="updateModel('baseCommand', $event)"
                                    (updateStreams)="setStreams($event)">
                 </ct-base-command-form>
