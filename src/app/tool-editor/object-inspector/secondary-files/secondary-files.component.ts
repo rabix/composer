@@ -10,7 +10,7 @@ import {noop} from "../../../lib/utils.lib";
         { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => SecondaryFilesComponent), multi: true }
     ],
     template: `
-<ct-form-panel *ngIf="form" [collapsed]="true">
+<ct-form-panel class="borderless" *ngIf="form" [collapsed]="true">
     <div class="tc-header">Secondary Files</div>
     <div class="tc-body">
 

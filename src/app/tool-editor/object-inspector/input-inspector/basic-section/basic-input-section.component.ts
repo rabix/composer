@@ -54,6 +54,11 @@ require("./basic-input-section.component.scss");
                 
                 <input-type-select [formControl]="basicSectionForm.controls['typeForm']"></input-type-select>
                 
+                <symbols-section class="form-group" 
+                                *ngIf="input.type.type === 'enum'"
+                                [formControl]="basicSectionForm.controls['symbols']">
+                </symbols-section>
+                
                 <div class="form-group flex-container" 
                         *ngIf="input.type.type !== 'map' && basicSectionForm.controls['isBound']">
                     <label>Include in command line</label>
@@ -64,11 +69,6 @@ require("./basic-input-section.component.scss");
                         </toggle-slider>
                     </span>
                 </div> <!-- Include in commandline -->
-                
-                <symbols-section class="form-group" 
-                                *ngIf="input.type.type === 'enum'"
-                                [formControl]="basicSectionForm.controls['symbols']">
-                </symbols-section>
                 
                 <input-binding-section *ngIf="input.isBound" 
                             [context]="context"
@@ -107,11 +107,9 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
             isBound: [this.input.isBound],
             isRequired: [!this.input.type.isNullable],
             inputBinding: [this.input.inputBinding],
-            itemType: [this.input.type.items ? this.input.type.items : "File"],
             symbols: [this.input.type.symbols ? this.input.type.symbols : this.initSymbolsList]
         });
 
-        this.listenToItemTypeFormChanges();
         this.listenToIsBoundChanges();
         this.listenToInputBindingChanges();
         this.listenToTypeFormChanges();
@@ -167,18 +165,9 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
     private listenToInputBindingChanges(): void {
         this.tracked = this.basicSectionForm.controls['inputBinding'].valueChanges
-            .subscribe((input: InputProperty)  => {
+            .subscribe((input: InputProperty) => {
                 this.input.updateInputBinding(input.inputBinding);
                 Object.assign(this.input.customProps, input.customProps);
-            });
-    }
-
-    private listenToItemTypeFormChanges(): void {
-        this.tracked = this.basicSectionForm.controls['itemType'].valueChanges
-            .subscribe((value: PrimitiveParameterType) => {
-                if (!!value && this.input.type.type === 'array') {
-                    this.input.type.items = value;
-                }
             });
     }
 
