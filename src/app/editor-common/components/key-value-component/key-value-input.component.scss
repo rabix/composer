@@ -25,8 +25,15 @@ ct-key-value-input {
 .key-container {
     display: flex;
 
-    .key-validation-icon {
+    .error-validation-icon, .warning-validation-icon {
         margin: auto;
+    }
+
+    .error-validation-icon {
         color: $brand-danger;
+    }
+
+    .warning-validation-icon {
+        color: $brand-warning;
     }
 }

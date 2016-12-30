@@ -33,15 +33,13 @@ require("./key-value-list.component.scss");
 
                         <li class="col-sm-12 gui-section-list-item clickable row"
                             *ngFor="let entry of keyValueFormList; let i = index"
-                            [class.invalid-entry]="!form.controls[entry.id].valid 
-                                                 || isDuplicateKey(form.controls[entry.id].value.key)">
-                        
+                            [class.invalid-entry]="duplicateKeys.has(form.controls[entry.id].value.key)">
+              
                             <ct-key-value-input 
                                     [context]="context"
                                     [formControl]="form.controls[entry.id]"
                                     [keyValidator]="keyValidator"
-                                    [valueValidator]="valueValidator"
-                                    [isDuplicate]="isDuplicateKey(form.controls[entry.id].value.key)">
+                                    [isDuplicate]="duplicateKeys.has(form.controls[entry.id].value.key)">
                                             
                                 <div *ngIf="!!entry" class="col-sm-1 align-right">
                                     <i title="Delete" class="fa fa-trash text-hover-danger" (click)="removeEntry(entry)"></i>
@@ -78,16 +76,13 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
     public valueColumnText = "Value";
 
     @Input()
-    public keyValidator = () => null;
-
-    @Input()
-    public valueValidator = () => null;
-
-    @Input()
     public allowDuplicateKeys = true;
 
     @Input()
     public helpLink = "";
+
+    @Input()
+    public keyValidator = () => null;
 
     private keyValueFormList: {
         id: string,
@@ -102,9 +97,9 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
 
     private propagateChange = (_) => {};
 
-    private form = new FormGroup({});
+    private form = new FormGroup({}, this.duplicateKeyValidator.bind(this));
 
-    private currentKeyList: string[] = [];
+    private duplicateKeys = new Set();
 
     constructor(private guidService: GuidService) {
         super();
@@ -115,7 +110,6 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
         value: string | ExpressionModel,
         readonly?: boolean
     }[]): void {
-        this.currentKeyList = keyValueList.map(value => value.key);
 
         this.keyValueFormList = keyValueList.map(entry => {
             return {
@@ -125,14 +119,24 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
         });
 
         this.keyValueFormList.forEach(hint => {
-            this.form.addControl(hint.id, new FormControl(hint.model));
+            this.form.addControl(
+                hint.id,
+                new FormControl(hint.model)
+            );
         });
 
         this.tracked = this.form.valueChanges.subscribe(change => {
-            const newList = Object.keys(change).map(key => change[key]);
-            this.currentKeyList = newList.map(value => value.key);
+            let newKeyValueList = [];
+            let uniqueKeys: string[] = [];
 
-            this.propagateChange(newList);
+            Object.keys(change).forEach(key => {
+                if (uniqueKeys.indexOf(change[key].key) === - 1) {
+                    newKeyValueList.push(change[key]);
+                    uniqueKeys.push(change[key].key)
+                }
+            });
+
+            this.propagateChange(Array.from(newKeyValueList));
         });
     }
 
@@ -144,10 +148,27 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
         this.onTouched = fn;
     }
 
-    private isDuplicateKey(key: string) {
-        if (!this.allowDuplicateKeys && !!key) {
-            return this.currentKeyList.indexOf(key) !== this.currentKeyList.lastIndexOf(key);
+    private duplicateKeyValidator(g: FormGroup) {
+        if (!this.duplicateKeys || this.allowDuplicateKeys) {
+            return;
         }
+
+        this.duplicateKeys.clear();
+        let keySet = new Set();
+
+        const keyList = Object.keys(g.controls)
+            .filter(key => !!g.controls[key].value.key)
+            .map(key => g.controls[key].value.key);
+
+        keyList.forEach((key) => {
+            if (keySet.has(key)) {
+                this.duplicateKeys.add(key);
+            } else {
+                keySet.add(key);
+            }
+        });
+
+        return this.duplicateKeys.size > 0 ? { message: "There are duplicates in the form." }: null;
     }
 
     private addEntry(): void {

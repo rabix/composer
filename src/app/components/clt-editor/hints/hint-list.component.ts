@@ -21,9 +21,9 @@ import {ReplaySubject} from "rxjs";
                     [emptyListText]="'Special flags for tool execution'"
                     [keyColumnText]="'Class'"
                     [helpLink]="helpLink"
-                    [keyValidator]="validateClassForm"
                     [context]="context"
                     [allowDuplicateKeys]="false"
+                    [keyValidator]="validateClassForm"
                     [formControl]="form"></key-value-list>
             </div>
         </ct-form-panel>
@@ -125,14 +125,16 @@ export class HintListComponent extends ComponentBase {
             .filter(res => res !== undefined);
     }
 
-    private validateClassForm(c: FormControl): null | {message: string} {
+    private validateClassForm(c: FormControl) {
 
         if (c.value  === "sbg:MemRequirement"
             || c.value === "sbg:CPURequirement"
             || c.value === "DockerRequirement") {
 
             return {
-                message: "Class name is not valid."
+                warning: {
+                    message: "This requirement is already defined and will be overwritten."
+                }
             }
         }
 
