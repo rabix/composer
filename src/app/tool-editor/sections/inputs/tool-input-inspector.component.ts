@@ -9,13 +9,13 @@ import {ComponentBase} from "../../../components/common/component-base";
     template: `
         <form [formGroup]="form" (ngSubmit)="onSubmit(form)">
         
-            <basic-input-section [formControl]="form.controls['basicInputSection']"
+            <ct-basic-input-section [formControl]="form.controls['basicInputSection']"
                                  [context]="context">
-            </basic-input-section>
+            </ct-basic-input-section>
             
             <ct-description-section [formControl]="form.controls['description']"></ct-description-section>
             
-            <stage-input [formControl]="form.controls['stageInputSection']"></stage-input>
+            <ct-stage-input [formControl]="form.controls['stageInputSection']"></ct-stage-input>
         </form>
 `
 })

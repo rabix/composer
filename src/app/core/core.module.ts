@@ -14,6 +14,7 @@ import {MenuItemComponent} from "./ui/menu/menu-item.component";
 import {MenuComponent} from "./ui/menu/menu.component";
 import {ContextDirective} from "./ui/context/context.directive";
 import {ContextService} from "./ui/context/context.service";
+import {MultilangCodeEditorComponent} from "./ui/code-editor/multilang-code-editor.component";
 
 @NgModule({
     entryComponents: [
@@ -25,11 +26,15 @@ import {ContextService} from "./ui/context/context.service";
 
         // Context
         // ContextDirective,
+
+        // Code Editor Components
+        MultilangCodeEditorComponent
     ],
     declarations: [
         // Code Editor Components
         CodeEditorComponent,
         CodePreviewComponent,
+        MultilangCodeEditorComponent,
 
         // Form Components
         FormPanelComponent,
@@ -55,6 +60,7 @@ import {ContextService} from "./ui/context/context.service";
         // Code Editor
         CodeEditorComponent,
         CodePreviewComponent,
+        MultilangCodeEditorComponent,
 
         // Forms
         FormPanelComponent,

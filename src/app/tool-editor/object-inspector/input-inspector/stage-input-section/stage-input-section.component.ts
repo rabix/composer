@@ -4,7 +4,7 @@ import {ComponentBase} from "../../../../components/common/component-base";
 import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
 
 @Component({
-    selector: 'stage-input',
+    selector: 'ct-stage-input',
     providers: [
         { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StageInputSectionComponent), multi: true }
     ],

@@ -1,6 +1,6 @@
 import {Component, Input, OnInit, ViewChild, ViewContainerRef} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
-import {CommandLineToolModel, ExpressionModel, ResourceRequirementModel} from "cwlts/models/d2sb";
+import {CommandLineToolModel, FileDefModel, ResourceRequirementModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../common/component-base";
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
 import {ProcessRequirement} from "cwlts/mappings/d2sb/ProcessRequirement";
@@ -20,14 +20,14 @@ require("./clt-editor.component.scss");
                                    (update)="setRequirement($event, true)">
                 </ct-docker-image-form>
                                 
-                <base-command-form [baseCommand]="model.baseCommand"
+                <ct-base-command-form [baseCommand]="model.baseCommand"
                                    [context]="{$job: model.job}"
                                    [stdin]="model.stdin"
                                    [stdout]="model.stdout"
                                    [form]="formGroup.controls['baseCommandGroup']"
-                                   (updateCmd)="setBaseCommand($event)"
+                                   (updateCmd)="updateModel('baseCommand', $event)"
                                    (updateStreams)="setStreams($event)">
-                </base-command-form>
+                </ct-base-command-form>
                                 
                 <ct-tool-input-list [location]="model.loc + '.inputs'" [entries]="model.inputs" 
                               (update)="updateModel('inputs', $event)">                             
@@ -54,7 +54,12 @@ require("./clt-editor.component.scss");
                                   [context]="{$job: model.job}">                
                 </ct-argument-list>
                 
-                <ct-file-def-list [entries]="model.createFileRequirement?.fileDef || []"></ct-file-def-list>
+                <ct-file-def-list [entries]="model.createFileRequirement?.fileDef || []"
+                                  [location]="model.createFileRequirement?.loc"
+                                  [readonly]="readonly"
+                                  (update)="updateModel('createFileRequirement', $event)"
+                                  [context]="{$job: model.job}">
+                </ct-file-def-list>
             </form>
         </div>
 
@@ -105,11 +110,22 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
         } else if (category === "outputs") {
             this.model.outputs = [];
             data.forEach(output => this.model.addOutput(output));
+        } else if (category === "baseCommand") {
+            this.model.baseCommand = [];
+            data.forEach(cmd => this.model.addBaseCommand(cmd));
+        } else if (category === "createFileRequirement") {
+            if (this.model.createFileRequirement) {
+                console.log("defs gotten from def-list", data);
+                this.model.createFileRequirement.fileDef = data;
+            } else {
+                this.model.setRequirement(<ProcessRequirement>{
+                    'class': "CreateFileRequirement",
+                    fileDef: data.map((d: FileDefModel) => d.serialize())
+                });
+            }
         }
 
-        if (this.formGroup.controls[category] instanceof FormGroup) {
-            this.formGroup.controls[category].markAsDirty();
-        }
+        this.formGroup.markAsDirty();
     }
 
     private setStreams(change) {
@@ -126,11 +142,6 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
     private setResource(resource: ResourceRequirementModel) {
         this.model.setRequirement(resource.serialize(), true);
         this.formGroup.markAsDirty();
-    }
-
-    private setBaseCommand(list: ExpressionModel[]) {
-        this.model.baseCommand = [];
-        list.forEach(cmd => this.model.addBaseCommand(cmd));
     }
 
     ngAfterViewInit() {

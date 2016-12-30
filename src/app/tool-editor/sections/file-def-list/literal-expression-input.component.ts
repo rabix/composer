@@ -1,24 +1,26 @@
 import {Component, Input, forwardRef} from "@angular/core";
-import {NG_VALUE_ACCESSOR, ControlValueAccessor} from "@angular/forms";
-import {ExpressionModel} from "cwlts/models/d2sb";
+import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ComponentBase} from "../../../components/common/component-base";
 import {noop} from "../../../lib/utils.lib";
+import {ExpressionModel} from "../../../../../node_modules/cwlts/models/d2sb/ExpressionModel";
 import {ModalService} from "../../../components/modal/modal.service";
-import {ModelExpressionEditorComponent} from "../../expression-editor/model-expression-editor.component";
+import {ModelExpressionEditorComponent} from "../../../editor-common/expression-editor/model-expression-editor.component";
+import {MultilangCodeEditorComponent} from "../../../core/ui/code-editor/multilang-code-editor.component";
+import {ACE_MODES_MAP} from "../../../components/code-editor/code-editor-modes-map";
 
-require("./expression-input.component.scss");
+require("./literal-expression-input.component.scss");
 
 @Component({
-    selector: 'ct-expression-input',
+    selector: 'ct-literal-expression-input',
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
-            useExisting: forwardRef(() => ExpressionInputComponent),
+            useExisting: forwardRef(() => LiteralExpressionInputComponent),
             multi: true
         }
     ],
     template: `
-            <div class="expression-input-group clickable"
+        <div class="expression-input-group clickable"
                  [class.expr]="isExpr"
                  [ct-validation-class]="model.validation">
                  
@@ -27,29 +29,22 @@ require("./expression-input.component.scss");
                     *ngIf="model.result && isExpr"
                     [title]="model.result">E:</b>
                 
-                <div class="input-group">
+                <div class="textarea-btn-group">
                 
-                    <input class="form-control"
+                    <textarea class="form-control"
                             #input
-                            *ngIf="type === 'string'"
-                            type="text"
-                            [value]="value?.toString()"
                             [readonly]="isExpr"
                             (blur)="onTouch()"
                             (click)="editExpr(isExpr ? 'edit' : null, $event)"
-                            (change)="editString(input.value)"/>
-                            
-                    <input class="form-control"
-                            #input
-                            type="number"
-                            *ngIf="type === 'number'"
-                            [value]="value?.toString()"
-                            [readonly]="isExpr"
-                            (blur)="onTouch()"
-                            (click)="editExpr(isExpr ? 'edit' : null, $event)"
-                            (change)="editString(input.value)"/>
-                        
-                    <span class="input-group-btn">
+                            (change)="editLiteral(input.value)">{{ value?.toString() }}</textarea>
+                    
+                    <span class="btn-group">
+                        <button type="button" 
+                            (click)="openLiteralEditor()"
+                            [disabled]="value.isExpression"
+                            class="btn btn-secondary">
+                            <i class="fa fa-expand"></i>
+                        </button>
                         <button type="button"
                             class="btn btn-secondary" 
                             (click)="editExpr(isExpr ? 'clear' : 'edit', $event)">
@@ -60,17 +55,25 @@ require("./expression-input.component.scss");
                     </span>  
             </div>
         </div>
-        `
+`
 })
-export class ExpressionInputComponent extends ComponentBase implements ControlValueAccessor {
-    /**
-     * Context in which expression should be executed
-     */
-    @Input()
-    public context: any;
+export class LiteralExpressionInputComponent extends ComponentBase implements ControlValueAccessor {
 
     @Input()
-    public type: "string" | "number" = "string";
+    context: {$job?: {}} = {};
+
+    @Input()
+    fileName: string;
+
+    /**
+     * Declaration of change function
+     */
+    private onChange = noop;
+
+    /**
+     * Declaration of touch function
+     */
+    private onTouch = noop;
 
     /** Flag if model is expression or primitive */
     private isExpr: boolean = false;
@@ -79,6 +82,7 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
      * Internal ExpressionModel on which changes are made
      */
     private model: ExpressionModel;
+
 
     /** getter for formControl value */
     public get value() {
@@ -93,14 +97,14 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
         }
     }
 
-    /**
-     * From ControlValueAccessor
-     * Write a new value to the element when initially loading formControl
-     * @param obj
-     */
-    writeValue(obj: ExpressionModel): void {
+
+    constructor(private modal: ModalService) {
+        super();
+    }
+
+    writeValue(obj: any): void {
         if (!(obj instanceof ExpressionModel)) {
-            console.warn(`ct-expression-input expected ExpressionModel, instead got ${obj}`)
+            console.warn(`ct-literal-expression-input expected ExpressionModel, instead got ${obj}`)
         }
 
         if (obj) {
@@ -110,49 +114,49 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
             this.model  = new ExpressionModel("", "");
             this.isExpr = this.model.isExpression;
         }
-
-        //@fixme(maya) might not be the best place for this
-        this.model.evaluate(this.context);
     }
 
-    /**
-     * From ControlValueAccessor
-     * @param fn
-     */
     registerOnChange(fn: any): void {
         this.onChange = fn;
     }
 
-    /**
-     * From ControlValueAccessor
-     * @param fn
-     */
     registerOnTouched(fn: any): void {
         this.onTouch = fn;
     }
 
-    /**
-     * Declaration of change function
-     */
-    private onChange = noop;
+    private openLiteralEditor() {
+        const editor = this.modal.show(MultilangCodeEditorComponent, {
+            backdrop: true,
+            closeOnOutsideClick: false,
+            title: "Edit File Content"
+        });
 
-    /**
-     * Declaration of touch function
-     */
-    private onTouch = noop;
+        editor.content.next(this.value.toString());
 
+        if (this.fileName) {
+            const nameParts = this.fileName.split('.');
+            const ext = nameParts[nameParts.length - 1].toLowerCase();
+            if (ACE_MODES_MAP[ext]) {
+                editor.language.next(ext);
+            }
+        }
 
-    constructor(private modal: ModalService) {
-        super();
+        editor.action.first().subscribe(action => {
+            if (action === "save") {
+                // save string
+                this.model = new ExpressionModel(this.model.loc, <string> editor.content.value);
+                this.onChange(this.model);
+            }
+            this.modal.close();
+        });
     }
 
     /**
      * Callback for setting string value to model
      * @param str
      */
-    private editString(str: number | string) {
-        if (this.type === "number") str = Number(str);
-        this.model.setValue(str, this.type);
+    private editLiteral(str: number | string) {
+        this.model.setValue(str, "string");
         this.onChange(this.model);
     }
 
@@ -166,7 +170,7 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
         if (!action) return;
 
         if (action === "edit") {
-            const editor = this.modal.show<ModelExpressionEditorComponent>(ModelExpressionEditorComponent, {
+            const editor = this.modal.show(ModelExpressionEditorComponent, {
                 backdrop: true,
                 closeOnOutsideClick: false,
                 title: "Edit Expression"
@@ -186,7 +190,7 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
         }
 
         if (action === "clear") {
-            this.model.setValue("", this.type);
+            this.model.setValue("", "string");
             this.model.result = null;
             this.isExpr       = false;
             event.stopPropagation();
