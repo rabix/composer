@@ -6,7 +6,7 @@ import {EditorCommonModule} from "../editor-common/editor-common.module";
 import {ArgumentListComponent} from "./sections/arguments/argument-list.component";
 import {FileDefListComponent} from "./sections/file-def-list/file-def-list.component";
 import {ResourcesComponent} from "./sections/resources/resources.component";
-import {ToolInputComponent} from "./sections/inputs/tool-input.component";
+import {ToolInputsComponent} from "./sections/inputs/tool-inputs.component";
 import {ToolInputListComponent} from "./sections/inputs/tool-input-list-component";
 import {ToolOutputListComponent} from "./sections/outputs/tool-output-list.component";
 
@@ -37,7 +37,7 @@ import {LiteralExpressionInputComponent} from "./sections/file-def-list/literal-
         ArgumentListComponent,
         ArgumentInspector,
         FileDefListComponent,
-        ToolInputComponent,
+        ToolInputsComponent,
         ToolInputInspector,
         ToolInputListComponent,
         ToolOutputListComponent,
@@ -64,7 +64,7 @@ import {LiteralExpressionInputComponent} from "./sections/file-def-list/literal-
         FileDefListComponent,
         ResourcesComponent,
         ToolInputListComponent,
-        ToolInputComponent,
+        ToolInputsComponent,
         ToolInputInspector,
         ToolOutputListComponent,
         ToolOutputInspector,

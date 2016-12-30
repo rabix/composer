@@ -55,11 +55,13 @@ require("./base-command-form.components.scss");
             <div class="row">
                 <div class="col-xs-6">
                     <label class="form-control-label">Stdin redirect</label>
-                    <ct-expression-input [formControl]="streamsForm.controls['stdin']"></ct-expression-input>
+                    <ct-expression-input [formControl]="streamsForm.controls['stdin']" 
+                        [context]="context"></ct-expression-input>
                 </div>
                 <div class="col-xs-6">
                     <label class="form-control-label">Stdout redirect</label>
-                    <ct-expression-input [formControl]="streamsForm.controls['stdout']"></ct-expression-input>
+                    <ct-expression-input [formControl]="streamsForm.controls['stdout']" 
+                        [context]="context"></ct-expression-input>
                 </div>
             </div>
             

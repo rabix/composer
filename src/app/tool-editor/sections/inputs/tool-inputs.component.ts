@@ -21,14 +21,14 @@ require("./input-list.component.scss");
     template: `
         <ct-form-panel [collapsed]="false">
             <span class="tc-header">
-                Inputs
+                Input ports
             </span>
             
             <div class="tc-body">
                 
                 <!--Blank Tool Screen-->
                 <ct-blank-tool-state *ngIf="!readonly && !entries.length"
-                                     [title]="'Tool Inputs'"
+                                     [title]="'Files, parameters, and other stuff displayed in the tools command line'"
                                      [buttonText]="'Add an Input'"
                                      (buttonClick)="addEntry()">
                 </ct-blank-tool-state>
@@ -45,7 +45,7 @@ require("./input-list.component.scss");
         </ct-form-panel>
     `
 })
-export class ToolInputComponent extends ComponentBase {
+export class ToolInputsComponent extends ComponentBase {
 
     @Input()
     public entries: CommandInputParameterModel[] = [];
@@ -75,6 +75,7 @@ export class ToolInputComponent extends ComponentBase {
 
         const newEntryLocation = `${this.location}[${this.entries.length}]`;
         const newEntry = new CommandInputParameterModel(newEntryLocation, undefined);
+        newEntry.type.type = "File";
         const entries = this.entries.concat(newEntry);
         this.update.next(entries);
 

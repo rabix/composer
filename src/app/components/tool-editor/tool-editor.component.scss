@@ -124,9 +124,22 @@ ct-tool-editor {
 
 .input-list-items {
     border-radius: $gui-section-list-item-border-radius;
-    border:1px solid $gui-section-list-item-bg;
     margin-bottom: 10px;
     list-style: none;
+
+    &.record-input {
+        border:1px solid $gui-section-list-item-bg;
+
+      > .gui-section-list-item {
+        margin-bottom: 10px;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+    }
+
+    .gui-section-list-item {
+        margin-bottom: 0;
+    }
 }
 
 //@todo(maya) belongs with tool editor or form components

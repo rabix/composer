@@ -57,11 +57,6 @@ export class InputTypeSelectComponent extends ComponentBase implements ControlVa
     writeValue(paramType: InputParameterTypeModel): void {
         this.paramType = paramType;
 
-        if (!this.paramType.type) {
-            this.paramType.type = "File";
-            this.onChange(this.paramType);
-        }
-
         this.form.controls["type"].setValue(this.paramType.type);
         this.form.controls["items"].setValue(this.paramType.items);
 

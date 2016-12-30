@@ -19,7 +19,6 @@ require("./input-list.component.scss");
     selector: "ct-tool-input-list",
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `                        
-               
                     <!--List Header Row-->
                     <div class="gui-section-list-title row">
                         <div class="col-sm-4">ID</div>
@@ -31,7 +30,9 @@ require("./input-list.component.scss");
                     <ul class="gui-section-list">
                     
                         <!--List Entry-->
-                        <li *ngFor="let entry of entries; let i = index" class="input-list-items container">                          
+                        <li *ngFor="let entry of entries; let i = index" 
+                            class="input-list-items container" 
+                            [class.record-input]="entry.type.type === 'record'">                          
 
                             <div class="gui-section-list-item clickable row"
                                 [ct-editor-inspector]="inspector"
@@ -80,6 +81,7 @@ require("./input-list.component.scss");
                         <div *ngIf="entry.type.fields" class="">
                             <ct-tool-input-list *ngIf = "entry.type.type === 'record'" [entries]="entry.type.fields"
                                   [location]="getFieldsLocation(i)"
+                                  [isField]="true"
                                   (update)="updateFields($event, i)">                             
                             </ct-tool-input-list>    
                         </div>                           
@@ -113,6 +115,10 @@ export class ToolInputListComponent extends ComponentBase {
     @Input()
     public readonly = false;
 
+    /** Flag if input is field of a record */
+    @Input()
+    public isField = false;
+
     @Output()
     public readonly update = new Subject();
 
@@ -134,9 +140,10 @@ export class ToolInputListComponent extends ComponentBase {
     }
 
     private addEntry() {
-
         const newEntryLocation = `${this.location}[${this.entries.length}]`;
         const newEntry = new CommandInputParameterModel(newEntryLocation);
+        newEntry.isField = this.isField;
+        newEntry.type.type = "File";
         const entries = this.entries.concat(newEntry);
         this.update.next(entries);
 
@@ -153,11 +160,15 @@ export class ToolInputListComponent extends ComponentBase {
         return `${this.location}[${index}].type.fields`;
     }
 
-    private updateFields(fields, i) {
+    private updateFields(newFields, i) {
+        const type = this.entries[i].type;
+        type.fields = [];
+        newFields.forEach(field => {
+            field.isField = true;
+            type.addField(field)
+        });
 
-        this.entries[i].type.fields = fields.slice();
         this.update.next(this.entries.slice());
-
     }
 
     private updateInput(newInput: CommandInputParameterModel, index: number) {
