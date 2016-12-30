@@ -7,6 +7,13 @@ ct-revision-list {
         display: flex;
         flex-direction: row;
         flex-wrap: nowrap;
+        position:relative;
+
+        .loading-progress {
+            position:absolute;
+            top: 0;
+            height: 2px;
+        }
 
         &.active {
             background-color: $light-border-color;
@@ -23,7 +30,7 @@ ct-revision-list {
         }
 
         .revision-info {
-
+            flex-shrink: 1;
         }
     }
 

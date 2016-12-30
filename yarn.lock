@@ -34,6 +34,10 @@
   version "2.4.1"
   resolved "https://registry.yarnpkg.com/@angular/platform-browser/-/platform-browser-2.4.1.tgz#4eaa829b450be34f0029796b6c3b99e27d3d5740"
 
+"@angular2-material/progress-bar@^2.0.0-alpha.8-2":
+  version "2.0.0-alpha.8-2"
+  resolved "https://registry.yarnpkg.com/@angular2-material/progress-bar/-/progress-bar-2.0.0-alpha.8-2.tgz#90d5ccf60f5c0136bc45dded108caa883cf746a4"
+
 "@types/ace@0.0.31":
   version "0.0.31"
   resolved "https://registry.yarnpkg.com/@types/ace/-/ace-0.0.31.tgz#97278f40e6b47c445bf1ca97fb5bd0ffa39787f4"

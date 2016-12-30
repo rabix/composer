@@ -1,6 +1,6 @@
 import * as Yaml from "js-yaml";
 import {Component, OnInit, Input, OnDestroy, ViewChild, ViewContainerRef} from "@angular/core";
-import {FormGroup, FormBuilder} from "@angular/forms";
+import {FormControl, FormGroup, FormBuilder} from "@angular/forms";
 import {ReplaySubject, BehaviorSubject} from "rxjs/Rx";
 import {ModalService} from "../modal";
 import {noop} from "../../lib/utils.lib";
@@ -15,6 +15,7 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
 import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
 import LoadOptions = jsyaml.LoadOptions;
+import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 
 require("./tool-editor.component.scss");
 
@@ -33,7 +34,7 @@ require("./tool-editor.component.scss");
                 <!--Revisions-->
                 <button class="btn btn-secondary btn-sm" type="button"
                         [ct-editor-inspector]="revisions"
-                        *ngIf="toolModel.customProps['sbg:revision']">
+                        *ngIf="this.data.data.source !== 'local'">
                         Revision: {{ toolModel.customProps['sbg:revision']}}
                         
                         <template #revisions>
@@ -51,6 +52,7 @@ require("./tool-editor.component.scss");
                 
                 <!--Save-->
                 <button [disabled]="!data.isWritable" 
+                        (click)="save()"
                         class="btn btn-secondary btn-sm" type="button">
                         Save
                 </button>
@@ -149,6 +151,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
     constructor(private webWorkerService: WebWorkerService,
                 private userPrefService: UserPreferencesService,
                 private formBuilder: FormBuilder,
+                private platform:PlatformAPI,
                 private inspector: EditorInspectorService,
                 private modal: ModalService) {
 
@@ -237,14 +240,29 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
         });
     }
 
-    private save(revisionNote: string) {
+    private save() {
         const text = this.toolGroup.dirty ? this.getModelText() : this.rawEditorContent.getValue();
 
-        if (this.data.data.source === "local") {
+        // For local files, just save and that's it
+        if (this.data.data.source === "local"){
             this.data.data.save(text).subscribe(noop);
-        } else {
-            this.data.save(JSON.parse(text), revisionNote).subscribe(noop);
+            return;
         }
+
+        // For Platform files, we need to ask for a revision note
+        this.modal.prompt({
+            cancellationLabel: "Cancel",
+            confirmationLabel: "Publish",
+            content: "Revision Note",
+            title: "Publish a new App Revision",
+            formControl: new FormControl('')
+        }).then(revisionNote => {
+            this.data.save(JSON.parse(text), revisionNote).subscribe(result => {
+                const cwl = JSON.stringify(result.message, null , 4);
+                this.rawEditorContent.next(cwl);
+            });
+        }, noop);
+
     }
 
     /**
@@ -275,7 +293,6 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
                 this.viewMode = view;
             }
         } else if (view === ViewMode.Code) {
-            console.log("Is tool group dirty", this.toolGroup.dirty);
             if (this.toolGroup.dirty) {
                 this.rawEditorContent.next(this.getModelText());
             }
@@ -303,7 +320,9 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
     }
 
     private openRevision(revisionNumber: number) {
-        console.log("Should open revision Number", revisionNumber);
+        this.platform.getAppCWL(this.data.data, revisionNumber).subscribe(cwl => {
+           this.rawEditorContent.next(cwl);
+        });
     }
 
     ngAfterViewInit() {

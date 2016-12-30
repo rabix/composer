@@ -14,8 +14,8 @@ import {WorkboxService} from "../workbox/workbox.service";
         </ct-panel-toolbar>
         
         <div *ngIf="isLoading">
-             <div class="text-xs-center"><small>Fetching Public Apps&hellip;</small></div>
-            <progress class="progress progress-striped progress-animated" value="100" max="100"></progress>
+            <md-progress-bar mode="indeterminate"></md-progress-bar>
+            <div class="text-xs-center"><small>Fetching Public Apps&hellip;</small></div>
         </div>
         <ct-tree-view [nodes]="nodes" [preferenceKey]="'public-apps'"></ct-tree-view>
     `

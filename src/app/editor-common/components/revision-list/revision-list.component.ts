@@ -8,6 +8,7 @@ import {
 } from "@angular/core";
 import {PlatformAppRevisionEntry} from "../../../services/api/platforms/platform-api.types";
 import {Subject} from "rxjs";
+
 require("./revision-list.component.scss");
 
 @Component({
@@ -22,6 +23,9 @@ require("./revision-list.component.scss");
                      (click)="selectRevision(revision)"
                      [class.active]="active === revision.number"
                      *ngFor="let revision of displayList">
+                    
+                    <md-progress-bar *ngIf="loadingRevision === revision" class="loading-progress" mode="indeterminate"></md-progress-bar>
+                    
                     <div class="revision-number h5">
                         {{ revision.number }}
                     </div>
@@ -50,6 +54,9 @@ export class RevisionListComponent implements OnChanges {
     @Output()
     public select = new Subject<number>();
 
+    @Input()
+    public loadingRevision;
+
     private displayList: {
         date: number,
         note: string,
@@ -63,9 +70,12 @@ export class RevisionListComponent implements OnChanges {
         }
 
         this.select.next(revision.number);
+
+        this.loadingRevision = revision;
     }
 
     ngOnChanges(changes: SimpleChanges): void {
+        this.loadingRevision = undefined;
 
         this.displayList = changes['revisions'].currentValue.map(rev => ({
             date: rev["sbg:modifiedOn"] * 1000,

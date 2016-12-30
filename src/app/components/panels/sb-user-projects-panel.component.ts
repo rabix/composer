@@ -33,10 +33,10 @@ import {WorkboxService} from "../workbox/workbox.service";
         </div>
         
         <div *ngIf="isLoading">
+            <md-progress-bar mode="indeterminate"></md-progress-bar>
             <div class="text-xs-center">
                 <small>Preparing Your Projects&hellip;</small>
             </div>
-            <progress class="progress progress-striped progress-animated" value="100" max="100"></progress>
         </div>
         
         <ct-tree-view [nodes]="nodes | async" [preferenceKey]="'user-projects'"></ct-tree-view>

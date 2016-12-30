@@ -1,63 +1,60 @@
 @import "../../../assets/sass/_variables.scss";
 
-
 .left-panel-bar {
-  display: flex;
-  flex-direction: column;
-  height: calc(100% - #{$main-header-height} - #{$panel-item-width});
-  justify-content: space-between;
-  background: $panel-side-tab-zone-bg;
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - #{$main-header-height} - #{$panel-item-width});
+    justify-content: space-between;
+    background: $panel-side-tab-zone-bg;
+    border-right: 1px solid darken($panel-side-tab-zone-bg, 10%);
 
 }
 
 ct-panel-switcher {
-  display: inline-block;
-  width: $panel-item-width;
-  border-right: 2px solid $panel-side-tab-zone-border;
-  color: white;
+    display: inline-block;
+    width: $panel-item-width;
+    color: white;
 
-  .switcher {
+    .switcher {
 
-    display: block;
-    padding: 20px 10px;
-    background: $panel-side-tab-bg;
-    border: 0;
-    position: relative;
-    height: 140px;
-    border-radius: 2px;
+        background: $panel-side-tab-bg;
+        border: 0;
+        position: relative;
+        height: 140px;
+        border-radius: 2px;
 
-    &:hover {
-      background: $panel-side-tab-hover-bg;
-      color: $panel-side-tab-hover-color;
-      .switcher-icon {
-        color: $panel-side-tab-hover-icon-color;
-      }
+        &:hover {
+            background: $panel-side-tab-hover-bg;
+            color: $panel-side-tab-hover-color;
+            .switcher-icon {
+                color: $panel-side-tab-hover-icon-color;
+            }
+        }
+
+        &.active {
+            background: $panel-side-tab-select-bg;
+            color: $panel-side-tab-select-color;
+            .switcher-icon {
+                color: $panel-side-tab-select-icon-color;
+            }
+        }
+
+        .switcher-text {
+            font-size: $font-size-sm;
+            left: 50%;
+            line-height: 0;
+            margin-top: -1px;
+            position: absolute;
+            text-align: center;
+            top: 50%;
+            transform: translateX(-50%) rotate(-90deg);
+            white-space: nowrap;
+        }
+
+        .switcher-icon {
+            color: $panel-side-tab-icon-color;
+        }
     }
-
-    &.active {
-      background: $panel-side-tab-select-bg;
-      color: $panel-side-tab-select-color;
-      .switcher-icon {
-        color: $panel-side-tab-select-icon-color;
-      }
-    }
-
-    .switcher-text {
-      font-size: $font-size-sm;
-      left: 50%;
-      line-height: 0;
-      margin-top: -1px;
-      position: absolute;
-      text-align: center;
-      top: 50%;
-      transform: translateX(-50%) rotate(-90deg);
-      white-space: nowrap;
-    }
-
-    .switcher-icon {
-      color: $panel-side-tab-icon-color;
-    }
-  }
 
 }
 

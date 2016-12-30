@@ -18,6 +18,7 @@ import {ValidationTextPipe} from "./pipes/validation-text.pipes";
 import {ValidationClassDirective} from "./components/validation-preview/validation-class.directive";
 import {EditorControlsComponent} from "./components/editor-controls/editor-controls.component";
 import {RevisionListComponent} from "./components/revision-list/revision-list.component";
+import {MdProgressBarModule} from "@angular2-material/progress-bar";
 
 @NgModule({
     declarations: [
@@ -63,7 +64,7 @@ import {RevisionListComponent} from "./components/revision-list/revision-list.co
         ExpressionEditorComponent,
         ModelExpressionEditorComponent,
     ],
-    imports: [BrowserModule, CoreModule, FormsModule, ReactiveFormsModule]
+    imports: [BrowserModule, CoreModule, FormsModule, ReactiveFormsModule, MdProgressBarModule]
 })
 export class EditorCommonModule {
 
