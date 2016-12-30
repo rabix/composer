@@ -45,6 +45,16 @@ import {EditorCommonModule} from "./app/editor-common/editor-common.module";
 import {ProjectSelectionModal} from "./app/components/modal/custom/project-selection-modal.component";
 import {UserPreferencesService} from "./app/services/storage/user-preferences.service";
 import {DomEventService} from "./app/services/dom/dom-event.service";
+import {FileRegistryService} from "./app/core/file-registry/file-registry.service";
+import {FILE_RESOLVERS} from "./app/core/file-registry/types";
+import {LocalDataSourceService} from "./app/sources/local/local.source.service";
+import {SBPlatformDataSourceService} from "./app/sources/sbg/sb-platform.source.service";
+import {GuidService} from "./app/services/guid.service";
+import {IpcService} from "./app/services/ipc.service";
+import {PlatformAPI} from "./app/services/api/platforms/platform-api.service";
+import {SettingsService} from "./app/services/settings/settings.service";
+import {Http} from "@angular/http";
+import {MdProgressBarModule} from "@angular2-material/progress-bar";
 
 @NgModule({
     providers: [
@@ -53,6 +63,11 @@ import {DomEventService} from "./app/services/dom/dom-event.service";
         TemplateProviderService,
         UserPreferencesService,
         DomEventService,
+        FileRegistryService,
+        GuidService,
+        IpcService,
+        SettingsService,
+        PlatformAPI
     ],
     declarations: [
         AlertComponent,
@@ -109,6 +124,7 @@ import {DomEventService} from "./app/services/dom/dom-event.service";
         HttpModule,
         ReactiveFormsModule,
         ToolEditorModule,
+        MdProgressBarModule,
     ],
     bootstrap: [MainComponent]
 })

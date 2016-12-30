@@ -1,7 +1,6 @@
 import {ChangeDetectionStrategy, Input, ChangeDetectorRef, NgZone, Component} from "@angular/core";
 import {FormControl} from "@angular/forms";
 import {Observable} from "rxjs";
-
 import {noop} from "../../lib/utils.lib";
 import {ModalService} from "../modal/modal.service";
 import {IpcService} from "../../services/ipc.service";
@@ -11,6 +10,7 @@ import {WorkboxService} from "../workbox/workbox.service";
 import {NewFileModalComponent} from "../modal/custom/new-file-modal.component";
 import {LocalDataSourceService} from "../../sources/local/local.source.service";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
+import {FileRegistryService} from "../../core/file-registry/file-registry.service";
 
 const {app, dialog} = window.require("electron").remote;
 
@@ -40,12 +40,14 @@ export class LocalFilesPanelComponent extends ComponentBase {
                 private detector: ChangeDetectorRef,
                 private workbox: WorkboxService,
                 private zone: NgZone,
-                private preferences: UserPreferencesService) {
+                private preferences: UserPreferencesService,
+                private registry: FileRegistryService
+    ) {
         super();
     }
 
     ngOnInit() {
-        this.tracked = this.preferences.get("local_open_folders", []).subscribe(files => this.addDirectory(...files));
+        this.preferences.get("local_open_folders", []).first().subscribe(files => this.addDirectory(...files));
     }
 
     private recursivelyMapChildrenToNodes(childrenProvider) {

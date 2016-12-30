@@ -14,6 +14,7 @@ import {MenuItemComponent} from "./ui/menu/menu-item.component";
 import {MenuComponent} from "./ui/menu/menu.component";
 import {ContextDirective} from "./ui/context/context.directive";
 import {ContextService} from "./ui/context/context.service";
+import {MdProgressBarModule} from "@angular2-material/progress-bar";
 
 @NgModule({
     entryComponents: [
@@ -74,14 +75,14 @@ import {ContextService} from "./ui/context/context.service";
 
         // Context
         ContextDirective,
-
     ],
     providers: [
         IpcService,
         GuidService,
         ContextService,
+
     ],
-    imports: [BrowserModule]
+    imports: [BrowserModule, MdProgressBarModule]
 })
 export class CoreModule {
 

@@ -1,4 +1,4 @@
-import {Injectable, NgZone} from "@angular/core";
+import {Injectable} from "@angular/core";
 import {DataEntrySource} from "../common/interfaces";
 import {Observable, Subject} from "rxjs";
 import {IpcService} from "../../services/ipc.service";
@@ -19,8 +19,7 @@ export class LocalDataSourceService {
 
     private fileUpdates = new Subject<(index: FileIndex) => FileIndex>();
 
-    constructor(private ipc: IpcService,
-                private zone: NgZone) {
+    constructor(private ipc: IpcService) {
 
         this.files = this.fileUpdates.scan((files, update) => update(files), {});
     }
@@ -51,7 +50,7 @@ export class LocalDataSourceService {
     }
 
     private getDirContent(dir: string) {
-        return this.ipc.request("readDirectory", dir, this.zone).flatMap(Observable.from as any)
+        return this.ipc.request("readDirectory", dir).flatMap(Observable.from as any)
             .map(entry => this.wrapFileEntry(entry))
             .reduce((acc, item) => acc.concat(item), [])
             .map(dir => dir.sort((a, b) => a.isDir ? -1 : 1));
@@ -59,17 +58,17 @@ export class LocalDataSourceService {
 
     private readFileContent(path) {
 
-        return this.ipc.request("readFileContent", path, this.zone);
+        return this.ipc.request("readFileContent", path);
     }
 
     public getContentSavingFunction(path) {
 
-        return content => this.ipc.request("saveFileContent", {path, content}, this.zone);
+        return content => this.ipc.request("saveFileContent", {path, content});
 
     }
 
     public createFile(path, content): Observable<any> {
-        const creation = this.ipc.request("createFile", {path, content}, this.zone)
+        const creation = this.ipc.request("createFile", {path, content})
             .map(file => this.wrapFileEntry(file))
             .share();
 
@@ -88,7 +87,7 @@ export class LocalDataSourceService {
     }
 
     public remove(dirPath): Observable<any> {
-        const deletion = this.ipc.request("deletePath", dirPath, this.zone).share();
+        const deletion = this.ipc.request("deletePath", dirPath).share();
 
         const parentPath = path.dirname(dirPath);
 
@@ -117,7 +116,7 @@ export class LocalDataSourceService {
     }
 
     public createDirectory(path) {
-        const creation = this.ipc.request("createDirectory", path, this.zone).share();
+        const creation = this.ipc.request("createDirectory", path).share();
 
         creation.switchMap(info => this.getDirContent(info.dirname).map(listing => ({listing, info})))
             .subscribe(data => {
