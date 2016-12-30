@@ -113,11 +113,13 @@ export class BaseCommandFormComponent extends ComponentBase implements OnInit, O
 
     ngOnChanges(changes: SimpleChanges): void {
         if (this.streamsForm) {
-            this.streamsForm.controls["stdin"].setValue(changes["stdin"].currentValue);
-            this.streamsForm.controls["stdout"].setValue(changes["stdout"].currentValue);
+            if (changes["stdin"]) this.streamsForm.controls["stdin"].setValue(changes["stdin"].currentValue);
+            if (changes["stdout"]) this.streamsForm.controls["stdout"].setValue(changes["stdout"].currentValue);
         }
 
-        this.initCmdForm(changes["baseCommand"].currentValue);
+        if (changes["baseCommand"]) {
+            this.initCmdForm(changes["baseCommand"].currentValue);
+        }
     }
 
     private initCmdForm(cmdList: ExpressionModel[]) {
@@ -171,14 +173,7 @@ export class BaseCommandFormComponent extends ComponentBase implements OnInit, O
     }
 
     private addBaseCommand(): void {
-        const newCmd = {
-            id: this.guidService.generate(),
-            model: new ExpressionModel("", "")
-        };
-
-        this.baseCommandForm.addControl(newCmd.id, new FormControl(newCmd.model, [Validators.required]));
-        this.formList.push(newCmd);
-
+        this.updateCmd.next(this.baseCommand.concat([new ExpressionModel("", "")]));
         this.form.markAsTouched();
     }
 
