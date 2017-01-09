@@ -45,9 +45,6 @@ export class HintListComponent extends ComponentBase {
         readonly: boolean
     }[] = [];
 
-    @Input()
-    public readonly = false;
-
     @Output()
     public update = new ReplaySubject<any>();
 

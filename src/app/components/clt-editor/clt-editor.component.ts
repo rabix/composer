@@ -46,7 +46,6 @@ require("./clt-editor.component.scss");
                 </ct-resources>
 
                 <ct-hint-list [entries]="model.hints || []" 
-                              [readonly]="readonly"
                               (update)="setHints($event)"></ct-hint-list>
                 
                 <ct-argument-list [location]="model.loc + '.arguments'" 
