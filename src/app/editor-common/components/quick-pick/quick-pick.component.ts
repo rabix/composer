@@ -19,13 +19,21 @@ require("./quick-pick.component.scss");
     ],
     template: `
     <div class="suggestions" *ngIf="!showCustom">
-
-        <button class="btn btn-secondary"
-                [class.selected]="computedVal === item.value"
-                (click)="setValue(item.value)"
-                *ngFor="let item of list">
-            {{ item.label }}
-        </button>
+    
+            <div class="radio-container" *ngFor="let item of list">
+                <input type="radio"
+                       [class.selected]="computedVal === item.value"
+                       [value]="item.value"
+                       [formControl]="radioForm"
+                       id="{{item.label}}"
+                       required>
+                       
+                <label class="radio-label btn btn-secondary"
+                        for="{{item.label}}"
+                       [class.selected]="computedVal === item.value">
+                       {{ item.label }}
+               </label>
+           </div>
     </div>
     
     <button type="button"
@@ -34,7 +42,7 @@ require("./quick-pick.component.scss");
             (click)="createControl('')">Custom
     </button>
 
-    <div *ngIf="showCustom" ngSwitch="type" class="removable-form-control">
+    <div *ngIf="showCustom" class="removable-form-control">
         <ct-expression-input [context]="context" 
                              [formControl]="customControl" 
                              [type]="type">
@@ -72,6 +80,8 @@ export class QuickPickComponent extends ComponentBase implements ControlValueAcc
 
     private computedVal: number | string | Expression;
 
+    private radioForm: FormControl;
+
     get value(): string|number|ExpressionModel {
         return this._value;
     }
@@ -96,6 +106,11 @@ export class QuickPickComponent extends ComponentBase implements ControlValueAcc
 
         this.computedVal = <string | number> val;
 
+        this.radioForm = new FormControl(this.computedVal);
+        this.radioForm.valueChanges.subscribe(value => {
+            this.setValue(value);
+        });
+
         if (this.showCustom) this.createControl(value);
     }
 
@@ -114,7 +129,7 @@ export class QuickPickComponent extends ComponentBase implements ControlValueAcc
     ngOnInit() {
         if (this.suggestions) {
             if (Array.isArray(this.suggestions)) {
-                let type = typeof this.suggestions[0];
+                const type = typeof this.suggestions[0];
                 if (type !== "string") {
                     console.warn(`Please provide ct-quick-pick with correct suggested value format. Expected "string" got "${type}"`)
                 } else {

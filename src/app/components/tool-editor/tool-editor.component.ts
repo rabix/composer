@@ -11,9 +11,7 @@ import {DataEntrySource} from "../../sources/common/interfaces";
 import {ViewMode} from "../view-switcher/view-switcher.component";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
 import {WebWorkerService} from "../../services/web-worker/web-worker.service";
-import {ToolSidebarService} from "../../services/sidebars/tool-sidebar.service";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
-import {ExpressionSidebarService} from "../../services/sidebars/expression-sidebar.service";
 import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
 import LoadOptions = jsyaml.LoadOptions;
@@ -24,9 +22,7 @@ require("./tool-editor.component.scss");
 @Component({
     selector: "ct-tool-editor",
     providers: [
-        ToolSidebarService,
-        EditorInspectorService,
-        ExpressionSidebarService,
+        EditorInspectorService
     ],
     template: `
         <block-loader *ngIf="isLoading"></block-loader>

@@ -1,5 +1,6 @@
 import {Component, Input, ElementRef, Renderer, ViewChild, forwardRef} from "@angular/core";
 import {FormControl, ControlValueAccessor, NG_VALUE_ACCESSOR, NG_VALIDATORS} from "@angular/forms";
+import {noop} from "../../../lib/utils.lib";
 
 require("./compact-list.component.scss");
 
@@ -10,7 +11,7 @@ require("./compact-list.component.scss");
         { provide: NG_VALIDATORS, useExisting: forwardRef(() => CompactListComponent), multi: true }
     ],
     template: `
-            <div class="compact-list-wrapper">
+           <div class="compact-list-wrapper" (click)="onListWrapperClick()">
                 
                 <div class="input-tag-list">
                     
@@ -25,7 +26,7 @@ require("./compact-list.component.scss");
                     <!-- Not using the <input>, 
                          so that the width can adjust to the text length,
                          and break into a new line if its long -->
-                    <span #tagInput ct-editable contenteditable="true" (click)="onListWrapperClick()"
+                     <span #tagInput ct-editable contenteditable="true"
                           class="tag-input"
                           *ngIf="tagInputControl"
                           [ngClass]="{'invalid-input': !isValidInput }"
@@ -74,9 +75,9 @@ export class CompactListComponent implements ControlValueAccessor  {
 
     private validationMessage: string = "Input not valid.";
 
-    private onTouched = () => { };
+    private onTouched = noop;
 
-    private propagateChange = (_) => {};
+    private propagateChange = noop;
 
     constructor(private renderer: Renderer) {
         this.tagInputControl = new FormControl("");
@@ -98,7 +99,7 @@ export class CompactListComponent implements ControlValueAccessor  {
         this.renderer.invokeElementMethod(this.tagInputElement.nativeElement, 'focus', []);
     }
 
-    private validate(c: FormControl): void {
+    validate(c: FormControl): void {
         this.control = c;
     }
 
@@ -125,7 +126,7 @@ export class CompactListComponent implements ControlValueAccessor  {
             this.addTagInControl(trimmedValue);
             this.isValidInput = this.control.valid;
 
-            if (!!this.isValidInput) {
+            if (this.isValidInput) {
                 this.tagList.push(trimmedValue);
                 this.tagInputControl.setValue("");
             } else {

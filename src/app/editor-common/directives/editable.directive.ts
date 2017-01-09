@@ -1,5 +1,6 @@
 import {Directive, ElementRef, forwardRef} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, NG_VALIDATORS, FormControl} from "@angular/forms";
+import {noop} from "../../lib/utils.lib";
 
 @Directive({
     selector: '[ct-editable][contenteditable=true]',
@@ -14,27 +15,25 @@ import {ControlValueAccessor, NG_VALUE_ACCESSOR, NG_VALIDATORS, FormControl} fro
 })
 export class EditableDirective implements ControlValueAccessor {
 
-    private propagateChange = (_) => { };
-    private onTouched = () => { };
+    private propagateChange = noop;
+    private onTouched = noop;
 
-    private validateFn = (_) => {};
+    private validateFn = noop;
 
     private lastValue: string;
 
-    constructor(private elRef: ElementRef) {
+    constructor(private elRef: ElementRef) { }
 
-    }
-
-    private writeValue(value: any): void {
+    writeValue(value: any): void {
         this.elRef.nativeElement.innerText = value;
         this.propagateChange(this.elRef.nativeElement.innerText);
     }
 
-    private registerOnChange(fn: any): void {
+    registerOnChange(fn: any): void {
         this.propagateChange = fn;
     }
 
-    private registerOnTouched(fn: any): void {
+    registerOnTouched(fn: any): void {
         this.onTouched = fn;
     }
 
@@ -52,7 +51,7 @@ export class EditableDirective implements ControlValueAccessor {
         }
     }
 
-    private validate(c: FormControl) {
+    validate(c: FormControl) {
         return this.validateFn(c);
     }
 }

@@ -41,7 +41,7 @@ export class ToolInputInspector extends ComponentBase {
         this.form = this.formBuilder.group({
             basicInputSection: this.input,
             description: this.input,
-            stageInputSection: this.input,
+            stageInputSection: this.input
         });
 
 

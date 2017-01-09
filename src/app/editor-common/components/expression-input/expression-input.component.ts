@@ -166,7 +166,7 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
         if (!action) return;
 
         if (action === "edit") {
-            const editor = this.modal.show<ModelExpressionEditorComponent>(ModelExpressionEditorComponent, {
+            const editor = this.modal.show(ModelExpressionEditorComponent, {
                 backdrop: true,
                 closeOnOutsideClick: false,
                 title: "Edit Expression"

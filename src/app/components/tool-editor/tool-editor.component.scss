@@ -122,6 +122,26 @@ ct-tool-editor {
     color: $arg-color;
 }
 
+.input-list-items {
+    border-radius: $gui-section-list-item-border-radius;
+    margin-bottom: 10px;
+    list-style: none;
+
+    &.record-input {
+        border:1px solid $gui-section-list-item-bg;
+
+      > .gui-section-list-item {
+        margin-bottom: 10px;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+    }
+
+    .gui-section-list-item {
+        margin-bottom: 0;
+    }
+}
+
 //@todo(maya) belongs with tool editor or form components
 .gui-section-list-item {
     transition: all .2s;

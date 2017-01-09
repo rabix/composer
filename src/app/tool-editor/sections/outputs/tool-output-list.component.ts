@@ -13,7 +13,7 @@ require("./output-list.component.scss");
     template: `
         <ct-form-panel [collapsed]="false">
             <span class="tc-header">
-                Outputs
+                Output ports
             </span>
             
             <div class="tc-body">
@@ -143,6 +143,7 @@ export class ToolOutputListComponent extends ComponentBase {
     private addEntry() {
         const newEntryLocation = `${this.location}[${this.entries.length}]`;
         const newEntry = new CommandOutputParameterModel(undefined, newEntryLocation);
+        newEntry.type.type = "File";
         const entries  = this.entries.concat(newEntry);
         this.update.next(entries);
 

@@ -1,3 +1,4 @@
+/*
 import {Component, forwardRef} from "@angular/core";
 import {
     ControlValueAccessor, NG_VALUE_ACCESSOR, FormGroup,
@@ -53,9 +54,9 @@ import {CustomValidators} from "../../../../validators/custom.validator";
     `
 })
 
-/**
+/!**
  * TODO: add the load content property on the model
- * */
+ * *!/
 export class SecondaryFilesComponent extends ComponentBase implements ControlValueAccessor {
 
     private port: CommandOutputParameterModel | CommandInputParameterModel;
@@ -68,7 +69,7 @@ export class SecondaryFilesComponent extends ComponentBase implements ControlVal
 
     private secondaryFilesFormGroup: FormGroup;
 
-    /** List which connects model to forms */
+    /!** List which connects model to forms *!/
     private formList: Array<{id: string, model: ExpressionModel}> = [];
 
     constructor(private guidService: GuidService) {
@@ -136,3 +137,4 @@ export class SecondaryFilesComponent extends ComponentBase implements ControlVal
         this.formList.forEach(item => this.secondaryFilesFormGroup.removeControl(item.id));
     }
 }
+*/

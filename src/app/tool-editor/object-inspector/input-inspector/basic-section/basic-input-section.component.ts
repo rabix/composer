@@ -10,12 +10,11 @@ import {
 } from "@angular/forms";
 import {
     CommandInputParameterModel as InputProperty,
-    CommandLineBindingModel,
     InputParameterTypeModel
 } from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../../components/common/component-base";
-import {CustomValidators} from "../../../../validators/custom.validator";
 import {PrimitiveParameterType} from "../../../../../../node_modules/cwlts/models/d2sb/ParameterTypeModel";
+import {noop} from "../../../../lib/utils.lib";
 
 require("./basic-input-section.component.scss");
 
@@ -39,8 +38,10 @@ require("./basic-input-section.component.scss");
                 <div class="form-group flex-container">
                     <label>Required</label>
                     <span class="align-right">
-                        {{input.type.isNullable ? "No" : "Yes"}}
-                        <toggle-slider [formControl]="basicSectionForm.controls['isRequired']"></toggle-slider>
+                        <toggle-slider [formControl]="basicSectionForm.controls['isRequired']"
+                                       [off]="'No'" 
+                                       [on]="'Yes'">
+                        </toggle-slider>
                     </span>
                 </div> <!-- Required -->
             
@@ -53,19 +54,21 @@ require("./basic-input-section.component.scss");
                 
                 <input-type-select [formControl]="basicSectionForm.controls['typeForm']"></input-type-select>
                 
-                <div class="form-group flex-container" 
-                        *ngIf="input.type.type !== 'map' && basicSectionForm.controls['isBound']">
-                    <label>Include in command line</label>
-                    <span class="align-right">
-                        {{input.isBound ? "Yes" : "No"}}
-                        <toggle-slider [formControl]="basicSectionForm.controls['isBound']"></toggle-slider>
-                    </span>
-                </div> <!-- Include in commandline -->
-                
                 <symbols-section class="form-group" 
                                 *ngIf="input.type.type === 'enum'"
                                 [formControl]="basicSectionForm.controls['symbols']">
                 </symbols-section>
+                
+                <div class="form-group flex-container" 
+                        *ngIf="input.type.type !== 'map' && basicSectionForm.controls['isBound']">
+                    <label>Include in command line</label>
+                    <span class="align-right">
+                        <toggle-slider [formControl]="basicSectionForm.controls['isBound']" 
+                                       [off]="'No'" 
+                                       [on]="'Yes'">
+                        </toggle-slider>
+                    </span>
+                </div> <!-- Include in commandline -->
                 
                 <input-binding-section *ngIf="input.isBound" 
                             [context]="context"
@@ -85,11 +88,9 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
     private basicSectionForm: FormGroup;
 
-    private onTouched = () => {
-    };
+    private onTouched = noop;
 
-    private propagateChange = (_) => {
-    };
+    private propagateChange = noop;
 
     private initSymbolsList: string[] = [];
 
@@ -102,16 +103,13 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
         this.basicSectionForm = this.formBuilder.group({
             propertyIdForm: [this.input.id],
-            typeForm: [this.input.type, [Validators.required, CustomValidators.cwlModel]],
+            typeForm: [this.input.type, [Validators.required]],
             isBound: [this.input.isBound],
-            //FIXME: isNullable is undefined when it's not nullable
             isRequired: [!this.input.type.isNullable],
-            inputBinding: [this.input.inputBinding, CustomValidators.cwlModel],
-            itemType: [this.input.type.items ? this.input.type.items : 'File'],
+            inputBinding: [this.input.inputBinding],
             symbols: [this.input.type.symbols ? this.input.type.symbols : this.initSymbolsList]
         });
 
-        this.listenToItemTypeFormChanges();
         this.listenToIsBoundChanges();
         this.listenToInputBindingChanges();
         this.listenToTypeFormChanges();
@@ -137,7 +135,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
         this.onTouched = fn;
     }
 
-    validate(c: FormControl) {
+    validate() {
         return this.basicSectionForm.valid ? null : {error: "Basic input section is not valid."}
     }
 
@@ -145,7 +143,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
         this.tracked = this.basicSectionForm.controls['isBound'].valueChanges.subscribe((isBound: boolean) => {
             if (isBound) {
                 this.input.createInputBinding();
-                this.basicSectionForm.setControl('inputBinding', new FormControl(this.input.inputBinding));
+                this.basicSectionForm.setControl('inputBinding', new FormControl(this.input));
                 this.listenToInputBindingChanges();
             } else {
                 this.input.removeInputBinding();
@@ -167,17 +165,9 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
     private listenToInputBindingChanges(): void {
         this.tracked = this.basicSectionForm.controls['inputBinding'].valueChanges
-            .subscribe((inputBinding: CommandLineBindingModel) => {
-                this.input.updateInputBinding(inputBinding);
-            });
-    }
-
-    private listenToItemTypeFormChanges(): void {
-        this.tracked = this.basicSectionForm.controls['itemType'].valueChanges
-            .subscribe((value: PrimitiveParameterType) => {
-                if (!!value && this.input.type.type === 'array') {
-                    this.input.type.items = value;
-                }
+            .subscribe((input: InputProperty) => {
+                this.input.updateInputBinding(input.inputBinding);
+                Object.assign(this.input.customProps, input.customProps);
             });
     }
 

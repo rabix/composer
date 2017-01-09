@@ -2,6 +2,7 @@ import {Component, forwardRef} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormBuilder, FormGroup} from "@angular/forms";
 import {ComponentBase} from "../../../../components/common/component-base";
 import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
+import {noop} from "../../../../lib/utils.lib";
 
 @Component({
     selector: 'ct-stage-input',
@@ -25,32 +26,28 @@ import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
                 </select>
             </div>
                 
-            
-           <!-- 
-           TODO
-           <div class="form-group flex-container *ngIf="input.type.type === 'File'">
+           
+           <div class="form-group flex-container" *ngIf="input.type.type === 'File'">
                 <label>Load Content</label>
                 <span class="align-right">
-                    {{input.inputBinding.loadContents ? "Yes" : "No"}}
-                    <toggle-slider [formControl]="stageInputFormGroup.controls['loadContent']"></toggle-slider>
+                    <toggle-slider [formControl]="stageInputFormGroup.controls['loadContent']"
+                                   [off]="'No'" 
+                                   [on]="'Yes'"></toggle-slider>
                 </span>
-            </div>-->
+           </div>
        
     </div> <!--tc-body-->
 </ct-form-panel>
     `
 })
 
-/**
- * TODO: add the load content property on the model
- * */
 export class StageInputSectionComponent extends ComponentBase implements ControlValueAccessor {
 
     private input: InputProperty;
 
-    private onTouched = () => { };
+    private onTouched = noop;
 
-    private propagateChange = (_) => {};
+    private propagateChange = noop;
 
     private stageInputFormGroup: FormGroup;
 
@@ -68,20 +65,20 @@ export class StageInputSectionComponent extends ComponentBase implements Control
         this.input = input;
 
         this.stageInputFormGroup = this.formBuilder.group({
-            stageInput: [this.input["sbg:sbg:stageInput"] || ""],
-            //TODO: add load content
-            //loadContent: []
+            stageInput: [this.input.customProps["sbg:stageInput"] || ""],
+            loadContent: [!!this.input.inputBinding && this.input.inputBinding.loadContents ? this.input.inputBinding.loadContents: false]
         });
 
         this.tracked = this.stageInputFormGroup.valueChanges
             .distinctUntilChanged()
             .subscribe(value => {
                 if (!!value.stageInput) {
-                    this.input["sbg:stageInput"] = value.stageInput;
-                } else if (this.input["sbg:stageInput"]) {
-                    delete this.input["sbg:stageInput"];
+                    this.input.customProps["sbg:stageInput"] = value.stageInput;
+                } else if (this.input.customProps["sbg:stageInput"]) {
+                    delete this.input.customProps["sbg:stageInput"];
                 }
 
+                this.input.inputBinding.loadContents = value.loadContent;
                 this.propagateChange(this.input);
             });
     }

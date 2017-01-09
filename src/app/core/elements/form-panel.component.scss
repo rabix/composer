@@ -1,10 +1,10 @@
 @import "../../../assets/sass/variables";
 
 ct-form-panel {
-    //.borderless .form-section {
-    //    border: none;
-    //    padding: 0;
-    //}
+    &.borderless .form-section {
+        border: none;
+        padding: 0;
+    }
 
     .form-section {
         position: relative;
