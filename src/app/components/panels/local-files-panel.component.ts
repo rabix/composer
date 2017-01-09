@@ -10,7 +10,6 @@ import {WorkboxService} from "../workbox/workbox.service";
 import {NewFileModalComponent} from "../modal/custom/new-file-modal.component";
 import {LocalDataSourceService} from "../../sources/local/local.source.service";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
-import {FileRegistryService} from "../../core/file-registry/file-registry.service";
 
 const {app, dialog} = window.require("electron").remote;
 
@@ -40,9 +39,7 @@ export class LocalFilesPanelComponent extends ComponentBase {
                 private detector: ChangeDetectorRef,
                 private workbox: WorkboxService,
                 private zone: NgZone,
-                private preferences: UserPreferencesService,
-                private registry: FileRegistryService
-    ) {
+                private preferences: UserPreferencesService) {
         super();
     }
 
@@ -103,8 +100,8 @@ export class LocalFilesPanelComponent extends ComponentBase {
                     contextMenu: this.createContextMenu(item),
                     childrenProvider: item.isReadable ? this.recursivelyMapChildrenToNodes(item.childrenProvider) : undefined,
                     openHandler: item.isReadable ? () => {
-                        this.openTab(item);
-                    } : undefined
+                            this.openTab(item);
+                        } : undefined
                 }
             }));
     }
@@ -219,9 +216,9 @@ export class LocalFilesPanelComponent extends ComponentBase {
             return;
         }
 
-        paths.filter(path => !this.nodes.find(item => item.id === path)).forEach(path => {
+        const newNodes = paths.filter(path => !this.nodes.find(item => item.id === path)).map(path => {
 
-            const node = {
+            return {
                 id: path,
                 name: path.split("/").pop(),
                 icon: "folder",
@@ -240,11 +237,11 @@ export class LocalFilesPanelComponent extends ComponentBase {
                     })
                 ],
             };
-
-            this.nodes.push(node);
         });
 
+        this.nodes = this.nodes.concat(newNodes);
         this.triggerChange();
+
         this.saveWorkspacePreferences();
     }
 
