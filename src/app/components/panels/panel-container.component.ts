@@ -27,7 +27,7 @@ require("./panel-container.component.scss");
 export class PanelContainerComponent {
 
     @Input("panels")
-    private panelList: Observable;
+    private panelList: Observable<{id: string, active: boolean}[]>;
 
     @ViewChildren(PanelComponent)
     private panels: QueryList<PanelComponent>;
@@ -57,7 +57,7 @@ export class PanelContainerComponent {
             handle.onDrag.subscribe(d => {
 
                 this.panels.first.setSize(d);
-                this.panels.last.setSize(document.body.clientHeight - d);
+                this.panels.last.setSize(document.body.clientHeight - <any> d);
 
             });
         });

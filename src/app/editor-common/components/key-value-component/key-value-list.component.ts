@@ -137,7 +137,7 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
                 }
             });
 
-            this.propagateChange(Array.from(newKeyValueList));
+            this.propagateChange(newKeyValueList);
         });
     }
 
@@ -157,17 +157,16 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
         this.duplicateKeys.clear();
         let keySet = new Set();
 
-        const keyList = Object.keys(g.controls)
+        Object.keys(g.controls)
             .filter(key => !!g.controls[key].value.key)
-            .map(key => g.controls[key].value.key);
-
-        keyList.forEach((key) => {
-            if (keySet.has(key)) {
-                this.duplicateKeys.add(key);
-            } else {
-                keySet.add(key);
-            }
-        });
+            .map(key => g.controls[key].value.key)
+            .forEach((key) => {
+                if (keySet.has(key)) {
+                    this.duplicateKeys.add(key);
+                } else {
+                    keySet.add(key);
+                }
+            });
 
         return this.duplicateKeys.size > 0 ? { message: "There are duplicates in the form." }: null;
     }
