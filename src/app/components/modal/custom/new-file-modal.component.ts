@@ -1,4 +1,3 @@
-import {assignable} from "../../../decorators/index";
 import {Component, ViewChild, Input} from "@angular/core";
 import {CwlFileTemplateType, CwlFileTemplate} from "../../../types/file-template.type";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";

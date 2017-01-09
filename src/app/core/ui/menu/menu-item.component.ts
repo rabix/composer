@@ -2,13 +2,11 @@ import {
     Component,
     Input,
     ChangeDetectionStrategy,
-    forwardRef,
     ViewChild,
     ElementRef,
     HostBinding,
     HostListener
 } from "@angular/core";
-import {MenuComponent} from "./menu.component";
 import {MenuItem} from "./menu-item";
 import {Subscription, Observable, Subject} from "rxjs/Rx";
 
@@ -16,7 +14,6 @@ require("./menu-item.component.scss");
 
 @Component({
     selector: "ct-menu-item",
-    directives: [forwardRef(() => MenuComponent)],
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <span class="name">{{ item.name }}</span>

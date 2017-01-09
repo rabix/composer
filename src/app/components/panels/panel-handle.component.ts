@@ -19,6 +19,6 @@ export class PanelHandleComponent {
         const up   = Observable.fromEvent(document, "mouseup");
         const move = Observable.fromEvent(document, "mousemove");
 
-        down.flatMap(_ => move.map(e => e.clientY).takeUntil(up)).subscribe(this.onDrag as Subject);
+        down.flatMap(_ => move.map((e:MouseEvent) => e.clientY).takeUntil(up)).subscribe(this.onDrag as Subject<any>);
     }
 }

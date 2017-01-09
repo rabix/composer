@@ -124,7 +124,7 @@ export class SettingsComponent implements OnInit {
 
 
             }))
-            .filter(err => err)
+            .filter(err => !!err)
             .subscribe(err => {
                 this.form.setErrors(err);
             });
