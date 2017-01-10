@@ -27,9 +27,9 @@ require("./basic-output-section.component.scss");
     <div class="form-group flex-container">
         <label class="form-control-label">Required</label>
         <span class="align-right">                        
-                        <toggle-slider [formControl]="basicSectionForm.controls['isRequired']"
+                        <ct-toggle-slider [formControl]="basicSectionForm.controls['isRequired']"
                                     [on]="'Yes'"
-                                    [off]="'No'"></toggle-slider>
+                                    [off]="'No'"></ct-toggle-slider>
                     </span>
     </div>
 

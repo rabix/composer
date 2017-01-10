@@ -30,9 +30,9 @@ import {noop} from "../../../../lib/utils.lib";
            <div class="form-group flex-container" *ngIf="input.type.type === 'File'">
                 <label>Load Content</label>
                 <span class="align-right">
-                    <toggle-slider [formControl]="stageInputFormGroup.controls['loadContent']"
+                    <ct-toggle-slider [formControl]="stageInputFormGroup.controls['loadContent']"
                                    [off]="'No'" 
-                                   [on]="'Yes'"></toggle-slider>
+                                   [on]="'Yes'"></ct-toggle-slider>
                 </span>
            </div>
        

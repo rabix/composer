@@ -13,7 +13,6 @@ import {
     InputParameterTypeModel
 } from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../../components/common/component-base";
-import {PrimitiveParameterType} from "../../../../../../node_modules/cwlts/models/d2sb/ParameterTypeModel";
 import {noop} from "../../../../lib/utils.lib";
 
 require("./basic-input-section.component.scss");
@@ -38,10 +37,10 @@ require("./basic-input-section.component.scss");
                 <div class="form-group flex-container">
                     <label>Required</label>
                     <span class="align-right">
-                        <toggle-slider [formControl]="basicSectionForm.controls['isRequired']"
+                        <ct-toggle-slider [formControl]="basicSectionForm.controls['isRequired']"
                                        [off]="'No'" 
                                        [on]="'Yes'">
-                        </toggle-slider>
+                        </ct-toggle-slider>
                     </span>
                 </div> <!-- Required -->
             
@@ -63,10 +62,10 @@ require("./basic-input-section.component.scss");
                         *ngIf="input.type.type !== 'map' && basicSectionForm.controls['isBound']">
                     <label>Include in command line</label>
                     <span class="align-right">
-                        <toggle-slider [formControl]="basicSectionForm.controls['isBound']" 
+                        <ct-toggle-slider [formControl]="basicSectionForm.controls['isBound']" 
                                        [off]="'No'" 
                                        [on]="'Yes'">
-                        </toggle-slider>
+                        </ct-toggle-slider>
                     </span>
                 </div> <!-- Include in commandline -->
                 
@@ -106,7 +105,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
             typeForm: [this.input.type, [Validators.required]],
             isBound: [this.input.isBound],
             isRequired: [!this.input.type.isNullable],
-            inputBinding: [this.input.inputBinding],
+            inputBinding: [this.input],
             symbols: [this.input.type.symbols ? this.input.type.symbols : this.initSymbolsList]
         });
 

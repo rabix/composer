@@ -23,9 +23,9 @@ import {CommandOutputBindingModel} from "cwlts/models/d2sb/CommandOutputBindingM
         <div class="form-group flex-container">
             <label class="form-control-label">Load Content</label>
             <span class="align-right">
-                        <toggle-slider [formControl]="outputEvalFormGroup.controls['loadContents']"
+                        <ct-toggle-slider [formControl]="outputEvalFormGroup.controls['loadContents']"
                                     [on]="'Yes'"
-                                    [off]="'No'"></toggle-slider>
+                                    [off]="'No'"></ct-toggle-slider>
                     </span>
         </div>
 

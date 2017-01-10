@@ -152,7 +152,9 @@ available types: {[label: string]: string | number} | string[]`)
     }
 
     writeValue(value: string | number | ExpressionModel): void {
-        this.value = value;
+        if (this.value !== value) {
+            this.value = value;
+        }
     }
 
     registerOnChange(fn: any): void {

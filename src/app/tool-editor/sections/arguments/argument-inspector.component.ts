@@ -27,9 +27,9 @@ import {ComponentBase} from "../../../components/common/component-base";
                 <div class="form-group flex-container">
                     <label>Prefix and value separation</label>
                     <span class="align-right">
-                        <toggle-slider [formControl]="form.controls['separate']"
+                        <ct-toggle-slider [formControl]="form.controls['separate']"
                                        [on]="'Separate'"
-                                       [off]="'Join'"></toggle-slider>
+                                       [off]="'Join'"></ct-toggle-slider>
                     </span>
                 </div>
               

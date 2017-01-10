@@ -16,6 +16,7 @@ import {ContextDirective} from "./ui/context/context.directive";
 import {ContextService} from "./ui/context/context.service";
 import {MdProgressBarModule} from "@angular2-material/progress-bar";
 import {MultilangCodeEditorComponent} from "./ui/code-editor/multilang-code-editor.component";
+import {ToggleComponent} from "./ui/toggle-slider/toggle-slider.component";
 
 @NgModule({
     entryComponents: [
@@ -39,6 +40,7 @@ import {MultilangCodeEditorComponent} from "./ui/code-editor/multilang-code-edit
 
         // Form Components
         FormPanelComponent,
+        ToggleComponent,
 
         // Tree Components
         TreeViewComponent,
@@ -65,6 +67,7 @@ import {MultilangCodeEditorComponent} from "./ui/code-editor/multilang-code-edit
 
         // Forms
         FormPanelComponent,
+        ToggleComponent,
 
         // Tooltip
         TooltipContentComponent,

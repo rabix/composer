@@ -4,7 +4,7 @@ import {NG_VALUE_ACCESSOR, ControlValueAccessor} from "@angular/forms";
 require("./toggle-slider.component.scss");
 
 @Component({
-    selector: "toggle-slider",
+    selector: "ct-toggle-slider",
     providers: [
         { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ToggleComponent), multi: true }
     ],
@@ -22,10 +22,10 @@ export class ToggleComponent implements ControlValueAccessor {
     private isChecked: boolean = false;
 
     @Input()
-    on: string;
+    public on = "On";
 
     @Input()
-    off: string;
+    public off = "Off";
 
     private onTouched = () => { };
 

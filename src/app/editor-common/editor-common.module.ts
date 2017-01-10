@@ -9,7 +9,6 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {ExpressionEditorComponent} from "./expression-editor/expression-editor.component";
 import {FileDefContentPipe} from "./pipes/file-def-content.pipe";
 import {FileDefNamePipe} from "./pipes/file-def-name.pipe";
-import {ToggleComponent} from "./components/toggle-slider/toggle-slider.component";
 import {ExpressionInputComponent} from "./components/expression-input/expression-input.component";
 import {CoreModule} from "../core/core.module";
 import {ModelExpressionEditorComponent} from "./expression-editor/model-expression-editor.component";
@@ -38,7 +37,6 @@ import {KeyValueListComponent} from "./components/key-value-component/key-value-
         FileDefNamePipe,
         ModelExpressionEditorComponent,
         QuickPickComponent,
-        ToggleComponent,
         ValidationClassDirective,
         ValidationComponent,
         ValidationTextPipe,
@@ -59,18 +57,14 @@ import {KeyValueListComponent} from "./components/key-value-component/key-value-
         ExpressionInputComponent,
         FileDefContentPipe,
         FileDefNamePipe,
-        ToggleComponent,
         ModelExpressionEditorComponent,
         QuickPickComponent,
-        ToggleComponent,
         ValidationClassDirective,
         CompactListComponent,
         EditableDirective,
         ExpressionModelListComponent,
-        QuickPickComponent,
         ValidationComponent,
         RevisionListComponent,
-        ValidationClassDirective,
         KeyValueInputComponent,
         KeyValueListComponent
     ],

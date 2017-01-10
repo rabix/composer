@@ -10,7 +10,7 @@ require("./clt-editor.component.scss");
     selector: "ct-clt-editor",
     template: `
         
-        <div class="row ">       
+        <div class="row">       
             <form [class.col-xs-6]="showInspector" 
                   [class.col-xs-12]="!showInspector" 
                   [formGroup]="formGroup">
