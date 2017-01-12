@@ -18,12 +18,12 @@ export class WorkboxService {
         let existingTab = tabs.find(existingTab => existingTab.id === tab.id);
 
         if (existingTab) {
-            this.activeTab.next(existingTab);
+            this.activateTab(existingTab);
             return;
         }
 
         this.tabs.next(tabs.concat(tab));
-        this.activeTab.next(tab);
+        this.activateTab(tab);
 
     }
 
@@ -42,7 +42,7 @@ export class WorkboxService {
 
     public closeOtherTabs(tab) {
         this.tabs.next([tab]);
-        this.activeTab.next(tab);
+        this.activateTab(tab);
     }
 
     public activateNext() {
@@ -50,7 +50,7 @@ export class WorkboxService {
         const index             = tabs.indexOf(activeTab);
         const newActiveTab      = index === (tabs.length - 1) ? tabs[0] : tabs[index + 1];
 
-        this.activeTab.next(newActiveTab);
+        this.activateTab(newActiveTab);
     }
 
     public activatePrevious() {
@@ -58,13 +58,13 @@ export class WorkboxService {
         const index             = tabs.indexOf(activeTab);
         const newActiveTab      = index ? tabs[index - 1] : tabs[tabs.length - 1];
 
-        this.activeTab.next(newActiveTab);
+        this.activateTab(newActiveTab);
     }
 
     private ensureActiveTab() {
         const {tabs, activeTab} = this.extractValues();
         if (!tabs.find(t => t === activeTab)) {
-            this.activeTab.next(tabs[tabs.length - 1]);
+            this.activateTab(tabs[tabs.length - 1]);
         }
     }
 
@@ -73,6 +73,14 @@ export class WorkboxService {
             activeTab: this.activeTab.getValue(),
             tabs: this.tabs.getValue()
         }
+    }
+
+    private activateTab(tab) {
+        if (this.activeTab.getValue() === tab) {
+            return;
+        }
+
+        this.activeTab.next(tab);
     }
 
 }

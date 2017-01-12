@@ -1,72 +1,90 @@
 @import "../../../assets/sass/variables";
 
+ct-layout {
 
-.flex-box {
-  display: flex;
-  height: 100%;
-  margin: 0;
-  width: 100%;
-
-  .flex-col {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    overflow-x: hidden;
-    overflow-y: auto;
-
-    &.hidden {
-      flex: 0 !important;
+    .layout-section {
+        color: $layout-section-font-color;
+        background: $layout-section-background;
     }
 
-    &.workbox-col {
-      overflow: hidden;
+    .main-container {
+        display: flex;
+        height: 100%;
+        margin: 0;
+        width: 100%;
+        flex-direction: column;
+
+        .not-status-bar {
+            display: flex;
+            flex-direction: row;
+            flex: 1 1 100%;
+            border-bottom: $layout-section-border-light;
+        }
+        ct-status-bar {
+            width: 100%;
+            flex: 1 1 $layout-stripe-width;
+            border-top: $layout-section-border-dark;
+            background: $layout-section-background;
+        }
+
+        .flex-col {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow-x: hidden;
+            overflow-y: auto;
+
+            &.hidden {
+                flex: 0 !important;
+            }
+
+            &.workbox-col {
+                overflow: hidden;
+            }
+        }
+
+        .handle-vertical {
+            background: $panel-resize-handle-color;
+            cursor: col-resize;
+            display: inline-block;
+            width: $panel-resize-handle-width;
+            border-right: $layout-section-border-light;
+
+            &:before {
+                content: '';
+                display: block;
+                position: relative;
+                background-color: $main-header-bg;
+                width: $panel-resize-handle-width;
+                height: $main-header-height;
+            }
+
+            &.hidden {
+                width: 1px;
+            }
+
+        }
+
     }
-  }
 
-  .handle-vertical {
-    background: $panel-resize-handle-color;
-    cursor: col-resize;
-    display: inline-block;
-    width: $panel-resize-handle-width;
-
-    &:before {
-      content: '';
-      display: block;
-      position: relative;
-      background-color: $main-header-bg;
-      width: $panel-resize-handle-width;
-      height: $main-header-height;
+    .top-bar {
+        height: $main-header-height;
+        background: $main-header-bg;
     }
 
-    &.hidden {
-      width: 1px;
+    .flex-row {
+        display: flex;
     }
 
-  }
+    .flex-row {
+        display: flex;
+    }
 
-}
+    .flex-row:not(.fixed) {
+        flex: 1;
+        overflow: hidden;
+        //overflow-x: hidden;
+        //overflow-y: auto;
+    }
 
-.panel-switch-col {
-  width: 26px;
-  overflow: hidden;
-}
-
-.top-bar {
-  height: $main-header-height;
-  background: $main-header-bg;
-}
-
-.flex-row {
-  display: flex;
-}
-
-.flex-row {
-  display: flex;
-}
-
-.flex-row:not(.fixed) {
-  flex: 1;
-  overflow: hidden;
-  //overflow-x: hidden;
-  //overflow-y: auto;
 }

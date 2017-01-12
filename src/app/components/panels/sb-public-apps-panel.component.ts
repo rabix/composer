@@ -5,6 +5,7 @@ import {PlatformAppEntry} from "../../services/api/platforms/platform-api.types"
 import {SettingsService} from "../../services/settings/settings.service";
 import {PublicAppService} from "../../platform-providers/public-apps/public-app.service";
 import {WorkboxService} from "../workbox/workbox.service";
+import {StatusBarService} from "../../core/status-bar/status-bar.service";
 @Component({
     selector: "ct-sb-public-apps-panel",
     host: {class: "block"},
@@ -29,6 +30,7 @@ export class SBPublicAppsPanelComponent {
     constructor(private platform: PlatformAPI,
                 private workbox: WorkboxService,
                 private settings: SettingsService,
+                private statusBar: StatusBarService,
                 private contextMenu: PublicAppService) {
     }
 
@@ -36,14 +38,19 @@ export class SBPublicAppsPanelComponent {
 
         const sortingMethod = (a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase());
 
+        let statusProcessID;
+
         this.settings.platformConfiguration
-            .do(_ => this.isLoading = true)
+            .do(_ => {
+                this.isLoading = true;
+                statusProcessID = this.statusBar.startProcess("Fetching public apps...");
+            })
             .flatMap(_ => this.platform.getPublicApps().map(apps => {
                 const categorized = apps.map(app => {
                     const content = Observable.of(1).switchMap(_ => this.platform.getAppCWL(app))
                         .switchMap(cwl => new BehaviorSubject(cwl)).share();
                     return {
-                        name: app.label,
+                        name: `${app.label} ${app["sbg:toolkitVersion"]}`.trim(),
                         icon: app.class || "file",
                         isExpandable: false,
                         content,
@@ -84,6 +91,8 @@ export class SBPublicAppsPanelComponent {
             })).subscribe(categories => {
             this.isLoading = false;
             this.nodes     = categories;
+
+            this.statusBar.stopProcess(statusProcessID, "Fetched public apps");
         }, err => {
             this.isLoading = false;
         });

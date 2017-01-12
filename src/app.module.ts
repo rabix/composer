@@ -20,8 +20,6 @@ import {StructurePanelComponent} from "./app/components/panels/structure-panel.c
 import {SettingsComponent} from "./app/components/settings";
 import {TabManagerComponent} from "./app/components/tab-manager/tab-manager.component";
 import {ToolEditorComponent} from "./app/components/tool-editor/tool-editor.component";
-import {ValidationIssuesComponent} from "./app/components/validation-issues/validation-issues.component";
-import {ViewModeSwitchComponent} from "./app/components/view-switcher/view-switcher.component";
 import {SettingsButtonComponent} from "./app/components/workbox/settings-button.component";
 import {WorkflowEditorComponent} from "./app/components/workflow-editor/workflow-editor.component";
 import {DockerImageFormComponent} from "./app/components/forms/inputs/forms/docker-image-form.component";
@@ -46,15 +44,13 @@ import {ProjectSelectionModal} from "./app/components/modal/custom/project-selec
 import {UserPreferencesService} from "./app/services/storage/user-preferences.service";
 import {DomEventService} from "./app/services/dom/dom-event.service";
 import {FileRegistryService} from "./app/core/file-registry/file-registry.service";
-import {FILE_RESOLVERS} from "./app/core/file-registry/types";
-import {LocalDataSourceService} from "./app/sources/local/local.source.service";
-import {SBPlatformDataSourceService} from "./app/sources/sbg/sb-platform.source.service";
 import {GuidService} from "./app/services/guid.service";
 import {IpcService} from "./app/services/ipc.service";
 import {PlatformAPI} from "./app/services/api/platforms/platform-api.service";
 import {SettingsService} from "./app/services/settings/settings.service";
 import {Http} from "@angular/http";
 import {MdProgressBarModule} from "@angular2-material/progress-bar";
+import {MdCoreModule} from "@angular2-material/core";
 
 @NgModule({
     providers: [
@@ -102,8 +98,6 @@ import {MdProgressBarModule} from "@angular2-material/progress-bar";
         StructurePanelComponent,
         TabManagerComponent,
         ToolEditorComponent,
-        ValidationIssuesComponent,
-        ViewModeSwitchComponent,
         WorkboxComponent,
         WorkflowEditorComponent,
     ],
@@ -124,7 +118,9 @@ import {MdProgressBarModule} from "@angular2-material/progress-bar";
         HttpModule,
         ReactiveFormsModule,
         ToolEditorModule,
+        MdCoreModule,
         MdProgressBarModule,
+
     ],
     bootstrap: [MainComponent]
 })

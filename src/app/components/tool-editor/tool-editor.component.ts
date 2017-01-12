@@ -1,28 +1,38 @@
 import * as Yaml from "js-yaml";
-import {Component, OnInit, Input, OnDestroy, ViewChild, ViewContainerRef} from "@angular/core";
+import {
+    Component,
+    OnInit,
+    Input,
+    OnDestroy,
+    ViewChild,
+    ViewContainerRef,
+    TemplateRef
+} from "@angular/core";
 import {FormControl, FormGroup, FormBuilder} from "@angular/forms";
-import {ReplaySubject, BehaviorSubject} from "rxjs/Rx";
+import {BehaviorSubject} from "rxjs/Rx";
 import {ModalService} from "../modal";
 import {noop} from "../../lib/utils.lib";
 import {CommandLineToolModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../common/component-base";
 import {Validation} from "cwlts/models/helpers/validation";
 import {DataEntrySource} from "../../sources/common/interfaces";
-import {ViewMode} from "../view-switcher/view-switcher.component";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
 import {WebWorkerService} from "../../services/web-worker/web-worker.service";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
-import LoadOptions = jsyaml.LoadOptions;
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
+import {StatusBarService} from "../../core/status-bar/status-bar.service";
+import {WorkboxTab} from "../workbox/workbox-tab.interface";
+import LoadOptions = jsyaml.LoadOptions;
 
 require("./tool-editor.component.scss");
 
 @Component({
     selector: "ct-tool-editor",
     providers: [
-        EditorInspectorService
+        EditorInspectorService,
+        WebWorkerService
     ],
     template: `
         <block-loader *ngIf="isLoading"></block-loader>
@@ -62,13 +72,14 @@ require("./tool-editor.component.scss");
             <!--Header & Editor Column-->
             <div class="editor-content flex-row">
                 <!--Editor Row-->
-                        <ct-code-editor-x *ngIf="viewMode === __modes.Code" class="editor" 
+                        <ct-code-editor-x *ngIf="viewMode === viewModes.Code" class="editor" 
                                           [(content)]="rawEditorContent"
-                                          [language]="data.language | async"
+                                          [options]="{theme: 'ace/theme/monokai'}"
+                                          [language]="'yaml'"
                                           [readonly]="!data.isWritable"></ct-code-editor-x>
                      
                         <!--GUI Editor-->
-                        <ct-clt-editor *ngIf="viewMode === __modes.Gui"
+                        <ct-clt-editor *ngIf="viewMode === viewModes.Gui"
                                        class="gui-editor-component flex-col"
                                        [readonly]="!data.isWritable"
                                        [formGroup]="toolGroup"
@@ -83,38 +94,74 @@ require("./tool-editor.component.scss");
                     </div>
             </div>
             
-             <div class="status-bar-footer">
-            
-                <div class="left-side">
-                    <validation-issues [issuesStream]="validation" 
-                                       (select)="selectBottomPanel($event)" 
-                                       [show]="bottomPanel === 'validation'"></validation-issues>
-                    
-                    <commandline [commandLineParts]="commandLineParts" 
-                                 (select)="selectBottomPanel($event)" 
-                                 [show]="bottomPanel === 'commandLine'"></commandline>
-                </div>
+            <div *ngIf="reportPanel" class="app-report-panel layout-section">
+                <ct-validation-report *ngIf="reportPanel === 'validation'" [issues]="validation"></ct-validation-report>
+                <ct-command-line-preview *ngIf="reportPanel === 'commandLinePreview'" [commandLineParts]="commandLineParts"></ct-command-line-preview>
                 
-                <div class="right-side">
-                    <ct-view-mode-switch [viewMode]="viewMode"
-                                         [disabled]="!isValidCWL"
-                                         (switch)="switchView($event)">
-                    </ct-view-mode-switch>
-                </div>
             </div>
+            
+            <template #statusControls>
+                <span class="btn-group">
+                    <button [disabled]="!validation || (!validation.errors.length && !validation.warnings.length)" 
+                            [class.btn-primary]="reportPanel === 'validation'"
+                            [class.btn-secondary]="reportPanel !== 'validation'"
+                            (click)="toggleReport('validation')" 
+                            class="btn btn-sm">
+                            
+                        <span *ngIf="validation?.errors?.length">
+                            <i class="fa fa-times-circle text-danger"></i> {{validation.errors.length}} Errors
+                        </span>
+                        
+                        <span *ngIf="!validation?.errors?.length && validation?.warnings?.length">
+                            <i class="fa fa-exclamation-triangle text-warning"></i> {{validation.warnings.length}} Warnings
+                        </span>
+                        
+                        <span *ngIf="!validation?.errors?.length && !validation?.warnings?.length">
+                            No Issues
+                        </span>
+                        
+                        
+                    </button>
+                    
+                    <button [class.btn-secondary]="reportPanel !== 'commandLinePreview'"
+                            [class.btn-primary]="reportPanel == 'commandLinePreview'"
+                            [disabled]="!isValidCWL"
+                            (click)="toggleReport('commandLinePreview')" 
+                            class="btn btn-secondary btn-sm">Preview</button>
+                </span>
+                
+                <span class="btn-group">
+                    <button class="btn btn-secondary btn-sm" 
+                            (click)="switchView(viewModes.Code)"
+                            [class.btn-primary]="viewMode === viewModes.Code"
+                            [class.btn-secondary]="viewMode !== viewModes.Code">Code</button>
+                            
+                    <button class="btn btn-secondary btn-sm"
+                            [disabled]="!isValidCWL"
+                            (click)="switchView(viewModes.Gui)"
+                            [class.btn-primary]="viewMode === viewModes.Gui"
+                            [class.btn-secondary]="viewMode !== viewModes.Gui">Visual</button>
+                            
+                    <button class="btn btn-secondary btn-sm"
+                            [disabled]="!isValidCWL"
+                            (click)="switchView(viewModes.Test)"
+                            [class.btn-primary]="viewMode === viewModes.Test"
+                            [class.btn-secondary]="viewMode !== viewModes.Test">Test</button>
+                </span>
+            </template>
         </div>
     `
 })
-export class ToolEditorComponent extends ComponentBase implements OnInit, OnDestroy {
+export class ToolEditorComponent extends ComponentBase implements OnInit, OnDestroy, WorkboxTab {
     @Input()
     public data: DataEntrySource;
 
-    /** Stream of ValidationResponse for current document */
-    public validation = new ReplaySubject<ValidationResponse>(1);
+    /** ValidationResponse for current document */
+    public validation: ValidationResponse;
 
     /** Default view mode. */
     @Input()
-    public viewMode = ViewMode.Code;
+    public viewMode;
 
     /** Flag to indicate the document is loading */
     private isLoading = true;
@@ -124,7 +171,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
 
     /** Flag for bottom panel, shows validation-issues, commandline, or neither */
     //@todo(maya) consider using ct-panel-switcher instead
-    private bottomPanel: "validation" |"commandLineTool" | null;
+    private reportPanel: "validation" |"commandLinePreview" | undefined;
 
     /** Flag for validity of CWL document */
     private isValidCWL = false;
@@ -138,7 +185,15 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
     /** Sorted array of resulting command line parts */
     private commandLineParts: CommandLinePart[];
 
-    private __modes = ViewMode;
+    /** Template of the status controls that will be shown in the status bar */
+    @ViewChild("statusControls")
+    private statusControls: TemplateRef;
+
+    private viewModes = {
+        Code: 'code',
+        Gui: 'gui',
+        Test: 'test'
+    };
 
     private toolGroup: FormGroup;
 
@@ -151,11 +206,14 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
     constructor(private webWorkerService: WebWorkerService,
                 private userPrefService: UserPreferencesService,
                 private formBuilder: FormBuilder,
-                private platform:PlatformAPI,
+                private platform: PlatformAPI,
                 private inspector: EditorInspectorService,
+                private statusBar: StatusBarService,
                 private modal: ModalService) {
 
         super();
+
+        this.viewMode = this.viewModes.Code;
 
         this.toolGroup = formBuilder.group({});
 
@@ -176,9 +234,13 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
             });
 
         // Whenever content of a file changes, forward the change to the raw editor content steam.
-        this.tracked = this.data.content.subscribe(val => {
+        const statusID = this.statusBar.startProcess(`Loading ${this.data.data.id}`);
+        this.tracked   = this.data.content.subscribe(val => {
             this.rawEditorContent.next(val);
+            this.statusBar.stopProcess(statusID);
         });
+
+        this.statusBar.setControls(this.statusControls);
 
         /**
          * Track validation results.
@@ -207,24 +269,26 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
             this.commandLineParts = this.toolModel.getCommandLineParts();
 
             // update validation stream on model validation updates
+
             this.toolModel.setValidationCallback((res: Validation) => {
-                this.validation.next({
+                this.validation = {
                     errors: res.errors,
                     warnings: res.warnings,
                     isValidatableCwl: true,
                     isValidCwl: true,
                     isValidJSON: true
-                });
+                };
             });
 
             this.toolModel.validate();
 
             // load document in GUI and turn off loader, only if loader was active
             if (this.isLoading) {
-                this.viewMode  = ViewMode.Gui;
+                this.viewMode  = this.viewModes.Gui;
                 this.isLoading = false;
             }
 
+            console.log("Second validation")
             return {
                 errors: this.toolModel.validation.errors,
                 warnings: this.toolModel.validation.warnings,
@@ -233,10 +297,9 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
                 isValidJSON: true
             };
 
-        }).subscribe(this.validation);
-
-        this.tracked = this.validation.subscribe(err => {
-            this.isValidCWL = err.isValidCwl;
+        }).subscribe((v) => {
+            this.validation = v;
+            this.isValidCWL = v.isValidCwl;
         });
     }
 
@@ -244,8 +307,13 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
         const text = this.toolGroup.dirty ? this.getModelText() : this.rawEditorContent.getValue();
 
         // For local files, just save and that's it
-        if (this.data.data.source === "local"){
-            this.data.data.save(text).subscribe(noop);
+        if (this.data.data.source === "local") {
+            const path = this.data.data.path;
+
+            const statusID = this.statusBar.startProcess(`Saving ${path}...`, `Saved ${path}`);
+            this.data.data.save(text).subscribe(() => {
+                this.statusBar.stopProcess(statusID);
+            });
             return;
         }
 
@@ -257,9 +325,14 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
             title: "Publish a new App Revision",
             formControl: new FormControl('')
         }).then(revisionNote => {
+
+            const path     = this.data.data["sbg:id"] || this.data.data.id;
+            const statusID = this.statusBar.startProcess(`Creating a new revision of ${path}`);
             this.data.save(JSON.parse(text), revisionNote).subscribe(result => {
-                const cwl = JSON.stringify(result.message, null , 4);
+                const cwl = JSON.stringify(result.message, null, 4);
                 this.rawEditorContent.next(cwl);
+                this.statusBar.stopProcess(statusID, `Created revision ${result.message['sbg:latestRevision']} from ${path}`);
+
             });
         }, noop);
 
@@ -269,11 +342,11 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
      * Toggles between GUI and Code view. If necessary, it will show a prompt about reformatting
      * when switching to GUI view.
      *
-     * @param view
+     * @param mode
      */
-    private switchView(view: ViewMode) {
+    private switchView(mode) {
 
-        if (view === ViewMode.Gui) {
+        if (mode === this.viewModes.Gui) {
 
             if (this.showReformatPrompt) {
                 this.modal.checkboxPrompt({
@@ -286,18 +359,18 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
                     if (res) this.userPrefService.put("show_reformat_prompt", false);
 
                     this.showReformatPrompt = false;
-                    this.viewMode           = view;
+                    this.viewMode           = mode;
                 }, noop);
 
             } else {
-                this.viewMode = view;
+                this.viewMode = mode;
             }
-        } else if (view === ViewMode.Code) {
+        } else if (mode === this.viewModes.Code) {
             if (this.toolGroup.dirty) {
                 this.rawEditorContent.next(this.getModelText());
             }
 
-            this.viewMode = view;
+            this.viewMode = mode;
         }
     }
 
@@ -311,17 +384,13 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
         return this.data.language.value === "json" ? JSON.stringify(modelObject, null, 4) : Yaml.dump(modelObject);
     }
 
-    /**
-     * Toggles the status bar panels
-     * @param panel
-     */
-    private selectBottomPanel(panel: "validation"|"commandLineTool") {
-        this.bottomPanel = this.bottomPanel === panel ? null : panel;
+    private toggleReport(panel: "validation" | "commandLinePreview") {
+        this.reportPanel = this.reportPanel === panel ? undefined : panel;
     }
 
     private openRevision(revisionNumber: number) {
         this.platform.getAppCWL(this.data.data, revisionNumber).subscribe(cwl => {
-           this.rawEditorContent.next(cwl);
+            this.rawEditorContent.next(cwl);
         });
     }
 
@@ -330,4 +399,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
         super.ngAfterViewInit();
     }
 
+    provideStatusControls() {
+        return this.statusControls;
+    }
 }

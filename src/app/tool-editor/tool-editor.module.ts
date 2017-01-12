@@ -25,6 +25,7 @@ import {OutputEvalSectionComponent} from "./object-inspector/output-inspector/ou
 import {FileDefInspectorComponent} from "./sections/file-def-list/file-def-inspector.component";
 import {LiteralExpressionInputComponent} from "./sections/file-def-list/literal-expression-input.component";
 import {SecondaryFilesComponent} from "./object-inspector/secondary-files/secondary-files.component";
+import {CommandLinePreviewComponent} from "./components/command-line-preview/command-line-preview.component";
 
 @NgModule({
     declarations: [
@@ -48,7 +49,8 @@ import {SecondaryFilesComponent} from "./object-inspector/secondary-files/second
         StageInputSectionComponent,
         ResourcesComponent,
         OutputEvalSectionComponent,
-        LiteralExpressionInputComponent
+        LiteralExpressionInputComponent,
+        CommandLinePreviewComponent,
     ],
     exports: [
         ArgumentListComponent,
@@ -68,7 +70,8 @@ import {SecondaryFilesComponent} from "./object-inspector/secondary-files/second
         OutputEvalSectionComponent,
         OutputMetaDataSectionComponent,
         LiteralExpressionInputComponent,
-        OutputMetaDataSectionComponent
+        OutputMetaDataSectionComponent,
+        CommandLinePreviewComponent,
     ],
     imports: [
         BrowserModule,

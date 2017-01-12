@@ -17,6 +17,8 @@ import {ContextService} from "./ui/context/context.service";
 import {MdProgressBarModule} from "@angular2-material/progress-bar";
 import {MultilangCodeEditorComponent} from "./ui/code-editor/multilang-code-editor.component";
 import {ToggleComponent} from "./ui/toggle-slider/toggle-slider.component";
+import {StatusBarComponent} from "./status-bar/status-bar.component";
+import {MomentModule} from "angular2-moment";
 
 @NgModule({
     entryComponents: [
@@ -56,7 +58,9 @@ import {ToggleComponent} from "./ui/toggle-slider/toggle-slider.component";
         MenuComponent,
 
         // Context
-        ContextDirective
+        ContextDirective,
+
+        StatusBarComponent
 
     ],
     exports: [
@@ -84,6 +88,8 @@ import {ToggleComponent} from "./ui/toggle-slider/toggle-slider.component";
 
         // Context
         ContextDirective,
+
+        StatusBarComponent,
     ],
     providers: [
         IpcService,
@@ -91,7 +97,7 @@ import {ToggleComponent} from "./ui/toggle-slider/toggle-slider.component";
         ContextService,
 
     ],
-    imports: [BrowserModule, MdProgressBarModule]
+    imports: [BrowserModule, MdProgressBarModule, MomentModule]
 })
 export class CoreModule {
 

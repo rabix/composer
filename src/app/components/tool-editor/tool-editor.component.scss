@@ -5,48 +5,46 @@ ct-tool-editor {
     .tool-inspector {
         display: block;
         height: 100%;
-        //background: $body-color;
         background: white;
     }
-}
 
-.editor-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: stretch;
-    align-content: stretch;
-    background: $gui-editor-bg;
-    position: relative;
-    height: 100%;
-    width: 100%;
-
-    .flex-row {
-        flex-grow: 1;
-    }
-
-    .flex-col {
-        flex-grow: 1
-    }
-
-    .flex-col-item {
-        flex-grow: 1;
-    }
-
-    .editor-content {
+    .editor-container {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         justify-content: space-between;
         align-items: stretch;
         align-content: stretch;
+        background: $gui-editor-bg;
+        position: relative;
         height: 100%;
         width: 100%;
-    }
 
-    .inspector-col {
-        flex-grow: .6;
+        .flex-row, .flex-col, .flex-col-item {
+            flex-grow: 1;
+        }
+
+        .editor-content {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: stretch;
+            align-content: stretch;
+            height: 100%;
+            width: 100%;
+        }
+
+        .inspector-col {
+            flex-grow: .6;
+        }
+
+        .app-report-panel {
+            flex-basis: 150px;
+            border-left: $layout-section-border-dark;
+            border-top: $layout-section-border-light;
+        }
     }
 }
+
 
 .status-bar-footer {
     background: $gui-editor-status-bar-bg;
@@ -82,32 +80,6 @@ ct-tool-editor {
         }
     }
 
-    ct-view-mode-switch {
-
-        button {
-            text-transform: uppercase;
-
-            &[disabled] {
-                .fa {
-                    color: #555;
-                }
-            }
-        }
-
-        .fa {
-            color: #6DABED;
-        }
-    }
-
-    validation-issues {
-        .warning {
-            color: $brand-warning;
-        }
-
-        .error {
-            color: $brand-danger;
-        }
-    }
 }
 
 .input-cli {
@@ -128,13 +100,13 @@ ct-tool-editor {
     list-style: none;
 
     &.record-input {
-        border:1px solid $gui-section-list-item-bg;
+        border: 1px solid $gui-section-list-item-bg;
 
-      > .gui-section-list-item {
-        margin-bottom: 10px;
-        border-bottom-right-radius: 0;
-        border-bottom-left-radius: 0;
-      }
+        > .gui-section-list-item {
+            margin-bottom: 10px;
+            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 0;
+        }
     }
 
     .gui-section-list-item {
@@ -169,32 +141,6 @@ ct-tool-editor {
         .fa {
             color: $gui-section-list-item-select-icon-color;
         }
-    }
-}
-
-//@todo(maya) belongs with status bar component
-.console-component {
-    position: absolute;
-    bottom: $status-bar-height - 3px;
-    z-index: 9;
-
-    height: 0;
-    min-width: 100%;
-    overflow: auto;
-
-    background: #000000;
-    opacity: 0.9;
-    transition: height 300ms;
-
-    color: $console-default-color;
-    font-family: monospace;
-
-    .console-content {
-        padding: 14px;
-    }
-
-    &.show {
-        height: 90px;
     }
 }
 

@@ -12,6 +12,7 @@ import {ComponentBase} from "../common/component-base";
 import {MenuItem} from "../../core/ui/menu/menu-item";
 import {UserProjectsService} from "../../platform-providers/user-projects/user-projects.service";
 import {WorkboxService} from "../workbox/workbox.service";
+import {StatusBarService} from "../../core/status-bar/status-bar.service";
 
 @Component({
     selector: "ct-sb-user-projects-panel",
@@ -48,7 +49,7 @@ export class SBUserProjectsPanelComponent extends ComponentBase {
 
     private isLoading = false;
 
-    private allProjects = new ReplaySubject<{id: string, data: PlatformProjectEntry}>();
+    private allProjects = new ReplaySubject<{ id: string, data: PlatformProjectEntry }>();
 
     private openProjects = new ReplaySubject(1);
 
@@ -60,12 +61,18 @@ export class SBUserProjectsPanelComponent extends ComponentBase {
                 private workbox: WorkboxService,
                 private preferences: UserPreferencesService,
                 private modal: ModalService,
+                private statusBar: StatusBarService,
                 private settings: SettingsService,
                 private contextMenu: UserProjectsService) {
         super();
 
+        let statusProcessID;
+
         this.settings.platformConfiguration
-            .do(_ => this.isLoading = true)
+            .do(_ => {
+                this.isLoading  = true;
+                statusProcessID = this.statusBar.startProcess("Fetching user projects...");
+            })
             .flatMap(_ => this.dataSource.getProjects())
             .map(projects => projects
                 .sort((a, b) => a.data.name.toLowerCase().localeCompare(b.data.name.toLowerCase()))
@@ -101,6 +108,7 @@ export class SBUserProjectsPanelComponent extends ComponentBase {
                     conf
                 }))
             .subscribe(data => {
+                this.statusBar.stopProcess(statusProcessID, "Fetched user projects");
                 this.isLoading = false;
                 this.nodes.next(data.nodes);
                 this.preferences.put("open_projects", Object.assign(data.projects, {

@@ -1,5 +1,4 @@
 /// <reference path="../../../custom-typings.d.ts"/>
-
 import {Component, ViewContainerRef} from "@angular/core";
 import {Observable} from "rxjs/Rx";
 import {ContextService} from "../../core/ui/context/context.service";
@@ -17,10 +16,10 @@ import {SBPlatformDataSourceService} from "../../sources/sbg/sb-platform.source.
 import {SettingsService} from "../../services/settings/settings.service";
 import {UrlValidator} from "../../validators/url.validator";
 import {UserProjectsService} from "../../platform-providers/user-projects/user-projects.service";
-import {WorkboxService} from "../workbox/workbox.service";
 
 require("./../../../assets/sass/main.scss");
 require("./main.component.scss");
+
 
 @Component({
     selector: "cottontail",
@@ -34,7 +33,6 @@ require("./main.component.scss");
         EventHubService,
         FileRegistry,
         UrlValidator,
-        WorkboxService,
         PlatformAPI,
         SBPlatformDataSourceService,
         SettingsService,

@@ -27,6 +27,7 @@ ct-revision-list {
             flex-basis: 60px;
             text-align: center;
             font-family: $font-family-title;
+            flex-shrink: 0;
         }
 
         .revision-info {

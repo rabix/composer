@@ -9,11 +9,7 @@
 @import "icons";
 @import "forms";
 @import "alerts";
-
-@keyframes progress-bar-stripes {
-  0% { margin-left: 20px; background-position: 20px 0; }
-  100% { margin-left: 0px; background-position: 0 0; }
-}
+@import "./theme-variables";
 
 @import url(https://fonts.googleapis.com/css?family=Montserrat:400,700);
 

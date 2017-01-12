@@ -83,20 +83,6 @@ $panel-header-bg: $chrome-dark-bg-secondary;
 $panel-header-color: $chrome-dark-text;
 
 /**
- * PANEL ITEMS
- */
-$panel-item-width: 25px;
-$panel-item-color: white;
-$panel-item-icon-color: $panel-item-color;
-
-$panel-item-hover-bg: lighten($panel-bg, 5%);
-$panel-item-hover-color: $panel-item-color;
-
-$panel-item-select-bg: $chrome-dark-bg-secondary;
-$panel-item-select-color: white;
-$panel-item-icon-select-color: $panel-item-select-color;
-
-/**
  * PANEL TABS
  */
 $panel-side-tab-zone-bg: $chrome-dark-bg;
@@ -187,3 +173,25 @@ $btn-success-border: #328e46;
 $btn-primary-border: #296394;
 $btn-danger-border: #804c03; // not according to style guide
 $btn-warning-border: #bc7e20; // not according to style guide
+
+/** Layout */
+$layout-stripe-width: 25px;
+$layout-section-background: #333;
+$layout-section-border-dark: 1px solid #1a1a1a;
+$layout-section-border-light: 1px solid #4d4d4d;
+$layout-section-font-color:  #f3f3f3;
+
+
+/**
+ * PANEL ITEMS
+ */
+$panel-item-width: $layout-stripe-width;
+$panel-item-color: white;
+$panel-item-icon-color: $panel-item-color;
+
+$panel-item-hover-bg: lighten($panel-bg, 5%);
+$panel-item-hover-color: $panel-item-color;
+
+$panel-item-select-bg: $chrome-dark-bg-secondary;
+$panel-item-select-color: white;
+$panel-item-icon-select-color: $panel-item-select-color;

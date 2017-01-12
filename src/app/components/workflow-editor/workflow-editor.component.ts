@@ -3,7 +3,6 @@ import {Subscription, ReplaySubject, BehaviorSubject} from "rxjs";
 import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
 import {DataEntrySource} from "../../sources/common/interfaces";
 import {WebWorkerService} from "../../services/web-worker/web-worker.service";
-import {ViewMode} from "../view-switcher/view-switcher.component";
 
 @Component({
     selector: 'ct-workflow-editor',
@@ -17,17 +16,6 @@ import {ViewMode} from "../view-switcher/view-switcher.component";
                 
                 <div [hidden]="viewMode !== __viewModes.Gui">
                     Workflow Editor Coming Soon
-                </div>
-            </div>
-        
-            <div class="status-bar-footer">
-                <div class="left-side">
-                    <validation-issues [issuesStream]="schemaValidation" [show]="showValidation" (select)="showValidation = !showValidation"></validation-issues>
-                </div>
-                <div class="right-side">
-                    <ct-view-mode-switch [viewMode]="viewMode"
-                                         [disabled]="!isValidCWL"
-                                         (switch)="viewMode = $event"></ct-view-mode-switch>
                 </div>
             </div>
         </div>

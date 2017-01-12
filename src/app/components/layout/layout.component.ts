@@ -12,49 +12,64 @@ import {
     PanelGroupMap,
     PANEL_LOCAL_FILES
 } from "./layout.types";
+import {StatusBarService} from "../../core/status-bar/status-bar.service";
+import {StatusBarComponent} from "../../core/status-bar/status-bar.component";
+import {WorkboxService} from "../workbox/workbox.service";
 
 
 require("./layout.component.scss");
 
 @Component({
     selector: "ct-layout",
+    providers: [StatusBarService, WorkboxService],
     template: `
-        <div class="flex-box">
+        <div class="main-container">
             
-            <div class="panel-switch-col">
-                <div class="top-bar"></div>
-                <div class="left-panel-bar">
-                
-                    <ct-panel-switcher [panels]="(panelSwitches | async)?.top.panels" 
-                                       (statusChange)="onPanelSwitch($event, 'top')"></ct-panel-switcher>
+            <div class="not-status-bar">
+            
+                <!--Panel Switch Column-->
+                <div>
+                    <div class="top-bar"></div>
+                    <div class="left-panel-bar">
                     
-                    <ct-panel-switcher [panels]="(panelSwitches | async)?.bottom.panels" 
-                                       (statusChange)="onPanelSwitch($event, 'bottom')"></ct-panel-switcher>                                       
-                       
+                        <ct-panel-switcher [panels]="(panelSwitches | async)?.top.panels" 
+                                           (statusChange)="onPanelSwitch($event, 'top')"></ct-panel-switcher>
+                        
+                        <ct-panel-switcher [panels]="(panelSwitches | async)?.bottom.panels" 
+                                           (statusChange)="onPanelSwitch($event, 'bottom')"></ct-panel-switcher>                                       
+                           
+                    </div>
+                    
+                    <div class="toggle-panel-left">
+                        <i aria-hidden="true" class="fa fa-caret-square-o-left" 
+                        (click) = "togglePanelLeft()"></i>                    
+                    </div> 
                 </div>
                 
-                <div class="toggle-panel-left">
-                    <i aria-hidden="true" class="fa fa-caret-square-o-left" 
-                    (click) = "togglePanelLeft()"></i>                    
-                </div> 
-            </div>
-            
-            <div class="flex-col col-panels" 
-                 [style.flex]="treeSize"
-                 [class.hidden]="(visiblePanels | async).length === 0">
-                 
-                <div class="top-bar fixed">
-                    <div class="seven-bridges-logo"></div>
+                <!--Panels Column-->
+                <div class="flex-col col-panels" 
+                     [style.flex]="treeSize"
+                     [class.hidden]="(visiblePanels | async).length === 0">
+                     
+                    <div class="top-bar fixed">
+                        <div class="seven-bridges-logo"></div>
+                    </div>
+                    
+                    <ct-panel-container [panels]="panels" class="flex-row"></ct-panel-container>
                 </div>
                 
-                <ct-panel-container [panels]="panels" class="flex-row"></ct-panel-container>
+                <!--Panel/Content Resize Handle-->
+                <div #handle class="handle-vertical" [class.hidden]="(visiblePanels | async).length === 0"></div>
+                
+                <!--Editor Content Column-->
+                <div class="flex-col workbox-col" [style.flex]="tabsSize">
+                    <ct-workbox class="flex-col"></ct-workbox>
+                </div>
+                
             </div>
             
-            <div #handle class="handle-vertical" [class.hidden]="(visiblePanels | async).length === 0"></div>
-            
-            <div class="flex-col workbox-col" [style.flex]="tabsSize">
-                <ct-workbox class="flex-col"></ct-workbox>
-            </div>
+            <ct-status-bar #statusBar class="layout-section"></ct-status-bar>
+          
         </div>
     `
 })
@@ -72,6 +87,9 @@ export class LayoutComponent extends ComponentBase implements OnInit {
     @ViewChild("handle")
     private handle: ElementRef;
 
+    @ViewChild(StatusBarComponent)
+    private statusBarComponent;
+
     /** Tracking all available panel states */
     protected panels = new BehaviorSubject<PanelStatus[]>([]);
 
@@ -83,7 +101,10 @@ export class LayoutComponent extends ComponentBase implements OnInit {
 
     private el: Element;
 
-    constructor(private preferences: UserPreferencesService, private domEvents: DomEventService, el: ElementRef) {
+    constructor(private preferences: UserPreferencesService,
+                private domEvents: DomEventService,
+                private statusBar: StatusBarService,
+                el: ElementRef) {
         super();
 
         this.el = el.nativeElement;
@@ -107,34 +128,36 @@ export class LayoutComponent extends ComponentBase implements OnInit {
 
     ngOnInit() {
 
+        this.statusBar.host = this.statusBarComponent;
+
         // Layout is resizable, so we need to react when user drags the handle
         this.tracked = this.domEvents.onDrag(this.handle.nativeElement)
             .map(ev => {
-            const x = ev.clientX;
+                const x = ev.clientX;
 
-            // You can't make the left column narrower than 200px
-            const leftMargin = 200;
+                // You can't make the left column narrower than 200px
+                const leftMargin = 200;
 
-            // And you can't make the right column narrower than 400px
-            const rightMargin = document.body.clientWidth - 400;
+                // And you can't make the right column narrower than 400px
+                const rightMargin = document.body.clientWidth - 400;
 
-            // So if you've reached the limit, stop updating the aspect ratio
-            if (x < leftMargin) {
-                return leftMargin;
-            } else if (x > rightMargin) {
-                return rightMargin
-            }
+                // So if you've reached the limit, stop updating the aspect ratio
+                if (x < leftMargin) {
+                    return leftMargin;
+                } else if (x > rightMargin) {
+                    return rightMargin
+                }
 
-            // Otherwise, return how wide the left column should be
-            return x;
-        }).subscribe(x => {
-            // Take the width of the window
-            const docWidth = document.body.clientWidth;
-            // Set tree width to the given x
-            this.treeSize = x;
-            // And fill document area with the rest
-            this.tabsSize = docWidth - x;
-        });
+                // Otherwise, return how wide the left column should be
+                return x;
+            }).subscribe(x => {
+                // Take the width of the window
+                const docWidth = document.body.clientWidth;
+                // Set tree width to the given x
+                this.treeSize  = x;
+                // And fill document area with the rest
+                this.tabsSize  = docWidth - x;
+            });
 
 
         // Flatten the grouped switches into an array
@@ -150,7 +173,7 @@ export class LayoutComponent extends ComponentBase implements OnInit {
         // Whenever panels get changed, we want to register the shortcuts
         // we should unregister the old ones because of the check if a shortcut is already registered
         const shortcutSubs: Subscription[] = [];
-        this.tracked = this.panels.subscribe(panels => {
+        this.tracked                       = this.panels.subscribe(panels => {
             // Unsubscribe from all previous subscriptions on these shortcuts
             shortcutSubs.forEach(sub => sub.unsubscribe());
             shortcutSubs.length = 0;
@@ -180,7 +203,7 @@ export class LayoutComponent extends ComponentBase implements OnInit {
 
     private onPanelSwitch(panels, position) {
 
-        const next = this.panelSwitches.getValue();
+        const next     = this.panelSwitches.getValue();
         next[position] = new PanelGroup(panels);
 
         // Preserve state of opened panels in local storage
@@ -198,5 +221,9 @@ export class LayoutComponent extends ComponentBase implements OnInit {
                 next[position].panels.forEach(panel => panel.active = false);
                 this.onPanelSwitch(next[position].panels, position)
             });
+    }
+
+    ngAfterViewInit() {
+
     }
 }

@@ -52,11 +52,7 @@ export class PlatformAPI {
                     headers: new Headers({
                         "auth-token": config.key
                     })
-                })).subscribe(
-                res => {
-                    console.log("Pushing session ID");
-                    this.sessionID.next(res.json().message.session_id);
-                });
+                })).subscribe(res => this.sessionID.next(res.json().message.session_id));
         });
     }
 

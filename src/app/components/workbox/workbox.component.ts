@@ -1,9 +1,11 @@
-import {Component, OnInit, ElementRef} from "@angular/core";
+import {Component, OnInit, ElementRef, ViewChildren, QueryList} from "@angular/core";
 import {TabData} from "./tab-data.interface";
 import {ComponentBase} from "../common/component-base";
 import {IpcService} from "../../services/ipc.service";
 import {MenuItem} from "../../core/ui/menu/menu-item";
 import {WorkboxService} from "./workbox.service";
+import {StatusBarService} from "../../core/status-bar/status-bar.service";
+import {StatusControlProvider} from "../../core/status-bar/status-control-provider.interface";
 
 require("./workbox.component.scss");
 
@@ -26,10 +28,15 @@ require("./workbox.component.scss");
             
         </div>
         <div class="ct-workbox-body">
-           <ct-tab-manager *ngFor="let tab of tabs" 
-                        [hidden]="tab !== (workbox.activeTab | async)" 
-                        [tab]="tab">
-           </ct-tab-manager>
+            <span *ngFor="let tab of tabs" [hidden]="tab !== activeTab">
+                <div [ngSwitch]="tab?.contentType | async" class="full-height">
+                    <ct-tool-editor #tabComponent *ngSwitchCase="'CommandLineTool'" [data]="tab.contentData"></ct-tool-editor>
+                    <ct-workflow-editor [data]="tab.contentData" *ngSwitchCase="'Workflow'"></ct-workflow-editor>
+                    <ct-file-editor [data]="tab.contentData" *ngSwitchCase="'Code'"></ct-file-editor>
+                    <ct-settings *ngSwitchCase="'Settings'"></ct-settings>
+                    <block-loader *ngSwitchDefault></block-loader>
+                </div>
+            </span>
         </div>
     `
 })
@@ -43,8 +50,12 @@ export class WorkboxComponent extends ComponentBase implements OnInit {
 
     private el: Element;
 
+    @ViewChildren("tabComponent")
+    private tabComponents: QueryList<any>;
+
     constructor(private ipc: IpcService,
                 public workbox: WorkboxService,
+                private statusBar: StatusBarService,
                 el: ElementRef) {
         super();
         this.el = el.nativeElement;
@@ -76,9 +87,21 @@ export class WorkboxComponent extends ComponentBase implements OnInit {
         this.tracked = this.workbox.tabs.subscribe(tabs => {
             this.tabs = tabs;
         });
+    }
 
+    ngAfterViewInit() {
         this.tracked = this.workbox.activeTab.subscribe(tab => {
-            this.activeTab = tab;
+            console.log("Removing controls");
+            this.statusBar.removeControls();
+
+            this.activeTab  = tab;
+            const idx       = this.tabs.findIndex(t => t === tab);
+
+            const component = this.tabComponents.find((item, index) => index === idx);
+
+            if (component && (component as StatusControlProvider).provideStatusControls) {
+                this.statusBar.setControls(component.provideStatusControls());
+            }
         });
     }
 
