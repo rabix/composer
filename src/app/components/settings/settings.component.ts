@@ -141,9 +141,9 @@ export class SettingsComponent implements OnInit {
     }
 
     private openTokenPage() {
-        let url = "https://igor.sbgenomics.com/account/#developer";
+        let url = "https://igor.sbgenomics.com/developer/#token";
         if (this.form.controls["url"].valid) {
-            url = this.form.controls["url"].value + "/account/#developer";
+            url = this.form.controls["url"].value + "/developer/#token";
         }
 
         this.system.openLink(url);
