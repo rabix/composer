@@ -77,7 +77,7 @@ require("./tool-editor.component.scss");
                                           [options]="{theme: 'ace/theme/monokai'}"
                                           [language]="'yaml'"
                                           [readonly]="!data.isWritable"></ct-code-editor-x>
-                     
+                        
                         <!--GUI Editor-->
                         <ct-clt-editor *ngIf="viewMode === viewModes.Gui"
                                        class="gui-editor-component flex-col"

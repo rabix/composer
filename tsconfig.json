@@ -15,7 +15,8 @@
         ]
 
     },
-    "files": ["src/main.electron.ts", "node_modules/zone.js/dist/zone.js.d.ts"],
+
+    "include": ["src/**/*.ts", "node_modules/zone.js/dist/zone.js.d.ts"],
     "awesomeTypescriptLoaderOptions": {
         "resolveGlobs": true,
         "forkChecker": true

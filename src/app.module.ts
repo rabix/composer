@@ -1,3 +1,6 @@
+/// <reference path="../node_modules/typescript/lib/lib.dom.d.ts" />
+/// <reference path="../node_modules/typescript/lib/lib.es2017.d.ts" />
+
 import {NgModule} from "@angular/core";
 import {HttpModule} from "@angular/http";
 import {MainComponent} from "./app/components/main";
