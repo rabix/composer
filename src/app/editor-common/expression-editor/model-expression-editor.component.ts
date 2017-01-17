@@ -24,10 +24,9 @@ export class ModelExpressionEditorComponent {
 
     private rawCode = new ReplaySubject<string>();
 
-    private evaluator: (code: string) => string;
+    private evaluator: (code: string) => Promise<string>;
 
     ngOnInit() {
-
         this.rawCode.next(this.model.getScript() || "");
 
         this.evaluator = (content: string) => {
@@ -35,16 +34,11 @@ export class ModelExpressionEditorComponent {
             this.model = new ExpressionModel(this.model.loc, this.model.serialize());
             this.model.setValue(content, "expression");
 
-            const result             = this.model.evaluate(this.context);
-            const {errors, warnings} = this.model.validation;
-            const [err]              = [...errors, ...warnings];
-
-            if (err) {
+            return this.model.evaluate(this.context).then(res => {
+                return JSON.stringify(res, null, 4) || "";
+            }, err => {
                 return err.message + " on " + err.loc;
-            }
-
-            return JSON.stringify(result, null, 4) || "";
-
+            });
         }
     }
 }

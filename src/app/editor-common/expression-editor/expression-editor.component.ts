@@ -65,7 +65,7 @@ export class ExpressionEditorComponent extends ComponentBase {
     public editorContent: Observable<string>;
 
     @Input()
-    public evaluator: (code: string) => string;
+    public evaluator: (code: string) => Promise<string>;
 
     @Output()
     public action = new Subject<"close"|"save">();
@@ -83,7 +83,9 @@ export class ExpressionEditorComponent extends ComponentBase {
             .filter(e => typeof e === "string")
             .distinctUntilChanged()
             .subscribe(content => {
-                this.previewContent.next(this.evaluator(content));
+                this.evaluator(content).then(res => {
+                    this.previewContent.next(res);
+                });
             });
 
         this.contextNodes = this.transformContext(this.context);

@@ -9,7 +9,7 @@ import {
     TemplateRef
 } from "@angular/core";
 import {FormControl, FormGroup, FormBuilder} from "@angular/forms";
-import {BehaviorSubject} from "rxjs/Rx";
+import {BehaviorSubject, Observable} from "rxjs/Rx";
 import {ModalService} from "../modal";
 import {noop} from "../../lib/utils.lib";
 import {CommandLineToolModel} from "cwlts/models/d2sb";
@@ -96,8 +96,7 @@ require("./tool-editor.component.scss");
             
             <div *ngIf="reportPanel" class="app-report-panel layout-section">
                 <ct-validation-report *ngIf="reportPanel === 'validation'" [issues]="validation"></ct-validation-report>
-                <ct-command-line-preview *ngIf="reportPanel === 'commandLinePreview'" [commandLineParts]="commandLineParts"></ct-command-line-preview>
-                
+                <ct-command-line-preview *ngIf="reportPanel === 'commandLinePreview'" [commandLineParts]="commandLineParts | async"></ct-command-line-preview>
             </div>
             
             <template #statusControls>
@@ -183,11 +182,11 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
     private toolModel = new CommandLineToolModel("document");
 
     /** Sorted array of resulting command line parts */
-    private commandLineParts: CommandLinePart[];
+    private commandLineParts: Observable<CommandLinePart[]>;
 
     /** Template of the status controls that will be shown in the status bar */
     @ViewChild("statusControls")
-    private statusControls: TemplateRef;
+    private statusControls: TemplateRef<any>;
 
     private viewModes = {
         Code: 'code',
@@ -288,7 +287,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
                 this.isLoading = false;
             }
 
-            console.log("Second validation")
+            console.log("Second validation");
             return {
                 errors: this.toolModel.validation.errors,
                 warnings: this.toolModel.validation.warnings,

@@ -25,7 +25,7 @@ require("./expression-input.component.scss");
                 <ct-validation-preview [entry]="model.validation"></ct-validation-preview>
                 <b class="validation-icon result"
                     *ngIf="model.result && isExpr"
-                    [title]="model.result">E:</b>
+                    [title]="result">E:</b>
                 
                 <div class="input-group">
                 
@@ -80,6 +80,11 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
      */
     private model: ExpressionModel;
 
+    /**
+     * Result gotten from expression evaluation
+     */
+    private result: any;
+
     /** getter for formControl value */
     public get value() {
         return this.model;
@@ -111,8 +116,11 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
             this.isExpr = this.model.isExpression;
         }
 
-        //@fixme(maya) might not be the best place for this
-        this.model.evaluate(this.context);
+        this.model.evaluate(this.context).then(res => {
+            this.result = res;
+        }, err => {
+            console.warn('ExpressionInputComponent got an error while evaluating an expression', err);
+        });
     }
 
     /**

@@ -1134,9 +1134,9 @@ custom-event@~1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/custom-event/-/custom-event-1.0.1.tgz#5d02a46850adf1b4a317946a3928fccb5bfd0425"
 
-cwlts@^1.9.17:
-  version "1.9.17"
-  resolved "https://registry.yarnpkg.com/cwlts/-/cwlts-1.9.17.tgz#46c9e5e0bd2d1baefc5d4eee4249940c831d0272"
+cwlts@^1.10.0:
+  version "1.10.0"
+  resolved "https://registry.yarnpkg.com/cwlts/-/cwlts-1.10.0.tgz#3b15292311ae85cedbf05794e0aa4fea314a9361"
 
 dashdash@^1.12.0:
   version "1.14.1"
@@ -5390,7 +5390,7 @@ typedarray@~0.0.5:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
-typescript@^2.1.4:
+typescript@^2.1.5:
   version "2.1.5"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.1.5.tgz#6fe9479e00e01855247cea216e7561bafcdbcd4a"
 

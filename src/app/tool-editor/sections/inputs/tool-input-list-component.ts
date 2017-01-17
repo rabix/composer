@@ -66,7 +66,7 @@ require("./input-list.component.scss");
                             <!--Object Inspector Template -->
                             <template #inspector>
                                 <ct-editor-inspector-content>
-                                    <div class="tc-header">{{ entry.loc || "Input" }}</div>
+                                    <div class="tc-header">{{ entry.id || entry.loc || "Input" }}</div>
                                     <div class="tc-body">
                                         <ct-tool-input-inspector 
                                             (save)="updateInput($event, i)" 

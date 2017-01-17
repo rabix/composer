@@ -103,15 +103,18 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
         if (category === "inputs") {
             this.model.inputs = [];
             data.forEach(input => this.model.addInput(input));
+            this.model.updateCommandLine();
         } else if (category === "arguments") {
             this.model.arguments = [];
             data.forEach(argument => this.model.addArgument(argument));
+            this.model.updateCommandLine();
         } else if (category === "outputs") {
             this.model.outputs = [];
             data.forEach(output => this.model.addOutput(output));
         } else if (category === "baseCommand") {
             this.model.baseCommand = [];
             data.forEach(cmd => this.model.addBaseCommand(cmd));
+            this.model.updateCommandLine();
         } else if (category === "createFileRequirement") {
             if (this.model.createFileRequirement) {
                 console.log("defs gotten from def-list", data);
@@ -131,6 +134,7 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
         ["stdin", "stdout"].forEach(str => {
             if (change[str]) this.model.updateStream(change[str], <"stdin" | "stdout"> str);
         });
+        this.model.updateCommandLine();
     }
 
     private setRequirement(req: ProcessRequirement, hint: boolean) {
