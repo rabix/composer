@@ -26,31 +26,33 @@ import {FileDefInspectorComponent} from "./sections/file-def-list/file-def-inspe
 import {LiteralExpressionInputComponent} from "./sections/file-def-list/literal-expression-input.component";
 import {SecondaryFilesComponent} from "./object-inspector/secondary-files/secondary-files.component";
 import {CommandLinePreviewComponent} from "./components/command-line-preview/command-line-preview.component";
+import {JobEditorComponent} from "./sections/job-editor/job-editor.component";
 
 @NgModule({
     declarations: [
-        ArgumentListComponent,
         ArgumentInspector,
-        FileDefListComponent,
-        ToolInputsComponent,
-        ToolInputInspector,
-        ToolInputListComponent,
-        ToolOutputListComponent,
-        ToolOutputInspector,
+        ArgumentListComponent,
         BasicInputSectionComponent,
         BasicOutputSectionComponent,
-        InputTypeSelectComponent,
-        DescriptionComponent,
-        InputBindingSectionComponent,
-        FileDefInspectorComponent,
-        SymbolsComponent,
-        SecondaryFilesComponent,
-        OutputMetaDataSectionComponent,
-        StageInputSectionComponent,
-        ResourcesComponent,
-        OutputEvalSectionComponent,
-        LiteralExpressionInputComponent,
         CommandLinePreviewComponent,
+        DescriptionComponent,
+        FileDefInspectorComponent,
+        FileDefListComponent,
+        InputBindingSectionComponent,
+        InputTypeSelectComponent,
+        JobEditorComponent,
+        LiteralExpressionInputComponent,
+        OutputEvalSectionComponent,
+        OutputMetaDataSectionComponent,
+        ResourcesComponent,
+        SecondaryFilesComponent,
+        StageInputSectionComponent,
+        SymbolsComponent,
+        ToolInputInspector,
+        ToolInputListComponent,
+        ToolInputsComponent,
+        ToolOutputInspector,
+        ToolOutputListComponent,
     ],
     exports: [
         ArgumentListComponent,
@@ -71,7 +73,8 @@ import {CommandLinePreviewComponent} from "./components/command-line-preview/com
         OutputMetaDataSectionComponent,
         LiteralExpressionInputComponent,
         OutputMetaDataSectionComponent,
-        CommandLinePreviewComponent,
+        CommandLinePreviewComponent, // Should not be exported
+        JobEditorComponent, // Should not be exported
     ],
     imports: [
         BrowserModule,

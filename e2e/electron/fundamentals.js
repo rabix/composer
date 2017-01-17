@@ -24,6 +24,8 @@ describe("Application Launch", function () {
         this.app.client.getHTML("[data-marker='ready']", false).then(content => {
             assert.equal(content, 'ready');
             done();
+        }, err => {
+            done(err);
         });
     });
 });

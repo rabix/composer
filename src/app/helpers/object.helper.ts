@@ -1,5 +1,3 @@
-import * as _ from "lodash";
-
 export class ObjectHelper {
 
     private static pathDelimiter = ".";
@@ -16,7 +14,7 @@ export class ObjectHelper {
         // Ensure that path is an array of path elements
         const resolvedPath = typeof path === "string" ? path.split(ObjectHelper.pathDelimiter) : path;
 
-        (<Array<string>> resolvedPath).reduce((acc, curr, index, arr)=> {
+        (<Array<string>> resolvedPath).reduce((acc, curr, index, arr) => {
             if (index === arr.length - 1) {
                 return acc[curr] = value;
             }
@@ -30,6 +28,23 @@ export class ObjectHelper {
                 throw new Error("Couldn't add a nested property to type " + typeof acc);
             }
         }, target);
+    }
+
+    public static getProperty<T, R>(target: T, path: string, defaultReturn: R): R | any {
+        const parts = path.split(this.pathDelimiter);
+        if (!target) {
+            return defaultReturn;
+        }
+
+        for (let key of parts) {
+            if (!target[key]) {
+                return defaultReturn;
+            }
+
+            target = target[key];
+        }
+
+        return target;
     }
 
     /**

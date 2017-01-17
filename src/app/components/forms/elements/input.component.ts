@@ -1,7 +1,6 @@
 import {Component, Input, ElementRef, ViewChild, Renderer, AfterViewInit, ChangeDetectionStrategy} from "@angular/core";
 import {FormControl} from "@angular/forms";
 require("./input.component.scss");
-
 @Component({
     selector: "ct-input",
     changeDetection: ChangeDetectionStrategy.OnPush,

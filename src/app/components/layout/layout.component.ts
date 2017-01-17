@@ -15,8 +15,6 @@ import {
 import {StatusBarService} from "../../core/status-bar/status-bar.service";
 import {StatusBarComponent} from "../../core/status-bar/status-bar.component";
 import {WorkboxService} from "../workbox/workbox.service";
-
-
 require("./layout.component.scss");
 
 @Component({
@@ -77,11 +75,11 @@ export class LayoutComponent extends ComponentBase implements OnInit {
 
     /** Flex ratio of the left part of the layout */
     @Input()
-    private treeSize = 1;
+    public treeSize = 1;
 
     /** Flex ratio of the document part of the layout */
     @Input()
-    private tabsSize = 4;
+    public tabsSize = 4;
 
     /** Draggable column separator, handled via it's native element reference */
     @ViewChild("handle")

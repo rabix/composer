@@ -1,22 +1,26 @@
 {
     "compilerOptions": {
-        "target": "es5",
+        "target": "es6",
         "module": "commonjs",
         "moduleResolution": "node",
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "sourceMap": true,
         "noEmitHelpers": true,
-        "lib": ["dom","es6"],
+        "lib": [
+            "dom",
+            "es6"
+        ],
         "types": [
             "ace",
             "electron",
             "jasmine"
         ]
-
     },
-
-    "include": ["src/**/*.ts", "node_modules/zone.js/dist/zone.js.d.ts"],
+    "include": [
+        "src/**/*.ts",
+        "node_modules/zone.js/dist/zone.js.d.ts"
+    ],
     "awesomeTypescriptLoaderOptions": {
         "resolveGlobs": true,
         "forkChecker": true

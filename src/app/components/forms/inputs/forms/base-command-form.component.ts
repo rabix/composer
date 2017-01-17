@@ -4,9 +4,7 @@ import {ExpressionModel} from "cwlts/models/d2sb";
 import {ReplaySubject} from "rxjs";
 import {ComponentBase} from "../../../common/component-base";
 import {GuidService} from "../../../../services/guid.service";
-
 require("./base-command-form.components.scss");
-
 @Component({
     selector: 'ct-base-command-form',
     template: `<ct-form-panel>

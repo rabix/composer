@@ -6,9 +6,7 @@ import {MenuItem} from "../../core/ui/menu/menu-item";
 import {WorkboxService} from "./workbox.service";
 import {StatusBarService} from "../../core/status-bar/status-bar.service";
 import {StatusControlProvider} from "../../core/status-bar/status-control-provider.interface";
-
 require("./workbox.component.scss");
-
 @Component({
     host: {"class": "ct-workbox"},
     selector: 'ct-workbox',

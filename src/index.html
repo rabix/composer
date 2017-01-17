@@ -2,19 +2,17 @@
 <html lang="en">
 <head>
 
-    <title><%= webpackConfig.metadata.title %></title>
+    <title>Rabix Editors</title>
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="<%= webpackConfig.metadata.title %>">
 
-    <!-- base url -->
-    <base href="<%= webpackConfig.metadata.baseUrl %>">
-    <script>
+    <% if (webpackConfig.htmlElements.headTags) { %>
+        <%= webpackConfig.htmlElements.headTags %>
+    <% } %>
 
-    </script>
-
+    <base href="<%= htmlWebpackPlugin.options.metadata.baseUrl %>">
 </head>
 
 <body>
@@ -25,9 +23,10 @@
         </div>
     </cottontail>
 
-<% if (webpackConfig.metadata.ENV === 'development') { %>
-<script src="/webpack-dev-server.js"></script>
-<% } %>
+    <% if (htmlWebpackPlugin.options.metadata.isDevServer) { %>
+    <!-- Webpack Dev Server reload -->
+    <script src="/webpack-dev-server.js"></script>
+    <% } %>
 
 </body>
 </html>

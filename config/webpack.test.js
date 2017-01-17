@@ -107,7 +107,7 @@ module.exports = {
          *
          * See: http://webpack.github.io/docs/configuration.html#module-loaders
          */
-        loaders: [
+        rules: [
 
             /**
              * Typescript loader support for .ts and Angular 2 async routes via .async.ts

@@ -1,4 +1,5 @@
 /// <reference path="../../../custom-typings.d.ts"/>
+import "brace";
 import {Component, ViewContainerRef} from "@angular/core";
 import {Observable} from "rxjs/Rx";
 import {ContextService} from "../../core/ui/context/context.service";
@@ -20,7 +21,6 @@ import {UserProjectsService} from "../../platform-providers/user-projects/user-p
 require("./../../../assets/sass/main.scss");
 require("./main.component.scss");
 
-
 @Component({
     selector: "cottontail",
     template: `
@@ -35,7 +35,6 @@ require("./main.component.scss");
         UrlValidator,
         PlatformAPI,
         SBPlatformDataSourceService,
-        SettingsService,
         ContextService,
         // FIXME: this needs to be handled in a system-specific way
         GuidService,

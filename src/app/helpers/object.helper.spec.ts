@@ -1,4 +1,5 @@
 import {ObjectHelper} from "./object.helper";
+import {} from "@angular";
 
 describe("ObjectHelper", () => {
 

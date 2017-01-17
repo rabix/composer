@@ -36,7 +36,7 @@ export class PlatformAPI {
     private platformServices: {brood: string, watson: string, gatekeeper: string} = {} as any;
 
     constructor(private http: Http, private settings: SettingsService) {
-
+console.log("ENVP is", ENVP);
         this.settings.platformConfiguration.subscribe(config => {
 
             Object.keys(ENVP.serviceRoutes).forEach(serviceName => {

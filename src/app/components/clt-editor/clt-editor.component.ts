@@ -3,9 +3,7 @@ import {FormBuilder, FormGroup} from "@angular/forms";
 import {CommandLineToolModel, FileDefModel, RequirementBaseModel, ResourceRequirementModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../common/component-base";
 import {ProcessRequirement} from "cwlts/mappings/d2sb/ProcessRequirement";
-
 require("./clt-editor.component.scss");
-
 @Component({
     selector: "ct-clt-editor",
     template: `

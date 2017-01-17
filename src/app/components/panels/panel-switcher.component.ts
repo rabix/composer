@@ -1,8 +1,6 @@
 import {Component, Output, Input, ChangeDetectionStrategy} from "@angular/core";
 import {ReplaySubject} from "rxjs";
-
 require("./panel-switcher.component.scss");
-
 @Component({
     selector: "ct-panel-switcher",
     changeDetection: ChangeDetectionStrategy.OnPush,
