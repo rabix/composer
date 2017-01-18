@@ -183,11 +183,9 @@ module.exports = function (options) {
             // NOTE: when adding more properties make sure you include them in custom-typings.d.ts
             new DefinePlugin({
                 'ENV': JSON.stringify(ENV),
-                'HMR': false,
                 'process.env': {
                     'ENV': JSON.stringify(ENV),
                     'NODE_ENV': JSON.stringify(ENV),
-                    'HMR': false,
                 }
             }),
 

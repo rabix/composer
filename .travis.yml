@@ -19,8 +19,7 @@ before_script:
 script:
   - npm run build:electron
   - scripts/electron-build.sh
-  - npm run test:electron:backend
-  - npm run test:electron:frontend
+  - npm test
 
 notifications:
   email: false

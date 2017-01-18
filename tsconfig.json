@@ -1,15 +1,20 @@
 {
     "compilerOptions": {
-        "target": "es6",
+        "target": "es5",
         "module": "commonjs",
         "moduleResolution": "node",
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
+        "allowSyntheticDefaultImports": true,
         "sourceMap": true,
+        "noEmit": true,
         "noEmitHelpers": true,
         "lib": [
             "dom",
             "es6"
+        ],
+        "typeRoots": [
+            "node_modules/@types"
         ],
         "types": [
             "ace",
@@ -17,9 +22,12 @@
             "jasmine"
         ]
     },
-    "include": [
-        "src/**/*.ts",
-        "node_modules/zone.js/dist/zone.js.d.ts"
+    "exclude": [
+        "node_modules",
+        "dist",
+        "electron",
+        "build",
+        "e2e"
     ],
     "awesomeTypescriptLoaderOptions": {
         "resolveGlobs": true,
