@@ -115,7 +115,6 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
             this.model.updateCommandLine();
         } else if (category === "createFileRequirement") {
             if (this.model.createFileRequirement) {
-                console.log("defs gotten from def-list", data);
                 this.model.createFileRequirement.fileDef = data;
             } else {
                 this.model.setRequirement(<ProcessRequirement>{

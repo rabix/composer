@@ -134,7 +134,6 @@ export class ExpressionEditorComponent extends ComponentBase {
                     trace = trace.split(".").map(p => (parseInt(p) == p) ? `[${p}]` : p).join(".")
                         .replace(/\]\.\[/g, "][")
                         .replace(/\.\[/g, "[");
-                    console.log("Trace is now", trace);
                     this.editor.editor.session.insert(this.editor.editor.getCursorPosition(), String(trace));
                 };
             }

@@ -127,7 +127,6 @@ export class ModalService {
             refAssign(ref, params);
 
             ref.decision.subscribe(content => {
-                console.log("Closing checkbox prompt");
                 content !== null ? resolve(content) : reject();
                 this.close();
             });

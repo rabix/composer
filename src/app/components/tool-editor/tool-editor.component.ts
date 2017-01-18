@@ -287,7 +287,6 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
                 this.isLoading = false;
             }
 
-            console.log("Second validation");
             return {
                 errors: this.toolModel.validation.errors,
                 warnings: this.toolModel.validation.warnings,

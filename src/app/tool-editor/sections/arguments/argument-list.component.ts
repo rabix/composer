@@ -149,10 +149,6 @@ export class ArgumentListComponent extends ComponentBase implements OnChanges {
         this.update.next(entries);
     }
 
-    private repos() {
-        console.log("Should reposition");
-    }
-
     private addEntry() {
 
         const newEntryLocation = `${this.location}[${this.entries.length}]`;

@@ -24,8 +24,6 @@ require("./revision-list.component.scss");
                      [class.active]="active === revision.number"
                      *ngFor="let revision of displayList">
                     
-                    <md-progress-bar *ngIf="loadingRevision === revision" class="loading-progress" mode="indeterminate"></md-progress-bar>
-                    
                     <div class="revision-number h5">
                         {{ revision.number }}
                     </div>

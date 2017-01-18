@@ -20,7 +20,6 @@ import {ValidationTextPipe} from "./pipes/validation-text.pipes";
 import {ValidationClassDirective} from "./components/validation-preview/validation-class.directive";
 import {EditorControlsComponent} from "./components/editor-controls/editor-controls.component";
 import {RevisionListComponent} from "./components/revision-list/revision-list.component";
-import {MdProgressBarModule} from "@angular2-material/progress-bar";
 import {KeyValueInputComponent} from "./components/key-value-component/key-value-input.component";
 import {KeyValueListComponent} from "./components/key-value-component/key-value-list.component";
 import {ValidationReportComponent} from "./components/validation-report/validation-report.component";
@@ -77,7 +76,7 @@ import {ValidationReportComponent} from "./components/validation-report/validati
         ExpressionEditorComponent,
         ModelExpressionEditorComponent,
     ],
-    imports: [BrowserModule, CoreModule, FormsModule, ReactiveFormsModule, MdProgressBarModule]
+    imports: [BrowserModule, CoreModule, FormsModule, ReactiveFormsModule]
 })
 export class EditorCommonModule {
 

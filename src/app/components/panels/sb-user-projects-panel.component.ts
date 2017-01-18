@@ -34,7 +34,6 @@ import {StatusBarService} from "../../core/status-bar/status-bar.service";
         </div>
         
         <div *ngIf="isLoading">
-            <md-progress-bar mode="indeterminate"></md-progress-bar>
             <div class="text-xs-center">
                 <small>Preparing Your Projects&hellip;</small>
             </div>

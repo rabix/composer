@@ -15,7 +15,6 @@ import {StatusBarService} from "../../core/status-bar/status-bar.service";
         </ct-panel-toolbar>
         
         <div *ngIf="isLoading">
-            <md-progress-bar mode="indeterminate"></md-progress-bar>
             <div class="text-xs-center"><small>Fetching Public Apps&hellip;</small></div>
         </div>
         <ct-tree-view [nodes]="nodes" [preferenceKey]="'public-apps'"></ct-tree-view>

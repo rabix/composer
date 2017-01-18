@@ -25,12 +25,6 @@ export class JobEditorComponent implements OnChanges {
 
     private inputGroups: { name: string, inputs: CommandInputParameterModel[] }[] = [];
 
-
-    ngOnInit() {
-        console.log("Got job and inputs", this.job, this.inputs);
-
-    }
-
     ngOnChanges(changes: SimpleChanges) {
         // this.inputs.sort((a, b) => {
         //     const categoryA = ObjectHelper.

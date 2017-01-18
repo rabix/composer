@@ -89,7 +89,6 @@ export class WorkboxComponent extends ComponentBase implements OnInit {
 
     ngAfterViewInit() {
         this.tracked = this.workbox.activeTab.subscribe(tab => {
-            console.log("Removing controls");
             this.statusBar.removeControls();
 
             this.activeTab  = tab;

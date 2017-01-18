@@ -27,7 +27,7 @@ describe("WebWorkerService", () => {
             webWorkerService.validateJsonSchema(text);
 
             webWorkerService.validationResultStream.subscribe((res:ValidationResponse) => {
-                expect(res.errors[0]).toEqual('Not a valid JSON');
+                expect(res.errors[0].message).toEqual("Document is missing 'class' property");
                 done();
             });
         });
@@ -39,7 +39,7 @@ describe("WebWorkerService", () => {
             webWorkerService.validateJsonSchema(text);
 
             webWorkerService.validationResultStream.subscribe((res:ValidationResponse) => {
-                expect(res.errors[0]).toEqual("JSON is missing 'cwlVersion' or 'class'");
+                expect(res.errors[0].message).toEqual("Document is missing 'class' property");
                 done();
             });
         });

@@ -60,7 +60,6 @@ export class TooltipDirective extends ComponentBase {
         instance.show();
 
         this.tracked = Observable.fromEvent(window, "scroll", true).first().subscribe(_ => {
-            console.log("Scrolling");
             this.hide();
         });
 

@@ -52,8 +52,6 @@ import {IpcService} from "./app/services/ipc.service";
 import {PlatformAPI} from "./app/services/api/platforms/platform-api.service";
 import {SettingsService} from "./app/services/settings/settings.service";
 import {Http} from "@angular/http";
-import {MdProgressBarModule} from "@angular2-material/progress-bar";
-import {MdCoreModule} from "@angular2-material/core";
 
 @NgModule({
     providers: [
@@ -121,9 +119,6 @@ import {MdCoreModule} from "@angular2-material/core";
         HttpModule,
         ReactiveFormsModule,
         ToolEditorModule,
-        MdCoreModule,
-        MdProgressBarModule,
-
     ],
     bootstrap: [MainComponent]
 })

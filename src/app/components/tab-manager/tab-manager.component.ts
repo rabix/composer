@@ -22,15 +22,4 @@ export class TabManagerComponent implements OnChanges {
 
     @ViewChildren("component")
     private tabComponent: QueryList<StatusControlProvider>;
-
-    ngAfterViewInit() {
-        console.log("Tab component query", this.tabComponent);
-        this.tabComponent.changes.subscribe((value) => {
-            console.log("Value of tab component", value)
-        });
-    }
-
-    ngOnChanges(changes: SimpleChanges): void {
-        console.log("TAb component", this.tabComponent);
-    }
 }

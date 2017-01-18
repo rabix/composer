@@ -102,6 +102,7 @@ export class CodeEditorComponent extends ComponentBase {
     }
 
     ngOnInit() {
+
         // Instantiate the editor instance inside the target element
         this.editor  = ace.edit(this.elementRef.nativeElement);
         this.tracked = this.editor;
