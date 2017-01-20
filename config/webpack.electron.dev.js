@@ -19,7 +19,7 @@ const METADATA = webpackMerge(commonConfig({env: ENV}).metadata, {
 
 module.exports = function (options) {
     return webpackMerge(commonConfig({env: ENV}), {
-        devtool: "cheap-module-source-map",
+        devtool: "eval-source-map",
         output: {
             path: helpers.root("dist"),
             filename: "[name].bundle.js",
