@@ -27,7 +27,6 @@ import {FileDefInspectorComponent} from "./sections/file-def-list/file-def-inspe
 import {LiteralExpressionInputComponent} from "./sections/file-def-list/literal-expression-input.component";
 import {SecondaryFilesComponent} from "./object-inspector/secondary-files/secondary-files.component";
 import {CommandLinePreviewComponent} from "./components/command-line-preview/command-line-preview.component";
-import {JobEditorComponent} from "./sections/job-editor/job-editor.component";
 
 @NgModule({
     declarations: [
@@ -41,7 +40,6 @@ import {JobEditorComponent} from "./sections/job-editor/job-editor.component";
         FileDefListComponent,
         InputBindingSectionComponent,
         InputTypeSelectComponent,
-        JobEditorComponent,
         LiteralExpressionInputComponent,
         OutputEvalSectionComponent,
         OutputMetaDataSectionComponent,
@@ -77,7 +75,6 @@ import {JobEditorComponent} from "./sections/job-editor/job-editor.component";
         LiteralExpressionInputComponent,
         OutputMetaDataSectionComponent,
         CommandLinePreviewComponent, // Should not be exported
-        JobEditorComponent, // Should not be exported
     ],
     imports: [
         BrowserModule,

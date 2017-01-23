@@ -23,6 +23,9 @@ import {RevisionListComponent} from "./components/revision-list/revision-list.co
 import {KeyValueInputComponent} from "./components/key-value-component/key-value-input.component";
 import {KeyValueListComponent} from "./components/key-value-component/key-value-list.component";
 import {ValidationReportComponent} from "./components/validation-report/validation-report.component";
+import {JobEditorComponent} from "./job-editor/job-editor.component";
+import {FileInputInspector} from "./inspector-forms/file-input-inspector.component";
+import {JobEditorEntryComponent} from "./job-editor/job-editor-entry.component";
 
 @NgModule({
     declarations: [
@@ -38,6 +41,8 @@ import {ValidationReportComponent} from "./components/validation-report/validati
         ExpressionModelListComponent,
         FileDefContentPipe,
         FileDefNamePipe,
+        JobEditorComponent,
+        JobEditorEntryComponent,
         KeyValueInputComponent,
         KeyValueListComponent,
         ModelExpressionEditorComponent,
@@ -47,10 +52,12 @@ import {ValidationReportComponent} from "./components/validation-report/validati
         ValidationComponent,
         ValidationReportComponent,
         ValidationTextPipe,
+        FileInputInspector,
     ],
     exports: [
         BlankToolStateComponent,
         CompactListComponent,
+        FileInputInspector,
         EditableDirective,
         EditorControlsComponent,
         EditorInspectorComponent,
@@ -61,6 +68,7 @@ import {ValidationReportComponent} from "./components/validation-report/validati
         ExpressionModelListComponent,
         FileDefContentPipe,
         FileDefNamePipe,
+        JobEditorComponent,
         KeyValueInputComponent,
         KeyValueListComponent,
         ModelExpressionEditorComponent,

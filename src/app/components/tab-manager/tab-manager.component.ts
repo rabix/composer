@@ -1,11 +1,9 @@
 import {Component, Input, ViewChildren, QueryList} from "@angular/core";
 import {TabData} from "../workbox/tab-data.interface";
-import {WebWorkerService} from "../../services/web-worker/web-worker.service";
 import {StatusControlProvider} from "../../core/status-bar/status-control-provider.interface";
 
 @Component({
     selector: "ct-tab-manager",
-    providers: [WebWorkerService],
     template: `
         <div [ngSwitch]="tab?.contentType | async" class="full-height">
             <ct-tool-editor #component *ngSwitchCase="'CommandLineTool'" [data]="tab.contentData"></ct-tool-editor>

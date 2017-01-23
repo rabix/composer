@@ -6,7 +6,7 @@ import {
     OnDestroy,
     ViewChild,
     ViewContainerRef,
-    TemplateRef
+    TemplateRef, Injector
 } from "@angular/core";
 import {FormControl, FormGroup, FormBuilder} from "@angular/forms";
 import {BehaviorSubject, Observable} from "rxjs/Rx";
@@ -25,6 +25,7 @@ import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {StatusBarService} from "../../core/status-bar/status-bar.service";
 import {WorkboxTab} from "../workbox/workbox-tab.interface";
 import LoadOptions = jsyaml.LoadOptions;
+import {ObjectSourcePlatform} from "../../core/provider-tokens";
 
 require("./tool-editor.component.scss");
 
@@ -84,6 +85,11 @@ require("./tool-editor.component.scss");
                                        [readonly]="!data.isWritable"
                                        [formGroup]="toolGroup"
                                        [model]="toolModel"></ct-clt-editor>
+                                       
+                        <ct-job-editor *ngIf="viewMode === viewModes.Test"
+                                        class="gui-editor-component flex-col p-2"
+                                        [job]="toolModel.job" 
+                                        [inputs]="toolModel.inputs"></ct-job-editor>
                                        
                                        
                     <!--Object Inspector Column-->
@@ -342,34 +348,30 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
      *
      * @param mode
      */
-    private switchView(mode) {
+    private switchView(mode): void {
 
-        if (mode === this.viewModes.Gui) {
+        if (mode === this.viewModes.Gui && this.showReformatPrompt) {
 
-            if (this.showReformatPrompt) {
-                this.modal.checkboxPrompt({
-                    title: "Confirm GUI Formatting",
-                    content: "Activating GUI mode might change the formatting of this document. Do you wish to continue?",
-                    cancellationLabel: "Cancel",
-                    confirmationLabel: "OK",
-                    checkboxLabel: "Don't show this dialog again",
-                }).then(res => {
-                    if (res) this.userPrefService.put("show_reformat_prompt", false);
+            this.modal.checkboxPrompt({
+                title: "Confirm GUI Formatting",
+                content: "Activating GUI mode might change the formatting of this document. Do you wish to continue?",
+                cancellationLabel: "Cancel",
+                confirmationLabel: "OK",
+                checkboxLabel: "Don't show this dialog again",
+            }).then(res => {
+                if (res) this.userPrefService.put("show_reformat_prompt", false);
 
-                    this.showReformatPrompt = false;
-                    this.viewMode           = mode;
-                }, noop);
-
-            } else {
-                this.viewMode = mode;
-            }
-        } else if (mode === this.viewModes.Code) {
-            if (this.toolGroup.dirty) {
-                this.rawEditorContent.next(this.getModelText());
-            }
-
-            this.viewMode = mode;
+                this.showReformatPrompt = false;
+                this.viewMode           = mode;
+            }, noop);
+            return;
         }
+
+        if (mode === this.viewModes.Code && this.toolGroup.dirty) {
+            this.rawEditorContent.next(this.getModelText());
+        }
+
+        this.viewMode = mode;
     }
 
     /**

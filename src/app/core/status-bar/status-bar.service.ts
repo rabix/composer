@@ -37,6 +37,8 @@ export class StatusBarService {
                 this.setStatus(completionMessage);
             }
         });
+
+        return process;
     }
 
     public startProcess(firstMessage = "", completionMessage = "") {
@@ -81,6 +83,10 @@ export class StatusBarService {
 
     public removeControls() {
         this.controls.next(undefined);
+    }
+
+    public instant(message: string): void {
+        this.stopProcess(this.startProcess(""), message);
     }
 
 }
