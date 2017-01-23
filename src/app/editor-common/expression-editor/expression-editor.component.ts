@@ -79,7 +79,7 @@ export class ExpressionEditorComponent extends ComponentBase {
 
 
     ngOnInit() {
-        this.tracked = this.editorContent.debounceTime(250)
+        this.tracked = this.editorContent.debounceTime(50)
             .filter(e => typeof e === "string")
             .distinctUntilChanged()
             .subscribe(content => {
