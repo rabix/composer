@@ -11,23 +11,35 @@ import {
 import {ComponentBase} from "../../../components/common/component-base";
 import {CommandInputParameterModel} from "cwlts/models/d2sb";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
+import {ModalService} from "../../../components/modal/modal.service";
+import {noop} from "../../../lib/utils.lib";
 
 
 require("./input-list.component.scss");
 
 @Component({
     selector: "ct-tool-input-list",
+
     changeDetection: ChangeDetectionStrategy.OnPush,
-    template: `                        
+    template: `   
+    <div class="container">                    
+
+                    <!--Blank Tool Screen-->
+                    <ct-blank-tool-state *ngIf="!readonly && !entries.length && isField"
+                                         [title]="'Click the button to define a field for record.'"
+                                         [buttonText]="'Add field'"
+                                         (buttonClick)="addEntry()">
+                    </ct-blank-tool-state>    
+                        
                     <!--List Header Row-->
-                    <div class="gui-section-list-title row">
+                    <div class="gui-section-list-title row" *ngIf="entries.length">
                         <div class="col-sm-4">ID</div>
                         <div class="col-sm-3">Type</div>
                         <div class="col-sm-4">Binding</div>
                     </div>
                 
                     <!--Input List Entries-->
-                    <ul class="gui-section-list">
+                    <ul class="gui-section-list nested-type">
                     
                         <!--List Entry-->
                         <li *ngFor="let entry of entries; let i = index" 
@@ -36,7 +48,7 @@ require("./input-list.component.scss");
 
                             <div class="gui-section-list-item clickable row"
                                 [ct-editor-inspector]="inspector"
-                                [ct-editor-inspector-target]="entry"
+                                [ct-editor-inspector-target]="entry.loc"
                                 [ct-validation-class]="entry.validation">
                                 
                                 <!--ID Column-->
@@ -77,9 +89,11 @@ require("./input-list.component.scss");
                                 </ct-editor-inspector-content>
                             </template>
                             
-                            
-                        <div *ngIf="entry.type.fields" class="">
-                            <ct-tool-input-list *ngIf = "entry.type.type === 'record'" [entries]="entry.type.fields"
+                        
+                        <!--Nested entries-->
+                        <div *ngIf="entry.type.fields" class="children">
+                            <ct-tool-input-list *ngIf="isRecordType(entry)" [entries]="entry.type.fields"
+                                  [readonly]="readonly"
                                   [location]="getFieldsLocation(i)"
                                   [isField]="true"
                                   (update)="updateFields($event, i)">                             
@@ -87,15 +101,16 @@ require("./input-list.component.scss");
                         </div>                           
                                                   
                         </li>
-                    </ul>
-            
-                <!--Add Input Button-->
-                <button *ngIf="!readonly" 
-                        (click)="addEntry()" 
-                        type="button" 
-                        class="btn pl-0 btn-link no-outline no-underline-hover">
-                    <i class="fa fa-plus"></i> Add an Input
-                </button>
+                    </ul>            
+    </div>  
+    
+    <!--Add entry link-->
+    <button *ngIf="!readonly && entries.length" 
+            (click)="addEntry()" 
+            type="button" 
+            class="btn pl-0 btn-link no-outline no-underline-hover">
+        <i class="fa fa-plus"></i> Add an Input
+    </button>
 
     `
 })
@@ -125,21 +140,27 @@ export class ToolInputListComponent extends ComponentBase {
     @ViewChildren("inspector", {read: TemplateRef})
     private inspectorTemplate: QueryList<TemplateRef<any>>;
 
-    constructor(private inspector: EditorInspectorService) {
+    constructor(private inspector: EditorInspectorService, private modal: ModalService) {
         super();
     }
 
     private removeEntry(index) {
+        this.modal.confirm({
+            title: "Really Remove?",
+            content: `Are you sure that you want to remove this input?`,
+            cancellationLabel: "No, keep it",
+            confirmationLabel: "Yes, remove it"
+        }).then(() => {
+            if (this.inspector.isInspecting(this.entries[index].loc)) {
+                this.inspector.hide();
+            }
 
-        if (this.inspector.isInspecting(this.entries[index])) {
-            this.inspector.hide();
-        }
-
-        const entries = this.entries.slice(0, index).concat(this.entries.slice(index + 1));
-        this.update.next(entries);
+            const entries = this.entries.slice(0, index).concat(this.entries.slice(index + 1));
+            this.update.next(entries);
+        }, noop);
     }
 
-    private addEntry() {
+    public addEntry() {
         const newEntryLocation = `${this.location}[${this.entries.length}]`;
         const newEntry = new CommandInputParameterModel(newEntryLocation);
         newEntry.isField = this.isField;
@@ -152,7 +173,7 @@ export class ToolInputListComponent extends ComponentBase {
             .delay(1)
             .map(list => list.last)
             .subscribe(templateRef => {
-                this.inspector.show(templateRef, newEntry);
+                this.inspector.show(templateRef, newEntry.loc);
             });
     }
 
@@ -183,5 +204,9 @@ export class ToolInputListComponent extends ComponentBase {
         Object.assign(input, newInput);
 
         this.update.next(this.entries.slice());
+    }
+
+    private isRecordType (entry) {
+        return entry.type.type === 'record' || (entry.type.type === 'array' && entry.type.items === 'record');
     }
 }

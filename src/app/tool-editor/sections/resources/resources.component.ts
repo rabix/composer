@@ -1,4 +1,4 @@
-import {Component, Input, SimpleChanges, Output} from "@angular/core";
+import {Component, Input, SimpleChanges, Output, OnChanges} from "@angular/core";
 import {FormControl} from "@angular/forms";
 import {ResourceRequirementModel, ExpressionModel} from "cwlts/models/d2sb";
 import {ReplaySubject} from "rxjs";
@@ -33,7 +33,7 @@ import {ReplaySubject} from "rxjs";
 
 `
 })
-export class ResourcesComponent {
+export class ResourcesComponent implements OnChanges {
     @Input()
     entries: {
         cpu?: ResourceRequirementModel,
