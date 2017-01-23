@@ -39,7 +39,7 @@ require("./input-list.component.scss");
                     </div>
                 
                     <!--Input List Entries-->
-                    <ul class="gui-section-list nested-type">
+                    <ul class="gui-section-list">
                     
                         <!--List Entry-->
                         <li *ngFor="let entry of entries; let i = index" 
