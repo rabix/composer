@@ -19,7 +19,7 @@ require("./expression-input.component.scss");
     ],
     template: `
             <div class="expression-input-group clickable"
-                 [class.expr]="isExpr"
+                 [class.expr]="isExpr || disableLiteralTextInput"
                  [ct-validation-class]="model.validation">
                  
                 <ct-validation-preview [entry]="model.validation"></ct-validation-preview>
@@ -30,24 +30,13 @@ require("./expression-input.component.scss");
                 <div class="input-group">
                 
                     <input class="form-control"
-                            #input
-                            *ngIf="type === 'string'"
-                            type="text"
-                            [value]="value?.toString()"
-                            [readonly]="isExpr"
-                            (blur)="onTouch()"
-                            (click)="editExpr(isExpr ? 'edit' : null, $event)"
-                            (change)="editString(input.value)"/>
-                            
-                    <input class="form-control"
-                            #input
-                            type="number"
-                            *ngIf="type === 'number'"
-                            [value]="value?.toString()"
-                            [readonly]="isExpr"
-                            (blur)="onTouch()"
-                            (click)="editExpr(isExpr ? 'edit' : null, $event)"
-                            (change)="editString(input.value)"/>
+                        #input               
+                        [type]="isExpr ? 'string' : type"
+                        [value]="value?.toString()"
+                        [readonly]="isExpr || disableLiteralTextInput"
+                        (blur)="onTouch()"
+                        (click)="editExpr(isExpr || disableLiteralTextInput ? 'edit' : null, $event)"
+                        (change)="editString(input.value)"/>
                         
                     <span class="input-group-btn">
                         <button type="button"
@@ -71,6 +60,10 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
 
     @Input()
     public type: "string" | "number" = "string";
+
+    /** When set to true, only expressions are allowed */
+    @Input()
+    public disableLiteralTextInput: boolean = false;
 
     /** Flag if model is expression or primitive */
     private isExpr: boolean = false;
@@ -185,20 +178,34 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
             editor.action.first().subscribe(action => {
                 if (action === "save") {
                     this.model = new ExpressionModel(this.model.loc, editor.model.serialize());
-                    this.model.evaluate(this.context); // to reset validation
-                    this.isExpr = this.model.isExpression;
-                    this.onChange(this.model);
+                    this.model.evaluate(this.context).then(() => {
+                        // to reset validation
+                        this.isExpr = this.model.isExpression;
+                        this.onChange(this.model);
+                    },
+                    () => {
+                        // to reset validation
+                        this.isExpr = this.model.isExpression;
+                        this.onChange(this.model);
+                    });
                 }
                 this.modal.close();
             });
         }
 
         if (action === "clear") {
-            this.model.setValue("", this.type);
-            this.model.result = null;
-            this.isExpr       = false;
-            event.stopPropagation();
-            this.onChange(this.model);
+            this.modal.confirm({
+                title: "Really Remove?",
+                content: `Are you sure that you want to remove this expression?`,
+                cancellationLabel: "No, keep it",
+                confirmationLabel: "Yes, delete it"
+            }).then(() => {
+                this.model.setValue("", this.type);
+                this.model.result = null;
+                this.isExpr       = false;
+                event.stopPropagation();
+                this.onChange(this.model);
+            }, noop);
         }
     }
 }

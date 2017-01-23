@@ -5,6 +5,7 @@ import {ComponentBase} from "../../../components/common/component-base";
 import {noop} from "../../../lib/utils.lib";
 import {AsyncSubject} from "rxjs";
 import {Expression} from "cwlts/mappings/d2sb/Expression";
+import {ModalService} from "../../../components/modal/modal.service";
 
 require("./quick-pick.component.scss");
 
@@ -48,8 +49,8 @@ require("./quick-pick.component.scss");
                              [type]="type">
         </ct-expression-input>
         
-        <span class="remove-icon" (click)="removeControl()">
-            <i class="fa fa-trash"></i>
+        <span class="remove-icon" (click)="removeControl($event)">
+            <i [ct-tooltip]="'Delete'" class="fa fa-trash text-hover-danger"></i>
         </span>
     </div>
     `
@@ -126,6 +127,10 @@ export class QuickPickComponent extends ComponentBase implements ControlValueAcc
         }
     }
 
+    constructor(private modal: ModalService) {
+        super();
+    }
+
     ngOnInit() {
         if (this.suggestions) {
             if (Array.isArray(this.suggestions)) {
@@ -176,7 +181,23 @@ available types: {[label: string]: string | number} | string[]`)
             });
     }
 
-    private removeControl(): void {
+    private removeControl(event?: Event): void {
+        if (!!event) {
+            event.stopPropagation();
+            this.modal.confirm({
+                title: "Really Remove?",
+                content: `Are you sure that you want to remove this custom resource?`,
+                cancellationLabel: "No, keep it",
+                confirmationLabel: "Yes, remove it"
+            }).then(() => {
+                this.removeFunction();
+            }, noop);
+        } else {
+            this.removeFunction();
+        }
+    }
+
+    private removeFunction () {
         if (this.customControl) {
             this.computedVal   = "";
             this.showCustom    = false;
@@ -187,7 +208,6 @@ available types: {[label: string]: string | number} | string[]`)
             } else {
                 this.value = "";
             }
-
         }
     }
 }

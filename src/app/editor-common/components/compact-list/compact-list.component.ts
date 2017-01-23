@@ -1,6 +1,7 @@
 import {Component, Input, ElementRef, Renderer, ViewChild, forwardRef} from "@angular/core";
 import {FormControl, ControlValueAccessor, NG_VALUE_ACCESSOR, NG_VALIDATORS} from "@angular/forms";
 import {noop} from "../../../lib/utils.lib";
+import {ModalService} from "../../../components/modal/modal.service";
 
 require("./compact-list.component.scss");
 
@@ -18,7 +19,7 @@ require("./compact-list.component.scss");
                     <span *ngFor="let tag of tagList; let i = index;"
                           class="tag tag-pill tag-default">
                           {{tag}}
-                          <i class="fa fa-times remove-tag-icon" 
+                          <i class="fa fa-times remove-tag-icon text-hover-danger" [ct-tooltip]="'Delete'"
                              (click)="removeTag(i, $event)"></i>
                     </span>
                    
@@ -79,7 +80,7 @@ export class CompactListComponent implements ControlValueAccessor  {
 
     private propagateChange = noop;
 
-    constructor(private renderer: Renderer) {
+    constructor(private renderer: Renderer, private modal: ModalService) {
         this.tagInputControl = new FormControl("");
     }
 
@@ -154,11 +155,17 @@ export class CompactListComponent implements ControlValueAccessor  {
     }
 
     private removeTag(index: number, event?: Event): void {
-        if (!!event) {
-            event.stopPropagation();
-        }
 
-        this.tagList.splice(index, 1);
-        this.propagateChange(this.tagList);
+        !!event && event.stopPropagation();
+
+        this.modal.confirm({
+            title: "Really Remove?",
+            content: `Are you sure that you want to remove this symbol?`,
+            cancellationLabel: "No, keep it",
+            confirmationLabel: "Yes, remove it"
+        }).then(() => {
+            this.tagList.splice(index, 1);
+            this.propagateChange(this.tagList);
+        }, noop);
     }
 }

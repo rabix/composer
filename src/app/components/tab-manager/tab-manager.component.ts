@@ -1,4 +1,4 @@
-import {Component, Input, OnChanges, SimpleChanges, ViewChildren, QueryList} from "@angular/core";
+import {Component, Input, ViewChildren, QueryList} from "@angular/core";
 import {TabData} from "../workbox/tab-data.interface";
 import {WebWorkerService} from "../../services/web-worker/web-worker.service";
 import {StatusControlProvider} from "../../core/status-bar/status-control-provider.interface";
@@ -16,7 +16,7 @@ import {StatusControlProvider} from "../../core/status-bar/status-control-provid
         </div>
     `
 })
-export class TabManagerComponent implements OnChanges {
+export class TabManagerComponent {
     @Input()
     public tab: TabData<any>;
 
