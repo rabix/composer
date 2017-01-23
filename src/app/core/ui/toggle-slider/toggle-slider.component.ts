@@ -1,4 +1,4 @@
-import {Component, forwardRef, Input} from "@angular/core";
+import {Component, forwardRef, Input, ElementRef, ViewChild, Renderer} from "@angular/core";
 import {NG_VALUE_ACCESSOR, ControlValueAccessor} from "@angular/forms";
 
 require("./toggle-slider.component.scss");
@@ -12,8 +12,8 @@ require("./toggle-slider.component.scss");
         <span>{{ isChecked ? on : off }}</span>
 
         <label class="switch">
-            <input type="checkbox" [checked]="isChecked" (change)="toggleCheck()">
-            <div class="slider round"></div>
+            <input #checkbox type="checkbox" [checked]="isChecked" (change)="toggleCheck()">
+            <div class="slider round" [class.disabled]="isDisabled"></div>
         </label>
     `
 })
@@ -21,11 +21,18 @@ export class ToggleComponent implements ControlValueAccessor {
 
     private isChecked: boolean = false;
 
+    private isDisabled: boolean = false;
+
     @Input()
     public on = "On";
 
     @Input()
     public off = "Off";
+
+    @ViewChild('checkbox') checkbox;
+
+    constructor(private renderer: Renderer) {
+    }
 
     private onTouched = () => { };
 
@@ -46,5 +53,10 @@ export class ToggleComponent implements ControlValueAccessor {
 
     registerOnTouched(fn: any): void {
         this.onTouched = fn;
+    }
+
+    setDisabledState(isDisabled: boolean): void {
+        this.isDisabled = isDisabled;
+        this.renderer.setElementAttribute(this.checkbox.nativeElement, 'disabled', this.isDisabled ? "disabled" : null);
     }
 }
