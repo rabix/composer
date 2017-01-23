@@ -5,9 +5,10 @@ import {
     Output,
     EventEmitter,
     SimpleChanges,
-    OnChanges, ChangeDetectorRef
+    OnChanges
 } from "@angular/core";
-import {InputParameterTypeModel} from "cwlts/models/d2sb";
+import {CommandInputParameterModel} from "cwlts/models/d2sb";
+
 @Component({
     selector: "ct-job-editor-entry",
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -90,7 +91,7 @@ import {InputParameterTypeModel} from "cwlts/models/d2sb";
 export class JobEditorEntryComponent implements OnChanges {
 
     @Input()
-    public input: InputParameterTypeModel;
+    public input: CommandInputParameterModel;
 
     @Input()
     public value: any;
@@ -105,6 +106,7 @@ export class JobEditorEntryComponent implements OnChanges {
     }
 
     public updateArray(index, data) {
+
         // This is tricky.
         // We need to update the original value in place, and cant replace its reference because
         // of the object inspector, which would still point to the previous entry.
