@@ -25,7 +25,6 @@ import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {StatusBarService} from "../../core/status-bar/status-bar.service";
 import {WorkboxTab} from "../workbox/workbox-tab.interface";
 import LoadOptions = jsyaml.LoadOptions;
-import {ObjectSourcePlatform} from "../../core/provider-tokens";
 
 require("./tool-editor.component.scss");
 
@@ -44,7 +43,7 @@ require("./tool-editor.component.scss");
             <ct-editor-controls>
             
                 <!--View Modes-->
-                <span class="btn-group">
+                <span class="btn-group pull-left">
                     <button class="btn btn-secondary btn-sm" 
                             (click)="switchView(viewModes.Code)"
                             [class.btn-primary]="viewMode === viewModes.Code"
