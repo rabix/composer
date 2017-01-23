@@ -9,17 +9,15 @@ require("./toggle-slider.component.scss");
         { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ToggleComponent), multi: true }
     ],
     template: `
-        <span>{{ isChecked ? on : off }}</span>
+        <span>{{ value ? on : off }}</span>
 
         <label class="switch">
-            <input type="checkbox" [checked]="isChecked" (change)="toggleCheck()">
+            <input type="checkbox" [checked]="value" (change)="toggleCheck()">
             <div class="slider round"></div>
         </label>
     `
 })
 export class ToggleComponent implements ControlValueAccessor {
-
-    private isChecked: boolean = false;
 
     @Input()
     public on = "On";
@@ -27,17 +25,20 @@ export class ToggleComponent implements ControlValueAccessor {
     @Input()
     public off = "Off";
 
+    @Input()
+    public value = false;
+
     private onTouched = () => { };
 
     private propagateChange = (_) => {};
 
     private toggleCheck(): void {
-        this.isChecked = !this.isChecked;
-        this.propagateChange(this.isChecked);
+        this.value = !this.value;
+        this.propagateChange(this.value);
     }
 
     writeValue(isChecked: boolean): void {
-        this.isChecked = !!isChecked;
+        this.value = !!isChecked;
     }
 
     registerOnChange(fn: any): void {

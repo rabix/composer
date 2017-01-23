@@ -30,7 +30,7 @@ export class ObjectHelper {
         }, target);
     }
 
-    public static getProperty<T, R>(target: T, path: string, defaultReturn: R): R | any {
+    public static getProperty<T, R>(target: T, path: string, defaultReturn?: R): R | any {
         const parts = path.split(this.pathDelimiter);
         if (!target) {
             return defaultReturn;

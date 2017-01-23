@@ -1,5 +1,4 @@
 import {ObjectHelper} from "./object.helper";
-import {} from "@angular";
 
 describe("ObjectHelper", () => {
 
@@ -48,6 +47,32 @@ describe("ObjectHelper", () => {
                 goo: {boo: {baz: {taz: "gaz"}}}
             });
         });
+    });
+
+    describe("getProperty()", () => {
+        it("should retrieve first-level property from an object", () => {
+            expect(ObjectHelper.getProperty({hello: "world"}, "hello")).toEqual("world");
+        });
+
+        it("should return a default value when requested property doesn't exist", () => {
+            expect(ObjectHelper.getProperty({}, "hello")).toBeUndefined();
+            expect(ObjectHelper.getProperty({hello: {foo: "bar"}}, "hello.boo", "moo")).toEqual("moo");
+        });
+
+        it("should retrieve  nested property", () => {
+            const nested = {ray: "casting"};
+            const target = {
+                hello: {
+                    foo: "bar"
+                },
+                meister: {
+                    boo: nested
+                }
+            };
+            expect(ObjectHelper.getProperty(target, "hello.foo")).toEqual("bar");
+            expect(ObjectHelper.getProperty(target, "meister.boo")).toBe(nested);
+        });
+
     });
 
     /**
