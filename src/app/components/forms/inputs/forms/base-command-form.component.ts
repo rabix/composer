@@ -4,6 +4,9 @@ import {ExpressionModel} from "cwlts/models/d2sb";
 import {ReplaySubject} from "rxjs";
 import {ComponentBase} from "../../../common/component-base";
 import {GuidService} from "../../../../services/guid.service";
+import {ModalService} from "../../../modal/modal.service";
+import {noop} from "../../../../lib/utils.lib";
+
 require("./base-command-form.components.scss");
 @Component({
     selector: 'ct-base-command-form',
@@ -30,7 +33,7 @@ require("./base-command-form.components.scss");
                             [formControl]="baseCommandForm.controls[item.id]">              
                     </ct-expression-input>
 
-                    <div class="remove-icon clickable" (click)="removeBaseCommand(item)">
+                    <div class="remove-icon clickable text-hover-danger" [ct-tooltip]="'Delete'" (click)="removeBaseCommand(item)">
                         <i class="fa fa-trash"></i>
                     </div>
                 </li> 
@@ -105,7 +108,7 @@ export class BaseCommandFormComponent extends ComponentBase implements OnInit, O
     /** List which connects model to forms */
     private formList: Array<{id: string, model: ExpressionModel}> = [];
 
-    constructor(private guidService: GuidService) {
+    constructor(private guidService: GuidService, private modal: ModalService) {
         super();
     }
 
@@ -135,21 +138,19 @@ export class BaseCommandFormComponent extends ComponentBase implements OnInit, O
                 new FormControl(item.model, [Validators.required])
             );
         });
+
+        this.baseCommandForm.valueChanges.first().subscribe(change => {
+            const v = Object.keys(change).map(key => change[key]);
+            this.updateCmd.next(v);
+        });
     }
 
 
     public ngOnInit(): void {
+
         this.form = new FormGroup({});
 
-        // Base command
-        this.initCmdForm(this.baseCommand);
-
         this.form.addControl("baseCommand", this.baseCommandForm);
-
-        this.tracked = this.baseCommandForm.valueChanges.subscribe(change => {
-            const v = Object.keys(change).map(key => change[key]);
-            this.updateCmd.next(v);
-        });
 
         // Streams
         this.streamsForm = new FormGroup({
@@ -165,14 +166,20 @@ export class BaseCommandFormComponent extends ComponentBase implements OnInit, O
     }
 
     private removeBaseCommand(ctrl: {id: string, model: ExpressionModel}): void {
-        this.formList = this.formList.filter(item => item.id !== ctrl.id);
-        this.form.removeControl(ctrl.id);
-        this.form.markAsDirty();
+        this.modal.confirm({
+            title: "Really Remove?",
+            content: `Are you sure that you want to remove this base command?`,
+            cancellationLabel: "No, keep it",
+            confirmationLabel: "Yes, remove it"
+        }).then(() => {
+            this.formList = this.formList.filter(item => item.id !== ctrl.id);
+            this.form.removeControl(ctrl.id);
+            this.updateCmd.next(this.formList.map(data => data.model));
+        }, noop);
     }
 
     private addBaseCommand(): void {
         this.updateCmd.next(this.baseCommand.concat([new ExpressionModel("", "")]));
-        this.form.markAsTouched();
     }
 
     ngOnDestroy() {
