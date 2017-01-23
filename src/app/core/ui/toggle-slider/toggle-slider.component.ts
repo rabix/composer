@@ -12,7 +12,7 @@ require("./toggle-slider.component.scss");
         <span>{{ value ? on : off }}</span>
 
         <label class="switch">
-            <input type="checkbox" [checked]="value" (change)="toggleCheck()">
+            <input #checkbox type="checkbox" [checked]="value" (change)="toggleCheck()">
             <div class="slider round" [class.disabled]="isDisabled"></div>
         </label>
     `
