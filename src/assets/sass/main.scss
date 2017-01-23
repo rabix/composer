@@ -18,10 +18,11 @@ html, body {
   background: $body-bg;
   color: $body-color;
 
+
   background-repeat: repeat;
   background-position: center center;
   background-size: auto auto;
-  background-image: linear-gradient(225deg,$brand-primary-bg 0%,$brand-primary-bg-dark 100%);
+  background-image: linear-gradient(225deg,$body-color 0%,$body-color 100%);
 }
 
 .loading-image {

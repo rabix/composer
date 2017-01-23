@@ -1,7 +1,11 @@
+@import "../../../../assets/sass/variables";
+
 ct-validation-report {
     font-family: monospace;
     padding: 10px;
     display: block;
+    height: 100%;
+    background: $layout-section-terminal-background;
 
     p {
         margin: 0;
