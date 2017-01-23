@@ -1,4 +1,9 @@
+@import "../../../../assets/sass/variables";
+
 ct-command-line-preview {
-    font-family: monospace;
-    padding: 10px;
+  display: block;
+  height: 100%;
+  font-family: monospace;
+  padding: 10px;
+  background: $layout-section-terminal-background
 }

@@ -42,6 +42,27 @@ require("./tool-editor.component.scss");
         
             <!--Control Header-->
             <ct-editor-controls>
+            
+                <!--View Modes-->
+                <span class="btn-group">
+                    <button class="btn btn-secondary btn-sm" 
+                            (click)="switchView(viewModes.Code)"
+                            [class.btn-primary]="viewMode === viewModes.Code"
+                            [class.btn-secondary]="viewMode !== viewModes.Code">Code</button>
+                            
+                    <button class="btn btn-secondary btn-sm"
+                            [disabled]="!isValidCWL"
+                            (click)="switchView(viewModes.Gui)"
+                            [class.btn-primary]="viewMode === viewModes.Gui"
+                            [class.btn-secondary]="viewMode !== viewModes.Gui">Visual</button>
+                            
+                    <button class="btn btn-secondary btn-sm"
+                            [disabled]="!isValidCWL"
+                            (click)="switchView(viewModes.Test)"
+                            [class.btn-primary]="viewMode === viewModes.Test"
+                            [class.btn-secondary]="viewMode !== viewModes.Test">Test</button>
+                </span>
+            
                 <!--Revisions-->
                 <button class="btn btn-secondary btn-sm" type="button"
                         [ct-editor-inspector]="revisions"
@@ -107,7 +128,7 @@ require("./tool-editor.component.scss");
             
             <template #statusControls>
                 <span class="btn-group">
-                    <button [disabled]="!validation || (!validation.errors.length && !validation.warnings.length)" 
+                    <button [disabled]="!validation" 
                             [class.btn-primary]="reportPanel === 'validation'"
                             [class.btn-secondary]="reportPanel !== 'validation'"
                             (click)="toggleReport('validation')" 
@@ -133,25 +154,6 @@ require("./tool-editor.component.scss");
                             [disabled]="!isValidCWL"
                             (click)="toggleReport('commandLinePreview')" 
                             class="btn btn-secondary btn-sm">Preview</button>
-                </span>
-                
-                <span class="btn-group">
-                    <button class="btn btn-secondary btn-sm" 
-                            (click)="switchView(viewModes.Code)"
-                            [class.btn-primary]="viewMode === viewModes.Code"
-                            [class.btn-secondary]="viewMode !== viewModes.Code">Code</button>
-                            
-                    <button class="btn btn-secondary btn-sm"
-                            [disabled]="!isValidCWL"
-                            (click)="switchView(viewModes.Gui)"
-                            [class.btn-primary]="viewMode === viewModes.Gui"
-                            [class.btn-secondary]="viewMode !== viewModes.Gui">Visual</button>
-                            
-                    <button class="btn btn-secondary btn-sm"
-                            [disabled]="!isValidCWL"
-                            (click)="switchView(viewModes.Test)"
-                            [class.btn-primary]="viewMode === viewModes.Test"
-                            [class.btn-secondary]="viewMode !== viewModes.Test">Test</button>
                 </span>
             </template>
         </div>
