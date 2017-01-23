@@ -33,20 +33,22 @@ require("./basic-output-section.component.scss");
                     </span>
     </div>
 
-    <!-- ID -->
+    <!--ID-->
     <div class="form-group">
         <label class="form-control-label">ID</label>
         <input type="text" class="form-control" [formControl]="basicSectionForm.controls['propertyIdForm']">
     </div>
 
-    <!-- Input Type -->
+    <!--Input Type -->
     <div class="form-group">
         <input-type-select [formControl]="basicSectionForm.controls['typeForm']"></input-type-select>
     </div>
     
     <!--Symbols-->
-    <symbols-section class="form-group" *ngIf="output.type.type === 'enum'" [formControl]="basicSectionForm.controls['symbols']">
-    </symbols-section>
+    <symbols-section class="form-group" 
+                    *ngIf="isEnumType()"
+                    [formControl]="basicSectionForm.controls['symbols']">
+    </symbols-section>       
 
     <!--Glob-->
     <div class="form-group">
@@ -56,7 +58,7 @@ require("./basic-output-section.component.scss");
     </div>
 
 </form>
-<!--ct-basic-output-section-->
+
 `
 })
 export class BasicOutputSectionComponent extends ComponentBase implements ControlValueAccessor {
@@ -80,6 +82,7 @@ export class BasicOutputSectionComponent extends ComponentBase implements Contro
     }
 
     writeValue(output: OutputProperty): void {
+
         this.output = output;
 
         this.basicSectionForm = this.formBuilder.group({
@@ -139,5 +142,9 @@ export class BasicOutputSectionComponent extends ComponentBase implements Contro
                 this.output.type.name = this.output.id;
             }
         });
+    }
+
+    private isEnumType () {
+        return this.output.type.type === 'enum' || (this.output.type.type === 'array' && this.output.type.items === 'enum');
     }
 }

@@ -21,6 +21,7 @@ require("./description.component.scss");
              It's best to be concise and informative.
         </div>
         
+        <!--Label-->
         <div class="form-group">
             <label class="form-control-label">Label</label>
             <input type="text" 
@@ -28,6 +29,7 @@ require("./description.component.scss");
                    [formControl]="descriptionFormGroup.controls['label']">
         </div>
         
+        <!--Description-->
         <div class="form-group">
             <label class="form-control-label">Description</label>        
             <textarea class="form-control" 
@@ -35,12 +37,13 @@ require("./description.component.scss");
                       [formControl]="descriptionFormGroup.controls['description']"></textarea>
         </div>
         
-         <div *ngIf="port.type.type === 'File'">
+        <!--File Types-->
+         <div *ngIf="isFileType()">
             <label class="form-control-label">File types</label>
             <input class="form-control"
                    [formControl]="descriptionFormGroup.controls['fileTypes']"/>
          </div>
-    </div> <!--tc-body-->
+    </div>
 </ct-form-panel>
     `
 })
@@ -108,5 +111,9 @@ export class DescriptionComponent extends ComponentBase implements ControlValueA
 
     registerOnTouched(fn: any): void {
         this.onTouched = fn;
+    }
+
+    private isFileType() {
+        return this.port.type.type === 'File' || (this.port.type.type === 'array' && this.port.type.items === 'File');
     }
 }

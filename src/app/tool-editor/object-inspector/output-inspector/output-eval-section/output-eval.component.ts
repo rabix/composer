@@ -14,12 +14,16 @@ import {CommandOutputBindingModel} from "cwlts/models/d2sb/CommandOutputBindingM
     <div class="tc-header">Output eval</div>
     <div class="tc-body" *ngIf="output && outputEvalFormGroup">
 
+        <!--Output eval-->
         <div class="form-group">
             <label class="form-control-label">Output eval</label>
-            <ct-expression-input [context]="context" [formControl]="outputEvalFormGroup.controls['outputEval']">
+            <ct-expression-input [disableLiteralTextInput]="true"
+                                 [context]="context" 
+                                 [formControl]="outputEvalFormGroup.controls['outputEval']">
             </ct-expression-input>
         </div>
 
+        <!--Load Content-->
         <div class="form-group flex-container">
             <label class="form-control-label">Load Content</label>
             <span class="align-right">
