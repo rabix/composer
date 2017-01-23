@@ -53,7 +53,6 @@ export class JobEditorComponent implements OnChanges {
     public inputs: CommandInputParameterModel[] = [];
 
     constructor(private cdr: ChangeDetectorRef, private statusBar: StatusBarService) {
-
     }
 
     /**
@@ -62,7 +61,6 @@ export class JobEditorComponent implements OnChanges {
     public inputGroups: { name: string, inputs: CommandInputParameterModel[] }[] = [];
 
     private onJobFormChange(event) {
-        console.log("Job form change")
     }
 
     private jobValueUpdate(inputId, jobValue) {
@@ -73,7 +71,6 @@ export class JobEditorComponent implements OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        console.log("Change happened", changes);
         // Whenever inputs are updated, regroup them and sort them for display
         const grouped = this.inputs.reduce((acc, item) => {
             const cat = OH.getProperty(item, "customProps.sbg:category", "");

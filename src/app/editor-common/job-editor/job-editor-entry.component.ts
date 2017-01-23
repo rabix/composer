@@ -5,7 +5,7 @@ import {
     Output,
     EventEmitter,
     SimpleChanges,
-    OnChanges
+    OnChanges, ChangeDetectorRef
 } from "@angular/core";
 import {InputParameterTypeModel} from "cwlts/models/d2sb";
 @Component({
@@ -40,11 +40,12 @@ import {InputParameterTypeModel} from "cwlts/models/d2sb";
             
             <!--Files-->
             <template ngSwitchCase="File">
-                <div class="clickable" [ct-editor-inspector]="fileInspector">
+                <div class="clickable" >
                     <div class="input-group">
                         <input readonly class="form-control" [value]="value?.path || ''"/>
                         <span class="input-group-btn">
-                            <button type="button" class="btn btn-secondary">
+                            <button type="button" class="btn btn-secondary" 
+                                    [ct-editor-inspector]="fileInspector">
                                 <i class="fa fa-ellipsis-h"></i>
                             </button>
                         </span>  
@@ -71,7 +72,7 @@ import {InputParameterTypeModel} from "cwlts/models/d2sb";
                                      (update)="updateArray(i, $event)"
                                      [value]="entry"></ct-job-editor-entry>
                                      
-                <button (click)="duplicateArrayEntry(value)" 
+                <button (click)="addArrayEntry({})" 
                         type="button" 
                         class="btn pl-0 btn-link no-outline no-underline-hover">
                     <i class="fa fa-plus"></i> New {{ input.type.items }}
@@ -100,21 +101,25 @@ export class JobEditorEntryComponent implements OnChanges {
     public arrayModifiedInput;
 
     public updateJob(data) {
-        console.log("Updating job from", this.input, "with", data);
         this.update.emit(data);
     }
 
     public updateArray(index, data) {
-        const update = this.value.slice(0, index).concat(data, this.value.slice(index + 1));
-        this.updateJob(update);
+        // This is tricky.
+        // We need to update the original value in place, and cant replace its reference because
+        // of the object inspector, which would still point to the previous entry.
+        // We can't close and reopen the inspector because it would break the control focus.
+        this.value[index] = Object.assign(this.value[index], data);
+
+        this.updateJob(this.value.slice());
+
     }
 
-    private duplicateArrayEntry(entry){
-        this.updateJob(this.value.concat({}));
+    private addArrayEntry(data){
+        this.updateJob(this.value.concat(data));
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        console.log("Changes in entry component", changes);
         if (this.input.type.type === "array") {
             this.arrayModifiedInput = {
                 ...this.input,
