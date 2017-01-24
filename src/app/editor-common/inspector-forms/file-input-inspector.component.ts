@@ -21,13 +21,13 @@ interface CWLFile {
             <!--Path-->
             <div class="form-group">
                 <label>Path</label>
-                <input class="form-control" formControlName="path"/>
+                <input class="form-control" formControlName="path" [value]="input.path"/>
             </div>
             
             <!--Size-->
             <div class="form-group">
                 <label>Size</label>
-                <input class="form-control" formControlName="size"/>
+                <input class="form-control" formControlName="size" [value]="input.size"/>
             </div>
             
             <!--Secondary Files-->
@@ -39,7 +39,7 @@ interface CWLFile {
             <!--Content-->
             <div class="form-group">
                 <label>Content</label>
-                <textarea rows="10" class="form-control"  formControlName="contents"></textarea>
+                <textarea rows="10" class="form-control"  formControlName="contents" [value]="input.contents"></textarea>
             </div>
         </form>
     `

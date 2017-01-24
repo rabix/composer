@@ -47,6 +47,12 @@ describe("ObjectHelper", () => {
                 goo: {boo: {baz: {taz: "gaz"}}}
             });
         });
+
+        it("should update array indexes", () => {
+           const t = {foo: ["bar", "baz", "nar"]};
+           ObjectHelper.addProperty(t, "foo.[1]", "marx");
+           expect(t.foo[1]).toEqual("marx");
+        });
     });
 
     describe("getProperty()", () => {
@@ -71,6 +77,11 @@ describe("ObjectHelper", () => {
             };
             expect(ObjectHelper.getProperty(target, "hello.foo")).toEqual("bar");
             expect(ObjectHelper.getProperty(target, "meister.boo")).toBe(nested);
+        });
+
+        it("should retrieve array indexes", () => {
+            const arr = {ray: ["foo", "bar", "baz"]};
+            expect(ObjectHelper.getProperty(arr, "ray.[1]")).toEqual("bar");
         });
 
     });

@@ -16,34 +16,34 @@ import {CommandInputParameterModel} from "cwlts/models/d2sb";
         <div [ngSwitch]="input.type.type" class="form-group">
             <!--Enums-->
             <template ngSwitchCase="enum">
-                <select [value]="value" class="form-control">
+                <select [value]="value" class="form-control" [attr.inputId]="input.id" [attr.arrayIndex]="index">
                     <option *ngFor="let val of input.type.symbols" [value]="val"> {{ val }}</option>
                 </select>
             </template>
             
             <!--Numbers-->
             <template ngSwitchCase="int">
-                <input type="number" class="form-control" [value]="value"/>
+                <input [attr.inputId]="input.id" [attr.arrayIndex]="index" type="number" class="form-control" [value]="value"/>
             </template>
             <template ngSwitchCase="float">
-                <input type="number" class="form-control" [value]="value"/>
+                <input [attr.inputId]="input.id" [attr.arrayIndex]="index" type="number" class="form-control" [value]="value"/>
             </template>
             
             <!--Strings-->
             <template ngSwitchCase="string">
-                <input class="form-control" [value]="value"/>
+                <input [attr.inputId]="input.id" [attr.arrayIndex]="index" class="form-control" [value]="value"/>
             </template>
             
             <!--Booleans-->
             <template ngSwitchCase="boolean">
-                <ct-toggle-slider class="pull-right" [value]="value"></ct-toggle-slider>
+                <ct-toggle-slider [attr.inputId]="input.id" [attr.arrayIndex]="index" class="pull-right" [value]="value"></ct-toggle-slider>
             </template>
             
             <!--Files-->
             <template ngSwitchCase="File">
                 <div class="clickable" >
                     <div class="input-group">
-                        <input readonly class="form-control" [value]="value?.path || ''"/>
+                        <input [attr.inputId]="input.id" [attr.arrayIndex]="index" [attr.jobPropPath]="'path'" class="form-control" [value]="value?.path"/>
                         <span class="input-group-btn">
                             <button type="button" class="btn btn-secondary" 
                                     [ct-editor-inspector]="fileInspector">
@@ -69,6 +69,7 @@ import {CommandInputParameterModel} from "cwlts/models/d2sb";
             <!--Arrays-->
             <template ngSwitchCase="array">
                 <ct-job-editor-entry *ngFor="let entry of value; let i = index" 
+                                     [index]="i"
                                      [input]="arrayModifiedInput" 
                                      (update)="updateArray(i, $event)"
                                      [value]="entry"></ct-job-editor-entry>
@@ -95,6 +96,9 @@ export class JobEditorEntryComponent implements OnChanges {
 
     @Input()
     public value: any;
+
+    @Input()
+    public index = -1;
 
     @Output()
     public update = new EventEmitter<any>();

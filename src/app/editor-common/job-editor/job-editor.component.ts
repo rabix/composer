@@ -4,7 +4,9 @@ import {
     ChangeDetectionStrategy,
     OnChanges,
     SimpleChanges,
-    ChangeDetectorRef, EventEmitter, Output
+    ChangeDetectorRef,
+    EventEmitter,
+    Output
 } from "@angular/core";
 import {ObjectHelper as OH} from "../../helpers/object.helper";
 import {CommandInputParameterModel} from "cwlts/models/d2sb";
@@ -25,7 +27,7 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
                     <form (change)="onJobFormChange($event)">
                         <div *ngFor="let input of group.inputs" >
                             
-                            <label>{{ input.id }}:</label>
+                            <label>{{ input?.label || input.id }}:</label>
                             <ct-job-editor-entry [input]="input" 
                                                  [value]="job.inputs[input.id]"
                                                  (update)="jobValueUpdate(input.id, $event)">
@@ -66,10 +68,49 @@ export class JobEditorComponent implements OnChanges {
      */
     public inputGroups: { name: string, inputs: CommandInputParameterModel[] }[] = [];
 
-    private onJobFormChange(event) {
+    private onJobFormChange(event: Event) {
+
+        const job = {...this.job};
+
+        const jobPropPath = event.target.getAttribute("jobPropPath");
+        const inputId     = event.target.getAttribute("inputID");
+        const arrayIndex  = event.target.getAttribute("arrayIndex");
+        const val         = event.target.value;
+        if (!inputId) {
+            return;
+        }
+
+
+        const isArr    = arrayIndex != -1;
+        const propPath = [
+            "inputs",
+            inputId,
+            !isArr ? "" : `[${arrayIndex}]`,
+            jobPropPath
+        ].filter(v => v).join(".");
+        OH.addProperty(job, propPath, val);
+
+        let jobRef = OH.getProperty(job, `inputs.${inputId}`);
+        if (isArr) {
+            const arrElement = jobRef[arrayIndex];
+
+            if (arrElement && typeof arrElement === "object") {
+                console.log("Copying an in array object");
+                jobRef[arrayIndex] = {...jobRef[arrayIndex]};
+            }
+
+            console.log("Slicing an array");
+            jobRef = jobRef.slice();
+        } else if (typeof jobRef === "object") {
+            jobRef = {...jobRef};
+        }
+
+        // const jobVal = OH.getProperty(job, `inputs.${inputId}`);
+        this.jobValueUpdate(inputId, jobRef);
     }
 
     private jobValueUpdate(inputId, jobValue) {
+        console.log("Updating", inputId, "with", jobValue);
         this.statusBar.instant(`Updated job value of ${inputId}.`);
 
         this.job = {...{}, ...this.job, inputs: {...this.job.inputs, [inputId]: jobValue}};
@@ -92,7 +133,7 @@ export class JobEditorComponent implements OnChanges {
         }));
     }
 
-    ngOnDestroy(){
+    ngOnDestroy() {
         this.inspector.hide();
     }
 }
