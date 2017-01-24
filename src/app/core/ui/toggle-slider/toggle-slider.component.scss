@@ -64,5 +64,11 @@ ct-toggle-slider {
     .slider.round:before {
         border-radius: 50%;
     }
+
+    .slider.round.disabled {
+        background-color: $input-bg-disabled;
+        cursor: $cursor-disabled;
+    }
+
 }
 

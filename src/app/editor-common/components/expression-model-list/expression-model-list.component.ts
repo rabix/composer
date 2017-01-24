@@ -5,6 +5,7 @@ import {ComponentBase} from "../../../components/common/component-base";
 import {GuidService} from "../../../services/guid.service";
 import {CustomValidators} from "../../../validators/custom.validator";
 import {noop} from "../../../lib/utils.lib";
+import {ModalService} from "../../../components/modal/modal.service";
 
 @Component({
     selector: 'expression-model-list',
@@ -24,17 +25,20 @@ import {noop} from "../../../lib/utils.lib";
                             [formControl]="form.controls[item.id]">
                     </ct-expression-input>
 
-                    <div class="remove-icon clickable" (click)="removeExpressionModel(item)">
-                        <i class="fa fa-trash"></i>
+                    <div class="remove-icon clickable"  (click)="removeExpressionModel(item)">
+                        <i [ct-tooltip]="'Delete'" class="fa fa-trash text-hover-danger"></i>
                     </div>
                 </li> 
             </ol>
 
-            <div *ngIf="formList.length === 0">
-                {{emptyListText}}
-            </div>
+            <ct-blank-tool-state *ngIf="!formList.length"
+                         [title]="emptyListText"
+                         [buttonText]="addButtonText"
+                         (buttonClick)="addExpressionModel()">
+            </ct-blank-tool-state>
 
-            <button type="button" class="btn btn-link add-btn-link no-underline-hover" (click)="addExpressionModel()">
+            <button type="button" *ngIf="formList.length" class="btn btn-link add-btn-link no-underline-hover" 
+                         (click)="addExpressionModel()">
                 <i class="fa fa-plus"></i> {{addButtonText}}
             </button>
     </form>
@@ -63,7 +67,7 @@ export class ExpressionModelListComponent extends ComponentBase implements Contr
 
     private form: FormGroup = new FormGroup({});
 
-    constructor(private guidService: GuidService) {
+    constructor(private guidService: GuidService, private modal: ModalService) {
         super();
     }
 
@@ -98,9 +102,16 @@ export class ExpressionModelListComponent extends ComponentBase implements Contr
     }
 
     private removeExpressionModel(ctrl: {id: string, model: ExpressionModel}): void {
-        this.formList = this.formList.filter(item => item.id !== ctrl.id);
-        this.form.removeControl(ctrl.id);
-        this.form.markAsDirty();
+        this.modal.confirm({
+            title: "Really Remove?",
+            content: `Are you sure that you want to remove this secondary file?`,
+            cancellationLabel: "No, keep it",
+            confirmationLabel: "Yes, remove it"
+        }).then(() => {
+            this.formList = this.formList.filter(item => item.id !== ctrl.id);
+            this.form.removeControl(ctrl.id);
+            this.form.markAsDirty();
+        }, noop);
     }
 
     private addExpressionModel(): void {

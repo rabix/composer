@@ -10,7 +10,7 @@ import {noop} from "../../../../lib/utils.lib";
         { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StageInputSectionComponent), multi: true }
     ],
     template: `
-<ct-form-panel *ngIf="input.type.type === 'record' || input.type.type === 'File'" class="borderless" [collapsed]="true">
+<ct-form-panel *ngIf="stageInputFormGroup" class="borderless" [collapsed]="true">
     <div class="tc-header">Stage Input</div>
     <div class="tc-body" *ngIf="input && stageInputFormGroup">
     
@@ -65,7 +65,7 @@ export class StageInputSectionComponent extends ComponentBase implements Control
         this.input = input;
 
         this.stageInputFormGroup = this.formBuilder.group({
-            stageInput: [this.input.customProps["sbg:stageInput"] || ""],
+            stageInput: [this.input.customProps["sbg:stageInput"] || null],
             loadContent: [!!this.input.inputBinding && this.input.inputBinding.loadContents ? this.input.inputBinding.loadContents: false]
         });
 

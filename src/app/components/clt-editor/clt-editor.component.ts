@@ -3,6 +3,7 @@ import {FormBuilder, FormGroup} from "@angular/forms";
 import {CommandLineToolModel, FileDefModel, RequirementBaseModel, ResourceRequirementModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../common/component-base";
 import {ProcessRequirement} from "cwlts/mappings/d2sb/ProcessRequirement";
+import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
 require("./clt-editor.component.scss");
 @Component({
     selector: "ct-clt-editor",
@@ -13,7 +14,6 @@ require("./clt-editor.component.scss");
                   [class.col-xs-12]="!showInspector" 
                   [formGroup]="formGroup">
                 <ct-docker-image-form [dockerRequirement]="model.docker"
-                                   [form]="formGroup.controls['dockerGroup']"
                                    (update)="setRequirement($event, true)">
                 </ct-docker-image-form>
                                 
@@ -25,15 +25,18 @@ require("./clt-editor.component.scss");
                                    (updateStreams)="setStreams($event)">
                 </ct-base-command-form>
                                 
-                <ct-tool-input [location]="model.loc + '.inputs'" [entries]="model.inputs" 
-                              (update)="updateModel('inputs', $event)">                             
+                <ct-tool-input [location]="model.loc + '.inputs'" [entries]="model.inputs"
+                                   [context]="{$job: model.job}"
+                                   [readonly]="readonly"
+                                   (update)="updateModel('inputs', $event)">                             
                 </ct-tool-input>
                 
-                <ct-tool-output-list [location]="model.loc + '.outputs'" [entries]="model.outputs || []" 
-                              [inputs]="model.inputs || []" 
-                              [readonly]="readonly" 
-                              (update)="updateModel('outputs', $event)">                        
-                </ct-tool-output-list>
+                <ct-tool-output [location]="model.loc + '.outputs'" [entries]="model.outputs || []" 
+                                  [context]="{$job: model.job}"
+                                  [inputs]="model.inputs || []" 
+                                  [readonly]="readonly" 
+                                  (update)="updateModel('outputs', $event)">                        
+                </ct-tool-output>
                                    
                 <ct-resources [entries]="model.resources" 
                               [readonly]="readonly" 
@@ -42,6 +45,7 @@ require("./clt-editor.component.scss");
                 </ct-resources>
 
                 <ct-hint-list [entries]="model.hints || []" 
+                              [context]="{$job: model.job}"
                               (update)="setHints($event)"></ct-hint-list>
                 
                 <ct-argument-list [location]="model.loc + '.arguments'" 
@@ -79,7 +83,7 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
         "sbg:MemRequirement"?: ResourceRequirementModel
     } = {};
 
-    constructor(private formBuilder: FormBuilder) {
+    constructor(private formBuilder: FormBuilder, private inspector: EditorInspectorService) {
         super();
 
 
@@ -153,7 +157,8 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
         this.formGroup.markAsDirty();
     }
 
-    ngAfterViewInit() {
-        // this.inspector.setHostView(this.inspectorContent);
+    ngOnDestroy() {
+        /* Close object inspector*/
+        this.inspector.hide();
     }
 }

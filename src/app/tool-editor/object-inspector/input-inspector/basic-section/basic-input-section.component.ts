@@ -32,34 +32,41 @@ require("./basic-input-section.component.scss");
         }
     ],
     template: `
-
           <form class="ct-basic-input-section">
+          
+                <!--Required-->
                 <div class="form-group flex-container">
                     <label>Required</label>
                     <span class="align-right">
-                        <ct-toggle-slider [formControl]="basicSectionForm.controls['isRequired']"
+                        <ct-toggle-slider [formControl]="basicSectionForm.controls['isRequired']"                                     
                                        [off]="'No'" 
                                        [on]="'Yes'">
                         </ct-toggle-slider>
                     </span>
-                </div> <!-- Required -->
+                </div> 
             
+                <!--ID-->
                 <div class="form-group">
                     <label class="form-control-label">ID</label>
                     <input type="text" 
                            class="form-control"
                            [formControl]="basicSectionForm.controls['propertyIdForm']">
-                </div> <!-- ID -->
+                </div>
                 
+                <!--Input Type -->
                 <input-type-select [formControl]="basicSectionForm.controls['typeForm']"></input-type-select>
                 
+                <!--Symbols-->
                 <symbols-section class="form-group" 
-                                *ngIf="input.type.type === 'enum'"
+                                *ngIf="isEnumType()"
                                 [formControl]="basicSectionForm.controls['symbols']">
-                </symbols-section>
+                </symbols-section>                
                 
+                <!--Include in command line -->
                 <div class="form-group flex-container" 
-                        *ngIf="input.type.type !== 'map' && basicSectionForm.controls['isBound']">
+                        *ngIf="!isMapType() 
+                                && basicSectionForm.controls['isBound']">
+                                
                     <label>Include in command line</label>
                     <span class="align-right">
                         <ct-toggle-slider [formControl]="basicSectionForm.controls['isBound']" 
@@ -67,14 +74,14 @@ require("./basic-input-section.component.scss");
                                        [on]="'Yes'">
                         </ct-toggle-slider>
                     </span>
-                </div> <!-- Include in commandline -->
+                </div> 
                 
+                <!--Input Binding-->
                 <input-binding-section *ngIf="input.isBound" 
                             [context]="context"
                             [propertyType]="input.type.type"
                             [formControl]="basicSectionForm.controls['inputBinding']"></input-binding-section>
-              
-            </form> <!--basic-input-section-->
+            </form> 
 `
 })
 export class BasicInputSectionComponent extends ComponentBase implements ControlValueAccessor {
@@ -117,7 +124,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
         this.tracked = this.basicSectionForm.valueChanges.subscribe(value => {
             this.input.type.isNullable = !value.isRequired;
 
-            if (value.symbols.length > 0 && this.input.type.type === 'enum') {
+            if (value.symbols.length > 0 && this.isEnumType()) {
                 this.input.type.symbols = value.symbols;
             }
 
@@ -156,7 +163,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
             .subscribe((id: string) => {
                 this.input.id = id;
 
-                if (this.input.type.type === "enum" || this.input.type.type === "record") {
+                if (this.isEnumType() || this.isRecordType()) {
                     this.input.type.name = id;
                 }
             });
@@ -179,7 +186,8 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
                     this.input.inputBinding.itemSeparator = undefined;
                 }
 
-                if (this.input.type.type === 'map' && this.input.isBound) {
+                if (this.isMapType() && this.input.isBound) {
+
                     this.input.removeInputBinding();
                     this.basicSectionForm.controls['isBound'].setValue(this.input.isBound);
                 }
@@ -188,9 +196,23 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
                     this.input.type.items = value.items;
                 }
 
-                if (this.input.type.type === 'enum' || this.input.type.type === 'record') {
+                if (this.isEnumType() || this.isRecordType()) {
                     this.input.type.name = this.input.id;
                 }
+
             });
     }
+
+    private isEnumType () {
+        return this.input.type.type === 'enum' || (this.input.type.type === 'array' && this.input.type.items === 'enum');
+    }
+
+    private isMapType () {
+        return this.input.type.type === 'map' || (this.input.type.type === 'array' && this.input.type.items === 'map')
+    }
+
+    private isRecordType () {
+        return this.input.type.type === 'record' || (this.input.type.type === 'array' && this.input.type.items === 'record');
+    }
+
 }

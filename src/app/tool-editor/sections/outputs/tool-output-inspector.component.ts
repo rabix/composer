@@ -22,7 +22,7 @@ import {ComponentBase} from "../../../components/common/component-base";
             <ct-output-eval [formControl]="form.controls['outputEval']">            
             </ct-output-eval>   
                      
-            <ct-secondary-file [formControl]="form.controls['secondaryFiles']">            
+            <ct-secondary-file *ngIf="isFileType()" [formControl]="form.controls['secondaryFiles']">            
             </ct-secondary-file>
  
         </form>
@@ -77,5 +77,9 @@ export class ToolOutputInspector extends ComponentBase implements OnChanges{
 
     private onSubmit(form: FormGroup) {
         this.save.next(form.value);
+    }
+
+    private isFileType() {
+        return this.output.type.type === 'File' || (this.output.type.type === 'array' && this.output.type.items === 'File');
     }
 }

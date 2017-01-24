@@ -19,6 +19,11 @@ ct-form-panel {
             padding: 0;
         }
 
+        .gui-section-list {
+            margin-left: -15px;
+            margin-right: -15px;
+        }
+
         .gui-section-list-title {
             font-family: $font-family-title;
             font-size: $font-size-sm;
