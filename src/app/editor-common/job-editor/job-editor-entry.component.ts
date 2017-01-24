@@ -123,10 +123,8 @@ export class JobEditorEntryComponent implements OnChanges {
 
     ngOnChanges(changes: SimpleChanges) {
         if (this.input.type.type === "array") {
-            this.arrayModifiedInput = {
-                ...this.input,
-                type: {...this.input.type, type: this.input.type.items}
-            }
+            this.arrayModifiedInput           = {...this.input};
+            this.arrayModifiedInput.type.type = this.input.type.items;
         }
     }
 }
