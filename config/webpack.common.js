@@ -36,7 +36,7 @@ const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
 const AOT = helpers.hasNpmFlag('aot');
 const METADATA = {
     title: "Rabix Editor",
-    baseUrl: '/',
+    baseUrl: '',
     host:"localhost",
     port: 9051,
     ENV: "development",
