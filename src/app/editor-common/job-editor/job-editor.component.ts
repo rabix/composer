@@ -4,11 +4,12 @@ import {
     ChangeDetectionStrategy,
     OnChanges,
     SimpleChanges,
-    ChangeDetectorRef
+    ChangeDetectorRef, EventEmitter, Output
 } from "@angular/core";
 import {ObjectHelper as OH} from "../../helpers/object.helper";
 import {CommandInputParameterModel} from "cwlts/models/d2sb";
 import {StatusBarService} from "../../core/status-bar/status-bar.service";
+import {EditorInspectorService} from "../inspector/editor-inspector.service";
 
 /**
  * Job Editor modifies the test values of the job json.
@@ -19,7 +20,7 @@ import {StatusBarService} from "../../core/status-bar/status-bar.service";
     template: `
         <div *ngFor="let group of inputGroups">
             <ct-form-panel>
-                <div class="tc-header">{{ group.name || "Ungrouped Inputs" }}</div>
+                <div class="tc-header">{{ group.name }}</div>
                 <div class="tc-body">
                     <form (change)="onJobFormChange($event)">
                         <div *ngFor="let input of group.inputs" >
@@ -44,7 +45,7 @@ export class JobEditorComponent implements OnChanges {
      * Existing CWL job metadata
      */
     @Input()
-    public job: { allocatedResources?: { cpu: string, mem: string }, inputs?: {} } = {};
+    public job: { allocatedResources?: { cpu: number, mem: number }, inputs?: {} } = {};
 
     /**
      * CWL app input definitions
@@ -52,7 +53,12 @@ export class JobEditorComponent implements OnChanges {
     @Input()
     public inputs: CommandInputParameterModel[] = [];
 
-    constructor(private cdr: ChangeDetectorRef, private statusBar: StatusBarService) {
+    @Output()
+    public update = new EventEmitter();
+
+    constructor(private cdr: ChangeDetectorRef,
+                private statusBar: StatusBarService,
+                private inspector: EditorInspectorService) {
     }
 
     /**
@@ -67,13 +73,15 @@ export class JobEditorComponent implements OnChanges {
         this.statusBar.instant(`Updated job value of ${inputId}.`);
 
         this.job = {...{}, ...this.job, inputs: {...this.job.inputs, [inputId]: jobValue}};
+        this.update.emit(this.job);
         this.cdr.markForCheck();
+
     }
 
     ngOnChanges(changes: SimpleChanges) {
         // Whenever inputs are updated, regroup them and sort them for display
         const grouped = this.inputs.reduce((acc, item) => {
-            const cat = OH.getProperty(item, "customProps.sbg:category", "");
+            const cat = OH.getProperty(item, "customProps.sbg:category", "Uncategorized");
             return {...acc, ...{[cat]: (acc[cat] || []).concat(item)}};
         }, {});
 
@@ -82,5 +90,9 @@ export class JobEditorComponent implements OnChanges {
             name: key,
             inputs: grouped[key]
         }));
+    }
+
+    ngOnDestroy(){
+        this.inspector.hide();
     }
 }

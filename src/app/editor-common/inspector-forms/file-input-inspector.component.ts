@@ -86,7 +86,7 @@ export class FileInputInspector {
         // Take the plain form values
             .map(() => this.formGroup.getRawValue())
 
-            // Merge plain form values with the secondaryFiles values map onto their original structure
+            // Merge plain form values with the se condaryFiles values map onto their original structure
             .map(val => ({...val, secondaryFiles: val.secondaryFiles.map(path => ({path}))}))
 
             // Then emit gathered data as an update from the component

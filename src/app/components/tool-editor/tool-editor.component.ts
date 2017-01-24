@@ -6,7 +6,7 @@ import {
     OnDestroy,
     ViewChild,
     ViewContainerRef,
-    TemplateRef, Injector
+    TemplateRef
 } from "@angular/core";
 import {FormControl, FormGroup, FormBuilder} from "@angular/forms";
 import {BehaviorSubject, Observable} from "rxjs/Rx";
@@ -109,6 +109,7 @@ require("./tool-editor.component.scss");
                         <ct-job-editor *ngIf="viewMode === viewModes.Test"
                                         class="gui-editor-component flex-col p-2"
                                         [job]="toolModel.job" 
+                                        (update)="onJobUpdate($event)"
                                         [inputs]="toolModel.inputs"></ct-job-editor>
                                        
                                        
@@ -393,6 +394,12 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
         this.platform.getAppCWL(this.data.data, revisionNumber).subscribe(cwl => {
             this.rawEditorContent.next(cwl);
         });
+    }
+
+    private onJobUpdate(job) {
+        console.log("Job is updated", job);
+        this.toolModel.setJob(job);
+        this.toolModel.updateCommandLine();
     }
 
     ngAfterViewInit() {
