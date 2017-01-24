@@ -133,7 +133,7 @@ export class CodeEditorComponent extends ComponentBase {
 
         // Listen for changes on the editor, debounce them for 150ms and then push them back into the text stream
         Observable.fromEvent(<any>this.editor, "change")
-            .debounceTime(150)
+            .debounceTime(50)
             .map(_ => this.editor.getValue())
             .subscribe(this.content);
     }

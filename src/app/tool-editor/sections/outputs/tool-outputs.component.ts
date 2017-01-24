@@ -7,46 +7,51 @@ import {
     ViewChild
 } from "@angular/core";
 import {ComponentBase} from "../../../components/common/component-base";
-import {CommandInputParameterModel} from "cwlts/models/d2sb";
-import {ToolInputListComponent} from "./tool-input-list-component";
+import {CommandOutputParameterModel, CommandInputParameterModel} from "cwlts/models/d2sb";
+import {ExternalLinks} from "../../../cwl/external-links";
+import {ToolOutputListComponent} from "./tool-output-list.component";
 
-
-require("./input-list.component.scss");
+require("./output-list.component.scss");
 
 @Component({
-    selector: "ct-tool-input",
+    selector: "ct-tool-output",
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <ct-form-panel [collapsed]="false">
             <span class="tc-header">
-                Input ports
+                Output ports
             </span>
             
             <div class="tc-body">
                 
                 <!--Blank Tool Screen-->
                 <ct-blank-tool-state *ngIf="!readonly && !entries.length"
-                                     [title]="'Files, parameters, and other stuff displayed in the tools command line'"
-                                     [buttonText]="'Add an Input'"
+                                     [title]="'Everything your tool generates as a result'"
+                                     [buttonText]="'Add an Output'"
+                                     [learnMoreURL]="helpLink"
                                      (buttonClick)="addEntry()">
                 </ct-blank-tool-state>
 
                 <!--List of entries-->
-                <ct-tool-input-list (update)="updateParent($event)"
+                <ct-tool-output-list (update)="updateParent($event)" 
+                    [inputs]="inputs" 
                     [entries]="entries" 
                     [location]="location" 
                     [context]="context" 
                     [readonly]="readonly">
-                </ct-tool-input-list>
+                </ct-tool-output-list>
                 
             </div>
         </ct-form-panel>
     `
 })
-export class ToolInputsComponent extends ComponentBase {
+export class ToolOutputsComponent extends ComponentBase {
 
     @Input()
-    public entries: CommandInputParameterModel[] = [];
+    public inputs: CommandInputParameterModel[] = [];
+
+    @Input()
+    public entries: CommandOutputParameterModel[] = [];
 
     /** Model location entry, used for tracing the path in the json document */
     @Input()
@@ -62,15 +67,16 @@ export class ToolInputsComponent extends ComponentBase {
     @Output()
     public readonly update = new Subject();
 
-    @ViewChild(ToolInputListComponent) inputList: ToolInputListComponent;
+    @ViewChild(ToolOutputListComponent) outputList: ToolOutputListComponent;
+
+    private helpLink = ExternalLinks.toolOutput;
 
     private addEntry() {
-        this.inputList.addEntry();
+        this.outputList.addEntry();
     }
 
     private updateParent(fields) {
         this.entries = fields.slice();
         this.update.next(this.entries.slice());
     }
-
 }

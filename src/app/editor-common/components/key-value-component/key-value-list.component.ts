@@ -4,6 +4,7 @@ import {ExpressionModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../components/common/component-base";
 import {GuidService} from "../../../services/guid.service";
 import {noop} from "../../../lib/utils.lib";
+import {ModalService} from "../../../components/modal/modal.service";
 
 require("./key-value-list.component.scss");
 
@@ -17,46 +18,56 @@ require("./key-value-list.component.scss");
         }
     ],
     template: `
-           <ct-blank-tool-state *ngIf="!readonly && !keyValueFormList.length"
+    <div class="container">
+    
+            <!--Blank Tool Screen-->
+            <ct-blank-tool-state *ngIf="!readonly && !keyValueFormList.length"
                          [title]="emptyListText"
                          [buttonText]="addEntryText"
                          [learnMoreURL]="helpLink"
                          (buttonClick)="addEntry()">
-           </ct-blank-tool-state>
+            </ct-blank-tool-state>
 
-                <div *ngIf="keyValueFormList.length" class="container">
-                    <div class="gui-section-list-title col-sm-12 row">
-                        <div class="col-sm-5">{{keyColumnText}}</div>
-                        <div class="col-sm-6">{{valueColumnText}}</div>
-                    </div>
+            <!--List Header Row-->
+            <div class="gui-section-list-title row" *ngIf="keyValueFormList.length">
+                <div class="col-sm-5">{{keyColumnText}}</div>
+                <div class="col-sm-6">{{valueColumnText}}</div>
+            </div>
+            
+            <!--Input List Entries-->
+            <ul class="gui-section-list">
+            
+                <!--List Entry-->
+                <li class="input-list-items container"
+                    *ngFor="let entry of keyValueFormList; let i = index">
+            
+                    <div class="gui-section-list-item clickable row"
+                        [class.invalid-entry]="duplicateKeys.has(form.controls[entry.id].value.key)">
 
-                    <ul class="gui-section-list">
-
-                        <li class="col-sm-12 gui-section-list-item clickable row"
-                            *ngFor="let entry of keyValueFormList; let i = index"
-                            [class.invalid-entry]="duplicateKeys.has(form.controls[entry.id].value.key)">
-              
-                            <ct-key-value-input 
-                                    [context]="context"
-                                    [formControl]="form.controls[entry.id]"
-                                    [keyValidator]="keyValidator"
-                                    [isDuplicate]="duplicateKeys.has(form.controls[entry.id].value.key)">
-                                            
-                                <div *ngIf="!!entry" class="col-sm-1 align-right">
-                                    <i title="Delete" class="fa fa-trash text-hover-danger" (click)="removeEntry(entry)"></i>
-                                </div>
-                            </ct-key-value-input>
-                        </li>
-                        
-                    </ul>
-                </div>
-
-                <button *ngIf="!readonly && keyValueFormList.length"
-                        (click)="addEntry()"
-                        type="button"
-                        class="btn pl-0 btn-link no-outline no-underline-hover">
-                    <i class="fa fa-plus"></i> {{addEntryText}}
-                </button>
+                        <ct-key-value-input 
+                                [context]="context"
+                                [formControl]="form.controls[entry.id]"
+                                [keyValidator]="keyValidator"
+                                [isDuplicate]="duplicateKeys.has(form.controls[entry.id].value.key)">
+                                        
+                            <div *ngIf="!!entry" class="col-sm-1 align-right">
+                                <i title="Delete" class="fa fa-trash text-hover-danger" (click)="removeEntry(entry)"></i>
+                            </div>
+                        </ct-key-value-input>
+                    </div>              
+            
+                </li>
+                
+            </ul>            
+    </div>
+    
+    <!--Add entry link-->
+    <button *ngIf="!readonly && keyValueFormList.length"
+            (click)="addEntry()"
+            type="button"
+            class="btn pl-0 btn-link no-outline no-underline-hover">
+        <i class="fa fa-plus"></i> {{addEntryText}}
+    </button>  
     `
 })
 export class KeyValueListComponent extends ComponentBase implements ControlValueAccessor {
@@ -102,7 +113,7 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
 
     private duplicateKeys = new Set();
 
-    constructor(private guidService: GuidService) {
+    constructor(private guidService: GuidService, private modal: ModalService) {
         super();
     }
 
@@ -186,9 +197,16 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
     }
 
     private removeEntry(ctrl: {id: string, model: ExpressionModel}): void {
-        this.keyValueFormList = this.keyValueFormList.filter(item => item.id !== ctrl.id);
-        this.form.removeControl(ctrl.id);
-        this.form.markAsDirty();
+        this.modal.confirm({
+            title: "Really Remove?",
+            content: `Are you sure that you want to remove this key-value pair?`,
+            cancellationLabel: "No, keep it",
+            confirmationLabel: "Yes, remove it"
+        }).then(() => {
+            this.keyValueFormList = this.keyValueFormList.filter(item => item.id !== ctrl.id);
+            this.form.removeControl(ctrl.id);
+            this.form.markAsDirty();
+        }, noop);
     }
 
     ngOnDestroy() {

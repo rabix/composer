@@ -190,11 +190,18 @@ export class LiteralExpressionInputComponent extends ComponentBase implements Co
         }
 
         if (action === "clear") {
-            this.model.setValue("", "string");
-            this.model.result = null;
-            this.isExpr       = false;
-            event.stopPropagation();
-            this.onChange(this.model);
+            this.modal.confirm({
+                title: "Really Remove?",
+                content: `Are you sure that you want to remove this expression?`,
+                cancellationLabel: "No, keep it",
+                confirmationLabel: "Yes, delete it"
+            }).then(() => {
+                this.model.setValue("", "string");
+                this.model.result = null;
+                this.isExpr       = false;
+                event.stopPropagation();
+                this.onChange(this.model);
+            }, noop);
         }
     }
 }

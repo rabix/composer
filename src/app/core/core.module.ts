@@ -13,6 +13,7 @@ import {TreeNodeIconComponent} from "./ui/tree-view/tree-node-icon.component";
 import {MenuItemComponent} from "./ui/menu/menu-item.component";
 import {MenuComponent} from "./ui/menu/menu.component";
 import {ContextDirective} from "./ui/context/context.directive";
+import {DisableFormControlDirective} from "./forms/disable-form-control.directive"
 import {ContextService} from "./ui/context/context.service";
 import {MultilangCodeEditorComponent} from "./ui/code-editor/multilang-code-editor.component";
 import {ToggleComponent} from "./ui/toggle-slider/toggle-slider.component";
@@ -34,6 +35,9 @@ import {MomentModule} from "angular2-moment";
         MultilangCodeEditorComponent
     ],
     declarations: [
+        // DisableFormControl
+        DisableFormControlDirective,
+
         // Code Editor Components
         CodeEditorComponent,
         CodePreviewComponent,
@@ -63,6 +67,9 @@ import {MomentModule} from "angular2-moment";
 
     ],
     exports: [
+        // DisableFormControl
+        DisableFormControlDirective,
+
         // Code Editor
         CodeEditorComponent,
         CodePreviewComponent,
@@ -88,7 +95,7 @@ import {MomentModule} from "angular2-moment";
         // Context
         ContextDirective,
 
-        StatusBarComponent,
+        StatusBarComponent
     ],
     providers: [
         IpcService,

@@ -25,14 +25,16 @@ import {noop} from "../../../../lib/utils.lib";
             multi: true
         }
     ],
+
     template: `
     <div class="form-group" *ngIf="inputBindingFormGroup && propertyType">
     
-            <div class="form-group" *ngIf="propertyType !== 'record'">
+            <div class="form-group" *ngIf="!isRecordType()">
                 <label class="form-control-label">Value</label>
                 <ct-expression-input
                             [context]="context"
-                            [formControl]="inputBindingFormGroup.controls['valueFrom']">
+                            [formControl]="inputBindingFormGroup.controls['valueFrom']"
+                            [disableLiteralTextInput]="true">
                 </ct-expression-input>
             </div>
         
@@ -45,23 +47,38 @@ import {noop} from "../../../../lib/utils.lib";
         
             <div class="form-group">
                 <label class="form-control-label">Prefix</label>
-                <input class="form-control"
+                <input class="form-control" 
+                       [ct-disabled]="isRecordType()"
                        [formControl]="inputBindingFormGroup.controls['prefix']"/>
             </div>
                  
             <div class="form-group flex-container">
                 <label>Prefix and value separation</label>
                 <span class="align-right">
-                    <ct-toggle-slider [formControl]="inputBindingFormGroup.controls['separate']"
+                    <ct-toggle-slider 
+                                   [ct-disabled]="isRecordType()"
+                                   [formControl]="inputBindingFormGroup.controls['separate']"
                                    [on]="'Separate'"
                                    [off]="'Join'"></ct-toggle-slider>
                 </span>
             </div>
             
-            <ct-stage-input [formControl]="inputBindingFormGroup.controls['stageInputSection']">
+            <div class="form-group" *ngIf="propertyType === 'array'">
+                <label class="form-control-label">Item Seperator</label>
+                <select class="form-control"
+                        [ct-disabled]="isRecordType()"
+                        [formControl]="inputBindingFormGroup.controls['itemSeparator']">
+                    <option *ngFor="let itemSeparator of itemSeparators" [value]="itemSeparator.value">
+                        {{itemSeparator.text}}
+                    </option>
+                </select>
+            </div>
+            
+            <ct-stage-input *ngIf="isRecordType() || isFileType()" 
+            [formControl]="inputBindingFormGroup.controls['stageInputSection']">
             </ct-stage-input>
            
-            <ct-secondary-file *ngIf="input.type.type === 'File'"
+            <ct-secondary-file *ngIf="isFileType()"
                              [formControl]="inputBindingFormGroup.controls['secondaryFilesSection']"
                              [context]="context"></ct-secondary-file>
     </div>
@@ -156,5 +173,13 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
 
                 this.propagateChange(this.input);
             });
+    }
+
+    private isFileType() {
+        return this.propertyType === 'File' || (this.propertyType === 'array' && this.input.type.items === 'File');
+    }
+
+    private isRecordType() {
+        return this.propertyType === 'record' || (this.propertyType === 'array'&& this.input.type.items === 'record');
     }
 }

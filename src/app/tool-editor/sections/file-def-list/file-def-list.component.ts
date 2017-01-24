@@ -12,6 +12,8 @@ import {FileDef} from "cwlts/mappings/d2sb/FileDef";
 import {FileDefModel} from "cwlts/models/d2sb";
 import {Subject} from "rxjs";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
+import {ModalService} from "../../../components/modal/modal.service";
+import {noop} from "../../../lib/utils.lib";
 
 require("./file-def-inspector.component.scss");
 
@@ -25,24 +27,33 @@ require("./file-def-inspector.component.scss");
             </span>
             
             <div class="tc-body">
-                <ct-blank-tool-state *ngIf="!readonly && !entries.length"
-                                     [title]="'Create temporary files needed for the tools'"
-                                     [buttonText]="'Create a file'"
-                                     (buttonClick)="addEntry()">
-                </ct-blank-tool-state>
-                
-                <div *ngIf="entries.length" class="container">
-                    <div class="gui-section-list-title row">
+            
+                <div class="container">
+                    
+                    <!--Blank Tool Screen-->
+                    <ct-blank-tool-state *ngIf="!readonly && !entries.length"
+                                         [title]="'Create temporary files needed for the tools'"
+                                         [buttonText]="'Create a file'"
+                                         (buttonClick)="addEntry()">
+                    </ct-blank-tool-state>                
+                    
+                    <!--List Header Row-->
+                    <div class="gui-section-list-title row" *ngIf="entries.length">
                         <div class="col-sm-5">Name</div>
                         <div class="col-sm-7">Content</div>
                     </div>
-                
+                    
+                    <!--FileDef List Entries-->
                     <ul class="gui-section-list">
-                        <li *ngFor="let entry of entries; let i = index"
+                    
+                        <!--List Entry-->
+                        <li *ngFor="let entry of entries; let i = index"                            
+                            class="input-list-items container">
+                            
+                            <div class="gui-section-list-item clickable row"
                             [ct-validation-class]="entry.validation"
                             [ct-editor-inspector]="inspector"
-                            [ct-editor-inspector-target]="entry"
-                            class="gui-section-list-item clickable validatable row">
+                            [ct-editor-inspector-target]="entry.loc">
                             
                             <!--Name Column-->
                             <div class="col-sm-5 ellipsis">
@@ -59,7 +70,11 @@ require("./file-def-inspector.component.scss");
                             
                             <!--Actions Column-->
                             <div *ngIf="!readonly" class="col-sm-1 align-right">
-                                <i title="Delete" class="fa fa-trash text-hover-danger" (click)="removeEntry(i)"></i>
+                                <i [ct-tooltip]="'Delete'"
+                                   class="fa fa-trash text-hover-danger" 
+                                   (click)="removeEntry(i, $event)"></i>
+                            </div>
+                            
                             </div>
                             
                              <!--Object Inspector Template -->
@@ -77,9 +92,10 @@ require("./file-def-inspector.component.scss");
                             </template>
                         </li>
                     </ul>
-                
+                    
                 </div>
-            
+                
+                <!--Add entry link-->
                 <button *ngIf="!readonly && entries.length" 
                         (click)="addEntry()" 
                         type="button" 
@@ -87,6 +103,7 @@ require("./file-def-inspector.component.scss");
                     <i class="fa fa-plus"></i> Add a File
                 </button>
             </div>
+
         </ct-form-panel>
     `
 })
@@ -111,7 +128,7 @@ export class FileDefListComponent extends ComponentBase {
     @ViewChildren("inspector", {read: TemplateRef})
     private inspectorTemplate: QueryList<TemplateRef<any>>;
 
-    constructor(private inspector: EditorInspectorService) {
+    constructor(private inspector: EditorInspectorService, private modal: ModalService) {
         super();
     }
 
@@ -126,21 +143,30 @@ export class FileDefListComponent extends ComponentBase {
             .delay(1)
             .map(list => list.last)
             .subscribe(templateRef => {
-                this.inspector.show(templateRef, newEntry);
+                this.inspector.show(templateRef, newEntry.loc);
             });
     }
 
     private removeEntry(index) {
-        if (this.inspector.isInspecting(this.entries[index])) {
-            this.inspector.hide();
-        }
+        this.modal.confirm({
+            title: "Really Remove?",
+            content: `Are you sure that you want to remove this file?`,
+            cancellationLabel: "No, keep it",
+            confirmationLabel: "Yes, remove it"
+        }).then(() => {
+            if (this.inspector.isInspecting(this.entries[index].loc)) {
+                this.inspector.hide();
+            }
 
-        this.entries = this.entries.slice(0, index).concat(this.entries.slice(index + 1));
-        this.update.next(this.entries);
+            this.entries = this.entries.slice(0, index).concat(this.entries.slice(index + 1));
+            this.update.next(this.entries);
+        }, noop);
+
     }
 
     private updateFileDef(newDef: FileDef, index: number) {
-        this.entries[index] = new FileDefModel(newDef);
+        const input = this.entries[index];
+        Object.assign(input, new FileDefModel(newDef));
         this.update.next(this.entries.slice());
     }
 }

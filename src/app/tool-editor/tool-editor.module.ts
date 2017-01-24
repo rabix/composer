@@ -9,6 +9,7 @@ import {ResourcesComponent} from "./sections/resources/resources.component";
 import {ToolInputsComponent} from "./sections/inputs/tool-inputs.component";
 import {ToolInputListComponent} from "./sections/inputs/tool-input-list-component";
 import {ToolOutputListComponent} from "./sections/outputs/tool-output-list.component";
+import {ToolOutputsComponent} from "./sections/outputs/tool-outputs.component";
 import {CWLModule} from "../cwl/cwl.module";
 import {ToolInputInspector} from "./sections/inputs/tool-input-inspector.component";
 import {ToolOutputInspector} from "./sections/outputs/tool-output-inspector.component";
@@ -51,6 +52,7 @@ import {CommandLinePreviewComponent} from "./components/command-line-preview/com
         ToolInputsComponent,
         ToolOutputInspector,
         ToolOutputListComponent,
+        ToolOutputsComponent
     ],
     exports: [
         ArgumentListComponent,
@@ -62,6 +64,7 @@ import {CommandLinePreviewComponent} from "./components/command-line-preview/com
         ToolInputInspector,
         ToolOutputListComponent,
         ToolOutputInspector,
+        ToolOutputsComponent,
         BasicInputSectionComponent,
         BasicOutputSectionComponent,
         FileDefInspectorComponent,

@@ -23,7 +23,7 @@ import {noop} from "../../../lib/utils.lib";
         
         <div class="form-group">
             <div [hidden]="paramType?.type !== 'array'">
-                <label>Items Type</label>
+                <label class="form-control-label">Items Type</label>
                 <select class="form-control"
                         [formControl]="form.controls['items']">
                     <option *ngFor="let item of itemTypes"

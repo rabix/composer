@@ -100,7 +100,7 @@ import {Http} from "@angular/http";
         TabManagerComponent,
         ToolEditorComponent,
         WorkboxComponent,
-        WorkflowEditorComponent,
+        WorkflowEditorComponent
     ],
     entryComponents: [
         CheckboxPromptComponent,

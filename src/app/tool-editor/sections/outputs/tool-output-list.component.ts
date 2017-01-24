@@ -1,9 +1,10 @@
 import {Component, Input, ChangeDetectionStrategy, Output, ViewChildren, QueryList, TemplateRef} from "@angular/core";
 import {ComponentBase} from "../../../components/common/component-base";
-import {ExternalLinks} from "../../../cwl/external-links";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 import {CommandOutputParameterModel, CommandInputParameterModel} from "cwlts/models/d2sb";
 import {Subject} from "rxjs";
+import {ModalService} from "../../../components/modal/modal.service";
+import {noop} from "../../../lib/utils.lib";
 
 require("./output-list.component.scss");
 
@@ -11,41 +12,48 @@ require("./output-list.component.scss");
     selector: "ct-tool-output-list",
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-        <ct-form-panel [collapsed]="false">
-            <span class="tc-header">
-                Output ports
-            </span>
-            
-            <div class="tc-body">
-                <ct-blank-tool-state *ngIf="!readonly && !entries.length"
-                                     [title]="'Everything your tool generates as a result'"
-                                     [buttonText]="'Add an Output'"
-                                     [learnMoreURL]="helpLink"
+    <div class="container">      
+                 
+                <!--Blank Tool Screen-->
+                <ct-blank-tool-state *ngIf="!readonly && !entries.length && isField"
+                                     [title]="'Click the button to define a field for record.'"
+                                     [buttonText]="'Add a field'"
                                      (buttonClick)="addEntry()">
-                </ct-blank-tool-state>
+                </ct-blank-tool-state>  
+                 
+                 <!--List Header Row-->
+                <div class="gui-section-list-title row" *ngIf="entries.length">
+                    <div class="col-sm-4">ID</div>
+                    <div class="col-sm-3">Type</div>
+                    <div class="col-sm-5">Glob</div>
+                </div>
+            
+                <!--Output List Entries-->
+                <ul class="gui-section-list">
                 
-                <div *ngIf="entries.length" class="container">
-                    <div class="gui-section-list-title row">
-                        <div class="col-sm-4">ID</div>
-                        <div class="col-sm-3">Type</div>
-                        <div class="col-sm-5">Glob</div>
-                    </div>
-                
-                    <ul class="gui-section-list">
-                        <li *ngFor="let entry of entries; let i = index"
+                    <!--List Entry-->
+                    <li *ngFor="let entry of entries; let i = index"
+                        class="input-list-items container" 
+                        [class.record-input]="entry.type.type === 'record'">
+                        
+                        <div class="gui-section-list-item clickable row"
                             [ct-editor-inspector]="inspector"
-                            [ct-editor-inspector-target]="entry"
-                            [ct-validation-class]="entry.validation"
-                            class="gui-section-list-item clickable row">
-                            
+                            [ct-editor-inspector-target]="entry.loc"
+                            [ct-validation-class]="entry.validation">
+                        
+                            <!--ID Column-->
                             <div class="col-sm-4 ellipsis" [title]="entry.id">
                                 <ct-validation-preview [entry]="entry.validation"></ct-validation-preview>
                                 {{ entry.id }}
                             </div>
+                            
+                            <!--Type Column-->
                             <div class="col-sm-3 ellipsis" [title]="entry.type">
                                 {{ entry.type | commandParameterType }}
-                            </div>
-                            
+                            </div>       
+                                                 
+                                                 
+                             <!--Tooltip for Glob-->
                              <ct-tooltip-content #ctt>
                                 <span *ngIf="entry.outputBinding.glob && !entry.outputBinding.glob?.isExpression">
                                     {{ entry.outputBinding.glob.toString() }}
@@ -56,6 +64,7 @@ require("./output-list.component.scss");
                                                  [content]="entry.outputBinding.glob.toString()"></ct-code-preview>
                             </ct-tooltip-content>
                             
+                            <!--Glob Column-->
                             <div class="ellipsis"
                                  [ct-tooltip]="ctt" 
                                  [tooltipPlacement]="'top'"
@@ -63,39 +72,56 @@ require("./output-list.component.scss");
                                      'col-sm-4': !readonly,
                                      'col-sm-5': readonly
                                  }">
-                                 {{ entry.outputBinding.glob | commandOutputGlob }}
+                                 {{ entry.outputBinding.glob}}
                              </div>
                             
+                            <!--Actions Column-->
                             <div *ngIf="!readonly" class="col-sm-1 align-right">
-                                <i title="Delete" class="fa fa-trash text-hover-danger" (click)="removeEntry(i)"></i>
+                                <i [ct-tooltip]="'Delete'"
+                                   class="fa fa-trash text-hover-danger"
+                                   (click)="removeEntry(i)"></i>
                             </div>
-                            
-                            <!--Object Inspector Template -->
-                            <template #inspector>
-                                <ct-editor-inspector-content>
-                                    <div class="tc-header">{{ entry.id || entry.loc || "Output" }}</div>
-                                    <div class="tc-body">
-                                        <ct-tool-output-inspector 
-                                                   (save)="updateOutput($event, i)" 
-                                                   [context]="context"
-                                                   [output]="entry"
-                                                   [inputs]="inputs">
-                                        </ct-tool-output-inspector>
-                                    </div>
-                                </ct-editor-inspector-content>
-                            </template>
-                        </li>
-                    </ul>
-                </div>
-            
-                <button *ngIf="!readonly && entries.length" 
-                        (click)="addEntry()" 
-                        type="button" 
-                        class="btn pl-0 btn-link no-outline no-underline-hover">
-                    <i class="fa fa-plus"></i> Add Output
-                </button>
-            </div>
-        </ct-form-panel>       
+                        
+                        </div>
+                        
+                        <!--Object Inspector Template -->
+                        <template #inspector>
+                            <ct-editor-inspector-content>
+                                <div class="tc-header">{{ entry.id || entry.loc || "Output" }}</div>
+                                <div class="tc-body">
+                                    <ct-tool-output-inspector 
+                                               (save)="updateOutput($event, i)" 
+                                               [context]="context"
+                                               [output]="entry"
+                                               [inputs]="inputs">
+                                    </ct-tool-output-inspector>
+                                </div>
+                            </ct-editor-inspector-content>
+                        </template>
+                        
+                        <!--Nested entries-->
+                        <div *ngIf="entry.type.fields" class="">
+                            <ct-tool-output-list *ngIf="isRecordType(entry)" [entries]="entry.type.fields"
+                                  [readonly]="readonly"
+                                  [inputs]="inputs"
+                                  [location]="getFieldsLocation(i)"
+                                  [isField]="true"
+                                  (update)="updateFields($event, i)">  
+                            </ct-tool-output-list>    
+                        </div>    
+                    
+                    </li>
+                </ul>
+        </div>
+        
+        <!--Add Output Button-->
+        <button *ngIf="!readonly && entries.length" 
+                (click)="addEntry()" 
+                type="button" 
+                class="btn pl-0 btn-link no-outline no-underline-hover">
+            <i class="fa fa-plus"></i> Add Output
+        </button>
+     
     `
 })
 export class ToolOutputListComponent extends ComponentBase {
@@ -117,32 +143,40 @@ export class ToolOutputListComponent extends ComponentBase {
     @Input()
     public readonly = false;
 
+    /** Flag if output is field of a record */
+    @Input()
+    public isField = false;
+
     @Output()
     public readonly update = new Subject();
 
     @ViewChildren("inspector", {read: TemplateRef})
     private inspectorTemplate: QueryList<TemplateRef<any>>;
 
-    constructor(private inspector: EditorInspectorService) {
+    constructor(private inspector: EditorInspectorService, private modal: ModalService) {
         super();
     }
 
-    private helpLink = ExternalLinks.toolOutput;
-
-
     private removeEntry(index) {
+        this.modal.confirm({
+            title: "Really Remove?",
+            content: `Are you sure that you want to remove this output?`,
+            cancellationLabel: "No, keep it",
+            confirmationLabel: "Yes, remove it"
+        }).then(() => {
+            if (this.inspector.isInspecting(this.entries[index].loc)) {
+                this.inspector.hide();
+            }
 
-        if (this.inspector.isInspecting(this.entries[index])) {
-            this.inspector.hide();
-        }
-
-        const entries = this.entries.slice(0, index).concat(this.entries.slice(index + 1));
-        this.update.next(entries);
+            const entries = this.entries.slice(0, index).concat(this.entries.slice(index + 1));
+            this.update.next(entries);
+        }, noop);
     }
 
-    private addEntry() {
+    public addEntry() {
         const newEntryLocation = `${this.location}[${this.entries.length}]`;
         const newEntry = new CommandOutputParameterModel(undefined, newEntryLocation);
+        newEntry.isField = this.isField;
         newEntry.type.type = "File";
         const entries  = this.entries.concat(newEntry);
         this.update.next(entries);
@@ -152,8 +186,23 @@ export class ToolOutputListComponent extends ComponentBase {
             .delay(1)
             .map(list => list.last)
             .subscribe(templateRef => {
-                this.inspector.show(templateRef, newEntry);
+                this.inspector.show(templateRef, newEntry.loc);
             });
+    }
+
+    private getFieldsLocation(index: number) {
+        return `${this.location}[${index}].type.fields`;
+    }
+
+    private updateFields(newFields, i) {
+        const type = this.entries[i].type;
+        type.fields = [];
+        newFields.forEach(field => {
+            field.isField = true;
+            type.addField(field)
+        });
+
+        this.update.next(this.entries.slice());
     }
 
     private updateOutput(newInput: CommandOutputParameterModel, index: number) {
