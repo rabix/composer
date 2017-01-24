@@ -1,6 +1,6 @@
 import {
     Component, Input, SimpleChanges, Output, EventEmitter,
-    ChangeDetectionStrategy
+    ChangeDetectionStrategy, ChangeDetectorRef
 } from "@angular/core";
 import {FormGroup, FormControl} from "@angular/forms";
 import {Observable, Subject} from "rxjs";
@@ -15,7 +15,7 @@ interface CWLFile {
 
 @Component({
     selector: "ct-file-input-inspector",
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    // changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <form (change)="rawChange.next($event)" [formGroup]="formGroup">
             <!--Path-->

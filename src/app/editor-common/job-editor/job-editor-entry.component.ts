@@ -5,7 +5,8 @@ import {
     Output,
     EventEmitter,
     SimpleChanges,
-    OnChanges
+    OnChanges,
+    ChangeDetectorRef
 } from "@angular/core";
 import {CommandInputParameterModel} from "cwlts/models/d2sb";
 
@@ -118,14 +119,14 @@ export class JobEditorEntryComponent implements OnChanges {
         this.value[index] = Object.assign(this.value[index], data);
 
         this.updateJob(this.value.slice());
-
     }
 
-    private addArrayEntry(data){
+    private addArrayEntry(data) {
         this.updateJob(this.value.concat(data));
     }
 
     ngOnChanges(changes: SimpleChanges) {
+
         if (this.input.type.type === "array") {
             this.arrayModifiedInput = {
                 ...this.input,

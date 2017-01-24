@@ -69,6 +69,7 @@ export class JobEditorComponent implements OnChanges {
     public inputGroups: { name: string, inputs: CommandInputParameterModel[] }[] = [];
 
     private onJobFormChange(event: Event) {
+        console.log("Job form change");
 
         const job = {...this.job};
 
@@ -80,7 +81,6 @@ export class JobEditorComponent implements OnChanges {
             return;
         }
 
-
         const isArr    = arrayIndex != -1;
         const propPath = [
             "inputs",
@@ -91,30 +91,16 @@ export class JobEditorComponent implements OnChanges {
         OH.addProperty(job, propPath, val);
 
         let jobRef = OH.getProperty(job, `inputs.${inputId}`);
-        if (isArr) {
-            const arrElement = jobRef[arrayIndex];
-
-            if (arrElement && typeof arrElement === "object") {
-                console.log("Copying an in array object");
-                jobRef[arrayIndex] = {...jobRef[arrayIndex]};
-            }
-
-            console.log("Slicing an array");
-            jobRef = jobRef.slice();
-        } else if (typeof jobRef === "object") {
-            jobRef = {...jobRef};
-        }
-
-        // const jobVal = OH.getProperty(job, `inputs.${inputId}`);
         this.jobValueUpdate(inputId, jobRef);
     }
 
     private jobValueUpdate(inputId, jobValue) {
-        console.log("Updating", inputId, "with", jobValue);
         this.statusBar.instant(`Updated job value of ${inputId}.`);
 
-        this.job = {...{}, ...this.job, inputs: {...this.job.inputs, [inputId]: jobValue}};
-        this.update.emit(this.job);
+        const job           = {...this.job};
+        job.inputs[inputId] = jobValue;
+
+        this.update.emit(job);
         this.cdr.markForCheck();
 
     }
