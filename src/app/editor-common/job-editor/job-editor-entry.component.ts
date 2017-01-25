@@ -14,6 +14,7 @@ import {JobHelper} from "cwlts/models/helpers/JobHelper";
     selector: "ct-job-editor-entry",
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
+        <div class="alert alert-warning form-control-label" *ngIf="warning">{{ warning }}</div>
         <div [ngSwitch]="input.type.type" class="form-group">
         
             <!--Each leaf field will be wrapped as an input group-->
@@ -74,10 +75,14 @@ import {JobHelper} from "cwlts/models/helpers/JobHelper";
                         <i class="fa fa-trash"></i>
                     </button>
                 </span>  
-            
             </div>
             
             <!--Records-->
+            
+            
+            
+            
+            
             <!--Arrays-->
             <template ngSwitchCase="array">
                 <ct-job-editor-entry *ngFor="let entry of value; let i = index" 
@@ -97,6 +102,8 @@ import {JobHelper} from "cwlts/models/helpers/JobHelper";
             <template ngSwitchDefault>
                 <div class="alert alert-info">Unknown input type: {{ input.type.type}}</div>
             </template>
+            
+            
         </div>
     `
 })
@@ -113,6 +120,14 @@ export class JobEditorEntryComponent implements OnChanges {
 
     @Output()
     public update = new EventEmitter<any>();
+
+
+    /**
+     * Entry might have a warning attached to it.
+     * This can happen for example if we encounter a mismatch between job value and the input type,
+     * for example, an input can by File[], and the job value can be just a plain string.
+     */
+    public warning: string;
 
     public arrayModifiedInput;
 
@@ -139,12 +154,25 @@ export class JobEditorEntryComponent implements OnChanges {
     }
 
     private addArrayEntry(input) {
+        this.warning         = undefined;
         const generatedEntry = JobHelper.getJobPart(input);
-        this.updateJob((this.value || []).concat(generatedEntry));
+        this.updateJob((this.value || []).concat(generatedEntry.slice(0, 1)));
     }
 
     private deleteFromArray() {
         this.updateJob(undefined);
+    }
+
+    ngOnInit() {
+        if (this.input.type.type === "array" && !Array.isArray(this.value)) {
+            this.value = [];
+            this.addArrayEntry(this.input);
+            this.warning = `Type mismatch: the default job value for this input 
+                            is of type “${typeof this.value}”, but the input is declared 
+                            as “${this.input.type.type}”. 
+                            You can generate a new set of test data for this input by clicking 
+                            on the “New ${this.input.type.items}” button.`
+        }
     }
 
     ngOnChanges(changes: SimpleChanges) {
