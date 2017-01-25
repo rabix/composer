@@ -39,6 +39,7 @@ ct-tool-editor {
 
         .app-report-panel {
             flex-basis: 150px;
+            overflow: auto;
             border-left: $layout-section-border-dark;
             border-top: $layout-section-border-light;
         }
