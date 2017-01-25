@@ -38,7 +38,7 @@ ct-panel-toolbar {
     background: $panel-header-bg;
     color: $panel-header-color;
     font-size: $font-size-sm;
-    padding: 4px 8px;
+    padding: 7px 8px;
     justify-content: space-between;
     flex-direction: row;
 
@@ -47,6 +47,6 @@ ct-panel-toolbar {
     }
 
     & + ct-tree-view {
-        height: calc(100% - 28px); // Bound to the ct-panel-toolbar padding/height
+        height: calc(100% - 32px); // Bound to the ct-panel-toolbar padding/height
     }
 }
