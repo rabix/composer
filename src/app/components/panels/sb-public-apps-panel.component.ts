@@ -46,8 +46,11 @@ export class SBPublicAppsPanelComponent {
             })
             .flatMap(_ => this.platform.getPublicApps().map(apps => {
                 const categorized = apps.map(app => {
-                    const content = Observable.of(1).switchMap(_ => this.platform.getAppCWL(app))
-                        .switchMap(cwl => new BehaviorSubject(cwl)).share();
+
+                    const content = Observable.of(1)
+                        .switchMap(_ => this.platform.getAppCWL(app))
+                        .switchMap(cwl => new BehaviorSubject(cwl));
+
                     return {
                         name: `${app.label} ${app["sbg:toolkitVersion"]}`.trim(),
                         icon: app.class || "file",
