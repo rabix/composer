@@ -15,7 +15,7 @@ import {JobHelper} from "cwlts/models/helpers/JobHelper";
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <div class="alert alert-warning form-control-label" *ngIf="warning">{{ warning }}</div>
-        <div [ngSwitch]="input.type.type" class="form-group">
+        <div [ngSwitch]="input.type.type" class="form-group" >
         
             <!--Each leaf field will be wrapped as an input group-->
             <!--Nested fields below should not be wrapped into other container elements-->
@@ -44,7 +44,11 @@ import {JobHelper} from "cwlts/models/helpers/JobHelper";
                 
                 <!--Booleans-->
                 <template ngSwitchCase="boolean">
-                    <ct-toggle-slider [attr.inputId]="input.id" [attr.arrayIndex]="index" class="pull-right" [value]="value"></ct-toggle-slider>
+                    <ct-toggle-slider class="pull-right"
+                                      [attr.inputId]="input.id"
+                                      [attr.arrayIndex]="index"
+                                      (change)="updateJob(value)"
+                                      [(ngModel)]="value"></ct-toggle-slider>
                 </template>
                 
                 <!--Files-->
@@ -78,10 +82,6 @@ import {JobHelper} from "cwlts/models/helpers/JobHelper";
             </div>
             
             <!--Records-->
-            
-            
-            
-            
             
             <!--Arrays-->
             <template ngSwitchCase="array">
