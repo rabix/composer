@@ -227,7 +227,7 @@ export class LayoutComponent extends ComponentBase {
 
     /**
      * Toggles the sidebar
-     * @param {boolean} state - when set to true sidebar will be collapsed, when set to false will be expanded
+     * @param {boolean} state - when set to true sidebar will be expanded, when set to false will be collapsed
      */
     private toggleSidebar(state? : boolean) {
         if (state !== undefined) {
