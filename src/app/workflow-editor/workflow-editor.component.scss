@@ -1,0 +1,153 @@
+@import "../../assets/sass/variables";
+@import "../../assets/sass/mixins";
+
+ct-workflow-editor {
+  .tool-inspector {
+    display: block;
+    height: 100%;
+    background: white;
+  }
+
+  .editor-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: stretch;
+    align-content: stretch;
+    background: $gui-editor-bg;
+    position: relative;
+    height: 100%;
+    width: 100%;
+
+    .flex-row, .flex-col, .flex-col-item {
+      flex-grow: 1;
+    }
+
+    .editor-content {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: stretch;
+      align-content: stretch;
+      height: 100%;
+      width: 100%;
+    }
+
+    .inspector-col {
+      flex-grow: .6;
+    }
+
+    .app-report-panel {
+      flex-basis: 150px;
+      border-left: $layout-section-border-dark;
+      border-top: $layout-section-border-light;
+    }
+  }
+}
+
+
+.status-bar-footer {
+  background: $gui-editor-status-bar-bg;
+  position: relative; //because of width of consoles
+
+  .left-side {
+    display: inline-block;
+
+    & > *:not(:last-child) button {
+      border-right: 1px solid #131313;
+    }
+  }
+
+  .right-side {
+    display: inline-block;
+    float: right;
+  }
+
+  button {
+    border: none;
+    margin-right: 5px;
+    background: none;
+    color: $gui-editor-status-bar-color;
+    padding-top: $status-bar-padding-y;
+    padding-bottom: $status-bar-padding-y;
+
+    &:focus, &:active, &:focus:active {
+      outline: none;
+    }
+
+    [class*="fa-angle"] {
+      margin-left: 7px;
+    }
+  }
+
+}
+
+.input-cli {
+  color: $input-port-color;
+}
+
+.baseCmd-cli {
+  color: $base-cmd-color;
+}
+
+.arg-cli {
+  color: $arg-color;
+}
+
+.input-list-items {
+  border-radius: $gui-section-list-item-border-radius;
+  margin-bottom: 10px;
+  list-style: none;
+
+  &.record-input {
+    border: 1px solid $gui-section-list-item-bg;
+
+    > .gui-section-list-item {
+      margin-bottom: 10px;
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+  }
+
+  .gui-section-list-item {
+    margin-bottom: 0;
+  }
+}
+
+//@todo(maya) belongs with tool editor or form components
+.gui-section-list-item {
+  transition: all .2s;
+
+  background: $gui-section-list-item-bg;
+  color: $gui-section-list-item-color;
+  border-radius: $gui-section-list-item-border-radius;
+  overflow: hidden;
+  padding: 7px 0;
+  margin-bottom: 10px;
+
+  .fa {
+    color: $gui-section-list-item-icon-color;
+  }
+
+  &:hover {
+    background: $gui-section-list-item-hover-bg;
+    color: $gui-section-list-item-hover-color;
+  }
+
+  &.selected, &.ct-inspected {
+    border-color: $gui-section-list-item-select-bg;
+    background: $gui-section-list-item-select-bg;
+    color: $gui-section-list-item-select-color;
+    .fa {
+      color: $gui-section-list-item-select-icon-color;
+    }
+  }
+}
+
+.error-text {
+  color: $console-error-color;
+}
+
+.warning-text {
+  color: $console-warning-color;
+}

@@ -9,27 +9,26 @@ import {
     TemplateRef
 } from "@angular/core";
 import {FormControl, FormGroup, FormBuilder} from "@angular/forms";
-import {BehaviorSubject, Observable} from "rxjs/Rx";
-import {ModalService} from "../modal";
-import {noop} from "../../lib/utils.lib";
-import {CommandLineToolModel} from "cwlts/models/d2sb";
-import {ComponentBase} from "../common/component-base";
+import {BehaviorSubject} from "rxjs/Rx";
 import {Validation} from "cwlts/models/helpers/validation";
-import {DataEntrySource} from "../../sources/common/interfaces";
-import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
-import {WebWorkerService} from "../../services/web-worker/web-worker.service";
-import {UserPreferencesService} from "../../services/storage/user-preferences.service";
-import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
-import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
-import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
-import {StatusBarService} from "../../core/status-bar/status-bar.service";
-import {WorkboxTab} from "../workbox/workbox-tab.interface";
 import LoadOptions = jsyaml.LoadOptions;
+import {WebWorkerService} from "../services/web-worker/web-worker.service";
+import {EditorInspectorService} from "../editor-common/inspector/editor-inspector.service";
+import {DataEntrySource} from "../sources/common/interfaces";
+import {ComponentBase} from "../components/common/component-base";
+import {WorkboxTab} from "../components/workbox/workbox-tab.interface";
+import {ValidationResponse} from "../services/web-worker/json-schema/json-schema.service";
+import {UserPreferencesService} from "../services/storage/user-preferences.service";
+import {PlatformAPI} from "../services/api/platforms/platform-api.service";
+import {StatusBarService} from "../core/status-bar/status-bar.service";
+import {ModalService} from "../components/modal/modal.service";
+import {noop} from "../lib/utils.lib";
+import {WorkflowFactory, WorkflowModel} from "cwlts/models";
 
-require("./tool-editor.component.scss");
+require("./workflow-editor.component.scss");
 
 @Component({
-    selector: "ct-tool-editor",
+    selector: "ct-workflow-editor",
     providers: [
         EditorInspectorService,
         WebWorkerService
@@ -66,11 +65,11 @@ require("./tool-editor.component.scss");
                 <button class="btn btn-secondary btn-sm" type="button"
                         [ct-editor-inspector]="revisions"
                         *ngIf="this.data.data.source !== 'local'">
-                        Revision: {{ toolModel.customProps['sbg:revision']}}
+                        Revision: {{ workflowModel.customProps['sbg:revision']}}
                         
                         <template #revisions>
-                            <ct-revision-list [active]="toolModel.customProps['sbg:revision']" 
-                                              [revisions]="toolModel.customProps['sbg:revisionsInfo']"
+                            <ct-revision-list [active]="workflowModel.customProps['sbg:revision']" 
+                                              [revisions]="workflowModel.customProps['sbg:revisionsInfo']"
                                               (select)="openRevision($event)">
                             </ct-revision-list>
                         </template>
@@ -100,17 +99,11 @@ require("./tool-editor.component.scss");
                                           [readonly]="!data.isWritable"></ct-code-editor-x>
                         
                         <!--GUI Editor-->
-                        <ct-clt-editor *ngIf="viewMode === viewModes.Gui"
+                        <ct-workflow-graph-editor *ngIf="viewMode === viewModes.Gui"
                                        class="gui-editor-component flex-col"
                                        [readonly]="!data.isWritable"
-                                       [formGroup]="toolGroup"
-                                       [model]="toolModel"></ct-clt-editor>
+                                       [model]="workflowModel"></ct-workflow-graph-editor>
                                        
-                        <ct-job-editor *ngIf="viewMode === viewModes.Test"
-                                        class="gui-editor-component flex-col p-2"
-                                        [job]="toolModel.job" 
-                                        (update)="onJobUpdate($event)"
-                                        [inputs]="toolModel.inputs"></ct-job-editor>
                                        
                                        
                     <!--Object Inspector Column-->
@@ -123,7 +116,6 @@ require("./tool-editor.component.scss");
             
             <div *ngIf="reportPanel" class="app-report-panel layout-section">
                 <ct-validation-report *ngIf="reportPanel === 'validation'" [issues]="validation"></ct-validation-report>
-                <ct-command-line-preview *ngIf="reportPanel === 'commandLinePreview'" [commandLineParts]="commandLineParts | async"></ct-command-line-preview>
             </div>
             
             <template #statusControls>
@@ -148,18 +140,12 @@ require("./tool-editor.component.scss");
                         
                         
                     </button>
-                    
-                    <button [class.btn-secondary]="reportPanel !== 'commandLinePreview'"
-                            [class.btn-primary]="reportPanel == 'commandLinePreview'"
-                            [disabled]="!isValidCWL"
-                            (click)="toggleReport('commandLinePreview')" 
-                            class="btn btn-secondary btn-sm">Preview</button>
                 </span>
             </template>
         </div>
     `
 })
-export class ToolEditorComponent extends ComponentBase implements OnInit, OnDestroy, WorkboxTab {
+export class WorkflowEditorComponent extends ComponentBase implements OnInit, OnDestroy, WorkboxTab {
     @Input()
     public data: DataEntrySource;
 
@@ -186,10 +172,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
     private rawEditorContent = new BehaviorSubject("");
 
     /** Model that's recreated on document change */
-    private toolModel = new CommandLineToolModel("document");
-
-    /** Sorted array of resulting command line parts */
-    private commandLineParts: Observable<CommandLinePart[]>;
+    private workflowModel: WorkflowModel = WorkflowFactory.from(null,"document");
 
     /** Template of the status controls that will be shown in the status bar */
     @ViewChild("statusControls")
@@ -270,13 +253,11 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
                 this.showReformatPrompt = false;
             }
 
-            // generate model and get command line parts
-            this.toolModel        = new CommandLineToolModel("document", json);
-            this.commandLineParts = this.toolModel.getCommandLineParts();
+            this.workflowModel        = WorkflowFactory.from(json, "document");
 
             // update validation stream on model validation updates
 
-            this.toolModel.setValidationCallback((res: Validation) => {
+            this.workflowModel.setValidationCallback((res: Validation) => {
                 this.validation = {
                     errors: res.errors,
                     warnings: res.warnings,
@@ -286,7 +267,9 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
                 };
             });
 
-            this.toolModel.validate();
+            this.workflowModel.isConnected();
+            this.workflowModel.hasCycles();
+
 
             // load document in GUI and turn off loader, only if loader was active
             if (this.isLoading) {
@@ -295,8 +278,8 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
             }
 
             return {
-                errors: this.toolModel.validation.errors,
-                warnings: this.toolModel.validation.warnings,
+                errors: this.workflowModel.validation.errors,
+                warnings: this.workflowModel.validation.warnings,
                 isValidatableCwl: true,
                 isValidCwl: true,
                 isValidJSON: true
@@ -380,12 +363,12 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
      * the text has been formatted by the GUI editor
      */
     private getModelText(): string {
-        const modelObject = Object.assign(this.toolModel.serialize(), {"rbx:modified": true});
+        const modelObject = Object.assign(this.workflowModel.serialize(), {"rbx:modified": true});
 
         return this.data.language.value === "json" ? JSON.stringify(modelObject, null, 4) : Yaml.dump(modelObject);
     }
 
-    private toggleReport(panel: "validation" | "commandLinePreview") {
+    private toggleReport(panel: "validation") {
         this.reportPanel = this.reportPanel === panel ? undefined : panel;
     }
 
@@ -393,12 +376,6 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
         this.platform.getAppCWL(this.data.data, revisionNumber).subscribe(cwl => {
             this.rawEditorContent.next(cwl);
         });
-    }
-
-    private onJobUpdate(job) {
-        console.log("Job is updated", job);
-        this.toolModel.setJob(job);
-        this.toolModel.updateCommandLine();
     }
 
     ngAfterViewInit() {

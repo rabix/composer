@@ -5,6 +5,7 @@ import {ExpressionModel, RequirementBaseModel} from "cwlts/models/d2sb";
 import {FormControl} from "@angular/forms";
 import {ReplaySubject} from "rxjs";
 
+// @todo move to editor common module
 @Component({
     selector: "ct-hint-list",
     changeDetection: ChangeDetectionStrategy.OnPush,

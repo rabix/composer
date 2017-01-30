@@ -13,6 +13,9 @@ import {Component, Input} from "@angular/core";
         
     `
 })
+/**
+ * @deprecated
+ */
 export class ListEntryComponent {
 
     @Input()

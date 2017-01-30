@@ -23,6 +23,9 @@ import {ReplaySubject} from "rxjs";
             </button>
     `
 })
+/**
+ * @deprecated
+ */
 export class CommandLineComponent {
     @Input()
     public commandLineParts: CommandLinePart[];

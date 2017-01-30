@@ -24,7 +24,6 @@ import {SettingsComponent} from "./app/components/settings";
 import {TabManagerComponent} from "./app/components/tab-manager/tab-manager.component";
 import {ToolEditorComponent} from "./app/components/tool-editor/tool-editor.component";
 import {SettingsButtonComponent} from "./app/components/workbox/settings-button.component";
-import {WorkflowEditorComponent} from "./app/components/workflow-editor/workflow-editor.component";
 import {DockerImageFormComponent} from "./app/components/forms/inputs/forms/docker-image-form.component";
 import {BaseCommandFormComponent} from "./app/components/forms/inputs/forms/base-command-form.component";
 import {CommandLineComponent} from "./app/components/clt-editor/commandline/commandline.component";
@@ -39,6 +38,8 @@ import {PromptComponent} from "./app/components/modal/common/prompt.component";
 import {CheckboxPromptComponent} from "./app/components/modal/common/checkbox-prompt.component";
 import {FileEditorComponent} from "./app/components/file-editor/file-editor.component";
 import {ToolEditorModule} from "./app/tool-editor/tool-editor.module";
+import {WorkflowEditorModule} from "./app/workflow-editor/workflow-editor.module";
+import {WorkflowEditorComponent} from "./app/workflow-editor/workflow-editor.component";
 import {CoreModule} from "./app/core/core.module";
 import {CWLModule} from "./app/cwl/cwl.module";
 import {HintListComponent} from "./app/components/clt-editor/hints/hint-list.component";
@@ -119,6 +120,7 @@ import {Http} from "@angular/http";
         HttpModule,
         ReactiveFormsModule,
         ToolEditorModule,
+        WorkflowEditorModule
     ],
     bootstrap: [MainComponent]
 })
