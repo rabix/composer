@@ -1,6 +1,6 @@
 import {
     Component, Input, SimpleChanges, Output, EventEmitter,
-    ChangeDetectionStrategy
+    ChangeDetectionStrategy, ChangeDetectorRef
 } from "@angular/core";
 import {FormGroup, FormControl} from "@angular/forms";
 import {Observable, Subject} from "rxjs";
@@ -15,19 +15,19 @@ interface CWLFile {
 
 @Component({
     selector: "ct-file-input-inspector",
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    // changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <form (change)="rawChange.next($event)" [formGroup]="formGroup">
             <!--Path-->
             <div class="form-group">
                 <label>Path</label>
-                <input class="form-control" formControlName="path"/>
+                <input class="form-control" formControlName="path" [value]="input.path"/>
             </div>
             
             <!--Size-->
             <div class="form-group">
                 <label>Size</label>
-                <input class="form-control" formControlName="size"/>
+                <input class="form-control" formControlName="size" [value]="input.size"/>
             </div>
             
             <!--Secondary Files-->
@@ -39,7 +39,7 @@ interface CWLFile {
             <!--Content-->
             <div class="form-group">
                 <label>Content</label>
-                <textarea rows="10" class="form-control"  formControlName="contents"></textarea>
+                <textarea rows="10" class="form-control"  formControlName="contents" [value]="input.contents"></textarea>
             </div>
         </form>
     `

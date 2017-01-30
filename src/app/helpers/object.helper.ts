@@ -10,11 +10,20 @@ export class ObjectHelper {
      * @param value value to add to the "baz" key
      */
     public static addProperty(target: Object, path: string[] | string, value: any): void {
-
         // Ensure that path is an array of path elements
-        const resolvedPath = typeof path === "string" ? path.split(ObjectHelper.pathDelimiter) : path;
+        const resolvedPath = typeof path === "string" ? path.split(ObjectHelper.pathDelimiter).filter(v => v.length) : path;
+
+        if (!resolvedPath) {
+            return;
+        }
 
         (<Array<string>> resolvedPath).reduce((acc, curr, index, arr) => {
+
+            const arrayMatch = curr.match(/^\[([0-9]*?)\]$/);
+            if (arrayMatch && arrayMatch.length === 2 && Array.isArray(acc)) {
+                return acc[arrayMatch[1]];
+            }
+
             if (index === arr.length - 1) {
                 return acc[curr] = value;
             }
@@ -31,12 +40,21 @@ export class ObjectHelper {
     }
 
     public static getProperty<T, R>(target: T, path: string, defaultReturn?: R): R | any {
-        const parts = path.split(this.pathDelimiter);
+        const parts = path.split(this.pathDelimiter).filter(v => v.length);
         if (!target) {
             return defaultReturn;
         }
 
         for (let key of parts) {
+
+            if (Array.isArray(target) && key) {
+                const arrayMatch = key.match(/^\[([0-9]*?)\]$/);
+                if (Array.isArray(arrayMatch) && arrayMatch.length === 2) {
+                    return target[arrayMatch[1]];
+                }
+
+            }
+
             if (!target[key]) {
                 return defaultReturn;
             }

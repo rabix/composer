@@ -27,16 +27,26 @@ export class PanelSwitcherComponent {
         active: boolean
     }];
 
+    @Input()
+    private sidebarExpanded;
+
     @Output()
     private statusChange = new ReplaySubject(1);
+
+    @Output()
+    private toggleSidebar = new ReplaySubject(1);
 
     ngOnInit() {
         this.statusChange.next(this.panels);
     }
 
     private toggle(panel) {
-
-        const newState = !panel.active;
+        // If sidebar is collapsed, panel active state will always be set to true and sidebar will be expanded
+        const newState = (this.sidebarExpanded !== true) ? (() => {
+                // Expand sidebar
+                this.toggleSidebar.next(true);
+                return true;
+            })() : !panel.active;
 
         this.panels.forEach(p => p.active = false);
         panel.active = newState;
