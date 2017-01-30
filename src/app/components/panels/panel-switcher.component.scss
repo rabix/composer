@@ -60,15 +60,15 @@ ct-panel-switcher {
 
 .toggle-panel-left {
     background: $panel-side-tab-zone-bg;
-    border-right: 2px solid $panel-side-tab-zone-border;
+    border-right: 1px solid darken($panel-side-tab-zone-bg, 10%);
     text-align: center;
-    padding-top: 1px;
     height: $panel-item-width;
 
     i {
-        color: lighten($gray-dark, 20%);
+        color: white;
         cursor: pointer;
-        font-size: 17px;
-        vertical-align: middle;
+        font-size: 18px;
+        font-weight: bold;
+        line-height: $panel-item-width;
     }
 }
