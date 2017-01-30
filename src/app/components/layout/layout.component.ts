@@ -30,24 +30,32 @@ require("./layout.component.scss");
                     <div class="top-bar"></div>
                     <div class="left-panel-bar">
                     
-                        <ct-panel-switcher [panels]="(panelSwitches | async)?.top.panels" 
-                                           (statusChange)="onPanelSwitch($event, 'top')"></ct-panel-switcher>
+                        <ct-panel-switcher [sidebarExpanded]="sidebarExpanded"
+                                           [panels]="(panelSwitches | async)?.top.panels"                                           
+                                           (statusChange)="onPanelSwitch($event, 'top')"
+                                           (toggleSidebar)="toggleSidebar($event)">                                          
+                        </ct-panel-switcher>
                         
-                        <ct-panel-switcher [panels]="(panelSwitches | async)?.bottom.panels" 
-                                           (statusChange)="onPanelSwitch($event, 'bottom')"></ct-panel-switcher>                                       
+                        <ct-panel-switcher [sidebarExpanded]="sidebarExpanded"
+                                           [panels]="(panelSwitches | async)?.bottom.panels" 
+                                           (statusChange)="onPanelSwitch($event, 'bottom')"
+                                           (toggleSidebar)="toggleSidebar($event)">                                           
+                        </ct-panel-switcher>                                       
                            
                     </div>
                     
                     <div class="toggle-panel-left">
-                        <i aria-hidden="true" class="fa fa-caret-square-o-left" 
-                        (click) = "togglePanelLeft()"></i>                    
+                        <i aria-hidden="true" class="fa" 
+                        [class.fa-angle-double-left]="!sidebarExpanded"  
+                        [class.fa-angle-double-right]="sidebarExpanded" 
+                        (click) = "toggleSidebar()"></i>                    
                     </div> 
                 </div>
                 
                 <!--Panels Column-->
                 <div class="flex-col col-panels" 
-                     [style.flex]="treeSize"
-                     [class.hidden]="(visiblePanels | async).length === 0">
+                    [style.flex]="treeSize"
+                    [class.hidden]="!sidebarExpanded || (visiblePanels | async).length === 0">
                      
                     <div class="top-bar fixed">
                         <div class="seven-bridges-logo"></div>
@@ -57,7 +65,9 @@ require("./layout.component.scss");
                 </div>
                 
                 <!--Panel/Content Resize Handle-->
-                <div #handle class="handle-vertical" [class.hidden]="(visiblePanels | async).length === 0"></div>
+                <div #handle class="handle-vertical" 
+                    [class.hidden]="!sidebarExpanded || (visiblePanels | async).length === 0">                  
+                </div>
                 
                 <!--Editor Content Column-->
                 <div class="flex-col workbox-col" [style.flex]="tabsSize">
@@ -71,7 +81,7 @@ require("./layout.component.scss");
         </div>
     `
 })
-export class LayoutComponent extends ComponentBase implements OnInit {
+export class LayoutComponent extends ComponentBase {
 
     /** Flex ratio of the left part of the layout */
     @Input()
@@ -87,6 +97,9 @@ export class LayoutComponent extends ComponentBase implements OnInit {
 
     @ViewChild(StatusBarComponent)
     private statusBarComponent;
+
+    /** Show/hide sidebar condition */
+    private sidebarExpanded = true;
 
     /** Tracking all available panel states */
     protected panels = new BehaviorSubject<PanelStatus[]>([]);
@@ -183,7 +196,7 @@ export class LayoutComponent extends ComponentBase implements OnInit {
         // Whenever panels get changed, we want to register the shortcuts
         // we should unregister the old ones because of the check if a shortcut is already registered
         const shortcutSubs: Subscription[] = [];
-        this.tracked                       = this.panels.subscribe(panels => {
+        this.tracked = this.panels.subscribe(panels => {
             // Unsubscribe from all previous subscriptions on these shortcuts
             shortcutSubs.forEach(sub => sub.unsubscribe());
             shortcutSubs.length = 0;
@@ -224,16 +237,27 @@ export class LayoutComponent extends ComponentBase implements OnInit {
         this.panelSwitches.next(Object.assign({}, next));
     }
 
-    private togglePanelLeft() {
-        const next = this.panelSwitches.getValue();
-        Object.keys(next)
-            .forEach(position => {
-                next[position].panels.forEach(panel => panel.active = false);
-                this.onPanelSwitch(next[position].panels, position)
-            });
-    }
+    /**
+     * Toggles the sidebar
+     * @param {boolean} state - when set to true sidebar will be expanded, when set to false will be collapsed
+     */
+    private toggleSidebar(state? : boolean) {
+        if (state !== undefined) {
+            this.sidebarExpanded = state;
+            return;
+        }
 
-    ngAfterViewInit() {
+        // If there is no active panel, make first one active and expand sidebar
+        if (this.visiblePanels.getValue().length === 0) {
+            const next = this.panelSwitches.getValue();
+            next["top"].panels[0].active = true;
+            this.onPanelSwitch(next["top"].panels, "top");
 
+            // Expand sidebar
+            this.sidebarExpanded = true;
+        } else {
+            // Toggle sidebar collapse/expand state
+            this.sidebarExpanded = !this.sidebarExpanded;
+        }
     }
 }
