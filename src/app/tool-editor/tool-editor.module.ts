@@ -27,6 +27,11 @@ import {FileDefInspectorComponent} from "./sections/file-def-list/file-def-inspe
 import {LiteralExpressionInputComponent} from "./sections/file-def-list/literal-expression-input.component";
 import {SecondaryFilesComponent} from "./object-inspector/secondary-files/secondary-files.component";
 import {CommandLinePreviewComponent} from "./components/command-line-preview/command-line-preview.component";
+import {ToolEditorComponent} from "./tool-editor.component";
+import {ToolVisualEditorComponent} from "./tool-visual-editor/tool-visual-editor.component";
+import {DockerRequirementComponent} from "./sections/docker/docker-requirement.component";
+import {BaseCommandComponent} from "./sections/base-command/base-command.component";
+import {HintListComponent} from "./sections/hints/hint-list.component";
 
 @NgModule({
     declarations: [
@@ -52,7 +57,12 @@ import {CommandLinePreviewComponent} from "./components/command-line-preview/com
         ToolInputsComponent,
         ToolOutputInspector,
         ToolOutputListComponent,
-        ToolOutputsComponent
+        ToolOutputsComponent,
+        ToolEditorComponent,
+        ToolVisualEditorComponent,
+        DockerRequirementComponent,
+        BaseCommandComponent,
+        HintListComponent
     ],
     exports: [
         ArgumentListComponent,
@@ -71,10 +81,9 @@ import {CommandLinePreviewComponent} from "./components/command-line-preview/com
         DescriptionComponent,
         StageInputSectionComponent,
         OutputEvalSectionComponent,
-        OutputMetaDataSectionComponent,
         LiteralExpressionInputComponent,
         OutputMetaDataSectionComponent,
-        CommandLinePreviewComponent, // Should not be exported
+        ToolEditorComponent,
     ],
     imports: [
         BrowserModule,

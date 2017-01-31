@@ -114,7 +114,8 @@ require('./workflow-graph-editor.component.scss');
                 <div class="container">
                     <!--List Header Row-->
                     <div class="gui-section-list-title row">
-                        <div class="col-sm-12">ID</div>
+                        <div class="col-sm-6">ID</div>
+                        <div class="col-sm-6">Type</div>
                     </div>
 
                     <!--Output List Entries-->
@@ -127,11 +128,17 @@ require('./workflow-graph-editor.component.scss');
                             <div class="gui-section-list-item clickable row">
 
                                 <!--ID Column-->
-                                <div class="col-sm-12 ellipsis" [title]="entry.id">
+                                <div class="col-sm-6 ellipsis" [title]="entry.id">
                                     <ct-validation-preview
                                             [entry]="entry.validation"></ct-validation-preview>
-                                    <pre>{{ entry | json }}</pre>
+                                    {{ entry.id }}
                                 </div>
+
+                                <!--Type Column-->
+                                <div class="col-sm-6 ellipsis">
+                                    {{ entry.type | commandParameterType }}
+                                </div>
+
                             </div>
                         </li>
                     </ul>

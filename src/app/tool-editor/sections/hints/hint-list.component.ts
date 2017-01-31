@@ -1,9 +1,9 @@
 import {Component, Input, Output, ChangeDetectionStrategy} from "@angular/core";
-import {ComponentBase} from "../../common/component-base";
 import {ExternalLinks} from "../../../cwl/external-links";
 import {ExpressionModel, RequirementBaseModel} from "cwlts/models/d2sb";
 import {FormControl} from "@angular/forms";
 import {ReplaySubject} from "rxjs";
+import {ComponentBase} from "../../../components/common/component-base";
 
 // @todo move to editor common module
 @Component({

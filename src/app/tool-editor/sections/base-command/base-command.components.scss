@@ -1,7 +1,7 @@
-@import "../../../../../assets/sass/variables";
-@import "../../../../../assets/sass/mixins";
+@import "../../../../assets/sass/variables";
+@import "../../../../assets/sass/mixins";
 
-ct-base-command-form .form-section {
+ct-base-command .form-section {
     @include cli-border($base-cmd-color);
 }
 

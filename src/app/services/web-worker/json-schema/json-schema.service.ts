@@ -29,7 +29,7 @@ export class JsonSchemaService {
         this.validator = attr.validator;
 
         const schemas = {
-            "draft-2": {
+            "sbg:draft-2": {
                 CommandLineTool: attr.draft2.cltSchema,
                 Workflow: attr.draft2.wfSchema,
                 ExpressionTool: attr.draft2.etSchema
@@ -103,7 +103,7 @@ export class JsonSchemaService {
                 warnings: []
             });
         } else {
-            cwlVersion       = cwlJson.cwlVersion || 'draft-2';
+            cwlVersion       = cwlJson.cwlVersion || "sbg:draft-2";
             jsonClass        = cwlJson.class;
             const isValidCWL = validator.validate(cwlVersion + jsonClass, cwlJson);
             const errors     = validator.errors || [];

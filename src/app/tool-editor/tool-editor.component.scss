@@ -1,8 +1,8 @@
-@import "../../../assets/sass/variables";
-@import "../../../assets/sass/mixins";
+@import "../../assets/sass/variables";
+@import "../../assets/sass/mixins";
 
 ct-tool-editor {
-    .tool-inspector {
+    .tool-inspector, .inspector {
         display: block;
         height: 100%;
         background: white;

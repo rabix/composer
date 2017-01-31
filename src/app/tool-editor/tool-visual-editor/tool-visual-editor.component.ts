@@ -1,29 +1,29 @@
-import {Component, Input, OnInit} from "@angular/core";
-import {FormBuilder, FormGroup} from "@angular/forms";
+import {Component, Input} from "@angular/core";
+import {FormGroup} from "@angular/forms";
 import {CommandLineToolModel, FileDefModel, RequirementBaseModel, ResourceRequirementModel} from "cwlts/models/d2sb";
-import {ComponentBase} from "../common/component-base";
 import {ProcessRequirement} from "cwlts/mappings/d2sb/ProcessRequirement";
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
-require("./clt-editor.component.scss");
+import {ComponentBase} from "../../components/common/component-base";
+require("./tool-visual-editor.component.scss");
 @Component({
-    selector: "ct-clt-editor",
+    selector: "ct-tool-visual-editor",
     template: `
         
         <div class="row">       
             <form [class.col-xs-6]="showInspector" 
                   [class.col-xs-12]="!showInspector" 
                   [formGroup]="formGroup">
-                <ct-docker-image-form [dockerRequirement]="model.docker"
+                <ct-docker-requirement [dockerRequirement]="model.docker"
                                    (update)="setRequirement($event, true)">
-                </ct-docker-image-form>
+                </ct-docker-requirement>
                                 
-                <ct-base-command-form [baseCommand]="model.baseCommand"
+                <ct-base-command [baseCommand]="model.baseCommand"
                                    [context]="{$job: model.job}"
                                    [stdin]="model.stdin"
                                    [stdout]="model.stdout"
                                    (updateCmd)="updateModel('baseCommand', $event)"
                                    (updateStreams)="setStreams($event)">
-                </ct-base-command-form>
+                </ct-base-command>
                                 
                 <ct-tool-input [location]="model.loc + '.inputs'" [entries]="model.inputs"
                                    [context]="{$job: model.job}"
@@ -66,7 +66,7 @@ require("./clt-editor.component.scss");
 
     `
 })
-export class CltEditorComponent extends ComponentBase implements OnInit {
+export class ToolVisualEditorComponent extends ComponentBase {
 
     @Input()
     public model: CommandLineToolModel;
@@ -83,21 +83,8 @@ export class CltEditorComponent extends ComponentBase implements OnInit {
         "sbg:MemRequirement"?: ResourceRequirementModel
     } = {};
 
-    constructor(private formBuilder: FormBuilder, private inspector: EditorInspectorService) {
+    constructor(private inspector: EditorInspectorService) {
         super();
-
-
-    }
-
-    ngOnInit() {
-
-        this.formGroup.addControl("dockerGroup", this.formBuilder.group({}));
-        this.formGroup.addControl("baseCommandGroup", this.formBuilder.group({}));
-        this.formGroup.addControl("inputs", this.formBuilder.group({}));
-        this.formGroup.addControl("outputs", this.formBuilder.group({}));
-        this.formGroup.addControl("arguments", this.formBuilder.group({}));
-
-        console.log("Model", this.model);
     }
 
     private updateModel(category: string, data: any) {

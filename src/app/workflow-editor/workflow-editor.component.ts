@@ -108,7 +108,7 @@ require("./workflow-editor.component.scss");
                                        
                     <!--Object Inspector Column-->
                     <div class="flex-col inspector-col" >
-                        <ct-editor-inspector class="tool-inspector">
+                        <ct-editor-inspector class="workflow-inspector">
                             <template #inspector></template>
                         </ct-editor-inspector>
                     </div>
