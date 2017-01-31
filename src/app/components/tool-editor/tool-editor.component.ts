@@ -397,9 +397,6 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
     }
 
     private onJobUpdate(job) {
-        console.log("Job is updated", job);
-        // this.toolModel.setJob(job);
-        // this.toolModel.updateCommandLine();
     }
 
     ngAfterViewInit() {

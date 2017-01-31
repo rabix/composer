@@ -1,109 +1,143 @@
 import {
     ChangeDetectionStrategy,
+    ChangeDetectorRef,
     Component,
-    Input,
-    Output,
     EventEmitter,
-    SimpleChanges,
-    OnChanges
+    Input,
+    OnChanges,
+    Output,
+    SimpleChanges
 } from "@angular/core";
 import {CommandInputParameterModel} from "cwlts/models/d2sb";
 import {JobHelper} from "cwlts/models/helpers/JobHelper";
+import {ObjectHelper} from "../../helpers/object.helper";
 
 @Component({
     selector: "ct-job-editor-entry",
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <div class="alert alert-warning form-control-label" *ngIf="warning">{{ warning }}</div>
-        <div [ngSwitch]="input.type.type" class="form-group" >
-        
+        <div [ngSwitch]="inputType" class="form-group">
+
             <!--Each leaf field will be wrapped as an input group-->
             <!--Nested fields below should not be wrapped into other container elements-->
             <!--because it will break size and positioning-->
             <div class="input-group">
-            
+
                 <!--Enums-->
                 <template ngSwitchCase="enum">
-                    <select [value]="value" class="form-control" [attr.inputId]="input.id" [attr.arrayIndex]="index">
-                        <option *ngFor="let val of input.type.symbols" [value]="val"> {{ val }}</option>
+                    <select [value]="value" class="form-control"
+                            [attr.inputId]="input?.id"
+                            [attr.prefix]="prefix"
+                            [attr.arrayIndex]="index">
+                        <option *ngFor="let val of input.type.symbols" [value]="val"> {{ val }}
+                        </option>
                     </select>
                 </template>
-                
+
                 <!--Numbers-->
                 <template ngSwitchCase="int">
-                    <input [attr.inputId]="input.id" [attr.arrayIndex]="index" type="number" class="form-control" [value]="value"/>
+                    <input [attr.inputId]="input?.id"
+                           [attr.arrayIndex]="index"
+                           [attr.prefix]="prefix"
+                           type="number"
+                           class="form-control"
+                           [value]="value"/>
                 </template>
                 <template ngSwitchCase="float">
-                    <input [attr.inputId]="input.id" [attr.arrayIndex]="index" type="number" class="form-control" [value]="value"/>
+                    <input [attr.inputId]="input?.id"
+                           [attr.prefix]="prefix"
+                           [attr.arrayIndex]="index"
+                           type="number"
+                           class="form-control"
+                           [value]="value"/>
                 </template>
-                
+
                 <!--Strings-->
                 <template ngSwitchCase="string">
-                    <input [attr.inputId]="input.id" [attr.arrayIndex]="index" class="form-control" [value]="value"/>
+                    <input [attr.inputId]="input?.id"
+                           [attr.arrayIndex]="index"
+                           [attr.prefix]="prefix"
+                           class="form-control"
+                           [value]="value"/>
                 </template>
-                
+
                 <!--Booleans-->
                 <template ngSwitchCase="boolean">
                     <ct-toggle-slider class="pull-right"
-                                      [attr.inputId]="input.id"
+                                      [attr.inputId]="input?.id"
+                                      [attr.prefix]="prefix"
                                       [attr.arrayIndex]="index"
                                       (change)="updateJob(value)"
                                       [(ngModel)]="value"></ct-toggle-slider>
                 </template>
-                
+
                 <!--Files-->
                 <template ngSwitchCase="File">
-                    <input [attr.inputId]="input.id" [attr.arrayIndex]="index" [attr.jobPropPath]="'path'" class="form-control" [value]="value?.path"/>
+                    <input [attr.inputId]="input?.id"
+                           [attr.arrayIndex]="index"
+                           [attr.jobPropPath]="'path'"
+                           [attr.prefix]="prefix"
+                           class="form-control"
+                           [value]="value?.path"/>
                     <span class="input-group-btn">
-                        <button type="button" class="btn btn-secondary" 
+                        
+                        <button type="button" class="btn btn-secondary"
                                 [ct-editor-inspector]="fileInspector">
                             <i class="fa fa-ellipsis-h"></i>
                         </button>
-                    </span>  
-                    
+                    </span>
+
                     <template #fileInspector>
                         <ct-editor-inspector-content>
-                            <div class="tc-header">{{ input.id }}</div>
+                            <div class="tc-header">{{ input?.id }}</div>
                             <div class="tc-body">
-                                <ct-file-input-inspector [input]="value || {}" 
-                                                         (update)="updateJob($event)">
+                                <ct-file-input-inspector [input]="value || {}"
+                                                         (update)="updateFile($event)">
                                 </ct-file-input-inspector>
                             </div>
                         </ct-editor-inspector-content>
                     </template>
                 </template>
-                
+
                 <!--Every element that's a part of the array can be deleted, so we add a deletion button to it-->
                 <span class="input-group-btn" *ngIf="index !== -1">
                     <button type="button" class="btn btn-secondary" (click)="deleteFromArray()">
                         <i class="fa fa-trash"></i>
                     </button>
-                </span>  
+                </span>
             </div>
-            
+
             <!--Records-->
-            
+            <template ngSwitchCase="record">
+                <ct-job-editor-entry *ngFor="let entry of input.type.fields"
+                                     [prefix]="this.prefix + '.' + entry.id"
+                                     [input]="entry"
+                                     (update)="updateRecord(entry.id, $event)"
+                                     [value]="value ? value[entry.id] : undefined"></ct-job-editor-entry>
+            </template>
+
             <!--Arrays-->
             <template ngSwitchCase="array">
-                <ct-job-editor-entry *ngFor="let entry of value; let i = index" 
+                <ct-job-editor-entry *ngFor="let entry of value; let i = index"
                                      [index]="i"
-                                     [input]="arrayModifiedInput" 
+                                     [input]="arrayModifiedInput"
                                      (update)="updateArray(i, $event)"
                                      [value]="entry"></ct-job-editor-entry>
-                                     
-                <button (click)="addArrayEntry(input)" 
-                        type="button" 
+
+                <button (click)="addArrayEntry(input)"
+                        type="button"
                         class="btn pl-0 btn-link no-outline no-underline-hover">
                     <i class="fa fa-plus"></i> New {{ input.type.items }}
                 </button>
             </template>
-            
+
             <!--Unknown-->
             <template ngSwitchDefault>
-                <div class="alert alert-info">Unknown input type: {{ input.type.type}}</div>
+                <div class="alert alert-info">Unknown input type: {{ inputType }}</div>
             </template>
-            
-            
+
+
         </div>
     `
 })
@@ -118,12 +152,21 @@ export class JobEditorEntryComponent implements OnChanges {
     @Input()
     public index = -1;
 
+    @Input()
+    public prefix;
+
     @Output()
     public update = new EventEmitter<any>();
 
+    public inputType: string;
+
+    private initial;
+
+    constructor(private cdr: ChangeDetectorRef) {
+    }
 
     /**
-     * Entry might have a warning attached to it.
+     * We might want to show a warning next to a field.
      * This can happen for example if we encounter a mismatch between job value and the input type,
      * for example, an input can by File[], and the job value can be just a plain string.
      */
@@ -133,6 +176,22 @@ export class JobEditorEntryComponent implements OnChanges {
 
     public updateJob(data) {
         this.update.emit(data);
+    }
+
+    private updateFile(data){
+
+        this.updateJob(data);
+    }
+
+    private updateRecord(entryId, event) {
+
+        const data = {...(this.value || {})};
+        ObjectHelper.addProperty(data, entryId, event);
+        let d = {...data,
+            [entryId]: {...event}
+        };
+
+        this.updateJob(d);
     }
 
     public updateArray(index, data) {
@@ -164,20 +223,30 @@ export class JobEditorEntryComponent implements OnChanges {
     }
 
     ngOnInit() {
-        if (this.input.type.type === "array" && !Array.isArray(this.value)) {
-            this.value = [];
-            this.addArrayEntry(this.input);
+
+        if (this.inputType === "record") {
+            this.prefix = this.input.id;
+        }
+
+        // If we are expecting an array, but didn't get one, we won't fill up any components,
+        // just show the user a warning about the type mismatch
+        if (this.inputType === "array"
+            && !Array.isArray(this.value)
+            && this.value !== undefined) {
+
+            this.value   = [];
             this.warning = `Type mismatch: the default job value for this input 
                             is of type “${typeof this.value}”, but the input is declared 
-                            as “${this.input.type.type}”. 
+                            as “${this.inputType}”. 
                             You can generate a new set of test data for this input by clicking 
                             on the “New ${this.input.type.items}” button.`
         }
     }
 
     ngOnChanges(changes: SimpleChanges) {
+        this.inputType = this.input.type.type;
 
-        if (this.input.type.type === "array") {
+        if (this.inputType === "array") {
             this.arrayModifiedInput = {
                 ...this.input,
                 type: {
