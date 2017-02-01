@@ -21,13 +21,13 @@ interface CWLFile {
             <!--Path-->
             <div class="form-group">
                 <label>Path</label>
-                <input class="form-control" formControlName="path" [value]="input.path"/>
+                <input class="form-control" formControlName="path" [value]="input.path || ''"/>
             </div>
             
             <!--Size-->
             <div class="form-group">
                 <label>Size</label>
-                <input class="form-control" formControlName="size" [value]="input.size"/>
+                <input class="form-control" formControlName="size" [value]="input.size || 0"/>
             </div>
             
             <!--Secondary Files-->
@@ -39,7 +39,7 @@ interface CWLFile {
             <!--Content-->
             <div class="form-group">
                 <label>Content</label>
-                <textarea rows="10" class="form-control"  formControlName="contents" [value]="input.contents"></textarea>
+                <textarea rows="10" class="form-control"  formControlName="contents" [value]="input.contents || ''"></textarea>
             </div>
         </form>
     `
@@ -64,6 +64,8 @@ export class FileInputInspector {
     public rawChange = new Subject<any>();
 
     ngOnInit() {
+        console.log("Inspector creation", this.value);
+
         this.formGroup = new FormGroup({
             path: new FormControl(this.input.path),
             size: new FormControl(this.input.size),
@@ -90,12 +92,21 @@ export class FileInputInspector {
             .map(val => ({...val, secondaryFiles: val.secondaryFiles.map(path => ({path}))}))
 
             // Then emit gathered data as an update from the component
-            .subscribe(data => this.update.emit(data));
+            .subscribe(data => {
+                console.log("Inspector emit",data);
+                this.update.emit(data);
+            });
     }
 
     ngOnChanges(changes: SimpleChanges) {
+
+        console.log("Inspector changes", changes);
+
+        if(!this.input){
+            return;
+        }
         // secondaryFiles is an array of files/directories, we just need their paths
-        this.secondaryFilePaths = (changes["input"].currentValue.secondaryFiles || []).map(v => v.path);
+        this.secondaryFilePaths = (this.input.secondaryFiles || []).map(v => v.path);
 
         // Form group is not present on first call
         if (this.formGroup) {

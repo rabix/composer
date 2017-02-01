@@ -32,6 +32,10 @@ export class ObjectHelper {
                 acc[curr] = {};
                 return acc[curr];
             } else if (typeof acc[curr] === "object" && acc[curr] !== null) {
+                if (Array.isArray(acc[curr])) {
+                    return acc[curr];
+                }
+
                 return acc[curr];
             } else {
                 throw new Error("Couldn't add a nested property to type " + typeof acc);

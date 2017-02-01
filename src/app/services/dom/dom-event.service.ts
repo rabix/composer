@@ -91,11 +91,37 @@ export class DomEventService {
     /**
      * Observes the dragging of an element.
      */
-    public onDrag(element: Element, ctName = "", ctData = {}): Observable<ExtendedMouseEvent> {
+    public onMove(element: Element, ctName = "", ctData = {}): Observable<ExtendedMouseEvent> {
         const down = Observable.fromEvent(element, "mousedown");
         const up   = Observable.fromEvent(document, "mouseup");
         const move = Observable.fromEvent(document, "mousemove");
         return down.flatMap(_ => move.takeUntil(up)).map((ev: MouseEvent) => Object.assign(ev, {ctData}, {ctName}));
+    }
+
+    public onDrag(element: Element, ctName = "", ctData = {}) {
+
+        const down = Observable.fromEvent(element, "mousedown");
+        const up   = Observable.fromEvent(document, "mouseup");
+        const move = Observable.fromEvent(document, "mousemove");
+
+        return down.map(ev => new Observable(obs => {
+
+            const decorate = event => Object.assign(event, {ctData}, {ctName});
+
+            obs.next(decorate(ev));
+
+            const moveSub = move.subscribe(moveEv => obs.next(decorate(moveEv)));
+
+            const upSub = up.first().subscribe(upEvent => {
+                obs.next(decorate(upEvent));
+                obs.complete();
+            });
+
+            return () => {
+                moveSub.unsubscribe();
+                upSub.unsubscribe();
+            }
+        }));
     }
 
 

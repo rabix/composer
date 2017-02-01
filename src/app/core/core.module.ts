@@ -13,12 +13,13 @@ import {TreeNodeIconComponent} from "./ui/tree-view/tree-node-icon.component";
 import {MenuItemComponent} from "./ui/menu/menu-item.component";
 import {MenuComponent} from "./ui/menu/menu.component";
 import {ContextDirective} from "./ui/context/context.directive";
-import {DisableFormControlDirective} from "./forms/disable-form-control.directive"
+import {DisableFormControlDirective} from "./forms/disable-form-control.directive";
 import {ContextService} from "./ui/context/context.service";
 import {MultilangCodeEditorComponent} from "./ui/code-editor/multilang-code-editor.component";
 import {ToggleComponent} from "./ui/toggle-slider/toggle-slider.component";
 import {StatusBarComponent} from "./status-bar/status-bar.component";
 import {MomentModule} from "angular2-moment";
+import {LoggerDirective} from "./elements/debugger/logger.directive";
 
 @NgModule({
     entryComponents: [
@@ -63,7 +64,9 @@ import {MomentModule} from "angular2-moment";
         // Context
         ContextDirective,
 
-        StatusBarComponent
+        StatusBarComponent,
+
+        LoggerDirective,
 
     ],
     exports: [
@@ -95,7 +98,8 @@ import {MomentModule} from "angular2-moment";
         // Context
         ContextDirective,
 
-        StatusBarComponent
+        StatusBarComponent,
+        LoggerDirective
     ],
     providers: [
         IpcService,

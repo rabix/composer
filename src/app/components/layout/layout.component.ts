@@ -141,8 +141,20 @@ export class LayoutComponent extends ComponentBase {
 
         this.statusBar.host = this.statusBarComponent;
 
+        this.domEvents.onDrag(this.handle.nativeElement).subscribe(drag => {
+
+            const first = drag.first().subscribe(ev => console.log("Started dragging", ev));
+            const mid = drag.skip(1).subscribe(ev => console.log("Dragging in progress", ev));
+            const last = drag.last().subscribe(ev => {
+
+                first.unsubscribe();
+                mid.unsubscribe();
+            });
+        });
+
+
         // Layout is resizable, so we need to react when user drags the handle
-        this.tracked = this.domEvents.onDrag(this.handle.nativeElement)
+        this.tracked = this.domEvents.onMove(this.handle.nativeElement)
             .map(ev => {
                 const x = ev.clientX;
 
