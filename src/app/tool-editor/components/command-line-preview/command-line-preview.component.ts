@@ -6,8 +6,8 @@ require("./command-line-preview.component.scss");
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <span *ngFor="let p of commandLineParts"
-              [class.warning-text]="p.type === 'warning'"
-              [class.error-text]="p.type === 'error'"
+              [class.text-console-warning]="p.type === 'warning'"
+              [class.text-console-error]="p.type === 'error'"
               [class.baseCmd-cli]="p.type === 'baseCommand'"
               [class.input-cli]="p.type === 'input'"
               [class.arg-cli]="p.type === 'argument'">

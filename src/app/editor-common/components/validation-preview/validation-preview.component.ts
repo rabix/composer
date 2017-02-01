@@ -19,7 +19,7 @@ require("./validation-preview.component.scss");
     </ct-tooltip-content>
     
     <ct-tooltip-content #errors>
-        <div class="error-text px-1" *ngFor="let error of entry.errors">{{ error.message }}</div>
+        <div class="text-console-error px-1" *ngFor="let error of entry.errors">{{ error.message }}</div>
     </ct-tooltip-content>
 `
 })

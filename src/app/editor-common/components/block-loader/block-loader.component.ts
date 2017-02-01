@@ -1,8 +1,6 @@
 import {Component} from "@angular/core";
 
-// css does not need to be included here
-// main.scss already loads it for the startup spinner
-// require("./block-loader.component.scss");
+require("./block-loader.component.scss");
 
 @Component({
     selector: "block-loader",
