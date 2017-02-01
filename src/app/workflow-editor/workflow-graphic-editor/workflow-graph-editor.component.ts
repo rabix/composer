@@ -82,7 +82,9 @@ require('./workflow-graph-editor.component.scss');
 
                         <!--List Entry-->
                         <li *ngFor="let entry of model.inputs; let i = index"
-                            class="input-list-items container">
+                            class="input-list-items container"
+                            [ct-editor-inspector]="inspector"
+                            [ct-editor-inspector-target]="entry.loc">
 
                             <div class="gui-section-list-item clickable row">
 
@@ -99,6 +101,19 @@ require('./workflow-graph-editor.component.scss');
                                 </div>
                             
                             </div>
+
+
+                            <!--Object Inspector Template -->
+                            <template #inspector>
+                                <ct-editor-inspector-content>
+                                    <div class="tc-header">{{ entry.id || entry.loc || "Input" }}</div>
+                                    <div class="tc-body">
+                                        <ct-workflow-input-inspector
+                                                [input]="entry">
+                                        </ct-workflow-input-inspector>
+                                    </div>
+                                </ct-editor-inspector-content>
+                            </template>
                         </li>
                     </ul>
                 </div>
@@ -123,7 +138,9 @@ require('./workflow-graph-editor.component.scss');
 
                         <!--List Entry-->
                         <li *ngFor="let entry of model.outputs; let i = index"
-                            class="input-list-items container">
+                            class="input-list-items container"
+                            [ct-editor-inspector]="inspector"
+                            [ct-editor-inspector-target]="entry.loc">
 
                             <div class="gui-section-list-item clickable row">
 
@@ -140,6 +157,18 @@ require('./workflow-graph-editor.component.scss');
                                 </div>
 
                             </div>
+
+                            <!--Object Inspector Template -->
+                            <template #inspector>
+                                <ct-editor-inspector-content>
+                                    <div class="tc-header">{{ entry.id || entry.loc || "Output" }}</div>
+                                    <div class="tc-body">
+                                        <ct-workflow-output-inspector
+                                                [output]="entry">
+                                        </ct-workflow-output-inspector>
+                                    </div>
+                                </ct-editor-inspector-content>
+                            </template>
                         </li>
                     </ul>
                 </div>
