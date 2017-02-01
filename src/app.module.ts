@@ -85,8 +85,7 @@ import {SettingsService} from "./app/services/settings/settings.service";
         FileEditorComponent,
         StructurePanelComponent,
         TabManagerComponent,
-        WorkboxComponent,
-        WorkflowEditorComponent
+        WorkboxComponent
     ],
     entryComponents: [
         CheckboxPromptComponent,

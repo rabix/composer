@@ -29,6 +29,9 @@ require("./workflow-editor.component.scss");
 
 @Component({
     selector: "ct-workflow-editor",
+    host:{
+        "class": "visual-editor-container"
+    },
     providers: [
         EditorInspectorService,
         WebWorkerService
@@ -108,7 +111,7 @@ require("./workflow-editor.component.scss");
                                        
                     <!--Object Inspector Column-->
                     <div class="flex-col inspector-col" >
-                        <ct-editor-inspector class="workflow-inspector">
+                        <ct-editor-inspector class="object-inspector">
                             <template #inspector></template>
                         </ct-editor-inspector>
                     </div>
@@ -130,7 +133,7 @@ require("./workflow-editor.component.scss");
                             <i class="fa fa-times-circle text-danger"></i> {{validation.errors.length}} Errors
                         </span>
                         
-                        <span *ngIf="!validation?.errors?.length && validation?.warnings?.length">
+                        <span *ngIf="validation?.warnings?.length" [class.pl-1]="validation?.errors?.length">
                             <i class="fa fa-exclamation-triangle text-warning"></i> {{validation.warnings.length}} Warnings
                         </span>
                         

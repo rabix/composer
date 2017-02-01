@@ -28,6 +28,8 @@ import {FileInputInspector} from "./inspector-forms/file-input-inspector.compone
 import {JobEditorEntryComponent} from "./job-editor/job-editor-entry.component";
 import {BlockLoaderComponent} from "./components/block-loader/block-loader.component";
 
+require("./editor-common.scss");
+
 @NgModule({
     declarations: [
         BlankToolStateComponent,

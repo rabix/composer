@@ -30,6 +30,9 @@ require("./tool-editor.component.scss");
 
 @Component({
     selector: "ct-tool-editor",
+    host: {
+        "class": ".visual-editor-container"
+    },
     providers: [
         EditorInspectorService,
         WebWorkerService
@@ -115,7 +118,7 @@ require("./tool-editor.component.scss");
                                        
                     <!--Object Inspector Column-->
                     <div class="flex-col inspector-col" >
-                        <ct-editor-inspector class="tool-inspector">
+                        <ct-editor-inspector class="object-inspector">
                             <template #inspector></template>
                         </ct-editor-inspector>
                     </div>
