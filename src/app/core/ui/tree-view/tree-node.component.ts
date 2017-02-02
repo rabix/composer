@@ -20,6 +20,11 @@ import {ComponentBase} from "../../../components/common/component-base";
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <div #nodeBase
+             [ct-drag-enabled]="node.icon === 'CommandLineTool' || node.icon === 'Workflow'"   
+             [ct-drag-image-class]="node.icon == 'CommandLineTool' ? 'icon-command-line-tool' : 'icon-workflow'"
+             [ct-drag-image-caption]="node.name"  
+             [ct-drag-transfer-data]="node.id"     
+             [ct-drop-zones]="['zone1']"
              class="deep-unselectable clickable node-base"
              [style.paddingLeft.em]="level * 2"
              [attr.data-index]="nodeIndex"

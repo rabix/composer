@@ -1,0 +1,22 @@
+@import "../../../assets/sass/variables";
+
+.drag-container {
+    position: fixed;
+    cursor: -webkit-grab;
+
+    & > .drag-image {
+        width: 75px;
+        height: 75px;
+        opacity: 0.95;
+        margin: 0 auto;
+    }
+
+    & > .drag-text {
+        text-align: center;
+        font-family: sans-serif;
+        font-style: italic;
+        color: #666666;
+        padding: 5px;
+        max-width: 200px;
+    }
+}
