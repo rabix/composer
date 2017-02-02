@@ -19,6 +19,9 @@ import {MultilangCodeEditorComponent} from "./ui/code-editor/multilang-code-edit
 import {ToggleComponent} from "./ui/toggle-slider/toggle-slider.component";
 import {StatusBarComponent} from "./status-bar/status-bar.component";
 import {MomentModule} from "angular2-moment";
+import {DragDirective} from "./drag-and-drop/drag-directive";
+import {DropDirective} from "./drag-and-drop/drop-directive";
+import {DropZones} from "./drag-and-drop/drop-zones-directive";
 import {LoggerDirective} from "./elements/debugger/logger.directive";
 
 @NgModule({
@@ -36,7 +39,12 @@ import {LoggerDirective} from "./elements/debugger/logger.directive";
         MultilangCodeEditorComponent
     ],
     declarations: [
-        // DisableFormControl
+        // Drag and Drop
+        DragDirective,
+        DropDirective,
+        DropZones,
+
+        // Disable Form Control
         DisableFormControlDirective,
 
         // Code Editor Components
@@ -70,7 +78,12 @@ import {LoggerDirective} from "./elements/debugger/logger.directive";
 
     ],
     exports: [
-        // DisableFormControl
+        // Drag and Drop
+        DragDirective,
+        DropDirective,
+        DropZones,
+
+        // Disable Form Control
         DisableFormControlDirective,
 
         // Code Editor
