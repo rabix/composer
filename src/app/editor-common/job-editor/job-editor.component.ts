@@ -27,12 +27,21 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
                     <form (change)="onJobFormChange($event)">
                         <div *ngFor="let input of group.inputs">
 
-                            <label>{{ input?.label || input.id }}:</label>
+                            <label>{{ input?.label || input.id }}: <i class="fa fa-info-circle text-muted" 
+                                                                      *ngIf="input.description" 
+                                                                      [ct-tooltip]="ctt"
+                                                                      [tooltipPlacement]="'top'"></i>
+                            </label>
                             <ct-job-editor-entry [input]="input"
                                                  [value]="job.inputs[input.id]"
                                                  (update)="jobValueUpdate(input.id, $event)">
                             </ct-job-editor-entry>
-                            <div class="form-control-label">{{ input.description }}</div>
+                            
+                            <ct-tooltip-content #ctt>
+                                <div class="tooltip-info">
+                                    {{ input.description }}
+                                </div>
+                            </ct-tooltip-content>
 
                         </div>
                     </form>
