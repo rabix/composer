@@ -6,3 +6,25 @@ pre {
 }
 
 .text-mono { font-family: monospace; }
+
+.text-console-error {
+  color: $console-error-color;
+}
+
+.text-console-warning {
+  color: $console-warning-color;
+}
+
+.text-hover-danger:hover {
+  color: $brand-danger !important;
+}
+
+.text-hover-warning:hover {
+  color: $brand-warning !important;
+}
+
+.no-outline {
+  &, &:focus, &:active {
+    outline: 0;
+  }
+}

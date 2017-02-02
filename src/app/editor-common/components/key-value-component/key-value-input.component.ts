@@ -34,11 +34,11 @@ require("./key-value-input.component.scss");
                    *ngIf="validation.warnings.length && !validation.errors.length"></i> 
                             
                 <ct-tooltip-content #warnings>
-                    <div class="warning-text px-1" *ngFor="let warning of validation.warnings">{{ warning }}</div>
+                    <div class="text-console-warning px-1" *ngFor="let warning of validation.warnings">{{ warning }}</div>
                 </ct-tooltip-content>
                 
                 <ct-tooltip-content #errors>
-                    <div class="error-text px-1" *ngFor="let error of validation.errors">{{ error }}</div>
+                    <div class="text-console-error px-1" *ngFor="let error of validation.errors">{{ error }}</div>
                 </ct-tooltip-content>
             
                 <input class="ellipsis form-control key-input"

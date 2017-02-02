@@ -11,8 +11,6 @@ import {ToolInputListComponent} from "./sections/inputs/tool-input-list-componen
 import {ToolOutputListComponent} from "./sections/outputs/tool-output-list.component";
 import {ToolOutputsComponent} from "./sections/outputs/tool-outputs.component";
 import {CWLModule} from "../cwl/cwl.module";
-import {ToolInputInspector} from "./sections/inputs/tool-input-inspector.component";
-import {ToolOutputInspector} from "./sections/outputs/tool-output-inspector.component";
 import {ArgumentInspector} from "./sections/arguments/argument-inspector.component";
 import {BasicInputSectionComponent} from "./object-inspector/input-inspector/basic-section/basic-input-section.component";
 import {BasicOutputSectionComponent} from "./object-inspector/output-inspector/output-basic-section/basic-output-section.component";
@@ -27,6 +25,13 @@ import {FileDefInspectorComponent} from "./sections/file-def-list/file-def-inspe
 import {LiteralExpressionInputComponent} from "./sections/file-def-list/literal-expression-input.component";
 import {SecondaryFilesComponent} from "./object-inspector/secondary-files/secondary-files.component";
 import {CommandLinePreviewComponent} from "./components/command-line-preview/command-line-preview.component";
+import {ToolEditorComponent} from "./tool-editor.component";
+import {ToolVisualEditorComponent} from "./tool-visual-editor/tool-visual-editor.component";
+import {DockerRequirementComponent} from "./sections/docker/docker-requirement.component";
+import {BaseCommandComponent} from "./sections/base-command/base-command.component";
+import {HintListComponent} from "./sections/hints/hint-list.component";
+import {ToolInputInspector} from "./object-inspector/input-inspector/tool-input-inspector.component";
+import {ToolOutputInspector} from "./object-inspector/output-inspector/tool-output-inspector.component";
 
 @NgModule({
     declarations: [
@@ -52,29 +57,15 @@ import {CommandLinePreviewComponent} from "./components/command-line-preview/com
         ToolInputsComponent,
         ToolOutputInspector,
         ToolOutputListComponent,
-        ToolOutputsComponent
+        ToolOutputsComponent,
+        ToolEditorComponent,
+        ToolVisualEditorComponent,
+        DockerRequirementComponent,
+        BaseCommandComponent,
+        HintListComponent
     ],
     exports: [
-        ArgumentListComponent,
-        ArgumentInspector,
-        FileDefListComponent,
-        ResourcesComponent,
-        ToolInputListComponent,
-        ToolInputsComponent,
-        ToolInputInspector,
-        ToolOutputListComponent,
-        ToolOutputInspector,
-        ToolOutputsComponent,
-        BasicInputSectionComponent,
-        BasicOutputSectionComponent,
-        FileDefInspectorComponent,
-        DescriptionComponent,
-        StageInputSectionComponent,
-        OutputEvalSectionComponent,
-        OutputMetaDataSectionComponent,
-        LiteralExpressionInputComponent,
-        OutputMetaDataSectionComponent,
-        CommandLinePreviewComponent, // Should not be exported
+        ToolEditorComponent,
     ],
     imports: [
         BrowserModule,

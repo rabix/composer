@@ -1,4 +1,5 @@
 @import "../../../assets/sass/variables";
+@import "../../../assets/sass/_mixins";
 
 ct-editor-inspector-content {
     overflow-y: auto;
@@ -46,6 +47,10 @@ ct-editor-inspector-content {
         font-size: $font-size-base;
         font-weight: 400;
         text-transform: uppercase;
+
+        .tc-header {
+            @include ellipsis();
+        }
     }
 
     .gui-section-body {
