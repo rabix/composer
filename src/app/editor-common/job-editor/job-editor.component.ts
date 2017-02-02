@@ -162,6 +162,7 @@ export class JobEditorComponent implements OnChanges {
             name: key,
             inputs: grouped[key]
         }));
+        console.log("Opening Jobs", this.job);
     }
 
     ngOnDestroy() {

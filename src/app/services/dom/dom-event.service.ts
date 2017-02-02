@@ -9,6 +9,10 @@ type ExtendedMouseEvent = MouseEvent & {
 @Injectable()
 export class DomEventService {
 
+    public readonly ON_DRAG_ENTER_EVENT: string = "onDragEnter";
+    public readonly ON_DRAG_LEAVE_EVENT: string = "onDragLeave";
+    public readonly ON_DROP_SUCCESS_EVENT: string = "onDropSuccess";
+
     private registeredShortcuts = new Map<string[], Observable<KeyboardEvent>>();
 
     public on(eventName: string, component?: Element, preventDefault = false) {
@@ -124,5 +128,15 @@ export class DomEventService {
         }));
     }
 
-
+    private triggerCustomEventOnElements(elements: Element [], eventName: string, data?: any) {
+        // FIXME: Should be added support for IE
+        elements.forEach(element => {
+            const event = new CustomEvent(eventName, {
+                detail: {
+                    data
+                }
+            });
+            element.dispatchEvent(event);
+        });
+    }
 }

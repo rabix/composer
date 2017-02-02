@@ -72,6 +72,16 @@ import {ObjectHelper} from "../../helpers/object.helper";
                                       [(ngModel)]="value"></ct-toggle-slider>
                 </template>
 
+                <!--Maps-->
+                <template ngSwitchCase="map">
+                    <ct-map-list class="form-group"
+                                 [attr.inputId]="input?.id"
+                                 [attr.prefix]="prefix"
+                                 [attr.arrayIndex]="index"
+                                 (change)="updateMap(value)"
+                                 [(ngModel)]="value"></ct-map-list>
+                </template>
+
                 <!--Files-->
                 <template ngSwitchCase="File">
                     <input [attr.inputId]="input?.id"
@@ -136,8 +146,6 @@ import {ObjectHelper} from "../../helpers/object.helper";
             <template ngSwitchDefault>
                 <div class="alert alert-info">Unknown input type: {{ inputType }}</div>
             </template>
-
-
         </div>
     `
 })
@@ -160,11 +168,6 @@ export class JobEditorEntryComponent implements OnChanges {
 
     public inputType: string;
 
-    private initial;
-
-    constructor(private cdr: ChangeDetectorRef) {
-    }
-
     /**
      * We might want to show a warning next to a field.
      * This can happen for example if we encounter a mismatch between job value and the input type,
@@ -178,16 +181,21 @@ export class JobEditorEntryComponent implements OnChanges {
         this.update.emit(data);
     }
 
-    private updateFile(data){
+    private updateFile(data) {
 
         this.updateJob(data);
+    }
+
+    private updateMap(map) {
+        this.updateJob(map);
     }
 
     private updateRecord(entryId, event) {
 
         const data = {...(this.value || {})};
         ObjectHelper.addProperty(data, entryId, event);
-        let d = {...data,
+        let d = {
+            ...data,
             [entryId]: {...event}
         };
 
@@ -244,6 +252,7 @@ export class JobEditorEntryComponent implements OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges) {
+
         this.inputType = this.input.type.type;
 
         if (this.inputType === "array") {

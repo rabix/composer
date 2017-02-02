@@ -2,7 +2,7 @@ import {
     Component, Input, SimpleChanges, Output, EventEmitter,
     ChangeDetectionStrategy, ChangeDetectorRef
 } from "@angular/core";
-import {FormGroup, FormControl} from "@angular/forms";
+import {FormGroup, FormControl, FormArray} from "@angular/forms";
 import {Observable, Subject} from "rxjs";
 
 interface CWLFile {
@@ -17,7 +17,7 @@ interface CWLFile {
     selector: "ct-file-input-inspector",
     // changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-        <form (change)="rawChange.next($event)" [formGroup]="formGroup">
+        <form [formGroup]="formGroup">
             <!--Path-->
             <div class="form-group">
                 <label>Path</label>
@@ -34,6 +34,11 @@ interface CWLFile {
             <div class="form-group">
                 <label>Secondary Files</label>
                 <compact-list formControlName="secondaryFiles"></compact-list>
+            </div>
+            
+            <div class="form-group">
+                <label>Metadata</label>
+                <ct-map-list formControlName="metadata"></ct-map-list>
             </div>
             
             <!--Content-->
@@ -60,17 +65,14 @@ export class FileInputInspector {
     /** Form group that holds all the data */
     public formGroup: FormGroup;
 
-    /** Changes on the native form fields */
-    public rawChange = new Subject<any>();
-
     ngOnInit() {
-        console.log("Inspector creation", this.value);
 
         this.formGroup = new FormGroup({
             path: new FormControl(this.input.path),
             size: new FormControl(this.input.size),
             secondaryFiles: new FormControl(this.secondaryFilePaths),
-            contents: new FormControl(this.input.contents)
+            contents: new FormControl(this.input.contents),
+            metadata: new FormControl(this.input.metadata)
         });
 
         // We need to combine changes from two different sources
@@ -82,10 +84,12 @@ export class FileInputInspector {
             // back into the loop. This works since elements are plain strings.
                 .distinctUntilChanged((a, b) => a.toString() === b.toString()),
 
-            // Watch for changes on the plain form fields
-            this.rawChange
+            this.formGroup.valueChanges.debounceTime(300)
         )
-        // Take the plain form values
+
+            .distinctUntilChanged((a,b) => JSON.stringify(a) === JSON.stringify(b))
+
+            // Take the plain form values
             .map(() => this.formGroup.getRawValue())
 
             // Merge plain form values with the se condaryFiles values map onto their original structure
@@ -93,14 +97,11 @@ export class FileInputInspector {
 
             // Then emit gathered data as an update from the component
             .subscribe(data => {
-                console.log("Inspector emit",data);
                 this.update.emit(data);
             });
     }
 
     ngOnChanges(changes: SimpleChanges) {
-
-        console.log("Inspector changes", changes);
 
         if(!this.input){
             return;
