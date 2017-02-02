@@ -3,6 +3,7 @@
 .drag-container {
     position: fixed;
     cursor: -webkit-grab;
+    z-index: 6;
 
     & > .drag-image {
         width: 75px;
