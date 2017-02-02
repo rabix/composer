@@ -86,8 +86,6 @@ export class FileInputInspector {
             // back into the loop. This works since elements are plain strings.
                 .distinctUntilChanged((a, b) => a.toString() === b.toString()),
 
-            // Watch for changes on the plain form fields
-
             this.formGroup.valueChanges.debounceTime(300)
         )
 
