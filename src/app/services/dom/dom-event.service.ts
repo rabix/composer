@@ -104,7 +104,10 @@ export class DomEventService {
 
     public onDrag(element: Element, ctName = "", ctData = {}) {
 
-        const down = Observable.fromEvent(element, "mousedown");
+        const down = Observable.fromEvent(element, "mousedown").do(ev => {
+            ev.stopPropagation && ev.stopPropagation();
+            ev.preventDefault && ev.preventDefault();
+        });
         const up   = Observable.fromEvent(document, "mouseup");
         const move = Observable.fromEvent(document, "mousemove");
 
