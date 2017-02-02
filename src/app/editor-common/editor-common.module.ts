@@ -26,6 +26,7 @@ import {ValidationReportComponent} from "./components/validation-report/validati
 import {JobEditorComponent} from "./job-editor/job-editor.component";
 import {FileInputInspector} from "./inspector-forms/file-input-inspector.component";
 import {JobEditorEntryComponent} from "./job-editor/job-editor-entry.component";
+import {MapListComponent} from "./components/map-list/map-list.component";
 
 @NgModule({
     declarations: [
@@ -53,8 +54,10 @@ import {JobEditorEntryComponent} from "./job-editor/job-editor-entry.component";
         ValidationReportComponent,
         ValidationTextPipe,
         FileInputInspector,
+        MapListComponent,
     ],
     exports: [
+        MapListComponent,
         BlankToolStateComponent,
         CompactListComponent,
         FileInputInspector,
