@@ -11,8 +11,6 @@ import {PanelComponent} from "./app/components/panels/panel.component";
 import {PanelSwitcherComponent} from "./app/components/panels/panel-switcher.component";
 import {PanelContainerComponent} from "./app/components/panels/panel-container.component";
 import {WorkboxComponent} from "./app/components/workbox/workbox.component";
-import {BlockLoaderComponent} from "./app/components/block-loader/block-loader.component";
-import {CltEditorComponent} from "./app/components/clt-editor/clt-editor.component";
 import {AlertComponent} from "./app/components/common/alert.component";
 import {LocalFilesPanelComponent} from "./app/components/panels/local-files-panel.component";
 import {PanelHandleComponent} from "./app/components/panels/panel-handle.component";
@@ -22,12 +20,7 @@ import {SBUserProjectsPanelComponent} from "./app/components/panels/sb-user-proj
 import {StructurePanelComponent} from "./app/components/panels/structure-panel.component";
 import {SettingsComponent} from "./app/components/settings";
 import {TabManagerComponent} from "./app/components/tab-manager/tab-manager.component";
-import {ToolEditorComponent} from "./app/components/tool-editor/tool-editor.component";
 import {SettingsButtonComponent} from "./app/components/workbox/settings-button.component";
-import {WorkflowEditorComponent} from "./app/components/workflow-editor/workflow-editor.component";
-import {DockerImageFormComponent} from "./app/components/forms/inputs/forms/docker-image-form.component";
-import {BaseCommandFormComponent} from "./app/components/forms/inputs/forms/base-command-form.component";
-import {CommandLineComponent} from "./app/components/clt-editor/commandline/commandline.component";
 import {ModalComponent, ModalService} from "./app/components/modal";
 import {ConfirmComponent} from "./app/components/modal/common/confirm.component";
 import {RadioGroupComponent} from "./app/components/forms/elements/radio-group.component";
@@ -39,9 +32,10 @@ import {PromptComponent} from "./app/components/modal/common/prompt.component";
 import {CheckboxPromptComponent} from "./app/components/modal/common/checkbox-prompt.component";
 import {FileEditorComponent} from "./app/components/file-editor/file-editor.component";
 import {ToolEditorModule} from "./app/tool-editor/tool-editor.module";
+import {WorkflowEditorModule} from "./app/workflow-editor/workflow-editor.module";
+import {WorkflowEditorComponent} from "./app/workflow-editor/workflow-editor.component";
 import {CoreModule} from "./app/core/core.module";
 import {CWLModule} from "./app/cwl/cwl.module";
-import {HintListComponent} from "./app/components/clt-editor/hints/hint-list.component";
 import {EditorCommonModule} from "./app/editor-common/editor-common.module";
 import {ProjectSelectionModal} from "./app/components/modal/custom/project-selection-modal.component";
 import {UserPreferencesService} from "./app/services/storage/user-preferences.service";
@@ -51,7 +45,6 @@ import {GuidService} from "./app/services/guid.service";
 import {IpcService} from "./app/services/ipc.service";
 import {PlatformAPI} from "./app/services/api/platforms/platform-api.service";
 import {SettingsService} from "./app/services/settings/settings.service";
-import {Http} from "@angular/http";
 
 @NgModule({
     providers: [
@@ -68,14 +61,8 @@ import {Http} from "@angular/http";
     ],
     declarations: [
         AlertComponent,
-        BaseCommandFormComponent,
-        BlockLoaderComponent,
         CheckboxPromptComponent,
-        CltEditorComponent,
-        CommandLineComponent,
         ConfirmComponent,
-        DockerImageFormComponent,
-        HintListComponent,
         InputComponent,
         LayoutComponent,
         LocalFilesPanelComponent,
@@ -98,9 +85,7 @@ import {Http} from "@angular/http";
         FileEditorComponent,
         StructurePanelComponent,
         TabManagerComponent,
-        ToolEditorComponent,
-        WorkboxComponent,
-        WorkflowEditorComponent
+        WorkboxComponent
     ],
     entryComponents: [
         CheckboxPromptComponent,
@@ -119,6 +104,7 @@ import {Http} from "@angular/http";
         HttpModule,
         ReactiveFormsModule,
         ToolEditorModule,
+        WorkflowEditorModule
     ],
     bootstrap: [MainComponent]
 })

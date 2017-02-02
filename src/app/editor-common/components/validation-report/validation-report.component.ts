@@ -6,12 +6,16 @@ require("./validation-report.component.scss");
     selector: "ct-validation-report",
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-        <p class="error-text" *ngFor="let error of issues.errors">
+        <p *ngIf="!issues.errors.length && !issues.warnings.length">
+            No issues found.
+        </p>
+        
+        <p class="text-console-error" *ngFor="let error of issues.errors">
             {{ error.loc ? error.loc + ": " : ""}}
             {{ error.message }}
         </p>
         
-        <p class="warning-text" *ngFor="let warning of issues.warnings">
+        <p class="text-console-warning" *ngFor="let warning of issues.warnings">
             {{ warning.loc ? warning.loc + ": " : ""}}
             {{ warning.message }}
         </p>

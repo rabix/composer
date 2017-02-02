@@ -27,6 +27,9 @@ import {JobEditorComponent} from "./job-editor/job-editor.component";
 import {FileInputInspector} from "./inspector-forms/file-input-inspector.component";
 import {JobEditorEntryComponent} from "./job-editor/job-editor-entry.component";
 import {MapListComponent} from "./components/map-list/map-list.component";
+import {BlockLoaderComponent} from "./components/block-loader/block-loader.component";
+
+require("./editor-common.scss");
 
 @NgModule({
     declarations: [
@@ -55,6 +58,7 @@ import {MapListComponent} from "./components/map-list/map-list.component";
         ValidationTextPipe,
         FileInputInspector,
         MapListComponent,
+        BlockLoaderComponent,
     ],
     exports: [
         MapListComponent,
@@ -80,6 +84,7 @@ import {MapListComponent} from "./components/map-list/map-list.component";
         ValidationClassDirective,
         ValidationComponent,
         ValidationReportComponent,
+        BlockLoaderComponent
     ],
     entryComponents: [
         EditorInspectorComponent,

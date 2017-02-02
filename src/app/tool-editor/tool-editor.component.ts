@@ -10,26 +10,29 @@ import {
 } from "@angular/core";
 import {FormControl, FormGroup, FormBuilder} from "@angular/forms";
 import {BehaviorSubject, Observable} from "rxjs/Rx";
-import {ModalService} from "../modal";
-import {noop} from "../../lib/utils.lib";
 import {CommandLineToolModel} from "cwlts/models/d2sb";
-import {ComponentBase} from "../common/component-base";
 import {Validation} from "cwlts/models/helpers/validation";
-import {DataEntrySource} from "../../sources/common/interfaces";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
-import {WebWorkerService} from "../../services/web-worker/web-worker.service";
-import {UserPreferencesService} from "../../services/storage/user-preferences.service";
-import {ValidationResponse} from "../../services/web-worker/json-schema/json-schema.service";
-import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
-import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
-import {StatusBarService} from "../../core/status-bar/status-bar.service";
-import {WorkboxTab} from "../workbox/workbox-tab.interface";
 import LoadOptions = jsyaml.LoadOptions;
+import {EditorInspectorService} from "../editor-common/inspector/editor-inspector.service";
+import {WebWorkerService} from "../services/web-worker/web-worker.service";
+import {ComponentBase} from "../components/common/component-base";
+import {WorkboxTab} from "../components/workbox/workbox-tab.interface";
+import {DataEntrySource} from "../sources/common/interfaces";
+import {ValidationResponse} from "../services/web-worker/json-schema/json-schema.service";
+import {UserPreferencesService} from "../services/storage/user-preferences.service";
+import {PlatformAPI} from "../services/api/platforms/platform-api.service";
+import {StatusBarService} from "../core/status-bar/status-bar.service";
+import {ModalService} from "../components/modal/modal.service";
+import {noop} from "../lib/utils.lib";
 
 require("./tool-editor.component.scss");
 
 @Component({
     selector: "ct-tool-editor",
+    host: {
+        "class": ".visual-editor-container"
+    },
     providers: [
         EditorInspectorService,
         WebWorkerService
@@ -100,11 +103,11 @@ require("./tool-editor.component.scss");
                                           [readonly]="!data.isWritable"></ct-code-editor-x>
                         
                         <!--GUI Editor-->
-                        <ct-clt-editor *ngIf="viewMode === viewModes.Gui"
+                        <ct-tool-visual-editor *ngIf="viewMode === viewModes.Gui"
                                        class="gui-editor-component flex-col"
                                        [readonly]="!data.isWritable"
                                        [formGroup]="toolGroup"
-                                       [model]="toolModel"></ct-clt-editor>
+                                       [model]="toolModel"></ct-tool-visual-editor>
                                        
                         <ct-job-editor *ngIf="viewMode === viewModes.Test"
                                         class="gui-editor-component flex-col p-2"
@@ -115,7 +118,7 @@ require("./tool-editor.component.scss");
                                        
                     <!--Object Inspector Column-->
                     <div class="flex-col inspector-col" >
-                        <ct-editor-inspector class="tool-inspector">
+                        <ct-editor-inspector class="object-inspector">
                             <template #inspector></template>
                         </ct-editor-inspector>
                     </div>
@@ -138,7 +141,7 @@ require("./tool-editor.component.scss");
                             <i class="fa fa-times-circle text-danger"></i> {{validation.errors.length}} Errors
                         </span>
                         
-                        <span *ngIf="!validation?.errors?.length && validation?.warnings?.length">
+                        <span *ngIf="validation?.warnings?.length" [class.pl-1]="validation?.errors?.length">
                             <i class="fa fa-exclamation-triangle text-warning"></i> {{validation.warnings.length}} Warnings
                         </span>
                         
@@ -177,7 +180,6 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
     private showReformatPrompt = true;
 
     /** Flag for bottom panel, shows validation-issues, commandline, or neither */
-    //@todo(maya) consider using ct-panel-switcher instead
     private reportPanel: "validation" |"commandLinePreview" | undefined;
 
     /** Flag for validity of CWL document */

@@ -2,12 +2,12 @@ import {Component, Input, Output, OnChanges, SimpleChanges, ChangeDetectionStrat
 import {FormGroup, FormControl} from "@angular/forms";
 import {DockerRequirementModel} from "cwlts/models/d2sb";
 import {ReplaySubject} from "rxjs";
-import {ComponentBase} from "../../../common/component-base";
 import {DockerRequirement} from "cwlts/mappings/d2sb/DockerRequirement";
+import {ComponentBase} from "../../../components/common/component-base";
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
-    selector: 'ct-docker-image-form',
+    selector: 'ct-docker-requirement',
     template: `
         <ct-form-panel>
             <div class="tc-header">
@@ -28,7 +28,7 @@ import {DockerRequirement} from "cwlts/mappings/d2sb/DockerRequirement";
         </ct-form-panel>
     `
 })
-export class DockerImageFormComponent extends ComponentBase implements OnChanges {
+export class DockerRequirementComponent extends ComponentBase implements OnChanges {
     @Input()
     public dockerRequirement: DockerRequirementModel;
 

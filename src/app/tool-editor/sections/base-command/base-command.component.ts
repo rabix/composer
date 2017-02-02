@@ -2,14 +2,14 @@ import {Component, Input, OnInit, OnDestroy, Output, OnChanges, SimpleChanges} f
 import {FormGroup, Validators, FormControl} from "@angular/forms";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ReplaySubject} from "rxjs";
-import {ComponentBase} from "../../../common/component-base";
-import {GuidService} from "../../../../services/guid.service";
-import {ModalService} from "../../../modal/modal.service";
-import {noop} from "../../../../lib/utils.lib";
+import {ComponentBase} from "../../../components/common/component-base";
+import {GuidService} from "../../../services/guid.service";
+import {ModalService} from "../../../components/modal/modal.service";
+import {noop} from "../../../lib/utils.lib";
 
-require("./base-command-form.components.scss");
+require("./base-command.components.scss");
 @Component({
-    selector: 'ct-base-command-form',
+    selector: 'ct-base-command',
     template: `<ct-form-panel>
     <div class="tc-header">
         Base Command
@@ -70,7 +70,7 @@ require("./base-command-form.components.scss");
 </ct-form-panel>
     `
 })
-export class BaseCommandFormComponent extends ComponentBase implements OnInit, OnDestroy, OnChanges {
+export class BaseCommandComponent extends ComponentBase implements OnInit, OnDestroy, OnChanges {
     /** baseCommand property of model */
     @Input()
     public baseCommand: ExpressionModel[];
