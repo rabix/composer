@@ -65,7 +65,7 @@ export class FileInputInspector {
     /** Form group that holds all the data */
     public formGroup: FormGroup;
 
-    public fileMetadata = {foo: "bar", loo: "moo", goo: "nothing nothing"};
+    public fileMetadata = {};
 
     ngOnInit() {
 
