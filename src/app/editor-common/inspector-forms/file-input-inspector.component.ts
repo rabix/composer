@@ -65,8 +65,6 @@ export class FileInputInspector {
     /** Form group that holds all the data */
     public formGroup: FormGroup;
 
-    public fileMetadata = {};
-
     ngOnInit() {
 
         this.formGroup = new FormGroup({
@@ -74,7 +72,7 @@ export class FileInputInspector {
             size: new FormControl(this.input.size),
             secondaryFiles: new FormControl(this.secondaryFilePaths),
             contents: new FormControl(this.input.contents),
-            metadata: new FormControl(this.fileMetadata)
+            metadata: new FormControl(this.input.metadata)
         });
 
         // We need to combine changes from two different sources
