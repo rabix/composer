@@ -219,4 +219,7 @@ export class ToolOutputListComponent extends ComponentBase {
         this.update.next(this.entries.slice());
     }
 
+    private isRecordType (entry) {
+        return entry.type.type === 'record' || (entry.type.type === 'array' && entry.type.items === 'record');
+    }
 }
