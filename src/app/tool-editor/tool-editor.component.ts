@@ -31,7 +31,7 @@ require("./tool-editor.component.scss");
 @Component({
     selector: "ct-tool-editor",
     host: {
-        "class": ".visual-editor-container"
+        "class": "tab-container"
     },
     providers: [
         EditorInspectorService,
