@@ -1,6 +1,5 @@
 import {
     ChangeDetectionStrategy,
-    ChangeDetectorRef,
     Component,
     EventEmitter,
     Input,
@@ -222,7 +221,7 @@ export class JobEditorEntryComponent implements OnChanges {
 
     private addArrayEntry(input) {
         this.warning         = undefined;
-        const generatedEntry = JobHelper.getJobPart(input);
+        const generatedEntry = JobHelper.generateMockJobData(input);
         this.updateJob((this.value || []).concat(generatedEntry.slice(0, 1)));
     }
 
