@@ -1,6 +1,6 @@
 import {Component, Input} from "@angular/core";
 import {FormGroup} from "@angular/forms";
-import {CommandLineToolModel, FileDefModel, RequirementBaseModel, ResourceRequirementModel} from "cwlts/models/d2sb";
+import {SBDraft2CommandLineToolModel, FileDefModel, RequirementBaseModel, ResourceRequirementModel} from "cwlts/models/d2sb";
 import {ProcessRequirement} from "cwlts/mappings/d2sb/ProcessRequirement";
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
 import {ComponentBase} from "../../components/common/component-base";
@@ -69,7 +69,7 @@ require("./tool-visual-editor.component.scss");
 export class ToolVisualEditorComponent extends ComponentBase {
 
     @Input()
-    public model: CommandLineToolModel;
+    public model: SBDraft2CommandLineToolModel;
 
     @Input()
     public readonly: boolean;
