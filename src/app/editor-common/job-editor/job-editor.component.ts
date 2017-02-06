@@ -19,8 +19,35 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
 @Component({
     selector: "ct-job-editor",
     changeDetection: ChangeDetectionStrategy.OnPush,
-    template: `
+    template: `        
+        <ct-form-panel>
+            <div class="tc-header">Computational Resources</div>
+            <div class="tc-body">
+                <form #resources="ngForm" 
+                      class="row"
+                      (change)="onResourceFormChange($event)" 
+                      *ngIf="job.allocatedResources">
+                    <div class="col-xs-6">
+                        <label>CPU:</label>
+                        <div class="form-group">
+                            <input type="number" class="form-control" name="cpu"
+                                   [ngModel]="job.allocatedResources.cpu">
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <label>Mem:</label>
+                        <div class="form-group">
+                            <input type="number" class="form-control" name="mem"
+                                   [ngModel]="job.allocatedResources.mem">
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </ct-form-panel>
+        
         <div *ngFor="let group of inputGroups">
+            
             <ct-form-panel>
                 <div class="tc-header">{{ group.name }}</div>
                 <div class="tc-body">
@@ -156,6 +183,23 @@ export class JobEditorComponent implements OnChanges {
         // Send the update to the output of this component
         this.update.emit(job);
         this.job = {...job};
+        this.cdr.markForCheck();
+    }
+
+    /**
+     * Update allocatedResources value
+     */
+    private onResourceFormChange(event: Event) {
+        // Find which key was updated, either "mem" or "cpu"
+        const formField = event.target as HTMLInputElement;
+        const res = formField.name;
+        const value = formField.value;
+
+        // Update appropriate key, cast value to number
+        OH.addProperty(this.job.allocatedResources, res, Number(value));
+
+        // Send output for component
+        this.update.emit(this.job);
         this.cdr.markForCheck();
     }
 
