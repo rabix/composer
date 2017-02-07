@@ -1,19 +1,18 @@
 import * as Yaml from "js-yaml";
 import {
     Component,
-    OnInit,
     Input,
     OnDestroy,
+    OnInit,
+    TemplateRef,
     ViewChild,
-    ViewContainerRef,
-    TemplateRef
+    ViewContainerRef
 } from "@angular/core";
-import {FormControl, FormGroup, FormBuilder} from "@angular/forms";
+import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {BehaviorSubject, Observable} from "rxjs/Rx";
-import {CommandLineToolModel} from "cwlts/models/d2sb";
+import {SBDraft2CommandLineToolModel as CommandLineToolModel} from "cwlts/models/d2sb";
 import {Validation} from "cwlts/models/helpers/validation";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
-import LoadOptions = jsyaml.LoadOptions;
 import {EditorInspectorService} from "../editor-common/inspector/editor-inspector.service";
 import {WebWorkerService} from "../services/web-worker/web-worker.service";
 import {ComponentBase} from "../components/common/component-base";
@@ -25,6 +24,7 @@ import {PlatformAPI} from "../services/api/platforms/platform-api.service";
 import {StatusBarService} from "../core/status-bar/status-bar.service";
 import {ModalService} from "../components/modal/modal.service";
 import {noop} from "../lib/utils.lib";
+import LoadOptions = jsyaml.LoadOptions;
 
 require("./tool-editor.component.scss");
 
@@ -399,6 +399,8 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
     }
 
     private onJobUpdate(job) {
+        console.log("Job is updated", job);
+        this.toolModel.setJob(job);
         this.toolModel.updateCommandLine();
     }
 

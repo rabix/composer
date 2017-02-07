@@ -10,14 +10,16 @@ import {StepModel} from "cwlts/models";
     template: `        
         <h3>In ports</h3>
         <div class="gui-section-list-title row">
-            <div class="col-sm-6">ID</div>
-            <div class="col-sm-6">Source</div>
+            <div class="col-sm-4">ID</div>
+            <div class="col-sm-4">Source</div>
+            <div class="col-sm-4">Type</div>
         </div>
         
         <ul *ngFor="let i of step.in" class="col-sm-12">
             <li class="gui-section-list-item row">
-                <div class="col-sm-6 ellipsis" [title]="i.id">{{ i.id }}</div>
-                <div class="col-sm-6 ellipsis" [title]="i.source">{{ i.source }}</div>
+                <div class="col-sm-4 ellipsis" [title]="i.id">{{ i.id }}</div>
+                <div class="col-sm-4 ellipsis" [title]="i.source">{{ i.source }}</div>
+                <div class="col-sm-4 ellipsis">{{ i.type | commandParameterType }}</div>
             </li>
         </ul>
         
