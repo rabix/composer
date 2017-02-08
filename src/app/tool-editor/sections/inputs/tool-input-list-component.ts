@@ -162,7 +162,7 @@ export class ToolInputListComponent extends ComponentBase {
 
     public addEntry() {
         const newEntryLocation = `${this.location}[${this.entries.length}]`;
-        const newEntry = new CommandInputParameterModel(newEntryLocation);
+        const newEntry = new CommandInputParameterModel(undefined, newEntryLocation);
         newEntry.isField = this.isField;
         newEntry.type.type = "File";
         const entries = this.entries.concat(newEntry);

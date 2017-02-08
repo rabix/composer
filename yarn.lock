@@ -1447,9 +1447,9 @@ custom-event@~1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/custom-event/-/custom-event-1.0.1.tgz#5d02a46850adf1b4a317946a3928fccb5bfd0425"
 
-cwlts@^1.10.5:
-  version "1.10.5"
-  resolved "https://registry.yarnpkg.com/cwlts/-/cwlts-1.10.5.tgz#241de1473f70a2efd03d3d24c0c54336aaa2e40a"
+cwlts@^1.10.6:
+  version "1.10.6"
+  resolved "https://registry.yarnpkg.com/cwlts/-/cwlts-1.10.6.tgz#98f9dc7a95ee1d04a9a0b990ba49db4283bc5229"
 
 dashdash@^1.12.0:
   version "1.14.1"
