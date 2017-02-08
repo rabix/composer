@@ -13,7 +13,9 @@ require("./workbox.component.scss");
     template: `
         <div class="ct-workbox-head">
             <ul class="list-inline ct-tab-bar inset-panel" tabindex="-1">
-                <li *ngFor="let tab of tabs; let i = index;"
+                <li *ngFor="let tab of tabs; let i = index;" 
+                    [ct-drag-over]="true"                     
+                    (onDragOver)="workbox.openTab(tab)"                  
                     (click)="workbox.openTab(tab)"
                     [class.active]="tab === (workbox.activeTab | async)"
                     [ct-context]="createContextMenu(tab)"
