@@ -9,8 +9,13 @@ type ExtendedMouseEvent = MouseEvent & {
 @Injectable()
 export class DomEventService {
 
+    public readonly ON_DRAG_ENTER_ZONE_EVENT: string = "onDragEnterZone";
+    public readonly ON_DRAG_LEAVE_ZONE_EVENT: string = "onDragLeaveZone";
+
     public readonly ON_DRAG_ENTER_EVENT: string = "onDragEnter";
     public readonly ON_DRAG_LEAVE_EVENT: string = "onDragLeave";
+    public readonly ON_DRAG_OVER_EVENT: string = "onDragOver";
+
     public readonly ON_DROP_SUCCESS_EVENT: string = "onDropSuccess";
 
     private registeredShortcuts = new Map<string[], Observable<KeyboardEvent>>();
@@ -131,7 +136,7 @@ export class DomEventService {
         }));
     }
 
-    private triggerCustomEventOnElements(elements: Element [], eventName: string, data?: any) {
+    public triggerCustomEventOnElements(elements: Element [], eventName: string, data?: any) {
         // FIXME: Should be added support for IE
         elements.forEach(element => {
             const event = new CustomEvent(eventName, {

@@ -23,6 +23,7 @@ import {DragDirective} from "./drag-and-drop/drag-directive";
 import {DropDirective} from "./drag-and-drop/drop-directive";
 import {DropZones} from "./drag-and-drop/drop-zones-directive";
 import {LoggerDirective} from "./elements/debugger/logger.directive";
+import {DragOverDirective} from "./drag-and-drop/drag-over-directive";
 
 @NgModule({
     entryComponents: [
@@ -42,6 +43,7 @@ import {LoggerDirective} from "./elements/debugger/logger.directive";
         // Drag and Drop
         DragDirective,
         DropDirective,
+        DragOverDirective,
         DropZones,
 
         // Disable Form Control
@@ -81,6 +83,7 @@ import {LoggerDirective} from "./elements/debugger/logger.directive";
         // Drag and Drop
         DragDirective,
         DropDirective,
+        DragOverDirective,
         DropZones,
 
         // Disable Form Control
