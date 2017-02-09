@@ -230,7 +230,6 @@ export class JobEditorEntryComponent implements OnChanges {
     }
 
     ngOnInit() {
-
         if (this.inputType === "record") {
             this.prefix = this.input.id;
         }

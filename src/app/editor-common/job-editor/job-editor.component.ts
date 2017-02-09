@@ -174,15 +174,11 @@ export class JobEditorComponent implements OnChanges {
         // Show a message in the status bar about what's changed.
         this.statusBar.instant(`Updated job value of ${input ? input.label || input.id : inputId}.`);
 
-        // Create a new reference of the job for the change detector
-        const job = {...this.job};
-
         // Assign the given value to the job key
-        OH.addProperty(job.inputs, inputId, jobValue);
+        OH.addProperty(this.job.inputs, inputId, jobValue);
 
         // Send the update to the output of this component
-        this.update.emit(job);
-        this.job = {...job};
+        this.update.emit(this.job);
         this.cdr.markForCheck();
     }
 
@@ -207,7 +203,7 @@ export class JobEditorComponent implements OnChanges {
         // Whenever inputs are updated, regroup them and sort them for display
         const grouped = this.inputs.reduce((acc, item) => {
             const cat = OH.getProperty(item, "customProps.sbg:category", "Uncategorized");
-            return {...acc, ...{[cat]: (acc[cat] || []).concat(item)}};
+            return Object.assign(acc, {[cat]: (acc[cat] || []).concat(item)});
         }, {});
 
         // Order groups alphabetically
@@ -215,7 +211,6 @@ export class JobEditorComponent implements OnChanges {
             name: key,
             inputs: grouped[key]
         }));
-        console.log("Opening Jobs", this.job);
     }
 
     ngOnDestroy() {
