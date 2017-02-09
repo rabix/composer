@@ -19,9 +19,13 @@ export class ObjectHelper {
 
         (<Array<string>> resolvedPath).reduce((acc, curr, index, arr) => {
 
+
             const arrayMatch = curr.match(/^\[([0-9]*?)\]$/);
             if (arrayMatch && arrayMatch.length === 2 && Array.isArray(acc)) {
-                return acc[arrayMatch[1]];
+                if (index !== arr.length - 1) {
+                    return acc[arrayMatch[1]];
+                }
+                return acc[arrayMatch[1]] = value;
             }
 
             if (index === arr.length - 1) {
