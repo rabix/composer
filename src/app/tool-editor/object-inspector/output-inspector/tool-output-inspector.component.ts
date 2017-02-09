@@ -1,5 +1,5 @@
 import {Component, Input, Output, OnChanges, SimpleChanges} from "@angular/core";
-import {CommandOutputParameterModel, CommandInputParameterModel} from "cwlts/models/d2sb";
+import {CommandOutputParameterModel, SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {Subject} from "rxjs";
 import {ComponentBase} from "../../../components/common/component-base";
@@ -31,7 +31,7 @@ import {ComponentBase} from "../../../components/common/component-base";
 export class ToolOutputInspector extends ComponentBase implements OnChanges{
 
     @Input()
-    public inputs: CommandInputParameterModel[] = [];
+    public inputs: SBDraft2CommandInputParameterModel[] = [];
 
     @Input()
     public output: CommandOutputParameterModel;
@@ -40,7 +40,7 @@ export class ToolOutputInspector extends ComponentBase implements OnChanges{
     @Input()
     public context: {$job?: any, $self?: any} = {};
 
-    private inputList: CommandInputParameterModel[] = [];
+    private inputList: SBDraft2CommandInputParameterModel[] = [];
 
     private form: FormGroup;
 

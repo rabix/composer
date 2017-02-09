@@ -9,7 +9,7 @@ import {
     QueryList
 } from "@angular/core";
 import {ComponentBase} from "../../../components/common/component-base";
-import {CommandInputParameterModel} from "cwlts/models/d2sb";
+import {SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 import {ModalService} from "../../../components/modal/modal.service";
 import {noop} from "../../../lib/utils.lib";
@@ -117,7 +117,7 @@ require("./input-list.component.scss");
 export class ToolInputListComponent extends ComponentBase {
 
     @Input()
-    public entries: CommandInputParameterModel[] = [];
+    public entries: SBDraft2CommandInputParameterModel[] = [];
 
     /** Model location entry, used for tracing the path in the json document */
     @Input()
@@ -162,7 +162,7 @@ export class ToolInputListComponent extends ComponentBase {
 
     public addEntry() {
         const newEntryLocation = `${this.location}[${this.entries.length}]`;
-        const newEntry = new CommandInputParameterModel(undefined, newEntryLocation);
+        const newEntry = new SBDraft2CommandInputParameterModel(undefined, newEntryLocation);
         newEntry.isField = this.isField;
         newEntry.type.type = "File";
         const entries = this.entries.concat(newEntry);
@@ -192,7 +192,7 @@ export class ToolInputListComponent extends ComponentBase {
         this.update.next(this.entries.slice());
     }
 
-    private updateInput(newInput: CommandInputParameterModel, index: number) {
+    private updateInput(newInput: SBDraft2CommandInputParameterModel, index: number) {
 
         // FIXME: cloning an object ditches its prototype chain, but we need it
         const input = this.entries[index];

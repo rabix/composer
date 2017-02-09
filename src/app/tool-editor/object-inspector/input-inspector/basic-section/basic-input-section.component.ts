@@ -9,11 +9,11 @@ import {
     NG_VALIDATORS
 } from "@angular/forms";
 import {
-    CommandInputParameterModel as InputProperty,
-    InputParameterTypeModel
+    SBDraft2CommandInputParameterModel,
 } from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../../components/common/component-base";
 import {noop} from "../../../../lib/utils.lib";
+import {ParameterTypeModel} from "../../../../../../node_modules/cwlts/models/generic/ParameterTypeModel";
 
 require("./basic-input-section.component.scss");
 
@@ -87,10 +87,10 @@ require("./basic-input-section.component.scss");
 export class BasicInputSectionComponent extends ComponentBase implements ControlValueAccessor {
 
     @Input()
-    public context: {$job?: any, $self?: any} = {};
+    public context: { $job?: any, $self?: any } = {};
 
     /** The currently displayed property */
-    private input: InputProperty;
+    private input: SBDraft2CommandInputParameterModel;
 
     private basicSectionForm: FormGroup;
 
@@ -104,7 +104,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
         super();
     }
 
-    writeValue(input: InputProperty): void {
+    writeValue(input: SBDraft2CommandInputParameterModel): void {
         this.input = input;
 
         this.basicSectionForm = this.formBuilder.group({
@@ -171,7 +171,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
     private listenToInputBindingChanges(): void {
         this.tracked = this.basicSectionForm.controls['inputBinding'].valueChanges
-            .subscribe((input: InputProperty) => {
+            .subscribe((input: SBDraft2CommandInputParameterModel) => {
                 this.input.updateInputBinding(input.inputBinding);
                 Object.assign(this.input.customProps, input.customProps);
             });
@@ -179,7 +179,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
     private listenToTypeFormChanges(): void {
         this.tracked = this.basicSectionForm.controls['typeForm'].valueChanges
-            .subscribe((value: InputParameterTypeModel) => {
+            .subscribe((value: ParameterTypeModel) => {
                 this.input.type.setType(value.type);
 
                 if (value.type !== 'array' && this.input.isBound) {
@@ -203,15 +203,15 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
             });
     }
 
-    private isEnumType () {
+    private isEnumType() {
         return this.input.type.type === 'enum' || (this.input.type.type === 'array' && this.input.type.items === 'enum');
     }
 
-    private isMapType () {
+    private isMapType() {
         return this.input.type.type === 'map' || (this.input.type.type === 'array' && this.input.type.items === 'map')
     }
 
-    private isRecordType () {
+    private isRecordType() {
         return this.input.type.type === 'record' || (this.input.type.type === 'array' && this.input.type.items === 'record');
     }
 

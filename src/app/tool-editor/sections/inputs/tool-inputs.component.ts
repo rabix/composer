@@ -7,7 +7,7 @@ import {
     ViewChild
 } from "@angular/core";
 import {ComponentBase} from "../../../components/common/component-base";
-import {CommandInputParameterModel} from "cwlts/models/d2sb";
+import {SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
 import {ToolInputListComponent} from "./tool-input-list-component";
 
 
@@ -46,7 +46,7 @@ require("./input-list.component.scss");
 export class ToolInputsComponent extends ComponentBase {
 
     @Input()
-    public entries: CommandInputParameterModel[] = [];
+    public entries: SBDraft2CommandInputParameterModel[] = [];
 
     /** Model location entry, used for tracing the path in the json document */
     @Input()

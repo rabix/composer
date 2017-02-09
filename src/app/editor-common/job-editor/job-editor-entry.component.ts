@@ -7,7 +7,7 @@ import {
     Output,
     SimpleChanges
 } from "@angular/core";
-import {CommandInputParameterModel} from "cwlts/models/d2sb";
+import {SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
 import {JobHelper} from "cwlts/models/helpers/JobHelper";
 import {ObjectHelper} from "../../helpers/object.helper";
 
@@ -151,7 +151,7 @@ import {ObjectHelper} from "../../helpers/object.helper";
 export class JobEditorEntryComponent implements OnChanges {
 
     @Input()
-    public input: CommandInputParameterModel;
+    public input: SBDraft2CommandInputParameterModel;
 
     @Input()
     public value: any;
