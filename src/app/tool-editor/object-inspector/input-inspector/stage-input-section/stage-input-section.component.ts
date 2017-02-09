@@ -1,7 +1,7 @@
 import {Component, forwardRef} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormBuilder, FormGroup} from "@angular/forms";
 import {ComponentBase} from "../../../../components/common/component-base";
-import {CommandInputParameterModel as InputProperty} from "cwlts/models/d2sb";
+import {SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
 import {noop} from "../../../../lib/utils.lib";
 
 @Component({
@@ -43,7 +43,7 @@ import {noop} from "../../../../lib/utils.lib";
 
 export class StageInputSectionComponent extends ComponentBase implements ControlValueAccessor {
 
-    private input: InputProperty;
+    private input: SBDraft2CommandInputParameterModel;
 
     private onTouched = noop;
 
@@ -61,7 +61,7 @@ export class StageInputSectionComponent extends ComponentBase implements Control
         super();
     }
 
-    writeValue(input: InputProperty): void {
+    writeValue(input: SBDraft2CommandInputParameterModel): void {
         this.input = input;
 
         this.stageInputFormGroup = this.formBuilder.group({

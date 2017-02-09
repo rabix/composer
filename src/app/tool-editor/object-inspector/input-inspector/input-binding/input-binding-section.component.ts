@@ -7,7 +7,7 @@ import {
     FormGroup,
     NG_VALIDATORS
 } from "@angular/forms";
-import {CommandInputParameterModel as InputProperty, CommandLineBindingModel} from "cwlts/models/d2sb";
+import {SBDraft2CommandInputParameterModel, CommandLineBindingModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../../components/common/component-base";
 import {noop} from "../../../../lib/utils.lib";
 
@@ -93,7 +93,7 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
     @Input()
     public context: {$job?: any, $self?: any} = {};
 
-    private input: InputProperty;
+    private input: SBDraft2CommandInputParameterModel;
 
     private inputBindingFormGroup: FormGroup;
 
@@ -114,7 +114,7 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
         super();
     }
 
-    writeValue(input: InputProperty): void {
+    writeValue(input: SBDraft2CommandInputParameterModel): void {
         this.input = input;
 
         if (!!this.input.inputBinding) {
@@ -136,7 +136,7 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
         }
     }
 
-    private createInputBindingForm(input: InputProperty): void {
+    private createInputBindingForm(input: SBDraft2CommandInputParameterModel): void {
         this.inputBindingFormGroup = this.formBuilder.group({
             stageInputSection: [input],
             secondaryFilesSection: [input.inputBinding.secondaryFiles || []],

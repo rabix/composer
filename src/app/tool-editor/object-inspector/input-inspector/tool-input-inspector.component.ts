@@ -1,5 +1,5 @@
 import {Component, Input, Output} from "@angular/core";
-import {CommandInputParameterModel} from "cwlts/models/d2sb";
+import {SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {Subject} from "rxjs";
 import {ComponentBase} from "../../../components/common/component-base";
@@ -21,7 +21,7 @@ import {ComponentBase} from "../../../components/common/component-base";
 export class ToolInputInspector extends ComponentBase {
 
     @Input()
-    public input: CommandInputParameterModel;
+    public input: SBDraft2CommandInputParameterModel;
 
     /** Context in which expression should be evaluated */
     @Input()
@@ -30,7 +30,7 @@ export class ToolInputInspector extends ComponentBase {
     private form: FormGroup;
 
     @Output()
-    public save = new Subject<CommandInputParameterModel>();
+    public save = new Subject<SBDraft2CommandInputParameterModel>();
 
     constructor(private formBuilder: FormBuilder) {
         super();
