@@ -67,6 +67,7 @@ export class MapListComponent extends ComponentBase implements ControlValueAcces
 
     constructor(private zone: NgZone) {
         super();
+        console.log("Constructing new map list");
     }
 
     private add() {
@@ -81,40 +82,23 @@ export class MapListComponent extends ComponentBase implements ControlValueAcces
     }
 
     private resizeControls() {
-        const controlArray = this.formGroup.get("pairs") as FormArray;
-        const lengthDiff   = this.list.length - controlArray.length;
-        const listCopy     = this.list.slice();
+        const newControlArray = new FormArray(this.list.map((pair) => new FormGroup({
+                key: new FormControl(pair.key),
+                value: new FormControl(pair.value)
+            })
+        ));
 
-        this.zone.runOutsideAngular(() => {
-            for (let i = 0; i < Math.abs(lengthDiff); i++) {
-                if (lengthDiff > 0) {
-                    controlArray.insert(controlArray.length, new FormGroup({
-                        key: new FormControl(""),
-                        value: new FormControl(""),
-                    }));
-                    continue;
-                }
-
-                controlArray.removeAt(controlArray.length - 1);
-
-            }
-
-            controlArray.patchValue(listCopy);
-        });
-
-
+        this.formGroup.setControl("pairs", newControlArray);
     }
 
     ngAfterViewInit() {
-
         this.formGroup.valueChanges
-            .do(data => console.log("Form Value Change", data))
             .map(ch => ch.pairs)
             .do(pairs => this.list = pairs)
             .distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
             .map(pairs => pairs
                 .filter(i => i.key.trim())
-                .reduce((acc, item) => ({...acc, ...{[item.key.trim()]: item.value.trim()}}), {}))
+                .reduce((acc, item) => ({...acc, ...{[item.key.trim()]: item.value.toString().trim()}}), {}))
             .subscribe(val => {
                 console.log("Propagating", val);
                 this.onChangeCallback(val);
@@ -122,21 +106,22 @@ export class MapListComponent extends ComponentBase implements ControlValueAcces
     }
 
     writeValue(obj: any): void {
-
         if (!obj) {
             obj = {};
         }
-console.log("Applying val", obj);
+
         const entryList = Object.keys(obj).map(key => ({key, value: obj[key]}));
         this.list.forEach((e, i) => {
-            if (!e.key) {
+            if (!e.key.toString().length) {
                 entryList.splice(i, 0, e);
             }
         });
-
+        if (this.list.toString() == entryList.toString()) {
+            console.log("Breaking")
+            return;
+        }
         this.list = entryList;
         this.resizeControls();
-        this.onChangeCallback(this.list);
     }
 
     registerOnChange(fn: any): void {
