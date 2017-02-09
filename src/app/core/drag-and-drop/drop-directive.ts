@@ -8,9 +8,9 @@ export class DropDirective extends ComponentBase {
 
     @Input('ct-drop-enabled') set dropEnabled(enabled: boolean) {
         if (enabled) {
-            this.el.setAttribute("ct-droppable", '');
+            this.el.setAttribute("ct-drop-enabled", '');
         } else {
-            this.el.removeAttribute("ct-droppable");
+            this.el.removeAttribute("ct-drop-enabled");
         }
     }
 

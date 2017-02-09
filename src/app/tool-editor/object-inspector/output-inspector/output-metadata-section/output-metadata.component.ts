@@ -1,7 +1,7 @@
 import {Component, forwardRef, Input} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormGroup, FormBuilder} from "@angular/forms";
 import {ComponentBase} from "../../../../components/common/component-base";
-import {CommandInputParameterModel, CommandOutputParameterModel as OutputProperty, ExpressionModel} from "cwlts/models/d2sb";
+import {SBDraft2CommandInputParameterModel, CommandOutputParameterModel as OutputProperty, ExpressionModel} from "cwlts/models/d2sb";
 import {noop} from "../../../../lib/utils.lib";
 
 require("./output-metadata.component.scss");
@@ -48,7 +48,7 @@ require("./output-metadata.component.scss");
 export class OutputMetaDataSectionComponent extends ComponentBase implements ControlValueAccessor {
 
     @Input()
-    public inputs: CommandInputParameterModel[] = [];
+    public inputs: SBDraft2CommandInputParameterModel[] = [];
 
     /** The currently displayed property */
     private output: OutputProperty;

@@ -32,7 +32,8 @@ export class DragDirective extends ComponentBase {
             this.domEvents.onDrag(this.el, "", {
                 dragImage: null,
                 preHoveredElement: null,
-                preEnteredDropZones: []
+                preEnteredDropZones: [],
+                preDragEntered: null
             }).subscribe(drag => {
 
                 // On Drag Start
@@ -48,6 +49,7 @@ export class DragDirective extends ComponentBase {
                     const dragImage = ev.ctData.dragImage;
                     const preEnteredDropZones = ev.ctData.preEnteredDropZones;
                     const preHoveredElement = ev.ctData.preHoveredElement;
+                    const preDragEntered = ev.ctData.preDragEntered;
 
                     // Reposition of drag image
                     dragImage.style.top =
@@ -66,25 +68,42 @@ export class DragDirective extends ComponentBase {
                         const curEnteredDropZones = [];
                         let parent = curHoveredElement;
 
+                        let curDragEntered = null;
+
                         // Find all matching drop zones starting from the hovered element all up to the root node
                         while (parent != null) {
                             if (this.isDropEnabledOnElement(parent) && this.matchDragAndDropZones(this.el, parent)) {
                                 curEnteredDropZones.push(parent);
                             }
 
+                            // Find first element that is listening to drag over events
+                            if (!curDragEntered && parent.hasAttribute("ct-drag-over")) {
+                                curDragEntered = parent;
+                            }
+
                             parent = parent.parentElement;
+                        }
+
+                        // Trigger dragOverEnter/dragOverLeave when you leave/enter previous/new element that is listening to drag over events
+                        if (curDragEntered != preDragEntered) {
+                            curDragEntered && this.domEvents.triggerCustomEventOnElements([curDragEntered],
+                                this.domEvents.ON_DRAG_ENTER_EVENT);
+                            preDragEntered && this.domEvents.triggerCustomEventOnElements([preDragEntered],
+                                this.domEvents.ON_DRAG_LEAVE_EVENT);
                         }
 
                         // Find differences between previous and current matched drop zones (entered ones)
                         const enteredDropZones = this.diffArray(curEnteredDropZones, preEnteredDropZones);
                         const leavedDropZones = this.diffArray(preEnteredDropZones, curEnteredDropZones);
 
-                        // Trigger Drag Enter event
-                        this.domEvents.triggerCustomEventOnElements(enteredDropZones, this.domEvents.ON_DRAG_ENTER_EVENT);
+                        // Trigger Drag Enter event on elements
+                        this.domEvents.triggerCustomEventOnElements(enteredDropZones, this.domEvents.ON_DRAG_ENTER_ZONE_EVENT);
 
-                        // Trigger Drag Leave event
-                        this.domEvents.triggerCustomEventOnElements(leavedDropZones, this.domEvents.ON_DRAG_LEAVE_EVENT);
+                        // Trigger Drag Leave event on elements
+                        this.domEvents.triggerCustomEventOnElements(leavedDropZones, this.domEvents.ON_DRAG_LEAVE_ZONE_EVENT);
 
+
+                        ev.ctData.preDragEntered = curDragEntered;
                         ev.ctData.preEnteredDropZones = curEnteredDropZones;
                     }
 
@@ -99,9 +118,13 @@ export class DragDirective extends ComponentBase {
                         document.body.removeChild(ev.ctData.dragImage);
                     }
 
+                    // Trigger Drag Over Leave event on previously entered (onDragOverEnter) element
+                    ev.ctData.preDragEntered && this.domEvents.triggerCustomEventOnElements([ev.ctData.preDragEntered],
+                        this.domEvents.ON_DRAG_LEAVE_EVENT);
+
                     // Trigger Drag Leave event for all previously entered dropZones
                     ev.ctData.preEnteredDropZones.forEach((dropZone) => {
-                        this.domEvents.triggerCustomEventOnElements([dropZone], this.domEvents.ON_DRAG_LEAVE_EVENT);
+                        this.domEvents.triggerCustomEventOnElements([dropZone], this.domEvents.ON_DRAG_LEAVE_ZONE_EVENT);
                     });
 
                     // Get current hovered element (where to drop)
@@ -114,8 +137,9 @@ export class DragDirective extends ComponentBase {
 
                     // Check if current element has the matching drop zones
                     if (curHoveredElement != null && this.matchDragAndDropZones(this.el, curHoveredElement)) {
-                        this.domEvents.triggerCustomEventOnElements([curHoveredElement]
-                            , this.domEvents.ON_DROP_SUCCESS_EVENT, Object.assign({}, {data: this.dragTransferData}, {event: ev}));
+                        this.domEvents.triggerCustomEventOnElements([curHoveredElement],
+                            this.domEvents.ON_DROP_SUCCESS_EVENT,
+                            Object.assign({}, {data: this.dragTransferData}, {event: ev}));
                     }
 
                     first.unsubscribe();
@@ -150,7 +174,7 @@ export class DragDirective extends ComponentBase {
      * Returns true if particular element can be a drop zone
      */
     private isDropEnabledOnElement(element: Element): boolean {
-        return element.hasAttribute("ct-droppable");
+        return element.hasAttribute("ct-drop-enabled");
     }
 
     /**

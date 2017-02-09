@@ -1,7 +1,7 @@
 import {Component, forwardRef} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormBuilder, FormGroup} from "@angular/forms";
 import {ComponentBase} from "../../../../components/common/component-base";
-import {CommandOutputParameterModel, CommandInputParameterModel} from "cwlts/models/d2sb";
+import {CommandOutputParameterModel, SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
 import {noop} from "../../../../lib/utils.lib";
 
 require("./description.component.scss");
@@ -49,7 +49,7 @@ require("./description.component.scss");
 })
 export class DescriptionComponent extends ComponentBase implements ControlValueAccessor {
 
-    private port: CommandOutputParameterModel | CommandInputParameterModel;
+    private port: CommandOutputParameterModel | SBDraft2CommandInputParameterModel;
 
     private onTouched = noop;
 
@@ -61,7 +61,7 @@ export class DescriptionComponent extends ComponentBase implements ControlValueA
         super();
     }
 
-    writeValue(port: CommandOutputParameterModel | CommandInputParameterModel): void {
+    writeValue(port: CommandOutputParameterModel | SBDraft2CommandInputParameterModel): void {
         this.port = port;
 
         this.descriptionFormGroup = this.formBuilder.group({
