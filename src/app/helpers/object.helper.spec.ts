@@ -49,9 +49,17 @@ describe("ObjectHelper", () => {
         });
 
         it("should update array indexes", () => {
-           const t = {foo: ["bar", "baz", "nar"]};
-           ObjectHelper.addProperty(t, "foo.[1]", "marx");
-           expect(t.foo[1]).toEqual("marx");
+            const t = {foo: ["bar", "baz", "nar"]};
+            ObjectHelper.addProperty(t, "foo.[1]", "marx");
+            expect(t.foo[1]).toEqual("marx");
+        });
+
+        it("should add array elements and objects unexpectedly well", () => {
+            const t: any = {};
+
+            ObjectHelper.addProperty(t, "foo.[2].[3].path", "baz");
+            expect(Array.isArray(t.foo[2])).toBe(true);
+            expect(t.foo[2][3].path).toBe("baz");
         });
     });
 
