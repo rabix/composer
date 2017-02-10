@@ -63,7 +63,10 @@ require("./workflow-editor.component.scss");
                             [class.btn-primary]="viewMode === viewModes.Test"
                             [class.btn-secondary]="viewMode !== viewModes.Test">Test</button>
                 </span>
-            
+
+                <!--CWLVersion-->
+                <span class="tag tag-default">{{ workflowModel.cwlVersion }}</span>
+                
                 <!--Revisions-->
                 <button class="btn btn-secondary btn-sm" type="button"
                         [ct-editor-inspector]="revisions"
