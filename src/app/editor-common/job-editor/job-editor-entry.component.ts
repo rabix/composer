@@ -25,10 +25,8 @@ import {ObjectHelper} from "../../helpers/object.helper";
 
                 <!--Enums-->
                 <template ngSwitchCase="enum">
-                    <select [value]="value" class="form-control"
-                            [attr.inputId]="input?.id"
-                            [attr.prefix]="prefix"
-                            [attr.arrayIndex]="index">
+                    <select [value]="value" class="form-control"                           
+                            [attr.prefix]="prefix">
                         <option *ngFor="let val of input.type.symbols" [value]="val"> {{ val }}
                         </option>
                     </select>
@@ -36,17 +34,13 @@ import {ObjectHelper} from "../../helpers/object.helper";
 
                 <!--Numbers-->
                 <template ngSwitchCase="int">
-                    <input [attr.inputId]="input?.id"
-                           [attr.arrayIndex]="index"
-                           [attr.prefix]="prefix"
+                    <input [attr.prefix]="prefix"
                            type="number"
                            class="form-control"
                            [value]="value"/>
                 </template>
                 <template ngSwitchCase="float">
-                    <input [attr.inputId]="input?.id"
-                           [attr.prefix]="prefix"
-                           [attr.arrayIndex]="index"
+                    <input [attr.prefix]="prefix"
                            type="number"
                            class="form-control"
                            [value]="value"/>
@@ -54,9 +48,7 @@ import {ObjectHelper} from "../../helpers/object.helper";
 
                 <!--Strings-->
                 <template ngSwitchCase="string">
-                    <input [attr.inputId]="input?.id"
-                           [attr.arrayIndex]="index"
-                           [attr.prefix]="prefix"
+                    <input [attr.prefix]="prefix"
                            class="form-control"
                            [value]="value"/>
                 </template>
@@ -64,28 +56,22 @@ import {ObjectHelper} from "../../helpers/object.helper";
                 <!--Booleans-->
                 <template ngSwitchCase="boolean">
                     <ct-toggle-slider class="pull-right"
-                                      [attr.inputId]="input?.id"
                                       [attr.prefix]="prefix"
-                                      [attr.arrayIndex]="index"
-                                      (change)="updateJob(value)"
-                                      [(ngModel)]="value"></ct-toggle-slider>
+                                      (change)="updateJob($event)"
+                                      [value]="value"></ct-toggle-slider>
                 </template>
 
                 <!--Maps-->
                 <template ngSwitchCase="map">
                     <ct-map-list class="form-group"
-                                 [attr.inputId]="input?.id"
                                  [attr.prefix]="prefix"
-                                 [attr.arrayIndex]="index"
                                  (change)="updateMap(value)"
-                                 [(ngModel)]="value"></ct-map-list>
+                                 [ngModel]="value"></ct-map-list>
                 </template>
 
                 <!--Files-->
                 <template ngSwitchCase="File">
-                    <input [attr.inputId]="input?.id"
-                           [attr.arrayIndex]="index"
-                           [attr.jobPropPath]="'path'"
+                    <input [attr.jobPropPath]="'path'"
                            [attr.prefix]="prefix"
                            class="form-control"
                            [value]="value?.path"/>
@@ -120,7 +106,7 @@ import {ObjectHelper} from "../../helpers/object.helper";
             <!--Records-->
             <template ngSwitchCase="record">
                 <ct-job-editor-entry *ngFor="let entry of input.type.fields"
-                                     [prefix]="this.prefix + '.' + entry.id"
+                                     [prefix]="prefix + '.' + entry.id"
                                      [input]="entry"
                                      (update)="updateRecord(entry.id, $event)"
                                      [value]="value ? value[entry.id] : undefined"></ct-job-editor-entry>
@@ -129,6 +115,7 @@ import {ObjectHelper} from "../../helpers/object.helper";
             <!--Arrays-->
             <template ngSwitchCase="array">
                 <ct-job-editor-entry *ngFor="let entry of value; let i = index"
+                                     [prefix]="prefix + '.[' + i +']'"
                                      [index]="i"
                                      [input]="arrayModifiedInput"
                                      (update)="updateArray(i, $event)"
@@ -181,7 +168,6 @@ export class JobEditorEntryComponent implements OnChanges {
     }
 
     private updateFile(data) {
-
         this.updateJob(data);
     }
 
@@ -195,10 +181,19 @@ export class JobEditorEntryComponent implements OnChanges {
         ObjectHelper.addProperty(data, entryId, event);
         let d = {
             ...data,
-            [entryId]: {...event}
+            [entryId]: Array.isArray(event) || this.isPrimitiveValue(event) ? event : {...event}
         };
 
         this.updateJob(d);
+    }
+
+
+    /**
+     * Returns true if arg is one of: [undefined, null, number, boolean, string]
+     */
+    private isPrimitiveValue(arg: any) {
+        const type = typeof arg;
+        return arg == null || (type != "object" && type != "function");
     }
 
     public updateArray(index, data) {
@@ -214,6 +209,7 @@ export class JobEditorEntryComponent implements OnChanges {
         // We need to update the original value in place, and cant replace its reference because
         // of the object inspector, which would still point to the previous entry.
         // We can't close and reopen the inspector because it would break the control focus.
+        Object.keys(this.value[index]).forEach((item) => delete this.value[index][item]);
         this.value[index] = Object.assign(this.value[index], data);
 
         this.updateJob(this.value.slice());
@@ -230,10 +226,6 @@ export class JobEditorEntryComponent implements OnChanges {
     }
 
     ngOnInit() {
-        if (this.inputType === "record") {
-            this.prefix = this.input.id;
-        }
-
         // If we are expecting an array, but didn't get one, we won't fill up any components,
         // just show the user a warning about the type mismatch
         if (this.inputType === "array"

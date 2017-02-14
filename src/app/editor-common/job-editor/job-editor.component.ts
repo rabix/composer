@@ -59,7 +59,8 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
                                                                       [ct-tooltip]="ctt"
                                                                       [tooltipPlacement]="'top'"></i>
                             </label>
-                            <ct-job-editor-entry [input]="input"
+                            <ct-job-editor-entry [prefix]="input.id"
+                                                 [input]="input"
                                                  [value]="job.inputs[input.id]"
                                                  (update)="jobValueUpdate(input.id, $event)">
                             </ct-job-editor-entry>
@@ -109,6 +110,9 @@ export class JobEditorComponent implements OnChanges {
      * We need to take those values and emit the new job structure as an update.
      */
     private onJobFormChange(event: Event) {
+
+        event.stopPropagation();
+
         console.log("----> Job Form Change", event);
 
         const formField = event.target as HTMLInputElement;
@@ -120,33 +124,23 @@ export class JobEditorComponent implements OnChanges {
         // ex. "path" in "job.inputs.de_results.path".
         const jobPropPath = formField.getAttribute("jobPropPath");
 
-        // If the input is an array, we should find the index of the element here.
-        const arrayIndex = formField.getAttribute("arrayIndex") === null ? -1 : formField.getAttribute("arrayIndex");
-
-        // If we have a record, nested inputs have a prefix property
-        const prefix = formField.getAttribute("prefix");
-
-        // ID of the input that the modification refers to.
-        const inputId = prefix || formField.getAttribute("inputID");
+        // Get field path (for an example -> "inputId.[0].record.[2]")
+        const fieldPath = formField.getAttribute("prefix");
 
         // Get the new value that we should set the job to
         const val = formField.value;
 
-        // Form field might not have input id, so if we missed it,
+        // Form field might not have fieldPath, so if we missed it,
         // it's better to do nothing than break the app.
-        if (!inputId) {
+        if (!fieldPath) {
             return;
         }
 
-        // For ease of use, non-arrays will have -1 as an index value.
-        const isArr = arrayIndex != -1;
-
         // Compose a path that looks like "inputs.de_results.[2].path",
-        // where the last 2 parts are optional.
+        // where the last part is optional.
         const propPath = [
             "inputs",
-            inputId,
-            !isArr ? "" : `[${arrayIndex}]`,
+            fieldPath,
             jobPropPath
         ].filter(v => v).join(".");
 
@@ -156,11 +150,11 @@ export class JobEditorComponent implements OnChanges {
         // Get the new value of this input's job.
         // On the previous step, we might have set some nested property of it,
         // so here we take the top-level structure anyway.
-        const jobRef = OH.getProperty(job.inputs, inputId);
+        const jobRef = OH.getProperty(job.inputs, fieldPath);
 
 
         // Dispatch it as an update to the job
-        this.jobValueUpdate(inputId, jobRef);
+        this.jobValueUpdate(fieldPath, jobRef);
     }
 
     /**
