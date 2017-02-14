@@ -1,4 +1,4 @@
-import {Component, Input, Output, SimpleChanges, ChangeDetectionStrategy} from "@angular/core";
+import {Component, Input, Output, ChangeDetectorRef, SimpleChanges, ChangeDetectionStrategy} from "@angular/core";
 import {CommandInputParameterModel} from "cwlts/models/d2sb";
 import {Subject} from "rxjs";
 import {ComponentBase} from "../../../../components/common/component-base";
@@ -208,7 +208,7 @@ export class WorkflowStepInspectorTabInputs extends ComponentBase {
         }));
     }
 
-    private static isFileType(input) {
+    private isFileType(input) {
         return input.type.type === 'File' || (input.type.type === 'array' && input.type.items === 'File');
     }
 

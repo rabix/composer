@@ -87,4 +87,14 @@ export class ObjectHelper {
             }
         }
     }
+
+    /**
+     * Returns true if arg is one of: [undefined, null, number, boolean, string]
+     * @param arg
+     * @returns boolean
+     */
+    public static isPrimitiveValue(arg: any) {
+        const type = typeof arg;
+        return arg == null || (type != "object" && type != "function");
+    }
 }

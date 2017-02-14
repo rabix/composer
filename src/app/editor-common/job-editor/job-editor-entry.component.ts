@@ -181,19 +181,10 @@ export class JobEditorEntryComponent implements OnChanges {
         ObjectHelper.addProperty(data, entryId, event);
         let d = {
             ...data,
-            [entryId]: Array.isArray(event) || this.isPrimitiveValue(event) ? event : {...event}
+            [entryId]: Array.isArray(event) || ObjectHelper.isPrimitiveValue(event) ? event : {...event}
         };
 
         this.updateJob(d);
-    }
-
-
-    /**
-     * Returns true if arg is one of: [undefined, null, number, boolean, string]
-     */
-    private isPrimitiveValue(arg: any) {
-        const type = typeof arg;
-        return arg == null || (type != "object" && type != "function");
     }
 
     public updateArray(index, data) {
