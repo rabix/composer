@@ -24,6 +24,7 @@ import {DropDirective} from "./drag-and-drop/drop-directive";
 import {DropZones} from "./drag-and-drop/drop-zones-directive";
 import {LoggerDirective} from "./elements/debugger/logger.directive";
 import {DragOverDirective} from "./drag-and-drop/drag-over-directive";
+import {DropDownButtonComponent} from "./ui/dropdown-button/dropdown-button-component";
 
 @NgModule({
     entryComponents: [
@@ -40,6 +41,9 @@ import {DragOverDirective} from "./drag-and-drop/drag-over-directive";
         MultilangCodeEditorComponent
     ],
     declarations: [
+        // Drop down button
+        DropDownButtonComponent,
+
         // Drag and Drop
         DragDirective,
         DropDirective,
@@ -80,6 +84,9 @@ import {DragOverDirective} from "./drag-and-drop/drag-over-directive";
 
     ],
     exports: [
+        // Drop down button
+        DropDownButtonComponent,
+
         // Drag and Drop
         DragDirective,
         DropDirective,
