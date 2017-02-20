@@ -1,5 +1,6 @@
 import {Component, Input, ElementRef, forwardRef, Output, EventEmitter, ChangeDetectionStrategy} from "@angular/core";
 import {NG_VALUE_ACCESSOR, ControlValueAccessor} from "@angular/forms";
+import {noop} from "../../../lib/utils.lib";
 
 @Component({
     selector: "ct-dropdown-button",
@@ -16,7 +17,7 @@ import {NG_VALUE_ACCESSOR, ControlValueAccessor} from "@angular/forms";
             </button>
 
             <ul class="dropdown-menu dropdown-menu-right" aria-haspopup="true" aria-expanded="true">
-                <li href class="dropdown-item" *ngFor="let item of dropDownOptions" (click)="select(item)"
+                <li class="dropdown-item cursor-pointer" *ngFor="let item of dropDownOptions" (click)="select(item)"
                     [class.selected]="item.value === selected?.value">
                     <div>
                         {{item.caption}}
@@ -100,9 +101,7 @@ export class DropDownButtonComponent implements ControlValueAccessor {
         this.onTouched = fn;
     }
 
-    private onTouched = () => {
-    };
+    private onTouched = noop;
 
-    private propagateChange = (_) => {
-    };
+    private propagateChange = noop;
 }

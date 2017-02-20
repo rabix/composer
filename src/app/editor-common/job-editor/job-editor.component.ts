@@ -54,7 +54,7 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
                     <form (change)="onJobFormChange($event)">
                         <div *ngFor="let input of group.inputs">
 
-                            <label>{{ input?.label || input.id }}: <i class="fa fa-info-circle text-muted" 
+                            <label>{{ input?.label || input.id }} <i class="fa fa-info-circle text-muted" 
                                                                       *ngIf="input.description" 
                                                                       [ct-tooltip]="ctt"
                                                                       [tooltipPlacement]="'top'"></i>

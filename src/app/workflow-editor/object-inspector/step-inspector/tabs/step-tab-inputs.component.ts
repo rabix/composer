@@ -1,10 +1,12 @@
-import {Component, Input, Output, ChangeDetectorRef, SimpleChanges, ChangeDetectionStrategy} from "@angular/core";
-import {CommandInputParameterModel} from "cwlts/models/d2sb";
+import {Component, Input, Output, SimpleChanges, ChangeDetectionStrategy} from "@angular/core";
+import {WorkflowStepInputModel} from "cwlts/models";
 import {Subject} from "rxjs";
 import {ComponentBase} from "../../../../components/common/component-base";
 import {StepModel, WorkflowModel} from "cwlts/models";
 import {ObjectHelper as OH} from "../../../../helpers/object.helper";
 import {StatusBarService} from "../../../../core/status-bar/status-bar.service";
+
+require("./step-tab-inputs.component.scss");
 
 @Component({
     selector: "ct-workflow-step-inspector-inputs",
@@ -16,57 +18,63 @@ import {StatusBarService} from "../../../../core/status-bar/status-bar.service";
                 <div class="tc-header">{{ group.name }}</div>
                 <div class="tc-body">
                     <form (change)="onInputsFormChange($event)">
-                        <div *ngFor="let input of group.inputs; let i = index;">        
+                        <div *ngFor="let input of group.inputs; let i = index;" class="mb-1">        
         
                             <!--Label and port options-->
-                            <div class="form-group flex-container">                                
+                            <div class="input-title flex-baseline">
                                 
-                                <label>{{ input?.label || input.id }}: <i class="fa fa-info-circle text-muted"
-                                                                          *ngIf="input.description"
-                                                                          [ct-tooltip]="ctt"
-                                                                          [tooltipPlacement]="'top'"></i>
+                                <label class="input-label" [title]="input.label || input.id">
+                                    {{ input.label || input.id }} 
+                                    <i class="fa fa-info-circle text-muted"
+                                       *ngIf="input.description"
+                                       [ct-tooltip]="ctt"
+                                       [tooltipPlacement]="'top'"></i>
                                 </label>        
         
                                 <!--Port options for File and array of Files-->
-                                <span *ngIf="isFileType(input)" class="align-right"> 
+                                <div *ngIf="isFileType(input)" class="port-controls"> 
                                             <ct-toggle-slider
                                                 (change)="onPortOptionChange(input, $event ? 'port' : 'editable')"
+                                                [on]="'Show'"
+                                                [off]="'Hide'"
                                                 [value]="input.isVisible">
                                             </ct-toggle-slider>
-                                 </span>        
+                                </div>        
                                 
                                 <!--Port options for all other types-->                                
-                                <span *ngIf="!isFileType(input)" class="align-right">
+                                <div *ngIf="!isFileType(input)" class="input-control">
                                             <ct-dropdown-button [dropDownOptions]="dropDownPortOptions" 
                                                                 (change)="onPortOptionChange(input, $event)"
                                                                 [value]="input.status">
                                             </ct-dropdown-button>
-                                </span>        
+                                </div>        
                             </div>
         
                             <!--Input-->
                             <ct-workflow-step-inspector-entry [input]="input"
                                                               [prefix]="input.id"
                                                               [value]="input.default"
-                                                              (update)="stepValueUpdate(input.id + '.default', $event)">
+                                                              *ngIf="!isFileType(input)"
+                                                              (update)="stepValueUpdate(input.id + '.default', $event)" 
+                                                              class="mb-0">
                             </ct-workflow-step-inspector-entry>        
         
                             <!--Connections-->
                             <div>
                                 
                                 <!--No connections-->
-                                <div *ngIf="input.source.length === 0">
-                                    <div class="alert alert-warning form-control-label">
-                                        Not connected
+                                <div *ngIf="input.source.length === 0 && input.isVisible">
+                                    <div class="alert alert-warning small">
+                                        <i class="fa fa-warning fa-fw text-warning"></i> Not connected
                                     </div>
                                 </div>
 
                                 <!--List of connections-->
-                                <div *ngIf="input.source.length > 0">
+                                <div *ngIf="input.source.length > 0" class="text-muted small">
                                     Connections:
-                                    <div *ngFor="let port of input.source">
-                                        {{'PortId: ' + port}}
-                                    </div>
+                                    <code *ngFor="let port of input.source">
+                                        {{ port }}
+                                    </code>
                                 </div>
                             </div>
         
@@ -111,11 +119,11 @@ export class WorkflowStepInspectorTabInputs extends ComponentBase {
     public step: StepModel;
 
     @Output()
-    public save = new Subject<CommandInputParameterModel>();
+    public save = new Subject<WorkflowStepInputModel>();
 
     private group = [];
 
-    public inputGroups: { name: string, inputs: CommandInputParameterModel[] }[] = [];
+    public inputGroups: { name: string, inputs: WorkflowStepInputModel[] }[] = [];
 
     constructor(private statusBar: StatusBarService) {
         super();
@@ -192,7 +200,7 @@ export class WorkflowStepInspectorTabInputs extends ComponentBase {
         OH.addProperty(this.step.inAsMap, prefix, value);
     }
 
-    ngOnChanges(changes: SimpleChanges) {
+    ngOnChanges() {
 
         // Whenever inputs are updated, regroup them and sort them for display
         const grouped = this.step.in.reduce((acc, item) => {

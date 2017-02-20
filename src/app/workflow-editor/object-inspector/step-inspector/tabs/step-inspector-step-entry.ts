@@ -7,9 +7,9 @@ import {
     Output,
     SimpleChanges
 } from "@angular/core";
-import {CommandInputParameterModel} from "cwlts/models/d2sb";
 import {ObjectHelper} from "../../../../helpers/object.helper";
 import {JobHelper} from "cwlts/models/helpers/JobHelper";
+import {WorkflowStepInputModel} from "cwlts/models";
 
 @Component({
     selector: "ct-workflow-step-inspector-entry",
@@ -71,7 +71,9 @@ import {JobHelper} from "cwlts/models/helpers/JobHelper";
 
                 <!--Files and array of Files-->
                 <template ngSwitchCase="File">
-                    <div class="alert alert-warning form-control-label">Message for files and array of files?</div>                           
+                    <div class="alert alert-warning form-control-label">
+                        Cannot set default values for type File and File[].
+                    </div>                           
                 </template>
                 
                 <!--Every element that's a part of the array can be deleted, so we add a deletion button to it-->
@@ -110,7 +112,7 @@ import {JobHelper} from "cwlts/models/helpers/JobHelper";
 
             <!--Unknown-->
             <template ngSwitchDefault>
-                <div class="alert alert-info">Unknown input type: {{ inputType }}</div>
+                <div class="alert alert-info">Unknown input type: {{ inputType || "null" }}</div>
             </template>
         </div>
     `
@@ -118,7 +120,7 @@ import {JobHelper} from "cwlts/models/helpers/JobHelper";
 export class WorkflowStepInspectorInputEntry implements OnChanges {
 
     @Input()
-    public input: CommandInputParameterModel;
+    public input: WorkflowStepInputModel;
 
     @Input()
     public value: any;
