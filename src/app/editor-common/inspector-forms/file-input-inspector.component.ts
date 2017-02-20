@@ -33,7 +33,7 @@ interface CWLFile {
             <!--Secondary Files-->
             <div class="form-group">
                 <label>Secondary Files</label>
-                <compact-list formControlName="secondaryFiles"></compact-list>
+                <compact-list [addKeyCode]="13" formControlName="secondaryFiles"></compact-list>
             </div>
             
             <div class="form-group">

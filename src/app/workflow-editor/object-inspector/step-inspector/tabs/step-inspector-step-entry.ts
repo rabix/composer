@@ -7,12 +7,12 @@ import {
     Output,
     SimpleChanges
 } from "@angular/core";
-import {SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
+import {CommandInputParameterModel} from "cwlts/models/d2sb";
+import {ObjectHelper} from "../../../../helpers/object.helper";
 import {JobHelper} from "cwlts/models/helpers/JobHelper";
-import {ObjectHelper} from "../../helpers/object.helper";
 
 @Component({
-    selector: "ct-job-editor-entry",
+    selector: "ct-workflow-step-inspector-entry",
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <div class="alert alert-warning form-control-label" *ngIf="warning">{{ warning }}</div>
@@ -25,7 +25,7 @@ import {ObjectHelper} from "../../helpers/object.helper";
 
                 <!--Enums-->
                 <template ngSwitchCase="enum">
-                    <select [value]="value" class="form-control"                           
+                    <select [value]="value" class="form-control"
                             [attr.prefix]="prefix">
                         <option *ngFor="let val of input.type.symbols" [value]="val"> {{ val }}
                         </option>
@@ -47,7 +47,7 @@ import {ObjectHelper} from "../../helpers/object.helper";
                 </template>
 
                 <!--Strings-->
-                <template ngSwitchCase="string">
+                <template ngSwitchCase="string">                    
                     <input [attr.prefix]="prefix"
                            class="form-control"
                            [value]="value"/>
@@ -65,61 +65,41 @@ import {ObjectHelper} from "../../helpers/object.helper";
                 <template ngSwitchCase="map">
                     <ct-map-list class="form-group"
                                  [attr.prefix]="prefix"
-                                 (change)="updateMap(value)"
+                                 (change)="updateMap($event)"
                                  [ngModel]="value"></ct-map-list>
                 </template>
 
-                <!--Files-->
+                <!--Files and array of Files-->
                 <template ngSwitchCase="File">
-                    <input [attr.jobPropPath]="'path'"
-                           [attr.prefix]="prefix"
-                           class="form-control"
-                           [value]="value?.path"/>
-                    <span class="input-group-btn">
-                        
-                        <button type="button" class="btn btn-secondary"
-                                [ct-editor-inspector]="fileInspector">
-                            <i class="fa fa-ellipsis-h"></i>
-                        </button>
-                    </span>
-
-                    <template #fileInspector>
-                        <ct-editor-inspector-content>
-                            <div class="tc-header">{{ input?.id }}</div>
-                            <div class="tc-body">
-                                <ct-file-input-inspector [input]="value || {}"
-                                                         (update)="updateFile($event)">
-                                </ct-file-input-inspector>
-                            </div>
-                        </ct-editor-inspector-content>
-                    </template>
+                    <div class="alert alert-warning form-control-label">Message for files and array of files?</div>                           
                 </template>
-
+                
                 <!--Every element that's a part of the array can be deleted, so we add a deletion button to it-->
                 <span class="input-group-btn" *ngIf="index !== -1">
                     <button type="button" class="btn btn-secondary" (click)="deleteFromArray()">
                         <i class="fa fa-trash"></i>
                     </button>
                 </span>
+                
             </div>
 
             <!--Records-->
             <template ngSwitchCase="record">
-                <ct-job-editor-entry *ngFor="let entry of input.type.fields"
+                <ct-workflow-step-inspector-entry *ngFor="let entry of input.type.fields"
                                      [prefix]="prefix + '.' + entry.id"
                                      [input]="entry"
                                      (update)="updateRecord(entry.id, $event)"
-                                     [value]="value ? value[entry.id] : undefined"></ct-job-editor-entry>
+                                     [value]="value ? value[entry.id] : undefined"></ct-workflow-step-inspector-entry>
             </template>
 
             <!--Arrays-->
             <template ngSwitchCase="array">
-                <ct-job-editor-entry *ngFor="let entry of value; let i = index"
-                                     [prefix]="prefix + '.[' + i +']'"
-                                     [index]="i"
-                                     [input]="arrayModifiedInput"
-                                     (update)="updateArray(i, $event)"
-                                     [value]="entry"></ct-job-editor-entry>
+                <ct-workflow-step-inspector-entry *ngFor="let entry of value; let i = index"
+                                                  [prefix]="prefix + '.[' + i +']'"
+                                                  [index]="i"
+                                                  [input]="arrayModifiedInput"
+                                                  (update)="updateArray(i, $event)"
+                                                  [value]="entry"></ct-workflow-step-inspector-entry>
 
                 <button (click)="addArrayEntry(input)"
                         type="button"
@@ -135,10 +115,10 @@ import {ObjectHelper} from "../../helpers/object.helper";
         </div>
     `
 })
-export class JobEditorEntryComponent implements OnChanges {
+export class WorkflowStepInspectorInputEntry implements OnChanges {
 
     @Input()
-    public input: SBDraft2CommandInputParameterModel;
+    public input: CommandInputParameterModel;
 
     @Input()
     public value: any;
@@ -156,8 +136,8 @@ export class JobEditorEntryComponent implements OnChanges {
 
     /**
      * We might want to show a warning next to a field.
-     * This can happen for example if we encounter a mismatch between job value and the input type,
-     * for example, an input can by File[], and the job value can be just a plain string.
+     * This can happen for example if we encounter a mismatch between step value and the input type,
+     * for example, an input can by File[], and the step value can be just a plain string.
      */
     public warning: string;
 
@@ -165,10 +145,6 @@ export class JobEditorEntryComponent implements OnChanges {
 
     public updateJob(data) {
         this.update.emit(data);
-    }
-
-    private updateFile(data) {
-        this.updateJob(data);
     }
 
     private updateMap(map) {
@@ -187,8 +163,7 @@ export class JobEditorEntryComponent implements OnChanges {
         this.updateJob(d);
     }
 
-    public updateArray(index, data) {
-
+    public updateArray(index: number, data: any) {
         // We need some kind of convention to broadcast information
         // that an array element should be deleted
         if (data === undefined) {
@@ -217,14 +192,12 @@ export class JobEditorEntryComponent implements OnChanges {
     }
 
     ngOnInit() {
-        // If we are expecting an array, but didn't get one, we won't fill up any components,
-        // just show the user a warning about the type mismatch
         if (this.inputType === "array"
             && !Array.isArray(this.value)
             && this.value !== undefined) {
 
             this.value   = [];
-            this.warning = `Type mismatch: the default job value for this input 
+            this.warning = `Type mismatch: the default step value for this input 
                             is of type “${typeof this.value}”, but the input is declared 
                             as “${this.inputType}”. 
                             You can generate a new set of test data for this input by clicking 
@@ -237,11 +210,18 @@ export class JobEditorEntryComponent implements OnChanges {
         this.inputType = this.input.type.type;
 
         if (this.inputType === "array") {
-            this.arrayModifiedInput = {
-                ...this.input,
-                type: {
-                    ...this.input.type,
-                    type: this.input.type.items
+
+            // If input is array of Files show the same message as for Files
+            if (this.input.type.items === "File") {
+                this.inputType = "File";
+
+            } else {
+                this.arrayModifiedInput = {
+                    ...this.input,
+                    type: {
+                        ...this.input.type,
+                        type: this.input.type.items
+                    }
                 }
             }
         }

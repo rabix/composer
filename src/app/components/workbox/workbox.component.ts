@@ -122,7 +122,7 @@ export class WorkboxComponent extends ComponentBase implements OnInit {
      * Removes all tabs
      */
     private removeAllTabs() {
-        this.tabs = [];
+        this.workbox.closeAllTabs();
     }
 
     private createContextMenu(tab): MenuItem[] {

@@ -101,7 +101,7 @@ export class BasicOutputSectionComponent extends ComponentBase implements Contro
             this.output.type.isNullable = !value.isRequired;
             this.output.outputBinding.glob = value.glob;
 
-            if (value.symbols.length > 0 && this.output.type.type === 'enum') {
+            if (value.symbols.length > 0 && this.isEnumType()) {
                 this.output.type.symbols = value.symbols;
             }
 
@@ -126,8 +126,7 @@ export class BasicOutputSectionComponent extends ComponentBase implements Contro
         this.tracked = this.basicSectionForm.controls['propertyIdForm'].valueChanges
             .subscribe((id: string) => {
                 this.output.id = id;
-
-                if (this.output.type.type === "enum" || this.output.type.type === "record") {
+                if (this.isEnumType() || this.isRecordType()) {
                     this.output.type.name = id;
                 }
             });
@@ -138,10 +137,14 @@ export class BasicOutputSectionComponent extends ComponentBase implements Contro
 
             this.output.type.setType(value.type);
 
-            if (this.output.type.type === 'enum' || this.output.type.type === 'record') {
+            if (this.isEnumType() || this.isRecordType()) {
                 this.output.type.name = this.output.id;
             }
         });
+    }
+
+    private isRecordType () {
+        return this.output.type.type === 'record' || (this.output.type.type === 'array' && this.output.type.items === 'record');
     }
 
     private isEnumType () {

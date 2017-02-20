@@ -1,5 +1,6 @@
 import {Component, Input} from "@angular/core";
 import {WorkflowModel} from "cwlts/models";
+import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
 
 require('./workflow-graph-editor.component.scss');
 
@@ -53,7 +54,8 @@ require('./workflow-graph-editor.component.scss');
                                     <div class="tc-header">{{ entry.id || entry.loc || "Step" }}</div>
                                     <div class="tc-body">
                                         <ct-workflow-step-inspector 
-                                            [step]="entry">
+                                            [step]="entry"
+                                            [workflowModel]="model">
                                         </ct-workflow-step-inspector>
                                     </div>
                                 </ct-editor-inspector-content>
@@ -185,4 +187,13 @@ export class WorkflowGraphEditorComponent {
 
     @Input()
     model: WorkflowModel;
+
+
+    constructor(private inspector: EditorInspectorService) {
+    }
+
+    ngOnDestroy() {
+        /* Close object inspector*/
+        this.inspector.hide();
+    }
 }
