@@ -30,8 +30,9 @@ require('./workflow-graph-editor.component.scss');
                             class="input-list-items container">
 
                             <div class="gui-section-list-item clickable row"
-                                [ct-editor-inspector]="inspector"
-                                [ct-editor-inspector-target]="entry.loc">
+                                 [ct-editor-inspector]="inspector"
+                                 [ct-editor-inspector-target]="entry.loc" 
+                                 [ct-validation-class]="entry.validation">
 
                                 <!--ID Column-->
                                 <div class="col-sm-6" [title]="entry.id">

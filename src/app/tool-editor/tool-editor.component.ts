@@ -9,8 +9,7 @@ import {
     ViewContainerRef
 } from "@angular/core";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
-import {BehaviorSubject, Observable} from "rxjs/Rx";
-import {SBDraft2CommandLineToolModel as CommandLineToolModel} from "cwlts/models/d2sb";
+import {BehaviorSubject, Subject} from "rxjs/Rx";
 import {Validation} from "cwlts/models/helpers/validation";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
 import {EditorInspectorService} from "../editor-common/inspector/editor-inspector.service";
@@ -25,6 +24,8 @@ import {StatusBarService} from "../core/status-bar/status-bar.service";
 import {ModalService} from "../components/modal/modal.service";
 import {noop} from "../lib/utils.lib";
 import LoadOptions = jsyaml.LoadOptions;
+import {CommandLineToolFactory} from "../../../node_modules/cwlts/models/generic/CommandLineToolFactory";
+import {CommandLineToolModel} from "../../../node_modules/cwlts/models/generic/CommandLineToolModel";
 
 require("./tool-editor.component.scss");
 
@@ -192,10 +193,10 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
     private rawEditorContent = new BehaviorSubject("");
 
     /** Model that's recreated on document change */
-    private toolModel = new CommandLineToolModel("document");
+    private toolModel: CommandLineToolModel = CommandLineToolFactory.from(null, "document");
 
     /** Sorted array of resulting command line parts */
-    private commandLineParts: Observable<CommandLinePart[]>;
+    private commandLineParts: Subject<CommandLinePart[]> = new Subject();
 
     /** Template of the status controls that will be shown in the status bar */
     @ViewChild("statusControls")
@@ -277,8 +278,11 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
             }
 
             // generate model and get command line parts
-            this.toolModel        = new CommandLineToolModel("document", json);
-            this.commandLineParts = this.toolModel.getCommandLineParts();
+            this.toolModel        = CommandLineToolFactory.from(json, "document");
+            this.toolModel.onCommandLineResult((res) => {
+                this.commandLineParts.next(res);
+            });
+            this.toolModel.updateCommandLine();
 
             // update validation stream on model validation updates
 

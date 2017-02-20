@@ -260,6 +260,7 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
             }
 
             this.workflowModel        = WorkflowFactory.from(json, "document");
+            console.log(this.workflowModel);
 
             // update validation stream on model validation updates
 
@@ -273,9 +274,7 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
                 };
             });
 
-            this.workflowModel.isConnected();
-            this.workflowModel.hasCycles();
-
+            this.workflowModel.validate();
 
             // load document in GUI and turn off loader, only if loader was active
             if (this.isLoading) {
