@@ -44,7 +44,7 @@ require('./workflow-not-graph-editor.component.scss');
                                 </div>
                                 <!--RUN Column-->
                                 <div class="col-sm-6">
-                                    {{ entry.run }}
+                                    {{ entry.run?.class }}: {{ entry.run?.label || entry.run?.id || entry.run }}
                                 </div>
                             </div>
                             

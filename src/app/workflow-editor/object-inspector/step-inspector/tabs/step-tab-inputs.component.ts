@@ -1,4 +1,4 @@
-import {Component, Input, Output, SimpleChanges, ChangeDetectionStrategy} from "@angular/core";
+import {Component, Input, Output, ChangeDetectionStrategy} from "@angular/core";
 import {WorkflowStepInputModel} from "cwlts/models";
 import {Subject} from "rxjs";
 import {ComponentBase} from "../../../../components/common/component-base";
