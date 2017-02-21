@@ -55,7 +55,13 @@ require("./workflow-editor.component.scss");
                             [disabled]="!isValidCWL"
                             (click)="switchView(viewModes.Gui)"
                             [class.btn-primary]="viewMode === viewModes.Gui"
-                            [class.btn-secondary]="viewMode !== viewModes.Gui">Visual</button>
+                            [class.btn-secondary]="viewMode !== viewModes.Gui">Not Really Visual</button>       
+                    
+                    <button class="btn btn-secondary btn-sm"
+                            [disabled]="!isValidCWL"
+                            (click)="switchView(viewModes.Graph)"
+                            [class.btn-primary]="viewMode === viewModes.Graph"
+                            [class.btn-secondary]="viewMode !== viewModes.Graph">Very Visual</button>
                             
                     <button class="btn btn-secondary btn-sm"
                             [disabled]="!isValidCWL"
@@ -105,15 +111,21 @@ require("./workflow-editor.component.scss");
                                           [readonly]="!data.isWritable"></ct-code-editor-x>
                         
                         <!--GUI Editor-->
-                        <ct-workflow-graph-editor *ngIf="viewMode === viewModes.Gui"
+                        <ct-workflow-not-graph-editor *ngIf="viewMode === viewModes.Gui"
                                        class="gui-editor-component flex-col"
                                        [readonly]="!data.isWritable"
-                                       [model]="workflowModel"></ct-workflow-graph-editor>
-                                       
-                                       
+                                       [model]="workflowModel"></ct-workflow-not-graph-editor>
+                
+                        <ct-workflow-graph-editor *ngIf="viewMode === viewModes.Graph"
+                                                  [readonly]="!data.isWritable"
+                                                  [model]="workflowModel"
+                                                  class="gui-editor-component flex-col">
+                            
+                        </ct-workflow-graph-editor>
+                
                                        
                     <!--Object Inspector Column-->
-                    <div class="flex-col inspector-col" >
+                    <div [hidden]="!showInspector" class="flex-col inspector-col" >
                         <ct-editor-inspector class="object-inspector">
                             <template #inspector></template>
                         </ct-editor-inspector>
@@ -158,6 +170,9 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
     /** ValidationResponse for current document */
     public validation: ValidationResponse;
 
+    @Input()
+    public showInspector = true;
+
     /** Default view mode. */
     @Input()
     public viewMode;
@@ -185,9 +200,10 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
     private statusControls: TemplateRef<any>;
 
     private viewModes = {
-        Code: 'code',
+        Code: "code",
         Gui: 'gui',
-        Test: 'test'
+        Test: "test",
+        Graph: "graph"
     };
 
     private toolGroup: FormGroup;
@@ -195,8 +211,6 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
     @ViewChild("inspector", {read: ViewContainerRef})
     private inspectorHostView: ViewContainerRef;
 
-    @Input()
-    public showInspector = false;
 
     constructor(private webWorkerService: WebWorkerService,
                 private userPrefService: UserPreferencesService,
@@ -339,25 +353,29 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
      */
     private switchView(mode): void {
 
-        if (mode === this.viewModes.Gui && this.showReformatPrompt) {
-
-            this.modal.checkboxPrompt({
-                title: "Confirm GUI Formatting",
-                content: "Activating GUI mode might change the formatting of this document. Do you wish to continue?",
-                cancellationLabel: "Cancel",
-                confirmationLabel: "OK",
-                checkboxLabel: "Don't show this dialog again",
-            }).then(res => {
-                if (res) this.userPrefService.put("show_reformat_prompt", false);
-
-                this.showReformatPrompt = false;
-                this.viewMode           = mode;
-            }, noop);
-            return;
-        }
+        // if (mode === this.viewModes.Gui && this.showReformatPrompt) {
+        //
+        //     this.modal.checkboxPrompt({
+        //         title: "Confirm GUI Formatting",
+        //         content: "Activating GUI mode might change the formatting of this document. Do you wish to continue?",
+        //         cancellationLabel: "Cancel",
+        //         confirmationLabel: "OK",
+        //         checkboxLabel: "Don't show this dialog again",
+        //     }).then(res => {
+        //         if (res) this.userPrefService.put("show_reformat_prompt", false);
+        //
+        //         this.showReformatPrompt = false;
+        //         this.viewMode           = mode;
+        //     }, noop);
+        //     return;
+        // }
 
         if (mode === this.viewModes.Code && this.toolGroup.dirty) {
             this.rawEditorContent.next(this.getModelText());
+        }
+
+        if(mode === this.viewModes.Graph){
+
         }
 
         this.viewMode = mode;

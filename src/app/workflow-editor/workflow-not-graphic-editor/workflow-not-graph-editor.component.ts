@@ -2,10 +2,10 @@ import {Component, Input} from "@angular/core";
 import {WorkflowModel} from "cwlts/models";
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
 
-require('./workflow-graph-editor.component.scss');
+require('./workflow-not-graph-editor.component.scss');
 
 @Component({
-    selector: "ct-workflow-graph-editor",
+    selector: "ct-workflow-not-graph-editor",
     template: `
 <div class="row">
 
@@ -166,8 +166,7 @@ require('./workflow-graph-editor.component.scss');
                                 <ct-editor-inspector-content>
                                     <div class="tc-header">{{ entry.id || entry.loc || "Output" }}</div>
                                     <div class="tc-body">
-                                        <ct-workflow-output-inspector
-                                                [output]="entry">
+                                        <ct-workflow-output-inspector [output]="entry">
                                         </ct-workflow-output-inspector>
                                     </div>
                                 </ct-editor-inspector-content>
@@ -181,7 +180,7 @@ require('./workflow-graph-editor.component.scss');
 </div>
 `
 })
-export class WorkflowGraphEditorComponent {
+export class WorkflowNotGraphEditorComponent {
     @Input()
     readonly: boolean;
 
