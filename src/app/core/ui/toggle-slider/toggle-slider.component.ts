@@ -30,9 +30,18 @@ export class ToggleComponent implements ControlValueAccessor {
     @Input()
     public value = false;
 
+    @Input()
+    public readonly = false;
+
     @ViewChild('checkbox') checkbox;
 
     constructor(private renderer: Renderer) {
+    }
+
+    ngOnInit() {
+        if (this.readonly) {
+            this.setDisabledState(true);
+        }
     }
 
     private onTouched = () => { };

@@ -8,7 +8,9 @@ import {ReplaySubject, Subject} from "rxjs";
         <ct-expression-editor [evaluator]="evaluator" 
                               [context]="context"
                               (action)="action.next($event)"
-                              [editorContent]="rawCode"></ct-expression-editor>
+                              [editorContent]="rawCode"
+                              [readonly]="readonly">
+        </ct-expression-editor>
     `
 })
 export class ModelExpressionEditorComponent {
@@ -18,6 +20,9 @@ export class ModelExpressionEditorComponent {
 
     @Input()
     public context: {$job?: any, $self?: any};
+
+    @Input()
+    public readonly = false;
 
     @Output()
     public action = new Subject<"close" | "save">();

@@ -40,6 +40,9 @@ export class HintListComponent extends ComponentBase {
     @Input()
     public entries: RequirementBaseModel[] = [];
 
+    @Input()
+    public readonly = false;
+
     private formList: {
         key?: string,
         value: string | ExpressionModel,

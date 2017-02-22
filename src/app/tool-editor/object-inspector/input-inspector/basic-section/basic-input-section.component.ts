@@ -40,7 +40,8 @@ require("./basic-input-section.component.scss");
                     <span class="align-right">
                         <ct-toggle-slider [formControl]="basicSectionForm.controls['isRequired']"                                     
                                        [off]="'No'" 
-                                       [on]="'Yes'">
+                                       [on]="'Yes'"
+                                       [readonly]="readonly">
                         </ct-toggle-slider>
                     </span>
                 </div> 
@@ -58,8 +59,9 @@ require("./basic-input-section.component.scss");
                 
                 <!--Symbols-->
                 <symbols-section class="form-group" 
-                                *ngIf="isEnumType()"
-                                [formControl]="basicSectionForm.controls['symbols']">
+                                 *ngIf="isEnumType()"
+                                 [formControl]="basicSectionForm.controls['symbols']"
+                                 [readonly]="readonly">
                 </symbols-section>                
                 
                 <!--Include in command line -->
@@ -71,16 +73,19 @@ require("./basic-input-section.component.scss");
                     <span class="align-right">
                         <ct-toggle-slider [formControl]="basicSectionForm.controls['isBound']" 
                                        [off]="'No'" 
-                                       [on]="'Yes'">
+                                       [on]="'Yes'"
+                                       [readonly]="readonly">
                         </ct-toggle-slider>
                     </span>
                 </div> 
                 
                 <!--Input Binding-->
                 <input-binding-section *ngIf="input.isBound" 
-                            [context]="context"
-                            [propertyType]="input.type.type"
-                            [formControl]="basicSectionForm.controls['inputBinding']"></input-binding-section>
+                                       [context]="context"
+                                       [propertyType]="input.type.type"
+                                       [readonly]="readonly"
+                                       [formControl]="basicSectionForm.controls['inputBinding']">
+                </input-binding-section>
             </form> 
 `
 })
@@ -88,6 +93,9 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
     @Input()
     public context: { $job?: any, $self?: any } = {};
+
+    @Input()
+    public readonly = false;
 
     /** The currently displayed property */
     private input: SBDraft2CommandInputParameterModel;
@@ -108,8 +116,8 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
         this.input = input;
 
         this.basicSectionForm = this.formBuilder.group({
-            propertyIdForm: [this.input.id],
-            typeForm: [this.input.type, [Validators.required]],
+            propertyIdForm: [{value: this.input.id, disabled: this.readonly}],
+            typeForm: [{value: this.input.type, disabled: this.readonly}, [Validators.required]],
             isBound: [this.input.isBound],
             isRequired: [!this.input.type.isNullable],
             inputBinding: [this.input],

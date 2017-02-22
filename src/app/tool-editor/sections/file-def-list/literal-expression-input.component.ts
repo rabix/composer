@@ -46,8 +46,9 @@ require("./literal-expression-input.component.scss");
                             <i class="fa fa-expand"></i>
                         </button>
                         <button type="button"
-                            class="btn btn-secondary" 
-                            (click)="editExpr(isExpr ? 'clear' : 'edit', $event)">
+                                class="btn btn-secondary"
+                                [disabled]="readonly"
+                                (click)="editExpr(isExpr ? 'clear' : 'edit', $event)">
                             <i class="fa"
                                 [ngClass]="{'fa-times': isExpr,
                                             'fa-code': !isExpr}"></i>
@@ -64,6 +65,9 @@ export class LiteralExpressionInputComponent extends ComponentBase implements Co
 
     @Input()
     fileName: string;
+
+    @Input()
+    public readonly = false;
 
     /**
      * Declaration of change function
@@ -96,7 +100,6 @@ export class LiteralExpressionInputComponent extends ComponentBase implements Co
             this.onChange(val);
         }
     }
-
 
     constructor(private modal: ModalService) {
         super();
@@ -175,6 +178,8 @@ export class LiteralExpressionInputComponent extends ComponentBase implements Co
                 closeOnOutsideClick: false,
                 title: "Edit Expression"
             });
+
+            editor.readonly = this.readonly;
 
             editor.model   = this.model;
             editor.context = this.context;

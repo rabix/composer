@@ -19,7 +19,7 @@ require("./compact-list.component.scss");
                     <span *ngFor="let tag of tagList; let i = index;"
                           class="tag tag-pill tag-default">
                           {{tag}}
-                          <i class="fa fa-times remove-tag-icon text-hover-danger" [ct-tooltip]="'Delete'"
+                          <i *ngIf="!readonly" class="fa fa-times remove-tag-icon text-hover-danger" [ct-tooltip]="'Delete'"
                              (click)="removeTag(i, $event)"></i>
                     </span>
                    
@@ -50,6 +50,9 @@ require("./compact-list.component.scss");
     `
 })
 export class CompactListComponent implements ControlValueAccessor  {
+
+    @Input()
+    public readonly = false;
 
     /**
      * Key codes

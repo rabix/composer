@@ -33,12 +33,12 @@ require("./expression-input.component.scss");
                         #input               
                         [type]="isExpr ? 'string' : type"
                         [value]="value?.toString()"
-                        [readonly]="isExpr || disableLiteralTextInput"
+                        [readonly]="isExpr || disableLiteralTextInput || readonly"
                         (blur)="onTouch()"
                         (click)="editExpr(isExpr || disableLiteralTextInput ? 'edit' : null, $event)"
                         (change)="editString(input.value)"/>
                         
-                    <span class="input-group-btn">
+                    <span class="input-group-btn" *ngIf="!readonly">
                         <button type="button"
                             class="btn btn-secondary" 
                             (click)="editExpr(isExpr ? 'clear' : 'edit', $event)">
@@ -64,6 +64,9 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
     /** When set to true, only expressions are allowed */
     @Input()
     public disableLiteralTextInput: boolean = false;
+
+    @Input()
+    public readonly = false;
 
     /** Flag if model is expression or primitive */
     private isExpr: boolean = false;
@@ -172,6 +175,8 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
                 closeOnOutsideClick: false,
                 title: "Edit Expression"
             });
+
+            editor.readonly = this.readonly;
 
             editor.model   = this.model;
             editor.context = this.context;

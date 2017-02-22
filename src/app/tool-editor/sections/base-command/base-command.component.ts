@@ -30,17 +30,18 @@ require("./base-command.components.scss");
 
                     <ct-expression-input
                             [context]="context" 
-                            [formControl]="baseCommandForm.controls[item.id]">              
+                            [formControl]="baseCommandForm.controls[item.id]"
+                            [readonly]="readonly">
                     </ct-expression-input>
 
-                    <div class="remove-icon clickable text-hover-danger" [ct-tooltip]="'Delete'" (click)="removeBaseCommand(item)">
+                    <div *ngIf="!readonly" class="remove-icon clickable text-hover-danger" [ct-tooltip]="'Delete'" (click)="removeBaseCommand(item)">
                         <i class="fa fa-trash"></i>
                     </div>
                 </li> 
             </ol>
           
 
-            <button type="button" *ngIf="formList.length > 0" class="btn btn-link add-btn-link no-underline-hover" (click)="addBaseCommand()">
+            <button type="button" *ngIf="formList.length > 0 && !readonly" class="btn btn-link add-btn-link no-underline-hover" (click)="addBaseCommand()">
                 <i class="fa fa-plus"></i> Add base command
             </button>
             
@@ -55,13 +56,19 @@ require("./base-command.components.scss");
             <div class="row">
                 <div class="col-xs-6">
                     <label class="form-control-label">Stdin redirect</label>
-                    <ct-expression-input [formControl]="streamsForm.controls['stdin']" 
-                        [context]="context"></ct-expression-input>
+                    <ct-expression-input
+                            [formControl]="streamsForm.controls['stdin']"
+                            [context]="context"
+                            [readonly]="readonly">
+                    </ct-expression-input>
                 </div>
                 <div class="col-xs-6">
                     <label class="form-control-label">Stdout redirect</label>
-                    <ct-expression-input [formControl]="streamsForm.controls['stdout']" 
-                        [context]="context"></ct-expression-input>
+                    <ct-expression-input
+                            [formControl]="streamsForm.controls['stdout']"
+                            [context]="context"
+                            [readonly]="readonly">
+                    </ct-expression-input>
                 </div>
             </div>
             
@@ -87,6 +94,13 @@ export class BaseCommandComponent extends ComponentBase implements OnInit, OnDes
     @Input()
     public form: FormGroup;
 
+    /** Context in which expression should be evaluated */
+    @Input()
+    public context: {$job: any};
+
+    @Input()
+    public readonly = false;
+
     /** Update event triggered on command form changes (add, remove, edit) */
     @Output()
     public updateCmd = new ReplaySubject<ExpressionModel[]>();
@@ -94,10 +108,6 @@ export class BaseCommandComponent extends ComponentBase implements OnInit, OnDes
     /** Update event triggered on stream changes */
     @Output()
     public updateStreams = new ReplaySubject<ExpressionModel[]>();
-
-    /** Context in which expression should be evaluated */
-    @Input()
-    public context: {$job: any};
 
     /** form group for streams */
     private streamsForm: FormGroup;
