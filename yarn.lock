@@ -1452,16 +1452,16 @@ custom-event@~1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/custom-event/-/custom-event-1.0.1.tgz#5d02a46850adf1b4a317946a3928fccb5bfd0425"
 
-cwl-svg@^0.0.6:
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/cwl-svg/-/cwl-svg-0.0.6.tgz#fa72ce2e2e8cacc7005869956aee241de52ec48c"
+cwl-svg@^0.0.8:
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/cwl-svg/-/cwl-svg-0.0.8.tgz#edaf9e0a19b7d281f155ac5127e36b3b3456e411"
   dependencies:
     core-js "^2.4.1"
     snapsvg-cjs "0.0.4"
 
-cwlts@^1.11.1:
-  version "1.11.1"
-  resolved "https://registry.yarnpkg.com/cwlts/-/cwlts-1.11.1.tgz#4cb5f5d01893d31d8a72483550462804d067fc71"
+cwlts@^1.11.3:
+  version "1.11.3"
+  resolved "https://registry.yarnpkg.com/cwlts/-/cwlts-1.11.3.tgz#79ec702e5573ebaf83fde262d85bacb9df7fc567"
 
 dashdash@^1.12.0:
   version "1.14.1"

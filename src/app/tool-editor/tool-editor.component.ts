@@ -117,6 +117,7 @@ require("./tool-editor.component.scss");
                                         class="gui-editor-component flex-col p-2"
                                         [job]="toolModel.job" 
                                         (update)="onJobUpdate($event)"
+                                        (reset)="resetJob()"
                                         [inputs]="toolModel.inputs"></ct-job-editor>
                                        
                                        
@@ -410,6 +411,11 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
         this.toolModel.setJob(job);
         this.toolModel.updateCommandLine();
     }
+
+    private resetJob() {
+        this.toolModel.resetJobDefaults();
+    }
+
 
     ngAfterViewInit() {
         this.inspector.setHostView(this.inspectorHostView);

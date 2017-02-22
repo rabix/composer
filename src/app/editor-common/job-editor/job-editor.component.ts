@@ -19,7 +19,17 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
 @Component({
     selector: "ct-job-editor",
     changeDetection: ChangeDetectionStrategy.OnPush,
-    template: `        
+    template: `    
+        <div class="row block mb-1">
+            <div class="col-xs-12">
+                <button class="btn btn-secondary pull-right"
+                        (click)="reset.emit()">
+                    Reset to mock values
+                </button>        
+            </div>
+        </div>
+        
+        
         <ct-form-panel>
             <div class="tc-header">Computational Resources</div>
             <div class="tc-body">
@@ -94,6 +104,9 @@ export class JobEditorComponent implements OnChanges {
 
     @Output()
     public update = new EventEmitter();
+
+    @Output()
+    public reset = new EventEmitter();
 
     constructor(private cdr: ChangeDetectorRef,
                 private statusBar: StatusBarService,
