@@ -22,23 +22,23 @@ import {StatusBarService} from "../../core/status-bar/status-bar.service";
             <span class="tc-name">Projects</span>
             <span class="tc-tools clickable">
                 <i *ngIf="(closedProjects | async)?.length"
-                   (click)="openProjectSelectionModal()"                   
+                   (click)="openProjectSelectionModal()"
                    class="fa fa-fw fa-plus-circle"></i>
             </span>
         </ct-panel-toolbar>
-        
+
         <div *ngIf="!isLoading && (openProjects | async)?.length === 0"
              class="alert alert-info m-1">
-             <i class="fa fa-info-circle alert-icon"></i>
+            <i class="fa fa-info-circle alert-icon"></i>
             There are no open projects. Select projects to open by clicking the plus above.
         </div>
-        
+
         <div *ngIf="isLoading">
             <div class="text-xs-center">
                 <small>Preparing Your Projects&hellip;</small>
             </div>
         </div>
-        
+
         <ct-tree-view [nodes]="nodes | async" [preferenceKey]="'user-projects'"></ct-tree-view>
     `
 })
@@ -144,7 +144,7 @@ export class SBUserProjectsPanelComponent extends ComponentBase {
                     contextMenu: this.contextMenu.getContextMenu(source.data.label, source.content),
                     openHandler: _ => {
                         this.workbox.openTab({
-                            id: source.data.class + "_" + source.data.label,
+                            id: source.data.class + "_" + source.data["sbg:id"],
                             title: Observable.of(source.data.label),
                             contentType: Observable.of(source.data.class),
                             contentData: source

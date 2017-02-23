@@ -44,8 +44,7 @@ require("./input-list.component.scss");
                         <!--List Entry-->
                         <li *ngFor="let entry of entries; let i = index" 
                             class="input-list-items container" 
-                            [class.record-input]="entry.type.type === 'record' || entry.type.items === 'record'">
-
+                            [class.record-input]="isRecordType(entry)">
                             <div class="gui-section-list-item clickable row"
                                 [ct-editor-inspector]="inspector"
                                 [ct-editor-inspector-target]="entry.loc"
@@ -90,11 +89,9 @@ require("./input-list.component.scss");
                                     </div>
                                 </ct-editor-inspector-content>
                             </template>
-                            
-                        
-                        <!--Nested entries-->
-                        <div *ngIf="entry.type.fields" class="children">
-                            <ct-tool-input-list *ngIf="isRecordType(entry)" [entries]="entry.type.fields"
+
+                        <div *ngIf="isRecordType(entry)" class="children">
+                            <ct-tool-input-list [entries]="entry.type.fields"
                                   [readonly]="readonly"
                                   [location]="getFieldsLocation(i)"
                                   [isField]="true"

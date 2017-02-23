@@ -1,20 +1,24 @@
-import {Component, forwardRef, Input, ElementRef, ViewChild, Renderer} from "@angular/core";
+import {
+    Component, forwardRef, Input, ViewChild, Renderer, Output, EventEmitter,
+    ChangeDetectionStrategy
+} from "@angular/core";
 import {NG_VALUE_ACCESSOR, ControlValueAccessor} from "@angular/forms";
 
 require("./toggle-slider.component.scss");
 
 @Component({
     selector: "ct-toggle-slider",
+    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ToggleComponent), multi: true }
     ],
     template: `
-        <span>{{ value ? on : off }}</span>
-
-        <label class="switch">
-            <input #checkbox type="checkbox" [checked]="value" (change)="toggleCheck()">
-            <div class="slider round" [class.disabled]="isDisabled"></div>
-        </label>
+            <span>{{ value ? on : off }}</span>
+    
+            <label class="switch">
+                <input #checkbox type="checkbox" [checked]="value" (change)="toggleCheck($event)" [disabled]="isDisabled">
+                <div class="slider round" [class.disabled]="isDisabled"></div>
+            </label>
     `
 })
 export class ToggleComponent implements ControlValueAccessor {
@@ -31,7 +35,10 @@ export class ToggleComponent implements ControlValueAccessor {
     public value = false;
 
     @Input()
-    public readonly = false;
+    public disabled = false;
+
+    @Output()
+    public change = new EventEmitter();
 
     @ViewChild('checkbox') checkbox;
 
@@ -48,9 +55,16 @@ export class ToggleComponent implements ControlValueAccessor {
 
     private propagateChange = (_) => {};
 
-    private toggleCheck(): void {
+    private toggleCheck(event): void {
+        event.stopPropagation();
+
         this.value = !this.value;
+        this.change.emit(this.value);
         this.propagateChange(this.value);
+    }
+
+    ngOnInit() {
+        this.setDisabledState(this.disabled);
     }
 
     writeValue(isChecked: boolean): void {

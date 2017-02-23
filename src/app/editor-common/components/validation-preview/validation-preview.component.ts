@@ -15,11 +15,11 @@ require("./validation-preview.component.scss");
        *ngIf="entry?.warnings.length && !entry.errors.length"></i> 
                 
     <ct-tooltip-content #warnings>
-        <div class="warning-text px-1" *ngFor="let warning of entry.warnings">{{ warning.message }}</div>
+        <p class="warning-text px-1" *ngFor="let warning of entry.warnings">{{ warning.message }}</p>
     </ct-tooltip-content>
     
     <ct-tooltip-content #errors>
-        <div class="text-console-error px-1" *ngFor="let error of entry.errors">{{ error.message }}</div>
+        <p class="text-console-error px-1" *ngFor="let error of entry.errors">{{ error.message }}</p>
     </ct-tooltip-content>
 `
 })

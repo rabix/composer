@@ -5,18 +5,29 @@ import {CoreModule} from "../core/core.module";
 import {EditorCommonModule} from "../editor-common/editor-common.module";
 import {CWLModule} from "../cwl/cwl.module";
 import {WorkflowStepInspector} from "./object-inspector/step-inspector/step-inspector.component";
+import {WorkflowStepInspectorTabInputs} from "./object-inspector/step-inspector/tabs/step-tab-inputs.component";
+import {WorkflowStepInspectorTabInfo} from "./object-inspector/step-inspector/tabs/step-tab-info.component";
+import {WorkflowStepInspectorTabStep} from "./object-inspector/step-inspector/tabs/step-tab-step.component";
+import {WorkflowStepInspectorInputEntry} from "./object-inspector/step-inspector/tabs/step-inspector-step-entry";
 import {WorkflowEditorComponent} from "./workflow-editor.component";
-import {WorkflowGraphEditorComponent} from "./workflow-graphic-editor/workflow-graph-editor.component";
+import {WorkflowNotGraphEditorComponent} from "./workflow-not-graphic-editor/workflow-not-graph-editor.component";
 import {WorkflowOutputInspector} from "./object-inspector/output-inspector/workflow-output-inspector.component";
 import {WorkflowInputInspector} from "./object-inspector/input-inspector/workflow-input-inspector.component";
+import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow-graph-editor.component";
 
 @NgModule({
     declarations: [
         WorkflowEditorComponent,
         WorkflowGraphEditorComponent,
-        WorkflowStepInspector,
+        WorkflowNotGraphEditorComponent,
+        WorkflowInputInspector,
         WorkflowOutputInspector,
-        WorkflowInputInspector
+        WorkflowStepInspector,
+        WorkflowStepInspectorInputEntry,
+        WorkflowStepInspectorTabInputs,
+        WorkflowStepInspectorTabInfo,
+        WorkflowStepInspectorTabStep,
+
     ],
     exports: [
         WorkflowEditorComponent

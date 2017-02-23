@@ -1,0 +1,193 @@
+// Color Scheme
+$color-background: rgb(41, 41, 41);
+
+$color-primary: #537388;
+$color-primary-alt: #2e556f;
+$color-secondary: #9a3daf;
+$color-tertiary: #e64d23;
+$color-neutral: rgb(121, 121, 121);
+$color-warning: rgb(246, 147, 54);
+$color-danger: rgb(214, 18, 33);
+
+// Color Application
+$background: $color-background;
+$node-background-color: $color-primary;
+$port-background-color: rgb(121, 121, 121);
+$port-highlight-color: $color-tertiary;
+$port-label-color: white;
+
+$edge-inner-color: white;
+$edge-inner-width: 2px;
+$edge-outer-color: $color-background;
+$edge-outer-width: 5px;
+
+$font-family: sans-serif;
+$font-color: white;
+
+svg.cwl-workflow {
+
+    fill: $background;
+    font-family: $font-family;
+    color: $font-color;
+    padding: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+
+    -webkit-transform: translateZ(0);
+    -moz-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    -o-transform: translateZ(0);
+    transform: translateZ(0);
+
+    .workflow {
+        @extend .noselect;
+    }
+
+    .node {
+
+        &.dragging {
+
+            .drag-handle {
+                stroke-width: 10;
+            }
+
+            .port {
+                display: none;
+            }
+        }
+
+        &.edge-hover {
+            .outer {
+                stroke: $port-highlight-color;
+            }
+        }
+
+        .drag-handle {
+            transition: all .3s;
+            stroke: $background;
+            stroke-width: 0;
+        }
+
+        &:hover {
+            .port .label {
+                transition: all .1s;
+                opacity: 1;
+                text-shadow: 1px 1px 4px $background;
+            }
+        }
+
+        .outer {
+            stroke: white;
+            stroke-width: 2px;
+            fill: $background;
+        }
+
+        .label {
+            text-anchor: middle;
+            fill: $font-color;
+            text-shadow: 1px 1px 4px $background;
+        }
+
+        .inner {
+            stroke: 0;
+            fill: $node-background-color;
+
+        }
+
+        .port {
+            stroke: 0;
+            fill: $port-background-color;
+
+            &:hover {
+                fill: $port-highlight-color;
+            }
+
+            &.output-port .label {
+                text-anchor: start;
+            }
+
+            &.input-port .label {
+                text-anchor: end;
+            }
+
+            .label {
+                transition: all .1s;
+                fill: $port-label-color;
+                font-size: .8em;
+                user-select: none;
+                pointer-events: none;
+                opacity: 0;
+            }
+        }
+    }
+
+    .edge {
+
+        &:hover .inner {
+            stroke: $port-highlight-color;
+        }
+
+        .inner, .outer {
+            fill: none;
+            stroke-linecap: round;
+        }
+
+        .inner {
+            stroke-width: 3px;
+            stroke: $edge-inner-color;
+        }
+        .outer {
+            stroke-width: 7px;
+            stroke: $edge-outer-color;
+        }
+    }
+
+    .unselectable {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        cursor: pointer;
+    }
+
+    //
+    .node-input-hover-zone,
+    .node-output-hover-zone {
+        fill: transparent;
+    }
+    .node-output-hover-zone,
+    .node-input-hover-zone {
+        pointer-events: none;
+    }
+    //
+    //.hover-child.output .output-port,
+    //.hover-child.input .input-port,
+    //.node-output-hover-zone:hover ~ .output-port,
+    //.node-input-hover-zone:hover ~ .input-port {
+    //  .io-port-label {
+    //    transition: all .1s;
+    //    opacity: .4;
+    //  }
+    //}
+    //
+    //.io-port-label:hover,
+    //.io-port:hover .io-port-label {
+    //  transition: all .1s;
+    //  opacity: 1 !important;
+    //  font-weight: 500;
+    //}
+
+}
+
+.noselect {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none;
+    /* Non-prefixed version, currently
+                                     supported by Chrome and Opera */
+}

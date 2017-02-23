@@ -32,13 +32,17 @@
   }
 }
 
+.cursor-pointer {
+  cursor: pointer;
+}
+
 .no-underline-hover:hover,
 .no-underline-hover:focus {
   text-decoration: none;
 }
 
 .zero-size {
-  font-size: 0px;
+  font-size: 0;
 }
 
 .full-width {
@@ -60,4 +64,9 @@
 .flex-fill {
   display: flex;
   flex-grow: 1;
+}
+
+.flex-baseline {
+  display: flex;
+  align-items: baseline;
 }

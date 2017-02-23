@@ -1,10 +1,11 @@
 import {Component, Input} from "@angular/core";
 import {WorkflowModel} from "cwlts/models";
+import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
 
-require('./workflow-graph-editor.component.scss');
+require('./workflow-not-graph-editor.component.scss');
 
 @Component({
-    selector: "ct-workflow-graph-editor",
+    selector: "ct-workflow-not-graph-editor",
     template: `
 <div class="row">
 
@@ -30,8 +31,9 @@ require('./workflow-graph-editor.component.scss');
                             class="input-list-items container">
 
                             <div class="gui-section-list-item clickable row"
-                                [ct-editor-inspector]="inspector"
-                                [ct-editor-inspector-target]="entry.loc">
+                                 [ct-editor-inspector]="inspector"
+                                 [ct-editor-inspector-target]="entry.loc" 
+                                 [ct-validation-class]="entry.validation">
 
                                 <!--ID Column-->
                                 <div class="col-sm-6" [title]="entry.id">
@@ -42,7 +44,7 @@ require('./workflow-graph-editor.component.scss');
                                 </div>
                                 <!--RUN Column-->
                                 <div class="col-sm-6">
-                                    {{ entry.run }}
+                                    {{ entry.run?.class }}: {{ entry.run?.label || entry.run?.id || entry.run }}
                                 </div>
                             </div>
                             
@@ -52,7 +54,8 @@ require('./workflow-graph-editor.component.scss');
                                     <div class="tc-header">{{ entry.id || entry.loc || "Step" }}</div>
                                     <div class="tc-body">
                                         <ct-workflow-step-inspector 
-                                            [step]="entry">
+                                            [step]="entry"
+                                            [workflowModel]="model">
                                         </ct-workflow-step-inspector>
                                     </div>
                                 </ct-editor-inspector-content>
@@ -163,8 +166,7 @@ require('./workflow-graph-editor.component.scss');
                                 <ct-editor-inspector-content>
                                     <div class="tc-header">{{ entry.id || entry.loc || "Output" }}</div>
                                     <div class="tc-body">
-                                        <ct-workflow-output-inspector
-                                                [output]="entry">
+                                        <ct-workflow-output-inspector [output]="entry">
                                         </ct-workflow-output-inspector>
                                     </div>
                                 </ct-editor-inspector-content>
@@ -178,10 +180,19 @@ require('./workflow-graph-editor.component.scss');
 </div>
 `
 })
-export class WorkflowGraphEditorComponent {
+export class WorkflowNotGraphEditorComponent {
     @Input()
     readonly: boolean;
 
     @Input()
     model: WorkflowModel;
+
+
+    constructor(private inspector: EditorInspectorService) {
+    }
+
+    ngOnDestroy() {
+        /* Close object inspector*/
+        this.inspector.hide();
+    }
 }

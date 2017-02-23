@@ -8,8 +8,13 @@ require("./tool-visual-editor.component.scss");
 @Component({
     selector: "ct-tool-visual-editor",
     template: `
+        <div class="row" *ngIf="model.cwlVersion !== 'sbg:draft-2'">
+            <div class="alert alert-warning">
+                Only tools which are <code>sbg:draft-2</code> are currently supported. This tool is versioned as <code>{{ model.cwlVersion }}</code>.
+            </div>
+        </div>
         
-        <div class="row">       
+        <div class="row" *ngIf="model.cwlVersion === 'sbg:draft-2'">       
             <form [class.col-xs-6]="showInspector" 
                   [class.col-xs-12]="!showInspector" 
                   [formGroup]="formGroup">

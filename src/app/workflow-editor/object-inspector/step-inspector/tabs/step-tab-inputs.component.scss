@@ -1,0 +1,14 @@
+@import "../../../../../assets/sass/mixins";
+
+ct-workflow-step-inspector-inputs {
+  .input-title {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: .5rem;
+
+    .input-label {
+      @include ellipsis();
+      display: block;
+    }
+  }
+}

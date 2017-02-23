@@ -22,7 +22,7 @@ import {noop} from "../../../lib/utils.lib";
         }
     ],
     template: `
-        <div [formGroup]="formGroup">
+        <div [formGroup]="formGroup" (change)="onInputsFormChange($event)">
             <div formArrayName="pairs">
                 <div *ngFor="let item of formGroup.controls['pairs'].controls; let i = index"
                      [formGroupName]="i"
@@ -136,5 +136,9 @@ export class MapListComponent extends ComponentBase implements ControlValueAcces
     }
 
     setDisabledState(isDisabled: boolean): void {
+    }
+
+    private onInputsFormChange ($event) {
+        $event.stopPropagation();
     }
 }

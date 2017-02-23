@@ -45,6 +45,10 @@ export class WorkboxService {
         this.activateTab(tab);
     }
 
+    public closeAllTabs() {
+        this.tabs.next([]);
+    }
+
     public activateNext() {
         const {tabs, activeTab} = this.extractValues();
         const index             = tabs.indexOf(activeTab);
