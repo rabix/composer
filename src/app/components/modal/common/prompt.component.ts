@@ -1,6 +1,5 @@
 import {Component, Input, Output} from "@angular/core";
 import {Subject} from "rxjs";
-import {assignable} from "../../../decorators/index";
 import {FormControl, FormGroup} from "@angular/forms";
 import {ComponentBase} from "../../common/component-base";
 
@@ -26,23 +25,18 @@ import {ComponentBase} from "../../common/component-base";
 })
 export class PromptComponent extends ComponentBase {
 
-    @assignable()
     @Input()
     public content: string;
 
-    @assignable()
     @Input()
     public cancellationLabel: string;
 
-    @assignable()
     @Input()
     public confirmationLabel: string;
 
-    @assignable("next")
     @Output()
     public decision = new Subject<boolean>();
 
-    @assignable()
     @Input()
     public formControl: FormControl;
 

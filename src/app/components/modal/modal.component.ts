@@ -12,7 +12,6 @@ import {
 } from "@angular/core";
 import {ModalService} from "./modal.service";
 import {Subscription, Observable, BehaviorSubject} from "rxjs/Rx";
-import {assignable} from "../../decorators";
 import {assign} from "../../helpers/chap";
 
 
@@ -42,7 +41,6 @@ export interface ModalOptions {
 })
 export class ModalComponent {
 
-    @assignable()
     @HostBinding("class.backdrop")
     private backdrop: boolean;
 
@@ -53,15 +51,12 @@ export class ModalComponent {
     private modalWindow: ViewContainerRef;
 
     /** Should the modal clouse when you click on the area outside of it? */
-    @assignable()
     public closeOnOutsideClick: boolean;
 
     /** Title of the modal window */
-    @assignable("next")
     public title: BehaviorSubject<string>;
 
     /** When you press the "ESC" key, should the modal be closed? */
-    @assignable()
     public closeOnEscape: boolean;
 
     /** Holds the ComponentRef object of a component that is injected and rendered inside the modal */

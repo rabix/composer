@@ -1,6 +1,5 @@
 import {Component, Input, Output} from "@angular/core";
 import {Subject} from "rxjs";
-import {assignable} from "../../../decorators";
 @Component({
     selector: "ct-modal-checkbox-prompt",
     template: `<form (ngSubmit)="decision.next(answer.checked)">
@@ -27,23 +26,18 @@ import {assignable} from "../../../decorators";
 })
 export class CheckboxPromptComponent {
 
-    @assignable()
     @Input()
     public content: string;
 
-    @assignable()
     @Input()
     public cancellationLabel: string;
 
-    @assignable()
     @Input()
     public confirmationLabel: string;
 
-    @assignable()
     @Input()
     public checkboxLabel: string;
 
-    @assignable("next")
     @Output()
     public decision = new Subject<boolean>();
 

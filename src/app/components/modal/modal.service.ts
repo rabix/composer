@@ -5,7 +5,6 @@ import {ConfirmComponent} from "./common/confirm.component";
 import {ModalComponent, ModalOptions} from "./modal.component";
 import {PromptComponent} from "./common/prompt.component";
 import {PromptParams, ConfirmationParams} from "./types";
-import {refAssign} from "../../lib/object.lib";
 
 @Injectable()
 export class ModalService {
@@ -74,7 +73,7 @@ export class ModalService {
             const ref = this.show<ConfirmComponent>(ConfirmComponent, {title: parameters.title});
 
             // Assign passed parameters to it
-            refAssign(ref, parameters);
+            Object.assign(ref, parameters);
 
             // Close the modal when any action is triggered on its output
             ref.decision.subscribe(accepted => {

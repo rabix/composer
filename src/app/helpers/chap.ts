@@ -1,4 +1,3 @@
-import {DECORATOR_KEY_ASSIGNABLE} from "../decorators";
 
 /**
  * Assigns values to @assignable properties of component instances
