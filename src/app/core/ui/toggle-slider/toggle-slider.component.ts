@@ -26,6 +26,9 @@ export class ToggleComponent implements ControlValueAccessor {
     private isDisabled: boolean = false;
 
     @Input()
+    public readonly = false;
+
+    @Input()
     public on = "On";
 
     @Input()
@@ -61,10 +64,6 @@ export class ToggleComponent implements ControlValueAccessor {
         this.value = !this.value;
         this.change.emit(this.value);
         this.propagateChange(this.value);
-    }
-
-    ngOnInit() {
-        this.setDisabledState(this.disabled);
     }
 
     writeValue(isChecked: boolean): void {
