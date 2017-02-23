@@ -106,7 +106,7 @@
   version "6.0.63"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.63.tgz#e08acbbd5946e0e95990b1c76f3ce5b7882a48eb"
 
-"@types/q@^0.0.32":
+"@types/q@*", "@types/q@^0.0.32":
   version "0.0.32"
   resolved "https://registry.yarnpkg.com/@types/q/-/q-0.0.32.tgz#bd284e57c84f1325da702babfc82a5328190c0c5"
 
@@ -114,7 +114,7 @@
   version "2.53.37"
   resolved "https://registry.yarnpkg.com/@types/selenium-webdriver/-/selenium-webdriver-2.53.37.tgz#34f743c20e53ae7100ede90870fde554df2447f8"
 
-"@types/selenium-webdriver@~2.53.39":
+"@types/selenium-webdriver@^2.53.39":
   version "2.53.39"
   resolved "https://registry.yarnpkg.com/@types/selenium-webdriver/-/selenium-webdriver-2.53.39.tgz#15ff93392c339abd39d6d3a04e715faa9a263cf3"
 
@@ -137,6 +137,13 @@
   resolved "https://registry.yarnpkg.com/@types/uglify-js/-/uglify-js-2.6.28.tgz#1499b48ca3a44132250b318cdde25b8f45f0c616"
   dependencies:
     "@types/source-map" "*"
+
+"@types/webdriverio@^4.5.2":
+  version "4.5.2"
+  resolved "https://registry.yarnpkg.com/@types/webdriverio/-/webdriverio-4.5.2.tgz#5d7d05e8a59705b15bd600d8fff9f592724da19a"
+  dependencies:
+    "@types/node" "*"
+    "@types/q" "*"
 
 "@types/webpack@^2.2.2":
   version "2.2.6"
@@ -457,23 +464,23 @@ atob@~1.1.0:
   resolved "https://registry.yarnpkg.com/atob/-/atob-1.1.3.tgz#95f13629b12c3a51a5d215abdce2aa9f32f80773"
 
 autoprefixer@^6.3.1:
-  version "6.7.4"
-  resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-6.7.4.tgz#b4405a263325c04a7c2b1c86fc603ad7bbfe01c6"
+  version "6.7.5"
+  resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-6.7.5.tgz#50848f39dc08730091d9495023487e7cc21f518d"
   dependencies:
-    browserslist "^1.7.4"
+    browserslist "^1.7.5"
     caniuse-db "^1.0.30000624"
     normalize-range "^0.1.2"
     num2fraction "^1.2.2"
-    postcss "^5.2.14"
+    postcss "^5.2.15"
     postcss-value-parser "^3.2.3"
 
 awesome-typescript-loader@~3.0.0-beta.18:
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/awesome-typescript-loader/-/awesome-typescript-loader-3.0.4.tgz#71391f1fc10eec1fed561adf8a99289813ff2063"
+  version "3.0.7"
+  resolved "https://registry.yarnpkg.com/awesome-typescript-loader/-/awesome-typescript-loader-3.0.7.tgz#6ac5c356bb503cbd92b051b0c21dac74e2716ec9"
   dependencies:
     colors "^1.1.2"
     enhanced-resolve "^3.1.0"
-    loader-utils "^0.2.16"
+    loader-utils "^1.0.2"
     lodash "^4.17.4"
     mkdirp "^0.5.1"
     object-assign "^4.1.1"
@@ -731,8 +738,8 @@ braces@^1.8.2:
     repeat-element "^1.1.2"
 
 brorand@^1.0.1:
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/brorand/-/brorand-1.0.7.tgz#6677fa5e4901bdbf9c9ec2a748e28dca407a9bfc"
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/brorand/-/brorand-1.1.0.tgz#12c25efe40a45e3c323eb8675a0a0ce57b22371f"
 
 browser-stdout@1.3.0:
   version "1.3.0"
@@ -789,12 +796,12 @@ browserify-zlib@^0.1.4:
   dependencies:
     pako "~0.2.0"
 
-browserslist@^1.0.1, browserslist@^1.5.2, browserslist@^1.7.4:
-  version "1.7.4"
-  resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-1.7.4.tgz#56a12da876f787223743a866224ccd8f97014628"
+browserslist@^1.0.1, browserslist@^1.5.2, browserslist@^1.7.5:
+  version "1.7.5"
+  resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-1.7.5.tgz#eca4713897b51e444283241facf3985de49a9e2b"
   dependencies:
     caniuse-db "^1.0.30000624"
-    electron-to-chromium "^1.2.2"
+    electron-to-chromium "^1.2.3"
 
 buffer-crc32@^0.2.1:
   version "0.2.13"
@@ -876,8 +883,8 @@ caniuse-api@^1.5.2:
     lodash.uniq "^4.3.0"
 
 caniuse-db@^1.0.30000346, caniuse-db@^1.0.30000624:
-  version "1.0.30000624"
-  resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000624.tgz#554b87547895e36f5fe128f4b7448a2ea5bf2213"
+  version "1.0.30000626"
+  resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000626.tgz#44363dc86857efaf758fea9faef6a15ed93d8f33"
 
 capture-stack-trace@^1.0.0:
   version "1.0.0"
@@ -950,8 +957,8 @@ clap@^1.0.9:
     chalk "^1.1.3"
 
 clean-css@4.0.x:
-  version "4.0.7"
-  resolved "https://registry.yarnpkg.com/clean-css/-/clean-css-4.0.7.tgz#d8fa8b4d87a125f38fa3d64afc59abfc68ba7790"
+  version "4.0.8"
+  resolved "https://registry.yarnpkg.com/clean-css/-/clean-css-4.0.8.tgz#063dfd593404d3a3d1db494d4b6d0f378b0781b6"
   dependencies:
     source-map "0.5.x"
 
@@ -1460,8 +1467,8 @@ cwl-svg@^0.0.8:
     snapsvg-cjs "0.0.4"
 
 cwlts@^1.11.3:
-  version "1.11.3"
-  resolved "https://registry.yarnpkg.com/cwlts/-/cwlts-1.11.3.tgz#79ec702e5573ebaf83fde262d85bacb9df7fc567"
+  version "1.11.5"
+  resolved "https://registry.yarnpkg.com/cwlts/-/cwlts-1.11.5.tgz#526bbf4a65247fff410e681bc51b0c0a8d85621a"
 
 dashdash@^1.12.0:
   version "1.14.1"
@@ -1770,9 +1777,9 @@ electron-packager@^8.1.0:
     sanitize-filename "^1.6.0"
     semver "^5.3.0"
 
-electron-to-chromium@^1.2.2:
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.2.2.tgz#e41bc9488c88e3cfa1e94bde28e8420d7d47c47c"
+electron-to-chromium@^1.2.3:
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.2.3.tgz#4b4d04d237c301f72e2d15c2137b2b79f9f5ab76"
 
 electron@1.4.14:
   version "1.4.14"
@@ -1782,13 +1789,16 @@ electron@1.4.14:
     extract-zip "^1.0.3"
 
 elliptic@^6.0.0:
-  version "6.3.3"
-  resolved "https://registry.yarnpkg.com/elliptic/-/elliptic-6.3.3.tgz#5482d9646d54bcb89fd7d994fc9e2e9568876e3f"
+  version "6.4.0"
+  resolved "https://registry.yarnpkg.com/elliptic/-/elliptic-6.4.0.tgz#cac9af8762c85836187003c8dfe193e5e2eae5df"
   dependencies:
     bn.js "^4.4.0"
     brorand "^1.0.1"
     hash.js "^1.0.0"
+    hmac-drbg "^1.0.0"
     inherits "^2.0.1"
+    minimalistic-assert "^1.0.0"
+    minimalistic-crypto-utils "^1.0.0"
 
 emojis-list@^2.0.0:
   version "2.1.0"
@@ -2585,7 +2595,7 @@ has@^1.0.1:
   dependencies:
     function-bind "^1.0.2"
 
-hash.js@^1.0.0:
+hash.js@^1.0.0, hash.js@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/hash.js/-/hash.js-1.0.3.tgz#1332ff00156c0a0ffdd8236013d07b77a0451573"
   dependencies:
@@ -2616,6 +2626,14 @@ he@1.1.x:
 highlight.js@^9.0.0:
   version "9.9.0"
   resolved "https://registry.yarnpkg.com/highlight.js/-/highlight.js-9.9.0.tgz#b9995dcfdc2773e307a34f0460d92b9a474782c0"
+
+hmac-drbg@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/hmac-drbg/-/hmac-drbg-1.0.0.tgz#3db471f45aae4a994a0688322171f51b8b91bee5"
+  dependencies:
+    hash.js "^1.0.3"
+    minimalistic-assert "^1.0.0"
+    minimalistic-crypto-utils "^1.0.1"
 
 hoek@2.x.x:
   version "2.16.3"
@@ -3349,6 +3367,14 @@ loader-utils@0.2.x, loader-utils@^0.2.11, loader-utils@^0.2.15, loader-utils@^0.
     json5 "^0.5.0"
     object-assign "^4.0.1"
 
+loader-utils@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/loader-utils/-/loader-utils-1.0.2.tgz#a9f923c865a974623391a8602d031137fad74830"
+  dependencies:
+    big.js "^3.1.3"
+    emojis-list "^2.0.0"
+    json5 "^0.5.0"
+
 locate-path@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/locate-path/-/locate-path-2.0.0.tgz#2b568b265eec944c6d9c0de9c3dbbbca0354cd8e"
@@ -3738,6 +3764,10 @@ minimalistic-assert@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/minimalistic-assert/-/minimalistic-assert-1.0.0.tgz#702be2dda6b37f4836bcb3f5db56641b64a1d3d3"
 
+minimalistic-crypto-utils@^1.0.0, minimalistic-crypto-utils@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/minimalistic-crypto-utils/-/minimalistic-crypto-utils-1.0.1.tgz#f6c00c1c0b082246e5c4d99dfb8c7c083b2b582a"
+
 minimatch@0.3:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-0.3.0.tgz#275d8edaac4f1bb3326472089e7949c8394699dd"
@@ -4004,8 +4034,8 @@ npm-install-package@^1.0.2:
     noop2 "^2.0.0"
 
 npm-run-all@^4.0.0:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/npm-run-all/-/npm-run-all-4.0.1.tgz#f10144d20b57ed9bbf6c36a8de9502e0b80f2b4e"
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/npm-run-all/-/npm-run-all-4.0.2.tgz#a84669348e6db6ccbe052200b4cdb6bfe034a4fe"
   dependencies:
     chalk "^1.1.3"
     cross-spawn "^5.0.1"
@@ -4584,9 +4614,9 @@ postcss-zindex@^2.0.1:
     postcss "^5.0.4"
     uniqs "^2.0.0"
 
-postcss@^5.0.10, postcss@^5.0.11, postcss@^5.0.12, postcss@^5.0.13, postcss@^5.0.14, postcss@^5.0.16, postcss@^5.0.2, postcss@^5.0.4, postcss@^5.0.5, postcss@^5.0.6, postcss@^5.0.8, postcss@^5.2.14:
-  version "5.2.14"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-5.2.14.tgz#47b4fbde363fd4f81e547f7e0e43d6d300267330"
+postcss@^5.0.10, postcss@^5.0.11, postcss@^5.0.12, postcss@^5.0.13, postcss@^5.0.14, postcss@^5.0.16, postcss@^5.0.2, postcss@^5.0.4, postcss@^5.0.5, postcss@^5.0.6, postcss@^5.0.8, postcss@^5.2.15:
+  version "5.2.15"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-5.2.15.tgz#a9e8685e50e06cc5b3fdea5297273246c26f5b30"
   dependencies:
     chalk "^1.1.3"
     js-base64 "^2.1.9"
@@ -4836,8 +4866,8 @@ readable-stream@^1.1.8, readable-stream@~1.1.9:
     string_decoder "~0.10.x"
 
 readable-stream@^2.0.0, "readable-stream@^2.0.0 || ^1.1.13", readable-stream@^2.0.1, readable-stream@^2.0.2, readable-stream@^2.0.5, readable-stream@^2.1.0:
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-2.2.2.tgz#a9e6fec3c7dda85f8bb1b3ba7028604556fc825e"
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-2.2.3.tgz#9cf49463985df016c8ae8813097a9293a9b33729"
   dependencies:
     buffer-shims "^1.0.0"
     core-util-is "~1.0.0"
@@ -4907,8 +4937,8 @@ reduce-function-call@^1.0.1:
     balanced-match "^0.4.2"
 
 reflect-metadata@^0.1.2, reflect-metadata@^0.1.9:
-  version "0.1.9"
-  resolved "https://registry.yarnpkg.com/reflect-metadata/-/reflect-metadata-0.1.9.tgz#987238dc87a516895fe457f130435ffbd763a4d4"
+  version "0.1.10"
+  resolved "https://registry.yarnpkg.com/reflect-metadata/-/reflect-metadata-0.1.10.tgz#b4f83704416acad89988c9b15635d47e03b9344a"
 
 regenerate@^1.2.1:
   version "1.3.2"
@@ -6165,8 +6195,8 @@ w3c-blob@0.0.1:
   resolved "https://registry.yarnpkg.com/w3c-blob/-/w3c-blob-0.0.1.tgz#b0cd352a1a50f515563420ffd5861f950f1d85b8"
 
 watchpack@^1.2.0:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/watchpack/-/watchpack-1.2.1.tgz#01efa80c5c29e5c56ba55d6f5470a35b6402f0b2"
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/watchpack/-/watchpack-1.3.1.tgz#7d8693907b28ce6013e7f3610aa2a1acf07dad87"
   dependencies:
     async "^2.1.2"
     chokidar "^1.4.3"

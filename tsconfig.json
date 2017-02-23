@@ -19,7 +19,8 @@
         "types": [
             "ace",
             "electron",
-            "jasmine"
+            "jasmine",
+            "webdriverio"
         ]
     },
     "exclude": [
