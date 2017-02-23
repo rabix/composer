@@ -24,7 +24,8 @@ require("./step-tab-inputs.component.scss");
                             <div class="input-title flex-baseline">
                                 
                                 <label class="input-label" [title]="input.label || input.id">
-                                    {{ input.label || input.id }} 
+                                    {{ input.label || input.id }}
+                                    <span class="text-danger" *ngIf="!input.type.isNullable">*</span>
                                     <i class="fa fa-info-circle text-muted"
                                        *ngIf="input.description"
                                        [ct-tooltip]="ctt"
@@ -35,6 +36,7 @@ require("./step-tab-inputs.component.scss");
                                 <div *ngIf="isFileType(input)" class="port-controls"> 
                                             <ct-toggle-slider
                                                 (change)="onPortOptionChange(input, $event ? 'port' : 'editable')"
+                                                [disabled]="!input.type.isNullable"
                                                 [on]="'Show'"
                                                 [off]="'Hide'"
                                                 [value]="input.isVisible">
@@ -204,7 +206,7 @@ export class WorkflowStepInspectorTabInputs extends ComponentBase {
 
         // Whenever inputs are updated, regroup them and sort them for display
         const grouped = this.step.in.reduce((acc, item) => {
-            const group = this.isFileType(item) ? item.type.isNullable ? null : "Files" : "App parameters";
+            const group = this.isFileType(item) ? "Files" : "App parameters";
             return Object.assign(acc, group ? {[group]: (acc[group] || []).concat(item)} : null);
 
         }, {});

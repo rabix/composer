@@ -16,7 +16,7 @@ require("./toggle-slider.component.scss");
             <span>{{ value ? on : off }}</span>
     
             <label class="switch">
-                <input #checkbox type="checkbox" [checked]="value" (change)="toggleCheck($event)">
+                <input #checkbox type="checkbox" [checked]="value" (change)="toggleCheck($event)" [disabled]="isDisabled">
                 <div class="slider round" [class.disabled]="isDisabled"></div>
             </label>
     `
@@ -33,6 +33,9 @@ export class ToggleComponent implements ControlValueAccessor {
 
     @Input()
     public value = false;
+
+    @Input()
+    public disabled = false;
 
     @Output()
     public change = new EventEmitter();
@@ -52,6 +55,10 @@ export class ToggleComponent implements ControlValueAccessor {
         this.value = !this.value;
         this.change.emit(this.value);
         this.propagateChange(this.value);
+    }
+
+    ngOnInit() {
+        this.setDisabledState(this.disabled);
     }
 
     writeValue(isChecked: boolean): void {
