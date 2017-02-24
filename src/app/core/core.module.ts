@@ -25,9 +25,12 @@ import {DropZones} from "./drag-and-drop/drop-zones-directive";
 import {LoggerDirective} from "./elements/debugger/logger.directive";
 import {DragOverDirective} from "./drag-and-drop/drag-over-directive";
 import {DropDownButtonComponent} from "./ui/dropdown-button/dropdown-button-component";
+import {DropDownMenuComponent} from "./ui/dropdown-button/dropdown-menu.component";
 
 @NgModule({
     entryComponents: [
+        DropDownMenuComponent,
+
         TooltipContentComponent,
 
         // Menu
@@ -43,6 +46,7 @@ import {DropDownButtonComponent} from "./ui/dropdown-button/dropdown-button-comp
     declarations: [
         // Drop down button
         DropDownButtonComponent,
+        DropDownMenuComponent,
 
         // Drag and Drop
         DragDirective,
@@ -127,7 +131,7 @@ import {DropDownButtonComponent} from "./ui/dropdown-button/dropdown-button-comp
     providers: [
         IpcService,
         GuidService,
-        ContextService,
+        ContextService
 
     ],
     imports: [BrowserModule, MomentModule]
