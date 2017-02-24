@@ -35,7 +35,7 @@ require("./expression-input.component.scss");
                         [value]="value?.toString()"
                         [readonly]="isExpr || disableLiteralTextInput || readonly"
                         (blur)="onTouch()"
-                        (click)="editExpr(isExpr || disableLiteralTextInput ? 'edit' : null, $event)"
+                        (click)="editExpr(isExpr || disableLiteralTextInput && !readonly ? 'edit' : null, $event)"
                         (change)="editString(input.value)"/>
                         
                     <span class="input-group-btn" *ngIf="!readonly">

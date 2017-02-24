@@ -43,6 +43,7 @@ import {noop} from "../../../../lib/utils.lib";
                 <label class="form-control-label">Position</label>
                 <input class="form-control"
                        type="number"
+                       [ct-disabled]="readonly"
                        [formControl]="inputBindingFormGroup.controls['position']"/>
              </div>
         
@@ -149,7 +150,7 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
             stageInputSection: [input],
             secondaryFilesSection: [input.inputBinding.secondaryFiles || []],
             valueFrom: [input.inputBinding.valueFrom, [Validators.required]],
-            position: [{value: input.inputBinding.position, disabled: this.readonly}, [Validators.pattern(/^\d+$/)]],
+            position: [input.inputBinding.position, [Validators.pattern(/^\d+$/)]],
             prefix: [input.inputBinding.prefix],
             separate: [input.inputBinding.separate !== false],
             itemSeparator: [!!input.inputBinding.itemSeparator ? input.inputBinding.itemSeparator : null]
@@ -176,10 +177,13 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
                 };
 
 
-                this.input.inputBinding = new CommandLineBindingModel(binding);
-                Object.assign(this.input.customProps, value.stageInputSection.customProps);
+                if (!this.readonly) {
+                    this.input.inputBinding = new CommandLineBindingModel(binding);
+                    Object.assign(this.input.customProps, value.stageInputSection.customProps);
 
-                this.propagateChange(this.input);
+                    this.propagateChange(this.input);
+                }
+
             });
     }
 
