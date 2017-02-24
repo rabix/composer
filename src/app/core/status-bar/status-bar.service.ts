@@ -27,7 +27,7 @@ export class StatusBarService {
 
         this.queueSize.next(this.queueSize.getValue() + 1);
 
-        this.process = (this.process || new Observable<string>()).concat(process);
+        this.process = (this.process || Observable as any).concat(process);
 
         process.last().subscribe(() => {
 
