@@ -19,7 +19,8 @@ require("./tool-visual-editor.component.scss");
                   [class.col-xs-12]="!showInspector" 
                   [formGroup]="formGroup">
                 <ct-docker-requirement [dockerRequirement]="model.docker"
-                                   (update)="setRequirement($event, true)">
+                                       (update)="setRequirement($event, true)"
+                                       [readonly]="readonly">
                 </ct-docker-requirement>
                                 
                 <ct-base-command [baseCommand]="model.baseCommand"
@@ -27,44 +28,52 @@ require("./tool-visual-editor.component.scss");
                                    [stdin]="model.stdin"
                                    [stdout]="model.stdout"
                                    (updateCmd)="updateModel('baseCommand', $event)"
-                                   (updateStreams)="setStreams($event)">
+                                   (updateStreams)="setStreams($event)"
+                                   [readonly]="readonly">
                 </ct-base-command>
                                 
                 <ct-tool-input [location]="model.loc + '.inputs'" [entries]="model.inputs"
                                    [context]="{$job: model.job}"
                                    [readonly]="readonly"
-                                   (update)="updateModel('inputs', $event)">                             
+                                   (update)="updateModel('inputs', $event)"
+                                   [readonly]="readonly">
                 </ct-tool-input>
                 
                 <ct-tool-output [location]="model.loc + '.outputs'" [entries]="model.outputs || []" 
                                   [context]="{$job: model.job}"
                                   [inputs]="model.inputs || []" 
                                   [readonly]="readonly" 
-                                  (update)="updateModel('outputs', $event)">                        
+                                  (update)="updateModel('outputs', $event)"
+                                  [readonly]="readonly">
                 </ct-tool-output>
                                    
                 <ct-resources [entries]="model.resources" 
                               [readonly]="readonly" 
                               (update)="setResource($event)" 
-                              [context]="{$job: model.job}">
+                              [context]="{$job: model.job}"
+                              [readonly]="readonly">
                 </ct-resources>
 
                 <ct-hint-list [entries]="model.hints || []" 
                               [context]="{$job: model.job}"
-                              (update)="setHints($event)"></ct-hint-list>
+                              (update)="setHints($event)"
+                              [readonly]="readonly">
+                </ct-hint-list>
                 
                 <ct-argument-list [location]="model.loc + '.arguments'" 
                                   [entries]="model.arguments || []"     
                                   [readonly]="readonly"                    
                                   (update)="updateModel('arguments', $event)"
-                                  [context]="{$job: model.job}">                
+                                  [context]="{$job: model.job}"
+                                  [readonly]="readonly">
                 </ct-argument-list>
                 
                 <ct-file-def-list [entries]="model.createFileRequirement?.fileDef || []"
                                   [location]="model.createFileRequirement?.loc"
                                   [readonly]="readonly"
                                   (update)="updateModel('createFileRequirement', $event)"
-                                  [context]="{$job: model.job}">
+                                  [context]="{$job: model.job}"
+                                  [readonly]="readonly">
                 </ct-file-def-list>
             </form>
         </div>

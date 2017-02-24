@@ -1,4 +1,4 @@
-import {Component, forwardRef} from "@angular/core";
+import {Component, forwardRef, Input} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormBuilder, FormGroup} from "@angular/forms";
 import {ComponentBase} from "../../../../components/common/component-base";
 import {CommandOutputParameterModel as OutProperty} from "cwlts/models/d2sb";
@@ -18,7 +18,8 @@ import {CommandOutputBindingModel} from "cwlts/models/d2sb/CommandOutputBindingM
         <div class="form-group">
             <label class="form-control-label">Output eval</label>
             <ct-expression-input [disableLiteralTextInput]="true"
-                                 [context]="context" 
+                                 [context]="context"
+                                 [readonly]="readonly"
                                  [formControl]="outputEvalFormGroup.controls['outputEval']">
             </ct-expression-input>
         </div>
@@ -28,8 +29,10 @@ import {CommandOutputBindingModel} from "cwlts/models/d2sb/CommandOutputBindingM
             <label class="form-control-label">Load Content</label>
             <span class="align-right">
                         <ct-toggle-slider [formControl]="outputEvalFormGroup.controls['loadContents']"
-                                    [on]="'Yes'"
-                                    [off]="'No'"></ct-toggle-slider>
+                                          [on]="'Yes'"
+                                          [off]="'No'"
+                                          [readonly]="readonly">
+                        </ct-toggle-slider>
                     </span>
         </div>
 
@@ -48,6 +51,9 @@ import {CommandOutputBindingModel} from "cwlts/models/d2sb/CommandOutputBindingM
  * TODO: add the load content property on the model
  * */
 export class OutputEvalSectionComponent extends ComponentBase implements ControlValueAccessor {
+
+    @Input()
+    public readonly = false;
 
     private output: OutProperty;
 

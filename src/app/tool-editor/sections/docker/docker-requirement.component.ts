@@ -32,6 +32,9 @@ export class DockerRequirementComponent extends ComponentBase implements OnChang
     @Input()
     public dockerRequirement: DockerRequirementModel;
 
+    @Input()
+    public readonly = false;
+
     private form: FormGroup;
 
     @Output()
@@ -41,7 +44,7 @@ export class DockerRequirementComponent extends ComponentBase implements OnChang
         this.form = new FormGroup({});
 
         const dockerPull = this.dockerRequirement ? this.dockerRequirement.dockerPull : "";
-        this.form.addControl("dockerPull", new FormControl(dockerPull));
+        this.form.addControl("dockerPull", new FormControl({value: dockerPull, disabled: this.readonly}));
 
         this.form.valueChanges.first().subscribe(changes => {
             const docker: DockerRequirement = this.dockerRequirement ?

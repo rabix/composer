@@ -13,6 +13,9 @@ export class EditorInspectorDirective extends ComponentBase {
     @Input("ct-editor-inspector-target")
     public target: any = this;
 
+    @Input("ct-editor-inspector-readonly")
+    public readonly = false;
+
     @HostBinding("class.ct-inspected")
     private isInspected = false;
 

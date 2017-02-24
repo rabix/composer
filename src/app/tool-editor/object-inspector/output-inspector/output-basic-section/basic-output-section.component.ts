@@ -28,8 +28,10 @@ require("./basic-output-section.component.scss");
         <label class="form-control-label">Required</label>
         <span class="align-right">                        
                         <ct-toggle-slider [formControl]="basicSectionForm.controls['isRequired']"
-                                    [on]="'Yes'"
-                                    [off]="'No'"></ct-toggle-slider>
+                                          [on]="'Yes'"
+                                          [off]="'No'"
+                                          [readonly]="readonly">
+                        </ct-toggle-slider>
                     </span>
     </div>
 
@@ -53,7 +55,9 @@ require("./basic-output-section.component.scss");
     <!--Glob-->
     <div class="form-group">
         <label class="form-control-label">Glob</label>
-        <ct-expression-input [context]="context" [formControl]="basicSectionForm.controls['glob']">
+        <ct-expression-input [context]="context"
+                             [formControl]="basicSectionForm.controls['glob']"
+                             [readonly]="readonly">
         </ct-expression-input>
     </div>
 
@@ -62,6 +66,9 @@ require("./basic-output-section.component.scss");
 `
 })
 export class BasicOutputSectionComponent extends ComponentBase implements ControlValueAccessor {
+
+    @Input()
+    public readonly = false;
 
     @Input()
     public context: {$job?: any, $self?: any} = {};
@@ -86,8 +93,8 @@ export class BasicOutputSectionComponent extends ComponentBase implements Contro
         this.output = output;
 
         this.basicSectionForm = this.formBuilder.group({
-            propertyIdForm: [this.output.id],
-            typeForm: [this.output.type, [Validators.required]],
+            propertyIdForm: [{value: this.output.id, disabled: this.readonly}],
+            typeForm: [{value: this.output.type, disabled: this.readonly}, [Validators.required]],
             glob: [this.output.outputBinding.glob],
             isRequired: [!this.output.type.isNullable],
             itemType: [!!this.output.type.items ? this.output.type.items : 'File'],

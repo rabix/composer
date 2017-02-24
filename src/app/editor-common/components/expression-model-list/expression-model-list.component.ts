@@ -22,10 +22,11 @@ import {ModalService} from "../../../components/modal/modal.service";
 
                     <ct-expression-input
                             [context]="context"
-                            [formControl]="form.controls[item.id]">
+                            [formControl]="form.controls[item.id]"
+                            [readonly]="readonly">
                     </ct-expression-input>
 
-                    <div class="remove-icon clickable"  (click)="removeExpressionModel(item)">
+                    <div *ngIf="!readonly" class="remove-icon clickable"  (click)="removeExpressionModel(item)">
                         <i [ct-tooltip]="'Delete'" class="fa fa-trash text-hover-danger"></i>
                     </div>
                 </li> 
@@ -34,10 +35,11 @@ import {ModalService} from "../../../components/modal/modal.service";
             <ct-blank-tool-state *ngIf="!formList.length"
                          [title]="emptyListText"
                          [buttonText]="addButtonText"
+                         [readonly]="readonly"
                          (buttonClick)="addExpressionModel()">
             </ct-blank-tool-state>
 
-            <button type="button" *ngIf="formList.length" class="btn btn-link add-btn-link no-underline-hover" 
+            <button type="button" *ngIf="formList.length && !readonly" class="btn btn-link add-btn-link no-underline-hover"
                          (click)="addExpressionModel()">
                 <i class="fa fa-plus"></i> {{addButtonText}}
             </button>
@@ -45,6 +47,9 @@ import {ModalService} from "../../../components/modal/modal.service";
 `
 })
 export class ExpressionModelListComponent extends ComponentBase implements ControlValueAccessor {
+
+    @Input()
+    public readonly = false;
 
     @Input()
     public addButtonText: string = "";

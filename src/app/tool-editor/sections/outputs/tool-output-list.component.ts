@@ -39,6 +39,7 @@ require("./output-list.component.scss");
                         <div class="gui-section-list-item clickable row"
                             [ct-editor-inspector]="inspector"
                             [ct-editor-inspector-target]="entry.loc"
+                            [ct-editor-inspector-readonly]="readonly"
                             [ct-validation-class]="entry.validation">
                         
                             <!--ID Column-->
@@ -93,7 +94,8 @@ require("./output-list.component.scss");
                                                (save)="updateOutput($event, i)" 
                                                [context]="context"
                                                [output]="entry"
-                                               [inputs]="inputs">
+                                               [inputs]="inputs"
+                                               [readonly]="readonly">
                                     </ct-tool-output-inspector>
                                 </div>
                             </ct-editor-inspector-content>

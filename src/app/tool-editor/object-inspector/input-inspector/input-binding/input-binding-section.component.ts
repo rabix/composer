@@ -33,6 +33,7 @@ import {noop} from "../../../../lib/utils.lib";
                 <label class="form-control-label">Value</label>
                 <ct-expression-input
                             [context]="context"
+                            [readonly]="readonly"
                             [formControl]="inputBindingFormGroup.controls['valueFrom']"
                             [disableLiteralTextInput]="true">
                 </ct-expression-input>
@@ -42,13 +43,14 @@ import {noop} from "../../../../lib/utils.lib";
                 <label class="form-control-label">Position</label>
                 <input class="form-control"
                        type="number"
+                       [ct-disabled]="readonly"
                        [formControl]="inputBindingFormGroup.controls['position']"/>
              </div>
         
             <div class="form-group">
                 <label class="form-control-label">Prefix</label>
                 <input class="form-control" 
-                       [ct-disabled]="isRecordType()"
+                       [ct-disabled]="isRecordType() || readonly"
                        [formControl]="inputBindingFormGroup.controls['prefix']"/>
             </div>
                  
@@ -59,6 +61,7 @@ import {noop} from "../../../../lib/utils.lib";
                                    [ct-disabled]="isRecordType()"
                                    [formControl]="inputBindingFormGroup.controls['separate']"
                                    [on]="'Separate'"
+                                   [readonly]="readonly"
                                    [off]="'Join'"></ct-toggle-slider>
                 </span>
             </div>
@@ -75,16 +78,22 @@ import {noop} from "../../../../lib/utils.lib";
             </div>
             
             <ct-stage-input *ngIf="isRecordType() || isFileType()" 
-            [formControl]="inputBindingFormGroup.controls['stageInputSection']">
+                            [formControl]="inputBindingFormGroup.controls['stageInputSection']"
+                            [readonly]="readonly">
             </ct-stage-input>
            
             <ct-secondary-file *ngIf="isFileType()"
-                             [formControl]="inputBindingFormGroup.controls['secondaryFilesSection']"
-                             [context]="context"></ct-secondary-file>
+                               [formControl]="inputBindingFormGroup.controls['secondaryFilesSection']"
+                               [context]="context"
+                               [readonly]="readonly">
+            </ct-secondary-file>
     </div>
     `
 })
 export class InputBindingSectionComponent extends ComponentBase implements ControlValueAccessor {
+
+    @Input()
+    public readonly = false;
 
     /** The type of the property as an input, so we can react to changes in the component */
     @Input()
@@ -168,10 +177,13 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
                 };
 
 
-                this.input.inputBinding = new CommandLineBindingModel(binding);
-                Object.assign(this.input.customProps, value.stageInputSection.customProps);
+                if (!this.readonly) {
+                    this.input.inputBinding = new CommandLineBindingModel(binding);
+                    Object.assign(this.input.customProps, value.stageInputSection.customProps);
 
-                this.propagateChange(this.input);
+                    this.propagateChange(this.input);
+                }
+
             });
     }
 

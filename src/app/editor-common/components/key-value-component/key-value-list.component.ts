@@ -73,6 +73,9 @@ require("./key-value-list.component.scss");
 export class KeyValueListComponent extends ComponentBase implements ControlValueAccessor {
 
     @Input()
+    public readonly = false;
+
+    @Input()
     public context: {$job: any} = { $job: {} };
 
     @Input()

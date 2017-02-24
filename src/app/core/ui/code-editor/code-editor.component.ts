@@ -119,6 +119,8 @@ export class CodeEditorComponent extends ComponentBase {
             });
         }
 
+        this.options.readOnly = this.readonly
+
         this.editor.setOptions(this.options);
 
         // Hack for disabling the warning message about a deprecated method

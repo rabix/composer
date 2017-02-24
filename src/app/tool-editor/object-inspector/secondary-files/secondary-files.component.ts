@@ -18,6 +18,7 @@ import {noop} from "../../../lib/utils.lib";
             [context]="context"
             [emptyListText]="'No Secondary Files defined.'"
             [addButtonText]="'Add secondary file'"
+            [readonly]="readonly"
             [formControl]="form"></expression-model-list>
     </div>
 </ct-form-panel>
@@ -25,6 +26,9 @@ import {noop} from "../../../lib/utils.lib";
 })
 
 export class SecondaryFilesComponent extends ComponentBase implements ControlValueAccessor {
+
+    @Input()
+    public readonly = false;
 
     /** Context in which expression should be evaluated */
     @Input()

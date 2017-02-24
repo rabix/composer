@@ -11,20 +11,25 @@ import {FileDef} from "cwlts/mappings/d2sb/FileDef";
     <div class="form-group file-name">
         <label class="form-control-label">File Name</label>
         <ct-expression-input [formControl]="form.controls['filename']"
-                             [context]="context">
+                             [context]="context"
+                             [readonly]="readonly">
         </ct-expression-input>
     </div>
     
     <div class="form-group file-content">
         <label class="form-control-label">File Content</label>
         <ct-literal-expression-input [formControl]="form.controls['fileContent']"
-                             [fileName]="fileName"
-                             [context]="context">
+                                     [fileName]="fileName"
+                                     [context]="context"
+                                     [readonly]="readonly">
         </ct-literal-expression-input> 
     </div>
 </form>`
 })
 export class FileDefInspectorComponent extends ComponentBase {
+
+    @Input()
+    public readonly = false;
 
     @Input()
     public fileDef: FileDefModel;

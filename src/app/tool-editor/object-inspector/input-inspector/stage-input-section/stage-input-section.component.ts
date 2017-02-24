@@ -1,4 +1,4 @@
-import {Component, forwardRef} from "@angular/core";
+import {Component, forwardRef, Input} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormBuilder, FormGroup} from "@angular/forms";
 import {ComponentBase} from "../../../../components/common/component-base";
 import {SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
@@ -31,8 +31,10 @@ import {noop} from "../../../../lib/utils.lib";
                 <label>Load Content</label>
                 <span class="align-right">
                     <ct-toggle-slider [formControl]="stageInputFormGroup.controls['loadContent']"
-                                   [off]="'No'" 
-                                   [on]="'Yes'"></ct-toggle-slider>
+                                      [off]="'No'"
+                                      [on]="'Yes'"
+                                      [readonly]="readonly">
+                    </ct-toggle-slider>
                 </span>
            </div>
        
@@ -42,6 +44,9 @@ import {noop} from "../../../../lib/utils.lib";
 })
 
 export class StageInputSectionComponent extends ComponentBase implements ControlValueAccessor {
+
+    @Input()
+    public readonly = false;
 
     private input: SBDraft2CommandInputParameterModel;
 
@@ -65,7 +70,7 @@ export class StageInputSectionComponent extends ComponentBase implements Control
         this.input = input;
 
         this.stageInputFormGroup = this.formBuilder.group({
-            stageInput: [this.input.customProps["sbg:stageInput"] || null],
+            stageInput: [{value: this.input.customProps["sbg:stageInput"] || null, disabled: this.readonly}],
             loadContent: [!!this.input.inputBinding && this.input.inputBinding.loadContents ? this.input.inputBinding.loadContents: false]
         });
 
