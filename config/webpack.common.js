@@ -5,8 +5,8 @@ try {
     envConfig = require('./env.json');
 } catch (ex) {
 
-    console.error("\x1b[95m", `
-    We couldn’t the “config/env.json” file.
+    console.log("\x1b[95m", `
+    We couldn’t find the “config/env.json” file.
     Please check the “config/env.example.json” for a sample on how to make your own configuration.  
     `);
     try {
