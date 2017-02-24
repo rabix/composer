@@ -107,6 +107,7 @@ require("./argument-list.component.scss");
                                     <ct-argument-inspector 
                                         (save)="updateArgument($event, entry)" 
                                         [argument]="entry"
+                                        [readonly]="readonly"
                                         [context]="context">                                            
                                     </ct-argument-inspector>
                                 </div>

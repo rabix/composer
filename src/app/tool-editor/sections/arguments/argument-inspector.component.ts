@@ -19,8 +19,9 @@ import {ComponentBase} from "../../../components/common/component-base";
                 <div class="form-group">
                     <label class="form-control-label">Expression</label>
                     <ct-expression-input 
-                    [context]="context"
-                    [formControl]="form.controls['valueFrom']">                    
+                      [context]="context"
+                      [readonly]="readonly"
+                      [formControl]="form.controls['valueFrom']">
                     </ct-expression-input>
                 </div>
                 
@@ -28,8 +29,10 @@ import {ComponentBase} from "../../../components/common/component-base";
                     <label>Prefix and value separation</label>
                     <span class="align-right">
                         <ct-toggle-slider [formControl]="form.controls['separate']"
-                                       [on]="'Separate'"
-                                       [off]="'Join'"></ct-toggle-slider>
+                                          [on]="'Separate'"
+                                          [off]="'Join'"
+                                          [readonly]="readonly">
+                        </ct-toggle-slider>
                     </span>
                 </div>
               
@@ -43,6 +46,9 @@ import {ComponentBase} from "../../../components/common/component-base";
 `
 })
 export class ArgumentInspector extends ComponentBase {
+
+    @Input()
+    public readonly = false;
 
     @Input()
     public argument: CommandArgumentModel;
@@ -64,8 +70,8 @@ export class ArgumentInspector extends ComponentBase {
         this.form = this.formBuilder.group({
             valueFrom: new FormControl(this.argument.valueFrom),
             separate: new FormControl(this.argument.separate !== false),
-            position: new FormControl(this.argument.position || 0),
-            prefix: new FormControl(this.argument.prefix || ''),
+            position: new FormControl({value: this.argument.position || 0, disabled: this.readonly}),
+            prefix: new FormControl({value: this.argument.prefix || '', disabled: this.readonly}),
         });
 
         this.tracked = this.form.valueChanges.subscribe(values => this.save.next(values));

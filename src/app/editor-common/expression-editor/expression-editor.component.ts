@@ -42,7 +42,7 @@ require("./expression-editor.component.scss");
             
             <div class="modal-footer">
                 <button (click)="action.next('close')" class="btn btn-secondary btn-sm" type="button">Cancel</button>
-                <button (click)="action.next('save')" class="btn btn-primary btn-sm" type="button">Save</button>
+                <button *ngIf="!readonly" (click)="action.next('save')" class="btn btn-primary btn-sm" type="button">Save</button>
             </div>
         </div>
         
@@ -66,6 +66,9 @@ export class ExpressionEditorComponent extends ComponentBase {
 
     @Input()
     public evaluator: (code: string) => Promise<string>;
+
+    @Input()
+    public readonly = false;
 
     @Output()
     public action = new Subject<"close"|"save">();

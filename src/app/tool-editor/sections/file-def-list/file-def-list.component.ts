@@ -85,7 +85,8 @@ require("./file-def-inspector.component.scss");
                                             <ct-file-def-inspector 
                                                 (save)="updateFileDef($event, i)" 
                                                 [context]="context"
-                                                [fileDef]="entry">
+                                                [fileDef]="entry"
+                                                [readonly]="readonly">
                                             </ct-file-def-inspector>
                                         </div>
                                 </ct-editor-inspector-content>

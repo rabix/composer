@@ -14,7 +14,8 @@ require("./input.component.scss");
                 <input #inputField
                        class="form-control input-sm"
                        [placeholder]="placeholder"
-                       [formControl]="control"/>
+                       [formControl]="control"
+                       [disabled]="readonly"/>
             </div>
         </label>
     `
@@ -33,6 +34,9 @@ export class InputComponent implements AfterViewInit {
 
     @Input()
     private name: string;
+
+    @Input()
+    public readonly = false;
 
     @ViewChild("inputField")
     private inputField: ElementRef;

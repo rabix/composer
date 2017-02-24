@@ -10,25 +10,35 @@ import {ComponentBase} from "../../../components/common/component-base";
         <form [formGroup]="form" (ngSubmit)="onSubmit(form)">
         
             <ct-basic-output-section [formControl]="form.controls['basicOutputSection']"
-                                 [context]="context">
+                                     [readonly]="readonly"
+                                     [context]="context">
             </ct-basic-output-section>
             
-            <ct-description-section [formControl]="form.controls['description']">            
+           <ct-description-section [formControl]="form.controls['description']"
+                                   [readonly]="readonly">
             </ct-description-section>    
                   
-            <ct-output-metadata-section [inputs]="inputList" [formControl]="form.controls['metaData']">            
+           <ct-output-metadata-section [inputs]="inputList"
+                                       [formControl]="form.controls['metaData']"
+                                       [readonly]="readonly">
             </ct-output-metadata-section>                  
             
-            <ct-output-eval [formControl]="form.controls['outputEval']">            
+            <ct-output-eval [formControl]="form.controls['outputEval']"
+                            [readonly]="readonly">
             </ct-output-eval>   
                      
-            <ct-secondary-file *ngIf="isFileType()" [formControl]="form.controls['secondaryFiles']">            
+            <ct-secondary-file *ngIf="isFileType()"
+                               [formControl]="form.controls['secondaryFiles']"
+                               [readonly]="readonly">
             </ct-secondary-file>
  
         </form>
 `
 })
 export class ToolOutputInspector extends ComponentBase implements OnChanges{
+
+    @Input()
+    public readonly = false;
 
     @Input()
     public inputs: SBDraft2CommandInputParameterModel[] = [];

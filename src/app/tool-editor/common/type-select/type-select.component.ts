@@ -52,6 +52,8 @@ export class InputTypeSelectComponent extends ComponentBase implements ControlVa
 
     private onChange = noop;
 
+    private skipOnChange = false;
+
     writeValue(paramType: InputParameterTypeModel): void {
         this.paramType = paramType;
 
@@ -69,7 +71,12 @@ export class InputTypeSelectComponent extends ComponentBase implements ControlVa
                 this.form.controls["items"].setValue("File");
             }
 
-            this.onChange(this.paramType);
+            // This method gets triggered if we set disabled state
+            // and there is no way to distinguish it from other events.
+            if (!this.skipOnChange) {
+                this.skipOnChange = false;
+                this.onChange(this.paramType);
+            }
         });
     }
 
@@ -79,5 +86,13 @@ export class InputTypeSelectComponent extends ComponentBase implements ControlVa
 
     registerOnTouched(fn: any): void {
         this.onTouched = fn;
+    }
+
+    setDisabledState(isDisabled: boolean) {
+        if (isDisabled) {
+            this.skipOnChange = true;
+            this.form.controls["type"].disable();
+            this.form.controls["items"].disable();
+        }
     }
 }

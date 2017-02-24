@@ -39,23 +39,27 @@ require("./quick-pick.component.scss");
     
     <button type="button"
             class="btn btn-primary"
-            *ngIf="!showCustom"
+            *ngIf="!showCustom && !readonly"
             (click)="createControl('')">Custom
     </button>
 
     <div *ngIf="showCustom" class="removable-form-control">
         <ct-expression-input [context]="context" 
-                             [formControl]="customControl" 
+                             [formControl]="customControl"
+                             [readonly]="readonly"
                              [type]="type">
         </ct-expression-input>
         
         <span class="remove-icon" (click)="removeControl($event)">
-            <i [ct-tooltip]="'Delete'" class="fa fa-trash text-hover-danger"></i>
+            <i *ngIf="!readonly" [ct-tooltip]="'Delete'" class="fa fa-trash text-hover-danger"></i>
         </span>
     </div>
     `
 })
 export class QuickPickComponent extends ComponentBase implements ControlValueAccessor, OnInit {
+
+    @Input()
+    public readonly = false;
 
     @Input()
     public suggestions: {[label: string]: string | number} | string[];
@@ -109,7 +113,9 @@ export class QuickPickComponent extends ComponentBase implements ControlValueAcc
 
         this.radioForm = new FormControl(this.computedVal);
         this.radioForm.valueChanges.subscribe(value => {
-            this.setValue(value);
+            if (!this.readonly) {
+                this.setValue(value);
+            }
         });
 
         if (this.showCustom) this.createControl(value);
@@ -174,11 +180,13 @@ available types: {[label: string]: string | number} | string[]`)
         this.customControl = new FormControl(value);
         this.showCustom    = true;
 
-        this.tracked = this.customControl.valueChanges
-            .subscribe((value: any) => {
-                this.onTouch();
-                this.value = value;
-            });
+        if (!this.readonly) {
+            this.tracked = this.customControl.valueChanges
+                .subscribe((value: any) => {
+                    this.onTouch();
+                    this.value = value;
+                });
+        }
     }
 
     private removeControl(event?: Event): void {

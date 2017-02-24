@@ -38,7 +38,9 @@ require("./output-metadata.component.scss");
                     [addEntryText]="'Add Metadata'"
                     [emptyListText]="'No metadata defined.'"
                     [context]="context"
-                    [formControl]="metadataForm.controls['metadataList']"></key-value-list>
+                    [formControl]="metadataForm.controls['metadataList']"
+                    [readonly]="readonly">
+            </key-value-list>
         </div>
     </div>
 
@@ -46,6 +48,9 @@ require("./output-metadata.component.scss");
 `
 })
 export class OutputMetaDataSectionComponent extends ComponentBase implements ControlValueAccessor {
+
+    @Input()
+    public readonly = false;
 
     @Input()
     public inputs: SBDraft2CommandInputParameterModel[] = [];
@@ -77,8 +82,8 @@ export class OutputMetaDataSectionComponent extends ComponentBase implements Con
             });
 
         this.metadataForm = this.formBuilder.group({
-            inheritMetadata: [this.output.outputBinding.inheritMetadataFrom || ""],
-            metadataList: [this.keyValueFormList]
+            inheritMetadata: [{value: this.output.outputBinding.inheritMetadataFrom || "", disabled: this.readonly}],
+            metadataList: [{value: this.keyValueFormList, disabled: this.readonly}]
         });
 
         this.listenToFormChanges();

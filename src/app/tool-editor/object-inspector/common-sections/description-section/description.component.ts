@@ -1,4 +1,4 @@
-import {Component, forwardRef} from "@angular/core";
+import {Component, forwardRef, Input} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormBuilder, FormGroup} from "@angular/forms";
 import {ComponentBase} from "../../../../components/common/component-base";
 import {CommandOutputParameterModel, SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
@@ -49,6 +49,9 @@ require("./description.component.scss");
 })
 export class DescriptionComponent extends ComponentBase implements ControlValueAccessor {
 
+    @Input()
+    public readonly = false;
+
     private port: CommandOutputParameterModel | SBDraft2CommandInputParameterModel;
 
     private onTouched = noop;
@@ -65,9 +68,9 @@ export class DescriptionComponent extends ComponentBase implements ControlValueA
         this.port = port;
 
         this.descriptionFormGroup = this.formBuilder.group({
-            label: [this.port.label],
-            description: [this.port.description],
-            fileTypes: [this.port.customProps["sbg:fileTypes"]]
+            label: [{value: this.port.label, disabled: this.readonly}],
+            description: [{value: this.port.description, disabled: this.readonly}],
+            fileTypes: [{value: this.port.customProps["sbg:fileTypes"], disabled: this.readonly}]
         });
 
         this.tracked = this.descriptionFormGroup.valueChanges

@@ -44,11 +44,11 @@ require("./input-list.component.scss");
                         <!--List Entry-->
                         <li *ngFor="let entry of entries; let i = index" 
                             class="input-list-items container" 
-                            [class.record-input]="isRecordType(entry)">                          
-
+                            [class.record-input]="isRecordType(entry)">
                             <div class="gui-section-list-item clickable row"
                                 [ct-editor-inspector]="inspector"
                                 [ct-editor-inspector-target]="entry.loc"
+                                [ct-editor-inspector-readonly]="readonly"
                                 [ct-validation-class]="entry.validation">
                                 
                                 <!--ID Column-->
@@ -83,7 +83,8 @@ require("./input-list.component.scss");
                                         <ct-tool-input-inspector 
                                             (save)="updateInput($event, i)" 
                                             [context]="context"
-                                            [input]="entry">
+                                            [input]="entry"
+                                            [readonly]="readonly">
                                         </ct-tool-input-inspector>
                                     </div>
                                 </ct-editor-inspector-content>

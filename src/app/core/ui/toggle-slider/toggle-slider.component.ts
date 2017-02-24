@@ -45,6 +45,12 @@ export class ToggleComponent implements ControlValueAccessor {
     constructor(private renderer: Renderer) {
     }
 
+    ngOnInit() {
+        if (this.readonly) {
+            this.setDisabledState(true);
+        }
+    }
+
     private onTouched = () => { };
 
     private propagateChange = (_) => {};
