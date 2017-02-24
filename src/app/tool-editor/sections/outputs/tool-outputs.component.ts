@@ -7,7 +7,8 @@ import {
     ViewChild
 } from "@angular/core";
 import {ComponentBase} from "../../../components/common/component-base";
-import {CommandOutputParameterModel, CommandInputParameterModel} from "cwlts/models/d2sb";
+import {CommandOutputParameterModel} from "cwlts/models/d2sb";
+import {CommandInputParameterModel} from "cwlts/models";
 import {ExternalLinks} from "../../../cwl/external-links";
 import {ToolOutputListComponent} from "./tool-output-list.component";
 
