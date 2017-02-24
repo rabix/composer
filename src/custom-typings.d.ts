@@ -39,18 +39,6 @@ interface Window {
 // Extra variables that live on Global that will be replaced by webpack DefinePlugin
 declare let ENV: string;
 
-interface GlobalEnvironment {
-    ENV;
-}
-
-interface WebpackRequire {
-    context(file: string, flag?: boolean, exp?: RegExp): any;
-}
-
-interface ErrorStackTraceLimit {
-    stackTraceLimit: number;
-}
-
 declare namespace Reflect {
     function decorate(decorators: ClassDecorator[], target: Function): Function;
     function decorate(decorators: (PropertyDecorator | MethodDecorator)[],
@@ -69,34 +57,9 @@ declare namespace Reflect {
                             target: Object,
                             targetKey: string | symbol): void;
 
-    function hasMetadata(metadataKey: any, target: Object): boolean;
-    function hasMetadata(metadataKey: any, target: Object, targetKey: string | symbol): boolean;
-
-    function hasOwnMetadata(metadataKey: any, target: Object): boolean;
-    function hasOwnMetadata(metadataKey: any, target: Object, targetKey: string | symbol): boolean;
-
     function getMetadata(metadataKey: any, target: Object): any;
     function getMetadata(metadataKey: any, target: Object, targetKey: string | symbol): any;
 
     function getOwnMetadata(metadataKey: any, target: Object): any;
     function getOwnMetadata(metadataKey: any, target: Object, targetKey: string | symbol): any;
-
-    function getMetadataKeys(target: Object): any[];
-    function getMetadataKeys(target: Object, targetKey: string | symbol): any[];
-
-    function getOwnMetadataKeys(target: Object): any[];
-    function getOwnMetadataKeys(target: Object, targetKey: string | symbol): any[];
-
-    function deleteMetadata(metadataKey: any, target: Object): boolean;
-    function deleteMetadata(metadataKey: any, target: Object, targetKey: string | symbol): boolean;
-}
-
-
-// We need this here since there is a problem with Zone.js typings
-interface Thenable<T> {
-    then<U>(onFulfilled?: (value: T) => U | Thenable<U>,
-            onRejected?: (error: any) => U | Thenable<U>): Thenable<U>;
-    then<U>(onFulfilled?: (value: T) => U | Thenable<U>,
-            onRejected?: (error: any) => void): Thenable<U>;
-    catch<U>(onRejected?: (error: any) => U | Thenable<U>): Thenable<U>;
 }

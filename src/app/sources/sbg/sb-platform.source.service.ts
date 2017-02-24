@@ -15,7 +15,7 @@ export class SBPlatformDataSourceService {
 
         return this.platform.getOwnProjects()
             .flatMap(Observable.from as any)
-            .map(project => {
+            .map((project: any) => {
                 return {
                     id: project.id,
                     data: project,

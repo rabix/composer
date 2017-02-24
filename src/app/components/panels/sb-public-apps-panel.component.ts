@@ -87,7 +87,7 @@ export class SBPublicAppsPanelComponent {
                     name: key,
                     icon: "angle",
                     isExpandable: true,
-                    childrenProvider: _ => Observable.of(categorized[key])
+                    childrenProvider: _ => Observable.of(categorized[key]) as any
                 })).sort(sortingMethod).concat(noToolkits.sort(sortingMethod));
 
             })).subscribe(categories => {

@@ -104,7 +104,7 @@ export class ModalService {
             const ref = this.show<PromptComponent>(PromptComponent, {title: parameters.title});
 
             // Pass given parameters to the PromptComponent instance
-            refAssign(ref, parameters);
+            Object.assign(ref, parameters);
 
             // Watch for the closing action of the component
             ref.decision.subscribe(content => {
@@ -123,7 +123,7 @@ export class ModalService {
     }) {
         return this.wrap<boolean>((resolve, reject) => {
             const ref = this.show<CheckboxPromptComponent>(CheckboxPromptComponent, {title: params.title});
-            refAssign(ref, params);
+            Object.assign(ref, params);
 
             ref.decision.subscribe(content => {
                 content !== null ? resolve(content) : reject();

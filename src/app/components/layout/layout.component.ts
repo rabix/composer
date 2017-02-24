@@ -1,16 +1,16 @@
-import {Component, OnInit, ViewChild, ElementRef, Input} from "@angular/core";
+import {Component, ElementRef, Input, ViewChild} from "@angular/core";
 import {BehaviorSubject, Subscription} from "rxjs";
 import {DomEventService} from "../../services/dom/dom-event.service";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {ComponentBase} from "../common/component-base";
 import {
-    PanelGroup,
-    PanelStatus,
-    PANEL_USER_PROJECTS,
+    PANEL_LOCAL_FILES,
     PANEL_PUBLIC_APPS,
     PANEL_STRUCTURE,
+    PANEL_USER_PROJECTS,
+    PanelGroup,
     PanelGroupMap,
-    PANEL_LOCAL_FILES
+    PanelStatus
 } from "./layout.types";
 import {StatusBarService} from "../../core/status-bar/status-bar.service";
 import {StatusBarComponent} from "../../core/status-bar/status-bar.component";

@@ -1,13 +1,5 @@
 import * as Yaml from "js-yaml";
-import {
-    Component,
-    Input,
-    OnDestroy,
-    OnInit,
-    TemplateRef,
-    ViewChild,
-    ViewContainerRef
-} from "@angular/core";
+import {Component, Input, OnDestroy, OnInit, TemplateRef, ViewChild, ViewContainerRef} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {BehaviorSubject, Subject} from "rxjs/Rx";
 import {Validation} from "cwlts/models/helpers/validation";
@@ -23,9 +15,8 @@ import {PlatformAPI} from "../services/api/platforms/platform-api.service";
 import {StatusBarService} from "../core/status-bar/status-bar.service";
 import {ModalService} from "../components/modal/modal.service";
 import {noop} from "../lib/utils.lib";
+import {CommandLineToolFactory} from "cwlts/models/generic/CommandLineToolFactory";
 import LoadOptions = jsyaml.LoadOptions;
-import {CommandLineToolFactory} from "../../../node_modules/cwlts/models/generic/CommandLineToolFactory";
-import {CommandLineToolModel} from "../../../node_modules/cwlts/models/generic/CommandLineToolModel";
 
 require("./tool-editor.component.scss");
 
@@ -194,7 +185,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
     private rawEditorContent = new BehaviorSubject("");
 
     /** Model that's recreated on document change */
-    private toolModel: CommandLineToolModel = CommandLineToolFactory.from(null, "document");
+    private toolModel = CommandLineToolFactory.from(null, "document");
 
     /** Sorted array of resulting command line parts */
     private commandLineParts: Subject<CommandLinePart[]> = new Subject();

@@ -7,7 +7,7 @@ export type PlatformSettings = {
     url: string,
     key: string,
     enabled: boolean
-}
+};
 
 @Injectable()
 export class SettingsService extends ComponentBase {
@@ -19,8 +19,13 @@ export class SettingsService extends ComponentBase {
     constructor(private userPreferencesService: UserPreferencesService) {
         super();
 
-        this.tracked = this.userPreferencesService.get("platformConnectionSettings", false)
-            .subscribe(prefs => prefs ? this.platformConfiguration.next(prefs) : this.validity.next(false));
+        this.tracked = this.userPreferencesService.get<PlatformSettings|boolean>("platformConnectionSettings", false)
+            .subscribe(prefs => {
+                if (prefs === false) {
+                    return this.validity.next(false);
+                }
+                this.platformConfiguration.next(prefs as PlatformSettings);
+            });
 
         this.platformConfiguration.subscribe(settings => {
             this.userPreferencesService.put("platformConnectionSettings", settings);

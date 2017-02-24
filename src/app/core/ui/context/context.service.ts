@@ -25,7 +25,7 @@ export class ContextService {
         nEl.style.left     = x + "px";
         nEl.style.top      = y + "px";
 
-        Observable.fromEvent(document, "click").first().subscribe(_ => {
+        Observable.fromEvent(document, "click").first().subscribe(() => {
             this.close();
         });
     }

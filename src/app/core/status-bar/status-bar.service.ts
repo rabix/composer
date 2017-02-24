@@ -15,7 +15,7 @@ export class StatusBarService {
 
     public process: Observable<string>;
 
-    public readonly controls = new ReplaySubject<TemplateRef>();
+    public readonly controls = new ReplaySubject<TemplateRef<any>>();
 
     private processMap = {};
 
@@ -27,7 +27,7 @@ export class StatusBarService {
 
         this.queueSize.next(this.queueSize.getValue() + 1);
 
-        this.process = (this.process || Observable).concat(process);
+        this.process = (this.process || new Observable<string>()).concat(process);
 
         process.last().subscribe(() => {
 
@@ -49,7 +49,9 @@ export class StatusBarService {
         this.processMap[id] = p;
         this.enqueue(p, completionMessage);
 
-        p.subscribe(noop, noop, () => delete this.processMap[name]);
+        p.subscribe(noop, noop, () => {
+            delete this.processMap[id];
+        });
 
         return id;
     }
@@ -77,7 +79,7 @@ export class StatusBarService {
         this.status.next({message, time: time ? new Date() : undefined});
     }
 
-    public setControls(tpl: TemplateRef) {
+    public setControls(tpl: TemplateRef<any>) {
         this.controls.next(tpl);
     }
 

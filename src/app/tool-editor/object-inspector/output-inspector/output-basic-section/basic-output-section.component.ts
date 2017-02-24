@@ -8,9 +8,9 @@ import {
     NG_VALIDATORS
 } from "@angular/forms";
 import {CommandOutputParameterModel as OutputProperty} from "cwlts/models/d2sb";
-import {OutputParameterTypeModel} from "cwlts/models/d2sb/OutputParameterTypeModel";
 import {ComponentBase} from "../../../../components/common/component-base";
 import {noop} from "../../../../lib/utils.lib";
+import {OutputParameterTypeModel} from "cwlts/models";
 
 require("./basic-output-section.component.scss");
 

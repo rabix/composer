@@ -1,8 +1,7 @@
 import {Component, Input} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {ModalService} from "../modal.service";
-import {ReplaySubject} from "rxjs";
-import {PlatformProjectEntry} from "../../../services/api/platforms/platform-api.types";
+import {Observable} from "rxjs";
 
 @Component({
     selector: 'ct-project-selection-modal',
@@ -31,10 +30,10 @@ import {PlatformProjectEntry} from "../../../services/api/platforms/platform-api
 export class ProjectSelectionModal {
 
     @Input()
-    public save: (selectedProject: string) => ReplaySubject<{id: string, data: PlatformProjectEntry}>;
+    public save: (selectedProject: string) => void;
 
     @Input()
-    public closedProjects: string;
+    public closedProjects: Observable<string>;
 
     private selectedProject: string;
 

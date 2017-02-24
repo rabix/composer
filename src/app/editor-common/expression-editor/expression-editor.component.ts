@@ -97,7 +97,7 @@ export class ExpressionEditorComponent extends ComponentBase {
 
     private transformContext(context: {$job?: Object, $self?: Object} = {}): TreeNode[] {
 
-        const wrap = (nodes, path = "") => Object.keys(nodes).map(key => {
+        const wrap = (nodes, path = ""): TreeNode[] => Object.keys(nodes).map(key => {
             const node = nodes[key];
 
             let type = typeof node;
@@ -134,17 +134,17 @@ export class ExpressionEditorComponent extends ComponentBase {
                 openHandler = () => {
 
 
-                    trace = trace.split(".").map(p => (parseInt(p) == p) ? `[${p}]` : p).join(".")
+                    trace = trace.split(".").map(p => (parseInt(p).toString() == p) ? `[${p}]` : p).join(".")
                         .replace(/\]\.\[/g, "][")
                         .replace(/\.\[/g, "[");
                     this.editor.editor.session.insert(this.editor.editor.getCursorPosition(), String(trace));
                 };
             }
 
-            return {name, childrenProvider, icon, openHandler};
+            return {name, childrenProvider, icon, openHandler} as TreeNode;
         });
 
-        return wrap(context);
+        return wrap(context) as TreeNode[];
 
     }
 }

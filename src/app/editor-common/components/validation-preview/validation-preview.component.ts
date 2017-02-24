@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, Input} from "@angular/core";
 import {Validation} from "cwlts/models/helpers/validation";
 
 require("./validation-preview.component.scss");

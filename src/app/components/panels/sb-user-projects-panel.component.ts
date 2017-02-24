@@ -44,17 +44,17 @@ import {StatusBarService} from "../../core/status-bar/status-bar.service";
 })
 export class SBUserProjectsPanelComponent extends ComponentBase {
 
-    private nodes = new ReplaySubject(1);
+    public nodes = new ReplaySubject(1);
 
-    private isLoading = false;
+    public isLoading = false;
 
     private allProjects = new ReplaySubject<{ id: string, data: PlatformProjectEntry }>();
 
-    private openProjects = new ReplaySubject(1);
+    public openProjects = new ReplaySubject(1);
 
-    private closedProjects = new ReplaySubject(1);
+    public closedProjects = new ReplaySubject(1);
 
-    private projectUpdates = new Subject();
+    public projectUpdates = new Subject();
 
     constructor(private dataSource: SBPlatformDataSourceService,
                 private workbox: WorkboxService,
@@ -85,9 +85,9 @@ export class SBUserProjectsPanelComponent extends ComponentBase {
                     isOpen: (openProjectPrefs[config.url] || []).indexOf(p.id) !== -1
                 }));
             })
-            .subscribe(this.allProjects);
+            .subscribe(this.allProjects as any);
 
-        this.allProjects.map((projects: any[]) => {
+        this.allProjects.map((projects: any) => {
             return projects.reduce((acc, curr) => {
                 acc[curr.isOpen ? "open" : "closed"].push(curr);
                 return acc;
@@ -111,7 +111,7 @@ export class SBUserProjectsPanelComponent extends ComponentBase {
                 this.isLoading = false;
                 this.nodes.next(data.nodes);
                 this.preferences.put("open_projects", Object.assign(data.projects, {
-                    [data.conf.url]: data.nodes.map(n => n.id)
+                    [data.conf.url]: (data.nodes as any[]).map(n => n.id)
                 }));
             });
 
@@ -163,7 +163,7 @@ export class SBUserProjectsPanelComponent extends ComponentBase {
     }
 
     private openProjectSelectionModal() {
-        const component = this.modal.show<ProjectSelectionModal>(ProjectSelectionModal, {
+        const component = this.modal.show(ProjectSelectionModal, {
             title: "Open Project",
             closeOnOutsideClick: true,
             closeOnEscape: true

@@ -82,6 +82,7 @@
         "@types/js-yaml": "^3.5.29",
         "@types/node": "^7.0.0",
         "@types/selenium-webdriver": "^2.53.39",
+        "@types/snapsvg": "^0.4.27",
         "@types/source-map": "^0.5.0",
         "@types/uglify-js": "^2.0.27",
         "@types/webpack": "^2.2.2",

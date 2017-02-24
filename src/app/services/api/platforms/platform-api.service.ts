@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {Http, Headers, URLSearchParams} from "@angular/http";
+import {Headers, Http, URLSearchParams} from "@angular/http";
 import {ENVP} from "../../../config/env.config";
 import {Observable, ReplaySubject} from "rxjs";
 import {PlatformAppEntry, PlatformProjectEntry} from "./platform-api.types";
@@ -33,7 +33,7 @@ export class PlatformAPI {
 
     private sessionID = new ReplaySubject(1);
 
-    private platformServices: {brood: string, watson: string, gatekeeper: string} = {} as any;
+    private platformServices: { brood: string, watson: string, gatekeeper: string } = {} as any;
 
     constructor(private http: Http, private settings: SettingsService) {
         this.settings.platformConfiguration.subscribe(config => {
@@ -73,7 +73,7 @@ export class PlatformAPI {
     }
 
     private getServiceUrl(platformUrl: string, serviceName: string) {
-        const isVayu    = platformUrl.indexOf("-vayu.sbgenomics.com") !== -1;
+        const isVayu = platformUrl.indexOf("-vayu.sbgenomics.com") !== -1;
         const isStaging = platformUrl.indexOf("staging-igor.sbgenomics.com") !== -1;
 
         let serviceUrl = platformUrl.replace("igor", serviceName);
@@ -104,7 +104,6 @@ export class PlatformAPI {
 
     /**
      * @deprecated
-     * @returns {Observable<T>}
      */
     public getApps(): Observable<PlatformAppEntry[]> {
 
@@ -127,7 +126,7 @@ export class PlatformAPI {
         })))).first();
     }
 
-    public getAppCWL(app, revision: number) {
+    public getAppCWL(app, revision?: number) {
 
         const id = app["sbg:id"].split("/").slice(0, -1).concat(revision).filter(x => x !== undefined).join("/");
 
@@ -161,14 +160,15 @@ export class PlatformAPI {
     public saveApp(app: PlatformAppEntry, revisionNote: string) {
 
         // Take the App id without the revision id
-        let appPath = app["sbg:id"].split("/");
-        appPath.pop();
-        appPath = appPath.join("/");
+        const appPathChunks = app["sbg:id"].split("/");
+        appPathChunks.pop();
+
+        const appPath = appPathChunks.join("/");
 
         // Checkout the newest version of this App to get the latest revision
         return this.sessionID.switchMap(sessionID => this.getApp(appPath).flatMap(latestApp => {
             const nextRevision = (latestApp["sbg:latestRevision"] || 0) + 1;
-            const endpoint     = `${this.platformServices.brood}/apps/${appPath}/${nextRevision}`;
+            const endpoint = `${this.platformServices.brood}/apps/${appPath}/${nextRevision}`;
 
             return this.http.post(endpoint, Object.assign({}, app, {
                 "sbg:revisionNotes": revisionNote

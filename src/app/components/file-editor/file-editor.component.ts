@@ -1,7 +1,6 @@
-import {Component, OnInit, Input} from "@angular/core";
+import {Component, Input, OnInit} from "@angular/core";
 import {BehaviorSubject} from "rxjs";
 import {DataEntrySource} from "../../sources/common/interfaces";
-import {logop} from "../../lib/utils.lib";
 import {ComponentBase} from "../common/component-base";
 import {StatusBarService} from "../../core/status-bar/status-bar.service";
 

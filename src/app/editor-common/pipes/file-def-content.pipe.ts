@@ -1,6 +1,6 @@
 import {Pipe, PipeTransform} from "@angular/core";
 import {ExpressionModel} from "cwlts/models/d2sb";
-import {Expression} from "../../../../node_modules/cwlts/mappings/d2sb/Expression";
+import {Expression} from "cwlts/mappings/d2sb/Expression";
 
 @Pipe({
     name: "fileDefContent"

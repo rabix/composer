@@ -22,8 +22,4 @@ export class MenuItem {
             isEnabled: new BehaviorSubject(true)
         }, streams || {});
     }
-
-    public addChild(item: MenuItem): void {
-        this.children.push(item);
-    }
 }

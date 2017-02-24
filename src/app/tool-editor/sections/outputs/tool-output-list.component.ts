@@ -1,10 +1,11 @@
 import {Component, Input, ChangeDetectionStrategy, Output, ViewChildren, QueryList, TemplateRef} from "@angular/core";
 import {ComponentBase} from "../../../components/common/component-base";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
-import {CommandOutputParameterModel, CommandInputParameterModel} from "cwlts/models/d2sb";
 import {Subject} from "rxjs";
 import {ModalService} from "../../../components/modal/modal.service";
 import {noop} from "../../../lib/utils.lib";
+import {CommandInputParameterModel} from "cwlts/models/generic/CommandInputParameterModel";
+import {CommandOutputParameterModel} from "cwlts/models/d2sb";
 
 require("./output-list.component.scss");
 

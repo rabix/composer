@@ -1,4 +1,4 @@
-import {Component, Input, Output, ChangeDetectionStrategy} from "@angular/core";
+import {ChangeDetectionStrategy, Component, Input, Output} from "@angular/core";
 import {ExternalLinks} from "../../../cwl/external-links";
 import {ExpressionModel, RequirementBaseModel} from "cwlts/models/d2sb";
 import {FormControl} from "@angular/forms";
@@ -16,8 +16,8 @@ import {ComponentBase} from "../../../components/common/component-base";
             </div>
 
             <div class="tc-body">
-            
-                <key-value-list 
+
+                <key-value-list
                     [addEntryText]="'Add a Hint'"
                     [emptyListText]="'Special flags for tool execution'"
                     [keyColumnText]="'Class'"
@@ -28,13 +28,13 @@ import {ComponentBase} from "../../../components/common/component-base";
                     [formControl]="form"></key-value-list>
             </div>
         </ct-form-panel>
-`
+    `
 })
 export class HintListComponent extends ComponentBase {
 
     /** Context in which expression should be evaluated */
     @Input()
-    public context: {$job: any} = { $job: {} };
+    public context: { $job: any } = {$job: {}};
 
     /** List of entries that should be shown */
     @Input()
@@ -69,12 +69,15 @@ export class HintListComponent extends ComponentBase {
     }
 
 
-    private createFormList(entries: RequirementBaseModel[]): {key: string, value: string, readonly: boolean}[] {
-
+    private createFormList(entries: RequirementBaseModel[]): {
+        key: string,
+        value: string | ExpressionModel,
+        readonly: boolean
+    }[] {
         return entries.map((hint: RequirementBaseModel) => {
             let newHint = {
                 key: hint['class'],
-                value: "",
+                value: <string | ExpressionModel>"",
                 readonly: false
             };
 
@@ -96,10 +99,10 @@ export class HintListComponent extends ComponentBase {
     }
 
     private createHintList(formList: {
-        key?: string,
-        value: string | ExpressionModel,
-        readonly: boolean
-    }[]): any[] {
+                               key?: string,
+                               value: string | ExpressionModel,
+                               readonly: boolean
+                           }[]): any[] {
 
         return formList
             .map((item): RequirementBaseModel | any => {
@@ -111,7 +114,7 @@ export class HintListComponent extends ComponentBase {
                             customProps: JSON.parse(item.value)
                         }).serialize();
 
-                    } else  if (!item.key) {
+                    } else if (!item.key) {
                         return JSON.parse(item.value);
                     }
                 }
@@ -128,7 +131,7 @@ export class HintListComponent extends ComponentBase {
 
     private validateClassForm(c: FormControl) {
 
-        if (c.value  === "sbg:MemRequirement"
+        if (c.value === "sbg:MemRequirement"
             || c.value === "sbg:CPURequirement"
             || c.value === "DockerRequirement") {
 

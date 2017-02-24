@@ -109,7 +109,7 @@ export class DomEventService {
 
     public onDrag(element: Element, ctName = "", ctData = {}) {
 
-        const down = Observable.fromEvent(element, "mousedown").do(ev => {
+        const down = Observable.fromEvent(element, "mousedown").do((ev: MouseEvent) => {
             ev.stopPropagation && ev.stopPropagation();
             ev.preventDefault && ev.preventDefault();
         });

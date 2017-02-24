@@ -25,7 +25,7 @@ export class DragOverDirective extends ComponentBase {
     }
 
     ngOnInit() {
-        this.tracked = this.dragOver().subscribe(_ => {
+        this.tracked = this.dragOver().subscribe(() => {
             this.domEvents.triggerCustomEventOnElements([this.el], this.domEvents.ON_DRAG_OVER_EVENT);
         });
     }

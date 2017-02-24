@@ -21,7 +21,7 @@ export class LocalDataSourceService {
 
     constructor(private ipc: IpcService) {
 
-        this.files = this.fileUpdates.scan((files, update) => update(files), {});
+        this.files = this.fileUpdates.scan((files, update: Function) => update(files), {});
     }
 
 

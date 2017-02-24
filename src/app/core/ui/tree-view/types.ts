@@ -3,7 +3,7 @@ import {Observable} from "rxjs/Rx";
 export interface TreeNode {
     id?: string;
     name: string;
-    icon?: Observable<string>,
+    icon?: Observable<string> | string,
     isExpandable?: boolean;
     openHandler?: (...any: any[]) => Observable<any>;
     childrenProvider?: (...any: any[]) => Observable<TreeNode[]>

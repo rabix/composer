@@ -50,7 +50,7 @@ export class ToolInputInspector extends ComponentBase {
         });
 
 
-        this.tracked = this.form.valueChanges.subscribe(_ => {
+        this.tracked = this.form.valueChanges.subscribe(() => {
             this.save.next(this.input);
         });
     }

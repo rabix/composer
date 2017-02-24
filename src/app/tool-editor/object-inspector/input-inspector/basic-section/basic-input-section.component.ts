@@ -1,19 +1,17 @@
-import {Component, Input, forwardRef} from "@angular/core";
+import {Component, forwardRef, Input} from "@angular/core";
 import {
-    Validators,
-    FormControl,
     ControlValueAccessor,
-    NG_VALUE_ACCESSOR,
-    FormGroup,
     FormBuilder,
-    NG_VALIDATORS
+    FormControl,
+    FormGroup,
+    NG_VALIDATORS,
+    NG_VALUE_ACCESSOR,
+    Validators
 } from "@angular/forms";
-import {
-    SBDraft2CommandInputParameterModel,
-} from "cwlts/models/d2sb";
+import {SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../../components/common/component-base";
 import {noop} from "../../../../lib/utils.lib";
-import {ParameterTypeModel} from "../../../../../../node_modules/cwlts/models/generic/ParameterTypeModel";
+import {InputParameterTypeModel} from "cwlts/models";
 
 require("./basic-input-section.component.scss");
 
@@ -187,7 +185,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
 
     private listenToTypeFormChanges(): void {
         this.tracked = this.basicSectionForm.controls['typeForm'].valueChanges
-            .subscribe((value: ParameterTypeModel) => {
+            .subscribe((value: InputParameterTypeModel) => {
                 this.input.type.setType(value.type);
 
                 if (value.type !== 'array' && this.input.isBound) {

@@ -67,7 +67,6 @@ export class MapListComponent extends ComponentBase implements ControlValueAcces
 
     constructor(private zone: NgZone) {
         super();
-        console.log("Constructing new map list");
     }
 
     private add() {
@@ -100,7 +99,6 @@ export class MapListComponent extends ComponentBase implements ControlValueAcces
                 .filter(i => i.key.trim())
                 .reduce((acc, item) => ({...acc, ...{[item.key.trim()]: item.value.toString().trim()}}), {}))
             .subscribe(val => {
-                console.log("Propagating", val);
                 this.onChangeCallback(val);
             });
     }
@@ -117,7 +115,6 @@ export class MapListComponent extends ComponentBase implements ControlValueAcces
             }
         });
         if (this.list.toString() == entryList.toString()) {
-            console.log("Breaking")
             return;
         }
         this.list = entryList;

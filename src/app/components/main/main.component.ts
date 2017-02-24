@@ -6,7 +6,6 @@ import {ContextService} from "../../core/ui/context/context.service";
 import {ElectronPublicAppService} from "../../platform-providers/public-apps/electron-public-app.service";
 import {ElectronUserProjectsService} from "../../platform-providers/user-projects/electron-user-projects.service";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
-import {FileRegistry} from "../../services/file-registry.service";
 import {GuidService} from "../../services/guid.service";
 import {IpcService} from "../../services/ipc.service";
 import {LocalDataSourceService} from "../../sources/local/local.source.service";
@@ -14,7 +13,6 @@ import {ModalService} from "../modal/modal.service";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {PublicAppService} from "../../platform-providers/public-apps/public-app.service";
 import {SBPlatformDataSourceService} from "../../sources/sbg/sb-platform.source.service";
-import {SettingsService} from "../../services/settings/settings.service";
 import {UrlValidator} from "../../validators/url.validator";
 import {UserProjectsService} from "../../platform-providers/user-projects/user-projects.service";
 
@@ -31,7 +29,6 @@ require("./main.component.scss");
     `,
     providers: [
         EventHubService,
-        FileRegistry,
         UrlValidator,
         PlatformAPI,
         SBPlatformDataSourceService,

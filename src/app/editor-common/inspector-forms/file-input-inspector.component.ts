@@ -1,9 +1,6 @@
-import {
-    Component, Input, SimpleChanges, Output, EventEmitter,
-    ChangeDetectionStrategy, ChangeDetectorRef
-} from "@angular/core";
-import {FormGroup, FormControl, FormArray} from "@angular/forms";
-import {Observable, Subject} from "rxjs";
+import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {FormControl, FormGroup} from "@angular/forms";
+import {Observable} from "rxjs";
 
 interface CWLFile {
     path?: string;
@@ -15,7 +12,6 @@ interface CWLFile {
 
 @Component({
     selector: "ct-file-input-inspector",
-    // changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <form [formGroup]="formGroup">
             <!--Path-->
@@ -23,28 +19,29 @@ interface CWLFile {
                 <label>Path</label>
                 <input class="form-control" formControlName="path" [value]="input.path || ''"/>
             </div>
-            
+
             <!--Size-->
             <div class="form-group">
                 <label>Size</label>
                 <input class="form-control" formControlName="size" [value]="input.size || 0"/>
             </div>
-            
+
             <!--Secondary Files-->
             <div class="form-group">
                 <label>Secondary Files</label>
                 <compact-list [addKeyCode]="13" formControlName="secondaryFiles"></compact-list>
             </div>
-            
+
             <div class="form-group">
                 <label>Metadata</label>
                 <ct-map-list formControlName="metadata"></ct-map-list>
             </div>
-            
+
             <!--Content-->
             <div class="form-group">
                 <label>Content</label>
-                <textarea rows="10" class="form-control"  formControlName="contents" [value]="input.contents || ''"></textarea>
+                <textarea rows="10" class="form-control" formControlName="contents"
+                          [value]="input.contents || ''"></textarea>
             </div>
         </form>
     `
@@ -87,7 +84,7 @@ export class FileInputInspector {
             this.formGroup.valueChanges.debounceTime(300)
         )
 
-            .distinctUntilChanged((a,b) => JSON.stringify(a) === JSON.stringify(b))
+            .distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
 
             // Take the plain form values
             .map(() => this.formGroup.getRawValue())
@@ -101,13 +98,13 @@ export class FileInputInspector {
             });
     }
 
-    ngOnChanges(changes: SimpleChanges) {
+    ngOnChanges() {
 
-        if(!this.input){
+        if (!this.input) {
             return;
         }
         // secondaryFiles is an array of files/directories, we just need their paths
-        this.secondaryFilePaths = (this.input.secondaryFiles || []).map(v => v.path);
+        this.secondaryFilePaths = (this.input.secondaryFiles as { path: string }[] || []).map(v => v.path);
 
         // Form group is not present on first call
         if (this.formGroup) {

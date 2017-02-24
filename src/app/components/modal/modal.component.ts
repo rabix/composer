@@ -12,7 +12,6 @@ import {
 } from "@angular/core";
 import {ModalService} from "./modal.service";
 import {Subscription, Observable, BehaviorSubject} from "rxjs/Rx";
-import {assign} from "../../helpers/chap";
 
 
 require("./modal.component.scss");
@@ -126,7 +125,7 @@ export class ModalComponent {
 
     public configure<T>(config: ModalOptions) {
         this.backdrop = config.backdrop;
-        assign(config, this);
+        Object.assign(this, config);
     }
 
     public produce<T>(factory: ComponentFactory<T>, componentState?: Object): ComponentRef<T> {
@@ -134,7 +133,7 @@ export class ModalComponent {
         this.nestedComponentRef = this.nestedComponentContainer.createComponent(factory, 0, this.injector);
 
         if (typeof componentState === "object") {
-            assign(componentState, this.nestedComponentRef.instance);
+            Object.assign(this.nestedComponentRef.instance, componentState);
         }
 
         Observable.of("Reposition me right away!")

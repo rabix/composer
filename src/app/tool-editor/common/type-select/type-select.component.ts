@@ -1,8 +1,8 @@
-import {InputParameterTypeModel} from "cwlts/models/d2sb/InputParameterTypeModel";
 import {Component, forwardRef} from "@angular/core";
 import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, FormGroup} from "@angular/forms";
 import {ComponentBase} from "../../../components/common/component-base";
 import {noop} from "../../../lib/utils.lib";
+import {InputParameterTypeModel} from "cwlts/models";
 
 @Component({
     selector: 'input-type-select',
@@ -37,13 +37,13 @@ import {noop} from "../../../lib/utils.lib";
 })
 export class InputTypeSelectComponent extends ComponentBase implements ControlValueAccessor {
 
-    private paramType: InputParameterTypeModel;
+    public paramType: InputParameterTypeModel;
 
-    private propertyTypes = ["array", "enum", "record", "File", "string", "int", "float", "boolean", "map"];
+    public propertyTypes = ["array", "enum", "record", "File", "string", "int", "float", "boolean", "map"];
 
-    private itemTypes =  ["enum", "record", "File", "string", "int", "float", "boolean", "map"];
+    public itemTypes =  ["enum", "record", "File", "string", "int", "float", "boolean", "map"];
 
-    private form: FormGroup = new FormGroup({
+    public form: FormGroup = new FormGroup({
         type: new FormControl(null),
         items: new FormControl(null)
     });

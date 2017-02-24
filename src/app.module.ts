@@ -38,7 +38,6 @@ import {EditorCommonModule} from "./app/editor-common/editor-common.module";
 import {ProjectSelectionModal} from "./app/components/modal/custom/project-selection-modal.component";
 import {UserPreferencesService} from "./app/services/storage/user-preferences.service";
 import {DomEventService} from "./app/services/dom/dom-event.service";
-import {FileRegistryService} from "./app/core/file-registry/file-registry.service";
 import {GuidService} from "./app/services/guid.service";
 import {IpcService} from "./app/services/ipc.service";
 import {PlatformAPI} from "./app/services/api/platforms/platform-api.service";
@@ -51,7 +50,6 @@ import {SettingsService} from "./app/services/settings/settings.service";
         TemplateProviderService,
         UserPreferencesService,
         DomEventService,
-        FileRegistryService,
         GuidService,
         IpcService,
         SettingsService,

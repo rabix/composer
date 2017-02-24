@@ -93,7 +93,7 @@ export class WorkflowGraphEditorComponent {
      * Triggers when click events occurs on canvas
      */
     handleClick(ev : Event) {
-        let current = ev.target;
+        let current = ev.target as Element;
 
         // Check if clicked element is a node or any descendant of a node (in order to open object inspector if so)
         while (current != this.canvas.nativeElement) {
@@ -101,7 +101,7 @@ export class WorkflowGraphEditorComponent {
                 this.openNodeInInspector(current);
                 break;
             }
-            current = current.parentNode;
+            current = current.parentNode as Element;
         }
     }
 
@@ -123,7 +123,7 @@ export class WorkflowGraphEditorComponent {
      */
     private openNodeInInspector(node: Element) {
 
-        const typeOfNode = "steps";
+        let typeOfNode = "steps";
 
         if (this.hasClassSvgElement(node, "input")) {
             typeOfNode = "inputs";

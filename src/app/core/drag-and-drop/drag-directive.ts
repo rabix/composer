@@ -37,14 +37,14 @@ export class DragDirective extends ComponentBase {
             }).subscribe(drag => {
 
                 // On Drag Start
-                const first = drag.first().subscribe(ev => {
+                const first = drag.first().subscribe((ev:any) => {
                     // Create drag image
                     ev.ctData.dragImage = this.createDragImage(this.dragImageClass, this.dragImageCaption);
                     document.body.appendChild(ev.ctData.dragImage);
                 });
 
                 // On Drag (Mouse Move)
-                const mid = drag.skip(1).subscribe(ev => {
+                const mid = drag.skip(1).subscribe((ev:any) => {
 
                     const dragImage = ev.ctData.dragImage;
                     const preEnteredDropZones = ev.ctData.preEnteredDropZones;
@@ -111,7 +111,7 @@ export class DragDirective extends ComponentBase {
                 });
 
                 // On Drag End
-                const last = drag.last().subscribe(ev => {
+                drag.last().subscribe((ev:any) => {
 
                     // Remove drag image from DOM
                     if (ev.ctData.dragImage) {

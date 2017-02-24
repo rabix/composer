@@ -1,4 +1,4 @@
-import {FormControl} from "../../../../node_modules/@angular/forms/src/model";
+import {FormControl} from "@angular/forms";
 
 export interface ModalQuestionParams {
     title?: string;
