@@ -1,6 +1,11 @@
-import {Component, Input, ElementRef, forwardRef, Output, EventEmitter, ChangeDetectionStrategy} from "@angular/core";
+import {
+    Component, Input, ElementRef, forwardRef, Output, EventEmitter, ChangeDetectionStrategy,
+    ViewContainerRef, ViewChild, ComponentRef, ComponentFactoryResolver, ChangeDetectorRef
+} from "@angular/core";
 import {NG_VALUE_ACCESSOR, ControlValueAccessor} from "@angular/forms";
 import {noop} from "../../../lib/utils.lib";
+import {DropDownMenuComponent} from "./dropdown-menu.component";
+import {ComponentBase} from "../../../components/common/component-base";
 
 @Component({
     selector: "ct-dropdown-button",
@@ -9,30 +14,16 @@ import {noop} from "../../../lib/utils.lib";
         {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DropDownButtonComponent), multi: true}
     ],
     template: `
+        <div class="btn-group dropdown" [class.open]="toggle" (click)="showMenu(!toggle)">
 
-        <div class="btn-group dropdown" [class.open]="toggle" (document:click)="clickOnDocument($event)">
-
-            <button class="btn btn-secondary dropdown-toggle" (click)="toggleMenu()" type="button">
+            <button #button class="btn btn-secondary dropdown-toggle" type="button">
                 {{selected?.caption}}
             </button>
 
-            <ul class="dropdown-menu dropdown-menu-right" aria-haspopup="true" aria-expanded="true">
-                <li class="dropdown-item cursor-pointer" *ngFor="let item of dropDownOptions" (click)="select(item)"
-                    [class.selected]="item.value === selected?.value">
-                    <div>
-                        {{item.caption}}
-                    </div>
-
-                    <div class="form-control-label">
-                        {{item.description}}
-                    </div>
-                </li>
-            </ul>
         </div>
-
     `
 })
-export class DropDownButtonComponent implements ControlValueAccessor {
+export class DropDownButtonComponent extends ComponentBase implements ControlValueAccessor {
 
     @Input()
     public dropDownOptions: { value, caption, description }[] = [];
@@ -46,11 +37,16 @@ export class DropDownButtonComponent implements ControlValueAccessor {
     @Output()
     public change = new EventEmitter();
 
+    @ViewChild('button', {read: ViewContainerRef}) button;
+
     private toggle = false;
 
     private el: Element;
 
-    constructor(el: ElementRef) {
+    private dropDownList: ComponentRef<DropDownMenuComponent>;
+
+    constructor(el: ElementRef, private resolver: ComponentFactoryResolver, private cdr: ChangeDetectorRef) {
+        super();
         this.el = el.nativeElement;
     }
 
@@ -66,31 +62,53 @@ export class DropDownButtonComponent implements ControlValueAccessor {
     }
 
     /**
-     * Open/close drop down menu
+     * Selects item
      */
-    private toggleMenu() {
-        this.toggle = !this.toggle;
-    }
-
     private select(item) {
         // Avoid selecting if its already selected
-        if (this.selected && this.selected !== item) {
+        if (this.selected && item && this.selected !== item) {
             this.selected = item;
             this.change.emit(this.selected.value);
             this.propagateChange(this.selected.value);
         }
 
-        // Close drop down menu
-        this.toggle = false;
+        // Close drop-down menu
+        this.showMenu(false);
     }
 
     /**
-     * If clicked outside of an element, close drop down menu
+     * Show/Hide drop-down menu
      */
-    clickOnDocument(ev) {
-        if (!(!!this.el && this.el.contains(ev.target))) {
-            this.toggle = false;
-        }
+    private showMenu(show: boolean) {
+        this.toggle = show;
+        show ? this.createDropDownMenu() : this.destroyDropDownMenu();
+    }
+
+    /**
+     * Dynamically creates drop-down menu
+     */
+    createDropDownMenu() {
+        const factory = this.resolver.resolveComponentFactory(DropDownMenuComponent);
+        this.dropDownList = this.button.createComponent(factory);
+        const instance = this.dropDownList.instance;
+
+        instance.dropDownOptions = this.dropDownOptions;
+        instance.hostElement = this.el;
+        instance.selected = this.selected;
+        instance["select"].first().subscribe((item) => {
+            this.select(item);
+        });
+    }
+
+    /**
+     * Destroys dynamically created drop-down menu
+     */
+    destroyDropDownMenu() {
+        this.dropDownList && this.dropDownList.destroy();
+        this.dropDownList = null;
+
+        // Needed when hide is coming from drop-down menu (change detection is not triggered)
+        this.cdr.markForCheck();
     }
 
     registerOnChange(fn: any): void {
