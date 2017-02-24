@@ -41,8 +41,8 @@ export class DropDownMenuComponent {
 
     ngOnInit() {
         // Close drop-down menu when you click outside of it
-        Observable.fromEvent(document, "click").filter((ev) => {
-            return !this.hostElement.contains(ev.target)
+        Observable.fromEvent(document, "click").filter((ev: MouseEvent) => {
+            return !this.hostElement.contains(ev.target as Node)
         }).first().subscribe(() => {
             this.selectItem(undefined);
         });

@@ -41,7 +41,7 @@ export class DropDownButtonComponent extends ComponentBase implements ControlVal
 
     private toggle = false;
 
-    private el: Element;
+    private el: HTMLElement;
 
     private dropDownList: ComponentRef<DropDownMenuComponent>;
 
