@@ -2,7 +2,7 @@ import {Component, Input, forwardRef} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ComponentBase} from "../../../components/common/component-base";
 import {noop} from "../../../lib/utils.lib";
-import {ExpressionModel} from "../../../../../node_modules/cwlts/models/d2sb/ExpressionModel";
+import {ExpressionModel} from "cwlts/models/d2sb";
 import {ModalService} from "../../../components/modal/modal.service";
 import {ModelExpressionEditorComponent} from "../../../editor-common/expression-editor/model-expression-editor.component";
 import {MultilangCodeEditorComponent} from "../../../core/ui/code-editor/multilang-code-editor.component";
