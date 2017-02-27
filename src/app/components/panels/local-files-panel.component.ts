@@ -93,6 +93,7 @@ export class LocalFilesPanelComponent extends ComponentBase {
                 }
 
                 return {
+                    content: item.content,
                     id: item.path,
                     name: item.name,
                     icon,
