@@ -1,18 +1,17 @@
 import * as Yaml from "js-yaml";
 import {
     Component,
-    OnInit,
     Input,
     OnDestroy,
+    OnInit,
+    TemplateRef,
     ViewChild,
     ViewContainerRef,
-    TemplateRef
+    ViewEncapsulation
 } from "@angular/core";
-import {FormControl, FormGroup, FormBuilder} from "@angular/forms";
+import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {BehaviorSubject} from "rxjs/Rx";
 import {Validation} from "cwlts/models/helpers/validation";
-import LoadOptions = jsyaml.LoadOptions;
-import {WebWorkerService} from "../services/web-worker/web-worker.service";
 import {EditorInspectorService} from "../editor-common/inspector/editor-inspector.service";
 import {DataEntrySource} from "../sources/common/interfaces";
 import {ComponentBase} from "../components/common/component-base";
@@ -24,29 +23,29 @@ import {StatusBarService} from "../core/status-bar/status-bar.service";
 import {ModalService} from "../components/modal/modal.service";
 import {noop} from "../lib/utils.lib";
 import {WorkflowFactory, WorkflowModel} from "cwlts/models";
-
-require("./workflow-editor.component.scss");
+import {CwlSchemaValidationWorkerService} from "../editor-common/cwl-schema-validation-worker/cwl-schema-validation-worker.service";
+import LoadOptions = jsyaml.LoadOptions;
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-workflow-editor",
-    host:{
+    styleUrls: ["./workflow-editor.component.scss"],
+    host: {
         "class": "tab-container"
     },
-    providers: [
-        EditorInspectorService,
-        WebWorkerService
-    ],
+    providers: [EditorInspectorService],
     template: `
         <block-loader *ngIf="isLoading"></block-loader>
-        
+
         <div class="editor-container" [hidden]="isLoading">
-        
+
             <!--Control Header-->
             <ct-editor-controls>
-            
+
                 <!--View Modes-->
                 <span class="btn-group pull-left">
-                    <button class="btn btn-secondary btn-sm" 
+                    <button class="btn btn-secondary btn-sm"
                             (click)="switchView(viewModes.Code)"
                             [class.btn-primary]="viewMode === viewModes.Code"
                             [class.btn-secondary]="viewMode !== viewModes.Code">Code</button>
@@ -72,76 +71,76 @@ require("./workflow-editor.component.scss");
 
                 <!--CWLVersion-->
                 <span class="tag tag-default">{{ workflowModel.cwlVersion }}</span>
-                
+
                 <!--Revisions-->
                 <button class="btn btn-secondary btn-sm" type="button"
                         [ct-editor-inspector]="revisions"
                         *ngIf="this.data.data.source !== 'local'">
-                        Revision: {{ workflowModel.customProps['sbg:revision']}}
-                        
-                        <template #revisions>
-                            <ct-revision-list [active]="workflowModel.customProps['sbg:revision']" 
-                                              [revisions]="workflowModel.customProps['sbg:revisionsInfo']"
-                                              (select)="openRevision($event)">
-                            </ct-revision-list>
-                        </template>
+                    Revision: {{ workflowModel.customProps['sbg:revision']}}
+
+                    <template #revisions>
+                        <ct-revision-list [active]="workflowModel.customProps['sbg:revision']"
+                                          [revisions]="workflowModel.customProps['sbg:revisionsInfo']"
+                                          (select)="openRevision($event)">
+                        </ct-revision-list>
+                    </template>
                 </button>
-                
+
                 <!--Copy-->
                 <button class="btn btn-secondary btn-sm" type="button">
                     Copy...
                 </button>
-                
+
                 <!--Save-->
-                <button [disabled]="!data.isWritable" 
+                <button [disabled]="!data.isWritable"
                         (click)="save()"
                         class="btn btn-secondary btn-sm" type="button">
-                        Save
+                    Save
                 </button>
             </ct-editor-controls>
 
-                    
+
             <!--Header & Editor Column-->
             <div class="editor-content flex-row">
                 <!--Editor Row-->
-                        <ct-code-editor-x *ngIf="viewMode === viewModes.Code" class="editor" 
-                                          [(content)]="rawEditorContent"
-                                          [options]="{theme: 'ace/theme/monokai'}"
-                                          [language]="'yaml'"
-                                          [readonly]="!data.isWritable"></ct-code-editor-x>
-                        
-                        <!--GUI Editor-->
-                        <ct-workflow-not-graph-editor *ngIf="viewMode === viewModes.Gui"
-                                       class="gui-editor-component flex-col"
-                                       [readonly]="!data.isWritable"
-                                       [model]="workflowModel"></ct-workflow-not-graph-editor>
-                
-                        <ct-workflow-graph-editor *ngIf="viewMode === viewModes.Graph"
-                                                  [readonly]="!data.isWritable"
-                                                  [model]="workflowModel"
-                                                  class="gui-editor-component flex-col">
-                            
-                        </ct-workflow-graph-editor>
-                
-                                       
-                    <!--Object Inspector Column-->
-                    <div [hidden]="!showInspector" class="flex-col inspector-col" >
-                        <ct-editor-inspector class="object-inspector">
-                            <template #inspector></template>
-                        </ct-editor-inspector>
-                    </div>
+                <ct-code-editor-x *ngIf="viewMode === viewModes.Code" class="editor"
+                                  [(content)]="rawEditorContent"
+                                  [options]="{theme: 'ace/theme/monokai'}"
+                                  [language]="'yaml'"
+                                  [readonly]="!data.isWritable"></ct-code-editor-x>
+
+                <!--GUI Editor-->
+                <ct-workflow-not-graph-editor *ngIf="viewMode === viewModes.Gui"
+                                              class="gui-editor-component flex-col"
+                                              [readonly]="!data.isWritable"
+                                              [model]="workflowModel"></ct-workflow-not-graph-editor>
+
+                <ct-workflow-graph-editor *ngIf="viewMode === viewModes.Graph"
+                                          [readonly]="!data.isWritable"
+                                          [model]="workflowModel"
+                                          class="gui-editor-component flex-col">
+
+                </ct-workflow-graph-editor>
+
+
+                <!--Object Inspector Column-->
+                <div [hidden]="!showInspector" class="flex-col inspector-col">
+                    <ct-editor-inspector class="object-inspector">
+                        <template #inspector></template>
+                    </ct-editor-inspector>
+                </div>
             </div>
-            
+
             <div *ngIf="reportPanel" class="app-report-panel layout-section">
                 <ct-validation-report *ngIf="reportPanel === 'validation'" [issues]="validation"></ct-validation-report>
             </div>
-            
+
             <template #statusControls>
                 <span class="btn-group">
-                    <button [disabled]="!validation" 
+                    <button [disabled]="!validation"
                             [class.btn-primary]="reportPanel === 'validation'"
                             [class.btn-secondary]="reportPanel !== 'validation'"
-                            (click)="toggleReport('validation')" 
+                            (click)="toggleReport('validation')"
                             class="btn btn-sm">
                             
                         <span *ngIf="validation?.errors?.length">
@@ -184,7 +183,7 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
     private showReformatPrompt = true;
 
     /** Flag for bottom panel, shows validation-issues, commandline, or neither */
-    private reportPanel: "validation" |"commandLinePreview" | undefined;
+    private reportPanel: "validation" | "commandLinePreview" | undefined;
 
     /** Flag for validity of CWL document */
     private isValidCWL = false;
@@ -193,7 +192,7 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
     private rawEditorContent = new BehaviorSubject("");
 
     /** Model that's recreated on document change */
-    private workflowModel: WorkflowModel = WorkflowFactory.from(null,"document");
+    private workflowModel: WorkflowModel = WorkflowFactory.from(null, "document");
 
     /** Template of the status controls that will be shown in the status bar */
     @ViewChild("statusControls")
@@ -201,7 +200,7 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
 
     private viewModes = {
         Code: "code",
-        Gui: 'gui',
+        Gui: "gui",
         Test: "test",
         Graph: "graph"
     };
@@ -212,7 +211,7 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
     private inspectorHostView: ViewContainerRef;
 
 
-    constructor(private webWorkerService: WebWorkerService,
+    constructor(private cwlValidatorService: CwlSchemaValidationWorkerService,
                 private userPrefService: UserPreferencesService,
                 private formBuilder: FormBuilder,
                 private platform: PlatformAPI,
@@ -239,12 +238,64 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
             .skip(1)
             .distinctUntilChanged()
             .subscribe(latestContent => {
-                this.webWorkerService.validateJsonSchema(latestContent);
+
+                this.cwlValidatorService.validate(latestContent).then(r => {
+                    console.log("Validated", r);
+                    if (!r.isValidCwl) {
+                        // turn off loader and load document as code
+                        this.isLoading = false;
+                        return r;
+                    }
+
+                    // load JSON to generate model
+                    let json = Yaml.safeLoad(this.rawEditorContent.getValue(), {
+                        json: true
+                    } as LoadOptions);
+
+                    // should show prompt, but json is already reformatted
+                    if (this.showReformatPrompt && json["rbx:modified"]) {
+                        this.showReformatPrompt = false;
+                    }
+
+                    this.workflowModel = WorkflowFactory.from(json, "document");
+                    console.log(this.workflowModel);
+
+                    // update validation stream on model validation updates
+
+                    this.workflowModel.setValidationCallback((res: Validation) => {
+                        this.validation = {
+                            errors: res.errors,
+                            warnings: res.warnings,
+                            isValidatableCwl: true,
+                            isValidCwl: true,
+                            isValidJSON: true
+                        };
+                    });
+
+                    this.workflowModel.validate();
+
+                    // load document in GUI and turn off loader, only if loader was active
+                    if (this.isLoading) {
+                        this.viewMode = this.viewModes.Gui;
+                        this.isLoading = false;
+                    }
+
+                    const out = {
+                        errors: this.workflowModel.validation.errors,
+                        warnings: this.workflowModel.validation.warnings,
+                        isValidatableCwl: true,
+                        isValidCwl: true,
+                        isValidJSON: true
+                    };
+                    this.validation = out;
+                    this.isValidCWL = out.isValidCwl;
+                });
+                // this.webWorkerService.validateJsonSchema(latestContent);
             });
 
         // Whenever content of a file changes, forward the change to the raw editor content steam.
         const statusID = this.statusBar.startProcess(`Loading ${this.data.data.id}`);
-        this.tracked   = this.data.content.subscribe(val => {
+        this.tracked = this.data.content.subscribe(val => {
             this.rawEditorContent.next(val);
             this.statusBar.stopProcess(statusID);
         });
@@ -256,58 +307,58 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
          * If content is not valid CWL, show the code.
          * If it's a valid CWL, parse it into a model, and show the GUI mode on first load.
          */
-        this.tracked = this.webWorkerService.validationResultStream.map(r => {
-            if (!r.isValidCwl) {
-                // turn off loader and load document as code
-                this.isLoading = false;
-                return r;
-            }
-
-            // load JSON to generate model
-            let json = Yaml.safeLoad(this.rawEditorContent.getValue(), {
-                json: true
-            } as LoadOptions);
-
-            // should show prompt, but json is already reformatted
-            if (this.showReformatPrompt && json["rbx:modified"]) {
-                this.showReformatPrompt = false;
-            }
-
-            this.workflowModel        = WorkflowFactory.from(json, "document");
-            console.log(this.workflowModel);
-
-            // update validation stream on model validation updates
-
-            this.workflowModel.setValidationCallback((res: Validation) => {
-                this.validation = {
-                    errors: res.errors,
-                    warnings: res.warnings,
-                    isValidatableCwl: true,
-                    isValidCwl: true,
-                    isValidJSON: true
-                };
-            });
-
-            this.workflowModel.validate();
-
-            // load document in GUI and turn off loader, only if loader was active
-            if (this.isLoading) {
-                this.viewMode  = this.viewModes.Gui;
-                this.isLoading = false;
-            }
-
-            return {
-                errors: this.workflowModel.validation.errors,
-                warnings: this.workflowModel.validation.warnings,
-                isValidatableCwl: true,
-                isValidCwl: true,
-                isValidJSON: true
-            };
-
-        }).subscribe((v) => {
-            this.validation = v;
-            this.isValidCWL = v.isValidCwl;
-        });
+        // this.tracked = this.webWorkerService.validationResultStream.map(r => {
+        //     if (!r.isValidCwl) {
+        //         // turn off loader and load document as code
+        //         this.isLoading = false;
+        //         return r;
+        //     }
+        //
+        //     // load JSON to generate model
+        //     let json = Yaml.safeLoad(this.rawEditorContent.getValue(), {
+        //         json: true
+        //     } as LoadOptions);
+        //
+        //     // should show prompt, but json is already reformatted
+        //     if (this.showReformatPrompt && json["rbx:modified"]) {
+        //         this.showReformatPrompt = false;
+        //     }
+        //
+        //     this.workflowModel = WorkflowFactory.from(json, "document");
+        //     console.log(this.workflowModel);
+        //
+        //     // update validation stream on model validation updates
+        //
+        //     this.workflowModel.setValidationCallback((res: Validation) => {
+        //         this.validation = {
+        //             errors: res.errors,
+        //             warnings: res.warnings,
+        //             isValidatableCwl: true,
+        //             isValidCwl: true,
+        //             isValidJSON: true
+        //         };
+        //     });
+        //
+        //     this.workflowModel.validate();
+        //
+        //     // load document in GUI and turn off loader, only if loader was active
+        //     if (this.isLoading) {
+        //         this.viewMode = this.viewModes.Gui;
+        //         this.isLoading = false;
+        //     }
+        //
+        //     return {
+        //         errors: this.workflowModel.validation.errors,
+        //         warnings: this.workflowModel.validation.warnings,
+        //         isValidatableCwl: true,
+        //         isValidCwl: true,
+        //         isValidJSON: true
+        //     };
+        //
+        // }).subscribe((v) => {
+        //     this.validation = v;
+        //     this.isValidCWL = v.isValidCwl;
+        // });
     }
 
     private save() {
@@ -330,15 +381,15 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
             confirmationLabel: "Publish",
             content: "Revision Note",
             title: "Publish a new App Revision",
-            formControl: new FormControl('')
+            formControl: new FormControl("")
         }).then(revisionNote => {
 
-            const path     = this.data.data["sbg:id"] || this.data.data.id;
+            const path = this.data.data["sbg:id"] || this.data.data.id;
             const statusID = this.statusBar.startProcess(`Creating a new revision of ${path}`);
             this.data.save(JSON.parse(text), revisionNote).subscribe(result => {
                 const cwl = JSON.stringify(result.message, null, 4);
                 this.rawEditorContent.next(cwl);
-                this.statusBar.stopProcess(statusID, `Created revision ${result.message['sbg:latestRevision']} from ${path}`);
+                this.statusBar.stopProcess(statusID, `Created revision ${result.message["sbg:latestRevision"]} from ${path}`);
 
             });
         }, noop);
@@ -374,7 +425,7 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
             this.rawEditorContent.next(this.getModelText());
         }
 
-        if(mode === this.viewModes.Graph){
+        if (mode === this.viewModes.Graph) {
 
         }
 

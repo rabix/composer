@@ -1,14 +1,14 @@
-//this method is here to avoid linting errors
+// this method is here to avoid linting errors
 declare function postMessage(message: ValidationResponse);
 declare function require(s: string);
 
 export interface ValidationResponse {
-    isValidatableCwl: boolean,
-    isValidCwl: boolean,
-    isValidJSON: boolean,
-    errors: Array<any>,
-    warnings: Array<any>,
-    class?: "CommandLineTool" | "Workflow"
+    isValidatableCwl: boolean;
+    isValidCwl: boolean;
+    isValidJSON: boolean;
+    errors: Array<any>;
+    warnings: Array<any>;
+    class?: "CommandLineTool" | "Workflow";
 }
 
 const YAML = require("js-yaml");
@@ -20,12 +20,12 @@ export class JsonSchemaService {
     private errorMessage: string;
 
     constructor(attr: {
-        draft3: any,
-        draft4: any,
-        draft2: any,
-        v1: any,
-        validator: any
-    }) {
+                    draft3: any,
+                    draft4: any,
+                    draft2: any,
+                    v1: any,
+                    validator: any
+                }) {
         this.validator = attr.validator;
 
         const schemas = {
@@ -50,7 +50,7 @@ export class JsonSchemaService {
             this.validator.addSchema(schemas[key].CommandLineTool, key + "CommandLineTool");
             this.validator.addSchema(schemas[key].Workflow, key + "Workflow");
             this.validator.addSchema(schemas[key].ExpressionTool, key + "ExpressionTool");
-        })
+        });
     }
 
     public isClassValid(cwlClass: string) {
@@ -77,7 +77,7 @@ export class JsonSchemaService {
     public validateJson(jsonText: string) {
         const validator = this.validator;
 
-        let cwlJson: {cwlVersion: string, class: string};
+        let cwlJson: { cwlVersion: string, class: string };
         let cwlVersion;
         let jsonClass;
 
@@ -103,12 +103,12 @@ export class JsonSchemaService {
                 warnings: []
             });
         } else {
-            cwlVersion       = cwlJson.cwlVersion || "sbg:draft-2";
-            jsonClass        = cwlJson.class;
+            cwlVersion = cwlJson.cwlVersion || "sbg:draft-2";
+            jsonClass = cwlJson.class;
             const isValidCWL = validator.validate(cwlVersion + jsonClass, cwlJson);
-            const errors     = validator.errors || [];
+            const errors = validator.errors || [];
 
-            let result: ValidationResponse = {
+            const result: ValidationResponse = {
                 isValidJSON: true,
                 isValidatableCwl: true,
                 isValidCwl: isValidCWL,
@@ -131,10 +131,10 @@ export class JsonSchemaService {
             return {
                 message: message,
                 loc: `document${err.dataPath}`
-            }
+            };
         }).reduce((acc, curr) => {
             acc = acc.filter(err => {
-                return err.message !== curr.message || err.loc !== curr.loc
+                return err.message !== curr.message || err.loc !== curr.loc;
             });
 
             acc.push(curr);
@@ -149,11 +149,11 @@ export class JsonSchemaService {
 }
 
 interface AVJResult {
-    dataPath: string,
-    keyword: string,
-    message: string,
+    dataPath: string;
+    keyword: string;
+    message: string;
     params: {
         allowedValues: string[]
-    },
-    schemaPath: string
+    };
+    schemaPath: string;
 }

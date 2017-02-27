@@ -1,51 +1,52 @@
-import {Component, forwardRef, Input} from "@angular/core";
-import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormGroup, FormBuilder} from "@angular/forms";
+import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
+import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ComponentBase} from "../../../../components/common/component-base";
-import {SBDraft2CommandInputParameterModel, CommandOutputParameterModel as OutputProperty, ExpressionModel} from "cwlts/models/d2sb";
+import {CommandOutputParameterModel as OutputProperty, ExpressionModel, SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
 import {noop} from "../../../../lib/utils.lib";
 
-require("./output-metadata.component.scss");
-
 @Component({
-    selector: 'ct-output-metadata-section',
+    encapsulation: ViewEncapsulation.None,
+
+    selector: "ct-output-metadata-section",
+    styleUrls: ["./output-metadata.component.scss"],
     providers: [
-        { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => OutputMetaDataSectionComponent), multi: true }
+        {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => OutputMetaDataSectionComponent), multi: true}
     ],
     template: `
-<ct-form-panel *ngIf="output.type.type === 'File' || (output.type.type === 'array' && output.type.items === 'File')" 
-        class="borderless" [collapsed]="true">
+        <ct-form-panel *ngIf="output.type.type === 'File' || (output.type.type === 'array' && output.type.items === 'File')"
+                       class="borderless" [collapsed]="true">
 
-    <div class="tc-header">Metadata</div>
-    <div class="tc-body" *ngIf="metadataForm">
-        <div class="form-group" *ngIf="metadataForm">
-            <form>
+            <div class="tc-header">Metadata</div>
+            <div class="tc-body" *ngIf="metadataForm">
+                <div class="form-group" *ngIf="metadataForm">
+                    <form>
 
-                <!--Inherit Metadata field-->
-                <div class="form-group">
-                    <label class="form-control-label">Inherit</label>
-                    <select class="form-control" [formControl]="metadataForm.controls['inheritMetadata']">
-                        <option value="">-- none --</option>
-                        <option *ngFor="let item of inputs" [value]="item.id">
-                            {{item.id}}
-                        </option>
-                    </select>
+                        <!--Inherit Metadata field-->
+                        <div class="form-group">
+                            <label class="form-control-label">Inherit</label>
+                            <select class="form-control" [formControl]="metadataForm.controls['inheritMetadata']">
+                                <option value="">-- none --</option>
+                                <option *ngFor="let item of inputs" [value]="item.id">
+                                    {{item.id}}
+                                </option>
+                            </select>
+                        </div>
+
+                    </form>
+
+
+                    <key-value-list
+                        [addEntryText]="'Add Metadata'"
+                        [emptyListText]="'No metadata defined.'"
+                        [context]="context"
+                        [formControl]="metadataForm.controls['metadataList']"
+                        [readonly]="readonly">
+                    </key-value-list>
                 </div>
+            </div>
 
-            </form>
-            
-            
-            <key-value-list 
-                    [addEntryText]="'Add Metadata'"
-                    [emptyListText]="'No metadata defined.'"
-                    [context]="context"
-                    [formControl]="metadataForm.controls['metadataList']"
-                    [readonly]="readonly">
-            </key-value-list>
-        </div>
-    </div>
-
-</ct-form-panel>
-`
+        </ct-form-panel>
+    `
 })
 export class OutputMetaDataSectionComponent extends ComponentBase implements ControlValueAccessor {
 
@@ -64,7 +65,7 @@ export class OutputMetaDataSectionComponent extends ComponentBase implements Con
 
     private metadataForm: FormGroup;
 
-    private keyValueFormList: {key: string, value: string | ExpressionModel}[] = [];
+    private keyValueFormList: { key: string, value: string | ExpressionModel }[] = [];
 
     constructor(private formBuilder: FormBuilder) {
         super();
@@ -103,7 +104,7 @@ export class OutputMetaDataSectionComponent extends ComponentBase implements Con
             .subscribe(change => {
                 const metadataObject = {};
 
-                change.metadataList.forEach((item: {key: string, value: ExpressionModel}) => {
+                change.metadataList.forEach((item: { key: string, value: ExpressionModel }) => {
                     metadataObject[item.key] = item.value;
                 });
 

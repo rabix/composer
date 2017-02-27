@@ -1,25 +1,27 @@
-import {Component, Input, Output} from "@angular/core";
+import {Component, Input, Output, ViewEncapsulation} from "@angular/core";
 import {SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {Subject} from "rxjs";
 import {ComponentBase} from "../../../components/common/component-base";
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-tool-input-inspector",
     template: `
         <form [formGroup]="form" (ngSubmit)="onSubmit(form)">
-        
-                <ct-basic-input-section [formControl]="form.controls['basicInputSection']"
-                                        [context]="context"
-                                        [readonly]="readonly">
-                </ct-basic-input-section>
-                
-                <ct-description-section [formControl]="form.controls['description']"
-                                        [readonly]="readonly">
-                </ct-description-section>
+
+            <ct-basic-input-section [formControl]="form.controls['basicInputSection']"
+                                    [context]="context"
+                                    [readonly]="readonly">
+            </ct-basic-input-section>
+
+            <ct-description-section [formControl]="form.controls['description']"
+                                    [readonly]="readonly">
+            </ct-description-section>
 
         </form>
-`
+    `
 })
 export class ToolInputInspector extends ComponentBase {
 
@@ -28,7 +30,7 @@ export class ToolInputInspector extends ComponentBase {
 
     /** Context in which expression should be evaluated */
     @Input()
-    public context: {$job?: any, $self?: any} = {};
+    public context: { $job?: any, $self?: any } = {};
 
     @Input()
     public readonly = false;

@@ -1,17 +1,11 @@
-import {
-    ChangeDetectionStrategy,
-    Component,
-    EventEmitter,
-    Input,
-    OnChanges,
-    Output,
-    SimpleChanges
-} from "@angular/core";
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewEncapsulation} from "@angular/core";
 import {SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
 import {JobHelper} from "cwlts/models/helpers/JobHelper";
 import {ObjectHelper} from "../../helpers/object.helper";
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-job-editor-entry",
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
@@ -25,7 +19,7 @@ import {ObjectHelper} from "../../helpers/object.helper";
 
                 <!--Enums-->
                 <template ngSwitchCase="enum">
-                    <select [value]="value" class="form-control"                           
+                    <select [value]="value" class="form-control"
                             [attr.prefix]="prefix">
                         <option *ngFor="let val of input.type.symbols" [value]="val"> {{ val }}
                         </option>
@@ -207,7 +201,7 @@ export class JobEditorEntryComponent implements OnChanges {
     }
 
     private addArrayEntry(input) {
-        this.warning         = undefined;
+        this.warning = undefined;
         const generatedEntry = JobHelper.generateMockJobData(input);
         this.updateJob((this.value || []).concat(generatedEntry.slice(0, 1)));
     }
@@ -223,7 +217,7 @@ export class JobEditorEntryComponent implements OnChanges {
             && !Array.isArray(this.value)
             && this.value !== undefined) {
 
-            this.value   = [];
+            this.value = [];
             this.warning = `Type mismatch: the default job value for this input 
                             is of type “${typeof this.value}”, but the input is declared 
                             as “${this.inputType}”. 

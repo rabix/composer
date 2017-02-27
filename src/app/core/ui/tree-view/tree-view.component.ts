@@ -1,4 +1,4 @@
-import {Component, Input, ElementRef, QueryList, ViewChildren, ChangeDetectionStrategy} from "@angular/core";
+import {ChangeDetectionStrategy, Component, ElementRef, Input, QueryList, ViewChildren, ViewEncapsulation} from "@angular/core";
 import {Observable} from "rxjs";
 import {TreeNode} from "./types";
 import {TreeNodeComponent} from "./tree-node.component";
@@ -6,10 +6,11 @@ import {TreeViewService} from "./tree-view.service";
 import {ComponentBase} from "../../../components/common/component-base";
 import {DomEventService} from "../../../services/dom/dom-event.service";
 
-require("./tree-view.component.scss");
-
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-tree-view",
+    styleUrls: ["./tree-view.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [TreeViewService],
     template: `
@@ -17,9 +18,9 @@ require("./tree-view.component.scss");
             <div class="search-term">
                 Matching: <span class="term">"{{ searchTerm }}"</span>
             </div>
-        
+
         </div>
-        
+
         <div [class.m-t-2]="searchTerm.length > 0">
             <ct-tree-node class="root-node" *ngFor="let node of nodes" [node]="node" [preferenceKey]="preferenceKey"></ct-tree-node>
         </div>
@@ -140,14 +141,14 @@ export class TreeViewComponent extends ComponentBase {
             .distinctUntilChanged((a, b) => a == b);
     }
 
-    private observeArrowToggling(): Observable<"close"|"open"> {
+    private observeArrowToggling(): Observable<"close" | "open"> {
 
         return this.domEvents.on("keydown", this.el)
             .filter((ev: KeyboardEvent) => [37, 39].indexOf(ev.keyCode) !== -1)
             .map((ev: KeyboardEvent) => ev.keyCode === 37 ? "close" : "open");
     }
 
-    private observeArrowNavigation(): Observable<"up"|"down"> {
+    private observeArrowNavigation(): Observable<"up" | "down"> {
 
         return this.domEvents.on("keydown", this.el)
             .filter((ev: KeyboardEvent) => [38, 40].indexOf(ev.keyCode) !== -1)

@@ -1,34 +1,36 @@
 import {
-    Component,
-    Input,
     ChangeDetectionStrategy,
-    ViewChild,
+    Component,
     ElementRef,
     HostBinding,
-    HostListener
+    HostListener,
+    Input,
+    ViewChild,
+    ViewEncapsulation
 } from "@angular/core";
 import {MenuItem} from "./menu-item";
-import {Subscription, Observable, Subject} from "rxjs/Rx";
-
-require("./menu-item.component.scss");
+import {Observable, Subject, Subscription} from "rxjs/Rx";
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-menu-item",
     changeDetection: ChangeDetectionStrategy.OnPush,
+    styleUrls: ["./menu-item.component.scss"],
     template: `
         <span class="name">{{ item.name }}</span>
-        
+
         <span class="expander">
             <i *ngIf="item?.children.length" class="fa fa-caret-right"></i>
         </span>
-        
-        <ct-menu #menu 
+
+        <ct-menu #menu
                  class="nested"
-                 *ngIf="!item.isDisabled && item.children?.length && hover" 
+                 *ngIf="!item.isDisabled && item.children?.length && hover"
                  [style.left.px]="menuWidth"
                  [items]="item.children">
         </ct-menu>
-        
+
     `
 })
 export class MenuItemComponent {
@@ -46,8 +48,8 @@ export class MenuItemComponent {
     private subscriptions: Subscription[];
 
     constructor(private el: ElementRef) {
-        this.hover         = false;
-        this.isDisabled    = false;
+        this.hover = false;
+        this.isDisabled = false;
         this.subscriptions = [];
     }
 

@@ -1,20 +1,21 @@
-import {Component, Input, ElementRef, Renderer, ViewChild, forwardRef} from "@angular/core";
-import {FormControl, ControlValueAccessor, NG_VALUE_ACCESSOR, NG_VALIDATORS} from "@angular/forms";
+import {Component, ElementRef, forwardRef, Input, Renderer, ViewChild, ViewEncapsulation} from "@angular/core";
+import {ControlValueAccessor, FormControl, NG_VALIDATORS, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {noop} from "../../../lib/utils.lib";
 import {ModalService} from "../../../components/modal/modal.service";
 
-require("./compact-list.component.scss");
-
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "compact-list",
+    styleUrls: ["./compact-list.component.scss"],
     providers: [
-        { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => CompactListComponent), multi: true },
-        { provide: NG_VALIDATORS, useExisting: forwardRef(() => CompactListComponent), multi: true }
+        {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => CompactListComponent), multi: true},
+        {provide: NG_VALIDATORS, useExisting: forwardRef(() => CompactListComponent), multi: true}
     ],
     template: `
-           <div class="compact-list-wrapper" (click)="onListWrapperClick()">
-                
-                <div class="input-tag-list">
+        <div class="compact-list-wrapper" (click)="onListWrapperClick()">
+
+            <div class="input-tag-list">
                     
                     <span *ngFor="let tag of tagList; let i = index;"
                           class="tag tag-pill tag-default">
@@ -22,34 +23,34 @@ require("./compact-list.component.scss");
                           <i *ngIf="!readonly" class="fa fa-times remove-tag-icon text-hover-danger" [ct-tooltip]="'Delete'"
                              (click)="removeTag(i, $event)"></i>
                     </span>
-                   
-                   
-                    <!-- Not using the <input>, 
-                         so that the width can adjust to the text length,
-                         and break into a new line if its long -->
-                     <span #tagInput ct-editable contenteditable="true"
-                          class="tag-input"
-                          *ngIf="tagInputControl"
-                          [ngClass]="{'invalid-input': !isValidInput }"
-                          [formControl]="tagInputControl"
-                          (keydown)="onTagInputKeyDown($event)"
-                          (keyup)="onTagInputKeyUp()"
-                          (blur)="onTagInputBlur()">
+
+
+                <!-- Not using the <input>, 
+                     so that the width can adjust to the text length,
+                     and break into a new line if its long -->
+                <span #tagInput ct-editable contenteditable="true"
+                      class="tag-input"
+                      *ngIf="tagInputControl"
+                      [ngClass]="{'invalid-input': !isValidInput }"
+                      [formControl]="tagInputControl"
+                      (keydown)="onTagInputKeyDown($event)"
+                      (keyup)="onTagInputKeyUp()"
+                      (blur)="onTagInputBlur()">
                     </span>
-                     
-                      <span *ngIf="isValidInput === false" 
-                            class="tooltip-wrapper">
+
+                <span *ngIf="isValidInput === false"
+                      class="tooltip-wrapper">
                           <i class="fa fa-exclamation-circle input-error-icon"></i>
                           
                           <span class="tooltip-text">
                             {{validationMessage}}
                           </span>
                       </span>
-                </div>
             </div>
+        </div>
     `
 })
-export class CompactListComponent implements ControlValueAccessor  {
+export class CompactListComponent implements ControlValueAccessor {
 
     @Input()
     public readonly = false;
@@ -100,7 +101,7 @@ export class CompactListComponent implements ControlValueAccessor  {
     }
 
     private onListWrapperClick(): void {
-        this.renderer.invokeElementMethod(this.tagInputElement.nativeElement, 'focus', []);
+        this.renderer.invokeElementMethod(this.tagInputElement.nativeElement, "focus", []);
     }
 
     validate(c: FormControl): void {

@@ -1,5 +1,5 @@
-import {Component, Input, ChangeDetectionStrategy} from "@angular/core";
-import {BehaviorSubject, Subject, Observable} from "rxjs/Rx";
+import {ChangeDetectionStrategy, Component, Input, ViewEncapsulation} from "@angular/core";
+import {BehaviorSubject, Observable, Subject} from "rxjs/Rx";
 import {RadioButtonComponent} from "./radio-button.component";
 
 export interface GroupItem<T> {
@@ -10,6 +10,8 @@ export interface GroupItem<T> {
 }
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-radio-group",
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: {
@@ -20,9 +22,9 @@ export interface GroupItem<T> {
                          [class.btn-primary]="item.value === (value | async)"
                          (onClick)="onChildClick($event)"
                          [value]="item.value"
-                         [name]="item.name" 
+                         [name]="item.name"
                          [icon]="item.icon">
-        </ct-radio-button>        
+        </ct-radio-button>
     `
 })
 export class RadioGroupComponent<T> {

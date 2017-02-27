@@ -1,17 +1,14 @@
-import {Directive, ElementRef, Input} from '@angular/core';
+import {Directive, ElementRef, Input} from "@angular/core";
 import {Observable} from "rxjs";
 import {ComponentBase} from "../../components/common/component-base";
 import {DomEventService} from "../../services/dom/dom-event.service";
 
-
-require("./drag-and-drop.scss");
-
-@Directive({selector: '[ct-drag-over]'})
+@Directive({selector: "[ct-drag-over]"})
 export class DragOverDirective extends ComponentBase {
 
-    @Input('ct-drag-over') set d(enabled: boolean) {
+    @Input("ct-drag-over") set d(enabled: boolean) {
         if (enabled) {
-            this.el.setAttribute("ct-drag-over", '');
+            this.el.setAttribute("ct-drag-over", "");
         } else {
             this.el.removeAttribute("ct-drag-over");
         }

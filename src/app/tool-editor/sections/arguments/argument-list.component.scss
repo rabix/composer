@@ -2,6 +2,6 @@
 @import "../../../../assets/sass/mixins";
 
 ct-argument-list .form-section {
-  @include cli-border($arg-color);
+    @include cli-border($arg-color);
 }
 

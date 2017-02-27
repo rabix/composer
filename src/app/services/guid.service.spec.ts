@@ -11,7 +11,7 @@ describe("GUID Generator Service", () => {
     });
 
     it("Should be able to generate a proper v4 guid", () => {
-        const id   = guid.generate();
+        const id = guid.generate();
 
         expect(typeof id).toBe("string");
         expect(id.length).toBe(36);
@@ -27,7 +27,7 @@ describe("GUID Generator Service", () => {
 
     it("Should not repeat generated ids", () => {
         const limit = 10;
-        const ids   = [];
+        const ids = [];
 
         for (let i = 0; i < limit; i++) {
             ids.push(guid.generate());

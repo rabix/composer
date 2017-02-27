@@ -1,16 +1,18 @@
-import {Component, Input, ChangeDetectionStrategy, HostBinding, Output, ViewChild} from "@angular/core";
+import {ChangeDetectionStrategy, Component, HostBinding, Input, Output, ViewChild, ViewEncapsulation} from "@angular/core";
 import {Observable} from "rxjs";
 import {ComponentBase} from "../../../components/common/component-base";
 import {CodeEditorComponent} from "./code-editor.component";
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-code-preview",
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <ct-code-editor-x #editor
-          [(content)]="contentStream"
-          [language]="language"
-          [options]="{
+                          [(content)]="contentStream"
+                          [language]="language"
+                          [options]="{
             readOnly: true,
             theme: 'ace/theme/monokai',
             showGutter: false,
@@ -54,8 +56,8 @@ export class CodePreviewComponent extends ComponentBase {
     }
 
     ngAfterViewInit() {
-        const editor     = this.editor.getEditorInstance();
-        const lineNum    = editor.getValue().trim().split(/\r\n|\r|\n/).length;
+        const editor = this.editor.getEditorInstance();
+        const lineNum = editor.getValue().trim().split(/\r\n|\r|\n/).length;
         const lineHeight = 16; // Sorry for hardcoding, low priority
 
         this.height = Math.min(lineNum, 20) * lineHeight;

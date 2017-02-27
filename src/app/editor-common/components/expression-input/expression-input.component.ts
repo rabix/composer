@@ -1,15 +1,16 @@
-import {Component, Input, forwardRef} from "@angular/core";
-import {NG_VALUE_ACCESSOR, ControlValueAccessor} from "@angular/forms";
+import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
+import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../components/common/component-base";
 import {noop} from "../../../lib/utils.lib";
 import {ModalService} from "../../../components/modal/modal.service";
 import {ModelExpressionEditorComponent} from "../../expression-editor/model-expression-editor.component";
 
-require("./expression-input.component.scss");
-
 @Component({
-    selector: 'ct-expression-input',
+    encapsulation: ViewEncapsulation.None,
+
+    selector: "ct-expression-input",
+    styleUrls: ["./expression-input.component.scss"],
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
@@ -18,38 +19,38 @@ require("./expression-input.component.scss");
         }
     ],
     template: `
-            <div class="expression-input-group clickable"
-                 [class.expr]="isExpr || disableLiteralTextInput"
-                 [ct-validation-class]="model.validation">
-                 
-                <ct-validation-preview [entry]="model.validation"></ct-validation-preview>
-                <b class="validation-icon result"
-                    *ngIf="model.result && isExpr"
-                    [title]="result">E:</b>
-                
-                <div class="input-group">
-                
-                    <input class="form-control"
-                        #input               
-                        [type]="isExpr ? 'string' : type"
-                        [value]="value?.toString()"
-                        [readonly]="isExpr || disableLiteralTextInput || readonly"
-                        (blur)="onTouch()"
-                        (click)="editExpr(isExpr || disableLiteralTextInput && !readonly ? 'edit' : null, $event)"
-                        (change)="editString(input.value)"/>
-                        
-                    <span class="input-group-btn" *ngIf="!readonly">
+        <div class="expression-input-group clickable"
+             [class.expr]="isExpr || disableLiteralTextInput"
+             [ct-validation-class]="model.validation">
+
+            <ct-validation-preview [entry]="model.validation"></ct-validation-preview>
+            <b class="validation-icon result"
+               *ngIf="model.result && isExpr"
+               [title]="result">E:</b>
+
+            <div class="input-group">
+
+                <input class="form-control"
+                       #input
+                       [type]="isExpr ? 'string' : type"
+                       [value]="value?.toString()"
+                       [readonly]="isExpr || disableLiteralTextInput || readonly"
+                       (blur)="onTouch()"
+                       (click)="editExpr(isExpr || disableLiteralTextInput && !readonly ? 'edit' : null, $event)"
+                       (change)="editString(input.value)"/>
+
+                <span class="input-group-btn" *ngIf="!readonly">
                         <button type="button"
-                            class="btn btn-secondary" 
-                            (click)="editExpr(isExpr ? 'clear' : 'edit', $event)">
+                                class="btn btn-secondary"
+                                (click)="editExpr(isExpr ? 'clear' : 'edit', $event)">
                             <i class="fa"
-                                [ngClass]="{'fa-times': isExpr,
+                               [ngClass]="{'fa-times': isExpr,
                                             'fa-code': !isExpr}"></i>
                         </button>
-                    </span>  
+                    </span>
             </div>
         </div>
-        `
+    `
 })
 export class ExpressionInputComponent extends ComponentBase implements ControlValueAccessor {
     /**
@@ -105,17 +106,17 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
         }
 
         if (obj) {
-            this.model  = obj;
+            this.model = obj;
             this.isExpr = obj.isExpression;
         } else {
-            this.model  = new ExpressionModel("", "");
+            this.model = new ExpressionModel("", "");
             this.isExpr = this.model.isExpression;
         }
 
         this.model.evaluate(this.context).then(res => {
             this.result = res;
         }, err => {
-            console.warn('ExpressionInputComponent got an error while evaluating an expression', err);
+            console.warn("ExpressionInputComponent got an error while evaluating an expression", err);
         });
     }
 
@@ -178,21 +179,21 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
 
             editor.readonly = this.readonly;
 
-            editor.model   = this.model;
+            editor.model = this.model;
             editor.context = this.context;
             editor.action.first().subscribe(action => {
                 if (action === "save") {
                     this.model = new ExpressionModel(this.model.loc, editor.model.serialize());
                     this.model.evaluate(this.context).then(() => {
-                        // to reset validation
-                        this.isExpr = this.model.isExpression;
-                        this.onChange(this.model);
-                    },
-                    () => {
-                        // to reset validation
-                        this.isExpr = this.model.isExpression;
-                        this.onChange(this.model);
-                    });
+                            // to reset validation
+                            this.isExpr = this.model.isExpression;
+                            this.onChange(this.model);
+                        },
+                        () => {
+                            // to reset validation
+                            this.isExpr = this.model.isExpression;
+                            this.onChange(this.model);
+                        });
                 }
                 this.modal.close();
             });
@@ -207,7 +208,7 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
             }).then(() => {
                 this.model.setValue("", this.type);
                 this.model.result = null;
-                this.isExpr       = false;
+                this.isExpr = false;
                 event.stopPropagation();
                 this.onChange(this.model);
             }, noop);

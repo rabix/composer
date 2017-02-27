@@ -6,7 +6,8 @@ import {
     Input,
     OnChanges,
     Output,
-    SimpleChanges
+    SimpleChanges,
+    ViewEncapsulation
 } from "@angular/core";
 import {ObjectHelper as OH} from "../../helpers/object.helper";
 import {SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
@@ -17,25 +18,27 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
  * Job Editor modifies the test values of the job json.
  */
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-job-editor",
     changeDetection: ChangeDetectionStrategy.OnPush,
-    template: `    
+    template: `
         <div class="row block mb-1">
             <div class="col-xs-12">
                 <button class="btn btn-secondary pull-right"
                         (click)="reset.emit()">
                     Reset to mock values
-                </button>        
+                </button>
             </div>
         </div>
-        
-        
+
+
         <ct-form-panel>
             <div class="tc-header">Computational Resources</div>
             <div class="tc-body">
-                <form #resources="ngForm" 
+                <form #resources="ngForm"
                       class="row"
-                      (change)="onResourceFormChange($event)" 
+                      (change)="onResourceFormChange($event)"
                       *ngIf="job.allocatedResources">
                     <div class="col-xs-6">
                         <label>CPU:</label>
@@ -55,26 +58,26 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
 
             </div>
         </ct-form-panel>
-        
+
         <div *ngFor="let group of inputGroups">
-            
+
             <ct-form-panel>
                 <div class="tc-header">{{ group.name }}</div>
                 <div class="tc-body">
                     <form (change)="onJobFormChange($event)">
                         <div *ngFor="let input of group.inputs">
 
-                            <label>{{ input?.label || input.id }} <i class="fa fa-info-circle text-muted" 
-                                                                      *ngIf="input.description" 
-                                                                      [ct-tooltip]="ctt"
-                                                                      [tooltipPlacement]="'top'"></i>
+                            <label>{{ input?.label || input.id }} <i class="fa fa-info-circle text-muted"
+                                                                     *ngIf="input.description"
+                                                                     [ct-tooltip]="ctt"
+                                                                     [tooltipPlacement]="'top'"></i>
                             </label>
                             <ct-job-editor-entry [prefix]="input.id"
                                                  [input]="input"
                                                  [value]="job.inputs[input.id]"
                                                  (update)="jobValueUpdate(input.id, $event)">
                             </ct-job-editor-entry>
-                            
+
                             <ct-tooltip-content #ctt>
                                 <div class="tooltip-info">
                                     {{ input.description }}

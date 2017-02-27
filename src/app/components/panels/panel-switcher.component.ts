@@ -1,15 +1,17 @@
-import {Component, Output, Input, ChangeDetectionStrategy} from "@angular/core";
+import {ChangeDetectionStrategy, Component, Input, Output, ViewEncapsulation} from "@angular/core";
 import {ReplaySubject} from "rxjs";
-require("./panel-switcher.component.scss");
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-panel-switcher",
+    styleUrls: ["./panel-switcher.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-        <div *ngFor="let p of panels" 
-             class="switcher clickable unselectable top" 
+        <div *ngFor="let p of panels"
+             class="switcher clickable unselectable top"
              (click)="toggle(p)"
              [class.active]="p.active">
-             
+
             <div class="switcher-text">
                 <i class="switcher-icon fa fa-fw fa-{{ p.icon }}"></i>
                 {{ p.name }}
@@ -43,10 +45,10 @@ export class PanelSwitcherComponent {
     private toggle(panel) {
         // If sidebar is collapsed, panel active state will always be set to true and sidebar will be expanded
         const newState = (this.sidebarExpanded !== true) ? (() => {
-                // Expand sidebar
-                this.toggleSidebar.next(true);
-                return true;
-            })() : !panel.active;
+            // Expand sidebar
+            this.toggleSidebar.next(true);
+            return true;
+        })() : !panel.active;
 
         this.panels.forEach(p => p.active = false);
         panel.active = newState;

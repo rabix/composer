@@ -22,11 +22,11 @@ export class FileName {
     public readonly isAbsolute: boolean;
 
     constructor(fullPath: string) {
-        this.fullPath                 = fullPath;
-        [, this.extension = ""]       = this.fullPath.split(/\.(?=[a-z0-9]*$)/gi);
-        this.isAbsolute               = this.fullPath.charAt(0) === "/";
-        this.dir                      = this.fullPath.substr(0, this.fullPath.lastIndexOf("/") + 1);
-        this.baseName                 = this.fullPath.substr(this.dir.length);
+        this.fullPath = fullPath;
+        [, this.extension = ""] = this.fullPath.split(/\.(?=[a-z0-9]*$)/gi);
+        this.isAbsolute = this.fullPath.charAt(0) === "/";
+        this.dir = this.fullPath.substr(0, this.fullPath.lastIndexOf("/") + 1);
+        this.baseName = this.fullPath.substr(this.dir.length);
         this.baseNameWithoutExtension = this.baseName.substr(0, this.baseName.indexOf(this.extension) - 1);
     }
 

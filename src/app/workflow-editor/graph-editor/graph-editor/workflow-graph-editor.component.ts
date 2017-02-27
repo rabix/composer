@@ -1,15 +1,15 @@
-import {
-    Component, ElementRef, Input, TemplateRef, ViewChild
-} from "@angular/core";
+import {Component, ElementRef, Input, TemplateRef, ViewChild, ViewEncapsulation} from "@angular/core";
 import {StepModel, WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
 import {Workflow} from "cwl-svg";
 import {StatusBarService} from "../../../core/status-bar/status-bar.service";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 declare const Snap: any;
-require("./workflow-graph-editor.component.scss");
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-workflow-graph-editor",
+    styleUrls: ["./workflow-graph-editor.component.scss"],
     template: `
         <svg (click)="handleClick($event)" #canvas class="cwl-workflow"></svg>
 
@@ -92,7 +92,7 @@ export class WorkflowGraphEditorComponent {
     /**
      * Triggers when click events occurs on canvas
      */
-    handleClick(ev : Event) {
+    handleClick(ev: Event) {
         let current = ev.target as Element;
 
         // Check if clicked element is a node or any descendant of a node (in order to open object inspector if so)
@@ -128,7 +128,7 @@ export class WorkflowGraphEditorComponent {
         if (this.hasClassSvgElement(node, "input")) {
             typeOfNode = "inputs";
         } else if (this.hasClassSvgElement(node, "output")) {
-            typeOfNode  ="outputs";
+            typeOfNode = "outputs";
         }
 
         this.inspectedNode = this.model[typeOfNode].find((input) => input.id === node.getAttribute("data-id"));

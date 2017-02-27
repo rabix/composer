@@ -1,9 +1,11 @@
-import {Component, Input, ViewChildren, QueryList, ElementRef} from "@angular/core";
-import {Observable, BehaviorSubject, Subject} from "rxjs";
+import {Component, ElementRef, Input, QueryList, ViewChildren, ViewEncapsulation} from "@angular/core";
+import {BehaviorSubject, Observable, Subject} from "rxjs";
 import {PanelComponent} from "./panel.component";
-require("./panel-container.component.scss");
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-panel-container",
+    styleUrls: ["./panel-container.component.scss"],
     template: `
         <template ngFor let-panel [ngForOf]="panelList | async" let-isLast="last">
             <ct-panel [size]="totalPanelSize" [class.hidden]="!panel.active">
@@ -11,15 +13,15 @@ require("./panel-container.component.scss");
                 <ct-sb-public-apps-panel class="full-width" *ngIf="panel.id === 'sb_public_apps'"></ct-sb-public-apps-panel>
                 <ct-local-files-panel class="full-width" *ngIf="panel.id === 'local_files'"></ct-local-files-panel>
                 <ct-structure-panel class="full-width" *ngIf="panel.id === 'structure'"></ct-structure-panel>
-                
-            </ct-panel>    
+
+            </ct-panel>
         </template>
     `
 })
 export class PanelContainerComponent {
 
     @Input("panels")
-    public panelList: Observable<{id: string, active: boolean}[]>;
+    public panelList: Observable<{ id: string, active: boolean }[]>;
 
     @ViewChildren(PanelComponent)
     private panels: QueryList<PanelComponent>;

@@ -1,15 +1,16 @@
-import {Component, forwardRef, Input} from "@angular/core";
-import {NG_VALUE_ACCESSOR, ControlValueAccessor, FormGroup, FormControl} from "@angular/forms";
+import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
+import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../components/common/component-base";
 import {GuidService} from "../../../services/guid.service";
 import {noop} from "../../../lib/utils.lib";
 import {ModalService} from "../../../components/modal/modal.service";
 
-require("./key-value-list.component.scss");
-
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "key-value-list",
+    styleUrls: ["./key-value-list.component.scss"],
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
@@ -18,14 +19,14 @@ require("./key-value-list.component.scss");
         }
     ],
     template: `
-    <div class="container">
-    
+        <div class="container">
+
             <!--Blank Tool Screen-->
             <ct-blank-tool-state *ngIf="!readonly && !keyValueFormList.length"
-                         [title]="emptyListText"
-                         [buttonText]="addEntryText"
-                         [learnMoreURL]="helpLink"
-                         (buttonClick)="addEntry()">
+                                 [title]="emptyListText"
+                                 [buttonText]="addEntryText"
+                                 [learnMoreURL]="helpLink"
+                                 (buttonClick)="addEntry()">
             </ct-blank-tool-state>
 
             <!--List Header Row-->
@@ -33,41 +34,41 @@ require("./key-value-list.component.scss");
                 <div class="col-sm-5">{{keyColumnText}}</div>
                 <div class="col-sm-6">{{valueColumnText}}</div>
             </div>
-            
+
             <!--Input List Entries-->
             <ul class="gui-section-list">
-            
+
                 <!--List Entry-->
                 <li class="input-list-items container"
                     *ngFor="let entry of keyValueFormList; let i = index">
-            
-                    <div class="gui-section-list-item clickable row"
-                        [class.invalid-entry]="duplicateKeys.has(form.controls[entry.id].value.key)">
 
-                        <ct-key-value-input 
-                                [context]="context"
-                                [formControl]="form.controls[entry.id]"
-                                [keyValidator]="keyValidator"
-                                [isDuplicate]="duplicateKeys.has(form.controls[entry.id].value.key)">
-                                        
+                    <div class="gui-section-list-item clickable row"
+                         [class.invalid-entry]="duplicateKeys.has(form.controls[entry.id].value.key)">
+
+                        <ct-key-value-input
+                            [context]="context"
+                            [formControl]="form.controls[entry.id]"
+                            [keyValidator]="keyValidator"
+                            [isDuplicate]="duplicateKeys.has(form.controls[entry.id].value.key)">
+
                             <div *ngIf="!!entry" class="col-sm-1 align-right">
                                 <i title="Delete" class="fa fa-trash text-hover-danger" (click)="removeEntry(entry)"></i>
                             </div>
                         </ct-key-value-input>
-                    </div>              
-            
+                    </div>
+
                 </li>
-                
-            </ul>            
-    </div>
-    
-    <!--Add entry link-->
-    <button *ngIf="!readonly && keyValueFormList.length"
-            (click)="addEntry()"
-            type="button"
-            class="btn pl-0 btn-link no-outline no-underline-hover">
-        <i class="fa fa-plus"></i> {{addEntryText}}
-    </button>  
+
+            </ul>
+        </div>
+
+        <!--Add entry link-->
+        <button *ngIf="!readonly && keyValueFormList.length"
+                (click)="addEntry()"
+                type="button"
+                class="btn pl-0 btn-link no-outline no-underline-hover">
+            <i class="fa fa-plus"></i> {{addEntryText}}
+        </button>
     `
 })
 export class KeyValueListComponent extends ComponentBase implements ControlValueAccessor {
@@ -76,7 +77,7 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
     public readonly = false;
 
     @Input()
-    public context: {$job: any} = { $job: {} };
+    public context: { $job: any } = {$job: {}};
 
     @Input()
     public addEntryText = "";
@@ -121,10 +122,10 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
     }
 
     writeValue(keyValueList: {
-        key?: string,
-        value: string | ExpressionModel,
-        readonly?: boolean
-    }[]): void {
+                   key?: string,
+                   value: string | ExpressionModel,
+                   readonly?: boolean
+               }[]): void {
 
         this.keyValueFormList = keyValueList.map(entry => {
             return {
@@ -145,7 +146,7 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
             let uniqueKeys: string[] = [];
 
             Object.keys(change).forEach(key => {
-                if (uniqueKeys.indexOf(change[key].key) === - 1) {
+                if (uniqueKeys.indexOf(change[key].key) === -1) {
                     newKeyValueList.push(change[key]);
                     uniqueKeys.push(change[key].key)
                 }
@@ -182,7 +183,7 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
                 }
             });
 
-        return this.duplicateKeys.size > 0 ? { message: "There are duplicates in the form." }: null;
+        return this.duplicateKeys.size > 0 ? {message: "There are duplicates in the form."} : null;
     }
 
     private addEntry(): void {
@@ -199,7 +200,7 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
         this.form.addControl(newEntry.id, new FormControl(newEntry.model));
     }
 
-    private removeEntry(ctrl: {id: string, model: ExpressionModel}): void {
+    private removeEntry(ctrl: { id: string, model: ExpressionModel }): void {
         this.modal.confirm({
             title: "Really Remove?",
             content: `Are you sure that you want to remove this key-value pair?`,

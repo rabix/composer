@@ -1,73 +1,76 @@
-import {Component, Input} from "@angular/core";
+import {Component, Input, ViewEncapsulation} from "@angular/core";
 import {FormGroup} from "@angular/forms";
-import {SBDraft2CommandLineToolModel, FileDefModel, RequirementBaseModel, ResourceRequirementModel} from "cwlts/models/d2sb";
+import {FileDefModel, RequirementBaseModel, ResourceRequirementModel, SBDraft2CommandLineToolModel} from "cwlts/models/d2sb";
 import {ProcessRequirement} from "cwlts/mappings/d2sb/ProcessRequirement";
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
 import {ComponentBase} from "../../components/common/component-base";
-require("./tool-visual-editor.component.scss");
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-tool-visual-editor",
+    styleUrls: ["./tool-visual-editor.component.scss"],
     template: `
         <div class="row" *ngIf="model.cwlVersion !== 'sbg:draft-2'">
             <div class="alert alert-warning">
-                Only tools which are <code>sbg:draft-2</code> are currently supported. This tool is versioned as <code>{{ model.cwlVersion }}</code>.
+                Only tools which are <code>sbg:draft-2</code> are currently supported. This tool is versioned as <code>{{ model.cwlVersion
+                }}</code>.
             </div>
         </div>
-        
-        <div class="row" *ngIf="model.cwlVersion === 'sbg:draft-2'">       
-            <form [class.col-xs-6]="showInspector" 
-                  [class.col-xs-12]="!showInspector" 
+
+        <div class="row" *ngIf="model.cwlVersion === 'sbg:draft-2'">
+            <form [class.col-xs-6]="showInspector"
+                  [class.col-xs-12]="!showInspector"
                   [formGroup]="formGroup">
                 <ct-docker-requirement [dockerRequirement]="model.docker"
                                        (update)="setRequirement($event, true)"
                                        [readonly]="readonly">
                 </ct-docker-requirement>
-                                
+
                 <ct-base-command [baseCommand]="model.baseCommand"
-                                   [context]="{$job: model.job}"
-                                   [stdin]="model.stdin"
-                                   [stdout]="model.stdout"
-                                   (updateCmd)="updateModel('baseCommand', $event)"
-                                   (updateStreams)="setStreams($event)"
-                                   [readonly]="readonly">
+                                 [context]="{$job: model.job}"
+                                 [stdin]="model.stdin"
+                                 [stdout]="model.stdout"
+                                 (updateCmd)="updateModel('baseCommand', $event)"
+                                 (updateStreams)="setStreams($event)"
+                                 [readonly]="readonly">
                 </ct-base-command>
-                                
+
                 <ct-tool-input [location]="model.loc + '.inputs'" [entries]="model.inputs"
-                                   [context]="{$job: model.job}"
-                                   [readonly]="readonly"
-                                   (update)="updateModel('inputs', $event)"
-                                   [readonly]="readonly">
+                               [context]="{$job: model.job}"
+                               [readonly]="readonly"
+                               (update)="updateModel('inputs', $event)"
+                               [readonly]="readonly">
                 </ct-tool-input>
-                
-                <ct-tool-output [location]="model.loc + '.outputs'" [entries]="model.outputs || []" 
-                                  [context]="{$job: model.job}"
-                                  [inputs]="model.inputs || []" 
-                                  [readonly]="readonly" 
-                                  (update)="updateModel('outputs', $event)"
-                                  [readonly]="readonly">
+
+                <ct-tool-output [location]="model.loc + '.outputs'" [entries]="model.outputs || []"
+                                [context]="{$job: model.job}"
+                                [inputs]="model.inputs || []"
+                                [readonly]="readonly"
+                                (update)="updateModel('outputs', $event)"
+                                [readonly]="readonly">
                 </ct-tool-output>
-                                   
-                <ct-resources [entries]="model.resources" 
-                              [readonly]="readonly" 
-                              (update)="setResource($event)" 
+
+                <ct-resources [entries]="model.resources"
+                              [readonly]="readonly"
+                              (update)="setResource($event)"
                               [context]="{$job: model.job}"
                               [readonly]="readonly">
                 </ct-resources>
 
-                <ct-hint-list [entries]="model.hints || []" 
+                <ct-hint-list [entries]="model.hints || []"
                               [context]="{$job: model.job}"
                               (update)="setHints($event)"
                               [readonly]="readonly">
                 </ct-hint-list>
-                
-                <ct-argument-list [location]="model.loc + '.arguments'" 
-                                  [entries]="model.arguments || []"     
-                                  [readonly]="readonly"                    
+
+                <ct-argument-list [location]="model.loc + '.arguments'"
+                                  [entries]="model.arguments || []"
+                                  [readonly]="readonly"
                                   (update)="updateModel('arguments', $event)"
                                   [context]="{$job: model.job}"
                                   [readonly]="readonly">
                 </ct-argument-list>
-                
+
                 <ct-file-def-list [entries]="model.createFileRequirement?.fileDef || []"
                                   [location]="model.createFileRequirement?.loc"
                                   [readonly]="readonly"
@@ -123,7 +126,7 @@ export class ToolVisualEditorComponent extends ComponentBase {
                 this.model.createFileRequirement.fileDef = data;
             } else {
                 this.model.setRequirement(<ProcessRequirement>{
-                    'class': "CreateFileRequirement",
+                    "class": "CreateFileRequirement",
                     fileDef: data.map((d: FileDefModel) => d.serialize())
                 });
             }

@@ -102,7 +102,7 @@ export class DomEventService {
      */
     public onMove(element: Element, ctName = "", ctData = {}): Observable<ExtendedMouseEvent> {
         const down = Observable.fromEvent(element, "mousedown");
-        const up   = Observable.fromEvent(document, "mouseup");
+        const up = Observable.fromEvent(document, "mouseup");
         const move = Observable.fromEvent(document, "mousemove");
         return down.flatMap(_ => move.takeUntil(up)).map((ev: MouseEvent) => Object.assign(ev, {ctData}, {ctName}));
     }
@@ -113,7 +113,7 @@ export class DomEventService {
             ev.stopPropagation && ev.stopPropagation();
             ev.preventDefault && ev.preventDefault();
         });
-        const up   = Observable.fromEvent(document, "mouseup");
+        const up = Observable.fromEvent(document, "mouseup");
         const move = Observable.fromEvent(document, "mousemove");
 
         return down.map(ev => new Observable(obs => {

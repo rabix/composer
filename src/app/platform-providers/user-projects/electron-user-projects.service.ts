@@ -4,7 +4,7 @@ import {MenuItem} from "../../core/ui/menu/menu-item";
 import {UserProjectsService} from "./user-projects.service";
 import {LocalDataSourceService} from "../../sources/local/local.source.service";
 
-const {app, dialog} = window.require("electron").remote;
+const {app, dialog} = window["require"]("electron").remote;
 
 @Injectable()
 export class ElectronUserProjectsService extends UserProjectsService {

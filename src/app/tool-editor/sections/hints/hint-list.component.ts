@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Input, Output} from "@angular/core";
+import {ChangeDetectionStrategy, Component, Input, Output, ViewEncapsulation} from "@angular/core";
 import {ExternalLinks} from "../../../cwl/external-links";
 import {ExpressionModel, RequirementBaseModel} from "cwlts/models/d2sb";
 import {FormControl} from "@angular/forms";
@@ -7,6 +7,8 @@ import {ComponentBase} from "../../../components/common/component-base";
 
 // @todo move to editor common module
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-hint-list",
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
@@ -76,7 +78,7 @@ export class HintListComponent extends ComponentBase {
     }[] {
         return entries.map((hint: RequirementBaseModel) => {
             let newHint = {
-                key: hint['class'],
+                key: hint["class"],
                 value: <string | ExpressionModel>"",
                 readonly: false
             };
@@ -110,7 +112,7 @@ export class HintListComponent extends ComponentBase {
                 if (item.readonly && typeof item.value === "string") {
                     if (!!item.key && !!item.key.trim()) {
                         return new RequirementBaseModel({
-                            'class': item.key,
+                            "class": item.key,
                             customProps: JSON.parse(item.value)
                         }).serialize();
 
@@ -121,7 +123,7 @@ export class HintListComponent extends ComponentBase {
 
                 if (!!item.key && !!item.key.trim() && !item.readonly) {
                     return new RequirementBaseModel({
-                        'class': item.key,
+                        "class": item.key,
                         value: (<ExpressionModel>item.value).serialize()
                     }).serialize();
                 }

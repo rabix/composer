@@ -2,5 +2,5 @@
 @import "../../../../assets/sass/mixins";
 
 ct-tool-input .form-section {
-  @include cli-border($input-port-color);
+    @include cli-border($input-port-color);
 }

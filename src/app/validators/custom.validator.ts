@@ -4,7 +4,7 @@ import {Injectable} from "@angular/core";
 @Injectable()
 export class CustomValidators {
     static cwlModel = (c: AbstractControl) => {
-        const val    = c.value;
+        const val = c.value;
         let res: any = {};
 
         if (!val || !val.validation) return null;

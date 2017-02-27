@@ -1,30 +1,25 @@
 import {Subject} from "rxjs";
-import {
-    Component,
-    Input,
-    ChangeDetectionStrategy,
-    Output,
-    ViewChild
-} from "@angular/core";
+import {ChangeDetectionStrategy, Component, Input, Output, ViewChild, ViewEncapsulation} from "@angular/core";
 import {ComponentBase} from "../../../components/common/component-base";
 import {CommandOutputParameterModel} from "cwlts/models/d2sb";
 import {CommandInputParameterModel} from "cwlts/models";
 import {ExternalLinks} from "../../../cwl/external-links";
 import {ToolOutputListComponent} from "./tool-output-list.component";
 
-require("./output-list.component.scss");
-
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-tool-output",
     changeDetection: ChangeDetectionStrategy.OnPush,
+    styleUrls: ["./output-list.component.scss"],
     template: `
         <ct-form-panel [collapsed]="false">
             <span class="tc-header">
                 Output ports
             </span>
-            
+
             <div class="tc-body">
-                
+
                 <!--Blank Tool Screen-->
                 <ct-blank-tool-state *ngIf="!readonly && !entries.length"
                                      [title]="'Everything your tool generates as a result'"
@@ -34,14 +29,14 @@ require("./output-list.component.scss");
                 </ct-blank-tool-state>
 
                 <!--List of entries-->
-                <ct-tool-output-list (update)="updateParent($event)" 
-                    [inputs]="inputs" 
-                    [entries]="entries" 
-                    [location]="location" 
-                    [context]="context" 
-                    [readonly]="readonly">
+                <ct-tool-output-list (update)="updateParent($event)"
+                                     [inputs]="inputs"
+                                     [entries]="entries"
+                                     [location]="location"
+                                     [context]="context"
+                                     [readonly]="readonly">
                 </ct-tool-output-list>
-                
+
             </div>
         </ct-form-panel>
     `
@@ -60,7 +55,7 @@ export class ToolOutputsComponent extends ComponentBase {
 
     /** Context in which expression should be evaluated */
     @Input()
-    public context: {$job: any};
+    public context: { $job: any };
 
     @Input()
     public readonly = false;

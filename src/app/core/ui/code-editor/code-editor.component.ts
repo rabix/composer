@@ -1,23 +1,39 @@
-import {Component, Input, Output, ElementRef} from "@angular/core";
-import {Observable, Subject} from "rxjs";
+import {Component, ElementRef, Input, Output, ViewEncapsulation} from "@angular/core";
 import {ComponentBase} from "../../../components/common/component-base";
-import Editor = AceAjax.Editor;
+import * as ace from "brace";
+
+
+import "brace/mode/java";
+import "brace/mode/javascript";
+import "brace/mode/json";
+import "brace/mode/markdown";
+import "brace/mode/python";
+import "brace/mode/sh";
+import "brace/mode/text";
+import "brace/mode/typescript";
+import "brace/mode/yaml";
+import "brace/mode/c_cpp";
+import "brace/mode/scss";
+import "brace/mode/html";
+import "brace/mode/xml";
+import "brace/mode/r";
+import "brace/ext/searchbox";
+import "brace/theme/chrome";
+import "brace/theme/monokai";
+import {Observable} from "rxjs/Observable";
+import {Subject} from "rxjs/Subject";
+
 import {ACE_MODES_MAP} from "../../../components/code-editor/code-editor-modes-map";
-
-require("brace/ext/searchbox");
-require("brace/theme/chrome");
-require("brace/theme/monokai");
-
-require("./code-editor.component.scss");
+import Editor = AceAjax.Editor;
 
 export interface AceEditorOptions {
 
     // Editor Options
-    selectionStyle?: "line"|"text";
+    selectionStyle?: "line" | "text";
     highlightActiveLine?: boolean;
     highlightSelectedWord?: boolean;
     readOnly?: boolean;
-    cursorStyle?: "ace"|"slim"|"smooth"|"wide";
+    cursorStyle?: "ace" | "slim" | "smooth" | "wide";
     mergeUndoDeltas?: boolean | "always";
     behavioursEnabled?: boolean;
     wrapBehavioursEnabled?: boolean;
@@ -73,7 +89,10 @@ export interface AceEditorOptions {
 }
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-code-editor-x",
+    styleUrls: ["./code-editor.component.scss"],
     template: ""
 })
 export class CodeEditorComponent extends ComponentBase {
@@ -104,7 +123,7 @@ export class CodeEditorComponent extends ComponentBase {
     ngOnInit() {
 
         // Instantiate the editor instance inside the target element
-        this.editor  = ace.edit(this.elementRef.nativeElement);
+        this.editor = ace.edit(this.elementRef.nativeElement);
         this.tracked = this.editor;
 
         // Set the theme and language

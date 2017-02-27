@@ -1,13 +1,26 @@
 import {
-    Component, Input, ElementRef, forwardRef, Output, EventEmitter, ChangeDetectionStrategy,
-    ViewContainerRef, ViewChild, ComponentRef, ComponentFactoryResolver, ChangeDetectorRef
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
+    Component,
+    ComponentFactoryResolver,
+    ComponentRef,
+    ElementRef,
+    EventEmitter,
+    forwardRef,
+    Input,
+    Output,
+    ViewChild,
+    ViewContainerRef,
+    ViewEncapsulation
 } from "@angular/core";
-import {NG_VALUE_ACCESSOR, ControlValueAccessor} from "@angular/forms";
+import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {noop} from "../../../lib/utils.lib";
 import {DropDownMenuComponent} from "./dropdown-menu.component";
 import {ComponentBase} from "../../../components/common/component-base";
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-dropdown-button",
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
@@ -30,14 +43,14 @@ export class DropDownButtonComponent extends ComponentBase implements ControlVal
 
     private selected: { value, caption, description } = null;
 
-    @Input('value') set value(value: string) {
+    @Input("value") set value(value: string) {
         this.externalSelect(value);
     }
 
     @Output()
     public change = new EventEmitter();
 
-    @ViewChild('button', {read: ViewContainerRef}) button;
+    @ViewChild("button", {read: ViewContainerRef}) button;
 
     private toggle = false;
 

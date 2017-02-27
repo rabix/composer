@@ -1,4 +1,4 @@
-import {Directive, Input, HostListener, TemplateRef, HostBinding, ChangeDetectorRef} from "@angular/core";
+import {ChangeDetectorRef, Directive, HostBinding, HostListener, Input, TemplateRef} from "@angular/core";
 import {EditorInspectorService} from "./editor-inspector.service";
 import {ComponentBase} from "../../components/common/component-base";
 

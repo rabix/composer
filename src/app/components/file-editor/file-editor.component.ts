@@ -1,13 +1,15 @@
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, Input, OnInit, ViewEncapsulation} from "@angular/core";
 import {BehaviorSubject} from "rxjs";
 import {DataEntrySource} from "../../sources/common/interfaces";
 import {ComponentBase} from "../common/component-base";
 import {StatusBarService} from "../../core/status-bar/status-bar.service";
 
 @Component({
-    selector: 'ct-file-editor',
+    encapsulation: ViewEncapsulation.None,
+
+    selector: "ct-file-editor",
     host: {
-      "class": "tab-container"
+        "class": "tab-container"
     },
     template: `
         <block-loader *ngIf="isLoading"></block-loader>
@@ -27,14 +29,14 @@ import {StatusBarService} from "../../core/status-bar/status-bar.service";
                     Save
                 </button>
             </ct-editor-controls>
-            
+
             <div class="editor-content flex-row">
-                <ct-code-editor-x [(content)]="rawEditorContent" 
+                <ct-code-editor-x [(content)]="rawEditorContent"
                                   [language]="data.language"
                                   [options]="{theme: 'ace/theme/monokai'}"></ct-code-editor-x>
             </div>
         </div>
-`
+    `
 })
 export class FileEditorComponent extends ComponentBase implements OnInit {
     @Input()
@@ -50,7 +52,7 @@ export class FileEditorComponent extends ComponentBase implements OnInit {
         this.tracked = this.data.content.subscribe(this.rawEditorContent);
     }
 
-    private save(){
+    private save() {
         // For local files, just save and that's it
         if (this.data.data.source === "local") {
             const path = this.data.data.path;

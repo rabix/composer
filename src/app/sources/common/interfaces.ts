@@ -6,15 +6,15 @@ export type LOCAL_FS_SOURCE_ID = "local";
 
 export type DATA_SOURCE_ID =
     SB_PLATFORM_SOURCE_ID
-        | SB_PUBLIC_SOURCE_ID
-        | LOCAL_FS_SOURCE_ID;
+    | SB_PUBLIC_SOURCE_ID
+    | LOCAL_FS_SOURCE_ID;
 
 export interface DataEntrySource {
     id: string;
     data?: any;
     type?: "file" | "folder",
     isWritable?: boolean;
-    save?: ((...args: any[])=> Observable<any>)
+    save?: ((...args: any[]) => Observable<any>)
     sourceId?: DATA_SOURCE_ID;
     content?: Observable<string> | any,
     language?: Observable<string> | any,

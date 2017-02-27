@@ -1,43 +1,43 @@
 @import "../../../../assets/sass/variables";
 
 .validatable {
-  border: $gui-section-list-item-border-size solid transparent;
+    border: $gui-section-list-item-border-size solid transparent;
 
-  &:hover {
-    border-color: $gui-section-list-item-hover-border;
-  }
-
-  &.error {
-    .validation-icon {
-      color: $brand-danger;
+    &:hover {
+        border-color: $gui-section-list-item-hover-border;
     }
 
-    &:hover, &.selected, &.ct-inspected {
-      border-color: $brand-danger;
+    &.error {
+        .validation-icon {
+            color: $brand-danger;
+        }
+
+        &:hover, &.selected, &.ct-inspected {
+            border-color: $brand-danger;
+        }
+
+        &.selected, &.ct-inspected {
+            background-color: $brand-danger;
+        }
+    }
+
+    &.warning {
+        .validation-icon {
+            color: $brand-warning;
+        }
+
+        &:hover, &.selected, &.ct-inspected {
+            border-color: $brand-warning;
+        }
+
+        &.selected, &.ct-inspected {
+            background-color: $brand-warning;
+        }
     }
 
     &.selected, &.ct-inspected {
-      background-color: $brand-danger;
+        .validation-icon {
+            color: $gui-section-list-item-select-icon-color;
+        }
     }
-  }
-
-  &.warning {
-    .validation-icon {
-      color: $brand-warning;
-    }
-
-    &:hover, &.selected, &.ct-inspected {
-      border-color: $brand-warning;
-    }
-
-    &.selected, &.ct-inspected {
-      background-color: $brand-warning;
-    }
-  }
-
-  &.selected, &.ct-inspected {
-    .validation-icon {
-      color: $gui-section-list-item-select-icon-color;
-    }
-  }
 }

@@ -1,6 +1,8 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, OnInit, ViewEncapsulation} from "@angular/core";
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-panel-toolbar",
     template: `
         <div class="title">

@@ -1,5 +1,5 @@
 import {Injectable, TemplateRef} from "@angular/core";
-import {Observable, Subject, BehaviorSubject, ReplaySubject} from "rxjs";
+import {BehaviorSubject, Observable, ReplaySubject, Subject} from "rxjs";
 import {StatusBarComponent} from "./status-bar.component";
 import {noop} from "../../lib/utils.lib";
 import {GuidService} from "../../services/guid.service";

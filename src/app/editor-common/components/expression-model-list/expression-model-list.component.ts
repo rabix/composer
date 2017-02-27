@@ -1,5 +1,5 @@
-import {Component, Input, forwardRef} from "@angular/core";
-import {Validators, FormControl, ControlValueAccessor, NG_VALUE_ACCESSOR, FormGroup} from "@angular/forms";
+import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
+import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../components/common/component-base";
 import {GuidService} from "../../../services/guid.service";
@@ -8,9 +8,11 @@ import {noop} from "../../../lib/utils.lib";
 import {ModalService} from "../../../components/modal/modal.service";
 
 @Component({
-    selector: 'expression-model-list',
+    encapsulation: ViewEncapsulation.None,
+
+    selector: "expression-model-list",
     providers: [
-        { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ExpressionModelListComponent), multi: true }
+        {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ExpressionModelListComponent), multi: true}
     ],
     template: `
         <form *ngIf="form" [formGroup]="form">
@@ -18,33 +20,33 @@ import {ModalService} from "../../../components/modal/modal.service";
             <ol *ngIf="formList.length > 0" class="list-unstyled">
 
                 <li *ngFor="let item of formList"
-                     class="removable-form-control">
+                    class="removable-form-control">
 
                     <ct-expression-input
-                            [context]="context"
-                            [formControl]="form.controls[item.id]"
-                            [readonly]="readonly">
+                        [context]="context"
+                        [formControl]="form.controls[item.id]"
+                        [readonly]="readonly">
                     </ct-expression-input>
 
-                    <div *ngIf="!readonly" class="remove-icon clickable"  (click)="removeExpressionModel(item)">
+                    <div *ngIf="!readonly" class="remove-icon clickable" (click)="removeExpressionModel(item)">
                         <i [ct-tooltip]="'Delete'" class="fa fa-trash text-hover-danger"></i>
                     </div>
-                </li> 
+                </li>
             </ol>
 
             <ct-blank-tool-state *ngIf="!formList.length"
-                         [title]="emptyListText"
-                         [buttonText]="addButtonText"
-                         [readonly]="readonly"
-                         (buttonClick)="addExpressionModel()">
+                                 [title]="emptyListText"
+                                 [buttonText]="addButtonText"
+                                 [readonly]="readonly"
+                                 (buttonClick)="addExpressionModel()">
             </ct-blank-tool-state>
 
             <button type="button" *ngIf="formList.length && !readonly" class="btn btn-link add-btn-link no-underline-hover"
-                         (click)="addExpressionModel()">
+                    (click)="addExpressionModel()">
                 <i class="fa fa-plus"></i> {{addButtonText}}
             </button>
-    </form>
-`
+        </form>
+    `
 })
 export class ExpressionModelListComponent extends ComponentBase implements ControlValueAccessor {
 
@@ -59,10 +61,10 @@ export class ExpressionModelListComponent extends ComponentBase implements Contr
 
     /** Context in which expression should be evaluated */
     @Input()
-    public context: {$job: any} = { $job: {} };
+    public context: { $job: any } = {$job: {}};
 
     /** List which connects model to forms */
-    private formList: Array<{id: string, model: ExpressionModel}> = [];
+    private formList: Array<{ id: string, model: ExpressionModel }> = [];
 
     private onTouched = noop;
 
@@ -106,7 +108,7 @@ export class ExpressionModelListComponent extends ComponentBase implements Contr
         this.onTouched = fn;
     }
 
-    private removeExpressionModel(ctrl: {id: string, model: ExpressionModel}): void {
+    private removeExpressionModel(ctrl: { id: string, model: ExpressionModel }): void {
         this.modal.confirm({
             title: "Really Remove?",
             content: `Are you sure that you want to remove this secondary file?`,

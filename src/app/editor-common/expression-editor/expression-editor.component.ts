@@ -1,19 +1,20 @@
-import {Component, Input, HostBinding, Output, ViewChild} from "@angular/core";
+import {Component, HostBinding, Input, Output, ViewChild, ViewEncapsulation} from "@angular/core";
 import {BehaviorSubject, Observable, Subject} from "rxjs";
 import {TreeNode} from "../../core/ui/tree-view/types";
 import {ComponentBase} from "../../components/common/component-base";
 import {CodeEditorComponent} from "../../core/ui/code-editor/code-editor.component";
 
-require("./expression-editor.component.scss");
-
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-expression-editor",
+    styleUrls: ["./expression-editor.component.scss"],
     template: `
         <div class="p-0 flex-row-container modal-large">
-            
+
             <div class="main-row">
                 <div class="flex-col code-col">
-                    <div class="title" >Expression:</div>
+                    <div class="title">Expression:</div>
                     <div class="code-main">
                         <ct-code-editor-x #editor [content]="editorContent" [language]="'javascript'" [options]="{
                         'theme': 'ace/theme/monokai',
@@ -21,11 +22,11 @@ require("./expression-editor.component.scss");
                         'wrap': true
                         }"></ct-code-editor-x>
                     </div>
-                    
+
                     <div class="title">Output:</div>
                     <div class="code-preview">
-                        
-                        <ct-code-editor-x  [content]="previewContent" [language]="'json'" [options]="{
+
+                        <ct-code-editor-x [content]="previewContent" [language]="'json'" [options]="{
                             'theme': 'ace/theme/monokai',
                             'showGutter': false,
                             'wrap': true,
@@ -34,18 +35,18 @@ require("./expression-editor.component.scss");
                         }"></ct-code-editor-x>
                     </div>
                 </div>
-                
+
                 <div class="context-col">
                     <ct-tree-view [nodes]="contextNodes"></ct-tree-view>
                 </div>
             </div>
-            
+
             <div class="modal-footer">
                 <button (click)="action.next('close')" class="btn btn-secondary btn-sm" type="button">Cancel</button>
                 <button *ngIf="!readonly" (click)="action.next('save')" class="btn btn-primary btn-sm" type="button">Save</button>
             </div>
         </div>
-        
+
     `
 })
 export class ExpressionEditorComponent extends ComponentBase {
@@ -59,7 +60,7 @@ export class ExpressionEditorComponent extends ComponentBase {
     public width;
 
     @Input()
-    public context: {$job?: Object, $self?: Object};
+    public context: { $job?: Object, $self?: Object };
 
     @Input()
     public editorContent: Observable<string>;
@@ -71,7 +72,7 @@ export class ExpressionEditorComponent extends ComponentBase {
     public readonly = false;
 
     @Output()
-    public action = new Subject<"close"|"save">();
+    public action = new Subject<"close" | "save">();
 
     private previewContent = new BehaviorSubject("");
 
@@ -95,7 +96,7 @@ export class ExpressionEditorComponent extends ComponentBase {
     }
 
 
-    private transformContext(context: {$job?: Object, $self?: Object} = {}): TreeNode[] {
+    private transformContext(context: { $job?: Object, $self?: Object } = {}): TreeNode[] {
 
         const wrap = (nodes, path = ""): TreeNode[] => Object.keys(nodes).map(key => {
             const node = nodes[key];
@@ -108,7 +109,7 @@ export class ExpressionEditorComponent extends ComponentBase {
             }
 
             const isIterable = type === "array" || type === "object";
-            const isNothing  = node === undefined || node === null;
+            const isNothing = node === undefined || node === null;
 
             let typeDisplay = isIterable ? type : `"${node}"`;
             if (isNothing) {
@@ -121,7 +122,7 @@ export class ExpressionEditorComponent extends ComponentBase {
             const name = `<pre>${key}: <i>${typeDisplay}</i></pre>`;
 
             let childrenProvider = undefined;
-            let openHandler      = undefined;
+            let openHandler = undefined;
 
             let trace = [path, key].filter(e => e).join(".");
             if (type === "object") {

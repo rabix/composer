@@ -1,32 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-
-    <title>Rabix Editors</title>
-
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RabixComposer</title>
+    <base href="./">
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <% if (webpackConfig.htmlElements.headTags) { %>
-        <%= webpackConfig.htmlElements.headTags %>
-    <% } %>
-
-    <base href="<%= htmlWebpackPlugin.options.metadata.baseUrl %>">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="css/font-awesome.min.css"/>
 </head>
-
 <body>
-
-    <cottontail>
-        <div class="loading-image">
-            <img src="assets/img/rabix-logo.png"/>
-        </div>
-    </cottontail>
-
-    <% if (htmlWebpackPlugin.options.metadata.isDevServer) { %>
-    <!-- Webpack Dev Server reload -->
-    <script src="/webpack-dev-server.js"></script>
-    <% } %>
-
+<cottontail>Loading...</cottontail>
 </body>
 </html>

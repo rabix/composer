@@ -1,9 +1,11 @@
-import {Component} from "@angular/core";
+import {Component, ViewEncapsulation} from "@angular/core";
 import {SettingsService} from "../../services/settings/settings.service";
 import {WorkboxService} from "./workbox.service";
 import {Observable} from "rxjs";
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-settings-button",
     template: `
         <div>

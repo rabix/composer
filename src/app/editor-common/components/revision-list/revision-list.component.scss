@@ -7,10 +7,10 @@ ct-revision-list {
         display: flex;
         flex-direction: row;
         flex-wrap: nowrap;
-        position:relative;
+        position: relative;
 
         .loading-progress {
-            position:absolute;
+            position: absolute;
             top: 0;
             height: 2px;
         }

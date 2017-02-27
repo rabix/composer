@@ -1,16 +1,16 @@
 import {Directive, ElementRef, forwardRef} from "@angular/core";
-import {ControlValueAccessor, NG_VALUE_ACCESSOR, NG_VALIDATORS, FormControl} from "@angular/forms";
+import {ControlValueAccessor, FormControl, NG_VALIDATORS, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {noop} from "../../lib/utils.lib";
 
 @Directive({
-    selector: '[ct-editable][contenteditable=true]',
+    selector: "[ct-editable][contenteditable=true]",
     providers: [
-        { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => EditableDirective), multi: true },
-        { provide: NG_VALIDATORS, useExisting: forwardRef(() => EditableDirective), multi: true }
+        {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => EditableDirective), multi: true},
+        {provide: NG_VALIDATORS, useExisting: forwardRef(() => EditableDirective), multi: true}
     ],
     host: {
-        '(keydown)': 'onKeyDown($event)',
-        '(keyup)': 'onKeyUp()'
+        "(keydown)": "onKeyDown($event)",
+        "(keyup)": "onKeyUp()"
     }
 })
 export class EditableDirective implements ControlValueAccessor {
@@ -22,7 +22,8 @@ export class EditableDirective implements ControlValueAccessor {
 
     private lastValue: string;
 
-    constructor(private elRef: ElementRef) { }
+    constructor(private elRef: ElementRef) {
+    }
 
     writeValue(value: any): void {
         this.elRef.nativeElement.innerText = value;

@@ -15,7 +15,9 @@ ct-toggle-slider {
     }
 
     /* Hide default HTML checkbox */
-    .switch input {display:none;}
+    .switch input {
+        display: none;
+    }
 
     /* The slider */
     .slider {
@@ -51,9 +53,9 @@ ct-toggle-slider {
     }
 
     input:checked + .slider:before {
-        -webkit-transform: translateX( calc(#{$switch-width} / 2) );
-        -ms-transform: translateX( calc(#{$switch-width} / 2) );
-        transform: translateX( calc(#{$switch-width} / 2) );
+        -webkit-transform: translateX(calc(#{$switch-width} / 2));
+        -ms-transform: translateX(calc(#{$switch-width} / 2));
+        transform: translateX(calc(#{$switch-width} / 2));
     }
 
     /* Rounded sliders */

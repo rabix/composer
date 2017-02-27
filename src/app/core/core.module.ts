@@ -26,6 +26,7 @@ import {LoggerDirective} from "./elements/debugger/logger.directive";
 import {DragOverDirective} from "./drag-and-drop/drag-over-directive";
 import {DropDownButtonComponent} from "./ui/dropdown-button/dropdown-button-component";
 import {DropDownMenuComponent} from "./ui/dropdown-button/dropdown-menu.component";
+import {WebWorkerBuilderService} from "./web-worker/web-worker-builder.service";
 
 @NgModule({
     entryComponents: [
@@ -131,7 +132,8 @@ import {DropDownMenuComponent} from "./ui/dropdown-button/dropdown-menu.componen
     providers: [
         IpcService,
         GuidService,
-        ContextService
+        ContextService,
+        WebWorkerBuilderService,
 
     ],
     imports: [BrowserModule, MomentModule]

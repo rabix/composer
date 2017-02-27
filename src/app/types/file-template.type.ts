@@ -16,8 +16,8 @@ export class CwlFileTemplate extends FileTemplate {
         super();
 
         this.cwlVersion = cwlVersion || "v1.0";
-        this.type       = type || "blank";
-        this.params     = params;
+        this.type = type || "blank";
+        this.params = params;
 
         this.params["id"] = this.makeID(this.params["label"]);
 
@@ -29,9 +29,9 @@ export class CwlFileTemplate extends FileTemplate {
     }
 
     private makeID(str) {
-        str = str.replace(/([a-z])([A-Z])/g, '$1-$2');
-        str = str.replace(/[ \t\W]/g, '-');
-        str = str.replace(/^-+|-+$/g, '');
+        str = str.replace(/([a-z])([A-Z])/g, "$1-$2");
+        str = str.replace(/[ \t\W]/g, "-");
+        str = str.replace(/^-+|-+$/g, "");
         return str.toLowerCase();
     }
 

@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Input, ChangeDetectorRef, NgZone, Component} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, NgZone, ViewEncapsulation} from "@angular/core";
 import {FormControl} from "@angular/forms";
 import {Observable} from "rxjs";
 import {noop} from "../../lib/utils.lib";
@@ -11,9 +11,11 @@ import {NewFileModalComponent} from "../modal/custom/new-file-modal.component";
 import {LocalDataSourceService} from "../../sources/local/local.source.service";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 
-const {app, dialog} = window.require("electron").remote;
+const {app, dialog} = window["require"]("electron").remote;
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-local-files-panel",
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: {"class": "block"},
@@ -24,7 +26,7 @@ const {app, dialog} = window.require("electron").remote;
                 <i class="fa fa-fw fa-plus-circle"></i>
             </span>
         </ct-panel-toolbar>
-        
+
         <ct-tree-view [nodes]="nodes" [preferenceKey]="'local-files'"></ct-tree-view>
     `
 })
@@ -100,8 +102,8 @@ export class LocalFilesPanelComponent extends ComponentBase {
                     contextMenu: this.createContextMenu(item),
                     childrenProvider: item.isReadable ? this.recursivelyMapChildrenToNodes(item.childrenProvider) : undefined,
                     openHandler: item.isReadable ? () => {
-                            this.openTab(item);
-                        } : undefined
+                        this.openTab(item);
+                    } : undefined
                 }
             }));
     }

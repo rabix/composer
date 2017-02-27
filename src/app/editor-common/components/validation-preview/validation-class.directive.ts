@@ -13,7 +13,11 @@ export class ValidationClassDirective {
     @Input("ct-validation-class")
     entry: Validation;
 
-    get errors() { return this.entry ? this.entry.errors.length : false }
+    get errors() {
+        return this.entry ? this.entry.errors.length : false
+    }
 
-    get warnings() { return this.entry ? this.entry.warnings.length : false }
+    get warnings() {
+        return this.entry ? this.entry.warnings.length : false
+    }
 }

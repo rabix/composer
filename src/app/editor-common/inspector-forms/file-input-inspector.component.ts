@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {Component, EventEmitter, Input, Output, ViewEncapsulation} from "@angular/core";
 import {FormControl, FormGroup} from "@angular/forms";
 import {Observable} from "rxjs";
 
@@ -11,6 +11,8 @@ interface CWLFile {
 }
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-file-input-inspector",
     template: `
         <form [formGroup]="formGroup">

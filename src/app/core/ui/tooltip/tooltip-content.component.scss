@@ -1,28 +1,28 @@
 ct-tooltip-content {
 
-  display: inline-block;
-  position: fixed;
-  z-index: 100;
-
-  //Bootstrap class override
-  .tooltip {
+    display: inline-block;
     position: fixed;
-  }
+    z-index: 100;
 
-  .tooltip-inner {
-    box-sizing: content-box;
-    padding: 2px;
-    max-width: none !important;
-    background-color: rgba(0, 0, 0, .8);
-
-    .tooltip-inner-plaintext {
-      padding: 4px 8px;
+    //Bootstrap class override
+    .tooltip {
+        position: fixed;
     }
-  }
 
-  .tooltip-info {
-    display: block;
-    max-width: 200px;
-  }
+    .tooltip-inner {
+        box-sizing: content-box;
+        padding: 2px;
+        max-width: none !important;
+        background-color: rgba(0, 0, 0, .8);
+
+        .tooltip-inner-plaintext {
+            padding: 4px 8px;
+        }
+    }
+
+    .tooltip-info {
+        display: block;
+        max-width: 200px;
+    }
 }
 

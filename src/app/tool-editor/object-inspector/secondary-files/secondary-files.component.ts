@@ -1,27 +1,29 @@
-import {Component, forwardRef, Input} from "@angular/core";
-import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormControl} from "@angular/forms";
+import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
+import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ComponentBase} from "../../../components/common/component-base";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {noop} from "../../../lib/utils.lib";
 
 @Component({
-    selector: 'ct-secondary-file',
+    encapsulation: ViewEncapsulation.None,
+
+    selector: "ct-secondary-file",
     providers: [
-        { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => SecondaryFilesComponent), multi: true }
+        {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => SecondaryFilesComponent), multi: true}
     ],
     template: `
-<ct-form-panel class="borderless" *ngIf="form" [collapsed]="true">
-    <div class="tc-header">Secondary Files</div>
-    <div class="tc-body">
+        <ct-form-panel class="borderless" *ngIf="form" [collapsed]="true">
+            <div class="tc-header">Secondary Files</div>
+            <div class="tc-body">
 
-        <expression-model-list
-            [context]="context"
-            [emptyListText]="'No Secondary Files defined.'"
-            [addButtonText]="'Add secondary file'"
-            [readonly]="readonly"
-            [formControl]="form"></expression-model-list>
-    </div>
-</ct-form-panel>
+                <expression-model-list
+                    [context]="context"
+                    [emptyListText]="'No Secondary Files defined.'"
+                    [addButtonText]="'Add secondary file'"
+                    [readonly]="readonly"
+                    [formControl]="form"></expression-model-list>
+            </div>
+        </ct-form-panel>
     `
 })
 
@@ -32,7 +34,7 @@ export class SecondaryFilesComponent extends ComponentBase implements ControlVal
 
     /** Context in which expression should be evaluated */
     @Input()
-    public context: {$job: any} = { $job: {} };
+    public context: { $job: any } = {$job: {}};
 
     private secondaryFiles: ExpressionModel[];
 

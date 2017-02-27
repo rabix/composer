@@ -1,4 +1,4 @@
-import {Component, OnInit, ElementRef, ViewChildren, QueryList} from "@angular/core";
+import {Component, ElementRef, OnInit, QueryList, ViewChildren, ViewEncapsulation} from "@angular/core";
 import {TabData} from "./tab-data.interface";
 import {ComponentBase} from "../common/component-base";
 import {IpcService} from "../../services/ipc.service";
@@ -6,16 +6,18 @@ import {MenuItem} from "../../core/ui/menu/menu-item";
 import {WorkboxService} from "./workbox.service";
 import {StatusBarService} from "../../core/status-bar/status-bar.service";
 import {StatusControlProvider} from "../../core/status-bar/status-control-provider.interface";
-require("./workbox.component.scss");
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     host: {"class": "ct-workbox"},
-    selector: 'ct-workbox',
+    selector: "ct-workbox",
+    styleUrls: ["./workbox.component.scss"],
     template: `
         <div class="ct-workbox-head">
             <ul class="list-inline ct-tab-bar inset-panel" tabindex="-1">
-                <li *ngFor="let tab of tabs; let i = index;" 
-                    [ct-drag-over]="true"                     
-                    (onDragOver)="workbox.openTab(tab)"                  
+                <li *ngFor="let tab of tabs; let i = index;"
+                    [ct-drag-over]="true"
+                    (onDragOver)="workbox.openTab(tab)"
                     (click)="workbox.openTab(tab)"
                     [class.active]="tab === (workbox.activeTab | async)"
                     [ct-context]="createContextMenu(tab)"
@@ -25,7 +27,7 @@ require("./workbox.component.scss");
                 </li>
             </ul>
             <ct-settings-button></ct-settings-button>
-            
+
         </div>
         <div class="ct-workbox-body">
             <span *ngFor="let tab of tabs" [hidden]="tab !== activeTab">
@@ -93,8 +95,8 @@ export class WorkboxComponent extends ComponentBase implements OnInit {
         this.tracked = this.workbox.activeTab.subscribe(tab => {
             this.statusBar.removeControls();
 
-            this.activeTab  = tab;
-            const idx       = this.tabs.findIndex(t => t === tab);
+            this.activeTab = tab;
+            const idx = this.tabs.findIndex(t => t === tab);
 
             const component = this.tabComponents.find((item, index) => index === idx);
 

@@ -1,50 +1,51 @@
-import {Component, forwardRef, Input} from "@angular/core";
-import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormBuilder, FormGroup} from "@angular/forms";
+import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
+import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ComponentBase} from "../../../../components/common/component-base";
 import {CommandOutputParameterModel, SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
 import {noop} from "../../../../lib/utils.lib";
 
-require("./description.component.scss");
-
 @Component({
-    selector: 'ct-description-section',
+    encapsulation: ViewEncapsulation.None,
+
+    selector: "ct-description-section",
+    styleUrls: ["./description.component.scss"],
     providers: [
-        { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DescriptionComponent), multi: true }
+        {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DescriptionComponent), multi: true}
     ],
     template: `
-<ct-form-panel class="borderless" [collapsed]="true">
-    <div class="tc-header">Description</div>
-    <div class="tc-body" *ngIf="port && descriptionFormGroup">
-    
-        <div class="form-text">
-             This description will be visible when using the tool in the workflow editor.
-             It's best to be concise and informative.
-        </div>
-        
-        <!--Label-->
-        <div class="form-group">
-            <label class="form-control-label">Label</label>
-            <input type="text" 
-                   class="form-control"
-                   [formControl]="descriptionFormGroup.controls['label']">
-        </div>
-        
-        <!--Description-->
-        <div class="form-group">
-            <label class="form-control-label">Description</label>        
-            <textarea class="form-control" 
-                      rows="4"
-                      [formControl]="descriptionFormGroup.controls['description']"></textarea>
-        </div>
-        
-        <!--File Types-->
-         <div *ngIf="isFileType()">
-            <label class="form-control-label">File types</label>
-            <input class="form-control"
-                   [formControl]="descriptionFormGroup.controls['fileTypes']"/>
-         </div>
-    </div>
-</ct-form-panel>
+        <ct-form-panel class="borderless" [collapsed]="true">
+            <div class="tc-header">Description</div>
+            <div class="tc-body" *ngIf="port && descriptionFormGroup">
+
+                <div class="form-text">
+                    This description will be visible when using the tool in the workflow editor.
+                    It's best to be concise and informative.
+                </div>
+
+                <!--Label-->
+                <div class="form-group">
+                    <label class="form-control-label">Label</label>
+                    <input type="text"
+                           class="form-control"
+                           [formControl]="descriptionFormGroup.controls['label']">
+                </div>
+
+                <!--Description-->
+                <div class="form-group">
+                    <label class="form-control-label">Description</label>
+                    <textarea class="form-control"
+                              rows="4"
+                              [formControl]="descriptionFormGroup.controls['description']"></textarea>
+                </div>
+
+                <!--File Types-->
+                <div *ngIf="isFileType()">
+                    <label class="form-control-label">File types</label>
+                    <input class="form-control"
+                           [formControl]="descriptionFormGroup.controls['fileTypes']"/>
+                </div>
+            </div>
+        </ct-form-panel>
     `
 })
 export class DescriptionComponent extends ComponentBase implements ControlValueAccessor {
@@ -84,8 +85,8 @@ export class DescriptionComponent extends ComponentBase implements ControlValueA
                     delete this.port.customProps["sbg:fileTypes"];
                 }
 
-                this.setTextProperty('label', value.label);
-                this.setTextProperty('description', value.description);
+                this.setTextProperty("label", value.label);
+                this.setTextProperty("description", value.description);
 
                 this.propagateChange(this.port);
             });
@@ -117,6 +118,6 @@ export class DescriptionComponent extends ComponentBase implements ControlValueA
     }
 
     private isFileType() {
-        return this.port.type.type === 'File' || (this.port.type.type === 'array' && this.port.type.items === 'File');
+        return this.port.type.type === "File" || (this.port.type.type === "array" && this.port.type.items === "File");
     }
 }

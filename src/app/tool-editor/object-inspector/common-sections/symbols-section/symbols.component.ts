@@ -1,28 +1,29 @@
-import {Component, forwardRef, Input} from "@angular/core";
-import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormControl} from "@angular/forms";
+import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
+import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ComponentBase} from "../../../../components/common/component-base";
 import {noop} from "../../../../lib/utils.lib";
 
-require("./symbols.component.scss");
-
 @Component({
-    selector: 'symbols-section',
+    encapsulation: ViewEncapsulation.None,
+
+    selector: "symbols-section",
+    styleUrls: ["./symbols.component.scss"],
     providers: [
-        { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => SymbolsComponent), multi: true }
+        {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => SymbolsComponent), multi: true}
     ],
     template: `
         <div class="form-group" *ngIf="symbolsForm">
-        <form>
-               <label>Symbols</label>
-               <compact-list *ngIf="symbolsForm" 
-                             [addKeyCode]="13"
-                             [readonly]="readonly"
-                             [formControl]="symbolsForm">
+            <form>
+                <label>Symbols</label>
+                <compact-list *ngIf="symbolsForm"
+                              [addKeyCode]="13"
+                              [readonly]="readonly"
+                              [formControl]="symbolsForm">
                 </compact-list>
-                     
-        </form>
+
+            </form>
         </div>
-`
+    `
 })
 export class SymbolsComponent extends ComponentBase implements ControlValueAccessor {
 

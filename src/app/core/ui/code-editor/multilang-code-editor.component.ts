@@ -1,37 +1,39 @@
-import {Component, Output} from '@angular/core';
-import {Subject, BehaviorSubject} from "rxjs";
+import {Component, Output, ViewEncapsulation} from "@angular/core";
+import {BehaviorSubject, Subject} from "rxjs";
 import {ACE_MODES_MAP} from "../../../components/code-editor/code-editor-modes-map";
 
 @Component({
-    selector: 'ct-multilang-code-editor',
+    encapsulation: ViewEncapsulation.None,
+
+    selector: "ct-multilang-code-editor",
     template: `
-    <div class="p-0 flex-row-container modal-large">
-        <div class="form-inline modal-options">
-            <div class="form-group">
-                <label>Syntax highlighting: </label>
-                <select class="form-control" 
-                        (change)="language.next($event.target.value.toLowerCase())">
-                    <option *ngFor="let lang of languages" 
-                            [selected]="lang.toLowerCase() === (language | async)">
+        <div class="p-0 flex-row-container modal-large">
+            <div class="form-inline modal-options">
+                <div class="form-group">
+                    <label>Syntax highlighting: </label>
+                    <select class="form-control"
+                            (change)="language.next($event.target.value.toLowerCase())">
+                        <option *ngFor="let lang of languages"
+                                [selected]="lang.toLowerCase() === (language | async)">
                             {{ lang }}
-                    </option>
-                </select>            
+                        </option>
+                    </select>
+                </div>
             </div>
-        </div>
-        
-        <div class="main-row">
-            <ct-code-editor-x [(content)]="content" [language]="language" [options]="{
+
+            <div class="main-row">
+                <ct-code-editor-x [(content)]="content" [language]="language" [options]="{
                 'theme': 'ace/theme/monokai',
                 'wrap': true
             }"></ct-code-editor-x>
+            </div>
+
+            <div class="modal-footer">
+                <button (click)="action.next('close')" class="btn btn-secondary btn-sm" type="button">Cancel</button>
+                <button (click)="action.next('save')" class="btn btn-primary btn-sm" type="button">Save</button>
+            </div>
         </div>
-        
-        <div class="modal-footer">
-            <button (click)="action.next('close')" class="btn btn-secondary btn-sm" type="button">Cancel</button>
-            <button (click)="action.next('save')" class="btn btn-primary btn-sm" type="button">Save</button>
-        </div>
-    </div>
-`
+    `
 })
 export class MultilangCodeEditorComponent {
     @Output()

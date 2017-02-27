@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, ViewChild} from "@angular/core";
+import {Component, ElementRef, Input, ViewChild, ViewEncapsulation} from "@angular/core";
 import {BehaviorSubject, Subscription} from "rxjs";
 import {DomEventService} from "../../services/dom/dom-event.service";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
@@ -15,69 +15,71 @@ import {
 import {StatusBarService} from "../../core/status-bar/status-bar.service";
 import {StatusBarComponent} from "../../core/status-bar/status-bar.component";
 import {WorkboxService} from "../workbox/workbox.service";
-require("./layout.component.scss");
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-layout",
     providers: [StatusBarService, WorkboxService],
+    styleUrls: ["./layout.component.scss"],
     template: `
         <div class="main-container">
-            
+
             <div class="not-status-bar">
-            
+
                 <!--Panel Switch Column-->
                 <div>
                     <div class="top-bar"></div>
                     <div class="left-panel-bar">
-                    
+
                         <ct-panel-switcher [sidebarExpanded]="sidebarExpanded"
-                                           [panels]="(panelSwitches | async)?.top.panels"                                           
+                                           [panels]="(panelSwitches | async)?.top.panels"
                                            (statusChange)="onPanelSwitch($event, 'top')"
-                                           (toggleSidebar)="toggleSidebar($event)">                                          
+                                           (toggleSidebar)="toggleSidebar($event)">
                         </ct-panel-switcher>
-                        
+
                         <ct-panel-switcher [sidebarExpanded]="sidebarExpanded"
-                                           [panels]="(panelSwitches | async)?.bottom.panels" 
+                                           [panels]="(panelSwitches | async)?.bottom.panels"
                                            (statusChange)="onPanelSwitch($event, 'bottom')"
-                                           (toggleSidebar)="toggleSidebar($event)">                                           
-                        </ct-panel-switcher>                                       
-                           
+                                           (toggleSidebar)="toggleSidebar($event)">
+                        </ct-panel-switcher>
+
                     </div>
-                    
+
                     <div class="toggle-panel-left">
-                        <i aria-hidden="true" class="fa" 
-                        [class.fa-angle-double-left]="!sidebarExpanded"  
-                        [class.fa-angle-double-right]="sidebarExpanded" 
-                        (click) = "toggleSidebar()"></i>                    
-                    </div> 
+                        <i aria-hidden="true" class="fa"
+                           [class.fa-angle-double-left]="!sidebarExpanded"
+                           [class.fa-angle-double-right]="sidebarExpanded"
+                           (click)="toggleSidebar()"></i>
+                    </div>
                 </div>
-                
+
                 <!--Panels Column-->
-                <div class="flex-col col-panels" 
-                    [style.flex]="treeSize"
-                    [class.hidden]="!sidebarExpanded || (visiblePanels | async).length === 0">
-                     
+                <div class="flex-col col-panels"
+                     [style.flex]="treeSize"
+                     [class.hidden]="!sidebarExpanded || (visiblePanels | async).length === 0">
+
                     <div class="top-bar fixed">
                         <div class="seven-bridges-logo"></div>
                     </div>
-                    
+
                     <ct-panel-container [panels]="panels" class="flex-row"></ct-panel-container>
                 </div>
-                
+
                 <!--Panel/Content Resize Handle-->
-                <div #handle class="handle-vertical" 
-                    [class.hidden]="!sidebarExpanded || (visiblePanels | async).length === 0">                  
+                <div #handle class="handle-vertical"
+                     [class.hidden]="!sidebarExpanded || (visiblePanels | async).length === 0">
                 </div>
-                
+
                 <!--Editor Content Column-->
                 <div class="flex-col workbox-col" [style.flex]="tabsSize">
                     <ct-workbox class="flex-col"></ct-workbox>
                 </div>
-                
+
             </div>
-            
+
             <ct-status-bar #statusBar class="layout-section"></ct-status-bar>
-          
+
         </div>
     `
 })
@@ -141,18 +143,6 @@ export class LayoutComponent extends ComponentBase {
 
         this.statusBar.host = this.statusBarComponent;
 
-        this.domEvents.onDrag(this.handle.nativeElement).subscribe(drag => {
-
-            const first = drag.first().subscribe(ev => console.log("Started dragging", ev));
-            const mid = drag.skip(1).subscribe(ev => console.log("Dragging in progress", ev));
-            const last = drag.last().subscribe(ev => {
-
-                first.unsubscribe();
-                mid.unsubscribe();
-            });
-        });
-
-
         // Layout is resizable, so we need to react when user drags the handle
         this.tracked = this.domEvents.onMove(this.handle.nativeElement)
             .map(ev => {
@@ -177,9 +167,9 @@ export class LayoutComponent extends ComponentBase {
                 // Take the width of the window
                 const docWidth = document.body.clientWidth;
                 // Set tree width to the given x
-                this.treeSize  = x;
+                this.treeSize = x;
                 // And fill document area with the rest
-                this.tabsSize  = docWidth - x;
+                this.tabsSize = docWidth - x;
             });
 
 
@@ -226,7 +216,7 @@ export class LayoutComponent extends ComponentBase {
 
     private onPanelSwitch(panels, position) {
 
-        const next     = this.panelSwitches.getValue();
+        const next = this.panelSwitches.getValue();
         next[position] = new PanelGroup(panels);
 
         // Preserve state of opened panels in local storage
@@ -241,7 +231,7 @@ export class LayoutComponent extends ComponentBase {
      * Toggles the sidebar
      * @param {boolean} state - when set to true sidebar will be expanded, when set to false will be collapsed
      */
-    private toggleSidebar(state? : boolean) {
+    private toggleSidebar(state?: boolean) {
         if (state !== undefined) {
             this.sidebarExpanded = state;
             return;
