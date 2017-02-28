@@ -16,8 +16,8 @@ npm install
 
 ## Starting the dev environment
 ```bash
-npm start // starts the dev server
-npm electron // opens the app shell
+npm run serve // starts the dev server
+npm run electron // opens the app shell
 ```
 
 ## Packaging the build as a desktop app for the host system and architecture
