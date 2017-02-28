@@ -3,6 +3,11 @@ import {StepModel, WorkflowInputParameterModel, WorkflowModel, WorkflowOutputPar
 import {Workflow} from "cwl-svg";
 import {StatusBarService} from "../../../core/status-bar/status-bar.service";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
+import {Observable} from "rxjs";
+import * as Yaml from "js-yaml";
+import LoadOptions = jsyaml.LoadOptions;
+
+
 declare const Snap: any;
 
 @Component({
@@ -95,10 +100,20 @@ export class WorkflowGraphEditorComponent {
     /**
      * Triggers when app is dropped on canvas
      */
-    private onDrop(node) {
+    private onDrop(node: {content: Observable<string>}) {
         node.content.first().subscribe((node)=>{
-            const step = this.model.addStepFromProcess(node);
-            this.graph.command("app.create", step);
+            try {
+                let json = Yaml.safeLoad(node, {
+                    json: true
+                } as LoadOptions);
+
+                const step = this.model.addStepFromProcess(json);
+
+                this.graph.command("app.create", step);
+            } catch (ex) {
+                console.warn(ex);
+            }
+
         });
     }
 
