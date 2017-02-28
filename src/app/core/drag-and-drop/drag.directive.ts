@@ -1,6 +1,5 @@
 import {Observable} from "rxjs";
 import {Directive, ElementRef, Input} from "@angular/core";
-import {Directive, ElementRef, Input} from '@angular/core';
 import {ComponentBase} from "../../components/common/component-base";
 import {DomEventService} from "../../services/dom/dom-event.service";
 

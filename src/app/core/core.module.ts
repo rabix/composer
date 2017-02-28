@@ -19,11 +19,11 @@ import {MultilangCodeEditorComponent} from "./ui/code-editor/multilang-code-edit
 import {ToggleComponent} from "./ui/toggle-slider/toggle-slider.component";
 import {StatusBarComponent} from "./status-bar/status-bar.component";
 import {MomentModule} from "angular2-moment";
-import {DragDirective} from "./drag-and-drop/drag-directive";
-import {DropDirective} from "./drag-and-drop/drop-directive";
-import {DropZones} from "./drag-and-drop/drop-zones-directive";
+import {DragDirective} from "./drag-and-drop/drag.directive";
+import {DropDirective} from "./drag-and-drop/drop.directive";
+import {DropZones} from "./drag-and-drop/drop-zones.directive";
 import {LoggerDirective} from "./elements/debugger/logger.directive";
-import {DragOverDirective} from "./drag-and-drop/drag-over-directive";
+import {DragOverDirective} from "./drag-and-drop/drag-over.directive";
 import {DropDownButtonComponent} from "./ui/dropdown-button/dropdown-button-component";
 import {DropDownMenuComponent} from "./ui/dropdown-button/dropdown-menu.component";
 import {WebWorkerBuilderService} from "./web-worker/web-worker-builder.service";
