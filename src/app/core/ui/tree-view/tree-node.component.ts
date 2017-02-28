@@ -26,7 +26,7 @@ import {ComponentBase} from "../../../components/common/component-base";
              [ct-drag-enabled]="node.icon === 'CommandLineTool' || node.icon === 'Workflow'"
              [ct-drag-image-class]="node.icon == 'CommandLineTool' ? 'icon-command-line-tool' : 'icon-workflow'"
              [ct-drag-image-caption]="node.name"
-             [ct-drag-transfer-data]="node.id"
+             [ct-drag-transfer-data]="node"
              [ct-drop-zones]="['zone1']"
              class="deep-unselectable clickable node-base"
              [style.paddingLeft.em]="level * 2"

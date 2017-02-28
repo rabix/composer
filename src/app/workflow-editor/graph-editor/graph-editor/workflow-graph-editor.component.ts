@@ -11,7 +11,10 @@ declare const Snap: any;
     selector: "ct-workflow-graph-editor",
     styleUrls: ["./workflow-graph-editor.component.scss"],
     template: `
-        <svg (click)="handleClick($event)" #canvas class="cwl-workflow"></svg>
+        <svg (click)="handleClick($event)" #canvas class="cwl-workflow" 
+             [ct-drop-enabled]="true" 
+             [ct-drop-zones]="['zone1']"
+             (onDropSuccess)="onDrop($event.detail.data.transfer_data)"></svg>
 
         <template #controls>
             
@@ -87,6 +90,16 @@ export class WorkflowGraphEditorComponent {
             this.graph.command("workflow.scale", this.graph.getScale() - .1);
 
         }
+    }
+
+    /**
+     * Triggers when app is dropped on canvas
+     */
+    private onDrop(node) {
+        node.content.first().subscribe((node)=>{
+            const step = this.model.addStepFromProcess(node);
+            this.graph.command("app.create", step);
+        });
     }
 
     /**

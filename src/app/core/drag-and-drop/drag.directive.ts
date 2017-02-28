@@ -1,3 +1,4 @@
+import {Observable} from "rxjs";
 import {Directive, ElementRef, Input} from "@angular/core";
 import {ComponentBase} from "../../components/common/component-base";
 import {DomEventService} from "../../services/dom/dom-event.service";
@@ -31,8 +32,10 @@ export class DragDirective extends ComponentBase {
                 dragImage: null,
                 preHoveredElement: null,
                 preEnteredDropZones: [],
-                preDragEntered: null
-            }).subscribe(drag => {
+                preDragEntered: null,
+            }).subscribe(obs => {
+
+                const drag = obs.skipUntil(Observable.of(1).delay(300));
 
                 // On Drag Start
                 const first = drag.first().subscribe((ev: any) => {
@@ -137,7 +140,7 @@ export class DragDirective extends ComponentBase {
                     if (curHoveredElement != null && this.matchDragAndDropZones(this.el, curHoveredElement)) {
                         this.domEvents.triggerCustomEventOnElements([curHoveredElement],
                             this.domEvents.ON_DROP_SUCCESS_EVENT,
-                            Object.assign({}, {data: this.dragTransferData}, {event: ev}));
+                            Object.assign({}, {transfer_data: this.dragTransferData}, {event: ev}));
                     }
 
                     first.unsubscribe();

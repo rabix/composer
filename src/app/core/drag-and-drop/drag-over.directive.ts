@@ -31,8 +31,6 @@ export class DragOverDirective extends ComponentBase {
         const dragEnter = Observable.fromEvent(this.el, this.domEvents.ON_DRAG_ENTER_EVENT);
         const dragLeave = Observable.fromEvent(this.el, this.domEvents.ON_DRAG_LEAVE_EVENT);
 
-        return dragEnter.flatMap(function (md) {
-            return Observable.of(md).delay(500).takeUntil(dragLeave);
-        });
+        return dragEnter.flatMap(md => Observable.of(md).delay(500).takeUntil(dragLeave));
     }
 }
