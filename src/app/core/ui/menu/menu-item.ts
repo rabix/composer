@@ -1,4 +1,4 @@
-import {Subject, BehaviorSubject, Observable} from "rxjs/Rx";
+import {BehaviorSubject, Observable, Subject} from "rxjs/Rx";
 
 interface MenuItemUpdates {
     click?: Subject<MenuItem> | Function;
@@ -14,7 +14,7 @@ export class MenuItem {
                 streams?: MenuItemUpdates,
                 children?: MenuItem[]) {
 
-        this.name     = name;
+        this.name = name;
         this.children = children || [];
 
         this.updates = Object.assign({

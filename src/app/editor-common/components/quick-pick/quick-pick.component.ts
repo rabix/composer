@@ -1,5 +1,5 @@
-import {Component, Input, forwardRef, OnInit, Output} from "@angular/core";
-import {FormControl, NG_VALUE_ACCESSOR, ControlValueAccessor} from "@angular/forms";
+import {Component, forwardRef, Input, OnInit, Output, ViewEncapsulation} from "@angular/core";
+import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../components/common/component-base";
 import {noop} from "../../../lib/utils.lib";
@@ -7,10 +7,11 @@ import {AsyncSubject} from "rxjs";
 import {Expression} from "cwlts/mappings/d2sb/Expression";
 import {ModalService} from "../../../components/modal/modal.service";
 
-require("./quick-pick.component.scss");
-
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-quick-pick",
+    styleUrls: ["./quick-pick.component.scss"],
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
@@ -19,8 +20,8 @@ require("./quick-pick.component.scss");
         }
     ],
     template: `
-    <div class="suggestions" *ngIf="!showCustom">
-    
+        <div class="suggestions" *ngIf="!showCustom">
+
             <div class="radio-container" *ngFor="let item of list">
                 <input type="radio"
                        [class.selected]="computedVal === item.value"
@@ -28,32 +29,32 @@ require("./quick-pick.component.scss");
                        [formControl]="radioForm"
                        id="{{item.label}}"
                        required>
-                       
-                <label class="radio-label btn btn-secondary"
-                        for="{{item.label}}"
-                       [class.selected]="computedVal === item.value">
-                       {{ item.label }}
-               </label>
-           </div>
-    </div>
-    
-    <button type="button"
-            class="btn btn-primary"
-            *ngIf="!showCustom && !readonly"
-            (click)="createControl('')">Custom
-    </button>
 
-    <div *ngIf="showCustom" class="removable-form-control">
-        <ct-expression-input [context]="context" 
-                             [formControl]="customControl"
-                             [readonly]="readonly"
-                             [type]="type">
-        </ct-expression-input>
-        
-        <span class="remove-icon" (click)="removeControl($event)">
+                <label class="radio-label btn btn-secondary"
+                       for="{{item.label}}"
+                       [class.selected]="computedVal === item.value">
+                    {{ item.label }}
+                </label>
+            </div>
+        </div>
+
+        <button type="button"
+                class="btn btn-primary"
+                *ngIf="!showCustom && !readonly"
+                (click)="createControl('')">Custom
+        </button>
+
+        <div *ngIf="showCustom" class="removable-form-control">
+            <ct-expression-input [context]="context"
+                                 [formControl]="customControl"
+                                 [readonly]="readonly"
+                                 [type]="type">
+            </ct-expression-input>
+
+            <span class="remove-icon" (click)="removeControl($event)">
             <i *ngIf="!readonly" [ct-tooltip]="'Delete'" class="fa fa-trash text-hover-danger"></i>
         </span>
-    </div>
+        </div>
     `
 })
 export class QuickPickComponent extends ComponentBase implements ControlValueAccessor, OnInit {
@@ -62,7 +63,7 @@ export class QuickPickComponent extends ComponentBase implements ControlValueAcc
     public readonly = false;
 
     @Input()
-    public suggestions: {[label: string]: string | number} | string[];
+    public suggestions: { [label: string]: string | number } | string[];
 
     @Input()
     public context: any;
@@ -75,7 +76,7 @@ export class QuickPickComponent extends ComponentBase implements ControlValueAcc
 
     private showCustom = false;
 
-    private list: {label: string, value: string | number}[] = [];
+    private list: { label: string, value: string | number }[] = [];
 
     private customControl: FormControl;
 
@@ -87,20 +88,20 @@ export class QuickPickComponent extends ComponentBase implements ControlValueAcc
 
     private radioForm: FormControl;
 
-    get value(): string|number|ExpressionModel {
+    get value(): string | number | ExpressionModel {
         return this._value;
     }
 
-    set value(value: string|number|ExpressionModel) {
+    set value(value: string | number | ExpressionModel) {
         this.onChange(value);
         this._value = value;
-        let val     = value;
+        let val = value;
 
         if (value instanceof ExpressionModel && value.type !== "expression") {
             val = <string | number>value.serialize();
         }
 
-        if (this.list && val !== '' && val !== null && val !== undefined) {
+        if (this.list && val !== "" && val !== null && val !== undefined) {
             this.showCustom = !this.list.filter(item => {
                 return item.value === val;
             }).length;
@@ -178,7 +179,7 @@ available types: {[label: string]: string | number} | string[]`)
 
     private createControl(value: number | string | ExpressionModel): void {
         this.customControl = new FormControl(value);
-        this.showCustom    = true;
+        this.showCustom = true;
 
         if (!this.readonly) {
             this.tracked = this.customControl.valueChanges
@@ -205,10 +206,10 @@ available types: {[label: string]: string | number} | string[]`)
         }
     }
 
-    private removeFunction () {
+    private removeFunction() {
         if (this.customControl) {
-            this.computedVal   = "";
-            this.showCustom    = false;
+            this.computedVal = "";
+            this.showCustom = false;
             this.customControl = undefined;
 
             if (this._value instanceof ExpressionModel) {

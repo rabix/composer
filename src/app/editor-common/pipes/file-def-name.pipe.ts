@@ -9,7 +9,7 @@ import {ExpressionModel} from "cwlts/models/d2sb/ExpressionModel";
 export class FileDefNamePipe implements PipeTransform {
     transform(value: string | Expression, args: any[]): any {
 
-        if(value instanceof ExpressionModel){
+        if (value instanceof ExpressionModel) {
             return value.toString();
         }
 

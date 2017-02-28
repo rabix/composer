@@ -1,5 +1,5 @@
-import {Observable, BehaviorSubject} from "rxjs";
-import {Component} from "@angular/core";
+import {BehaviorSubject, Observable} from "rxjs";
+import {Component, ViewEncapsulation} from "@angular/core";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {PlatformAppEntry} from "../../services/api/platforms/platform-api.types";
 import {SettingsService} from "../../services/settings/settings.service";
@@ -7,15 +7,19 @@ import {PublicAppService} from "../../platform-providers/public-apps/public-app.
 import {WorkboxService} from "../workbox/workbox.service";
 import {StatusBarService} from "../../core/status-bar/status-bar.service";
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-sb-public-apps-panel",
     host: {class: "block"},
     template: `
         <ct-panel-toolbar>
             <span class="tc-name">Public Apps</span>
         </ct-panel-toolbar>
-        
+
         <div *ngIf="isLoading">
-            <div class="text-xs-center"><small>Fetching Public Apps&hellip;</small></div>
+            <div class="text-xs-center">
+                <small>Fetching Public Apps&hellip;</small>
+            </div>
         </div>
         <ct-tree-view [nodes]="nodes" [preferenceKey]="'public-apps'"></ct-tree-view>
     `
@@ -92,7 +96,7 @@ export class SBPublicAppsPanelComponent {
 
             })).subscribe(categories => {
             this.isLoading = false;
-            this.nodes     = categories;
+            this.nodes = categories;
 
             this.statusBar.stopProcess(statusProcessID, "Fetched public apps");
         }, err => {

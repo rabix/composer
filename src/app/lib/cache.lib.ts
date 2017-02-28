@@ -1,14 +1,14 @@
-import {ReplaySubject, BehaviorSubject, Observable} from "rxjs";
+import {BehaviorSubject, Observable, ReplaySubject} from "rxjs";
 interface CacheComparator<T> {
     (a: T, b: T): boolean
 }
 export class HashCache<T> {
-    private cache: BehaviorSubject<{[id: string]: ReplaySubject<T>}>;
+    private cache: BehaviorSubject<{ [id: string]: ReplaySubject<T> }>;
     private sharedWatcherPool = {};
     private comparator: CacheComparator<T>;
 
     constructor(initialData = {}, comparator?: CacheComparator<T>) {
-        this.cache      = new BehaviorSubject(initialData);
+        this.cache = new BehaviorSubject(initialData);
         this.comparator = comparator;
     }
 
@@ -52,7 +52,7 @@ export class HashCache<T> {
         }
     }
 
-    public all(): BehaviorSubject<{[id: string]: ReplaySubject<T>}> {
+    public all(): BehaviorSubject<{ [id: string]: ReplaySubject<T> }> {
         return this.cache;
     }
 }

@@ -54,5 +54,3 @@ npm-debug.log
 # IDE #
 .idea/
 *.swp
-
-config/env.json

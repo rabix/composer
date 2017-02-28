@@ -1,4 +1,4 @@
-import {Subscription, AsyncSubject} from "rxjs";
+import {AsyncSubject, Subscription} from "rxjs";
 import {OnDestroy} from "@angular/core";
 
 export abstract class ComponentBase implements OnDestroy {
@@ -6,7 +6,7 @@ export abstract class ComponentBase implements OnDestroy {
     /**
      * Holds the subscriptions that need to be disposed when the component gets removed.
      */
-    private __disposables: {dispose: string, track: Object}[] = [];
+    private __disposables: { dispose: string, track: Object }[] = [];
 
     public viewReady = new AsyncSubject();
 
@@ -46,7 +46,7 @@ export abstract class ComponentBase implements OnDestroy {
         this.__disposables.forEach(d => d.track[d.dispose]());
     }
 
-    ngAfterViewInit(){
+    ngAfterViewInit() {
         this.viewReady.next(true);
         this.viewReady.complete();
 

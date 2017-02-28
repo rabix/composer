@@ -1,5 +1,7 @@
-import {Component, Input, HostBinding, ChangeDetectionStrategy} from "@angular/core";
+import {ChangeDetectionStrategy, Component, HostBinding, Input, ViewEncapsulation} from "@angular/core";
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-alert",
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: {

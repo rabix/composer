@@ -1,14 +1,16 @@
-import {OnInit, Component, Input, ElementRef, Renderer} from "@angular/core";
+import {Component, ElementRef, Input, OnInit, Renderer, ViewEncapsulation} from "@angular/core";
 import {Observable} from "rxjs";
 
-require("./panel.component.scss");
-
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     host: {
         "class": "panel"
     },
+    styleUrls: ["./panel.component.scss"],
     selector: "ct-panel",
-    template: `<ng-content></ng-content>`
+    template: `
+        <ng-content></ng-content>`
 })
 
 export class PanelComponent implements OnInit {
@@ -28,7 +30,7 @@ export class PanelComponent implements OnInit {
         this.renderer.setElementStyle(this.el.nativeElement, "flex", number);
     }
 
-    public getSize(){
+    public getSize() {
         return this.el.nativeElement.style.flex;
     }
 

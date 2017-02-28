@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {Subject, Observable} from "rxjs/Rx";
+import {Observable, Subject} from "rxjs/Rx";
 
 export interface AppEventAction {
     type: string,
@@ -31,7 +31,7 @@ export class EventHubService {
 
     constructor() {
         this.eventStream = new Subject<AppEventAction>();
-        this.responses   = new Subject<AppEventResponse>();
+        this.responses = new Subject<AppEventResponse>();
 
     }
 
@@ -68,7 +68,7 @@ export class EventHubService {
         this.responses.next(ev);
     }
 
-    public intercept<T>(action): SourceInterceptor<T>{
+    public intercept<T>(action): SourceInterceptor<T> {
         return source => {
             return source.catch(error => {
                 this.respond({action, error});

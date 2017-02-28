@@ -1,23 +1,22 @@
 import {Observable} from "rxjs";
+import {Directive, ElementRef, Input} from "@angular/core";
 import {Directive, ElementRef, Input} from '@angular/core';
 import {ComponentBase} from "../../components/common/component-base";
 import {DomEventService} from "../../services/dom/dom-event.service";
 
-require("./drag-and-drop.scss");
-
-@Directive({selector: '[ct-drag-enabled]'})
+@Directive({selector: "[ct-drag-enabled]"})
 export class DragDirective extends ComponentBase {
 
-    @Input('ct-drag-enabled')
+    @Input("ct-drag-enabled")
     private dragEnabled = false;
 
-    @Input('ct-drag-image-class')
+    @Input("ct-drag-image-class")
     private dragImageClass: string;
 
-    @Input('ct-drag-transfer-data')
+    @Input("ct-drag-transfer-data")
     public dragTransferData: any;
 
-    @Input('ct-drag-image-caption')
+    @Input("ct-drag-image-caption")
     public dragImageCaption: string;
 
     public el: Element;
@@ -40,14 +39,14 @@ export class DragDirective extends ComponentBase {
                 const drag = obs.skipUntil(Observable.of(1).delay(300));
 
                 // On Drag Start
-                const first = drag.first().subscribe((ev:any) => {
+                const first = drag.first().subscribe((ev: any) => {
                     // Create drag image
                     ev.ctData.dragImage = this.createDragImage(this.dragImageClass, this.dragImageCaption);
                     document.body.appendChild(ev.ctData.dragImage);
                 });
 
                 // On Drag (Mouse Move)
-                const mid = drag.skip(1).subscribe((ev:any) => {
+                const mid = drag.skip(1).subscribe((ev: any) => {
 
                     const dragImage = ev.ctData.dragImage;
                     const preEnteredDropZones = ev.ctData.preEnteredDropZones;
@@ -56,9 +55,9 @@ export class DragDirective extends ComponentBase {
 
                     // Reposition of drag image
                     dragImage.style.top =
-                        ev.clientY - (1 / 2) * dragImage.offsetHeight + 'px';
+                        ev.clientY - (1 / 2) * dragImage.offsetHeight + "px";
                     dragImage.style.left =
-                        (ev.clientX - (1 / 2) * dragImage.offsetWidth) + 'px';
+                        (ev.clientX - (1 / 2) * dragImage.offsetWidth) + "px";
 
                     // Get element behind drag image at following mouse coordinates
                     dragImage.style.visibility = "hidden";
@@ -114,7 +113,7 @@ export class DragDirective extends ComponentBase {
                 });
 
                 // On Drag End
-                drag.last().subscribe((ev:any) => {
+                drag.last().subscribe((ev: any) => {
 
                     // Remove drag image from DOM
                     if (ev.ctData.dragImage) {

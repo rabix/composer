@@ -1,15 +1,11 @@
-import {Component, EventEmitter, forwardRef, NgZone, Output} from "@angular/core";
-import {
-    ControlValueAccessor,
-    FormArray,
-    FormControl,
-    FormGroup,
-    NG_VALUE_ACCESSOR
-} from "@angular/forms";
+import {Component, EventEmitter, forwardRef, NgZone, Output, ViewEncapsulation} from "@angular/core";
+import {ControlValueAccessor, FormArray, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ComponentBase} from "../../../components/common/component-base";
 import {noop} from "../../../lib/utils.lib";
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-map-list",
     host: {
         "class": "block container"
@@ -135,7 +131,7 @@ export class MapListComponent extends ComponentBase implements ControlValueAcces
     setDisabledState(isDisabled: boolean): void {
     }
 
-    private onInputsFormChange ($event) {
+    private onInputsFormChange($event) {
         $event.stopPropagation();
     }
 }

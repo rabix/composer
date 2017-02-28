@@ -1,10 +1,12 @@
-import {Component, ViewContainerRef, ViewChild} from "@angular/core";
+import {Component, ViewChild, ViewContainerRef, ViewEncapsulation} from "@angular/core";
 import {StatusBarService} from "./status-bar.service";
 import {ComponentBase} from "../../components/common/component-base";
-require("./status-bar.component.scss");
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-status-bar",
+    styleUrls: ["./status-bar.component.scss"],
     template: `
 
         <!--Status-->
@@ -14,7 +16,7 @@ require("./status-bar.component.scss");
                 <span *ngIf="status.time">({{ status.time | amTimeAgo }})</span>
             </span>
         </span>
-        
+
         <!--Process-->
         <span class="status-item">
             <span *ngIf="queueSize">
@@ -24,7 +26,7 @@ require("./status-bar.component.scss");
                 </span>
             </span>
         </span>
-        
+
         <!--Buttons and switches-->
         <span class="status-item">
             <span #controlHost></span>

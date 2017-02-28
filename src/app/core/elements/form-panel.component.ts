@@ -1,8 +1,10 @@
-import {Component, Input, ChangeDetectionStrategy} from "@angular/core";
+import {ChangeDetectionStrategy, Component, Input, ViewEncapsulation} from "@angular/core";
 
-require("./form-panel.component.scss");
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-form-panel",
+    styleUrls: ["./form-panel.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <div class="form-section container">
@@ -26,7 +28,7 @@ require("./form-panel.component.scss");
                 </div>
             </div>
         </div>
-`
+    `
 })
 export class FormPanelComponent {
 

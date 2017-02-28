@@ -1,9 +1,11 @@
-import {Component, Input, ElementRef, ViewChild, Renderer, AfterViewInit, ChangeDetectionStrategy} from "@angular/core";
+import {AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, Renderer, ViewChild, ViewEncapsulation} from "@angular/core";
 import {FormControl} from "@angular/forms";
-require("./input.component.scss");
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-input",
     changeDetection: ChangeDetectionStrategy.OnPush,
+    styleUrls: ["./input.component.scss"],
     host: {
         "class": "form-group"
     },

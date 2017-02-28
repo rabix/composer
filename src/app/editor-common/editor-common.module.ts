@@ -28,8 +28,7 @@ import {FileInputInspector} from "./inspector-forms/file-input-inspector.compone
 import {JobEditorEntryComponent} from "./job-editor/job-editor-entry.component";
 import {MapListComponent} from "./components/map-list/map-list.component";
 import {BlockLoaderComponent} from "./components/block-loader/block-loader.component";
-
-require("./editor-common.scss");
+import {CwlSchemaValidationWorkerService} from "./cwl-schema-validation-worker/cwl-schema-validation-worker.service";
 
 @NgModule({
     declarations: [
@@ -91,6 +90,9 @@ require("./editor-common.scss");
         EditorInspectorContentComponent,
         ExpressionEditorComponent,
         ModelExpressionEditorComponent,
+    ],
+    providers: [
+        CwlSchemaValidationWorkerService
     ],
     imports: [BrowserModule, CoreModule, FormsModule, ReactiveFormsModule]
 })

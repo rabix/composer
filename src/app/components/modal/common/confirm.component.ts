@@ -1,6 +1,8 @@
-import {Component, Input, Output} from "@angular/core";
+import {Component, Input, Output, ViewEncapsulation} from "@angular/core";
 import {Subject} from "rxjs";
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-modal-confirm",
     template: `
         <form (ngSubmit)="decision.next(true)">
@@ -9,7 +11,7 @@ import {Subject} from "rxjs";
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary btn-sm" (click)="decision.next(false)" type="button">{{ cancellationLabel }}</button>
-                <button class="btn btn-primary btn-sm" type="submit" >{{ confirmationLabel }}</button>
+                <button class="btn btn-primary btn-sm" type="submit">{{ confirmationLabel }}</button>
             </div>
         </form>
     `
@@ -30,7 +32,7 @@ export class ConfirmComponent {
 
     constructor() {
 
-        this.content           = "Are you sure?";
+        this.content = "Are you sure?";
         this.cancellationLabel = "Cancel";
         this.confirmationLabel = "Yes";
     }

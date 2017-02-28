@@ -1,39 +1,41 @@
-import {Component, Input, SimpleChanges, Output, OnChanges} from "@angular/core";
+import {Component, Input, OnChanges, Output, SimpleChanges, ViewEncapsulation} from "@angular/core";
 import {FormControl} from "@angular/forms";
-import {ResourceRequirementModel, ExpressionModel} from "cwlts/models/d2sb";
+import {ExpressionModel, ResourceRequirementModel} from "cwlts/models/d2sb";
 import {ReplaySubject} from "rxjs";
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-resources",
     template: `
 
-<ct-form-panel [collapsed]="false">
+        <ct-form-panel [collapsed]="false">
     <span class="tc-header">
         Resources
     </span>
 
-    <div class="tc-body">
-    
-        <label class="form-control-label">Memory</label>
-        <ct-quick-pick [suggestions]="memSuggest" 
-                       [formControl]="memControl"
-                       [context]="context"
-                       [type]="'number'"
-                       [readonly]="readonly">
-        </ct-quick-pick>
-        
-        <label class="form-control-label">CPU</label>
-        <ct-quick-pick [suggestions]="cpuSuggest" 
-                       [formControl]="cpuControl"
-                       [context]="context"
-                       [type]="'number'"
-                       [readonly]="readonly">
-        </ct-quick-pick>
-    </div>
+            <div class="tc-body">
 
-</ct-form-panel>
+                <label class="form-control-label">Memory</label>
+                <ct-quick-pick [suggestions]="memSuggest"
+                               [formControl]="memControl"
+                               [context]="context"
+                               [type]="'number'"
+                               [readonly]="readonly">
+                </ct-quick-pick>
 
-`
+                <label class="form-control-label">CPU</label>
+                <ct-quick-pick [suggestions]="cpuSuggest"
+                               [formControl]="cpuControl"
+                               [context]="context"
+                               [type]="'number'"
+                               [readonly]="readonly">
+                </ct-quick-pick>
+            </div>
+
+        </ct-form-panel>
+
+    `
 })
 export class ResourcesComponent implements OnChanges {
     @Input()
@@ -46,7 +48,7 @@ export class ResourcesComponent implements OnChanges {
     readonly: boolean;
 
     @Input()
-    context: {$job?: any, $self?: any};
+    context: { $job?: any, $self?: any };
 
     @Output()
     update = new ReplaySubject<any>();
@@ -79,9 +81,9 @@ export class ResourcesComponent implements OnChanges {
                 value = new ExpressionModel("", value);
             }
             const res = new ResourceRequirementModel({
-                    "class": "sbg:MemRequirement",
-                    value
-                }, "");
+                "class": "sbg:MemRequirement",
+                value
+            }, "");
             res.value = value;
             this.update.next(res);
         });
@@ -95,9 +97,9 @@ export class ResourcesComponent implements OnChanges {
                 value = new ExpressionModel("", value);
             }
             const res = new ResourceRequirementModel({
-                    "class": "sbg:CPURequirement",
-                    value
-                }, "");
+                "class": "sbg:CPURequirement",
+                value
+            }, "");
             res.value = value;
             this.update.next(res);
         });

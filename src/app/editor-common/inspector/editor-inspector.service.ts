@@ -1,4 +1,4 @@
-import {Injectable, ViewContainerRef, EmbeddedViewRef, TemplateRef} from "@angular/core";
+import {EmbeddedViewRef, Injectable, TemplateRef, ViewContainerRef} from "@angular/core";
 import {BehaviorSubject} from "rxjs";
 
 @Injectable()

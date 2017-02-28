@@ -1,8 +1,10 @@
-import {Component, ChangeDetectionStrategy, Input} from "@angular/core";
-require("./command-line-preview.component.scss");
+import {ChangeDetectionStrategy, Component, Input, ViewEncapsulation} from "@angular/core";
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-command-line-preview",
+    styleUrls: ["./command-line-preview.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <span *ngFor="let p of commandLineParts" [title]="p.loc"

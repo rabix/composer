@@ -1,6 +1,8 @@
-import {Component, ChangeDetectionStrategy} from "@angular/core";
+import {ChangeDetectionStrategy, Component, ViewEncapsulation} from "@angular/core";
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-structure-panel",
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `

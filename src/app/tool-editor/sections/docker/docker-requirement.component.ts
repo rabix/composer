@@ -1,22 +1,24 @@
-import {Component, Input, Output, OnChanges, SimpleChanges, ChangeDetectionStrategy} from "@angular/core";
-import {FormGroup, FormControl} from "@angular/forms";
+import {ChangeDetectionStrategy, Component, Input, OnChanges, Output, SimpleChanges, ViewEncapsulation} from "@angular/core";
+import {FormControl, FormGroup} from "@angular/forms";
 import {DockerRequirementModel} from "cwlts/models/d2sb";
 import {ReplaySubject} from "rxjs";
 import {DockerRequirement} from "cwlts/mappings/d2sb/DockerRequirement";
 import {ComponentBase} from "../../../components/common/component-base";
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     changeDetection: ChangeDetectionStrategy.OnPush,
-    selector: 'ct-docker-requirement',
+    selector: "ct-docker-requirement",
     template: `
         <ct-form-panel>
             <div class="tc-header">
                 Docker Image
             </div>
-        
+
             <div class="tc-body">
                 <form [formGroup]="form" *ngIf="form">
-        
+
                     <label for="docker_image" class="form-control-label">Docker Repository</label>
                     <input name="dockerPull"
                            type="text"

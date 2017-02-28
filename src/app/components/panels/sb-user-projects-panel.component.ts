@@ -1,5 +1,5 @@
-import {Component} from "@angular/core";
-import {ReplaySubject, Observable, Subject} from "rxjs";
+import {Component, ViewEncapsulation} from "@angular/core";
+import {Observable, ReplaySubject, Subject} from "rxjs";
 import {DataEntrySource} from "../../sources/common/interfaces";
 import {SettingsService} from "../../services/settings/settings.service";
 import {SBPlatformDataSourceService} from "../../sources/sbg/sb-platform.source.service";
@@ -15,6 +15,8 @@ import {WorkboxService} from "../workbox/workbox.service";
 import {StatusBarService} from "../../core/status-bar/status-bar.service";
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-sb-user-projects-panel",
     host: {"class": "block"},
     template: `
@@ -69,7 +71,7 @@ export class SBUserProjectsPanelComponent extends ComponentBase {
 
         this.settings.platformConfiguration
             .do(_ => {
-                this.isLoading  = true;
+                this.isLoading = true;
                 statusProcessID = this.statusBar.startProcess("Fetching user projects...");
             })
             .flatMap(_ => this.dataSource.getProjects())
@@ -170,7 +172,7 @@ export class SBUserProjectsPanelComponent extends ComponentBase {
         });
 
         component.closedProjects = this.closedProjects;
-        component.save           = (projectID) => {
+        component.save = (projectID) => {
             this.setProjectStatus(projectID, true);
             this.allProjects.first().subscribe(x => component.closeModal());
         };

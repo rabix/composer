@@ -11,23 +11,19 @@ The Rabix Editor (codename Cottontail) is a graphical and code editor specially 
 ```bash
 git clone https://github.com/rabix/cottontail-frontend
 cd cottontail-frontend
-yarn install
-
-cd electron
-yarn install
+npm install
 ```
 
 ## Starting the dev environment
 ```bash
-cp config/env.example.json config/env.json # only once, modify if needed
-yarn run start:electron
-./scripts/electron-start.sh
+npm start // starts the dev server
+npm electron // opens the app shell
 ```
 
 ## Packaging the build as a desktop app for the host system and architecture
 ```bash
-yarn run build:electron
-./scripts/electron-build.sh
+npm run build
+npm run package
 ```
 
 ## Setup

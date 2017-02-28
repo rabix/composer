@@ -1,10 +1,11 @@
-import {Component} from "@angular/core";
+import {Component, ViewEncapsulation} from "@angular/core";
 import {EditorInspectorService} from "./editor-inspector.service";
 
-require("./editor-inspector-content.component.scss");
-
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-editor-inspector-content",
+    styleUrls: ["./editor-inspector-content.component.scss"],
     template: `
         <div class="form-section container">
             <div class="row header pt-1 pb-1">

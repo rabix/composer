@@ -1,8 +1,10 @@
-import {Component, Input, Output} from "@angular/core";
+import {Component, Input, Output, ViewEncapsulation} from "@angular/core";
 import {WorkflowOutputParameterModel} from "cwlts/models";
 import {Subject} from "rxjs";
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-workflow-output-inspector",
     template: `
         <div>

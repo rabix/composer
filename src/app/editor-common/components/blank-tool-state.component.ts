@@ -1,7 +1,9 @@
-import {Component, ChangeDetectionStrategy, Input, Output, EventEmitter} from "@angular/core";
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewEncapsulation} from "@angular/core";
 import {SystemService} from "../../platform-providers/system.service";
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-blank-tool-state",
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
@@ -11,7 +13,7 @@ import {SystemService} from "../../platform-providers/system.service";
                     {{ title }}
                 </div>
             </div>
-            
+
             <div class="row text-xs-center mb-1" *ngIf="buttonText && !readonly">
                 <div class="col-xs-12">
                     <button class="btn btn-primary" type="button" (click)="buttonClick.emit(true)">
@@ -19,14 +21,14 @@ import {SystemService} from "../../platform-providers/system.service";
                     </button>
                 </div>
             </div>
-            
+
             <div class="row text-xs-center mb-1" *ngIf="learnMoreURL">
                 <div class="col-xs-12">
-                    or 
-                    <a href="" class="clickable nav-link" 
+                    or
+                    <a href="" class="clickable nav-link"
                        (click)="$event.preventDefault(); system.openLink(learnMoreURL)">
-                       Learn More
-                   </a>
+                        Learn More
+                    </a>
                 </div>
             </div>
         </div>

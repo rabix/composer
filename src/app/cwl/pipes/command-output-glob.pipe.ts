@@ -5,7 +5,7 @@ import {ExpressionModel} from "cwlts/models/d2sb";
 export class CommandOutputGlobPipe implements PipeTransform {
     transform(glob): any {
 
-        if(!glob){
+        if (!glob) {
             return "n/a";
         }
 

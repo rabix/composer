@@ -1,17 +1,11 @@
-import {
-    ChangeDetectionStrategy,
-    Component,
-    EventEmitter,
-    Input,
-    OnChanges,
-    Output,
-    SimpleChanges
-} from "@angular/core";
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewEncapsulation} from "@angular/core";
 import {ObjectHelper} from "../../../../helpers/object.helper";
 import {JobHelper} from "cwlts/models/helpers/JobHelper";
 import {WorkflowStepInputModel} from "cwlts/models";
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-workflow-step-inspector-entry",
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
@@ -47,7 +41,7 @@ import {WorkflowStepInputModel} from "cwlts/models";
                 </template>
 
                 <!--Strings-->
-                <template ngSwitchCase="string">                    
+                <template ngSwitchCase="string">
                     <input [attr.prefix]="prefix"
                            class="form-control"
                            [value]="value"/>
@@ -73,25 +67,25 @@ import {WorkflowStepInputModel} from "cwlts/models";
                 <template ngSwitchCase="File">
                     <div class="alert alert-warning form-control-label">
                         Cannot set default values for type File and File[].
-                    </div>                           
+                    </div>
                 </template>
-                
+
                 <!--Every element that's a part of the array can be deleted, so we add a deletion button to it-->
                 <span class="input-group-btn" *ngIf="index !== -1">
                     <button type="button" class="btn btn-secondary" (click)="deleteFromArray()">
                         <i class="fa fa-trash"></i>
                     </button>
                 </span>
-                
+
             </div>
 
             <!--Records-->
             <template ngSwitchCase="record">
                 <ct-workflow-step-inspector-entry *ngFor="let entry of input.type.fields"
-                                     [prefix]="prefix + '.' + entry.id"
-                                     [input]="entry"
-                                     (update)="updateRecord(entry.id, $event)"
-                                     [value]="value ? value[entry.id] : undefined"></ct-workflow-step-inspector-entry>
+                                                  [prefix]="prefix + '.' + entry.id"
+                                                  [input]="entry"
+                                                  (update)="updateRecord(entry.id, $event)"
+                                                  [value]="value ? value[entry.id] : undefined"></ct-workflow-step-inspector-entry>
             </template>
 
             <!--Arrays-->
@@ -184,7 +178,7 @@ export class WorkflowStepInspectorInputEntry implements OnChanges {
     }
 
     private addArrayEntry(input) {
-        this.warning         = undefined;
+        this.warning = undefined;
         const generatedEntry = JobHelper.generateMockJobData(input);
         this.updateJob((this.value || []).concat(generatedEntry.slice(0, 1)));
     }
@@ -198,7 +192,7 @@ export class WorkflowStepInspectorInputEntry implements OnChanges {
             && !Array.isArray(this.value)
             && this.value !== undefined) {
 
-            this.value   = [];
+            this.value = [];
             this.warning = `Type mismatch: the default step value for this input 
                             is of type “${typeof this.value}”, but the input is declared 
                             as “${this.inputType}”. 

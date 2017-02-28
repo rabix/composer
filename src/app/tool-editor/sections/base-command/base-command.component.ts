@@ -1,5 +1,5 @@
-import {Component, Input, OnInit, OnDestroy, Output, OnChanges, SimpleChanges} from "@angular/core";
-import {FormGroup, Validators, FormControl} from "@angular/forms";
+import {Component, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewEncapsulation} from "@angular/core";
+import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ReplaySubject} from "rxjs";
 import {ComponentBase} from "../../../components/common/component-base";
@@ -7,74 +7,79 @@ import {GuidService} from "../../../services/guid.service";
 import {ModalService} from "../../../components/modal/modal.service";
 import {noop} from "../../../lib/utils.lib";
 
-require("./base-command.components.scss");
 @Component({
-    selector: 'ct-base-command',
-    template: `<ct-form-panel>
-    <div class="tc-header">
-        Base Command
-    </div>
-    <div class="tc-body">
-        <form *ngIf="form">
-        
-            <ct-blank-tool-state *ngIf="!readonly && !formList.length"
-                                 [title]="'Base command for running your tool'"
-                                 [buttonText]="'Add base command'"
-                                 (buttonClick)="addBaseCommand()">
-            </ct-blank-tool-state>
+    encapsulation: ViewEncapsulation.None,
 
-            <ol *ngIf="formList.length > 0" class="list-unstyled">
+    selector: "ct-base-command",
+    styleUrls: ["./base-command.component.scss"],
+    template: `
+        <ct-form-panel>
+            <div class="tc-header">
+                Base Command
+            </div>
+            <div class="tc-body">
+                <form *ngIf="form">
 
-                <li *ngFor="let item of formList"
-                     class="removable-form-control">
+                    <ct-blank-tool-state *ngIf="!readonly && !formList.length"
+                                         [title]="'Base command for running your tool'"
+                                         [buttonText]="'Add base command'"
+                                         (buttonClick)="addBaseCommand()">
+                    </ct-blank-tool-state>
 
-                    <ct-expression-input
-                            [context]="context" 
-                            [formControl]="baseCommandForm.controls[item.id]"
-                            [readonly]="readonly">
-                    </ct-expression-input>
+                    <ol *ngIf="formList.length > 0" class="list-unstyled">
 
-                    <div *ngIf="!readonly" class="remove-icon clickable text-hover-danger" [ct-tooltip]="'Delete'" (click)="removeBaseCommand(item)">
-                        <i class="fa fa-trash"></i>
+                        <li *ngFor="let item of formList"
+                            class="removable-form-control">
+
+                            <ct-expression-input
+                                [context]="context"
+                                [formControl]="baseCommandForm.controls[item.id]"
+                                [readonly]="readonly">
+                            </ct-expression-input>
+
+                            <div *ngIf="!readonly" class="remove-icon clickable text-hover-danger" [ct-tooltip]="'Delete'"
+                                 (click)="removeBaseCommand(item)">
+                                <i class="fa fa-trash"></i>
+                            </div>
+                        </li>
+                    </ol>
+
+
+                    <button type="button" *ngIf="formList.length > 0 && !readonly" class="btn btn-link add-btn-link no-underline-hover"
+                            (click)="addBaseCommand()">
+                        <i class="fa fa-plus"></i> Add base command
+                    </button>
+
+                    <hr>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <h3 class="gui-section-header mb-1">
+                                Streams
+                            </h3>
+                        </div>
                     </div>
-                </li> 
-            </ol>
-          
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <label class="form-control-label">Stdin redirect</label>
+                            <ct-expression-input
+                                [formControl]="streamsForm.controls['stdin']"
+                                [context]="context"
+                                [readonly]="readonly">
+                            </ct-expression-input>
+                        </div>
+                        <div class="col-xs-6">
+                            <label class="form-control-label">Stdout redirect</label>
+                            <ct-expression-input
+                                [formControl]="streamsForm.controls['stdout']"
+                                [context]="context"
+                                [readonly]="readonly">
+                            </ct-expression-input>
+                        </div>
+                    </div>
 
-            <button type="button" *ngIf="formList.length > 0 && !readonly" class="btn btn-link add-btn-link no-underline-hover" (click)="addBaseCommand()">
-                <i class="fa fa-plus"></i> Add base command
-            </button>
-            
-            <hr>
-            <div class="row">
-                <div class="col-xs-12">
-                    <h3 class="gui-section-header mb-1">
-                        Streams
-                    </h3>
-                </div>
+                </form>
             </div>
-            <div class="row">
-                <div class="col-xs-6">
-                    <label class="form-control-label">Stdin redirect</label>
-                    <ct-expression-input
-                            [formControl]="streamsForm.controls['stdin']"
-                            [context]="context"
-                            [readonly]="readonly">
-                    </ct-expression-input>
-                </div>
-                <div class="col-xs-6">
-                    <label class="form-control-label">Stdout redirect</label>
-                    <ct-expression-input
-                            [formControl]="streamsForm.controls['stdout']"
-                            [context]="context"
-                            [readonly]="readonly">
-                    </ct-expression-input>
-                </div>
-            </div>
-            
-        </form>
-    </div>
-</ct-form-panel>
+        </ct-form-panel>
     `
 })
 export class BaseCommandComponent extends ComponentBase implements OnInit, OnDestroy, OnChanges {
@@ -96,7 +101,7 @@ export class BaseCommandComponent extends ComponentBase implements OnInit, OnDes
 
     /** Context in which expression should be evaluated */
     @Input()
-    public context: {$job: any};
+    public context: { $job: any };
 
     @Input()
     public readonly = false;
@@ -116,7 +121,7 @@ export class BaseCommandComponent extends ComponentBase implements OnInit, OnDes
     private baseCommandForm: FormGroup;
 
     /** List which connects model to forms */
-    private formList: Array<{id: string, model: ExpressionModel}> = [];
+    private formList: Array<{ id: string, model: ExpressionModel }> = [];
 
     constructor(private guidService: GuidService, private modal: ModalService) {
         super();
@@ -175,7 +180,7 @@ export class BaseCommandComponent extends ComponentBase implements OnInit, OnDes
         });
     }
 
-    private removeBaseCommand(ctrl: {id: string, model: ExpressionModel}): void {
+    private removeBaseCommand(ctrl: { id: string, model: ExpressionModel }): void {
         this.modal.confirm({
             title: "Really Remove?",
             content: `Are you sure that you want to remove this base command?`,

@@ -1,9 +1,11 @@
-import {Component, Input, Output} from "@angular/core";
+import {Component, Input, Output, ViewEncapsulation} from "@angular/core";
 import {Subject} from "rxjs";
 import {FormControl, FormGroup} from "@angular/forms";
 import {ComponentBase} from "../../common/component-base";
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-modal-prompt",
     template: `
         <form (ngSubmit)="decision.next(answer.value)" [formGroup]="form">
@@ -18,7 +20,7 @@ import {ComponentBase} from "../../common/component-base";
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary btn-sm" (click)="decision.next(false)" type="button">{{ cancellationLabel }}</button>
-                <button [disabled]="form.invalid" class="btn btn-primary btn-sm" type="submit" >{{ confirmationLabel }}</button>
+                <button [disabled]="form.invalid" class="btn btn-primary btn-sm" type="submit">{{ confirmationLabel }}</button>
             </div>
         </form>
     `
@@ -48,7 +50,7 @@ export class PromptComponent extends ComponentBase {
     constructor() {
 
         super();
-        this.content           = "Are you sure?";
+        this.content = "Are you sure?";
         this.cancellationLabel = "Cancel";
         this.confirmationLabel = "Yes";
 

@@ -16,7 +16,7 @@ export class ContextDirective {
     @HostListener("contextmenu", ["$event"])
     private onRightClick(event: MouseEvent) {
         event.preventDefault();
-        if(!this.contextMenuItems){
+        if (!this.contextMenuItems) {
             return;
         }
 

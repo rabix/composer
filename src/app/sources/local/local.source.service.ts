@@ -4,13 +4,13 @@ import {Observable, Subject} from "rxjs";
 import {IpcService} from "../../services/ipc.service";
 import {noop} from "../../lib/utils.lib";
 
-const fs   = window.require("fs");
-const path = window.require("path");
+const fs = window["require"]("fs");
+const path = window["require"]("path");
 
 
-type LocalSource = DataEntrySource | {isDir: boolean, isFile: boolean};
+type LocalSource = DataEntrySource | { isDir: boolean, isFile: boolean };
 
-type FileIndex = {[folder: string]: LocalSource[]};
+type FileIndex = { [folder: string]: LocalSource[] };
 @Injectable()
 export class LocalDataSourceService {
 
@@ -103,7 +103,7 @@ export class LocalDataSourceService {
 
         if (entry.isFile) {
             content = Observable.of(1).switchMap(_ => this.readFileContent(entry.path)).share();
-            save    = this.getContentSavingFunction(entry.path);
+            save = this.getContentSavingFunction(entry.path);
         }
 
 

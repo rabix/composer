@@ -1,4 +1,4 @@
-import {Directive, HostListener, ComponentRef, ViewContainerRef, Input, ComponentFactoryResolver} from "@angular/core";
+import {ComponentFactoryResolver, ComponentRef, Directive, HostListener, Input, ViewContainerRef} from "@angular/core";
 import {TooltipContentComponent} from "./tooltip-content.component";
 import {TooltipPlacement} from "./types";
 import {ComponentBase} from "../../../components/common/component-base";
@@ -47,15 +47,15 @@ export class TooltipDirective extends ComponentBase {
         if (typeof this.content === "string") {
 
             const factory = this.resolver.resolveComponentFactory(TooltipContentComponent);
-            this.tooltip  = this.viewContainerRef.createComponent(factory);
+            this.tooltip = this.viewContainerRef.createComponent(factory);
 
-            instance         = this.tooltip.instance;
+            instance = this.tooltip.instance;
             instance.content = this.content;
         }
 
         instance.hostElement = this.viewContainerRef.element.nativeElement;
-        instance.placement   = this.tooltipPlacement;
-        instance.animation   = this.tooltipAnimation;
+        instance.placement = this.tooltipPlacement;
+        instance.animation = this.tooltipAnimation;
 
         instance.show();
 

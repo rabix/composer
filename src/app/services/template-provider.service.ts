@@ -11,7 +11,7 @@ type TemplateType = "draft-2-workflow" | "draft-2-command-line-tool" | string;
 export class TemplateProviderService {
 
     public compile(templateName: TemplateType, data = {}) {
-        if(!templates[templateName]){
+        if (!templates[templateName]) {
             return "";
         }
         console.debug("Compiling template", templateName);

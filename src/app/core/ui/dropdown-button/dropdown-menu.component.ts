@@ -1,22 +1,24 @@
-import {Component, Output, EventEmitter, ChangeDetectionStrategy, Input} from "@angular/core";
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewEncapsulation} from "@angular/core";
 import {Observable} from "rxjs";
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-dropdown-menu",
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <ul class="dropdown-menu dropdown-menu-right" aria-haspopup="true" aria-expanded="true" style="display:initial">
             <li class="dropdown-item cursor-pointer" *ngFor="let item of dropDownOptions" (click)="selectItem(item)"
                 [class.selected]="item.value === selected?.value">
-        
+
                 <div>
                     {{item.caption}}
                 </div>
-        
+
                 <div class="form-control-label">
                     {{item.description}}
                 </div>
-        
+
             </li>
         </ul>
     `

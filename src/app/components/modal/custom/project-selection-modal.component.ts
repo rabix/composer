@@ -1,17 +1,19 @@
-import {Component, Input} from "@angular/core";
+import {Component, Input, ViewEncapsulation} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {ModalService} from "../modal.service";
 import {Observable} from "rxjs";
 
 @Component({
-    selector: 'ct-project-selection-modal',
-    template: `       
+    encapsulation: ViewEncapsulation.None,
+
+    selector: "ct-project-selection-modal",
+    template: `
         <div>
             <form (ngSubmit)="onSubmit()" [formGroup]="openProjectForm" class="flex-form">
                 <div class="modal-body">
                     <div class="input-group project-selection-input-group">
-                        <select #projectSelection class="project-selector form-control custom-select" 
-                        (change)="selectProject(projectSelection.value)" required>
+                        <select #projectSelection class="project-selector form-control custom-select"
+                                (change)="selectProject(projectSelection.value)" required>
                             <option value="" disabled [selected]="true">Choose a Project...</option>
                             <option *ngFor="let p of (closedProjects | async)" [value]="p.id">{{ p.name }}</option>
                         </select>
@@ -20,12 +22,12 @@ import {Observable} from "rxjs";
                 <div class="modal-footer">
                     <button class="btn btn-secondary btn-sm" type="button" (click)="onCancel()">Cancel</button>
                     <button class="btn btn-primary btn-sm" type="submit" [disabled]="!openProjectForm.valid">
-                        Open                        
+                        Open
                     </button>
                 </div>
             </form>
         </div>
-`
+    `
 })
 export class ProjectSelectionModal {
 

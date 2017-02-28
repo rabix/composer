@@ -1,29 +1,23 @@
-import {
-    Component,
-    Input,
-    ChangeDetectionStrategy,
-    OnChanges,
-    SimpleChanges,
-    Output
-} from "@angular/core";
+import {ChangeDetectionStrategy, Component, Input, OnChanges, Output, SimpleChanges, ViewEncapsulation} from "@angular/core";
 import {PlatformAppRevisionEntry} from "../../../services/api/platforms/platform-api.types";
 import {Subject} from "rxjs";
 
-require("./revision-list.component.scss");
-
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-revision-list",
+    styleUrls: ["./revision-list.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <ct-editor-inspector-content class="p-0">
             <div class="tc-header">Revisions</div>
             <div class="tc-body">
-                
+
                 <div class="revision-entry row pt-1 clickable"
                      (click)="selectRevision(revision)"
                      [class.active]="active === revision.number"
                      *ngFor="let revision of displayList">
-                    
+
                     <div class="revision-number h5">
                         {{ revision.number }}
                     </div>
@@ -32,7 +26,7 @@ require("./revision-list.component.scss");
                             {{ revision.note }}
                         </div>
                         <div class="mb-1 revision-date form-control-label">
-                            by {{ revision.author }} on {{ revision.date  | date:'medium' }}  
+                            by {{ revision.author }} on {{ revision.date | date:'medium' }}
                         </div>
                     </div>
                 </div>
@@ -75,7 +69,7 @@ export class RevisionListComponent implements OnChanges {
     ngOnChanges(changes: SimpleChanges): void {
         this.loadingRevision = undefined;
 
-        this.displayList = changes['revisions'].currentValue.map(rev => ({
+        this.displayList = changes["revisions"].currentValue.map(rev => ({
             date: rev["sbg:modifiedOn"] * 1000,
             note: rev["sbg:revisionNotes"],
             author: rev["sbg:modifiedBy"],

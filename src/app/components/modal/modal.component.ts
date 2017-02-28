@@ -6,36 +6,37 @@ import {
     HostBinding,
     HostListener,
     Inject,
+    Injector,
     ViewChild,
     ViewContainerRef,
-    Injector
+    ViewEncapsulation
 } from "@angular/core";
 import {ModalService} from "./modal.service";
-import {Subscription, Observable, BehaviorSubject} from "rxjs/Rx";
-
-
-require("./modal.component.scss");
+import {BehaviorSubject, Observable, Subscription} from "rxjs/Rx";
 
 export interface ModalOptions {
-    title?: string,
-    backdrop?: boolean,
-    closeOnOutsideClick?: boolean,
-    closeOnEscape?: boolean,
-    componentState?: Object
+    title?: string;
+    backdrop?: boolean;
+    closeOnOutsideClick?: boolean;
+    closeOnEscape?: boolean;
+    componentState?: Object;
 }
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-modal",
+    styleUrls: ["./modal.component.scss"],
     template: `
-    <div #container class="ct-modal-frame">
-        <div class="ct-modal-header" 
-             draggable="true" 
-             (dragstart)="onDragStart($event)"
-             (dragend)="onDragEnd($event)">
-             {{ title | async }}
-         </div>
-        <div #nestedComponent></div>
-    </div>
+        <div #container class="ct-modal-frame">
+            <div class="ct-modal-header"
+                 draggable="true"
+                 (dragstart)="onDragStart($event)"
+                 (dragend)="onDragEnd($event)">
+                {{ title  }}
+            </div>
+            <div #nestedComponent></div>
+        </div>
     `
 })
 export class ModalComponent {
@@ -53,7 +54,7 @@ export class ModalComponent {
     public closeOnOutsideClick: boolean;
 
     /** Title of the modal window */
-    public title: BehaviorSubject<string>;
+    public title: "";
 
     /** When you press the "ESC" key, should the modal be closed? */
     public closeOnEscape: boolean;
@@ -71,10 +72,10 @@ export class ModalComponent {
                 private service: ModalService,
                 private injector: Injector) {
 
-        this.backdrop            = false;
+        this.backdrop = false;
         this.closeOnOutsideClick = true;
-        this.closeOnEscape       = true;
-        this.title               = new BehaviorSubject("");
+        this.closeOnEscape = true;
+        this.title = "";
 
         this.subscriptions = [];
 
@@ -98,11 +99,11 @@ export class ModalComponent {
         const {clientX: startX, clientY: startY} = event;
 
         const style = this.modalWindow.element.nativeElement.style;
-        const top   = parseFloat(style.top);
-        const left  = parseFloat(style.left);
+        const top = parseFloat(style.top);
+        const left = parseFloat(style.left);
 
-        const img = document.createElement('img');
-        img.src   = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+        const img = document.createElement("img");
+        img.src = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
         event.dataTransfer.setDragImage(img, 0, 0);
 
 
@@ -154,15 +155,15 @@ export class ModalComponent {
         const {clientWidth: wWidth, clientHeight: wHeight} = document.body;
         const {clientWidth: mWidth, clientHeight: mHeight} = el;
 
-        el.style.maxWidth  = wWidth - 50 + "px";
+        el.style.maxWidth = wWidth - 50 + "px";
         el.style.maxHeight = wHeight - 50 + "px";
 
         if (tweak) {
-            el.style.top  = tweak.top;
+            el.style.top = tweak.top;
             el.style.left = tweak.left;
         } else {
             // Move the modal a bit more towards the top, looks better that way
-            el.style.top  = (wHeight - mHeight) / 4 + "px";
+            el.style.top = (wHeight - mHeight) / 4 + "px";
             el.style.left = (wWidth - mWidth) / 2 + "px";
         }
     }

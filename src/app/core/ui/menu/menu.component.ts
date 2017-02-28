@@ -1,10 +1,11 @@
-import {Component, Input, ElementRef} from "@angular/core";
+import {Component, ElementRef, Input, ViewEncapsulation} from "@angular/core";
 import {MenuItem} from "./menu-item";
 
-require("./menu.component.scss");
-
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-menu",
+    styleUrls: ["./menu.component.scss"],
     template: `
         <ct-menu-item *ngFor="let item of items" [item]="item"></ct-menu-item>
     `

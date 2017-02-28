@@ -5,32 +5,32 @@ describe("ObjectHelper", () => {
     describe("addProperty()", () => {
 
         it("should add a root-level value to an empty object", () => {
-            const target   = {},
-                  addition = "bar";
+            const target = {},
+                addition = "bar";
 
             ObjectHelper.addProperty(target, "foo", addition);
             expect(target).toEqual({foo: "bar"});
         });
 
         it("should add a nested value to an empty object", () => {
-            const target   = {},
-                  addition = "bar";
+            const target = {},
+                addition = "bar";
 
             ObjectHelper.addProperty(target, "foo.baz.maz", addition);
             expect(target).toEqual({foo: {baz: {maz: "bar"}}});
         });
 
         it("should override a nested object", () => {
-            const target   = {foo: {moo: "boo"}},
-                  addition = {baz: {taz: "gaz"}};
+            const target = {foo: {moo: "boo"}},
+                addition = {baz: {taz: "gaz"}};
 
             ObjectHelper.addProperty(target, "foo.moo", addition);
             expect(target).toEqual({foo: {moo: {baz: {taz: "gaz"}}}});
         });
 
         it("should throw an error is the value to override is not an object or undefined", () => {
-            const target   = {foo: {moo: 2000}},
-                  addition = {baz: "taz"};
+            const target = {foo: {moo: 2000}},
+                addition = {baz: "taz"};
 
             expect(() => {
                 ObjectHelper.addProperty(target, "foo.moo.goo", addition)
@@ -38,8 +38,8 @@ describe("ObjectHelper", () => {
         });
 
         it("should work with arrays", () => {
-            const target   = {foo: "moo"},
-                  addition = {baz: {taz: "gaz"}};
+            const target = {foo: "moo"},
+                addition = {baz: {taz: "gaz"}};
 
             ObjectHelper.addProperty(target, ["goo", "boo"], addition);
             expect(target).toEqual({
@@ -101,13 +101,13 @@ describe("ObjectHelper", () => {
 
         it("should extend class instance properties", () => {
             class TestClass {
-                private first    = null;
+                private first = null;
                 protected second = "moo";
-                public third     = null;
+                public third = null;
             }
 
             let instance = new TestClass();
-            let source   = {first: "foo", second: "bar", third: "baz"};
+            let source = {first: "foo", second: "bar", third: "baz"};
 
             ObjectHelper.addEnumerables(instance, source);
             expect((<any>instance).first).toEqual("foo");

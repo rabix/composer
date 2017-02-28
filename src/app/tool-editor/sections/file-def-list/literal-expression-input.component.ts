@@ -1,4 +1,4 @@
-import {Component, Input, forwardRef} from "@angular/core";
+import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ComponentBase} from "../../../components/common/component-base";
 import {noop} from "../../../lib/utils.lib";
@@ -8,10 +8,11 @@ import {ModelExpressionEditorComponent} from "../../../editor-common/expression-
 import {MultilangCodeEditorComponent} from "../../../core/ui/code-editor/multilang-code-editor.component";
 import {ACE_MODES_MAP} from "../../../components/code-editor/code-editor-modes-map";
 
-require("./literal-expression-input.component.scss");
-
 @Component({
-    selector: 'ct-literal-expression-input',
+    encapsulation: ViewEncapsulation.None,
+
+    selector: "ct-literal-expression-input",
+    styleUrls: ["./literal-expression-input.component.scss"],
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
@@ -21,28 +22,28 @@ require("./literal-expression-input.component.scss");
     ],
     template: `
         <div class="expression-input-group clickable"
-                 [class.expr]="isExpr"
-                 [ct-validation-class]="model.validation">
-                 
-                <ct-validation-preview [entry]="model.validation"></ct-validation-preview>
-                <b class="validation-icon result"
-                    *ngIf="model.result && isExpr"
-                    [title]="model.result">E:</b>
-                
-                <div class="textarea-btn-group">
+             [class.expr]="isExpr"
+             [ct-validation-class]="model.validation">
+
+            <ct-validation-preview [entry]="model.validation"></ct-validation-preview>
+            <b class="validation-icon result"
+               *ngIf="model.result && isExpr"
+               [title]="model.result">E:</b>
+
+            <div class="textarea-btn-group">
                 
                     <textarea class="form-control"
-                            #input
-                            [readonly]="isExpr"
-                            (blur)="onTouch()"
-                            (click)="editExpr(isExpr ? 'edit' : null, $event)"
-                            (change)="editLiteral(input.value)">{{ value?.toString() }}</textarea>
-                    
-                    <span class="btn-group">
-                        <button type="button" 
-                            (click)="openLiteralEditor()"
-                            [disabled]="value.isExpression"
-                            class="btn btn-secondary">
+                              #input
+                              [readonly]="isExpr"
+                              (blur)="onTouch()"
+                              (click)="editExpr(isExpr ? 'edit' : null, $event)"
+                              (change)="editLiteral(input.value)">{{ value?.toString() }}</textarea>
+
+                <span class="btn-group">
+                        <button type="button"
+                                (click)="openLiteralEditor()"
+                                [disabled]="value.isExpression"
+                                class="btn btn-secondary">
                             <i class="fa fa-expand"></i>
                         </button>
                         <button type="button"
@@ -50,18 +51,18 @@ require("./literal-expression-input.component.scss");
                                 [disabled]="readonly"
                                 (click)="editExpr(isExpr ? 'clear' : 'edit', $event)">
                             <i class="fa"
-                                [ngClass]="{'fa-times': isExpr,
+                               [ngClass]="{'fa-times': isExpr,
                                             'fa-code': !isExpr}"></i>
                         </button>
-                    </span>  
+                    </span>
             </div>
         </div>
-`
+    `
 })
 export class LiteralExpressionInputComponent extends ComponentBase implements ControlValueAccessor {
 
     @Input()
-    context: {$job?: {}} = {};
+    context: { $job?: {} } = {};
 
     @Input()
     fileName: string;
@@ -111,10 +112,10 @@ export class LiteralExpressionInputComponent extends ComponentBase implements Co
         }
 
         if (obj) {
-            this.model  = obj;
+            this.model = obj;
             this.isExpr = obj.isExpression;
         } else {
-            this.model  = new ExpressionModel("", "");
+            this.model = new ExpressionModel("", "");
             this.isExpr = this.model.isExpression;
         }
     }
@@ -137,7 +138,7 @@ export class LiteralExpressionInputComponent extends ComponentBase implements Co
         editor.content.next(this.value.toString());
 
         if (this.fileName) {
-            const nameParts = this.fileName.split('.');
+            const nameParts = this.fileName.split(".");
             const ext = nameParts[nameParts.length - 1].toLowerCase();
             if (ACE_MODES_MAP[ext]) {
                 editor.language.next(ext);
@@ -181,7 +182,7 @@ export class LiteralExpressionInputComponent extends ComponentBase implements Co
 
             editor.readonly = this.readonly;
 
-            editor.model   = this.model;
+            editor.model = this.model;
             editor.context = this.context;
             editor.action.first().subscribe(action => {
                 if (action === "save") {
@@ -203,7 +204,7 @@ export class LiteralExpressionInputComponent extends ComponentBase implements Co
             }).then(() => {
                 this.model.setValue("", "string");
                 this.model.result = null;
-                this.isExpr       = false;
+                this.isExpr = false;
                 event.stopPropagation();
                 this.onChange(this.model);
             }, noop);

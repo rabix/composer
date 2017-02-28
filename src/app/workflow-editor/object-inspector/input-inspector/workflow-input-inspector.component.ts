@@ -1,14 +1,16 @@
-import {Component, Input, Output} from "@angular/core";
+import {Component, Input, Output, ViewEncapsulation} from "@angular/core";
 import {WorkflowInputParameterModel} from "cwlts/models";
 import {Subject} from "rxjs";
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-workflow-input-inspector",
     template: `
-    <div>
-        <!--REMOVE ME-->
-        <pre>{{ input | json }}</pre>
-    </div>`
+        <div>
+            <!--REMOVE ME-->
+            <pre>{{ input | json }}</pre>
+        </div>`
 })
 export class WorkflowInputInspector {
     @Input()

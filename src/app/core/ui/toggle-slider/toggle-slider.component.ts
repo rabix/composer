@@ -1,24 +1,32 @@
 import {
-    Component, forwardRef, Input, ViewChild, Renderer, Output, EventEmitter,
-    ChangeDetectionStrategy
+    ChangeDetectionStrategy,
+    Component,
+    EventEmitter,
+    forwardRef,
+    Input,
+    Output,
+    Renderer,
+    ViewChild,
+    ViewEncapsulation
 } from "@angular/core";
-import {NG_VALUE_ACCESSOR, ControlValueAccessor} from "@angular/forms";
-
-require("./toggle-slider.component.scss");
+import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-toggle-slider",
+    styleUrls: ["./toggle-slider.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
-        { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ToggleComponent), multi: true }
+        {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ToggleComponent), multi: true}
     ],
     template: `
-            <span>{{ value ? on : off }}</span>
-    
-            <label class="switch">
-                <input #checkbox type="checkbox" [checked]="value" (change)="toggleCheck($event)" [disabled]="isDisabled">
-                <div class="slider round" [class.disabled]="isDisabled"></div>
-            </label>
+        <span>{{ value ? on : off }}</span>
+
+        <label class="switch">
+            <input #checkbox type="checkbox" [checked]="value" (change)="toggleCheck($event)" [disabled]="isDisabled">
+            <div class="slider round" [class.disabled]="isDisabled"></div>
+        </label>
     `
 })
 export class ToggleComponent implements ControlValueAccessor {
@@ -43,7 +51,7 @@ export class ToggleComponent implements ControlValueAccessor {
     @Output()
     public change = new EventEmitter();
 
-    @ViewChild('checkbox') checkbox;
+    @ViewChild("checkbox") checkbox;
 
     constructor(private renderer: Renderer) {
     }
@@ -54,9 +62,11 @@ export class ToggleComponent implements ControlValueAccessor {
         }
     }
 
-    private onTouched = () => { };
+    private onTouched = () => {
+    };
 
-    private propagateChange = (_) => {};
+    private propagateChange = (_) => {
+    };
 
     private toggleCheck(event): void {
         event.stopPropagation();
@@ -80,6 +90,6 @@ export class ToggleComponent implements ControlValueAccessor {
 
     setDisabledState(isDisabled: boolean): void {
         this.isDisabled = isDisabled;
-        this.renderer.setElementAttribute(this.checkbox.nativeElement, 'disabled', this.isDisabled ? "disabled" : null);
+        this.renderer.setElementAttribute(this.checkbox.nativeElement, "disabled", this.isDisabled ? "disabled" : null);
     }
 }

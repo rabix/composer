@@ -1,11 +1,13 @@
-import {Component, Input, Output} from "@angular/core";
+import {Component, Input, Output, ViewEncapsulation} from "@angular/core";
 import {ExpressionModel} from "cwlts/models/d2sb";
 import {ReplaySubject, Subject} from "rxjs";
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-model-expression-editor",
     template: `
-        <ct-expression-editor [evaluator]="evaluator" 
+        <ct-expression-editor [evaluator]="evaluator"
                               [context]="context"
                               (action)="action.next($event)"
                               [editorContent]="rawCode"
@@ -19,7 +21,7 @@ export class ModelExpressionEditorComponent {
     public model: ExpressionModel;
 
     @Input()
-    public context: {$job?: any, $self?: any};
+    public context: { $job?: any, $self?: any };
 
     @Input()
     public readonly = false;

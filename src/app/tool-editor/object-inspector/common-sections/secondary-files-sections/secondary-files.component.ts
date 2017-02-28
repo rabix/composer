@@ -1,140 +1,141 @@
 /*
-import {Component, forwardRef} from "@angular/core";
-import {
-    ControlValueAccessor, NG_VALUE_ACCESSOR, FormGroup,
-    FormControl, Validators
-} from "@angular/forms";
-import {ComponentBase} from "../../../../components/common/component-base";
-import {CommandOutputParameterModel, CommandInputParameterModel} from "cwlts/models/d2sb";
-import {ExpressionModel} from "cwlts/models/d2sb";
-import {GuidService} from "../../../../services/guid.service";
-import {CustomValidators} from "../../../../validators/custom.validator";
+ import {Component, forwardRef, ViewEncapsulation} from "@angular/core";
+ import {
+ ControlValueAccessor, NG_VALUE_ACCESSOR, FormGroup,
+ FormControl, Validators
+ } from "@angular/forms";
+ import {ComponentBase} from "../../../../components/common/component-base";
+ import {CommandOutputParameterModel, CommandInputParameterModel} from "cwlts/models/d2sb";
+ import {ExpressionModel} from "cwlts/models/d2sb";
+ import {GuidService} from "../../../../services/guid.service";
+ import {CustomValidators} from "../../../../validators/custom.validator";
 
-@Component({
-    selector: 'ct-secondary-file',
-    providers: [
-        { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => SecondaryFilesComponent), multi: true }
-    ],
-    template: `
-<ct-form-panel class="borderless" [collapsed]="true">
-    <div class="tc-header">Secondary files</div>
-    <div class="tc-body" *ngIf="port && secondaryFilesFormGroup">
+ @Component({ encapsulation: ViewEncapsulation.None,
 
-        <form *ngIf="secondaryFilesFormGroup" [formGroup]="secondaryFilesFormGroup">
+ selector: 'ct-secondary-file',
+ providers: [
+ { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => SecondaryFilesComponent), multi: true }
+ ],
+ template: `
+ <ct-form-panel class="borderless" [collapsed]="true">
+ <div class="tc-header">Secondary files</div>
+ <div class="tc-body" *ngIf="port && secondaryFilesFormGroup">
 
-            <ol *ngIf="formList.length > 0" class="list-unstyled">
+ <form *ngIf="secondaryFilesFormGroup" [formGroup]="secondaryFilesFormGroup">
 
-                <li *ngFor="let item of formList" class="removable-form-control">
+ <ol *ngIf="formList.length > 0" class="list-unstyled">
 
-                    <ct-expression-input [context]="context" [formControl]="secondaryFilesFormGroup.controls[item.id]">
-                    </ct-expression-input>
+ <li *ngFor="let item of formList" class="removable-form-control">
 
-                    <div class="remove-icon clickable" (click)="removeSecondaryFile(item)">
-                        <i class="fa fa-trash"></i>
-                    </div>
-                </li>
-            </ol>
+ <ct-expression-input [context]="context" [formControl]="secondaryFilesFormGroup.controls[item.id]">
+ </ct-expression-input>
 
-            <div *ngIf="formList.length === 0">
-                No Secondary Files defined.
-            </div>
+ <div class="remove-icon clickable" (click)="removeSecondaryFile(item)">
+ <i class="fa fa-trash"></i>
+ </div>
+ </li>
+ </ol>
 
-            <button type="button" class="btn btn-link add-btn-link no-underline-hover" (click)="addSecondaryFile()">
-                <i class="fa fa-plus"></i> Add secondary file
-            </button>
-        </form>
+ <div *ngIf="formList.length === 0">
+ No Secondary Files defined.
+ </div>
 
-        <div class="secondary-text">
-            If a tool created index files, list them here.
-        </div>
+ <button type="button" class="btn btn-link add-btn-link no-underline-hover" (click)="addSecondaryFile()">
+ <i class="fa fa-plus"></i> Add secondary file
+ </button>
+ </form>
 
-    </div>
-    <!--tc-body-->
-</ct-form-panel>
-    `
-})
+ <div class="secondary-text">
+ If a tool created index files, list them here.
+ </div>
 
-/!**
+ </div>
+ <!--tc-body-->
+ </ct-form-panel>
+ `
+ })
+
+ /!**
  * TODO: add the load content property on the model
  * *!/
-export class SecondaryFilesComponent extends ComponentBase implements ControlValueAccessor {
+ export class SecondaryFilesComponent extends ComponentBase implements ControlValueAccessor {
 
-    private port: CommandOutputParameterModel | CommandInputParameterModel;
+ private port: CommandOutputParameterModel | CommandInputParameterModel;
 
-    private onTouched = () => {
-    };
+ private onTouched = () => {
+ };
 
-    private propagateChange = (_) => {
-    };
+ private propagateChange = (_) => {
+ };
 
-    private secondaryFilesFormGroup: FormGroup;
+ private secondaryFilesFormGroup: FormGroup;
 
-    /!** List which connects model to forms *!/
-    private formList: Array<{id: string, model: ExpressionModel}> = [];
+ /!** List which connects model to forms *!/
+ private formList: Array<{id: string, model: ExpressionModel}> = [];
 
-    constructor(private guidService: GuidService) {
-        super();
-    }
+ constructor(private guidService: GuidService) {
+ super();
+ }
 
-    writeValue(port: CommandOutputParameterModel | CommandInputParameterModel): void {
-        this.port = port;
+ writeValue(port: CommandOutputParameterModel | CommandInputParameterModel): void {
+ this.port = port;
 
-        this.secondaryFilesFormGroup = new FormGroup({});
+ this.secondaryFilesFormGroup = new FormGroup({});
 
-        this.formList = this.port[this.port instanceof CommandOutputParameterModel ? "outputBinding" : "inputBinding"]
-            .secondaryFiles.map(model => {
-                return {
-                    id: this.guidService.generate(), model
-                };
-            });
+ this.formList = this.port[this.port instanceof CommandOutputParameterModel ? "outputBinding" : "inputBinding"]
+ .secondaryFiles.map(model => {
+ return {
+ id: this.guidService.generate(), model
+ };
+ });
 
-        this.formList.forEach((item) => {
-            this.secondaryFilesFormGroup.addControl(
-                item.id,
-                new FormControl(item.model, [Validators.required])
-            );
-        });
+ this.formList.forEach((item) => {
+ this.secondaryFilesFormGroup.addControl(
+ item.id,
+ new FormControl(item.model, [Validators.required])
+ );
+ });
 
-        this.tracked = this.secondaryFilesFormGroup.valueChanges
-            .distinctUntilChanged()
-            .subscribe(change => {
+ this.tracked = this.secondaryFilesFormGroup.valueChanges
+ .distinctUntilChanged()
+ .subscribe(change => {
 
-                this.port[this.port instanceof CommandOutputParameterModel ? "outputBinding" : "inputBinding"]
-                    .secondaryFiles = Object.keys(change).map(key => change[key]);
+ this.port[this.port instanceof CommandOutputParameterModel ? "outputBinding" : "inputBinding"]
+ .secondaryFiles = Object.keys(change).map(key => change[key]);
 
-                this.propagateChange(this.port);
-            });
-    }
+ this.propagateChange(this.port);
+ });
+ }
 
-    private addSecondaryFile(): void {
-        const newCmd = {
-            id: this.guidService.generate(),
-            model: new ExpressionModel("", "")
-        };
+ private addSecondaryFile(): void {
+ const newCmd = {
+ id: this.guidService.generate(),
+ model: new ExpressionModel("", "")
+ };
 
-        this.secondaryFilesFormGroup.addControl(newCmd.id,
-            new FormControl(newCmd.model, [Validators.required, CustomValidators.cwlModel]));
-        this.formList.push(newCmd);
-        this.secondaryFilesFormGroup.markAsTouched();
-    }
+ this.secondaryFilesFormGroup.addControl(newCmd.id,
+ new FormControl(newCmd.model, [Validators.required, CustomValidators.cwlModel]));
+ this.formList.push(newCmd);
+ this.secondaryFilesFormGroup.markAsTouched();
+ }
 
-    private removeSecondaryFile(ctrl: {id: string, model: ExpressionModel}): void {
-        this.formList = this.formList.filter(item => item.id !== ctrl.id);
-        this.secondaryFilesFormGroup.removeControl(ctrl.id);
-        this.secondaryFilesFormGroup.markAsDirty();
-    }
+ private removeSecondaryFile(ctrl: {id: string, model: ExpressionModel}): void {
+ this.formList = this.formList.filter(item => item.id !== ctrl.id);
+ this.secondaryFilesFormGroup.removeControl(ctrl.id);
+ this.secondaryFilesFormGroup.markAsDirty();
+ }
 
-    registerOnChange(fn: any): void {
-        this.propagateChange = fn;
-    }
+ registerOnChange(fn: any): void {
+ this.propagateChange = fn;
+ }
 
-    registerOnTouched(fn: any): void {
-        this.onTouched = fn;
-    }
+ registerOnTouched(fn: any): void {
+ this.onTouched = fn;
+ }
 
-    ngOnDestroy() {
-        super.ngOnDestroy();
-        this.formList.forEach(item => this.secondaryFilesFormGroup.removeControl(item.id));
-    }
-}
-*/
+ ngOnDestroy() {
+ super.ngOnDestroy();
+ this.formList.forEach(item => this.secondaryFilesFormGroup.removeControl(item.id));
+ }
+ }
+ */

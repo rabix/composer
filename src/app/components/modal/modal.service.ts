@@ -1,10 +1,10 @@
-import {Injectable, ComponentFactoryResolver, ViewContainerRef, ComponentRef} from "@angular/core";
+import {ComponentFactoryResolver, ComponentRef, Injectable, ViewContainerRef} from "@angular/core";
 import {Subject} from "rxjs";
 import {CheckboxPromptComponent} from "./common/checkbox-prompt.component";
 import {ConfirmComponent} from "./common/confirm.component";
 import {ModalComponent, ModalOptions} from "./modal.component";
 import {PromptComponent} from "./common/prompt.component";
-import {PromptParams, ConfirmationParams} from "./types";
+import {ConfirmationParams, PromptParams} from "./types";
 
 @Injectable()
 export class ModalService {
@@ -30,7 +30,7 @@ export class ModalService {
     /**
      * Open a modal window with the given component inside it.
      */
-    public show<T>(component: {new(...args: any[]):T;}, options?: ModalOptions): T {
+    public show<T>(component: { new(...args: any[]): T; }, options?: ModalOptions): T {
 
         const config = Object.assign({
             backdrop: false,
@@ -43,7 +43,7 @@ export class ModalService {
         // If some other modal is open, close it
         this.close();
 
-        const modalFactory     = this.resolver.resolveComponentFactory(ModalComponent);
+        const modalFactory = this.resolver.resolveComponentFactory(ModalComponent);
         const componentFactory = this.resolver.resolveComponentFactory(component);
 
         this.modalComponentRef = this.rootViewRef.createComponent(modalFactory);
@@ -115,12 +115,12 @@ export class ModalService {
     }
 
     public checkboxPrompt(params = {
-        title: "Confirm",
-        content: "Are you sure?",
-        confirmationLabel: "Yes",
-        cancellationLabel: "Cancel",
-        checkboxLabel: "Don't show this again"
-    }) {
+                              title: "Confirm",
+                              content: "Are you sure?",
+                              confirmationLabel: "Yes",
+                              cancellationLabel: "Cancel",
+                              checkboxLabel: "Don't show this again"
+                          }) {
         return this.wrap<boolean>((resolve, reject) => {
             const ref = this.show<CheckboxPromptComponent>(CheckboxPromptComponent, {title: params.title});
             Object.assign(ref, params);

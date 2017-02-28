@@ -1,28 +1,28 @@
-import {Component, Input, Output, ChangeDetectionStrategy} from "@angular/core";
-import {WorkflowStepInputModel} from "cwlts/models";
+import {ChangeDetectionStrategy, Component, Input, Output, ViewEncapsulation} from "@angular/core";
+import {StepModel, WorkflowModel, WorkflowStepInputModel} from "cwlts/models";
 import {Subject} from "rxjs";
 import {ComponentBase} from "../../../../components/common/component-base";
-import {StepModel, WorkflowModel} from "cwlts/models";
 import {ObjectHelper as OH} from "../../../../helpers/object.helper";
 import {StatusBarService} from "../../../../core/status-bar/status-bar.service";
 
-require("./step-tab-inputs.component.scss");
-
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-workflow-step-inspector-inputs",
     changeDetection: ChangeDetectionStrategy.OnPush,
+    styleUrls: ["./step-tab-inputs.component.scss"],
     template: `
         <div *ngFor="let group of inputGroups">
-        
+
             <ct-form-panel class="borderless">
                 <div class="tc-header">{{ group.name }}</div>
                 <div class="tc-body">
                     <form (change)="onInputsFormChange($event)">
-                        <div *ngFor="let input of group.inputs; let i = index;" class="mb-1">        
-        
+                        <div *ngFor="let input of group.inputs; let i = index;" class="mb-1">
+
                             <!--Label and port options-->
                             <div class="input-title flex-baseline">
-                                
+
                                 <label class="input-label" [title]="input.label || input.id">
                                     {{ input.label || input.id }}
                                     <span class="text-danger" *ngIf="!input.type.isNullable">*</span>
@@ -30,40 +30,40 @@ require("./step-tab-inputs.component.scss");
                                        *ngIf="input.description"
                                        [ct-tooltip]="ctt"
                                        [tooltipPlacement]="'top'"></i>
-                                </label>        
-        
+                                </label>
+
                                 <!--Port options for File and array of Files-->
-                                <div *ngIf="isFileType(input)" class="port-controls"> 
-                                            <ct-toggle-slider
-                                                (change)="onPortOptionChange(input, $event ? 'port' : 'editable')"
-                                                [disabled]="!input.type.isNullable"
-                                                [on]="'Show'"
-                                                [off]="'Hide'"
-                                                [value]="input.isVisible">
-                                            </ct-toggle-slider>
-                                </div>        
-                                
-                                <!--Port options for all other types-->                                
+                                <div *ngIf="isFileType(input)" class="port-controls">
+                                    <ct-toggle-slider
+                                        (change)="onPortOptionChange(input, $event ? 'port' : 'editable')"
+                                        [disabled]="!input.type.isNullable"
+                                        [on]="'Show'"
+                                        [off]="'Hide'"
+                                        [value]="input.isVisible">
+                                    </ct-toggle-slider>
+                                </div>
+
+                                <!--Port options for all other types-->
                                 <div *ngIf="!isFileType(input)" class="input-control">
-                                            <ct-dropdown-button [dropDownOptions]="dropDownPortOptions" 
-                                                                (change)="onPortOptionChange(input, $event)"
-                                                                [value]="input.status">
-                                            </ct-dropdown-button>
-                                </div>        
+                                    <ct-dropdown-button [dropDownOptions]="dropDownPortOptions"
+                                                        (change)="onPortOptionChange(input, $event)"
+                                                        [value]="input.status">
+                                    </ct-dropdown-button>
+                                </div>
                             </div>
-        
+
                             <!--Input-->
                             <ct-workflow-step-inspector-entry [input]="input"
                                                               [prefix]="input.id"
                                                               [value]="input.default"
                                                               *ngIf="!isFileType(input)"
-                                                              (update)="stepValueUpdate(input.id + '.default', $event)" 
+                                                              (update)="stepValueUpdate(input.id + '.default', $event)"
                                                               class="mb-0">
-                            </ct-workflow-step-inspector-entry>        
-        
+                            </ct-workflow-step-inspector-entry>
+
                             <!--Connections-->
                             <div>
-                                
+
                                 <!--No connections-->
                                 <div *ngIf="input.source.length === 0 && input.isVisible">
                                     <div class="alert alert-warning small">
@@ -79,20 +79,20 @@ require("./step-tab-inputs.component.scss");
                                     </code>
                                 </div>
                             </div>
-        
+
                             <!--Tooltip-->
                             <ct-tooltip-content #ctt>
                                 <div class="tooltip-info">
                                     {{ input.description }}
                                 </div>
                             </ct-tooltip-content>
-        
+
                         </div>
                     </form>
                 </div>
             </ct-form-panel>
-        </div> 
-`
+        </div>
+    `
 })
 export class WorkflowStepInspectorTabInputs extends ComponentBase {
 
@@ -135,15 +135,14 @@ export class WorkflowStepInspectorTabInputs extends ComponentBase {
      * Executes when port option get changed via drop down menu or toggle slider
      */
     private onPortOptionChange(input, value) {
-        switch (value)
-        {
-            case'editable':
+        switch (value) {
+            case"editable":
                 this.workflowModel.clearPort(input);
                 break;
-            case'exposed':
+            case"exposed":
                 this.workflowModel.exposePort(input);
                 break;
-            case'port':
+            case"port":
                 this.workflowModel.includePort(input);
                 break;
         }
@@ -219,7 +218,7 @@ export class WorkflowStepInspectorTabInputs extends ComponentBase {
     }
 
     private isFileType(input) {
-        return input.type.type === 'File' || (input.type.type === 'array' && input.type.items === 'File');
+        return input.type.type === "File" || (input.type.type === "array" && input.type.items === "File");
     }
 
 }

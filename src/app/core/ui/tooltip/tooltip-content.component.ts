@@ -1,9 +1,10 @@
-import {Component, Input, AfterViewInit, ElementRef, ChangeDetectorRef, HostBinding, ViewChild} from "@angular/core";
-
-require("./tooltip-content.component.scss");
+import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostBinding, Input, ViewChild, ViewEncapsulation} from "@angular/core";
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-tooltip-content",
+    styleUrls: ["./tooltip-content.component.scss"],
     host: {
         "class": "tooltip",
         "[class]": "'tooltip-' + placement"
@@ -15,19 +16,19 @@ require("./tooltip-content.component.scss");
              [class.in]="isIn"
              [class.fade]="isFade"
              role="tooltip">
-            <div class="tooltip-arrow"></div> 
+            <div class="tooltip-arrow"></div>
             <div class="tooltip-inner"
                  #tooltipInner
                  [style.maxWidth.px]="maxWidth"
                  [style.width.px]="width"
                  [style.height.px]="height">
-                
+
                 <!--If there is a component given, transclude it-->
                 <ng-content></ng-content>
-                
+
                 <!--If it's a plain string, show it-->
                 <span *ngIf="content" class="tooltip-inner-plaintext">{{ content }}</span>
-            </div> 
+            </div>
         </div>
     `
 })
@@ -40,7 +41,7 @@ export class TooltipContentComponent implements AfterViewInit {
     public content: string;
 
     @Input()
-    public placement: "top"|"bottom"|"left"|"right" = "bottom";
+    public placement: "top" | "bottom" | "left" | "right" = "bottom";
 
     @Input()
     public animation: boolean = false;
@@ -96,7 +97,7 @@ export class TooltipContentComponent implements AfterViewInit {
         setTimeout(() => {
             const p = this.positionElements(this.hostElement, this.element.nativeElement.children[0]);
 
-            this.top  = p.top;
+            this.top = p.top;
             this.left = p.left;
             this.cdr.markForCheck();
         });
@@ -104,7 +105,7 @@ export class TooltipContentComponent implements AfterViewInit {
     }
 
     public hide(): void {
-        this.top  = -10000;
+        this.top = -10000;
         this.left = -10000;
         this.isIn = false;
 
@@ -115,11 +116,11 @@ export class TooltipContentComponent implements AfterViewInit {
 
     private positionElements(hostEl: HTMLElement, targetEl: HTMLElement) {
 
-        const {left:hostLeft, top:hostTop}                             = hostEl.getBoundingClientRect();
-        const {clientWidth: hostWidth, clientHeight: hostHeight}       = hostEl;
+        const {left: hostLeft, top: hostTop} = hostEl.getBoundingClientRect();
+        const {clientWidth: hostWidth, clientHeight: hostHeight} = hostEl;
         const {clientWidth: contentWidth, clientHeight: contentHeight} = targetEl;
 
-        const contentTop  = hostTop - contentHeight;
+        const contentTop = hostTop - contentHeight;
         const contentLeft = hostLeft - contentWidth / 2 + hostWidth / 2;
 
         return {top: contentTop, left: contentLeft};

@@ -1,10 +1,12 @@
-import {Component, ChangeDetectionStrategy, Input, Output, HostListener} from "@angular/core";
+import {ChangeDetectionStrategy, Component, HostListener, Input, Output, ViewEncapsulation} from "@angular/core";
 import {Observable, Subject} from "rxjs/Rx";
-require("./radio-button.component.scss");
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-radio-button",
     changeDetection: ChangeDetectionStrategy.OnPush,
+    styleUrls: ["./radio-button.component.scss"],
     host: {
         "class": "ct-radio-button btn"
     },

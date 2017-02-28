@@ -3,12 +3,12 @@ import {PublicAppService} from "./public-app.service";
 import {LocalDataSourceService} from "../../sources/local/local.source.service";
 import {MenuItem} from "../../core/ui/menu/menu-item";
 
-const {app, dialog} = window.require("electron").remote;
+const {app, dialog} = window["require"]("electron").remote;
 
 @Injectable()
 export class ElectronPublicAppService extends PublicAppService {
 
-    constructor (private fs: LocalDataSourceService) {
+    constructor(private fs: LocalDataSourceService) {
         super();
     }
 
@@ -25,7 +25,8 @@ export class ElectronPublicAppService extends PublicAppService {
                     if (path) {
                         content.first().switchMap(cont => this.fs.createFile(path, cont).catch(() => {
                             return this.fs.getContentSavingFunction(path)(cont);
-                        })).subscribe(() => {},
+                        })).subscribe(() => {
+                            },
                             error => dialog.showErrorBox("Error", "An unknown error has occurred!"));
                     }
                 });

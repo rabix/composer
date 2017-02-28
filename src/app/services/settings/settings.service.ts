@@ -19,7 +19,7 @@ export class SettingsService extends ComponentBase {
     constructor(private userPreferencesService: UserPreferencesService) {
         super();
 
-        this.tracked = this.userPreferencesService.get<PlatformSettings|boolean>("platformConnectionSettings", false)
+        this.tracked = this.userPreferencesService.get<PlatformSettings | boolean>("platformConnectionSettings", false)
             .subscribe(prefs => {
                 if (prefs === false) {
                     return this.validity.next(false);

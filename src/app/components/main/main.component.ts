@@ -1,6 +1,4 @@
-/// <reference path="../../../custom-typings.d.ts"/>
-import "brace";
-import {Component, ViewContainerRef} from "@angular/core";
+import {Component, ViewContainerRef, ViewEncapsulation} from "@angular/core";
 import {Observable} from "rxjs/Rx";
 import {ContextService} from "../../core/ui/context/context.service";
 import {ElectronPublicAppService} from "../../platform-providers/public-apps/electron-public-app.service";
@@ -15,18 +13,17 @@ import {PublicAppService} from "../../platform-providers/public-apps/public-app.
 import {SBPlatformDataSourceService} from "../../sources/sbg/sb-platform.source.service";
 import {UrlValidator} from "../../validators/url.validator";
 import {UserProjectsService} from "../../platform-providers/user-projects/user-projects.service";
-
-require("./../../../assets/sass/main.scss");
-require("./main.component.scss");
-
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "cottontail",
     template: `
         <ct-layout></ct-layout>
         <div id="runnix" [class.active]="runnix | async"></div>
-        
+
         <span data-marker="ready">ready</span>
     `,
+    styleUrls: ["./../../../assets/sass/main.scss", "./main.component.scss"],
     providers: [
         EventHubService,
         UrlValidator,

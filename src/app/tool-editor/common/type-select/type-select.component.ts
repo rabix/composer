@@ -1,13 +1,15 @@
-import {Component, forwardRef} from "@angular/core";
-import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, FormGroup} from "@angular/forms";
+import {Component, forwardRef, ViewEncapsulation} from "@angular/core";
+import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ComponentBase} from "../../../components/common/component-base";
 import {noop} from "../../../lib/utils.lib";
 import {InputParameterTypeModel} from "cwlts/models";
 
 @Component({
-    selector: 'input-type-select',
+    encapsulation: ViewEncapsulation.None,
+
+    selector: "input-type-select",
     providers: [
-        { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => InputTypeSelectComponent), multi: true }
+        {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => InputTypeSelectComponent), multi: true}
     ],
     template: `
         <div class="form-group">
@@ -19,8 +21,8 @@ import {InputParameterTypeModel} from "cwlts/models";
                 </option>
             </select>
         </div><!--Type-->
-        
-        
+
+
         <div class="form-group">
             <div [hidden]="paramType?.type !== 'array'">
                 <label class="form-control-label">Items Type</label>
@@ -41,7 +43,7 @@ export class InputTypeSelectComponent extends ComponentBase implements ControlVa
 
     public propertyTypes = ["array", "enum", "record", "File", "string", "int", "float", "boolean", "map"];
 
-    public itemTypes =  ["enum", "record", "File", "string", "int", "float", "boolean", "map"];
+    public itemTypes = ["enum", "record", "File", "string", "int", "float", "boolean", "map"];
 
     public form: FormGroup = new FormGroup({
         type: new FormControl(null),

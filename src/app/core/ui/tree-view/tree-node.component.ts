@@ -1,14 +1,15 @@
 import {
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
     Component,
+    ElementRef,
     Input,
     OnInit,
-    ChangeDetectorRef,
     QueryList,
-    ViewChildren,
-    ElementRef,
     Renderer,
     ViewChild,
-    ChangeDetectionStrategy
+    ViewChildren,
+    ViewEncapsulation
 } from "@angular/core";
 import {BehaviorSubject} from "rxjs";
 import {TreeNode} from "./types";
@@ -16,14 +17,16 @@ import {TreeViewService} from "./tree-view.service";
 import {ComponentBase} from "../../../components/common/component-base";
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+
     selector: "ct-tree-node",
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <div #nodeBase
-             [ct-drag-enabled]="node.icon === 'CommandLineTool' || node.icon === 'Workflow'"   
+             [ct-drag-enabled]="node.icon === 'CommandLineTool' || node.icon === 'Workflow'"
              [ct-drag-image-class]="node.icon == 'CommandLineTool' ? 'icon-command-line-tool' : 'icon-workflow'"
-             [ct-drag-image-caption]="node.name"  
-             [ct-drag-transfer-data]="node"     
+             [ct-drag-image-caption]="node.name"
+             [ct-drag-transfer-data]="node"
              [ct-drop-zones]="['zone1']"
              class="deep-unselectable clickable node-base"
              [style.paddingLeft.em]="level * 2"
@@ -32,31 +35,32 @@ import {ComponentBase} from "../../../components/common/component-base";
              (click)="onClick($event)"
              [class.selected]="isHighlighted | async"
              (dblclick)="toggle()">
-            
+
             <ct-tree-node-icon class="icon-space"
                                [expanded]="isExpanded"
                                [isLoading]="isLoading"
                                [type]="node.icon"
-                               (click)="toggle()">           
+                               (click)="toggle()">
             </ct-tree-node-icon>
-            
+
             <span *ngIf="node" class="name-container" [ct-context]="node.contextMenu" [title]="node.name">
                 <span class="name" *ngFor="let namePart of nameParts" [innerHTML]="namePart"></span>
             </span>
-            
+
             <span *ngIf="node.onClose" class="pull-right">
                 <button type="button" class="text-primary btn-link no-underline-hover clickable" (click)="node.onClose()">&times;</button>
             </span>
         </div>
-        
+
         <div *ngIf="isExpanded && nodeChildren" class="children">
-            <ct-tree-node [level]="level + 1" *ngFor="let node of nodeChildren" [node]="node" [preferenceKey]="preferenceKey"></ct-tree-node>
+            <ct-tree-node [level]="level + 1" *ngFor="let node of nodeChildren" [node]="node"
+                          [preferenceKey]="preferenceKey"></ct-tree-node>
             <div *ngIf="nodeChildren.length === 0">
                 <span class="icon-space"></span>
-                <i class="text-muted">empty </i>    
+                <i class="text-muted">empty </i>
             </div>
         </div>
-        
+
     `
 })
 export class TreeNodeComponent extends ComponentBase implements OnInit {

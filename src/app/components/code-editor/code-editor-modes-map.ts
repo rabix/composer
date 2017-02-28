@@ -25,17 +25,3 @@ export const ACE_MODES_MAP = {
     r: "r"
 };
 
-require("brace/mode/java");
-require("brace/mode/javascript");
-require("brace/mode/json");
-require("brace/mode/markdown");
-require("brace/mode/python");
-require("brace/mode/sh");
-require("brace/mode/text");
-require("brace/mode/typescript");
-require("brace/mode/yaml");
-require("brace/mode/c_cpp");
-require("brace/mode/scss");
-require("brace/mode/html");
-require("brace/mode/xml");
-require("brace/mode/r");
