@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, Input, ViewEncapsulation} from "@angular/core";
-import {ValidationResponse} from "../../../services/web-worker/json-schema/json-schema.service";
+import {Validation} from "cwlts/models/helpers/validation/Validation";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -25,5 +25,5 @@ import {ValidationResponse} from "../../../services/web-worker/json-schema/json-
 })
 export class ValidationReportComponent {
     @Input()
-    public issues: ValidationResponse;
+    public issues: Validation;
 }

@@ -16,7 +16,6 @@ import {EditorInspectorService} from "../editor-common/inspector/editor-inspecto
 import {DataEntrySource} from "../sources/common/interfaces";
 import {ComponentBase} from "../components/common/component-base";
 import {WorkboxTab} from "../components/workbox/workbox-tab.interface";
-import {ValidationResponse} from "../services/web-worker/json-schema/json-schema.service";
 import {UserPreferencesService} from "../services/storage/user-preferences.service";
 import {PlatformAPI} from "../services/api/platforms/platform-api.service";
 import {StatusBarService} from "../core/status-bar/status-bar.service";
@@ -167,7 +166,7 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
     public data: DataEntrySource;
 
     /** ValidationResponse for current document */
-    public validation: ValidationResponse;
+    public validation;
 
     @Input()
     public showInspector = true;
