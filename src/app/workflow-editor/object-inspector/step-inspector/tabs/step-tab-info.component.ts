@@ -1,4 +1,5 @@
 import {Component, Input, ViewEncapsulation} from "@angular/core";
+import {StepModel} from "cwlts/models";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -34,9 +35,9 @@ import {Component, Input, ViewEncapsulation} from "@angular/core";
 })
 export class WorkflowStepInspectorTabInfo {
     @Input()
-    public step;
+    public step: StepModel;
 
     private getDescription() {
-        return this.step['description'] || this.step.run['description'];
+        return this.step.description || this.step.description;
     }
 }

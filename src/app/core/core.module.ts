@@ -27,7 +27,7 @@ import {DragOverDirective} from "./drag-and-drop/drag-over.directive";
 import {DropDownButtonComponent} from "./ui/dropdown-button/dropdown-button-component";
 import {DropDownMenuComponent} from "./ui/dropdown-button/dropdown-menu.component";
 import {WebWorkerBuilderService} from "./web-worker/web-worker-builder.service";
-import {MarkDownService} from './markdown/markdown.service';
+import {MarkdownService} from './markdown/markdown.service';
 import {MarkdownDirective} from './markdown/markdown.directive';
 
 @NgModule({
@@ -142,7 +142,7 @@ import {MarkdownDirective} from './markdown/markdown.directive';
         GuidService,
         ContextService,
         WebWorkerBuilderService,
-        MarkDownService
+        MarkdownService
 
     ],
     imports: [BrowserModule, MomentModule]

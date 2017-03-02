@@ -1,5 +1,5 @@
 import {ElementRef, Input, Directive} from '@angular/core';
-import {MarkDownService} from "./markdown.service";
+import {MarkdownService} from "./markdown.service";
 
 
 @Directive({
@@ -9,7 +9,7 @@ export class MarkdownDirective {
 
     private el: HTMLElement;
 
-    constructor(el: ElementRef, private markDownService: MarkDownService) {
+    constructor(el: ElementRef, private markDownService: MarkdownService) {
         this.el = el.nativeElement;
     }
 
