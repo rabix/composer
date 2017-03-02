@@ -12,113 +12,113 @@ import {SystemService} from "../../platform-providers/system.service";
     selector: "ct-workflow-info",
     styleUrls: ["./workflow-info.component.scss"],
     template: `
-<div class="workflow-info">
-  <div class="workflow-info-item workflow-header">
-    <h3>{{model.customProps.label}}</h3>
-    <div>Created by {{createdBy}} on {{createdOn | date}}. Last edited by {{editedBy}} on {{editedOn | date}}</div>
-    <div>Revision note: "{{revisionNote}}"</div>
-  </div>
-  <h3>Description:</h3>
-  <div class="workflow-info-item workflow-description" [ct-markdown]="model.customProps.description"></div>
-  <div class="workflow-info-item workflow-meta">
-    <div class="workflow-meta-item">
-      <h4>Categories</h4>
-      <ul>
-        <li *ngFor="let cat of categories;">{{cat}}</li>
-      </ul>
-    </div>
-    <div class="workflow-meta-item">
-      <h4>Toolkit</h4>
-      <div>{{toolkit}}</div>
-    </div>
-    <div class="workflow-meta-item">
-      <h4>License</h4>
-      <div>{{model.customProps['sbg:license']}}</div>
-    </div>
-    <div class="workflow-meta-item">
-      <h4>Contributors</h4>
-      <ul>
-        <li *ngFor="let contrib of contributors">{{contrib}}</li>
-      </ul>
-    </div>
-  </div>
-  <div class="workflow-info-item workflow-links">
-    <h3>Links</h3>
-    <ul>
-      <li *ngFor="let link of links"><a href="" (click)="$event.preventDefault(); openWebPage(link.id)">{{link.label}}</a></li>
-    </ul>
-  </div>
-  <div class="workflow-info-item workflow-details">
-    <ct-tabs-component>
-      <ct-tab-component tabTitle="Inputs">
-        <div *ngIf="inputs.length === 0">
-          No inputs.
+      <div class="workflow-info">
+        <div class="workflow-info-item workflow-header">
+          <h3>{{model.customProps.label}}</h3>
+          <div>Created by {{createdBy}} on {{createdOn | date}}. Last edited by {{editedBy}} on {{editedOn | date}}</div>
+          <div>Revision note: "{{revisionNote}}"</div>
         </div>
-        <table class="table" *ngIf="inputs.length > 0">
-          <tr>
-            <th>ID</th>
-            <th>Label</th>
-            <th>Type</th>
-            <th>Required</th>
-            <th>Prefix</th>
-            <th>Format</th>
-          </tr>
-          <tr *ngFor="let input of inputs">
-            <th scope="row">{{input.id}}</th>
-            <td>{{input.customProps.label}}</td>
-            <td>{{input.type | commandParameterType}}</td>
-            <td>{{input.type.isNullable ? 'False' : 'True'}}</td>
-            <td>prefix</td>
-            <td>format</td>
-          </tr>
-        </table>
-      </ct-tab-component>
-      <ct-tab-component tabTitle="App Settings">
-        <div *ngIf="appSettings.length === 0">
-          No settings.
+        <h3>Description:</h3>
+        <div class="workflow-info-item workflow-description" [ct-markdown]="model.customProps.description"></div>
+        <div class="workflow-info-item workflow-meta">
+          <div class="workflow-meta-item">
+            <h4>Categories</h4>
+            <ul>
+              <li *ngFor="let cat of categories;">{{cat}}</li>
+            </ul>
+          </div>
+          <div class="workflow-meta-item">
+            <h4>Toolkit</h4>
+            <div>{{toolkit}}</div>
+          </div>
+          <div class="workflow-meta-item">
+            <h4>License</h4>
+            <div>{{model.customProps['sbg:license']}}</div>
+          </div>
+          <div class="workflow-meta-item">
+            <h4>Contributors</h4>
+            <ul>
+              <li *ngFor="let contrib of contributors">{{contrib}}</li>
+            </ul>
+          </div>
         </div>
-        <table class="table" *ngIf="appSettings.length > 0">
-            <tr>
-              <th>ID</th>
-              <th>Label</th>
-              <th>Type</th>
-              <th>Required</th>
-              <th>Prefix</th>
-              <th>Format</th>
-            </tr>
-            <tr *ngFor="let input of appSettings">
-              <th scope="row">{{input.id}}</th>
-              <td>{{input.customProps.label}}</td>
-              <td>{{input.type | commandParameterType}}</td>
-              <td>{{input.type.isNullable ? 'False' : 'True'}}</td>
-              <td>prefix</td>
-              <td>format</td>
-            </tr>
-        </table>
-      </ct-tab-component>
-      <ct-tab-component tabTitle="Outputs">
-        <div *ngIf="model.outputs.length === 0">
-          No outputs.
+        <div class="workflow-info-item workflow-links">
+          <h3>Links</h3>
+          <ul>
+            <li *ngFor="let link of links"><a href="" (click)="$event.preventDefault(); openWebPage(link.id)">{{link.label}}</a></li>
+          </ul>
         </div>
-        <table class="table">
-            <tr>
-              <th>ID</th>
-              <th>Label</th>
-              <th>Type</th>
-              <th>Format</th>
-            </tr>
-            <tr *ngFor="let output of model.outputs">
-              <th scope="row">{{output.id}}</th>
-              <td>{{output.label}}</td>
-              <td>{{output.type | commandParameterType}}</td>
-              <td>format</td>
-            </tr>
-        </table>
-      </ct-tab-component>
-    </ct-tabs-component>
-  </div>
-</div>
-`
+        <div class="workflow-info-item workflow-details">
+          <ct-tabs-component>
+            <ct-tab-component tabTitle="Inputs">
+              <div *ngIf="inputs.length === 0">
+                No inputs.
+              </div>
+              <table class="table" *ngIf="inputs.length > 0">
+                <tr>
+                  <th>ID</th>
+                  <th>Label</th>
+                  <th>Type</th>
+                  <th>Required</th>
+                  <th>Prefix</th>
+                  <th>Format</th>
+                </tr>
+                <tr *ngFor="let input of inputs">
+                  <th scope="row">{{input.id}}</th>
+                  <td>{{input.customProps.label}}</td>
+                  <td>{{input.type | commandParameterType}}</td>
+                  <td>{{input.type.isNullable ? 'False' : 'True'}}</td>
+                  <td>prefix</td>
+                  <td>format</td>
+                </tr>
+              </table>
+            </ct-tab-component>
+            <ct-tab-component tabTitle="App Settings">
+              <div *ngIf="appSettings.length === 0">
+                No settings.
+              </div>
+              <table class="table" *ngIf="appSettings.length > 0">
+                  <tr>
+                    <th>ID</th>
+                    <th>Label</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Prefix</th>
+                    <th>Format</th>
+                  </tr>
+                  <tr *ngFor="let input of appSettings">
+                    <th scope="row">{{input.id}}</th>
+                    <td>{{input.customProps.label}}</td>
+                    <td>{{input.type | commandParameterType}}</td>
+                    <td>{{input.type.isNullable ? 'False' : 'True'}}</td>
+                    <td>prefix</td>
+                    <td>format</td>
+                  </tr>
+              </table>
+            </ct-tab-component>
+            <ct-tab-component tabTitle="Outputs">
+              <div *ngIf="model.outputs.length === 0">
+                No outputs.
+              </div>
+              <table class="table">
+                  <tr>
+                    <th>ID</th>
+                    <th>Label</th>
+                    <th>Type</th>
+                    <th>Format</th>
+                  </tr>
+                  <tr *ngFor="let output of model.outputs">
+                    <th scope="row">{{output.id}}</th>
+                    <td>{{output.label}}</td>
+                    <td>{{output.type | commandParameterType}}</td>
+                    <td>format</td>
+                  </tr>
+              </table>
+            </ct-tab-component>
+          </ct-tabs-component>
+        </div>
+      </div>
+    `
 })
 export class WorkflowInfoComponent implements OnChanges {
     @Input()
