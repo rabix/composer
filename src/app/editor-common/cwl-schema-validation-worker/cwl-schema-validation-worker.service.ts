@@ -7,6 +7,15 @@ import * as cwlSchemas from "cwlts/schemas";
 declare const jsyaml;
 declare const Ajv;
 
+export interface ValidationResponse {
+    isValidatableCwl: boolean,
+    isValidCwl: boolean,
+    isValidJSON: boolean,
+    errors: {message: string, loc: string}[],
+    warnings: {message: string, loc: string}[],
+    class?: string
+}
+
 @Injectable()
 export class CwlSchemaValidationWorkerService {
 

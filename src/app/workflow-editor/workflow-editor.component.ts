@@ -22,7 +22,10 @@ import {StatusBarService} from "../core/status-bar/status-bar.service";
 import {ModalService} from "../components/modal/modal.service";
 import {noop} from "../lib/utils.lib";
 import {WorkflowFactory, WorkflowModel} from "cwlts/models";
-import {CwlSchemaValidationWorkerService} from "../editor-common/cwl-schema-validation-worker/cwl-schema-validation-worker.service";
+import {
+    CwlSchemaValidationWorkerService,
+    ValidationResponse
+} from "../editor-common/cwl-schema-validation-worker/cwl-schema-validation-worker.service";
 import LoadOptions = jsyaml.LoadOptions;
 
 @Component({
@@ -166,7 +169,7 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
     public data: DataEntrySource;
 
     /** ValidationResponse for current document */
-    public validation;
+    public validation: ValidationResponse;
 
     @Input()
     public showInspector = true;

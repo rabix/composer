@@ -17,14 +17,16 @@ import {EditorInspectorService} from "../editor-common/inspector/editor-inspecto
 import {ComponentBase} from "../components/common/component-base";
 import {WorkboxTab} from "../components/workbox/workbox-tab.interface";
 import {DataEntrySource} from "../sources/common/interfaces";
-import {ValidationResponse} from "../services/web-worker/json-schema/json-schema.service";
 import {UserPreferencesService} from "../services/storage/user-preferences.service";
 import {PlatformAPI} from "../services/api/platforms/platform-api.service";
 import {StatusBarService} from "../core/status-bar/status-bar.service";
 import {ModalService} from "../components/modal/modal.service";
 import {noop} from "../lib/utils.lib";
 import {CommandLineToolFactory} from "cwlts/models/generic/CommandLineToolFactory";
-import {CwlSchemaValidationWorkerService} from "../editor-common/cwl-schema-validation-worker/cwl-schema-validation-worker.service";
+import {
+    CwlSchemaValidationWorkerService,
+    ValidationResponse
+} from "../editor-common/cwl-schema-validation-worker/cwl-schema-validation-worker.service";
 import LoadOptions = jsyaml.LoadOptions;
 
 @Component({
