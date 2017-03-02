@@ -27,6 +27,8 @@ import {DragOverDirective} from "./drag-and-drop/drag-over.directive";
 import {DropDownButtonComponent} from "./ui/dropdown-button/dropdown-button-component";
 import {DropDownMenuComponent} from "./ui/dropdown-button/dropdown-menu.component";
 import {WebWorkerBuilderService} from "./web-worker/web-worker-builder.service";
+import {MarkdownService} from './markdown/markdown.service';
+import {MarkdownDirective} from './markdown/markdown.directive';
 
 @NgModule({
     entryComponents: [
@@ -45,6 +47,9 @@ import {WebWorkerBuilderService} from "./web-worker/web-worker-builder.service";
         MultilangCodeEditorComponent
     ],
     declarations: [
+        // Markdown directive
+        MarkdownDirective,
+
         // Drop down button
         DropDownButtonComponent,
         DropDownMenuComponent,
@@ -89,6 +94,9 @@ import {WebWorkerBuilderService} from "./web-worker/web-worker-builder.service";
 
     ],
     exports: [
+        // Markdown directive
+        MarkdownDirective,
+
         // Drop down button
         DropDownButtonComponent,
 
@@ -134,6 +142,7 @@ import {WebWorkerBuilderService} from "./web-worker/web-worker-builder.service";
         GuidService,
         ContextService,
         WebWorkerBuilderService,
+        MarkdownService
 
     ],
     imports: [BrowserModule, MomentModule]

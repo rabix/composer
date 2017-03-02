@@ -36,11 +36,13 @@ import {StepModel, WorkflowModel} from "cwlts/models";
         </ct-workflow-step-inspector-inputs>
 
         <!--Inputs-->
-        <ct-workflow-step-inspector-info *ngIf="viewMode === tabs.Info">
+        <ct-workflow-step-inspector-info *ngIf="viewMode === tabs.Info"
+                                            [step]="step">
         </ct-workflow-step-inspector-info>
 
         <!--Step-->
-        <ct-workflow-step-inspector-step *ngIf="viewMode === tabs.Step">
+        <ct-workflow-step-inspector-step *ngIf="viewMode === tabs.Step"
+                                            [step]="step">
         </ct-workflow-step-inspector-step>
     `
 })
