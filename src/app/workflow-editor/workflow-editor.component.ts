@@ -69,6 +69,12 @@ import LoadOptions = jsyaml.LoadOptions;
                             (click)="switchView(viewModes.Test)"
                             [class.btn-primary]="viewMode === viewModes.Test"
                             [class.btn-secondary]="viewMode !== viewModes.Test">Test</button>
+
+                    <button class="btn btn-secondary btn-sm"
+                            [disabled]="!isValidCWL"
+                            (click)="switchView(viewModes.Info)"
+                            [class.btn-primary]="viewMode === viewModes.Info"
+                            [class.btn-secondary]="viewMode !== viewModes.Info">App Info</button>
                 </span>
 
                 <!--CWLVersion-->
@@ -103,7 +109,7 @@ import LoadOptions = jsyaml.LoadOptions;
 
 
             <!--Header & Editor Column-->
-            <div class="editor-content flex-row">
+            <div class="editor-content flex-row fixed">
                 <!--Editor Row-->
                 <ct-code-editor-x *ngIf="viewMode === viewModes.Code" class="editor"
                                   [(content)]="rawEditorContent"
@@ -124,6 +130,9 @@ import LoadOptions = jsyaml.LoadOptions;
 
                 </ct-workflow-graph-editor>
 
+                <ct-workflow-info *ngIf="viewMode === viewModes.Info"
+                                  [model]="workflowModel">
+                </ct-workflow-info>
 
                 <!--Object Inspector Column-->
                 <div [hidden]="!showInspector" class="flex-col inspector-col">
@@ -204,7 +213,8 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
         Code: "code",
         Gui: "gui",
         Test: "test",
-        Graph: "graph"
+        Graph: "graph",
+        Info: "info"
     };
 
     private toolGroup: FormGroup;

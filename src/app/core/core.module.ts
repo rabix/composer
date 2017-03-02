@@ -29,6 +29,8 @@ import {DropDownMenuComponent} from "./ui/dropdown-button/dropdown-menu.componen
 import {WebWorkerBuilderService} from "./web-worker/web-worker-builder.service";
 import {MarkdownService} from './markdown/markdown.service';
 import {MarkdownDirective} from './markdown/markdown.directive';
+import {TabsComponent} from './ui/tabs/tabs.component';
+import {TabComponent} from './ui/tabs/tab.component';
 
 @NgModule({
     entryComponents: [
@@ -44,7 +46,10 @@ import {MarkdownDirective} from './markdown/markdown.directive';
         // ContextDirective,
 
         // Code Editor Components
-        MultilangCodeEditorComponent
+        MultilangCodeEditorComponent,
+
+        TabsComponent,
+        TabComponent
     ],
     declarations: [
         // Markdown directive
@@ -92,6 +97,9 @@ import {MarkdownDirective} from './markdown/markdown.directive';
 
         LoggerDirective,
 
+        TabsComponent,
+        TabComponent
+
     ],
     exports: [
         // Markdown directive
@@ -135,7 +143,10 @@ import {MarkdownDirective} from './markdown/markdown.directive';
         ContextDirective,
 
         StatusBarComponent,
-        LoggerDirective
+        LoggerDirective,
+
+        TabsComponent,
+        TabComponent
     ],
     providers: [
         IpcService,

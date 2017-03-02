@@ -1,0 +1,30 @@
+.workflow-info {
+    margin: 20px;
+}
+
+.workflow-info-item {
+    margin-bottom: 40px;
+}
+
+.workflow-meta {
+    display: flex;
+}
+
+.workflow-meta-item {
+    flex-grow: 1;
+
+    ul {
+        list-style-type: none;
+    }
+}
+
+.workflow-links {
+    ul {
+        display: flex;
+        list-style-type: none;
+    }
+
+    li {
+        margin-right: 30px;
+    }
+}
