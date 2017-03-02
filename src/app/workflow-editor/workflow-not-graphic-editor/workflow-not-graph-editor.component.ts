@@ -45,7 +45,7 @@ import {EditorInspectorService} from "../../editor-common/inspector/editor-inspe
                                         </div>
                                         <!--RUN Column-->
                                         <div class="col-sm-6">
-                                            {{ entry.run?.class }}: {{ entry.run?.label || entry.run?.id || entry.run }}
+                                            {{ entry.run?.class }}: {{ entry.label || entry.run?.label || entry.run?.id }}
                                         </div>
                                     </div>
 

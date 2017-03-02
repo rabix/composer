@@ -2,8 +2,6 @@ import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, ViewEncaps
 import {ComponentBase} from "../../../../components/common/component-base";
 import {StepModel, WorkflowModel} from "cwlts/models";
 import {FormBuilder, FormGroup} from "@angular/forms";
-import {tryCatch} from "rxjs/util/tryCatch";
-import {ExceptionInfo} from "_debugger";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -53,9 +51,9 @@ import {ExceptionInfo} from "_debugger";
                 </select>
             
                 <!--Multiple Scatter-->
-                <select *ngIf="step.hasMultipleScatter" class="form-control" [formControl]="form.controls['scatter']">
-                    <!--Should be added tags component with autocomplete-->
-                </select>
+                <div *ngIf="step.hasMultipleScatter" class="form-control" [formControl]="form.controls['scatter']">
+                    <!--@todo(marijan): add autocomplete tags component here once it's finished-->
+                </div>
             
             </div>
             
@@ -116,7 +114,7 @@ export class WorkflowStepInspectorTabStep extends ComponentBase {
             catch (e) {
                 this.form.controls['id'].setErrors({error: e.message});
                 // Because this comes outside of Angular (workflow model)
-                this.cdr.markForCheck()
+                this.cdr.markForCheck();
             }
         });
 
