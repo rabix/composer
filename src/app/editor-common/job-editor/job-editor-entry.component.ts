@@ -7,6 +7,8 @@ import {ObjectHelper} from "../../helpers/object.helper";
     encapsulation: ViewEncapsulation.None,
 
     selector: "ct-job-editor-entry",
+    styleUrls: ["./job-editor-entry.component.scss"],
+
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <div class="alert alert-warning form-control-label" *ngIf="warning">{{ warning }}</div>
@@ -90,7 +92,7 @@ import {ObjectHelper} from "../../helpers/object.helper";
                 </template>
 
                 <!--Every element that's a part of the array can be deleted, so we add a deletion button to it-->
-                <span class="input-group-btn" *ngIf="index !== -1">
+                <span [class]="inputType !== 'record' ? 'input-group-btn' : 'record-delete'" *ngIf="index !== -1">
                     <button type="button" class="btn btn-secondary" (click)="deleteFromArray()">
                         <i class="fa fa-trash"></i>
                     </button>
@@ -99,11 +101,24 @@ import {ObjectHelper} from "../../helpers/object.helper";
 
             <!--Records-->
             <template ngSwitchCase="record">
-                <ct-job-editor-entry *ngFor="let entry of input.type.fields"
-                                     [prefix]="prefix + '.' + entry.id"
-                                     [input]="entry"
-                                     (update)="updateRecord(entry.id, $event)"
-                                     [value]="value ? value[entry.id] : undefined"></ct-job-editor-entry>
+                <div *ngFor="let entry of input.type.fields" class="ml-1">
+                    <label>{{ entry?.label || entry.id }} <i class="fa fa-info-circle text-muted"
+                                                             *ngIf="entry.description"
+                                                             [ct-tooltip]="ctt"
+                                                             [tooltipPlacement]="'top'"></i>
+                    </label>
+                    <ct-job-editor-entry [prefix]="prefix + '.' + entry.id"
+                                         [input]="entry"
+                                         (update)="updateRecord(entry.id, $event)"
+                                         [value]="value ? value[entry.id] : undefined"></ct-job-editor-entry>
+
+                    <ct-tooltip-content #ctt>
+                        <div class="tooltip-info">
+                            {{ input.description }}
+                        </div>
+                    </ct-tooltip-content>
+                </div>
+                
             </template>
 
             <!--Arrays-->
