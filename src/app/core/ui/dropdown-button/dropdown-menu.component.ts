@@ -9,7 +9,7 @@ import {Observable} from "rxjs";
     template: `
         <ul class="dropdown-menu dropdown-menu-right" aria-haspopup="true" aria-expanded="true" style="display:initial">
             <li class="dropdown-item cursor-pointer" *ngFor="let item of dropDownOptions" (click)="selectItem(item)"
-                [class.selected]="item.value === selected?.value">
+                [class.active]="item.value === selected?.value">
 
                 <div>
                     {{item.caption}}

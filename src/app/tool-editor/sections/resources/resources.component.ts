@@ -2,6 +2,7 @@ import {Component, Input, OnChanges, Output, SimpleChanges, ViewEncapsulation} f
 import {FormControl} from "@angular/forms";
 import {ExpressionModel, ResourceRequirementModel} from "cwlts/models/d2sb";
 import {ReplaySubject} from "rxjs";
+import {ComponentBase} from "../../../components/common/component-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -37,12 +38,12 @@ import {ReplaySubject} from "rxjs";
 
     `
 })
-export class ResourcesComponent implements OnChanges {
+export class ResourcesComponent extends ComponentBase implements OnChanges {
     @Input()
     entries: {
         cpu?: ResourceRequirementModel,
         mem?: ResourceRequirementModel
-    };
+    } = {};
 
     @Input()
     readonly: boolean;
@@ -74,8 +75,8 @@ export class ResourcesComponent implements OnChanges {
     }
 
     ngOnInit() {
-        this.memControl.valueChanges.filter(val => {
-            return val !== this.entries.mem.value;
+        this.tracked = this.memControl.valueChanges.filter(val => {
+            return this.entries.mem ? val !== this.entries.mem.value : true;
         }).subscribe(value => {
             if (!(value instanceof ExpressionModel)) {
                 value = new ExpressionModel("", value);
@@ -88,11 +89,9 @@ export class ResourcesComponent implements OnChanges {
             this.update.next(res);
         });
 
-        this.cpuControl.valueChanges.filter(val => {
-            return val !== this.entries.cpu.value;
+        this.tracked = this.cpuControl.valueChanges.filter(val => {
+            return this.entries.cpu ? val !== this.entries.cpu.value : true;
         }).subscribe(value => {
-            if (value === this.entries.cpu.value) return;
-
             if (!(value instanceof ExpressionModel)) {
                 value = new ExpressionModel("", value);
             }

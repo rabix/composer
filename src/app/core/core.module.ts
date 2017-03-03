@@ -120,6 +120,7 @@ import {MarkdownDirective} from './markdown/markdown.directive';
 
         // Tooltip
         TooltipContentComponent,
+        TreeNodeIconComponent,
 
         // Tree
         TreeViewComponent,

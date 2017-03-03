@@ -65,9 +65,9 @@ import {WorkflowStepInputModel} from "cwlts/models";
 
                 <!--Files and array of Files-->
                 <template ngSwitchCase="File">
-                    <div class="alert alert-warning form-control-label">
+                    <span class="text-warning small">
                         Cannot set default values for type File and File[].
-                    </div>
+                    </span>
                 </template>
 
                 <!--Every element that's a part of the array can be deleted, so we add a deletion button to it-->
@@ -81,11 +81,22 @@ import {WorkflowStepInputModel} from "cwlts/models";
 
             <!--Records-->
             <template ngSwitchCase="record">
-                <ct-workflow-step-inspector-entry *ngFor="let entry of input.type.fields"
-                                                  [prefix]="prefix + '.' + entry.id"
-                                                  [input]="entry"
-                                                  (update)="updateRecord(entry.id, $event)"
-                                                  [value]="value ? value[entry.id] : undefined"></ct-workflow-step-inspector-entry>
+                
+                <div *ngFor="let entry of input.type.fields" class="ml-1">
+                    <label>{{entry?.label || entry.id}} <i class="fa fa-info-circle text-muted"
+                                                           *ngIf="entry.description"
+                                                           [ct-tooltip]="ctt"
+                                                           [tooltipPlacement]="'top'"></i></label>
+                    <ct-workflow-step-inspector-entry [prefix]="prefix + '.' + entry.id"
+                                                      [input]="entry"
+                                                      (update)="updateRecord(entry.id, $event)"
+                                                      [value]="value ? value[entry.id] : undefined"></ct-workflow-step-inspector-entry>
+                    <ct-tooltip-content #ctt>
+                        <div class="tooltip-info">
+                            {{ entry.description }}
+                        </div>
+                    </ct-tooltip-content>
+                </div>
             </template>
 
             <!--Arrays-->

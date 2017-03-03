@@ -52,7 +52,10 @@ import {EditorInspectorService} from "../../editor-common/inspector/editor-inspe
                                     <!--Object Inspector Template -->
                                     <template #inspector>
                                         <ct-editor-inspector-content>
-                                            <div class="tc-header">{{ entry.id || entry.loc || "Step" }}</div>
+                                            <div class="tc-header">
+                                                <ct-tree-node-icon [type]="entry.run?.class" class="align-icon-height"></ct-tree-node-icon>
+                                                <span>{{ entry.label || entry.id || entry.loc || "Step" }}</span>
+                                            </div>
                                             <div class="tc-body">
                                                 <ct-workflow-step-inspector
                                                     [step]="entry"
