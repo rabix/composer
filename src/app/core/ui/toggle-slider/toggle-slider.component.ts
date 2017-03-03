@@ -57,7 +57,7 @@ export class ToggleComponent implements ControlValueAccessor {
     }
 
     ngOnInit() {
-        if (this.readonly) {
+        if (this.readonly || this.disabled) {
             this.setDisabledState(true);
         }
     }

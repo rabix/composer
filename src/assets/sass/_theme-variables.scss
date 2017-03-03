@@ -196,3 +196,10 @@ $panel-item-hover-color: $panel-item-color;
 $panel-item-select-bg: $chrome-dark-bg-secondary;
 $panel-item-select-color: white;
 $panel-item-icon-select-color: $panel-item-select-color;
+
+
+/**
+ * DROP DOWN
+ */
+$dropdown-link-active-bg: darken($dropdown-link-hover-bg, 5%);
+$dropdown-link-active-color: $body-color;

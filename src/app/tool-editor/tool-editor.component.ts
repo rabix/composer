@@ -95,8 +95,7 @@ import LoadOptions = jsyaml.LoadOptions;
                     Save
                 </button>
             </ct-editor-controls>
-
-
+            
             <!--Header & Editor Column-->
             <div class="editor-content flex-row">
                 <!--Editor Row-->

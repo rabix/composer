@@ -36,7 +36,9 @@ declare const Snap: any;
         <!--Inspector Template -->
         <template #inspector>
             <ct-editor-inspector-content>
-                <div class="tc-header">{{ inspectedNode.id || inspectedNode.loc || typeOfInspectedNode()}}</div>
+                <div class="tc-header">
+                    <ct-tree-node-icon *ngIf="inspectedNode.run" [type]="inspectedNode.run?.class" class="align-icon-height"></ct-tree-node-icon>
+                    {{ inspectedNode.label || inspectedNode.id || inspectedNode.loc || typeOfInspectedNode()}}</div>
                 <div class="tc-body">
                     <ct-workflow-step-inspector *ngIf="typeOfInspectedNode() === 'Step'"
                                                 [step]="inspectedNode"
