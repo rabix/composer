@@ -1,4 +1,7 @@
-import {Component, ElementRef, Input, TemplateRef, ViewChild, ViewEncapsulation} from "@angular/core";
+import {
+    ChangeDetectionStrategy, Component, ElementRef, Input, TemplateRef, ViewChild,
+    ViewEncapsulation
+} from "@angular/core";
 import {StepModel, WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
 import {Workflow} from "cwl-svg";
 import {StatusBarService} from "../../../core/status-bar/status-bar.service";
@@ -12,7 +15,7 @@ declare const Snap: any;
 
 @Component({
     encapsulation: ViewEncapsulation.None,
-
+    changeDetection: ChangeDetectionStrategy.OnPush,
     selector: "ct-workflow-graph-editor",
     styleUrls: ["./workflow-graph-editor.component.scss"],
     template: `
@@ -45,13 +48,11 @@ declare const Snap: any;
                                                 [workflowModel]="model">
                     </ct-workflow-step-inspector>
 
-                    <ct-workflow-input-inspector *ngIf="typeOfInspectedNode() === 'Input'"
-                                                 [input]="inspectedNode">
-                    </ct-workflow-input-inspector>
+                    <ct-workflow-io-inspector *ngIf="typeOfInspectedNode() === 'Input' || typeOfInspectedNode() === 'Output'"
+                                                [port]="inspectedNode"
+                                                [workflowModel]="workflowModel">
+                    </ct-workflow-io-inspector>
 
-                    <ct-workflow-output-inspector *ngIf="typeOfInspectedNode() === 'Output'"
-                                                  [output]="entry">
-                    </ct-workflow-output-inspector>
                 </div>
             </ct-editor-inspector-content>
         </template>
