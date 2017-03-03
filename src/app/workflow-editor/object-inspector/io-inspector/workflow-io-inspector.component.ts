@@ -136,14 +136,11 @@ export class WorkflowIOInspector extends ComponentBase {
                 }
             }
             catch (e) {
-                debugger;
-
                 this.form.controls['id'].setErrors({error: e.message});
                 // Because this comes outside of Angular (workflow model)
                 this.cdr.markForCheck()
             }
         });
-
 
         this.tracked = this.form.controls["symbols"].valueChanges.subscribe((value) => {
             if (value.length > 0 && this.isEnumType()) {
