@@ -3,15 +3,36 @@ const router = require("./ipc-router");
 const acceleratorProxy = require("./accelerator-proxy");
 
 let win;
+let splash;
 
 function start(config = {}) {
 
     router.start();
 
-    win = new BrowserWindow();
-    win.maximize();
+    splash = new BrowserWindow({
+        width: 580,
+        height: 310,
+        frame: false,
+        show: false,
+        resizable: false
+    });
+    splash.loadURL(`file://${__dirname}/splash/index.html`);
+    splash.once("ready-to-show", () => {
+        splash.show();
+    });
 
+    win = new BrowserWindow({
+        show: false
+    });
+    win.maximize();
     win.loadURL(config.url);
+    win.once("ready-to-show", () => {
+        setTimeout(() => {
+            win.show();
+            splash.destroy();
+            splash = undefined;
+        }, 300);
+    });
 
     if (config.devTools) {
         win.webContents.openDevTools();
@@ -96,6 +117,7 @@ module.exports = {
 
 // Quit when all windows are closed.
         app.on("window-all-closed", () => {
+
             // On macOS it is common for applications and their menu bar
             // to stay active until the user quits explicitly with Cmd + Q
             if (process.platform !== "darwin") {
