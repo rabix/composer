@@ -100,6 +100,7 @@ import LoadOptions = jsyaml.LoadOptions;
             <div class="editor-content flex-row">
                 <!--Editor Row-->
                 <ct-code-editor-x *ngIf="viewMode === viewModes.Code" class="editor"
+                                  [class.flex-col]="showInspector"
                                   [(content)]="rawEditorContent"
                                   [options]="{theme: 'ace/theme/monokai'}"
                                   [language]="'yaml'"
