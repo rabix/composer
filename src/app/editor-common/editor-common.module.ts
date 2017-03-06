@@ -29,6 +29,8 @@ import {JobEditorEntryComponent} from "./job-editor/job-editor-entry.component";
 import {MapListComponent} from "./components/map-list/map-list.component";
 import {BlockLoaderComponent} from "./components/block-loader/block-loader.component";
 import {CwlSchemaValidationWorkerService} from "./cwl-schema-validation-worker/cwl-schema-validation-worker.service";
+import {SymbolsComponent} from "./components/symbols/symbols.component";
+import {InputTypeSelectComponent} from "./components/type-select/type-select.component"
 
 @NgModule({
     declarations: [
@@ -58,6 +60,8 @@ import {CwlSchemaValidationWorkerService} from "./cwl-schema-validation-worker/c
         FileInputInspector,
         MapListComponent,
         BlockLoaderComponent,
+        SymbolsComponent,
+        InputTypeSelectComponent
     ],
     exports: [
         MapListComponent,
@@ -83,7 +87,9 @@ import {CwlSchemaValidationWorkerService} from "./cwl-schema-validation-worker/c
         ValidationClassDirective,
         ValidationComponent,
         ValidationReportComponent,
-        BlockLoaderComponent
+        BlockLoaderComponent,
+        SymbolsComponent,
+        InputTypeSelectComponent
     ],
     entryComponents: [
         EditorInspectorComponent,
