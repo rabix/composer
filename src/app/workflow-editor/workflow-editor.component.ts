@@ -242,9 +242,9 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
             .subscribe(latestContent => {
 
                 this.cwlValidatorService.validate(latestContent).then(r => {
-                    console.log("Validated", r);
                     if (!r.isValidCwl) {
                         // turn off loader and load document as code
+                        this.validation = r;
                         this.isLoading = false;
                         return r;
                     }

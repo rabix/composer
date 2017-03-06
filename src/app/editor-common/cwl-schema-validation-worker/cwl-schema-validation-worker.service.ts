@@ -106,7 +106,7 @@ export class CwlSchemaValidationWorkerService {
 
         const ajv = new Ajv();
         const validation = ajv.validate(schemaMap[cwlVersion][json.class], json);
-        const errors = validation.errors || [];
+        const errors = ajv.errors || [];
 
         return Object.assign(response, {
             isValidCwl: validation,
