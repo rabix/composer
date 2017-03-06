@@ -14,12 +14,12 @@ import {SystemService} from "../../platform-providers/system.service";
     template: `
       <div class="workflow-info">
         <div class="workflow-info-item workflow-header">
-          <h3>{{model.customProps.label}}</h3>
+          <h3>{{model.label}}</h3>
           <div>Created by {{createdBy}} on {{createdOn | date}}. Last edited by {{editedBy}} on {{editedOn | date}}</div>
           <div>Revision note: "{{revisionNote}}"</div>
         </div>
         <h3>Description:</h3>
-        <div class="workflow-info-item workflow-description" [ct-markdown]="model.customProps.description"></div>
+        <div class="workflow-info-item workflow-description" [ct-markdown]="model.description"></div>
         <div class="workflow-info-item workflow-meta">
           <div class="workflow-meta-item">
             <h4>Categories</h4>
@@ -64,7 +64,7 @@ import {SystemService} from "../../platform-providers/system.service";
                   <th>Format</th>
                 </tr>
                 <tr *ngFor="let input of inputs">
-                  <th scope="row">{{input.id}}</th>
+                  <th scope="row">{{input.idp}}</th>
                   <td>{{input.customProps.label}}</td>
                   <td>{{input.type | commandParameterType}}</td>
                   <td>{{input.type.isNullable ? 'False' : 'True'}}</td>
@@ -141,6 +141,8 @@ export class WorkflowInfoComponent implements OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges) {
+
+        console.log('wf model', this.model);
 
         this.createdBy = this.model.customProps['sbg:createdBy'];
         this.createdOn = this.model.customProps['sbg:createdOn'] * 1000;

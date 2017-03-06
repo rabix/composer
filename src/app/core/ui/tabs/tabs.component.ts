@@ -1,10 +1,12 @@
-import { Component, ContentChildren, QueryList, AfterContentInit } from '@angular/core';
+import { Component, ContentChildren, QueryList, AfterContentInit, ViewEncapsulation } from '@angular/core';
 import { TabComponent } from './tab.component';
 
 @Component({
   selector: 'ct-tabs-component',
+  encapsulation: ViewEncapsulation.Emulated,
+  styleUrls: ["./tabs.component.scss"],
   template:`
-    <div class="row workflow-step-inspector-tabs">
+    <div class="row ct-tabs-component">
       <div class="signle-tab col-sm-4" *ngFor="let tab of tabs" (click)="selectTab(tab)" [class.active]="tab.active">
         <a href="#">{{tab.title}}</a>
       </div>
