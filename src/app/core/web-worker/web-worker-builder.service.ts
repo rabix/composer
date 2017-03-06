@@ -13,7 +13,7 @@ export class WebWorkerBuilderService {
     }
 
     private compile(fn: Function, scripts = [], context = {}) {
-        let origin = document.location.href.replace("/index.html", "");
+        let [origin]= document.location.href.replace("/index.html", "").split("#");
         if (origin.endsWith("/")) {
             origin = origin.slice(0, -1);
         }
