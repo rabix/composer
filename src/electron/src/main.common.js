@@ -8,7 +8,8 @@ function start(config = {}) {
 
     router.start();
 
-    win = new BrowserWindow({width: 1024, height: 768});
+    win = new BrowserWindow();
+    win.maximize();
 
     win.loadURL(config.url);
 
