@@ -14,10 +14,8 @@ import {CWLModule} from "../cwl/cwl.module";
 import {ArgumentInspector} from "./sections/arguments/argument-inspector.component";
 import {BasicInputSectionComponent} from "./object-inspector/input-inspector/basic-section/basic-input-section.component";
 import {BasicOutputSectionComponent} from "./object-inspector/output-inspector/output-basic-section/basic-output-section.component";
-import {InputTypeSelectComponent} from "./common/type-select/type-select.component";
 import {DescriptionComponent} from "./object-inspector/common-sections/description-section/description.component";
 import {InputBindingSectionComponent} from "./object-inspector/input-inspector/input-binding/input-binding-section.component";
-import {SymbolsComponent} from "./object-inspector/common-sections/symbols-section/symbols.component";
 import {OutputMetaDataSectionComponent} from "./object-inspector/output-inspector/output-metadata-section/output-metadata.component";
 import {StageInputSectionComponent} from "./object-inspector/input-inspector/stage-input-section/stage-input-section.component";
 import {OutputEvalSectionComponent} from "./object-inspector/output-inspector/output-eval-section/output-eval.component";
@@ -44,14 +42,12 @@ import {ToolOutputInspector} from "./object-inspector/output-inspector/tool-outp
         FileDefInspectorComponent,
         FileDefListComponent,
         InputBindingSectionComponent,
-        InputTypeSelectComponent,
         LiteralExpressionInputComponent,
         OutputEvalSectionComponent,
         OutputMetaDataSectionComponent,
         ResourcesComponent,
         SecondaryFilesComponent,
         StageInputSectionComponent,
-        SymbolsComponent,
         ToolInputInspector,
         ToolInputListComponent,
         ToolInputsComponent,
@@ -65,7 +61,7 @@ import {ToolOutputInspector} from "./object-inspector/output-inspector/tool-outp
         HintListComponent
     ],
     exports: [
-        ToolEditorComponent,
+        ToolEditorComponent
     ],
     imports: [
         BrowserModule,

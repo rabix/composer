@@ -1,6 +1,26 @@
 @import "../../../../../assets/sass/mixins";
+@import "../../../../../assets/sass/variables";
+
+$grid-gutter-width-half: $grid-gutter-width-base / 2;
 
 ct-workflow-step-inspector-inputs {
+    .input-box {
+        margin-right: -$grid-gutter-width-half;
+        margin-left: -$grid-gutter-width-half;
+        padding: 1rem $grid-gutter-width-half;
+        border-bottom: 1px solid #ddd;
+
+        ct-dropdown-button {
+            button {
+                border: none;
+                background: none;
+                &:hover, &:active, &:focus {
+                    background: none;
+                }
+            }
+        }
+    }
+
     .input-title {
         display: flex;
         justify-content: space-between;

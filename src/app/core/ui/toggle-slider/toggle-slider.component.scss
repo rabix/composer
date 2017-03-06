@@ -35,8 +35,8 @@ ct-toggle-slider {
     .slider:before {
         position: absolute;
         content: "";
-        height: calc(#{$switch-height} - 2px);
-        width: calc(#{$switch-height} - 2px);
+        height: $switch-height - 2px;
+        width: $switch-height - 2px;
         left: 2px;
         bottom: 1px;
         background-color: $background-light;
@@ -53,14 +53,14 @@ ct-toggle-slider {
     }
 
     input:checked + .slider:before {
-        -webkit-transform: translateX(calc(#{$switch-width} / 2));
-        -ms-transform: translateX(calc(#{$switch-width} / 2));
-        transform: translateX(calc(#{$switch-width} / 2));
+        -webkit-transform: translateX($switch-width / 2);
+        -ms-transform: translateX($switch-width / 2);
+        transform: translateX($switch-width / 2);
     }
 
     /* Rounded sliders */
     .slider.round {
-        border-radius: calc(#{$switch-width} / 2);
+        border-radius: $switch-width / 2;
     }
 
     .slider.round:before {

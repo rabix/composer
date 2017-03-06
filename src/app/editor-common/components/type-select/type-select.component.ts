@@ -1,4 +1,4 @@
-import {Component, forwardRef, ViewEncapsulation} from "@angular/core";
+import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ComponentBase} from "../../../components/common/component-base";
 import {noop} from "../../../lib/utils.lib";
@@ -41,8 +41,10 @@ export class InputTypeSelectComponent extends ComponentBase implements ControlVa
 
     public paramType: InputParameterTypeModel;
 
+    @Input("propertyTypes")
     public propertyTypes = ["array", "enum", "record", "File", "string", "int", "float", "boolean", "map"];
 
+    @Input("itemTypes")
     public itemTypes = ["enum", "record", "File", "string", "int", "float", "boolean", "map"];
 
     public form: FormGroup = new FormGroup({

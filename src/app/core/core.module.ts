@@ -128,6 +128,7 @@ import {TabComponent} from './ui/tabs/tab.component';
 
         // Tooltip
         TooltipContentComponent,
+        TreeNodeIconComponent,
 
         // Tree
         TreeViewComponent,

@@ -1,13 +1,13 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {ComponentBase} from "../../../../components/common/component-base";
-import {noop} from "../../../../lib/utils.lib";
+import {ComponentBase} from "../../../components/common/component-base";
+import {noop} from "../../../lib/utils.lib";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
 
     selector: "symbols-section",
-    styleUrls: ["./symbols.component.scss"],
+    styleUrls: ["symbols.component.scss"],
     providers: [
         {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => SymbolsComponent), multi: true}
     ],

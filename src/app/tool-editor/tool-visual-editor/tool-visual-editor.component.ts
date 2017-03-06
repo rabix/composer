@@ -12,8 +12,8 @@ import {ComponentBase} from "../../components/common/component-base";
     template: `
         <div class="row" *ngIf="model.cwlVersion !== 'sbg:draft-2'">
             <div class="alert alert-warning">
-                Only tools which are <code>sbg:draft-2</code> are currently supported. This tool is versioned as <code>{{ model.cwlVersion
-                }}</code>.
+                Only tools which are <code>sbg:draft-2</code> are currently supported. 
+                This tool is versioned as <code>{{ model.cwlVersion}}</code>.
             </div>
         </div>
 
@@ -37,7 +37,6 @@ import {ComponentBase} from "../../components/common/component-base";
 
                 <ct-tool-input [location]="model.loc + '.inputs'" [entries]="model.inputs"
                                [context]="{$job: model.job}"
-                               [readonly]="readonly"
                                (update)="updateModel('inputs', $event)"
                                [readonly]="readonly">
                 </ct-tool-input>
@@ -45,13 +44,11 @@ import {ComponentBase} from "../../components/common/component-base";
                 <ct-tool-output [location]="model.loc + '.outputs'" [entries]="model.outputs || []"
                                 [context]="{$job: model.job}"
                                 [inputs]="model.inputs || []"
-                                [readonly]="readonly"
                                 (update)="updateModel('outputs', $event)"
                                 [readonly]="readonly">
                 </ct-tool-output>
 
                 <ct-resources [entries]="model.resources"
-                              [readonly]="readonly"
                               (update)="setResource($event)"
                               [context]="{$job: model.job}"
                               [readonly]="readonly">
@@ -65,7 +62,6 @@ import {ComponentBase} from "../../components/common/component-base";
 
                 <ct-argument-list [location]="model.loc + '.arguments'"
                                   [entries]="model.arguments || []"
-                                  [readonly]="readonly"
                                   (update)="updateModel('arguments', $event)"
                                   [context]="{$job: model.job}"
                                   [readonly]="readonly">
@@ -73,7 +69,6 @@ import {ComponentBase} from "../../components/common/component-base";
 
                 <ct-file-def-list [entries]="model.createFileRequirement?.fileDef || []"
                                   [location]="model.createFileRequirement?.loc"
-                                  [readonly]="readonly"
                                   (update)="updateModel('createFileRequirement', $event)"
                                   [context]="{$job: model.job}"
                                   [readonly]="readonly">

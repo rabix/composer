@@ -45,14 +45,17 @@ import {EditorInspectorService} from "../../editor-common/inspector/editor-inspe
                                         </div>
                                         <!--RUN Column-->
                                         <div class="col-sm-6">
-                                            {{ entry.run?.class }}: {{ entry.run?.label || entry.run?.id || entry.run }}
+                                            {{ entry.run?.class }}: {{ entry.label || entry.run?.label || entry.run?.id }}
                                         </div>
                                     </div>
 
                                     <!--Object Inspector Template -->
                                     <template #inspector>
                                         <ct-editor-inspector-content>
-                                            <div class="tc-header">{{ entry.id || entry.loc || "Step" }}</div>
+                                            <div class="tc-header">
+                                                <ct-tree-node-icon [type]="entry.run?.class" class="align-icon-height"></ct-tree-node-icon>
+                                                <span>{{ entry.label || entry.id || entry.loc || "Step" }}</span>
+                                            </div>
                                             <div class="tc-body">
                                                 <ct-workflow-step-inspector
                                                     [step]="entry"
@@ -86,11 +89,12 @@ import {EditorInspectorService} from "../../editor-common/inspector/editor-inspe
 
                                 <!--List Entry-->
                                 <li *ngFor="let entry of model.inputs; let i = index"
-                                    class="input-list-items container"
-                                    [ct-editor-inspector]="inspector"
-                                    [ct-editor-inspector-target]="entry.loc">
+                                    class="input-list-items container">
 
-                                    <div class="gui-section-list-item clickable row">
+                                    <div class="gui-section-list-item clickable row"
+                                         [ct-editor-inspector]="inspector"
+                                         [ct-editor-inspector-target]="entry.loc"
+                                         [ct-validation-class]="entry.validation">
 
                                         <!--ID Column-->
                                         <div class="col-sm-6 ellipsis" [title]="entry.id">
@@ -112,9 +116,10 @@ import {EditorInspectorService} from "../../editor-common/inspector/editor-inspe
                                         <ct-editor-inspector-content>
                                             <div class="tc-header">{{ entry.id || entry.loc || "Input" }}</div>
                                             <div class="tc-body">
-                                                <ct-workflow-input-inspector
-                                                    [input]="entry">
-                                                </ct-workflow-input-inspector>
+                                                <ct-workflow-io-inspector
+                                                    [port]="entry"
+                                                    [workflowModel]="model">
+                                                </ct-workflow-io-inspector>
                                             </div>
                                         </ct-editor-inspector-content>
                                     </template>
@@ -142,11 +147,12 @@ import {EditorInspectorService} from "../../editor-common/inspector/editor-inspe
 
                                 <!--List Entry-->
                                 <li *ngFor="let entry of model.outputs; let i = index"
-                                    class="input-list-items container"
-                                    [ct-editor-inspector]="inspector"
-                                    [ct-editor-inspector-target]="entry.loc">
+                                    class="input-list-items container">
 
-                                    <div class="gui-section-list-item clickable row">
+                                    <div class="gui-section-list-item clickable row"
+                                         [ct-editor-inspector]="inspector"
+                                         [ct-editor-inspector-target]="entry.loc"
+                                         [ct-validation-class]="entry.validation">
 
                                         <!--ID Column-->
                                         <div class="col-sm-6 ellipsis" [title]="entry.id">
@@ -167,8 +173,9 @@ import {EditorInspectorService} from "../../editor-common/inspector/editor-inspe
                                         <ct-editor-inspector-content>
                                             <div class="tc-header">{{ entry.id || entry.loc || "Output" }}</div>
                                             <div class="tc-body">
-                                                <ct-workflow-output-inspector [output]="entry">
-                                                </ct-workflow-output-inspector>
+                                                <ct-workflow-io-inspector [port]="entry"
+                                                                          [workflowModel]="model">
+                                                </ct-workflow-io-inspector>
                                             </div>
                                         </ct-editor-inspector-content>
                                     </template>

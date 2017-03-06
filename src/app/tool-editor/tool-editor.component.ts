@@ -10,7 +10,7 @@ import {
     ViewEncapsulation
 } from "@angular/core";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
-import {BehaviorSubject, Subject} from "rxjs/Rx";
+import {BehaviorSubject, ReplaySubject, Subject} from "rxjs/Rx";
 import {Validation} from "cwlts/models/helpers/validation";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
 import {EditorInspectorService} from "../editor-common/inspector/editor-inspector.service";
@@ -95,8 +95,7 @@ import LoadOptions = jsyaml.LoadOptions;
                     Save
                 </button>
             </ct-editor-controls>
-
-
+            
             <!--Header & Editor Column-->
             <div class="editor-content flex-row">
                 <!--Editor Row-->
@@ -198,7 +197,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
     private toolModel = CommandLineToolFactory.from(null, "document");
 
     /** Sorted array of resulting command line parts */
-    private commandLineParts: Subject<CommandLinePart[]> = new Subject();
+    private commandLineParts: Subject<CommandLinePart[]> = new ReplaySubject();
 
     /** Template of the status controls that will be shown in the status bar */
     @ViewChild("statusControls")
@@ -248,6 +247,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
                     if (!r.isValidCwl) {
                         // turn off loader and load document as code
                         this.isLoading = false;
+                        this.validation = r;
                         return r;
                     }
 

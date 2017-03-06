@@ -1,6 +1,7 @@
 import {ChangeDetectionStrategy, Component, Input, ViewEncapsulation} from "@angular/core";
 import {ComponentBase} from "../../../components/common/component-base";
 import {StepModel, WorkflowModel} from "cwlts/models";
+import {UserPreferencesService} from "../../../services/storage/user-preferences.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -13,17 +14,17 @@ import {StepModel, WorkflowModel} from "cwlts/models";
         <div class="row workflow-step-inspector-tabs">
 
             <!--Tab Info-->
-            <div class="single-tab col-sm-4" [class.active]="viewMode == tabs.Info" (click)="viewMode = tabs.Info">
+            <div class="single-tab col-sm-4" [class.active]="viewMode == tabs.Info" (click)="changeTab(tabs.Info)">
                 <span>App Info</span>
             </div>
 
             <!--Tab Inputs-->
-            <div class="single-tab col-sm-4" [class.active]="viewMode == tabs.Inputs" (click)="viewMode = tabs.Inputs">
+            <div class="single-tab col-sm-4" [class.active]="viewMode == tabs.Inputs" (click)="changeTab(tabs.Inputs)">
                 <span>Inputs</span>
             </div>
 
             <!--Tab Step-->
-            <div class="single-tab col-sm-4" [class.active]="viewMode == tabs.Step" (click)="viewMode = tabs.Step">
+            <div class="single-tab col-sm-4" [class.active]="viewMode == tabs.Step" (click)="changeTab(tabs.Step)">
                 <span>Step</span>
             </div>
 
@@ -41,7 +42,9 @@ import {StepModel, WorkflowModel} from "cwlts/models";
         </ct-workflow-step-inspector-info>
 
         <!--Step-->
-        <ct-workflow-step-inspector-step *ngIf="viewMode === tabs.Step">
+        <ct-workflow-step-inspector-step *ngIf="viewMode === tabs.Step"
+                                            [step]="step"
+                                            [workflowModel]="workflowModel">
         </ct-workflow-step-inspector-step>
     `
 })
@@ -61,7 +64,15 @@ export class WorkflowStepInspector extends ComponentBase {
 
     private viewMode = this.tabs.Inputs;
 
-    constructor() {
+    constructor(private userPrefService: UserPreferencesService) {
         super();
+
+        this.tracked = this.userPrefService.get("step_inspector_active_tab", this.tabs.Inputs, true)
+            .subscribe(x => this.viewMode = x);
+    }
+
+    private changeTab(tab: string) {
+        this.viewMode = tab;
+        this.userPrefService.put("step_inspector_active_tab", tab);
     }
 }

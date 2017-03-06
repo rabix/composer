@@ -252,9 +252,9 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
             .subscribe(latestContent => {
 
                 this.cwlValidatorService.validate(latestContent).then(r => {
-                    console.log("Validated", r);
                     if (!r.isValidCwl) {
                         // turn off loader and load document as code
+                        this.validation = r;
                         this.isLoading = false;
                         return r;
                     }
@@ -313,64 +313,6 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
         });
 
         this.statusBar.setControls(this.statusControls);
-
-        /**
-         * Track validation results.
-         * If content is not valid CWL, show the code.
-         * If it's a valid CWL, parse it into a model, and show the GUI mode on first load.
-         */
-        // this.tracked = this.webWorkerService.validationResultStream.map(r => {
-        //     if (!r.isValidCwl) {
-        //         // turn off loader and load document as code
-        //         this.isLoading = false;
-        //         return r;
-        //     }
-        //
-        //     // load JSON to generate model
-        //     let json = Yaml.safeLoad(this.rawEditorContent.getValue(), {
-        //         json: true
-        //     } as LoadOptions);
-        //
-        //     // should show prompt, but json is already reformatted
-        //     if (this.showReformatPrompt && json["rbx:modified"]) {
-        //         this.showReformatPrompt = false;
-        //     }
-        //
-        //     this.workflowModel = WorkflowFactory.from(json, "document");
-        //     console.log(this.workflowModel);
-        //
-        //     // update validation stream on model validation updates
-        //
-        //     this.workflowModel.setValidationCallback((res: Validation) => {
-        //         this.validation = {
-        //             errors: res.errors,
-        //             warnings: res.warnings,
-        //             isValidatableCwl: true,
-        //             isValidCwl: true,
-        //             isValidJSON: true
-        //         };
-        //     });
-        //
-        //     this.workflowModel.validate();
-        //
-        //     // load document in GUI and turn off loader, only if loader was active
-        //     if (this.isLoading) {
-        //         this.viewMode = this.viewModes.Gui;
-        //         this.isLoading = false;
-        //     }
-        //
-        //     return {
-        //         errors: this.workflowModel.validation.errors,
-        //         warnings: this.workflowModel.validation.warnings,
-        //         isValidatableCwl: true,
-        //         isValidCwl: true,
-        //         isValidJSON: true
-        //     };
-        //
-        // }).subscribe((v) => {
-        //     this.validation = v;
-        //     this.isValidCWL = v.isValidCwl;
-        // });
     }
 
     private save() {

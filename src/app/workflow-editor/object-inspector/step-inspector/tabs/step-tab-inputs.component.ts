@@ -18,14 +18,14 @@ import {StatusBarService} from "../../../../core/status-bar/status-bar.service";
                 <div class="tc-header">{{ group.name }}</div>
                 <div class="tc-body">
                     <form (change)="onInputsFormChange($event)">
-                        <div *ngFor="let input of group.inputs; let i = index;" class="mb-1">
+                        <div *ngFor="let input of group.inputs; let i = index;" class="input-box">
 
                             <!--Label and port options-->
                             <div class="input-title flex-baseline">
 
                                 <label class="input-label" [title]="input.label || input.id">
-                                    {{ input.label || input.id }}
                                     <span class="text-danger" *ngIf="!input.type.isNullable">*</span>
+                                    {{ input.label || input.id }}
                                     <i class="fa fa-info-circle text-muted"
                                        *ngIf="input.description"
                                        [ct-tooltip]="ctt"
@@ -66,17 +66,17 @@ import {StatusBarService} from "../../../../core/status-bar/status-bar.service";
 
                                 <!--No connections-->
                                 <div *ngIf="input.source.length === 0 && input.isVisible">
-                                    <div class="alert alert-warning small">
-                                        <i class="fa fa-warning fa-fw text-warning"></i> Not connected
-                                    </div>
+                                    <span class="text-warning small" *ngIf="input.type.isNullable">
+                                        <i class="fa fa-warning fa-fw"></i> This port is not connected
+                                    </span>
+                                    <span class="text-danger small" *ngIf="!input.type.isNullable">
+                                        <i class="fa fa-times-circle fa-fw"></i> This required port is not connected
+                                    </span>
                                 </div>
 
                                 <!--List of connections-->
                                 <div *ngIf="input.source.length > 0" class="text-muted small">
-                                    Connections:
-                                    <code *ngFor="let port of input.source">
-                                        {{ port }}
-                                    </code>
+                                    Connections: {{ input.source.join(", ") }}
                                 </div>
                             </div>
 
