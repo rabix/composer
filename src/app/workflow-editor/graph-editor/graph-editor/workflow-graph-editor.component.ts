@@ -50,7 +50,7 @@ declare const Snap: any;
 
                     <ct-workflow-io-inspector *ngIf="typeOfInspectedNode() === 'Input' || typeOfInspectedNode() === 'Output'"
                                                 [port]="inspectedNode"
-                                                [workflowModel]="workflowModel">
+                                                [workflowModel]="model">
                     </ct-workflow-io-inspector>
 
                 </div>
