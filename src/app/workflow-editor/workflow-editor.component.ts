@@ -112,6 +112,7 @@ import LoadOptions = jsyaml.LoadOptions;
             <div class="editor-content flex-row fixed">
                 <!--Editor Row-->
                 <ct-code-editor-x *ngIf="viewMode === viewModes.Code" class="editor"
+                                  [class.flex-col]="showInspector"
                                   [(content)]="rawEditorContent"
                                   [options]="{theme: 'ace/theme/monokai'}"
                                   [language]="'yaml'"
@@ -131,6 +132,7 @@ import LoadOptions = jsyaml.LoadOptions;
                 </ct-workflow-graph-editor>
 
                 <ct-workflow-info *ngIf="viewMode === viewModes.Info"
+                                  [class.flex-col]="showInspector"
                                   [model]="workflowModel">
                 </ct-workflow-info>
 

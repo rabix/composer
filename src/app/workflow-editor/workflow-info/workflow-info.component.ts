@@ -16,7 +16,7 @@ import {SystemService} from "../../platform-providers/system.service";
         <div class="workflow-info-item workflow-header">
           <h3>{{model.label}}</h3>
           <div>Created by {{createdBy}} on {{createdOn | date}}. Last edited by {{editedBy}} on {{editedOn | date}}</div>
-          <div>Revision note: "{{revisionNote}}"</div>
+          <div *ngIf="revisionNote">Revision note: "{{revisionNote}}"</div>
         </div>
         <h3>Description:</h3>
         <div class="workflow-info-item workflow-description" [ct-markdown]="model.description"></div>
@@ -64,8 +64,8 @@ import {SystemService} from "../../platform-providers/system.service";
                   <th>Format</th>
                 </tr>
                 <tr *ngFor="let input of inputs">
-                  <th scope="row">{{input.idp}}</th>
-                  <td>{{input.customProps.label}}</td>
+                  <th scope="row">{{input.id}}</th>
+                  <td>{{input.label}}</td>
                   <td>{{input.type | commandParameterType}}</td>
                   <td>{{input.type.isNullable ? 'False' : 'True'}}</td>
                   <td>prefix</td>
@@ -88,7 +88,7 @@ import {SystemService} from "../../platform-providers/system.service";
                   </tr>
                   <tr *ngFor="let input of appSettings">
                     <th scope="row">{{input.id}}</th>
-                    <td>{{input.customProps.label}}</td>
+                    <td>{{input.label}}</td>
                     <td>{{input.type | commandParameterType}}</td>
                     <td>{{input.type.isNullable ? 'False' : 'True'}}</td>
                     <td>prefix</td>
@@ -142,13 +142,11 @@ export class WorkflowInfoComponent implements OnChanges {
 
     ngOnChanges(changes: SimpleChanges) {
 
-        console.log('wf model', this.model);
-
         this.createdBy = this.model.customProps['sbg:createdBy'];
         this.createdOn = this.model.customProps['sbg:createdOn'] * 1000;
         this.editedBy = this.model.customProps['sbg:modifiedBy'];
         this.editedOn = this.model.customProps['sbg:modifiedOn'] * 1000;
-        this.revisionNote = this.model.customProps['sbg:revisionNotes'];
+        this.revisionNote = this.model.customProps['sbg:revisionNotes'] || null;
         this.categories = this.model.customProps['sbg:categories'];
         this.toolkit = this.model.customProps['sbg:toolkit'] + ' ' + this.model.customProps['sbg:toolkitVersion']
         this.contributors = this.model.customProps['sbg:contributors'];
