@@ -57,9 +57,10 @@ declare const Snap: any;
                                                 [workflowModel]="model">
                     </ct-workflow-step-inspector>
 
-                    <ct-workflow-io-inspector *ngIf="typeOfInspectedNode() === 'Input' || typeOfInspectedNode() === 'Output'"
-                                                [port]="inspectedNode"
-                                                [workflowModel]="model">
+                    <ct-workflow-io-inspector
+                        *ngIf="typeOfInspectedNode() === 'Input' || typeOfInspectedNode() === 'Output'"
+                        [port]="inspectedNode"
+                        [workflowModel]="model">
 
                     </ct-workflow-io-inspector>
 
@@ -90,20 +91,13 @@ export class WorkflowGraphEditorComponent {
     private graph: Workflow;
 
     constructor(private statusBar: StatusBarService,
-                private inspector: EditorInspectorService,
-                private cdref: ChangeDetectorRef,
-                private zone: NgZone) {
+                private inspector: EditorInspectorService) {
     }
 
     ngAfterViewInit() {
 
-        this.cdref.detach();
-
-
-        this.zone.runOutsideAngular(() => {
-            this.graph = new Workflow(new Snap(this.canvas.nativeElement), this.model);
-            this.graph.command("workflow.fit");
-        });
+        this.graph = new Workflow(new Snap(this.canvas.nativeElement), this.model);
+        this.graph.command("workflow.fit");
         this.statusBar.setControls(this.controlsTemplate);
     }
 
