@@ -127,10 +127,10 @@ import LoadOptions = jsyaml.LoadOptions;
                                (reset)="resetJob()"
                                [inputs]="toolModel.inputs"></ct-job-editor>
 
-                <ct-tool-info *ngIf="viewMode === viewModes.Info"
+                <ct-app-info *ngIf="viewMode === viewModes.Info"
                               class="gui-editor-component p-2"
                               [class.flex-col]="showInspector"
-                              [model]="toolModel"></ct-tool-info>
+                              [model]="toolModel"></ct-app-info>
 
 
                 <!--Object Inspector Column-->

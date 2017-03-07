@@ -131,10 +131,10 @@ import LoadOptions = jsyaml.LoadOptions;
 
                 </ct-workflow-graph-editor>
 
-                <ct-workflow-info *ngIf="viewMode === viewModes.Info"
+                <ct-app-info *ngIf="viewMode === viewModes.Info"
                                   [class.flex-col]="showInspector"
                                   [model]="workflowModel">
-                </ct-workflow-info>
+                </ct-app-info>
 
                 <!--Object Inspector Column-->
                 <div [hidden]="!showInspector" class="flex-col inspector-col">

@@ -13,7 +13,6 @@ import {WorkflowEditorComponent} from "./workflow-editor.component";
 import {WorkflowNotGraphEditorComponent} from "./workflow-not-graphic-editor/workflow-not-graph-editor.component";
 import {WorkflowIOInspector} from "./object-inspector/io-inspector/workflow-io-inspector.component";
 import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow-graph-editor.component";
-import {WorkflowInfoComponent} from "./workflow-info/workflow-info.component";
 
 @NgModule({
     declarations: [
@@ -26,7 +25,6 @@ import {WorkflowInfoComponent} from "./workflow-info/workflow-info.component";
         WorkflowStepInspectorTabInputs,
         WorkflowStepInspectorTabInfo,
         WorkflowStepInspectorTabStep,
-        WorkflowInfoComponent,
     ],
     exports: [
         WorkflowEditorComponent

@@ -30,7 +30,6 @@ import {BaseCommandComponent} from "./sections/base-command/base-command.compone
 import {HintListComponent} from "./sections/hints/hint-list.component";
 import {ToolInputInspector} from "./object-inspector/input-inspector/tool-input-inspector.component";
 import {ToolOutputInspector} from "./object-inspector/output-inspector/tool-output-inspector.component";
-import {ToolInfoComponent} from "./tool-info/tool-info.component";
 
 @NgModule({
     declarations: [
@@ -60,7 +59,6 @@ import {ToolInfoComponent} from "./tool-info/tool-info.component";
         DockerRequirementComponent,
         BaseCommandComponent,
         HintListComponent,
-        ToolInfoComponent
     ],
     exports: [
         ToolEditorComponent
