@@ -18,6 +18,7 @@
         "build": "./node_modules/.bin/ng build -prod -aot",
         "package": "./scripts/electron-build.sh",
         "test": "./node_modules/.bin/ng test",
+        "test-once": "./node_modules/.bin/ng test --watch false",
         "lint": "./node_modules/.bin/ng lint",
         "e2e": "./node_modules/.bin/ng e2e",
         "update-webdriver": "node node_modules/protractor/bin/webdriver-manager update"
@@ -37,8 +38,8 @@
         "bootstrap": "4.0.0-alpha.5",
         "brace": "^0.10.0",
         "core-js": "^2.4.1",
-        "cwl-svg": "^0.0.9",
-        "cwlts": "^1.11.5",
+        "cwl-svg": "^0.0.16",
+        "cwlts": "^1.11.32",
         "font-awesome": "^4.7.0",
         "js-yaml": "^3.8.1",
         "markdown-it-lazy-headers": "^0.1.3",

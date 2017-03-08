@@ -19,7 +19,7 @@ before_script:
 script:
   - npm run build
   - npm run package
-  - npm test
+  - npm run test-once
 
 notifications:
   email: false

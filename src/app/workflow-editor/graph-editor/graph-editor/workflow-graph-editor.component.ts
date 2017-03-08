@@ -1,5 +1,12 @@
 import {
-    ChangeDetectionStrategy, Component, ElementRef, Input, TemplateRef, ViewChild,
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
+    Component,
+    ElementRef,
+    Input,
+    NgZone,
+    TemplateRef,
+    ViewChild,
     ViewEncapsulation
 } from "@angular/core";
 import {StepModel, WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
@@ -19,10 +26,10 @@ declare const Snap: any;
     selector: "ct-workflow-graph-editor",
     styleUrls: ["./workflow-graph-editor.component.scss"],
     template: `
-        <svg (click)="handleClick($event)" #canvas class="cwl-workflow" 
-             [ct-drop-enabled]="true" 
+        <svg (dblclick)="openInspector($event)" #canvas class="cwl-workflow"
+             [ct-drop-enabled]="true"
              [ct-drop-zones]="['zone1']"
-             (onDropSuccess)="onDrop($event.detail.data.transfer_data)"></svg>
+             (onDropSuccess)="onDrop($event.detail.data.event, $event.detail.data.transfer_data)"></svg>
 
         <template #controls>
             
@@ -40,17 +47,21 @@ declare const Snap: any;
         <template #inspector>
             <ct-editor-inspector-content>
                 <div class="tc-header">
-                    <ct-tree-node-icon *ngIf="inspectedNode.run" [type]="inspectedNode.run?.class" class="align-icon-height"></ct-tree-node-icon>
-                    {{ inspectedNode.label || inspectedNode.id || inspectedNode.loc || typeOfInspectedNode()}}</div>
+                    <ct-tree-node-icon *ngIf="inspectedNode.run" [type]="inspectedNode.run?.class"
+                                       class="align-icon-height"></ct-tree-node-icon>
+                    {{ inspectedNode.label || inspectedNode.id || inspectedNode.loc || typeOfInspectedNode()}}
+                </div>
                 <div class="tc-body">
                     <ct-workflow-step-inspector *ngIf="typeOfInspectedNode() === 'Step'"
                                                 [step]="inspectedNode"
                                                 [workflowModel]="model">
                     </ct-workflow-step-inspector>
 
-                    <ct-workflow-io-inspector *ngIf="typeOfInspectedNode() === 'Input' || typeOfInspectedNode() === 'Output'"
-                                                [port]="inspectedNode"
-                                                [workflowModel]="workflowModel">
+                    <ct-workflow-io-inspector
+                        *ngIf="typeOfInspectedNode() === 'Input' || typeOfInspectedNode() === 'Output'"
+                        [port]="inspectedNode"
+                        [workflowModel]="model">
+
                     </ct-workflow-io-inspector>
 
                 </div>
@@ -79,14 +90,15 @@ export class WorkflowGraphEditorComponent {
 
     private graph: Workflow;
 
-    constructor(private statusBar: StatusBarService, private inspector: EditorInspectorService) {
+    constructor(private statusBar: StatusBarService,
+                private inspector: EditorInspectorService) {
     }
 
     ngAfterViewInit() {
 
         this.graph = new Workflow(new Snap(this.canvas.nativeElement), this.model);
-        this.statusBar.setControls(this.controlsTemplate);
         this.graph.command("workflow.fit");
+        this.statusBar.setControls(this.controlsTemplate);
     }
 
     private upscale() {
@@ -103,16 +115,22 @@ export class WorkflowGraphEditorComponent {
     /**
      * Triggers when app is dropped on canvas
      */
-    private onDrop(node: {content: Observable<string>}) {
-        node.content.first().subscribe((node)=>{
+    private onDrop(ev: MouseEvent, node: { content: Observable<string> }) {
+        node.content.first().subscribe((node) => {
             try {
                 let json = Yaml.safeLoad(node, {
                     json: true
                 } as LoadOptions);
 
-                const step = this.model.addStepFromProcess(json);
 
-                this.graph.command("app.create", step);
+                const step = this.model.addStepFromProcess(json);
+                const coords = this.graph.translateMouseCoords(ev.clientX, ev.clientY);
+                Object.assign(step.customProps, {
+                    "sbg:x": coords.x,
+                    "sbg:y": coords.y
+                });
+
+                this.graph.command("app.create.step", step);
             } catch (ex) {
                 console.warn(ex);
             }
@@ -123,7 +141,7 @@ export class WorkflowGraphEditorComponent {
     /**
      * Triggers when click events occurs on canvas
      */
-    handleClick(ev: Event) {
+    openInspector(ev: Event) {
         let current = ev.target as Element;
 
         // Check if clicked element is a node or any descendant of a node (in order to open object inspector if so)
