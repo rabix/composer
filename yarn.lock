@@ -109,11 +109,17 @@
   version "3.4.8"
   resolved "https://registry.yarnpkg.com/@angular/router/-/router-3.4.8.tgz#d569099359848a3f708df87f685c98d37621ab97"
 
-"@angular/tsc-wrapped@0.5.2", "@angular/tsc-wrapped@>=0.5.0 <5.0.0 || >=4.0.0-beta <5.0.0":
+"@angular/tsc-wrapped@0.5.2":
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/@angular/tsc-wrapped/-/tsc-wrapped-0.5.2.tgz#2eddf472c467fcb334ea94deddaaa71990c5a482"
   dependencies:
     tsickle "^0.2"
+
+"@angular/tsc-wrapped@>=0.5.0 <5.0.0 || >=4.0.0-beta <5.0.0":
+  version "4.0.0-rc.2"
+  resolved "https://registry.yarnpkg.com/@angular/tsc-wrapped/-/tsc-wrapped-4.0.0-rc.2.tgz#d7023d93f4576b6f776ffc7175ff760e7e133705"
+  dependencies:
+    tsickle "^0.21.0"
 
 "@ngtools/json-schema@1.0.5":
   version "1.0.5"
@@ -4315,7 +4321,7 @@ readable-stream@^1.1.8, readable-stream@~1.1.9:
     isarray "0.0.1"
     string_decoder "~0.10.x"
 
-readable-stream@^2.0.0, readable-stream@^2.1.0, readable-stream@~2.1.4:
+readable-stream@^2.0.0, "readable-stream@^2.0.0 || ^1.1.13", readable-stream@^2.1.0, readable-stream@~2.1.4:
   version "2.1.5"
   resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-2.1.5.tgz#66fa8b720e1438b364681f2ad1a63c618448c9d0"
   dependencies:
@@ -4327,7 +4333,7 @@ readable-stream@^2.0.0, readable-stream@^2.1.0, readable-stream@~2.1.4:
     string_decoder "~0.10.x"
     util-deprecate "~1.0.1"
 
-"readable-stream@^2.0.0 || ^1.1.13", readable-stream@^2.0.1, readable-stream@^2.0.2, readable-stream@^2.0.5, readable-stream@~2.0.0:
+readable-stream@^2.0.1, readable-stream@^2.0.2, readable-stream@^2.0.5, readable-stream@~2.0.0:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-2.0.6.tgz#8f90341e68a53ccc928788dacfcd11b36eb9b78e"
   dependencies:
@@ -5028,7 +5034,7 @@ sumchecker@^2.0.1:
   dependencies:
     debug "^2.2.0"
 
-supports-color@3.1.2, supports-color@^3.1.0, supports-color@^3.1.1:
+supports-color@3.1.2, supports-color@^3.1.0, supports-color@^3.1.1, supports-color@^3.1.2:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-3.1.2.tgz#72a262894d9d408b956ca05ff37b2ed8a6e2a2d5"
   dependencies:
@@ -5038,7 +5044,7 @@ supports-color@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-2.0.0.tgz#535d045ce6b6363fa40117084629995e9df324c7"
 
-supports-color@^3.1.2, supports-color@^3.2.3:
+supports-color@^3.2.3:
   version "3.2.3"
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-3.2.3.tgz#65ac0504b3954171d8a64946b2ae3cbb8a5f54f6"
   dependencies:
@@ -5225,6 +5231,15 @@ tsconfig@^5.0.2:
 tsickle@^0.2:
   version "0.2.6"
   resolved "https://registry.yarnpkg.com/tsickle/-/tsickle-0.2.6.tgz#ad4abf92e74ebdf3fb5aa187ca85b02066fe1a1b"
+  dependencies:
+    minimist "^1.2.0"
+    mkdirp "^0.5.1"
+    source-map "^0.5.6"
+    source-map-support "^0.4.2"
+
+tsickle@^0.21.0:
+  version "0.21.5"
+  resolved "https://registry.yarnpkg.com/tsickle/-/tsickle-0.21.5.tgz#341c1834b9d293c8cbffc295a86a1e46268ed22f"
   dependencies:
     minimist "^1.2.0"
     mkdirp "^0.5.1"
@@ -5497,8 +5512,8 @@ webdriver-js-extender@^1.0.0:
     selenium-webdriver "^2.53.2"
 
 webdriver-manager@^12.0.1:
-  version "12.0.2"
-  resolved "https://registry.yarnpkg.com/webdriver-manager/-/webdriver-manager-12.0.2.tgz#9bc541e975b18de8bf7f6ad163b69488169e8914"
+  version "12.0.3"
+  resolved "https://registry.yarnpkg.com/webdriver-manager/-/webdriver-manager-12.0.3.tgz#b4a0a1391ceb7e147ea035a393bc1c61143fc656"
   dependencies:
     adm-zip "^0.4.7"
     chalk "^1.1.1"
@@ -5656,9 +5671,16 @@ write-file-atomic@^1.1.2:
     imurmurhash "^0.1.4"
     slide "^1.1.5"
 
-ws@1.1.1, ws@^1.0.1:
+ws@1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/ws/-/ws-1.1.1.tgz#082ddb6c641e85d4bb451f03d52f06eabdb1f018"
+  dependencies:
+    options ">=0.0.5"
+    ultron "1.0.x"
+
+ws@^1.0.1:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-1.1.2.tgz#8a244fa052401e08c9886cf44a85189e1fd4067f"
   dependencies:
     options ">=0.0.5"
     ultron "1.0.x"

@@ -14,7 +14,7 @@ export interface DataEntrySource {
     data?: any;
     type?: "file" | "folder",
     isWritable?: boolean;
-    resolve: () => Promise<string>,
+    resolve?: () => Promise<string>,
     save?: ((...args: any[]) => Observable<any>)
     sourceId?: DATA_SOURCE_ID;
     content?: Observable<string> | any,
