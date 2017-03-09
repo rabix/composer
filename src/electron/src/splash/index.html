@@ -27,6 +27,11 @@
             background: linear-gradient(to bottom right, #00104c, #5a476b 50%, #995083);
             -webkit-font-smoothing: antialiased;
 
+
+        }
+
+        * {
+            pointer-events: none;
         }
 
         .light {
@@ -160,6 +165,12 @@
 <div class="progress">
     <div class="indeterminate"></div>
 </div>
-
+<script>
+    const webFrame = require("electron").webFrame;
+    webFrame.setZoomLevelLimits(1, 1);
+    webFrame.setVisualZoomLevelLimits(1, 1);
+    webFrame.setLayoutZoomLevelLimits(1, 1);
+</script>
 </body>
+
 </html>
