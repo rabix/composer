@@ -1,5 +1,6 @@
 import * as Yaml from "js-yaml";
 import {
+    ChangeDetectorRef,
     Component,
     Input,
     OnDestroy,
@@ -219,6 +220,7 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
                 private platform: PlatformAPI,
                 private inspector: EditorInspectorService,
                 private statusBar: StatusBarService,
+                private cdr: ChangeDetectorRef,
                 private modal: ModalService) {
 
         super();
@@ -242,6 +244,7 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
             .subscribe(latestContent => {
 
                 this.cwlValidatorService.validate(latestContent).then(r => {
+
                     if (!r.isValidCwl) {
                         // turn off loader and load document as code
                         this.validation = r;
@@ -259,38 +262,40 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
                         this.showReformatPrompt = false;
                     }
 
-                    this.workflowModel = WorkflowFactory.from(json, "document");
-                    console.log(this.workflowModel);
+                    this.data.resolve().then(resolved => {
+                        this.workflowModel = WorkflowFactory.from(resolved as any, "document");
 
-                    // update validation stream on model validation updates
+                        // update validation stream on model validation updates
 
-                    this.workflowModel.setValidationCallback((res: Validation) => {
-                        this.validation = {
-                            errors: res.errors,
-                            warnings: res.warnings,
+                        this.workflowModel.setValidationCallback((res: Validation) => {
+                            this.validation = {
+                                errors: res.errors,
+                                warnings: res.warnings,
+                                isValidatableCwl: true,
+                                isValidCwl: true,
+                                isValidJSON: true
+                            };
+                        });
+
+                        this.workflowModel.validate();
+
+                        // load document in GUI and turn off loader, only if loader was active
+                        if (this.isLoading) {
+                            this.viewMode = this.viewModes.Gui;
+                            this.isLoading = false;
+                        }
+
+                        const out = {
+                            errors: this.workflowModel.validation.errors,
+                            warnings: this.workflowModel.validation.warnings,
                             isValidatableCwl: true,
                             isValidCwl: true,
                             isValidJSON: true
                         };
+                        this.validation = out;
+                        this.isValidCWL = out.isValidCwl;
                     });
 
-                    this.workflowModel.validate();
-
-                    // load document in GUI and turn off loader, only if loader was active
-                    if (this.isLoading) {
-                        this.viewMode = this.viewModes.Gui;
-                        this.isLoading = false;
-                    }
-
-                    const out = {
-                        errors: this.workflowModel.validation.errors,
-                        warnings: this.workflowModel.validation.warnings,
-                        isValidatableCwl: true,
-                        isValidCwl: true,
-                        isValidJSON: true
-                    };
-                    this.validation = out;
-                    this.isValidCWL = out.isValidCwl;
                 });
                 // this.webWorkerService.validateJsonSchema(latestContent);
             });

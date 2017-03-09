@@ -8,8 +8,6 @@ export class ElectronSystemService extends SystemService {
 
     public boot() {
         webFrame.setZoomLevelLimits(1, 1);
-        webFrame.setVisualZoomLevelLimits(1, 1);
-        webFrame.setLayoutZoomLevelLimits(1, 1);
     }
 
     public openLink(url: string) {
