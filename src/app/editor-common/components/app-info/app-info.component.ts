@@ -13,12 +13,19 @@ import {SystemService} from "../../../platform-providers/system.service";
     template: `
       <div class="app-info">
           <div class="app-info-item app-info-header">
-              <h3>{{model.label}}</h3>
+              <h3>
+                  <ct-inline-editor  [value]="model.label"  label="Name" [required]="true" type="text" (saveData)="model.label = $event">
+                      <h3>{{model.label}}</h3>
+                  </ct-inline-editor>
+              </h3>
               <div>Created by {{createdBy}} on {{createdOn | date}}. Last edited by {{editedBy}} on {{editedOn | date}}</div>
               <div *ngIf="revisionNote">Revision note: "{{revisionNote}}"</div>
           </div>
           <h3>Description:</h3>
-          <div class="app-info-item app-info-description" [ct-markdown]="model.description"></div>
+          <ct-inline-editor [value]="model.description" label="Description" type="textarea" (saveData)="model.description = $event">
+              <div class="app-info-item app-info-description" [ct-markdown]="model.description"></div>
+          </ct-inline-editor>
+
           <div class="app-info-item app-info-meta">
               <div class="app-info-meta-item">
                   <h4>Categories</h4>
@@ -42,10 +49,12 @@ import {SystemService} from "../../../platform-providers/system.service";
               </div>
           </div>
           <div class="app-info-item app-info-links">
-              <h3>Links</h3>
-              <ul>
-                  <li *ngFor="let link of links"><a href="" (click)="$event.preventDefault(); openWebPage(link.id)">{{link.label}}</a></li>
-              </ul>
+              <ct-inline-editor [value]="links"  label="Links" [required]="true" type="keyvalue">
+                  <h3>Links</h3>
+                  <ul>
+                      <li *ngFor="let link of links"><a href="" (click)="$event.preventDefault(); openWebPage(link.id)">{{link.label}}</a></li>
+                  </ul>
+              </ct-inline-editor>
           </div>
           <div class="app-info-item app-info-details">
               <ct-tabs-component>
@@ -140,7 +149,6 @@ export class AppInfoComponent implements OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges) {
-
         this.createdBy = this.model.customProps['sbg:createdBy'];
         this.createdOn = this.model.customProps['sbg:createdOn'] * 1000;
         this.editedBy = this.model.customProps['sbg:modifiedBy'];

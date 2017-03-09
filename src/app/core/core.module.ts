@@ -27,10 +27,13 @@ import {DragOverDirective} from "./drag-and-drop/drag-over.directive";
 import {DropDownButtonComponent} from "./ui/dropdown-button/dropdown-button-component";
 import {DropDownMenuComponent} from "./ui/dropdown-button/dropdown-menu.component";
 import {WebWorkerBuilderService} from "./web-worker/web-worker-builder.service";
-import {MarkdownService} from './markdown/markdown.service';
-import {MarkdownDirective} from './markdown/markdown.directive';
-import {TabsComponent} from './ui/tabs/tabs.component';
-import {TabComponent} from './ui/tabs/tab.component';
+import {MarkdownService} from "./markdown/markdown.service";
+import {MarkdownDirective} from "./markdown/markdown.directive";
+import {TabsComponent} from "./ui/tabs/tabs.component";
+import {TabComponent} from "./ui/tabs/tab.component";
+import {InlineEditorComponent} from "./ui/inline-editor/inline-editor.component";
+import {FormsModule} from '@angular/forms';
+
 
 @NgModule({
     entryComponents: [
@@ -49,7 +52,8 @@ import {TabComponent} from './ui/tabs/tab.component';
         MultilangCodeEditorComponent,
 
         TabsComponent,
-        TabComponent
+        TabComponent,
+        InlineEditorComponent
     ],
     declarations: [
         // Markdown directive
@@ -98,7 +102,8 @@ import {TabComponent} from './ui/tabs/tab.component';
         LoggerDirective,
 
         TabsComponent,
-        TabComponent
+        TabComponent,
+        InlineEditorComponent
 
     ],
     exports: [
@@ -147,7 +152,8 @@ import {TabComponent} from './ui/tabs/tab.component';
         LoggerDirective,
 
         TabsComponent,
-        TabComponent
+        TabComponent,
+        InlineEditorComponent
     ],
     providers: [
         IpcService,
@@ -157,7 +163,7 @@ import {TabComponent} from './ui/tabs/tab.component';
         MarkdownService
 
     ],
-    imports: [BrowserModule, MomentModule]
+    imports: [BrowserModule, MomentModule, FormsModule]
 })
 export class CoreModule {
 
