@@ -275,43 +275,46 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
                         this.showReformatPrompt = false;
                     }
 
-                    // generate model and get command line parts
-                    this.toolModel = CommandLineToolFactory.from(json, "document");
-                    this.toolModel.onCommandLineResult((res) => {
-                        this.commandLineParts.next(res);
-                    });
-                    this.toolModel.updateCommandLine();
 
-                    // update validation stream on model validation updates
+                    this.data.resolve().then((resolved) => {
+                        // generate model and get command line parts
+                        this.toolModel = CommandLineToolFactory.from(resolved as any, "document");
+                        this.toolModel.onCommandLineResult((res) => {
+                            this.commandLineParts.next(res);
+                        });
+                        this.toolModel.updateCommandLine();
 
-                    this.toolModel.setValidationCallback((res: Validation) => {
-                        this.validation = {
-                            errors: res.errors,
-                            warnings: res.warnings,
+                        // update validation stream on model validation updates
+
+                        this.toolModel.setValidationCallback((res: Validation) => {
+                            this.validation = {
+                                errors: res.errors,
+                                warnings: res.warnings,
+                                isValidatableCwl: true,
+                                isValidCwl: true,
+                                isValidJSON: true
+                            };
+                        });
+
+                        this.toolModel.validate();
+
+                        // load document in GUI and turn off loader, only if loader was active
+                        if (this.isLoading) {
+                            this.viewMode = this.viewModes.Gui;
+                            this.isLoading = false;
+                        }
+
+                        const v = {
+                            errors: this.toolModel.validation.errors,
+                            warnings: this.toolModel.validation.warnings,
                             isValidatableCwl: true,
                             isValidCwl: true,
                             isValidJSON: true
                         };
+
+                        this.validation = v;
+                        this.isValidCWL = v.isValidCwl;
                     });
-
-                    this.toolModel.validate();
-
-                    // load document in GUI and turn off loader, only if loader was active
-                    if (this.isLoading) {
-                        this.viewMode = this.viewModes.Gui;
-                        this.isLoading = false;
-                    }
-
-                    const v = {
-                        errors: this.toolModel.validation.errors,
-                        warnings: this.toolModel.validation.warnings,
-                        isValidatableCwl: true,
-                        isValidCwl: true,
-                        isValidJSON: true
-                    };
-
-                    this.validation = v;
-                    this.isValidCWL = v.isValidCwl;
                 });
             });
 

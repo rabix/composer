@@ -30,17 +30,24 @@ export class SBPlatformDataSourceService {
         return () => this.platform
             .getProjectApps(project.owner_canonical, project.slug)
             .flatMap(Observable.from as any)
-            .map((app: any) => ({
-                id: app.id,
-                data: app,
-                type: "file",
-                language: Observable.of("json"),
-                isWritable: project.membership.write,
-                content: Observable.of(1).switchMap(_ => this.platform.getAppCWL(app)).publishReplay().refCount(),
-                save: (jsonContent, revisionNote) => {
-                    return this.platform.saveApp(jsonContent, revisionNote);
+            .map((app: any) => {
+                    const content: Observable<string> = Observable.of(1).switchMap(_ => this.platform.getAppCWL(app))
+                        .publishReplay()
+                        .refCount();
+
+                    return {
+                        id: app.id,
+                        data: app,
+                        type: "file",
+                        language: Observable.of("json"),
+                        isWritable: project.membership.write,
+                        content,
+                        save: (jsonContent, revisionNote) => {
+                            return this.platform.saveApp(jsonContent, revisionNote);
+                        }
+                    }
                 }
-            }))
+            )
             .reduce((acc, item) => acc.concat(item), []);
     }
 }

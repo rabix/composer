@@ -33,9 +33,7 @@ export class DragDirective extends ComponentBase {
                 preHoveredElement: null,
                 preEnteredDropZones: [],
                 preDragEntered: null,
-            }).subscribe(obs => {
-
-                const drag = obs.skipUntil(Observable.of(1).delay(300));
+            }).subscribe(drag => {
 
                 // On Drag Start
                 const first = drag.first().subscribe((ev: any) => {
@@ -45,7 +43,8 @@ export class DragDirective extends ComponentBase {
                 });
 
                 // On Drag (Mouse Move)
-                const mid = drag.skip(1).subscribe((ev: any) => {
+                // Skip first 6 mouse move events in order to distinguish mouse click and drag
+                const mid = drag.skip(6).subscribe((ev: any) => {
 
                     const dragImage = ev.ctData.dragImage;
                     const preEnteredDropZones = ev.ctData.preEnteredDropZones;

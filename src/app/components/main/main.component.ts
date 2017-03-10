@@ -13,6 +13,7 @@ import {PublicAppService} from "../../platform-providers/public-apps/public-app.
 import {SBPlatformDataSourceService} from "../../sources/sbg/sb-platform.source.service";
 import {UrlValidator} from "../../validators/url.validator";
 import {UserProjectsService} from "../../platform-providers/user-projects/user-projects.service";
+import {SystemService} from "../../platform-providers/system.service";
 @Component({
     encapsulation: ViewEncapsulation.None,
 
@@ -42,7 +43,9 @@ export class MainComponent {
 
     public runnix: Observable<boolean>;
 
-    constructor(modal: ModalService, vcRef: ViewContainerRef) {
+    constructor(modal: ModalService, vcRef: ViewContainerRef, system: SystemService) {
+
+        system.boot();
         /**
          * Hack for angular's inability to provide the vcRef to a service with DI.
          * {@link ModalService.rootViewRef}

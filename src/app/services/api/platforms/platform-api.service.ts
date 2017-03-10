@@ -180,6 +180,15 @@ export class PlatformAPI {
         }));
     }
 
+    public getUpdates(ids: string []) {
+        return this.sessionID.switchMap(sessionID =>
+            this.http.post(`${this.platformServices.brood}/updates`, ids, {
+            headers: new Headers({
+                "session-id": sessionID
+            })
+        }).map(r => r.json().message).first());
+    }
+
     private objectToParams(obj) {
         const params = new URLSearchParams();
         Object.keys(obj).forEach(key => {

@@ -195,6 +195,7 @@ export class LocalFilesPanelComponent extends ComponentBase {
             contentType: Observable.of(file.type || "Code"),
             contentData: {
                 data: file,
+                resolve: file.resolve,
                 isWritable: true,
                 content: file.content,
                 language: Observable.of(file.language)

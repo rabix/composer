@@ -69,6 +69,11 @@ export class SBPublicAppsPanelComponent {
                                 contentData: {
                                     data: app,
                                     isWritable: false,
+                                    resolve: () => new Promise((resolve, reject) => {
+                                        content.take(1).subscribe(text => {
+                                            resolve(JSON.parse(text));
+                                        }, err => reject(err));
+                                    }),
                                     content,
                                     language: Observable.of("json")
                                 }

@@ -1,5 +1,6 @@
 import * as Yaml from "js-yaml";
 import {
+    ChangeDetectorRef,
     Component,
     Input,
     OnDestroy,
@@ -10,7 +11,7 @@ import {
     ViewEncapsulation
 } from "@angular/core";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
-import {BehaviorSubject} from "rxjs/Rx";
+import {BehaviorSubject, Observable} from "rxjs/Rx";
 import {Validation} from "cwlts/models/helpers/validation";
 import {EditorInspectorService} from "../editor-common/inspector/editor-inspector.service";
 import {DataEntrySource} from "../sources/common/interfaces";
@@ -231,6 +232,7 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
                 private platform: PlatformAPI,
                 private inspector: EditorInspectorService,
                 private statusBar: StatusBarService,
+                private cdr: ChangeDetectorRef,
                 private modal: ModalService) {
 
         super();
@@ -254,6 +256,7 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
             .subscribe(latestContent => {
 
                 this.cwlValidatorService.validate(latestContent).then(r => {
+
                     if (!r.isValidCwl) {
                         // turn off loader and load document as code
                         this.validation = r;
@@ -271,38 +274,38 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
                         this.showReformatPrompt = false;
                     }
 
-                    this.workflowModel = WorkflowFactory.from(json, "document");
-                    console.log(this.workflowModel);
+                    this.data.resolve().then(resolved => {
+                        this.workflowModel = WorkflowFactory.from(resolved as any, "document");
 
-                    // update validation stream on model validation updates
+                        // update validation stream on model validation updates
 
-                    this.workflowModel.setValidationCallback((res: Validation) => {
-                        this.validation = {
-                            errors: res.errors,
-                            warnings: res.warnings,
+                        this.workflowModel.setValidationCallback((res: Validation) => {
+                            this.validation = {
+                                errors: res.errors,
+                                warnings: res.warnings,
+                                isValidatableCwl: true,
+                                isValidCwl: true,
+                                isValidJSON: true
+                            };
+                        });
+
+                        this.workflowModel.validate();
+
+                        const out = {
+                            errors: this.workflowModel.validation.errors,
+                            warnings: this.workflowModel.validation.warnings,
                             isValidatableCwl: true,
                             isValidCwl: true,
                             isValidJSON: true
                         };
+                        this.validation = out;
+                        this.isValidCWL = out.isValidCwl;
+
+
+                        // After wf is created get updates for steps
+                        this.getStepUpdates();
                     });
 
-                    this.workflowModel.validate();
-
-                    // load document in GUI and turn off loader, only if loader was active
-                    if (this.isLoading) {
-                        this.viewMode = this.viewModes.Gui;
-                        this.isLoading = false;
-                    }
-
-                    const out = {
-                        errors: this.workflowModel.validation.errors,
-                        warnings: this.workflowModel.validation.warnings,
-                        isValidatableCwl: true,
-                        isValidCwl: true,
-                        isValidJSON: true
-                    };
-                    this.validation = out;
-                    this.isValidCWL = out.isValidCwl;
                 });
                 // this.webWorkerService.validateJsonSchema(latestContent);
             });
@@ -315,6 +318,35 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
         });
 
         this.statusBar.setControls(this.statusControls);
+    }
+
+    /**
+     * Call updates service to get information about steps if they have updates and mark ones that can be updated
+     */
+    private getStepUpdates() {
+        Observable.of(1).switchMap(() =>
+            // Call service only if wf is in user projects
+            this.data.data.source !== 'local' && this.data.isWritable ?
+                this.platform.getUpdates(this.workflowModel.steps.map(id => id.run.customProps["sbg:id"]))
+                : Observable.of(undefined))
+            .subscribe((response) => {
+
+                if (response) {
+                    Object.keys(response).forEach(key => {
+                        if (response[key] === true) {
+                            const step = this.workflowModel.steps.find(step => step.run.customProps["sbg:id"] === key);
+                            step && (step.hasUpdate = true);
+                        }
+                    });
+                }
+
+                // load document in GUI and turn off loader, only if loader was active
+                if (this.isLoading) {
+                    this.viewMode = this.viewModes.Gui;
+                    this.isLoading = false;
+                }
+
+            });
     }
 
     private save() {
