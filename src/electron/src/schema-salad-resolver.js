@@ -3,7 +3,6 @@ const http = require("http");
 const request = require("request");
 const yaml = require("js-yaml");
 
-
 function isUrl(s) {
     const regexp = /^(ftp|https|https):\/\/.*/i;
     return regexp.test(s);
@@ -46,6 +45,7 @@ function traverse(data, source) {
                                 Object.assign(data, content);
                                 break;
                             case "$include":
+                                debugger;
                                 data[key] = content;
 
                                 break;
@@ -86,10 +86,12 @@ function traverse(data, source) {
         }
 
         Promise.all(future).then(() => {
+
             Object.keys(data).forEach(k => {
-               if(data[k]["$include"]){
-                   data[k] = data[k]["$include"];
-               }
+
+                if (data[k] !== null && typeof data[k] === "object" && !Array.isArray(data[k]) && data[k]["$include"]) {
+                    data[k] = data[k]["$include"];
+                }
             });
 
             resolve(data);

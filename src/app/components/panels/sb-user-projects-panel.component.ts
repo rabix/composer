@@ -139,20 +139,29 @@ export class SBUserProjectsPanelComponent extends ComponentBase {
                 this.setProjectStatus(project.data.id, false);
             },
             childrenProvider: _ => project.childrenProvider()
-                .map(childrenApps => childrenApps.map((source: DataEntrySource) => ({
-                    name: source.data.label,
-                    icon: source.data.class || "file",
-                    content: source.content,
-                    contextMenu: this.contextMenu.getContextMenu(source.data.label, source.content),
-                    openHandler: _ => {
-                        this.workbox.openTab({
-                            id: source.data.class + "_" + source.data["sbg:id"],
-                            title: Observable.of(source.data.label),
-                            contentType: Observable.of(source.data.class),
-                            contentData: source
-                        });
-                    }
-                })))
+                .map(childrenApps => childrenApps.map((source: DataEntrySource) => {
+                    Object.assign(source, {
+                        resolve: () => new Promise((resolve, reject) => {
+                            source.content.take(1).subscribe(text => {
+                                resolve(JSON.parse(text));
+                            }, err => reject(err));
+                        }),
+                    });
+                    return {
+                        name: source.data.label,
+                        icon: source.data.class || "file",
+                        content: source.content,
+                        contextMenu: this.contextMenu.getContextMenu(source.data.label, source.content),
+                        openHandler: _ => {
+                            this.workbox.openTab({
+                                id: source.data.class + "_" + source.data["sbg:id"],
+                                title: Observable.of(source.data.label),
+                                contentType: Observable.of(source.data.class),
+                                contentData: source
+                            });
+                        }
+                    };
+                }))
         }
     }
 

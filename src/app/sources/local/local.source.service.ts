@@ -6,6 +6,8 @@ import {noop} from "../../lib/utils.lib";
 
 const fs = window["require"]("fs");
 const path = window["require"]("path");
+const remote = window["require"]("electron").remote;
+const schemaSaladResolver = remote.require("./src/schema-salad-resolver.js");
 
 
 type LocalSource = DataEntrySource | { isDir: boolean, isFile: boolean };
@@ -99,17 +101,21 @@ export class LocalDataSourceService {
     }
 
     private wrapFileEntry(entry) {
-        let content, save = undefined;
+        let content: Observable<string>;
+        let save;
+        let resolve: () => Promise<string>;
 
         if (entry.isFile) {
             content = Observable.of(1).switchMap(_ => this.readFileContent(entry.path)).share();
             save = this.getContentSavingFunction(entry.path);
+            resolve = () => this.ipc.request("resolve", entry.path).toPromise();
         }
 
 
         return Object.assign({}, entry, {
             save,
             content,
+            resolve,
             source: "local",
             childrenProvider: entry.isDir ? () => this.watch(entry.path) : undefined,
         });

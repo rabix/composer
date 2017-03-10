@@ -1,5 +1,6 @@
 const fsController = require("./controllers/fs.controller");
 const acceleratorController = require("./controllers/accelerator.controller");
+const resolver = require("./schema-salad-resolver");
 
 module.exports = {
 
@@ -25,6 +26,14 @@ module.exports = {
     },
     pathExists: (path, callback) => {
         fsController.pathExists(path, callback);
+    },
+
+    resolve: (path, callback) => {
+        resolver.resolve(path).then(result => {
+            callback(null, result);
+        }, err => {
+            callback(err);
+        });
     },
 
     // Shortcut Routes
