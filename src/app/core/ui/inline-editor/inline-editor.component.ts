@@ -16,7 +16,7 @@ import {
     template: `
     <div>
       <div *ngIf="editing">
-        <input #inlineEditControl *ngIf="type === 'text'" [required]="required" [type]="type" [placeholder]="label" value="{{value}}" [(ngModel)]="inputval"/>
+        <input #inlineEditControl *ngIf="type === 'text' || type === 'tags'" [required]="required" [type]="type" [placeholder]="label" value="{{value}}" [(ngModel)]="inputval"/>
         <textarea #inlineEditControl *ngIf="type === 'textarea'" [required]="required" [name]="value" rows="20" [(ngModel)]="inputval">{{value}}</textarea>
       </div>
       <div *ngIf="editing">
@@ -35,7 +35,7 @@ export class InlineEditorComponent  {
     inlineEditControl: ElementRef;
 
     @Input()
-    public value: string = '';
+    public value: any;
 
     @Input()
     public label: string = '';
@@ -53,9 +53,8 @@ export class InlineEditorComponent  {
     public saveData: EventEmitter<string> = new EventEmitter<string>();
 
     private editing: boolean = false;
-    private inputval: string = '';
+    private inputval: any;
     private isHover: boolean = false;
-    public onChange: any = Function.prototype;
 
     constructor(element: ElementRef, private _renderer: Renderer) {
     }
@@ -65,7 +64,13 @@ export class InlineEditorComponent  {
     }
 
     onSave($event: Event) {
-        this.saveData.emit(this.inputval);
+        let retValue = this.inputval;
+
+        if (this.type === 'tags') {
+            retValue = retValue.split(',').map((item) => item.trim());
+        }
+
+        this.saveData.emit(retValue);
 
         this.editing = false;
     }
@@ -85,7 +90,11 @@ export class InlineEditorComponent  {
     }
 
     ngOnInit() {
-        this.inputval = this.value;
+        if (this.type === 'tags') {
+            this.inputval = this.value.join(', ');
+        } else {
+            this.inputval = this.value;
+        }
     }
 
     private showEdit($event: Event) {

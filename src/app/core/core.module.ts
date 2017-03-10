@@ -32,7 +32,7 @@ import {MarkdownDirective} from "./markdown/markdown.directive";
 import {TabsComponent} from "./ui/tabs/tabs.component";
 import {TabComponent} from "./ui/tabs/tab.component";
 import {InlineEditorComponent} from "./ui/inline-editor/inline-editor.component";
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 
 @NgModule({
@@ -154,6 +154,7 @@ import {FormsModule} from '@angular/forms';
         TabsComponent,
         TabComponent,
         InlineEditorComponent
+
     ],
     providers: [
         IpcService,
@@ -163,7 +164,7 @@ import {FormsModule} from '@angular/forms';
         MarkdownService
 
     ],
-    imports: [BrowserModule, MomentModule, FormsModule]
+    imports: [BrowserModule, MomentModule, FormsModule, ReactiveFormsModule]
 })
 export class CoreModule {
 

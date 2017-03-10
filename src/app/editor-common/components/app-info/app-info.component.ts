@@ -28,24 +28,30 @@ import {SystemService} from "../../../platform-providers/system.service";
 
           <div class="app-info-item app-info-meta">
               <div class="app-info-meta-item">
-                  <h4>Categories</h4>
-                  <ul>
-                      <li *ngFor="let cat of categories;">{{cat}}</li>
-                  </ul>
+                  <ct-inline-editor [value]="model.customProps['sbg:categories']" label="Categories" type="tags" (saveData)="model.customProps['sbg:categories'] = $event">
+                      <h4>Categories</h4>
+                      <ul>
+                          <li *ngFor="let cat of model.customProps['sbg:categories'];">{{cat}}</li>
+                      </ul>
+                  </ct-inline-editor>
               </div>
               <div class="app-info-meta-item">
                   <h4>Toolkit</h4>
                   <div>{{toolkit}}</div>
               </div>
               <div class="app-info-meta-item">
-                  <h4>License</h4>
-                  <div>{{model.customProps['sbg:license']}}</div>
+                  <ct-inline-editor  [value]="model.customProps['sbg:license']"  label="License" [required]="false" type="text" (saveData)="model.customProps['sbg:license'] = $event">
+                      <h4>License</h4>
+                      <div>{{model.customProps['sbg:license']}}</div>
+                  </ct-inline-editor>
               </div>
               <div class="app-info-meta-item">
-                  <h4>Contributors</h4>
-                  <ul>
-                      <li *ngFor="let contrib of contributors">{{contrib}}</li>
-                  </ul>
+                  <ct-inline-editor [value]="model.customProps['sbg:contributors']" label="Contributors" type="tags" (saveData)="model.customProps['sbg:contributors'] = $event">
+                      <h4>Contributors</h4>
+                      <ul>
+                          <li *ngFor="let contrib of model.customProps['sbg:contributors']">{{contrib}}</li>
+                      </ul>
+                  </ct-inline-editor>
               </div>
           </div>
           <div class="app-info-item app-info-links">
@@ -137,9 +143,7 @@ export class AppInfoComponent implements OnChanges {
     public editedBy: string;
     public editedOn: number;
     public revisionNote: string;
-    public categories: Array<string>;
     public toolkit: string;
-    public contributors: Array<string>;
     public links: Array<Object>;
     public inputs: Array<Object>;
     public appSettings: Array<Object>;
@@ -154,9 +158,7 @@ export class AppInfoComponent implements OnChanges {
         this.editedBy = this.model.customProps['sbg:modifiedBy'];
         this.editedOn = this.model.customProps['sbg:modifiedOn'] * 1000;
         this.revisionNote = this.model.customProps['sbg:revisionNotes'] || null;
-        this.categories = this.model.customProps['sbg:categories'];
         this.toolkit = this.model.customProps['sbg:toolkit'] + ' ' + this.model.customProps['sbg:toolkitVersion']
-        this.contributors = this.model.customProps['sbg:contributors'];
         this.links = this.model.customProps['sbg:links'];
 
         this.inputs = this.model.inputs.filter((input) => input.type.type === 'File' || input.type.items === 'File');
