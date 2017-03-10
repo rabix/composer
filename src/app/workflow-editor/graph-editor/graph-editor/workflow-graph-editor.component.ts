@@ -94,8 +94,7 @@ export class WorkflowGraphEditorComponent {
                 private inspector: EditorInspectorService) {
     }
 
-    ngAfterViewInit() {
-
+    ngOnChanges() {
         this.graph = new Workflow(new Snap(this.canvas.nativeElement), this.model);
         this.graph.command("workflow.fit");
         this.statusBar.setControls(this.controlsTemplate);

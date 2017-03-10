@@ -40,6 +40,7 @@ import {CWLModule} from "./cwl/cwl.module";
 import {EditorCommonModule} from "./editor-common/editor-common.module";
 import {ToolEditorModule} from "./tool-editor/tool-editor.module";
 import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
+import {UpdateStepModal} from "./components/modal/custom/update-step-modal.component";
 
 @NgModule({
     providers: [
@@ -78,7 +79,8 @@ import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
         SettingsComponent,
         FileEditorComponent,
         StructurePanelComponent,
-        WorkboxComponent
+        WorkboxComponent,
+        UpdateStepModal,
     ],
     entryComponents: [
         CheckboxPromptComponent,
@@ -86,7 +88,8 @@ import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
         ModalComponent,
         NewFileModalComponent,
         ProjectSelectionModal,
-        PromptComponent
+        PromptComponent,
+        UpdateStepModal
     ],
     imports: [
         BrowserModule,

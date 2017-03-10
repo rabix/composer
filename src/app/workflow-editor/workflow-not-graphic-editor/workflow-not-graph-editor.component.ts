@@ -1,10 +1,10 @@
-import {Component, Input, ViewEncapsulation} from "@angular/core";
+import {ChangeDetectionStrategy, Component, Input, ViewEncapsulation} from "@angular/core";
 import {WorkflowModel} from "cwlts/models";
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
-
+    changeDetection: ChangeDetectionStrategy.OnPush,
     selector: "ct-workflow-not-graph-editor",
     styleUrls: ["./workflow-not-graph-editor.component.scss"],
     template: `

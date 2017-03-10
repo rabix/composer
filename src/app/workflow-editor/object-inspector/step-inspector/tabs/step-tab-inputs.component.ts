@@ -56,6 +56,7 @@ import {StatusBarService} from "../../../../core/status-bar/status-bar.service";
                             <ct-workflow-step-inspector-entry [input]="input"
                                                               [prefix]="input.id"
                                                               [value]="input.default"
+                                                              [type]="input.type"
                                                               *ngIf="!isFileType(input)"
                                                               (update)="stepValueUpdate(input.id + '.default', $event)"
                                                               class="mb-0">
@@ -119,6 +120,9 @@ export class WorkflowStepInspectorTabInputs extends ComponentBase {
 
     @Input()
     public step: StepModel;
+
+    @Input()
+    public inputs: WorkflowStepInputModel [] = [];
 
     @Output()
     public save = new Subject<WorkflowStepInputModel>();
@@ -204,7 +208,7 @@ export class WorkflowStepInspectorTabInputs extends ComponentBase {
     ngOnChanges() {
 
         // Whenever inputs are updated, regroup them and sort them for display
-        const grouped = this.step.in.reduce((acc, item) => {
+        const grouped = this.inputs.reduce((acc, item) => {
             const group = this.isFileType(item) ? "Files" : "App parameters";
             return Object.assign(acc, group ? {[group]: (acc[group] || []).concat(item)} : null);
 

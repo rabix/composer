@@ -89,6 +89,7 @@ import {WorkflowStepInputModel} from "cwlts/models";
                                                            [tooltipPlacement]="'top'"></i></label>
                     <ct-workflow-step-inspector-entry [prefix]="prefix + '.' + entry.id"
                                                       [input]="entry"
+                                                      [type]="input.type"
                                                       (update)="updateRecord(entry.id, $event)"
                                                       [value]="value ? value[entry.id] : undefined"></ct-workflow-step-inspector-entry>
                     <ct-tooltip-content #ctt>
@@ -104,6 +105,7 @@ import {WorkflowStepInputModel} from "cwlts/models";
                 <ct-workflow-step-inspector-entry *ngFor="let entry of value; let i = index"
                                                   [prefix]="prefix + '.[' + i +']'"
                                                   [index]="i"
+                                                  [type]="input.type"
                                                   [input]="arrayModifiedInput"
                                                   (update)="updateArray(i, $event)"
                                                   [value]="entry"></ct-workflow-step-inspector-entry>
@@ -135,6 +137,10 @@ export class WorkflowStepInspectorInputEntry implements OnChanges {
 
     @Input()
     public prefix;
+
+    // Added (but not used in code) just to call ngChanges() on change detection process when step is updated
+    @Input()
+    public type: string;
 
     @Output()
     public update = new EventEmitter<any>();

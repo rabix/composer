@@ -11,7 +11,7 @@ import {
     ViewEncapsulation
 } from "@angular/core";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
-import {BehaviorSubject} from "rxjs/Rx";
+import {BehaviorSubject, Observable} from "rxjs/Rx";
 import {Validation} from "cwlts/models/helpers/validation";
 import {EditorInspectorService} from "../editor-common/inspector/editor-inspector.service";
 import {DataEntrySource} from "../sources/common/interfaces";
@@ -279,12 +279,6 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
 
                         this.workflowModel.validate();
 
-                        // load document in GUI and turn off loader, only if loader was active
-                        if (this.isLoading) {
-                            this.viewMode = this.viewModes.Gui;
-                            this.isLoading = false;
-                        }
-
                         const out = {
                             errors: this.workflowModel.validation.errors,
                             warnings: this.workflowModel.validation.warnings,
@@ -294,6 +288,10 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
                         };
                         this.validation = out;
                         this.isValidCWL = out.isValidCwl;
+
+
+                        // After wf is created get updates for steps
+                        this.getStepUpdates();
                     });
 
                 });
@@ -308,6 +306,35 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
         });
 
         this.statusBar.setControls(this.statusControls);
+    }
+
+    /**
+     * Call updates service to get information about steps if they have updates and mark ones that can be updated
+     */
+    private getStepUpdates() {
+        Observable.of(1).switchMap(() =>
+            // Call service only if wf is in user projects
+            this.data.data.source !== 'local' && this.data.isWritable ?
+                this.platform.getUpdates(this.workflowModel.steps.map(id => id.run.customProps["sbg:id"]))
+                : Observable.of(undefined))
+            .subscribe((response) => {
+
+                if (response) {
+                    Object.keys(response).forEach(key => {
+                        if (response[key] === true) {
+                            const step = this.workflowModel.steps.find(step => step.run.customProps["sbg:id"] === key);
+                            step && (step.hasUpdate = true);
+                        }
+                    });
+                }
+
+                // load document in GUI and turn off loader, only if loader was active
+                if (this.isLoading) {
+                    this.viewMode = this.viewModes.Gui;
+                    this.isLoading = false;
+                }
+
+            });
     }
 
     private save() {
