@@ -1,8 +1,8 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {ComponentBase} from "../../../../components/common/component-base";
 import {CommandOutputParameterModel as OutProperty} from "cwlts/models/d2sb";
 import {CommandOutputBindingModel} from "cwlts/models/d2sb/CommandOutputBindingModel";
+import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -52,7 +52,7 @@ import {CommandOutputBindingModel} from "cwlts/models/d2sb/CommandOutputBindingM
 /**
  * TODO: add the load content property on the model
  * */
-export class OutputEvalSectionComponent extends ComponentBase implements ControlValueAccessor {
+export class OutputEvalSectionComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
     public readonly = false;

@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {noop} from "../../lib/utils.lib";
-import {MenuItem} from "../../core/ui/menu/menu-item";
+import {MenuItem} from "../../ui/menu/menu-item";
 import {UserProjectsService} from "./user-projects.service";
 import {LocalDataSourceService} from "../../sources/local/local.source.service";
 

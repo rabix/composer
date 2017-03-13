@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
 import {ReplaySubject} from "rxjs";
 import {UserPreferencesService} from "../storage/user-preferences.service";
-import {ComponentBase} from "../../components/common/component-base";
+import {DirectiveBase} from "../../util/directive-base/directive-base";
 
 export type PlatformSettings = {
     url: string,
@@ -10,7 +10,7 @@ export type PlatformSettings = {
 };
 
 @Injectable()
-export class SettingsService extends ComponentBase {
+export class SettingsService extends DirectiveBase {
 
     public platformConfiguration = new ReplaySubject<PlatformSettings>(1);
 

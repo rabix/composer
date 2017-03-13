@@ -1,8 +1,8 @@
 import {Component, HostBinding, Input, Output, ViewChild, ViewEncapsulation} from "@angular/core";
 import {BehaviorSubject, Observable, Subject} from "rxjs";
-import {TreeNode} from "../../core/ui/tree-view/types";
-import {ComponentBase} from "../../components/common/component-base";
-import {CodeEditorComponent} from "../../core/ui/code-editor/code-editor.component";
+import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {CodeEditorComponent} from "../../ui/code-editor/code-editor.component";
+import {TreeNode} from "../../ui/tree-view-old/types";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -49,7 +49,7 @@ import {CodeEditorComponent} from "../../core/ui/code-editor/code-editor.compone
 
     `
 })
-export class ExpressionEditorComponent extends ComponentBase {
+export class ExpressionEditorComponent extends DirectiveBase {
 
     @Input()
     @HostBinding("style.height.px")

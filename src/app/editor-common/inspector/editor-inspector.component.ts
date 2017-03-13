@@ -1,5 +1,5 @@
 import {Component, ViewEncapsulation} from "@angular/core";
-import {ComponentBase} from "../../components/common/component-base";
+import {DirectiveBase} from "../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -7,6 +7,6 @@ import {ComponentBase} from "../../components/common/component-base";
     selector: "ct-editor-inspector",
     template: "<ng-content></ng-content>"
 })
-export class EditorInspectorComponent extends ComponentBase {
+export class EditorInspectorComponent extends DirectiveBase {
 
 }

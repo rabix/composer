@@ -11,11 +11,11 @@ import {
     ViewChildren,
     ViewEncapsulation
 } from "@angular/core";
-import {ComponentBase} from "../../../components/common/component-base";
 import {SBDraft2CommandArgumentModel, SBDraft2CommandLineBindingModel} from "cwlts/models/d2sb";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
-import {ModalService} from "../../../components/modal/modal.service";
 import {noop} from "../../../lib/utils.lib";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -138,7 +138,7 @@ import {noop} from "../../../lib/utils.lib";
         </ct-form-panel>
     `
 })
-export class ArgumentListComponent extends ComponentBase implements OnChanges {
+export class ArgumentListComponent extends DirectiveBase implements OnChanges {
 
     @Input()
     public entries: SBDraft2CommandArgumentModel[] = [];

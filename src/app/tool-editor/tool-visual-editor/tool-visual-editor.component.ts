@@ -3,7 +3,7 @@ import {FormGroup} from "@angular/forms";
 import {FileDefModel, RequirementBaseModel, ResourceRequirementModel, SBDraft2CommandLineToolModel} from "cwlts/models/d2sb";
 import {ProcessRequirement} from "cwlts/mappings/d2sb/ProcessRequirement";
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
-import {ComponentBase} from "../../components/common/component-base";
+import {DirectiveBase} from "../../util/directive-base/directive-base";
 @Component({
     encapsulation: ViewEncapsulation.None,
 
@@ -78,7 +78,7 @@ import {ComponentBase} from "../../components/common/component-base";
 
     `
 })
-export class ToolVisualEditorComponent extends ComponentBase {
+export class ToolVisualEditorComponent extends DirectiveBase {
 
     @Input()
     public model: SBDraft2CommandLineToolModel;

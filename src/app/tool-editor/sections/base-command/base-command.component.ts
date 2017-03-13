@@ -2,10 +2,10 @@ import {Component, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, V
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 import {ReplaySubject} from "rxjs";
-import {ComponentBase} from "../../../components/common/component-base";
 import {GuidService} from "../../../services/guid.service";
-import {ModalService} from "../../../components/modal/modal.service";
 import {noop} from "../../../lib/utils.lib";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -82,7 +82,7 @@ import {noop} from "../../../lib/utils.lib";
         </ct-form-panel>
     `
 })
-export class BaseCommandComponent extends ComponentBase implements OnInit, OnDestroy, OnChanges {
+export class BaseCommandComponent extends DirectiveBase implements OnInit, OnDestroy, OnChanges {
     /** baseCommand property of model */
     @Input()
     public baseCommand: SBDraft2ExpressionModel[];
