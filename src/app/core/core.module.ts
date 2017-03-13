@@ -33,6 +33,7 @@ import {TabsComponent} from "./ui/tabs/tabs.component";
 import {TabComponent} from "./ui/tabs/tab.component";
 import {InlineEditorComponent} from "./ui/inline-editor/inline-editor.component";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {KeyvalueComponent} from "./ui/inline-editor/keyvalue.component"
 
 
 @NgModule({
@@ -53,7 +54,8 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
         TabsComponent,
         TabComponent,
-        InlineEditorComponent
+        InlineEditorComponent,
+        KeyvalueComponent
     ],
     declarations: [
         // Markdown directive
@@ -103,7 +105,8 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
         TabsComponent,
         TabComponent,
-        InlineEditorComponent
+        InlineEditorComponent,
+        KeyvalueComponent
 
     ],
     exports: [
@@ -153,7 +156,8 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
         TabsComponent,
         TabComponent,
-        InlineEditorComponent
+        InlineEditorComponent,
+        KeyvalueComponent
 
     ],
     providers: [

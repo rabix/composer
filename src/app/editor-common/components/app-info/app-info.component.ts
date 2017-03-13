@@ -55,10 +55,10 @@ import {SystemService} from "../../../platform-providers/system.service";
               </div>
           </div>
           <div class="app-info-item app-info-links">
-              <ct-inline-editor [value]="links"  label="Links" [required]="true" type="keyvalue">
+              <ct-inline-editor [value]="model.customProps['sbg:links']"  label="Links" [required]="true" type="keyvalue" (saveData)="model.customProps['sbg:links'] = $event">
                   <h3>Links</h3>
                   <ul>
-                      <li *ngFor="let link of links"><a href="" (click)="$event.preventDefault(); openWebPage(link.id)">{{link.label}}</a></li>
+                      <li *ngFor="let link of model.customProps['sbg:links']"><a href="" (click)="$event.preventDefault(); openWebPage(link.id)">{{link.label}}</a></li>
                   </ul>
               </ct-inline-editor>
           </div>
@@ -144,7 +144,6 @@ export class AppInfoComponent implements OnChanges {
     public editedOn: number;
     public revisionNote: string;
     public toolkit: string;
-    public links: Array<Object>;
     public inputs: Array<Object>;
     public appSettings: Array<Object>;
 
@@ -159,7 +158,6 @@ export class AppInfoComponent implements OnChanges {
         this.editedOn = this.model.customProps['sbg:modifiedOn'] * 1000;
         this.revisionNote = this.model.customProps['sbg:revisionNotes'] || null;
         this.toolkit = this.model.customProps['sbg:toolkit'] + ' ' + this.model.customProps['sbg:toolkitVersion']
-        this.links = this.model.customProps['sbg:links'];
 
         this.inputs = this.model.inputs.filter((input) => input.type.type === 'File' || input.type.items === 'File');
         this.appSettings = this.model.inputs.filter((input) => input.type.type !== 'File' && input.type.items !== 'File');

@@ -18,6 +18,7 @@ import {
       <div *ngIf="editing">
         <input #inlineEditControl *ngIf="type === 'text' || type === 'tags'" [required]="required" [type]="type" [placeholder]="label" value="{{value}}" [(ngModel)]="inputval"/>
         <textarea #inlineEditControl *ngIf="type === 'textarea'" [required]="required" [name]="value" rows="20" [(ngModel)]="inputval">{{value}}</textarea>
+        <ct-key-value #inlineEditControl *ngIf="type === 'keyvalue'" [(ngModel)]="inputval"></ct-key-value>
       </div>
       <div *ngIf="editing">
         <input type="button" value="Ok" class="btn btn-primary btn-sm" (click)="onSave($event)"/>
