@@ -1,9 +1,9 @@
 import {ChangeDetectionStrategy, Component, Input, Output, ViewEncapsulation} from "@angular/core";
 import {StepModel, WorkflowModel, WorkflowStepInputModel} from "cwlts/models";
 import {Subject} from "rxjs";
-import {ComponentBase} from "../../../../components/common/component-base";
 import {ObjectHelper as OH} from "../../../../helpers/object.helper";
-import {StatusBarService} from "../../../../core/status-bar/status-bar.service";
+import {StatusBarService} from "../../../../layout/status-bar/status-bar.service";
+import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 import {Workflow} from "cwl-svg";
 import {ChangeDetectorRef} from "@angular/core";
 
@@ -19,7 +19,7 @@ import {ChangeDetectorRef} from "@angular/core";
                 <div class="tc-header">{{ group.name }}</div>
                 <div class="tc-body">
                     <form (change)="onInputsFormChange($event)">
-                        <div *ngFor="let input of group.inputs; let i = index;" class="input-box">
+                        <div *ngFor="let input of group.inputs" class="input-box">
 
                             <!--Label and port options-->
                             <div class="input-title flex-baseline">
@@ -108,7 +108,7 @@ import {ChangeDetectorRef} from "@angular/core";
         </div>
     `
 })
-export class WorkflowStepInspectorTabInputs extends ComponentBase {
+export class WorkflowStepInspectorTabInputs extends DirectiveBase {
 
     public dropDownPortOptions = [
         {

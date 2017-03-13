@@ -13,12 +13,9 @@ import {BehaviorSubject, Observable} from "rxjs/Rx";
 import {Validation} from "cwlts/models/helpers/validation";
 import {EditorInspectorService} from "../editor-common/inspector/editor-inspector.service";
 import {DataEntrySource} from "../sources/common/interfaces";
-import {ComponentBase} from "../components/common/component-base";
-import {WorkboxTab} from "../components/workbox/workbox-tab.interface";
 import {UserPreferencesService} from "../services/storage/user-preferences.service";
 import {PlatformAPI} from "../services/api/platforms/platform-api.service";
-import {StatusBarService} from "../core/status-bar/status-bar.service";
-import {ModalService} from "../components/modal/modal.service";
+import {StatusBarService} from "../layout/status-bar/status-bar.service";
 import {noop} from "../lib/utils.lib";
 import {WorkflowFactory, WorkflowModel} from "cwlts/models";
 import {
@@ -26,12 +23,14 @@ import {
     ValidationResponse
 } from "../editor-common/cwl-schema-validation-worker/cwl-schema-validation-worker.service";
 import LoadOptions = jsyaml.LoadOptions;
+import {DirectiveBase} from "../util/directive-base/directive-base";
+import {ModalService} from "../ui/modal/modal.service";
+import {WorkboxTab} from "../core/workbox/workbox-tab.interface";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
 
     selector: "ct-workflow-editor",
-    styleUrls: ["./workflow-editor.component.scss"],
     host: {
         "class": "tab-container"
     },
@@ -104,6 +103,11 @@ import LoadOptions = jsyaml.LoadOptions;
             <!--Header & Editor Column-->
             <div class="editor-content flex-row fixed">
                 <!--Editor Row-->
+                <!--<ui-code-editor *ngIf="viewMode === viewModes.Code"-->
+                                <!--[formControl]="codeEditorContent"-->
+                                <!--[options]="{mode: 'ace/mode/yaml'}"-->
+                                <!--class="editor">-->
+                <!--</ui-code-editor>-->
                 <ct-code-editor-x *ngIf="viewMode === viewModes.Code" class="editor"
                                   [class.flex-col]="showInspector"
                                   [(content)]="rawEditorContent"
@@ -167,7 +171,7 @@ import LoadOptions = jsyaml.LoadOptions;
         </div>
     `
 })
-export class WorkflowEditorComponent extends ComponentBase implements OnDestroy, WorkboxTab {
+export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy, WorkboxTab {
     @Input()
     public data: DataEntrySource;
 
@@ -198,6 +202,8 @@ export class WorkflowEditorComponent extends ComponentBase implements OnDestroy,
 
     /** Model that's recreated on document change */
     private workflowModel: WorkflowModel = WorkflowFactory.from(null, "document");
+
+    private codeEditorContent: FormControl;
 
     /** Template of the status controls that will be shown in the status bar */
     @ViewChild("statusControls")
@@ -238,6 +244,19 @@ export class WorkflowEditorComponent extends ComponentBase implements OnDestroy,
     }
 
     ngAfterViewInit(): void {
+        this.codeEditorContent = new FormControl({
+            value: undefined,
+            disabled: !this.data.isWritable
+        });
+
+        this.codeEditorContent.valueChanges.subscribe(ch => {
+            console.log("Value change");
+        });
+
+        this.rawEditorContent.subscribe(content => {
+            this.codeEditorContent.setValue(content);
+
+        });
         // Whenever the editor content is changed, validate it using a JSON Schema.
         this.tracked = this.rawEditorContent
             .skip(1)

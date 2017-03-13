@@ -14,13 +14,10 @@ import {BehaviorSubject, ReplaySubject, Subject} from "rxjs/Rx";
 import {Validation} from "cwlts/models/helpers/validation";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
 import {EditorInspectorService} from "../editor-common/inspector/editor-inspector.service";
-import {ComponentBase} from "../components/common/component-base";
-import {WorkboxTab} from "../components/workbox/workbox-tab.interface";
 import {DataEntrySource} from "../sources/common/interfaces";
 import {UserPreferencesService} from "../services/storage/user-preferences.service";
 import {PlatformAPI} from "../services/api/platforms/platform-api.service";
-import {StatusBarService} from "../core/status-bar/status-bar.service";
-import {ModalService} from "../components/modal/modal.service";
+import {StatusBarService} from "../layout/status-bar/status-bar.service";
 import {noop} from "../lib/utils.lib";
 import {CommandLineToolFactory} from "cwlts/models/generic/CommandLineToolFactory";
 import {
@@ -28,6 +25,9 @@ import {
     ValidationResponse
 } from "../editor-common/cwl-schema-validation-worker/cwl-schema-validation-worker.service";
 import LoadOptions = jsyaml.LoadOptions;
+import {DirectiveBase} from "../util/directive-base/directive-base";
+import {ModalService} from "../ui/modal/modal.service";
+import {WorkboxTab} from "../core/workbox/workbox-tab.interface";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -182,7 +182,7 @@ import LoadOptions = jsyaml.LoadOptions;
         </div>
     `
 })
-export class ToolEditorComponent extends ComponentBase implements OnInit, OnDestroy, WorkboxTab {
+export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDestroy, WorkboxTab {
     @Input()
     public data: DataEntrySource;
 

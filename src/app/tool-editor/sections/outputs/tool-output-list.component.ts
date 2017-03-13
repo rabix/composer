@@ -1,11 +1,11 @@
 import {ChangeDetectionStrategy, Component, Input, Output, QueryList, TemplateRef, ViewChildren, ViewEncapsulation} from "@angular/core";
-import {ComponentBase} from "../../../components/common/component-base";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 import {Subject} from "rxjs";
-import {ModalService} from "../../../components/modal/modal.service";
 import {noop} from "../../../lib/utils.lib";
 import {CommandInputParameterModel} from "cwlts/models/generic/CommandInputParameterModel";
 import {CommandOutputParameterModel} from "cwlts/models/d2sb";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -128,7 +128,7 @@ import {CommandOutputParameterModel} from "cwlts/models/d2sb";
 
     `
 })
-export class ToolOutputListComponent extends ComponentBase {
+export class ToolOutputListComponent extends DirectiveBase {
 
     @Input()
     public inputs: CommandInputParameterModel[] = [];

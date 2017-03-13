@@ -1,10 +1,10 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
-import {ComponentBase} from "../../../components/common/component-base";
 import {GuidService} from "../../../services/guid.service";
 import {noop} from "../../../lib/utils.lib";
-import {ModalService} from "../../../components/modal/modal.service";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -71,7 +71,7 @@ import {ModalService} from "../../../components/modal/modal.service";
         </button>
     `
 })
-export class KeyValueListComponent extends ComponentBase implements ControlValueAccessor {
+export class KeyValueListComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
     public readonly = false;

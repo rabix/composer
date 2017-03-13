@@ -1,8 +1,8 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {ComponentBase} from "../../../components/common/component-base";
 import {noop} from "../../../lib/utils.lib";
 import {InputParameterTypeModel} from "cwlts/models";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -37,7 +37,7 @@ import {InputParameterTypeModel} from "cwlts/models";
         </div>
     `
 })
-export class InputTypeSelectComponent extends ComponentBase implements ControlValueAccessor {
+export class InputTypeSelectComponent extends DirectiveBase implements ControlValueAccessor {
 
     public paramType: InputParameterTypeModel;
 

@@ -1,8 +1,8 @@
 import {Subject} from "rxjs";
 import {ChangeDetectionStrategy, Component, Input, Output, ViewChild, ViewEncapsulation} from "@angular/core";
-import {ComponentBase} from "../../../components/common/component-base";
 import {SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
 import {ToolInputListComponent} from "./tool-input-list-component";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -37,7 +37,7 @@ import {ToolInputListComponent} from "./tool-input-list-component";
         </ct-form-panel>
     `
 })
-export class ToolInputsComponent extends ComponentBase {
+export class ToolInputsComponent extends DirectiveBase {
 
     @Input()
     public entries: SBDraft2CommandInputParameterModel[] = [];

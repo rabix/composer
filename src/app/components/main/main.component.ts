@@ -1,19 +1,19 @@
 import {Component, ViewContainerRef, ViewEncapsulation} from "@angular/core";
 import {Observable} from "rxjs/Rx";
-import {ContextService} from "../../core/ui/context/context.service";
+import {ContextService} from "../../ui/context/context.service";
 import {ElectronPublicAppService} from "../../platform-providers/public-apps/electron-public-app.service";
 import {ElectronUserProjectsService} from "../../platform-providers/user-projects/electron-user-projects.service";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {GuidService} from "../../services/guid.service";
 import {IpcService} from "../../services/ipc.service";
 import {LocalDataSourceService} from "../../sources/local/local.source.service";
-import {ModalService} from "../modal/modal.service";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {PublicAppService} from "../../platform-providers/public-apps/public-app.service";
 import {SBPlatformDataSourceService} from "../../sources/sbg/sb-platform.source.service";
 import {UrlValidator} from "../../validators/url.validator";
 import {UserProjectsService} from "../../platform-providers/user-projects/user-projects.service";
 import {SystemService} from "../../platform-providers/system.service";
+import {ModalService} from "../../ui/modal/modal.service";
 @Component({
     encapsulation: ViewEncapsulation.None,
 

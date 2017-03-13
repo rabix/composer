@@ -1,0 +1,76 @@
+@import "./../../../assets/sass/variables";
+
+:host {
+
+    background: $layout-element-background;
+
+    .title-bar-section {
+        background: $layout-title-bar-background;
+        height: $layout-title-bar-height;
+    }
+
+    .logo {
+        width: 100%;
+        line-height: $layout-title-bar-height;
+    }
+
+    .col-panels {
+        flex-basis: 120px;
+        min-width: 120px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .layout-section {
+        color: $layout-section-font-color;
+        background: $layout-section-background;
+    }
+
+    .main-container {
+        display: flex;
+        height: 100%;
+        margin: 0;
+        width: 100%;
+        flex-direction: column;
+
+        .not-status-bar {
+            display: flex;
+            flex-direction: row;
+            flex: 1 1 100%;
+            border-bottom: $layout-section-border-light;
+        }
+        ct-status-bar {
+            width: 100%;
+            flex: 1 1 $layout-stripe-width;
+            border-top: $layout-section-border-dark;
+            background: $layout-section-background;
+        }
+
+        .handle-vertical {
+            background: $panel-resize-handle-color;
+            cursor: col-resize;
+            display: inline-block;
+            width: $panel-resize-handle-width;
+            border-right: $layout-section-border-light;
+
+            &:before {
+                content: '';
+                display: block;
+                position: relative;
+                background-color: $main-header-bg;
+                width: $panel-resize-handle-width;
+                height: $main-header-height;
+            }
+
+            &.hidden {
+                width: 1px;
+            }
+
+        }
+
+    }
+
+    .top-bar {
+        height: $main-header-height;
+    }
+}

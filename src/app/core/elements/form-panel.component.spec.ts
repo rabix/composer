@@ -1,2 +1,0 @@
-describe("Form Panel Component", () => {
-});

@@ -1,10 +1,10 @@
 import {Subject} from "rxjs";
 import {ChangeDetectionStrategy, Component, Input, Output, QueryList, TemplateRef, ViewChildren, ViewEncapsulation} from "@angular/core";
-import {ComponentBase} from "../../../components/common/component-base";
 import {SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
-import {ModalService} from "../../../components/modal/modal.service";
 import {noop} from "../../../lib/utils.lib";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -105,7 +105,7 @@ import {noop} from "../../../lib/utils.lib";
 
     `
 })
-export class ToolInputListComponent extends ComponentBase {
+export class ToolInputListComponent extends DirectiveBase {
 
     @Input()
     public entries: SBDraft2CommandInputParameterModel[] = [];

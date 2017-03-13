@@ -1,8 +1,7 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, Output, ViewEncapsulation} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, ViewEncapsulation} from "@angular/core";
 import {WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
-import {Subject} from "rxjs";
 import {FormBuilder, FormGroup} from "@angular/forms";
-import {ComponentBase} from "../../../components/common/component-base";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {Workflow} from "cwl-svg";
 
 @Component({
@@ -88,7 +87,7 @@ import {Workflow} from "cwl-svg";
     `
 
 })
-export class WorkflowIOInspector extends ComponentBase {
+export class WorkflowIOInspector extends DirectiveBase {
 
     public propertyTypes = ["array", "enum", "File", "string", "int", "float", "boolean"];
 

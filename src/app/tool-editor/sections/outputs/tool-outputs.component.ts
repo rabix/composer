@@ -1,10 +1,10 @@
 import {Subject} from "rxjs";
 import {ChangeDetectionStrategy, Component, Input, Output, ViewChild, ViewEncapsulation} from "@angular/core";
-import {ComponentBase} from "../../../components/common/component-base";
 import {CommandOutputParameterModel} from "cwlts/models/d2sb";
 import {CommandInputParameterModel} from "cwlts/models";
 import {ExternalLinks} from "../../../cwl/external-links";
 import {ToolOutputListComponent} from "./tool-output-list.component";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -41,7 +41,7 @@ import {ToolOutputListComponent} from "./tool-output-list.component";
         </ct-form-panel>
     `
 })
-export class ToolOutputsComponent extends ComponentBase {
+export class ToolOutputsComponent extends DirectiveBase {
 
     @Input()
     public inputs: CommandInputParameterModel[] = [];

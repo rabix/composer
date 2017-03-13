@@ -1,8 +1,8 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
 import {SBDraft2CommandLineBindingModel, SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
-import {ComponentBase} from "../../../../components/common/component-base";
 import {noop} from "../../../../lib/utils.lib";
+import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -85,7 +85,7 @@ import {noop} from "../../../../lib/utils.lib";
         </div>
     `
 })
-export class InputBindingSectionComponent extends ComponentBase implements ControlValueAccessor {
+export class InputBindingSectionComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
     public readonly = false;

@@ -1,0 +1,27 @@
+export const ACE_MODE_MAP = {
+    java: "java",
+    js: "javascript",
+    javascript: "javascript",
+    json: "json",
+    md: "markdown",
+    markdown: "markdown",
+    python: "python",
+    py: "python",
+    sh: "sh",
+    txt: "text",
+    text: "text",
+    ts: "typescript",
+    yaml: "yaml",
+    yml: "yaml",
+    c: "c_cpp",
+    "c_cpp": "c_cpp",
+    "c++": "c_cpp",
+    cpp: "c_cpp",
+    css: "scss",
+    sass: "scss",
+    scss: "scss",
+    html: "html",
+    xml: "xml",
+    r: "r"
+};
+
