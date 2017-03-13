@@ -6,6 +6,8 @@ import {UpdateStepModal} from "../../../components/modal/custom/update-step-moda
 import {PlatformAPI} from "../../../services/api/platforms/platform-api.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {Workflow} from "cwl-svg";
+import {PlatformAPI} from "../../../services/api/platforms/platform-api.service";
+import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,

@@ -1,6 +1,7 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
+
 import {noop} from "../../../lib/utils.lib";
 import {ModelExpressionEditorComponent} from "../../expression-editor/model-expression-editor.component";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
