@@ -2,8 +2,8 @@ import {ChangeDetectionStrategy, Component, Input, Output, ViewEncapsulation} fr
 import {StepModel, WorkflowModel, WorkflowStepInputModel} from "cwlts/models";
 import {Subject} from "rxjs";
 import {ObjectHelper as OH} from "../../../../helpers/object.helper";
-import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 import {Workflow} from "cwl-svg";
+import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 import {ChangeDetectorRef} from "@angular/core";
 import {StatusBarService} from "../../../../layout/status-bar/status-bar.service";
 

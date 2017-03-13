@@ -30,6 +30,8 @@ import {CwlSchemaValidationWorkerService} from "./cwl-schema-validation-worker/c
 import {SymbolsComponent} from "./components/symbols/symbols.component";
 import {InputTypeSelectComponent} from "./components/type-select/type-select.component";
 import {AppInfoComponent} from "./components/app-info/app-info.component";
+import {InputTypeSelectComponent} from "./components/type-select/type-select.component";
+import {UIModule} from "../ui/ui.module";
 
 @NgModule({
     declarations: [
@@ -101,8 +103,8 @@ import {AppInfoComponent} from "./components/app-info/app-info.component";
         BrowserModule,
         FormsModule,
         ReactiveFormsModule,
-        CWLModule,
         UIModule,
+        CWLModule
     ]
 })
 export class EditorCommonModule {
