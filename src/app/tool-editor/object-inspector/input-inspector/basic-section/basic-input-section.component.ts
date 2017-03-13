@@ -1,9 +1,9 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
 import {SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
-import {ComponentBase} from "../../../../components/common/component-base";
 import {noop} from "../../../../lib/utils.lib";
 import {InputParameterTypeModel} from "cwlts/models";
+import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -80,7 +80,7 @@ import {InputParameterTypeModel} from "cwlts/models";
         </form>
     `
 })
-export class BasicInputSectionComponent extends ComponentBase implements ControlValueAccessor {
+export class BasicInputSectionComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
     public context: { $job?: any, $self?: any } = {};

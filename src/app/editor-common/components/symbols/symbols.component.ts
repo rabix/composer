@@ -1,7 +1,7 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {ComponentBase} from "../../../components/common/component-base";
 import {noop} from "../../../lib/utils.lib";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -25,7 +25,7 @@ import {noop} from "../../../lib/utils.lib";
         </div>
     `
 })
-export class SymbolsComponent extends ComponentBase implements ControlValueAccessor {
+export class SymbolsComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
     public readonly = false;
@@ -38,6 +38,7 @@ export class SymbolsComponent extends ComponentBase implements ControlValueAcces
 
     writeValue(symbols: string[]): void {
         this.symbolsForm = new FormControl(symbols || []);
+
         this.listenToFormChanges();
     }
 

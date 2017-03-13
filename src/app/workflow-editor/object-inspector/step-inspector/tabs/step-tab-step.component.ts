@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, ViewEncapsulation} from "@angular/core";
-import {ComponentBase} from "../../../../components/common/component-base";
 import {StepModel, WorkflowModel} from "cwlts/models";
 import {FormBuilder, FormGroup} from "@angular/forms";
+import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -71,7 +71,7 @@ import {FormBuilder, FormGroup} from "@angular/forms";
         
     `
 })
-export class WorkflowStepInspectorTabStep extends ComponentBase {
+export class WorkflowStepInspectorTabStep extends DirectiveBase {
 
     @Input()
     public step: StepModel;

@@ -2,7 +2,7 @@ import {Component, Input, OnChanges, Output, SimpleChanges, ViewEncapsulation} f
 import {FormControl} from "@angular/forms";
 import {ExpressionModel, ResourceRequirementModel} from "cwlts/models/d2sb";
 import {ReplaySubject} from "rxjs";
-import {ComponentBase} from "../../../components/common/component-base";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -38,7 +38,7 @@ import {ComponentBase} from "../../../components/common/component-base";
 
     `
 })
-export class ResourcesComponent extends ComponentBase implements OnChanges {
+export class ResourcesComponent extends DirectiveBase implements OnChanges {
     @Input()
     entries: {
         cpu?: ResourceRequirementModel,

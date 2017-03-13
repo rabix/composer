@@ -3,7 +3,7 @@ import {ExternalLinks} from "../../../cwl/external-links";
 import {ExpressionModel, RequirementBaseModel} from "cwlts/models/d2sb";
 import {FormControl} from "@angular/forms";
 import {ReplaySubject} from "rxjs";
-import {ComponentBase} from "../../../components/common/component-base";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 // @todo move to editor common module
 @Component({
@@ -32,7 +32,7 @@ import {ComponentBase} from "../../../components/common/component-base";
         </ct-form-panel>
     `
 })
-export class HintListComponent extends ComponentBase {
+export class HintListComponent extends DirectiveBase {
 
     /** Context in which expression should be evaluated */
     @Input()

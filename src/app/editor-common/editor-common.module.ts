@@ -10,7 +10,6 @@ import {ExpressionEditorComponent} from "./expression-editor/expression-editor.c
 import {FileDefContentPipe} from "./pipes/file-def-content.pipe";
 import {FileDefNamePipe} from "./pipes/file-def-name.pipe";
 import {ExpressionInputComponent} from "./components/expression-input/expression-input.component";
-import {CoreModule} from "../core/core.module";
 import {ModelExpressionEditorComponent} from "./expression-editor/model-expression-editor.component";
 import {CompactListComponent} from "./components/compact-list/compact-list.component";
 import {EditableDirective} from "./directives/editable.directive";
@@ -18,7 +17,6 @@ import {ExpressionModelListComponent} from "./components/expression-model-list/e
 import {ValidationComponent} from "./components/validation-preview/validation-preview.component";
 import {ValidationTextPipe} from "./pipes/validation-text.pipes";
 import {ValidationClassDirective} from "./components/validation-preview/validation-class.directive";
-import {EditorControlsComponent} from "./components/editor-controls/editor-controls.component";
 import {RevisionListComponent} from "./components/revision-list/revision-list.component";
 import {KeyValueInputComponent} from "./components/key-value-component/key-value-input.component";
 import {KeyValueListComponent} from "./components/key-value-component/key-value-list.component";
@@ -27,17 +25,16 @@ import {JobEditorComponent} from "./job-editor/job-editor.component";
 import {FileInputInspector} from "./inspector-forms/file-input-inspector.component";
 import {JobEditorEntryComponent} from "./job-editor/job-editor-entry.component";
 import {MapListComponent} from "./components/map-list/map-list.component";
-import {BlockLoaderComponent} from "./components/block-loader/block-loader.component";
 import {CwlSchemaValidationWorkerService} from "./cwl-schema-validation-worker/cwl-schema-validation-worker.service";
 import {SymbolsComponent} from "./components/symbols/symbols.component";
-import {InputTypeSelectComponent} from "./components/type-select/type-select.component"
+import {InputTypeSelectComponent} from "./components/type-select/type-select.component";
+import {UIModule} from "../ui/ui.module";
 
 @NgModule({
     declarations: [
         BlankToolStateComponent,
         CompactListComponent,
         EditableDirective,
-        EditorControlsComponent,
         EditorInspectorComponent,
         EditorInspectorContentComponent,
         EditorInspectorDirective,
@@ -59,9 +56,8 @@ import {InputTypeSelectComponent} from "./components/type-select/type-select.com
         ValidationTextPipe,
         FileInputInspector,
         MapListComponent,
-        BlockLoaderComponent,
         SymbolsComponent,
-        InputTypeSelectComponent
+        InputTypeSelectComponent,
     ],
     exports: [
         MapListComponent,
@@ -69,7 +65,6 @@ import {InputTypeSelectComponent} from "./components/type-select/type-select.com
         CompactListComponent,
         FileInputInspector,
         EditableDirective,
-        EditorControlsComponent,
         EditorInspectorComponent,
         EditorInspectorContentComponent,
         EditorInspectorDirective,
@@ -87,7 +82,6 @@ import {InputTypeSelectComponent} from "./components/type-select/type-select.com
         ValidationClassDirective,
         ValidationComponent,
         ValidationReportComponent,
-        BlockLoaderComponent,
         SymbolsComponent,
         InputTypeSelectComponent
     ],
@@ -100,7 +94,12 @@ import {InputTypeSelectComponent} from "./components/type-select/type-select.com
     providers: [
         CwlSchemaValidationWorkerService
     ],
-    imports: [BrowserModule, CoreModule, FormsModule, ReactiveFormsModule]
+    imports: [
+        BrowserModule,
+        FormsModule,
+        ReactiveFormsModule,
+        UIModule,
+    ]
 })
 export class EditorCommonModule {
 

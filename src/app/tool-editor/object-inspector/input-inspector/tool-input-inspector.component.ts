@@ -2,7 +2,7 @@ import {Component, Input, Output, ViewEncapsulation} from "@angular/core";
 import {SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {Subject} from "rxjs";
-import {ComponentBase} from "../../../components/common/component-base";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -23,7 +23,7 @@ import {ComponentBase} from "../../../components/common/component-base";
         </form>
     `
 })
-export class ToolInputInspector extends ComponentBase {
+export class ToolInputInspector extends DirectiveBase {
 
     @Input()
     public input: SBDraft2CommandInputParameterModel;

@@ -1,0 +1,135 @@
+@import "../../../assets/sass/variables";
+@import "../../../assets/sass/mixins";
+@import "../../../assets/sass/icons";
+
+ct-tree-view {
+    background: $panel-bg;
+    color: $panel-item-color;
+    display: block;
+    height: 100%;
+    overflow-y: auto;
+    padding: 4px;
+    position: relative;
+    width: 100%;
+
+    ct-tree-node {
+        display: block;
+        font-size: $font-size-sm;
+        position: relative;
+    }
+
+    .node-base {
+        height: 22px;
+        font-size: $font-size-sm;
+        font-weight: 300;
+        border-radius: 2px;
+        display: inline-block;
+        outline: none;
+        width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+        padding-left: 2em;
+
+        .name {
+            display: inline-block;
+            text-overflow: ellipsis;
+            white-space: pre;
+            overflow: hidden;
+        }
+
+        &:hover {
+            background: $panel-item-hover-bg;
+            color: $panel-item-hover-color;
+        }
+
+        &.selected {
+            background: $panel-item-select-bg;
+            color: $panel-item-select-color;
+
+            .icon-space .fa {
+                color: $panel-item-icon-select-color;
+            }
+        }
+    }
+
+    .root-node > .node-base {
+        padding-left: 0;
+    }
+
+    .icon-space {
+        display: inline-block;
+        width: 20px;
+        margin: 0 0 0 0;
+        position: relative;
+
+        .icon-command-line-tool, .icon-workflow {
+            position: relative;
+            top: 2px;
+        }
+
+        [class*='fa-angle'] {
+            @extend .icon-angle;
+        }
+    }
+
+    .node-icon {
+        margin-right: 4px;
+    }
+
+    .highlighted {
+
+    }
+}
+
+.name-container {
+    display: inline-block;
+    vertical-align: middle;
+
+    .name {
+        display: inline-block;
+        border: 1px solid transparent;
+        white-space: pre;
+    }
+
+    .name:first-child:not(:only-child) {
+        color: $brand-primary;
+        background: linear-gradient(to bottom, #fcfac0, #f6f283);
+        filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#fcfac0, endColorstr=#f6f283);
+        border-radius: 4px;
+        border: 1px solid orange;
+        box-sizing: border-box;
+        font-weight: 400;
+    }
+}
+
+.search-term-container {
+    height: 24px;
+    position: absolute;
+    width: 100%;
+    background: $brand-primary-bg-dark;
+    display: block;
+    margin-top: -4px;
+    margin-left: -4px;
+    z-index: 10;
+}
+
+.search-term {
+    display: block;
+
+    &.hidden {
+        height: 0;
+        opacity: 0;
+        padding: 0 0 0 10px;
+        font-size: 0;
+    }
+    .term {
+        white-space: pre;
+    }
+    height: 24px;
+    opacity: 1;
+    overflow: hidden;
+    padding: 4px 14px;
+    font-size: $font-size-xs;
+    font-style: italic;
+    transition: all .2s;
+}

@@ -11,7 +11,7 @@ import {
 } from "@angular/core";
 import {StepModel, WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
 import {Workflow} from "cwl-svg";
-import {StatusBarService} from "../../../core/status-bar/status-bar.service";
+import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 import {Observable} from "rxjs";
 import * as Yaml from "js-yaml";

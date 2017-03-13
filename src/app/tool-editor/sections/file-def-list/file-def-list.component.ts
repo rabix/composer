@@ -1,11 +1,11 @@
 import {ChangeDetectionStrategy, Component, Input, Output, QueryList, TemplateRef, ViewChildren, ViewEncapsulation} from "@angular/core";
-import {ComponentBase} from "../../../components/common/component-base";
 import {FileDef} from "cwlts/mappings/d2sb/FileDef";
 import {FileDefModel} from "cwlts/models/d2sb";
 import {Subject} from "rxjs";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
-import {ModalService} from "../../../components/modal/modal.service";
 import {noop} from "../../../lib/utils.lib";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -101,7 +101,7 @@ import {noop} from "../../../lib/utils.lib";
         </ct-form-panel>
     `
 })
-export class FileDefListComponent extends ComponentBase {
+export class FileDefListComponent extends DirectiveBase {
 
     /** List of entries that should be shown */
     @Input()

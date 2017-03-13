@@ -2,7 +2,7 @@ import {Subject} from "rxjs";
 import {Component, Input, Output, ViewEncapsulation} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {CommandArgumentModel} from "cwlts/models/d2sb";
-import {ComponentBase} from "../../../components/common/component-base";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -47,7 +47,7 @@ import {ComponentBase} from "../../../components/common/component-base";
         </form>
     `
 })
-export class ArgumentInspector extends ComponentBase {
+export class ArgumentInspector extends DirectiveBase {
 
     @Input()
     public readonly = false;

@@ -1,12 +1,12 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {ComponentBase} from "../../../components/common/component-base";
 import {noop} from "../../../lib/utils.lib";
 import {ExpressionModel} from "cwlts/models/d2sb";
-import {ModalService} from "../../../components/modal/modal.service";
 import {ModelExpressionEditorComponent} from "../../../editor-common/expression-editor/model-expression-editor.component";
-import {MultilangCodeEditorComponent} from "../../../core/ui/code-editor/multilang-code-editor.component";
-import {ACE_MODES_MAP} from "../../../components/code-editor/code-editor-modes-map";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {ModalService} from "../../../ui/modal/modal.service";
+import {ACE_MODE_MAP} from "../../../ui/code-editor-new/ace-mode-map";
+import {MultilangCodeEditorComponent} from "../../../ui/code-editor/multilang-code-editor.component";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -59,7 +59,7 @@ import {ACE_MODES_MAP} from "../../../components/code-editor/code-editor-modes-m
         </div>
     `
 })
-export class LiteralExpressionInputComponent extends ComponentBase implements ControlValueAccessor {
+export class LiteralExpressionInputComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
     context: { $job?: {} } = {};
@@ -140,7 +140,7 @@ export class LiteralExpressionInputComponent extends ComponentBase implements Co
         if (this.fileName) {
             const nameParts = this.fileName.split(".");
             const ext = nameParts[nameParts.length - 1].toLowerCase();
-            if (ACE_MODES_MAP[ext]) {
+            if (ACE_MODE_MAP[ext]) {
                 editor.language.next(ext);
             }
         }

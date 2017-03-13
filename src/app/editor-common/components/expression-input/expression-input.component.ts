@@ -1,10 +1,10 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ExpressionModel} from "cwlts/models/d2sb";
-import {ComponentBase} from "../../../components/common/component-base";
 import {noop} from "../../../lib/utils.lib";
-import {ModalService} from "../../../components/modal/modal.service";
 import {ModelExpressionEditorComponent} from "../../expression-editor/model-expression-editor.component";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -52,7 +52,7 @@ import {ModelExpressionEditorComponent} from "../../expression-editor/model-expr
         </div>
     `
 })
-export class ExpressionInputComponent extends ComponentBase implements ControlValueAccessor {
+export class ExpressionInputComponent extends DirectiveBase implements ControlValueAccessor {
     /**
      * Context in which expression should be executed
      */

@@ -1,9 +1,9 @@
 import {Component, Input, Output, ViewEncapsulation} from "@angular/core";
 import {Subject} from "rxjs";
-import {ComponentBase} from "../../../components/common/component-base";
 import {FormControl, FormGroup} from "@angular/forms";
 import {FileDefModel} from "cwlts/models/d2sb";
 import {FileDef} from "cwlts/mappings/d2sb/FileDef";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -29,7 +29,7 @@ import {FileDef} from "cwlts/mappings/d2sb/FileDef";
             </div>
         </form>`
 })
-export class FileDefInspectorComponent extends ComponentBase {
+export class FileDefInspectorComponent extends DirectiveBase {
 
     @Input()
     public readonly = false;

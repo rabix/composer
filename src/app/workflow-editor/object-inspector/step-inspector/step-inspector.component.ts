@@ -1,10 +1,10 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, ViewEncapsulation} from "@angular/core";
-import {ComponentBase} from "../../../components/common/component-base";
 import {StepModel, WorkflowModel} from "cwlts/models";
 import {UserPreferencesService} from "../../../services/storage/user-preferences.service";
-import {ModalService} from "../../../components/modal/modal.service";
-import {PlatformAPI} from "../../../services/api/platforms/platform-api.service";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {UpdateStepModal} from "../../../components/modal/custom/update-step-modal.component";
+import {PlatformAPI} from "../../../services/api/platforms/platform-api.service";
+import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -58,7 +58,7 @@ import {UpdateStepModal} from "../../../components/modal/custom/update-step-moda
         </ct-workflow-step-inspector-step>
     `
 })
-export class WorkflowStepInspector extends ComponentBase {
+export class WorkflowStepInspector extends DirectiveBase {
 
     @Input()
     public step: StepModel;
@@ -74,14 +74,15 @@ export class WorkflowStepInspector extends ComponentBase {
 
     private viewMode = this.tabs.Inputs;
 
-    constructor(private userPrefService: UserPreferencesService, private modal: ModalService,
-                private platform: PlatformAPI, private cdr: ChangeDetectorRef) {
+    constructor(private modal: ModalService,
+                private platform: PlatformAPI,
+                private cdr: ChangeDetectorRef,
+                private userPrefService: UserPreferencesService) {
         super();
 
         this.tracked = this.userPrefService.get("step_inspector_active_tab", this.tabs.Inputs, true)
             .subscribe(x => this.viewMode = x);
     }
-
 
 
     private updateStep(ev: Event) {

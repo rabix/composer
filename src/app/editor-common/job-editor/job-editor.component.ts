@@ -11,7 +11,7 @@ import {
 } from "@angular/core";
 import {ObjectHelper as OH} from "../../helpers/object.helper";
 import {SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
-import {StatusBarService} from "../../core/status-bar/status-bar.service";
+import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
 
 /**
