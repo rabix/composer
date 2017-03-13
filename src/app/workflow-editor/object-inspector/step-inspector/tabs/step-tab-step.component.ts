@@ -51,13 +51,11 @@ import {FormBuilder, FormGroup} from "@angular/forms";
                 </select>
             
                 <!--Multiple Scatter-->
-                <div *ngIf="step.hasMultipleScatter">
-                        <select class="form-control" multiple [formControl]="form.controls['scatter']">
-                            <option *ngFor="let opt of step.in" [value]="opt.id">
-                                {{opt.id}}
-                            </option>
-                        </select>
-                </div>
+                <select *ngIf="step.hasMultipleScatter" class="form-control" multiple [formControl]="form.controls['scatter']">
+                    <option *ngFor="let opt of step.in" [value]="opt.id">
+                        {{opt.id}}
+                    </option>
+                </select>
             
             </div>
             
