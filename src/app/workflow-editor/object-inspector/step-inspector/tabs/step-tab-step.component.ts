@@ -1,6 +1,7 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, ViewEncapsulation} from "@angular/core";
 import {StepModel, WorkflowModel} from "cwlts/models";
 import {FormBuilder, FormGroup} from "@angular/forms";
+import {Workflow} from "cwl-svg";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 import {Workflow} from "cwl-svg";
 
