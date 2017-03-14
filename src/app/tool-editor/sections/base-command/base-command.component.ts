@@ -1,6 +1,6 @@
 import {Component, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewEncapsulation} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
-import {ExpressionModel} from "cwlts/models/d2sb";
+import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 import {ReplaySubject} from "rxjs";
 import {ComponentBase} from "../../../components/common/component-base";
 import {GuidService} from "../../../services/guid.service";
@@ -85,15 +85,15 @@ import {noop} from "../../../lib/utils.lib";
 export class BaseCommandComponent extends ComponentBase implements OnInit, OnDestroy, OnChanges {
     /** baseCommand property of model */
     @Input()
-    public baseCommand: ExpressionModel[];
+    public baseCommand: SBDraft2ExpressionModel[];
 
     /** Stdin property of model */
     @Input()
-    public stdin: ExpressionModel;
+    public stdin: SBDraft2ExpressionModel;
 
     /** Stdout property of model */
     @Input()
-    public stdout: ExpressionModel;
+    public stdout: SBDraft2ExpressionModel;
 
     /** The parent forms group which is already in the clt-editor form tree */
     @Input()
@@ -108,11 +108,11 @@ export class BaseCommandComponent extends ComponentBase implements OnInit, OnDes
 
     /** Update event triggered on command form changes (add, remove, edit) */
     @Output()
-    public updateCmd = new ReplaySubject<ExpressionModel[]>();
+    public updateCmd = new ReplaySubject<SBDraft2ExpressionModel[]>();
 
     /** Update event triggered on stream changes */
     @Output()
-    public updateStreams = new ReplaySubject<ExpressionModel[]>();
+    public updateStreams = new ReplaySubject<SBDraft2ExpressionModel[]>();
 
     /** form group for streams */
     private streamsForm: FormGroup;
@@ -121,7 +121,7 @@ export class BaseCommandComponent extends ComponentBase implements OnInit, OnDes
     private baseCommandForm: FormGroup;
 
     /** List which connects model to forms */
-    private formList: Array<{ id: string, model: ExpressionModel }> = [];
+    private formList: Array<{ id: string, model: SBDraft2ExpressionModel }> = [];
 
     constructor(private guidService: GuidService, private modal: ModalService) {
         super();
@@ -138,7 +138,7 @@ export class BaseCommandComponent extends ComponentBase implements OnInit, OnDes
         }
     }
 
-    private initCmdForm(cmdList: ExpressionModel[]) {
+    private initCmdForm(cmdList: SBDraft2ExpressionModel[]) {
         this.formList = cmdList.map(model => {
             return {
                 id: this.guidService.generate(), model
@@ -180,7 +180,7 @@ export class BaseCommandComponent extends ComponentBase implements OnInit, OnDes
         });
     }
 
-    private removeBaseCommand(ctrl: { id: string, model: ExpressionModel }): void {
+    private removeBaseCommand(ctrl: { id: string, model: SBDraft2ExpressionModel }): void {
         this.modal.confirm({
             title: "Really Remove?",
             content: `Are you sure that you want to remove this base command?`,
@@ -194,7 +194,7 @@ export class BaseCommandComponent extends ComponentBase implements OnInit, OnDes
     }
 
     private addBaseCommand(): void {
-        this.updateCmd.next(this.baseCommand.concat([new ExpressionModel("", "")]));
+        this.updateCmd.next(this.baseCommand.concat([new SBDraft2ExpressionModel("", "")]));
     }
 
     ngOnDestroy() {

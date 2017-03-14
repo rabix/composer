@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, Input, Output, ViewEncapsulation} from "@angular/core";
 import {ExternalLinks} from "../../../cwl/external-links";
-import {ExpressionModel, RequirementBaseModel} from "cwlts/models/d2sb";
+import {SBDraft2ExpressionModel, RequirementBaseModel} from "cwlts/models/d2sb";
 import {FormControl} from "@angular/forms";
 import {ReplaySubject} from "rxjs";
 import {ComponentBase} from "../../../components/common/component-base";
@@ -47,7 +47,7 @@ export class HintListComponent extends ComponentBase {
 
     private formList: {
         key?: string,
-        value: string | ExpressionModel,
+        value: string | SBDraft2ExpressionModel,
         readonly: boolean
     }[] = [];
 
@@ -73,17 +73,17 @@ export class HintListComponent extends ComponentBase {
 
     private createFormList(entries: RequirementBaseModel[]): {
         key: string,
-        value: string | ExpressionModel,
+        value: string | SBDraft2ExpressionModel,
         readonly: boolean
     }[] {
         return entries.map((hint: RequirementBaseModel) => {
             let newHint = {
                 key: hint["class"],
-                value: <string | ExpressionModel>"",
+                value: <string | SBDraft2ExpressionModel>"",
                 readonly: false
             };
 
-            if (typeof hint.value === "string" || hint.value instanceof ExpressionModel) {
+            if (typeof hint.value === "string" || hint.value instanceof SBDraft2ExpressionModel) {
                 newHint.value = hint.value;
 
             } else {
@@ -102,7 +102,7 @@ export class HintListComponent extends ComponentBase {
 
     private createHintList(formList: {
                                key?: string,
-                               value: string | ExpressionModel,
+                               value: string | SBDraft2ExpressionModel,
                                readonly: boolean
                            }[]): any[] {
 
@@ -124,7 +124,7 @@ export class HintListComponent extends ComponentBase {
                 if (!!item.key && !!item.key.trim() && !item.readonly) {
                     return new RequirementBaseModel({
                         "class": item.key,
-                        value: (<ExpressionModel>item.value).serialize()
+                        value: (<SBDraft2ExpressionModel>item.value).serialize()
                     }).serialize();
                 }
             })

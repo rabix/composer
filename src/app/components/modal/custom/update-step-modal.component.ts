@@ -57,7 +57,7 @@ export class UpdateStepModal {
 
     public link;
 
-    constructor(private modal: ModalService, private settings: SettingsService, private system: SystemService) {
+    constructor(private modal: ModalService, private settings: SettingsService, public system: SystemService) {
 
     }
 

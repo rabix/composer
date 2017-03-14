@@ -4,12 +4,12 @@ import {Subject} from "rxjs";
 import {ComponentBase} from "../../../../components/common/component-base";
 import {ObjectHelper as OH} from "../../../../helpers/object.helper";
 import {StatusBarService} from "../../../../core/status-bar/status-bar.service";
+import {Workflow} from "cwl-svg";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
-
     selector: "ct-workflow-step-inspector-inputs",
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    //@todo: temporarily removing ChangeDetectionStrategy.OnPush because model is being changed externally by graph
     styleUrls: ["./step-tab-inputs.component.scss"],
     template: `
         <div *ngFor="let group of inputGroups">
@@ -97,7 +97,7 @@ import {StatusBarService} from "../../../../core/status-bar/status-bar.service";
 })
 export class WorkflowStepInspectorTabInputs extends ComponentBase {
 
-    private dropDownPortOptions = [
+    public dropDownPortOptions = [
         {
             value: "editable",
             caption: "Editable",
@@ -124,6 +124,9 @@ export class WorkflowStepInspectorTabInputs extends ComponentBase {
     @Input()
     public inputs: WorkflowStepInputModel [] = [];
 
+    @Input()
+    public graph: Workflow;
+
     @Output()
     public save = new Subject<WorkflowStepInputModel>();
 
@@ -142,12 +145,15 @@ export class WorkflowStepInspectorTabInputs extends ComponentBase {
         switch (value) {
             case"editable":
                 this.workflowModel.clearPort(input);
+                this.graph.redraw();
                 break;
             case"exposed":
                 this.workflowModel.exposePort(input);
+                this.graph.redraw();
                 break;
             case"port":
                 this.workflowModel.includePort(input);
+                this.graph.redraw();
                 break;
         }
     }

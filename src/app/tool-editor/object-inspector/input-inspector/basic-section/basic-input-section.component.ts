@@ -89,9 +89,9 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
     public readonly = false;
 
     /** The currently displayed property */
-    private input: SBDraft2CommandInputParameterModel;
+    public input: SBDraft2CommandInputParameterModel;
 
-    private basicSectionForm: FormGroup;
+    public basicSectionForm: FormGroup;
 
     private onTouched = noop;
 

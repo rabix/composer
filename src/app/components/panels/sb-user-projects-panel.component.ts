@@ -141,7 +141,11 @@ export class SBUserProjectsPanelComponent extends ComponentBase {
             childrenProvider: _ => project.childrenProvider()
                 .map(childrenApps => childrenApps.map((source: DataEntrySource) => {
                     Object.assign(source, {
-                        resolve: () => new Promise((resolve, reject) => {
+                        resolve: (data?: string) => new Promise((resolve, reject) => {
+                            if (data) {
+                                resolve(JSON.parse(data));
+                                return;
+                            }
                             source.content.take(1).subscribe(text => {
                                 resolve(JSON.parse(text));
                             }, err => reject(err));

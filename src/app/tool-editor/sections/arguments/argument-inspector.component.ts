@@ -1,7 +1,7 @@
 import {Subject} from "rxjs";
 import {Component, Input, Output, ViewEncapsulation} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
-import {CommandArgumentModel} from "cwlts/models/d2sb";
+import {SBDraft2CommandArgumentModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../components/common/component-base";
 
 @Component({
@@ -53,7 +53,7 @@ export class ArgumentInspector extends ComponentBase {
     public readonly = false;
 
     @Input()
-    public argument: CommandArgumentModel;
+    public argument: SBDraft2CommandArgumentModel;
 
     private form: FormGroup;
 

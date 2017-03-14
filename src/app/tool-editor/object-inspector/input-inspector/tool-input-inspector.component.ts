@@ -35,7 +35,7 @@ export class ToolInputInspector extends ComponentBase {
     @Input()
     public readonly = false;
 
-    private form: FormGroup;
+    public form: FormGroup;
 
     @Output()
     public save = new Subject<SBDraft2CommandInputParameterModel>();

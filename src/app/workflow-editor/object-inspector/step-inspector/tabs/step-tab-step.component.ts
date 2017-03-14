@@ -2,6 +2,7 @@ import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, ViewEncaps
 import {ComponentBase} from "../../../../components/common/component-base";
 import {StepModel, WorkflowModel} from "cwlts/models";
 import {FormBuilder, FormGroup} from "@angular/forms";
+import {Workflow} from "cwl-svg";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -79,6 +80,9 @@ export class WorkflowStepInspectorTabStep extends ComponentBase {
     @Input()
     public workflowModel: WorkflowModel;
 
+    @Input()
+    public graph: Workflow;
+
     private scatterMethodOptions = [
         {
             value: "dotproduct",
@@ -114,6 +118,7 @@ export class WorkflowStepInspectorTabStep extends ComponentBase {
             try {
                 // Change id on workflow model so canvas can interact with it
                 this.workflowModel.changeStepId(this.step, value);
+                this.graph.redraw();
             }
             catch (e) {
                 this.form.controls['id'].setErrors({error: e.message});
@@ -128,6 +133,7 @@ export class WorkflowStepInspectorTabStep extends ComponentBase {
 
         this.tracked = this.form.controls["label"].valueChanges.subscribe((label) => {
             this.step.label = label;
+            this.graph.redraw();
         });
 
         this.tracked = this.form.controls["scatter"].valueChanges.subscribe((scatter) => {

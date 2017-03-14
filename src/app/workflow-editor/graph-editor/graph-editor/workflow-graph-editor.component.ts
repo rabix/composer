@@ -22,7 +22,6 @@ declare const Snap: any;
 
 @Component({
     encapsulation: ViewEncapsulation.None,
-    changeDetection: ChangeDetectionStrategy.OnPush,
     selector: "ct-workflow-graph-editor",
     styleUrls: ["./workflow-graph-editor.component.scss"],
     template: `
@@ -54,12 +53,14 @@ declare const Snap: any;
                 <div class="tc-body">
                     <ct-workflow-step-inspector *ngIf="typeOfInspectedNode() === 'Step'"
                                                 [step]="inspectedNode"
+                                                [graph]="graph"
                                                 [workflowModel]="model">
                     </ct-workflow-step-inspector>
 
                     <ct-workflow-io-inspector
                         *ngIf="typeOfInspectedNode() === 'Input' || typeOfInspectedNode() === 'Output'"
                         [port]="inspectedNode"
+                        [graph]="graph"
                         [workflowModel]="model">
 
                     </ct-workflow-io-inspector>
@@ -88,7 +89,7 @@ export class WorkflowGraphEditorComponent {
 
     private inspectedNode: StepModel | WorkflowOutputParameterModel | WorkflowInputParameterModel = null;
 
-    private graph: Workflow;
+    public graph: Workflow;
 
     constructor(private statusBar: StatusBarService,
                 private inspector: EditorInspectorService) {

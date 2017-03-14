@@ -2,7 +2,7 @@ import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ComponentBase} from "../../../components/common/component-base";
 import {noop} from "../../../lib/utils.lib";
-import {ExpressionModel} from "cwlts/models/d2sb";
+import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 import {ModalService} from "../../../components/modal/modal.service";
 import {ModelExpressionEditorComponent} from "../../../editor-common/expression-editor/model-expression-editor.component";
 import {MultilangCodeEditorComponent} from "../../../core/ui/code-editor/multilang-code-editor.component";
@@ -81,12 +81,12 @@ export class LiteralExpressionInputComponent extends ComponentBase implements Co
     private onTouch = noop;
 
     /** Flag if model is expression or primitive */
-    private isExpr: boolean = false;
+    public isExpr: boolean = false;
 
     /**
      * Internal ExpressionModel on which changes are made
      */
-    private model: ExpressionModel;
+    public model: SBDraft2ExpressionModel;
 
 
     /** getter for formControl value */
@@ -95,7 +95,7 @@ export class LiteralExpressionInputComponent extends ComponentBase implements Co
     }
 
     /** setter for formControl value */
-    public set value(val: ExpressionModel) {
+    public set value(val: SBDraft2ExpressionModel) {
         if (val !== this.model) {
             this.model = val;
             this.onChange(val);
@@ -107,7 +107,7 @@ export class LiteralExpressionInputComponent extends ComponentBase implements Co
     }
 
     writeValue(obj: any): void {
-        if (!(obj instanceof ExpressionModel)) {
+        if (!(obj instanceof SBDraft2ExpressionModel)) {
             console.warn(`ct-literal-expression-input expected ExpressionModel, instead got ${obj}`)
         }
 
@@ -115,7 +115,7 @@ export class LiteralExpressionInputComponent extends ComponentBase implements Co
             this.model = obj;
             this.isExpr = obj.isExpression;
         } else {
-            this.model = new ExpressionModel("", "");
+            this.model = new SBDraft2ExpressionModel("", "");
             this.isExpr = this.model.isExpression;
         }
     }
@@ -148,7 +148,7 @@ export class LiteralExpressionInputComponent extends ComponentBase implements Co
         editor.action.first().subscribe(action => {
             if (action === "save") {
                 // save string
-                this.model = new ExpressionModel(this.model.loc, <string> editor.content.value);
+                this.model = new SBDraft2ExpressionModel(this.model.loc, <string> editor.content.value);
                 this.onChange(this.model);
             }
             this.modal.close();
@@ -186,7 +186,7 @@ export class LiteralExpressionInputComponent extends ComponentBase implements Co
             editor.context = this.context;
             editor.action.first().subscribe(action => {
                 if (action === "save") {
-                    this.model = new ExpressionModel(this.model.loc, editor.model.serialize());
+                    this.model = new SBDraft2ExpressionModel(this.model.loc, editor.model.serialize());
                     this.model.evaluate(this.context); // to reset validation
                     this.isExpr = this.model.isExpression;
                     this.onChange(this.model);

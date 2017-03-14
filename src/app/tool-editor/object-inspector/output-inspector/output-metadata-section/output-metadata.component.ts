@@ -1,7 +1,7 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ComponentBase} from "../../../../components/common/component-base";
-import {CommandOutputParameterModel as OutputProperty, ExpressionModel, SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
+import {CommandOutputParameterModel as OutputProperty, SBDraft2ExpressionModel, SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
 import {noop} from "../../../../lib/utils.lib";
 
 @Component({
@@ -65,7 +65,7 @@ export class OutputMetaDataSectionComponent extends ComponentBase implements Con
 
     private metadataForm: FormGroup;
 
-    private keyValueFormList: { key: string, value: string | ExpressionModel }[] = [];
+    private keyValueFormList: { key: string, value: string | SBDraft2ExpressionModel }[] = [];
 
     constructor(private formBuilder: FormBuilder) {
         super();
@@ -104,7 +104,7 @@ export class OutputMetaDataSectionComponent extends ComponentBase implements Con
             .subscribe(change => {
                 const metadataObject = {};
 
-                change.metadataList.forEach((item: { key: string, value: ExpressionModel }) => {
+                change.metadataList.forEach((item: { key: string, value: SBDraft2ExpressionModel }) => {
                     metadataObject[item.key] = item.value;
                 });
 
