@@ -143,7 +143,6 @@ export class AppInfoComponent implements OnChanges {
     public editedBy: string;
     public editedOn: number;
     public revisionNote: string;
-//    public toolkit: string;
     public inputs: Array<Object>;
     public appSettings: Array<Object>;
 
@@ -157,7 +156,6 @@ export class AppInfoComponent implements OnChanges {
         this.editedBy = this.model.customProps['sbg:modifiedBy'];
         this.editedOn = this.model.customProps['sbg:modifiedOn'] * 1000;
         this.revisionNote = this.model.customProps['sbg:revisionNotes'] || null;
-//        this.toolkit = this.model.customProps['sbg:toolkit'] + ' ' + this.model.customProps['sbg:toolkitVersion']
 
         this.inputs = this.model.inputs.filter((input) => input.type.type === 'File' || input.type.items === 'File');
         this.appSettings = this.model.inputs.filter((input) => input.type.type !== 'File' && input.type.items !== 'File');

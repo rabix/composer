@@ -91,7 +91,7 @@ export class InlineEditorComponent  {
     }
 
     ngOnInit() {
-        if (this.type === 'tags') {
+        if (this.type === 'tags' && Array.isArray(this.value)) {
             this.inputval = this.value.join(', ');
         } else {
             this.inputval = this.value;
