@@ -1,6 +1,6 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {ExpressionModel} from "cwlts/models/d2sb";
+import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../components/common/component-base";
 import {GuidService} from "../../../services/guid.service";
 import {noop} from "../../../lib/utils.lib";
@@ -104,7 +104,7 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
         id: string,
         model: {
             key?: string,
-            value: string | ExpressionModel,
+            value: string | SBDraft2ExpressionModel,
             readonly?: boolean
         }
     }[] = [];
@@ -123,7 +123,7 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
 
     writeValue(keyValueList: {
                    key?: string,
-                   value: string | ExpressionModel,
+                   value: string | SBDraft2ExpressionModel,
                    readonly?: boolean
                }[]): void {
 
@@ -191,7 +191,7 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
             id: this.guidService.generate(),
             model: {
                 key: "",
-                value: new ExpressionModel(null, ""),
+                value: new SBDraft2ExpressionModel(null, ""),
                 readonly: false
             }
         };
@@ -200,7 +200,7 @@ export class KeyValueListComponent extends ComponentBase implements ControlValue
         this.form.addControl(newEntry.id, new FormControl(newEntry.model));
     }
 
-    private removeEntry(ctrl: { id: string, model: ExpressionModel }): void {
+    private removeEntry(ctrl: { id: string, model: SBDraft2ExpressionModel }): void {
         this.modal.confirm({
             title: "Really Remove?",
             content: `Are you sure that you want to remove this key-value pair?`,

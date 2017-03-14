@@ -261,8 +261,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
                         this.showReformatPrompt = false;
                     }
 
-
-                    this.data.resolve().then((resolved) => {
+                    this.data.resolve(latestContent).then((resolved) => {
                         // generate model and get command line parts
                         this.toolModel = CommandLineToolFactory.from(resolved as any, "document");
                         this.toolModel.onCommandLineResult((res) => {

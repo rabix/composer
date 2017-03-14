@@ -103,12 +103,12 @@ export class LocalDataSourceService {
     private wrapFileEntry(entry) {
         let content: Observable<string>;
         let save;
-        let resolve: () => Promise<string>;
+        let resolve: (content: string) => Promise<string>;
 
         if (entry.isFile) {
             content = Observable.of(1).switchMap(_ => this.readFileContent(entry.path)).share();
             save = this.getContentSavingFunction(entry.path);
-            resolve = () => this.ipc.request("resolve", entry.path).toPromise();
+            resolve = (content) => this.ipc.request("resolveContent", {content, path:entry.path}).toPromise();
         }
 
 

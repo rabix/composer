@@ -64,12 +64,6 @@ import LoadOptions = jsyaml.LoadOptions;
                             (click)="switchView(viewModes.Graph)"
                             [class.btn-primary]="viewMode === viewModes.Graph"
                             [class.btn-secondary]="viewMode !== viewModes.Graph">Very Visual</button>
-                            
-                    <button class="btn btn-secondary btn-sm"
-                            [disabled]="!isValidCWL"
-                            (click)="switchView(viewModes.Test)"
-                            [class.btn-primary]="viewMode === viewModes.Test"
-                            [class.btn-secondary]="viewMode !== viewModes.Test">Test</button>
                 </span>
 
                 <!--CWLVersion-->
@@ -122,7 +116,6 @@ import LoadOptions = jsyaml.LoadOptions;
                                           [readonly]="!data.isWritable"
                                           [model]="workflowModel"
                                           class="gui-editor-component flex-col">
-
                 </ct-workflow-graph-editor>
 
 
@@ -262,8 +255,10 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
                         this.showReformatPrompt = false;
                     }
 
-                    this.data.resolve().then(resolved => {
+                    this.data.resolve(latestContent).then(resolved => {
+                        console.time("Workflow model");
                         this.workflowModel = WorkflowFactory.from(resolved as any, "document");
+                        console.timeEnd("Workflow model");
 
                         // update validation stream on model validation updates
 
@@ -295,7 +290,6 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
                     });
 
                 });
-                // this.webWorkerService.validateJsonSchema(latestContent);
             });
 
         // Whenever content of a file changes, forward the change to the raw editor content steam.
@@ -322,14 +316,16 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
                 if (response) {
                     Object.keys(response).forEach(key => {
                         if (response[key] === true) {
-                            const step = this.workflowModel.steps.find(step => step.run.customProps["sbg:id"] === key);
-                            step && (step.hasUpdate = true);
+                            this.workflowModel.steps
+                                .filter(step => step.run.customProps["sbg:id"] === key)
+                                .forEach(step => step.hasUpdate = true);
                         }
                     });
                 }
 
                 // load document in GUI and turn off loader, only if loader was active
                 if (this.isLoading) {
+                    //@todo: this.viewMode cannot be initially set to viewModes.Graph because canvas dimensions are not initialized
                     this.viewMode = this.viewModes.Gui;
                     this.isLoading = false;
                 }
@@ -397,7 +393,7 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
         //     return;
         // }
 
-        if (mode === this.viewModes.Code && this.toolGroup.dirty) {
+        if (mode === this.viewModes.Code) {
             this.rawEditorContent.next(this.getModelText());
         }
 

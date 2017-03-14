@@ -1,6 +1,6 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {ExpressionModel} from "cwlts/models/d2sb";
+import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../components/common/component-base";
 import {noop} from "../../../lib/utils.lib";
 
@@ -122,7 +122,7 @@ export class KeyValueInputComponent extends ComponentBase implements ControlValu
 
     writeValue(input: {
                    key?: string,
-                   value: string | ExpressionModel,
+                   value: string | SBDraft2ExpressionModel,
                    readonly?: boolean
                }): void {
 

@@ -1,7 +1,7 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ComponentBase} from "../../../components/common/component-base";
-import {ExpressionModel} from "cwlts/models/d2sb";
+import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 import {noop} from "../../../lib/utils.lib";
 
 @Component({
@@ -36,7 +36,7 @@ export class SecondaryFilesComponent extends ComponentBase implements ControlVal
     @Input()
     public context: { $job: any } = {$job: {}};
 
-    private secondaryFiles: ExpressionModel[];
+    private secondaryFiles: SBDraft2ExpressionModel[];
 
     private onTouched = noop;
 
@@ -44,12 +44,12 @@ export class SecondaryFilesComponent extends ComponentBase implements ControlVal
 
     private form: FormControl;
 
-    writeValue(secondaryFiles: ExpressionModel[]): void {
+    writeValue(secondaryFiles: SBDraft2ExpressionModel[]): void {
         this.secondaryFiles = secondaryFiles;
 
         this.form = new FormControl(this.secondaryFiles);
 
-        this.tracked = this.form.valueChanges.subscribe((fileList: ExpressionModel[]) => {
+        this.tracked = this.form.valueChanges.subscribe((fileList: SBDraft2ExpressionModel[]) => {
             this.propagateChange(fileList);
         });
     }

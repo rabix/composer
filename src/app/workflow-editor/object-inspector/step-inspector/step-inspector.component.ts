@@ -5,6 +5,7 @@ import {UserPreferencesService} from "../../../services/storage/user-preferences
 import {ModalService} from "../../../components/modal/modal.service";
 import {PlatformAPI} from "../../../services/api/platforms/platform-api.service";
 import {UpdateStepModal} from "../../../components/modal/custom/update-step-modal.component";
+import {Workflow} from "cwl-svg";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -43,6 +44,7 @@ import {UpdateStepModal} from "../../../components/modal/custom/update-step-moda
         <ct-workflow-step-inspector-inputs *ngIf="viewMode === tabs.Inputs"
                                            [step]="step"
                                            [inputs]="step.in"
+                                           [graph]="graph"
                                            [workflowModel]="workflowModel">
         </ct-workflow-step-inspector-inputs>
 
@@ -54,6 +56,7 @@ import {UpdateStepModal} from "../../../components/modal/custom/update-step-moda
         <!--Step-->
         <ct-workflow-step-inspector-step *ngIf="viewMode === tabs.Step"
                                          [step]="step"
+                                         [graph]="graph"
                                          [workflowModel]="workflowModel">
         </ct-workflow-step-inspector-step>
     `
@@ -66,13 +69,16 @@ export class WorkflowStepInspector extends ComponentBase {
     @Input()
     public workflowModel: WorkflowModel;
 
-    private tabs = {
+    @Input()
+    public graph: Workflow;
+
+    public tabs = {
         Inputs: "inputs",
         Info: "info",
         Step: "step"
     };
 
-    private viewMode = this.tabs.Inputs;
+    public viewMode = this.tabs.Inputs;
 
     constructor(private userPrefService: UserPreferencesService, private modal: ModalService,
                 private platform: PlatformAPI, private cdr: ChangeDetectorRef) {

@@ -36,6 +36,14 @@ module.exports = {
         });
     },
 
+    resolveContent: (data, callback) => {
+        resolver.resolveContent(data.content, data.path).then(result => {
+            callback(null, result);
+        }, err => {
+            callback(err);
+        });
+    },
+
     // Shortcut Routes
     accelerator: (name, callback) => {
         acceleratorController.register(name, callback);

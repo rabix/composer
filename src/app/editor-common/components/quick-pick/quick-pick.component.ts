@@ -1,6 +1,6 @@
 import {Component, forwardRef, Input, OnInit, Output, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {ExpressionModel} from "cwlts/models/d2sb";
+import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../components/common/component-base";
 import {noop} from "../../../lib/utils.lib";
 import {AsyncSubject} from "rxjs";
@@ -74,30 +74,30 @@ export class QuickPickComponent extends ComponentBase implements ControlValueAcc
     @Output()
     public update = new AsyncSubject<any>();
 
-    private showCustom = false;
+    public showCustom = false;
 
-    private list: { label: string, value: string | number }[] = [];
+    public list: { label: string, value: string | number }[] = [];
 
-    private customControl: FormControl;
+    public customControl: FormControl;
 
     private onTouch = noop;
 
     private onChange = noop;
 
-    private computedVal: number | string | Expression;
+    public computedVal: number | string | Expression;
 
-    private radioForm: FormControl;
+    public radioForm: FormControl;
 
-    get value(): string | number | ExpressionModel {
+    get value(): string | number | SBDraft2ExpressionModel {
         return this._value;
     }
 
-    set value(value: string | number | ExpressionModel) {
+    set value(value: string | number | SBDraft2ExpressionModel) {
         this.onChange(value);
         this._value = value;
         let val = value;
 
-        if (value instanceof ExpressionModel && value.type !== "expression") {
+        if (value instanceof SBDraft2ExpressionModel && value.type !== "expression") {
             val = <string | number>value.serialize();
         }
 
@@ -122,13 +122,13 @@ export class QuickPickComponent extends ComponentBase implements ControlValueAcc
         if (this.showCustom) this.createControl(value);
     }
 
-    private _value: string | number | ExpressionModel;
+    private _value: string | number | SBDraft2ExpressionModel;
 
     private setValue(val: string | number) {
         this.onTouch();
         this.computedVal = val;
-        if (this._value instanceof ExpressionModel) {
-            this.value = new ExpressionModel("", val);
+        if (this._value instanceof SBDraft2ExpressionModel) {
+            this.value = new SBDraft2ExpressionModel("", val);
         } else {
             this.value = val;
         }
@@ -163,7 +163,7 @@ available types: {[label: string]: string | number} | string[]`)
         }
     }
 
-    writeValue(value: string | number | ExpressionModel): void {
+    writeValue(value: string | number | SBDraft2ExpressionModel): void {
         if (this.value !== value) {
             this.value = value;
         }
@@ -177,7 +177,7 @@ available types: {[label: string]: string | number} | string[]`)
         this.onTouch = fn;
     }
 
-    private createControl(value: number | string | ExpressionModel): void {
+    private createControl(value: number | string | SBDraft2ExpressionModel): void {
         this.customControl = new FormControl(value);
         this.showCustom = true;
 
@@ -212,8 +212,8 @@ available types: {[label: string]: string | number} | string[]`)
             this.showCustom = false;
             this.customControl = undefined;
 
-            if (this._value instanceof ExpressionModel) {
-                this.value = new ExpressionModel("", "");
+            if (this._value instanceof SBDraft2ExpressionModel) {
+                this.value = new SBDraft2ExpressionModel("", "");
             } else {
                 this.value = "";
             }

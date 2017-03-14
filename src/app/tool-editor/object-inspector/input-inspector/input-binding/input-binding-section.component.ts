@@ -1,6 +1,6 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
-import {CommandLineBindingModel, SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
+import {SBDraft2CommandLineBindingModel, SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../../components/common/component-base";
 import {noop} from "../../../../lib/utils.lib";
 
@@ -62,7 +62,7 @@ import {noop} from "../../../../lib/utils.lib";
             </div>
 
             <div class="form-group" *ngIf="propertyType === 'array'">
-                <label class="form-control-label">Item Seperator</label>
+                <label class="form-control-label">Item Separator</label>
                 <select class="form-control"
                         [ct-disabled]="isRecordType()"
                         [formControl]="inputBindingFormGroup.controls['itemSeparator']">
@@ -99,14 +99,14 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
 
     private input: SBDraft2CommandInputParameterModel;
 
-    private inputBindingFormGroup: FormGroup;
+    public inputBindingFormGroup: FormGroup;
 
     private onTouched = noop;
 
     private propagateChange = noop;
 
     //@todo add itemSeparator field for type array
-    private itemSeparators: { text: string, value: string }[] = [
+    public itemSeparators: { text: string, value: string }[] = [
         {text: "equal", value: "="},
         {text: "comma", value: ","},
         {text: "semicolon", value: ";"},
@@ -173,7 +173,7 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
 
 
                 if (!this.readonly) {
-                    this.input.inputBinding = new CommandLineBindingModel(binding);
+                    this.input.inputBinding = new SBDraft2CommandLineBindingModel(binding);
                     Object.assign(this.input.customProps, value.stageInputSection.customProps);
 
                     this.propagateChange(this.input);
