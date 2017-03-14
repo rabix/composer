@@ -109,8 +109,6 @@ import {StatusBarService} from "../../../../core/status-bar/status-bar.service";
 })
 export class WorkflowStepInspectorTabInputs extends ComponentBase {
 
-    private maxWidth = "500px";
-
     private dropDownPortOptions = [
         {
             value: "editable",
