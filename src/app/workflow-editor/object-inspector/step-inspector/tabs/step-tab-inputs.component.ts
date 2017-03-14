@@ -2,6 +2,7 @@ import {ChangeDetectionStrategy, Component, Input, Output, ViewEncapsulation} fr
 import {StepModel, WorkflowModel, WorkflowStepInputModel} from "cwlts/models";
 import {Subject} from "rxjs";
 import {ObjectHelper as OH} from "../../../../helpers/object.helper";
+import {Workflow} from "cwl-svg";
 import {StatusBarService} from "../../../../layout/status-bar/status-bar.service";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 import {Workflow} from "cwl-svg";
@@ -10,7 +11,7 @@ import {ChangeDetectorRef} from "@angular/core";
 @Component({
     encapsulation: ViewEncapsulation.None,
     selector: "ct-workflow-step-inspector-inputs",
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    //@todo: temporarily removing ChangeDetectionStrategy.OnPush because model is being changed externally by graph
     styleUrls: ["./step-tab-inputs.component.scss"],
     template: `
         <div *ngFor="let group of inputGroups">
