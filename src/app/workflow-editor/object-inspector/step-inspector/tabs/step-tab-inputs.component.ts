@@ -23,7 +23,7 @@ import {Workflow} from "cwl-svg";
                             <!--Label and port options-->
                             <div class="input-title flex-baseline">
 
-                                <label class="input-label" [title]="input.label || input.id">
+                                <label class="input-label">
                                     <span class="text-danger" *ngIf="!input.type.isNullable">*</span>
                                     {{ input.label || input.id }}
                                     <i class="fa fa-info-circle text-muted"
@@ -82,10 +82,22 @@ import {Workflow} from "cwl-svg";
                             </div>
 
                             <!--Tooltip-->
-                            <ct-tooltip-content #ctt>
-                                <div class="tooltip-info">
-                                    {{ input.description }}
-                                </div>
+                            <ct-tooltip-content [maxWidth]="500" #ctt>
+
+                                <h4>{{input.label || input.id}}</h4>    
+                                
+                                <ul>
+                                    <!--Description-->
+                                    <li>
+                                        <span class="title">
+                                            Description:
+                                        </span>
+                                            <span class="value">
+                                            {{input.description}}
+                                        </span>
+                                    </li>                                    
+                                </ul>
+
                             </ct-tooltip-content>
 
                         </div>
