@@ -1,6 +1,6 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
-import {ExpressionModel} from "cwlts/models/d2sb";
+import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 import {ComponentBase} from "../../../components/common/component-base";
 import {GuidService} from "../../../services/guid.service";
 import {CustomValidators} from "../../../validators/custom.validator";
@@ -64,13 +64,13 @@ export class ExpressionModelListComponent extends ComponentBase implements Contr
     public context: { $job: any } = {$job: {}};
 
     /** List which connects model to forms */
-    private formList: Array<{ id: string, model: ExpressionModel }> = [];
+    private formList: Array<{ id: string, model: SBDraft2ExpressionModel }> = [];
 
     private onTouched = noop;
 
     private propagateChange = noop;
 
-    private input: ExpressionModel[];
+    private input: SBDraft2ExpressionModel[];
 
     private form: FormGroup = new FormGroup({});
 
@@ -78,7 +78,7 @@ export class ExpressionModelListComponent extends ComponentBase implements Contr
         super();
     }
 
-    writeValue(input: ExpressionModel[]): void {
+    writeValue(input: SBDraft2ExpressionModel[]): void {
         this.input = input;
 
         this.formList = this.input.map(model => {
@@ -108,7 +108,7 @@ export class ExpressionModelListComponent extends ComponentBase implements Contr
         this.onTouched = fn;
     }
 
-    private removeExpressionModel(ctrl: { id: string, model: ExpressionModel }): void {
+    private removeExpressionModel(ctrl: { id: string, model: SBDraft2ExpressionModel }): void {
         this.modal.confirm({
             title: "Really Remove?",
             content: `Are you sure that you want to remove this secondary file?`,
@@ -124,7 +124,7 @@ export class ExpressionModelListComponent extends ComponentBase implements Contr
     private addExpressionModel(): void {
         const newCmd = {
             id: this.guidService.generate(),
-            model: new ExpressionModel("")
+            model: new SBDraft2ExpressionModel("")
         };
 
         this.form.addControl(newCmd.id, new FormControl(newCmd.model, [Validators.required, CustomValidators.cwlModel]));

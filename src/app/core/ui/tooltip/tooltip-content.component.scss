@@ -12,7 +12,6 @@ ct-tooltip-content {
     .tooltip-inner {
         box-sizing: content-box;
         padding: 2px;
-        max-width: none !important;
         background-color: rgba(0, 0, 0, .8);
 
         .tooltip-inner-plaintext {

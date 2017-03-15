@@ -3,6 +3,7 @@ import {WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel
 import {Subject} from "rxjs";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {ComponentBase} from "../../../components/common/component-base";
+import {Workflow} from "cwl-svg";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -102,6 +103,9 @@ export class WorkflowIOInspector extends ComponentBase {
     @Input()
     public readonly = false;
 
+    @Input()
+    public graph: Workflow;
+
     private form: FormGroup;
 
     private initSymbolsList: string[] = [];
@@ -130,6 +134,7 @@ export class WorkflowIOInspector extends ComponentBase {
             try {
                 // Change id on workflow model so canvas can interact with it
                 this.workflowModel.changeIONodeId(this.port, value);
+                this.graph.redraw();
 
                 if (this.isEnumType()) {
                     this.port.type.name = value;
@@ -154,6 +159,7 @@ export class WorkflowIOInspector extends ComponentBase {
 
         this.tracked = this.form.controls["label"].valueChanges.subscribe((label) => {
             this.port.label = label;
+            this.graph.redraw();
         });
 
         this.tracked = this.form.controls["description"].valueChanges.subscribe((description) => {

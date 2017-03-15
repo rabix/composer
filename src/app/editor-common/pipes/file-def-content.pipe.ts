@@ -1,5 +1,5 @@
 import {Pipe, PipeTransform} from "@angular/core";
-import {ExpressionModel} from "cwlts/models/d2sb";
+import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 import {Expression} from "cwlts/mappings/d2sb/Expression";
 
 @Pipe({
@@ -7,13 +7,13 @@ import {Expression} from "cwlts/mappings/d2sb/Expression";
 })
 
 export class FileDefContentPipe implements PipeTransform {
-    transform(value: ExpressionModel, args: any[]): any {
+    transform(value: SBDraft2ExpressionModel, args: any[]): any {
 
         if (!value) {
             return "";
         }
 
-        if (value instanceof ExpressionModel) {
+        if (value instanceof SBDraft2ExpressionModel) {
             const serialized = value.serialize();
             if (serialized === undefined) return "";
 

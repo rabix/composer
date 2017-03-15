@@ -1,6 +1,6 @@
 import {Component, Input, OnChanges, Output, SimpleChanges, ViewEncapsulation} from "@angular/core";
 import {FormControl} from "@angular/forms";
-import {ExpressionModel, ResourceRequirementModel} from "cwlts/models/d2sb";
+import {SBDraft2ExpressionModel, ResourceRequirementModel} from "cwlts/models/d2sb";
 import {ReplaySubject} from "rxjs";
 import {ComponentBase} from "../../../components/common/component-base";
 
@@ -78,8 +78,8 @@ export class ResourcesComponent extends ComponentBase implements OnChanges {
         this.tracked = this.memControl.valueChanges.filter(val => {
             return this.entries.mem ? val !== this.entries.mem.value : true;
         }).subscribe(value => {
-            if (!(value instanceof ExpressionModel)) {
-                value = new ExpressionModel("", value);
+            if (!(value instanceof SBDraft2ExpressionModel)) {
+                value = new SBDraft2ExpressionModel("", value);
             }
             const res = new ResourceRequirementModel({
                 "class": "sbg:MemRequirement",
@@ -92,8 +92,8 @@ export class ResourcesComponent extends ComponentBase implements OnChanges {
         this.tracked = this.cpuControl.valueChanges.filter(val => {
             return this.entries.cpu ? val !== this.entries.cpu.value : true;
         }).subscribe(value => {
-            if (!(value instanceof ExpressionModel)) {
-                value = new ExpressionModel("", value);
+            if (!(value instanceof SBDraft2ExpressionModel)) {
+                value = new SBDraft2ExpressionModel("", value);
             }
             const res = new ResourceRequirementModel({
                 "class": "sbg:CPURequirement",

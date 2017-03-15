@@ -158,5 +158,14 @@ function fetch(filename, options) {
  * @type {resolve}
  */
 module.exports = {
-    resolve: fetch
+    resolve: fetch,
+    resolveContent: (content, path) => {
+        return new Promise((resolve, reject) => {
+            try {
+                parseJSON(content, path).then(resolve, reject);
+            } catch (ex) {
+                reject(ex);
+            }
+        })
+    },
 };

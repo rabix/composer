@@ -12,8 +12,7 @@ import {
     ViewEncapsulation
 } from "@angular/core";
 import {ComponentBase} from "../../../components/common/component-base";
-import {CommandArgumentModel} from "cwlts/models/d2sb";
-import {CommandLineBindingModel} from "cwlts/models/d2sb/CommandLineBindingModel";
+import {SBDraft2CommandArgumentModel, SBDraft2CommandLineBindingModel} from "cwlts/models/d2sb";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 import {ModalService} from "../../../components/modal/modal.service";
 import {noop} from "../../../lib/utils.lib";
@@ -142,7 +141,7 @@ import {noop} from "../../../lib/utils.lib";
 export class ArgumentListComponent extends ComponentBase implements OnChanges {
 
     @Input()
-    public entries: CommandArgumentModel[] = [];
+    public entries: SBDraft2CommandArgumentModel[] = [];
 
     @Input()
     public readonly = false;
@@ -151,7 +150,7 @@ export class ArgumentListComponent extends ComponentBase implements OnChanges {
     @Input()
     public location = "";
 
-    private arguments: CommandArgumentModel[] = [];
+    private arguments: SBDraft2CommandArgumentModel[] = [];
 
     /** Context in which expression should be evaluated */
     @Input()
@@ -188,7 +187,7 @@ export class ArgumentListComponent extends ComponentBase implements OnChanges {
     private addEntry() {
 
         const newEntryLocation = `${this.location}[${this.entries.length}]`;
-        const newEntry = new CommandArgumentModel({}, newEntryLocation);
+        const newEntry = new SBDraft2CommandArgumentModel({}, newEntryLocation);
         const entries = this.entries.concat(newEntry);
         this.update.next(entries);
 
@@ -207,11 +206,11 @@ export class ArgumentListComponent extends ComponentBase implements OnChanges {
     }
 
     private updateArgument(form: { position: number, prefix: string, separate: boolean, valueFrom: any },
-                           entry: CommandArgumentModel) {
+                           entry: SBDraft2CommandArgumentModel) {
 
         const argument = this.entries.find(x => entry == x);
 
-        argument.updateBinding(new CommandLineBindingModel({
+        argument.updateBinding(new SBDraft2CommandLineBindingModel({
             position: form.position,
             separate: form.separate,
             prefix: form.prefix,

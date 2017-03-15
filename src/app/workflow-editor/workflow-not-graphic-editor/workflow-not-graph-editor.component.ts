@@ -1,6 +1,7 @@
 import {ChangeDetectionStrategy, Component, Input, ViewEncapsulation} from "@angular/core";
 import {WorkflowModel} from "cwlts/models";
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
+import {noop} from "../../lib/utils.lib";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -59,6 +60,7 @@ import {EditorInspectorService} from "../../editor-common/inspector/editor-inspe
                                             <div class="tc-body">
                                                 <ct-workflow-step-inspector
                                                     [step]="entry"
+                                                    [graph]="mockGraph"
                                                     [workflowModel]="model">
                                                 </ct-workflow-step-inspector>
                                             </div>
@@ -118,6 +120,7 @@ import {EditorInspectorService} from "../../editor-common/inspector/editor-inspe
                                             <div class="tc-body">
                                                 <ct-workflow-io-inspector
                                                     [port]="entry"
+                                                    [graph]="mockGraph"
                                                     [workflowModel]="model">
                                                 </ct-workflow-io-inspector>
                                             </div>
@@ -195,6 +198,9 @@ export class WorkflowNotGraphEditorComponent {
     @Input()
     model: WorkflowModel;
 
+    public mockGraph = {
+        redraw: noop
+    };
 
     constructor(private inspector: EditorInspectorService) {
     }
