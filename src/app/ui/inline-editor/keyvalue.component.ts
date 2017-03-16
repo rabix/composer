@@ -1,7 +1,7 @@
 import {Component, EventEmitter, forwardRef, NgZone, Output, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormArray, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {ComponentBase} from "../../../components/common/component-base"
-import {noop} from "../../../lib/utils.lib"
+import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {noop} from "../../lib/utils.lib";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -46,7 +46,7 @@ import {noop} from "../../../lib/utils.lib"
         </div>
     `
 })
-export class KeyvalueComponent extends ComponentBase implements ControlValueAccessor {
+export class KeyvalueComponent extends DirectiveBase implements ControlValueAccessor {
 
     public list: { key: string, value: string }[] = [];
 

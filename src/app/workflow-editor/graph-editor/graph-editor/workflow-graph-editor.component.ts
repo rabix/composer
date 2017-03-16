@@ -1,20 +1,12 @@
-import {
-    ChangeDetectionStrategy,
-    Component,
-    ElementRef,
-    Input,
-    TemplateRef,
-    ViewChild,
-    ViewEncapsulation
-} from "@angular/core";
-import {StepModel, WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
+import {ChangeDetectionStrategy, Component, ElementRef, Input, TemplateRef, ViewChild, ViewEncapsulation} from "@angular/core";
 import {Workflow} from "cwl-svg";
-import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
-import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
-import {Observable} from "rxjs";
+import {StepModel, WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
 import * as Yaml from "js-yaml";
+import {Observable} from "rxjs";
+import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
+import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import LoadOptions = jsyaml.LoadOptions;
-import {ComponentBase} from "../../../components/common/component-base";
 
 
 declare const Snap: any;
@@ -70,7 +62,7 @@ declare const Snap: any;
         </template>
     `
 })
-export class WorkflowGraphEditorComponent extends ComponentBase {
+export class WorkflowGraphEditorComponent extends DirectiveBase {
 
     @Input()
     public model: WorkflowModel;
@@ -136,7 +128,7 @@ export class WorkflowGraphEditorComponent extends ComponentBase {
                 } as LoadOptions);
 
 
-                const step = this.model.addStepFromProcess(json);
+                const step   = this.model.addStepFromProcess(json);
                 const coords = this.graph.translateMouseCoords(ev.clientX, ev.clientY);
                 Object.assign(step.customProps, {
                     "sbg:x": coords.x,

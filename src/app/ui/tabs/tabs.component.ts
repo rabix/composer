@@ -1,11 +1,11 @@
-import { Component, ContentChildren, QueryList, AfterContentInit, ViewEncapsulation } from '@angular/core';
-import { TabComponent } from './tab.component';
+import { Component, ContentChildren, QueryList, AfterContentInit, ViewEncapsulation } from "@angular/core";
+import { TabComponent } from "./tab.component";
 
 @Component({
-  selector: 'ct-tabs-component',
+  selector: "ct-tabs-component",
   encapsulation: ViewEncapsulation.Emulated,
   styleUrls: ["./tabs.component.scss"],
-  template:`
+  template: `
     <div class="row ct-tabs-component">
         <div class="signle-tab col-sm-4" *ngFor="let tab of tabs" (click)="selectTab(tab)" [class.active]="tab.active">
             <a href="#">{{tab.title}}</a>
@@ -22,10 +22,10 @@ export class TabsComponent implements AfterContentInit {
     // contentChildren are set
     ngAfterContentInit() {
         // get all active tabs
-        let activeTabs = this.tabs.filter((tab)=>tab.active);
+        const activeTabs = this.tabs.filter((tab) => tab.active);
 
         // if there is no active tab set, activate the first
-        if(activeTabs.length === 0) {
+        if (activeTabs.length === 0) {
             this.selectTab(this.tabs.first);
         }
     }
