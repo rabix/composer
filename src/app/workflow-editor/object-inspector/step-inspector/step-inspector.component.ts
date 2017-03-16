@@ -1,13 +1,11 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, ViewEncapsulation} from "@angular/core";
+import {Workflow} from "cwl-svg";
 import {StepModel, WorkflowModel} from "cwlts/models";
-import {UserPreferencesService} from "../../../services/storage/user-preferences.service";
-import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {UpdateStepModal} from "../../../components/modal/custom/update-step-modal.component";
 import {PlatformAPI} from "../../../services/api/platforms/platform-api.service";
+import {UserPreferencesService} from "../../../services/storage/user-preferences.service";
 import {ModalService} from "../../../ui/modal/modal.service";
-import {Workflow} from "cwl-svg";
-import {PlatformAPI} from "../../../services/api/platforms/platform-api.service";
-import {ModalService} from "../../../ui/modal/modal.service";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -97,7 +95,7 @@ export class WorkflowStepInspector extends DirectiveBase {
     private updateStep(ev: Event) {
         ev.preventDefault();
 
-        const appId = this.step.run.customProps['sbg:id'].split('/');
+        const appId   = this.step.run.customProps["sbg:id"].split("/");
         const appData = [appId[0], appId[1], appId[2]].join("/");
 
 
@@ -109,7 +107,7 @@ export class WorkflowStepInspector extends DirectiveBase {
                 closeOnEscape: true
             });
 
-            component.step = this.step;
+            component.step         = this.step;
             component.updatedModel = app;
 
             component.confirm = () => {
