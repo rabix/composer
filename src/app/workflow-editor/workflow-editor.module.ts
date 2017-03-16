@@ -25,7 +25,6 @@ import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow
         WorkflowStepInspectorTabInputs,
         WorkflowStepInspectorTabInfo,
         WorkflowStepInspectorTabStep,
-
     ],
     exports: [
         WorkflowEditorComponent

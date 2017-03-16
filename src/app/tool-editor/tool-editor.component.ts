@@ -64,6 +64,13 @@ import LoadOptions = jsyaml.LoadOptions;
                             (click)="switchView(viewModes.Test)"
                             [class.btn-primary]="viewMode === viewModes.Test"
                             [class.btn-secondary]="viewMode !== viewModes.Test">Test</button>
+
+                    <button class="btn btn-secondary btn-sm"
+                            [disabled]="!isValidCWL"
+                            (click)="switchView(viewModes.Info)"
+                            [class.btn-primary]="viewMode === viewModes.Info"
+                            [class.btn-secondary]="viewMode !== viewModes.Info">App Info</button>
+
                 </span>
 
                 <!--CWLVersion-->
@@ -100,6 +107,7 @@ import LoadOptions = jsyaml.LoadOptions;
             <div class="editor-content flex-row">
                 <!--Editor Row-->
                 <ct-code-editor-x *ngIf="viewMode === viewModes.Code" class="editor"
+                                  [class.flex-col]="showInspector"
                                   [(content)]="rawEditorContent"
                                   [options]="{theme: 'ace/theme/monokai'}"
                                   [language]="'yaml'"
@@ -118,6 +126,11 @@ import LoadOptions = jsyaml.LoadOptions;
                                (update)="onJobUpdate($event)"
                                (reset)="resetJob()"
                                [inputs]="toolModel.inputs"></ct-job-editor>
+
+                <ct-app-info *ngIf="viewMode === viewModes.Info"
+                              class="gui-editor-component p-2"
+                              [class.flex-col]="showInspector"
+                              [model]="toolModel"></ct-app-info>
 
 
                 <!--Object Inspector Column-->
@@ -206,7 +219,8 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
     private viewModes = {
         Code: "code",
         Gui: "gui",
-        Test: "test"
+        Test: "test",
+        Info: "info"
     };
 
     private toolGroup: FormGroup;

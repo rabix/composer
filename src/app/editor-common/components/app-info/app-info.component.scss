@@ -1,0 +1,39 @@
+.app-info {
+    margin: 20px;
+    min-width: 600px;
+}
+
+.app-info-item {
+    margin-bottom: 40px;
+}
+
+.app-info-meta {
+    display: flex;
+}
+
+.app-info-meta-item {
+    flex-grow: 1;
+
+    ul {
+        list-style-type: none;
+    }
+}
+
+.app-info-links {
+    ul {
+        display: flex;
+        list-style-type: none;
+    }
+
+    li {
+        margin-right: 30px;
+    }
+}
+
+ct-inline-editor {
+    display: inline-block;
+}
+
+.app-info-details {
+    margin: 0 20px 0 16px;
+}

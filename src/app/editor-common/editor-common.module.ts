@@ -1,5 +1,6 @@
 import {NgModule} from "@angular/core";
 import {BrowserModule} from "@angular/platform-browser";
+import {CWLModule} from "../cwl/cwl.module";
 import {BlankToolStateComponent} from "./components/blank-tool-state.component";
 import {EditorInspectorComponent} from "./inspector/editor-inspector.component";
 import {EditorInspectorContentComponent} from "./inspector/editor-inspector-content.component";
@@ -31,6 +32,7 @@ import {BlockLoaderComponent} from "./components/block-loader/block-loader.compo
 import {CwlSchemaValidationWorkerService} from "./cwl-schema-validation-worker/cwl-schema-validation-worker.service";
 import {SymbolsComponent} from "./components/symbols/symbols.component";
 import {InputTypeSelectComponent} from "./components/type-select/type-select.component"
+import {AppInfoComponent} from "./components/app-info/app-info.component";
 
 @NgModule({
     declarations: [
@@ -61,7 +63,8 @@ import {InputTypeSelectComponent} from "./components/type-select/type-select.com
         MapListComponent,
         BlockLoaderComponent,
         SymbolsComponent,
-        InputTypeSelectComponent
+        InputTypeSelectComponent,
+        AppInfoComponent
     ],
     exports: [
         MapListComponent,
@@ -89,7 +92,8 @@ import {InputTypeSelectComponent} from "./components/type-select/type-select.com
         ValidationReportComponent,
         BlockLoaderComponent,
         SymbolsComponent,
-        InputTypeSelectComponent
+        InputTypeSelectComponent,
+        AppInfoComponent
     ],
     entryComponents: [
         EditorInspectorComponent,
@@ -100,7 +104,7 @@ import {InputTypeSelectComponent} from "./components/type-select/type-select.com
     providers: [
         CwlSchemaValidationWorkerService
     ],
-    imports: [BrowserModule, CoreModule, FormsModule, ReactiveFormsModule]
+    imports: [BrowserModule, CoreModule, FormsModule, ReactiveFormsModule, CWLModule]
 })
 export class EditorCommonModule {
 

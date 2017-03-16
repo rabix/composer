@@ -64,6 +64,18 @@ import LoadOptions = jsyaml.LoadOptions;
                             (click)="switchView(viewModes.Graph)"
                             [class.btn-primary]="viewMode === viewModes.Graph"
                             [class.btn-secondary]="viewMode !== viewModes.Graph">Very Visual</button>
+
+                    <button class="btn btn-secondary btn-sm"
+                            [disabled]="!isValidCWL"
+                            (click)="switchView(viewModes.Test)"
+                            [class.btn-primary]="viewMode === viewModes.Test"
+                            [class.btn-secondary]="viewMode !== viewModes.Test">Test</button>
+
+                    <button class="btn btn-secondary btn-sm"
+                            [disabled]="!isValidCWL"
+                            (click)="switchView(viewModes.Info)"
+                            [class.btn-primary]="viewMode === viewModes.Info"
+                            [class.btn-secondary]="viewMode !== viewModes.Info">App Info</button>
                 </span>
 
                 <!--CWLVersion-->
@@ -98,9 +110,10 @@ import LoadOptions = jsyaml.LoadOptions;
 
 
             <!--Header & Editor Column-->
-            <div class="editor-content flex-row">
+            <div class="editor-content flex-row fixed">
                 <!--Editor Row-->
                 <ct-code-editor-x *ngIf="viewMode === viewModes.Code" class="editor"
+                                  [class.flex-col]="showInspector"
                                   [(content)]="rawEditorContent"
                                   [options]="{theme: 'ace/theme/monokai'}"
                                   [language]="'yaml'"
@@ -118,6 +131,10 @@ import LoadOptions = jsyaml.LoadOptions;
                                           class="gui-editor-component flex-col">
                 </ct-workflow-graph-editor>
 
+                <ct-app-info *ngIf="viewMode === viewModes.Info"
+                                  [class.flex-col]="showInspector"
+                                  [model]="workflowModel">
+                </ct-app-info>
 
                 <!--Object Inspector Column-->
                 <div [hidden]="!showInspector" class="flex-col inspector-col">
@@ -198,7 +215,8 @@ export class WorkflowEditorComponent extends ComponentBase implements OnDestroy,
         Code: "code",
         Gui: "gui",
         Test: "test",
-        Graph: "graph"
+        Graph: "graph",
+        Info: "info"
     };
 
     private toolGroup: FormGroup;

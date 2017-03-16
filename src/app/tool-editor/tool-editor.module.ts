@@ -58,7 +58,7 @@ import {ToolOutputInspector} from "./object-inspector/output-inspector/tool-outp
         ToolVisualEditorComponent,
         DockerRequirementComponent,
         BaseCommandComponent,
-        HintListComponent
+        HintListComponent,
     ],
     exports: [
         ToolEditorComponent

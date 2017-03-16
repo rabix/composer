@@ -27,8 +27,14 @@ import {DragOverDirective} from "./drag-and-drop/drag-over.directive";
 import {DropDownButtonComponent} from "./ui/dropdown-button/dropdown-button-component";
 import {DropDownMenuComponent} from "./ui/dropdown-button/dropdown-menu.component";
 import {WebWorkerBuilderService} from "./web-worker/web-worker-builder.service";
-import {MarkdownService} from './markdown/markdown.service';
-import {MarkdownDirective} from './markdown/markdown.directive';
+import {MarkdownService} from "./markdown/markdown.service";
+import {MarkdownDirective} from "./markdown/markdown.directive";
+import {TabsComponent} from "./ui/tabs/tabs.component";
+import {TabComponent} from "./ui/tabs/tab.component";
+import {InlineEditorComponent} from "./ui/inline-editor/inline-editor.component";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {KeyvalueComponent} from "./ui/inline-editor/keyvalue.component"
+
 
 @NgModule({
     entryComponents: [
@@ -44,7 +50,12 @@ import {MarkdownDirective} from './markdown/markdown.directive';
         // ContextDirective,
 
         // Code Editor Components
-        MultilangCodeEditorComponent
+        MultilangCodeEditorComponent,
+
+        TabsComponent,
+        TabComponent,
+        InlineEditorComponent,
+        KeyvalueComponent
     ],
     declarations: [
         // Markdown directive
@@ -92,6 +103,11 @@ import {MarkdownDirective} from './markdown/markdown.directive';
 
         LoggerDirective,
 
+        TabsComponent,
+        TabComponent,
+        InlineEditorComponent,
+        KeyvalueComponent
+
     ],
     exports: [
         // Markdown directive
@@ -136,7 +152,13 @@ import {MarkdownDirective} from './markdown/markdown.directive';
         ContextDirective,
 
         StatusBarComponent,
-        LoggerDirective
+        LoggerDirective,
+
+        TabsComponent,
+        TabComponent,
+        InlineEditorComponent,
+        KeyvalueComponent
+
     ],
     providers: [
         IpcService,
@@ -146,7 +168,7 @@ import {MarkdownDirective} from './markdown/markdown.directive';
         MarkdownService
 
     ],
-    imports: [BrowserModule, MomentModule]
+    imports: [BrowserModule, MomentModule, FormsModule, ReactiveFormsModule]
 })
 export class CoreModule {
 
