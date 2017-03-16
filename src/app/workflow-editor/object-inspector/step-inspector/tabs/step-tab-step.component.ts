@@ -81,7 +81,7 @@ export class WorkflowStepInspectorTabStep extends ComponentBase {
     @Input()
     public graph: Workflow;
 
-    private scatterMethodOptions = [
+    public scatterMethodOptions = [
         {
             value: "dotproduct",
             caption: "Dot Product"
@@ -96,7 +96,7 @@ export class WorkflowStepInspectorTabStep extends ComponentBase {
         }
     ];
 
-    private form: FormGroup;
+    public form: FormGroup;
 
     constructor(private formBuilder: FormBuilder, private cdr: ChangeDetectorRef) {
         super();

@@ -158,7 +158,7 @@ import LoadOptions = jsyaml.LoadOptions;
         </div>
     `
 })
-export class WorkflowEditorComponent extends ComponentBase implements OnInit, OnDestroy, WorkboxTab {
+export class WorkflowEditorComponent extends ComponentBase implements OnDestroy, WorkboxTab {
     @Input()
     public data: DataEntrySource;
 
@@ -229,7 +229,7 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
 
     }
 
-    ngOnInit(): void {
+    ngAfterViewInit(): void {
         // Whenever the editor content is changed, validate it using a JSON Schema.
         this.tracked = this.rawEditorContent
             .skip(1)
@@ -256,9 +256,9 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
                     }
 
                     this.data.resolve(latestContent).then(resolved => {
-                        console.time("Workflow model");
+                        console.time("Workflow Model");
                         this.workflowModel = WorkflowFactory.from(resolved as any, "document");
-                        console.timeEnd("Workflow model");
+                        console.timeEnd("Workflow Model");
 
                         // update validation stream on model validation updates
 
@@ -287,6 +287,9 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
 
                         // After wf is created get updates for steps
                         this.getStepUpdates();
+
+                    }, () => {
+                        //@todo: handle unresolvable steps
                     });
 
                 });
@@ -300,6 +303,9 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
         });
 
         this.statusBar.setControls(this.statusControls);
+
+        this.inspector.setHostView(this.inspectorHostView);
+        super.ngAfterViewInit();
     }
 
     /**
@@ -422,11 +428,6 @@ export class WorkflowEditorComponent extends ComponentBase implements OnInit, On
         this.platform.getAppCWL(this.data.data, revisionNumber).subscribe(cwl => {
             this.rawEditorContent.next(cwl);
         });
-    }
-
-    ngAfterViewInit() {
-        this.inspector.setHostView(this.inspectorHostView);
-        super.ngAfterViewInit();
     }
 
     provideStatusControls() {
