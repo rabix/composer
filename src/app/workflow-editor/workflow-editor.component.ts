@@ -1,10 +1,8 @@
 import * as Yaml from "js-yaml";
 import {
-    ChangeDetectorRef,
     Component,
     Input,
     OnDestroy,
-    OnInit,
     TemplateRef,
     ViewChild,
     ViewContainerRef,
@@ -64,6 +62,12 @@ import LoadOptions = jsyaml.LoadOptions;
                             (click)="switchView(viewModes.Graph)"
                             [class.btn-primary]="viewMode === viewModes.Graph"
                             [class.btn-secondary]="viewMode !== viewModes.Graph">Very Visual</button>
+                    
+                    <button class="btn btn-secondary btn-sm"
+                            [disabled]="!isValidCWL"
+                            (click)="switchView(viewModes.Info)"
+                            [class.btn-primary]="viewMode === viewModes.Info"
+                            [class.btn-secondary]="viewMode !== viewModes.Info">App Info</button>
                 </span>
 
                 <!--CWLVersion-->
@@ -98,9 +102,10 @@ import LoadOptions = jsyaml.LoadOptions;
 
 
             <!--Header & Editor Column-->
-            <div class="editor-content flex-row">
+            <div class="editor-content flex-row fixed">
                 <!--Editor Row-->
                 <ct-code-editor-x *ngIf="viewMode === viewModes.Code" class="editor"
+                                  [class.flex-col]="showInspector"
                                   [(content)]="rawEditorContent"
                                   [options]="{theme: 'ace/theme/monokai'}"
                                   [language]="'yaml'"
@@ -118,6 +123,10 @@ import LoadOptions = jsyaml.LoadOptions;
                                           class="gui-editor-component flex-col">
                 </ct-workflow-graph-editor>
 
+                <ct-app-info *ngIf="viewMode === viewModes.Info"
+                                  [class.flex-col]="showInspector"
+                                  [model]="workflowModel">
+                </ct-app-info>
 
                 <!--Object Inspector Column-->
                 <div [hidden]="!showInspector" class="flex-col inspector-col">
@@ -173,7 +182,7 @@ export class WorkflowEditorComponent extends ComponentBase implements OnDestroy,
     public viewMode;
 
     /** Flag to indicate the document is loading */
-    private isLoading = true;
+    public isLoading = true;
 
     /** Flag for showing reformat prompt on GUI switch */
     private showReformatPrompt = true;
@@ -197,8 +206,8 @@ export class WorkflowEditorComponent extends ComponentBase implements OnDestroy,
     private viewModes = {
         Code: "code",
         Gui: "gui",
-        Test: "test",
-        Graph: "graph"
+        Graph: "graph",
+        Info: "info"
     };
 
     private toolGroup: FormGroup;
@@ -213,7 +222,6 @@ export class WorkflowEditorComponent extends ComponentBase implements OnDestroy,
                 private platform: PlatformAPI,
                 private inspector: EditorInspectorService,
                 private statusBar: StatusBarService,
-                private cdr: ChangeDetectorRef,
                 private modal: ModalService) {
 
         super();
@@ -288,8 +296,20 @@ export class WorkflowEditorComponent extends ComponentBase implements OnDestroy,
                         // After wf is created get updates for steps
                         this.getStepUpdates();
 
-                    }, () => {
-                        //@todo: handle unresolvable steps
+                    }, (err) => {
+                        this.isLoading = false;
+                        this.viewMode = this.viewModes.Code;
+                        this.isValidCWL = false;
+                        this.validation = {
+                            isValidatableCwl: true,
+                            isValidCwl: false,
+                            isValidJSON: true,
+                            warnings: [],
+                            errors: [{
+                                message: err.message,
+                                loc: "document"
+                            }]
+                        };
                     });
 
                 });
