@@ -1,0 +1,23 @@
+@import "./../../../../assets/sass/variables";
+@import "./../../../../assets/sass/mixins";
+
+:host {
+    display: block;
+    padding-top: .5em;
+    padding-bottom: .5em;
+
+    &:hover {
+        background: $layout-title-bar-background;
+        cursor: pointer;
+    }
+
+    .title {
+        @include ellipsis();
+    }
+
+    .label {
+        @include ellipsis();
+        color: $layout-text-color-faded;
+        font-size: .85rem;
+    }
+}
