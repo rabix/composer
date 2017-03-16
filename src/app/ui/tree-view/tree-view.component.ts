@@ -30,13 +30,13 @@ export class TreeViewComponent {
     level = 0;
 
     @ViewChildren(TreeNodeComponent)
-    private treeNodes: QueryList<TreeNodeComponent>;
+    private treeNodes: QueryList<TreeNodeComponent<any>>;
 
     constructor(private tree: TreeViewService) {
         tree.treeView = this;
     }
 
-    getChildren(): QueryList<TreeNodeComponent> {
+    getChildren(): QueryList<TreeNodeComponent<any>> {
         return this.treeNodes;
     }
 }
