@@ -1,7 +1,6 @@
 import {Injectable} from "@angular/core";
-import {ReplaySubject} from "rxjs";
+import {ReplaySubject} from "rxjs/ReplaySubject";
 import {UserPreferencesService} from "../storage/user-preferences.service";
-import {DirectiveBase} from "../../util/directive-base/directive-base";
 
 export type PlatformSettings = {
     url: string,
@@ -10,26 +9,28 @@ export type PlatformSettings = {
 };
 
 @Injectable()
-export class SettingsService extends DirectiveBase {
+export class SettingsService {
 
     public platformConfiguration = new ReplaySubject<PlatformSettings>(1);
 
     public validity = new ReplaySubject<boolean>(1);
 
-    constructor(private userPreferencesService: UserPreferencesService) {
-        super();
+    constructor(private profile: UserPreferencesService) {
 
-        this.tracked = this.userPreferencesService.get<PlatformSettings | boolean>("platformConnectionSettings", false)
-            .subscribe(prefs => {
-                if (prefs === false) {
-                    return this.validity.next(false);
-                }
-                this.platformConfiguration.next(prefs as PlatformSettings);
-            });
-
-        this.platformConfiguration.subscribe(settings => {
-            this.userPreferencesService.put("platformConnectionSettings", settings);
-            this.validity.next(true);
+        this.profile.get("credentials").subscribe(cr => {
+            console.log("Got credentials", cr);
         });
+        // this.profile.get<PlatformSettings | boolean>("platformConnectionSettings", false)
+        //     .subscribe(prefs => {
+        //         if (prefs === false) {
+        //             return this.validity.next(false);
+        //         }
+        //         this.platformConfiguration.next(prefs as PlatformSettings);
+        //     });
+        //
+        // this.platformConfiguration.subscribe(settings => {
+        //     this.profile.put("platformConnectionSettings", settings);
+        //     this.validity.next(true);
+        // });
     }
 }

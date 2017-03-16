@@ -18,7 +18,7 @@ import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 
 @Component({
     selector: "ct-layout",
-    providers: [StatusBarService, WorkboxService],
+    providers: [WorkboxService],
     styleUrls: ["./layout.component.scss"],
     template: `
         <div class="main-container">

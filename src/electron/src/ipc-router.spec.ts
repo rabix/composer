@@ -4,6 +4,7 @@ const assert = chai.assert;
 const proxy = require("proxyquire");
 const sinon = require("sinon");
 
+
 describe("IPC Router", () => {
 
     it("should register the data-request event callback", (done) => {
@@ -37,12 +38,12 @@ describe("IPC Router", () => {
                         id: "cool-123",
                         data: "eventData",
                         message: "testRouteEndpoint"
-                    })
+                    });
                 }
             }
         };
 
-        router = proxy("./ipc-router", {electron, "./routes": routes});
+        const router = proxy("./ipc-router", {electron, "./routes": routes});
         router.start();
 
         const [data, callback] = testRouteEndpoint.args[0];

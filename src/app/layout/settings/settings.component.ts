@@ -1,9 +1,11 @@
 import {Component, OnInit, ViewEncapsulation} from "@angular/core";
-import {PlatformSettings, SettingsService} from "../../services/settings/settings.service";
 import {AbstractControl, FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
-import {Subscription} from "rxjs";
 import {SystemService} from "../../platform-providers/system.service";
+import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
+import {IpcService} from "../../services/ipc.service";
+import {SettingsService} from "../../services/settings/settings.service";
+import {UserPreferencesService} from "../../services/storage/user-preferences.service";
+import {DirectiveBase} from "../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -35,14 +37,14 @@ import {SystemService} from "../../platform-providers/system.service";
 
                 <!--Platform Key Input Field-->
                 <div class="form-group"
-                     [class.has-danger]="form.controls.key.invalid">
+                     [class.has-danger]="form.controls.token.invalid">
 
                     <label class="strong" for="sbgApiKey">Authentication Key</label>
                     <input class="form-control form-control-success form-control-danger form-control-warning"
-                           formControlName="key"
+                           formControlName="token"
                            id="sbgApiKey"/>
 
-                    <div class="form-control-feedback" *ngIf="form.controls.key?.errors?.length">
+                    <div class="form-control-feedback" *ngIf="form.controls.token?.errors?.length">
                         The Authentication Key must be 32 characters long.
                     </div>
 
@@ -70,59 +72,52 @@ import {SystemService} from "../../platform-providers/system.service";
         </div>
     `
 })
-export class SettingsComponent implements OnInit {
-    private form: FormGroup;
+export class SettingsComponent extends DirectiveBase implements OnInit {
+    form: FormGroup;
 
-    private checkInProgress = false;
-
-    private subs: Subscription[] = [];
+    checkInProgress = false;
 
     constructor(private settings: SettingsService,
                 private api: PlatformAPI,
+                private ipc: IpcService,
+                private profile: UserPreferencesService,
                 private system: SystemService,
                 formBuilder: FormBuilder) {
 
+        super();
+
         this.form = formBuilder.group({
             url: ["", [Validators.required, Validators.pattern("https://[^/?]+\.[^.]+\\.sbgenomics\\.com")]],
-            key: ["", [(control) => {
+            token: ["", [(control) => {
 
                 if (control.value.length === 32) {
-                    return null
+                    return null;
                 }
 
-                return {length: "Authentication Key must be 32 characters long."};
+                return {length: "Authentication token must be 32 characters long."};
             }]]
         });
 
-
-        this.subs.push(
-            this.settings.platformConfiguration.subscribe((props: PlatformSettings) => {
-                Object.keys(props).forEach(key => {
-                    if (!this.form.controls[key]) {
-                        console.warn(`Trying to set a non existing property: “${key}”`);
-                    } else {
-                        this.form.controls[key].setValue(props[key]);
-                    }
-                })
-            })
-        );
-
+        this.tracked = this.profile.get("credentials").subscribe(credentials => {
+            console.log("Got a new credentials profile", credentials);
+            this.form.patchValue(credentials[0]);
+        });
     }
 
     ngOnInit() {
         this.form.statusChanges.debounceTime(300)
             .filter(status => status === "VALID")
-            .flatMap(_ => this.api.checkToken(this.form.value.url, this.form.value.key).map(res => {
+            .flatMap(_ => this.api.checkToken(this.form.value.url, this.form.value.token).map(res => {
                 if (res === true) {
                     return null;
                 }
 
                 if (res === false) {
-                    return {invalidKey: true}
+                    return {invalidKey: true};
                 }
 
                 if (res === "invalid_platform") {
-                    return {invalidPlatform: true}
+                    return {invalidPlatform: true};
                 }
 
 
@@ -135,15 +130,26 @@ export class SettingsComponent implements OnInit {
         this.form.statusChanges.map(s => s === "VALID").subscribe(this.settings.validity);
     }
 
-    ngOnDestroy() {
-        this.subs.forEach(sub => sub.unsubscribe());
+    onSubmit() {
+        const profile = this.form.get("url").value.match("https:\/\/(.*?)\.sbgenomics\.com")[1];
+        this.profile.put("credentials", [{
+            profile: profile === "igor" ? "default" : profile,
+            ...this.form.getRawValue()
+        }]);
+
+        setTimeout(() => {
+            console.log("Start scanning");
+            this.ipc.request("scanPlatforms").subscribe(res => {
+                console.log("Scanning done", res);
+            }, err => {
+                console.log("Indexing errored");
+            });
+        }, 100);
+
+        // this.settings.platformConfiguration.next(this.form.value);
     }
 
-    private onSubmit() {
-        this.settings.platformConfiguration.next(this.form.value);
-    }
-
-    private openTokenPage() {
+    openTokenPage() {
         let url = "https://igor.sbgenomics.com/developer/#token";
         if (this.form.controls["url"].valid) {
             url = this.form.controls["url"].value + "/developer/#token";
@@ -157,7 +163,7 @@ export class SettingsComponent implements OnInit {
      * and updates the control values if the do
      * @param control
      */
-    private expandPlatformUrl(control: AbstractControl) {
+    expandPlatformUrl(control: AbstractControl) {
 
         const httpCheck = /^https?:\/\//gi;
 

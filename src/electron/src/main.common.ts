@@ -1,13 +1,19 @@
 const {app, Menu, BrowserWindow} = require("electron");
-const router = require("./ipc-router");
+
+app.setPath("userData", app.getPath("home") + "/.sevenbridges/rabix-composer");
+
+const router           = require("./ipc-router");
 const acceleratorProxy = require("./accelerator-proxy");
+
+import profile = require("./user-profile/profile");
 
 let win;
 let splash;
 
-function start(config = {}) {
+function start(config: { devTools: boolean, url: string }) {
 
     router.start();
+    profile.boot();
 
     splash = new BrowserWindow({
         width: 580,
@@ -39,7 +45,7 @@ function start(config = {}) {
     }
 
     win.on("closed", () => {
-        win = undefined
+        win = undefined;
     });
 
 
@@ -107,7 +113,7 @@ function start(config = {}) {
 }
 
 
-module.exports = {
+export = {
     start: (config) => {
 
 // This method will be called when Electron has finished
@@ -125,14 +131,12 @@ module.exports = {
             }
         });
 
-        app.on('activate', () => {
+        app.on("activate", () => {
             // On macOS it's common to re-create a window in the App when the
             // dock icon is clicked and there are no other windows open.
             if (win === null) {
-                start();
+                start(config);
             }
         });
-
-
     }
 };

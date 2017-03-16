@@ -88,8 +88,9 @@ export class WorkflowStepInspector extends DirectiveBase {
                 private userPrefService: UserPreferencesService) {
         super();
 
-        this.tracked = this.userPrefService.get("step_inspector_active_tab", this.tabs.Inputs, true)
-            .subscribe(x => this.viewMode = x);
+        // @fixme Bring this back with the new service
+        // this.tracked = this.userPrefService.get("step_inspector_active_tab", this.tabs.Inputs, true)
+        //     .subscribe(x => this.viewMode = x);
     }
 
 

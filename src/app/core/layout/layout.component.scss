@@ -57,9 +57,9 @@
                 content: '';
                 display: block;
                 position: relative;
-                background-color: $main-header-bg;
+                background-color: $layout-title-bar-background;
                 width: $panel-resize-handle-width;
-                height: $main-header-height;
+                height: $layout-title-bar-height;
             }
 
             &.hidden {

@@ -1,15 +1,15 @@
-const fs = require("fs");
-const path = require("path");
+const fs     = require("fs");
+const path   = require("path");
 const rimraf = require("rimraf");
-const yaml = require("js-yaml");
+const yaml   = require("js-yaml");
 const mkdirp = require("mkdirp");
 
 function findCWLClass(content) {
     try {
         const cwlClasses = ["Workflow", "CommandLineTool"];
-        const found = yaml.safeLoad(content, {json: true})["class"] || "";
+        const found      = yaml.safeLoad(content, {json: true})["class"] || "";
 
-        return cwlClasses.indexOf(found) !== -1 ? found : ""
+        return cwlClasses.indexOf(found) !== -1 ? found : "";
     } catch (err) {
         return "";
     }
@@ -63,16 +63,16 @@ function getFileOutputInfo(filePath, callback) {
         });
 
 
-    })
+    });
 }
 
-module.exports = {
+export = {
     saveFileContent: (path, content, callback) => {
 
         // Make content optional with an empty string as a default
         if (typeof content === "function") {
             callback = content;
-            content = "";
+            content  = "";
         }
 
         // Open file for writing. Fails if file doesn't exist
@@ -94,7 +94,7 @@ module.exports = {
         // Make content optional with an empty string as a default
         if (typeof content === "function") {
             callback = content;
-            content = "";
+            content  = "";
         }
 
         // "wx" creates the file if it doesn't exist, but fails if it exists.
@@ -189,10 +189,8 @@ module.exports = {
                 exists: err ? false : true
             });
         });
-    }
+    },
+    findCWLClass,
+    getPotentialCWLClassFromFile,
+    getFileOutputInfo
 };
-
-
-module.exports.findCWLClass = findCWLClass;
-module.exports.getPotentialCWLClassFromFile = getPotentialCWLClassFromFile;
-module.exports.getFileOutputInfo = getFileOutputInfo;

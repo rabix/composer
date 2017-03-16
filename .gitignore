@@ -33,6 +33,7 @@ Thumbs.db
 /bower_components
 npm-debug.log
 
+
 # Coverage #
 /coverage/
 
@@ -51,6 +52,10 @@ npm-debug.log
 /dist/**
 .webpack.json
 
+
 # IDE #
 .idea/
 *.swp
+
+
+/src/electron/dist

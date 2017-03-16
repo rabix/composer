@@ -136,7 +136,7 @@ export class PlatformAPI {
             })
             // Platform CWL files don't come with newlines
         })).map(r => {
-            return JSON.stringify(r.json(), null, 4)
+            return JSON.stringify(r.json(), null, 4);
         });
     }
 

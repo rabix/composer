@@ -4,7 +4,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {EditorCommonModule} from "../editor-common/editor-common.module";
 import {CWLModule} from "../cwl/cwl.module";
 import {WorkflowStepInspector} from "./object-inspector/step-inspector/step-inspector.component";
-import {WorkflowStepInspectorTabInputs} from "./object-inspector/step-inspector/tabs/step-tab-inputs.component";
+import {WorkflowStepInspectorTabInputsComponent} from "./object-inspector/step-inspector/tabs/step-tab-inputs.component";
 import {WorkflowStepInspectorTabInfo} from "./object-inspector/step-inspector/tabs/step-tab-info.component";
 import {WorkflowStepInspectorTabStep} from "./object-inspector/step-inspector/tabs/step-tab-step.component";
 import {WorkflowStepInspectorInputEntry} from "./object-inspector/step-inspector/tabs/step-inspector-step-entry";
@@ -23,7 +23,7 @@ import {LayoutModule} from "../layout/layout.module";
         WorkflowIOInspector,
         WorkflowStepInspector,
         WorkflowStepInspectorInputEntry,
-        WorkflowStepInspectorTabInputs,
+        WorkflowStepInspectorTabInputsComponent,
         WorkflowStepInspectorTabInfo,
         WorkflowStepInspectorTabStep,
     ],

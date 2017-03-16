@@ -1,10 +1,11 @@
-const ctrl = require("./fs.controller");
-const chai = require("chai");
-const tmp = require("tmp");
+import ctrl = require("./fs.controller");
+import chai = require("chai");
+import tmp = require("tmp");
+import fs = require("fs");
+import path = require("path");
+import rimraf = require("rimraf");
+
 const assert = chai.assert;
-const fs = require("fs");
-const path = require("path");
-const rimraf = require("rimraf");
 
 tmp.setGracefulCleanup();
 
@@ -314,7 +315,7 @@ describe("FS Controller", () => {
                 fs.writeFile(fd, "test data", (err) => {
                     if (err) throw err;
 
-                    const newContent = '{ "class": "Workflow" }';
+                    const newContent = "{ \"class\": \"Workflow\" }";
 
                     ctrl.saveFileContent(path, newContent, (err, info) => {
                         if (err) throw err;

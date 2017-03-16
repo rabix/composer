@@ -14,7 +14,7 @@ import {FileName} from "../../../core/forms/models/file-name";
     selector: "ct-new-file-modal",
     template: `
         <div>
-            <block-loader class="overlay" *ngIf="isCreatingFile"></block-loader>
+            <ct-block-loader class="overlay" *ngIf="isCreatingFile"></ct-block-loader>
             <form (ngSubmit)="onSubmit(newFileForm)" [formGroup]="newFileForm" class="flex-form">
                 <div class="modal-body">
                     <ct-radio-group #tpl class="flex-container" [items]="fileTypes"></ct-radio-group>
@@ -29,7 +29,7 @@ import {FileName} from "../../../core/forms/models/file-name";
                         <ct-input [name]="'Label'" [control]="cwlExtrasForm.controls['label']"></ct-input>
                         <ct-input [name]="'Description'" [control]="cwlExtrasForm.controls['description']"></ct-input>
                     </div>
-                    
+
                     <div *ngIf="error" class="alert alert-danger form-control-label">
                         {{ error.message }}
                     </div>
