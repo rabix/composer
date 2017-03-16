@@ -1,13 +1,10 @@
-import {Component, Input, Output, ViewEncapsulation} from "@angular/core";
+import {ChangeDetectorRef, Component, Input, Output, ViewEncapsulation} from "@angular/core";
 import {Workflow} from "cwl-svg";
 import {StepModel, WorkflowModel, WorkflowStepInputModel} from "cwlts/models";
 import {Subject} from "rxjs/Subject";
 import {ObjectHelper as OH} from "../../../../helpers/object.helper";
-import {Workflow} from "cwl-svg";
-import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 import {StatusBarService} from "../../../../layout/status-bar/status-bar.service";
-import {Workflow} from "cwl-svg";
-import {ChangeDetectorRef} from "@angular/core";
+import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -87,18 +84,18 @@ import {ChangeDetectorRef} from "@angular/core";
                             <!--Tooltip-->
                             <ct-tooltip-content [maxWidth]="500" #ctt>
 
-                                <h4>{{input.label || input.id}}</h4>    
-                                
+                                <h4>{{input.label || input.id}}</h4>
+
                                 <ul>
                                     <!--Description-->
                                     <li>
                                         <span class="title">
                                             Description:
                                         </span>
-                                            <span class="value">
+                                        <span class="value">
                                             {{input.description}}
                                         </span>
-                                    </li>                                    
+                                    </li>
                                 </ul>
 
                             </ct-tooltip-content>
@@ -227,7 +224,7 @@ export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase {
     }
 
     private handleConnectionChange = (src, dest) => {
-        if(dest && dest.parentStep && dest.parentStep.id === this.step.id) {
+        if (dest && dest.parentStep && dest.parentStep.id === this.step.id) {
             console.log(dest);
             this.cdr.markForCheck();
         }
