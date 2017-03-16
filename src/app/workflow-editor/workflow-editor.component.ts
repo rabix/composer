@@ -1,10 +1,8 @@
 import * as Yaml from "js-yaml";
 import {
-    ChangeDetectorRef,
     Component,
     Input,
     OnDestroy,
-    OnInit,
     TemplateRef,
     ViewChild,
     ViewContainerRef,
@@ -64,13 +62,7 @@ import LoadOptions = jsyaml.LoadOptions;
                             (click)="switchView(viewModes.Graph)"
                             [class.btn-primary]="viewMode === viewModes.Graph"
                             [class.btn-secondary]="viewMode !== viewModes.Graph">Very Visual</button>
-
-                    <button class="btn btn-secondary btn-sm"
-                            [disabled]="!isValidCWL"
-                            (click)="switchView(viewModes.Test)"
-                            [class.btn-primary]="viewMode === viewModes.Test"
-                            [class.btn-secondary]="viewMode !== viewModes.Test">Test</button>
-
+                    
                     <button class="btn btn-secondary btn-sm"
                             [disabled]="!isValidCWL"
                             (click)="switchView(viewModes.Info)"
@@ -190,7 +182,7 @@ export class WorkflowEditorComponent extends ComponentBase implements OnDestroy,
     public viewMode;
 
     /** Flag to indicate the document is loading */
-    private isLoading = true;
+    public isLoading = true;
 
     /** Flag for showing reformat prompt on GUI switch */
     private showReformatPrompt = true;
@@ -214,7 +206,6 @@ export class WorkflowEditorComponent extends ComponentBase implements OnDestroy,
     private viewModes = {
         Code: "code",
         Gui: "gui",
-        Test: "test",
         Graph: "graph",
         Info: "info"
     };
@@ -231,7 +222,6 @@ export class WorkflowEditorComponent extends ComponentBase implements OnDestroy,
                 private platform: PlatformAPI,
                 private inspector: EditorInspectorService,
                 private statusBar: StatusBarService,
-                private cdr: ChangeDetectorRef,
                 private modal: ModalService) {
 
         super();
@@ -306,8 +296,20 @@ export class WorkflowEditorComponent extends ComponentBase implements OnDestroy,
                         // After wf is created get updates for steps
                         this.getStepUpdates();
 
-                    }, () => {
-                        //@todo: handle unresolvable steps
+                    }, (err) => {
+                        this.isLoading = false;
+                        this.viewMode = this.viewModes.Code;
+                        this.isValidCWL = false;
+                        this.validation = {
+                            isValidatableCwl: true,
+                            isValidCwl: false,
+                            isValidJSON: true,
+                            warnings: [],
+                            errors: [{
+                                message: err.message,
+                                loc: "document"
+                            }]
+                        };
                     });
 
                 });

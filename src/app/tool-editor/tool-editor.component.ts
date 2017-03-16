@@ -102,7 +102,7 @@ import LoadOptions = jsyaml.LoadOptions;
                     Save
                 </button>
             </ct-editor-controls>
-            
+
             <!--Header & Editor Column-->
             <div class="editor-content flex-row">
                 <!--Editor Row-->
@@ -128,9 +128,9 @@ import LoadOptions = jsyaml.LoadOptions;
                                [inputs]="toolModel.inputs"></ct-job-editor>
 
                 <ct-app-info *ngIf="viewMode === viewModes.Info"
-                              class="gui-editor-component p-2"
-                              [class.flex-col]="showInspector"
-                              [model]="toolModel"></ct-app-info>
+                             class="gui-editor-component p-2"
+                             [class.flex-col]="showInspector"
+                             [model]="toolModel"></ct-app-info>
 
 
                 <!--Object Inspector Column-->
@@ -142,7 +142,8 @@ import LoadOptions = jsyaml.LoadOptions;
             </div>
 
             <div *ngIf="reportPanel" class="app-report-panel layout-section">
-                <ct-validation-report *ngIf="reportPanel === 'validation'" [issues]="validation"></ct-validation-report>
+                <ct-validation-report *ngIf="reportPanel === 'validation'"
+                                      [issues]="validation"></ct-validation-report>
                 <ct-command-line-preview *ngIf="reportPanel === 'commandLinePreview'"
                                          [commandLineParts]="commandLineParts | async"></ct-command-line-preview>
             </div>
@@ -159,7 +160,8 @@ import LoadOptions = jsyaml.LoadOptions;
                             <i class="fa fa-times-circle text-danger"></i> {{validation.errors.length}} Errors
                         </span>
                         
-                        <span *ngIf="validation?.warnings?.length" [class.pl-1]="validation?.errors?.length">
+                        <span *ngIf="validation?.warnings?.length"
+                              [class.pl-1]="validation?.errors?.length">
                             <i class="fa fa-exclamation-triangle text-warning"></i> {{validation.warnings.length}} Warnings
                         </span>
                         
@@ -260,7 +262,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
                 this.cwlValidatorService.validate(latestContent).then(r => {
                     if (!r.isValidCwl) {
                         // turn off loader and load document as code
-                        this.isLoading = false;
+                        this.isLoading  = false;
                         this.validation = r;
                         return r;
                     }
@@ -299,7 +301,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
 
                         // load document in GUI and turn off loader, only if loader was active
                         if (this.isLoading) {
-                            this.viewMode = this.viewModes.Gui;
+                            this.viewMode  = this.viewModes.Gui;
                             this.isLoading = false;
                         }
 
@@ -313,13 +315,27 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
 
                         this.validation = v;
                         this.isValidCWL = v.isValidCwl;
+                    }, (err) => {
+                        this.isLoading  = false;
+                        this.viewMode   = this.viewModes.Code;
+                        this.isValidCWL = false;
+                        this.validation = {
+                            isValidatableCwl: true,
+                            isValidCwl: false,
+                            isValidJSON: true,
+                            warnings: [],
+                            errors: [{
+                                message: err.message,
+                                loc: "document"
+                            }]
+                        };
                     });
                 });
             });
 
         // Whenever content of a file changes, forward the change to the raw editor content steam.
         const statusID = this.statusBar.startProcess(`Loading ${this.data.data.id}`);
-        this.tracked = this.data.content.subscribe(val => {
+        this.tracked   = this.data.content.subscribe(val => {
             this.rawEditorContent.next(val);
             this.statusBar.stopProcess(statusID);
         });
@@ -350,7 +366,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
             formControl: new FormControl("")
         }).then(revisionNote => {
 
-            const path = this.data.data["sbg:id"] || this.data.data.id;
+            const path     = this.data.data["sbg:id"] || this.data.data.id;
             const statusID = this.statusBar.startProcess(`Creating a new revision of ${path}`);
             this.data.save(JSON.parse(text), revisionNote).subscribe(result => {
                 const cwl = JSON.stringify(result.message, null, 4);
@@ -382,7 +398,7 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
                 if (res) this.userPrefService.put("show_reformat_prompt", false);
 
                 this.showReformatPrompt = false;
-                this.viewMode = mode;
+                this.viewMode           = mode;
             }, noop);
             return;
         }
