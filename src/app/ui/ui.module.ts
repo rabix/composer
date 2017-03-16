@@ -29,6 +29,7 @@ import {TreeNodeComponent} from "./tree-view/tree-node/tree-node.component";
 import {TreeViewComponent} from "./tree-view/tree-view.component";
 import {TabComponent} from "./tabs/tab.component";
 import {TabsComponent} from "./tabs/tabs.component";
+import {BlockLoaderComponent} from "./block-loader/block-loader.component";
 
 @NgModule({
     imports: [
