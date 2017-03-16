@@ -1,11 +1,12 @@
-import {Component, ElementRef, OnInit, QueryList, ViewChildren} from "@angular/core";
-import {TabData} from "./tab-data.interface";
-import {IpcService} from "../../services/ipc.service";
-import {MenuItem} from "../../ui/menu/menu-item";
-import {WorkboxService} from "./workbox.service";
-import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {AfterViewInit, Component, ElementRef, OnInit, QueryList, ViewChildren} from "@angular/core";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {StatusControlProvider} from "../../layout/status-bar/status-control-provider.interface";
+import {IpcService} from "../../services/ipc.service";
+import {MenuItem} from "../../ui/menu/menu-item";
+import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {TabData} from "./tab-data.interface";
+import {WorkboxService} from "./workbox.service";
+
 @Component({
     selector: "ct-workbox",
     styleUrls: ["./workbox.component.scss"],
@@ -31,17 +32,19 @@ import {StatusControlProvider} from "../../layout/status-bar/status-control-prov
         <div class="ct-workbox-body">
             <span *ngFor="let tab of tabs" [hidden]="tab !== activeTab">
                 <div [ngSwitch]="tab?.contentType | async" class="full-height">
-                    <ct-tool-editor #tabComponent *ngSwitchCase="'CommandLineTool'" [data]="tab.contentData"></ct-tool-editor>
-                    <ct-workflow-editor #tabComponent [data]="tab.contentData" *ngSwitchCase="'Workflow'"></ct-workflow-editor>
+                    <ct-tool-editor #tabComponent *ngSwitchCase="'CommandLineTool'"
+                                    [data]="tab.contentData"></ct-tool-editor>
+                    <ct-workflow-editor #tabComponent [data]="tab.contentData"
+                                        *ngSwitchCase="'Workflow'"></ct-workflow-editor>
                     <ct-file-editor [data]="tab.contentData" *ngSwitchCase="'Code'"></ct-file-editor>
                     <ct-settings *ngSwitchCase="'Settings'"></ct-settings>
-                    <block-loader *ngSwitchDefault></block-loader>
+                    <ct-block-loader *ngSwitchDefault></ct-block-loader>
                 </div>
             </span>
         </div>
     `
 })
-export class WorkboxComponent extends DirectiveBase implements OnInit {
+export class WorkboxComponent extends DirectiveBase implements OnInit, AfterViewInit {
 
     /** List of tab data objects */
     public tabs: TabData<any>[] = [];
@@ -95,7 +98,7 @@ export class WorkboxComponent extends DirectiveBase implements OnInit {
             this.statusBar.removeControls();
 
             this.activeTab = tab;
-            const idx = this.tabs.findIndex(t => t === tab);
+            const idx      = this.tabs.findIndex(t => t === tab);
 
             const component = this.tabComponents.find((item, index) => index === idx);
 
@@ -126,7 +129,7 @@ export class WorkboxComponent extends DirectiveBase implements OnInit {
         this.workbox.closeAllTabs();
     }
 
-    private createContextMenu(tab): MenuItem[] {
+    public createContextMenu(tab): MenuItem[] {
         const closeOthers = new MenuItem("Close Others", {
             click: () => this.removeOtherTabs(tab)
         });

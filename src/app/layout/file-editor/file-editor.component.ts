@@ -12,7 +12,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
         "class": "tab-container"
     },
     template: `
-        <block-loader *ngIf="isLoading"></block-loader>
+        <ct-block-loader *ngIf="isLoading"></ct-block-loader>
 
         <div class="editor-container" [hidden]="isLoading">
 

@@ -53,7 +53,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
         </div>
 
         <div *ngIf="isExpanded && nodeChildren" class="children">
-            <ct-tree-node [level]="level + 1" *ngFor="let node of nodeChildren" [node]="node"
+            <ct-tree-node [level]="level + 1" *ngFor="let node of nodeChildren"
                           [preferenceKey]="preferenceKey"></ct-tree-node>
             <div *ngIf="nodeChildren.length === 0">
                 <span class="icon-space"></span>

@@ -1,4 +1,4 @@
-const main = require("./src/main.common");
+import main = require("./src/main.common");
 
 main.start({
     url: `file://${__dirname}/index.html`,

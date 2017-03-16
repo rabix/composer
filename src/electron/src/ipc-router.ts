@@ -3,7 +3,7 @@ const routes = require("./routes");
 
 function bindDataRequestListener() {
     ipcMain.on("data-request", (event, request) => {
-
+        console.log("Received request", request.id, request.data);
         const controllerFn = routes[request.message];
 
         const reply = (id) => (error, data) => {

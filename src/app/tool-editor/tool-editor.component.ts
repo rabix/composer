@@ -39,7 +39,7 @@ import {WorkboxTab} from "../core/workbox/workbox-tab.interface";
     },
     providers: [EditorInspectorService],
     template: `
-        <block-loader *ngIf="isLoading"></block-loader>
+        <ct-block-loader *ngIf="isLoading"></ct-block-loader>
 
         <div class="editor-container" [hidden]="isLoading">
 
@@ -247,7 +247,8 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
 
         this.toolGroup = formBuilder.group({});
 
-        this.tracked = this.userPrefService.get("show_reformat_prompt", true, true).subscribe(x => this.showReformatPrompt = x);
+        // @fixme Bring this back with the new service
+        // this.tracked = this.userPrefService.get("show_reformat_prompt", true, true).subscribe(x => this.showReformatPrompt = x);
 
         this.tracked = this.inspector.inspectedObject.map(obj => obj !== undefined)
             .subscribe(show => this.showInspector = show);

@@ -1,7 +1,7 @@
-const fs = require("fs");
-const http = require("http");
-const request = require("request");
-const yaml = require("js-yaml");
+import fs = require("fs");
+import http = require("http");
+import request = require("request");
+import yaml = require("js-yaml");
 
 function isUrl(s) {
     const regexp = /^(ftp|https|https):\/\/.*/i;

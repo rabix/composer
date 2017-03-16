@@ -8,11 +8,11 @@ import {
     ViewEncapsulation
 } from "@angular/core";
 import {Observable} from "rxjs";
-import {TreeNode} from "./types";
+import {DomEventService} from "../../services/dom/dom-event.service";
+import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {TreeNodeComponent} from "./tree-node.component";
 import {TreeViewService} from "./tree-view.service";
-import {DirectiveBase} from "../../util/directive-base/directive-base";
-import {DomEventService} from "../../services/dom/dom-event.service";
+import {TreeNode} from "./types";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -57,7 +57,7 @@ export class TreeViewComponent extends DirectiveBase {
             this.searchTerm = term;
         });
 
-        this.el = el.nativeElement;
+        this.el      = el.nativeElement;
         //
         this.tracked = this.observeArrowNavigation().withLatestFrom(
             this.tree.selectedNode.filter(n => !!n),
@@ -86,7 +86,7 @@ export class TreeViewComponent extends DirectiveBase {
 
                 const expand = nodes =>
                     nodes.reduce((acc, node) => acc.concat(node, expand(node.getChildren().toArray())), []);
-                const next = expand(treeNodes).find(node => node.nodeIndex == nextNode.getAttribute("data-index"));
+                const next   = expand(treeNodes).find(node => node.nodeIndex == nextNode.getAttribute("data-index"));
 
                 // Select the component that matches the index
                 this.tree.selectedNode.next(next);
@@ -109,10 +109,10 @@ export class TreeViewComponent extends DirectiveBase {
 
         this.tracked = this.tree.selectedNode.filter(c => !!c)
             .map(comp => comp.el.querySelector(".node-base")).subscribe(el => {
-                const nodeRect = el.getBoundingClientRect();
-                const treeRect = this.el.getBoundingClientRect();
-                const nodeFromAbove = nodeRect.top - treeRect.top;
-                const nodeFromBelow = treeRect.height - nodeFromAbove - nodeRect.height;
+                const nodeRect       = el.getBoundingClientRect();
+                const treeRect       = this.el.getBoundingClientRect();
+                const nodeFromAbove  = nodeRect.top - treeRect.top;
+                const nodeFromBelow  = treeRect.height - nodeFromAbove - nodeRect.height;
                 const isAboveTheFold = nodeFromAbove < 0;
                 const isBelowTheFold = nodeFromBelow < 0;
 

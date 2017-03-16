@@ -36,7 +36,7 @@ import {WorkboxTab} from "../core/workbox/workbox-tab.interface";
     },
     providers: [EditorInspectorService],
     template: `
-        <block-loader *ngIf="isLoading"></block-loader>
+        <ct-block-loader *ngIf="isLoading"></ct-block-loader>
 
         <div class="editor-container" [hidden]="isLoading">
 
@@ -104,9 +104,9 @@ import {WorkboxTab} from "../core/workbox/workbox-tab.interface";
             <div class="editor-content flex-row fixed">
                 <!--Editor Row-->
                 <!--<ui-code-editor *ngIf="viewMode === viewModes.Code"-->
-                                <!--[formControl]="codeEditorContent"-->
-                                <!--[options]="{mode: 'ace/mode/yaml'}"-->
-                                <!--class="editor">-->
+                <!--[formControl]="codeEditorContent"-->
+                <!--[options]="{mode: 'ace/mode/yaml'}"-->
+                <!--class="editor">-->
                 <!--</ui-code-editor>-->
                 <ct-code-editor-x *ngIf="viewMode === viewModes.Code" class="editor"
                                   [class.flex-col]="showInspector"
@@ -236,7 +236,8 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
 
         this.toolGroup = formBuilder.group({});
 
-        this.tracked = this.userPrefService.get("show_reformat_prompt", true, true).subscribe(x => this.showReformatPrompt = x);
+        // @fixme Bring this back with the new service
+        // this.tracked = this.userPrefService.get("show_reformat_prompt", true, true).subscribe(x => this.showReformatPrompt = x);
 
         this.tracked = this.inspector.inspectedObject.map(obj => obj !== undefined)
             .subscribe(show => this.showInspector = show);

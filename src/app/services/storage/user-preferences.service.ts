@@ -1,36 +1,35 @@
 import {Injectable} from "@angular/core";
-import {Observable} from "rxjs";
-
+import "rxjs/add/operator/map";
+import "rxjs/add/operator/take";
+import {Observable} from "rxjs/Observable";
+import {Subject} from "rxjs/Subject";
+import {IpcService} from "../ipc.service";
+import {UserProfileCacheKey} from "./user-profile-cache-key";
 
 @Injectable()
 export class UserPreferencesService {
 
-    private storage: Storage;
+    private updates = new Subject<{
+        key: string;
+        value: any;
+    }>();
 
-    constructor() {
-        this.storage = localStorage;
+    constructor(private ipc: IpcService) {
+
     }
 
-    public put(key: string, value: any): void {
-        this.storage.setItem(key, JSON.stringify(value));
+    public put(key: UserProfileCacheKey, value: any): void {
+
+        this.ipc.request("putSetting", {key, value});
+        this.updates.next({key, value});
     }
 
-    public get<T>(key: string, fallback?: T, saveDefault = false): Observable<T> {
+    public get<T>(key: UserProfileCacheKey, fallback?: T): Observable<T> {
 
-        const val = this.storage.getItem(key);
+        console.log("Requesting", key);
+        return this.ipc.request("getSetting", key)
 
-        if (!val && typeof val !== "number") {
-            if (saveDefault) {
-                this.put(key, fallback);
-            }
-            return Observable.of(fallback);
-        }
-
-        if (val === "undefined") {
-            this.storage.removeItem(key);
-            return Observable.of(fallback);
-        }
-
-        return Observable.of(JSON.parse(val));
+            .merge(this.updates.filter(u => u.key === key).map(u => u.value))
+            .map(v => v === undefined ? fallback : v);
     }
 }

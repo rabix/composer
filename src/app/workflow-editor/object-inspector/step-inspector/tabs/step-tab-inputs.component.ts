@@ -1,17 +1,18 @@
-import {ChangeDetectionStrategy, Component, Input, Output, ViewEncapsulation} from "@angular/core";
+import {Component, Input, Output, ViewEncapsulation} from "@angular/core";
+import {Workflow} from "cwl-svg";
 import {StepModel, WorkflowModel, WorkflowStepInputModel} from "cwlts/models";
-import {Subject} from "rxjs";
+import {Subject} from "rxjs/Subject";
 import {ObjectHelper as OH} from "../../../../helpers/object.helper";
 import {Workflow} from "cwl-svg";
-import {StatusBarService} from "../../../../layout/status-bar/status-bar.service";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
+import {StatusBarService} from "../../../../layout/status-bar/status-bar.service";
 import {Workflow} from "cwl-svg";
 import {ChangeDetectorRef} from "@angular/core";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
     selector: "ct-workflow-step-inspector-inputs",
-    //@todo: temporarily removing ChangeDetectionStrategy.OnPush because model is being changed externally by graph
+    // @todo: temporarily removing ChangeDetectionStrategy.OnPush because model is being changed externally by graph
     styleUrls: ["./step-tab-inputs.component.scss"],
     template: `
         <div *ngFor="let group of inputGroups">
@@ -109,7 +110,7 @@ import {ChangeDetectorRef} from "@angular/core";
         </div>
     `
 })
-export class WorkflowStepInspectorTabInputs extends DirectiveBase {
+export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase {
 
     public dropDownPortOptions = [
         {
@@ -144,7 +145,7 @@ export class WorkflowStepInspectorTabInputs extends DirectiveBase {
     @Output()
     public save = new Subject<WorkflowStepInputModel>();
 
-    private group = [];
+    public group = [];
 
     public inputGroups: { name: string, inputs: WorkflowStepInputModel[] }[] = [];
 
@@ -155,7 +156,7 @@ export class WorkflowStepInspectorTabInputs extends DirectiveBase {
     /**
      * Executes when port option get changed via drop down menu or toggle slider
      */
-    private onPortOptionChange(input, value) {
+    onPortOptionChange(input, value) {
         switch (value) {
             case"editable":
                 this.workflowModel.clearPort(input);
@@ -175,7 +176,7 @@ export class WorkflowStepInspectorTabInputs extends DirectiveBase {
     /**
      * Executes when step get edited in the top-level forms.
      */
-    private onInputsFormChange(event: Event) {
+    onInputsFormChange(event: Event) {
 
         event.stopPropagation();
 
@@ -207,11 +208,11 @@ export class WorkflowStepInspectorTabInputs extends DirectiveBase {
     /**
      * Updates the step value for a given input
      */
-    private stepValueUpdate(prefix, value) {
+    stepValueUpdate(prefix, value) {
 
         // Get top level id from prefix
         const inputId = prefix.split(".")[0];
-        const input = this.step.in.find(i => i.id === inputId);
+        const input   = this.step.in.find(i => i.id === inputId);
 
         console.log("----> Step Value Update", inputId, value);
 
@@ -253,7 +254,7 @@ export class WorkflowStepInspectorTabInputs extends DirectiveBase {
         }));
     }
 
-    private isFileType(input) {
+    isFileType(input) {
         return input.type.type === "File" || (input.type.type === "array" && input.type.items === "File");
     }
 

@@ -1,22 +1,22 @@
-import {BrowserModule} from "@angular/platform-browser";
-import {CoreModule} from "./core/core.module";
-import {DomEventService} from "./services/dom/dom-event.service";
-import {FormBuilder, FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {GuidService} from "./services/guid.service";
-import {HttpModule} from "@angular/http";
-import {IpcService} from "./services/ipc.service";
-import {MainComponent} from "./components/main/main.component";
 import {NgModule} from "@angular/core";
-import {PlatformAPI} from "./services/api/platforms/platform-api.service";
-import {SettingsService} from "./services/settings/settings.service";
-import {TemplateProviderService} from "./services/template-provider.service";
-import {UserPreferencesService} from "./services/storage/user-preferences.service";
-import {ToolEditorModule} from "./tool-editor/tool-editor.module";
-import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
+import {FormBuilder, FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {HttpModule} from "@angular/http";
+import {BrowserModule} from "@angular/platform-browser";
+import {MainComponent} from "./components/main/main.component";
+import {CoreModule} from "./core/core.module";
+import {DataGatewayService} from "./core/data-gateway/data-gateway.service";
 import {CWLModule} from "./cwl/cwl.module";
 import {EditorCommonModule} from "./editor-common/editor-common.module";
-import {LayoutComponent} from "./core/layout/layout.component";
+import {PlatformAPI} from "./services/api/platforms/platform-api.service";
+import {DomEventService} from "./services/dom/dom-event.service";
+import {GuidService} from "./services/guid.service";
+import {IpcService} from "./services/ipc.service";
+import {SettingsService} from "./services/settings/settings.service";
+import {UserPreferencesService} from "./services/storage/user-preferences.service";
+import {TemplateProviderService} from "./services/template-provider.service";
+import {ToolEditorModule} from "./tool-editor/tool-editor.module";
 import {UIModule} from "./ui/ui.module";
+import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
 
 @NgModule({
     providers: [
@@ -28,6 +28,7 @@ import {UIModule} from "./ui/ui.module";
         IpcService,
         SettingsService,
         PlatformAPI,
+        DataGatewayService,
     ],
     declarations: [
         MainComponent,

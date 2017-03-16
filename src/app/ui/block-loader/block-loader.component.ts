@@ -1,20 +1,12 @@
-import {Component, ViewEncapsulation} from "@angular/core";
+import {ChangeDetectionStrategy, Component} from "@angular/core";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
-    selector: "block-loader",
+    selector: "ct-block-loader",
     styleUrls: ["./block-loader.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-        <div class="block-loader">
-            <div class="vertically-aligned-cell">
-                <i class="fa fa-cog fa-spin fa-3x"></i>
-                <p>Loading...</p>
-            </div>
-        </div>
-
+        <ct-progress></ct-progress>
     `
 })
 export class BlockLoaderComponent {
-
 }
