@@ -1,10 +1,8 @@
 import {
     ChangeDetectionStrategy,
-    ChangeDetectorRef,
     Component,
     ElementRef,
     Input,
-    NgZone,
     TemplateRef,
     ViewChild,
     ViewEncapsulation
@@ -16,6 +14,7 @@ import {EditorInspectorService} from "../../../editor-common/inspector/editor-in
 import {Observable} from "rxjs";
 import * as Yaml from "js-yaml";
 import LoadOptions = jsyaml.LoadOptions;
+import {ComponentBase} from "../../../components/common/component-base";
 
 
 declare const Snap: any;
@@ -23,6 +22,7 @@ declare const Snap: any;
 @Component({
     encapsulation: ViewEncapsulation.None,
     selector: "ct-workflow-graph-editor",
+    changeDetection: ChangeDetectionStrategy.OnPush,
     styleUrls: ["./workflow-graph-editor.component.scss"],
     template: `
         <svg (dblclick)="openInspector($event)" #canvas class="cwl-workflow"
@@ -70,7 +70,7 @@ declare const Snap: any;
         </template>
     `
 })
-export class WorkflowGraphEditorComponent {
+export class WorkflowGraphEditorComponent extends ComponentBase {
 
     @Input()
     public model: WorkflowModel;
@@ -93,6 +93,19 @@ export class WorkflowGraphEditorComponent {
 
     constructor(private statusBar: StatusBarService,
                 private inspector: EditorInspectorService) {
+        super();
+    }
+
+    ngOnInit() {
+        const removeHandler = (node) => {
+            if (node === this.inspectedNode) {
+                this.inspector.hide();
+            }
+        };
+
+        this.tracked = this.model.on("output.remove", removeHandler);
+        this.tracked = this.model.on("input.remove", removeHandler);
+        this.tracked = this.model.on("step.remove", removeHandler);
     }
 
     ngOnChanges() {

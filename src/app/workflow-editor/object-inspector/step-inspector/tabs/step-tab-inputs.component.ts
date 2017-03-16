@@ -5,11 +5,12 @@ import {ComponentBase} from "../../../../components/common/component-base";
 import {ObjectHelper as OH} from "../../../../helpers/object.helper";
 import {StatusBarService} from "../../../../core/status-bar/status-bar.service";
 import {Workflow} from "cwl-svg";
+import {ChangeDetectorRef} from "@angular/core";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
     selector: "ct-workflow-step-inspector-inputs",
-    //@todo: temporarily removing ChangeDetectionStrategy.OnPush because model is being changed externally by graph
+    changeDetection: ChangeDetectionStrategy.OnPush,
     styleUrls: ["./step-tab-inputs.component.scss"],
     template: `
         <div *ngFor="let group of inputGroups">
@@ -146,7 +147,7 @@ export class WorkflowStepInspectorTabInputs extends ComponentBase {
 
     public inputGroups: { name: string, inputs: WorkflowStepInputModel[] }[] = [];
 
-    constructor(private statusBar: StatusBarService) {
+    constructor(private statusBar: StatusBarService, private cdr: ChangeDetectorRef) {
         super();
     }
 
@@ -221,6 +222,18 @@ export class WorkflowStepInspectorTabInputs extends ComponentBase {
 
         // Assign the given value to the step key
         OH.addProperty(this.step.inAsMap, prefix, value);
+    }
+
+    private handleConnectionChange = (src, dest) => {
+        if(dest && dest.parentStep && dest.parentStep.id === this.step.id) {
+            console.log(dest);
+            this.cdr.markForCheck();
+        }
+    };
+
+    ngOnInit() {
+        this.tracked = this.workflowModel.on("connection.create", this.handleConnectionChange.bind(this));
+        this.tracked = this.workflowModel.on("connection.remove", this.handleConnectionChange.bind(this));
     }
 
     ngOnChanges() {

@@ -65,6 +65,7 @@ export class StatusBarService {
 
         if (!p) {
             console.error(`Process “${id}” doesn't exist.`);
+            console.trace();
             return;
         }
 
