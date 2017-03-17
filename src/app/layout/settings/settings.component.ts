@@ -142,7 +142,7 @@ export class SettingsComponent extends DirectiveBase implements OnInit {
             this.ipc.request("scanPlatforms").subscribe(res => {
                 console.log("Scanning done", res);
             }, err => {
-                console.log("Indexing errored");
+                console.log("Indexing errored", err);
             });
         }, 100);
 

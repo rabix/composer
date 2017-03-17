@@ -24,7 +24,7 @@ export class IpcService {
     constructor(private guid: GuidService, @Optional() private zone: NgZone) {
         ipcRenderer.on("data-reply", (sender, response) => {
 
-            console.debug("Data reply received", response.id, response);
+            // console.debug("Data reply received", response.id, response);
 
             if (!this.pendingRequests[response.id]) {
                 console.warn("Missing ipc request stream", response.id);
@@ -64,7 +64,7 @@ export class IpcService {
             stream: new AsyncSubject<any>(),
         };
 
-        console.debug("Sending", message, "(", messageID, ")", data);
+        // console.debug("Sending", message, "(", messageID, ")", data);
 
         ipcRenderer.send("data-request", {
             id: messageID,
@@ -93,7 +93,6 @@ export class IpcService {
     }
 
     public notify(message: any): void {
-        console.log("IPC notify", message);
         ipcRenderer.send("notification", {message});
     }
 }
