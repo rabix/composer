@@ -1,0 +1,45 @@
+@import "../../../assets/sass/variables";
+@import "../../../assets/sass/mixins";
+
+:host {
+    $tab-height: $action-bar-height;
+
+    display: block;
+
+    .tab-container {
+        width: 100%;
+        display: flex;
+        height: $tab-height;
+        flex-direction: row;
+    }
+
+    .tab {
+        @include ellipsis();
+        flex: 1;
+        text-align: center;
+        line-height: $tab-height;
+        background: none;
+        color: $layout-text-color-faded;
+
+        &.auto {
+            flex-basis: auto;
+        }
+    }
+
+    .active {
+        color: $layout-text-color;
+    }
+
+    .selection-underline {
+        position: relative;
+        height: $tab-height * .05;
+        background: $layout-element-separator-color;
+    }
+
+    .underline-highlight {
+        transition: .2s all;
+        height: 100%;
+        position: absolute;
+        background: $color-primary;
+    }
+}

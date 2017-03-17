@@ -66,7 +66,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 
                 <button type="submit"
                         class="btn btn-primary"
-                        [disabled]="form.invalid || checkInProgress">Apply
+                        [disabled]="checkInProgress">Apply
                 </button>
             </form>
         </div>
@@ -99,7 +99,6 @@ export class SettingsComponent extends DirectiveBase implements OnInit {
         });
 
         this.tracked = this.profile.get("credentials").subscribe(credentials => {
-            console.log("Got a new credentials profile", credentials);
             this.form.patchValue(credentials[0]);
         });
     }
@@ -135,16 +134,9 @@ export class SettingsComponent extends DirectiveBase implements OnInit {
         this.profile.put("credentials", [{
             profile: profile === "igor" ? "default" : profile,
             ...this.form.getRawValue()
-        }]);
-
-        setTimeout(() => {
-            console.log("Start scanning");
-            this.ipc.request("scanPlatforms").subscribe(res => {
-                console.log("Scanning done", res);
-            }, err => {
-                console.log("Indexing errored", err);
-            });
-        }, 100);
+        }]).take(1).subscribe(() => {
+            this.ipc.request("scanPlatforms");
+        });
 
         // this.settings.platformConfiguration.next(this.form.value);
     }

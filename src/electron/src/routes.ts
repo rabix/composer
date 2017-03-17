@@ -5,7 +5,8 @@ const resolver              = require("./schema-salad-resolver");
 const settings              = require("electron-settings");
 
 let platformGateways = {};
-module.exports       = {
+
+module.exports = {
 
     // File System Routes
 
@@ -118,6 +119,7 @@ module.exports       = {
     },
 
     scanPlatforms: (data, callback) => {
+
         console.log("Triggered platform scanning");
 
         settings.get("credentials").then(results => {
@@ -128,7 +130,13 @@ module.exports       = {
 
                     const platform = new PlatformGateway(source.url);
 
-                    platform.getSessionID(source.token, () => {
+                    platform.getSessionID(source.token, (err, message) => {
+                        if (err) {
+                            return reject(err);
+                        }
+
+                        source.sessionID = platform.sessionID;
+                        settings.set("credentials", results);
 
                         const publicProm = new Promise((resolve, reject) => {
                             platform.getPublicApps((err, apps) => {

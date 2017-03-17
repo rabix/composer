@@ -1,11 +1,10 @@
 import {ChangeDetectorRef, Component, Input, Output, ViewEncapsulation} from "@angular/core";
+import {Workflow} from "cwl-svg";
 import {StepModel, WorkflowModel, WorkflowStepInputModel} from "cwlts/models";
 import {Subject} from "rxjs/Subject";
 import {ObjectHelper as OH} from "../../../../helpers/object.helper";
 import {StatusBarService} from "../../../../layout/status-bar/status-bar.service";
-import {Workflow} from "cwl-svg";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
-import {ChangeDetectorRef} from "@angular/core";
 
 @Component({
     encapsulation: ViewEncapsulation.None,

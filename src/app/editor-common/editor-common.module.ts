@@ -14,8 +14,6 @@ import {QuickPickComponent} from "./components/quick-pick/quick-pick.component";
 import {RevisionListComponent} from "./components/revision-list/revision-list.component";
 import {SymbolsComponent} from "./components/symbols/symbols.component";
 import {InputTypeSelectComponent} from "./components/type-select/type-select.component";
-import {AppInfoComponent} from "./components/app-info/app-info.component";
-import {InputTypeSelectComponent} from "./components/type-select/type-select.component";
 import {ValidationClassDirective} from "./components/validation-preview/validation-class.directive";
 import {ValidationComponent} from "./components/validation-preview/validation-preview.component";
 import {ValidationReportComponent} from "./components/validation-report/validation-report.component";
@@ -106,7 +104,6 @@ import {CWLModule} from "../cwl/cwl.module";
         FormsModule,
         ReactiveFormsModule,
         UIModule,
-        CWLModule
     ]
 })
 export class EditorCommonModule {

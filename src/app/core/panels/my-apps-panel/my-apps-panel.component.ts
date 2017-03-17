@@ -330,9 +330,20 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                 console.log("Should open app", app);
                 this.workbox.openTab({
                     id: app.id,
-                    title: app["name"],
+                    title: Observable.of(app.label),
                     contentType: Observable.of(app["class"]),
-                    contentData: app
+                    contentData: {
+                        id: app.id,
+                        data: app,
+                        type: "file",
+                        language: Observable.of("json"),
+                        isWritable: true,
+                        resolve: () => Observable.of(app).toPromise(),
+                        content: Observable.of(JSON.stringify(app)),
+                        save: (jsonContent, revisionNote) => {
+                            return this.platform.saveApp(jsonContent, revisionNote);
+                        }
+                    }
                 });
             });
     }

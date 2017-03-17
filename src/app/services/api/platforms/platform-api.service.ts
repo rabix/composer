@@ -6,13 +6,6 @@ import {SettingsService} from "../../settings/settings.service";
 import {PlatformAppEntry, PlatformProjectEntry} from "./platform-api.types";
 
 
-export interface PlatformApp {
-    id: string;
-    href: string;
-    name: string;
-    project: string;
-}
-
 export interface ServiceConfig {
     port?: number;
     prefix?: string;
@@ -36,14 +29,15 @@ export class PlatformAPI {
             // the race condition with other api calls will take the old one
             this.sessionID = new ReplaySubject(1);
 
-            this.checkToken(config.url, config.key).filter(isValid => isValid === true)
+            this.checkToken(config.url, config.token).filter(isValid => isValid === true)
                 .switchMap(_ => this.http.post(this.platformServices.gatekeeper + "/session/open/auth", {}, {
                     headers: new Headers({
-                        "auth-token": config.key
+                        "auth-token": config.token
                     })
                 })).subscribe(res => this.sessionID.next(res.json().message.session_id));
         });
     }
+
 
     public checkToken(platform: string, token: string) {
         const url = this.getServiceUrl(platform, "gatekeeper");

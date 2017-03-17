@@ -69,7 +69,7 @@ export class DataGatewayService {
      */
     getPlatformListing(source: string): Observable<{ id: string, name: string }[]> {
 
-        return this.scans.switchMap(s => this.profile.get(`dataCache.${source}.projects`))
+        return this.scans.flatMap(s => this.profile.get(`dataCache.${source}.projects`))
             .do(p => console.log("Projects", p));
     }
 

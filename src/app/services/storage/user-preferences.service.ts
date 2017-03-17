@@ -18,10 +18,10 @@ export class UserPreferencesService {
 
     }
 
-    public put(key: UserProfileCacheKey, value: any): void {
+    public put(key: UserProfileCacheKey, value: any) {
 
-        this.ipc.request("putSetting", {key, value});
         this.updates.next({key, value});
+        return this.ipc.request("putSetting", {key, value});
     }
 
     public get<T>(key: UserProfileCacheKey, fallback?: T): Observable<T> {

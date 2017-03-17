@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ViewContainerRef, ViewEncapsulation} from "@angular/core";
+import {Component, ViewContainerRef, ViewEncapsulation} from "@angular/core";
 import {Observable} from "rxjs/Rx";
 import {DataGatewayService} from "../../core/data-gateway/data-gateway.service";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
@@ -15,6 +15,8 @@ import {SBPlatformDataSourceService} from "../../sources/sbg/sb-platform.source.
 import {ContextService} from "../../ui/context/context.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {UrlValidator} from "../../validators/url.validator";
+import {MarkdownService} from "../../ui/markdown/markdown.service";
+import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -32,6 +34,7 @@ import {UrlValidator} from "../../validators/url.validator";
         UrlValidator,
         PlatformAPI,
         SBPlatformDataSourceService,
+        MarkdownService,
         ContextService,
         StatusBarService,
         // FIXME: this needs to be handled in a system-specific way
@@ -46,10 +49,11 @@ export class MainComponent {
     public runnix: Observable<boolean>;
 
     constructor(modal: ModalService,
+                system: SystemService,
                 vcRef: ViewContainerRef,
+                prefs: UserPreferencesService,
                 dataGateway: DataGatewayService,
-                statusBarService: StatusBarService,
-                system: SystemService) {
+                statusBarService: StatusBarService) {
 
         system.boot();
         /**
@@ -57,6 +61,7 @@ export class MainComponent {
          * {@link ModalService.rootViewRef}
          */
         modal.rootViewRef = vcRef;
+
 
         const scanning = statusBarService.startProcess("Synchronizing with remote sources...");
 

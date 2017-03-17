@@ -27,17 +27,7 @@ const defaults = {
      * @type string[] tree node ids
      */
     expandedNodes: [],
-    workspace: {
-
-        projects: [],
-
-        /**
-         * Which of your local folders are in your workspace
-         * @type string[] absolute paths
-         */
-        localFolders: [],
-    },
-
+    localFolders: [],
     dataCache: {}
 };
 
