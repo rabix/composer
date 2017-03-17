@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, OnInit, QueryList, ViewChildren} from "@angular/core";
+import {AfterViewInit, Component, ElementRef, OnInit, QueryList, ViewChildren, ViewEncapsulation} from "@angular/core";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {StatusControlProvider} from "../../layout/status-bar/status-control-provider.interface";
 import {IpcService} from "../../services/ipc.service";
@@ -13,7 +13,7 @@ import {WorkboxService} from "./workbox.service";
     template: `
         <div class="ct-workbox-head">
             <ul class="list-inline ct-tab-bar inset-panel" tabindex="-1">
-                <li *ngFor="let tab of tabs"
+                <li *ngFor="let tab of tabs; let i = index;"
                     [ct-drag-over]="true"
                     (onDragOver)="workbox.openTab(tab)"
                     (click)="workbox.openTab(tab)"
@@ -21,7 +21,12 @@ import {WorkboxService} from "./workbox.service";
                     [ct-context]="createContextMenu(tab)"
                     class="ct-workbox-tab clickable">
                     <div class="title">{{ tab.title | async }}</div>
-                    <div (click)="removeTab(tab)" class="close-icon">×</div>
+                    <div (click)="removeTab(tab)" class="close-icon"><b>×</b></div>
+                </li>
+
+                <li class="ct-workbox-add-tab-icon clickable">
+                    <i class="fa fa-plus" aria-hidden="true" (click)="openNewFileTab()">
+                    </i>
                 </li>
             </ul>
             <div>
@@ -37,6 +42,8 @@ import {WorkboxService} from "./workbox.service";
                     <ct-workflow-editor #tabComponent [data]="tab.contentData"
                                         *ngSwitchCase="'Workflow'"></ct-workflow-editor>
                     <ct-file-editor [data]="tab.contentData" *ngSwitchCase="'Code'"></ct-file-editor>
+                    <ct-welcome-tab *ngSwitchCase="'Welcome'"></ct-welcome-tab>
+                    <ct-new-file-tab *ngSwitchCase="'NewFile'"></ct-new-file-tab>
                     <ct-settings *ngSwitchCase="'Settings'"></ct-settings>
                     <ct-block-loader *ngSwitchDefault></ct-block-loader>
                 </div>
@@ -98,7 +105,7 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
             this.statusBar.removeControls();
 
             this.activeTab = tab;
-            const idx      = this.tabs.findIndex(t => t === tab);
+            const idx = this.tabs.findIndex(t => t === tab);
 
             const component = this.tabComponents.find((item, index) => index === idx);
 
@@ -129,7 +136,31 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
         this.workbox.closeAllTabs();
     }
 
-    public createContextMenu(tab): MenuItem[] {
+    /**
+     * Opens a new file tab
+     */
+    private openNewFileTab() {
+        this.workbox.openTab({
+            id: "newFile",
+            title: Observable.of("NewFile"),
+            contentType: Observable.of("NewFile"),
+            contentData: {}
+        });
+    }
+
+    /**
+     * Opens a welcome tab
+     */
+    private openWelcomeTab() {
+        this.workbox.openTab({
+            id: "welcome",
+            title: Observable.of("Welcome"),
+            contentType: Observable.of("Welcome"),
+            contentData: {}
+        });
+    }
+
+    private createContextMenu(tab): MenuItem[] {
         const closeOthers = new MenuItem("Close Others", {
             click: () => this.removeOtherTabs(tab)
         });
