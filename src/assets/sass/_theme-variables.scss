@@ -62,7 +62,7 @@ $console-warning-color: $brand-warning;
  * FILE TABS
  */
 $main-header-bg: #333;
-$main-header-height: 44px;
+$main-header-height: 35px;
 $tab-bg: $chrome-dark-bg-secondary;
 $tab-color: $text-light;
 
@@ -72,6 +72,7 @@ $tab-hover-color: white;
 $tab-select-bg: $body-bg;
 $tab-select-color: $body-color;
 
+$tab-top-margin: 5px;
 /**
  * SIDE PANELS
  */
