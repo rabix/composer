@@ -102,22 +102,6 @@ module.exports = {
         }, err => callback(err));
     },
 
-    getListing: (path, callback) => {
-
-    },
-
-    getFile: (path, callback) => {
-
-    },
-
-    search: (data, callback) => {
-
-    },
-
-    fetchApp: (data, callback) => {
-
-    },
-
     scanPlatforms: (data, callback) => {
 
         console.log("Triggered platform scanning");

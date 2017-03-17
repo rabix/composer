@@ -85,13 +85,10 @@ export class DataGatewayService {
     }
 
     getLocalListing() {
-        return this.profile.get("workspace.localFolders", []);
+        return this.profile.get("localFolders", []);
     }
 
-    getApp(platform, appID) {
-        return this.ipc.request("fetchApp", {
-            platform,
-            appID
-        });
+    getLocalFile(path) {
+        return this.ipc.request("readFileContent", path);
     }
 }

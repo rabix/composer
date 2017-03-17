@@ -261,7 +261,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
         this.tree.expansionChanges
             .filter(n => n.isExpanded === true && n.type === "folder")
             .do(n => n.modify(() => n.loading = true))
-            .switchMap(n => this.dataGateway.getFolderListing(n.id), (node, listing) => ({node, listing}))
+            .flatMap(n => this.dataGateway.getFolderListing(n.id), (node, listing) => ({node, listing}))
             .subscribe((data: {
                             node: TreeNodeComponent<FilesystemEntry>
                             listing: FolderListing
@@ -345,6 +345,27 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                         }
                     }
                 });
+            });
+
+        this.tree.open.filter(n => n.type === "file")
+            .flatMap(node => this.dataGateway.getLocalFile(node.data.path), (node, content) => ({node, content}))
+            .subscribe(data => {
+                console.log("Should open app", data);
+                const {node, content} = data;
+
+                this.workbox.openTab({
+                    id: node.data.path,
+                    title: Observable.of(node.data.name),
+                    contentType: Observable.of(node.data.type || "Code"),
+                    contentData: {
+                        data: node.data,
+                        resolve: () => Observable.of(JSON.parse(content)).toPromise(),
+                        isWritable: true,
+                        content:  Observable.of(content),
+                        language: Observable.of(node.data.language)
+                    }
+                });
+
             });
     }
 }
