@@ -1,4 +1,5 @@
-import {Component, ElementRef, OnInit, QueryList, ViewChildren, ViewEncapsulation} from "@angular/core";
+import {AfterViewInit, Component, ElementRef, OnInit, QueryList, ViewChildren, ViewEncapsulation} from "@angular/core";
+import {Observable} from "rxjs/Observable";
 import {TabData} from "./tab-data.interface";
 import {ComponentBase} from "../common/component-base";
 import {IpcService} from "../../services/ipc.service";
@@ -23,7 +24,12 @@ import {StatusControlProvider} from "../../core/status-bar/status-control-provid
                     [ct-context]="createContextMenu(tab)"
                     class="ct-workbox-tab clickable">
                     <div class="title">{{ tab.title | async }}</div>
-                    <div (click)="removeTab(tab)" class="close-icon">×</div>
+                    <div (click)="removeTab(tab)" class="close-icon"><b>×</b></div>
+                </li>
+
+                <li class="ct-workbox-add-tab-icon clickable">
+                    <i class="fa fa-plus" aria-hidden="true" (click)="openNewFileTab()">
+                    </i>
                 </li>
             </ul>
             <ct-settings-button></ct-settings-button>
@@ -35,6 +41,8 @@ import {StatusControlProvider} from "../../core/status-bar/status-control-provid
                     <ct-tool-editor #tabComponent *ngSwitchCase="'CommandLineTool'" [data]="tab.contentData"></ct-tool-editor>
                     <ct-workflow-editor #tabComponent [data]="tab.contentData" *ngSwitchCase="'Workflow'"></ct-workflow-editor>
                     <ct-file-editor [data]="tab.contentData" *ngSwitchCase="'Code'"></ct-file-editor>
+                    <ct-welcome-tab *ngSwitchCase="'Welcome'"></ct-welcome-tab>
+                    <ct-new-file-tab *ngSwitchCase="'NewFile'"></ct-new-file-tab>
                     <ct-settings *ngSwitchCase="'Settings'"></ct-settings>
                     <block-loader *ngSwitchDefault></block-loader>
                 </div>
@@ -42,7 +50,7 @@ import {StatusControlProvider} from "../../core/status-bar/status-control-provid
         </div>
     `
 })
-export class WorkboxComponent extends ComponentBase implements OnInit {
+export class WorkboxComponent extends ComponentBase implements OnInit, AfterViewInit {
 
     /** List of tab data objects */
     public tabs: TabData<any>[] = [];
@@ -125,6 +133,30 @@ export class WorkboxComponent extends ComponentBase implements OnInit {
      */
     private removeAllTabs() {
         this.workbox.closeAllTabs();
+    }
+
+    /**
+     * Opens a new file tab
+     */
+    private openNewFileTab() {
+        this.workbox.openTab({
+            id: "newFile",
+            title: Observable.of("NewFile"),
+            contentType: Observable.of("NewFile"),
+            contentData: {}
+        });
+    }
+
+    /**
+     * Opens a welcome tab
+     */
+    private openWelcomeTab() {
+        this.workbox.openTab({
+            id: "welcome",
+            title: Observable.of("Welcome"),
+            contentType: Observable.of("Welcome"),
+            contentData: {}
+        });
     }
 
     private createContextMenu(tab): MenuItem[] {
