@@ -41,6 +41,9 @@ import {EditorCommonModule} from "./editor-common/editor-common.module";
 import {ToolEditorModule} from "./tool-editor/tool-editor.module";
 import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
 import {UpdateStepModal} from "./components/modal/custom/update-step-modal.component";
+import {WelcomeTabComponent} from "./components/onboarding/welcome.component"
+import {FooterTabComponent} from "./components/onboarding/footer.component";
+import {NewFileTabComponent} from "./components/onboarding/new-file.component";
 
 @NgModule({
     providers: [
@@ -81,6 +84,9 @@ import {UpdateStepModal} from "./components/modal/custom/update-step-modal.compo
         StructurePanelComponent,
         WorkboxComponent,
         UpdateStepModal,
+        WelcomeTabComponent,
+        FooterTabComponent,
+        NewFileTabComponent
     ],
     entryComponents: [
         CheckboxPromptComponent,
