@@ -1,15 +1,10 @@
 import {Injectable} from "@angular/core";
 import {Headers, Http, URLSearchParams} from "@angular/http";
-import {ENVP} from "../../../config/env.config";
 import {Observable, ReplaySubject} from "rxjs";
-import {PlatformAppEntry, PlatformProjectEntry} from "./platform-api.types";
+import {ENVP} from "../../../config/env.config";
 import {SettingsService} from "../../settings/settings.service";
+import {PlatformAppEntry, PlatformProjectEntry} from "./platform-api.types";
 
-export interface PlatformProject {
-    id: string;
-    href: string;
-    name: string;
-}
 
 export interface PlatformApp {
     id: string;
@@ -18,20 +13,15 @@ export interface PlatformApp {
     project: string;
 }
 
-export interface PlatformAppDetails extends PlatformApp {
-    revision: number
-    raw: Object
-}
-
 export interface ServiceConfig {
-    port?: number,
-    prefix?: string
+    port?: number;
+    prefix?: string;
 }
 
 @Injectable()
 export class PlatformAPI {
 
-    private sessionID = new ReplaySubject(1);
+    sessionID = new ReplaySubject(1);
 
     private platformServices: { brood: string, watson: string, gatekeeper: string } = {} as any;
 
@@ -73,7 +63,7 @@ export class PlatformAPI {
     }
 
     private getServiceUrl(platformUrl: string, serviceName: string) {
-        const isVayu = platformUrl.indexOf("-vayu.sbgenomics.com") !== -1;
+        const isVayu    = platformUrl.indexOf("-vayu.sbgenomics.com") !== -1;
         const isStaging = platformUrl.indexOf("staging-igor.sbgenomics.com") !== -1;
 
         let serviceUrl = platformUrl.replace("igor", serviceName);
@@ -168,7 +158,7 @@ export class PlatformAPI {
         // Checkout the newest version of this App to get the latest revision
         return this.sessionID.switchMap(sessionID => this.getApp(appPath).flatMap(latestApp => {
             const nextRevision = (latestApp["sbg:latestRevision"] || 0) + 1;
-            const endpoint = `${this.platformServices.brood}/apps/${appPath}/${nextRevision}`;
+            const endpoint     = `${this.platformServices.brood}/apps/${appPath}/${nextRevision}`;
 
             return this.http.post(endpoint, Object.assign({}, app, {
                 "sbg:revisionNotes": revisionNote
@@ -183,10 +173,10 @@ export class PlatformAPI {
     public getUpdates(ids: string []) {
         return this.sessionID.switchMap(sessionID =>
             this.http.post(`${this.platformServices.brood}/updates`, ids, {
-            headers: new Headers({
-                "session-id": sessionID
-            })
-        }).map(r => r.json().message).first());
+                headers: new Headers({
+                    "session-id": sessionID
+                })
+            }).map(r => r.json().message).first());
     }
 
     private objectToParams(obj) {

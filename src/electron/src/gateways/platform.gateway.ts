@@ -66,7 +66,6 @@ export class PlatformGateway {
         }
     }
 
-
     getSessionID(authToken: string, callback) {
         const gk = this.serviceRoutes.gatekeeper;
         console.log("Checking session ID");
@@ -127,6 +126,13 @@ export class PlatformGateway {
             url: endpoint,
             headers: {"session-id": this.sessionID},
         }, this.proxyJsonMessage(callback));
+    }
+
+    getApp(id, callback) {
+        request({
+            url: this.serviceRoutes.brood + "/apps/" + id,
+            headers: {"session-id": this.sessionID}
+        }, this.proxyJsonMessage(callback))
     }
 
 

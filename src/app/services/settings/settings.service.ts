@@ -16,10 +16,6 @@ export class SettingsService {
     public validity = new ReplaySubject<boolean>(1);
 
     constructor(private profile: UserPreferencesService) {
-
-        this.profile.get("credentials").subscribe(cr => {
-            console.log("Got credentials", cr);
-        });
         // this.profile.get<PlatformSettings | boolean>("platformConnectionSettings", false)
         //     .subscribe(prefs => {
         //         if (prefs === false) {

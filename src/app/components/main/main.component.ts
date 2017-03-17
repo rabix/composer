@@ -1,4 +1,4 @@
-import {Component, ViewContainerRef, ViewEncapsulation} from "@angular/core";
+import {AfterViewInit, Component, ViewContainerRef, ViewEncapsulation} from "@angular/core";
 import {Observable} from "rxjs/Rx";
 import {DataGatewayService} from "../../core/data-gateway/data-gateway.service";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
@@ -15,6 +15,7 @@ import {SBPlatformDataSourceService} from "../../sources/sbg/sb-platform.source.
 import {ContextService} from "../../ui/context/context.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {UrlValidator} from "../../validators/url.validator";
+
 @Component({
     encapsulation: ViewEncapsulation.None,
 

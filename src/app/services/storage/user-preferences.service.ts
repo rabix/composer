@@ -26,7 +26,6 @@ export class UserPreferencesService {
 
     public get<T>(key: UserProfileCacheKey, fallback?: T): Observable<T> {
 
-        console.log("Requesting", key);
         return this.ipc.request("getSetting", key)
 
             .merge(this.updates.filter(u => u.key === key).map(u => u.value))

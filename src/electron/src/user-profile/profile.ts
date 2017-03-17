@@ -17,10 +17,16 @@ const defaults = {
             label: "Seven Bridges",
             profile: "default",
             url: "https://igor.sbgenomics.com",
+            sessionID: null,
             token: "",
         } as ProfileCredentialEntry
     ] as ProfileCredentials,
     lastScanTime: 0,
+    /**
+     * Which of your folders are expanded
+     * @type string[] tree node ids
+     */
+    expandedNodes: [],
     workspace: {
 
         projects: [],
@@ -30,11 +36,6 @@ const defaults = {
          * @type string[] absolute paths
          */
         localFolders: [],
-        /**
-         * Which of your folders are expanded
-         * @type string[] tree node ids
-         */
-        expandedNodes: [],
     },
 
     dataCache: {}

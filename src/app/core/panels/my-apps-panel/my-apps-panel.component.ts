@@ -1,5 +1,6 @@
-import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren} from "@angular/core";
+import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren} from "@angular/core";
 import {FormControl} from "@angular/forms";
+import {Observable} from "rxjs";
 
 import "rxjs/add/operator/map";
 
@@ -8,6 +9,7 @@ import {PlatformAPI} from "../../../services/api/platforms/platform-api.service"
 import {UserPreferencesService} from "../../../services/storage/user-preferences.service";
 import {TreeNode} from "../../../ui/tree-view/tree-node";
 import {TreeNodeComponent} from "../../../ui/tree-view/tree-node/tree-node.component";
+import {TreeViewComponent} from "../../../ui/tree-view/tree-view.component";
 import {TreeViewService} from "../../../ui/tree-view/tree-view.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
@@ -46,7 +48,7 @@ import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.c
                 <i class="icon fa-4x fa fa-search"></i>
             </div>
 
-            <ct-tree-view [hidden]="searchContent?.value" [nodes]="treeNodes" [level]="1"></ct-tree-view>
+            <ct-tree-view #tree [hidden]="searchContent?.value" [nodes]="treeNodes" [level]="1"></ct-tree-view>
         </div>
     `,
     providers: [TreeViewService, LocalFileRepositoryService],
@@ -64,6 +66,9 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
     appliedSearchTerm: string;
 
     expandedNodes;
+
+    @ViewChild(TreeViewComponent)
+    treeComponent: TreeViewComponent;
 
     @ViewChildren(NavSearchResultComponent, {read: ElementRef})
     private searchResultComponents: QueryList<ElementRef>;
@@ -87,21 +92,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
 
         this.attachExpansionStateSaving();
 
-
-        //
-        // this.tree.open.filter(n => n.node.type === "sbpla-app")
-        //     .map(n => n.node.data)
-        //     .flatMap(app => this.platform.getApp(app["sbg:id"]))
-        //     .subscribe(app => {
-        //         this.workbox.openTab({
-        //             id: app.id,
-        //             title: app.name,
-        //             contentType: Observable.of(app.class),
-        //             contentData: app
-        //         });
-        //     });
-
-
+        this.listenForAppOpening();
     }
 
     ngOnInit(): void {
@@ -116,6 +107,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
     }
 
     ngAfterViewInit() {
+
         this.searchResultComponents.changes.subscribe(list => {
             list.forEach((el, idx) => setTimeout(() => el.nativeElement.classList.add("shown"), idx * 20));
         });
@@ -138,6 +130,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                 };
             });
             this.cdr.markForCheck();
+            this.applyExpansionState(this.treeComponent.getChildren());
         });
     }
 
@@ -203,6 +196,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                 data.node.modify(() => {
                     data.node.loading  = false;
                     data.node.children = children;
+                    this.applyExpansionState(data.node.getChildren());
                 });
             });
     }
@@ -226,8 +220,9 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
 
                 // Update the tree view
                 data.node.modify(() => {
-                    data.node.loading  = false;
                     data.node.children = children;
+                    this.applyExpansionState(data.node.getChildren());
+                    data.node.loading = false;
                 });
             });
     }
@@ -235,17 +230,16 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
     private listenForProjectExpansion() {
         this.tree.expansionChanges.filter(n => n.isExpanded === true && n.type === "project")
             .do(n => n.modify(() => n.loading = true))
-            .switchMap(n => {
+            .flatMap(n => {
                 const source      = n.id.substr(0, n.id.indexOf("/"));
                 const projectName = n.id.substr(n.id.indexOf("/") + 1);
-
                 return this.dataGateway.getProjectListing(source, projectName);
             }, (node, listing) => ({
                 node,
                 listing
             }))
             .subscribe(data => {
-                console.log("Project listing", data.listing);
+
                 const children = data.listing.map(app => {
                     return {
                         id: data.node.id + "/" + app["sbg:id"],
@@ -258,6 +252,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                 data.node.modify(() => {
                     data.node.children = children;
                     data.node.loading  = false;
+                    this.applyExpansionState(data.node.getChildren());
                 });
             });
     }
@@ -294,43 +289,51 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                         label: entry.path.split("/").pop(),
                     };
                 });
+
+
                 data.node.modify(() => {
                     data.node.children = children;
-                    data.node.loading  = false;
+                    this.applyExpansionState(data.node.getChildren());
+                    data.node.loading = false;
                 });
             });
     }
 
     private attachExpansionStateSaving() {
         this.tree.expansionChanges
-            .flatMap(node => this.preferences.get("workspace.expandedNodes", []).take(1), (node, expanded) => ({node, expanded}))
+            .flatMap(node => this.preferences.get("expandedNodes", []).take(1), (node, expanded) => ({node, expanded}))
             .subscribe(data => {
                 const {node, expanded} = data;
 
-                console.log("Currently expanded", expanded);
                 if (node.isExpanded && expanded.indexOf(node.id) === -1) {
-                    this.preferences.put("workspace.expandedNodes", expanded.concat(node.id));
-                } else {
-
+                    this.preferences.put("expandedNodes", expanded.concat(node.id));
+                } else if (!node.isExpanded) {
                     const idx = expanded.indexOf(node.id);
                     if (idx !== -1) {
                         expanded.splice(idx, 1);
-                        this.preferences.put("workspace.expandedNodes", expanded);
+                        this.preferences.put("expandedNodes", expanded);
                     }
                 }
             });
+    }
 
-        // this.tree.nodeInit.bufferTime(200).subscribe((node) => {
-        //     console.log("Node init", node);
-        // });
-        this.tree.nodeInit.withLatestFrom(this.preferences.get("workspace.expandedNodes", []), (nodes, expanded) => ({
-            nodes,
-            expanded
-        }))
-        // .filter(data => data.expanded.indexOf(data.node.id) !== -1)
-            .subscribe(data => {
-                console.log("Init nodes", data);
+    private applyExpansionState(nodes: QueryList<TreeNodeComponent<any>>) {
+        this.preferences.get("expandedNodes", []).take(1).subscribe(expanded => {
+            nodes.filter(node => expanded.indexOf(node.id) !== -1).forEach(node => node.expand());
+        });
+    }
+
+    private listenForAppOpening() {
+        this.tree.open.filter(n => n.type === "app")
+            .flatMap(node => this.platform.getApp(node.data["sbg:id"]))
+            .subscribe(app => {
+                console.log("Should open app", app);
+                this.workbox.openTab({
+                    id: app.id,
+                    title: app["name"],
+                    contentType: Observable.of(app["class"]),
+                    contentData: app
+                });
             });
-
     }
 }

@@ -19,16 +19,13 @@ export class DataGatewayService {
     scan() {
         return this.profile.get("lastScanTime").take(1)
             .switchMap(timestamp => {
-                console.log("Timestamp is", timestamp);
                 // Skip for 1h
                 if (!timestamp || timestamp < (Date.now().valueOf() - 3600000 )) {
                     return this.ipc.request("scanPlatforms").do(() => {
-                        console.log("Updating last scan time");
                         this.profile.put("lastScanTime", Date.now().valueOf());
                         this.scans.next("");
                     });
                 } else {
-                    console.log("Skipping scan");
                     return Observable.of("");
                 }
             });
@@ -80,8 +77,6 @@ export class DataGatewayService {
 
         return this.profile.get(`dataCache.${profile}.apps`).map((apps: any[] = []) => {
             return apps.filter(app => app["sbg:projectName"] === projectName);
-        }).do(apps => {
-            console.log("Passing apps", apps);
         });
     }
 
@@ -91,5 +86,12 @@ export class DataGatewayService {
 
     getLocalListing() {
         return this.profile.get("workspace.localFolders", []);
+    }
+
+    getApp(platform, appID) {
+        return this.ipc.request("fetchApp", {
+            platform,
+            appID
+        });
     }
 }

@@ -104,6 +104,7 @@ export class TreeNodeComponent<T> implements OnInit {
 
     contract() {
         this.isExpanded = false;
+        this.tree.expansionChanges.next(this);
     }
 
     select() {

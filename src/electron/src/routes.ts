@@ -4,7 +4,8 @@ const acceleratorController = require("./controllers/accelerator.controller");
 const resolver              = require("./schema-salad-resolver");
 const settings              = require("electron-settings");
 
-module.exports = {
+let platformGateways = {};
+module.exports       = {
 
     // File System Routes
 
@@ -67,6 +68,39 @@ module.exports = {
         });
     },
 
+    makeGateways(callback){
+        platformGateways = {};
+
+        settings.get("credentials").then(results => {
+
+            results.filter(c => !c.token).forEach(c => {
+                c.sessionID = null;
+                delete platformGateways[c.profile];
+            });
+
+            const sessionPromises = results.filter(c => c.token).map(c => {
+
+                return new Promise((resolve, reject) => {
+
+                    const gate = new PlatformGateway(c.url);
+
+                    return gate.getSessionID(c.token, (err, sessionID) => {
+                        if (err) {
+                            return reject(err);
+                        }
+
+                        platformGateways[c.profile] = gate;
+
+                        resolve(gate);
+                    });
+                });
+            });
+
+            Promise.all(sessionPromises).then(resolve => callback(null, resolve), err => callback(err));
+
+        }, err => callback(err));
+    },
+
     getListing: (path, callback) => {
 
     },
@@ -76,6 +110,10 @@ module.exports = {
     },
 
     search: (data, callback) => {
+
+    },
+
+    fetchApp: (data, callback) => {
 
     },
 
@@ -101,7 +139,7 @@ module.exports = {
                             });
                         });
 
-                        const userProm   = new Promise((resolve, reject) => {
+                        const userProm = new Promise((resolve, reject) => {
                             platform.getUserApps((err, apps) => {
                                 if (err) {
                                     return reject(err);
