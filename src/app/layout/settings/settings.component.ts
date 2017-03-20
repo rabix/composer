@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewEncapsulation} from "@angular/core";
+import {Component, OnInit} from "@angular/core";
 import {AbstractControl, FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {SystemService} from "../../platform-providers/system.service";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
@@ -8,10 +8,10 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-settings",
+    styleUrls: ["./settings.component.scss"],
     template: `
+
         <div class="m-1">
             <form class="m-t-1"
                   (ngSubmit)="onSubmit()"

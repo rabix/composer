@@ -71,15 +71,15 @@
     align-items: baseline;
 }
 
-.btn-unstyled {
+.btn-unstyled,
+.btn-unstyled:active,
+.btn-unstyled:hover,
+.btn-unstyled:focus {
     background: none;
     color: inherit;
     border: 0;
     padding: inherit;
     margin: inherit;
     cursor: pointer;
-
-    &:active, &:focus {
-        outline: none;
-    }
+    outline: none;
 }

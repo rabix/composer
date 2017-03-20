@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {BehaviorSubject, Observable} from "rxjs";
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
 
 @Injectable()
 export class WorkboxService {
@@ -8,17 +8,13 @@ export class WorkboxService {
 
     public activeTab = new BehaviorSubject(undefined);
 
-    public openTab(tab: {
-                       id: any,
-                       title: string | Observable<string>,
-                       contentType: string | Observable<string>,
-                       contentData: any,
-                   }) {
-        const {tabs} = this.extractValues();
-        let existingTab = tabs.find(existingTab => existingTab.id === tab.id);
+    public openTab(tab) {
 
-        if (existingTab) {
-            this.activateTab(existingTab);
+        const {tabs} = this.extractValues();
+        const foundTab = tabs.find(existingTab => existingTab.id === tab.id);
+
+        if (foundTab) {
+            this.activateTab(foundTab);
             return;
         }
 
@@ -33,8 +29,8 @@ export class WorkboxService {
         }
 
         const currentlyOpenTabs = this.tabs.getValue();
-        const tabToRemove = currentlyOpenTabs.find(t => t.id === tab.id);
-        const newTabList = currentlyOpenTabs.filter(t => t !== tabToRemove);
+        const tabToRemove       = currentlyOpenTabs.find(t => t.id === tab.id);
+        const newTabList        = currentlyOpenTabs.filter(t => t !== tabToRemove);
 
         this.tabs.next(newTabList);
         this.ensureActiveTab();
@@ -51,16 +47,16 @@ export class WorkboxService {
 
     public activateNext() {
         const {tabs, activeTab} = this.extractValues();
-        const index = tabs.indexOf(activeTab);
-        const newActiveTab = index === (tabs.length - 1) ? tabs[0] : tabs[index + 1];
+        const index             = tabs.indexOf(activeTab);
+        const newActiveTab      = index === (tabs.length - 1) ? tabs[0] : tabs[index + 1];
 
         this.activateTab(newActiveTab);
     }
 
     public activatePrevious() {
         const {tabs, activeTab} = this.extractValues();
-        const index = tabs.indexOf(activeTab);
-        const newActiveTab = index ? tabs[index - 1] : tabs[tabs.length - 1];
+        const index             = tabs.indexOf(activeTab);
+        const newActiveTab      = index ? tabs[index - 1] : tabs[tabs.length - 1];
 
         this.activateTab(newActiveTab);
     }

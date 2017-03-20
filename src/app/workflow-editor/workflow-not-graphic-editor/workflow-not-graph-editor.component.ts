@@ -1,10 +1,9 @@
-import {ChangeDetectionStrategy, Component, Input, ViewEncapsulation} from "@angular/core";
+import {ChangeDetectionStrategy, Component, Input, OnDestroy, ViewEncapsulation} from "@angular/core";
 import {WorkflowModel} from "cwlts/models";
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
 import {noop} from "../../lib/utils.lib";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
     selector: "ct-workflow-not-graph-editor",
     styleUrls: ["./workflow-not-graph-editor.component.scss"],
@@ -18,7 +17,7 @@ import {noop} from "../../lib/utils.lib";
             </span>
 
                     <div class="tc-body">
-                        <div class="container">
+                        <div>
                             <!--List Header Row-->
                             <div class="gui-section-list-title row">
                                 <div class="col-sm-6">ID</div>
@@ -26,11 +25,11 @@ import {noop} from "../../lib/utils.lib";
                             </div>
 
                             <!--Output List Entries-->
-                            <ul class="gui-section-list">
+                            <ul class="ml-1 mr-1">
 
                                 <!--List Entry-->
                                 <li *ngFor="let entry of model.steps; let i = index"
-                                    class="input-list-items container">
+                                    class="input-list-items">
 
                                     <div class="gui-section-list-item clickable row"
                                          [ct-editor-inspector]="inspector"
@@ -79,7 +78,7 @@ import {noop} from "../../lib/utils.lib";
             </span>
 
                     <div class="tc-body">
-                        <div class="container">
+                        <div>
                             <!--List Header Row-->
                             <div class="gui-section-list-title row">
                                 <div class="col-sm-6">ID</div>
@@ -87,11 +86,11 @@ import {noop} from "../../lib/utils.lib";
                             </div>
 
                             <!--Output List Entries-->
-                            <ul class="gui-section-list">
+                            <ul class="ml-1 mr-1">
 
                                 <!--List Entry-->
                                 <li *ngFor="let entry of model.inputs; let i = index"
-                                    class="input-list-items container">
+                                    class="input-list-items">
 
                                     <div class="gui-section-list-item clickable row"
                                          [ct-editor-inspector]="inspector"
@@ -138,7 +137,7 @@ import {noop} from "../../lib/utils.lib";
             </span>
 
                     <div class="tc-body">
-                        <div class="container">
+                        <div>
                             <!--List Header Row-->
                             <div class="gui-section-list-title row">
                                 <div class="col-sm-6">ID</div>
@@ -146,11 +145,11 @@ import {noop} from "../../lib/utils.lib";
                             </div>
 
                             <!--Output List Entries-->
-                            <ul class="gui-section-list">
+                            <ul class="ml-1 mr-1">
 
                                 <!--List Entry-->
                                 <li *ngFor="let entry of model.outputs; let i = index"
-                                    class="input-list-items container">
+                                    class="input-list-items">
 
                                     <div class="gui-section-list-item clickable row"
                                          [ct-editor-inspector]="inspector"
@@ -191,7 +190,7 @@ import {noop} from "../../lib/utils.lib";
         </div>
     `
 })
-export class WorkflowNotGraphEditorComponent {
+export class WorkflowNotGraphEditorComponent implements OnDestroy {
     @Input()
     readonly: boolean;
 
@@ -202,7 +201,7 @@ export class WorkflowNotGraphEditorComponent {
         redraw: noop
     };
 
-    constructor(private inspector: EditorInspectorService) {
+    constructor(public inspector: EditorInspectorService) {
     }
 
     ngOnDestroy() {

@@ -1,4 +1,5 @@
-import {AfterViewInit, Component, ElementRef, OnInit, QueryList, ViewChildren, ViewEncapsulation} from "@angular/core";
+import {AfterViewInit, Component, ElementRef, NgZone, OnInit, QueryList, ViewChildren} from "@angular/core";
+import {Observable} from "rxjs/Observable";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {StatusControlProvider} from "../../layout/status-bar/status-control-provider.interface";
 import {IpcService} from "../../services/ipc.service";
@@ -11,43 +12,47 @@ import {WorkboxService} from "./workbox.service";
     selector: "ct-workbox",
     styleUrls: ["./workbox.component.scss"],
     template: `
-        <div class="ct-workbox-head">
-            <ul class="list-inline ct-tab-bar inset-panel" tabindex="-1">
-                <li *ngFor="let tab of tabs; let i = index;"
+        <div class="head">
+
+            <ul class="tab-bar inset-panel" tabindex="-1">
+
+                <li *ngFor="let tab of tabs;"
                     [ct-drag-over]="true"
                     (onDragOver)="workbox.openTab(tab)"
                     (click)="workbox.openTab(tab)"
                     [class.active]="tab === (workbox.activeTab | async)"
                     [ct-context]="createContextMenu(tab)"
-                    class="ct-workbox-tab clickable">
+                    class="tab clickable">
                     <div class="title">{{ tab.title | async }}</div>
                     <div (click)="removeTab(tab)" class="close-icon"><b>×</b></div>
                 </li>
 
                 <li class="ct-workbox-add-tab-icon clickable">
-                    <i class="fa fa-plus" aria-hidden="true" (click)="openNewFileTab()">
-                    </i>
+                    <i class="fa fa-plus" aria-hidden="true" (click)="openNewFileTab()"></i>
                 </li>
-            </ul>
-            <div>
-                <ct-settings-button></ct-settings-button>
-            </div>
 
+            </ul>
+
+            <ct-settings-button></ct-settings-button>
         </div>
-        <div class="ct-workbox-body">
-            <span *ngFor="let tab of tabs" [hidden]="tab !== activeTab">
-                <div [ngSwitch]="tab?.contentType | async" class="full-height">
-                    <ct-tool-editor #tabComponent *ngSwitchCase="'CommandLineTool'"
+
+        <div class="body">
+
+            <template ngFor let-tab [ngForOf]="tabs">
+
+                <div class="component-container" [ngSwitch]="tab?.contentType | async" [hidden]="tab !== activeTab">
+                    <ct-tool-editor class="tab-component" #tabComponent *ngSwitchCase="'CommandLineTool'"
                                     [data]="tab.contentData"></ct-tool-editor>
-                    <ct-workflow-editor #tabComponent [data]="tab.contentData"
-                                        *ngSwitchCase="'Workflow'"></ct-workflow-editor>
-                    <ct-file-editor [data]="tab.contentData" *ngSwitchCase="'Code'"></ct-file-editor>
-                    <ct-welcome-tab *ngSwitchCase="'Welcome'"></ct-welcome-tab>
-                    <ct-new-file-tab *ngSwitchCase="'NewFile'"></ct-new-file-tab>
-                    <ct-settings *ngSwitchCase="'Settings'"></ct-settings>
-                    <ct-block-loader *ngSwitchDefault></ct-block-loader>
+                    <ct-workflow-editor #tabComponent [data]="tab.contentData" *ngSwitchCase="'Workflow'"></ct-workflow-editor>
+                    <ct-file-editor class="tab-component" [data]="tab.contentData" *ngSwitchCase="'Code'"></ct-file-editor>
+                    <ct-welcome-tab class="tab-component" *ngSwitchCase="'Welcome'"></ct-welcome-tab>
+                    <ct-new-file-tab class="tab-component" *ngSwitchCase="'NewFile'"></ct-new-file-tab>
+                    <ct-settings class="tab-component" *ngSwitchCase="'Settings'"></ct-settings>
+                    <ct-tab-loader class="tab-component" *ngSwitchDefault></ct-tab-loader>
                 </div>
-            </span>
+
+            </template>
+
         </div>
     `
 })
@@ -67,13 +72,13 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
     constructor(private ipc: IpcService,
                 public workbox: WorkboxService,
                 private statusBar: StatusBarService,
+                private zone: NgZone,
                 el: ElementRef) {
         super();
         this.el = el.nativeElement;
     }
 
     ngOnInit() {
-
 
         // FIXME: this needs to be handled in a system-specific way
         // Listen for a shortcut that should close the active tab
@@ -95,9 +100,15 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
                 this.workbox.activatePrevious();
             });
 
+
         this.tracked = this.workbox.tabs.subscribe(tabs => {
             this.tabs = tabs;
         });
+
+        setTimeout(() => {
+            this.openWelcomeTab();
+        });
+
     }
 
     ngAfterViewInit() {
@@ -105,7 +116,7 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
             this.statusBar.removeControls();
 
             this.activeTab = tab;
-            const idx = this.tabs.findIndex(t => t === tab);
+            const idx      = this.tabs.findIndex(t => t === tab);
 
             const component = this.tabComponents.find((item, index) => index === idx);
 
@@ -139,7 +150,7 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
     /**
      * Opens a new file tab
      */
-    private openNewFileTab() {
+    openNewFileTab() {
         this.workbox.openTab({
             id: "newFile",
             title: Observable.of("NewFile"),
@@ -151,7 +162,7 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
     /**
      * Opens a welcome tab
      */
-    private openWelcomeTab() {
+    openWelcomeTab() {
         this.workbox.openTab({
             id: "welcome",
             title: Observable.of("Welcome"),
@@ -160,7 +171,7 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
         });
     }
 
-    private createContextMenu(tab): MenuItem[] {
+    createContextMenu(tab): MenuItem[] {
         const closeOthers = new MenuItem("Close Others", {
             click: () => this.removeOtherTabs(tab)
         });

@@ -1,6 +1,8 @@
 import {NgModule} from "@angular/core";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {BrowserModule} from "@angular/platform-browser";
+import {NewFileTabComponent} from "../components/onboarding/new-file.component";
+import {WelcomeTabComponent} from "../components/onboarding/welcome.component";
 import {EditorCommonModule} from "../editor-common/editor-common.module";
 import {LayoutModule} from "../layout/layout.module";
 import {GuidService} from "../services/guid.service";
@@ -18,6 +20,7 @@ import {PanelContainerComponent} from "./panels/panel-container/panel-container.
 import {WebWorkerBuilderService} from "./web-worker/web-worker-builder.service";
 import {SettingsButtonComponent} from "./workbox/settings-button.component";
 import {WorkboxComponent} from "./workbox/workbox.component";
+import {GettingStartedComponent} from "../components/onboarding/getting-started.component";
 
 @NgModule({
     entryComponents: [],
@@ -31,6 +34,9 @@ import {WorkboxComponent} from "./workbox/workbox.component";
         PanelContainerComponent,
         MyAppsPanelComponent,
         NavSearchResultComponent,
+        WelcomeTabComponent,
+        GettingStartedComponent,
+        NewFileTabComponent
     ],
     exports: [
         LogoComponent,

@@ -26,7 +26,7 @@ import {TreeViewService} from "../tree-view.service";
             <!--Expansion icon if the node is expanded and there is an expansion icon-->
             <i *ngIf="!loading && isExpanded  && iconExpanded" class="fa fa-fw" [ngClass]="iconExpanded"></i>
 
-            <span class="name-container">{{ label }}</span>
+            {{ label }}
         </div>
 
         <div *ngIf="isExpanded && children?.length" class="children">

@@ -1,19 +1,19 @@
-import {Component, ViewEncapsulation} from "@angular/core";
+import {Component} from "@angular/core";
+import {Observable} from "rxjs/Observable";
 import {SettingsService} from "../../services/settings/settings.service";
 import {WorkboxService} from "./workbox.service";
-import {Observable} from "rxjs";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
 
     selector: "ct-settings-button",
+    styles: [`
+        .settings-icon {
+            display: inline-block;
+            font-size: 1rem;
+        }
+    `],
     template: `
-        <div>
-            <button (click)="openSettings()" class="settings-button btn btn-secondary btn-sm">
-                <i *ngIf="!hasWarning" class="fa fa-fw fa-cog"></i>
-                <i *ngIf="hasWarning" class="fa fa-fw fa-exclamation-triangle text-warning"></i>
-            </button>
-        </div>
+        <i (click)="openSettings()" class="settings-icon clickable fa fa-fw fa-sliders" [class.text-warning]="hasWarning"></i>
     `
 })
 export class SettingsButtonComponent {
@@ -25,7 +25,7 @@ export class SettingsButtonComponent {
         settings.validity.subscribe(isValid => this.hasWarning = !isValid);
     }
 
-    private openSettings() {
+    openSettings() {
 
         this.workbox.openTab({
             id: "settings",

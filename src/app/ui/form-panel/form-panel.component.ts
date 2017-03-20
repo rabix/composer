@@ -7,7 +7,7 @@ import {ChangeDetectionStrategy, Component, Input, ViewEncapsulation} from "@ang
     styleUrls: ["./form-panel.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-        <div class="form-section container">
+        <div class="form-section pl-1 pr-1">
             <div class="row">
                 <div class="col-xs-12">
                     <i class="fa clickable pull-right"
@@ -35,7 +35,7 @@ export class FormPanelComponent {
     @Input()
     public collapsed = false;
 
-    private toggle() {
+    toggle() {
         this.collapsed = !this.collapsed;
     }
 }

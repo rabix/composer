@@ -31,6 +31,7 @@ import {FileDefContentPipe} from "./pipes/file-def-content.pipe";
 import {FileDefNamePipe} from "./pipes/file-def-name.pipe";
 import {ValidationTextPipe} from "./pipes/validation-text.pipes";
 import {CWLModule} from "../cwl/cwl.module";
+import { EditorLayoutComponent } from './editor-layout/editor-layout.component';
 
 @NgModule({
     declarations: [
@@ -60,7 +61,8 @@ import {CWLModule} from "../cwl/cwl.module";
         MapListComponent,
         SymbolsComponent,
         InputTypeSelectComponent,
-        AppInfoComponent
+        AppInfoComponent,
+        EditorLayoutComponent
     ],
     exports: [
         MapListComponent,
@@ -87,7 +89,8 @@ import {CWLModule} from "../cwl/cwl.module";
         ValidationReportComponent,
         SymbolsComponent,
         InputTypeSelectComponent,
-        AppInfoComponent
+        AppInfoComponent,
+        EditorLayoutComponent
     ],
     entryComponents: [
         EditorInspectorComponent,

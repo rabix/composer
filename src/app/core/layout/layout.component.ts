@@ -1,7 +1,11 @@
 import {Component, ElementRef, Input, ViewChild} from "@angular/core";
 import {BehaviorSubject, Subscription} from "rxjs";
+import {StatusBarComponent} from "../../layout/status-bar/status-bar.component";
+import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {DomEventService} from "../../services/dom/dom-event.service";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
+import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {WorkboxService} from "../workbox/workbox.service";
 import {
     PANEL_LOCAL_FILES,
     PANEL_PUBLIC_APPS,
@@ -11,47 +15,36 @@ import {
     PanelGroupMap,
     PanelStatus
 } from "./layout.types";
-import {StatusBarComponent} from "../../layout/status-bar/status-bar.component";
-import {DirectiveBase} from "../../util/directive-base/directive-base";
-import {WorkboxService} from "../workbox/workbox.service";
-import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 
 @Component({
     selector: "ct-layout",
     providers: [WorkboxService],
     styleUrls: ["./layout.component.scss"],
     template: `
-        <div class="main-container">
 
-            <div class="not-status-bar">
+        <div class="main-content">
 
-                <!--Panels Column-->
-                <div class="flex-col col-panels"
-                     [style.flexGrow]="treeSize"
-                     [class.hidden]="!sidebarExpanded || (visiblePanels | async).length === 0">
+            <!--Panels Column-->
+            <div class="panel-column" [style.flexGrow]="treeSize" [class.hidden]="!sidebarExpanded || !(visiblePanels | async)?.length">
 
-                    <ct-logo class="pl-1 logo title-bar-section"></ct-logo>
-                    <ct-panel-container class="layout-section">
-                        <ct-apps-panel class="panel"></ct-apps-panel>
-                    </ct-panel-container>
-                    <!--<ct-panel-container [panels]="panels" class="flex-row"></ct-panel-container>-->
-                </div>
-
-                <!--Panel/Content Resize Handle-->
-                <div #handle class="handle-vertical"
-                     [class.hidden]="!sidebarExpanded || (visiblePanels | async).length === 0">
-                </div>
-
-                <!--Editor Content Column-->
-                <div class="flex-col workbox-col" [style.flexGrow]="tabsSize">
-                    <ct-workbox class="flex-col"></ct-workbox>
-                </div>
-
+                <ct-logo class="pl-1 logo title-bar-section"></ct-logo>
+                <ct-panel-container class="layout-section">
+                    <ct-apps-panel class="panel"></ct-apps-panel>
+                </ct-panel-container>
+                <!--<ct-panel-container [panels]="panels" class="flex-row"></ct-panel-container>-->
             </div>
 
-            <ct-status-bar #statusBar class="layout-section"></ct-status-bar>
+            <!--Panel/Content Resize Handle-->
+            <div #handle class="handle-vertical"
+                 [class.hidden]="!sidebarExpanded || (visiblePanels | async)?.length === 0">
+            </div>
+
+            <!--Editor Content Column-->
+            <ct-workbox [style.flexGrow]="tabsSize" class=""></ct-workbox>
 
         </div>
+
+        <ct-status-bar #statusBar class="layout-section"></ct-status-bar>
     `
 })
 export class LayoutComponent extends DirectiveBase {
@@ -72,13 +65,13 @@ export class LayoutComponent extends DirectiveBase {
     private statusBarComponent;
 
     /** Show/hide sidebar condition */
-    private sidebarExpanded = true;
+    sidebarExpanded = true;
 
     /** Tracking all available panel states */
     protected panels = new BehaviorSubject<PanelStatus[]>([]);
 
     /** Tracking visible panels so we know whether to show or hide the panel block */
-    protected visiblePanels = new BehaviorSubject<PanelStatus[]>([]);
+    visiblePanels = new BehaviorSubject<PanelStatus[]>([]);
 
     /** Tracking the panel switches so we know which ones to highlight and where to put them */
     protected panelSwitches: BehaviorSubject<PanelGroupMap>;
@@ -129,7 +122,7 @@ export class LayoutComponent extends DirectiveBase {
                 if (x < leftMargin) {
                     return leftMargin;
                 } else if (x > rightMargin) {
-                    return rightMargin
+                    return rightMargin;
                 }
 
                 // Otherwise, return how wide the left column should be
@@ -138,9 +131,9 @@ export class LayoutComponent extends DirectiveBase {
                 // Take the width of the window
                 const docWidth = document.body.clientWidth;
                 // Set tree width to the given x
-                this.treeSize = x;
+                this.treeSize  = x;
                 // And fill document area with the rest
-                this.tabsSize = docWidth - x;
+                this.tabsSize  = docWidth - x;
             });
 
 
@@ -157,7 +150,7 @@ export class LayoutComponent extends DirectiveBase {
         // Whenever panels get changed, we want to register the shortcuts
         // we should unregister the old ones because of the check if a shortcut is already registered
         const shortcutSubs: Subscription[] = [];
-        this.tracked = this.panels.subscribe(panels => {
+        this.tracked                       = this.panels.subscribe(panels => {
             // Unsubscribe from all previous subscriptions on these shortcuts
             shortcutSubs.forEach(sub => sub.unsubscribe());
             shortcutSubs.length = 0;
@@ -187,7 +180,7 @@ export class LayoutComponent extends DirectiveBase {
 
     private onPanelSwitch(panels, position) {
 
-        const next = this.panelSwitches.getValue();
+        const next     = this.panelSwitches.getValue();
         next[position] = new PanelGroup(panels);
 
         // Preserve state of opened panels in local storage
@@ -210,7 +203,7 @@ export class LayoutComponent extends DirectiveBase {
 
         // If there is no active panel, make first one active and expand sidebar
         if (this.visiblePanels.getValue().length === 0) {
-            const next = this.panelSwitches.getValue();
+            const next                   = this.panelSwitches.getValue();
             next["top"].panels[0].active = true;
             this.onPanelSwitch(next["top"].panels, "top");
 

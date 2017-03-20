@@ -1,6 +1,6 @@
 @import "../../../assets/sass/variables";
 
-ct-status-bar {
+:host {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;

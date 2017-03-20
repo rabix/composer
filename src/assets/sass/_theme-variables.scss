@@ -1,3 +1,4 @@
+
 /**
  * GUI EDITORS
  */
@@ -56,7 +57,6 @@ $output-port-color: $uncoded-color;
 $arg-color: #FDA365;
 $console-error-color: lighten($brand-danger, 30%);
 $console-warning-color: $brand-warning;
-
 
 /**
  * FILE TABS
@@ -181,8 +181,9 @@ $layout-section-background: #333;
 $layout-section-terminal-background: #222;
 $layout-section-border-dark: 1px solid #1a1a1a;
 $layout-section-border-light: 1px solid #4d4d4d;
-$layout-section-font-color:  #f3f3f3;
+$layout-section-font-color: #f3f3f3;
 
+$layout-section-alt-border-color: #ccc;
 
 /**
  * PANEL ITEMS
@@ -198,9 +199,15 @@ $panel-item-select-bg: $chrome-dark-bg-secondary;
 $panel-item-select-color: white;
 $panel-item-icon-select-color: $panel-item-select-color;
 
-
 /**
  * DROP DOWN
  */
 $dropdown-link-active-bg: darken($dropdown-link-hover-bg, 5%);
 $dropdown-link-active-color: $body-color;
+
+/**
+* Action Bar
+ */
+$action-bar-border-color: $layout-section-alt-border-color;
+$action-bar-background: white; // @TODO Fix theme variable, bottom of tab value
+$action-bar-height: 40px; // @TODO Fix theme variable

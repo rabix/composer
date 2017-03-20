@@ -7,6 +7,8 @@ import {SettingsComponent} from "./settings/settings.component";
 import {StatusBarComponent} from "./status-bar/status-bar.component";
 import {UIModule} from "../ui/ui.module";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {ActionBarComponent} from "./action-bar/action-bar.component";
+import { TabLoaderComponent } from './tab-loader/tab-loader.component';
 
 @NgModule({
     imports: [
@@ -17,16 +19,20 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
         UIModule
     ],
     declarations: [
+        ActionBarComponent,
         EditorControlsComponent,
         FileEditorComponent,
         SettingsComponent,
         StatusBarComponent,
+        TabLoaderComponent,
     ],
     exports: [
+        ActionBarComponent,
         EditorControlsComponent,
         FileEditorComponent,
         SettingsComponent,
         StatusBarComponent,
+        TabLoaderComponent,
     ]
 })
 export class LayoutModule {

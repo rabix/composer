@@ -1,7 +1,6 @@
-@import "variables";
-@import "./theme-variables";
-@import "./modern/variables";
 
+
+@import "variables";
 @import "bootstrap-pack";
 @import "mixins";
 @import "resets";
@@ -10,6 +9,9 @@
 @import "icons";
 @import "forms";
 @import "alerts";
+
+@import "./theme-variables";
+@import "./modern/variables";
 
 @import "~selectize/dist/css/selectize.default.css";
 

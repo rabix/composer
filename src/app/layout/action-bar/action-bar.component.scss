@@ -1,0 +1,15 @@
+@import "../../../assets/sass/variables";
+
+:host {
+    display: flex;
+    flex-basis: $action-bar-height;
+    background: $action-bar-background;
+    border-bottom: 1px solid $layout-section-alt-border-color;
+    justify-content: space-between;
+
+    /deep/ .btn {
+        height: 28px;
+        margin-top: ($action-bar-height - 28px)/2;
+        font-size: $font-size-sm;
+    }
+}

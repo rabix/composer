@@ -1,17 +1,12 @@
-ct-welcome-tab {
+:host {
     display: flex;
     flex-direction: column;
-    height: 100%;
 
-    & > .content-container {
+    .content-container {
         flex: 1;
         display: flex;
-        align-items: center;
-        justify-content: center;
         text-align: center;
-
-        & > .content {
-            max-width: 50%;
-        }
+        flex-direction: column;
+        justify-content: center;
     }
 }

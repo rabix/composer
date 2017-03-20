@@ -5,6 +5,7 @@
     $tab-height: $action-bar-height;
 
     display: block;
+    font-size: $font-size-sm;
 
     .tab-container {
         width: 100%;
@@ -13,27 +14,41 @@
         flex-direction: row;
     }
 
-    .tab {
+
+
+    /deep/ ct-tab-selector-entry {
+
         @include ellipsis();
+        display: inline-block;
         flex: 1;
         text-align: center;
-        line-height: $tab-height;
+        line-height: $action-bar-height;
         background: none;
+        cursor: pointer;
         color: $layout-text-color-faded;
 
-        &.auto {
-            flex-basis: auto;
+        &.active {
+            color: $layout-text-color;
+        }
+
+        &.disabled {
+            cursor: not-allowed;
+            color: gray;
         }
     }
 
-    .active {
-        color: $layout-text-color;
+    .auto {
+        /deep/ ct-tab-selector-entry {
+            flex-basis: auto;
+            padding: 0 1em;
+        }
     }
 
     .selection-underline {
         position: relative;
-        height: $tab-height * .05;
+        height: 2px;
         background: $layout-element-separator-color;
+        margin-top: -3px;
     }
 
     .underline-highlight {
@@ -41,5 +56,21 @@
         height: 100%;
         position: absolute;
         background: $color-primary;
+    }
+
+    &.inverse {
+
+        /deep/ ct-tab-selector-entry {
+            color: #222; // @FIXME add theme variable
+
+            &.disabled {
+                color: #ccc;
+            }
+        }
+
+        .selection-underline {
+            background: $layout-element-alt-foreground;
+
+        }
     }
 }

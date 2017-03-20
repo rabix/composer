@@ -1,0 +1,8 @@
+@import "../../../assets/sass/variables";
+
+:host {
+    /deep/ ct-progress {
+        width: 50%;
+        margin: -$action-bar-height auto 0;
+    }
+}

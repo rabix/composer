@@ -25,6 +25,11 @@ $brand-primary-bg-dark: #1B2833;
 $brand-primary-bg-bright: #34495E;
 
 /**
+* Typography
+ */
+$font-size-sm: .9rem;
+
+/**
 *  SBG Variables
 */
 
@@ -46,7 +51,7 @@ $hr-border-color: $border-color;
 * SBG colors
 */
 $brand-success: #3eb157;
-$brand-primary: #337cb9;
+$brand-primary: rgb(93, 149, 208);
 $brand-danger: #d8000c;
 $brand-warning: #f89406;
 $brand-info: #f3f8fc;

@@ -1,7 +1,7 @@
 @import "../../../assets/sass/variables";
 @import "../../../assets/sass/_mixins";
 
-ct-editor-inspector-content {
+:host {
     overflow-y: auto;
     overflow-x: hidden;
 
@@ -66,13 +66,4 @@ ct-editor-inspector-content {
             height: auto;
         }
     }
-}
-
-ct-editor-inspector {
-    position: static;
-    display: block;
-    overflow-y: auto;
-    overflow-x: hidden;
-    border: 1px solid transparent;
-    border-left-color: $gui-section-border;
 }

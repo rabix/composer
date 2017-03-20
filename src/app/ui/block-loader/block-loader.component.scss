@@ -2,11 +2,8 @@
 :host {
     height: 100%;
     z-index: 1;
-    display: block;
+    display: flex;
+    align-content: space-around;
+    align-items: center;
 
-    /deep/ {
-        ct-progress {
-            background-color: $layout-title-bar-background;
-        }
-    }
 }

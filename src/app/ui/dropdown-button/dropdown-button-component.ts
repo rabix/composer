@@ -41,7 +41,7 @@ export class DropDownButtonComponent extends DirectiveBase implements ControlVal
     @Input()
     public dropDownOptions: { value, caption, description }[] = [];
 
-    private selected: { value, caption, description } = null;
+    selected: { value, caption, description } = null;
 
     @Input("value") set value(value: string) {
         this.externalSelect(value);
@@ -52,7 +52,7 @@ export class DropDownButtonComponent extends DirectiveBase implements ControlVal
 
     @ViewChild("button", {read: ViewContainerRef}) button;
 
-    private toggle = false;
+    toggle = false;
 
     private el: HTMLElement;
 
@@ -92,7 +92,7 @@ export class DropDownButtonComponent extends DirectiveBase implements ControlVal
     /**
      * Show/Hide drop-down menu
      */
-    private showMenu(show: boolean) {
+    showMenu(show: boolean) {
         this.toggle = show;
         show ? this.createDropDownMenu() : this.destroyDropDownMenu();
     }

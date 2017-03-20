@@ -1,44 +1,41 @@
 import {
     AfterViewInit,
     ChangeDetectionStrategy,
+    ChangeDetectorRef,
     Component,
+    ContentChildren,
     ElementRef,
     EventEmitter,
     Input,
-    OnChanges,
     OnInit,
     Output,
     QueryList,
-    ViewChildren
+    Renderer,
+    ViewChild
 } from "@angular/core";
+import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {TabSelectorEntryComponent} from "./tab-selector-entry/tab-selector-entry.component";
+import {TabSelectorService} from "./tab-selector.service";
 
 @Component({
     selector: "ct-tab-selector",
+    providers: [TabSelectorService],
     template: `
-        <div class="tab-container">
-            <button #buttons *ngFor="let tab of tabs" (click)="setActiveTab(tab)"
-                    class="tab btn-unstyled {{ distribute }}"
-                    [class.active]="active === tab">
-                {{ tab }}
-            </button>
+        <div class="tab-container {{ distribute }}">
+            <ng-content></ng-content>
         </div>
         <div class="selection-underline">
-            <div *ngIf="distribute === 'auto'" class="underline-highlight"
-                 [style.width.px]="highlightWidth"
-                 [style.marginLeft.px]="highlightOffset"></div>
+            <div *ngIf="distribute === 'auto'" #autoHighlighter class="underline-highlight"></div>
 
             <div *ngIf="distribute === 'equal'" class="underline-highlight"
-                 [style.width.%]="100 / tabs.length"
-                 [style.marginLeft.%]="tabs.indexOf(active) * 100/tabs.length"></div>
+                 [style.width.%]="100 / tabEntries.length"
+                 [style.marginLeft.%]="tabEntries.toArray().indexOf(active) * 100/tabEntries.length"></div>
         </div>
     `,
     styleUrls: ["./tab-selector.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TabSelectorComponent implements OnInit, OnChanges, AfterViewInit {
-
-    @Input()
-    tabs: any[];
+export class TabSelectorComponent extends DirectiveBase implements OnInit, AfterViewInit {
 
     @Input()
     active: any;
@@ -49,47 +46,49 @@ export class TabSelectorComponent implements OnInit, OnChanges, AfterViewInit {
     @Input()
     distribute: "equal" | "auto" = "equal";
 
-    @ViewChildren("buttons")
-    buttons: QueryList<ElementRef>;
+    @ViewChild("autoHighlighter", {read: ElementRef})
+    autoHighlight: ElementRef;
 
-    highlightOffset: number;
+    @ContentChildren(TabSelectorEntryComponent)
+    tabEntries: QueryList<TabSelectorEntryComponent>;
 
-    highlightWidth: number;
+    @ContentChildren(TabSelectorEntryComponent, {read: ElementRef})
+    tabEntryElements: QueryList<ElementRef>;
+
+    constructor(private selector: TabSelectorService,
+                private cdr: ChangeDetectorRef,
+                private renderer: Renderer) {
+        super();
+    }
 
     ngOnInit() {
-        if (!this.active) {
-            this.active = this.tabs[0];
-        }
+        this.selector.selectedTab.next(this.active);
     }
 
     ngAfterViewInit() {
-        this.updateHighlight();
-    }
+        this.tracked = this.selector.selectedTab.subscribe((tab) => {
+            this.active = tab;
+            this.activeChange.emit(tab);
 
-    public setActiveTab(tab) {
-        this.active = tab;
-        this.activeChange.emit(tab);
-        this.updateHighlight();
-    }
-
-    ngOnChanges() {
-        if (this.buttons) {
             this.updateHighlight();
-        }
+            this.cdr.markForCheck();
+        });
     }
 
     private updateHighlight() {
+        if (this.distribute === "equal" || !this.active) {
+            return;
+        }
 
-        const idx = this.tabs.indexOf(this.active);
-        const buttons = this.buttons.toArray();
-
+        const idx     = this.tabEntries.toArray().indexOf(this.active);
+        const entries = this.tabEntryElements.toArray();
 
         let offset = 0;
         for (let i = 0; i < idx; i++) {
-            offset += buttons[i].nativeElement.clientWidth;
+            offset += entries[i].nativeElement.clientWidth;
         }
 
-        this.highlightWidth = buttons[idx].nativeElement.clientWidth;
-        this.highlightOffset = offset;
+        this.renderer.setElementStyle(this.autoHighlight.nativeElement, "width", entries[idx].nativeElement.clientWidth + "px");
+        this.renderer.setElementStyle(this.autoHighlight.nativeElement, "marginLeft", offset + "px");
     }
 }

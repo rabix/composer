@@ -3,8 +3,7 @@
 
 :host {
     display: block;
-
-    @include ellipsis();
+    white-space: nowrap;
 
     .node-base {
         padding: .25em;

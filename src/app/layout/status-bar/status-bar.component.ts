@@ -1,16 +1,14 @@
-import {Component, ViewChild, ViewContainerRef, ViewEncapsulation} from "@angular/core";
-import {StatusBarService} from "./status-bar.service";
+import {Component, OnInit, ViewChild, ViewContainerRef} from "@angular/core";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {StatusBarService} from "./status-bar.service";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-status-bar",
     styleUrls: ["./status-bar.component.scss"],
     template: `
 
         <!--Status-->
-        <span class="status-item hidden-md-down">
+        <span class="status-item">
             <span *ngIf="status">
                 {{ status.message }}
                 <span *ngIf="status.time">({{ status.time | amTimeAgo }})</span>
@@ -20,7 +18,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
         <!--Process-->
         <span class="status-item">
             <span *ngIf="queueSize">
-                {{ service.process | async }}
+                {{ statusBar.process | async }}
                 <span *ngIf="queueSize > 1">
                     and {{ queueSize - 1 }} more
                 </span>
@@ -33,24 +31,24 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
         </span>
     `
 })
-export class StatusBarComponent extends DirectiveBase {
+export class StatusBarComponent extends DirectiveBase implements OnInit {
 
-    public status: { message: string, time?: Date };
+    status: { message: string, time?: Date };
 
-    private queueSize = 0;
+    queueSize = 0;
 
     @ViewChild("controlHost", {read: ViewContainerRef})
     private controlHost: ViewContainerRef;
 
-    constructor(private service: StatusBarService) {
+    constructor(public statusBar: StatusBarService) {
         super();
-        this.tracked = this.service.status.subscribe(s => this.status = s);
-        this.tracked = this.service.queueSize.subscribe(s => this.queueSize = s);
+        this.tracked = this.statusBar.status.subscribe(s => this.status = s);
+        this.tracked = this.statusBar.queueSize.subscribe(s => this.queueSize = s);
     }
 
     ngOnInit() {
 
-        this.service.controls.subscribe(tpl => {
+        this.statusBar.controls.subscribe(tpl => {
             this.controlHost.clear();
 
             if (tpl) {

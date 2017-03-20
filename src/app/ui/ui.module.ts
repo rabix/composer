@@ -30,6 +30,8 @@ import {TreeViewComponent} from "./tree-view/tree-view.component";
 import {TabComponent} from "./tabs/tab.component";
 import {TabsComponent} from "./tabs/tabs.component";
 import {BlockLoaderComponent} from "./block-loader/block-loader.component";
+import { TabSelectorEntryComponent } from './tab-selector/tab-selector-entry/tab-selector-entry.component';
+import {DropDownMenuComponent} from "./dropdown-button/dropdown-menu.component";
 
 @NgModule({
     imports: [
@@ -62,11 +64,14 @@ import {BlockLoaderComponent} from "./block-loader/block-loader.component";
         InlineEditorComponent,
         KeyvalueComponent,
         TabComponent,
-        TabsComponent
+        TabsComponent,
+        TabSelectorEntryComponent
     ],
 
     entryComponents: [
         TooltipContentComponent,
+        DropDownButtonComponent,
+        DropDownMenuComponent
     ],
 
     declarations: [
@@ -101,6 +106,8 @@ import {BlockLoaderComponent} from "./block-loader/block-loader.component";
         ToasterComponent,
         InlineEditorComponent,
         TabComponent,
+        TabSelectorEntryComponent,
+        DropDownMenuComponent
     ]
 })
 export class UIModule {

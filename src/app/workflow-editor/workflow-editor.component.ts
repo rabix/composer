@@ -1,81 +1,58 @@
-import * as Yaml from "js-yaml";
-import {
-    Component,
-    Input,
-    OnDestroy,
-    TemplateRef,
-    ViewChild,
-    ViewContainerRef,
-    ViewEncapsulation
-} from "@angular/core";
+import {Component, Input, OnDestroy, TemplateRef, ViewChild, ViewContainerRef} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
-import {BehaviorSubject, Observable} from "rxjs/Rx";
-import {Validation} from "cwlts/models/helpers/validation";
-import {EditorInspectorService} from "../editor-common/inspector/editor-inspector.service";
-import {DataEntrySource} from "../sources/common/interfaces";
-import {UserPreferencesService} from "../services/storage/user-preferences.service";
-import {PlatformAPI} from "../services/api/platforms/platform-api.service";
-import {StatusBarService} from "../layout/status-bar/status-bar.service";
-import {noop} from "../lib/utils.lib";
 import {WorkflowFactory, WorkflowModel} from "cwlts/models";
+import {Validation} from "cwlts/models/helpers/validation";
+import * as Yaml from "js-yaml";
+import {BehaviorSubject, Observable} from "rxjs/Rx";
+import {WorkboxTab} from "../core/workbox/workbox-tab.interface";
 import {
     CwlSchemaValidationWorkerService,
     ValidationResponse
 } from "../editor-common/cwl-schema-validation-worker/cwl-schema-validation-worker.service";
-import LoadOptions = jsyaml.LoadOptions;
-import {DirectiveBase} from "../util/directive-base/directive-base";
+import {EditorInspectorService} from "../editor-common/inspector/editor-inspector.service";
+import {StatusBarService} from "../layout/status-bar/status-bar.service";
+import {noop} from "../lib/utils.lib";
+import {PlatformAPI} from "../services/api/platforms/platform-api.service";
+import {UserPreferencesService} from "../services/storage/user-preferences.service";
+import {DataEntrySource} from "../sources/common/interfaces";
 import {ModalService} from "../ui/modal/modal.service";
-import {WorkboxTab} from "../core/workbox/workbox-tab.interface";
+import {DirectiveBase} from "../util/directive-base/directive-base";
+
+import LoadOptions = jsyaml.LoadOptions;
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-workflow-editor",
-    host: {
-        "class": "tab-container"
-    },
     providers: [EditorInspectorService],
+    styleUrls: ["./workflow-editor.component.scss"],
     template: `
-        <ct-block-loader *ngIf="isLoading"></ct-block-loader>
+        <ct-action-bar>
+            <ct-tab-selector class="inverse" [distribute]="'auto'" [active]="codeTab" (activeChange)="switchTab($event)">
+                <ct-tab-selector-entry [disabled]="!isValidCWL" [tab]="'info'">App Info</ct-tab-selector-entry>
+                <ct-tab-selector-entry [disabled]="!isValidCWL" [tab]="'graph'">Graph View</ct-tab-selector-entry>
+                <ct-tab-selector-entry [disabled]="!isValidCWL" [tab]="'list'">List View</ct-tab-selector-entry>
+                <ct-tab-selector-entry [tab]="'code'" #codeTab>Code</ct-tab-selector-entry>
+            </ct-tab-selector>
 
-        <div class="editor-container" [hidden]="isLoading">
+            <div class="document-controls">
 
-            <!--Control Header-->
-            <ct-editor-controls>
+                <!--Save-->
+                <button [disabled]="!data.isWritable"
+                        (click)="save()"
+                        class="btn btn-sm btn-secondary" type="button">
+                    <i class="fa fa-save"></i>
+                </button>
 
-                <!--View Modes-->
-                <span class="btn-group pull-left">
-                    <button class="btn btn-secondary btn-sm"
-                            (click)="switchView(viewModes.Code)"
-                            [class.btn-primary]="viewMode === viewModes.Code"
-                            [class.btn-secondary]="viewMode !== viewModes.Code">Code</button>
-                            
-                    <button class="btn btn-secondary btn-sm"
-                            [disabled]="!isValidCWL"
-                            (click)="switchView(viewModes.Gui)"
-                            [class.btn-primary]="viewMode === viewModes.Gui"
-                            [class.btn-secondary]="viewMode !== viewModes.Gui">Not Really Visual</button>       
-                    
-                    <button class="btn btn-secondary btn-sm"
-                            [disabled]="!isValidCWL"
-                            (click)="switchView(viewModes.Graph)"
-                            [class.btn-primary]="viewMode === viewModes.Graph"
-                            [class.btn-secondary]="viewMode !== viewModes.Graph">Very Visual</button>
-                    
-                    <button class="btn btn-secondary btn-sm"
-                            [disabled]="!isValidCWL"
-                            (click)="switchView(viewModes.Info)"
-                            [class.btn-primary]="viewMode === viewModes.Info"
-                            [class.btn-secondary]="viewMode !== viewModes.Info">App Info</button>
-                </span>
+                <!--Copy-->
+                <button class="btn btn-sm btn-secondary " type="button">
+                    <i class="fa fa-copy"></i>
+                </button>
 
-                <!--CWLVersion-->
-                <span class="tag tag-default">{{ workflowModel.cwlVersion }}</span>
 
                 <!--Revisions-->
-                <button class="btn btn-secondary btn-sm" type="button"
-                        [ct-editor-inspector]="revisions"
-                        *ngIf="this.data.data.source !== 'local'">
+                <button *ngIf="this.data.data.source !== 'local'"
+                        class="btn btn-sm btn-secondary" type="button"
+                        [ct-editor-inspector]="revisions">
+
                     Revision: {{ workflowModel.customProps['sbg:revision']}}
 
                     <template #revisions>
@@ -86,135 +63,115 @@ import {WorkboxTab} from "../core/workbox/workbox-tab.interface";
                     </template>
                 </button>
 
-                <!--Copy-->
-                <button class="btn btn-secondary btn-sm" type="button">
-                    Copy...
-                </button>
+            </div>
+        </ct-action-bar>
 
-                <!--Save-->
-                <button [disabled]="!data.isWritable"
-                        (click)="save()"
-                        class="btn btn-secondary btn-sm" type="button">
-                    Save
-                </button>
-            </ct-editor-controls>
+        <div class="editor-layout">
+            <!--Editor Row-->
+            <!--<ui-code-editor *ngIf="viewMode === viewModeTypes.Code"-->
+            <!--[formControl]="codeEditorContent"-->
+            <!--[options]="{mode: 'ace/mode/yaml'}"-->
+            <!--class="editor">-->
+            <!--</ui-code-editor>-->
+            <ct-code-editor-x *ngIf="viewMode === 'code'"
+                              class="editor-main"
+                              [(content)]="rawEditorContent"
+                              [options]="{theme: 'ace/theme/monokai'}"
+                              [language]="'yaml'"
+                              [readonly]="!data.isWritable"></ct-code-editor-x>
 
-
-            <!--Header & Editor Column-->
-            <div class="editor-content flex-row fixed">
-                <!--Editor Row-->
-                <!--<ui-code-editor *ngIf="viewMode === viewModes.Code"-->
-                <!--[formControl]="codeEditorContent"-->
-                <!--[options]="{mode: 'ace/mode/yaml'}"-->
-                <!--class="editor">-->
-                <!--</ui-code-editor>-->
-                <ct-code-editor-x *ngIf="viewMode === viewModes.Code" class="editor"
-                                  [class.flex-col]="showInspector"
-                                  [(content)]="rawEditorContent"
-                                  [options]="{theme: 'ace/theme/monokai'}"
-                                  [language]="'yaml'"
-                                  [readonly]="!data.isWritable"></ct-code-editor-x>
-
-                <!--GUI Editor-->
-                <ct-workflow-not-graph-editor *ngIf="viewMode === viewModes.Gui"
-                                              class="gui-editor-component flex-col"
-                                              [readonly]="!data.isWritable"
-                                              [model]="workflowModel"></ct-workflow-not-graph-editor>
-
-                <ct-workflow-graph-editor *ngIf="viewMode === viewModes.Graph"
+            <!--GUI Editor-->
+            <ct-workflow-not-graph-editor *ngIf="viewMode === 'list'"
+                                          class="editor-main"
                                           [readonly]="!data.isWritable"
-                                          [model]="workflowModel"
-                                          class="gui-editor-component flex-col">
-                </ct-workflow-graph-editor>
+                                          [model]="workflowModel"></ct-workflow-not-graph-editor>
 
-                <ct-app-info *ngIf="viewMode === viewModes.Info"
-                                  [class.flex-col]="showInspector"
-                                  [model]="workflowModel">
-                </ct-app-info>
+            <ct-workflow-graph-editor *ngIf="viewMode === 'graph'"
+                                      [readonly]="!data.isWritable"
+                                      [model]="workflowModel"
+                                      class="editor-main">
+            </ct-workflow-graph-editor>
 
-                <!--Object Inspector Column-->
-                <div [hidden]="!showInspector" class="flex-col inspector-col">
-                    <ct-editor-inspector class="object-inspector">
-                        <template #inspector></template>
-                    </ct-editor-inspector>
-                </div>
-            </div>
+            <ct-app-info *ngIf="viewMode === 'info'"
+                         [class.flex-col]="showInspector"
+                         [model]="workflowModel">
+            </ct-app-info>
 
-            <div *ngIf="reportPanel" class="app-report-panel layout-section">
-                <ct-validation-report *ngIf="reportPanel === 'validation'" [issues]="validation"></ct-validation-report>
-            </div>
-
-            <template #statusControls>
-                <span class="btn-group">
-                    <button [disabled]="!validation"
-                            [class.btn-primary]="reportPanel === 'validation'"
-                            [class.btn-secondary]="reportPanel !== 'validation'"
-                            (click)="toggleReport('validation')"
-                            class="btn btn-sm">
-                            
-                        <span *ngIf="validation?.errors?.length">
-                            <i class="fa fa-times-circle text-danger"></i> {{validation.errors.length}} Errors
-                        </span>
-                        
-                        <span *ngIf="validation?.warnings?.length" [class.pl-1]="validation?.errors?.length">
-                            <i class="fa fa-exclamation-triangle text-warning"></i> {{validation.warnings.length}} Warnings
-                        </span>
-                        
-                        <span *ngIf="!validation?.errors?.length && !validation?.warnings?.length">
-                            No Issues
-                        </span>
-                        
-                        
-                    </button>
-                </span>
-            </template>
+            <!--Object Inspector Column-->
+            <ct-editor-inspector [class.flex-hide]="!showInspector">
+                <template #inspector></template>
+            </ct-editor-inspector>
         </div>
+
+        <!--Header & Editor Column-->
+
+
+        <div *ngIf="reportPanel" class="app-report-panel layout-section">
+            <ct-validation-report *ngIf="reportPanel === 'validation'" [issues]="validation"></ct-validation-report>
+        </div>
+
+        <template #statusControls>
+            <span class="btn-group">
+            <button [disabled]="!validation"
+                    [class.btn-primary]="reportPanel === 'validation'"
+                    [class.btn-secondary]="reportPanel !== 'validation'"
+                    (click)="toggleReport('validation')"
+                    class="btn btn-sm">
+            
+            <span *ngIf="validation?.errors?.length">
+            <i class="fa fa-times-circle text-danger"></i> {{validation.errors.length}} Errors
+            </span>
+            
+            <span *ngIf="validation?.warnings?.length" [class.pl-1]="validation?.errors?.length">
+            <i class="fa fa-exclamation-triangle text-warning"></i> {{validation.warnings.length}} Warnings
+            </span>
+            
+            <span *ngIf="!validation?.errors?.length && !validation?.warnings?.length">
+            No Issues
+            </span>
+            
+            
+            </button>
+            </span>
+        </template>
     `
 })
 export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy, WorkboxTab {
+
     @Input()
-    public data: DataEntrySource;
+    data: DataEntrySource;
 
     /** ValidationResponse for current document */
-    public validation: ValidationResponse;
+    validation: ValidationResponse;
 
-    @Input()
-    public showInspector = true;
+    showInspector = true;
 
     /** Default view mode. */
-    @Input()
-    public viewMode;
+    viewMode;
 
     /** Flag to indicate the document is loading */
-    public isLoading = true;
+    isLoading = true;
+
+    /** Flag for bottom panel, shows validation-issues, commandline, or neither */
+    reportPanel: "validation" | "commandLinePreview" | undefined;
+
+    /** Flag for validity of CWL document */
+    isValidCWL = false;
+
+    /** Stream of contents in code editor */
+    rawEditorContent = new BehaviorSubject("");
+
+    /** Model that's recreated on document change */
+    workflowModel: WorkflowModel = WorkflowFactory.from(null, "document");
 
     /** Flag for showing reformat prompt on GUI switch */
     private showReformatPrompt = true;
-
-    /** Flag for bottom panel, shows validation-issues, commandline, or neither */
-    private reportPanel: "validation" | "commandLinePreview" | undefined;
-
-    /** Flag for validity of CWL document */
-    private isValidCWL = false;
-
-    /** Stream of contents in code editor */
-    private rawEditorContent = new BehaviorSubject("");
-
-    /** Model that's recreated on document change */
-    private workflowModel: WorkflowModel = WorkflowFactory.from(null, "document");
 
     private codeEditorContent: FormControl;
 
     /** Template of the status controls that will be shown in the status bar */
     @ViewChild("statusControls")
     private statusControls: TemplateRef<any>;
-
-    private viewModes = {
-        Code: "code",
-        Gui: "gui",
-        Graph: "graph",
-        Info: "info"
-    };
 
     private toolGroup: FormGroup;
 
@@ -232,8 +189,6 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
 
         super();
 
-        this.viewMode = this.viewModes.Code;
-
         this.toolGroup = formBuilder.group({});
 
         // @fixme Bring this back with the new service
@@ -248,10 +203,6 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
         this.codeEditorContent = new FormControl({
             value: undefined,
             disabled: !this.data.isWritable
-        });
-
-        this.codeEditorContent.valueChanges.subscribe(ch => {
-            console.log("Value change");
         });
 
         this.rawEditorContent.subscribe(content => {
@@ -269,12 +220,12 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                     if (!r.isValidCwl) {
                         // turn off loader and load document as code
                         this.validation = r;
-                        this.isLoading = false;
+                        this.isLoading  = false;
                         return r;
                     }
 
                     // load JSON to generate model
-                    let json = Yaml.safeLoad(this.rawEditorContent.getValue(), {
+                    const json = Yaml.safeLoad(this.rawEditorContent.getValue(), {
                         json: true
                     } as LoadOptions);
 
@@ -302,7 +253,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
 
                         this.workflowModel.validate();
 
-                        const out = {
+                        const out       = {
                             errors: this.workflowModel.validation.errors,
                             warnings: this.workflowModel.validation.warnings,
                             isValidatableCwl: true,
@@ -317,8 +268,8 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                         this.getStepUpdates();
 
                     }, (err) => {
-                        this.isLoading = false;
-                        this.viewMode = this.viewModes.Code;
+                        this.isLoading  = false;
+                        this.viewMode   = "code";
                         this.isValidCWL = false;
                         this.validation = {
                             isValidatableCwl: true,
@@ -337,7 +288,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
 
         // Whenever content of a file changes, forward the change to the raw editor content steam.
         const statusID = this.statusBar.startProcess(`Loading ${this.data.data.id}`);
-        this.tracked = this.data.content.subscribe(val => {
+        this.tracked   = this.data.content.subscribe(val => {
             this.rawEditorContent.next(val);
             this.statusBar.stopProcess(statusID);
         });
@@ -354,7 +305,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
     private getStepUpdates() {
         Observable.of(1).switchMap(() =>
             // Call service only if wf is in user projects
-            this.data.data.source !== 'local' && this.data.isWritable ?
+            this.data.data.source !== "local" && this.data.isWritable ?
                 this.platform.getUpdates(this.workflowModel.steps.map(id => id.run.customProps["sbg:id"]))
                 : Observable.of(undefined))
             .subscribe((response) => {
@@ -371,15 +322,15 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
 
                 // load document in GUI and turn off loader, only if loader was active
                 if (this.isLoading) {
-                    //@todo: this.viewMode cannot be initially set to viewModes.Graph because canvas dimensions are not initialized
-                    this.viewMode = this.viewModes.Gui;
+                    //@todo: this.viewMode cannot be initially set to viewModeTypes.Graph because canvas dimensions are not initialized
+                    this.viewMode  = "info";
                     this.isLoading = false;
                 }
 
             });
     }
 
-    private save() {
+    save() {
         const text = this.toolGroup.dirty ? this.getModelText() : this.rawEditorContent.getValue();
 
         // For local files, just save and that's it
@@ -402,7 +353,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
             formControl: new FormControl("")
         }).then(revisionNote => {
 
-            const path = this.data.data["sbg:id"] || this.data.data.id;
+            const path     = this.data.data["sbg:id"] || this.data.data.id;
             const statusID = this.statusBar.startProcess(`Creating a new revision of ${path}`);
             this.data.save(JSON.parse(text), revisionNote).subscribe(result => {
                 const cwl = JSON.stringify(result.message, null, 4);
@@ -420,9 +371,9 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
      *
      * @param mode
      */
-    private switchView(mode): void {
+    switchView(mode): void {
 
-        // if (mode === this.viewModes.Gui && this.showReformatPrompt) {
+        // if (mode === this.viewModeTypes.Gui && this.showReformatPrompt) {
         //
         //     this.modal.checkboxPrompt({
         //         title: "Confirm GUI Formatting",
@@ -439,11 +390,11 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
         //     return;
         // }
 
-        if (mode === this.viewModes.Code) {
+        if (mode === "code") {
             this.rawEditorContent.next(this.getModelText());
         }
 
-        if (mode === this.viewModes.Graph) {
+        if (mode === "graph") {
 
         }
 
@@ -460,11 +411,11 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
         return this.data.language.value === "json" ? JSON.stringify(modelObject, null, 4) : Yaml.dump(modelObject);
     }
 
-    private toggleReport(panel: "validation") {
+    toggleReport(panel: "validation") {
         this.reportPanel = this.reportPanel === panel ? undefined : panel;
     }
 
-    private openRevision(revisionNumber: number) {
+    openRevision(revisionNumber: number) {
         this.platform.getAppCWL(this.data.data, revisionNumber).subscribe(cwl => {
             this.rawEditorContent.next(cwl);
         });
@@ -472,5 +423,12 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
 
     provideStatusControls() {
         return this.statusControls;
+    }
+
+    switchTab(tabEntry) {
+        setTimeout(() => {
+            this.viewMode = tabEntry.tab;
+        }, 200);
+        console.log("Set view mode to", this.viewMode);
     }
 }

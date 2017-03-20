@@ -5,12 +5,12 @@
     position: relative;
     display: block;
     width: 100%;
-    background-color: $brand-primary;
+    background-color: #ccc;
     background-clip: padding-box;
     overflow: hidden;
 
     .indeterminate {
-        background-color: $color-primary;
+        background-color: $brand-primary;
 
         &:before,
         &:after {
