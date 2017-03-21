@@ -26,7 +26,9 @@ export class UserPreferencesService {
             return this.ipc.request("putSetting", {key, value});
         }
 
-        window.localStorage.setItem(key, JSON.stringify(value));
+        const item = JSON.stringify(value);
+        window.localStorage.setItem(key, item);
+        return Observable.of(item);
     }
 
     public get<T>(key: UserProfileCacheKey, fallback?: T): Observable<T> {
