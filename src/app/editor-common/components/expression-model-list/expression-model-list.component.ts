@@ -5,7 +5,7 @@ import {GuidService} from "../../../services/guid.service";
 import {CustomValidators} from "../../../validators/custom.validator";
 import {noop} from "../../../lib/utils.lib";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
-import {ModalService} from "../../../ui/modal-old/modal.service";
+import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,

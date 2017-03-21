@@ -1,9 +1,13 @@
 @import "../../../assets/sass/variables";
+
 :host {
-    height: 100%;
-    z-index: 1;
-    display: flex;
-    align-content: space-around;
-    align-items: center;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background-color: $body-background;
+  z-index: 9;
+  display: flex;
+  align-content: space-around;
+  align-items: center;
 
 }

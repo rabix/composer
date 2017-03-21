@@ -8,8 +8,8 @@ import {LocalDataSourceService} from "../../sources/local/local.source.service";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {WorkboxService} from "../workbox/workbox.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
-import {ModalService} from "../../ui/modal-old/modal.service";
-import {NewFileModalComponent} from "../../ui/modal-old/custom/new-file-modal.component";
+import {ModalService} from "../../ui/modal/modal.service";
+import {NewFileModalComponent} from "../../ui/modal/custom/new-file-modal.component";
 
 const {app, dialog} = window["require"]("electron").remote;
 

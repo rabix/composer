@@ -10,7 +10,7 @@ import {
     ViewEncapsulation
 } from "@angular/core";
 import {Observable} from "rxjs";
-import {CodeEditorComponent} from "./code-editor.component";
+import {CodeEditorXComponent} from "./code-editor.component";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 
 @Component({
@@ -52,8 +52,8 @@ export class CodePreviewComponent extends DirectiveBase {
     @Output()
     viewReady;
 
-    @ViewChild("editor", {read: CodeEditorComponent})
-    private editor: CodeEditorComponent;
+    @ViewChild("editor", {read: CodeEditorXComponent})
+    private editor: CodeEditorXComponent;
 
     contentStream: Observable<string>;
 

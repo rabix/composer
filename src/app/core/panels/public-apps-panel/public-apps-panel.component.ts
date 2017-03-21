@@ -20,8 +20,9 @@ import Platform = NodeJS.Platform;
 @Component({
     selector: "ct-public-apps-panel",
     template: `
-        <ct-search-field class="m-1" [formControl]="searchContent" [placeholder]="'Search Public Apps...'"></ct-search-field>
-        
+        <ct-search-field class="m-1" [formControl]="searchContent"
+                         [placeholder]="'Search Public Apps...'"></ct-search-field>
+
         <div class="btn-group grouping-toggle" *ngIf="!searchContent?.value">
             <button type="button"
                     (click)="regroup('toolkit')"
@@ -47,10 +48,10 @@ import Platform = NodeJS.Platform;
                                       [label]="entry?.label">
                 </ct-nav-search-result>
             </div>
-            <ct-block-loader class="m-1"
-                             *ngIf="searchContent.value 
+            <ct-line-loader class="m-1"
+                            *ngIf="searchContent.value 
                              && searchContent.value !== appliedSearchTerm 
-                             && !searchResults"></ct-block-loader>
+                             && !searchResults"></ct-line-loader>
 
             <div *ngIf="searchContent.value 
                         && searchContent.value === appliedSearchTerm 
@@ -62,7 +63,8 @@ import Platform = NodeJS.Platform;
                 <i class="icon fa-4x fa fa-search"></i>
             </div>
 
-            <ct-tree-view #tree [hidden]="searchContent?.value" [nodes]="groupedNodes" [level]="1"></ct-tree-view>
+            <ct-tree-view #tree [hidden]="searchContent?.value" [nodes]="groupedNodes"
+                          [level]="1"></ct-tree-view>
         </div>
     `,
     providers: [TreeViewService, LocalFileRepositoryService],

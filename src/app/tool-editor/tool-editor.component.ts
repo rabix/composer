@@ -27,7 +27,7 @@ import {
 } from "../editor-common/cwl-schema-validation-worker/cwl-schema-validation-worker.service";
 import LoadOptions = jsyaml.LoadOptions;
 import {DirectiveBase} from "../util/directive-base/directive-base";
-import {ModalService} from "../ui/modal-old/modal.service";
+import {ModalService} from "../ui/modal/modal.service";
 import {WorkboxTab} from "../core/workbox/workbox-tab.interface";
 import {SettingsService} from "../services/settings/settings.service";
 import {SystemService} from "../platform-providers/system.service";
@@ -42,7 +42,7 @@ import {SystemService} from "../platform-providers/system.service";
     },
     providers: [EditorInspectorService],
     template: `
-        <ct-block-loader *ngIf="isLoading"></ct-block-loader>
+        <ct-line-loader *ngIf="isLoading"></ct-line-loader>
 
         <div class="editor-container" [hidden]="isLoading">
 
@@ -399,19 +399,19 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
 
         if (mode === this.viewModes.Gui && this.showReformatPrompt) {
 
-            this.modal.checkboxPrompt({
-                title: "Confirm GUI Formatting",
-                content: "Activating GUI mode might change the formatting of this document. Do you wish to continue?",
-                cancellationLabel: "Cancel",
-                confirmationLabel: "OK",
-                checkboxLabel: "Don't show this dialog again",
-            }).then(res => {
-                if (res) this.userPrefService.put("show_reformat_prompt", false);
-
-                this.showReformatPrompt = false;
-                this.viewMode           = mode;
-            }, noop);
-            return;
+            // this.modal.checkboxPrompt({
+            //     title: "Confirm GUI Formatting",
+            //     content: "Activating GUI mode might change the formatting of this document. Do you wish to continue?",
+            //     cancellationLabel: "Cancel",
+            //     confirmationLabel: "OK",
+            //     checkboxLabel: "Don't show this dialog again",
+            // }).then(res => {
+            //     if (res) this.userPrefService.put("show_reformat_prompt", false);
+            //
+            //     this.showReformatPrompt = false;
+            //     this.viewMode           = mode;
+            // }, noop);
+            // return;
         }
 
         if (mode === this.viewModes.Code && this.toolGroup.dirty) {

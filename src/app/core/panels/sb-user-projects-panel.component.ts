@@ -10,9 +10,9 @@ import {UserProjectsService} from "../../platform-providers/user-projects/user-p
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {WorkboxService} from "../workbox/workbox.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
-import {NewFileModalComponent} from "../../ui/modal-old/custom/new-file-modal.component";
-import {ProjectSelectionModal} from "../../ui/modal-old/custom/project-selection-modal.component";
-import {ModalService} from "../../ui/modal-old/modal.service";
+import {NewFileModalComponent} from "../../ui/modal/custom/new-file-modal.component";
+import {ProjectSelectionModal} from "../../ui/modal/custom/project-selection-modal.component";
+import {ModalService} from "../../ui/modal/modal.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,

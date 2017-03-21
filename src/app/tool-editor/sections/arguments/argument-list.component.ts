@@ -11,7 +11,7 @@ import {EditorInspectorService} from "../../../editor-common/inspector/editor-in
 import {noop} from "../../../lib/utils.lib";
 import {CommandLineToolModel} from "cwlts/models";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
-import {ModalService} from "../../../ui/modal-old/modal.service";
+import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
     selector: "ct-argument-list",

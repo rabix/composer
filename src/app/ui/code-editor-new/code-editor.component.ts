@@ -1,5 +1,8 @@
 import {ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, OnInit, SimpleChanges} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
+
+import * as ace from "brace";
+
 import "brace/mode/java";
 import "brace/mode/javascript";
 import "brace/mode/json";
@@ -79,6 +82,11 @@ export class CodeEditorComponent implements OnInit, ControlValueAccessor {
     writeValue(content: string): void {
         if (content === undefined || content === null) {
             return;
+        }
+
+        if (typeof content !== "string") {
+            debugger;
+            throw new Error(`Expected content to be typeof "string", instead got "${typeof content}"`);
         }
 
         if (!this.originalContent) {

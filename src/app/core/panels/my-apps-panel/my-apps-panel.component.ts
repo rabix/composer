@@ -24,10 +24,12 @@ import {AddSourceModalComponent} from "../../modals/add-source-modal/add-source-
 @Component({
     selector: "ct-my-apps-panel",
     template: `
-        <ct-search-field class="m-1" [formControl]="searchContent" [placeholder]="'Search My Apps...'"></ct-search-field>
+        <ct-search-field class="m-1" [formControl]="searchContent"
+                         [placeholder]="'Search My Apps...'"></ct-search-field>
 
         <div>
-            <button class="btn btn-link btn-primary app-sources-btn" (click)="openAddAppSourcesDialog()">
+            <button class="btn btn-link btn-primary app-sources-btn"
+                    (click)="openAddAppSourcesDialog()">
                 <i class="fa fa-fw fa-plus"></i> Open a Project...
             </button>
         </div>
@@ -42,10 +44,10 @@ import {AddSourceModalComponent} from "../../modals/add-source-modal/add-source-
                                       [label]="entry?.label">
                 </ct-nav-search-result>
             </div>
-            <ct-block-loader class="m-1"
-                             *ngIf="searchContent.value 
+            <ct-line-loader class="m-1"
+                            *ngIf="searchContent.value 
                              && searchContent.value !== appliedSearchTerm 
-                             && !searchResults"></ct-block-loader>
+                             && !searchResults"></ct-line-loader>
 
             <div *ngIf="searchContent.value 
                         && searchContent.value === appliedSearchTerm 
@@ -57,7 +59,8 @@ import {AddSourceModalComponent} from "../../modals/add-source-modal/add-source-
                 <i class="icon fa-4x fa fa-search"></i>
             </div>
 
-            <ct-tree-view #tree [hidden]="searchContent?.value" [nodes]="treeNodes" [level]="1"></ct-tree-view>
+            <ct-tree-view #tree [hidden]="searchContent?.value" [nodes]="treeNodes"
+                          [level]="1"></ct-tree-view>
         </div>
     `,
     providers: [TreeViewService, LocalFileRepositoryService],

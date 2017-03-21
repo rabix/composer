@@ -7,7 +7,6 @@ import {StatusBarService} from "../../../../layout/status-bar/status-bar.service
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
     selector: "ct-workflow-step-inspector-inputs",
     // @todo: temporarily removing ChangeDetectionStrategy.OnPush because model is being changed externally by graph
     styleUrls: ["./step-tab-inputs.component.scss"],

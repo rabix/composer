@@ -119,7 +119,7 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
         });
 
         // fetch secondaryFiles depending on their location
-        if (this.input.inputBinding.hasSecondaryFiles) {
+        if (this.input.inputBinding && this.input.inputBinding.hasSecondaryFiles) {
             this.form.addControl("secondaryFiles", new FormControl(this.input.inputBinding.secondaryFiles));
         } else if (this.input.hasSecondaryFiles) {
             this.form.addControl("secondaryFiles", new FormControl(this.input.secondaryFiles));

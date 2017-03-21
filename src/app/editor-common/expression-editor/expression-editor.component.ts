@@ -1,7 +1,7 @@
 import {Component, HostBinding, Input, Output, ViewChild, ViewEncapsulation} from "@angular/core";
 import {BehaviorSubject, Observable, Subject} from "rxjs";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
-import {CodeEditorComponent} from "../../ui/code-editor/code-editor.component";
+import {CodeEditorXComponent} from "../../ui/code-editor/code-editor.component";
 import {TreeNode} from "../../ui/tree-view-old/types";
 
 @Component({
@@ -78,8 +78,8 @@ export class ExpressionEditorComponent extends DirectiveBase {
 
     public contextNodes: TreeNode[];
 
-    @ViewChild("editor", {read: CodeEditorComponent})
-    private editor: CodeEditorComponent;
+    @ViewChild("editor", {read: CodeEditorXComponent})
+    private editor: CodeEditorXComponent;
 
 
     ngOnInit() {

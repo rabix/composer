@@ -5,7 +5,7 @@ import {noop} from "../../../lib/utils.lib";
 import {AsyncSubject} from "rxjs";
 import {Expression} from "cwlts/mappings/d2sb/Expression";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
-import {ModalService} from "../../../ui/modal-old/modal.service";
+import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,

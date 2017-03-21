@@ -3,10 +3,10 @@
 
 $grid-gutter-width-half: $grid-gutter-width-base / 2;
 
-ct-workflow-step-inspector-inputs {
+:host {
     .input-box {
-        margin-right: -$grid-gutter-width-half;
-        margin-left: -$grid-gutter-width-half;
+        margin-right: -$grid-gutter-width-base;
+        margin-left: -$grid-gutter-width-base;
         padding: 1rem $grid-gutter-width-half;
         border-bottom: 1px solid #ddd;
 

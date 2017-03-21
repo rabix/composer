@@ -8,7 +8,8 @@ import {DragDirective} from "./behaviors/drag-and-drop/drag.directive";
 import {DropZones} from "./behaviors/drag-and-drop/drop-zones.directive";
 import {DropDirective} from "./behaviors/drag-and-drop/drop.directive";
 import {BlockLoaderComponent} from "./block-loader/block-loader.component";
-import {CodeEditorComponent} from "./code-editor/code-editor.component";
+import {CodeEditorComponent} from "./code-editor-new/code-editor.component";
+import {CodeEditorXComponent} from "./code-editor/code-editor.component";
 import {CodePreviewComponent} from "./code-editor/code-preview.component";
 import {ContextDirective} from "./context/context.directive";
 import {DropDownButtonComponent} from "./dropdown-button/dropdown-button-component";
@@ -26,7 +27,6 @@ import {ProgressComponent} from "./progress/progress.component";
 import {TabSelectorEntryComponent} from "./tab-selector/tab-selector-entry/tab-selector-entry.component";
 import {TabSelectorComponent} from "./tab-selector/tab-selector.component";
 import {TabComponent} from "./tabs/tab.component";
-import {TabsComponent} from "./tabs/tabs.component";
 import {ToasterComponent} from "./toaster/toaster.component";
 import {ToggleComponent} from "./toggle-slider/toggle-slider.component";
 import {TooltipContentComponent} from "./tooltip/tooltip-content.component";
@@ -34,6 +34,8 @@ import {TooltipDirective} from "./tooltip/tooltip.directive";
 import {TreeNodeIconComponent} from "./tree-view-old/tree-node-icon.component";
 import {TreeNodeComponent} from "./tree-view/tree-node/tree-node.component";
 import {TreeViewComponent} from "./tree-view/tree-view.component";
+import {TabsComponent} from "./tabs/tabs.component";
+import {LineLoaderComponent} from "./line-loader/line-loader.component";
 
 @NgModule({
     imports: [
@@ -45,6 +47,7 @@ import {TreeViewComponent} from "./tree-view/tree-view.component";
         AutoCompleteComponent,
         BlockLoaderComponent,
         CodeEditorComponent,
+        CodeEditorXComponent,
         CodePreviewComponent,
         ContextDirective,
         DisableFormControlDirective,
@@ -76,14 +79,17 @@ import {TreeViewComponent} from "./tree-view/tree-view.component";
         DropDownButtonComponent,
         DropDownMenuComponent,
         ModalComponent,
-        TooltipContentComponent,
+        TooltipContentComponent
     ],
 
     declarations: [
         AutoCompleteComponent,
+        LineLoaderComponent,
         BlockLoaderComponent,
         CodeEditorComponent,
         CodePreviewComponent,
+        CodeEditorXComponent,
+        ModalComponent,
         ContextDirective,
         DisableFormControlDirective,
         DragDirective,

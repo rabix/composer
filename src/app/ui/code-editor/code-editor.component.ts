@@ -95,7 +95,7 @@ export interface AceEditorOptions {
     styleUrls: ["./code-editor.component.scss"],
     template: ""
 })
-export class CodeEditorComponent extends DirectiveBase {
+export class CodeEditorXComponent extends DirectiveBase {
 
     /** Stream of raw string content that should be displayed in the editor */
     @Input()

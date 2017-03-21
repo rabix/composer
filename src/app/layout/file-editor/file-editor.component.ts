@@ -11,9 +11,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
     host: {
         "class": "tab-container"
     },
-    template: `
-        <ct-block-loader *ngIf="isLoading"></ct-block-loader>
-
+    template: `        
         <div class="editor-container" [hidden]="isLoading">
 
             <ct-editor-controls>

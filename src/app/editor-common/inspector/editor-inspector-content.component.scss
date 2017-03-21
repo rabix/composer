@@ -4,6 +4,7 @@
 :host {
     overflow-y: auto;
     overflow-x: hidden;
+    flex: 1;
 
     .header {
         border: 1px solid transparent;
@@ -14,7 +15,7 @@
         position: relative;
         display: block;
         background: $gui-section-bg;
-        margin-bottom: 20px;
+        height: 100%;
 
         .borderless & {
             border: none;

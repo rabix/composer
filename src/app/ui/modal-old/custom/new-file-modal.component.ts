@@ -14,10 +14,11 @@ import {FileName} from "../../../core/forms/models/file-name";
     selector: "ct-new-file-modal",
     template: `
         <div>
-            <ct-block-loader class="overlay" *ngIf="isCreatingFile"></ct-block-loader>
+            <ct-line-loader class="overlay" *ngIf="isCreatingFile"></ct-line-loader>
             <form (ngSubmit)="onSubmit(newFileForm)" [formGroup]="newFileForm" class="flex-form">
                 <div class="modal-body">
-                    <ct-radio-group #tpl class="flex-container" [items]="fileTypes"></ct-radio-group>
+                    <ct-radio-group #tpl class="flex-container"
+                                    [items]="fileTypes"></ct-radio-group>
                     <br/>
                     <ct-input [name]="'File Name'"
                               [autofocus]="true"
@@ -26,8 +27,10 @@ import {FileName} from "../../../core/forms/models/file-name";
                     </ct-input>
 
                     <div *ngIf="showCwlExtrasForm" [formGroup]="cwlExtrasForm">
-                        <ct-input [name]="'Label'" [control]="cwlExtrasForm.controls['label']"></ct-input>
-                        <ct-input [name]="'Description'" [control]="cwlExtrasForm.controls['description']"></ct-input>
+                        <ct-input [name]="'Label'"
+                                  [control]="cwlExtrasForm.controls['label']"></ct-input>
+                        <ct-input [name]="'Description'"
+                                  [control]="cwlExtrasForm.controls['description']"></ct-input>
                     </div>
 
                     <div *ngIf="error" class="alert alert-danger form-control-label">
@@ -35,8 +38,12 @@ import {FileName} from "../../../core/forms/models/file-name";
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary btn-sm" type="button" (click)="onCancel()">Cancel</button>
-                    <button class="btn btn-primary btn-sm" type="submit" [disabled]="!newFileForm.valid">Create</button>
+                    <button class="btn btn-secondary btn-sm" type="button" (click)="onCancel()">
+                        Cancel
+                    </button>
+                    <button class="btn btn-primary btn-sm" type="submit"
+                            [disabled]="!newFileForm.valid">Create
+                    </button>
                 </div>
             </form>
         </div>

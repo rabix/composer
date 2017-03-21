@@ -2,8 +2,8 @@ import {ComponentFactoryResolver, ComponentRef, Injectable, TemplateRef, ViewCon
 import {ModalOptions} from "./modal-options";
 import {Subject} from "rxjs";
 import {ModalComponent} from "./modal.component";
-import {ConfirmComponent} from "../modal-old/common/confirm.component";
-import {PromptComponent} from "../modal-old/common/prompt.component";
+import {ConfirmComponent} from "./common/confirm.component";
+import {PromptComponent} from "./common/prompt.component";
 import {FormControl} from "@angular/forms";
 
 @Injectable()

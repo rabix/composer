@@ -1,4 +1,12 @@
-import {Component, Input, OnDestroy, TemplateRef, ViewChild, ViewContainerRef} from "@angular/core";
+import {
+    Component,
+    Input,
+    OnDestroy,
+    OnInit,
+    TemplateRef,
+    ViewChild,
+    ViewContainerRef
+} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {WorkflowFactory, WorkflowModel} from "cwlts/models";
 import {Validation} from "cwlts/models/helpers/validation";
@@ -15,7 +23,7 @@ import {noop} from "../lib/utils.lib";
 import {PlatformAPI} from "../services/api/platforms/platform-api.service";
 import {UserPreferencesService} from "../services/storage/user-preferences.service";
 import {DataEntrySource} from "../sources/common/interfaces";
-import {ModalService} from "../ui/modal-old/modal.service";
+import {ModalService} from "../ui/modal/modal.service";
 import {DirectiveBase} from "../util/directive-base/directive-base";
 
 import LoadOptions = jsyaml.LoadOptions;
@@ -30,9 +38,12 @@ import {SettingsService} from "../services/settings/settings.service";
         <ct-action-bar>
             <ct-tab-selector class="inverse" [distribute]="'auto'" [active]="viewMode"
                              (activeChange)="switchTab($event)">
-                <ct-tab-selector-entry [disabled]="!isValidCWL" [tabName]="'info'">App Info</ct-tab-selector-entry>
-                <ct-tab-selector-entry [disabled]="!isValidCWL" [tabName]="'graph'">Graph View</ct-tab-selector-entry>
-                <ct-tab-selector-entry [disabled]="!isValidCWL" [tabName]="'list'">List View</ct-tab-selector-entry>
+                <ct-tab-selector-entry [disabled]="!isValidCWL" [tabName]="'info'">App Info
+                </ct-tab-selector-entry>
+                <ct-tab-selector-entry [disabled]="!isValidCWL" [tabName]="'graph'">Graph View
+                </ct-tab-selector-entry>
+                <ct-tab-selector-entry [disabled]="!isValidCWL" [tabName]="'list'">List View
+                </ct-tab-selector-entry>
                 <ct-tab-selector-entry [tabName]="'code'">Code</ct-tab-selector-entry>
             </ct-tab-selector>
 
@@ -75,21 +86,24 @@ import {SettingsService} from "../services/settings/settings.service";
         </ct-action-bar>
 
         <div class="editor-layout">
+
+            <ct-block-loader *ngIf="isLoading"></ct-block-loader>
+
             <!--Editor Row-->
-            <!--<ui-code-editor *ngIf="viewMode === viewModeTypes.Code"-->
-            <!--[formControl]="codeEditorContent"-->
-            <!--[options]="{mode: 'ace/mode/yaml'}"-->
-            <!--class="editor">-->
-            <!--</ui-code-editor>-->
-            <ct-code-editor-x *ngIf="viewMode === 'code'"
-                              class="editor-main"
-                              [(content)]="rawEditorContent"
-                              [options]="{theme: 'ace/theme/monokai'}"
-                              [language]="'yaml'"
-                              [readonly]="!data.isWritable"></ct-code-editor-x>
+            <ui-code-editor *ngIf="viewMode === 'code' && !isLoading"
+                            [formControl]="codeEditorContent"
+                            [options]="{mode: 'ace/mode/yaml'}"
+                            class="editor">
+            </ui-code-editor>
+            <!--<ct-code-editor-x *ngIf="viewMode === 'code'"-->
+            <!--class="editor-main"-->
+            <!--[(content)]="rawEditorContent"-->
+            <!--[options]="{theme: 'ace/theme/monokai'}"-->
+            <!--[language]="'yaml'"-->
+            <!--[readonly]="!data.isWritable"></ct-code-editor-x>-->
 
             <!--GUI Editor-->
-            <ct-workflow-not-graph-editor *ngIf="viewMode === 'list'"
+            <ct-workflow-not-graph-editor *ngIf="viewMode === 'list' && !isLoading"
                                           class="editor-main"
                                           [readonly]="!data.isWritable"
                                           [model]="workflowModel"></ct-workflow-not-graph-editor>
@@ -100,7 +114,7 @@ import {SettingsService} from "../services/settings/settings.service";
                                       class="editor-main">
             </ct-workflow-graph-editor>
 
-            <ct-app-info *ngIf="viewMode === 'info'"
+            <ct-app-info *ngIf="viewMode === 'info' && !isLoading"
                          [class.flex-col]="showInspector"
                          [model]="workflowModel">
             </ct-app-info>
@@ -115,7 +129,8 @@ import {SettingsService} from "../services/settings/settings.service";
 
 
         <div *ngIf="reportPanel" class="app-report-panel layout-section">
-            <ct-validation-report *ngIf="reportPanel === 'validation'" [issues]="validation"></ct-validation-report>
+            <ct-validation-report *ngIf="reportPanel === 'validation'"
+                                  [issues]="validation"></ct-validation-report>
         </div>
 
         <template #statusControls>
@@ -144,7 +159,7 @@ import {SettingsService} from "../services/settings/settings.service";
         </template>
     `
 })
-export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy, WorkboxTab {
+export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy, OnInit, WorkboxTab {
 
     @Input()
     data: DataEntrySource;
@@ -172,10 +187,10 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
     /** Model that's recreated on document change */
     workflowModel: WorkflowModel = WorkflowFactory.from(null, "document");
 
+    codeEditorContent = new FormControl(undefined);
+
     /** Flag for showing reformat prompt on GUI switch */
     private showReformatPrompt = true;
-
-    private codeEditorContent: FormControl;
 
     /** Template of the status controls that will be shown in the status bar */
     @ViewChild("statusControls")
@@ -209,16 +224,15 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
 
     }
 
-    ngAfterViewInit(): void {
-        this.codeEditorContent = new FormControl({
-            value: undefined,
-            disabled: !this.data.isWritable
-        });
+    ngOnInit(): void {
+        if (!this.data.isWritable) {
+            this.codeEditorContent.disable();
+        }
 
-        this.rawEditorContent.subscribe(content => {
+        this.tracked = this.rawEditorContent.subscribe(content => {
             this.codeEditorContent.setValue(content);
-
         });
+
         // Whenever the editor content is changed, validate it using a JSON Schema.
         this.tracked = this.rawEditorContent
             .skip(1)
@@ -230,7 +244,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                     if (!r.isValidCwl) {
                         // turn off loader and load document as code
                         this.validation = r;
-                        this.isLoading = false;
+                        this.isLoading  = false;
                         return r;
                     }
 
@@ -263,7 +277,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
 
                         this.workflowModel.validate();
 
-                        const out = {
+                        const out       = {
                             errors: this.workflowModel.validation.errors,
                             warnings: this.workflowModel.validation.warnings,
                             isValidatableCwl: true,
@@ -278,8 +292,8 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                         this.getStepUpdates();
 
                     }, (err) => {
-                        this.isLoading = false;
-                        this.viewMode = "code";
+                        this.isLoading  = false;
+                        this.viewMode   = "code";
                         this.isValidCWL = false;
                         this.validation = {
                             isValidatableCwl: true,
@@ -298,7 +312,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
 
         // Whenever content of a file changes, forward the change to the raw editor content steam.
         const statusID = this.statusBar.startProcess(`Loading ${this.data.data.id}`);
-        this.tracked = this.data.content.subscribe(val => {
+        this.tracked   = this.data.content.subscribe(val => {
             this.rawEditorContent.next(val);
             this.statusBar.stopProcess(statusID);
         });
@@ -332,7 +346,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
 
                 // load document in GUI and turn off loader, only if loader was active
                 if (this.isLoading) {
-                    //@todo: this.viewMode cannot be initially set to viewModeTypes.Graph because canvas dimensions are not initialized
+                    // @todo: this.viewMode cannot be initially set to viewModeTypes.Graph because canvas dimensions are not initialized
                     this.viewMode = "info";
                     this.isLoading = false;
                 }
@@ -363,7 +377,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
             formControl: new FormControl("")
         }).then(revisionNote => {
 
-            const path = this.data.data["sbg:id"] || this.data.data.id;
+            const path     = this.data.data["sbg:id"] || this.data.data.id;
             const statusID = this.statusBar.startProcess(`Creating a new revision of ${path}`);
             this.data.save(JSON.parse(text), revisionNote).subscribe(result => {
                 const cwl = JSON.stringify(result.message, null, 4);
@@ -445,7 +459,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
      * Open workflow in browser
      */
     goToApp() {
-        const urlApp = this.workflowModel["sbgId"];
+        const urlApp     = this.workflowModel["sbgId"];
         const urlProject = urlApp.split("/").splice(0, 2).join("/");
 
         this.settings.platformConfiguration.first().map(settings => settings.url).subscribe((url) => {

@@ -4,12 +4,10 @@ import {StepModel, WorkflowModel} from "cwlts/models";
 import {UpdateStepModal} from "../../../components/modal/custom/update-step-modal.component";
 import {PlatformAPI} from "../../../services/api/platforms/platform-api.service";
 import {UserPreferencesService} from "../../../services/storage/user-preferences.service";
-import {ModalService} from "../../../ui/modal-old/modal.service";
+import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-workflow-step-inspector",
     changeDetection: ChangeDetectionStrategy.OnPush,
     styleUrls: ["./step-inspector.component.scss"],
@@ -61,24 +59,24 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         </ct-workflow-step-inspector-step>
     `
 })
-export class WorkflowStepInspector extends DirectiveBase {
+export class StepInspectorComponent extends DirectiveBase {
 
     @Input()
-    public step: StepModel;
+    step: StepModel;
 
     @Input()
-    public workflowModel: WorkflowModel;
+    workflowModel: WorkflowModel;
 
     @Input()
-    public graph: Workflow;
+    graph: Workflow;
 
-    public tabs = {
+    tabs = {
         Inputs: "inputs",
         Info: "info",
         Step: "step"
     };
 
-    public viewMode = this.tabs.Inputs;
+    viewMode = this.tabs.Inputs;
 
     constructor(private modal: ModalService,
                 private platform: PlatformAPI,
@@ -92,7 +90,7 @@ export class WorkflowStepInspector extends DirectiveBase {
     }
 
 
-    private updateStep(ev: Event) {
+    updateStep(ev: Event) {
         ev.preventDefault();
 
         const appId   = this.step.run.customProps["sbg:id"].split("/");
@@ -101,7 +99,7 @@ export class WorkflowStepInspector extends DirectiveBase {
 
         this.platform.getApp(appData).subscribe((app) => {
 
-            const component = this.modal.show(UpdateStepModal, {
+            const component = this.modal.fromComponent(UpdateStepModal, {
                 title: "Update available",
                 closeOnOutsideClick: true,
                 closeOnEscape: true
@@ -117,11 +115,11 @@ export class WorkflowStepInspector extends DirectiveBase {
                 this.cdr.markForCheck();
 
                 component.closeModal();
-            }
+            };
         });
     }
 
-    private changeTab(tab: string) {
+    changeTab(tab: string) {
         this.viewMode = tab;
         this.userPrefService.put("step_inspector_active_tab", tab);
     }
