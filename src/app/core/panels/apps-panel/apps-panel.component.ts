@@ -24,10 +24,7 @@ export class AppsPanelComponent implements AfterViewInit {
 
 
     activeTab = "myApps";
-
-    @ViewChild(TabSelectorComponent)
-    tabSelector: TabSelectorComponent;
-
+    
     constructor(private prefs: UserPreferencesService, private cdr: ChangeDetectorRef) {
     }
 

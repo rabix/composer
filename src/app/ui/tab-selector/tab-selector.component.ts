@@ -106,6 +106,7 @@ export class TabSelectorComponent extends DirectiveBase implements OnInit, After
     }
 
     ngOnChanges(changes: SimpleChanges) {
+        this.selector.selectedTab.next(this.active);
         this.updateHighlight();
     }
 
