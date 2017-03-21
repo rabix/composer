@@ -1,0 +1,43 @@
+@import "../../../../assets/sass/variables";
+
+:host {
+
+    display: flex;
+    flex-direction: column;
+
+    .header {
+        display: block;
+        border-bottom: 1px solid $layout-section-alt-border-color;
+    }
+
+    ct-tab-selector-entry {
+        line-height: 3em;
+    }
+
+    .body {
+        flex: 1 1 auto;
+        min-height: 300px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .dialog-local {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .dialog-connection {
+        flex: 1;
+        padding: 1em;
+    }
+
+
+
+    .footer {
+        text-align: right;
+    }
+}
