@@ -19,6 +19,8 @@ import {ModalService} from "../ui/modal/modal.service";
 import {DirectiveBase} from "../util/directive-base/directive-base";
 
 import LoadOptions = jsyaml.LoadOptions;
+import {SystemService} from "../platform-providers/system.service";
+import {SettingsService} from "../services/settings/settings.service";
 
 @Component({
     selector: "ct-workflow-editor",
@@ -26,7 +28,8 @@ import LoadOptions = jsyaml.LoadOptions;
     styleUrls: ["./workflow-editor.component.scss"],
     template: `
         <ct-action-bar>
-            <ct-tab-selector class="inverse" [distribute]="'auto'" [active]="viewMode" (activeChange)="switchTab($event)">
+            <ct-tab-selector class="inverse" [distribute]="'auto'" [active]="viewMode"
+                             (activeChange)="switchTab($event)">
                 <ct-tab-selector-entry [disabled]="!isValidCWL" [tabName]="'info'">App Info</ct-tab-selector-entry>
                 <ct-tab-selector-entry [disabled]="!isValidCWL" [tabName]="'graph'">Graph View</ct-tab-selector-entry>
                 <ct-tab-selector-entry [disabled]="!isValidCWL" [tabName]="'list'">List View</ct-tab-selector-entry>
@@ -34,6 +37,11 @@ import LoadOptions = jsyaml.LoadOptions;
             </ct-tab-selector>
 
             <div class="document-controls">
+
+                <!--Go to app-->
+                <button class="btn btn-sm btn-secondary " type="button" (click)="goToApp()">
+                    <i class="fa fa-external-link"></i>
+                </button>
 
                 <!--Save-->
                 <button [disabled]="!data.isWritable"
@@ -185,7 +193,9 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                 private platform: PlatformAPI,
                 private inspector: EditorInspectorService,
                 private statusBar: StatusBarService,
-                private modal: ModalService) {
+                private modal: ModalService,
+                private system: SystemService,
+                private settings: SettingsService) {
 
         super();
 
@@ -220,7 +230,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                     if (!r.isValidCwl) {
                         // turn off loader and load document as code
                         this.validation = r;
-                        this.isLoading  = false;
+                        this.isLoading = false;
                         return r;
                     }
 
@@ -253,7 +263,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
 
                         this.workflowModel.validate();
 
-                        const out       = {
+                        const out = {
                             errors: this.workflowModel.validation.errors,
                             warnings: this.workflowModel.validation.warnings,
                             isValidatableCwl: true,
@@ -268,8 +278,8 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                         this.getStepUpdates();
 
                     }, (err) => {
-                        this.isLoading  = false;
-                        this.viewMode   = "code";
+                        this.isLoading = false;
+                        this.viewMode = "code";
                         this.isValidCWL = false;
                         this.validation = {
                             isValidatableCwl: true,
@@ -288,7 +298,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
 
         // Whenever content of a file changes, forward the change to the raw editor content steam.
         const statusID = this.statusBar.startProcess(`Loading ${this.data.data.id}`);
-        this.tracked   = this.data.content.subscribe(val => {
+        this.tracked = this.data.content.subscribe(val => {
             this.rawEditorContent.next(val);
             this.statusBar.stopProcess(statusID);
         });
@@ -323,7 +333,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                 // load document in GUI and turn off loader, only if loader was active
                 if (this.isLoading) {
                     //@todo: this.viewMode cannot be initially set to viewModeTypes.Graph because canvas dimensions are not initialized
-                    this.viewMode  = "info";
+                    this.viewMode = "info";
                     this.isLoading = false;
                 }
 
@@ -353,7 +363,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
             formControl: new FormControl("")
         }).then(revisionNote => {
 
-            const path     = this.data.data["sbg:id"] || this.data.data.id;
+            const path = this.data.data["sbg:id"] || this.data.data.id;
             const statusID = this.statusBar.startProcess(`Creating a new revision of ${path}`);
             this.data.save(JSON.parse(text), revisionNote).subscribe(result => {
                 const cwl = JSON.stringify(result.message, null, 4);
@@ -430,4 +440,17 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
             this.viewMode = tabName;
         });
     }
+
+    /**
+     * Open workflow in browser
+     */
+    goToApp() {
+        const urlApp = this.workflowModel["sbgId"];
+        const urlProject = urlApp.split("/").splice(0, 2).join("/");
+
+        this.settings.platformConfiguration.first().map(settings => settings.url).subscribe((url) => {
+            this.system.openLink(`${url}/u/${urlProject}/apps/#${urlApp}`);
+        });
+    }
+
 }

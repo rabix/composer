@@ -1,5 +1,6 @@
 import * as Yaml from "js-yaml";
 import {
+    AfterViewInit,
     Component,
     Input,
     OnDestroy,
@@ -28,6 +29,8 @@ import LoadOptions = jsyaml.LoadOptions;
 import {DirectiveBase} from "../util/directive-base/directive-base";
 import {ModalService} from "../ui/modal/modal.service";
 import {WorkboxTab} from "../core/workbox/workbox-tab.interface";
+import {SettingsService} from "../services/settings/settings.service";
+import {SystemService} from "../platform-providers/system.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -75,6 +78,11 @@ import {WorkboxTab} from "../core/workbox/workbox-tab.interface";
 
                 <!--CWLVersion-->
                 <span class="tag tag-default">{{ toolModel.cwlVersion }}</span>
+
+                <!--Go to app-->
+                <button class="btn btn-sm btn-secondary " type="button" (click)="goToApp()">
+                    <i class="fa fa-external-link"></i>
+                </button>
 
                 <!--Revisions-->
                 <button class="btn btn-secondary btn-sm" type="button"
@@ -182,7 +190,7 @@ import {WorkboxTab} from "../core/workbox/workbox-tab.interface";
         </div>
     `
 })
-export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDestroy, WorkboxTab {
+export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDestroy, WorkboxTab, AfterViewInit {
     @Input()
     public data: DataEntrySource;
 
@@ -239,7 +247,9 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
                 private platform: PlatformAPI,
                 private inspector: EditorInspectorService,
                 private statusBar: StatusBarService,
-                private modal: ModalService) {
+                private modal: ModalService,
+                private system: SystemService,
+                private settings: SettingsService) {
 
         super();
 
@@ -440,6 +450,17 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
         this.toolModel.resetJobDefaults();
     }
 
+    /**
+     * Open tool in browser
+     */
+    goToApp() {
+        const urlApp = this.toolModel["sbgId"];
+        const urlProject = urlApp.split("/").splice(0, 2).join("/");
+
+        this.settings.platformConfiguration.first().map(settings => settings.url).subscribe((url) => {
+            this.system.openLink(`${url}/u/${urlProject}/apps/#${urlApp}`);
+        });
+    }
 
     ngAfterViewInit() {
         this.inspector.setHostView(this.inspectorHostView);
