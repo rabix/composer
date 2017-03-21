@@ -30,8 +30,9 @@ import {TreeViewComponent} from "./tree-view/tree-view.component";
 import {TabComponent} from "./tabs/tab.component";
 import {TabsComponent} from "./tabs/tabs.component";
 import {BlockLoaderComponent} from "./block-loader/block-loader.component";
-import { TabSelectorEntryComponent } from './tab-selector/tab-selector-entry/tab-selector-entry.component';
+import { TabSelectorEntryComponent } from "./tab-selector/tab-selector-entry/tab-selector-entry.component";
 import {DropDownMenuComponent} from "./dropdown-button/dropdown-menu.component";
+import {AutoCompleteComponent} from "./auto-complete/auto-complete.component";
 
 @NgModule({
     imports: [
@@ -65,7 +66,8 @@ import {DropDownMenuComponent} from "./dropdown-button/dropdown-menu.component";
         KeyvalueComponent,
         TabComponent,
         TabsComponent,
-        TabSelectorEntryComponent
+        TabSelectorEntryComponent,
+        AutoCompleteComponent
     ],
 
     entryComponents: [
@@ -107,7 +109,8 @@ import {DropDownMenuComponent} from "./dropdown-button/dropdown-menu.component";
         InlineEditorComponent,
         TabComponent,
         TabSelectorEntryComponent,
-        DropDownMenuComponent
+        DropDownMenuComponent,
+        AutoCompleteComponent
     ]
 })
 export class UIModule {
