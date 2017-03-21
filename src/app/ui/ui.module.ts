@@ -46,6 +46,7 @@ import {LineLoaderComponent} from "./line-loader/line-loader.component";
     exports: [
         AutoCompleteComponent,
         BlockLoaderComponent,
+        LineLoaderComponent,
         CodeEditorComponent,
         CodeEditorXComponent,
         CodePreviewComponent,

@@ -45,7 +45,7 @@ export class WelcomeTabComponent {
     onOpenProjectButtonClick() {
         this.modal.fromComponent(AddSourceModalComponent, {
             title: "Open a Project",
-            backdrop: true;
+            backdrop: true
         });
     }
 }
