@@ -138,7 +138,7 @@ export class CodeEditorComponent extends ComponentBase {
             });
         }
 
-        this.options.readOnly = this.readonly
+        this.options.readOnly = this.readonly;
 
         this.editor.setOptions(this.options);
 

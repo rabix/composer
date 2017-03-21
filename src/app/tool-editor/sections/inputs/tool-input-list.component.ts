@@ -1,18 +1,20 @@
-import {Subject} from "rxjs";
-import {ChangeDetectionStrategy, Component, Input, Output, QueryList, TemplateRef, ViewChildren, ViewEncapsulation} from "@angular/core";
+import {
+    Component,
+    EventEmitter,
+    Input,
+    Output,
+    QueryList,
+    TemplateRef,
+    ViewChildren
+} from "@angular/core";
 import {ComponentBase} from "../../../components/common/component-base";
-import {SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
+import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 import {ModalService} from "../../../components/modal/modal.service";
 import {noop} from "../../../lib/utils.lib";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-tool-input-list",
-    styleUrls: ["./input-list.component.scss"],
-
-    changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <div class="container">
 
@@ -45,7 +47,8 @@ import {noop} from "../../../lib/utils.lib";
 
                         <!--ID Column-->
                         <div class="col-sm-4 ellipsis">
-                            <ct-validation-preview [entry]="entry.validation"></ct-validation-preview>
+                            <ct-validation-preview
+                                    [entry]="entry.validation"></ct-validation-preview>
                             {{ entry.id }}
                         </div>
 
@@ -73,21 +76,22 @@ import {noop} from "../../../lib/utils.lib";
                             <div class="tc-header">{{ entry.id || entry.loc || "Input" }}</div>
                             <div class="tc-body">
                                 <ct-tool-input-inspector
-                                    (save)="updateInput($event, i)"
-                                    [context]="context"
-                                    [input]="entry"
-                                    [readonly]="readonly">
+                                        [context]="context"
+                                        [input]="entry"
+                                        (save)="entriesChange.emit(entries)"
+                                        [readonly]="readonly">
                                 </ct-tool-input-inspector>
                             </div>
                         </ct-editor-inspector-content>
                     </template>
 
                     <div *ngIf="isRecordType(entry)" class="children">
-                        <ct-tool-input-list [entries]="entry.type.fields"
+                        <ct-tool-input-list [(entries)]="entry.type.fields"
+                                            (entriesChange)="entriesChange.emit(entries)"
                                             [readonly]="readonly"
+                                            [parent]="entry"
                                             [location]="getFieldsLocation(i)"
-                                            [isField]="true"
-                                            (update)="updateFields($event, i)">
+                                            [isField]="true">
                         </ct-tool-input-list>
                     </div>
 
@@ -108,7 +112,7 @@ import {noop} from "../../../lib/utils.lib";
 export class ToolInputListComponent extends ComponentBase {
 
     @Input()
-    public entries: SBDraft2CommandInputParameterModel[] = [];
+    public entries: CommandInputParameterModel[] = [];
 
     /** Model location entry, used for tracing the path in the json document */
     @Input()
@@ -125,8 +129,11 @@ export class ToolInputListComponent extends ComponentBase {
     @Input()
     public isField = false;
 
+    @Input()
+    public parent: CommandLineToolModel | CommandInputParameterModel;
+
     @Output()
-    public readonly update = new Subject();
+    public readonly entriesChange = new EventEmitter();
 
     @ViewChildren("inspector", {read: TemplateRef})
     private inspectorTemplate: QueryList<TemplateRef<any>>;
@@ -147,17 +154,24 @@ export class ToolInputListComponent extends ComponentBase {
             }
 
             const entries = this.entries.slice(0, index).concat(this.entries.slice(index + 1));
-            this.update.next(entries);
+            this.entriesChange.emit(entries);
         }, noop);
     }
 
     public addEntry() {
-        const newEntryLocation = `${this.location}[${this.entries.length}]`;
-        const newEntry = new SBDraft2CommandInputParameterModel(undefined, newEntryLocation);
-        newEntry.isField = this.isField;
+        let newEntry: CommandInputParameterModel;
+
+        if (this.isField) {
+            newEntry = (this.parent as CommandInputParameterModel).type.addField({})
+        } else {
+            newEntry = (this.parent as CommandLineToolModel).addInput({})
+        }
+
+        newEntry.createInputBinding();
+        newEntry.isField   = this.isField;
         newEntry.type.type = "File";
-        const entries = this.entries.concat(newEntry);
-        this.update.next(entries);
+
+        this.entriesChange.emit(this.entries);
 
         this.inspectorTemplate.changes
             .take(1)
@@ -170,31 +184,6 @@ export class ToolInputListComponent extends ComponentBase {
 
     private getFieldsLocation(index: number) {
         return `${this.location}[${index}].type.fields`;
-    }
-
-    private updateFields(newFields, i) {
-        const type = this.entries[i].type;
-        type.fields = [];
-        newFields.forEach(field => {
-            field.isField = true;
-            type.addField(field)
-        });
-
-        this.update.next(this.entries.slice());
-    }
-
-    private updateInput(newInput: SBDraft2CommandInputParameterModel, index: number) {
-
-        // FIXME: cloning an object ditches its prototype chain, but we need it
-        const input = this.entries[index];
-
-        /**
-         * FIXME: input parameter type needs to be able to switch references
-         * then make {@link CommandParameterTypePipe} pure again.
-         */
-        Object.assign(input, newInput);
-
-        this.update.next(this.entries.slice());
     }
 
     private isRecordType(entry) {

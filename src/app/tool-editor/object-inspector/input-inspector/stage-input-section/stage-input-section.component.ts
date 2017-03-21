@@ -1,25 +1,30 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ComponentBase} from "../../../../components/common/component-base";
-import {SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
+import {CommandInputParameterModel} from "cwlts/models";
 import {noop} from "../../../../lib/utils.lib";
+import {FormControl} from "../../../../../../node_modules/@angular/forms/src/model";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
 
     selector: "ct-stage-input",
     providers: [
-        {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StageInputSectionComponent), multi: true}
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => StageInputSectionComponent),
+            multi: true
+        }
     ],
     template: `
-        <ct-form-panel *ngIf="stageInputFormGroup" class="borderless" [collapsed]="true">
+        <ct-form-panel *ngIf="form" class="borderless" [collapsed]="true">
             <div class="tc-header">Stage Input</div>
-            <div class="tc-body" *ngIf="input && stageInputFormGroup">
+            <div class="tc-body" *ngIf="input && form">
 
-                <div class="form-group">
+                <div class="form-group" *ngIf="form.controls['stageInput']">
                     <label>Stage Input</label>
                     <select class="form-control"
-                            [formControl]="stageInputFormGroup.controls['stageInput']">
+                            [formControl]="form.controls['stageInput']">
 
                         <option *ngFor="let item of stageInputOptions"
                                 [value]="item.value">
@@ -29,10 +34,10 @@ import {noop} from "../../../../lib/utils.lib";
                 </div>
 
 
-                <div class="form-group flex-container" *ngIf="input.type.type === 'File'">
+                <div class="form-group flex-container" *ngIf="isFileType()">
                     <label>Load Content</label>
                     <span class="align-right">
-                    <ct-toggle-slider [formControl]="stageInputFormGroup.controls['loadContent']"
+                    <ct-toggle-slider [formControl]="form.controls['loadContent']"
                                       [off]="'No'"
                                       [on]="'Yes'"
                                       [readonly]="readonly">
@@ -50,15 +55,15 @@ export class StageInputSectionComponent extends ComponentBase implements Control
     @Input()
     public readonly = false;
 
-    private input: SBDraft2CommandInputParameterModel;
+    input: CommandInputParameterModel;
 
     private onTouched = noop;
 
     private propagateChange = noop;
 
-    private stageInputFormGroup: FormGroup;
+    form: FormGroup;
 
-    private stageInputOptions: { text: string, value: string }[] = [
+    stageInputOptions: { text: string, value: string }[] = [
         {text: "-- none --", value: null},
         {text: "Copy", value: "copy"},
         {text: "Link", value: "link"}
@@ -68,15 +73,22 @@ export class StageInputSectionComponent extends ComponentBase implements Control
         super();
     }
 
-    writeValue(input: SBDraft2CommandInputParameterModel): void {
+    writeValue(input: CommandInputParameterModel): void {
         this.input = input;
 
-        this.stageInputFormGroup = this.formBuilder.group({
-            stageInput: [{value: this.input.customProps["sbg:stageInput"] || null, disabled: this.readonly}],
+        this.form = this.formBuilder.group({
             loadContent: [!!this.input.inputBinding && this.input.inputBinding.loadContents ? this.input.inputBinding.loadContents : false]
         });
 
-        this.tracked = this.stageInputFormGroup.valueChanges
+        if (this.input.hasStageInput) {
+            this.form.addControl("stageInput", new FormControl({
+                    value: this.input.customProps["sbg:stageInput"] || null,
+                    disabled: this.readonly
+                })
+            );
+        }
+
+        this.tracked = this.form.valueChanges
             .distinctUntilChanged()
             .subscribe(value => {
                 if (!!value.stageInput) {
@@ -88,6 +100,10 @@ export class StageInputSectionComponent extends ComponentBase implements Control
                 this.input.inputBinding.loadContents = value.loadContent;
                 this.propagateChange(this.input);
             });
+    }
+
+    private isFileType() {
+        return this.input.type.type === "File" || this.input.type.items === "File";
     }
 
     registerOnChange(fn: any): void {

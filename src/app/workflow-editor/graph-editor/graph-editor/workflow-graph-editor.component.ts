@@ -15,6 +15,7 @@ import {Observable} from "rxjs";
 import * as Yaml from "js-yaml";
 import LoadOptions = jsyaml.LoadOptions;
 import {ComponentBase} from "../../../components/common/component-base";
+import {noop} from "../../../lib/utils.lib";
 
 
 declare const Snap: any;
@@ -132,7 +133,8 @@ export class WorkflowGraphEditorComponent extends ComponentBase {
         node.content.first().subscribe((node) => {
             try {
                 let json = Yaml.safeLoad(node, {
-                    json: true
+                    json: true,
+                    onWarning: noop
                 } as LoadOptions);
 
 

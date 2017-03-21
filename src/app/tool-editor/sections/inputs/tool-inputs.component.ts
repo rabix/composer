@@ -1,15 +1,12 @@
 import {Subject} from "rxjs";
-import {ChangeDetectionStrategy, Component, Input, Output, ViewChild, ViewEncapsulation} from "@angular/core";
+import {Component, Input, Output, ViewChild, EventEmitter} from "@angular/core";
 import {ComponentBase} from "../../../components/common/component-base";
-import {SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
-import {ToolInputListComponent} from "./tool-input-list-component";
+import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
+import {ToolInputListComponent} from "./tool-input-list.component";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-tool-input",
-    styleUrls: ["./input-list.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    styleUrls: ["./tool-inputs.component.scss"],
     template: `
         <ct-form-panel [collapsed]="false">
             <span class="tc-header">
@@ -19,16 +16,17 @@ import {ToolInputListComponent} from "./tool-input-list-component";
             <div class="tc-body">
 
                 <!--Blank Tool Screen-->
-                <ct-blank-tool-state *ngIf="!readonly && !entries.length"
+                <ct-blank-tool-state *ngIf="!readonly && !model?.inputs.length"
                                      [title]="'Files, parameters, and other stuff displayed in the tools command line'"
                                      [buttonText]="'Add an Input'"
                                      (buttonClick)="addEntry()">
                 </ct-blank-tool-state>
 
                 <!--List of entries-->
-                <ct-tool-input-list (update)="updateParent($event)"
-                                    [entries]="entries"
+                <ct-tool-input-list [(entries)]="model.inputs"
+                                    (entriesChange)="update.emit($event)"
                                     [location]="location"
+                                    [parent]="model"
                                     [context]="context"
                                     [readonly]="readonly">
                 </ct-tool-input-list>
@@ -40,7 +38,7 @@ import {ToolInputListComponent} from "./tool-input-list-component";
 export class ToolInputsComponent extends ComponentBase {
 
     @Input()
-    public entries: SBDraft2CommandInputParameterModel[] = [];
+    public entries: CommandInputParameterModel[] = [];
 
     /** Model location entry, used for tracing the path in the json document */
     @Input()
@@ -53,18 +51,17 @@ export class ToolInputsComponent extends ComponentBase {
     @Input()
     public readonly = false;
 
+    @Input()
+    public model: CommandLineToolModel;
+
     @Output()
-    public readonly update = new Subject();
+    public update = new EventEmitter();
+
 
     @ViewChild(ToolInputListComponent) inputList: ToolInputListComponent;
 
     private addEntry() {
         this.inputList.addEntry();
-    }
-
-    private updateParent(fields) {
-        this.entries = fields.slice();
-        this.update.next(this.entries.slice());
     }
 
 }

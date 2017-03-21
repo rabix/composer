@@ -1,6 +1,6 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
+import {ExpressionModel} from "cwlts/models";
 import {ComponentBase} from "../../../components/common/component-base";
 import {noop} from "../../../lib/utils.lib";
 import {ModalService} from "../../../components/modal/modal.service";
@@ -21,11 +21,11 @@ import {ModelExpressionEditorComponent} from "../../expression-editor/model-expr
     template: `
         <div class="expression-input-group clickable"
              [class.expr]="isExpr || disableLiteralTextInput"
-             [ct-validation-class]="model.validation">
+             [ct-validation-class]="model?.validation">
 
-            <ct-validation-preview [entry]="model.validation"></ct-validation-preview>
+            <ct-validation-preview [entry]="model?.validation"></ct-validation-preview>
             <b class="validation-icon result"
-               *ngIf="model.result && isExpr"
+               *ngIf="model?.result && isExpr"
                [title]="result">E:</b>
 
             <div class="input-group">
@@ -75,7 +75,7 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
     /**
      * Internal ExpressionModel on which changes are made
      */
-    public model: SBDraft2ExpressionModel;
+    public model: ExpressionModel;
 
     /**
      * Result gotten from expression evaluation
@@ -88,7 +88,7 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
     }
 
     /** setter for formControl value */
-    public set value(val: SBDraft2ExpressionModel) {
+    public set value(val: ExpressionModel) {
         if (val !== this.model) {
             this.model = val;
             this.onChange(val);
@@ -100,24 +100,21 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
      * Write a new value to the element when initially loading formControl
      * @param obj
      */
-    writeValue(obj: SBDraft2ExpressionModel): void {
-        if (!(obj instanceof SBDraft2ExpressionModel)) {
+    writeValue(obj: ExpressionModel): void {
+        if (!(obj instanceof ExpressionModel)) {
             console.warn(`ct-expression-input expected ExpressionModel, instead got ${obj}`)
         }
 
         if (obj) {
             this.model = obj;
             this.isExpr = obj.isExpression;
-        } else {
-            this.model = new SBDraft2ExpressionModel("", "");
-            this.isExpr = this.model.isExpression;
-        }
 
-        this.model.evaluate(this.context).then(res => {
-            this.result = res;
-        }, err => {
-            console.warn("ExpressionInputComponent got an error while evaluating an expression", err);
-        });
+            this.model.evaluate(this.context).then(res => {
+                this.result = res;
+            }, err => {
+                console.warn("ExpressionInputComponent got an error while evaluating an expression", err);
+            });
+        }
     }
 
     /**
@@ -179,11 +176,16 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
 
             editor.readonly = this.readonly;
 
+            const cachedValue = this.model.serialize();
+            const cachedType = this.model.type;
+
             editor.model = this.model;
             editor.context = this.context;
             editor.action.first().subscribe(action => {
                 if (action === "save") {
-                    this.model = new SBDraft2ExpressionModel(this.model.loc, editor.model.serialize());
+                    const val = editor.model.serialize();
+                    this.model.setValue(val, "expression");
+
                     this.model.evaluate(this.context).then(() => {
                             // to reset validation
                             this.isExpr = this.model.isExpression;
@@ -194,6 +196,8 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
                             this.isExpr = this.model.isExpression;
                             this.onChange(this.model);
                         });
+                } else {
+                    this.model.setValue(cachedValue, cachedType);
                 }
                 this.modal.close();
             });

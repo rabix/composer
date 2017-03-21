@@ -74,9 +74,9 @@ export class ExpressionEditorComponent extends ComponentBase {
     @Output()
     public action = new Subject<"close" | "save">();
 
-    private previewContent = new BehaviorSubject("");
+    public previewContent = new BehaviorSubject("");
 
-    private contextNodes: TreeNode[];
+    public contextNodes: TreeNode[];
 
     @ViewChild("editor", {read: CodeEditorComponent})
     private editor: CodeEditorComponent;

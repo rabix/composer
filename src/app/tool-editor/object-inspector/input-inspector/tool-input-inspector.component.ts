@@ -1,5 +1,5 @@
 import {Component, Input, Output, ViewEncapsulation} from "@angular/core";
-import {SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
+import {CommandInputParameterModel} from "cwlts/models";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {Subject} from "rxjs";
 import {ComponentBase} from "../../../components/common/component-base";
@@ -26,7 +26,7 @@ import {ComponentBase} from "../../../components/common/component-base";
 export class ToolInputInspector extends ComponentBase {
 
     @Input()
-    public input: SBDraft2CommandInputParameterModel;
+    public input: CommandInputParameterModel;
 
     /** Context in which expression should be evaluated */
     @Input()
@@ -38,7 +38,7 @@ export class ToolInputInspector extends ComponentBase {
     public form: FormGroup;
 
     @Output()
-    public save = new Subject<SBDraft2CommandInputParameterModel>();
+    public save = new Subject<CommandInputParameterModel>();
 
     constructor(private formBuilder: FormBuilder) {
         super();
@@ -52,7 +52,8 @@ export class ToolInputInspector extends ComponentBase {
         });
 
 
-        this.tracked = this.form.valueChanges.subscribe(() => {
+        // Skipping 1 because the first changes are from the form initializing
+        this.tracked = this.form.valueChanges.skip(1).subscribe(() => {
             this.save.next(this.input);
         });
     }

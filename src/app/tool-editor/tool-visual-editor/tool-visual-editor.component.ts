@@ -1,26 +1,20 @@
-import {Component, Input, ViewEncapsulation} from "@angular/core";
+import {Component, Input} from "@angular/core";
 import {FormGroup} from "@angular/forms";
-import {FileDefModel, RequirementBaseModel, ResourceRequirementModel, SBDraft2CommandLineToolModel} from "cwlts/models/d2sb";
+
+import {FileDefModel, ResourceRequirementModel} from "cwlts/models/d2sb";
+import {CommandLineToolModel, RequirementBaseModel} from "cwlts/models";
 import {ProcessRequirement} from "cwlts/mappings/d2sb/ProcessRequirement";
+
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
 import {ComponentBase} from "../../components/common/component-base";
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-tool-visual-editor",
     styleUrls: ["./tool-visual-editor.component.scss"],
     template: `
-        <div class="row" *ngIf="model.cwlVersion !== 'sbg:draft-2'">
-            <div class="alert alert-warning">
-                Only tools which are <code>sbg:draft-2</code> are currently supported. 
-                This tool is versioned as <code>{{ model.cwlVersion}}</code>.
-            </div>
-        </div>
-
-        <div class="row" *ngIf="model.cwlVersion === 'sbg:draft-2'">
-            <form [class.col-xs-6]="showInspector"
-                  [class.col-xs-12]="!showInspector"
+        <div class="row">
+            <form class="col-xs-12"
                   [formGroup]="formGroup">
+                
                 <ct-docker-requirement [dockerRequirement]="model.docker"
                                        (update)="setRequirement($event, true)"
                                        [readonly]="readonly">
@@ -28,6 +22,7 @@ import {ComponentBase} from "../../components/common/component-base";
 
                 <ct-base-command [baseCommand]="model.baseCommand"
                                  [context]="{$job: model.job}"
+                                 [model]="model"
                                  [stdin]="model.stdin"
                                  [stdout]="model.stdout"
                                  (updateCmd)="updateModel('baseCommand', $event)"
@@ -35,20 +30,23 @@ import {ComponentBase} from "../../components/common/component-base";
                                  [readonly]="readonly">
                 </ct-base-command>
 
-                <ct-tool-input [location]="model.loc + '.inputs'" [entries]="model.inputs"
+                <ct-tool-input [location]="model.loc + '.inputs'"
                                [context]="{$job: model.job}"
+                               [model]="model"
                                (update)="updateModel('inputs', $event)"
                                [readonly]="readonly">
                 </ct-tool-input>
 
-                <ct-tool-output [location]="model.loc + '.outputs'" [entries]="model.outputs || []"
+                <ct-tool-output [location]="model.loc + '.outputs'" 
                                 [context]="{$job: model.job}"
+                                [model]="model"
                                 [inputs]="model.inputs || []"
                                 (update)="updateModel('outputs', $event)"
                                 [readonly]="readonly">
                 </ct-tool-output>
 
                 <ct-resources [entries]="model.resources"
+                              *ngIf="model.cwlVersion === 'sbg:draft-2'"
                               (update)="setResource($event)"
                               [context]="{$job: model.job}"
                               [readonly]="readonly">
@@ -56,19 +54,21 @@ import {ComponentBase} from "../../components/common/component-base";
 
                 <ct-hint-list [entries]="model.hints || []"
                               [context]="{$job: model.job}"
+                              *ngIf="model.cwlVersion === 'sbg:draft-2'"
                               (update)="setHints($event)"
                               [readonly]="readonly">
                 </ct-hint-list>
 
                 <ct-argument-list [location]="model.loc + '.arguments'"
-                                  [entries]="model.arguments || []"
+                                  [model]="model"
                                   (update)="updateModel('arguments', $event)"
                                   [context]="{$job: model.job}"
                                   [readonly]="readonly">
                 </ct-argument-list>
-
+                
                 <ct-file-def-list [entries]="model.createFileRequirement?.fileDef || []"
                                   [location]="model.createFileRequirement?.loc"
+                                  *ngIf="model.cwlVersion === 'sbg:draft-2'"
                                   (update)="updateModel('createFileRequirement', $event)"
                                   [context]="{$job: model.job}"
                                   [readonly]="readonly">
@@ -81,7 +81,7 @@ import {ComponentBase} from "../../components/common/component-base";
 export class ToolVisualEditorComponent extends ComponentBase {
 
     @Input()
-    public model: SBDraft2CommandLineToolModel;
+    public model: CommandLineToolModel;
 
     @Input()
     public readonly: boolean;
@@ -101,21 +101,14 @@ export class ToolVisualEditorComponent extends ComponentBase {
 
     private updateModel(category: string, data: any) {
 
-        if (category === "inputs") {
-            this.model.inputs = [];
-            data.forEach(input => this.model.addInput(input));
+        if (category === "inputs" || category === "arguments") {
             this.model.updateCommandLine();
-        } else if (category === "arguments") {
-            this.model.arguments = [];
-            data.forEach(argument => this.model.addArgument(argument));
-            this.model.updateCommandLine();
-        } else if (category === "outputs") {
-            this.model.outputs = [];
-            data.forEach(output => this.model.addOutput(output));
+
         } else if (category === "baseCommand") {
             this.model.baseCommand = [];
             data.forEach(cmd => this.model.addBaseCommand(cmd));
             this.model.updateCommandLine();
+
         } else if (category === "createFileRequirement") {
             if (this.model.createFileRequirement) {
                 this.model.createFileRequirement.fileDef = data;
@@ -135,6 +128,7 @@ export class ToolVisualEditorComponent extends ComponentBase {
             if (change[str]) this.model.updateStream(change[str], <"stdin" | "stdout"> str);
         });
         this.model.updateCommandLine();
+        this.formGroup.markAsDirty();
     }
 
     private setRequirement(req: ProcessRequirement, hint: boolean) {

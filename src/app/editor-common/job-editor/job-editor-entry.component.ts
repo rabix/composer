@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewEncapsulation} from "@angular/core";
-import {SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
+import {CommandInputParameterModel} from "cwlts/models";
 import {JobHelper} from "cwlts/models/helpers/JobHelper";
 import {ObjectHelper} from "../../helpers/object.helper";
 
@@ -147,7 +147,7 @@ import {ObjectHelper} from "../../helpers/object.helper";
 export class JobEditorEntryComponent implements OnChanges {
 
     @Input()
-    public input: SBDraft2CommandInputParameterModel;
+    public input: CommandInputParameterModel;
 
     @Input()
     public value: any;

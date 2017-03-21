@@ -1,7 +1,8 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ComponentBase} from "../../../../components/common/component-base";
-import {CommandOutputParameterModel as OutputProperty, SBDraft2ExpressionModel, SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
+import {CommandInputParameterModel} from "cwlts/models";
+import {SBDraft2ExpressionModel, SBDraft2CommandOutputParameterModel} from "cwlts/models/d2sb";
 import {noop} from "../../../../lib/utils.lib";
 
 @Component({
@@ -35,10 +36,10 @@ import {noop} from "../../../../lib/utils.lib";
                     </form>
 
 
+                    <!--@todo Replace this key-value-list-->
                     <key-value-list
                         [addEntryText]="'Add Metadata'"
                         [emptyListText]="'No metadata defined.'"
-                        [context]="context"
                         [formControl]="metadataForm.controls['metadataList']"
                         [readonly]="readonly">
                     </key-value-list>
@@ -54,16 +55,16 @@ export class OutputMetaDataSectionComponent extends ComponentBase implements Con
     public readonly = false;
 
     @Input()
-    public inputs: SBDraft2CommandInputParameterModel[] = [];
+    public inputs: CommandInputParameterModel[] = [];
 
     /** The currently displayed property */
-    private output: OutputProperty;
+    public output: SBDraft2CommandOutputParameterModel;
 
     private onTouched = noop;
 
     private propagateChange = noop;
 
-    private metadataForm: FormGroup;
+    public metadataForm: FormGroup;
 
     private keyValueFormList: { key: string, value: string | SBDraft2ExpressionModel }[] = [];
 
@@ -71,7 +72,7 @@ export class OutputMetaDataSectionComponent extends ComponentBase implements Con
         super();
     }
 
-    writeValue(output: OutputProperty): void {
+    writeValue(output: SBDraft2CommandOutputParameterModel): void {
         this.output = output;
 
         this.keyValueFormList = Object.keys(this.output.outputBinding.metadata)

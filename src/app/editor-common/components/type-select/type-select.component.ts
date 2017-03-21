@@ -2,7 +2,7 @@ import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ComponentBase} from "../../../components/common/component-base";
 import {noop} from "../../../lib/utils.lib";
-import {InputParameterTypeModel} from "cwlts/models";
+import {ParameterTypeModel} from "cwlts/models";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -39,7 +39,7 @@ import {InputParameterTypeModel} from "cwlts/models";
 })
 export class InputTypeSelectComponent extends ComponentBase implements ControlValueAccessor {
 
-    public paramType: InputParameterTypeModel;
+    public paramType: ParameterTypeModel;
 
     @Input("propertyTypes")
     public propertyTypes = ["array", "enum", "record", "File", "string", "int", "float", "boolean", "map"];
@@ -58,7 +58,7 @@ export class InputTypeSelectComponent extends ComponentBase implements ControlVa
 
     private skipOnChange = false;
 
-    writeValue(paramType: InputParameterTypeModel): void {
+    writeValue(paramType: ParameterTypeModel): void {
         this.paramType = paramType;
 
         this.form.controls["type"].setValue(this.paramType.type);

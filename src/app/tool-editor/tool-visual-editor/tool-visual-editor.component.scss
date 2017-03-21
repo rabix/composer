@@ -1,6 +1,6 @@
 @import "../../../assets/sass/variables";
 
-ct-tool-visual-editor {
+:host {
     overflow-y: auto;
     color: $text-dark;
     width: 100%;

@@ -1,8 +1,7 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ComponentBase} from "../../../../components/common/component-base";
-import {CommandOutputParameterModel as OutProperty} from "cwlts/models/d2sb";
-import {CommandOutputBindingModel} from "cwlts/models/d2sb/CommandOutputBindingModel";
+import {CommandOutputParameterModel} from "cwlts/models";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -20,7 +19,6 @@ import {CommandOutputBindingModel} from "cwlts/models/d2sb/CommandOutputBindingM
                 <div class="form-group">
                     <label class="form-control-label">Output eval</label>
                     <ct-expression-input [disableLiteralTextInput]="true"
-                                         [context]="context"
                                          [readonly]="readonly"
                                          [formControl]="outputEvalFormGroup.controls['outputEval']">
                     </ct-expression-input>
@@ -49,15 +47,12 @@ import {CommandOutputBindingModel} from "cwlts/models/d2sb/CommandOutputBindingM
     `
 })
 
-/**
- * TODO: add the load content property on the model
- * */
 export class OutputEvalSectionComponent extends ComponentBase implements ControlValueAccessor {
 
     @Input()
     public readonly = false;
 
-    private output: OutProperty;
+    public output: CommandOutputParameterModel;
 
     private onTouched = () => {
     };
@@ -65,13 +60,13 @@ export class OutputEvalSectionComponent extends ComponentBase implements Control
     private propagateChange = (_) => {
     };
 
-    private outputEvalFormGroup: FormGroup;
+    public outputEvalFormGroup: FormGroup;
 
     constructor(private formBuilder: FormBuilder) {
         super();
     }
 
-    writeValue(output: OutProperty): void {
+    writeValue(output: CommandOutputParameterModel): void {
         this.output = output;
 
         this.outputEvalFormGroup = this.formBuilder.group({
@@ -83,10 +78,10 @@ export class OutputEvalSectionComponent extends ComponentBase implements Control
             .distinctUntilChanged()
             .subscribe(value => {
 
-                this.output.updateOutputBinding(new CommandOutputBindingModel({
-                    loadContents: value.loadContents,
-                    outputEval: value.outputEval.serialize()
-                }));
+                // this.output.updateOutputBinding(new CommandOutputBindingModel({
+                //     loadContents: value.loadContents,
+                //     outputEval: value.outputEval.serialize()
+                // }));
 
                 this.propagateChange(this.output);
             });

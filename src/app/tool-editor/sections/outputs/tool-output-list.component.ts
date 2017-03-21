@@ -1,18 +1,24 @@
-import {ChangeDetectionStrategy, Component, Input, Output, QueryList, TemplateRef, ViewChildren, ViewEncapsulation} from "@angular/core";
+import {
+    Component,
+    EventEmitter,
+    Input,
+    Output,
+    QueryList,
+    TemplateRef,
+    ViewChildren
+} from "@angular/core";
 import {ComponentBase} from "../../../components/common/component-base";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
-import {Subject} from "rxjs";
 import {ModalService} from "../../../components/modal/modal.service";
 import {noop} from "../../../lib/utils.lib";
-import {CommandInputParameterModel} from "cwlts/models/generic/CommandInputParameterModel";
-import {CommandOutputParameterModel} from "cwlts/models/d2sb";
+import {
+    CommandInputParameterModel,
+    CommandLineToolModel,
+    CommandOutputParameterModel
+} from "cwlts/models";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-tool-output-list",
-    styleUrls: ["./output-list.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <div class="container">
 
@@ -46,7 +52,8 @@ import {CommandOutputParameterModel} from "cwlts/models/d2sb";
 
                         <!--ID Column-->
                         <div class="col-sm-4 ellipsis" [title]="entry.id">
-                            <ct-validation-preview [entry]="entry.validation"></ct-validation-preview>
+                            <ct-validation-preview
+                                    [entry]="entry.validation"></ct-validation-preview>
                             {{ entry.id }}
                         </div>
 
@@ -62,9 +69,10 @@ import {CommandOutputParameterModel} from "cwlts/models/d2sb";
                                     {{ entry.outputBinding.glob.toString() }}
                                 </span>
 
-                            <ct-code-preview *ngIf="ctt.isIn && entry.outputBinding.glob && entry.outputBinding.glob?.isExpression"
-                                             (viewReady)="ctt.show()"
-                                             [content]="entry.outputBinding.glob.toString()"></ct-code-preview>
+                            <ct-code-preview
+                                    *ngIf="ctt.isIn && entry.outputBinding.glob && entry.outputBinding.glob?.isExpression"
+                                    (viewReady)="ctt.show()"
+                                    [content]="entry.outputBinding.glob.toString()"></ct-code-preview>
                         </ct-tooltip-content>
 
                         <!--Glob Column-->
@@ -93,11 +101,11 @@ import {CommandOutputParameterModel} from "cwlts/models/d2sb";
                             <div class="tc-header">{{ entry.id || entry.loc || "Output" }}</div>
                             <div class="tc-body">
                                 <ct-tool-output-inspector
-                                    (save)="updateOutput($event, i)"
-                                    [context]="context"
-                                    [output]="entry"
-                                    [inputs]="inputs"
-                                    [readonly]="readonly">
+                                        (save)="entriesChange.emit(entries)"
+                                        [context]="context"
+                                        [output]="entry"
+                                        [inputs]="inputs"
+                                        [readonly]="readonly">
                                 </ct-tool-output-inspector>
                             </div>
                         </ct-editor-inspector-content>
@@ -105,12 +113,13 @@ import {CommandOutputParameterModel} from "cwlts/models/d2sb";
 
                     <!--Nested entries-->
                     <div *ngIf="isRecordType(entry)" class="">
-                        <ct-tool-output-list [entries]="entry.type.fields"
+                        <ct-tool-output-list [(entries)]="entry.type.fields"
+                                             (entriesChange)="entriesChange.emit(entries)"
                                              [readonly]="readonly"
                                              [inputs]="inputs"
+                                             [parent]="entry"
                                              [location]="getFieldsLocation(i)"
-                                             [isField]="true"
-                                             (update)="updateFields($event, i)">
+                                             [isField]="true">
                         </ct-tool-output-list>
                     </div>
 
@@ -151,8 +160,11 @@ export class ToolOutputListComponent extends ComponentBase {
     @Input()
     public isField = false;
 
+    @Input()
+    public parent: CommandLineToolModel | CommandOutputParameterModel;
+
     @Output()
-    public readonly update = new Subject();
+    public readonly entriesChange = new EventEmitter();
 
     @ViewChildren("inspector", {read: TemplateRef})
     private inspectorTemplate: QueryList<TemplateRef<any>>;
@@ -171,19 +183,23 @@ export class ToolOutputListComponent extends ComponentBase {
             if (this.inspector.isInspecting(this.entries[index].loc)) {
                 this.inspector.hide();
             }
-
             const entries = this.entries.slice(0, index).concat(this.entries.slice(index + 1));
-            this.update.next(entries);
+            this.entriesChange.emit(entries);
         }, noop);
     }
 
     public addEntry() {
-        const newEntryLocation = `${this.location}[${this.entries.length}]`;
-        const newEntry = new CommandOutputParameterModel(undefined, newEntryLocation);
-        newEntry.isField = this.isField;
-        newEntry.type.type = "File";
-        const entries = this.entries.concat(newEntry);
-        this.update.next(entries);
+        let newEntry;
+
+        if (this.isField) {
+            newEntry = (this.parent as CommandOutputParameterModel).type.addField({});
+        } else {
+            newEntry = (this.parent as CommandLineToolModel).addOutput({});
+        }
+        newEntry.isField       = this.isField;
+        newEntry.type.type     = "File";
+
+        this.entriesChange.emit(this.entries);
 
         this.inspectorTemplate.changes
             .take(1)
@@ -196,31 +212,6 @@ export class ToolOutputListComponent extends ComponentBase {
 
     private getFieldsLocation(index: number) {
         return `${this.location}[${index}].type.fields`;
-    }
-
-    private updateFields(newFields, i) {
-        const type = this.entries[i].type;
-        type.fields = [];
-        newFields.forEach(field => {
-            field.isField = true;
-            type.addField(field)
-        });
-
-        this.update.next(this.entries.slice());
-    }
-
-    private updateOutput(newInput: CommandOutputParameterModel, index: number) {
-
-        // FIXME: cloning an object ditches its prototype chain, but we need it
-        const input = this.entries[index];
-
-        /**
-         * FIXME: input parameter type needs to be able to switch references
-         * then make {@link CommandParameterTypePipe} pure again.
-         */
-        Object.assign(input, newInput);
-
-        this.update.next(this.entries.slice());
     }
 
     private isRecordType(entry) {

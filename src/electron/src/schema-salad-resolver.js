@@ -4,7 +4,7 @@ const request = require("request");
 const yaml = require("js-yaml");
 
 function isUrl(s) {
-    const regexp = /^(ftp|https|https):\/\/.*/i;
+    const regexp = /^(ftp|http|https):\/\/.*/i;
     return regexp.test(s);
 }
 
@@ -103,7 +103,7 @@ function parseJSON(content, source) {
     return new Promise((resolve, reject) => {
         const data = yaml.safeLoad(content, {
                 filename: source,
-                onWarning: reject,
+                onWarning: () => {},
                 json: true
             }) || {};
 

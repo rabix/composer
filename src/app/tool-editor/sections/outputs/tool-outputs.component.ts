@@ -1,17 +1,15 @@
-import {Subject} from "rxjs";
-import {ChangeDetectionStrategy, Component, Input, Output, ViewChild, ViewEncapsulation} from "@angular/core";
+import {Component, EventEmitter, Input, Output, ViewChild} from "@angular/core";
 import {ComponentBase} from "../../../components/common/component-base";
-import {CommandOutputParameterModel} from "cwlts/models/d2sb";
-import {CommandInputParameterModel} from "cwlts/models";
+import {
+    CommandInputParameterModel,
+    CommandLineToolModel,
+    CommandOutputParameterModel
+} from "cwlts/models";
 import {ExternalLinks} from "../../../cwl/external-links";
 import {ToolOutputListComponent} from "./tool-output-list.component";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-tool-output",
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    styleUrls: ["./output-list.component.scss"],
     template: `
         <ct-form-panel [collapsed]="false">
             <span class="tc-header">
@@ -21,7 +19,7 @@ import {ToolOutputListComponent} from "./tool-output-list.component";
             <div class="tc-body">
 
                 <!--Blank Tool Screen-->
-                <ct-blank-tool-state *ngIf="!readonly && !entries.length"
+                <ct-blank-tool-state *ngIf="!readonly && !model?.outputs.length"
                                      [title]="'Everything your tool generates as a result'"
                                      [buttonText]="'Add an Output'"
                                      [learnMoreURL]="helpLink"
@@ -29,11 +27,12 @@ import {ToolOutputListComponent} from "./tool-output-list.component";
                 </ct-blank-tool-state>
 
                 <!--List of entries-->
-                <ct-tool-output-list (update)="updateParent($event)"
-                                     [inputs]="inputs"
-                                     [entries]="entries"
+                <ct-tool-output-list [inputs]="inputs"
+                                     [(entries)]="model.outputs"
+                                     (entriesChange)="update.emit($event)"
                                      [location]="location"
                                      [context]="context"
+                                     [parent]="model"
                                      [readonly]="readonly">
                 </ct-tool-output-list>
 
@@ -60,19 +59,17 @@ export class ToolOutputsComponent extends ComponentBase {
     @Input()
     public readonly = false;
 
+    @Input()
+    public model: CommandLineToolModel;
+
     @Output()
-    public readonly update = new Subject();
+    public readonly update = new EventEmitter();
 
     @ViewChild(ToolOutputListComponent) outputList: ToolOutputListComponent;
 
-    private helpLink = ExternalLinks.toolOutput;
+    public helpLink = ExternalLinks.toolOutput;
 
     private addEntry() {
         this.outputList.addEntry();
-    }
-
-    private updateParent(fields) {
-        this.entries = fields.slice();
-        this.update.next(this.entries.slice());
     }
 }

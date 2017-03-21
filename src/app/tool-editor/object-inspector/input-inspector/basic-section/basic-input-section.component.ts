@@ -1,9 +1,15 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
-import {ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
-import {SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
+import {
+    ControlValueAccessor,
+    FormBuilder,
+    FormControl,
+    FormGroup,
+    NG_VALUE_ACCESSOR,
+    Validators
+} from "@angular/forms";
+import {CommandInputParameterModel} from "cwlts/models";
 import {ComponentBase} from "../../../../components/common/component-base";
 import {noop} from "../../../../lib/utils.lib";
-import {InputParameterTypeModel} from "cwlts/models";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -15,11 +21,6 @@ import {InputParameterTypeModel} from "cwlts/models";
             provide: NG_VALUE_ACCESSOR,
             useExisting: forwardRef(() => BasicInputSectionComponent),
             multi: true
-        },
-        {
-            provide: NG_VALIDATORS,
-            useExisting: forwardRef(() => BasicInputSectionComponent),
-            multi: true
         }
     ],
     template: `
@@ -29,7 +30,7 @@ import {InputParameterTypeModel} from "cwlts/models";
             <div class="form-group flex-container">
                 <label>Required</label>
                 <span class="align-right">
-                        <ct-toggle-slider [formControl]="basicSectionForm.controls['isRequired']"
+                        <ct-toggle-slider [formControl]="form.controls['isRequired']"
                                           [off]="'No'"
                                           [on]="'Yes'"
                                           [readonly]="readonly">
@@ -42,27 +43,25 @@ import {InputParameterTypeModel} from "cwlts/models";
                 <label class="form-control-label">ID</label>
                 <input type="text"
                        class="form-control"
-                       [formControl]="basicSectionForm.controls['propertyIdForm']">
+                       [formControl]="form.controls['id']">
             </div>
 
             <!--Input Type -->
-            <input-type-select [formControl]="basicSectionForm.controls['typeForm']"></input-type-select>
+            <input-type-select [formControl]="form.controls['typeForm']"></input-type-select>
 
             <!--Symbols-->
             <symbols-section class="form-group"
-                             *ngIf="isEnumType()"
-                             [formControl]="basicSectionForm.controls['symbols']"
+                             *ngIf="isType('enum')"
+                             [formControl]="form.controls['symbols']"
                              [readonly]="readonly">
             </symbols-section>
 
             <!--Include in command line -->
             <div class="form-group flex-container"
-                 *ngIf="!isMapType() 
-                                && basicSectionForm.controls['isBound']">
-
+                 *ngIf="!isType('map') && form.controls['isBound']">
                 <label>Include in command line</label>
                 <span class="align-right">
-                        <ct-toggle-slider [formControl]="basicSectionForm.controls['isBound']"
+                        <ct-toggle-slider [formControl]="form.controls['isBound']"
                                           [off]="'No'"
                                           [on]="'Yes'"
                                           [readonly]="readonly">
@@ -75,8 +74,14 @@ import {InputParameterTypeModel} from "cwlts/models";
                                    [context]="context"
                                    [propertyType]="input.type.type"
                                    [readonly]="readonly"
-                                   [formControl]="basicSectionForm.controls['inputBinding']">
+                                   [formControl]="form.controls['inputBinding']">
             </input-binding-section>
+
+            <ct-secondary-file *ngIf="isType('File') && form.controls['secondaryFiles']"
+                               [formControl]="form.controls['secondaryFiles']"
+                               [context]="context"
+                               [readonly]="readonly">
+            </ct-secondary-file>
         </form>
     `
 })
@@ -89,42 +94,94 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
     public readonly = false;
 
     /** The currently displayed property */
-    public input: SBDraft2CommandInputParameterModel;
+    public input: CommandInputParameterModel;
 
-    public basicSectionForm: FormGroup;
+    public form: FormGroup;
 
     private onTouched = noop;
 
     private propagateChange = noop;
 
-    private initSymbolsList: string[] = [];
-
     constructor(private formBuilder: FormBuilder) {
         super();
     }
 
-    writeValue(input: SBDraft2CommandInputParameterModel): void {
+    writeValue(input: CommandInputParameterModel): void {
         this.input = input;
 
-        this.basicSectionForm = this.formBuilder.group({
-            propertyIdForm: [{value: this.input.id, disabled: this.readonly}],
+        this.form = this.formBuilder.group({
+            id: [{value: this.input.id, disabled: this.readonly}],
             typeForm: [{value: this.input.type, disabled: this.readonly}, [Validators.required]],
             isBound: [this.input.isBound],
             isRequired: [!this.input.type.isNullable],
             inputBinding: [this.input],
-            symbols: [this.input.type.symbols ? this.input.type.symbols : this.initSymbolsList]
+            symbols: [this.input.type.symbols ? this.input.type.symbols : []]
         });
 
-        this.listenToIsBoundChanges();
-        this.listenToInputBindingChanges();
-        this.listenToTypeFormChanges();
-        this.listenToIdChanges();
+        // fetch secondaryFiles depending on their location
+        if (this.input.inputBinding.hasSecondaryFiles) {
+            this.form.addControl("secondaryFiles", new FormControl(this.input.inputBinding.secondaryFiles));
+        } else if (this.input.hasSecondaryFiles) {
+            this.form.addControl("secondaryFiles", new FormControl(this.input.secondaryFiles));
+        }
 
-        this.tracked = this.basicSectionForm.valueChanges.subscribe(value => {
+        // track separately because it causes changes to the rest of the form
+        this.listenToIsBoundChanges();
+
+        this.tracked = this.form.valueChanges.subscribe(value => {
+            // nullable changes
             this.input.type.isNullable = !value.isRequired;
 
-            if (value.symbols.length > 0 && this.isEnumType()) {
+            // symbols changes
+            if (value.symbols.length > 0 && this.isType("enum")) {
                 this.input.type.symbols = value.symbols;
+            }
+
+            // binding changes
+            if (value.inputBinding) {
+                this.input.updateInputBinding(value.inputBinding.inputBinding);
+                Object.assign(this.input.customProps, value.inputBinding.customProps);
+            }
+
+            // id changes
+            if (this.input.id !== value.id) {
+                this.input.id = value.id;
+
+                if (this.isType("enum") || this.isType("record")) {
+                    this.input.type.name = value.id;
+                }
+            }
+
+            // secondaryFiles changes
+            if(value.secondaryFiles) {
+                if (value.secondaryFiles && this.input.inputBinding.hasSecondaryFiles) {
+                    this.input.inputBinding.secondaryFiles = value.secondaryFiles;
+                } else if (value.secondaryFiles && this.input.hasSecondaryFiles) {
+                    this.input.secondaryFiles = value.secondaryFiles;
+                }
+            }
+
+            // type changes
+            if (value.type) {
+                this.input.type.setType(value.type.type);
+
+                if (value.type.type !== "array" && this.input.isBound) {
+                    this.input.inputBinding.itemSeparator = undefined;
+                }
+
+                if (this.isType("map") && this.input.isBound) {
+
+                    this.input.removeInputBinding();
+                    this.form.controls["isBound"].setValue(this.input.isBound);
+                }
+
+                if (!!value.type.items && this.input.type.type === "array") {
+                    this.input.type.items = value.type.items;
+                }
+
+                if (this.isType("enum") || this.isType("record")) {
+                    this.input.type.name = this.input.id;
+                }
             }
 
             this.input.validate();
@@ -140,78 +197,19 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
         this.onTouched = fn;
     }
 
-    validate() {
-        return this.basicSectionForm.valid ? null : {error: "Basic input section is not valid."}
-    }
-
     private listenToIsBoundChanges(): void {
-        this.tracked = this.basicSectionForm.controls["isBound"].valueChanges.subscribe((isBound: boolean) => {
+        this.tracked = this.form.controls["isBound"].valueChanges.subscribe((isBound: boolean) => {
             if (isBound) {
                 this.input.createInputBinding();
-                this.basicSectionForm.setControl("inputBinding", new FormControl(this.input));
-                this.listenToInputBindingChanges();
+                this.form.setControl("inputBinding", new FormControl(this.input));
             } else {
                 this.input.removeInputBinding();
-                this.basicSectionForm.removeControl("inputBinding");
+                this.form.removeControl("inputBinding");
             }
         });
     }
 
-    private listenToIdChanges(): void {
-        this.tracked = this.basicSectionForm.controls["propertyIdForm"].valueChanges
-            .subscribe((id: string) => {
-                this.input.id = id;
-
-                if (this.isEnumType() || this.isRecordType()) {
-                    this.input.type.name = id;
-                }
-            });
+    private isType(type: string) {
+        return this.input.type.type === type || this.input.type.items === type;
     }
-
-    private listenToInputBindingChanges(): void {
-        this.tracked = this.basicSectionForm.controls["inputBinding"].valueChanges
-            .subscribe((input: SBDraft2CommandInputParameterModel) => {
-                this.input.updateInputBinding(input.inputBinding);
-                Object.assign(this.input.customProps, input.customProps);
-            });
-    }
-
-    private listenToTypeFormChanges(): void {
-        this.tracked = this.basicSectionForm.controls["typeForm"].valueChanges
-            .subscribe((value: InputParameterTypeModel) => {
-                this.input.type.setType(value.type);
-
-                if (value.type !== "array" && this.input.isBound) {
-                    this.input.inputBinding.itemSeparator = undefined;
-                }
-
-                if (this.isMapType() && this.input.isBound) {
-
-                    this.input.removeInputBinding();
-                    this.basicSectionForm.controls["isBound"].setValue(this.input.isBound);
-                }
-
-                if (!!value.items && this.input.type.type === "array") {
-                    this.input.type.items = value.items;
-                }
-
-                if (this.isEnumType() || this.isRecordType()) {
-                    this.input.type.name = this.input.id;
-                }
-
-            });
-    }
-
-    private isEnumType() {
-        return this.input.type.type === "enum" || (this.input.type.type === "array" && this.input.type.items === "enum");
-    }
-
-    private isMapType() {
-        return this.input.type.type === "map" || (this.input.type.type === "array" && this.input.type.items === "map")
-    }
-
-    private isRecordType() {
-        return this.input.type.type === "record" || (this.input.type.type === "array" && this.input.type.items === "record");
-    }
-
 }

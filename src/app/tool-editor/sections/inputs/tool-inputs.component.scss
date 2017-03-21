@@ -1,6 +1,8 @@
 @import "../../../../assets/sass/variables";
 @import "../../../../assets/sass/mixins";
 
-ct-tool-input .form-section {
+:host {
+  /deep/ .form-section {
     @include cli-border($input-port-color);
+  }
 }
