@@ -5,16 +5,16 @@ import {TabSelectorComponent} from "../../../ui/tab-selector/tab-selector.compon
 @Component({
     selector: "ct-apps-panel",
     template: `
-        <ct-tab-selector distribute="equal" (activeChange)="changeTab($event)">
+        <ct-tab-selector distribute="equal" [active]="activeTab" (activeChange)="changeTab($event)">
             <ct-tab-selector-entry [tabName]="'myApps'">My Apps</ct-tab-selector-entry>
             <ct-tab-selector-entry [tabName]="'publicApps'">Public Apps</ct-tab-selector-entry>
         </ct-tab-selector>
 
-        <div class="panel-container" [hidden]="activeTab?.tabName !== 'myApps'">
+        <div class="panel-container" [hidden]="activeTab !== 'myApps'">
             <ct-my-apps-panel></ct-my-apps-panel>
         </div>
 
-        <div class="panel-container" [hidden]="activeTab?.tabName !== 'publicApps'">
+        <div class="panel-container" [hidden]="activeTab !== 'publicApps'">
             <ct-public-apps-panel></ct-public-apps-panel>
         </div>
     `,
@@ -23,7 +23,7 @@ import {TabSelectorComponent} from "../../../ui/tab-selector/tab-selector.compon
 export class AppsPanelComponent implements AfterViewInit {
 
 
-    activeTab;
+    activeTab = "myApps";
 
     @ViewChild(TabSelectorComponent)
     tabSelector: TabSelectorComponent;
@@ -32,8 +32,8 @@ export class AppsPanelComponent implements AfterViewInit {
     }
 
     changeTab(tab) {
-        if (tab) {
-            this.prefs.put("selectedAppPanel", tab.tabName);
+        if (tab !== this.activeTab) {
+            this.prefs.put("selectedAppPanel", tab);
         }
 
     }
@@ -48,9 +48,9 @@ export class AppsPanelComponent implements AfterViewInit {
             }
 
             setTimeout(() => {
-                const tab = this.tabSelector.activateTab(tabName);
-                console.log("Prefered panel is", tabName, tab);
-                this.activeTab = tab;
+
+                this.activeTab = tabName;
+
                 this.cdr.markForCheck();
                 this.cdr.detectChanges();
             });

@@ -26,11 +26,11 @@ import LoadOptions = jsyaml.LoadOptions;
     styleUrls: ["./workflow-editor.component.scss"],
     template: `
         <ct-action-bar>
-            <ct-tab-selector class="inverse" [distribute]="'auto'" [active]="codeTab" (activeChange)="switchTab($event)">
+            <ct-tab-selector class="inverse" [distribute]="'auto'" [active]="viewMode" (activeChange)="switchTab($event)">
                 <ct-tab-selector-entry [disabled]="!isValidCWL" [tabName]="'info'">App Info</ct-tab-selector-entry>
                 <ct-tab-selector-entry [disabled]="!isValidCWL" [tabName]="'graph'">Graph View</ct-tab-selector-entry>
                 <ct-tab-selector-entry [disabled]="!isValidCWL" [tabName]="'list'">List View</ct-tab-selector-entry>
-                <ct-tab-selector-entry [tabName]="'code'" #codeTab>Code</ct-tab-selector-entry>
+                <ct-tab-selector-entry [tabName]="'code'">Code</ct-tab-selector-entry>
             </ct-tab-selector>
 
             <div class="document-controls">
@@ -147,7 +147,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
     showInspector = true;
 
     /** Default view mode. */
-    viewMode;
+    viewMode = "code";
 
     /** Flag to indicate the document is loading */
     isLoading = true;
@@ -425,10 +425,9 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
         return this.statusControls;
     }
 
-    switchTab(tabEntry) {
+    switchTab(tabName) {
         setTimeout(() => {
-            this.viewMode = tabEntry.tab;
-        }, 200);
-        console.log("Set view mode to", this.viewMode);
+            this.viewMode = tabName;
+        });
     }
 }

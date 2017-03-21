@@ -13,9 +13,7 @@ export class LocalFileRepositoryService {
     }
 
     watch(directoryPath: string): Observable<any> {
-        console.log("Reading dir", directoryPath);
         return this.readDirectory(directoryPath).do(r => {
-            console.log("Reading", r);
         });
     }
 

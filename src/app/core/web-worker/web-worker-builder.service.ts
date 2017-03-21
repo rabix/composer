@@ -21,8 +21,6 @@ export class WebWorkerBuilderService {
             origin = origin.slice(0, -1);
         }
 
-        console.log("Compiled origin", origin, "from", document.location);
-
         const paths = scripts.map(s => s.startsWith("/") ? s.slice(1) : s)
             .map(s => "'" + [origin, s].join("/") + "'");
 

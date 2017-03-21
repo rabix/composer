@@ -177,8 +177,6 @@ export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase {
 
         event.stopPropagation();
 
-        console.log("----> Step Inspector Form Change", event);
-
         const formField = event.target as HTMLInputElement;
 
         // Get field path (for an example -> "inputId.[0].record.[2]")
@@ -211,8 +209,6 @@ export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase {
         const inputId = prefix.split(".")[0];
         const input   = this.step.in.find(i => i.id === inputId);
 
-        console.log("----> Step Value Update", inputId, value);
-
         // Show a message in the status bar about what's changed.
         this.statusBar.instant(`Updated step value of ${input ? input.label || input.id : inputId}.`);
 
@@ -225,7 +221,6 @@ export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase {
 
     private handleConnectionChange = (src, dest) => {
         if (dest && dest.parentStep && dest.parentStep.id === this.step.id) {
-            console.log(dest);
             this.cdr.markForCheck();
         }
     };

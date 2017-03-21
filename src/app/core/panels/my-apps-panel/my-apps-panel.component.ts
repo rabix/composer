@@ -328,7 +328,6 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
         this.tree.open.filter(n => n.type === "app")
             .flatMap(node => this.platform.getApp(node.data["sbg:id"]))
             .subscribe(app => {
-                console.log("Should open app", app);
                 this.workbox.openTab({
                     id: app.id,
                     title: Observable.of(app.label),
@@ -351,7 +350,6 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
         this.tree.open.filter(n => n.type === "file")
             .flatMap(node => this.dataGateway.getLocalFile(node.data.path), (node, content) => ({node, content}))
             .subscribe(data => {
-                console.log("Should open app", data);
                 const {node, content} = data;
 
                 this.workbox.openTab({

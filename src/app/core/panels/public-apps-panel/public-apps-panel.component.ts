@@ -122,7 +122,6 @@ export class PublicAppsPanelComponent extends DirectiveBase implements AfterView
         if (groupBy === this.grouping && !force) {
             return;
         }
-        console.log("Putting", groupBy);
         this.preferences.put("publicAppsGrouping", groupBy);
 
         this.expandedNodes.take(1).subscribe(expanded => {
@@ -267,7 +266,6 @@ export class PublicAppsPanelComponent extends DirectiveBase implements AfterView
         this.tree.open.filter(n => n.type === "app")
             .flatMap(node => this.platform.getApp(node.data["sbg:id"]))
             .subscribe(app => {
-                console.log("Should open app", app);
                 this.workbox.openTab({
                     id: app.id,
                     title: Observable.of(app.label),

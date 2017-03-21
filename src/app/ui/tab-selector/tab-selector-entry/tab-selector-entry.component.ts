@@ -18,7 +18,7 @@ export class TabSelectorEntryComponent {
     tabName: string;
 
     constructor(private selector: TabSelectorService) {
-        selector.selectedTab.subscribe(tab => this.active = tab === this);
+        selector.selectedTab.subscribe(tabName => this.active = this.tabName === tabName);
     }
 
     @HostListener("click")
@@ -26,6 +26,6 @@ export class TabSelectorEntryComponent {
         if (this.disabled) {
             return;
         }
-        this.selector.selectedTab.next(this);
+        this.selector.selectedTab.next(this.tabName);
     }
 }

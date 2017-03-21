@@ -129,8 +129,6 @@ export class JobEditorComponent implements OnChanges {
 
         event.stopPropagation();
 
-        console.log("----> Job Form Change", event);
-
         const formField = event.target as HTMLInputElement;
 
         // Make a copy of the current job so we can operate on it without modifying the shown data.
@@ -177,7 +175,6 @@ export class JobEditorComponent implements OnChanges {
      * Updates the job value for a given input and emits the updated job.
      */
     private jobValueUpdate(inputId, jobValue) {
-        console.log("----> Job Value Update", inputId, jobValue);
 
         const input = this.inputs.find(i => i.id === inputId);
 

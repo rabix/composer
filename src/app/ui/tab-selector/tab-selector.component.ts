@@ -6,11 +6,11 @@ import {
     ContentChildren,
     ElementRef,
     EventEmitter,
-    Input,
+    Input, OnChanges,
     OnInit,
     Output,
     QueryList,
-    Renderer,
+    Renderer, SimpleChanges,
     ViewChild
 } from "@angular/core";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
@@ -29,19 +29,19 @@ import {TabSelectorService} from "./tab-selector.service";
 
             <div *ngIf="distribute === 'equal'" class="underline-highlight"
                  [style.width.%]="100 / tabEntries.length"
-                 [style.marginLeft.%]="tabEntries.toArray().indexOf(active) * 100/tabEntries.length"></div>
+                 [style.marginLeft.%]="leftMarginPc"></div>
         </div>
     `,
     styleUrls: ["./tab-selector.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TabSelectorComponent extends DirectiveBase implements OnInit, AfterViewInit {
+export class TabSelectorComponent extends DirectiveBase implements OnInit, AfterViewInit, OnChanges {
 
     @Input()
-    active: any;
+    active: string;
 
     @Output()
-    activeChange = new EventEmitter<any>();
+    activeChange = new EventEmitter<string>();
 
     @Input()
     distribute: "equal" | "auto" = "equal";
@@ -55,6 +55,8 @@ export class TabSelectorComponent extends DirectiveBase implements OnInit, After
     @ContentChildren(TabSelectorEntryComponent, {read: ElementRef})
     tabEntryElements: QueryList<ElementRef>;
 
+    leftMarginPc = 0;
+
     constructor(private selector: TabSelectorService,
                 private cdr: ChangeDetectorRef,
                 private renderer: Renderer) {
@@ -62,51 +64,36 @@ export class TabSelectorComponent extends DirectiveBase implements OnInit, After
     }
 
     ngOnInit() {
-
-
+        this.activateTab(this.active);
     }
 
-    activateTab(tab: string | TabSelectorEntryComponent): TabSelectorEntryComponent {
-
-        let found;
-        if (typeof tab === "string") {
-            found = this.tabEntries.find((item) => item.tabName === tab);
-        } else {
-            found = this.tabEntries.find(item => item === tab);
-        }
-
-        this.selector.selectedTab.next(found);
-        return found;
+    activateTab(tabName: string) {
+        this.selector.selectedTab.next(tabName);
     }
 
     ngAfterViewInit() {
 
-        if (this.active) {
-            this.selector.selectedTab.next(this.active);
-        }
-        // if (!this.active) {
-        //     this.selector.selectedTab.next(this.tabEntries.toArray()[0]);
-        // }
-
         setTimeout(() => {
-            this.tracked = this.selector.selectedTab
-                .subscribe((tab) => {
-                    this.active = tab;
-                    this.activeChange.emit(tab);
+            this.tracked = this.selector.selectedTab.subscribe((tab) => {
 
-                    this.updateHighlight();
-                    this.cdr.markForCheck();
-                });
+                this.active = tab;
+                this.activeChange.emit(tab);
+
+                this.leftMarginPc = this.tabEntries.toArray().findIndex(t => t.tabName === this.active) * 100 / this.tabEntries.length;
+
+                // this.updateHighlight();
+                // this.cdr.markForCheck();
+            });
         });
 
     }
 
     private updateHighlight() {
-        if (this.distribute === "equal" || !this.active) {
+        if (this.distribute === "equal" || !this.active || !this.tabEntries) {
             return;
         }
 
-        const idx     = this.tabEntries.toArray().indexOf(this.active);
+        const idx     = this.tabEntries.toArray().findIndex(tab => tab.tabName === this.active);
         const entries = this.tabEntryElements.toArray();
 
         let offset = 0;
@@ -116,6 +103,10 @@ export class TabSelectorComponent extends DirectiveBase implements OnInit, After
 
         this.renderer.setElementStyle(this.autoHighlight.nativeElement, "width", entries[idx].nativeElement.clientWidth + "px");
         this.renderer.setElementStyle(this.autoHighlight.nativeElement, "marginLeft", offset + "px");
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        this.updateHighlight();
     }
 
 
