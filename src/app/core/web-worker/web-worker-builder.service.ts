@@ -15,12 +15,12 @@ export class WebWorkerBuilderService {
     private compile(fn: Function, scripts = [], context = {}) {
         let [origin] = document.location.href.replace("/index.html", "").split("#");
 
+        [origin] = origin.split("?");
+
         if (origin.endsWith("/")) {
             origin = origin.slice(0, -1);
         }
-        if (origin.endsWith("?")) {
-            origin = origin.slice(0, -1);
-        }
+
         console.log("Compiled origin", origin, "from", document.location);
 
         const paths = scripts.map(s => s.startsWith("/") ? s.slice(1) : s)
