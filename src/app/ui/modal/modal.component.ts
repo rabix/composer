@@ -2,175 +2,138 @@ import {
     Component,
     ComponentFactory,
     ComponentRef,
+    ElementRef,
     forwardRef,
     HostBinding,
     HostListener,
     Inject,
     Injector,
+    Renderer,
+    TemplateRef,
     ViewChild,
-    ViewContainerRef,
-    ViewEncapsulation
+    ViewContainerRef
 } from "@angular/core";
+import {Observable} from "rxjs/Observable";
+import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {ModalOptions} from "./modal-options";
 import {ModalService} from "./modal.service";
-import {BehaviorSubject, Observable, Subscription} from "rxjs/Rx";
-
-export interface ModalOptions {
-    title?: string;
-    backdrop?: boolean;
-    closeOnOutsideClick?: boolean;
-    closeOnEscape?: boolean;
-    componentState?: Object;
-}
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-modal",
-    styleUrls: ["./modal.component.scss"],
     template: `
-        <div #container class="ct-modal-frame">
-            <div class="ct-modal-header"
-                 draggable="true"
-                 (dragstart)="onDragStart($event)"
-                 (dragend)="onDragEnd($event)">
-                {{ title  }}
-            </div>
+        <div #container class="ui-modal-frame">
+            <div #header class="pl-1 ui-modal-header">{{ title }}</div>
             <div #nestedComponent></div>
         </div>
-    `
+    `,
+    styleUrls: ["./modal.component.scss"],
 })
-export class ModalComponent {
+export class ModalComponent extends DirectiveBase {
 
     @HostBinding("class.backdrop")
-    private backdrop: boolean;
-
-    @ViewChild("nestedComponent", {read: ViewContainerRef})
-    private nestedComponentContainer: ViewContainerRef;
-
-    @ViewChild("container", {read: ViewContainerRef})
-    private modalWindow: ViewContainerRef;
+    public backdrop = false;
 
     /** Should the modal clouse when you click on the area outside of it? */
-    public closeOnOutsideClick: boolean;
+    public closeOnOutsideClick = false;
 
     /** Title of the modal window */
-    public title: "";
+    public title: string;
 
     /** When you press the "ESC" key, should the modal be closed? */
-    public closeOnEscape: boolean;
+    public closeOnEscape: true;
 
     /** Holds the ComponentRef object of a component that is injected and rendered inside the modal */
     private nestedComponentRef: ComponentRef<any>;
 
-    /** Stream of drag events */
-    private dragSubscription: Subscription;
+    @ViewChild("nestedComponent", {read: ViewContainerRef})
+    private nestedComponent: ViewContainerRef;
 
-    /** Subscriptions to dispose when the modal closes */
-    private subscriptions: Subscription[];
+    @ViewChild("container", {read: ViewContainerRef})
+    private modalWindow: ViewContainerRef;
+
+    @ViewChild("header", {read: ElementRef})
+    private headerElement: ElementRef;
 
     constructor(@Inject(forwardRef(() => ModalService))
                 private service: ModalService,
+                // private domEvents: DomEventsService,
+                private renderer: Renderer,
+                private hostElement: ElementRef,
                 private injector: Injector) {
+        super();
 
-        this.backdrop = false;
-        this.closeOnOutsideClick = true;
-        this.closeOnEscape = true;
-        this.title = "";
-
-        this.subscriptions = [];
-
-        if (this.closeOnEscape) {
-            this.subscriptions.push(Observable.fromEvent(document, "keyup")
-                .map((ev: KeyboardEvent) => ev.which)
-                .filter(key => key === 27)
-                .subscribe(ev => this.service.close()));
-        }
+        this.tracked = Observable.fromEvent(document, "keyup")
+            .filter(() => this.closeOnEscape)
+            .map((ev: KeyboardEvent) => ev.which)
+            .filter(key => key === 27)
+            .subscribe(() => this.service.close());
     }
 
     @HostListener("click", ["$event.target"])
     private onClick(target) {
-        const clickInsideTheModal = this.modalWindow.element.nativeElement.contains(target);
-        if (!clickInsideTheModal && this.closeOnOutsideClick) {
+        const clickedOutsideModal = !this.modalWindow.element.nativeElement.contains(target);
+
+        if (this.closeOnOutsideClick && clickedOutsideModal) {
             this.service.close();
         }
     }
 
-    private onDragStart(event) {
-        const {clientX: startX, clientY: startY} = event;
+    // ngAfterViewInit() {
 
-        const style = this.modalWindow.element.nativeElement.style;
-        const top = parseFloat(style.top);
-        const left = parseFloat(style.left);
+    // this.tracked = this.domEvents.onDrag(this.headerElement.nativeElement).subscribe(dragObs => {
+    //   dragObs.pairwise().map((moves: [MouseEvent, MouseEvent]) => ({
+    //     dx: moves[1].clientX - moves[0].clientX,
+    //     dy: moves[1].clientY - moves[0].clientY
+    //   })).subscribe((ev) => {
+    //     this.reposition({left: ev.dx, top: ev.dy});
+    //   });
+    // });
+    // }
 
-        const img = document.createElement("img");
-        img.src = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
-        event.dataTransfer.setDragImage(img, 0, 0);
+    public configure(config: ModalOptions) {
 
-
-        this.dragSubscription = Observable
-            .fromEvent(event.target, "drag")
-            .filter((event: MouseEvent) => event.pageX !== 0 && event.pageY !== 0)
-            .subscribe((event: MouseEvent) => {
-                this.reposition({
-                    top: top + (event.clientY - startY) + "px",
-                    left: left + (event.clientX - startX) + "px"
-                })
-            });
-
-        this.reposition();
-    }
-
-    private onDragEnd(event) {
-        this.dragSubscription.unsubscribe();
-    }
-
-    public configure<T>(config: ModalOptions) {
-        this.backdrop = config.backdrop;
         Object.assign(this, config);
+        if (typeof config.title === "string") {
+            this.title = config.title;
+        }
     }
 
-    public produce<T>(factory: ComponentFactory<T>, componentState?: Object): ComponentRef<T> {
+    public produce<T>(factory: ComponentFactory<T>): ComponentRef<T> {
 
-        this.nestedComponentRef = this.nestedComponentContainer.createComponent(factory, 0, this.injector);
+        this.nestedComponentRef = this.nestedComponent.createComponent(factory, 0, this.injector);
 
-        if (typeof componentState === "object") {
-            Object.assign(this.nestedComponentRef.instance, componentState);
-        }
-
-        Observable.of("Reposition me right away!")
-            .merge(Observable.fromEvent(window, "resize").debounceTime(50))
-            .subscribe(s => {
-                this.reposition();
-            });
+        Observable.of(1).merge(Observable.fromEvent(window, "resize").debounceTime(50)).subscribe(() => {
+            this.reposition();
+        });
 
         return this.nestedComponentRef;
     }
 
-    private reposition(tweak?: any) {
+    public embed<T>(template: TemplateRef<T>): void {
 
-        const el = this.modalWindow.element.nativeElement as HTMLElement;
+        this.tracked = this.nestedComponent.createEmbeddedView(template);
+        this.reposition();
+    }
 
-        el.style.position = "absolute";
+    private reposition(tweak?: { left: number, top: number }) {
 
-        const {clientWidth: wWidth, clientHeight: wHeight} = document.body;
+        const el                                           = this.modalWindow.element.nativeElement as HTMLElement;
+        const {clientWidth: wWidth, clientHeight: wHeight} = this.hostElement.nativeElement;
         const {clientWidth: mWidth, clientHeight: mHeight} = el;
-
-        el.style.maxWidth = wWidth - 50 + "px";
-        el.style.maxHeight = wHeight - 50 + "px";
+        const styleUpdate                                  = {
+            position: "absolute",
+            maxWidth: wWidth - 50,
+            top: (wHeight - mHeight) / 4 + "px",
+            left: (wWidth - mWidth) / 2 + "px"
+        };
 
         if (tweak) {
-            el.style.top = tweak.top;
-            el.style.left = tweak.left;
-        } else {
-            // Move the modal a bit more towards the top, looks better that way
-            el.style.top = (wHeight - mHeight) / 4 + "px";
-            el.style.left = (wWidth - mWidth) / 2 + "px";
+            Object.assign(styleUpdate, {
+                top: Number(el.style.top) + tweak.top + "px",
+                left: Number(el.style.left) + tweak.left + "px",
+            });
         }
-    }
 
-    ngOnDestroy() {
-        this.subscriptions.forEach(sub => sub.unsubscribe());
-        this.nestedComponentRef.destroy();
+        Object.keys(styleUpdate).forEach(k => this.renderer.setElementStyle(el, k, styleUpdate[k]));
     }
-
 }

@@ -81,8 +81,8 @@ export class TabSelectorComponent extends DirectiveBase implements OnInit, After
 
                 this.leftMarginPc = this.tabEntries.toArray().findIndex(t => t.tabName === this.active) * 100 / this.tabEntries.length;
 
-                // this.updateHighlight();
-                // this.cdr.markForCheck();
+                this.updateHighlight();
+                this.cdr.markForCheck();
             });
         });
 

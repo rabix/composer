@@ -21,6 +21,7 @@ const defaults = {
             token: "",
         } as ProfileCredentialEntry
     ] as ProfileCredentials,
+
     lastScanTime: 0,
     selectedAppPanel: "my-apps", // Can be “my-apps” or “public-apps”,
     publicAppsGrouping: "toolkit", // Can “toolkit” or “categories”

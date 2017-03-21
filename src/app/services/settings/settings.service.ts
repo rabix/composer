@@ -1,16 +1,24 @@
 import {Injectable} from "@angular/core";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {UserPreferencesService} from "../storage/user-preferences.service";
+import {PlatformAPI} from "../api/platforms/platform-api.service";
+import {letProto} from "rxjs/operator/let";
 
 @Injectable()
 export class SettingsService {
 
     public platformConfiguration = new ReplaySubject<{
+        profile: string,
         url: string;
         token: string;
     }>(1);
 
     public validity = new ReplaySubject<boolean>(1);
+
+    static urlToProfile(url) {
+        const profile = url.match("https:\/\/(.*?)\.sbgenomics\.com")[1].toLowerCase();
+        return profile === "igor" ? "default" : profile;
+    }
 
     constructor(private profile: UserPreferencesService) {
 
@@ -22,16 +30,16 @@ export class SettingsService {
                 sessionID: null,
                 token: "",
             }
-        ]).map(prefs => prefs[0]).subscribe(prefs => {
-            if (!prefs || !prefs.url || !prefs.token) {
-                return this.validity.next(false);
-            }
-            this.platformConfiguration.next(prefs);
-        });
+        ])
+            .map(prefs => prefs[0])
+            .subscribe(prefs => {
 
-        // this.platformConfiguration.subscribe(settings => {
-        //     this.profile.put("platformConnectionSettings", settings);
-        //     this.validity.next(true);
-        // });
+                if (!prefs || !prefs.url || !prefs.token) {
+                    return this.validity.next(false);
+                }
+
+                this.platformConfiguration.next(prefs);
+            });
+
     }
 }

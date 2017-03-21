@@ -4,9 +4,9 @@ import {noop} from "../../../lib/utils.lib";
 import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 import {ModelExpressionEditorComponent} from "../../../editor-common/expression-editor/model-expression-editor.component";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
-import {ModalService} from "../../../ui/modal/modal.service";
 import {ACE_MODE_MAP} from "../../../ui/code-editor-new/ace-mode-map";
 import {MultilangCodeEditorComponent} from "../../../ui/code-editor/multilang-code-editor.component";
+import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -129,7 +129,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
     }
 
     private openLiteralEditor() {
-        const editor = this.modal.show(MultilangCodeEditorComponent, {
+        const editor = this.modal.fromComponent(MultilangCodeEditorComponent, {
             backdrop: true,
             closeOnOutsideClick: false,
             title: "Edit File Content"
@@ -174,7 +174,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
         if (!action) return;
 
         if (action === "edit") {
-            const editor = this.modal.show(ModelExpressionEditorComponent, {
+            const editor = this.modal.fromComponent(ModelExpressionEditorComponent, {
                 backdrop: true,
                 closeOnOutsideClick: false,
                 title: "Edit Expression"

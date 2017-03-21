@@ -106,7 +106,7 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
         }
 
         if (obj) {
-            this.model = obj;
+            this.model  = obj;
             this.isExpr = obj.isExpression;
 
             this.model.evaluate(this.context).then(res => {
@@ -168,7 +168,7 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
         if (!action) return;
 
         if (action === "edit") {
-            const editor = this.modal.show(ModelExpressionEditorComponent, {
+            const editor = this.modal.fromComponent(ModelExpressionEditorComponent, {
                 backdrop: true,
                 closeOnOutsideClick: false,
                 title: "Edit Expression"
@@ -179,7 +179,7 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
             const cachedValue = this.model.serialize();
             const cachedType = this.model.type;
 
-            editor.model = this.model;
+            editor.model   = this.model;
             editor.context = this.context;
             editor.action.first().subscribe(action => {
                 if (action === "save") {
@@ -212,7 +212,7 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
             }).then(() => {
                 this.model.setValue("", this.type);
                 this.model.result = null;
-                this.isExpr = false;
+                this.isExpr       = false;
                 event.stopPropagation();
                 this.onChange(this.model);
             }, noop);

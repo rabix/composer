@@ -39,7 +39,8 @@
 
     .auto {
         /deep/ ct-tab-selector-entry {
-            flex-basis: auto;
+            flex: 0 0 auto;
+            //flex-basis: auto;
             padding: 0 1em;
         }
     }

@@ -19,10 +19,11 @@ export class PlatformAPI {
     private platformServices: { brood: string, watson: string, gatekeeper: string } = {} as any;
 
     constructor(private http: Http, private settings: SettingsService) {
+
         this.settings.platformConfiguration.subscribe(config => {
 
             Object.keys(ENVP.serviceRoutes).forEach(serviceName => {
-                this.platformServices[serviceName] = this.getServiceUrl(config.url, serviceName);
+                this.platformServices[serviceName] = PlatformAPI.getServiceUrl(config.url, serviceName);
             });
 
             // If we do not reset the session ID upon the connection change,
@@ -40,7 +41,7 @@ export class PlatformAPI {
 
 
     public checkToken(platform: string, token: string) {
-        const url = this.getServiceUrl(platform, "gatekeeper");
+        const url = PlatformAPI.getServiceUrl(platform, "gatekeeper");
 
         return this.http.get(url + "/auth_token/check", {
             headers: new Headers({
@@ -49,14 +50,16 @@ export class PlatformAPI {
         }).catch(res => Observable.of(res)).map(res => {
 
             if (res.status === 0) {
+                this.settings.validity.next(false);
                 return "invalid_platform";
             }
 
+            this.settings.validity.next(res.ok);
             return res.ok;
         });
     }
 
-    private getServiceUrl(platformUrl: string, serviceName: string) {
+    static getServiceUrl(platformUrl: string, serviceName: string) {
         const isVayu    = platformUrl.indexOf("-vayu.sbgenomics.com") !== -1;
         const isStaging = platformUrl.indexOf("staging-igor.sbgenomics.com") !== -1;
 

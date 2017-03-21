@@ -15,7 +15,7 @@ import {noop} from "../lib/utils.lib";
 import {PlatformAPI} from "../services/api/platforms/platform-api.service";
 import {UserPreferencesService} from "../services/storage/user-preferences.service";
 import {DataEntrySource} from "../sources/common/interfaces";
-import {ModalService} from "../ui/modal/modal.service";
+import {ModalService} from "../ui/modal-old/modal.service";
 import {DirectiveBase} from "../util/directive-base/directive-base";
 
 import LoadOptions = jsyaml.LoadOptions;

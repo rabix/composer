@@ -132,9 +132,9 @@ export class SettingsComponent extends DirectiveBase implements OnInit {
     }
 
     onSubmit() {
-        const profile = this.form.get("url").value.match("https:\/\/(.*?)\.sbgenomics\.com")[1];
+        const profile = SettingsService.urlToProfile(this.form.get("url").value);
         this.profile.put("credentials", [{
-            profile: profile === "igor" ? "default" : profile,
+            profile: profile,
             ...this.form.getRawValue()
         }]);
     }
@@ -161,5 +161,6 @@ export class SettingsComponent extends DirectiveBase implements OnInit {
             control.setValue(`https://${control.value}.sbgenomics.com`);
         }
     }
+
 
 }

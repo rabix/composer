@@ -84,7 +84,7 @@ module.exports         = {
     scanPlatforms: (data, callback) => {
 
         const {credentials} = data;
-console.log("Scanning with credentuals", credentials);
+
         const promises = credentials.map(source => {
 
             return new Promise((resolve, reject) => {

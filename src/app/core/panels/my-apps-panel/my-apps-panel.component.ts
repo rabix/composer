@@ -18,12 +18,19 @@ import {WorkboxService} from "../../workbox/workbox.service";
 import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.component";
 
 import * as Yaml from "js-yaml";
+import {ModalService} from "../../../ui/modal/modal.service";
+import {AddSourceModalComponent} from "../../modals/add-source-modal/add-source-modal.component";
 
 @Component({
     selector: "ct-my-apps-panel",
     template: `
-        <ct-search-field class="m-1" [formControl]="searchContent"
-                         [placeholder]="'Search My Apps...'"></ct-search-field>
+        <ct-search-field class="m-1" [formControl]="searchContent" [placeholder]="'Search My Apps...'"></ct-search-field>
+
+        <div>
+            <button class="btn btn-link btn-primary app-sources-btn" (click)="openAddAppSourcesDialog()">
+                <i class="fa fa-fw fa-plus"></i> Open a Project...
+            </button>
+        </div>
 
         <div class="scroll-container">
             <div *ngIf="searchContent?.value && searchResults" class="search-results">
@@ -68,9 +75,6 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
 
     expandedNodes: Observable<string[]>;
 
-    @ViewChild(TreeViewComponent)
-    treeComponent: TreeViewComponent;
-
     @ViewChildren(NavSearchResultComponent, {read: ElementRef})
     private searchResultComponents: QueryList<ElementRef>;
 
@@ -79,6 +83,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                 private platform: PlatformAPI,
                 private cdr: ChangeDetectorRef,
                 private workbox: WorkboxService,
+                private modal: ModalService,
                 private dataGateway: DataGatewayService) {
         super();
 
@@ -367,5 +372,14 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                 });
 
             });
+    }
+
+    openAddAppSourcesDialog() {
+        console.log("Clicked!");
+        const component = this.modal.fromComponent(AddSourceModalComponent, {
+            title: "Add App Sources...",
+            backdrop: true
+        });
+        console.log("Making a modal", component);
     }
 }

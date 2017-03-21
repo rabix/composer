@@ -64,8 +64,8 @@ export class UpdateStepModal {
 
     ngOnInit() {
 
-        const urlApp = this.step.run.customProps['sbg:id'];
-        const urlProject = urlApp.split('/').splice(0, 2).join('/');
+        const urlApp     = this.step.run.customProps["sbg:id"];
+        const urlProject = urlApp.split("/").splice(0, 2).join("/");
 
         this.settings.platformConfiguration.first().map(settings => settings.url).subscribe((url) => {
             this.link = `${url}/u/${urlProject}/apps/#${urlApp}`;

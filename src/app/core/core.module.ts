@@ -22,9 +22,14 @@ import {SettingsButtonComponent} from "./workbox/settings-button.component";
 import {WorkboxComponent} from "./workbox/workbox.component";
 import {GettingStartedComponent} from "../components/onboarding/getting-started.component";
 import {PublicAppsPanelComponent} from "./panels/public-apps-panel/public-apps-panel.component";
+import {AddSourceModalComponent} from "./modals/add-source-modal/add-source-modal.component";
+import { PlatformConnectionFormComponent } from './settings/platform-connection-form/platform-connection-form.component';
+import {PlatformAPI} from "../services/api/platforms/platform-api.service";
 
 @NgModule({
-    entryComponents: [],
+    entryComponents: [
+        AddSourceModalComponent
+    ],
     declarations: [
         LayoutComponent,
         LogoComponent,
@@ -38,7 +43,9 @@ import {PublicAppsPanelComponent} from "./panels/public-apps-panel/public-apps-p
         NavSearchResultComponent,
         WelcomeTabComponent,
         GettingStartedComponent,
-        NewFileTabComponent
+        NewFileTabComponent,
+        AddSourceModalComponent,
+        PlatformConnectionFormComponent
     ],
     exports: [
         LogoComponent,
@@ -48,6 +55,7 @@ import {PublicAppsPanelComponent} from "./panels/public-apps-panel/public-apps-p
         GuidService,
         WebWorkerBuilderService,
         ModalService,
+        PlatformAPI,
     ],
     imports: [
         BrowserModule,

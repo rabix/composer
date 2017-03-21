@@ -4,7 +4,7 @@ import {StepModel, WorkflowModel} from "cwlts/models";
 import {UpdateStepModal} from "../../../components/modal/custom/update-step-modal.component";
 import {PlatformAPI} from "../../../services/api/platforms/platform-api.service";
 import {UserPreferencesService} from "../../../services/storage/user-preferences.service";
-import {ModalService} from "../../../ui/modal/modal.service";
+import {ModalService} from "../../../ui/modal-old/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({

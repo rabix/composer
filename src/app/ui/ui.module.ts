@@ -30,15 +30,16 @@ import {TreeViewComponent} from "./tree-view/tree-view.component";
 import {TabComponent} from "./tabs/tab.component";
 import {TabsComponent} from "./tabs/tabs.component";
 import {BlockLoaderComponent} from "./block-loader/block-loader.component";
-import { TabSelectorEntryComponent } from "./tab-selector/tab-selector-entry/tab-selector-entry.component";
+import {TabSelectorEntryComponent} from "./tab-selector/tab-selector-entry/tab-selector-entry.component";
 import {DropDownMenuComponent} from "./dropdown-button/dropdown-menu.component";
 import {AutoCompleteComponent} from "./auto-complete/auto-complete.component";
+import {ModalComponent} from "./modal/modal.component";
 
 @NgModule({
     imports: [
         CommonModule,
         FormsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
     ],
     exports: [
         CodeEditorComponent,
@@ -67,13 +68,15 @@ import {AutoCompleteComponent} from "./auto-complete/auto-complete.component";
         TabComponent,
         TabsComponent,
         TabSelectorEntryComponent,
-        AutoCompleteComponent
+        AutoCompleteComponent,
+        ModalComponent,
     ],
 
     entryComponents: [
         TooltipContentComponent,
         DropDownButtonComponent,
-        DropDownMenuComponent
+        DropDownMenuComponent,
+        ModalComponent,
     ],
 
     declarations: [
@@ -86,6 +89,7 @@ import {AutoCompleteComponent} from "./auto-complete/auto-complete.component";
         DisableFormControlDirective,
         CodePreviewComponent,
         CodeEditorComponent,
+        ModalComponent,
         ContextDirective,
         DragDirective,
         DragOverDirective,

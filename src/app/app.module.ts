@@ -26,8 +26,8 @@ import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
         DomEventService,
         GuidService,
         IpcService,
-        SettingsService,
         PlatformAPI,
+        SettingsService,
         DataGatewayService,
     ],
     declarations: [

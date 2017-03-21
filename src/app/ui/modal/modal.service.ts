@@ -1,170 +1,143 @@
-import {ComponentFactoryResolver, ComponentRef, Injectable, ViewContainerRef} from "@angular/core";
+import {ComponentFactoryResolver, ComponentRef, Injectable, TemplateRef, ViewContainerRef} from "@angular/core";
+import {ModalOptions} from "./modal-options";
 import {Subject} from "rxjs";
-import {CheckboxPromptComponent} from "./common/checkbox-prompt.component";
-import {ConfirmComponent} from "./common/confirm.component";
-import {ModalComponent, ModalOptions} from "./modal.component";
-import {PromptComponent} from "./common/prompt.component";
-import {ConfirmationParams, PromptParams} from "./types";
+import {ModalComponent} from "./modal.component";
+import {ConfirmComponent} from "../modal-old/common/confirm.component";
+import {PromptComponent} from "../modal-old/common/prompt.component";
+import {FormControl} from "@angular/forms";
 
 @Injectable()
 export class ModalService {
 
-    /**
-     * This needs to be hack-set from a component that has the view ref.
-     * Still not gracefully solved with Angular.
-     * {@link MainComponent.constructor}
-     */
-    public rootViewRef: ViewContainerRef;
+    private rootViewContainer: ViewContainerRef;
 
     private modalComponentRef: ComponentRef<ModalComponent>;
 
-    private onClose = new Subject<any>();
+    private onClose = new Subject();
 
     constructor(private resolver: ComponentFactoryResolver) {
 
-        this.onClose.subscribe(_ => {
-            this.cleanComponentRef();
-        });
+        this.onClose.subscribe(() => this.cleanComponentRef());
     }
 
-    /**
-     * Open a modal window with the given component inside it.
-     */
-    public show<T>(component: { new(...args: any[]): T; }, options?: ModalOptions): T {
+    public setViewContainer(view: ViewContainerRef): void {
+        this.rootViewContainer = view;
+    }
 
-        const config = Object.assign({
+    public close() {
+        this.onClose.next();
+    }
+
+    public fromComponent<T>(component: { new (...args: any[]): T; }, config?: Partial<ModalOptions>): T {
+
+        this.close();
+
+        config = {
             backdrop: false,
             closeOnEscape: true,
             closeOnOutsideClick: true,
-            componentState: {},
             title: "",
-        } as ModalOptions, options);
+            ...config
+        };
 
-        // If some other modal is open, close it
-        this.close();
-
-        const modalFactory = this.resolver.resolveComponentFactory(ModalComponent);
+        const modalFactory     = this.resolver.resolveComponentFactory(ModalComponent);
         const componentFactory = this.resolver.resolveComponentFactory(component);
 
-        this.modalComponentRef = this.rootViewRef.createComponent(modalFactory);
-        this.modalComponentRef.instance.configure<T>(config);
+        this.modalComponentRef = this.rootViewContainer.createComponent(modalFactory);
 
-        const componentRef = this.modalComponentRef.instance.produce<T>(componentFactory, config.componentState || {});
+        this.modalComponentRef.instance.configure(config as ModalOptions);
+
+        const componentRef = this.modalComponentRef.instance.produce(componentFactory);
 
         return componentRef.instance;
     }
 
-    /**
-     * Shows a confirmation modal window.
-     *
-     * @returns {Promise} Promise that will resolve if user confirms the prompt and reject if user cancels
-     */
-    public confirm(params: ConfirmationParams): Promise<any> {
-        const parameters = Object.assign({
-            title: "Confirm",
-            content: "Are you sure?",
-            confirmationLabel: "Yes",
-            cancellationLabel: "Cancel"
-        }, params);
+    public fromTemplate<T>(template: TemplateRef<T>, config?: Partial<ModalOptions>): void {
+        this.close();
+        config = {
+            backdrop: false,
+            closeOnEscape: true,
+            closeOnOutsideClick: true,
+            title: "",
+            ...config
+        };
 
-        return this.wrap<true>((resolve, reject) => {
+        const modalFactory     = this.resolver.resolveComponentFactory(ModalComponent);
+        this.modalComponentRef = this.rootViewContainer.createComponent(modalFactory);
 
-            // Show the ConfirmComponent as a modal
-            const ref = this.show<ConfirmComponent>(ConfirmComponent, {title: parameters.title});
+        this.modalComponentRef.instance.configure(config as ModalOptions);
 
-            // Assign passed parameters to it
-            Object.assign(ref, parameters);
+        this.modalComponentRef.instance.embed(template);
+    }
 
-            // Close the modal when any action is triggered on its output
-            ref.decision.subscribe(accepted => {
+    private wrapPromise<T>(handler: (resolve, reject) => void): Promise<T> {
+        const insideClosing = new Promise((resolve, reject) => {
+            handler(resolve, reject);
+        });
+
+        const outsideClosing = new Promise((resolve, reject) => {
+            this.onClose.first().subscribe(reject);
+        });
+
+        return Promise.race([insideClosing, outsideClosing]);
+    }
+
+    private cleanComponentRef() {
+
+        if (this.modalComponentRef) {
+            this.modalComponentRef.destroy();
+        }
+
+    }
+
+    confirm(params: {
+                title?: string,
+                content?: string,
+                confirmationLabel?: string,
+                cancellationLabel ?: string
+            }) {
+
+        return this.wrapPromise((resolve, reject) => {
+            const component = this.fromComponent(ConfirmComponent, {
+                title: params.title || "Are you sure?"
+            });
+
+            Object.assign(component, {
+                content: "Are you sure?",
+                confirmationLabel: "Yes",
+                cancellationLabel: "Cancel"
+            }, params);
+
+            component.decision.subscribe(accepted => {
                 accepted ? resolve(true) : reject();
                 this.close();
             });
         });
     }
 
-    /**
-     * Prompts the user to enter a single string value
-     */
-    public prompt(params: PromptParams): Promise<string> {
+    prompt(params: {
+               title?: string,
+               content?: string,
+               confirmationLabel?: string,
+               cancellationLabel ?: string,
+               formControl: FormControl,
+           }) {
 
-        // Set the default values for params that are not given
-        const parameters = Object.assign({
-            title: "",
-            content: "Please enter the value:",
-            confirmationLabel: "Submit",
-            cancellationLabel: "Cancel",
-            formControl: null
-        } as PromptParams, params);
+        return this.wrapPromise((resolve, reject) => {
+            const component = this.fromComponent(PromptComponent, {
+                title: params.title || "Are you sure?"
+            });
 
-        // Handle actions inside the modal that might result in it closing - submission and cancelling
-        return this.wrap<string>((resolve, reject) => {
+            Object.assign(component, {
+                content: "Are you sure?",
+                confirmationLabel: "Yes",
+                cancellationLabel: "Cancel"
+            }, params);
 
-            // Show the PromptComponent in the modal
-            const ref = this.show<PromptComponent>(PromptComponent, {title: parameters.title});
-
-            // Pass given parameters to the PromptComponent instance
-            Object.assign(ref, parameters);
-
-            // Watch for the closing action of the component
-            ref.decision.subscribe(content => {
-                content !== false ? resolve(content) : reject();
+            component.decision.subscribe(accepted => {
+                accepted ? resolve(true) : reject();
                 this.close();
             });
         });
-    }
-
-    public checkboxPrompt(params = {
-                              title: "Confirm",
-                              content: "Are you sure?",
-                              confirmationLabel: "Yes",
-                              cancellationLabel: "Cancel",
-                              checkboxLabel: "Don't show this again"
-                          }) {
-        return this.wrap<boolean>((resolve, reject) => {
-            const ref = this.show<CheckboxPromptComponent>(CheckboxPromptComponent, {title: params.title});
-            Object.assign(ref, params);
-
-            ref.decision.subscribe(content => {
-                content !== null ? resolve(content) : reject();
-                this.close();
-            });
-
-        });
-    }
-
-    /**
-     * Close the modal in case one is open.
-     */
-    public close() {
-        this.onClose.next(true);
-    }
-
-    /**
-     * Cleans up the reference to the underlying componentRef
-     */
-    private cleanComponentRef() {
-        if (this.modalComponentRef) {
-            this.modalComponentRef.destroy();
-        }
-    }
-
-    /**
-     * Wraps up the concrete modal component's business logic as a promise
-     */
-    private wrap<T>(handler: (resolve, reject) => void): Promise<T> {
-
-        // Wrap up the original component business logic handler
-        const insideClosings = new Promise((resolve, reject) => {
-            handler(resolve, reject);
-        });
-
-        // Handle closing the modal from outside (esc key, click on backdrop)
-        const outsideClosings = new Promise((resolve, reject) => {
-            this.onClose.first().subscribe(reject);
-        });
-
-        // Whichever closing action happens (resolves/rejects) first, use that one, and discard the other.
-        return Promise.race([insideClosings, outsideClosings]);
     }
 }

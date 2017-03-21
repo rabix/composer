@@ -27,7 +27,7 @@ import {
 } from "../editor-common/cwl-schema-validation-worker/cwl-schema-validation-worker.service";
 import LoadOptions = jsyaml.LoadOptions;
 import {DirectiveBase} from "../util/directive-base/directive-base";
-import {ModalService} from "../ui/modal/modal.service";
+import {ModalService} from "../ui/modal-old/modal.service";
 import {WorkboxTab} from "../core/workbox/workbox-tab.interface";
 import {SettingsService} from "../services/settings/settings.service";
 import {SystemService} from "../platform-providers/system.service";

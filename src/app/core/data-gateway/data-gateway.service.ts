@@ -4,25 +4,28 @@ import {ReplaySubject} from "rxjs/ReplaySubject";
 import {ProfileCredentialEntry, ProfileCredentials} from "../../../electron/src/user-profile/profile";
 import {IpcService} from "../../services/ipc.service";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
+import {BehaviorSubject, Subject} from "rxjs";
 
 @Injectable()
 export class DataGatewayService {
 
-    private scans = new ReplaySubject<string>();
+    scans          = new Subject<Observable<any>>();
+    scanCompletion = new BehaviorSubject<string>("");
 
     constructor(private preferences: UserPreferencesService,
                 private ipc: IpcService) {
 
-        this.scans.next("");
     }
 
-    scan() {
-        const scan = this.preferences.get("credentials")
-            .switchMap(credentials => this.ipc.request("scanPlatforms", {credentials}))
+
+    scan(creds?) {
+        const c    = creds ? Observable.of(creds) : this.preferences.get("credentials");
+        const scan = c.switchMap(credentials => this.ipc.request("scanPlatforms", {credentials}))
             .publishReplay(1)
             .refCount();
 
-        scan.subscribe(this.scans);
+        scan.subscribe(this.scanCompletion);
+
         return scan;
     }
 
@@ -59,13 +62,13 @@ export class DataGatewayService {
      */
     getPlatformListing(source: string): Observable<{ id: string, name: string }[]> {
 
-        return this.scans.flatMap(s => this.preferences.get(`dataCache.${source}.projects`))
+        return this.scanCompletion.flatMap(s => this.preferences.get(`dataCache.${source}.projects`))
             .do(p => console.log("Projects", p));
     }
 
     getProjectListing(profile, projectName): Observable<any[]> {
 
-        return this.scans.flatMap(() => this.preferences.get(`dataCache.${profile}.apps`)).map((apps: any[] = []) => {
+        return this.scanCompletion.flatMap(() => this.preferences.get(`dataCache.${profile}.apps`)).map((apps: any[] = []) => {
             return apps.filter(app => app["sbg:projectName"] === projectName);
         });
     }
@@ -91,7 +94,7 @@ export class DataGatewayService {
     }
 
     getPublicApps() {
-        return this.scans.flatMap(() => this.preferences.get("dataCache", {})).map(profiles => {
+        return this.scanCompletion.flatMap(() => this.preferences.get("dataCache", {})).map(profiles => {
             const mainProfile = Object.keys(profiles)[0];
             if (mainProfile) {
                 return profiles[mainProfile]["publicApps"] || [];

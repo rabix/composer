@@ -13,11 +13,10 @@ import {GuidService} from "../../services/guid.service";
 import {LocalDataSourceService} from "../../sources/local/local.source.service";
 import {SBPlatformDataSourceService} from "../../sources/sbg/sb-platform.source.service";
 import {ContextService} from "../../ui/context/context.service";
+import {MarkdownService} from "../../ui/markdown/markdown.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {UrlValidator} from "../../validators/url.validator";
-import {MarkdownService} from "../../ui/markdown/markdown.service";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
-import {IpcService} from "../../services/ipc.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -52,28 +51,32 @@ export class MainComponent {
     constructor(modal: ModalService,
                 system: SystemService,
                 vcRef: ViewContainerRef,
-                prefs: UserPreferencesService,
-                ipc: IpcService,
+                preferences: UserPreferencesService,
                 dataGateway: DataGatewayService,
                 statusBarService: StatusBarService) {
 
         system.boot();
+
         /**
          * Hack for angular's inability to provide the vcRef to a service with DI.
          * {@link ModalService.rootViewRef}
          */
-        modal.rootViewRef = vcRef;
+        modal.setViewContainer(vcRef);
 
 
-        const scanning = statusBarService.startProcess("Synchronizing with remote sources...");
-
-        dataGateway.scan().subscribe(() => {
-                statusBarService.stopProcess(scanning, "Remote sources synchronized.");
+        let process;
+        preferences.get("credentials", [])
+            .do(_ => process = statusBarService.startProcess("Synchronizing with remote sources..."))
+            .flatMap(_ => dataGateway.scan())
+            .subscribe(_ => {
+                statusBarService.stopProcess(process, "Remote sources synchronized.");
 
             }, err => {
-                console.warn("Please handle me differently!", err);
-                statusBarService.stopProcess(scanning, "Could not synchronize with remote data.");
+                statusBarService.stopProcess(process, "Could not synchronize with remote data.");
+
             });
+
+        dataGateway.scan();
 
         this.runnix = Observable.fromEvent(document, "keyup").map((e: KeyboardEvent) => e.keyCode).bufferCount(10, 1)
             .filter(seq => seq.toString() === [38, 38, 40, 40, 37, 39, 37, 39, 66, 65].toString())

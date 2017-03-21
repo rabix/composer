@@ -42,6 +42,19 @@
             color: #a184dc;
         }
     }
+
+    .app-sources-btn {
+        text-decoration: none;
+        color: $brand-primary;
+        padding-top: 0;
+
+        &:active, &:focus {
+            color: $brand-primary;
+            border-color: transparent;
+            background: none;
+            outline: none;
+        }
+    }
 }
 
 

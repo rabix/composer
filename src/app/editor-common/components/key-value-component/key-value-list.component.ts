@@ -4,7 +4,7 @@ import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 import {GuidService} from "../../../services/guid.service";
 import {noop} from "../../../lib/utils.lib";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
-import {ModalService} from "../../../ui/modal/modal.service";
+import {ModalService} from "../../../ui/modal-old/modal.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,

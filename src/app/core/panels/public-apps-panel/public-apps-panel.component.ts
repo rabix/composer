@@ -21,7 +21,7 @@ import Platform = NodeJS.Platform;
     selector: "ct-public-apps-panel",
     template: `
         <ct-search-field class="m-1" [formControl]="searchContent" [placeholder]="'Search Public Apps...'"></ct-search-field>
-
+        
         <div class="btn-group grouping-toggle" *ngIf="!searchContent?.value">
             <button type="button"
                     (click)="regroup('toolkit')"
