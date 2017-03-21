@@ -1,4 +1,6 @@
 import {Component} from "@angular/core";
+import {ModalService} from "../../ui/modal/modal.service";
+import {AddSourceModalComponent} from "../../core/modals/add-source-modal/add-source-modal.component";
 
 @Component({
     styleUrls: ["welcome.component.scss"],
@@ -23,9 +25,9 @@ import {Component} from "@angular/core";
             </h2>
 
             <p>
-                <a href="" target="_blank" class="btn btn-primary">
-                    Open a project
-                </a>
+                <button type="button" (click)="onOpenProjectButtonClick()" class="btn btn-primary">
+                    Open a Project
+                </button>
             </p>
         </div>
 
@@ -35,4 +37,15 @@ import {Component} from "@angular/core";
 })
 export class WelcomeTabComponent {
 
+
+    constructor(private modal: ModalService) {
+
+    }
+
+    onOpenProjectButtonClick() {
+        this.modal.fromComponent(AddSourceModalComponent, {
+            title: "Open a Project",
+            backdrop: true;
+        });
+    }
 }

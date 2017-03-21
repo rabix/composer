@@ -375,8 +375,8 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
     }
 
     openAddAppSourcesDialog() {
-        const component = this.modal.fromComponent(AddSourceModalComponent, {
-            title: "Add App Sources...",
+        this.modal.fromComponent(AddSourceModalComponent, {
+            title: "Open a Project",
             backdrop: true
         });
     }

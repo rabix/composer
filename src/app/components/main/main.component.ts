@@ -64,14 +64,13 @@ export class MainComponent {
         modal.setViewContainer(vcRef);
 
 
-        let process;
         preferences.get("credentials", [])
-            .do(_ => process = statusBarService.startProcess("Synchronizing with remote sources..."))
+            .map(_ => statusBarService.instant("Synchronizing with remote sources..."))
             .flatMap(_ => dataGateway.scan())
-            .subscribe(_ => {
-                statusBarService.stopProcess(process, "Remote sources synchronized.");
-            }, err => {
-                statusBarService.stopProcess(process, "Could not synchronize with remote data.");
+            .subscribe(() => {
+                statusBarService.instant("Remote sources synchronized.");
+            }, () => {
+                statusBarService.instant("Could not synchronize with remote data.");
             });
 
         this.runnix = Observable.fromEvent(document, "keyup").map((e: KeyboardEvent) => e.keyCode).bufferCount(10, 1)

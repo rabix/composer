@@ -36,16 +36,29 @@ const {app, dialog} = window["require"]("electron").remote;
                 </ul>
             </div>
 
-            <div class="dialog-connection dialog-content" *ngIf="activeTab === 'platform' && projectStep === 'connect'">
+            <div class="dialog-connection dialog-content" *ngIf="activeTab === 'platform' && !isConnected && !connecting">
                 <p>
                     <strong>Connect to the Seven Bridges Platform</strong>
                 </p>
                 <ct-platform-connection-form (submission)="onConnectionSubmission($event)"></ct-platform-connection-form>
             </div>
 
+            <div class="dialog-connection" *ngIf="activeTab === 'platform' && !isConnected && connecting ">
+                <p>
+                    <strong>Checking your connection to the platform...</strong>
+                    <ct-block-loader></ct-block-loader>
+                </p>
+            </div>
+
+            <div class="dialog-connection" *ngIf="activeTab === 'platform' && isConnected && !loadedProjects">
+                <p>
+                    <strong>Fetching your projects...</strong>
+                    <ct-block-loader></ct-block-loader>
+                </p>
+            </div>
 
             <div class="dialog-connection dialog-content"
-                 *ngIf="activeTab === 'platform' && projectStep === 'add' && nonAddedUserProjects.length">
+                 *ngIf="activeTab === 'platform' && isConnected && loadedProjects && nonAddedUserProjects.length">
                 <p>
                     <strong>Add Projects to the Workspace</strong>
                 </p>
@@ -54,23 +67,10 @@ const {app, dialog} = window["require"]("electron").remote;
                         <option *ngFor="let project of nonAddedUserProjects" [value]="project.value">{{ project.label }}</option>
                     </select>
                 </div>
-
             </div>
 
-            <div class="dialog-connection" *ngIf="activeTab === 'platform' && projectStep === 'checking-apps'">
-                <p>
-                    <strong>Fetching your projects...</strong>
-                    <ct-block-loader></ct-block-loader>
-                </p>
-            </div>
-            <div class="dialog-connection" *ngIf="activeTab === 'platform' && projectStep === 'checking-connection'">
-                <p>
-                    <strong>Checking your connection to the platform...</strong>
-                    <ct-block-loader></ct-block-loader>
-                </p>
-            </div>
-
-            <div class="dialog-connection" *ngIf="activeTab === 'platform' && projectStep === 'add' && nonAddedUserProjects.length === 0">
+            <div class="dialog-connection"
+                 *ngIf="activeTab === 'platform' && isConnected && loadedProjects && nonAddedUserProjects.length === 0">
                 <p>
                     <strong>You have added all your projects to the workspace.</strong>
                 </p>
@@ -80,7 +80,6 @@ const {app, dialog} = window["require"]("electron").remote;
             <div class="footer pr-1 pb-1">
                 <button type="button" class="btn btn-secondary" (click)="modal.close()">Cancel</button>
                 <button type="button" class="btn btn-success"
-                        [disabled]="projectStep !== 'add'"
                         (click)="onDone()">Done
                 </button>
             </div>
@@ -104,6 +103,12 @@ export class AddSourceModalComponent extends DirectiveBase implements OnInit {
 
     localFoldersToAdd = [];
 
+    loadedProjects = false;
+
+    isConnected = false;
+
+    connecting = true;
+
     constructor(settings: SettingsService,
                 data: DataGatewayService,
                 public modal: ModalService,
@@ -113,16 +118,15 @@ export class AddSourceModalComponent extends DirectiveBase implements OnInit {
 
         const validity = settings.validity;
         this.tracked   = validity.take(1).subscribe(isValid => {
-            this.projectStep = isValid ? "checking-apps" : "connect";
+            this.isConnected = isValid;
+            this.connecting  = false;
         });
 
         this.tracked = data.scanCompletion
             .flatMap(_ => settings.platformConfiguration)
             .flatMap(config => {
                 const profile = SettingsService.urlToProfile(config.url);
-                return preferences.get(`dataCache.${profile}`, {projects: []})
-                    .map(cache => ({cache, profile}))
-                    .do(_ => console.log("Received data cache for", profile))
+                return preferences.get(`dataCache.${profile}`, {projects: []}).map(cache => ({cache, profile}));
             })
             .withLatestFrom(preferences.get("openProjects", []),
                 (cacheData: any, openProjects) => {
@@ -132,8 +136,9 @@ export class AddSourceModalComponent extends DirectiveBase implements OnInit {
                         openProjects
                     };
                 })
+            .filter(stuff => stuff.projects.length)
             .subscribe(stuff => {
-
+                console.log("Received all projects", stuff);
                 this.nonAddedUserProjects = stuff.projects.filter(p => {
                     return stuff.openProjects.indexOf(`${stuff.profile}/${p.slug}`) === -1;
                 }).map(p => ({
@@ -141,16 +146,17 @@ export class AddSourceModalComponent extends DirectiveBase implements OnInit {
                     label: p.name
                 }));
 
-                this.projectStep = "add";
+                this.loadedProjects = true;
             });
     }
+
 
     ngOnInit() {
 
     }
 
     onDone() {
-        if (this.activeTab === "platform" && this.projectStep === "add") {
+        if (this.activeTab === "platform" && this.loadedProjects) {
             const val = this.projectSelectionControl.value;
             if (val && val.length) {
                 this.preferences.get("openProjects", []).take(1).map(set => {
@@ -177,6 +183,7 @@ export class AddSourceModalComponent extends DirectiveBase implements OnInit {
 
     onConnectionSubmission(val) {
         this.projectStep = "add";
+        this.isConnected = true;
     }
 
     selectLocalFolders() {

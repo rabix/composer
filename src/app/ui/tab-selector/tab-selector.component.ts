@@ -74,7 +74,7 @@ export class TabSelectorComponent extends DirectiveBase implements OnInit, After
     ngAfterViewInit() {
 
         setTimeout(() => {
-            this.tracked = this.selector.selectedTab.subscribe((tab) => {
+            this.tracked = this.selector.selectedTab.distinctUntilChanged().subscribe((tab) => {
 
                 this.active = tab;
                 this.activeChange.emit(tab);

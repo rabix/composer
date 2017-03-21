@@ -94,7 +94,7 @@ export class PlatformConnectionFormComponent extends DirectiveBase implements On
 
         this.formGroup.addControl(
             "url",
-            new FormControl("", [Validators.required, Validators.pattern("https://[^/?]+\.[^.]+\\.sbgenomics\\.com")])
+            new FormControl("https://igor.sbgenomics.com", [Validators.required, Validators.pattern("https://[^/?]+\.[^.]+\\.sbgenomics\\.com")])
         );
 
         this.formGroup.addControl(
@@ -115,9 +115,11 @@ export class PlatformConnectionFormComponent extends DirectiveBase implements On
             sessionID: null,
             token: "",
         }])
+            .do(_ => console.log("Got credentials", _))
             .filter(c => c.length > 0)
             .subscribe(credentials => {
                 console.log("Got credentials", credentials[0], "form group", this.formGroup);
+                debugger;
                 this.formGroup.patchValue(credentials[0]);
             });
 
