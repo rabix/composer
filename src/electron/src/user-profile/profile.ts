@@ -32,7 +32,7 @@ const defaults = {
      */
     expandedNodes: [],
     localFolders: [],
-    dataCache: {},
+    dataCache: undefined,
     localAppsIndex: [],
 };
 

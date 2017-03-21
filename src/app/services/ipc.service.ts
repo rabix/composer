@@ -35,7 +35,7 @@ export class IpcService {
 
             const action = () => {
                 if (response.error) {
-                    console.warn("Error on IPC Channel:", response.error);
+                    console.warn("Error on IPC Channel:", response.error, response.id);
                     stream.error(response.error);
                 }
                 stream.next(response.data);

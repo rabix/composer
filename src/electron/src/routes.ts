@@ -32,6 +32,15 @@ module.exports         = {
         fsController.pathExists(path, callback);
     },
 
+    hasDataCache: (data, callback) => {
+        settings.has("dataCache").then(yeah => {
+                callback(null, yeah);
+            }, err => {
+                callback(err);
+            }
+        )
+    },
+
     resolve: (path, callback) => {
         resolver.resolve(path).then(result => {
             callback(null, result);

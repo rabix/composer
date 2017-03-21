@@ -70,13 +70,9 @@ export class MainComponent {
             .flatMap(_ => dataGateway.scan())
             .subscribe(_ => {
                 statusBarService.stopProcess(process, "Remote sources synchronized.");
-
             }, err => {
                 statusBarService.stopProcess(process, "Could not synchronize with remote data.");
-
             });
-
-        dataGateway.scan();
 
         this.runnix = Observable.fromEvent(document, "keyup").map((e: KeyboardEvent) => e.keyCode).bufferCount(10, 1)
             .filter(seq => seq.toString() === [38, 38, 40, 40, 37, 39, 37, 39, 66, 65].toString())

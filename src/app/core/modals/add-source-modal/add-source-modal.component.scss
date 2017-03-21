@@ -22,7 +22,12 @@
         justify-content: space-between;
     }
 
-    .dialog-local {
+    .dialog-content {
+        max-height: 500px;
+        overflow:auto;
+    }
+
+    .dialog-centered {
         flex: 1;
         display: flex;
         flex-direction: column;
@@ -40,4 +45,5 @@
     .footer {
         text-align: right;
     }
+
 }

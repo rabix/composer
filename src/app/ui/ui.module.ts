@@ -34,6 +34,7 @@ import {TabSelectorEntryComponent} from "./tab-selector/tab-selector-entry/tab-s
 import {DropDownMenuComponent} from "./dropdown-button/dropdown-menu.component";
 import {AutoCompleteComponent} from "./auto-complete/auto-complete.component";
 import {ModalComponent} from "./modal/modal.component";
+import {SelectComponent} from "./auto-complete/select/select.component";
 
 @NgModule({
     imports: [

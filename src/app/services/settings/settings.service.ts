@@ -31,6 +31,7 @@ export class SettingsService {
                 token: "",
             }
         ])
+            .distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
             .map(prefs => prefs[0])
             .subscribe(prefs => {
 
