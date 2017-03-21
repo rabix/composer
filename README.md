@@ -17,6 +17,7 @@ npm install
 ## Starting the dev environment
 ```bash
 npm run serve // starts the dev server
+npm run electron:compile // compiles electron backend
 npm run electron // opens the app shell
 ```
 

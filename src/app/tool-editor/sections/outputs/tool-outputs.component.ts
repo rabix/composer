@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, Output, ViewChild} from "@angular/core";
-import {ComponentBase} from "../../../components/common/component-base";
 import {
     CommandInputParameterModel,
     CommandLineToolModel,

@@ -7,15 +7,15 @@ import {
     TemplateRef,
     ViewChildren
 } from "@angular/core";
-import {ComponentBase} from "../../../components/common/component-base";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
-import {ModalService} from "../../../components/modal/modal.service";
 import {noop} from "../../../lib/utils.lib";
 import {
     CommandInputParameterModel,
     CommandLineToolModel,
     CommandOutputParameterModel
 } from "cwlts/models";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
     selector: "ct-tool-output-list",
@@ -137,7 +137,7 @@ import {
 
     `
 })
-export class ToolOutputListComponent extends ComponentBase {
+export class ToolOutputListComponent extends DirectiveBase {
 
     @Input()
     public inputs: CommandInputParameterModel[] = [];
