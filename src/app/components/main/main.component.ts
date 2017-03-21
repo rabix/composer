@@ -17,6 +17,7 @@ import {ModalService} from "../../ui/modal/modal.service";
 import {UrlValidator} from "../../validators/url.validator";
 import {MarkdownService} from "../../ui/markdown/markdown.service";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
+import {IpcService} from "../../services/ipc.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -52,6 +53,7 @@ export class MainComponent {
                 system: SystemService,
                 vcRef: ViewContainerRef,
                 prefs: UserPreferencesService,
+                ipc: IpcService,
                 dataGateway: DataGatewayService,
                 statusBarService: StatusBarService) {
 
@@ -65,12 +67,13 @@ export class MainComponent {
 
         const scanning = statusBarService.startProcess("Synchronizing with remote sources...");
 
-        dataGateway.scan().take(1).subscribe(() => {
-            statusBarService.stopProcess(scanning, "Remote sources synchronized.");
-        }, err => {
-            console.warn("Please handle me differently!", err);
-            statusBarService.stopProcess(scanning, "Could not synchronize with remote data.");
-        });
+        dataGateway.scan().subscribe(() => {
+                statusBarService.stopProcess(scanning, "Remote sources synchronized.");
+
+            }, err => {
+                console.warn("Please handle me differently!", err);
+                statusBarService.stopProcess(scanning, "Could not synchronize with remote data.");
+            });
 
         this.runnix = Observable.fromEvent(document, "keyup").map((e: KeyboardEvent) => e.keyCode).bufferCount(10, 1)
             .filter(seq => seq.toString() === [38, 38, 40, 40, 37, 39, 37, 39, 66, 65].toString())

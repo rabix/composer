@@ -136,15 +136,7 @@ export class SettingsComponent extends DirectiveBase implements OnInit {
         this.profile.put("credentials", [{
             profile: profile === "igor" ? "default" : profile,
             ...this.form.getRawValue()
-        }]).take(1).subscribe((credentials) => {
-
-            const process = this.status.startProcess("Fetching platform data...", "Platform data fetched.");
-            this.ipc.request("scanPlatforms", {credentials}).take(1).subscribe(() => {
-                this.status.stopProcess(process);
-            });
-        });
-
-        // this.settings.platformConfiguration.next(this.form.value);
+        }]);
     }
 
     openTokenPage() {

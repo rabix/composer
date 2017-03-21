@@ -10,30 +10,24 @@ export class DataGatewayService {
 
     private scans = new ReplaySubject<string>();
 
-    constructor(private profile: UserPreferencesService,
+    constructor(private preferences: UserPreferencesService,
                 private ipc: IpcService) {
 
         this.scans.next("");
     }
 
     scan() {
-        return this.profile.get("lastScanTime").take(1)
-            .switchMap(timestamp => {
-                // Skip for 1h
-                if (!timestamp || timestamp < (Date.now().valueOf() - 3600000 )) {
-                    return this.ipc.request("scanPlatforms").do(() => {
-                        this.profile.put("lastScanTime", Date.now().valueOf());
-                        this.scans.next("");
-                    });
-                } else {
-                    return Observable.of("");
-                }
-            });
+        const scan = this.preferences.get("credentials")
+            .switchMap(credentials => this.ipc.request("scanPlatforms", {credentials}))
+            .publishReplay(1)
+            .refCount();
 
+        scan.subscribe(this.scans);
+        return scan;
     }
 
     getDataSources(): Observable<ProfileCredentials> {
-        return this.profile.get("credentials").map((credentials: ProfileCredentials) => {
+        return this.preferences.get("credentials").map((credentials: ProfileCredentials) => {
 
             const local: ProfileCredentialEntry = {
                 label: "Local Files",
@@ -65,13 +59,13 @@ export class DataGatewayService {
      */
     getPlatformListing(source: string): Observable<{ id: string, name: string }[]> {
 
-        return this.scans.flatMap(s => this.profile.get(`dataCache.${source}.projects`))
+        return this.scans.flatMap(s => this.preferences.get(`dataCache.${source}.projects`))
             .do(p => console.log("Projects", p));
     }
 
     getProjectListing(profile, projectName): Observable<any[]> {
 
-        return this.profile.get(`dataCache.${profile}.apps`).map((apps: any[] = []) => {
+        return this.scans.flatMap(() => this.preferences.get(`dataCache.${profile}.apps`)).map((apps: any[] = []) => {
             return apps.filter(app => app["sbg:projectName"] === projectName);
         });
     }
@@ -81,7 +75,7 @@ export class DataGatewayService {
     }
 
     getLocalListing() {
-        return this.profile.get("localFolders", []);
+        return this.preferences.get("localFolders", []);
     }
 
     getLocalFile(path) {
@@ -97,7 +91,7 @@ export class DataGatewayService {
     }
 
     getPublicApps() {
-        return this.profile.get("dataCache", {}).map(profiles => {
+        return this.scans.flatMap(() => this.preferences.get("dataCache", {})).map(profiles => {
             const mainProfile = Object.keys(profiles)[0];
             if (mainProfile) {
                 return profiles[mainProfile]["publicApps"] || [];
