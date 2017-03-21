@@ -30,8 +30,8 @@ import {Component, ViewEncapsulation} from "@angular/core";
                         <div class="app">
 
                             <!--Image-->
-                            <div class="image">
-                                Image
+                            <div class="image-container">
+                                <div class="image workflow"></div>
                             </div>
 
                             <!--Description-->
@@ -49,8 +49,8 @@ import {Component, ViewEncapsulation} from "@angular/core";
                         <div class="app">
 
                             <!--Image-->
-                            <div class="image">
-                                Image
+                            <div class="image-container">
+                                <div class="image tool"></div>
                             </div>
 
                             <!--Description-->
