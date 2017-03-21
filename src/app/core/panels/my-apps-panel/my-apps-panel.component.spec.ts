@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MyAppsPanelComponent } from './my-apps-panel.component';
 
-describe('MyAppsPanelComponent', () => {
+describe('PublicAppsPanelComponent', () => {
   let component: MyAppsPanelComponent;
   let fixture: ComponentFixture<MyAppsPanelComponent>;
 

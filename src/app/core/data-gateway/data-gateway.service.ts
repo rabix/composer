@@ -58,10 +58,6 @@ export class DataGatewayService {
         });
     }
 
-    getPublicSources() {
-
-    }
-
     /**
      * Gets the top-level data listing for a data source
      * @param source "default", "igor"
@@ -90,5 +86,28 @@ export class DataGatewayService {
 
     getLocalFile(path) {
         return this.ipc.request("readFileContent", path);
+    }
+
+    searchLocalProjects(term, limit = 20) {
+        return this.ipc.request("searchLocalProjects", {term, limit});
+    }
+
+    searchUserProjects(term: string, limit = 20) {
+        return this.ipc.request("searchUserProjects", {term, limit});
+    }
+
+    getPublicApps() {
+        return this.profile.get("dataCache", {}).map(profiles => {
+            const mainProfile = Object.keys(profiles)[0];
+            if (mainProfile) {
+                return profiles[mainProfile]["publicApps"] || [];
+            }
+
+            return [];
+        });
+    }
+
+    searchPublicApps(term: any, limit = 20) {
+        return this.ipc.request("searchPublicApps", {term, limit});
     }
 }

@@ -15,7 +15,7 @@ export class TabSelectorEntryComponent {
     active = false;
 
     @Input()
-    tab: string;
+    tabName: string;
 
     constructor(private selector: TabSelectorService) {
         selector.selectedTab.subscribe(tab => this.active = tab === this);

@@ -1,4 +1,5 @@
 import {
+    AfterViewInit,
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
@@ -47,7 +48,7 @@ import {TreeViewService} from "../tree-view.service";
     styleUrls: ["./tree-node.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TreeNodeComponent<T> implements OnInit {
+export class TreeNodeComponent<T> implements OnInit, AfterViewInit {
 
 
     @Input() id: string;
@@ -74,11 +75,15 @@ export class TreeNodeComponent<T> implements OnInit {
 
     ngOnInit() {
 
+
+        this.tree.nodeInit.next(this);
+
         if (this.isExpanded) {
             this.expand();
         }
+    }
 
-        this.tree.nodeInit.next(this);
+    ngAfterViewInit() {
     }
 
     toggle() {

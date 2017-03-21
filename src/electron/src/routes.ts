@@ -1,12 +1,12 @@
 import {PlatformGateway} from "./gateways/platform.gateway";
+import * as SearchController from "./controllers/search.controller";
 const fsController          = require("./controllers/fs.controller");
 const acceleratorController = require("./controllers/accelerator.controller");
 const resolver              = require("./schema-salad-resolver");
 const settings              = require("electron-settings");
 
-let platformGateways = {};
-
-module.exports = {
+const searchController = require("./controllers/search.controller");
+module.exports         = {
 
     // File System Routes
 
@@ -69,37 +69,16 @@ module.exports = {
         });
     },
 
-    makeGateways(callback){
-        platformGateways = {};
+    searchLocalProjects: (data: { term: string, limit: number }, callback) => {
+        SearchController.searchLocalProjects(data.term, data.limit, callback);
+    },
 
-        settings.get("credentials").then(results => {
+    searchUserProjects: (data: { term: string, limit: number }, callback) => {
+        SearchController.searchUserProjects(data.term, data.limit, callback);
+    },
 
-            results.filter(c => !c.token).forEach(c => {
-                c.sessionID = null;
-                delete platformGateways[c.profile];
-            });
-
-            const sessionPromises = results.filter(c => c.token).map(c => {
-
-                return new Promise((resolve, reject) => {
-
-                    const gate = new PlatformGateway(c.url);
-
-                    return gate.getSessionID(c.token, (err, sessionID) => {
-                        if (err) {
-                            return reject(err);
-                        }
-
-                        platformGateways[c.profile] = gate;
-
-                        resolve(gate);
-                    });
-                });
-            });
-
-            Promise.all(sessionPromises).then(resolve => callback(null, resolve), err => callback(err));
-
-        }, err => callback(err));
+    searchPublicApps: (data: { term: string, limit: number }, callback) => {
+        SearchController.searchPublicApps(data.term, data.limit, callback);
     },
 
     scanPlatforms: (data, callback) => {

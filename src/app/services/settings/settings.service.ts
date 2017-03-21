@@ -14,7 +14,15 @@ export class SettingsService {
 
     constructor(private profile: UserPreferencesService) {
 
-        this.profile.get("credentials", []).map(prefs => prefs[0]).subscribe(prefs => {
+        this.profile.get("credentials", [
+            {
+                label: "Seven Bridges",
+                profile: "default",
+                url: "https://igor.sbgenomics.com",
+                sessionID: null,
+                token: "",
+            }
+        ]).map(prefs => prefs[0]).subscribe(prefs => {
             if (!prefs || !prefs.url || !prefs.token) {
                 return this.validity.next(false);
             }

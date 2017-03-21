@@ -24,3 +24,7 @@ export function get(filePath, callback) {
 
     }
 }
+
+export function search(term, config = {}, callback){
+
+}

@@ -21,14 +21,41 @@ export class UserPreferencesService {
     public put(key: UserProfileCacheKey, value: any) {
 
         this.updates.next({key, value});
-        return this.ipc.request("putSetting", {key, value});
+
+        if (key.startsWith("dataCache")) {
+            return this.ipc.request("putSetting", {key, value});
+        }
+
+        window.localStorage.setItem(key, JSON.stringify(value));
     }
 
     public get<T>(key: UserProfileCacheKey, fallback?: T): Observable<T> {
 
-        return this.ipc.request("getSetting", key)
 
-            .merge(this.updates.filter(u => u.key === key).map(u => u.value))
-            .map(v => v === undefined ? fallback : v);
+        if (key.startsWith("dataCache")) {
+
+            return this.ipc.request("getSetting", key)
+
+                .merge(this.updates.filter(u => u.key === key).map(u => u.value))
+                .map(v => v === undefined ? fallback : v);
+        }
+
+        /**
+         * Temporary rerouting until we have a better cache system
+         * Stuff that are not in dataCache are small and can be stored in localStorage for now
+         */
+
+        const hit = window.localStorage.getItem(key);
+        let cacheItem;
+        if (hit === undefined || hit === null || hit === "undefined" || hit === "null") {
+            cacheItem = fallback;
+            this.put(key, cacheItem);
+        } else {
+            cacheItem = JSON.parse(hit);
+        }
+
+        return Observable.of(cacheItem).merge(this.updates.filter(u => u.key === key).map(u => u.value)).distinctUntilChanged();
+
+
     }
 }

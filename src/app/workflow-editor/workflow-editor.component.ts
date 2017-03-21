@@ -27,10 +27,10 @@ import LoadOptions = jsyaml.LoadOptions;
     template: `
         <ct-action-bar>
             <ct-tab-selector class="inverse" [distribute]="'auto'" [active]="codeTab" (activeChange)="switchTab($event)">
-                <ct-tab-selector-entry [disabled]="!isValidCWL" [tab]="'info'">App Info</ct-tab-selector-entry>
-                <ct-tab-selector-entry [disabled]="!isValidCWL" [tab]="'graph'">Graph View</ct-tab-selector-entry>
-                <ct-tab-selector-entry [disabled]="!isValidCWL" [tab]="'list'">List View</ct-tab-selector-entry>
-                <ct-tab-selector-entry [tab]="'code'" #codeTab>Code</ct-tab-selector-entry>
+                <ct-tab-selector-entry [disabled]="!isValidCWL" [tabName]="'info'">App Info</ct-tab-selector-entry>
+                <ct-tab-selector-entry [disabled]="!isValidCWL" [tabName]="'graph'">Graph View</ct-tab-selector-entry>
+                <ct-tab-selector-entry [disabled]="!isValidCWL" [tabName]="'list'">List View</ct-tab-selector-entry>
+                <ct-tab-selector-entry [tabName]="'code'" #codeTab>Code</ct-tab-selector-entry>
             </ct-tab-selector>
 
             <div class="document-controls">

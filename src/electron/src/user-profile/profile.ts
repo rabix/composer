@@ -22,13 +22,17 @@ const defaults = {
         } as ProfileCredentialEntry
     ] as ProfileCredentials,
     lastScanTime: 0,
+    selectedAppPanel: "my-apps", // Can be “my-apps” or “public-apps”,
+    publicAppsGrouping: "toolkit", // Can “toolkit” or “categories”
+
     /**
      * Which of your folders are expanded
      * @type string[] tree node ids
      */
     expandedNodes: [],
     localFolders: [],
-    dataCache: {}
+    dataCache: {},
+    localAppsIndex: [],
 };
 
 export function boot(): Promise<any> {

@@ -1,6 +1,6 @@
 import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren} from "@angular/core";
 import {FormControl} from "@angular/forms";
-import {Observable} from "rxjs";
+import {Observable} from "rxjs/Observable";
 
 import "rxjs/add/operator/map";
 
@@ -16,6 +16,8 @@ import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {FilesystemEntry, FolderListing} from "../../data-gateway/data-types/local.types";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.component";
+
+import * as Yaml from "js-yaml";
 
 @Component({
     selector: "ct-my-apps-panel",
@@ -36,7 +38,7 @@ import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.c
             <ct-block-loader class="m-1"
                              *ngIf="searchContent.value 
                              && searchContent.value !== appliedSearchTerm 
-                             && !searchResults?.length"></ct-block-loader>
+                             && !searchResults"></ct-block-loader>
 
             <div *ngIf="searchContent.value 
                         && searchContent.value === appliedSearchTerm 
@@ -56,7 +58,6 @@ import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.c
 })
 export class MyAppsPanelComponent extends DirectiveBase implements OnInit, AfterViewInit {
 
-
     treeNodes: TreeNode<any>[];
 
     searchContent = new FormControl();
@@ -65,7 +66,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
 
     appliedSearchTerm: string;
 
-    expandedNodes;
+    expandedNodes: Observable<string[]>;
 
     @ViewChild(TreeViewComponent)
     treeComponent: TreeViewComponent;
@@ -81,7 +82,10 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                 private dataGateway: DataGatewayService) {
         super();
 
-        this.expandedNodes = this.preferences.get("workspace.expandedNodes", []);
+        this.expandedNodes = this.preferences.get("expandedNodes", []).take(1).publishReplay(1).refCount();
+    }
+
+    ngOnInit(): void {
 
         this.loadDataSources();
         this.attachSearchObserver();
@@ -89,80 +93,85 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
         this.listenForPlatformExpansion();
         this.listenForProjectExpansion();
         this.listenForFolderExpansion();
-
         this.attachExpansionStateSaving();
-
         this.listenForAppOpening();
-    }
 
-    ngOnInit(): void {
-    }
-
-    private search(term) {
-        return this.tree.getAllChildren()
-            .filter((c: TreeNodeComponent<any>) => {
-                return (c.type === "app" || c.type === "file")
-                    && c.label.toLocaleLowerCase().indexOf(term.toLowerCase()) !== -1;
-            });
     }
 
     ngAfterViewInit() {
-
         this.searchResultComponents.changes.subscribe(list => {
             list.forEach((el, idx) => setTimeout(() => el.nativeElement.classList.add("shown"), idx * 20));
         });
     }
 
     private loadDataSources() {
-        this.tracked = this.dataGateway.getDataSources().subscribe(sources => {
-            this.treeNodes = sources.map(source => {
-                let icon = `fa-user-circle-o`;
-                if (source.profile === "local") {
-                    icon = "fa-hdd-o";
-                }
-                return {
-                    id: source.profile,
-                    label: source.label,
-                    isExpandable: true,
-                    type: "source",
-                    icon: `${icon} ${source.connected ? "connected" : "disconnected"}`
+        this.tracked = this.dataGateway.getDataSources()
+            .withLatestFrom(this.expandedNodes, (sources, expanded) => ({sources, expanded}))
+            .subscribe((data: { sources: any[], expanded: string[] }) => {
+                this.treeNodes = data.sources.map(source => {
+                    let icon = `fa-user-circle-o`;
+                    if (source.profile === "local") {
+                        icon = "fa-hdd-o";
+                    }
+                    return {
+                        id: source.profile,
+                        label: source.label,
+                        isExpandable: true,
+                        isExpanded: data.expanded.indexOf(source.profile) !== -1,
+                        type: "source",
+                        icon: `${icon} ${source.connected ? "connected" : "disconnected"}`
 
-                };
+                    };
+                });
+                this.cdr.markForCheck();
             });
-            this.cdr.markForCheck();
-            this.applyExpansionState(this.treeComponent.getChildren());
-        });
     }
 
     private attachSearchObserver() {
-        this.searchContent
-            .valueChanges
+
+        const localFileSearch = (term) => this.dataGateway.searchLocalProjects(term).map(results => results.map(result => {
+            const label   = result.path.split("/").slice(-3, -1).join("/");
+            const title   = result.path.split("/").pop();
+            let icon      = "fa-file";
+            let relevance = result.relevance;
+
+            if (result.type === "Workflow") {
+                icon = "fa-share-alt";
+                relevance++;
+            } else if (result.type === "CommandLineTool") {
+                icon = "fa-terminal";
+                relevance++;
+            }
+
+
+            return {
+                title,
+                label,
+                icon,
+                relevance
+            };
+        }));
+        const projectsSearch  = (term) => this.dataGateway.searchUserProjects(term).map(results => results.map(result => {
+            return {
+                title: result.label,
+                label: result.id.split("/").slice(5, 7).join(" → "),
+                icon: result.class === "Workflow" ? "fa-share-alt" : "fa-terminal",
+                relevance: result.relevance + 1
+            };
+        }));
+
+        this.searchContent.valueChanges
+            .do(term => this.searchResults = undefined)
             .debounceTime(250)
             .distinctUntilChanged()
-            .subscribe(val => {
-                this.appliedSearchTerm = val;
-
-                if (val.trim().length === 0 || (this.searchResults && this.searchResults.length === 0)) {
-                    this.searchResults = undefined;
-                    return;
-                }
-
-                this.searchResults = this.search(val)
-                    .map(node => {
-                        let label = "";
-                        if (node.type === "app") {
-                            label = node.id.split("/").slice(5, 7).join(" → ");
-                        } else if (node.type === "file") {
-                            label = node.id.split("/").slice(-3, -1).join(" → ");
-                        }
-
-                        return {
-                            title: node.label,
-                            label: label,
-                            open: () => node.open(),
-                            icon: node.icon
-                        };
-                    });
+            .do(term => {
+                this.appliedSearchTerm = term;
+            })
+            .filter(term => term.trim().length !== 0)
+            .switchMap(term => Observable.forkJoin(localFileSearch(term), projectsSearch(term)))
+            .subscribe(datasets => {
+                const combined     = [].concat(...datasets).sort((a, b) => b.relevance - a.relevance);
+                this.searchResults = combined;
                 this.cdr.markForCheck();
             });
     }
@@ -173,21 +182,21 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
     private listenForPlatformExpansion() {
 
         this.tree.expansionChanges
-            .filter(node =>
-            node.isExpanded === true
-            && node.type === "source"
-            && node.id !== "local")
+            .filter(node => node.isExpanded === true && node.type === "source" && node.id !== "local")
             .do(n => n.modify(() => n.loading = true))
-            .switchMap(n => this.dataGateway.getPlatformListing(n.id), (node, listing = []) => ({node, listing}))
-            .subscribe((data: { node: TreeNodeComponent<any>, listing: any }) => {
+            .flatMap(n => this.dataGateway.getPlatformListing(n.id), (node, listing = []) => ({node, listing}))
+            .withLatestFrom(this.expandedNodes, (outer, expanded) => ({...outer, expanded}))
+            .subscribe((data: { node: TreeNodeComponent<any>, listing: any, expanded: string[] }) => {
                 const children = data.listing.map(child => {
+                    const id = `${data.node.id}/${child.slug}`;
                     return {
-                        id: `${data.node.id}/${child.slug}`,
+                        id,
                         type: "project",
                         data: child,
                         icon: "fa-folder",
                         label: child.name,
                         isExpandable: true,
+                        isExpanded: data.expanded.indexOf(id) !== -1,
                         iconExpanded: "fa-folder-open",
                     };
                 });
@@ -196,7 +205,6 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                 data.node.modify(() => {
                     data.node.loading  = false;
                     data.node.children = children;
-                    this.applyExpansionState(data.node.getChildren());
                 });
             });
     }
@@ -206,7 +214,8 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
         this.tree.expansionChanges.filter(n => n.isExpanded === true && n.type === "source" && n.id === "local")
             .do(n => n.modify(() => n.loading = true))
             .switchMap(n => this.dataGateway.getLocalListing(), (node, listing) => ({node, listing}))
-            .subscribe((data: { node: TreeNodeComponent<any>, listing: any }) => {
+            .withLatestFrom(this.expandedNodes, (outer, expanded) => ({...outer, expanded}))
+            .subscribe((data: { node: TreeNodeComponent<any>, listing: any, expanded: string[] }) => {
                 const children = data.listing.map(path => {
                     return {
                         id: path,
@@ -214,6 +223,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                         icon: "fa-folder",
                         label: path.split("/").pop(),
                         isExpandable: true,
+                        isExpanded: data.expanded.indexOf(path) !== -1,
                         iconExpanded: "fa-folder-open",
                     };
                 });
@@ -221,8 +231,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                 // Update the tree view
                 data.node.modify(() => {
                     data.node.children = children;
-                    this.applyExpansionState(data.node.getChildren());
-                    data.node.loading = false;
+                    data.node.loading  = false;
                 });
             });
     }
@@ -234,10 +243,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                 const source      = n.id.substr(0, n.id.indexOf("/"));
                 const projectName = n.id.substr(n.id.indexOf("/") + 1);
                 return this.dataGateway.getProjectListing(source, projectName);
-            }, (node, listing) => ({
-                node,
-                listing
-            }))
+            }, (node, listing) => ({node, listing}))
             .subscribe(data => {
 
                 const children = data.listing.map(app => {
@@ -246,13 +252,12 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                         type: "app",
                         label: app.label,
                         icon: app.class === "CommandLineTool" ? "fa-terminal" : "fa-share-alt",
-                        data: app
+                        data: app,
                     };
                 });
                 data.node.modify(() => {
                     data.node.children = children;
                     data.node.loading  = false;
-                    this.applyExpansionState(data.node.getChildren());
                 });
             });
     }
@@ -262,9 +267,11 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
             .filter(n => n.isExpanded === true && n.type === "folder")
             .do(n => n.modify(() => n.loading = true))
             .flatMap(n => this.dataGateway.getFolderListing(n.id), (node, listing) => ({node, listing}))
+            .withLatestFrom(this.expandedNodes, (outer, expanded) => ({...outer, expanded}))
             .subscribe((data: {
                             node: TreeNodeComponent<FilesystemEntry>
-                            listing: FolderListing
+                            listing: FolderListing,
+                            expanded: string[]
                         }) => {
                 const children = data.listing.map(entry => {
 
@@ -285,6 +292,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                         iconExpanded,
                         id: entry.path,
                         isExpandable: entry.isDir,
+                        isExpanded: entry.isDir && data.expanded.indexOf(entry.path) !== -1,
                         type: entry.isDir ? "folder" : "file",
                         label: entry.path.split("/").pop(),
                     };
@@ -293,8 +301,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
 
                 data.node.modify(() => {
                     data.node.children = children;
-                    this.applyExpansionState(data.node.getChildren());
-                    data.node.loading = false;
+                    data.node.loading  = false;
                 });
             });
     }
@@ -317,12 +324,6 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
             });
     }
 
-    private applyExpansionState(nodes: QueryList<TreeNodeComponent<any>>) {
-        this.preferences.get("expandedNodes", []).take(1).subscribe(expanded => {
-            nodes.filter(node => expanded.indexOf(node.id) !== -1).forEach(node => node.expand());
-        });
-    }
-
     private listenForAppOpening() {
         this.tree.open.filter(n => n.type === "app")
             .flatMap(node => this.platform.getApp(node.data["sbg:id"]))
@@ -339,7 +340,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                         language: Observable.of("json"),
                         isWritable: true,
                         resolve: () => Observable.of(app).toPromise(),
-                        content: Observable.of(JSON.stringify(app)),
+                        content: Observable.of(JSON.stringify(app, null, 4)),
                         save: (jsonContent, revisionNote) => {
                             return this.platform.saveApp(jsonContent, revisionNote);
                         }
@@ -359,9 +360,10 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                     contentType: Observable.of(node.data.type || "Code"),
                     contentData: {
                         data: node.data,
-                        resolve: () => Observable.of(JSON.parse(content)).toPromise(),
+                        // @todo(batke)
+                        resolve: () => Observable.of(Yaml.safeLoad(content)).toPromise(),
                         isWritable: true,
-                        content:  Observable.of(content),
+                        content: Observable.of(content),
                         language: Observable.of(node.data.language)
                     }
                 });

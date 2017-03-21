@@ -99,8 +99,8 @@ export class LayoutComponent extends DirectiveBase {
         this.panelSwitches = new BehaviorSubject({top, bottom});
 
         // Retrieve state of opened panels from local storage
-        this.tracked = this.preferences.get("open-tabs", [top.panels[0].id])
-            .subscribe(tabs => tabs.forEach(panelId => this.switchPanel(panelId)));
+        // this.tracked = this.preferences.get("open-tabs", [top.panels[0].id])
+        //     .subscribe(tabs => tabs.forEach(panelId => this.switchPanel(panelId)));
     }
 
     ngOnInit() {

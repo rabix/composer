@@ -21,6 +21,7 @@ import {WebWorkerBuilderService} from "./web-worker/web-worker-builder.service";
 import {SettingsButtonComponent} from "./workbox/settings-button.component";
 import {WorkboxComponent} from "./workbox/workbox.component";
 import {GettingStartedComponent} from "../components/onboarding/getting-started.component";
+import {PublicAppsPanelComponent} from "./panels/public-apps-panel/public-apps-panel.component";
 
 @NgModule({
     entryComponents: [],
@@ -33,6 +34,7 @@ import {GettingStartedComponent} from "../components/onboarding/getting-started.
         AppsPanelComponent,
         PanelContainerComponent,
         MyAppsPanelComponent,
+        PublicAppsPanelComponent,
         NavSearchResultComponent,
         WelcomeTabComponent,
         GettingStartedComponent,

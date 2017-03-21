@@ -62,17 +62,43 @@ export class TabSelectorComponent extends DirectiveBase implements OnInit, After
     }
 
     ngOnInit() {
-        this.selector.selectedTab.next(this.active);
+
+
+    }
+
+    activateTab(tab: string | TabSelectorEntryComponent): TabSelectorEntryComponent {
+
+        let found;
+        if (typeof tab === "string") {
+            found = this.tabEntries.find((item) => item.tabName === tab);
+        } else {
+            found = this.tabEntries.find(item => item === tab);
+        }
+
+        this.selector.selectedTab.next(found);
+        return found;
     }
 
     ngAfterViewInit() {
-        this.tracked = this.selector.selectedTab.subscribe((tab) => {
-            this.active = tab;
-            this.activeChange.emit(tab);
 
-            this.updateHighlight();
-            this.cdr.markForCheck();
+        if (this.active) {
+            this.selector.selectedTab.next(this.active);
+        }
+        // if (!this.active) {
+        //     this.selector.selectedTab.next(this.tabEntries.toArray()[0]);
+        // }
+
+        setTimeout(() => {
+            this.tracked = this.selector.selectedTab
+                .subscribe((tab) => {
+                    this.active = tab;
+                    this.activeChange.emit(tab);
+
+                    this.updateHighlight();
+                    this.cdr.markForCheck();
+                });
         });
+
     }
 
     private updateHighlight() {
@@ -91,4 +117,6 @@ export class TabSelectorComponent extends DirectiveBase implements OnInit, After
         this.renderer.setElementStyle(this.autoHighlight.nativeElement, "width", entries[idx].nativeElement.clientWidth + "px");
         this.renderer.setElementStyle(this.autoHighlight.nativeElement, "marginLeft", offset + "px");
     }
+
+
 }
