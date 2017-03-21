@@ -1,28 +1,21 @@
-import {Subject} from "rxjs";
 import {
-    ChangeDetectionStrategy,
     Component,
+    EventEmitter,
     Input,
-    OnChanges,
     Output,
     QueryList,
-    SimpleChanges,
     TemplateRef,
-    ViewChildren,
-    ViewEncapsulation
+    ViewChildren
 } from "@angular/core";
-import {SBDraft2CommandArgumentModel, SBDraft2CommandLineBindingModel} from "cwlts/models/d2sb";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 import {noop} from "../../../lib/utils.lib";
+import {CommandLineToolModel} from "cwlts/models";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-argument-list",
     styleUrls: ["./argument-list.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <ct-form-panel [collapsed]="false">
             <span class="tc-header">
@@ -34,14 +27,14 @@ import {ModalService} from "../../../ui/modal/modal.service";
                 <div class="container">
 
                     <!--Blank Tool Screen-->
-                    <ct-blank-tool-state *ngIf="!readonly && !arguments.length"
+                    <ct-blank-tool-state *ngIf="!readonly && !model.arguments.length"
                                          [title]="'Command line arguments for your tool'"
                                          [buttonText]="'Add an Argument'"
                                          (buttonClick)="addEntry()">
                     </ct-blank-tool-state>
 
                     <!--List Header Row-->
-                    <div class="gui-section-list-title row" *ngIf="arguments.length">
+                    <div class="gui-section-list-title row" *ngIf="model.arguments.length">
                         <div class="col-sm-4">Value</div>
                         <div class="col-sm-3">Prefix</div>
                         <div class="col-sm-3">Separate</div>
@@ -52,7 +45,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                     <ul class="gui-section-list">
 
                         <!--List Entry-->
-                        <li *ngFor="let entry of arguments; let i = index"
+                        <li *ngFor="let entry of model.arguments; let i = index"
                             class="input-list-items container">
 
                             <div class="gui-section-list-item clickable row"
@@ -62,9 +55,9 @@ import {ModalService} from "../../../ui/modal/modal.service";
 
                                 <!--Tooltip for Value-->
                                 <ct-tooltip-content #ctt>
-                                <span *ngIf="entry.valueFrom && !entry.valueFrom.isExpression">
-                                {{ entry.toString() }}
-                                </span>
+                                    <span *ngIf="!entry.valueFrom || !entry.valueFrom?.isExpression">
+                                    {{ entry.toString() }}
+                                    </span>
 
                                     <ct-code-preview *ngIf="ctt.isIn && entry.valueFrom && entry.valueFrom.isExpression"
                                                      (viewReady)="ctt.show()"
@@ -103,7 +96,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                                 <div *ngIf="!readonly" class="col-sm-1 align-right">
                                     <i [ct-tooltip]="'Delete'"
                                        class="fa fa-trash text-hover-danger"
-                                       (click)="removeEntry(entry)"></i>
+                                       (click)="removeEntry(i)"></i>
                                 </div>
 
                             </div>
@@ -114,7 +107,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                                     <div class="tc-header">{{ entry.loc || "Argument"}}</div>
                                     <div class="tc-body">
                                         <ct-argument-inspector
-                                            (save)="updateArgument($event, entry)"
+                                            (save)="update.emit(model.arguments)"
                                             [argument]="entry"
                                             [readonly]="readonly"
                                             [context]="context">
@@ -128,7 +121,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                 </div>
 
                 <!--Add entry link-->
-                <button *ngIf="!readonly && arguments.length"
+                <button *ngIf="!readonly && model.arguments.length"
                         (click)="addEntry()"
                         type="button"
                         class="btn pl-0 btn-link no-outline no-underline-hover">
@@ -138,10 +131,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
         </ct-form-panel>
     `
 })
-export class ArgumentListComponent extends DirectiveBase implements OnChanges {
-
-    @Input()
-    public entries: SBDraft2CommandArgumentModel[] = [];
+export class ArgumentListComponent extends DirectiveBase {
 
     @Input()
     public readonly = false;
@@ -150,14 +140,15 @@ export class ArgumentListComponent extends DirectiveBase implements OnChanges {
     @Input()
     public location = "";
 
-    private arguments: SBDraft2CommandArgumentModel[] = [];
-
     /** Context in which expression should be evaluated */
     @Input()
     public context;
 
+    @Input()
+    public model: CommandLineToolModel;
+
     @Output()
-    public readonly update = new Subject();
+    public readonly update = new EventEmitter();
 
     @ViewChildren("inspector", {read: TemplateRef})
     private inspectorTemplate: QueryList<TemplateRef<any>>;
@@ -166,30 +157,26 @@ export class ArgumentListComponent extends DirectiveBase implements OnChanges {
         super();
     }
 
-    private removeEntry(entry) {
+    private removeEntry(index) {
         this.modal.confirm({
             title: "Really Remove?",
             content: `Are you sure that you want to remove this argument?`,
             cancellationLabel: "No, keep it",
             confirmationLabel: "Yes, remove it"
         }).then(() => {
-            const index = this.entries.findIndex(x => x == entry);
 
-            if (this.inspector.isInspecting(entry.loc)) {
+            if (this.inspector.isInspecting(this.model.arguments[index].loc)) {
                 this.inspector.hide();
             }
 
-            const entries = this.entries.slice(0, index).concat(this.entries.slice(index + 1));
-            this.update.next(entries);
+            const args = this.model.arguments.slice(0, index).concat(this.model.arguments.slice(index + 1));
+            this.update.emit(args);
         }, noop);
     }
 
     private addEntry() {
-
-        const newEntryLocation = `${this.location}[${this.entries.length}]`;
-        const newEntry = new SBDraft2CommandArgumentModel({}, newEntryLocation);
-        const entries = this.entries.concat(newEntry);
-        this.update.next(entries);
+        const newEntry = this.model.addArgument({});
+        this.update.emit(this.model.arguments);
 
         this.inspectorTemplate.changes
             .take(1)
@@ -198,26 +185,5 @@ export class ArgumentListComponent extends DirectiveBase implements OnChanges {
             .subscribe(templateRef => {
                 this.inspector.show(templateRef, newEntry.loc);
             });
-    }
-
-    ngOnChanges(changes: SimpleChanges): void {
-        this.arguments = changes["entries"].currentValue.map(entry => entry)
-            .sort((a, b) => a.position - b.position);
-    }
-
-    private updateArgument(form: { position: number, prefix: string, separate: boolean, valueFrom: any },
-                           entry: SBDraft2CommandArgumentModel) {
-
-        const argument = this.entries.find(x => entry == x);
-
-        argument.updateBinding(new SBDraft2CommandLineBindingModel({
-            position: form.position,
-            separate: form.separate,
-            prefix: form.prefix,
-            valueFrom: form.valueFrom.serialize()
-        }, argument.loc));
-
-        this.update.next(this.entries.slice());
-
     }
 }

@@ -5,7 +5,7 @@ import {ArgumentListComponent} from "./sections/arguments/argument-list.componen
 import {FileDefListComponent} from "./sections/file-def-list/file-def-list.component";
 import {ResourcesComponent} from "./sections/resources/resources.component";
 import {ToolInputsComponent} from "./sections/inputs/tool-inputs.component";
-import {ToolInputListComponent} from "./sections/inputs/tool-input-list-component";
+import {ToolInputListComponent} from "./sections/inputs/tool-input-list.component";
 import {ToolOutputListComponent} from "./sections/outputs/tool-output-list.component";
 import {ToolOutputsComponent} from "./sections/outputs/tool-outputs.component";
 import {ArgumentInspector} from "./sections/arguments/argument-inspector.component";

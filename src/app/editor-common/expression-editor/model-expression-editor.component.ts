@@ -1,5 +1,5 @@
 import {Component, Input, Output, ViewEncapsulation} from "@angular/core";
-import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
+import {ExpressionModel} from "cwlts/models";
 import {ReplaySubject, Subject} from "rxjs";
 
 @Component({
@@ -18,7 +18,7 @@ import {ReplaySubject, Subject} from "rxjs";
 export class ModelExpressionEditorComponent {
 
     @Input()
-    public model: SBDraft2ExpressionModel;
+    public model: ExpressionModel;
 
     @Input()
     public context: { $job?: any, $self?: any };

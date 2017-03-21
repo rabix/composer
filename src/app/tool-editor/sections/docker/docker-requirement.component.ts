@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, Input, OnChanges, Output, SimpleChanges, ViewEncapsulation} from "@angular/core";
 import {FormControl, FormGroup} from "@angular/forms";
-import {DockerRequirementModel} from "cwlts/models/d2sb";
+import {DockerRequirementModel} from "cwlts/models";
 import {ReplaySubject} from "rxjs";
 import {DockerRequirement} from "cwlts/mappings/d2sb/DockerRequirement";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
@@ -37,24 +37,24 @@ export class DockerRequirementComponent extends DirectiveBase implements OnChang
     @Input()
     public readonly = false;
 
-    private form: FormGroup;
+    public form: FormGroup;
 
     @Output()
     public update = new ReplaySubject<DockerRequirement>();
 
-    ngOnChanges(changes: SimpleChanges): void {
-        this.form = new FormGroup({});
+    ngOnChanges(simpleChanges: SimpleChanges): void {
+        if (!this.form) {
+            this.form = new FormGroup({});
 
-        const dockerPull = this.dockerRequirement ? this.dockerRequirement.dockerPull : "";
-        this.form.addControl("dockerPull", new FormControl({value: dockerPull, disabled: this.readonly}));
+            const dockerPull = this.dockerRequirement ? this.dockerRequirement.dockerPull : "";
+            this.form.addControl("dockerPull", new FormControl({value: dockerPull, disabled: this.readonly}));
+        }
 
         this.form.valueChanges.first().subscribe(changes => {
-            const docker: DockerRequirement = this.dockerRequirement ?
-                this.dockerRequirement.serialize() :
-                new DockerRequirementModel();
-
+            const docker: DockerRequirementModel = this.dockerRequirement || new DockerRequirementModel();
             docker.dockerPull = changes["dockerPull"];
-            this.update.next(docker);
+
+            this.update.next(docker.serialize());
         });
     }
 

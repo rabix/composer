@@ -1,7 +1,14 @@
-import {Component, Input, OnChanges, Output, SimpleChanges, ViewEncapsulation} from "@angular/core";
-import {CommandOutputParameterModel, SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
-import {FormBuilder, FormGroup} from "@angular/forms";
-import {Subject} from "rxjs";
+import {
+    Component,
+    EventEmitter,
+    Input,
+    OnChanges,
+    Output,
+    SimpleChanges,
+    ViewEncapsulation
+} from "@angular/core";
+import {CommandInputParameterModel, CommandOutputParameterModel} from "cwlts/models";
+import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
@@ -16,11 +23,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                      [context]="context">
             </ct-basic-output-section>
 
-            <ct-description-section [formControl]="form.controls['description']"
-                                    [readonly]="readonly">
-            </ct-description-section>
-
             <ct-output-metadata-section [inputs]="inputList"
+                                        *ngIf="form.controls['metaData']"
                                         [formControl]="form.controls['metaData']"
                                         [readonly]="readonly">
             </ct-output-metadata-section>
@@ -29,10 +33,14 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                             [readonly]="readonly">
             </ct-output-eval>
 
-            <ct-secondary-file *ngIf="isFileType()"
+            <ct-secondary-file *ngIf="isFileType() && form.controls['secondaryFiles']"
                                [formControl]="form.controls['secondaryFiles']"
                                [readonly]="readonly">
             </ct-secondary-file>
+
+            <ct-description-section [formControl]="form.controls['description']"
+                                    [readonly]="readonly">
+            </ct-description-section>
 
         </form>
     `
@@ -43,7 +51,7 @@ export class ToolOutputInspector extends DirectiveBase implements OnChanges {
     public readonly = false;
 
     @Input()
-    public inputs: SBDraft2CommandInputParameterModel[] = [];
+    public inputs: CommandInputParameterModel[] = [];
 
     @Input()
     public output: CommandOutputParameterModel;
@@ -52,12 +60,12 @@ export class ToolOutputInspector extends DirectiveBase implements OnChanges {
     @Input()
     public context: { $job?: any, $self?: any } = {};
 
-    private inputList: SBDraft2CommandInputParameterModel[] = [];
+    public inputList: CommandInputParameterModel[] = [];
 
-    private form: FormGroup;
+    public form: FormGroup;
 
     @Output()
-    public save = new Subject<CommandOutputParameterModel>();
+    public save = new EventEmitter<CommandOutputParameterModel>();
 
     constructor(private formBuilder: FormBuilder) {
         super();
@@ -75,13 +83,25 @@ export class ToolOutputInspector extends DirectiveBase implements OnChanges {
         this.form = this.formBuilder.group({
             basicOutputSection: [this.output],
             description: [this.output],
-            outputEval: [this.output],
-            metaData: [this.output],
-            secondaryFiles: [this.output.outputBinding.secondaryFiles || []]
+            outputEval: [this.output]
         });
 
+        if (this.output.outputBinding.hasMetadata && this.output.outputBinding.hasInheritMetadata) {
+            this.form.addControl("metaData", new FormControl(this.output));
+        }
+
+        if (this.output.outputBinding.hasSecondaryFiles) {
+            this.form.addControl("secondaryFiles", new FormControl(this.output.outputBinding.secondaryFiles || []));
+        } else if (this.output.hasSecondaryFiles) {
+            this.form.addControl("secondaryFiles", new FormControl(this.output.secondaryFiles || []));
+        }
+
         this.tracked = this.form.valueChanges.subscribe(value => {
-            this.output.outputBinding.secondaryFiles = value.secondaryFiles;
+            if (value.secondaryFiles && this.output.outputBinding.hasSecondaryFiles) {
+                this.output.outputBinding.secondaryFiles = value.secondaryFiles;
+            } else if (value.secondaryFiles && this.output.hasSecondaryFiles) {
+                this.output.secondaryFiles = value.secondaryFiles;
+            }
 
             this.save.next(this.output);
         });

@@ -1,8 +1,8 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
-import {CommandOutputParameterModel as OutputProperty} from "cwlts/models/d2sb";
+import {CommandOutputParameterModel} from "cwlts/models";
 import {noop} from "../../../../lib/utils.lib";
-import {OutputParameterTypeModel} from "cwlts/models";
+import {ParameterTypeModel} from "cwlts/models";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
 @Component({
@@ -68,9 +68,9 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
     public context: { $job?: any, $self?: any } = {};
 
     /** The currently displayed property */
-    private output: OutputProperty;
+    private output: CommandOutputParameterModel;
 
-    private basicSectionForm: FormGroup;
+    public basicSectionForm: FormGroup;
 
     private onTouched = noop;
 
@@ -82,7 +82,7 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
         super();
     }
 
-    writeValue(output: OutputProperty): void {
+    writeValue(output: CommandOutputParameterModel): void {
 
         this.output = output;
 
@@ -106,7 +106,6 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
                 this.output.type.symbols = value.symbols;
             }
 
-            this.output.validate();
             this.propagateChange(this.output);
         });
     }
@@ -134,7 +133,7 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
     }
 
     private listenToTypeFormChanges(): void {
-        this.tracked = this.basicSectionForm.controls["typeForm"].valueChanges.subscribe((value: OutputParameterTypeModel) => {
+        this.tracked = this.basicSectionForm.controls["typeForm"].valueChanges.subscribe((value: ParameterTypeModel) => {
 
             this.output.type.setType(value.type);
 

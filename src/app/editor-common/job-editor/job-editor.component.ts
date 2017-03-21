@@ -10,7 +10,7 @@ import {
     ViewEncapsulation
 } from "@angular/core";
 import {ObjectHelper as OH} from "../../helpers/object.helper";
-import {SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
+import {CommandInputParameterModel} from "cwlts/models";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
 
@@ -103,7 +103,7 @@ export class JobEditorComponent implements OnChanges {
      * CWL app input definitions.
      */
     @Input()
-    public inputs: SBDraft2CommandInputParameterModel[] = [];
+    public inputs: CommandInputParameterModel[] = [];
 
     @Output()
     public update = new EventEmitter();
@@ -119,7 +119,7 @@ export class JobEditorComponent implements OnChanges {
     /**
      * Inputs grouped and sorted the way they should be presented.
      */
-    public inputGroups: { name: string, inputs: SBDraft2CommandInputParameterModel[] }[] = [];
+    public inputGroups: { name: string, inputs: CommandInputParameterModel[] }[] = [];
 
     /**
      * Executes when job values get edited in the top-level forms.

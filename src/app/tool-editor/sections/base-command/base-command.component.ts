@@ -1,6 +1,6 @@
 import {Component, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewEncapsulation} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
-import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
+import {ExpressionModel, CommandLineToolModel} from "cwlts/models";
 import {ReplaySubject} from "rxjs";
 import {GuidService} from "../../../services/guid.service";
 import {noop} from "../../../lib/utils.lib";
@@ -9,7 +9,6 @@ import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
-
     selector: "ct-base-command",
     styleUrls: ["./base-command.component.scss"],
     template: `
@@ -85,15 +84,15 @@ import {ModalService} from "../../../ui/modal/modal.service";
 export class BaseCommandComponent extends DirectiveBase implements OnInit, OnDestroy, OnChanges {
     /** baseCommand property of model */
     @Input()
-    public baseCommand: SBDraft2ExpressionModel[];
+    public baseCommand: ExpressionModel[];
 
     /** Stdin property of model */
     @Input()
-    public stdin: SBDraft2ExpressionModel;
+    public stdin: ExpressionModel;
 
     /** Stdout property of model */
     @Input()
-    public stdout: SBDraft2ExpressionModel;
+    public stdout: ExpressionModel;
 
     /** The parent forms group which is already in the clt-editor form tree */
     @Input()
@@ -106,22 +105,25 @@ export class BaseCommandComponent extends DirectiveBase implements OnInit, OnDes
     @Input()
     public readonly = false;
 
+    @Input()
+    public model: CommandLineToolModel;
+
     /** Update event triggered on command form changes (add, remove, edit) */
     @Output()
-    public updateCmd = new ReplaySubject<SBDraft2ExpressionModel[]>();
+    public updateCmd = new ReplaySubject<ExpressionModel[]>();
 
     /** Update event triggered on stream changes */
     @Output()
-    public updateStreams = new ReplaySubject<SBDraft2ExpressionModel[]>();
+    public updateStreams = new ReplaySubject<ExpressionModel[]>();
 
     /** form group for streams */
-    private streamsForm: FormGroup;
+    public streamsForm: FormGroup;
 
     /** form group for base command */
-    private baseCommandForm: FormGroup;
+    public baseCommandForm: FormGroup;
 
     /** List which connects model to forms */
-    private formList: Array<{ id: string, model: SBDraft2ExpressionModel }> = [];
+    public formList: Array<{ id: string, model: ExpressionModel }> = [];
 
     constructor(private guidService: GuidService, private modal: ModalService) {
         super();
@@ -138,7 +140,7 @@ export class BaseCommandComponent extends DirectiveBase implements OnInit, OnDes
         }
     }
 
-    private initCmdForm(cmdList: SBDraft2ExpressionModel[]) {
+    private initCmdForm(cmdList: ExpressionModel[]) {
         this.formList = cmdList.map(model => {
             return {
                 id: this.guidService.generate(), model
@@ -180,7 +182,7 @@ export class BaseCommandComponent extends DirectiveBase implements OnInit, OnDes
         });
     }
 
-    private removeBaseCommand(ctrl: { id: string, model: SBDraft2ExpressionModel }): void {
+    private removeBaseCommand(ctrl: { id: string, model: ExpressionModel }): void {
         this.modal.confirm({
             title: "Really Remove?",
             content: `Are you sure that you want to remove this base command?`,
@@ -194,7 +196,8 @@ export class BaseCommandComponent extends DirectiveBase implements OnInit, OnDes
     }
 
     private addBaseCommand(): void {
-        this.updateCmd.next(this.baseCommand.concat([new SBDraft2ExpressionModel("", "")]));
+        this.model.addBaseCommand();
+        this.updateCmd.next(this.model.baseCommand);
     }
 
     ngOnDestroy() {

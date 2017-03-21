@@ -1,7 +1,7 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {noop} from "../../../lib/utils.lib";
-import {InputParameterTypeModel} from "cwlts/models";
+import {ParameterTypeModel} from "cwlts/models";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
@@ -39,7 +39,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 })
 export class InputTypeSelectComponent extends DirectiveBase implements ControlValueAccessor {
 
-    public paramType: InputParameterTypeModel;
+    public paramType: ParameterTypeModel;
 
     @Input("propertyTypes")
     public propertyTypes = ["array", "enum", "record", "File", "string", "int", "float", "boolean", "map"];
@@ -58,7 +58,7 @@ export class InputTypeSelectComponent extends DirectiveBase implements ControlVa
 
     private skipOnChange = false;
 
-    writeValue(paramType: InputParameterTypeModel): void {
+    writeValue(paramType: ParameterTypeModel): void {
         this.paramType = paramType;
 
         this.form.controls["type"].setValue(this.paramType.type);

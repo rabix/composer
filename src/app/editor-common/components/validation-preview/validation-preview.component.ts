@@ -16,15 +16,15 @@ import {Validation} from "cwlts/models/helpers/validation";
            *ngIf="entry?.warnings.length && !entry.errors.length"></i>
 
         <ct-tooltip-content #warnings>
-            <p class="warning-text px-1" *ngFor="let warning of entry.warnings">{{ warning.message }}</p>
+            <p class="warning-text px-1" *ngFor="let warning of entry?.warnings || []">{{ warning.message }}</p>
         </ct-tooltip-content>
 
         <ct-tooltip-content #errors>
-            <p class="text-console-error px-1" *ngFor="let error of entry.errors">{{ error.message }}</p>
+            <p class="text-console-error px-1" *ngFor="let error of entry?.errors || []">{{ error.message }}</p>
         </ct-tooltip-content>
     `
 })
 export class ValidationComponent {
     @Input()
-    public entry: Validation;
+    public entry: Validation = {errors: [], warnings: []};
 }

@@ -11,8 +11,8 @@ export interface ValidationResponse {
     isValidatableCwl: boolean,
     isValidCwl: boolean,
     isValidJSON: boolean,
-    errors: {message: string, loc: string}[],
-    warnings: {message: string, loc: string}[],
+    errors: { message: string, loc: string }[],
+    warnings: { message: string, loc: string }[],
     class?: string
 }
 
@@ -47,7 +47,7 @@ export class CwlSchemaValidationWorkerService {
     private workerFunction(content) {
 
         let json;
-        const schemas = this.schemas;
+        const schemas  = this.schemas;
         const response = {
             isValidatableCwl: false,
             isValidCwl: false,
@@ -59,10 +59,19 @@ export class CwlSchemaValidationWorkerService {
 
         // First check if this is json or yaml content
         try {
-            json = jsyaml.safeLoad(content, {json: true} as any);
+            let warnings = [];
+            json         = jsyaml.safeLoad(content, {
+                json: true, onWarning: (warn) => {
+                    warnings.push({
+                        loc: "document",
+                        message: warn.message
+                    });
+                }
+            } as any);
 
             response.isValidJSON = true;
-            response.errors = [];
+            response.errors      = [];
+            response.warnings    = warnings;
         } catch (e) {
             return response;
         }
@@ -88,10 +97,10 @@ export class CwlSchemaValidationWorkerService {
         }
 
         response.isValidatableCwl = true;
-        response.class = json.class;
+        response.class            = json.class;
 
         const cwlVersion = json.cwlVersion || "sbg:draft-2";
-        const schemaMap = {
+        const schemaMap  = {
             "sbg:draft-2": {
                 CommandLineTool: schemas.d2sb.cltSchema,
                 Workflow: schemas.d2sb.wfSchema,
@@ -103,10 +112,20 @@ export class CwlSchemaValidationWorkerService {
                 ExpressionTool: schemas.v1.etSchema
             }
         };
+        const ajv        = new Ajv();
+        let validation   = false;
+        let errors;
 
-        const ajv = new Ajv();
-        const validation = ajv.validate(schemaMap[cwlVersion][json.class], json);
-        const errors = ajv.errors || [];
+        if (["sbg:draft-2", "v1.0"].indexOf(cwlVersion) !== -1) {
+            validation = ajv.validate(schemaMap[cwlVersion][json.class], json);
+            errors     = ajv.errors || [];
+        } else {
+            errors = [{
+                message: `invalid cwlVersion "${cwlVersion}", expected "v1.0" or "sbg:draft-2"`,
+                loc: "document"
+            }]
+        }
+
 
         return Object.assign(response, {
             isValidCwl: validation,

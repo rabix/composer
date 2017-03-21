@@ -1,6 +1,7 @@
 import {ChangeDetectionStrategy, Component, Input, Output, ViewEncapsulation} from "@angular/core";
 import {ExternalLinks} from "../../../cwl/external-links";
-import {SBDraft2ExpressionModel, RequirementBaseModel} from "cwlts/models/d2sb";
+import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
+import {RequirementBaseModel} from "cwlts/models";
 import {FormControl} from "@angular/forms";
 import {ReplaySubject} from "rxjs";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";

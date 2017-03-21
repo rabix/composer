@@ -6,6 +6,7 @@ import {
 } from "@angular/core";
 import {WorkflowModel} from "cwlts/models";
 import {SystemService} from "../../../platform-providers/system.service";
+import {CommandInputParameterModel, WorkflowInputParameterModel, CommandLineToolModel} from "cwlts/models";
 
 @Component({
     selector: "ct-app-info",
@@ -83,7 +84,7 @@ import {SystemService} from "../../../platform-providers/system.service";
                             <td>{{input.type | commandParameterType}}</td>
                             <td>{{input.type.isNullable ? 'False' : 'True'}}</td>
                             <td>prefix</td>
-                            <td>format</td>
+                            <td>{{input.fileTypes ? input.fileTypes.join(', ') : '-'}}</td>
                         </tr>
                      </table>
                   </ct-tab-component>
@@ -106,7 +107,7 @@ import {SystemService} from "../../../platform-providers/system.service";
                               <td>{{input.type | commandParameterType}}</td>
                               <td>{{input.type.isNullable ? 'False' : 'True'}}</td>
                               <td>prefix</td>
-                              <td>format</td>
+                              <td>{{input.fileTypes ? input.fileTypes.join(', ') : '-'}}</td>
                           </tr>
                       </table>
                   </ct-tab-component>
@@ -125,7 +126,7 @@ import {SystemService} from "../../../platform-providers/system.service";
                               <th scope="row">{{output.id}}</th>
                               <td>{{output.label}}</td>
                               <td>{{output.type | commandParameterType}}</td>
-                              <td>format</td>
+                              <td>{{output.fileTypes ? output.fileTypes.join(', ') : '-'}}</td>
                           </tr>
                       </table>
                   </ct-tab-component>
@@ -136,15 +137,15 @@ import {SystemService} from "../../../platform-providers/system.service";
 })
 export class AppInfoComponent implements OnChanges {
     @Input()
-    model: WorkflowModel;
+    model: WorkflowModel | CommandLineToolModel;
 
     public createdBy: string;
     public createdOn: number;
     public editedBy: string;
     public editedOn: number;
     public revisionNote: string;
-    public inputs: Array<Object>;
-    public appSettings: Array<Object>;
+    public inputs: Array<CommandInputParameterModel | WorkflowInputParameterModel>;
+    public appSettings: Array<CommandInputParameterModel | WorkflowInputParameterModel>;
 
     constructor(private system: SystemService) {
 
@@ -157,8 +158,11 @@ export class AppInfoComponent implements OnChanges {
         this.editedOn = this.model.customProps['sbg:modifiedOn'] * 1000;
         this.revisionNote = this.model.customProps['sbg:revisionNotes'] || null;
 
-        this.inputs = this.model.inputs.filter((input) => input.type.type === 'File' || input.type.items === 'File');
-        this.appSettings = this.model.inputs.filter((input) => input.type.type !== 'File' && input.type.items !== 'File');
+
+        this.inputs = (this.model.inputs as Array<CommandInputParameterModel | WorkflowInputParameterModel>)
+            .filter((input) => input.type.type === 'File' || input.type.items === 'File');
+        this.appSettings = (this.model.inputs as Array<CommandInputParameterModel | WorkflowInputParameterModel>)
+            .filter((input) => input.type.type !== 'File' || input.type.items !== 'File');
     }
 
 

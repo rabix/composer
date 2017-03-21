@@ -1,4 +1,14 @@
-import {ChangeDetectionStrategy, Component, HostBinding, Input, Output, ViewChild, ViewEncapsulation} from "@angular/core";
+import {
+    ChangeDetectionStrategy,
+    Component,
+    ElementRef,
+    HostBinding,
+    Input,
+    Output,
+    Renderer,
+    ViewChild,
+    ViewEncapsulation
+} from "@angular/core";
 import {Observable} from "rxjs";
 import {CodeEditorComponent} from "./code-editor.component";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
@@ -26,28 +36,28 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 export class CodePreviewComponent extends DirectiveBase {
 
     @Input()
-    public content = "";
+    content = "";
 
     @Input()
-    public language = "javascript";
+    language = "javascript";
 
     @Input()
     @HostBinding("style.width.px")
-    public width = 500;
+    width = 500;
 
     @Input()
     @HostBinding("style.height.px")
-    public height = 300;
+    height = 300;
 
     @Output()
-    public viewReady;
+    viewReady;
 
     @ViewChild("editor", {read: CodeEditorComponent})
     private editor: CodeEditorComponent;
 
-    private contentStream: Observable<string>;
+    contentStream: Observable<string>;
 
-    constructor() {
+    constructor(private renderer: Renderer, private elemRef: ElementRef) {
         super();
     }
 
@@ -56,11 +66,12 @@ export class CodePreviewComponent extends DirectiveBase {
     }
 
     ngAfterViewInit() {
+
         const editor = this.editor.getEditorInstance();
         const lineNum = editor.getValue().trim().split(/\r\n|\r|\n/).length;
-        const lineHeight = 16; // Sorry for hardcoding, low priority
+        const lineHeight = 16; // Sorry for hardcoding, low priority >:(!
 
-        this.height = Math.min(lineNum, 20) * lineHeight;
+        this.renderer.setElementStyle(this.elemRef.nativeElement, "height", Math.min(lineNum, 20) * lineHeight + "px");
         super.ngAfterViewInit();
     }
 }

@@ -7,6 +7,7 @@ import {EditorInspectorService} from "../../../editor-common/inspector/editor-in
 import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import LoadOptions = jsyaml.LoadOptions;
+import {noop} from "../../../lib/utils.lib";
 
 
 declare const Snap: any;
@@ -124,7 +125,8 @@ export class WorkflowGraphEditorComponent extends DirectiveBase {
         node.content.first().subscribe((node) => {
             try {
                 let json = Yaml.safeLoad(node, {
-                    json: true
+                    json: true,
+                    onWarning: noop
                 } as LoadOptions);
 
 
