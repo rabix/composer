@@ -83,69 +83,62 @@ module.exports         = {
 
     scanPlatforms: (data, callback) => {
 
-        console.log("Triggered platform scanning");
+        const {credentials} = data;
+console.log("Scanning with credentuals", credentials);
+        const promises = credentials.map(source => {
 
-        settings.get("credentials").then(results => {
+            return new Promise((resolve, reject) => {
 
-            const promises = results.map(source => {
+                const platform = new PlatformGateway(source.url);
 
-                return new Promise((resolve, reject) => {
+                platform.getSessionID(source.token, (err, message) => {
+                    if (err) {
+                        return reject(err);
+                    }
 
-                    const platform = new PlatformGateway(source.url);
+                    source.sessionID = platform.sessionID;
 
-                    platform.getSessionID(source.token, (err, message) => {
-                        if (err) {
-                            return reject(err);
-                        }
-
-                        source.sessionID = platform.sessionID;
-                        settings.set("credentials", results);
-
-                        const publicProm = new Promise((resolve, reject) => {
-                            platform.getPublicApps((err, apps) => {
-                                if (err) {
-                                    return reject(err);
-                                }
-                                resolve(apps);
-                            });
+                    const publicProm = new Promise((resolve, reject) => {
+                        platform.getPublicApps((err, apps) => {
+                            if (err) {
+                                return reject(err);
+                            }
+                            resolve(apps);
                         });
-
-                        const userProm = new Promise((resolve, reject) => {
-                            platform.getUserApps((err, apps) => {
-                                if (err) {
-                                    return reject(err);
-                                }
-                                resolve(apps);
-                            });
-                        });
-
-                        const projectProm = new Promise((resolve, reject) => {
-                            platform.getProjects((err, projects) => {
-                                if (err) {
-                                    return reject(err);
-                                }
-                                resolve(projects);
-                            });
-                        });
-
-                        Promise.all([publicProm, userProm, projectProm]).then(values => {
-                            const [publicApps, apps, projects] = values;
-
-                            settings.set(`dataCache.${source.profile}`, {publicApps, apps, projects}).then(resolve, reject);
-
-                        }, reject);
                     });
 
+                    const userProm = new Promise((resolve, reject) => {
+                        platform.getUserApps((err, apps) => {
+                            if (err) {
+                                return reject(err);
+                            }
+                            resolve(apps);
+                        });
+                    });
+
+                    const projectProm = new Promise((resolve, reject) => {
+                        platform.getProjects((err, projects) => {
+                            if (err) {
+                                return reject(err);
+                            }
+                            resolve(projects);
+                        });
+                    });
+
+                    Promise.all([publicProm, userProm, projectProm]).then(values => {
+                        const [publicApps, apps, projects] = values;
+
+                        settings.set(`dataCache.${source.profile}`, {publicApps, apps, projects}).then(resolve, reject);
+
+                    }, reject);
                 });
+
             });
-
-            Promise.all(promises).then(values => {
-                callback(null, values);
-            }, err => callback(err));
-
-        }, err => {
-            callback(err);
         });
+
+        Promise.all(promises).then(values => {
+            callback(null, values);
+        }, err => callback(err));
     }
 
 };

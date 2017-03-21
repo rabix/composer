@@ -6,6 +6,7 @@ import {IpcService} from "../../services/ipc.service";
 import {SettingsService} from "../../services/settings/settings.service";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {StatusBarService} from "../status-bar/status-bar.service";
 
 @Component({
     selector: "ct-settings",
@@ -82,6 +83,7 @@ export class SettingsComponent extends DirectiveBase implements OnInit {
                 private ipc: IpcService,
                 private profile: UserPreferencesService,
                 private system: SystemService,
+                private status: StatusBarService,
                 formBuilder: FormBuilder) {
 
         super();
@@ -134,8 +136,12 @@ export class SettingsComponent extends DirectiveBase implements OnInit {
         this.profile.put("credentials", [{
             profile: profile === "igor" ? "default" : profile,
             ...this.form.getRawValue()
-        }]).take(1).subscribe(() => {
-            this.ipc.request("scanPlatforms");
+        }]).take(1).subscribe((credentials) => {
+
+            const process = this.status.startProcess("Fetching platform data...", "Platform data fetched.");
+            this.ipc.request("scanPlatforms", {credentials}).take(1).subscribe(() => {
+                this.status.stopProcess(process);
+            });
         });
 
         // this.settings.platformConfiguration.next(this.form.value);
