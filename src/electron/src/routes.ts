@@ -50,7 +50,7 @@ module.exports         = {
     },
 
     resolveContent: (data, callback) => {
-        resolver.resolveContent(data.content, data.path).then(result => {
+        resolver.res olveContent(data.content, data.path).then(result => {
             callback(null, result);
         }, err => {
             callback(err);

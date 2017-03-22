@@ -9,7 +9,6 @@ import {ObjectHelper} from "../../../helpers/object.helper";
 @Component({
     selector: "ct-select",
     styleUrls: ["./select.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SelectComponent implements AfterViewInit, OnDestroy {
 
@@ -161,7 +160,9 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
 
         })[0].selectize;
 
-        this.updateOptions(this.items);
+        setTimeout(() => {
+            this.updateOptions(this.items);
+        });
     }
 
     // Triggers when value in component is changed

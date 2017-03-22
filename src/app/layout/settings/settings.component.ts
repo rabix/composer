@@ -89,7 +89,7 @@ export class SettingsComponent extends DirectiveBase implements OnInit {
         super();
 
         this.form = formBuilder.group({
-            url: ["", [Validators.required, Validators.pattern("https://[^/?]+\.[^.]+\\.sbgenomics\\.com")]],
+            url: ["https://igor.sbgenomics.com", [Validators.required, Validators.pattern("https://[^/?]+\.[^.]+\\.sbgenomics\\.com")]],
             token: ["", [(control) => {
 
                 if (control.value.length === 32) {
@@ -101,7 +101,7 @@ export class SettingsComponent extends DirectiveBase implements OnInit {
         });
 
         this.tracked = this.profile.get("credentials").subscribe(credentials => {
-            this.form.patchValue(credentials[0]);
+            this.form.patchValue(credentials[0] || {});
         });
     }
 

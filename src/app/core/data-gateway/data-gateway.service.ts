@@ -67,14 +67,14 @@ export class DataGatewayService {
      * @returns {any}
      */
     getPlatformListing(source: string): Observable<{ id: string, name: string }[]> {
-        const allProjects  = this.scanCompletion.flatMap(s => this.preferences.get(`dataCache.${source}.projects`));
+        const allProjects  = this.scanCompletion.flatMap(s => this.preferences.get(`dataCache.${source}.projects`, []));
         const openProjects = this.preferences.get("openProjects", [])
             .map(projects => projects
                 .filter(p => p.startsWith(source + "/"))
                 .map(p => p.slice(source.length + 1))
             );
 
-        return Observable.combineLatest(allProjects, openProjects, (all: any[], open) => {
+        return Observable.combineLatest(allProjects, openProjects, (all = [], open) => {
             console.log("Combining projects", open, all);
             return all.filter(project => open.indexOf(project.slug) !== -1);
         });

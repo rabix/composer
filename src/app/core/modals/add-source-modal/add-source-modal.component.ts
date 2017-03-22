@@ -46,14 +46,14 @@ const {app, dialog} = window["require"]("electron").remote;
             <div class="dialog-connection" *ngIf="activeTab === 'platform' && !isConnected && connecting ">
                 <p>
                     <strong>Checking your connection to the platform...</strong>
-                    <ct-block-loader></ct-block-loader>
+                    <ct-line-loader></ct-line-loader>
                 </p>
             </div>
 
             <div class="dialog-connection" *ngIf="activeTab === 'platform' && isConnected && !loadedProjects">
                 <p>
                     <strong>Fetching your projects...</strong>
-                    <ct-block-loader></ct-block-loader>
+                    <ct-line-loader></ct-line-loader>
                 </p>
             </div>
 
@@ -63,9 +63,10 @@ const {app, dialog} = window["require"]("electron").remote;
                     <strong>Add Projects to the Workspace</strong>
                 </p>
                 <div>
-                    <select multiple class="form-control" [formControl]="projectSelectionControl">
-                        <option *ngFor="let project of nonAddedUserProjects" [value]="project.value">{{ project.label }}</option>
-                    </select>
+                    <ct-auto-complete [(ngModel)]="selectedProjects" [options]="nonAddedUserProjects"></ct-auto-complete>
+                    <!--<select multiple class="form-control" [formControl]="projectSelectionControl">-->
+                    <!--<option *ngFor="let project of nonAddedUserProjects" [value]="project.value">{{ project.label }}</option>-->
+                    <!--</select>-->
                 </div>
             </div>
 
@@ -99,8 +100,6 @@ export class AddSourceModalComponent extends DirectiveBase implements OnInit {
 
     nonAddedUserProjects = [];
 
-    projectSelectionControl = new FormControl();
-
     localFoldersToAdd = [];
 
     loadedProjects = false;
@@ -108,6 +107,8 @@ export class AddSourceModalComponent extends DirectiveBase implements OnInit {
     isConnected = false;
 
     connecting = true;
+
+    selectedProjects = [];
 
     constructor(settings: SettingsService,
                 data: DataGatewayService,
@@ -138,12 +139,11 @@ export class AddSourceModalComponent extends DirectiveBase implements OnInit {
                 })
             .filter(stuff => stuff.projects.length)
             .subscribe(stuff => {
-                console.log("Received all projects", stuff);
                 this.nonAddedUserProjects = stuff.projects.filter(p => {
                     return stuff.openProjects.indexOf(`${stuff.profile}/${p.slug}`) === -1;
                 }).map(p => ({
                     value: stuff.profile + "/" + p.slug,
-                    label: p.name
+                    text: p.name
                 }));
 
                 this.loadedProjects = true;
@@ -156,8 +156,9 @@ export class AddSourceModalComponent extends DirectiveBase implements OnInit {
     }
 
     onDone() {
+        console.log("Done");
         if (this.activeTab === "platform" && this.loadedProjects) {
-            const val = this.projectSelectionControl.value;
+            const val = this.selectedProjects;
             if (val && val.length) {
                 this.preferences.get("openProjects", []).take(1).map(set => {
                     return set.concat(val).filter((v, i, a) => a.indexOf(v) === i);
@@ -193,7 +194,7 @@ export class AddSourceModalComponent extends DirectiveBase implements OnInit {
             buttonLabel: "Add to Workspace",
             properties: ["openDirectory", "multiSelections"]
         }, (paths) => {
-            this.localFoldersToAdd = paths;
+            this.localFoldersToAdd = paths || [];
         });
     }
 

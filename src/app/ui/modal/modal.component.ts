@@ -71,7 +71,23 @@ export class ModalComponent extends DirectiveBase {
 
     @HostListener("click", ["$event.target"])
     private onClick(target) {
-        const clickedOutsideModal = !this.modalWindow.element.nativeElement.contains(target);
+
+        let isUnderModal   = false;
+        let elementDeleted = true;
+        let elementRoot    = target;
+
+        do {
+            if (elementRoot === this.modalWindow.element.nativeElement) {
+                isUnderModal = true;
+                break;
+            }
+
+            if (elementRoot === document) {
+                elementDeleted = false;
+            }
+        } while (elementRoot = elementRoot.parentNode);
+
+        const clickedOutsideModal = !isUnderModal && !elementDeleted;
 
         if (this.closeOnOutsideClick && clickedOutsideModal) {
             this.service.close();

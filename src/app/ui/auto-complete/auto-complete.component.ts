@@ -12,7 +12,6 @@ import {Subject} from "rxjs/Subject";
         <input #el [placeholder]="placeholder">
     `,
     styleUrls: ["./auto-complete.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AutoCompleteComponent extends SelectComponent implements ControlValueAccessor, OnInit {
 
