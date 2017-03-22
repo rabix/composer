@@ -1,10 +1,13 @@
 import {Injectable} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {ReplaySubject} from "rxjs/ReplaySubject";
+import {Subject} from "rxjs/Subject";
 import {ProfileCredentialEntry, ProfileCredentials} from "../../../electron/src/user-profile/profile";
+import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {IpcService} from "../../services/ipc.service";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
-import {BehaviorSubject, Subject} from "rxjs";
+import Platform = NodeJS.Platform;
+import {Http} from "@angular/http";
 
 @Injectable()
 export class DataGatewayService {
@@ -13,6 +16,8 @@ export class DataGatewayService {
     scanCompletion = new ReplaySubject<string>();
 
     constructor(private preferences: UserPreferencesService,
+                private api: PlatformAPI,
+                private http: Http,
                 private ipc: IpcService) {
 
         this.ipc.request("hasDataCache").take(1).subscribe(hasCache => {
@@ -120,5 +125,22 @@ export class DataGatewayService {
 
     searchPublicApps(term: any, limit = 20) {
         return this.ipc.request("searchPublicApps", {term, limit});
+    }
+
+    fetchFileContent(source: "app" | "local" | "public", almostID: string) {
+
+        if (source === "local") {
+            return this.ipc.request("readFileContent", almostID).take(1);
+        }
+
+        if (source === "app") {
+            const [profile, projectSlug, username, projectSlugAgain, appSlug, revision] = almostID.split("/");
+            return this.api.getApp(`${username}/${projectSlugAgain}/${appSlug}`).map(app => JSON.stringify(app, null, 4)).take(1);
+        }
+
+        if (source === "public") {
+            const [, , , , , username, projectSlug, appSlug, revision] = almostID.split("/");
+            return this.api.getApp(`${username}/${projectSlug}/${appSlug}`).map(app => JSON.stringify(app, null, 4)).take(1);
+        }
     }
 }

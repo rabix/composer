@@ -20,6 +20,7 @@ import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.c
 import * as Yaml from "js-yaml";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {AddSourceModalComponent} from "../../modals/add-source-modal/add-source-modal.component";
+import {PlatformAppEntry} from "../../data-gateway/data-types/platform-api.types";
 
 @Component({
     selector: "ct-my-apps-panel",
@@ -255,13 +256,24 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
             .subscribe(data => {
 
                 const children = data.listing.map(app => {
+                    const id = data.node.id + "/" + app["sbg:id"];
+
                     return {
-                        id: data.node.id + "/" + app["sbg:id"],
+                        id,
                         type: "app",
                         label: app.label,
                         icon: app.class === "CommandLineTool" ? "fa-terminal" : "fa-share-alt",
                         data: app,
-                    };
+                        dragEnabled: true,
+                        dragTransferData: {
+                            content: Observable.of("").switchMap(() => this.dataGateway.fetchFileContent("app", id))
+                                .publishReplay(1)
+                                .refCount()
+                        },
+                        dragDropZones: ["zone1"],
+                        dragLabel: app.label,
+                        dragImageClass: app.class === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
+                    } as TreeNode<PlatformAppEntry>;
                 });
                 data.node.modify(() => {
                     data.node.children = children;
@@ -294,15 +306,29 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                     } else if (entry.type === "CommandLineTool") {
                         icon = "fa-terminal";
                     }
+
+                    const id    = entry.path;
+                    const label = entry.path.split("/").pop();
+
                     return {
+                        id,
                         icon,
+                        label,
                         data: entry,
                         iconExpanded,
-                        id: entry.path,
                         isExpandable: entry.isDir,
                         isExpanded: entry.isDir && data.expanded.indexOf(entry.path) !== -1,
                         type: entry.isDir ? "folder" : "file",
-                        label: entry.path.split("/").pop(),
+                        dragEnabled: ["Workflow", "CommandLineTool"].indexOf(entry.type) !== -1,
+                        dragTransferData: {
+                            content: Observable.of("")
+                                .switchMap(_ => this.dataGateway.fetchFileContent("local", entry.path))
+                                .publishReplay(1)
+                                .refCount()
+                        },
+                        dragDropZones: ["zone1"],
+                        dragLabel: label,
+                        dragImageClass: entry.type === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
                     };
                 });
 

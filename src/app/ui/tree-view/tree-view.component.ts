@@ -7,16 +7,22 @@ import {TreeViewService} from "./tree-view.service";
     selector: "ct-tree-view",
     template: `
         <ct-tree-node *ngFor="let node of nodes"
-                      [id]="node?.id"
                       [level]="level"
+                      [id]="node?.id"
                       [type]="node?.type"
                       [icon]="node?.icon"
                       [label]="node?.label"
                       [data]="node?.data || {}"
                       [children]="node.children"
-                      [isExpanded]="node.isExpanded"
-                      [isExpandable]="node.isExpandable"
-                      [iconExpanded]="node?.iconExpanded">
+                      [dragLabel]="node?.dragLabel"
+                      [isExpanded]="node?.isExpanded"
+                      [dragEnabled]="node?.dragEnabled"
+                      [dragDropZones]="node?.dropZones"
+                      [isExpandable]="node?.isExpandable"
+                      [iconExpanded]="node?.iconExpanded"
+                      [dragImageClass]="node?.dragImageClass"
+                      [dragTransferData]="node?.dragTransferData"
+        >
         </ct-tree-node>
     `,
     styleUrls: ["./tree-view.component.scss"],

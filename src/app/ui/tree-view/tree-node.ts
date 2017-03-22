@@ -8,4 +8,10 @@ export interface TreeNode<T> {
     isExpandable?: boolean;
     children?: TreeNode<any>[];
     data?: T;
+
+    dragEnabled?: boolean;
+    dragTransferData?: any;
+    dragLabel?: string;
+    dragImageClass?: string;
+    dragDropZones?: string[];
 }

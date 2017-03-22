@@ -35,7 +35,10 @@ export class PlatformAPI {
                     headers: new Headers({
                         "auth-token": config.token
                     })
-                })).subscribe(res => this.sessionID.next(res.json().message.session_id));
+                }))
+                .subscribe(res => {
+                    this.sessionID.next(res.json().message.session_id);
+                });
         });
     }
 

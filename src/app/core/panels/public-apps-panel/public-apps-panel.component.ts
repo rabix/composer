@@ -212,6 +212,16 @@ export class PublicAppsPanelComponent extends DirectiveBase implements AfterView
                     type: "app",
                     data: app,
                     icon: app.class === "Workflow" ? "fa-share-alt" : "fa-terminal",
+                    dragEnabled: true,
+                    dragTransferData: {
+                        content: Observable.of("")
+                            .switchMap(() => this.dataGateway.fetchFileContent("public", app.id))
+                            .publishReplay(1)
+                            .refCount()
+                    },
+                    dragDropZones: ["zone1"],
+                    dragLabel: app.label,
+                    dragImageClass: app.class === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
                 };
             });
 

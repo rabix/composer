@@ -16,6 +16,13 @@ import {TreeViewService} from "../tree-view.service";
     template: `
         <div (dblclick)="toggle()"
              (click)="select()"
+
+             [ct-drag-enabled]="dragEnabled"
+             [ct-drag-image-class]="dragImageClass"
+             [ct-drag-image-caption]="dragLabel"
+             [ct-drag-transfer-data]="dragTransferData"
+             [ct-drop-zones]="dragDropZones"
+
              [style.paddingLeft.em]="level"
              [class.selected]="this === (tree.selected | async)"
              class="deep-unselectable clickable node-base {{ type }}">
@@ -41,6 +48,13 @@ import {TreeViewService} from "../tree-view.service";
                           [isExpandable]="child.isExpandable"
                           [iconExpanded]="child?.iconExpanded"
                           [children]="child.children"
+                          
+                          [dragEnabled]="child.dragEnabled"
+                          [dragTransferData]="child.dragTransferData"
+                          [dragLabel]="child.dragLabel"
+                          [dragImageClass]="child.dragImageClass"
+                          [dragDropZones]="child.dragDropZones"
+                          
                           [level]="level + 1"
             ></ct-tree-node>
         </div>
@@ -60,6 +74,12 @@ export class TreeNodeComponent<T> implements OnInit, AfterViewInit {
     @Input() isExpandable: boolean;
     @Input() children   = [];
     @Input() data: T;
+
+    @Input() dragEnabled      = false;
+    @Input() dragTransferData = {};
+    @Input() dragLabel        = "";
+    @Input() dragImageClass   = "";
+    @Input() dragDropZones    = [];
 
     @Input() selected = false;
     @Input() loading  = false;

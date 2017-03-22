@@ -1,8 +1,11 @@
-import {ChangeDetectionStrategy, Component, ElementRef, Input, TemplateRef, ViewChild, ViewEncapsulation} from "@angular/core";
+import {
+    ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, TemplateRef, ViewChild,
+    ViewEncapsulation
+} from "@angular/core";
 import {Workflow} from "cwl-svg";
 import {StepModel, WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
 import * as Yaml from "js-yaml";
-import {Observable} from "rxjs";
+import {Observable} from "rxjs/Observable";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
@@ -63,7 +66,7 @@ declare const Snap: any;
         </template>
     `
 })
-export class WorkflowGraphEditorComponent extends DirectiveBase {
+export class WorkflowGraphEditorComponent extends DirectiveBase implements OnChanges, OnInit, OnDestroy {
 
     @Input()
     public model: WorkflowModel;
@@ -80,7 +83,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase {
     @ViewChild("inspector", {read: TemplateRef})
     private inspectorTemplate: TemplateRef<any>;
 
-    private inspectedNode: StepModel | WorkflowOutputParameterModel | WorkflowInputParameterModel = null;
+    inspectedNode: StepModel | WorkflowOutputParameterModel | WorkflowInputParameterModel = null;
 
     public graph: Workflow;
 
@@ -107,11 +110,11 @@ export class WorkflowGraphEditorComponent extends DirectiveBase {
         this.statusBar.setControls(this.controlsTemplate);
     }
 
-    private upscale() {
+    upscale() {
         this.graph.command("workflow.scale", this.graph.getScale() + .1);
     }
 
-    private downscale() {
+    downscale() {
         if (this.graph.getScale() > .1) {
             this.graph.command("workflow.scale", this.graph.getScale() - .1);
 
@@ -121,7 +124,8 @@ export class WorkflowGraphEditorComponent extends DirectiveBase {
     /**
      * Triggers when app is dropped on canvas
      */
-    private onDrop(ev: MouseEvent, node: { content: Observable<string> }) {
+    onDrop(ev: MouseEvent, node: { content: Observable<string> }) {
+        console.log("Dropped!", node);
         node.content.first().subscribe((node) => {
             try {
                 let json = Yaml.safeLoad(node, {
@@ -164,7 +168,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase {
     /**
      * Returns type of inspected node to determine which template to render for object inspector
      */
-    private typeOfInspectedNode() {
+    typeOfInspectedNode() {
         if (this.inspectedNode instanceof StepModel) {
             return "Step";
         } else if (this.inspectedNode instanceof WorkflowInputParameterModel) {

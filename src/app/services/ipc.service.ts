@@ -10,6 +10,25 @@ enum RequestType {
     Watch
 }
 
+export type IPCRoute =
+    "accelerator"
+    | "createDirectory"
+    | "createFile"
+    | "deletePath"
+    | "getSetting"
+    | "hasDataCache"
+    | "pathExists"
+    | "putSetting"
+    | "readDirectory"
+    | "readFileContent"
+    | "resolve"
+    | "resolveContent"
+    | "scanPlatforms"
+    | "searchLocalProjects"
+    | "searchPublicApps"
+    | "searchUserProjects"
+    | "saveFileContent";
+
 @Injectable()
 export class IpcService {
 
@@ -56,7 +75,7 @@ export class IpcService {
         });
     }
 
-    public request(message: string, data = {}, zone?: NgZone) {
+    public request(message: IPCRoute, data = {}, zone?: NgZone) {
         const messageID = this.guid.generate();
 
         this.pendingRequests[messageID] = {

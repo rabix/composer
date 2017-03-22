@@ -6,7 +6,7 @@ export class DropZones extends DirectiveBase {
 
     @Input("ct-drop-zones")
     set dropZones(zones: string[]) {
-        this.el.setAttribute("ct-drop-zones", zones.toString());
+        this.el.setAttribute("ct-drop-zones", (zones || []).toString());
     }
 
     public el: Element;
