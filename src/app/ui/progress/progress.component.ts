@@ -8,5 +8,5 @@ import {ChangeDetectionStrategy, Component, OnInit} from "@angular/core";
     styleUrls: ["./progress.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ProgressComponent implements OnInit {
+export class ProgressComponent {
 }
