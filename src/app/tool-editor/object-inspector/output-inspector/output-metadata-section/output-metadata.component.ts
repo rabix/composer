@@ -14,8 +14,9 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
         {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => OutputMetaDataSectionComponent), multi: true}
     ],
     template: `
-        <ct-form-panel *ngIf="output.type.type === 'File' || (output.type.type === 'array' && output.type.items === 'File')"
-                       class="borderless" [collapsed]="true">
+        <ct-form-panel
+                *ngIf="output.type.type === 'File' || (output.type.type === 'array' && output.type.items === 'File')"
+                class="borderless" [collapsed]="true">
 
             <div class="tc-header">Metadata</div>
             <div class="tc-body" *ngIf="metadataForm">
@@ -25,7 +26,8 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                         <!--Inherit Metadata field-->
                         <div class="form-group">
                             <label class="form-control-label">Inherit</label>
-                            <select class="form-control" [formControl]="metadataForm.controls['inheritMetadata']">
+                            <select class="form-control"
+                                    [formControl]="metadataForm.controls['inheritMetadata']">
                                 <option value="">-- none --</option>
                                 <option *ngFor="let item of inputs" [value]="item.id">
                                     {{item.id}}
@@ -37,12 +39,12 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
 
                     <!--@todo Replace this key-value-list-->
-                    <key-value-list
-                        [addEntryText]="'Add Metadata'"
-                        [emptyListText]="'No metadata defined.'"
-                        [formControl]="metadataForm.controls['metadataList']"
-                        [readonly]="readonly">
-                    </key-value-list>
+                    <ct-key-value-list
+                            [addEntryText]="'Add Metadata'"
+                            [emptyListText]="'No metadata defined.'"
+                            [formControl]="metadataForm.controls['metadataList']"
+                            [readonly]="readonly">
+                    </ct-key-value-list>
                 </div>
             </div>
 

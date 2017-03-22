@@ -11,11 +11,26 @@
     .command-line-part{
         display: inline-block;
         border: 1px solid transparent;
-        margin-right: .6rem;
 
         &:hover {
             border-color: $brand-primary;
             border-radius: $border-radius-sm;
         }
+    }
+
+    .input-cli {
+        color: $input-port-color;
+    }
+
+    .baseCmd-cli {
+        color: $base-cmd-color;
+    }
+
+    .arg-cli {
+        color: $arg-color;
+    }
+
+    .stream-cli {
+        color: #ddd;
     }
 }

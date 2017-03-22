@@ -24,7 +24,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
 
             <div class="tc-body">
 
-                <div class="container">
+                <div>
 
                     <!--Blank Tool Screen-->
                     <ct-blank-tool-state *ngIf="!readonly && !model.arguments.length"
@@ -34,7 +34,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                     </ct-blank-tool-state>
 
                     <!--List Header Row-->
-                    <div class="gui-section-list-title row" *ngIf="model.arguments.length">
+                    <div class="gui-section-list-title" *ngIf="model.arguments.length">
                         <div class="col-sm-4">Value</div>
                         <div class="col-sm-3">Prefix</div>
                         <div class="col-sm-3">Separate</div>
@@ -46,9 +46,9 @@ import {ModalService} from "../../../ui/modal/modal.service";
 
                         <!--List Entry-->
                         <li *ngFor="let entry of model.arguments; let i = index"
-                            class="input-list-items container">
+                            class="input-list-items">
 
-                            <div class="gui-section-list-item clickable row"
+                            <div class="gui-section-list-item clickable"
                                  [ct-validation-class]="entry.validation"
                                  [ct-editor-inspector]="inspector"
                                  [ct-editor-inspector-target]="entry.loc">
@@ -134,30 +134,30 @@ import {ModalService} from "../../../ui/modal/modal.service";
 export class ArgumentListComponent extends DirectiveBase {
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
     /** Model location entry, used for tracing the path in the json document */
     @Input()
-    public location = "";
+    location = "";
 
     /** Context in which expression should be evaluated */
     @Input()
-    public context;
+    context;
 
     @Input()
-    public model: CommandLineToolModel;
+    model: CommandLineToolModel;
 
     @Output()
-    public readonly update = new EventEmitter();
+    readonly update = new EventEmitter();
 
     @ViewChildren("inspector", {read: TemplateRef})
-    private inspectorTemplate: QueryList<TemplateRef<any>>;
+    inspectorTemplate: QueryList<TemplateRef<any>>;
 
-    constructor(private inspector: EditorInspectorService, private modal: ModalService) {
+    constructor(public inspector: EditorInspectorService, private modal: ModalService) {
         super();
     }
 
-    private removeEntry(index) {
+    removeEntry(index) {
         this.modal.confirm({
             title: "Really Remove?",
             content: `Are you sure that you want to remove this argument?`,
@@ -174,7 +174,7 @@ export class ArgumentListComponent extends DirectiveBase {
         }, noop);
     }
 
-    private addEntry() {
+    addEntry() {
         const newEntry = this.model.addArgument({});
         this.update.emit(this.model.arguments);
 

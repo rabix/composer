@@ -95,12 +95,6 @@ import {SettingsService} from "../services/settings/settings.service";
                             [options]="{mode: 'ace/mode/yaml'}"
                             class="editor">
             </ui-code-editor>
-            <!--<ct-code-editor-x *ngIf="viewMode === 'code'"-->
-            <!--class="editor-main"-->
-            <!--[(content)]="rawEditorContent"-->
-            <!--[options]="{theme: 'ace/theme/monokai'}"-->
-            <!--[language]="'yaml'"-->
-            <!--[readonly]="!data.isWritable"></ct-code-editor-x>-->
 
             <!--GUI Editor-->
             <ct-workflow-not-graph-editor *ngIf="viewMode === 'list' && !isLoading"
@@ -330,7 +324,9 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
         Observable.of(1).switchMap(() =>
             // Call service only if wf is in user projects
             this.data.data.source !== "local" && this.data.isWritable ?
-                this.platform.getUpdates(this.workflowModel.steps.map(id => id.run.customProps["sbg:id"]))
+                this.platform.getUpdates(this.workflowModel.steps
+                    .map(step => step.run ? step.run.customProps["sbg:id"] : null)
+                    .filter(s => !!s))
                 : Observable.of(undefined))
             .subscribe((response) => {
 

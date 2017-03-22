@@ -59,14 +59,16 @@
 //            flex-grow: .6;
 //        }
 //
-//        .app-report-panel {
-//            flex-basis: 150px;
-//            overflow: auto;
-//            border-left: $layout-section-border-dark;
-//            border-top: $layout-section-border-light;
-//        }
+//
 //    }
 //}
+
+.app-report-panel {
+    display: flex;
+    flex-direction: column;
+    flex-basis: 150px;
+    overflow: auto;
+}
 
 .status-bar-footer {
     background: $gui-editor-status-bar-bg;
@@ -103,8 +105,18 @@
     }
 }
 
+.gui-section-header {
+    font-family: $font-family-title;
+    color: $gui-section-header-color;
+    margin: 0;
+    font-size: $font-size-base;
+    font-weight: 400;
+    text-transform: uppercase;
+}
+
 .gui-section-list-item {
     transition: all .2s;
+    display: flex;
 
     background: $gui-section-list-item-bg;
     color: $gui-section-list-item-color;

@@ -5,19 +5,19 @@ import {ChangeDetectionStrategy, Component, Input} from "@angular/core";
     styleUrls: ["./command-line-preview.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-        <div class="command-line-part" *ngFor="let p of commandLineParts"
-              [ct-tooltip]="ctt"
+        <span *ngFor="let p of commandLineParts"
               [class.text-console-warning]="p.type === 'warning'"
               [class.text-console-error]="p.type === 'error'"
               [class.baseCmd-cli]="p.type === 'baseCommand'"
               [class.input-cli]="p.type === 'input'"
-              [class.arg-cli]="p.type === 'argument'">{{ p.value.trim() }}<ct-tooltip-content *ngIf="p.value" #ctt>
-            <span>
-                {{ p.loc }}
-            </span>
-        </ct-tooltip-content></div>
-
-        
+              [class.arg-cli]="p.type === 'argument'"
+              [class.stream-cli]="p.type === 'stdin' || p.type === 'stdout'">
+            <div class="command-line-part" *ngIf="p.value" [ct-tooltip]="ctt">{{ p.value.trim() }}<ct-tooltip-content #ctt>
+                <span>
+                    {{ p.loc }}
+                </span>
+            </ct-tooltip-content></div>
+        </span>
     `
 })
 export class CommandLinePreviewComponent {

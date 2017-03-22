@@ -37,29 +37,29 @@ import {ToolInputListComponent} from "./tool-input-list.component";
 export class ToolInputsComponent extends DirectiveBase {
 
     @Input()
-    public entries: CommandInputParameterModel[] = [];
+    entries: CommandInputParameterModel[] = [];
 
     /** Model location entry, used for tracing the path in the json document */
     @Input()
-    public location = "";
+    location = "";
 
     /** Context in which expression should be evaluated */
     @Input()
-    public context: { $job: any };
+    context: { $job: any };
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
     @Input()
-    public model: CommandLineToolModel;
+    model: CommandLineToolModel;
 
     @Output()
-    public update = new EventEmitter();
+    update = new EventEmitter();
 
+    @ViewChild(ToolInputListComponent)
+    private inputList: ToolInputListComponent;
 
-    @ViewChild(ToolInputListComponent) inputList: ToolInputListComponent;
-
-    private addEntry() {
+    addEntry() {
         this.inputList.addEntry();
     }
 

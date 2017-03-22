@@ -7,15 +7,14 @@ import {
     Output,
     Renderer,
     ViewChild,
-    ViewEncapsulation
+    OnInit,
+    AfterViewInit
 } from "@angular/core";
-import {Observable} from "rxjs";
+import {Observable} from "rxjs/Observable";
 import {CodeEditorXComponent} from "./code-editor.component";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-code-preview",
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
@@ -33,7 +32,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
         }"></ct-code-editor-x>
     `
 })
-export class CodePreviewComponent extends DirectiveBase {
+export class CodePreviewComponent extends DirectiveBase implements OnInit, AfterViewInit {
 
     @Input()
     content = "";
@@ -67,8 +66,8 @@ export class CodePreviewComponent extends DirectiveBase {
 
     ngAfterViewInit() {
 
-        const editor = this.editor.getEditorInstance();
-        const lineNum = editor.getValue().trim().split(/\r\n|\r|\n/).length;
+        const editor     = this.editor.getEditorInstance();
+        const lineNum    = editor.getValue().trim().split(/\r\n|\r|\n/).length;
         const lineHeight = 16; // Sorry for hardcoding, low priority >:(!
 
         this.renderer.setElementStyle(this.elemRef.nativeElement, "height", Math.min(lineNum, 20) * lineHeight + "px");

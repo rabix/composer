@@ -1,24 +1,42 @@
 @import "../../../../assets/sass/variables";
 @import "../../../../assets/sass/mixins";
 
-ct-base-command .form-section {
-    @include cli-border($base-cmd-color);
-}
 
-//@todo(maya) fix this, move elsewhere, refactor
-.removable-form-control {
-    width: 100%;
-    position: relative;
+:host {
 
-    ct-expression-input, input, input:not([type="radio"]), input:not([type="checkbox"]) {
-        width: calc(100% - 20px);
-        display: inline-block;
+    /deep/ .form-section {
+        @include cli-border($base-cmd-color);
     }
 
-    .remove-icon {
+    .stream {
+        flex: 1;
+
+        & ~ .stream {
+            padding-left: 1rem;
+        }
+    }
+
+    .streams-row {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .removable-form-control {
+        width: 100%;
         position: relative;
-        cursor: pointer;
-        top: 6px;
-        float: right;
+
+        ct-expression-input, input, input:not([type="radio"]), input:not([type="checkbox"]) {
+            width: calc(100% - 20px);
+            display: inline-block;
+        }
+
+        .remove-icon {
+            position: relative;
+            cursor: pointer;
+            top: 6px;
+            float: right;
+        }
     }
+
 }
+

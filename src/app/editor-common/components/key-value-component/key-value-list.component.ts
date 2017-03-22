@@ -1,4 +1,4 @@
-import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
+import {Component, forwardRef, Input, ViewEncapsulation, OnDestroy} from "@angular/core";
 import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 import {GuidService} from "../../../services/guid.service";
@@ -9,7 +9,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
 @Component({
     encapsulation: ViewEncapsulation.None,
 
-    selector: "key-value-list",
+    selector: "ct-key-value-list",
     styleUrls: ["./key-value-list.component.scss"],
     providers: [
         {
@@ -19,7 +19,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
         }
     ],
     template: `
-        <div class="container">
+        <div>
 
             <!--Blank Tool Screen-->
             <ct-blank-tool-state *ngIf="!readonly && !keyValueFormList.length"
@@ -71,36 +71,36 @@ import {ModalService} from "../../../ui/modal/modal.service";
         </button>
     `
 })
-export class KeyValueListComponent extends DirectiveBase implements ControlValueAccessor {
+export class KeyValueListComponent extends DirectiveBase implements ControlValueAccessor, OnDestroy {
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
     @Input()
-    public context: { $job: any } = {$job: {}};
+    context: { $job: any } = {$job: {}};
 
     @Input()
-    public addEntryText = "";
+    addEntryText = "";
 
     @Input()
-    public emptyListText = "";
+    emptyListText = "";
 
     @Input()
-    public keyColumnText = "Key";
+    keyColumnText = "Key";
 
     @Input()
-    public valueColumnText = "Value";
+    valueColumnText = "Value";
 
     @Input()
-    public allowDuplicateKeys = true;
+    allowDuplicateKeys = true;
 
     @Input()
-    public helpLink = "";
+    helpLink = "";
 
     @Input()
-    public keyValidator = () => null;
+    keyValidator = noop;
 
-    private keyValueFormList: {
+    keyValueFormList: {
         id: string,
         model: {
             key?: string,
@@ -113,9 +113,9 @@ export class KeyValueListComponent extends DirectiveBase implements ControlValue
 
     private propagateChange = noop;
 
-    private form = new FormGroup({}, this.duplicateKeyValidator.bind(this));
+    form = new FormGroup({}, this.duplicateKeyValidator.bind(this));
 
-    private duplicateKeys = new Set();
+    duplicateKeys = new Set();
 
     constructor(private guidService: GuidService, private modal: ModalService) {
         super();
@@ -131,7 +131,7 @@ export class KeyValueListComponent extends DirectiveBase implements ControlValue
             return {
                 id: this.guidService.generate(),
                 model: entry
-            }
+            };
         });
 
         this.keyValueFormList.forEach(hint => {
@@ -142,13 +142,13 @@ export class KeyValueListComponent extends DirectiveBase implements ControlValue
         });
 
         this.tracked = this.form.valueChanges.subscribe(change => {
-            let newKeyValueList = [];
-            let uniqueKeys: string[] = [];
+            const newKeyValueList = [];
+            const uniqueKeys: string[] = [];
 
             Object.keys(change).forEach(key => {
                 if (uniqueKeys.indexOf(change[key].key) === -1) {
                     newKeyValueList.push(change[key]);
-                    uniqueKeys.push(change[key].key)
+                    uniqueKeys.push(change[key].key);
                 }
             });
 
@@ -164,13 +164,13 @@ export class KeyValueListComponent extends DirectiveBase implements ControlValue
         this.onTouched = fn;
     }
 
-    private duplicateKeyValidator(g: FormGroup) {
+    duplicateKeyValidator(g: FormGroup) {
         if (!this.duplicateKeys || this.allowDuplicateKeys) {
             return;
         }
 
         this.duplicateKeys.clear();
-        let keySet = new Set();
+        const keySet = new Set();
 
         Object.keys(g.controls)
             .filter(key => !!g.controls[key].value.key)
@@ -186,7 +186,7 @@ export class KeyValueListComponent extends DirectiveBase implements ControlValue
         return this.duplicateKeys.size > 0 ? {message: "There are duplicates in the form."} : null;
     }
 
-    private addEntry(): void {
+    addEntry(): void {
         const newEntry = {
             id: this.guidService.generate(),
             model: {
@@ -200,7 +200,7 @@ export class KeyValueListComponent extends DirectiveBase implements ControlValue
         this.form.addControl(newEntry.id, new FormControl(newEntry.model));
     }
 
-    private removeEntry(ctrl: { id: string, model: SBDraft2ExpressionModel }): void {
+    removeEntry(ctrl: { id: string, model: SBDraft2ExpressionModel }): void {
         this.modal.confirm({
             title: "Really Remove?",
             content: `Are you sure that you want to remove this key-value pair?`,

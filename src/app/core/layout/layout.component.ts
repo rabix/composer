@@ -1,5 +1,6 @@
-import {Component, ElementRef, Input, ViewChild} from "@angular/core";
-import {BehaviorSubject, Subscription} from "rxjs";
+import {Component, ElementRef, Input, ViewChild, OnInit} from "@angular/core";
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {Subscription} from "rxjs/Subscription";
 import {StatusBarComponent} from "../../layout/status-bar/status-bar.component";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {DomEventService} from "../../services/dom/dom-event.service";
@@ -36,7 +37,7 @@ import {
 
             <!--Panel/Content Resize Handle-->
             <div #handle class="handle-vertical"
-                 [class.hidden]="!sidebarExpanded || (visiblePanels | async)?.length === 0">
+                 [class.hidden]="!sidebarExpanded">
             </div>
 
             <!--Editor Content Column-->
@@ -47,7 +48,7 @@ import {
         <ct-status-bar #statusBar class="layout-section"></ct-status-bar>
     `
 })
-export class LayoutComponent extends DirectiveBase {
+export class LayoutComponent extends DirectiveBase implements OnInit {
 
     /** Flex ratio of the left part of the layout */
     @Input()

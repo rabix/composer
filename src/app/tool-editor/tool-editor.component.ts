@@ -1,4 +1,3 @@
-import * as Yaml from "js-yaml";
 import {
     AfterViewInit,
     Component,
@@ -7,87 +6,74 @@ import {
     OnInit,
     TemplateRef,
     ViewChild,
-    ViewContainerRef,
-    ViewEncapsulation
+    ViewContainerRef
 } from "@angular/core";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
-import {BehaviorSubject, ReplaySubject, Subject} from "rxjs/Rx";
-import {Validation} from "cwlts/models/helpers/validation";
-import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
-import {EditorInspectorService} from "../editor-common/inspector/editor-inspector.service";
-import {DataEntrySource} from "../sources/common/interfaces";
-import {UserPreferencesService} from "../services/storage/user-preferences.service";
-import {PlatformAPI} from "../services/api/platforms/platform-api.service";
-import {StatusBarService} from "../layout/status-bar/status-bar.service";
-import {noop} from "../lib/utils.lib";
 import {CommandLineToolFactory} from "cwlts/models/generic/CommandLineToolFactory";
+import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
+import {Validation} from "cwlts/models/helpers/validation";
+import * as Yaml from "js-yaml";
+import {BehaviorSubject, ReplaySubject, Subject} from "rxjs/Rx";
+import {WorkboxTab} from "../core/workbox/workbox-tab.interface";
 import {
     CwlSchemaValidationWorkerService,
     ValidationResponse
 } from "../editor-common/cwl-schema-validation-worker/cwl-schema-validation-worker.service";
-import LoadOptions = jsyaml.LoadOptions;
-import {DirectiveBase} from "../util/directive-base/directive-base";
-import {ModalService} from "../ui/modal/modal.service";
-import {WorkboxTab} from "../core/workbox/workbox-tab.interface";
-import {SettingsService} from "../services/settings/settings.service";
+import {EditorInspectorService} from "../editor-common/inspector/editor-inspector.service";
+import {StatusBarService} from "../layout/status-bar/status-bar.service";
+import {noop} from "../lib/utils.lib";
 import {SystemService} from "../platform-providers/system.service";
+import {PlatformAPI} from "../services/api/platforms/platform-api.service";
+import {SettingsService} from "../services/settings/settings.service";
+import {UserPreferencesService} from "../services/storage/user-preferences.service";
+import {DataEntrySource} from "../sources/common/interfaces";
+import {ModalService} from "../ui/modal/modal.service";
+import {DirectiveBase} from "../util/directive-base/directive-base";
+import LoadOptions = jsyaml.LoadOptions;
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-tool-editor",
     styleUrls: ["./tool-editor.component.scss"],
-    host: {
-        "class": "tab-container"
-    },
     providers: [EditorInspectorService],
     template: `
-        <ct-line-loader *ngIf="isLoading"></ct-line-loader>
+        <!--Control Header-->
+        <ct-action-bar>
+            <ct-tab-selector class="inverse" [distribute]="'auto'" [active]="viewMode"
+                             (activeChange)="switchTab($event)">
+                <ct-tab-selector-entry [disabled]="!isValidCWL" [tabName]="'info'">App Info
+                </ct-tab-selector-entry>
+                <ct-tab-selector-entry [disabled]="!isValidCWL" [tabName]="'gui'">Visual
+                </ct-tab-selector-entry>
+                <ct-tab-selector-entry [disabled]="!isValidCWL" [tabName]="'test'">Test
+                </ct-tab-selector-entry>
+                <ct-tab-selector-entry [tabName]="'code'">Code</ct-tab-selector-entry>
+            </ct-tab-selector>
 
-        <div class="editor-container" [hidden]="isLoading">
-
-            <!--Control Header-->
-            <ct-editor-controls>
-
-                <!--View Modes-->
-                <span class="btn-group pull-left">
-                    <button class="btn btn-secondary btn-sm"
-                            (click)="switchView(viewModes.Code)"
-                            [class.btn-primary]="viewMode === viewModes.Code"
-                            [class.btn-secondary]="viewMode !== viewModes.Code">Code</button>
-                            
-                    <button class="btn btn-secondary btn-sm"
-                            [disabled]="!isValidCWL"
-                            (click)="switchView(viewModes.Gui)"
-                            [class.btn-primary]="viewMode === viewModes.Gui"
-                            [class.btn-secondary]="viewMode !== viewModes.Gui">Visual</button>
-                            
-                    <button class="btn btn-secondary btn-sm"
-                            [disabled]="!isValidCWL"
-                            (click)="switchView(viewModes.Test)"
-                            [class.btn-primary]="viewMode === viewModes.Test"
-                            [class.btn-secondary]="viewMode !== viewModes.Test">Test</button>
-
-                    <button class="btn btn-secondary btn-sm"
-                            [disabled]="!isValidCWL"
-                            (click)="switchView(viewModes.Info)"
-                            [class.btn-primary]="viewMode === viewModes.Info"
-                            [class.btn-secondary]="viewMode !== viewModes.Info">App Info</button>
-
-                </span>
-
-                <!--CWLVersion-->
-                <span class="tag tag-default">{{ toolModel.cwlVersion }}</span>
+            <div class="document-controls">
 
                 <!--Go to app-->
                 <button class="btn btn-sm btn-secondary " type="button" (click)="goToApp()">
                     <i class="fa fa-external-link"></i>
                 </button>
 
+                <!--Save-->
+                <button [disabled]="!data.isWritable"
+                        (click)="save()"
+                        class="btn btn-sm btn-secondary" type="button">
+                    <i class="fa fa-save"></i>
+                </button>
+
+                <!--Copy-->
+                <button class="btn btn-sm btn-secondary " type="button">
+                    <i class="fa fa-copy"></i>
+                </button>
+
+
                 <!--Revisions-->
-                <button class="btn btn-secondary btn-sm" type="button"
-                        [ct-editor-inspector]="revisions"
-                        *ngIf="this.data.data.source !== 'local'">
+                <button *ngIf="this.data.data.source !== 'local'"
+                        class="btn btn-sm btn-secondary" type="button"
+                        [ct-editor-inspector]="revisions">
+
                     Revision: {{ toolModel.customProps['sbg:revision']}}
 
                     <template #revisions>
@@ -98,65 +84,55 @@ import {SystemService} from "../platform-providers/system.service";
                     </template>
                 </button>
 
-                <!--Copy-->
-                <button class="btn btn-secondary btn-sm" type="button">
-                    Copy...
-                </button>
-
-                <!--Save-->
-                <button [disabled]="!data.isWritable"
-                        (click)="save()"
-                        class="btn btn-secondary btn-sm" type="button">
-                    Save
-                </button>
-            </ct-editor-controls>
-
-            <!--Header & Editor Column-->
-            <div class="editor-content flex-row">
-                <!--Editor Row-->
-                <ct-code-editor-x *ngIf="viewMode === viewModes.Code" class="editor"
-                                  [class.flex-col]="showInspector"
-                                  [(content)]="rawEditorContent"
-                                  [options]="{theme: 'ace/theme/monokai'}"
-                                  [language]="'yaml'"
-                                  [readonly]="!data.isWritable"></ct-code-editor-x>
-
-                <!--GUI Editor-->
-                <ct-tool-visual-editor *ngIf="viewMode === viewModes.Gui"
-                                       class="gui-editor-component flex-col"
-                                       [readonly]="!data.isWritable"
-                                       [formGroup]="toolGroup"
-                                       [model]="toolModel"></ct-tool-visual-editor>
-
-                <ct-job-editor *ngIf="viewMode === viewModes.Test"
-                               class="gui-editor-component flex-col p-2"
-                               [job]="toolModel.job"
-                               (update)="onJobUpdate($event)"
-                               (reset)="resetJob()"
-                               [inputs]="toolModel.inputs"></ct-job-editor>
-
-                <ct-app-info *ngIf="viewMode === viewModes.Info"
-                             class="gui-editor-component p-2"
-                             [class.flex-col]="showInspector"
-                             [model]="toolModel"></ct-app-info>
-
-
-                <!--Object Inspector Column-->
-                <div class="flex-col inspector-col">
-                    <ct-editor-inspector class="object-inspector">
-                        <template #inspector></template>
-                    </ct-editor-inspector>
-                </div>
             </div>
+        </ct-action-bar>
 
-            <div *ngIf="reportPanel" class="app-report-panel layout-section">
-                <ct-validation-report *ngIf="reportPanel === 'validation'"
-                                      [issues]="validation"></ct-validation-report>
-                <ct-command-line-preview *ngIf="reportPanel === 'commandLinePreview'"
-                                         [commandLineParts]="commandLineParts | async"></ct-command-line-preview>
-            </div>
+        <!--Header & Editor Column-->
+        <div class="editor-layout">
 
-            <template #statusControls>
+            <ct-block-loader *ngIf="isLoading"></ct-block-loader>
+
+            <!--Editor Row-->
+            <ui-code-editor *ngIf="viewMode === 'code' && !isLoading"
+                            [formControl]="codeEditorContent"
+                            [options]="{mode: 'ace/mode/yaml'}"
+                            class="editor">
+            </ui-code-editor>
+
+            <!--GUI Editor-->
+            <ct-tool-visual-editor *ngIf="viewMode === 'gui' && !isLoading"
+                                   class="gui-editor-component flex-col"
+                                   [readonly]="!data.isWritable"
+                                   [formGroup]="toolGroup"
+                                   [model]="toolModel"></ct-tool-visual-editor>
+
+            <ct-job-editor *ngIf="viewMode === 'test' && !isLoading"
+                           class="gui-editor-component flex-col p-2"
+                           [job]="toolModel.job"
+                           (update)="onJobUpdate($event)"
+                           (reset)="resetJob()"
+                           [inputs]="toolModel.inputs"></ct-job-editor>
+
+            <ct-app-info *ngIf="viewMode === 'info' && !isLoading"
+                         class="gui-editor-component p-2"
+                         [class.flex-col]="showInspector"
+                         [model]="toolModel"></ct-app-info>
+
+
+            <!--Object Inspector Column-->
+            <ct-editor-inspector [class.flex-hide]="!showInspector">
+                <template #inspector></template>
+            </ct-editor-inspector>
+        </div>
+
+        <div *ngIf="reportPanel" class="app-report-panel layout-section">
+            <ct-validation-report *ngIf="reportPanel === 'validation'"
+                                  [issues]="validation"></ct-validation-report>
+            <ct-command-line-preview *ngIf="reportPanel === 'commandLinePreview'"
+                                     [commandLineParts]="commandLineParts | async"></ct-command-line-preview>
+        </div>
+
+        <template #statusControls>
                 <span class="btn-group">
                     <button [disabled]="!validation"
                             [class.btn-primary]="reportPanel === 'validation'"
@@ -186,60 +162,54 @@ import {SystemService} from "../platform-providers/system.service";
                             (click)="toggleReport('commandLinePreview')"
                             class="btn btn-secondary btn-sm">Preview</button>
                 </span>
-            </template>
-        </div>
+        </template>
     `
 })
 export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDestroy, WorkboxTab, AfterViewInit {
     @Input()
-    public data: DataEntrySource;
+    data: DataEntrySource;
 
     /** ValidationResponse for current document */
-    public validation: ValidationResponse;
+    validation: ValidationResponse;
 
     /** Default view mode. */
     @Input()
-    public viewMode;
+    viewMode;
 
     /** Flag to indicate the document is loading */
-    private isLoading = true;
+    isLoading = true;
 
     /** Flag for showing reformat prompt on GUI switch */
-    private showReformatPrompt = true;
+    showReformatPrompt = true;
 
     /** Flag for bottom panel, shows validation-issues, commandline, or neither */
-    private reportPanel: "validation" | "commandLinePreview" | undefined;
+    reportPanel: "validation" | "commandLinePreview" | undefined;
 
     /** Flag for validity of CWL document */
-    private isValidCWL = false;
+    isValidCWL = false;
 
     /** Stream of contents in code editor */
-    private rawEditorContent = new BehaviorSubject("");
+    rawEditorContent = new BehaviorSubject("");
 
     /** Model that's recreated on document change */
-    private toolModel = CommandLineToolFactory.from(null, "document");
+    toolModel = CommandLineToolFactory.from(null, "document");
 
     /** Sorted array of resulting command line parts */
-    private commandLineParts: Subject<CommandLinePart[]> = new ReplaySubject();
+    commandLineParts: Subject<CommandLinePart[]> = new ReplaySubject();
 
     /** Template of the status controls that will be shown in the status bar */
     @ViewChild("statusControls")
     private statusControls: TemplateRef<any>;
 
-    private viewModes = {
-        Code: "code",
-        Gui: "gui",
-        Test: "test",
-        Info: "info"
-    };
-
-    private toolGroup: FormGroup;
+    toolGroup: FormGroup;
 
     @ViewChild("inspector", {read: ViewContainerRef})
     private inspectorHostView: ViewContainerRef;
 
     @Input()
-    public showInspector = false;
+    showInspector = false;
+
+    codeEditorContent = new FormControl(undefined);
 
     constructor(private cwlValidatorService: CwlSchemaValidationWorkerService,
                 private userPrefService: UserPreferencesService,
@@ -253,7 +223,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
 
         super();
 
-        this.viewMode = this.viewModes.Code;
+        this.viewMode = "code";
 
         this.toolGroup = formBuilder.group({});
 
@@ -265,6 +235,10 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
     }
 
     ngOnInit(): void {
+        if (!this.data.isWritable) {
+            this.codeEditorContent.disable();
+        }
+
         // Whenever the editor content is changed, validate it using a JSON Schema.
         this.tracked = this.rawEditorContent
             .skip(1)
@@ -279,7 +253,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
                     }
 
                     // load JSON to generate model
-                    let json = Yaml.safeLoad(this.rawEditorContent.getValue(), {
+                    const json = Yaml.safeLoad(this.rawEditorContent.getValue(), {
                         json: true
                     } as LoadOptions);
 
@@ -312,7 +286,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
 
                         // load document in GUI and turn off loader, only if loader was active
                         if (this.isLoading) {
-                            this.viewMode  = this.viewModes.Gui;
+                            this.viewMode  = "gui";
                             this.isLoading = false;
                         }
 
@@ -328,7 +302,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
                         this.isValidCWL = v.isValidCwl;
                     }, (err) => {
                         this.isLoading  = false;
-                        this.viewMode   = this.viewModes.Code;
+                        this.viewMode   = "code";
                         this.isValidCWL = false;
                         this.validation = {
                             isValidatableCwl: true,
@@ -354,7 +328,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
         this.statusBar.setControls(this.statusControls);
     }
 
-    private save() {
+    save() {
         const text = this.toolGroup.dirty ? this.getModelText() : this.rawEditorContent.getValue();
 
         // For local files, just save and that's it
@@ -395,9 +369,9 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
      *
      * @param mode
      */
-    private switchView(mode): void {
+    switchView(mode): void {
 
-        if (mode === this.viewModes.Gui && this.showReformatPrompt) {
+        if (mode === "gui" && this.showReformatPrompt) {
 
             // this.modal.checkboxPrompt({
             //     title: "Confirm GUI Formatting",
@@ -414,7 +388,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
             // return;
         }
 
-        if (mode === this.viewModes.Code && this.toolGroup.dirty) {
+        if (mode === "code" && this.toolGroup.dirty) {
             this.rawEditorContent.next(this.getModelText());
         }
 
@@ -431,22 +405,22 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
         return this.data.language.value === "json" ? JSON.stringify(modelObject, null, 4) : Yaml.dump(modelObject);
     }
 
-    private toggleReport(panel: "validation" | "commandLinePreview") {
+    toggleReport(panel: "validation" | "commandLinePreview") {
         this.reportPanel = this.reportPanel === panel ? undefined : panel;
     }
 
-    private openRevision(revisionNumber: number) {
+    openRevision(revisionNumber: number) {
         this.platform.getAppCWL(this.data.data, revisionNumber).subscribe(cwl => {
             this.rawEditorContent.next(cwl);
         });
     }
 
-    private onJobUpdate(job) {
+    onJobUpdate(job) {
         this.toolModel.setJob(job);
         this.toolModel.updateCommandLine();
     }
 
-    private resetJob() {
+    resetJob() {
         this.toolModel.resetJobDefaults();
     }
 
@@ -454,13 +428,21 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
      * Open tool in browser
      */
     goToApp() {
-        const urlApp = this.toolModel["sbgId"];
+        const urlApp     = this.toolModel["sbgId"];
         const urlProject = urlApp.split("/").splice(0, 2).join("/");
 
         this.settings.platformConfiguration.first().map(settings => settings.url).subscribe((url) => {
             this.system.openLink(`${url}/u/${urlProject}/apps/#${urlApp}`);
         });
     }
+
+
+    switchTab(tabName) {
+        setTimeout(() => {
+            this.viewMode = tabName;
+        });
+    }
+
 
     ngAfterViewInit() {
         this.inspector.setHostView(this.inspectorHostView);

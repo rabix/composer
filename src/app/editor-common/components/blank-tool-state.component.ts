@@ -1,13 +1,11 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewEncapsulation} from "@angular/core";
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from "@angular/core";
 import {SystemService} from "../../platform-providers/system.service";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-blank-tool-state",
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-        <div class="container">
+        <div>
             <div class="row text-xs-center mb-1" *ngIf="title">
                 <div class="offset-xs-1 col-xs-10 h5">
                     {{ title }}
@@ -37,20 +35,20 @@ import {SystemService} from "../../platform-providers/system.service";
 export class BlankToolStateComponent {
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
     @Input()
-    public title = "";
+    title = "";
 
     @Input()
-    public buttonText;
+    buttonText;
 
     @Input()
-    public learnMoreURL;
+    learnMoreURL;
 
     @Output()
-    public buttonClick = new EventEmitter<boolean>();
+    buttonClick = new EventEmitter<boolean>();
 
-    constructor(private system: SystemService) {
+    constructor(public system: SystemService) {
     }
 }

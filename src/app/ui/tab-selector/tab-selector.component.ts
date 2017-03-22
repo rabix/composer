@@ -89,11 +89,18 @@ export class TabSelectorComponent extends DirectiveBase implements OnInit, After
     }
 
     private updateHighlight() {
-        if (this.distribute === "equal" || !this.active || !this.tabEntries) {
+        if (this.distribute === "equal"
+            || !this.active
+            || !this.tabEntries
+            || !this.autoHighlight
+        ) {
             return;
         }
 
         const idx     = this.tabEntries.toArray().findIndex(tab => tab.tabName === this.active);
+        if (idx === -1) {
+            throw new Error(`Tab entry "${this.active}" does not exist in tab entries "${this.tabEntries.toArray().join(", ")}"`);
+        }
         const entries = this.tabEntryElements.toArray();
 
         let offset = 0;
