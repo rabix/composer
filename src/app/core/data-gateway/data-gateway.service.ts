@@ -31,7 +31,18 @@ export class DataGatewayService {
 
     scan(creds?) {
         const c    = creds ? Observable.of(creds) : this.preferences.get("credentials");
-        const scan = c.switchMap(credentials => this.ipc.request("scanPlatforms", {credentials}))
+
+        const scan = c.filter(e => {
+            let allHaveTokens = true;
+            e.forEach(platform => {
+                // @fixme: fix partial scanning
+                if (!platform.token.trim().length) {
+                    allHaveTokens = false;
+                }
+            });
+
+            return allHaveTokens;
+        }).switchMap(credentials => this.ipc.request("scanPlatforms", {credentials}))
             .publishReplay(1)
             .refCount();
 

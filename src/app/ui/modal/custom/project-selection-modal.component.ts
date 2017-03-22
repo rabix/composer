@@ -1,7 +1,7 @@
 import {Component, Input, ViewEncapsulation} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {ModalService} from "../modal.service";
-import {Observable} from "rxjs";
+import {Observable} from "rxjs/Observable";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -32,22 +32,22 @@ import {Observable} from "rxjs";
 export class ProjectSelectionModal {
 
     @Input()
-    public save: (selectedProject: string) => void;
+    save: (selectedProject: string) => void;
 
     @Input()
-    public closedProjects: Observable<string>;
+    closedProjects: Observable<string>;
 
-    private selectedProject: string;
+    selectedProject: string;
 
     /** Base form for open project */
-    private openProjectForm: FormGroup;
+    openProjectForm: FormGroup;
 
     constructor(private formBuilder: FormBuilder,
                 private modal: ModalService) {
         this.openProjectForm = formBuilder.group({});
     }
 
-    private selectProject(projectID) {
+    selectProject(projectID) {
         this.selectedProject = projectID;
     }
 

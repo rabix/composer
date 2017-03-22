@@ -5,6 +5,7 @@ ct-validation-report {
     padding: 10px;
     display: block;
     height: 100%;
+    overflow: auto;
     background: $layout-section-terminal-background;
 
     p {

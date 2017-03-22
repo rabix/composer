@@ -48,7 +48,10 @@ import {SettingsService} from "../services/settings/settings.service";
             </ct-tab-selector>
 
             <div class="document-controls">
-
+                
+                <!--CWLVersion-->
+                <span class="tag tag-default">{{ workflowModel.cwlVersion }}</span>
+                
                 <!--Go to app-->
                 <button class="btn btn-sm btn-secondary " type="button" (click)="goToApp()">
                     <i class="fa fa-external-link"></i>
@@ -228,8 +231,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
         });
 
         // Whenever the editor content is changed, validate it using a JSON Schema.
-        this.tracked = this.rawEditorContent
-            .skip(1)
+        this.tracked = this.codeEditorContent.valueChanges
             .distinctUntilChanged()
             .subscribe(latestContent => {
 

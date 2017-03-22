@@ -103,7 +103,9 @@ function parseJSON(content, source) {
     return new Promise((resolve, reject) => {
         const data = yaml.safeLoad(content, {
                 filename: source,
-                onWarning: () => {},
+                onWarning: (warning) => {
+                    console.log(warning);
+                },
                 json: true
             }) || {};
 

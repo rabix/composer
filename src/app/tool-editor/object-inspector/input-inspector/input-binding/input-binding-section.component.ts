@@ -1,4 +1,4 @@
-import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
+import {Component, forwardRef, Input} from "@angular/core";
 import {
     ControlValueAccessor,
     FormBuilder,
@@ -11,9 +11,7 @@ import {noop} from "../../../../lib/utils.lib";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
-    selector: "input-binding-section",
+    selector: "ct-input-binding-section",
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
@@ -84,24 +82,24 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 export class InputBindingSectionComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
     /** The type of the property as an input, so we can react to changes in the component */
     @Input()
-    public propertyType: string;
+    propertyType: string;
 
     @Input()
-    public context: { $job?: any, $self?: any } = {};
+    context: { $job?: any, $self?: any } = {};
 
-    private input: CommandInputParameterModel;
+    input: CommandInputParameterModel;
 
-    public form: FormGroup;
+    form: FormGroup;
 
     private onTouched = noop;
 
     private propagateChange = noop;
 
-    public itemSeparators: { text: string, value: string }[] = [
+    itemSeparators: { text: string, value: string }[] = [
         {text: "equal", value: "="},
         {text: "comma", value: ","},
         {text: "semicolon", value: ";"},
@@ -129,7 +127,7 @@ export class InputBindingSectionComponent extends DirectiveBase implements Contr
         this.onTouched = fn;
     }
 
-    private createInputBindingForm(input: CommandInputParameterModel): void {
+    createInputBindingForm(input: CommandInputParameterModel): void {
         this.form = this.formBuilder.group({
             stageInput: [input],
             valueFrom: [input.inputBinding.valueFrom, [Validators.required]],
@@ -142,12 +140,12 @@ export class InputBindingSectionComponent extends DirectiveBase implements Contr
         this.listenToInputBindingFormChanges();
     }
 
-    private listenToInputBindingFormChanges(): void {
+    listenToInputBindingFormChanges(): void {
         this.tracked = this.form.valueChanges
             .distinctUntilChanged()
             .debounceTime(300)
             .subscribe(value => {
-                let binding:any = {
+                const binding: any = {
                     position: value.position || undefined,
                     prefix: value.prefix || undefined,
                     separate: value.separate,
@@ -172,7 +170,7 @@ export class InputBindingSectionComponent extends DirectiveBase implements Contr
             });
     }
 
-    private isType(type) {
+    isType(type) {
         return this.propertyType === type || this.input.type.items === type;
     }
 }

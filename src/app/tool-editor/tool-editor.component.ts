@@ -50,7 +50,10 @@ import LoadOptions = jsyaml.LoadOptions;
             </ct-tab-selector>
 
             <div class="document-controls">
-
+                
+                <!--CWLVersion-->
+                <span class="tag tag-default">{{ toolModel.cwlVersion }}</span>
+                
                 <!--Go to app-->
                 <button class="btn btn-sm btn-secondary " type="button" (click)="goToApp()">
                     <i class="fa fa-external-link"></i>
@@ -239,9 +242,13 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
             this.codeEditorContent.disable();
         }
 
+        this.tracked = this.rawEditorContent.subscribe(content => {
+            this.codeEditorContent.setValue(content);
+        });
+
+
         // Whenever the editor content is changed, validate it using a JSON Schema.
-        this.tracked = this.rawEditorContent
-            .skip(1)
+        this.tracked = this.codeEditorContent.valueChanges
             .distinctUntilChanged()
             .subscribe(latestContent => {
                 this.cwlValidatorService.validate(latestContent).then(r => {

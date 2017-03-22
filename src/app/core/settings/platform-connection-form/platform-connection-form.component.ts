@@ -24,8 +24,10 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                        id="sbgPlatform"
                        placeholder="https://igor.sbgenomics.com"/>
 
-                <div class="form-control-feedback" *ngIf="formGroup.controls.url?.dirty && formGroup.controls.url?.errors?.pattern">
-                    Invalid Platform Name. Try with something like <i>“https://igor.sbgenomics.com”</i>.
+                <div class="form-control-feedback"
+                     *ngIf="formGroup.controls.url?.dirty && formGroup.controls.url?.errors?.pattern">
+                    Invalid Platform Name. Try with something like
+                    <i>“https://igor.sbgenomics.com”</i>.
                 </div>
             </div>
 
@@ -38,7 +40,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                        formControlName="token"
                        id="sbgApiKey"/>
 
-                <div class="form-control-feedback" *ngIf="formGroup.controls.token?.dirty && formGroup.controls.token?.errors?.length">
+                <div class="form-control-feedback"
+                     *ngIf="formGroup.controls.token?.dirty && formGroup.controls.token?.errors?.length">
                     The Authentication Key must be 32 characters long.
                 </div>
 
@@ -52,7 +55,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             </div>
 
             <div *ngIf="form?.errors?.invalidKey" class="alert alert-warning">
-                <strong>Warning!</strong> This authentication key is not valid on the given platformGroup.
+                <strong>Warning!</strong> This authentication key is not valid on the given
+                platformGroup.
             </div>
             <div *ngIf="form?.errors?.invalidPlatform" class="alert alert-danger">
                 <strong>Danger!</strong> Given platform does not exist.
@@ -94,7 +98,11 @@ export class PlatformConnectionFormComponent extends DirectiveBase implements On
 
         this.formGroup.addControl(
             "url",
-            new FormControl("https://igor.sbgenomics.com", [Validators.required, Validators.pattern("https://[^/?]+\.[^.]+\\.sbgenomics\\.com")])
+            new FormControl("https://igor.sbgenomics.com",
+                [
+                    Validators.required,
+                    Validators.pattern("https://[^/?]+\.[^.]+\\.sbgenomics\\.com")
+                ])
         );
 
         this.formGroup.addControl(
@@ -119,7 +127,6 @@ export class PlatformConnectionFormComponent extends DirectiveBase implements On
             .filter(c => c.length > 0)
             .subscribe(credentials => {
                 console.log("Got credentials", credentials[0], "form group", this.formGroup);
-                debugger;
                 this.formGroup.patchValue(credentials[0]);
             });
 

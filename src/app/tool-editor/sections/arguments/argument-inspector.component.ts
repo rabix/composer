@@ -11,7 +11,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         <form [formGroup]="form">
             <div class="form-group">
                 <label>CommandLineBinding</label>
-                <ct-toggle-slider [formControl]="form.controls['hasBinding']"></ct-toggle-slider>
+                <ct-toggle-slider on="" off="" [formControl]="form.controls['hasBinding']"></ct-toggle-slider>
             </div>
 
             <div *ngIf="argument.hasBinding">

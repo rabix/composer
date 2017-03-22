@@ -1,6 +1,14 @@
-import {ChangeDetectionStrategy, Component, Input, OnChanges, Output, SimpleChanges, ViewEncapsulation} from "@angular/core";
+import {
+    ChangeDetectionStrategy,
+    Component,
+    Input,
+    OnChanges,
+    Output,
+    SimpleChanges,
+    ViewEncapsulation
+} from "@angular/core";
 import {PlatformAppRevisionEntry} from "../../../services/api/platforms/platform-api.types";
-import {Subject} from "rxjs";
+import {Subject} from "rxjs/Subject";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -38,25 +46,25 @@ export class RevisionListComponent implements OnChanges {
 
 
     @Input()
-    public revisions: PlatformAppRevisionEntry[] = [];
+    revisions: PlatformAppRevisionEntry[] = [];
 
     @Input()
-    public active: number;
+    active: number;
 
     @Output()
-    public select = new Subject<number>();
+    select = new Subject<number>();
 
     @Input()
-    public loadingRevision;
+    loadingRevision;
 
-    private displayList: {
+    displayList: {
         date: number,
         note: string,
         author: string,
         number: number
     }[] = [];
 
-    private selectRevision(revision) {
+    selectRevision(revision) {
         if (revision.number === this.active) {
             return;
         }
@@ -68,6 +76,10 @@ export class RevisionListComponent implements OnChanges {
 
     ngOnChanges(changes: SimpleChanges): void {
         this.loadingRevision = undefined;
+
+        if (!Array.isArray(changes["revisions"].currentValue)) {
+            return;
+        }
 
         this.displayList = changes["revisions"].currentValue.map(rev => ({
             date: rev["sbg:modifiedOn"] * 1000,
