@@ -9,28 +9,31 @@ import {ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, O
         </div>
         <div class="label"
              [class.ml-2]="icon"
-             *ngIf="label">{{ label }}</div>
+             *ngIf="label">{{ label }}
+        </div>
     `,
     styleUrls: ["./nav-search-result.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NavSearchResultComponent implements OnInit {
 
-    @Input()
-    title: string;
+    @Input() id: string;
+    @Input() title: string;
+    @Input() icon: string;
+    @Input() label: string;
 
-    @Input()
-    icon: string;
-
-    @Input()
-    label: string;
+    @Input() dragEnabled      = false;
+    @Input() dragTransferData = {};
+    @Input() dragLabel        = "";
+    @Input() dragImageClass   = "";
+    @Input() dragDropZones    = ["zone1"];
 
     @Output()
     open = new EventEmitter<any>();
 
     @HostListener("dblclick")
     triggerOpen() {
-        this.open.emit();
+        this.open.emit(this.id);
     }
 
     constructor() {

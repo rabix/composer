@@ -5,7 +5,6 @@ const acceleratorController = require("./controllers/accelerator.controller");
 const resolver              = require("./schema-salad-resolver");
 const settings              = require("electron-settings");
 
-const searchController = require("./controllers/search.controller");
 module.exports         = {
 
     // File System Routes
@@ -50,7 +49,7 @@ module.exports         = {
     },
 
     resolveContent: (data, callback) => {
-        resolver.res olveContent(data.content, data.path).then(result => {
+        resolver.resolveContent(data.content, data.path).then(result => {
             callback(null, result);
         }, err => {
             callback(err);
@@ -78,8 +77,8 @@ module.exports         = {
         });
     },
 
-    searchLocalProjects: (data: { term: string, limit: number }, callback) => {
-        SearchController.searchLocalProjects(data.term, data.limit, callback);
+    searchLocalProjects: (data: { term: string, limit: number, folders: string[] }, callback) => {
+        SearchController.searchLocalProjects(data.folders, data.term, data.limit, callback);
     },
 
     searchUserProjects: (data: { term: string, limit: number }, callback) => {

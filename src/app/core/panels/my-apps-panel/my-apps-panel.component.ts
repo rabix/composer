@@ -37,13 +37,22 @@ import {PlatformAppEntry} from "../../data-gateway/data-types/platform-api.types
 
         <div class="scroll-container">
             <div *ngIf="searchContent?.value && searchResults" class="search-results">
-                <ct-nav-search-result *ngFor="let entry of searchResults"
-                                      class="pl-1 pr-1"
-                                      [title]="entry?.title"
+
+                <ct-nav-search-result *ngFor="let entry of searchResults" class="pl-1 pr-1 deep-unselectable"
+                                      [id]="entry?.id"
                                       [icon]="entry?.icon"
-                                      (dblclick)="entry.open()"
-                                      [label]="entry?.label">
+                                      [title]="entry?.title"
+                                      [label]="entry?.label"
+
+                                      [ct-drag-enabled]="entry?.dragEnabled"
+                                      [ct-drag-transfer-data]="entry?.dragTransferData"
+                                      [ct-drag-image-caption]="entry?.dragLabel"
+                                      [ct-drag-image-class]="entry?.dragImageClass"
+                                      [ct-drop-zones]="entry?.dragDropZones"
+
+                                      (dblclick)="openSearchResult(entry)">
                 </ct-nav-search-result>
+
             </div>
             <ct-line-loader class="m-1"
                             *ngIf="searchContent.value 
@@ -139,8 +148,11 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
     private attachSearchObserver() {
 
         const localFileSearch = (term) => this.dataGateway.searchLocalProjects(term).map(results => results.map(result => {
-            const label   = result.path.split("/").slice(-3, -1).join("/");
-            const title   = result.path.split("/").pop();
+
+            const id    = result.path;
+            const label = result.path.split("/").slice(-3, -1).join("/");
+            const title = result.path.split("/").pop();
+
             let icon      = "fa-file";
             let relevance = result.relevance;
 
@@ -152,20 +164,33 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                 relevance++;
             }
 
-
             return {
-                title,
-                label,
-                icon,
-                relevance
+                id, icon, title, label, relevance,
+                dragEnabled: ["Workflow", "CommandLineTool"].indexOf(result.type) !== -1,
+                dragTransferData: id,
+                dragLabel: title,
+                dragImageClass: result.type === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
+                dragDropZones: ["zone1"]
             };
         }));
-        const projectsSearch  = (term) => this.dataGateway.searchUserProjects(term).map(results => results.map(result => {
+
+        const projectsSearch = (term) => this.dataGateway.searchUserProjects(term).map(results => results.map(result => {
+
+            const id    = result.profile + "/" + result["sbg:projectName"] + "/" + result["sbg:id"];
+            const title = result.label;
+
             return {
-                title: result.label,
-                label: result.id.split("/").slice(5, 7).join(" → "),
+                id,
                 icon: result.class === "Workflow" ? "fa-share-alt" : "fa-terminal",
-                relevance: result.relevance + 1
+                title,
+                label: result.id.split("/").slice(5, 7).join(" → "),
+                relevance: result.relevance + 1,
+
+                dragEnabled: true,
+                dragTransferData: id,
+                dragLabel: title,
+                dragImageClass: result["class"] === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
+                dragDropZones: ["zone1"]
             };
         }));
 
@@ -265,11 +290,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                         icon: app.class === "CommandLineTool" ? "fa-terminal" : "fa-share-alt",
                         data: app,
                         dragEnabled: true,
-                        dragTransferData: {
-                            content: Observable.of("").switchMap(() => this.dataGateway.fetchFileContent("app", id))
-                                .publishReplay(1)
-                                .refCount()
-                        },
+                        dragTransferData: id,
                         dragDropZones: ["zone1"],
                         dragLabel: app.label,
                         dragImageClass: app.class === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
@@ -320,12 +341,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                         isExpanded: entry.isDir && data.expanded.indexOf(entry.path) !== -1,
                         type: entry.isDir ? "folder" : "file",
                         dragEnabled: ["Workflow", "CommandLineTool"].indexOf(entry.type) !== -1,
-                        dragTransferData: {
-                            content: Observable.of("")
-                                .switchMap(_ => this.dataGateway.fetchFileContent("local", entry.path))
-                                .publishReplay(1)
-                                .refCount()
-                        },
+                        dragTransferData: entry.path,
                         dragDropZones: ["zone1"],
                         dragLabel: label,
                         dragImageClass: entry.type === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
@@ -360,47 +376,12 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
 
     private listenForAppOpening() {
         this.tree.open.filter(n => n.type === "app")
-            .flatMap(node => this.platform.getApp(node.data["sbg:id"]))
-            .subscribe(app => {
-                this.workbox.openTab({
-                    id: app.id,
-                    title: Observable.of(app.label),
-                    contentType: Observable.of(app["class"]),
-                    contentData: {
-                        id: app.id,
-                        data: app,
-                        type: "file",
-                        language: Observable.of("json"),
-                        isWritable: true,
-                        resolve: () => Observable.of(app).toPromise(),
-                        content: Observable.of(JSON.stringify(app, null, 4)),
-                        save: (jsonContent, revisionNote) => {
-                            return this.platform.saveApp(jsonContent, revisionNote);
-                        }
-                    }
-                });
-            });
+            .flatMap(node => this.workbox.getOrCreateFileTab(node.id + "/" + node.data["sbg:id"]))
+            .subscribe(tab => this.workbox.openTab(tab));
 
         this.tree.open.filter(n => n.type === "file")
-            .flatMap(node => this.dataGateway.getLocalFile(node.data.path), (node, content) => ({node, content}))
-            .subscribe(data => {
-                const {node, content} = data;
-
-                this.workbox.openTab({
-                    id: node.data.path,
-                    title: Observable.of(node.data.name),
-                    contentType: Observable.of(node.data.type || "Code"),
-                    contentData: {
-                        data: node.data,
-                        // @todo(batke)
-                        resolve: () => Observable.of(Yaml.safeLoad(content)).toPromise(),
-                        isWritable: true,
-                        content: Observable.of(content),
-                        language: Observable.of(node.data.language)
-                    }
-                });
-
-            });
+            .flatMap(node => this.workbox.getOrCreateFileTab(node.data.path))
+            .subscribe(tab => this.workbox.openTab(tab));
     }
 
     openAddAppSourcesDialog() {
@@ -408,5 +389,12 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
             title: "Open a Project",
             backdrop: true
         });
+    }
+
+    openSearchResult(entry: { id: string }) {
+        console.log("Open a search result", entry);
+        this.workbox.getOrCreateFileTab(entry.id)
+            .take(1)
+            .subscribe(tab => this.workbox.openTab(tab));
     }
 }

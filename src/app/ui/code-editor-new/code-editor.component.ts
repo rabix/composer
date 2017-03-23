@@ -1,4 +1,7 @@
-import {ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, OnInit, SimpleChanges} from "@angular/core";
+import {
+    ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, OnChanges, OnDestroy, OnInit,
+    SimpleChanges
+} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 
 import * as ace from "brace";
@@ -26,7 +29,7 @@ import "brace/ext/language_tools";
 import {AceEditorOptions} from "./ace-editor-options";
 
 @Component({
-    selector: "ui-code-editor",
+    selector: "ct-code-editor",
     template: "",
     styleUrls: ["./code-editor.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -38,7 +41,7 @@ import {AceEditorOptions} from "./ace-editor-options";
         }
     ]
 })
-export class CodeEditorComponent implements OnInit, ControlValueAccessor {
+export class CodeEditorComponent implements OnInit, ControlValueAccessor, OnDestroy, OnChanges {
 
     @Input()
     options: Partial<AceEditorOptions>;
@@ -102,8 +105,8 @@ export class CodeEditorComponent implements OnInit, ControlValueAccessor {
     registerOnChange(fn: any): void {
         this.onChange = fn;
         this.editor.on("change", (change) => {
-            this.onChange(this.editor.getValue())
-        })
+            this.onChange(this.editor.getValue());
+        });
     }
 
     registerOnTouched(fn: any): void {

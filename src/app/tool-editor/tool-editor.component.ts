@@ -30,6 +30,7 @@ import {DataEntrySource} from "../sources/common/interfaces";
 import {ModalService} from "../ui/modal/modal.service";
 import {DirectiveBase} from "../util/directive-base/directive-base";
 import LoadOptions = jsyaml.LoadOptions;
+import {AppTabData} from "../core/workbox/app-tab-data";
 
 @Component({
     selector: "ct-tool-editor",
@@ -40,20 +41,29 @@ import LoadOptions = jsyaml.LoadOptions;
         <ct-action-bar>
             <ct-tab-selector class="inverse" [distribute]="'auto'" [active]="viewMode"
                              (activeChange)="switchTab($event)">
-                <ct-tab-selector-entry [disabled]="!isValidCWL" [tabName]="'info'">App Info
+
+                <ct-tab-selector-entry [disabled]="!isValidCWL"
+                                       [tabName]="'info'">App Info
                 </ct-tab-selector-entry>
-                <ct-tab-selector-entry [disabled]="!isValidCWL" [tabName]="'gui'">Visual
+
+                <ct-tab-selector-entry [disabled]="!isValidCWL"
+                                       [tabName]="'gui'">Visual
                 </ct-tab-selector-entry>
-                <ct-tab-selector-entry [disabled]="!isValidCWL" [tabName]="'test'">Test
+
+                <ct-tab-selector-entry [disabled]="!isValidCWL"
+                                       [tabName]="'test'">Test
                 </ct-tab-selector-entry>
-                <ct-tab-selector-entry [tabName]="'code'">Code</ct-tab-selector-entry>
+
+                <ct-tab-selector-entry [disabled]="!viewMode"
+                                       [tabName]="'code'">Code
+                </ct-tab-selector-entry>
             </ct-tab-selector>
 
             <div class="document-controls">
-                
+
                 <!--CWLVersion-->
                 <span class="tag tag-default">{{ toolModel.cwlVersion }}</span>
-                
+
                 <!--Go to app-->
                 <button class="btn btn-sm btn-secondary " type="button" (click)="goToApp()">
                     <i class="fa fa-external-link"></i>
@@ -73,7 +83,7 @@ import LoadOptions = jsyaml.LoadOptions;
 
 
                 <!--Revisions-->
-                <button *ngIf="this.data.data.source !== 'local'"
+                <button *ngIf="data.dataSource !== 'local'"
                         class="btn btn-sm btn-secondary" type="button"
                         [ct-editor-inspector]="revisions">
 
@@ -96,11 +106,11 @@ import LoadOptions = jsyaml.LoadOptions;
             <ct-block-loader *ngIf="isLoading"></ct-block-loader>
 
             <!--Editor Row-->
-            <ui-code-editor *ngIf="viewMode === 'code' && !isLoading"
+            <ct-code-editor *ngIf="viewMode === 'code' && !isLoading"
                             [formControl]="codeEditorContent"
                             [options]="{mode: 'ace/mode/yaml'}"
                             class="editor">
-            </ui-code-editor>
+            </ct-code-editor>
 
             <!--GUI Editor-->
             <ct-tool-visual-editor *ngIf="viewMode === 'gui' && !isLoading"
@@ -170,14 +180,14 @@ import LoadOptions = jsyaml.LoadOptions;
 })
 export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDestroy, WorkboxTab, AfterViewInit {
     @Input()
-    data: DataEntrySource;
+    data: AppTabData;
 
     /** ValidationResponse for current document */
     validation: ValidationResponse;
 
     /** Default view mode. */
     @Input()
-    viewMode;
+    viewMode: "code" | "gui" | "test" | "info";
 
     /** Flag to indicate the document is loading */
     isLoading = true;
@@ -190,9 +200,6 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
 
     /** Flag for validity of CWL document */
     isValidCWL = false;
-
-    /** Stream of contents in code editor */
-    rawEditorContent = new BehaviorSubject("");
 
     /** Model that's recreated on document change */
     toolModel = CommandLineToolFactory.from(null, "document");
@@ -226,7 +233,6 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
 
         super();
 
-        this.viewMode = "code";
 
         this.toolGroup = formBuilder.group({});
 
@@ -242,131 +248,123 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
             this.codeEditorContent.disable();
         }
 
-        this.tracked = this.rawEditorContent.subscribe(content => {
-            this.codeEditorContent.setValue(content);
-        });
-
-
         // Whenever the editor content is changed, validate it using a JSON Schema.
-        this.tracked = this.codeEditorContent.valueChanges
-            .distinctUntilChanged()
-            .subscribe(latestContent => {
-                this.cwlValidatorService.validate(latestContent).then(r => {
-                    if (!r.isValidCwl) {
-                        // turn off loader and load document as code
-                        this.isLoading  = false;
-                        this.validation = r;
-                        return r;
-                    }
+        this.tracked = this.codeEditorContent.valueChanges.distinctUntilChanged().subscribe(latestContent => {
 
-                    // load JSON to generate model
-                    const json = Yaml.safeLoad(this.rawEditorContent.getValue(), {
-                        json: true
-                    } as LoadOptions);
+            this.cwlValidatorService.validate(latestContent).then(r => {
+                if (!r.isValidCwl) {
+                    // turn off loader and load document as code
+                    this.isLoading  = false;
+                    this.validation = r;
+                    return r;
+                }
 
-                    // should show prompt, but json is already reformatted
-                    if (this.showReformatPrompt && json["rbx:modified"]) {
-                        this.showReformatPrompt = false;
-                    }
+                // load JSON to generate model
+                const json = Yaml.safeLoad(this.codeEditorContent.value, {
+                    json: true
+                } as LoadOptions);
 
-                    this.data.resolve(latestContent).then((resolved) => {
-                        // generate model and get command line parts
-                        this.toolModel = CommandLineToolFactory.from(resolved as any, "document");
-                        this.toolModel.onCommandLineResult((res) => {
-                            this.commandLineParts.next(res);
-                        });
-                        this.toolModel.updateCommandLine();
+                // should show prompt, but json is already reformatted
+                if (this.showReformatPrompt && json["rbx:modified"]) {
+                    this.showReformatPrompt = false;
+                }
 
-                        // update validation stream on model validation updates
+                this.data.resolve(latestContent).subscribe((resolved) => {
+                    // generate model and get command line parts
+                    this.toolModel = CommandLineToolFactory.from(resolved as any, "document");
+                    this.toolModel.onCommandLineResult((res) => {
+                        this.commandLineParts.next(res);
+                    });
+                    this.toolModel.updateCommandLine();
 
-                        this.toolModel.setValidationCallback((res: Validation) => {
-                            this.validation = {
-                                errors: res.errors,
-                                warnings: res.warnings,
-                                isValidatableCwl: true,
-                                isValidCwl: true,
-                                isValidJSON: true
-                            };
-                        });
+                    // update validation stream on model validation updates
 
-                        this.toolModel.validate();
-
-                        // load document in GUI and turn off loader, only if loader was active
-                        if (this.isLoading) {
-                            this.viewMode  = "gui";
-                            this.isLoading = false;
-                        }
-
-                        const v = {
-                            errors: this.toolModel.validation.errors,
-                            warnings: this.toolModel.validation.warnings,
+                    this.toolModel.setValidationCallback((res: Validation) => {
+                        this.validation = {
+                            errors: res.errors,
+                            warnings: res.warnings,
                             isValidatableCwl: true,
                             isValidCwl: true,
                             isValidJSON: true
                         };
-
-                        this.validation = v;
-                        this.isValidCWL = v.isValidCwl;
-                    }, (err) => {
-                        this.isLoading  = false;
-                        this.viewMode   = "code";
-                        this.isValidCWL = false;
-                        this.validation = {
-                            isValidatableCwl: true,
-                            isValidCwl: false,
-                            isValidJSON: true,
-                            warnings: [],
-                            errors: [{
-                                message: err.message,
-                                loc: "document"
-                            }]
-                        };
                     });
+
+                    this.toolModel.validate();
+
+                    // load document in GUI and turn off loader, only if loader was active
+                    this.isLoading = false;
+
+                    const v = {
+                        errors: this.toolModel.validation.errors,
+                        warnings: this.toolModel.validation.warnings,
+                        isValidatableCwl: true,
+                        isValidCwl: true,
+                        isValidJSON: true
+                    };
+
+                    this.validation = v;
+                    this.isValidCWL = v.isValidCwl;
+
+                    if (!this.viewMode) {
+                        this.viewMode = "gui";
+                    }
+                }, (err) => {
+                    this.isLoading  = false;
+                    this.viewMode   = "code";
+                    this.isValidCWL = false;
+                    this.validation = {
+                        isValidatableCwl: true,
+                        isValidCwl: false,
+                        isValidJSON: true,
+                        warnings: [],
+                        errors: [{
+                            message: err.message,
+                            loc: "document"
+                        }]
+                    };
                 });
             });
 
-        // Whenever content of a file changes, forward the change to the raw editor content steam.
-        const statusID = this.statusBar.startProcess(`Loading ${this.data.data.id}`);
-        this.tracked   = this.data.content.subscribe(val => {
-            this.rawEditorContent.next(val);
-            this.statusBar.stopProcess(statusID);
         });
 
+        this.codeEditorContent.setValue(this.data.fileContent);
         this.statusBar.setControls(this.statusControls);
     }
 
     save() {
-        const text = this.toolGroup.dirty ? this.getModelText() : this.rawEditorContent.getValue();
 
-        // For local files, just save and that's it
-        if (this.data.data.source === "local") {
-            const path = this.data.data.path;
-
-            const statusID = this.statusBar.startProcess(`Saving ${path}...`, `Saved ${path}`);
-            this.data.data.save(text).subscribe(() => {
-                this.statusBar.stopProcess(statusID);
-            });
-            return;
-        }
-
-        // For Platform files, we need to ask for a revision note
-        this.modal.prompt({
-            cancellationLabel: "Cancel",
-            confirmationLabel: "Publish",
-            content: "Revision Note",
-            title: "Publish a new App Revision",
-            formControl: new FormControl("")
-        }).then(revisionNote => {
-
-            const path     = this.data.data["sbg:id"] || this.data.data.id;
-            const statusID = this.statusBar.startProcess(`Creating a new revision of ${path}`);
-            this.data.save(JSON.parse(text), revisionNote).subscribe(result => {
-                const cwl = JSON.stringify(result.message, null, 4);
-                this.rawEditorContent.next(cwl);
-                this.statusBar.stopProcess(statusID, `Created revision ${result.message["sbg:latestRevision"]} from ${path}`);
-
-            });
-        }, noop);
+        console.warn("Reimplement saving");
+        // const text = this.toolGroup.dirty ? this.getModelText() : this.codeEditorContent.value;
+        //
+        // // For local files, just save and that's it
+        // if (this.data.data.source === "local") {
+        //     const path = this.data.data.path;
+        //
+        //     const statusID = this.statusBar.startProcess(`Saving ${path}...`, `Saved ${path}`);
+        //     this.data.data.save(text).subscribe(() => {
+        //         this.statusBar.stopProcess(statusID);
+        //     });
+        //     return;
+        // }
+        //
+        // // For Platform files, we need to ask for a revision note
+        // this.modal.prompt({
+        //     cancellationLabel: "Cancel",
+        //     confirmationLabel: "Publish",
+        //     content: "Revision Note",
+        //     title: "Publish a new App Revision",
+        //     formControl: new FormControl("")
+        // }).then(revisionNote => {
+        //
+        //     const path     = this.data.data["sbg:id"] || this.data.data.id;
+        //     const statusID = this.statusBar.startProcess(`Creating a new revision of ${path}`);
+        //     this.data.save(JSON.parse(text), revisionNote).subscribe(result => {
+        //         const cwl = JSON.stringify(result.message, null, 4);
+        //         this.rawEditorContent.next(cwl);
+        //         this.statusBar.stopProcess(statusID, `Created revision ${result.message["sbg:latestRevision"]} from ${path}`);
+        //
+        //     });
+        // }, noop);
 
     }
 
@@ -396,7 +394,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
         }
 
         if (mode === "code" && this.toolGroup.dirty) {
-            this.rawEditorContent.next(this.getModelText());
+            this.codeEditorContent.setValue(this.getModelText());
         }
 
         this.viewMode = mode;
@@ -409,7 +407,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
     private getModelText(): string {
         const modelObject = Object.assign(this.toolModel.serialize(), {"rbx:modified": true});
 
-        return this.data.language.value === "json" ? JSON.stringify(modelObject, null, 4) : Yaml.dump(modelObject);
+        return this.data.language === "json" ? JSON.stringify(modelObject, null, 4) : Yaml.dump(modelObject);
     }
 
     toggleReport(panel: "validation" | "commandLinePreview") {
@@ -417,9 +415,10 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
     }
 
     openRevision(revisionNumber: number) {
-        this.platform.getAppCWL(this.data.data, revisionNumber).subscribe(cwl => {
-            this.rawEditorContent.next(cwl);
-        });
+        console.warn("Reimplement Revisions");
+        // this.platform.getAppCWL(this.data.data, revisionNumber).subscribe(cwl => {
+        //     this.rawEditorContent.next(cwl);
+        // });
     }
 
     onJobUpdate(job) {

@@ -1,8 +1,6 @@
-import {Observable} from "rxjs";
-
 export interface TabData<T> {
     id: string,
-    title: Observable<string>;
-    contentType: Observable<"CommandLineTool" | "Workflow" | "Settings" | "Code">,
-    contentData?: T
+    label: string;
+    type: "CommandLineTool" | "Workflow" | "Settings" | "Code" | "Welcome" | "NewFile";
+    data?: T;
 }

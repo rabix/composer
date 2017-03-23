@@ -15,7 +15,6 @@ import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {PlatformAppEntry} from "../../data-gateway/data-types/platform-api.types";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.component";
-import Platform = NodeJS.Platform;
 
 @Component({
     selector: "ct-public-apps-panel",
@@ -40,13 +39,20 @@ import Platform = NodeJS.Platform;
         <div class="scroll-container">
 
             <div *ngIf="searchContent?.value && searchResults" class="search-results">
-                <ct-nav-search-result *ngFor="let entry of searchResults"
-                                      class="pl-1 pr-1"
-                                      [title]="entry?.title"
+                <ct-nav-search-result *ngFor="let entry of searchResults" class="pl-1 pr-1" ct-drag-enabled=""
+                                      [id]="entry?.id"
                                       [icon]="entry?.icon"
-                                      (dblclick)="entry.open()"
-                                      [label]="entry?.label">
-                </ct-nav-search-result>
+                                      [label]="entry?.label"
+                                      [title]="entry?.title"
+
+                                      [ct-drag-enabled]="entry?.dragEnabled"
+                                      [ct-drag-transfer-data]="entry?.dragTransferData"
+                                      [ct-drag-image-caption]="entry?.dragLabel"
+                                      [ct-drag-image-class]="entry?.dragImageClass"
+                                      [ct-drop-zones]="entry?.dragDropZones"
+
+                                      (dblclick)="openSearchResult(entry)"
+                ></ct-nav-search-result>
             </div>
             <ct-line-loader class="m-1"
                             *ngIf="searchContent.value 
@@ -55,7 +61,7 @@ import Platform = NodeJS.Platform;
 
             <div *ngIf="searchContent.value 
                         && searchContent.value === appliedSearchTerm 
-                        && (searchResults && searchResults.length === 0)"
+                        && (searchResults && searchResults?.length === 0)"
                  class="no-results m-1">
                 <p class="explanation">
                     No search results for “{{ searchContent.value }}.”
@@ -196,11 +202,9 @@ export class PublicAppsPanelComponent extends DirectiveBase implements AfterView
         }, {});
 
 
-        const sortedGroup = Object.keys(groups).sort((a, b) => {
+        return Object.keys(groups).sort((a, b) => {
             return a.toLowerCase().localeCompare(b.toLowerCase());
         }).map(key => groups[key]) as TreeNode<PlatformAppEntry>[];
-
-        return sortedGroup;
     }
 
     private loadDataSources() {
@@ -213,12 +217,7 @@ export class PublicAppsPanelComponent extends DirectiveBase implements AfterView
                     data: app,
                     icon: app.class === "Workflow" ? "fa-share-alt" : "fa-terminal",
                     dragEnabled: true,
-                    dragTransferData: {
-                        content: Observable.of("")
-                            .switchMap(() => this.dataGateway.fetchFileContent("public", app.id))
-                            .publishReplay(1)
-                            .refCount()
-                    },
+                    dragTransferData: app.id,
                     dragDropZones: ["zone1"],
                     dragLabel: app.label,
                     dragImageClass: app.class === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
@@ -233,10 +232,19 @@ export class PublicAppsPanelComponent extends DirectiveBase implements AfterView
 
 
         const appSearch = (term) => this.dataGateway.searchPublicApps(term).map(results => results.map(result => {
+            const id    = result.id;
+            const title = result.label;
             return {
-                title: result.label,
+                id,
+                title,
                 label: `${result["sbg:toolkit"]} / ${result["sbg:categories"].join(", ")}`,
                 icon: result.class === "Workflow" ? "fa-share-alt" : "fa-terminal",
+
+                dragEnabled: true,
+                dragTransferData: id,
+                dragLabel: title,
+                dragImageClass: result["class"] === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
+                dragDropZones: ["zone1"]
             };
         }));
 
@@ -250,6 +258,7 @@ export class PublicAppsPanelComponent extends DirectiveBase implements AfterView
             .filter(term => term.trim().length !== 0)
             .switchMap(term => appSearch(term))
             .subscribe(results => {
+                console.log("Results", results);
                 this.searchResults = results;
                 this.cdr.markForCheck();
             });
@@ -276,25 +285,12 @@ export class PublicAppsPanelComponent extends DirectiveBase implements AfterView
 
     private listenForAppOpening() {
         this.tree.open.filter(n => n.type === "app")
-            .flatMap(node => this.platform.getApp(node.data["sbg:id"]))
-            .subscribe(app => {
-                this.workbox.openTab({
-                    id: app.id,
-                    title: Observable.of(app.label),
-                    contentType: Observable.of(app["class"]),
-                    contentData: {
-                        id: app.id,
-                        data: app,
-                        type: "file",
-                        language: Observable.of("json"),
-                        isWritable: true,
-                        resolve: () => Observable.of(app).toPromise(),
-                        content: Observable.of(JSON.stringify(app, null, 4)),
-                        save: (jsonContent, revisionNote) => {
-                            return this.platform.saveApp(jsonContent, revisionNote);
-                        }
-                    }
-                });
-            });
+            .flatMap(node => this.workbox.getOrCreateFileTab(node.id + "/" + node.data["sbg:id"]))
+            .subscribe(tab => this.workbox.openTab(tab));
+    }
+
+    openSearchResult(entry: { id: string }) {
+        console.log("Open a search result", entry);
+        this.workbox.getOrCreateFileTab(entry.id).take(1).subscribe(tab => this.workbox.openTab(tab));
     }
 }

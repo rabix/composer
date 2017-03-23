@@ -6,9 +6,11 @@ const fsController = require("./fs.controller");
 const cp           = require("child_process");
 
 let searchProcess: ChildProcess;
-const relevanceThreshold = 0.2;
+const relevanceThreshold = 0.1;
 
-export function searchLocalProjects(term, limit = 10, callback) {
+export function searchLocalProjects(folders: string[] = [], term: string, limit = 10, callback) {
+
+    console.log("Searching through local folders", folders);
 
     if (searchProcess) {
         searchProcess.kill();
@@ -17,18 +19,16 @@ export function searchLocalProjects(term, limit = 10, callback) {
 
     searchProcess = cp.fork(`${__dirname}/../workers/search-worker.js`);
 
-    settings.get("localFolders").then(folders => {
-        searchProcess.send({
-            term,
-            limit,
-            folders,
-            threshold: relevanceThreshold
-        });
-
-    }, err => callback(err));
+    searchProcess.send({
+        term,
+        limit,
+        folders,
+        threshold: relevanceThreshold
+    });
 
     searchProcess.on("message", (data) => {
         if (data.err) {
+            searchProcess.kill();
             return callback(data.err);
         }
 
@@ -41,10 +41,12 @@ export function searchLocalProjects(term, limit = 10, callback) {
             });
         }, (err, results) => {
             if (err) {
+                searchProcess.kill();
                 return callback(err);
             }
 
             callback(null, results);
+            searchProcess.kill();
         });
 
     });

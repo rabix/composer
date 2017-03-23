@@ -32,7 +32,6 @@ import {
                 <ct-panel-container class="layout-section">
                     <ct-apps-panel class="panel"></ct-apps-panel>
                 </ct-panel-container>
-                <!--<ct-panel-container [panels]="panels" class="flex-row"></ct-panel-container>-->
             </div>
 
             <!--Panel/Content Resize Handle-->

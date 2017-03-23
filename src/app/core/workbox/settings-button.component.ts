@@ -28,10 +28,9 @@ export class SettingsButtonComponent {
     openSettings() {
 
         this.workbox.openTab({
-            id: "settings",
-            title: Observable.of("Settings"),
-            contentType: Observable.of("Settings"),
-            contentData: {}
+            id: "?settings",
+            label: "Settings",
+            type: "Settings",
         });
     }
 }

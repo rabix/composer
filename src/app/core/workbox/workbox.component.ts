@@ -16,14 +16,13 @@ import {WorkboxService} from "./workbox.service";
 
             <ul class="tab-bar inset-panel" tabindex="-1">
 
-                <li *ngFor="let tab of tabs;"
+                <li *ngFor="let tab of tabs"
                     [ct-drag-over]="true"
                     (onDragOver)="workbox.openTab(tab)"
                     (click)="workbox.openTab(tab)"
                     [class.active]="tab === (workbox.activeTab | async)"
-                    [ct-context]="createContextMenu(tab)"
                     class="tab clickable">
-                    <div class="title">{{ tab.title | async }}</div>
+                    <div class="title">{{ tab.label }}</div>
                     <div (click)="removeTab(tab)" class="close-icon"><b>×</b></div>
                 </li>
 
@@ -40,14 +39,21 @@ import {WorkboxService} from "./workbox.service";
 
             <template ngFor let-tab [ngForOf]="tabs">
 
-                <div class="component-container" [ngSwitch]="tab?.contentType | async" [hidden]="tab !== activeTab">
+                <div class="component-container" [ngSwitch]="tab?.type" [hidden]="tab !== activeTab">
+
                     <ct-tool-editor class="tab-component" #tabComponent *ngSwitchCase="'CommandLineTool'"
-                                    [data]="tab.contentData"></ct-tool-editor>
-                    <ct-workflow-editor #tabComponent [data]="tab.contentData" *ngSwitchCase="'Workflow'"></ct-workflow-editor>
-                    <ct-file-editor class="tab-component" [data]="tab.contentData" *ngSwitchCase="'Code'"></ct-file-editor>
+                                    [data]="tab.data"></ct-tool-editor>
+
+                    <ct-workflow-editor #tabComponent [data]="tab.data" *ngSwitchCase="'Workflow'"></ct-workflow-editor>
+
+                    <ct-file-editor class="tab-component" [data]="tab.data" *ngSwitchCase="'Code'"></ct-file-editor>
+
                     <ct-welcome-tab class="tab-component" *ngSwitchCase="'Welcome'"></ct-welcome-tab>
+
                     <ct-new-file-tab class="tab-component" *ngSwitchCase="'NewFile'"></ct-new-file-tab>
+
                     <ct-settings class="tab-component" *ngSwitchCase="'Settings'"></ct-settings>
+
                     <ct-tab-loader class="tab-component" *ngSwitchDefault></ct-tab-loader>
                 </div>
 
@@ -152,10 +158,9 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
      */
     openNewFileTab() {
         this.workbox.openTab({
-            id: "newFile",
-            title: Observable.of("NewFile"),
-            contentType: Observable.of("NewFile"),
-            contentData: {}
+            id: "?newFile",
+            label: "New File",
+            type: "NewFile",
         });
     }
 
@@ -164,10 +169,9 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
      */
     openWelcomeTab() {
         this.workbox.openTab({
-            id: "welcome",
-            title: Observable.of("Welcome"),
-            contentType: Observable.of("Welcome"),
-            contentData: {}
+            id: "?welcome",
+            label: "Welcome",
+            type: "Welcome"
         });
     }
 

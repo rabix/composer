@@ -56,7 +56,12 @@ export class UserPreferencesService {
         }
 
         return Observable.of(cacheItem).merge(this.updates.filter(u => u.key === key).map(u => u.value)).distinctUntilChanged();
+    }
 
-
+    public addAppToRecentList(appID, appType: "Workflow" | "CommandLineTool") {
+        this.get("recentApps", []).take(1).map(list => {
+            list.unshift(appID);
+            return list.filter((e, i, a) => a.indexOf(e) === i).slice(0, 20);
+        }).flatMap(list => this.put("recentApps", list));
     }
 }
