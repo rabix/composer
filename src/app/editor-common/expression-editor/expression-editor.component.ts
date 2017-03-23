@@ -2,9 +2,9 @@ import {Component, HostBinding, Input, OnInit, Output, ViewChild} from "@angular
 import {FormControl} from "@angular/forms";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
-import {TreeNode} from "../../ui/tree-view-old/types";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {CodeEditorComponent} from "../../ui/code-editor-new/code-editor.component";
+import {TreeNode} from "../../ui/tree-view/tree-node";
 
 @Component({
     selector: "ct-expression-editor",
@@ -38,7 +38,7 @@ import {CodeEditorComponent} from "../../ui/code-editor-new/code-editor.componen
                 </div>
 
                 <div class="context-col">
-                    <ct-tree-view [nodes]="contextNodes"></ct-tree-view>
+                    <!--<ct-tree-view [nodes]="contextNodes"></ct-tree-view>-->
                 </div>
             </div>
 
@@ -78,7 +78,7 @@ export class ExpressionEditorComponent extends DirectiveBase implements OnInit {
     expressionControl = new FormControl(undefined);
     resultControl = new FormControl(undefined);
 
-    public contextNodes: TreeNode[];
+    public contextNodes: TreeNode<any>[];
 
     @ViewChild("editor", {read: CodeEditorComponent})
     private editor: CodeEditorComponent;
@@ -102,9 +102,9 @@ export class ExpressionEditorComponent extends DirectiveBase implements OnInit {
     }
 
 
-    private transformContext(context: { $job?: Object, $self?: Object } = {}): TreeNode[] {
+    private transformContext(context: { $job?: Object, $self?: Object } = {}): TreeNode<any>[] {
 
-        const wrap = (nodes, path = ""): TreeNode[] => Object.keys(nodes).map(key => {
+        const wrap = (nodes, path = ""): TreeNode<any>[] => Object.keys(nodes).map(key => {
             const node = nodes[key];
 
             let type = typeof node;
@@ -148,10 +148,10 @@ export class ExpressionEditorComponent extends DirectiveBase implements OnInit {
                 };
             }
 
-            return {name, childrenProvider, icon, openHandler} as TreeNode;
+            return {name, childrenProvider, icon, openHandler} as TreeNode<any>;
         });
 
-        return wrap(context) as TreeNode[];
+        return wrap(context) as TreeNode<any>[];
 
     }
 }

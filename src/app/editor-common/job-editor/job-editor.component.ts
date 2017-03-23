@@ -5,6 +5,7 @@ import {
     EventEmitter,
     Input,
     OnChanges,
+    OnDestroy,
     Output,
     SimpleChanges,
     ViewEncapsulation
@@ -18,12 +19,11 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
  * Job Editor modifies the test values of the job json.
  */
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
+    styleUrls: ["job-editor.component.scss"],
     selector: "ct-job-editor",
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-        <div class="row block mb-1">
+        <div class="block mb-1">
             <div class="col-xs-12">
                 <button class="btn btn-secondary pull-right"
                         (click)="reset.emit()">
@@ -67,10 +67,11 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
                     <form (change)="onJobFormChange($event)">
                         <div *ngFor="let input of group.inputs">
 
-                            <label>{{ input?.label || input.id }} <i class="fa fa-info-circle text-muted"
-                                                                     *ngIf="input.description"
-                                                                     [ct-tooltip]="ctt"
-                                                                     [tooltipPlacement]="'top'"></i>
+                            <label>{{ input?.label || input.id }} <i
+                                    class="fa fa-info-circle text-muted"
+                                    *ngIf="input.description"
+                                    [ct-tooltip]="ctt"
+                                    [tooltipPlacement]="'top'"></i>
                             </label>
                             <ct-job-editor-entry [prefix]="input.id"
                                                  [input]="input"
@@ -91,25 +92,31 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
         </div>
     `
 })
-export class JobEditorComponent implements OnChanges {
+export class JobEditorComponent implements OnChanges, OnDestroy {
 
     /**
      * Existing CWL job metadata.
      */
     @Input()
-    public job: { allocatedResources?: { cpu: number, mem: number }, inputs?: {} } = {};
+    job: { allocatedResources?: { cpu: number, mem: number }, inputs?: {} } = {};
 
     /**
      * CWL app input definitions.
      */
     @Input()
-    public inputs: CommandInputParameterModel[] = [];
+    inputs: CommandInputParameterModel[] = [];
 
     @Output()
-    public update = new EventEmitter();
+    update = new EventEmitter();
 
     @Output()
-    public reset = new EventEmitter();
+    reset = new EventEmitter();
+
+    /**
+     * Inputs grouped and sorted the way they should be presented.
+     */
+    inputGroups: { name: string, inputs: CommandInputParameterModel[] }[] = [];
+
 
     constructor(private cdr: ChangeDetectorRef,
                 private statusBar: StatusBarService,
@@ -117,15 +124,10 @@ export class JobEditorComponent implements OnChanges {
     }
 
     /**
-     * Inputs grouped and sorted the way they should be presented.
-     */
-    public inputGroups: { name: string, inputs: CommandInputParameterModel[] }[] = [];
-
-    /**
      * Executes when job values get edited in the top-level forms.
      * We need to take those values and emit the new job structure as an update.
      */
-    private onJobFormChange(event: Event) {
+    onJobFormChange(event: Event) {
 
         event.stopPropagation();
 
@@ -174,7 +176,7 @@ export class JobEditorComponent implements OnChanges {
     /**
      * Updates the job value for a given input and emits the updated job.
      */
-    private jobValueUpdate(inputId, jobValue) {
+    jobValueUpdate(inputId, jobValue) {
 
         const input = this.inputs.find(i => i.id === inputId);
 
@@ -192,11 +194,11 @@ export class JobEditorComponent implements OnChanges {
     /**
      * Update allocatedResources value
      */
-    private onResourceFormChange(event: Event) {
+    onResourceFormChange(event: Event) {
         // Find which key was updated, either "mem" or "cpu"
         const formField = event.target as HTMLInputElement;
-        const res = formField.name;
-        const value = formField.value;
+        const res       = formField.name;
+        const value     = formField.value;
 
         // Update appropriate key, cast value to number
         OH.addProperty(this.job.allocatedResources, res, Number(value));
@@ -221,7 +223,9 @@ export class JobEditorComponent implements OnChanges {
     }
 
     ngOnDestroy() {
-        this.inspector.hide();
+        if (this.inspector.inspectedObject.getValue() !== "revisions") {
+            this.inspector.hide();
+        }
     }
 
 }

@@ -145,7 +145,7 @@ import {CheckboxPromptComponent} from "./modal/common/checkbox-prompt.component"
         TreeNodeComponent,
         TreeNodeIconComponent,
         TreeNodeIconComponent,
-        TreeViewComponent,
+        TreeViewComponent
     ]
 })
 export class UIModule {

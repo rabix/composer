@@ -25,6 +25,7 @@ ct-app-info {
 
     ct-editor-inspector {
         flex-basis: 320px;
+        flex-shrink: 0;
     }
 
     .flex-hide {

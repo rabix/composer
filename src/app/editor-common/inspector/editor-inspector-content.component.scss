@@ -14,6 +14,7 @@
     .form-section {
         position: relative;
         display: block;
+        overflow: auto;
         background: $gui-section-bg;
         height: 100%;
 

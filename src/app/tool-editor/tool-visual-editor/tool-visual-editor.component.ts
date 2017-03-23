@@ -150,6 +150,8 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
 
     ngOnDestroy() {
         /* Close object inspector*/
-        this.inspector.hide();
+        if (this.inspector.inspectedObject.getValue() !== "revisions") {
+            this.inspector.hide();
+        }
     }
 }

@@ -81,8 +81,9 @@ import {AppTabData} from "../core/workbox/app-tab-data";
 
 
                 <!--Revisions-->
-                <button *ngIf="data.dataSource !== 'local'"
+                <button *ngIf="data.dataSource !== 'local' && toolModel.customProps['sbg:revision']"
                         class="btn btn-sm btn-secondary" type="button"
+                        [ct-editor-inspector-target]="'revisions'"
                         [ct-editor-inspector]="revisions">
 
                     Revision: {{ toolModel.customProps['sbg:revision']}}
@@ -112,13 +113,13 @@ import {AppTabData} from "../core/workbox/app-tab-data";
 
             <!--GUI Editor-->
             <ct-tool-visual-editor *ngIf="viewMode === 'gui' && !isLoading"
-                                   class="gui-editor-component flex-col"
+                                   class="flex-col"
                                    [readonly]="!data.isWritable"
                                    [formGroup]="toolGroup"
                                    [model]="toolModel"></ct-tool-visual-editor>
 
             <ct-job-editor *ngIf="viewMode === 'test' && !isLoading"
-                           class="gui-editor-component flex-col p-2"
+                           class="flex-col"
                            [job]="toolModel.job"
                            (update)="onJobUpdate($event)"
                            (reset)="resetJob()"
@@ -131,7 +132,7 @@ import {AppTabData} from "../core/workbox/app-tab-data";
 
 
             <!--Object Inspector Column-->
-            <ct-editor-inspector [class.flex-hide]="!showInspector">
+            <ct-editor-inspector [class.flex-hide]="!showInspector && (viewMode === 'code' || viewMode === 'info')">
                 <template #inspector></template>
             </ct-editor-inspector>
         </div>
@@ -235,7 +236,8 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
         // @fixme Bring this back with the new service
         // this.tracked = this.userPrefService.get("show_reformat_prompt", true, true).subscribe(x => this.showReformatPrompt = x);
 
-        this.tracked = this.inspector.inspectedObject.map(obj => obj !== undefined)
+        this.tracked = this.inspector.inspectedObject
+            .map(obj => obj !== undefined)
             .subscribe(show => this.showInspector = show);
     }
 

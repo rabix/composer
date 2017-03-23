@@ -11,7 +11,6 @@ import {PlatformAppRevisionEntry} from "../../../services/api/platforms/platform
 import {Subject} from "rxjs/Subject";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
 
     selector: "ct-revision-list",
     styleUrls: ["./revision-list.component.scss"],
@@ -27,7 +26,7 @@ import {Subject} from "rxjs/Subject";
                      *ngFor="let revision of displayList">
 
                     <div class="revision-number h5">
-                        {{ revision.number }}
+                        <div>{{ revision.number }}</div>
                     </div>
                     <div class="revision-info">
                         <div class="revision-note" *ngIf="revision.note">
