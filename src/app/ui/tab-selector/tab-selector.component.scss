@@ -47,9 +47,9 @@
 
     .selection-underline {
         position: relative;
-        height: 2px;
-        background: $layout-element-separator-color;
-        margin-top: -3px;
+        height: 1px;
+        //background: $layout-element-separator-color;
+        margin-top: -2px;
     }
 
     .underline-highlight {

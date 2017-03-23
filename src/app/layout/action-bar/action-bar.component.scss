@@ -3,13 +3,31 @@
 :host {
     display: flex;
     flex-basis: $action-bar-height;
-    background: $action-bar-background;
-    border-bottom: 1px solid $layout-section-alt-border-color;
+    background: rgb(59, 59, 59);
+    border-bottom: 1px solid #292929;
     justify-content: space-between;
 
     /deep/ .btn {
         height: 28px;
         margin-top: ($action-bar-height - 28px)/2;
-        font-size: $font-size-sm;
+        font-size: $font-size-base;
+        background: transparent;
+        border-radius: 2px;
+        border-color: transparent;
+        color: $layout-text-color-faded;
+
+        &:hover {
+            color: $layout-text-color;
+            border: 1px solid #6d6d6d;
+        }
+
+        &:active, &:focus {
+            background: none;
+            outline: none;
+        }
+
+        &:active {
+            background: #343434;
+        }
     }
 }

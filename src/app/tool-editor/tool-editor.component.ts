@@ -39,8 +39,7 @@ import {AppTabData} from "../core/workbox/app-tab-data";
     template: `
         <!--Control Header-->
         <ct-action-bar>
-            <ct-tab-selector class="inverse" [distribute]="'auto'" [active]="viewMode"
-                             (activeChange)="switchTab($event)">
+            <ct-tab-selector [distribute]="'auto'" [active]="viewMode" (activeChange)="switchTab($event)">
 
                 <ct-tab-selector-entry [disabled]="!isValidCWL"
                                        [tabName]="'info'">App Info

@@ -1,17 +1,10 @@
-import {
-    Component,
-    Input,
-    OnDestroy,
-    OnInit,
-    TemplateRef,
-    ViewChild,
-    ViewContainerRef
-} from "@angular/core";
+import {Component, Input, OnDestroy, OnInit, TemplateRef, ViewChild, ViewContainerRef} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {WorkflowFactory, WorkflowModel} from "cwlts/models";
 import {Validation} from "cwlts/models/helpers/validation";
 import * as Yaml from "js-yaml";
-import {BehaviorSubject, Observable, ReplaySubject} from "rxjs/Rx";
+import {Observable} from "rxjs/Rx";
+import {AppTabData} from "../core/workbox/app-tab-data";
 import {WorkboxTab} from "../core/workbox/workbox-tab.interface";
 import {
     CwlSchemaValidationWorkerService,
@@ -19,17 +12,14 @@ import {
 } from "../editor-common/cwl-schema-validation-worker/cwl-schema-validation-worker.service";
 import {EditorInspectorService} from "../editor-common/inspector/editor-inspector.service";
 import {StatusBarService} from "../layout/status-bar/status-bar.service";
-import {noop} from "../lib/utils.lib";
+import {SystemService} from "../platform-providers/system.service";
 import {PlatformAPI} from "../services/api/platforms/platform-api.service";
+import {SettingsService} from "../services/settings/settings.service";
 import {UserPreferencesService} from "../services/storage/user-preferences.service";
-import {DataEntrySource} from "../sources/common/interfaces";
 import {ModalService} from "../ui/modal/modal.service";
 import {DirectiveBase} from "../util/directive-base/directive-base";
 
 import LoadOptions = jsyaml.LoadOptions;
-import {SystemService} from "../platform-providers/system.service";
-import {SettingsService} from "../services/settings/settings.service";
-import {AppTabData} from "../core/workbox/app-tab-data";
 
 @Component({
     selector: "ct-workflow-editor",
@@ -37,21 +27,20 @@ import {AppTabData} from "../core/workbox/app-tab-data";
     styleUrls: ["./workflow-editor.component.scss"],
     template: `
         <ct-action-bar>
-            <ct-tab-selector class="inverse" [distribute]="'auto'" [active]="viewMode"
-                             (activeChange)="switchView($event)">
-                
-                <ct-tab-selector-entry [disabled]="!isValidCWL" 
+            <ct-tab-selector [distribute]="'auto'" [active]="viewMode" (activeChange)="switchView($event)">
+
+                <ct-tab-selector-entry [disabled]="!isValidCWL"
                                        [tabName]="'info'">App Info
                 </ct-tab-selector-entry>
-                
-                <ct-tab-selector-entry [disabled]="!isValidCWL" 
+
+                <ct-tab-selector-entry [disabled]="!isValidCWL"
                                        [tabName]="'graph'">Graph View
                 </ct-tab-selector-entry>
-                
+
                 <!--<ct-tab-selector-entry [disabled]="!isValidCWL" [tabName]="'list'">List View-->
                 <!--</ct-tab-selector-entry>-->
-                
-                <ct-tab-selector-entry [disabled]="!viewMode" 
+
+                <ct-tab-selector-entry [disabled]="!viewMode"
                                        [tabName]="'code'">Code
                 </ct-tab-selector-entry>
             </ct-tab-selector>
@@ -62,25 +51,27 @@ import {AppTabData} from "../core/workbox/app-tab-data";
                 <span class="tag tag-default">{{ workflowModel.cwlVersion }}</span>
 
                 <!--Go to app-->
-                <button class="btn btn-sm btn-secondary " type="button" (click)="goToApp()">
+                <button class="btn btn-sm btn-secondary " type="button" (click)="goToApp()" ct-tooltip="See on Seven Bridges">
                     <i class="fa fa-external-link"></i>
                 </button>
 
                 <!--Save-->
                 <button [disabled]="!data.isWritable"
                         (click)="save()"
+                        ct-tooltip="Save"
                         class="btn btn-sm btn-secondary" type="button">
                     <i class="fa fa-save"></i>
                 </button>
 
                 <!--Copy-->
-                <button class="btn btn-sm btn-secondary " type="button">
+                <button class="btn btn-sm btn-secondary " type="button" ct-tooltip="Save As...">
                     <i class="fa fa-copy"></i>
                 </button>
 
 
                 <!--Revisions-->
                 <button *ngIf="data.dataSource !== 'local'"
+                        ct-tooltip="See Revisions"
                         class="btn btn-sm btn-secondary" type="button"
                         [ct-editor-inspector]="revisions">
 

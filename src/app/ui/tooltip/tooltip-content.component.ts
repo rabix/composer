@@ -53,7 +53,7 @@ export class TooltipContentComponent implements AfterViewInit {
     public height: number;
 
     @Input()
-    public maxWidth = 200;
+    public maxWidth = 300;
 
     @ViewChild("tooltipInner")
     private tooltipInner: ElementRef;

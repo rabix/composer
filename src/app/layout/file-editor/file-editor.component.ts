@@ -7,7 +7,13 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
     selector: "ct-file-editor",
     styleUrls: ["./file-editor.component.scss"],
     template: `
-        <ct-action-bar></ct-action-bar>
+        <ct-action-bar>
+            <div class="document-controls">
+                <button [disabled]="!data.isWritable" class="btn btn-secondary btn-sm" type="button" (click)="save()">
+                    <i class="fa fa-fw fa-save"></i>
+                </button>
+            </div>
+        </ct-action-bar>
         <ct-code-editor [formControl]="fileContent"
                         [filePath]="data.id"
                         [options]="{
@@ -48,7 +54,8 @@ export class FileEditorComponent extends DirectiveBase implements OnInit {
         this.fileContent.setValue(this.data.fileContent);
     }
 
-    private save() {
+    save() {
+        console.log("Saving!");
         // // For local files, just save and that's it
         // if (this.data.data.source === "local") {
         //     const path = this.data.data.path;

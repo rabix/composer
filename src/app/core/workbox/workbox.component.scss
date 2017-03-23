@@ -19,6 +19,7 @@
         line-height: $layout-title-bar-height;
         width: 100%;
         display: flex;
+        margin-left: -2px
     }
 
     .body {
@@ -40,12 +41,7 @@
         flex-direction: column;
     }
 
-    .tab ~ .tab {
-        margin-left: 4px
-    }
-
     .ct-workbox-add-tab-icon {
-        margin-top: $topOffset;
         width: 30px;
         font-weight: bolder;
         text-align: center;
@@ -61,29 +57,26 @@
         padding: 0 10px 0 1px;
         overflow-x: auto;
         overflow-y: hidden;
+        list-style: none;
     }
 
     .tab {
         border: none;
         flex: 1;
-        font-size: $font-size-xs;
-        line-height: 34px;
-        margin: 5px 20px 0 5px;
+        font-size: $font-size-sm;
+
         max-width: 275px;
         min-width: 40px;
-        padding: 0 24px 10px 0;
+        padding: 0 24px 10px 10px;
         position: relative;
-        box-shadow: inset 1px 1px 0 $tab-bg, -4px 0px 4px rgba(0, 0, 0, 0.1);
-
-        &:first-child {
-            margin-left: 20px;
-        }
+        background: #2d2d2d;
+        color: $layout-text-color-faded;
+        border-left: 1px solid #4d4d4d;
+        border-right: 1px solid #373a3c;
+        line-height: 36px;
 
         .title {
-            margin-top: -5px;
             overflow: hidden;
-            padding-right: 10px;
-            padding-top: 5px;
             position: relative;
             text-overflow: ellipsis;
             white-space: pre;
@@ -93,50 +86,50 @@
         .close-icon {
             position: absolute;
             top: 0;
-            right: -10px;
-            width: 20px;
+            right: 10px;
             font-size: 16px;
             z-index: 10;
         }
 
         &.active, &.active:before, &.active:after {
             z-index: 1;
-            color: $tab-select-color;
-            background-image: -webkit-linear-gradient(top, $tab-select-bg, $tab-select-bg);
+            color: $layout-text-color;
+            background: #3B3B3B;
+            //background-image: -webkit-linear-gradient(top, $tab-select-bg, $tab-select-bg);
         }
 
-        &, &:before, &:after {
-            height: 34px;
-            background-image: -webkit-linear-gradient(top, lighten($tab-bg, 5%), $tab-bg);
-        }
-
-        &:before, &:after {
-            content: '';
-            position: absolute;
-            top: 0;
-            width: 25px;
-            height: 35px;
-        }
-
-        // triangle to left
-        &:before {
-            left: -14px;
-            border-top-left-radius: 3px;
-            box-shadow: inset 1px 1px 0 $tab-bg, -4px 0px 4px rgba(0, 0, 0, 0.1);
-            -webkit-transform: skewX(-30deg);
-        }
-
-        // triangle to right
-        &:after {
-            right: -14px;
-            border-top-right-radius: 3px;
-            box-shadow: inset -1px 1px 0 $tab-bg, 4px 0px 4px rgba(0, 0, 0, 0.1);
-            -webkit-transform: skewX(30deg);
-        }
+        //&, &:before, &:after {
+        //    height: 34px;
+        //    background: $tabBackground;
+        //    //background-image: -webkit-linear-gradient(top, lighten($tab-bg, 5%), $tab-bg);
+        //}
+        //
+        //&:before, &:after {
+        //    content: '';
+        //    position: absolute;
+        //    top: 0;
+        //    width: 25px;
+        //    height: 35px;
+        //}
+        //
+        //// triangle to left
+        //&:before {
+        //    left: -14px;
+        //    border-top-left-radius: 3px;
+        //    box-shadow: inset 1px 1px 0 $tab-bg, -4px 0px 4px rgba(0, 0, 0, 0.1);
+        //    -webkit-transform: skewX(-30deg);
+        //}
+        //
+        //// triangle to right
+        //&:after {
+        //    right: -14px;
+        //    border-top-right-radius: 3px;
+        //    box-shadow: inset -1px 1px 0 $tab-bg, 4px 0px 4px rgba(0, 0, 0, 0.1);
+        //    -webkit-transform: skewX(30deg);
+        //}
     }
 
     ct-settings-button {
         flex-basis: 30px;
-        margin-top: 2px;
     }
 }

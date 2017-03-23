@@ -21,7 +21,7 @@ import {TabSelectorService} from "./tab-selector.service";
     selector: "ct-tab-selector",
     providers: [TabSelectorService],
     template: `
-        <div class="tab-container {{ distribute }}">
+        <div class="tab-container {{ distribute }} deep-unselectable">
             <ng-content></ng-content>
         </div>
         <div class="selection-underline">

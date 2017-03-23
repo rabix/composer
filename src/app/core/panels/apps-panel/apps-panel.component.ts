@@ -1,6 +1,5 @@
-import {AfterViewInit, ChangeDetectorRef, Component, ViewChild} from "@angular/core";
+import {AfterViewInit, ChangeDetectorRef, Component} from "@angular/core";
 import {UserPreferencesService} from "../../../services/storage/user-preferences.service";
-import {TabSelectorComponent} from "../../../ui/tab-selector/tab-selector.component";
 
 @Component({
     selector: "ct-apps-panel",
