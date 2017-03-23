@@ -1,4 +1,8 @@
 import {Component} from "@angular/core";
+import {ModalService} from "../../ui/modal/modal.service";
+import {SendFeedbackModal} from "../../core/modals/send-feedback-modal/send-feedback.modal.component";
+import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
+import {SystemService} from "../../platform-providers/system.service";
 
 @Component({
     styleUrls: ["getting-started.component.scss"],
@@ -35,7 +39,7 @@ import {Component} from "@angular/core";
                 <p class="subtitle">Need help?</p>
                 <p>If you have any problem, idea or a thought let us know.</p>
                 <p>
-                    <a href="#" class="btn btn-outline-primary">
+                    <a href="#" class="btn btn-outline-primary" (click)="openFeedbackModal()">
                         Get support
                     </a>
                 </p>
@@ -45,4 +49,34 @@ import {Component} from "@angular/core";
 })
 export class GettingStartedComponent {
 
+
+    constructor(private modal: ModalService, private platformApi: PlatformAPI, private system: SystemService) {
+    }
+
+    openFeedbackModal() {
+
+        this.platformApi.sessionID.take(1).subscribe((sessionId) => {
+            if (sessionId) {
+
+                // User has an account and is connected to the platform
+
+                const modal = this.modal.fromComponent(SendFeedbackModal, {
+                    title: "Send feedback",
+                    backdrop: true
+                });
+
+                modal.sendFeedback = (feedbackType, message) => {
+                    this.platformApi.sendFeedback(feedbackType, message).subscribe(() => {
+                        modal.closeModal();
+                    });
+                };
+
+            } else {
+
+                // User is not connected to the platform
+
+                this.system.openLink("mailto:support@sbgenomics.com?subject=Cottontail Feedback");
+            }
+        });
+    }
 }

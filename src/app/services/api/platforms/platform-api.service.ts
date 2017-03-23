@@ -1,10 +1,10 @@
 import {Injectable} from "@angular/core";
 import {Headers, Http, URLSearchParams} from "@angular/http";
-import {Observable, ReplaySubject} from "rxjs";
+import {Observable} from "rxjs/Observable";
+import {ReplaySubject} from "rxjs/ReplaySubject";
 import {ENVP} from "../../../config/env.config";
 import {SettingsService} from "../../settings/settings.service";
 import {PlatformAppEntry, PlatformProjectEntry} from "./platform-api.types";
-
 
 export interface ServiceConfig {
     port?: number;
@@ -16,7 +16,9 @@ export class PlatformAPI {
 
     sessionID = new ReplaySubject(1);
 
-    private platformServices: { brood: string, watson: string, gatekeeper: string } = {} as any;
+    private platformServices: { brood: string, voyager: string, watson: string, gatekeeper: string } = {} as any;
+
+    private userInfo: { email: string, id: string, staff: boolean, username: string } = {} as any;
 
     constructor(private http: Http, private settings: SettingsService) {
 
@@ -38,7 +40,11 @@ export class PlatformAPI {
                 }))
                 .subscribe(res => {
                     this.sessionID.next(res.json().message.session_id);
-                });
+
+                    this.getUserInfo().subscribe((user) => this.userInfo = user);
+                }
+            )
+            ;
         });
     }
 
@@ -63,7 +69,7 @@ export class PlatformAPI {
     }
 
     static getServiceUrl(platformUrl: string, serviceName: string) {
-        const isVayu    = platformUrl.indexOf("-vayu.sbgenomics.com") !== -1;
+        const isVayu = platformUrl.indexOf("-vayu.sbgenomics.com") !== -1;
         const isStaging = platformUrl.indexOf("staging-igor.sbgenomics.com") !== -1;
 
         let serviceUrl = platformUrl.replace("igor", serviceName);
@@ -158,7 +164,7 @@ export class PlatformAPI {
         // Checkout the newest version of this App to get the latest revision
         return this.sessionID.switchMap(sessionID => this.getApp(appPath).flatMap(latestApp => {
             const nextRevision = (latestApp["sbg:latestRevision"] || 0) + 1;
-            const endpoint     = `${this.platformServices.brood}/apps/${appPath}/${nextRevision}`;
+            const endpoint = `${this.platformServices.brood}/apps/${appPath}/${nextRevision}`;
 
             return this.http.post(endpoint, Object.assign({}, app, {
                 "sbg:revisionNotes": revisionNote
@@ -177,6 +183,53 @@ export class PlatformAPI {
                     "session-id": sessionID
                 })
             }).map(r => r.json().message).first());
+    }
+
+    public getUserInfo() {
+        return this.sessionID.switchMap(sessionID =>
+            this.http.get(`${this.platformServices.gatekeeper}/user/`, {
+                headers: new Headers({
+                    "session-id": sessionID
+                })
+            }).map(r => r.json().message).first());
+    }
+
+    public sendFeedback(type: string, message: string) {
+        return this.settings.platformConfiguration.take(1).switchMap((conf) => {
+                const data = {
+                    "id": "user.feedback",
+                    "data": {
+                        "user": this.userInfo.id,
+                        "referrer": "Cottontail " + conf.url,
+                        "user_agent": process.platform,
+                        "timestamp": this.getFormatedCurrentTimeStamp(),
+                        "text": message,
+                        "type": type,
+
+                    }
+                };
+                return this.sessionID.switchMap(sessionID =>
+                    this.http.post(`${this.platformServices.voyager}/send/`, data, {
+                        headers: new Headers({
+                            "session-id": sessionID
+                        })
+                    }).map(r => r.json().message).first());
+            }
+        );
+    }
+
+    // FIXME should not be here but currently here is the only place where it is used
+    private getFormatedCurrentTimeStamp() {
+        const date = new Date();
+        const pad = (n) => (n < 10 ? "0" : "") + n;
+
+        // format is YYYYMMDDHHMMSS
+        return date.getFullYear() +
+            pad(date.getMonth() + 1) +
+            pad(date.getDate()) +
+            pad(date.getHours()) +
+            pad(date.getMinutes()) +
+            pad(date.getSeconds());
     }
 
     private objectToParams(obj) {

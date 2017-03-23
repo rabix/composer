@@ -29,10 +29,12 @@ import {PanelComponent} from "./panels/panel.component";
 import {PanelHandleComponent} from "./panels/panel-handle.component";
 import {PanelSwitcherComponent} from "./panels/panel-switcher.component";
 import {PanelToolbarComponent} from "./panels/panel-toolbar.component";
+import {SendFeedbackModal} from "./modals/send-feedback-modal/send-feedback.modal.component";
 
 @NgModule({
     entryComponents: [
-        AddSourceModalComponent
+        AddSourceModalComponent,
+        SendFeedbackModal
     ],
     declarations: [
         LayoutComponent,
@@ -53,6 +55,7 @@ import {PanelToolbarComponent} from "./panels/panel-toolbar.component";
         GettingStartedComponent,
         NewFileTabComponent,
         AddSourceModalComponent,
+        SendFeedbackModal,
         PlatformConnectionFormComponent
     ],
     exports: [
