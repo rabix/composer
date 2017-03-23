@@ -35,45 +35,40 @@ import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostBinding, In
 export class TooltipContentComponent implements AfterViewInit {
 
     @Input()
-    public hostElement: HTMLElement;
+    hostElement: HTMLElement;
 
     @Input()
-    public content: string;
+    content: string;
 
     @Input()
-    public placement: "top" | "bottom" | "left" | "right" = "bottom";
+    placement: "top" | "bottom" | "left" | "right" = "bottom";
 
     @Input()
-    public animation: boolean = false;
+    animation = false;
 
     @Input()
-    public width: number;
+    width;
 
     @Input()
-    public height: number;
+    height: number;
 
     @Input()
-    public maxWidth = 300;
+    maxWidth = 300;
 
     @ViewChild("tooltipInner")
     private tooltipInner: ElementRef;
 
     @HostBinding("style.top.px")
-    private top: number = -100000;
+    top = -100000;
 
     @HostBinding("style.left.px")
-    private left: number = -100000;
+    left = -100000;
 
     @HostBinding("class.in")
-    private isIn: boolean = false;
+    isIn = false;
 
     @HostBinding("class.fade")
-    private isFade: boolean = false;
-
-
-    // -------------------------------------------------------------------------
-    // Constructor
-    // -------------------------------------------------------------------------
+    isFade = false;
 
     constructor(public element: ElementRef,
                 private cdr: ChangeDetectorRef) {
@@ -97,7 +92,7 @@ export class TooltipContentComponent implements AfterViewInit {
         setTimeout(() => {
             const p = this.positionElements(this.hostElement, this.element.nativeElement.children[0]);
 
-            this.top = p.top;
+            this.top  = p.top;
             this.left = p.left;
             this.cdr.markForCheck();
         });
@@ -105,7 +100,7 @@ export class TooltipContentComponent implements AfterViewInit {
     }
 
     public hide(): void {
-        this.top = -10000;
+        this.top  = -10000;
         this.left = -10000;
         this.isIn = false;
 
@@ -116,14 +111,34 @@ export class TooltipContentComponent implements AfterViewInit {
 
     private positionElements(hostEl: HTMLElement, targetEl: HTMLElement) {
 
-        const {left: hostLeft, top: hostTop} = hostEl.getBoundingClientRect();
-        const {clientWidth: hostWidth, clientHeight: hostHeight} = hostEl;
-        const {clientWidth: contentWidth, clientHeight: contentHeight} = targetEl;
+        const {offsetWidth, offsetHeight} = document.body;
 
-        const contentTop = hostTop - contentHeight;
-        const contentLeft = hostLeft - contentWidth / 2 + hostWidth / 2;
+        const hostBBox   = hostEl.getBoundingClientRect();
+        const targetBBox = targetEl.getBoundingClientRect();
 
-        return {top: contentTop, left: contentLeft};
+        if (this.placement === "top") {
+            const top = hostBBox.top - targetBBox.height;
+            let left  = hostBBox.left - targetBBox.width / 2 + hostBBox.width / 2;
+
+            if ((left + targetBBox.width) > offsetWidth) {
+                left += offsetWidth - (left + targetBBox.width);
+            } else if (left < 0) {
+                left = 0;
+            }
+
+            return {top, left};
+        } else if (this.placement === "bottom") {
+            const top = hostBBox.bottom;
+            let left  = hostBBox.left - targetBBox.width / 2 + hostBBox.width / 2;
+
+            if ((left + targetBBox.width) > offsetWidth) {
+                left += offsetWidth - (left + targetBBox.width);
+            } else if (left < 0) {
+                left = 0;
+            }
+
+            return {top, left};
+        }
     }
 
 }

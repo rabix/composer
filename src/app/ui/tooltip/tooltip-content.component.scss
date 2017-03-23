@@ -16,6 +16,11 @@ ct-tooltip-content {
 
         .tooltip-inner-plaintext {
             padding: 4px 8px;
+            display: inline-block;
+        }
+
+        &::before {
+            border: none;
         }
     }
 

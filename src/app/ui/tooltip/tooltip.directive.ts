@@ -47,15 +47,15 @@ export class TooltipDirective extends DirectiveBase {
         if (typeof this.content === "string") {
 
             const factory = this.resolver.resolveComponentFactory(TooltipContentComponent);
-            this.tooltip = this.viewContainerRef.createComponent(factory);
+            this.tooltip  = this.viewContainerRef.createComponent(factory);
 
-            instance = this.tooltip.instance;
+            instance         = this.tooltip.instance;
             instance.content = this.content;
         }
 
         instance.hostElement = this.viewContainerRef.element.nativeElement;
-        instance.placement = this.tooltipPlacement;
-        instance.animation = this.tooltipAnimation;
+        instance.placement   = this.tooltipPlacement;
+        instance.animation   = this.tooltipAnimation;
 
         instance.show();
 
