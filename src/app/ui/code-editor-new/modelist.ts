@@ -182,7 +182,7 @@ for (const name in supportedModes) {
     modes.push(mode);
 }
 export function getModeForPath(path) {
-    let mode       = modesByName.text;
+    let mode       = modesByName["text"];
     const fileName = path.split(/[\/\\]/).pop();
     for (let i = 0; i < modes.length; i++) {
         if (modes[i].supportsFile(fileName)) {
