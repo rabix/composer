@@ -95,16 +95,15 @@ import {ModalService} from "../../../ui/modal/modal.service";
                     </li>
                 </ul>
 
+                <!--Add entry link-->
+                <button *ngIf="!readonly && entries.length"
+                        (click)="addEntry()"
+                        type="button"
+                        class="btn pl-0 btn-link no-outline no-underline-hover">
+                    <i class="fa fa-plus"></i> Add a File
+                </button>
+
             </div>
-
-            <!--Add entry link-->
-            <button *ngIf="!readonly && entries.length"
-                    (click)="addEntry()"
-                    type="button"
-                    class="btn pl-0 btn-link no-outline no-underline-hover">
-                <i class="fa fa-plus"></i> Add a File
-            </button>
-
         </ct-form-panel>
     `
 })
@@ -134,9 +133,9 @@ export class FileDefListComponent extends DirectiveBase {
     }
 
     addEntry() {
-        const newLoc = `${this.location}.fileDef[${this.entries.length}]`;
+        const newLoc   = `${this.location}.fileDef[${this.entries.length}]`;
         const newEntry = new FileDefModel({fileContent: "", filename: ""}, newLoc);
-        const entries = this.entries.concat(newEntry);
+        const entries  = this.entries.concat(newEntry);
         this.update.next(entries);
 
         this.inspectorTemplate.changes
@@ -161,7 +160,7 @@ export class FileDefListComponent extends DirectiveBase {
 
             this.entries = this.entries.slice(0, index).concat(this.entries.slice(index + 1));
             this.update.next(this.entries);
-        }, noop);
+        }, err => console.warn);
 
     }
 

@@ -156,7 +156,7 @@ export class ToolInputListComponent extends DirectiveBase {
 
             const entries = this.entries.slice(0, index).concat(this.entries.slice(index + 1));
             this.entriesChange.emit(entries);
-        }, noop);
+        }, err => console.warn);
     }
 
     addEntry() {

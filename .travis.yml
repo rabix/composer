@@ -18,6 +18,7 @@ before_script:
   - sleep 3
 script:
   - npm run build
+  - npm run electron:compile
   - npm run package
   - npm run test-once
 

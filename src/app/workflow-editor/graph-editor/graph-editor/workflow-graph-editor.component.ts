@@ -103,7 +103,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         this.graph          = new Workflow(new Snap(this.canvas.nativeElement), this.model as any);
         const firstAnything = this.model.steps[0] || this.model.inputs[0] || this.model.outputs[0];
 
-        if (firstAnything.customProps["sbg:x"] === undefined) {
+        if (firstAnything && firstAnything.customProps["sbg:x"] === undefined) {
             console.log("Should arrange");
             // this.graph.command("workflow.arrange");
         }
@@ -129,7 +129,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     onDrop(ev: MouseEvent, nodeID: string) {
         console.log("Dropped!", nodeID);
 
-        this.gateway.fetchFileContent(nodeID, true).subscribe(app => {
+        this.gateway.fetchFileContent(nodeID, true).subscribe((app: any) => {
 
             const step   = this.model.addStepFromProcess(app);
             const coords = this.graph.translateMouseCoords(ev.clientX, ev.clientY);

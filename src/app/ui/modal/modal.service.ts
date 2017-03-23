@@ -1,6 +1,6 @@
 import {ComponentFactoryResolver, ComponentRef, Injectable, TemplateRef, ViewContainerRef} from "@angular/core";
 import {ModalOptions} from "./modal-options";
-import {Subject} from "rxjs";
+import {Subject} from "rxjs/Subject";
 import {ModalComponent} from "./modal.component";
 import {ConfirmComponent} from "./common/confirm.component";
 import {PromptComponent} from "./common/prompt.component";

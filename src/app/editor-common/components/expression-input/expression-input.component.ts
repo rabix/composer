@@ -57,43 +57,54 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
      * Context in which expression should be executed
      */
     @Input()
-    public context: any;
+    context: any;
 
     @Input()
-    public type: "string" | "number" = "string";
+    type: "string" | "number" = "string";
 
     /** When set to true, only expressions are allowed */
     @Input()
-    public disableLiteralTextInput: boolean = false;
+    disableLiteralTextInput: boolean = false;
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
     /** Flag if model is expression or primitive */
-    public isExpr: boolean = false;
+    isExpr: boolean = false;
 
     /**
      * Internal ExpressionModel on which changes are made
      */
-    public model: ExpressionModel;
+    model: ExpressionModel;
 
     /**
      * Result gotten from expression evaluation
      */
-    public result: any;
+    result: any;
 
     /** getter for formControl value */
-    public get value() {
+    get value() {
         return this.model;
     }
 
     /** setter for formControl value */
-    public set value(val: ExpressionModel) {
+    set value(val: ExpressionModel) {
         if (val !== this.model) {
             this.model = val;
             this.onChange(val);
         }
     }
+
+    /**
+     * Declaration of change function
+     */
+    private onChange = noop;
+
+    /**
+     * Declaration of touch function
+     */
+    private onTouch = noop;
+
 
     /**
      * From ControlValueAccessor
@@ -133,17 +144,6 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
         this.onTouch = fn;
     }
 
-    /**
-     * Declaration of change function
-     */
-    private onChange = noop;
-
-    /**
-     * Declaration of touch function
-     */
-    private onTouch = noop;
-
-
     constructor(private modal: ModalService) {
         super();
     }
@@ -153,7 +153,9 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
      * @param str
      */
     private editString(str: number | string) {
-        if (this.type === "number") str = Number(str);
+        if (this.type === "number") {
+            str = Number(str);
+        }
         this.model.setValue(str, this.type);
         this.onChange(this.model);
     }
@@ -165,7 +167,9 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
      */
     private editExpr(action: "clear" | "edit", event: Event): void {
 
-        if (!action) return;
+        if (!action) {
+            return;
+        }
 
         if (action === "edit") {
             const editor = this.modal.fromComponent(ModelExpressionEditorComponent, {
@@ -181,8 +185,8 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
 
             editor.model   = this.model;
             editor.context = this.context;
-            editor.action.first().subscribe(action => {
-                if (action === "save") {
+            editor.action.first().subscribe(editorAction => {
+                if (editorAction === "save") {
                     const val = editor.model.serialize();
                     this.model.setValue(val, "expression");
 
@@ -215,7 +219,7 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
                 this.isExpr       = false;
                 event.stopPropagation();
                 this.onChange(this.model);
-            }, noop);
+            }, err => console.warn);
         }
     }
 }

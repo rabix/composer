@@ -48,7 +48,7 @@ export class CodeEditorComponent implements OnInit, ControlValueAccessor, OnDest
     @Input()
     filePath?: string;
 
-    private editor: AceAjax.Editor;
+    editor: AceAjax.Editor;
 
     private originalContent: string;
 

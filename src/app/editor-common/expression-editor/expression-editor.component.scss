@@ -1,6 +1,6 @@
 @import "../../../assets/sass/variables";
 
-ct-expression-editor, ct-multilang-code-editor {
+:host {
     display: block;
 
     .title {

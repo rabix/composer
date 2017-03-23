@@ -210,7 +210,7 @@ export class KeyValueListComponent extends DirectiveBase implements ControlValue
             this.keyValueFormList = this.keyValueFormList.filter(item => item.id !== ctrl.id);
             this.form.removeControl(ctrl.id);
             this.form.markAsDirty();
-        }, noop);
+        }, err => console.warn);
     }
 
     ngOnDestroy() {

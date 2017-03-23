@@ -21,7 +21,6 @@ import {
 } from "../editor-common/cwl-schema-validation-worker/cwl-schema-validation-worker.service";
 import {EditorInspectorService} from "../editor-common/inspector/editor-inspector.service";
 import {StatusBarService} from "../layout/status-bar/status-bar.service";
-import {noop} from "../lib/utils.lib";
 import {SystemService} from "../platform-providers/system.service";
 import {PlatformAPI} from "../services/api/platforms/platform-api.service";
 import {SettingsService} from "../services/settings/settings.service";
@@ -251,6 +250,10 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
             this.cwlValidatorService.validate(latestContent).then(r => {
                 if (!r.isValidCwl) {
                     // turn off loader and load document as code
+                    if (!this.viewMode) {
+                        this.viewMode = "code";
+                    }
+
                     this.isLoading  = false;
                     this.validation = r;
                     return r;
@@ -319,6 +322,10 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
                             loc: "document"
                         }]
                     };
+
+                    if (!this.viewMode) {
+                        this.viewMode = "code";
+                    }
                 });
             });
 
@@ -361,7 +368,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
         //         this.statusBar.stopProcess(statusID, `Created revision ${result.message["sbg:latestRevision"]} from ${path}`);
         //
         //     });
-        // }, noop);
+        // }, err => console.warn);
 
     }
 
@@ -443,6 +450,10 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
     switchTab(tabName) {
         setTimeout(() => {
             this.viewMode = tabName;
+
+            if (tabName === "code" && this.toolGroup.dirty) {
+                this.codeEditorContent.setValue(this.getModelText());
+            }
         });
     }
 

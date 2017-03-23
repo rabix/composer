@@ -1,15 +1,14 @@
-import {Component, Input, Output, ViewEncapsulation} from "@angular/core";
-import {Subject} from "rxjs";
+import {AfterViewInit, Component, Input, OnInit, Output} from "@angular/core";
 import {FormControl, FormGroup} from "@angular/forms";
+import {Subject} from "rxjs/Subject";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
+    styleUrls: ["prompt.component.scss"],
     selector: "ct-modal-prompt",
     template: `
         <form (ngSubmit)="decision.next(answer.value)" [formGroup]="form">
-            <div class="modal-body">
+            <div class="body p-1">
                 <div class="form-group">
                     <label [innerHTML]="content"></label>
                     <input #answer autofocus [formControl]="formControl" class="form-control"/>
@@ -18,34 +17,37 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             <div *ngIf="errors.length > 0" class="m-1 alert alert-warning">
                 <div *ngFor="let err of errors">{{ err }}</div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary btn-sm" (click)="decision.next(false)" type="button">{{ cancellationLabel }}</button>
-                <button [disabled]="form.invalid" class="btn btn-primary btn-sm" type="submit">{{ confirmationLabel }}</button>
+            <div class="footer pr-1 pb-1">
+                <button class="btn btn-secondary" (click)="decision.next(false)" type="button">
+                    {{ cancellationLabel }}
+                </button>
+                <button [disabled]="form.invalid" class="btn btn-success" type="submit">
+                    {{ confirmationLabel }}
+                </button>
             </div>
         </form>
     `
 })
-export class PromptComponent extends DirectiveBase {
+export class PromptComponent extends DirectiveBase implements OnInit, AfterViewInit {
 
     @Input()
-    public content: string;
+    content: string;
 
     @Input()
-    public cancellationLabel: string;
+    cancellationLabel: string;
 
     @Input()
-    public confirmationLabel: string;
+    confirmationLabel: string;
 
     @Output()
-    public decision = new Subject<boolean>();
+    decision = new Subject<boolean>();
 
     @Input()
-    public formControl: FormControl;
+    formControl: FormControl;
 
-    private form: FormGroup;
+    form: FormGroup;
 
-    private errors: string[] = [];
-
+    errors: string[] = [];
 
     constructor() {
 
@@ -63,7 +65,8 @@ export class PromptComponent extends DirectiveBase {
 
     ngAfterViewInit() {
         this.tracked = this.formControl.statusChanges.subscribe(_ => {
-            this.errors = Object.keys(this.formControl.errors || {}).map(key => this.formControl.errors[key]);
+            this.errors = Object.keys(this.formControl.errors || {})
+                .map(key => this.formControl.errors[key]);
         });
     }
 }

@@ -1,12 +1,12 @@
-import {Component, HostBinding, Input, Output, ViewChild, ViewEncapsulation} from "@angular/core";
-import {BehaviorSubject, Observable, Subject} from "rxjs";
-import {DirectiveBase} from "../../util/directive-base/directive-base";
-import {CodeEditorXComponent} from "../../ui/code-editor/code-editor.component";
+import {Component, HostBinding, Input, OnInit, Output, ViewChild} from "@angular/core";
+import {FormControl} from "@angular/forms";
+import {Observable} from "rxjs/Observable";
+import {Subject} from "rxjs/Subject";
 import {TreeNode} from "../../ui/tree-view-old/types";
+import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {CodeEditorComponent} from "../../ui/code-editor-new/code-editor.component";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-expression-editor",
     styleUrls: ["./expression-editor.component.scss"],
     template: `
@@ -16,23 +16,24 @@ import {TreeNode} from "../../ui/tree-view-old/types";
                 <div class="flex-col code-col">
                     <div class="title">Expression:</div>
                     <div class="code-main">
-                        <ct-code-editor-x #editor [content]="editorContent" [language]="'javascript'" [options]="{
+                        <ct-code-editor #editor [formControl]="expressionControl" [options]="{
                         'theme': 'ace/theme/monokai',
+                        'mode': 'ace/mode/javascript',
                         'showGutter': false,
                         'wrap': true
-                        }"></ct-code-editor-x>
+                        }"></ct-code-editor>
                     </div>
 
                     <div class="title">Output:</div>
                     <div class="code-preview">
 
-                        <ct-code-editor-x [content]="previewContent" [language]="'json'" [options]="{
+                        <ct-code-editor [formControl]="resultControl" [options]="{
                             'theme': 'ace/theme/monokai',
                             'showGutter': false,
                             'wrap': true,
                             'readOnly': true,
                             'useWorker': false
-                        }"></ct-code-editor-x>
+                        }"></ct-code-editor>
                     </div>
                 </div>
 
@@ -49,7 +50,7 @@ import {TreeNode} from "../../ui/tree-view-old/types";
 
     `
 })
-export class ExpressionEditorComponent extends DirectiveBase {
+export class ExpressionEditorComponent extends DirectiveBase implements OnInit {
 
     @Input()
     @HostBinding("style.height.px")
@@ -74,21 +75,26 @@ export class ExpressionEditorComponent extends DirectiveBase {
     @Output()
     public action = new Subject<"close" | "save">();
 
-    public previewContent = new BehaviorSubject("");
+    expressionControl = new FormControl(undefined);
+    resultControl = new FormControl(undefined);
 
     public contextNodes: TreeNode[];
 
-    @ViewChild("editor", {read: CodeEditorXComponent})
-    private editor: CodeEditorXComponent;
+    @ViewChild("editor", {read: CodeEditorComponent})
+    private editor: CodeEditorComponent;
 
 
     ngOnInit() {
-        this.tracked = this.editorContent.debounceTime(50)
+        this.tracked = this.editorContent.subscribe(content => {
+            this.expressionControl.setValue(content);
+        });
+
+        this.tracked = this.expressionControl.valueChanges.debounceTime(50)
             .filter(e => typeof e === "string")
             .distinctUntilChanged()
             .subscribe(content => {
                 this.evaluator(content).then(res => {
-                    this.previewContent.next(res);
+                    this.resultControl.setValue(res);
                 });
             });
 
@@ -105,7 +111,7 @@ export class ExpressionEditorComponent extends DirectiveBase {
             if (Array.isArray(node)) {
                 type = "array";
             } else if (node === null) {
-                type = "null"
+                type = "null";
             }
 
             const isIterable = type === "array" || type === "object";
@@ -135,7 +141,7 @@ export class ExpressionEditorComponent extends DirectiveBase {
                 openHandler = () => {
 
 
-                    trace = trace.split(".").map(p => (parseInt(p).toString() == p) ? `[${p}]` : p).join(".")
+                    trace = trace.split(".").map(p => (parseInt(p, 10).toString() == p) ? `[${p}]` : p).join(".")
                         .replace(/\]\.\[/g, "][")
                         .replace(/\.\[/g, "[");
                     this.editor.editor.session.insert(this.editor.editor.getCursorPosition(), String(trace));

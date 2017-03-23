@@ -24,6 +24,7 @@ npm run electron // opens the app shell
 ## Packaging the build as a desktop app for the host system and architecture
 ```bash
 npm run build
+npm run electron:compile
 npm run package
 ```
 

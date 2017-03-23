@@ -207,7 +207,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
                 this.isExpr = false;
                 event.stopPropagation();
                 this.onChange(this.model);
-            }, noop);
+            }, err => console.warn);
         }
     }
 }

@@ -27,7 +27,7 @@ import LoadOptions = jsyaml.LoadOptions;
     styleUrls: ["./workflow-editor.component.scss"],
     template: `
         <ct-action-bar>
-            <ct-tab-selector [distribute]="'auto'" [active]="viewMode" (activeChange)="switchView($event)">
+            <ct-tab-selector [distribute]="'auto'" [active]="viewMode" (activeChange)="switchView($event, isDirty)">
 
                 <ct-tab-selector-entry [disabled]="!isValidCWL"
                                        [tabName]="'info'">App Info
@@ -105,7 +105,7 @@ import LoadOptions = jsyaml.LoadOptions;
                                           [readonly]="!data.isWritable"
                                           [model]="workflowModel"></ct-workflow-not-graph-editor>
 
-            <ct-workflow-graph-editor *ngIf="viewMode === 'graph'"
+            <ct-workflow-graph-editor *ngIf="viewMode === 'graph' && !isLoading"
                                       [readonly]="!data.isWritable"
                                       [model]="workflowModel"
                                       class="editor-main">
@@ -160,6 +160,8 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
 
     @Input()
     data: AppTabData;
+
+    isDirty = false;
 
     /** ValidationResponse for current document */
     validation: ValidationResponse;
@@ -236,6 +238,9 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                     // turn off loader and load document as code
                     this.validation = r;
                     this.isLoading  = false;
+
+                    this.viewMode = "code";
+
                     return r;
                 }
 
@@ -377,7 +382,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
         //         this.statusBar.stopProcess(statusID, `Created revision ${result.message["sbg:latestRevision"]} from ${path}`);
         //
         //     });
-        // }, noop);
+        // }, err => console.warn);
 
     }
 
@@ -386,6 +391,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
      * when switching to GUI view.
      *
      * @param mode
+     * @param serialize
      */
     switchView(mode): void {
 
@@ -408,7 +414,8 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
 
         setTimeout(() => {
 
-            if (mode === "code") {
+            // @fixme should only serialize if form is dirty
+            if (mode === "code" && this.isDirty) {
                 this.codeEditorContent.setValue(this.getModelText());
             }
 

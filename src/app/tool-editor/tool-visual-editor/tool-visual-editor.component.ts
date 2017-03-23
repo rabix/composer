@@ -15,6 +15,8 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
             <form
                   [formGroup]="formGroup">
                 
+                {{ formGroup.dirty }}
+                
                 <ct-docker-requirement [dockerRequirement]="model.docker"
                                        (update)="setRequirement($event, true)"
                                        [readonly]="readonly">

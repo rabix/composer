@@ -203,7 +203,9 @@ export class BaseCommandComponent extends DirectiveBase implements OnInit, OnDes
             this.formList = this.formList.filter(item => item.id !== ctrl.id);
             this.form.removeControl(ctrl.id);
             this.updateCmd.next(this.formList.map(data => data.model));
-        }, noop);
+        }, err => {
+            console.warn(err);
+        });
     }
 
     addBaseCommand(): void {

@@ -3,8 +3,7 @@ import {BehaviorSubject, Subject} from "rxjs";
 import {ACE_MODE_MAP} from "../code-editor-new/ace-mode-map";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
+    styleUrls: ["multilang-code-editor.component.scss"],
     selector: "ct-multilang-code-editor",
     template: `
         <div class="p-0 flex-row-container modal-large">

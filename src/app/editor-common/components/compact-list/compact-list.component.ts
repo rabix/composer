@@ -170,6 +170,6 @@ export class CompactListComponent implements ControlValueAccessor {
         }).then(() => {
             this.tagList.splice(index, 1);
             this.propagateChange(this.tagList);
-        }, noop);
+        }, err => console.warn);
     }
 }

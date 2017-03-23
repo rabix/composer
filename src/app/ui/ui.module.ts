@@ -90,7 +90,11 @@ import {CheckboxPromptComponent} from "./modal/common/checkbox-prompt.component"
         DropDownButtonComponent,
         DropDownMenuComponent,
         ModalComponent,
-        TooltipContentComponent
+        TooltipContentComponent,
+        ConfirmComponent,
+        CheckboxPromptComponent,
+        PromptComponent,
+        MultilangCodeEditorComponent
     ],
 
     declarations: [

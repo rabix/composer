@@ -118,7 +118,7 @@ export class ExpressionModelListComponent extends DirectiveBase implements Contr
             this.formList = this.formList.filter(item => item.id !== ctrl.id);
             this.form.removeControl(ctrl.id);
             this.form.markAsDirty();
-        }, noop);
+        }, err => console.warn);
     }
 
     private addExpressionModel(): void {

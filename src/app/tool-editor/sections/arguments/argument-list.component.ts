@@ -171,7 +171,7 @@ export class ArgumentListComponent extends DirectiveBase {
 
             const args = this.model.arguments.slice(0, index).concat(this.model.arguments.slice(index + 1));
             this.update.emit(args);
-        }, noop);
+        }, err => console.warn);
     }
 
     addEntry() {

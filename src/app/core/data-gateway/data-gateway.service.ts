@@ -168,7 +168,7 @@ export class DataGatewayService {
             if (parse) {
                 return request.map(content => {
                     try {
-                        return YAML.safeLoad(content, {json: true, onWarning: noop} as LoadOptions);
+                        return YAML.safeLoad(content, {json: true, onWarning: noop} as any);
                     } catch (err) {
                         return new Error(err);
                     }
@@ -204,7 +204,7 @@ export class DataGatewayService {
     resolveContent(content, path): Observable<Object | any> {
 
         if (!path.startsWith("/")) {
-            return Observable.of(content).map(txt => YAML.safeLoad(txt, {json: true}));
+            return Observable.of(content).map(txt => YAML.safeLoad(txt, {json: true} as any));
         }
 
         return this.ipc.request("resolveContent", ({content, path})).take(1);

@@ -126,7 +126,7 @@ export class WorkboxService {
 
             try {
 
-                const parsed = YAML.safeLoad(content, {json: true});
+                const parsed = YAML.safeLoad(content, {json: true} as any);
 
                 tab.data.parsedContent = parsed;
 

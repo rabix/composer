@@ -200,7 +200,7 @@ available types: {[label: string]: string | number} | string[]`)
                 confirmationLabel: "Yes, remove it"
             }).then(() => {
                 this.removeFunction();
-            }, noop);
+            }, err => console.warn);
         } else {
             this.removeFunction();
         }

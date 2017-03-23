@@ -1,17 +1,16 @@
-import {Component, Input, Output, ViewEncapsulation} from "@angular/core";
-import {Subject} from "rxjs";
+import {Component, Input, Output} from "@angular/core";
+import {Subject} from "rxjs/Subject";
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
+    styleUrls: ["confirm.component.scss"],
     selector: "ct-modal-confirm",
     template: `
         <form (ngSubmit)="decision.next(true)">
-            <div class="modal-body">
+            <div class="body p-1">
                 <span [innerHTML]="content"></span>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary btn-sm" (click)="decision.next(false)" type="button">{{ cancellationLabel }}</button>
-                <button class="btn btn-primary btn-sm" type="submit">{{ confirmationLabel }}</button>
+            <div class="footer pr-1 pb-1">
+                <button class="btn btn-secondary" (click)="decision.next(false)" type="button">{{ cancellationLabel }}</button>
+                <button class="btn btn-success" type="submit">{{ confirmationLabel }}</button>
             </div>
         </form>
     `
