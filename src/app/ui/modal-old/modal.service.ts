@@ -1,7 +1,7 @@
 import {ComponentFactoryResolver, ComponentRef, Injectable, ViewContainerRef} from "@angular/core";
 import {Subject} from "rxjs";
 import {CheckboxPromptComponent} from "./common/checkbox-prompt.component";
-import {ConfirmComponent} from "./common/confirm.component";
+import {OldConfirmComponent} from "./common/confirm.component";
 import {ModalComponent, ModalOptions} from "./modal.component";
 import {PromptComponent} from "./common/prompt.component";
 import {ConfirmationParams, PromptParams} from "./types";
@@ -70,7 +70,7 @@ export class ModalService {
         return this.wrap<true>((resolve, reject) => {
 
             // Show the ConfirmComponent as a modal
-            const ref = this.show<ConfirmComponent>(ConfirmComponent, {title: parameters.title});
+            const ref = this.show<OldConfirmComponent>(OldConfirmComponent, {title: parameters.title});
 
             // Assign passed parameters to it
             Object.assign(ref, parameters);

@@ -7,6 +7,7 @@ import "selectize";
 import {ObjectHelper} from "../../../helpers/object.helper";
 
 @Component({
+    template: "",
     selector: "ct-select",
     styleUrls: ["./select.component.scss"],
 })

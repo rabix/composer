@@ -5,7 +5,7 @@ import {ModalService} from "../modal.service";
 import {Observable} from "rxjs";
 import {TemplateProviderService} from "../../../services/template-provider.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
-import {GroupItem, RadioGroupComponent} from "../../../core/forms/elements/radio-group.component";
+import {GroupItem, RadioGroupComponent} from "../../radio-button/radio-group.component";
 import {FileName} from "../../../core/forms/models/file-name";
 
 @Component({

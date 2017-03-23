@@ -1,4 +1,4 @@
-import {Component, Input, ViewEncapsulation} from "@angular/core";
+/*import {Component, Input, ViewEncapsulation} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {ModalService} from "../modal.service";
 import {Observable} from "rxjs";
@@ -39,7 +39,7 @@ export class ProjectSelectionModal {
 
     private selectedProject: string;
 
-    /** Base form for open project */
+    // /** Base form for open project
     private openProjectForm: FormGroup;
 
     constructor(private formBuilder: FormBuilder,
@@ -63,3 +63,4 @@ export class ProjectSelectionModal {
         this.modal.close();
     }
 }
+*/

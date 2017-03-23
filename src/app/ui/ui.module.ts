@@ -36,6 +36,16 @@ import {TreeNodeComponent} from "./tree-view/tree-node/tree-node.component";
 import {TreeViewComponent} from "./tree-view/tree-view.component";
 import {TabsComponent} from "./tabs/tabs.component";
 import {LineLoaderComponent} from "./line-loader/line-loader.component";
+import {ConfirmComponent} from "./modal/common/confirm.component";
+import {PromptComponent} from "./modal/common/prompt.component";
+import {SelectComponent} from "./auto-complete/select/select.component";
+import {MultilangCodeEditorComponent} from "./code-editor/multilang-code-editor.component";
+import {InputComponent} from "./input/input.component";
+import {RadioButtonComponent} from "./radio-button/radio-button.component";
+import {RadioGroupComponent} from "./radio-button/radio-group.component";
+import {NewFileModalComponent} from "./modal/custom/new-file-modal.component";
+import {ProjectSelectionModal} from "./modal/custom/project-selection-modal.component";
+import {CheckboxPromptComponent} from "./modal/common/checkbox-prompt.component";
 
 @NgModule({
     imports: [
@@ -92,6 +102,8 @@ import {LineLoaderComponent} from "./line-loader/line-loader.component";
         CodeEditorXComponent,
         ModalComponent,
         ContextDirective,
+        ConfirmComponent,
+        CheckboxPromptComponent,
         DisableFormControlDirective,
         DragDirective,
         DragOverDirective,
@@ -101,14 +113,22 @@ import {LineLoaderComponent} from "./line-loader/line-loader.component";
         DropZones,
         FormPanelComponent,
         InlineEditorComponent,
-        InputFieldComponent,
+        InputFieldComponent, // @fixme remove this component?
+        InputComponent,
         KeyvalueComponent,
         MarkdownDirective,
         MenuComponent,
         MenuItemComponent,
         ModalComponent,
+        MultilangCodeEditorComponent,
+        NewFileModalComponent,
         ProgressComponent,
+        ProjectSelectionModal,
+        PromptComponent,
+        RadioButtonComponent,
+        RadioGroupComponent,
         SearchFieldComponent,
+        SelectComponent,
         TabComponent,
         TabsComponent,
         TabSelectorComponent,

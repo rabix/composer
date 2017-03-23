@@ -2,7 +2,7 @@ import {Injectable} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {Subject} from "rxjs/Subject";
-import {ProfileCredentialEntry, ProfileCredentials} from "../../../electron/src/user-profile/profile";
+import {ProfileCredentialEntry, ProfileCredentials} from "../../../../electron/src/user-profile/profile";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {IpcService} from "../../services/ipc.service";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
@@ -45,10 +45,9 @@ export class DataGatewayService {
 
 
     scan(creds?) {
-        const c = creds ? Observable.of(creds) : this.preferences.get("credentials");
+        const c = creds ? Observable.of(creds) : this.preferences.get<any[]>("credentials");
 
-        const scan = c.filter((e: { token: string }[]) => {
-            console.log("All tokens", e);
+        const scan = c.filter((e: { token: string }[] = []) => {
             let allHaveTokens = true;
             e.forEach(platform => {
                 // @fixme: fix partial scanning

@@ -1,4 +1,4 @@
-import {Component, Input, Output, ViewEncapsulation} from "@angular/core";
+/* import {Component, Input, Output, ViewEncapsulation} from "@angular/core";
 import {Subject} from "rxjs";
 import {FormControl, FormGroup} from "@angular/forms";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
@@ -67,3 +67,5 @@ export class PromptComponent extends DirectiveBase {
         });
     }
 }
+*/
+

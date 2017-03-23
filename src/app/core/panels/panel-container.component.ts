@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, QueryList, ViewChildren, ViewEncapsulation} from "@angular/core";
+/*import {Component, ElementRef, Input, QueryList, ViewChildren, ViewEncapsulation} from "@angular/core";
 import {BehaviorSubject, Observable, Subject} from "rxjs";
 import {PanelComponent} from "./panel.component";
 @Component({
@@ -29,7 +29,7 @@ export class PanelContainerComponent {
 
     public totalPanelSize: Subject<number>;
 
-    /** Needed so we know when to display the panel separator */
+    // /** Needed so we know when to display the panel separator
     private visiblePanelCount = new BehaviorSubject<number>(0);
 
     constructor(private el: ElementRef) {
@@ -46,3 +46,4 @@ export class PanelContainerComponent {
         this.totalPanelSize.next(document.body.clientHeight);
     }
 }
+*/

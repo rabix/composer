@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, ViewEncapsulation} from "@angular/core";
+/*import {ChangeDetectionStrategy, Component, ViewEncapsulation} from "@angular/core";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -15,3 +15,4 @@ export class StructurePanelComponent {
 
 
 }
+*/

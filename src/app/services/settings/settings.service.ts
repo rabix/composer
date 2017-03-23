@@ -1,8 +1,6 @@
 import {Injectable} from "@angular/core";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {UserPreferencesService} from "../storage/user-preferences.service";
-import {PlatformAPI} from "../api/platforms/platform-api.service";
-import {letProto} from "rxjs/operator/let";
 
 @Injectable()
 export class SettingsService {
@@ -11,6 +9,13 @@ export class SettingsService {
         profile: string,
         url: string;
         token: string;
+    }>(1);
+
+    public userInfo = new ReplaySubject<{
+        email: string,
+        id: string,
+        staff: boolean,
+        username: string
     }>(1);
 
     public validity = new ReplaySubject<boolean>(1);
