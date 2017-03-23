@@ -59,4 +59,4 @@ npm-debug.log
 
 
 electron/dist
-electron/node_modules/
+electron/node_modules
