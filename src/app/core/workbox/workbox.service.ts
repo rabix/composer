@@ -140,11 +140,14 @@ export class WorkboxService {
 
                 console.log("Parsed class", parsed);
 
-
                 tab.label = parsed.label || fileID;
                 tab.type  = parsed.class || "Code";
             } catch (ex) {
                 console.warn("Could not parse app", ex);
+            }
+
+            if (dataSource === "local") {
+                tab.label = fileID.split("/").pop();
             }
 
             console.log("Prepared app tab", tab);
