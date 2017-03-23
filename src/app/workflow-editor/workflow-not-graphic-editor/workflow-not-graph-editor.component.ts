@@ -28,7 +28,7 @@ import {noop} from "../../lib/utils.lib";
                             <ul class="ml-1 mr-1">
 
                                 <!--List Entry-->
-                                <li *ngFor="let entry of model.steps; let i = index"
+                                <li *ngFor="let entry of model.steps"
                                     class="input-list-items">
 
                                     <div class="gui-section-list-item clickable row"
@@ -89,7 +89,7 @@ import {noop} from "../../lib/utils.lib";
                             <ul class="ml-1 mr-1">
 
                                 <!--List Entry-->
-                                <li *ngFor="let entry of model.inputs; let i = index"
+                                <li *ngFor="let entry of model.inputs"
                                     class="input-list-items">
 
                                     <div class="gui-section-list-item clickable row"
@@ -148,7 +148,7 @@ import {noop} from "../../lib/utils.lib";
                             <ul class="ml-1 mr-1">
 
                                 <!--List Entry-->
-                                <li *ngFor="let entry of model.outputs; let i = index"
+                                <li *ngFor="let entry of model.outputs"
                                     class="input-list-items">
 
                                     <div class="gui-section-list-item clickable row"

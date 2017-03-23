@@ -5,9 +5,8 @@
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: space-between;
-    padding: 2px;
     font-size: $font-size-sm;
-    height: $layout-stripe-width;
+    height: 2em;
     line-height: $layout-stripe-width - 6;
 
     .status-item {
@@ -28,6 +27,26 @@
         .btn-group .btn {
             padding: 0 12px;
             line-height: $layout-stripe-width - 7;
+        }
+    }
+
+    /deep/ .status-buttons {
+        .btn {
+            background: none;
+            line-height: 2em;
+            color: $layout-text-color;
+            border: 1px solid transparent;
+            border-left-color: #222;
+            padding: 0 20px;
+            border-radius: 0;
+
+            &.active {
+                background: $layout-title-bar-background;
+            }
+
+            &:active, &:focus {
+                outline: none;
+            }
         }
     }
 }

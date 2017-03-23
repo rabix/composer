@@ -1,25 +1,18 @@
-import {
-    ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, TemplateRef, ViewChild,
-    ViewEncapsulation
-} from "@angular/core";
+import {Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, TemplateRef, ViewChild, ViewEncapsulation} from "@angular/core";
 import {Workflow} from "cwl-svg";
 import {StepModel, WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
-import * as Yaml from "js-yaml";
-import {Observable} from "rxjs/Observable";
+import {DataGatewayService} from "../../../core/data-gateway/data-gateway.service";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import LoadOptions = jsyaml.LoadOptions;
-import {noop} from "../../../lib/utils.lib";
-import {DataGatewayService} from "../../../core/data-gateway/data-gateway.service";
 
 
 declare const Snap: any;
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
     selector: "ct-workflow-graph-editor",
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    encapsulation: ViewEncapsulation.None,
     styleUrls: ["./workflow-graph-editor.component.scss"],
     template: `
         <svg (dblclick)="openInspector($event)" #canvas class="cwl-workflow"
@@ -109,14 +102,14 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     ngOnChanges() {
         this.graph          = new Workflow(new Snap(this.canvas.nativeElement), this.model as any);
         const firstAnything = this.model.steps[0] || this.model.inputs[0] || this.model.outputs[0];
+
         if (firstAnything.customProps["sbg:x"] === undefined) {
             console.log("Should arrange");
             // this.graph.command("workflow.arrange");
         }
 
-        console.log("done with arrangement");
         this.graph.command("workflow.fit");
-        this.statusBar.setControls(this.controlsTemplate);
+        // this.statusBar.setControls(this.controlsTemplate);
     }
 
     upscale() {

@@ -148,8 +148,7 @@ import {AppTabData} from "../core/workbox/app-tab-data";
         <template #statusControls>
                 <span class="btn-group">
                     <button [disabled]="!validation"
-                            [class.btn-primary]="reportPanel === 'validation'"
-                            [class.btn-secondary]="reportPanel !== 'validation'"
+                            [class.active]="reportPanel === 'validation'"
                             (click)="toggleReport('validation')"
                             class="btn btn-sm">
                             
@@ -169,8 +168,7 @@ import {AppTabData} from "../core/workbox/app-tab-data";
                         
                     </button>
                     
-                    <button [class.btn-secondary]="reportPanel !== 'commandLinePreview'"
-                            [class.btn-primary]="reportPanel == 'commandLinePreview'"
+                    <button [class.active]="reportPanel == 'commandLinePreview'"
                             [disabled]="!isValidCWL"
                             (click)="toggleReport('commandLinePreview')"
                             class="btn btn-secondary btn-sm">Preview</button>

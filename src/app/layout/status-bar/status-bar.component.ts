@@ -26,7 +26,7 @@ import {StatusBarService} from "./status-bar.service";
         </span>
 
         <!--Buttons and switches-->
-        <span class="status-item">
+        <span class="status-item status-buttons">
             <span #controlHost></span>
         </span>
     `
