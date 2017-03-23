@@ -15,33 +15,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
             </div>
         </ct-action-bar>
         <ct-code-editor [formControl]="fileContent"
-                        [filePath]="data.id"
-                        [options]="{
-
-                        }"></ct-code-editor>
-        <!---->
-        <!--<div class="editor-container" [hidden]="isLoading">-->
-
-        <!--<ct-editor-controls>-->
-        <!--&lt;!&ndash;Copy&ndash;&gt;-->
-        <!--<button class="btn btn-secondary btn-sm" type="button">-->
-        <!--Copy...-->
-        <!--</button>-->
-
-        <!--&lt;!&ndash;Save&ndash;&gt;-->
-        <!--<button [disabled]="!data.isWritable"-->
-        <!--(click)="save()"-->
-        <!--class="btn btn-secondary btn-sm" type="button">-->
-        <!--Save-->
-        <!--</button>-->
-        <!--</ct-editor-controls>-->
-
-        <!--<div class="editor-content flex-row">-->
-        <!--<ct-code-editor-x [(content)]="rawEditorContent"-->
-        <!--[language]="data.language"-->
-        <!--[options]="{theme: 'ace/theme/monokai'}"></ct-code-editor-x>-->
-        <!--</div>-->
-        <!--</div>-->
+                        [filePath]="data.id"></ct-code-editor>
     `
 })
 export class FileEditorComponent extends DirectiveBase implements OnInit {
@@ -55,7 +29,7 @@ export class FileEditorComponent extends DirectiveBase implements OnInit {
     }
 
     save() {
-        console.log("Saving!");
+        console.log("Saving!", this.fileContent.value);
         // // For local files, just save and that's it
         // if (this.data.data.source === "local") {
         //     const path = this.data.data.path;

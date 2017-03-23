@@ -47,9 +47,6 @@ import LoadOptions = jsyaml.LoadOptions;
 
             <div class="document-controls">
 
-                <!--CWLVersion-->
-                <span class="tag tag-default">{{ workflowModel.cwlVersion }}</span>
-
                 <!--Go to app-->
                 <button class="btn btn-sm btn-secondary " type="button" (click)="goToApp()" ct-tooltip="See on Seven Bridges">
                     <i class="fa fa-external-link"></i>

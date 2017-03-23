@@ -59,9 +59,6 @@ import {AppTabData} from "../core/workbox/app-tab-data";
 
             <div class="document-controls">
 
-                <!--CWLVersion-->
-                <span class="tag tag-default">{{ toolModel.cwlVersion }}</span>
-
                 <!--Go to app-->
                 <button class="btn btn-sm btn-secondary " type="button" (click)="goToApp()">
                     <i class="fa fa-external-link"></i>
