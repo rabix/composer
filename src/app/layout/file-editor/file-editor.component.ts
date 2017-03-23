@@ -1,66 +1,64 @@
-import {Component, Input, OnInit, ViewEncapsulation} from "@angular/core";
-import {BehaviorSubject} from "rxjs";
-import {DataEntrySource} from "../../sources/common/interfaces";
-import {StatusBarService} from "../status-bar/status-bar.service";
+import {Component, Input, OnInit} from "@angular/core";
+import {FormControl} from "@angular/forms";
+import {AppTabData} from "../../core/workbox/app-tab-data";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-file-editor",
-    host: {
-        "class": "tab-container"
-    },
-    template: `        
-        <div class="editor-container" [hidden]="isLoading">
+    styleUrls: ["./file-editor.component.scss"],
+    template: `
+        <ct-action-bar></ct-action-bar>
+        <ct-code-editor [formControl]="fileContent"
+                        [filePath]="data.id"
+                        [options]="{
 
-            <ct-editor-controls>
-                <!--Copy-->
-                <button class="btn btn-secondary btn-sm" type="button">
-                    Copy...
-                </button>
+                        }"></ct-code-editor>
+        <!---->
+        <!--<div class="editor-container" [hidden]="isLoading">-->
 
-                <!--Save-->
-                <button [disabled]="!data.isWritable"
-                        (click)="save()"
-                        class="btn btn-secondary btn-sm" type="button">
-                    Save
-                </button>
-            </ct-editor-controls>
+        <!--<ct-editor-controls>-->
+        <!--&lt;!&ndash;Copy&ndash;&gt;-->
+        <!--<button class="btn btn-secondary btn-sm" type="button">-->
+        <!--Copy...-->
+        <!--</button>-->
 
-            <div class="editor-content flex-row">
-                <ct-code-editor-x [(content)]="rawEditorContent"
-                                  [language]="data.language"
-                                  [options]="{theme: 'ace/theme/monokai'}"></ct-code-editor-x>
-            </div>
-        </div>
+        <!--&lt;!&ndash;Save&ndash;&gt;-->
+        <!--<button [disabled]="!data.isWritable"-->
+        <!--(click)="save()"-->
+        <!--class="btn btn-secondary btn-sm" type="button">-->
+        <!--Save-->
+        <!--</button>-->
+        <!--</ct-editor-controls>-->
+
+        <!--<div class="editor-content flex-row">-->
+        <!--<ct-code-editor-x [(content)]="rawEditorContent"-->
+        <!--[language]="data.language"-->
+        <!--[options]="{theme: 'ace/theme/monokai'}"></ct-code-editor-x>-->
+        <!--</div>-->
+        <!--</div>-->
     `
 })
 export class FileEditorComponent extends DirectiveBase implements OnInit {
     @Input()
-    public data: DataEntrySource;
+    data: AppTabData;
 
-    private rawEditorContent = new BehaviorSubject("");
-
-    constructor(private statusBar: StatusBarService) {
-        super();
-    }
+    fileContent = new FormControl(undefined);
 
     ngOnInit(): void {
-        this.tracked = this.data.content.subscribe(this.rawEditorContent);
+        this.fileContent.setValue(this.data.fileContent);
     }
 
     private save() {
-        // For local files, just save and that's it
-        if (this.data.data.source === "local") {
-            const path = this.data.data.path;
-
-            const statusID = this.statusBar.startProcess(`Saving ${path}...`, `Saved ${path}`);
-            this.data.data.save(this.rawEditorContent.getValue()).subscribe(() => {
-                this.statusBar.stopProcess(statusID);
-            });
-            return;
-        }
+        // // For local files, just save and that's it
+        // if (this.data.data.source === "local") {
+        //     const path = this.data.data.path;
+        //
+        //     const statusID = this.statusBar.startProcess(`Saving ${path}...`, `Saved ${path}`);
+        //     this.data.data.save(this.rawEditorContent.getValue()).subscribe(() => {
+        //         this.statusBar.stopProcess(statusID);
+        //     });
+        //     return;
+        // }
 
     }
 }

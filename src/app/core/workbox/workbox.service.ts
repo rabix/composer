@@ -110,6 +110,7 @@ export class WorkboxService {
                 type: "Code",
                 isWritable: dataSource !== "public",
                 data: {
+                    id: fileID,
                     isWritable: dataSource !== "public",
                     dataSource,
                     language: "json",

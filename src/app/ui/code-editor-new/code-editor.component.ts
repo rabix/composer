@@ -21,11 +21,10 @@ import "brace/mode/html";
 import "brace/mode/xml";
 import "brace/mode/r";
 import "brace/theme/chrome";
-import "brace/theme/monokai";
+import "brace/theme/idle_fingers";
 import "brace/ext/searchbox";
-import "brace/ext/modelist";
 import "brace/ext/language_tools";
-
+import {getModeForPath} from "./modelist";
 import {AceEditorOptions} from "./ace-editor-options";
 
 @Component({
@@ -46,6 +45,9 @@ export class CodeEditorComponent implements OnInit, ControlValueAccessor, OnDest
     @Input()
     options: Partial<AceEditorOptions>;
 
+    @Input()
+    filePath?: string;
+
     private editor: AceAjax.Editor;
 
     private originalContent: string;
@@ -61,7 +63,7 @@ export class CodeEditorComponent implements OnInit, ControlValueAccessor, OnDest
         // Instantiate an editor
         this.editor = ace.edit(this.elementRef.nativeElement);
         this.editor.setOptions(Object.assign({
-            theme: "ace/theme/monokai",
+            theme: "ace/theme/idle_fingers",
             mode: "ace/mode/text",
             enableBasicAutocompletion: true,
         } as Partial<AceEditorOptions>, this.options));
@@ -69,7 +71,11 @@ export class CodeEditorComponent implements OnInit, ControlValueAccessor, OnDest
         // Hack for disabling the warning message about a deprecated method
         this.editor.$blockScrolling = Infinity;
 
-
+        // Automatically assign a mode if file path is given
+        if (this.filePath) {
+            const mode = getModeForPath(this.filePath);
+            this.editor.session.setMode(mode.mode);
+        }
     }
 
     ngOnDestroy() {
