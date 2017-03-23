@@ -1,0 +1,49 @@
+const chai = require("chai");
+const assert = chai.assert;
+const proxy = require("proxyquire");
+const sinon = require("sinon");
+describe("IPC Router", () => {
+    it("should register the data-request event callback", (done) => {
+        const electron = { ipcMain: { on: sinon.spy() } };
+        const router = proxy("./ipc-router", { electron });
+        router.start();
+        assert.isTrue(electron.ipcMain.on.calledOnce);
+        const callArgs = electron.ipcMain.on.args[0];
+        assert.equal(callArgs[0], "data-request");
+        assert.isFunction(callArgs[1]);
+        done();
+    });
+    it("should call the appropriate controller function when required and return the response", (done) => {
+        const send = sinon.spy();
+        const testRouteEndpoint = sinon.spy((data, callback) => {
+            callback(null, { name: "Zoro" });
+        });
+        const event = { sender: { send } };
+        const routes = { testRouteEndpoint };
+        const electron = {
+            ipcMain: {
+                on: (route, callback) => {
+                    callback(event, {
+                        id: "cool-123",
+                        data: "eventData",
+                        message: "testRouteEndpoint"
+                    });
+                }
+            }
+        };
+        const router = proxy("./ipc-router", { electron, "./routes": routes });
+        router.start();
+        const [data, callback] = testRouteEndpoint.args[0];
+        assert.isTrue(testRouteEndpoint.calledOnce);
+        assert.equal(data, "eventData");
+        assert.equal(callback.length, 2);
+        const [replyMessage, replyData] = send.args[0];
+        assert.isTrue(send.calledOnce);
+        assert.equal(replyMessage, "data-reply");
+        assert.property(replyData, "id");
+        assert.property(replyData, "data");
+        assert.deepPropertyVal(replyData, "data.name", "Zoro");
+        done();
+    });
+});
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaXBjLXJvdXRlci5zcGVjLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vc3JjL2lwYy1yb3V0ZXIuc3BlYy50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxNQUFNLElBQUksR0FBRyxPQUFPLENBQUMsTUFBTSxDQUFDLENBQUM7QUFDN0IsTUFBTSxNQUFNLEdBQUcsSUFBSSxDQUFDLE1BQU0sQ0FBQztBQUUzQixNQUFNLEtBQUssR0FBRyxPQUFPLENBQUMsWUFBWSxDQUFDLENBQUM7QUFDcEMsTUFBTSxLQUFLLEdBQUcsT0FBTyxDQUFDLE9BQU8sQ0FBQyxDQUFDO0FBRy9CLFFBQVEsQ0FBQyxZQUFZLEVBQUU7SUFFbkIsRUFBRSxDQUFDLGlEQUFpRCxFQUFFLENBQUMsSUFBSTtRQUV2RCxNQUFNLFFBQVEsR0FBRyxFQUFDLE9BQU8sRUFBRSxFQUFDLEVBQUUsRUFBRSxLQUFLLENBQUMsR0FBRyxFQUFFLEVBQUMsRUFBQyxDQUFDO1FBQzlDLE1BQU0sTUFBTSxHQUFHLEtBQUssQ0FBQyxjQUFjLEVBQUUsRUFBQyxRQUFRLEVBQUMsQ0FBQyxDQUFDO1FBQ2pELE1BQU0sQ0FBQyxLQUFLLEVBQUUsQ0FBQztRQUVmLE1BQU0sQ0FBQyxNQUFNLENBQUMsUUFBUSxDQUFDLE9BQU8sQ0FBQyxFQUFFLENBQUMsVUFBVSxDQUFDLENBQUM7UUFFOUMsTUFBTSxRQUFRLEdBQUcsUUFBUSxDQUFDLE9BQU8sQ0FBQyxFQUFFLENBQUMsSUFBSSxDQUFDLENBQUMsQ0FBQyxDQUFDO1FBQzdDLE1BQU0sQ0FBQyxLQUFLLENBQUMsUUFBUSxDQUFDLENBQUMsQ0FBQyxFQUFFLGNBQWMsQ0FBQyxDQUFDO1FBQzFDLE1BQU0sQ0FBQyxVQUFVLENBQUMsUUFBUSxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUM7UUFFL0IsSUFBSSxFQUFFLENBQUM7SUFDWCxDQUFDLENBQUMsQ0FBQztJQUVILEVBQUUsQ0FBQyx1RkFBdUYsRUFBRSxDQUFDLElBQUk7UUFDN0YsTUFBTSxJQUFJLEdBQUcsS0FBSyxDQUFDLEdBQUcsRUFBRSxDQUFDO1FBRXpCLE1BQU0saUJBQWlCLEdBQUcsS0FBSyxDQUFDLEdBQUcsQ0FBQyxDQUFDLElBQUksRUFBRSxRQUFRO1lBQy9DLFFBQVEsQ0FBQyxJQUFJLEVBQUUsRUFBQyxJQUFJLEVBQUUsTUFBTSxFQUFDLENBQUMsQ0FBQztRQUNuQyxDQUFDLENBQUMsQ0FBQztRQUVILE1BQU0sS0FBSyxHQUFHLEVBQUMsTUFBTSxFQUFFLEVBQUMsSUFBSSxFQUFDLEVBQUMsQ0FBQztRQUMvQixNQUFNLE1BQU0sR0FBRyxFQUFDLGlCQUFpQixFQUFDLENBQUM7UUFDbkMsTUFBTSxRQUFRLEdBQUc7WUFDYixPQUFPLEVBQUU7Z0JBQ0wsRUFBRSxFQUFFLENBQUMsS0FBSyxFQUFFLFFBQVE7b0JBQ2hCLFFBQVEsQ0FBQyxLQUFLLEVBQUU7d0JBQ1osRUFBRSxFQUFFLFVBQVU7d0JBQ2QsSUFBSSxFQUFFLFdBQVc7d0JBQ2pCLE9BQU8sRUFBRSxtQkFBbUI7cUJBQy9CLENBQUMsQ0FBQztnQkFDUCxDQUFDO2FBQ0o7U0FDSixDQUFDO1FBRUYsTUFBTSxNQUFNLEdBQUcsS0FBSyxDQUFDLGNBQWMsRUFBRSxFQUFDLFFBQVEsRUFBRSxVQUFVLEVBQUUsTUFBTSxFQUFDLENBQUMsQ0FBQztRQUNyRSxNQUFNLENBQUMsS0FBSyxFQUFFLENBQUM7UUFFZixNQUFNLENBQUMsSUFBSSxFQUFFLFFBQVEsQ0FBQyxHQUFHLGlCQUFpQixDQUFDLElBQUksQ0FBQyxDQUFDLENBQUMsQ0FBQztRQUNuRCxNQUFNLENBQUMsTUFBTSxDQUFDLGlCQUFpQixDQUFDLFVBQVUsQ0FBQyxDQUFDO1FBQzVDLE1BQU0sQ0FBQyxLQUFLLENBQUMsSUFBSSxFQUFFLFdBQVcsQ0FBQyxDQUFDO1FBQ2hDLE1BQU0sQ0FBQyxLQUFLLENBQUMsUUFBUSxDQUFDLE1BQU0sRUFBRSxDQUFDLENBQUMsQ0FBQztRQUVqQyxNQUFNLENBQUMsWUFBWSxFQUFFLFNBQVMsQ0FBQyxHQUFHLElBQUksQ0FBQyxJQUFJLENBQUMsQ0FBQyxDQUFDLENBQUM7UUFDL0MsTUFBTSxDQUFDLE1BQU0sQ0FBQyxJQUFJLENBQUMsVUFBVSxDQUFDLENBQUM7UUFDL0IsTUFBTSxDQUFDLEtBQUssQ0FBQyxZQUFZLEVBQUUsWUFBWSxDQUFDLENBQUM7UUFDekMsTUFBTSxDQUFDLFFBQVEsQ0FBQyxTQUFTLEVBQUUsSUFBSSxDQUFDLENBQUM7UUFDakMsTUFBTSxDQUFDLFFBQVEsQ0FBQyxTQUFTLEVBQUUsTUFBTSxDQUFDLENBQUM7UUFDbkMsTUFBTSxDQUFDLGVBQWUsQ0FBQyxTQUFTLEVBQUUsV0FBVyxFQUFFLE1BQU0sQ0FBQyxDQUFDO1FBRXZELElBQUksRUFBRSxDQUFDO0lBQ1gsQ0FBQyxDQUFDLENBQUM7QUFDUCxDQUFDLENBQUMsQ0FBQyJ9

@@ -23,8 +23,12 @@ import {WorkboxComponent} from "./workbox/workbox.component";
 import {GettingStartedComponent} from "../components/onboarding/getting-started.component";
 import {PublicAppsPanelComponent} from "./panels/public-apps-panel/public-apps-panel.component";
 import {AddSourceModalComponent} from "./modals/add-source-modal/add-source-modal.component";
-import { PlatformConnectionFormComponent } from './settings/platform-connection-form/platform-connection-form.component';
+import {PlatformConnectionFormComponent} from "./settings/platform-connection-form/platform-connection-form.component";
 import {PlatformAPI} from "../services/api/platforms/platform-api.service";
+import {PanelComponent} from "./panels/panel.component";
+import {PanelHandleComponent} from "./panels/panel-handle.component";
+import {PanelSwitcherComponent} from "./panels/panel-switcher.component";
+import {PanelToolbarComponent} from "./panels/panel-toolbar.component";
 
 @NgModule({
     entryComponents: [
@@ -37,6 +41,10 @@ import {PlatformAPI} from "../services/api/platforms/platform-api.service";
         WorkboxComponent,
         SettingsButtonComponent,
         AppsPanelComponent,
+        PanelHandleComponent, // @todo remove?
+        PanelSwitcherComponent, // @todo remove?
+        PanelToolbarComponent, // @todo remove?
+        PanelComponent, // @todo remove?
         PanelContainerComponent,
         MyAppsPanelComponent,
         PublicAppsPanelComponent,

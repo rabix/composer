@@ -1,4 +1,4 @@
-import {Component, Input, Output, ViewEncapsulation} from "@angular/core";
+/*import {Component, Input, Output, ViewEncapsulation} from "@angular/core";
 import {Subject} from "rxjs";
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -52,3 +52,4 @@ export class CheckboxPromptComponent {
         this.checkboxLabel = "Don't show this again";
     }
 }
+*/

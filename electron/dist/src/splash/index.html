@@ -1,0 +1,176 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Rabix Composer</title>
+    <style>
+        @font-face {
+            font-family: "Montserrat";
+            font-weight: normal;
+            src: url("./fonts/montserrat/montserrat-regular-webfont.woff2");
+        }
+
+        @font-face {
+            font-family: "Montserrat";
+            font-weight: 300;
+            src: url("./fonts/montserrat/montserrat-light-webfont.woff2");
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+            background: linear-gradient(to bottom right, #00104c, #5a476b 50%, #995083);
+            -webkit-font-smoothing: antialiased;
+
+
+        }
+
+        * {
+            pointer-events: none;
+        }
+
+        .light {
+            font-weight: 300;
+        }
+
+        .heavy {
+            font-weight: 600;
+        }
+
+        .title {
+            font-family: "Montserrat", serif;
+            font-size: 48px;
+            color: white;
+            position: absolute;
+            top: 40px;
+            left: 50px;
+            letter-spacing: -0.025em;
+        }
+
+        /* Progress Bar */
+        .progress {
+            bottom: 0;
+            left: 0;
+            position: absolute;
+            height: 6px;
+            display: block;
+            width: 100%;
+            background-color: #5a476b;
+            background-clip: padding-box;
+            overflow: hidden;
+        }
+
+        .progress .indeterminate {
+            background-color: #995083;
+        }
+
+        .progress .indeterminate:before {
+            content: '';
+            position: absolute;
+            background-color: inherit;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            will-change: left, right;
+            -webkit-animation: indeterminate 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
+            animation: indeterminate 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
+        }
+
+        .progress .indeterminate:after {
+            content: '';
+            position: absolute;
+            background-color: inherit;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            will-change: left, right;
+            -webkit-animation: indeterminate-short 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
+            animation: indeterminate-short 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
+            -webkit-animation-delay: 1.15s;
+            animation-delay: 1.15s;
+        }
+
+        @-webkit-keyframes indeterminate {
+            0% {
+                left: -35%;
+                right: 100%;
+            }
+            60% {
+                left: 100%;
+                right: -90%;
+            }
+            100% {
+                left: 100%;
+                right: -90%;
+            }
+        }
+
+        @keyframes indeterminate {
+            0% {
+                left: -35%;
+                right: 100%;
+            }
+            60% {
+                left: 100%;
+                right: -90%;
+            }
+            100% {
+                left: 100%;
+                right: -90%;
+            }
+        }
+
+        @-webkit-keyframes indeterminate-short {
+            0% {
+                left: -200%;
+                right: 100%;
+            }
+            60% {
+                left: 107%;
+                right: -8%;
+            }
+            100% {
+                left: 107%;
+                right: -8%;
+            }
+        }
+
+        @keyframes indeterminate-short {
+            0% {
+                left: -200%;
+                right: 100%;
+            }
+            60% {
+                left: 107%;
+                right: -8%;
+            }
+            100% {
+                left: 107%;
+                right: -8%;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+<div class="title">
+    <span class="light">Rabix</span> <span class="heavy">Composer</span>
+
+</div>
+<div class="progress">
+    <div class="indeterminate"></div>
+</div>
+<script>
+    const webFrame = require("electron").webFrame;
+    webFrame.setZoomLevelLimits(1, 1);
+    webFrame.setVisualZoomLevelLimits(1, 1);
+    webFrame.setLayoutZoomLevelLimits(1, 1);
+</script>
+</body>
+
+</html>
