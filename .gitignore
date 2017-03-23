@@ -58,5 +58,5 @@ npm-debug.log
 *.swp
 
 
-/src/electron/dist
-/src/electron/node_modules/
+electron/dist
+electron/node_modules/
