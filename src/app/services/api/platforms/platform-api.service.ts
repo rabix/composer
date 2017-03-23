@@ -201,7 +201,7 @@ export class PlatformAPI {
                     "data": {
                         "user": this.userInfo.id,
                         "referrer": "Cottontail " + conf.url,
-                        "user_agent": process.platform,
+                        "user_agent": window.navigator.userAgent,
                         "timestamp": this.getFormatedCurrentTimeStamp(),
                         "text": message,
                         "type": type,
