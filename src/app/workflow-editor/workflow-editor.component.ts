@@ -232,7 +232,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
         }
 
         // Whenever the editor content is changed, validate it using a JSON Schema.
-        this.tracked = this.codeEditorContent.valueChanges.distinctUntilChanged().subscribe(latestContent => {
+        this.tracked = this.codeEditorContent.valueChanges.debounceTime(1000).distinctUntilChanged().subscribe(latestContent => {
 
             this.cwlValidatorService.validate(latestContent).then(r => {
 

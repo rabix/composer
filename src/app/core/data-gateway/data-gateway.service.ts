@@ -11,6 +11,8 @@ import {Http} from "@angular/http";
 import * as YAML from "js-yaml";
 import {noop} from "../../lib/utils.lib";
 import {LoadOptions} from "js-yaml";
+import {ModalService} from "../../ui/modal/modal.service";
+import {PromptComponent} from "../../ui/modal/common/prompt.component";
 
 @Injectable()
 export class DataGatewayService {
@@ -33,10 +35,10 @@ export class DataGatewayService {
     constructor(private preferences: UserPreferencesService,
                 private api: PlatformAPI,
                 private http: Http,
+                private modal: ModalService,
                 private ipc: IpcService) {
 
         this.ipc.request("hasDataCache").take(1).subscribe(hasCache => {
-            console.log("Received has cache", hasCache);
             if (hasCache) {
                 this.scanCompletion.next("");
             }
@@ -106,7 +108,6 @@ export class DataGatewayService {
             );
 
         return Observable.combineLatest(allProjects, openProjects, (all = [], open) => {
-            console.log("Combining projects", open, all);
             return all.filter(project => open.indexOf(project.slug) !== -1);
         });
     }
@@ -208,6 +209,31 @@ export class DataGatewayService {
         }
 
         return this.ipc.request("resolveContent", ({content, path})).take(1);
+    }
+
+
+    saveLocalFileContent(path, content) {
+        return this.ipc.request("saveFileContent", {path, content});
+    }
+
+    saveFile(fileID, content): Observable<boolean> {
+        const fileSource = DataGatewayService.getFileSource(fileID);
+
+        if (fileSource === "public") {
+            return Observable.throw("Cannot save a public file.");
+        }
+
+        if (fileSource === "local") {
+            return this.saveLocalFileContent(fileID, content);
+        }
+
+        return Observable.fromPromise(this.modal.prompt({
+            title: "Publish New App Revision",
+            content: "Revision Note",
+            cancellationLabel: "Cancel",
+            confirmationLabel: "Publish",
+        }));
+
 
     }
 

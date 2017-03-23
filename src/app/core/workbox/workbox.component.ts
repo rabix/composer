@@ -7,6 +7,7 @@ import {MenuItem} from "../../ui/menu/menu-item";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {TabData} from "./tab-data.interface";
 import {WorkboxService} from "./workbox.service";
+import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 
 @Component({
     selector: "ct-workbox",
@@ -78,7 +79,7 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
     constructor(private ipc: IpcService,
                 public workbox: WorkboxService,
                 private statusBar: StatusBarService,
-                private zone: NgZone,
+                private preferences: UserPreferencesService,
                 el: ElementRef) {
         super();
         this.el = el.nativeElement;
@@ -129,6 +130,10 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
             if (component && (component as StatusControlProvider).provideStatusControls) {
                 this.statusBar.setControls(component.provideStatusControls());
             }
+        });
+
+        setTimeout(() => {
+            this.restoreTabs();
         });
     }
 
@@ -185,5 +190,23 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
         });
 
         return [closeOthers, closeAll];
+    }
+
+    restoreTabs() {
+        this.preferences.get("openTabs", []).take(1).subscribe(tabs => {
+
+            console.log("Adding open tabs", tabs);
+            tabs.forEach(tab => {
+                if (tab.id.startsWith("?")) {
+                    this.workbox.openTab(tab);
+                } else {
+                    this.workbox.getOrCreateFileTab(tab.id).take(1).subscribe(appTab => {
+                        this.workbox.openTab(appTab);
+                    }, err => {
+                        console.warn("Cannot open app tab", tab);
+                    });
+                }
+            });
+        });
     }
 }

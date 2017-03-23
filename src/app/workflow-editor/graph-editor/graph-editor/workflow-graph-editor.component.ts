@@ -108,7 +108,9 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             // this.graph.command("workflow.arrange");
         }
 
-        this.graph.command("workflow.fit");
+        setTimeout(() => {
+            this.graph.command("workflow.fit");
+        });
         // this.statusBar.setControls(this.controlsTemplate);
     }
 
