@@ -1,12 +1,12 @@
 import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren} from "@angular/core";
 import {FormControl} from "@angular/forms";
-import {Observable} from "rxjs/Observable";
 
 import "rxjs/add/operator/map";
+import {Observable} from "rxjs/Observable";
 
 import {LocalFileRepositoryService} from "../../../file-repository/local-file-repository.service";
-import {PlatformAPI} from "../../../services/api/platforms/platform-api.service";
 import {UserPreferencesService} from "../../../services/storage/user-preferences.service";
+import {ModalService} from "../../../ui/modal/modal.service";
 import {TreeNode} from "../../../ui/tree-view/tree-node";
 import {TreeNodeComponent} from "../../../ui/tree-view/tree-node/tree-node.component";
 import {TreeViewComponent} from "../../../ui/tree-view/tree-view.component";
@@ -14,13 +14,10 @@ import {TreeViewService} from "../../../ui/tree-view/tree-view.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {FilesystemEntry, FolderListing} from "../../data-gateway/data-types/local.types";
+import {PlatformAppEntry} from "../../data-gateway/data-types/platform-api.types";
+import {AddSourceModalComponent} from "../../modals/add-source-modal/add-source-modal.component";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.component";
-
-import * as Yaml from "js-yaml";
-import {ModalService} from "../../../ui/modal/modal.service";
-import {AddSourceModalComponent} from "../../modals/add-source-modal/add-source-modal.component";
-import {PlatformAppEntry} from "../../data-gateway/data-types/platform-api.types";
 
 @Component({
     selector: "ct-my-apps-panel",
@@ -73,7 +70,7 @@ import {PlatformAppEntry} from "../../data-gateway/data-types/platform-api.types
                           [level]="1"></ct-tree-view>
         </div>
     `,
-    providers: [TreeViewService, LocalFileRepositoryService],
+    providers: [LocalFileRepositoryService],
     styleUrls: ["./my-apps-panel.component.scss"]
 })
 export class MyAppsPanelComponent extends DirectiveBase implements OnInit, AfterViewInit {
@@ -88,12 +85,15 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
 
     expandedNodes: Observable<string[]>;
 
+    @ViewChild(TreeViewComponent)
+    treeView: TreeViewComponent;
+
+    tree: TreeViewService;
+
     @ViewChildren(NavSearchResultComponent, {read: ElementRef})
     private searchResultComponents: QueryList<ElementRef>;
 
-    constructor(private tree: TreeViewService,
-                private preferences: UserPreferencesService,
-                private platform: PlatformAPI,
+    constructor(private preferences: UserPreferencesService,
                 private cdr: ChangeDetectorRef,
                 private workbox: WorkboxService,
                 private modal: ModalService,
@@ -105,18 +105,23 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
 
     ngOnInit(): void {
 
-        this.loadDataSources();
-        this.attachSearchObserver();
-        this.listenForLocalExpansion();
-        this.listenForPlatformExpansion();
-        this.listenForProjectExpansion();
-        this.listenForFolderExpansion();
-        this.attachExpansionStateSaving();
-        this.listenForAppOpening();
-
     }
 
     ngAfterViewInit() {
+        this.tree = this.treeView.getService();
+
+        setTimeout(() => {
+            this.loadDataSources();
+            this.attachSearchObserver();
+            this.listenForLocalExpansion();
+            this.listenForPlatformExpansion();
+            this.listenForProjectExpansion();
+            this.listenForFolderExpansion();
+            this.attachExpansionStateSaving();
+            this.listenForAppOpening();
+        });
+
+
         this.searchResultComponents.changes.subscribe(list => {
             list.forEach((el, idx) => setTimeout(() => el.nativeElement.classList.add("shown"), idx * 20));
         });

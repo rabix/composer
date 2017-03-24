@@ -60,6 +60,7 @@ export class CodeEditorComponent implements OnInit, ControlValueAccessor, OnDest
     }
 
     ngOnInit() {
+        console.log("Got options", this.options);
         // Instantiate an editor
         this.editor = ace.edit(this.elementRef.nativeElement);
         this.editor.setOptions(Object.assign({
@@ -94,7 +95,6 @@ export class CodeEditorComponent implements OnInit, ControlValueAccessor, OnDest
         }
 
         if (typeof content !== "string") {
-            debugger;
             throw new Error(`Expected content to be typeof "string", instead got "${typeof content}"`);
         }
 

@@ -25,6 +25,7 @@ import {TreeViewService} from "./tree-view.service";
         >
         </ct-tree-node>
     `,
+    providers: [TreeViewService],
     styleUrls: ["./tree-view.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -38,11 +39,15 @@ export class TreeViewComponent {
     @ViewChildren(TreeNodeComponent)
     private treeNodes: QueryList<TreeNodeComponent<any>>;
 
-    constructor(private tree: TreeViewService) {
+    constructor(public tree: TreeViewService) {
         tree.treeView = this;
     }
 
     getChildren(): QueryList<TreeNodeComponent<any>> {
         return this.treeNodes;
+    }
+
+    getService() {
+        return this.tree;
     }
 }

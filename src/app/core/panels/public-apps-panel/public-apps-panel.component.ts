@@ -2,7 +2,6 @@ import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, QueryList, View
 import {FormControl} from "@angular/forms";
 
 import "rxjs/add/operator/map";
-import {Observable} from "rxjs/Observable";
 
 import {LocalFileRepositoryService} from "../../../file-repository/local-file-repository.service";
 import {PlatformAPI} from "../../../services/api/platforms/platform-api.service";
@@ -73,7 +72,7 @@ import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.c
                           [level]="1"></ct-tree-view>
         </div>
     `,
-    providers: [TreeViewService, LocalFileRepositoryService],
+    providers: [LocalFileRepositoryService],
     styleUrls: ["./public-apps-panel.component.scss"]
 })
 export class PublicAppsPanelComponent extends DirectiveBase implements AfterViewInit {
@@ -98,9 +97,9 @@ export class PublicAppsPanelComponent extends DirectiveBase implements AfterView
     @ViewChildren(NavSearchResultComponent, {read: ElementRef})
     private searchResultComponents: QueryList<ElementRef>;
 
-    constructor(private tree: TreeViewService,
-                private preferences: UserPreferencesService,
-                private platform: PlatformAPI,
+    private tree: TreeViewService;
+
+    constructor(private preferences: UserPreferencesService,
                 private cdr: ChangeDetectorRef,
                 private workbox: WorkboxService,
                 private dataGateway: DataGatewayService) {
@@ -108,11 +107,6 @@ export class PublicAppsPanelComponent extends DirectiveBase implements AfterView
 
         this.expandedNodes = this.preferences.get("expandedNodes", []).take(1).publishReplay(1).refCount();
 
-        this.loadDataSources();
-        this.attachSearchObserver();
-        this.attachExpansionStateSaving();
-
-        this.listenForAppOpening();
 
         this.tracked = this.preferences.get("publicAppsGrouping", "toolkit").subscribe(grouping => {
             this.grouping = grouping;
@@ -120,6 +114,15 @@ export class PublicAppsPanelComponent extends DirectiveBase implements AfterView
     }
 
     ngAfterViewInit() {
+
+        this.tree = this.treeComponent.getService();
+
+        setTimeout(() => {
+            this.loadDataSources();
+            this.attachSearchObserver();
+            this.attachExpansionStateSaving();
+            this.listenForAppOpening();
+        });
 
         this.searchResultComponents.changes.subscribe(list => {
             list.forEach((el, idx) => setTimeout(() => el.nativeElement.classList.add("shown"), idx * 20));

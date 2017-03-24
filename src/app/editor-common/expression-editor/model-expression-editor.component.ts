@@ -1,40 +1,37 @@
-import {Component, Input, Output, ViewEncapsulation} from "@angular/core";
+import {Component, Input, OnInit, Output} from "@angular/core";
 import {ExpressionModel} from "cwlts/models";
-import {ReplaySubject, Subject} from "rxjs";
+import {Subject} from "rxjs/Subject";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-model-expression-editor",
     template: `
         <ct-expression-editor [evaluator]="evaluator"
                               [context]="context"
                               (action)="action.next($event)"
-                              [editorContent]="rawCode"
+                              [code]="code"
                               [readonly]="readonly">
         </ct-expression-editor>
     `
 })
-export class ModelExpressionEditorComponent {
+export class ModelExpressionEditorComponent implements OnInit {
 
     @Input()
-    public model: ExpressionModel;
+    model: ExpressionModel;
 
     @Input()
-    public context: { $job?: any, $self?: any };
+    context: { $job?: any, $self?: any };
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
     @Output()
-    public action = new Subject<"close" | "save">();
+    action = new Subject<"close" | "save">();
 
-    public rawCode = new ReplaySubject<string>();
-
-    public evaluator: (code: string) => Promise<string>;
+    code: string;
+    evaluator: (code: string) => Promise<string>;
 
     ngOnInit() {
-        this.rawCode.next(this.model.getScript() || "");
+        this.code = this.model.getScript() || "";
 
         this.evaluator = (content: string) => {
 
@@ -46,6 +43,6 @@ export class ModelExpressionEditorComponent {
             }, err => {
                 return err.message + " on " + err.loc;
             });
-        }
+        };
     }
 }
