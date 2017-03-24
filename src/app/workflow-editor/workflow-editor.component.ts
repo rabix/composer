@@ -51,7 +51,7 @@ import LoadOptions = jsyaml.LoadOptions;
                 <span class="btn btn-sm">{{workflowModel.cwlVersion}}</span>
 
                 <!--Go to app-->
-                <button class="btn btn-sm btn-secondary " 
+                <button class="btn btn-sm btn-secondary "
                         type="button"
                         (click)="goToApp()"
                         tooltipPlacement="bottom"
@@ -63,21 +63,23 @@ import LoadOptions = jsyaml.LoadOptions;
                 <button [disabled]="!data.isWritable"
                         (click)="save()"
                         ct-tooltip="Save"
-                        tooltipPlacement="bottom"
+                        [tooltipPlacement]="'bottom'"
                         class="btn btn-sm btn-secondary" type="button">
                     <i class="fa fa-save"></i>
                 </button>
 
                 <!--Copy-->
-                <button class="btn btn-sm btn-secondary " type="button" ct-tooltip="Save As..." tooltipPlacement="bottom">
+                <button class="btn btn-sm btn-secondary "
+                        type="button"
+                        ct-tooltip="Save As..."
+                        tooltipPlacement="bottom" >
                     <i class="fa fa-copy"></i>
                 </button>
 
-
                 <!--Revisions-->
-                <button *ngIf="data.dataSource !== 'local'"
-                        ct-tooltip="See Revisions"
-                        class="btn btn-sm btn-secondary" type="button"
+                <button *ngIf="data.dataSource !== 'local'" class="btn btn-sm btn-secondary" type="button"
+                        ct-tooltip="See Revision History"
+                        tooltipPlacement="bottom"
                         [ct-editor-inspector]="revisions">
 
                     Revision: {{ workflowModel.customProps['sbg:revision']}}
