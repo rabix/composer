@@ -20,10 +20,11 @@ import {ModalService} from "../ui/modal/modal.service";
 import {DirectiveBase} from "../util/directive-base/directive-base";
 
 import LoadOptions = jsyaml.LoadOptions;
+import {ErrorBarService} from "../layout/error-bar/error-bar.service";
 
 @Component({
     selector: "ct-workflow-editor",
-    providers: [EditorInspectorService],
+    providers: [EditorInspectorService, ErrorBarService],
     styleUrls: ["./workflow-editor.component.scss"],
     template: `
         <ct-action-bar>
@@ -94,6 +95,9 @@ import LoadOptions = jsyaml.LoadOptions;
 
             </div>
         </ct-action-bar>
+
+        <ct-error-bar>
+        </ct-error-bar>
 
         <div class="editor-layout">
 
@@ -213,7 +217,8 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                 private statusBar: StatusBarService,
                 private modal: ModalService,
                 private system: SystemService,
-                private settings: SettingsService) {
+                private settings: SettingsService,
+                private errorBarService: ErrorBarService) {
 
         super();
 
