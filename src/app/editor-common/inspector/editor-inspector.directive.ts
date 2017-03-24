@@ -1,11 +1,11 @@
 import {ChangeDetectorRef, Directive, HostBinding, HostListener, Input, TemplateRef} from "@angular/core";
 import {EditorInspectorService} from "./editor-inspector.service";
-import {ComponentBase} from "../../components/common/component-base";
+import {DirectiveBase} from "../../util/directive-base/directive-base";
 
 @Directive({
     selector: "[ct-editor-inspector]",
 })
-export class EditorInspectorDirective extends ComponentBase {
+export class EditorInspectorDirective extends DirectiveBase {
 
     @Input("ct-editor-inspector")
     public content: TemplateRef<any>;

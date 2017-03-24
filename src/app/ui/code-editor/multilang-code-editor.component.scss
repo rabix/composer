@@ -1,0 +1,65 @@
+@import "../../../assets/sass/variables";
+
+:host {
+  display: block;
+
+  .title {
+    flex-basis: 20px;
+    background-color: darken($body-color, 5%);
+    color: $gray-light;
+    padding-left: 4px;
+    border: 1px solid darken($body-color, 10%);
+    border-left: 1px transparent;
+    border-right: 1px transparent;
+
+  }
+
+  .modal-options {
+    background: $body-color;
+    color: $gray-light;
+    padding: 5px;
+    border-bottom: 1px solid darken($body-color, 10%);
+  }
+
+  .modal-footer {
+    background: $body-color;
+  }
+
+  .main-row {
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
+
+  .code-col, .code-main {
+    flex: 3;
+  }
+
+  .context-col, .code-preview {
+    flex: 1;
+  }
+
+  .flex-row-container {
+    display: flex;
+    flex-direction: column;
+
+    .flex-col {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .flex-col {
+      position: relative;
+      flex-basis: 0;
+
+      &.main-content {
+        flex: 3
+      }
+
+      &.component-controls {
+        flex: 1;
+        border-top: 1px solid #272822;
+      }
+    }
+  }
+}

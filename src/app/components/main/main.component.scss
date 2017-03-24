@@ -23,49 +23,52 @@
 }
 
 //MOVED FROM EDITOR COMMON
-.tab-container {
-    .object-inspector {
-        display: block;
-        height: 100%;
-        background: white;
-    }
+//.tab-container {
+//    .object-inspector {
+//        display: block;
+//        height: 100%;
+//        background: white;
+//    }
+//
+//    .editor-container {
+//        display: flex;
+//        flex-direction: column;
+//        justify-content: space-between;
+//        align-items: stretch;
+//        align-content: stretch;
+//        background: $gui-editor-bg;
+//        position: relative;
+//        height: 100%;
+//        width: 100%;
+//
+//        .flex-row, .flex-col, .flex-col-item {
+//            flex-grow: 1;
+//        }
+//
+//        .editor-content {
+//            display: flex;
+//            flex-direction: row;
+//            justify-content: space-between;
+//            align-items: stretch;
+//            align-content: stretch;
+//            height: 100%;
+//            width: 100%;
+//        }
+//
+//        .inspector-col {
+//            flex-grow: .6;
+//        }
+//
+//
+//    }
+//}
 
-    .editor-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: stretch;
-        align-content: stretch;
-        background: $gui-editor-bg;
-        position: relative;
-        height: 100%;
-        width: 100%;
-
-        .flex-row, .flex-col, .flex-col-item {
-            flex-grow: 1;
-        }
-
-        .editor-content {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: stretch;
-            align-content: stretch;
-            height: 100%;
-            width: 100%;
-        }
-
-        .inspector-col {
-            flex-grow: .6;
-        }
-
-        .app-report-panel {
-            flex-basis: 150px;
-            overflow: auto;
-            border-left: $layout-section-border-dark;
-            border-top: $layout-section-border-light;
-        }
-    }
+.app-report-panel {
+    display: flex;
+    flex-direction: column;
+    flex-basis: 150px;
+    overflow: auto;
+    background: #2d2d2d;
 }
 
 .status-bar-footer {
@@ -103,8 +106,18 @@
     }
 }
 
+.gui-section-header {
+    font-family: $font-family-title;
+    color: $gui-section-header-color;
+    margin: 0;
+    font-size: $font-size-base;
+    font-weight: 400;
+    text-transform: uppercase;
+}
+
 .gui-section-list-item {
     transition: all .2s;
+    display: flex;
 
     background: $gui-section-list-item-bg;
     color: $gui-section-list-item-color;

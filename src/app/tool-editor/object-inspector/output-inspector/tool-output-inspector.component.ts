@@ -9,7 +9,7 @@ import {
 } from "@angular/core";
 import {CommandInputParameterModel, CommandOutputParameterModel} from "cwlts/models";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
-import {ComponentBase} from "../../../components/common/component-base";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -45,7 +45,7 @@ import {ComponentBase} from "../../../components/common/component-base";
         </form>
     `
 })
-export class ToolOutputInspector extends ComponentBase implements OnChanges {
+export class ToolOutputInspector extends DirectiveBase implements OnChanges {
 
     @Input()
     public readonly = false;

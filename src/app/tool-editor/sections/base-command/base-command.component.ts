@@ -1,14 +1,21 @@
-import {Component, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewEncapsulation} from "@angular/core";
+import {
+    Component,
+    Input,
+    OnChanges,
+    OnDestroy,
+    OnInit,
+    Output,
+    SimpleChanges
+} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {ExpressionModel, CommandLineToolModel} from "cwlts/models";
-import {ReplaySubject} from "rxjs";
-import {ComponentBase} from "../../../components/common/component-base";
+import {ReplaySubject} from "rxjs/ReplaySubject";
 import {GuidService} from "../../../services/guid.service";
-import {ModalService} from "../../../components/modal/modal.service";
 import {noop} from "../../../lib/utils.lib";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
     selector: "ct-base-command",
     styleUrls: ["./base-command.component.scss"],
     template: `
@@ -31,12 +38,13 @@ import {noop} from "../../../lib/utils.lib";
                             class="removable-form-control">
 
                             <ct-expression-input
-                                [context]="context"
-                                [formControl]="baseCommandForm.controls[item.id]"
-                                [readonly]="readonly">
+                                    [context]="context"
+                                    [formControl]="baseCommandForm.controls[item.id]"
+                                    [readonly]="readonly">
                             </ct-expression-input>
 
-                            <div *ngIf="!readonly" class="remove-icon clickable text-hover-danger" [ct-tooltip]="'Delete'"
+                            <div *ngIf="!readonly" class="remove-icon clickable text-hover-danger"
+                                 [ct-tooltip]="'Delete'"
                                  (click)="removeBaseCommand(item)">
                                 <i class="fa fa-trash"></i>
                             </div>
@@ -44,34 +52,33 @@ import {noop} from "../../../lib/utils.lib";
                     </ol>
 
 
-                    <button type="button" *ngIf="formList.length > 0 && !readonly" class="btn btn-link add-btn-link no-underline-hover"
+                    <button type="button" *ngIf="formList.length > 0 && !readonly"
+                            class="btn btn-link add-btn-link no-underline-hover"
                             (click)="addBaseCommand()">
                         <i class="fa fa-plus"></i> Add base command
                     </button>
 
                     <hr>
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <h3 class="gui-section-header mb-1">
-                                Streams
-                            </h3>
-                        </div>
+                    <div>
+                        <h3 class="gui-section-header mb-1">
+                            Streams
+                        </h3>
                     </div>
-                    <div class="row">
-                        <div class="col-xs-6">
+                    <div class="streams-row">
+                        <div class="stream">
                             <label class="form-control-label">Stdin redirect</label>
                             <ct-expression-input
-                                [formControl]="streamsForm.controls['stdin']"
-                                [context]="context"
-                                [readonly]="readonly">
+                                    [formControl]="streamsForm.controls['stdin']"
+                                    [context]="context"
+                                    [readonly]="readonly">
                             </ct-expression-input>
                         </div>
-                        <div class="col-xs-6">
+                        <div class="stream">
                             <label class="form-control-label">Stdout redirect</label>
                             <ct-expression-input
-                                [formControl]="streamsForm.controls['stdout']"
-                                [context]="context"
-                                [readonly]="readonly">
+                                    [formControl]="streamsForm.controls['stdout']"
+                                    [context]="context"
+                                    [readonly]="readonly">
                             </ct-expression-input>
                         </div>
                     </div>
@@ -81,49 +88,49 @@ import {noop} from "../../../lib/utils.lib";
         </ct-form-panel>
     `
 })
-export class BaseCommandComponent extends ComponentBase implements OnInit, OnDestroy, OnChanges {
+export class BaseCommandComponent extends DirectiveBase implements OnInit, OnDestroy, OnChanges {
     /** baseCommand property of model */
     @Input()
-    public baseCommand: ExpressionModel[];
+    baseCommand: ExpressionModel[];
 
     /** Stdin property of model */
     @Input()
-    public stdin: ExpressionModel;
+    stdin: ExpressionModel;
 
     /** Stdout property of model */
     @Input()
-    public stdout: ExpressionModel;
+    stdout: ExpressionModel;
 
     /** The parent forms group which is already in the clt-editor form tree */
     @Input()
-    public form: FormGroup;
+    form: FormGroup;
 
     /** Context in which expression should be evaluated */
     @Input()
-    public context: { $job: any };
+    context: { $job: any };
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
     @Input()
-    public model: CommandLineToolModel;
+    model: CommandLineToolModel;
 
     /** Update event triggered on command form changes (add, remove, edit) */
     @Output()
-    public updateCmd = new ReplaySubject<ExpressionModel[]>();
+    updateCmd = new ReplaySubject<ExpressionModel[]>();
 
     /** Update event triggered on stream changes */
     @Output()
-    public updateStreams = new ReplaySubject<ExpressionModel[]>();
+    updateStreams = new ReplaySubject<ExpressionModel[]>();
 
     /** form group for streams */
-    public streamsForm: FormGroup;
+    streamsForm: FormGroup;
 
     /** form group for base command */
-    public baseCommandForm: FormGroup;
+    baseCommandForm: FormGroup;
 
     /** List which connects model to forms */
-    public formList: Array<{ id: string, model: ExpressionModel }> = [];
+    formList: Array<{ id: string, model: ExpressionModel }> = [];
 
     constructor(private guidService: GuidService, private modal: ModalService) {
         super();
@@ -131,8 +138,12 @@ export class BaseCommandComponent extends ComponentBase implements OnInit, OnDes
 
     ngOnChanges(changes: SimpleChanges): void {
         if (this.streamsForm) {
-            if (changes["stdin"]) this.streamsForm.controls["stdin"].setValue(changes["stdin"].currentValue);
-            if (changes["stdout"]) this.streamsForm.controls["stdout"].setValue(changes["stdout"].currentValue);
+            if (changes["stdin"]) {
+                this.streamsForm.controls["stdin"].setValue(changes["stdin"].currentValue);
+            }
+            if (changes["stdout"]) {
+                this.streamsForm.controls["stdout"].setValue(changes["stdout"].currentValue);
+            }
         }
 
         if (changes["baseCommand"]) {
@@ -163,7 +174,7 @@ export class BaseCommandComponent extends ComponentBase implements OnInit, OnDes
     }
 
 
-    public ngOnInit(): void {
+    ngOnInit(): void {
 
         this.form = new FormGroup({});
 
@@ -182,7 +193,7 @@ export class BaseCommandComponent extends ComponentBase implements OnInit, OnDes
         });
     }
 
-    private removeBaseCommand(ctrl: { id: string, model: ExpressionModel }): void {
+    removeBaseCommand(ctrl: { id: string, model: ExpressionModel }): void {
         this.modal.confirm({
             title: "Really Remove?",
             content: `Are you sure that you want to remove this base command?`,
@@ -192,10 +203,12 @@ export class BaseCommandComponent extends ComponentBase implements OnInit, OnDes
             this.formList = this.formList.filter(item => item.id !== ctrl.id);
             this.form.removeControl(ctrl.id);
             this.updateCmd.next(this.formList.map(data => data.model));
-        }, noop);
+        }, err => {
+            console.warn(err);
+        });
     }
 
-    private addBaseCommand(): void {
+    addBaseCommand(): void {
         this.model.addBaseCommand();
         this.updateCmd.next(this.model.baseCommand);
     }

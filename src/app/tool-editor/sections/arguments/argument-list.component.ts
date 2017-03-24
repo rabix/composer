@@ -7,11 +7,11 @@ import {
     TemplateRef,
     ViewChildren
 } from "@angular/core";
-import {ComponentBase} from "../../../components/common/component-base";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
-import {ModalService} from "../../../components/modal/modal.service";
 import {noop} from "../../../lib/utils.lib";
 import {CommandLineToolModel} from "cwlts/models";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
     selector: "ct-argument-list",
@@ -24,7 +24,7 @@ import {CommandLineToolModel} from "cwlts/models";
 
             <div class="tc-body">
 
-                <div class="container">
+                <div>
 
                     <!--Blank Tool Screen-->
                     <ct-blank-tool-state *ngIf="!readonly && !model.arguments.length"
@@ -34,7 +34,7 @@ import {CommandLineToolModel} from "cwlts/models";
                     </ct-blank-tool-state>
 
                     <!--List Header Row-->
-                    <div class="gui-section-list-title row" *ngIf="model.arguments.length">
+                    <div class="gui-section-list-title" *ngIf="model.arguments.length">
                         <div class="col-sm-4">Value</div>
                         <div class="col-sm-3">Prefix</div>
                         <div class="col-sm-3">Separate</div>
@@ -46,9 +46,9 @@ import {CommandLineToolModel} from "cwlts/models";
 
                         <!--List Entry-->
                         <li *ngFor="let entry of model.arguments; let i = index"
-                            class="input-list-items container">
+                            class="input-list-items">
 
-                            <div class="gui-section-list-item clickable row"
+                            <div class="gui-section-list-item clickable"
                                  [ct-validation-class]="entry.validation"
                                  [ct-editor-inspector]="inspector"
                                  [ct-editor-inspector-target]="entry.loc">
@@ -131,33 +131,33 @@ import {CommandLineToolModel} from "cwlts/models";
         </ct-form-panel>
     `
 })
-export class ArgumentListComponent extends ComponentBase {
+export class ArgumentListComponent extends DirectiveBase {
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
     /** Model location entry, used for tracing the path in the json document */
     @Input()
-    public location = "";
+    location = "";
 
     /** Context in which expression should be evaluated */
     @Input()
-    public context;
+    context;
 
     @Input()
-    public model: CommandLineToolModel;
+    model: CommandLineToolModel;
 
     @Output()
-    public readonly update = new EventEmitter();
+    readonly update = new EventEmitter();
 
     @ViewChildren("inspector", {read: TemplateRef})
-    private inspectorTemplate: QueryList<TemplateRef<any>>;
+    inspectorTemplate: QueryList<TemplateRef<any>>;
 
-    constructor(private inspector: EditorInspectorService, private modal: ModalService) {
+    constructor(public inspector: EditorInspectorService, private modal: ModalService) {
         super();
     }
 
-    private removeEntry(index) {
+    removeEntry(index) {
         this.modal.confirm({
             title: "Really Remove?",
             content: `Are you sure that you want to remove this argument?`,
@@ -171,10 +171,10 @@ export class ArgumentListComponent extends ComponentBase {
 
             const args = this.model.arguments.slice(0, index).concat(this.model.arguments.slice(index + 1));
             this.update.emit(args);
-        }, noop);
+        }, err => console.warn);
     }
 
-    private addEntry() {
+    addEntry() {
         const newEntry = this.model.addArgument({});
         this.update.emit(this.model.arguments);
 

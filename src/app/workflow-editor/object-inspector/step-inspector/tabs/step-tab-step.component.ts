@@ -1,76 +1,76 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, ViewEncapsulation} from "@angular/core";
-import {ComponentBase} from "../../../../components/common/component-base";
-import {StepModel, WorkflowModel} from "cwlts/models";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {Workflow} from "cwl-svg";
+import {StepModel, WorkflowModel} from "cwlts/models";
+import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
     selector: "ct-workflow-step-inspector-step",
     template: `
-            <!--ID-->
-            <div class="form-group" [class.has-danger]="form.controls['id'].errors">
-                <label class="form-control-label">ID</label>
-                <input type="text"
-                       class="form-control"
-                       [formControl]="form.controls['id']">
-                <div *ngIf="form.controls['id'].errors" class="form-control-feedback">
-                    {{form.controls['id'].errors['error']}}
-                </div>
+        <!--ID-->
+        <div class="form-group" [class.has-danger]="form.controls['id'].errors">
+            <label class="form-control-label">ID</label>
+            <input type="text"
+                   class="form-control"
+                   [formControl]="form.controls['id']">
+            <div *ngIf="form.controls['id'].errors" class="form-control-feedback">
+                {{form.controls['id'].errors['error']}}
             </div>
-            
-            <!--Label-->
-            <div class="form-group">
-                <label class="form-control-label">Label</label>
-                <input type="text"
-                       class="form-control"
-                       [formControl]="form.controls['label']">
-            </div>
-            
-            <!--Scatter Method-->
-            <div *ngIf="step.hasScatterMethod" class="form-group">
-                <label class="form-control-label">Scatter Method</label>
-                <select class="form-control" [formControl]="form.controls['scatterMethod']">
-                    <option *ngFor="let method of scatterMethodOptions" [value]="method.value">
-                        {{method.caption}}
-                    </option>
-                </select>
-            </div>
-            
-            <!--Scatter-->
-            <div class="form-group">
-                
-                <label class="form-control-label">Scatter</label>
-            
-                <!--Single Scatter-->
-                <select *ngIf="!step.hasMultipleScatter" class="form-control" [formControl]="form.controls['scatter']">
-                    <option value="">-- none --</option>
-                    <option *ngFor="let input of step.in" [value]="input.id">
-                        {{input.label}} (#{{input.id}})
-                    </option>
-                </select>
-            
-                <!--Multiple Scatter-->
-                <select *ngIf="step.hasMultipleScatter" class="form-control" multiple [formControl]="form.controls['scatter']">
-                    <option *ngFor="let opt of step.in" [value]="opt.id">
-                        {{opt.id}}
-                    </option>
-                </select>
-            
-            </div>
-            
-            <!--Description-->
-            <div class="form-group">
-                <label class="form-control-label">Description</label>
-                <textarea class="form-control"
-                          rows="4"
-                          [formControl]="form.controls['description']"></textarea>
-            </div>
-        
+        </div>
+
+        <!--Label-->
+        <div class="form-group">
+            <label class="form-control-label">Label</label>
+            <input type="text"
+                   class="form-control"
+                   [formControl]="form.controls['label']">
+        </div>
+
+        <!--Scatter Method-->
+        <div *ngIf="step.hasScatterMethod" class="form-group">
+            <label class="form-control-label">Scatter Method</label>
+            <select class="form-control" [formControl]="form.controls['scatterMethod']">
+                <option *ngFor="let method of scatterMethodOptions" [value]="method.value">
+                    {{method.caption}}
+                </option>
+            </select>
+        </div>
+
+        <!--Scatter-->
+        <div class="form-group">
+
+            <label class="form-control-label">Scatter</label>
+
+            <!--Single Scatter-->
+            <select *ngIf="!step.hasMultipleScatter" class="form-control" [formControl]="form.controls['scatter']">
+                <option value="">-- none --</option>
+                <option *ngFor="let input of step.in" [value]="input.id">
+                    {{input.label}} (#{{input.id}})
+                </option>
+            </select>
+
+            <!--Multiple Scatter-->
+            <select *ngIf="step.hasMultipleScatter" class="form-control" multiple [formControl]="form.controls['scatter']">
+                <option *ngFor="let opt of step.in" [value]="opt.id">
+                    {{opt.id}}
+                </option>
+            </select>
+
+        </div>
+
+        <!--Description-->
+        <div class="form-group">
+            <label class="form-control-label">Description</label>
+            <textarea class="form-control"
+                      rows="4"
+                      [formControl]="form.controls['description']"></textarea>
+        </div>
+
     `
 })
-export class WorkflowStepInspectorTabStep extends ComponentBase {
+export class WorkflowStepInspectorTabStep extends DirectiveBase {
 
     @Input()
     public step: StepModel;
@@ -119,7 +119,7 @@ export class WorkflowStepInspectorTabStep extends ComponentBase {
                 this.graph.redraw();
             }
             catch (e) {
-                this.form.controls['id'].setErrors({error: e.message});
+                this.form.controls["id"].setErrors({error: e.message});
                 // Because this comes outside of Angular (workflow model)
                 this.cdr.markForCheck();
             }

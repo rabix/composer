@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, Output, ViewChild} from "@angular/core";
-import {ComponentBase} from "../../../components/common/component-base";
 import {
     CommandInputParameterModel,
     CommandLineToolModel,
@@ -7,6 +6,7 @@ import {
 } from "cwlts/models";
 import {ExternalLinks} from "../../../cwl/external-links";
 import {ToolOutputListComponent} from "./tool-output-list.component";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
     selector: "ct-tool-output",
@@ -40,36 +40,36 @@ import {ToolOutputListComponent} from "./tool-output-list.component";
         </ct-form-panel>
     `
 })
-export class ToolOutputsComponent extends ComponentBase {
+export class ToolOutputsComponent extends DirectiveBase {
 
     @Input()
-    public inputs: CommandInputParameterModel[] = [];
+    inputs: CommandInputParameterModel[] = [];
 
     @Input()
-    public entries: CommandOutputParameterModel[] = [];
+    entries: CommandOutputParameterModel[] = [];
 
     /** Model location entry, used for tracing the path in the json document */
     @Input()
-    public location = "";
+    location = "";
 
     /** Context in which expression should be evaluated */
     @Input()
-    public context: { $job: any };
+    context: { $job: any };
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
     @Input()
-    public model: CommandLineToolModel;
+    model: CommandLineToolModel;
 
     @Output()
-    public readonly update = new EventEmitter();
+    readonly update = new EventEmitter();
 
     @ViewChild(ToolOutputListComponent) outputList: ToolOutputListComponent;
 
-    public helpLink = ExternalLinks.toolOutput;
+    helpLink = ExternalLinks.toolOutput;
 
-    private addEntry() {
+    addEntry() {
         this.outputList.addEntry();
     }
 }

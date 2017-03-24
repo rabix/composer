@@ -1,16 +1,14 @@
-import {ChangeDetectionStrategy, Component, Input, Output, ViewEncapsulation} from "@angular/core";
-import {StepModel, WorkflowModel, WorkflowStepInputModel} from "cwlts/models";
-import {Subject} from "rxjs";
-import {ComponentBase} from "../../../../components/common/component-base";
-import {ObjectHelper as OH} from "../../../../helpers/object.helper";
-import {StatusBarService} from "../../../../core/status-bar/status-bar.service";
+import {ChangeDetectorRef, Component, Input, Output, ViewEncapsulation} from "@angular/core";
 import {Workflow} from "cwl-svg";
-import {ChangeDetectorRef} from "@angular/core";
+import {StepModel, WorkflowModel, WorkflowStepInputModel} from "cwlts/models";
+import {Subject} from "rxjs/Subject";
+import {ObjectHelper as OH} from "../../../../helpers/object.helper";
+import {StatusBarService} from "../../../../layout/status-bar/status-bar.service";
+import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
     selector: "ct-workflow-step-inspector-inputs",
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    // @todo: temporarily removing ChangeDetectionStrategy.OnPush because model is being changed externally by graph
     styleUrls: ["./step-tab-inputs.component.scss"],
     template: `
         <div *ngFor="let group of inputGroups">
@@ -19,7 +17,7 @@ import {ChangeDetectorRef} from "@angular/core";
                 <div class="tc-header">{{ group.name }}</div>
                 <div class="tc-body">
                     <form (change)="onInputsFormChange($event)">
-                        <div *ngFor="let input of group.inputs; let i = index;" class="input-box">
+                        <div *ngFor="let input of group.inputs" class="input-box">
 
                             <!--Label and port options-->
                             <div class="input-title flex-baseline">
@@ -85,18 +83,18 @@ import {ChangeDetectorRef} from "@angular/core";
                             <!--Tooltip-->
                             <ct-tooltip-content [maxWidth]="500" #ctt>
 
-                                <h4>{{input.label || input.id}}</h4>    
-                                
+                                <h4>{{input.label || input.id}}</h4>
+
                                 <ul>
                                     <!--Description-->
                                     <li>
                                         <span class="title">
                                             Description:
                                         </span>
-                                            <span class="value">
+                                        <span class="value">
                                             {{input.description}}
                                         </span>
-                                    </li>                                    
+                                    </li>
                                 </ul>
 
                             </ct-tooltip-content>
@@ -108,7 +106,7 @@ import {ChangeDetectorRef} from "@angular/core";
         </div>
     `
 })
-export class WorkflowStepInspectorTabInputs extends ComponentBase {
+export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase {
 
     public dropDownPortOptions = [
         {
@@ -143,7 +141,7 @@ export class WorkflowStepInspectorTabInputs extends ComponentBase {
     @Output()
     public save = new Subject<WorkflowStepInputModel>();
 
-    private group = [];
+    public group = [];
 
     public inputGroups: { name: string, inputs: WorkflowStepInputModel[] }[] = [];
 
@@ -154,7 +152,7 @@ export class WorkflowStepInspectorTabInputs extends ComponentBase {
     /**
      * Executes when port option get changed via drop down menu or toggle slider
      */
-    private onPortOptionChange(input, value) {
+    onPortOptionChange(input, value) {
         switch (value) {
             case"editable":
                 this.workflowModel.clearPort(input);
@@ -174,11 +172,9 @@ export class WorkflowStepInspectorTabInputs extends ComponentBase {
     /**
      * Executes when step get edited in the top-level forms.
      */
-    private onInputsFormChange(event: Event) {
+    onInputsFormChange(event: Event) {
 
         event.stopPropagation();
-
-        console.log("----> Step Inspector Form Change", event);
 
         const formField = event.target as HTMLInputElement;
 
@@ -206,13 +202,11 @@ export class WorkflowStepInspectorTabInputs extends ComponentBase {
     /**
      * Updates the step value for a given input
      */
-    private stepValueUpdate(prefix, value) {
+    stepValueUpdate(prefix, value) {
 
         // Get top level id from prefix
         const inputId = prefix.split(".")[0];
-        const input = this.step.in.find(i => i.id === inputId);
-
-        console.log("----> Step Value Update", inputId, value);
+        const input   = this.step.in.find(i => i.id === inputId);
 
         // Show a message in the status bar about what's changed.
         this.statusBar.instant(`Updated step value of ${input ? input.label || input.id : inputId}.`);
@@ -225,8 +219,7 @@ export class WorkflowStepInspectorTabInputs extends ComponentBase {
     }
 
     private handleConnectionChange = (src, dest) => {
-        if(dest && dest.parentStep && dest.parentStep.id === this.step.id) {
-            console.log(dest);
+        if (dest && dest.parentStep && dest.parentStep.id === this.step.id) {
             this.cdr.markForCheck();
         }
     };
@@ -252,7 +245,7 @@ export class WorkflowStepInspectorTabInputs extends ComponentBase {
         }));
     }
 
-    private isFileType(input) {
+    isFileType(input) {
         return input.type.type === "File" || (input.type.type === "array" && input.type.items === "File");
     }
 

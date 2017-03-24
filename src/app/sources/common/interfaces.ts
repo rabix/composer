@@ -12,12 +12,12 @@ export type DATA_SOURCE_ID =
 export interface DataEntrySource {
     id: string;
     data?: any;
-    type?: "file" | "folder",
+    type?: "file" | "folder";
     isWritable?: boolean;
-    resolve?: (content?: string) => Promise<string>,
-    save?: ((...args: any[]) => Observable<any>)
+    resolve?: (content?: string) => Promise<string>;
+    save?: ((...args: any[]) => Observable<any>);
     sourceId?: DATA_SOURCE_ID;
-    content?: Observable<string> | any,
-    language?: Observable<string> | any,
+    content?: Observable<string> | any;
+    language?: Observable<string> | any;
     childrenProvider?: () => Observable<DataEntrySource[]> | any;
 }

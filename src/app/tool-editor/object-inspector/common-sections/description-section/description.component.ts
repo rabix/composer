@@ -1,8 +1,8 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {ComponentBase} from "../../../../components/common/component-base";
 import {CommandOutputParameterModel, CommandInputParameterModel} from "cwlts/models";
 import {noop} from "../../../../lib/utils.lib";
+import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -48,7 +48,7 @@ import {noop} from "../../../../lib/utils.lib";
         </ct-form-panel>
     `
 })
-export class DescriptionComponent extends ComponentBase implements ControlValueAccessor {
+export class DescriptionComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
     public readonly = false;

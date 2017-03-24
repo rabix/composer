@@ -1,9 +1,8 @@
-import {ChangeDetectionStrategy, Component, Input, OnChanges, Output, SimpleChanges, ViewEncapsulation} from "@angular/core";
+import {ChangeDetectionStrategy, Component, Input, OnChanges, Output, SimpleChanges} from "@angular/core";
+import {Subject} from "rxjs/Subject";
 import {PlatformAppRevisionEntry} from "../../../services/api/platforms/platform-api.types";
-import {Subject} from "rxjs";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
 
     selector: "ct-revision-list",
     styleUrls: ["./revision-list.component.scss"],
@@ -17,9 +16,11 @@ import {Subject} from "rxjs";
                      (click)="selectRevision(revision)"
                      [class.active]="active === revision.number"
                      *ngFor="let revision of displayList">
+                    
+                    <ct-line-loader *ngIf="loadingRevision === revision"></ct-line-loader>
 
                     <div class="revision-number h5">
-                        {{ revision.number }}
+                        <div>{{ revision.number }}</div>
                     </div>
                     <div class="revision-info">
                         <div class="revision-note" *ngIf="revision.note">
@@ -38,36 +39,40 @@ export class RevisionListComponent implements OnChanges {
 
 
     @Input()
-    public revisions: PlatformAppRevisionEntry[] = [];
+    revisions: PlatformAppRevisionEntry[] = [];
 
     @Input()
-    public active: number;
+    active: number;
 
     @Output()
-    public select = new Subject<number>();
+    select = new Subject<number>();
 
     @Input()
-    public loadingRevision;
+    loadingRevision;
 
-    private displayList: {
+    displayList: {
         date: number,
         note: string,
         author: string,
         number: number
     }[] = [];
 
-    private selectRevision(revision) {
+    selectRevision(revision) {
         if (revision.number === this.active) {
             return;
         }
 
+        this.loadingRevision = revision;
         this.select.next(revision.number);
 
-        this.loadingRevision = revision;
     }
 
     ngOnChanges(changes: SimpleChanges): void {
         this.loadingRevision = undefined;
+
+        if (!Array.isArray(changes["revisions"].currentValue)) {
+            return;
+        }
 
         this.displayList = changes["revisions"].currentValue.map(rev => ({
             date: rev["sbg:modifiedOn"] * 1000,

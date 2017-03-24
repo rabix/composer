@@ -1,62 +1,56 @@
 import {Injectable} from "@angular/core";
 import {Headers, Http, URLSearchParams} from "@angular/http";
+import {Observable} from "rxjs/Observable";
+import {ReplaySubject} from "rxjs/ReplaySubject";
 import {ENVP} from "../../../config/env.config";
-import {Observable, ReplaySubject} from "rxjs";
-import {PlatformAppEntry, PlatformProjectEntry} from "./platform-api.types";
 import {SettingsService} from "../../settings/settings.service";
-
-export interface PlatformProject {
-    id: string;
-    href: string;
-    name: string;
-}
-
-export interface PlatformApp {
-    id: string;
-    href: string;
-    name: string;
-    project: string;
-}
-
-export interface PlatformAppDetails extends PlatformApp {
-    revision: number
-    raw: Object
-}
+import {PlatformAppEntry, PlatformProjectEntry} from "./platform-api.types";
 
 export interface ServiceConfig {
-    port?: number,
-    prefix?: string
+    port?: number;
+    prefix?: string;
 }
 
 @Injectable()
 export class PlatformAPI {
 
-    private sessionID = new ReplaySubject(1);
+    sessionID = new ReplaySubject(1);
 
-    private platformServices: { brood: string, watson: string, gatekeeper: string } = {} as any;
+    private platformServices: { brood: string, voyager: string, watson: string, gatekeeper: string } = {} as any;
+
+    private userInfo: { email: string, id: string, staff: boolean, username: string } = {} as any;
 
     constructor(private http: Http, private settings: SettingsService) {
+
         this.settings.platformConfiguration.subscribe(config => {
 
             Object.keys(ENVP.serviceRoutes).forEach(serviceName => {
-                this.platformServices[serviceName] = this.getServiceUrl(config.url, serviceName);
+                this.platformServices[serviceName] = PlatformAPI.getServiceUrl(config.url, serviceName);
             });
 
             // If we do not reset the session ID upon the connection change,
             // the race condition with other api calls will take the old one
             this.sessionID = new ReplaySubject(1);
 
-            this.checkToken(config.url, config.key).filter(isValid => isValid === true)
+            this.checkToken(config.url, config.token).filter(isValid => isValid === true)
                 .switchMap(_ => this.http.post(this.platformServices.gatekeeper + "/session/open/auth", {}, {
                     headers: new Headers({
-                        "auth-token": config.key
+                        "auth-token": config.token
                     })
-                })).subscribe(res => this.sessionID.next(res.json().message.session_id));
+                }))
+                .subscribe(res => {
+                    this.sessionID.next(res.json().message.session_id);
+
+                    this.getUserInfo().subscribe((user) => this.userInfo = user);
+                }
+            )
+            ;
         });
     }
 
+
     public checkToken(platform: string, token: string) {
-        const url = this.getServiceUrl(platform, "gatekeeper");
+        const url = PlatformAPI.getServiceUrl(platform, "gatekeeper");
 
         return this.http.get(url + "/auth_token/check", {
             headers: new Headers({
@@ -65,14 +59,16 @@ export class PlatformAPI {
         }).catch(res => Observable.of(res)).map(res => {
 
             if (res.status === 0) {
+                this.settings.validity.next(false);
                 return "invalid_platform";
             }
 
+            this.settings.validity.next(res.ok);
             return res.ok;
         });
     }
 
-    private getServiceUrl(platformUrl: string, serviceName: string) {
+    static getServiceUrl(platformUrl: string, serviceName: string) {
         const isVayu = platformUrl.indexOf("-vayu.sbgenomics.com") !== -1;
         const isStaging = platformUrl.indexOf("staging-igor.sbgenomics.com") !== -1;
 
@@ -126,9 +122,9 @@ export class PlatformAPI {
         })))).first();
     }
 
-    public getAppCWL(app, revision?: number) {
+    public getAppCWL(appId, revision?: number) {
 
-        const id = app["sbg:id"].split("/").slice(0, -1).concat(revision).filter(x => x !== undefined).join("/");
+        const id = appId.split("/").slice(0, -1).concat(revision).filter(x => x !== undefined).join("/");
 
         return this.sessionID.switchMap(sessionID => this.http.get(`${this.platformServices.brood}/raw/${id}`, {
             headers: new Headers({
@@ -136,7 +132,7 @@ export class PlatformAPI {
             })
             // Platform CWL files don't come with newlines
         })).map(r => {
-            return JSON.stringify(r.json(), null, 4)
+            return JSON.stringify(r.json(), null, 4);
         });
     }
 
@@ -183,10 +179,57 @@ export class PlatformAPI {
     public getUpdates(ids: string []) {
         return this.sessionID.switchMap(sessionID =>
             this.http.post(`${this.platformServices.brood}/updates`, ids, {
-            headers: new Headers({
-                "session-id": sessionID
-            })
-        }).map(r => r.json().message).first());
+                headers: new Headers({
+                    "session-id": sessionID
+                })
+            }).map(r => r.json().message).first());
+    }
+
+    public getUserInfo() {
+        return this.sessionID.switchMap(sessionID =>
+            this.http.get(`${this.platformServices.gatekeeper}/user/`, {
+                headers: new Headers({
+                    "session-id": sessionID
+                })
+            }).map(r => r.json().message).first());
+    }
+
+    public sendFeedback(type: string, message: string) {
+        return this.settings.platformConfiguration.take(1).switchMap((conf) => {
+                const data = {
+                    "id": "user.feedback",
+                    "data": {
+                        "user": this.userInfo.id,
+                        "referrer": "Cottontail " + conf.url,
+                        "user_agent": window.navigator.userAgent,
+                        "timestamp": this.getFormatedCurrentTimeStamp(),
+                        "text": message,
+                        "type": type,
+
+                    }
+                };
+                return this.sessionID.switchMap(sessionID =>
+                    this.http.post(`${this.platformServices.voyager}/send/`, data, {
+                        headers: new Headers({
+                            "session-id": sessionID
+                        })
+                    }).map(r => r.json().message).first());
+            }
+        );
+    }
+
+    // FIXME should not be here but currently here is the only place where it is used
+    private getFormatedCurrentTimeStamp() {
+        const date = new Date();
+        const pad = (n) => (n < 10 ? "0" : "") + n;
+
+        // format is YYYYMMDDHHMMSS
+        return date.getFullYear() +
+            pad(date.getMonth() + 1) +
+            pad(date.getDate()) +
+            pad(date.getHours()) +
+            pad(date.getMinutes()) +
+            pad(date.getSeconds());
     }
 
     private objectToParams(obj) {

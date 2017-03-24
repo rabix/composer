@@ -1,36 +1,67 @@
 import {Injectable} from "@angular/core";
-import {Observable} from "rxjs";
-
+import "rxjs/add/operator/map";
+import "rxjs/add/operator/take";
+import {Observable} from "rxjs/Observable";
+import {Subject} from "rxjs/Subject";
+import {IpcService} from "../ipc.service";
+import {UserProfileCacheKey} from "./user-profile-cache-key";
 
 @Injectable()
 export class UserPreferencesService {
 
-    private storage: Storage;
+    private updates = new Subject<{
+        key: string;
+        value: any;
+    }>();
 
-    constructor() {
-        this.storage = localStorage;
+    constructor(private ipc: IpcService) {
+
     }
 
-    public put(key: string, value: any): void {
-        this.storage.setItem(key, JSON.stringify(value));
+    public put(key: UserProfileCacheKey, value: any) {
+
+        this.updates.next({key, value});
+
+        if (key.startsWith("dataCache")) {
+            return this.ipc.request("putSetting", {key, value});
+        }
+
+        window.localStorage.setItem(key, JSON.stringify(value));
+        return Observable.of(value);
     }
 
-    public get<T>(key: string, fallback?: T, saveDefault = false): Observable<T> {
+    public get<T>(key: UserProfileCacheKey, fallback?: T): Observable<T> {
 
-        const val = this.storage.getItem(key);
 
-        if (!val && typeof val !== "number") {
-            if (saveDefault) {
-                this.put(key, fallback);
-            }
-            return Observable.of(fallback);
+        if (key.startsWith("dataCache")) {
+
+            return this.ipc.request("getSetting", key)
+
+                .merge(this.updates.filter(u => u.key === key).map(u => u.value))
+                .map(v => v === undefined ? fallback : v);
         }
 
-        if (val === "undefined") {
-            this.storage.removeItem(key);
-            return Observable.of(fallback);
+        /**
+         * Temporary rerouting until we have a better cache system
+         * Stuff that are not in dataCache are small and can be stored in localStorage for now
+         */
+
+        const hit = window.localStorage.getItem(key);
+        let cacheItem;
+        if (hit === undefined || hit === null || hit === "undefined" || hit === "null") {
+            cacheItem = fallback;
+            this.put(key, cacheItem);
+        } else {
+            cacheItem = JSON.parse(hit);
         }
 
-        return Observable.of(JSON.parse(val));
+        return Observable.of(cacheItem).merge(this.updates.filter(u => u.key === key).map(u => u.value)).distinctUntilChanged();
+    }
+
+    public addAppToRecentList(appID, appType: "Workflow" | "CommandLineTool") {
+        this.get("recentApps", []).take(1).map(list => {
+            list.unshift(appID);
+            return list.filter((e, i, a) => a.indexOf(e) === i).slice(0, 20);
+        }).flatMap(list => this.put("recentApps", list));
     }
 }

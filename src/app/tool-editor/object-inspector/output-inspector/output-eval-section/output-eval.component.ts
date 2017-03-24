@@ -1,7 +1,7 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {ComponentBase} from "../../../../components/common/component-base";
 import {CommandOutputParameterModel} from "cwlts/models";
+import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -47,7 +47,7 @@ import {CommandOutputParameterModel} from "cwlts/models";
     `
 })
 
-export class OutputEvalSectionComponent extends ComponentBase implements ControlValueAccessor {
+export class OutputEvalSectionComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
     public readonly = false;

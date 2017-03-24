@@ -25,6 +25,11 @@ $brand-primary-bg-dark: #1B2833;
 $brand-primary-bg-bright: #34495E;
 
 /**
+* Typography
+ */
+$font-size-sm: .9rem;
+
+/**
 *  SBG Variables
 */
 
@@ -46,7 +51,7 @@ $hr-border-color: $border-color;
 * SBG colors
 */
 $brand-success: #3eb157;
-$brand-primary: #337cb9;
+$brand-primary: rgb(93, 149, 208);
 $brand-danger: #d8000c;
 $brand-warning: #f89406;
 $brand-info: #f3f8fc;
@@ -95,7 +100,7 @@ $editor-header-height: $header-padding * 2 + $btn-padding-y-sm * 2 + $btn-line-h
 
 
 $padding-sm: 10px;
-$padding-md: 15px;
+$padding-md: 1rem;
 
 /**
 * Status Bar
@@ -119,3 +124,4 @@ $readonly-input: #eceeef;
 
 
 @import "theme-variables";
+@import "./modern/variables";

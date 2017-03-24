@@ -1,9 +1,10 @@
 @import "../../../assets/sass/variables";
 @import "../../../assets/sass/_mixins";
 
-ct-editor-inspector-content {
+:host {
     overflow-y: auto;
     overflow-x: hidden;
+    flex: 1;
 
     .header {
         border: 1px solid transparent;
@@ -13,8 +14,9 @@ ct-editor-inspector-content {
     .form-section {
         position: relative;
         display: block;
+        overflow: auto;
         background: $gui-section-bg;
-        margin-bottom: 20px;
+        height: 100%;
 
         .borderless & {
             border: none;
@@ -66,13 +68,4 @@ ct-editor-inspector-content {
             height: auto;
         }
     }
-}
-
-ct-editor-inspector {
-    position: static;
-    display: block;
-    overflow-y: auto;
-    overflow-x: hidden;
-    border: 1px solid transparent;
-    border-left-color: $gui-section-border;
 }

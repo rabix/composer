@@ -1,11 +1,11 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
 import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
-import {ComponentBase} from "../../../components/common/component-base";
 import {GuidService} from "../../../services/guid.service";
 import {CustomValidators} from "../../../validators/custom.validator";
 import {noop} from "../../../lib/utils.lib";
-import {ModalService} from "../../../components/modal/modal.service";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -48,7 +48,7 @@ import {ModalService} from "../../../components/modal/modal.service";
         </form>
     `
 })
-export class ExpressionModelListComponent extends ComponentBase implements ControlValueAccessor {
+export class ExpressionModelListComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
     public readonly = false;
@@ -118,7 +118,7 @@ export class ExpressionModelListComponent extends ComponentBase implements Contr
             this.formList = this.formList.filter(item => item.id !== ctrl.id);
             this.form.removeControl(ctrl.id);
             this.form.markAsDirty();
-        }, noop);
+        }, err => console.warn);
     }
 
     private addExpressionModel(): void {

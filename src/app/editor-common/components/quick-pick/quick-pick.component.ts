@@ -1,11 +1,11 @@
 import {Component, forwardRef, Input, OnInit, Output, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
-import {ComponentBase} from "../../../components/common/component-base";
 import {noop} from "../../../lib/utils.lib";
 import {AsyncSubject} from "rxjs";
 import {Expression} from "cwlts/mappings/d2sb/Expression";
-import {ModalService} from "../../../components/modal/modal.service";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -57,7 +57,7 @@ import {ModalService} from "../../../components/modal/modal.service";
         </div>
     `
 })
-export class QuickPickComponent extends ComponentBase implements ControlValueAccessor, OnInit {
+export class QuickPickComponent extends DirectiveBase implements ControlValueAccessor, OnInit {
 
     @Input()
     public readonly = false;
@@ -200,7 +200,7 @@ available types: {[label: string]: string | number} | string[]`)
                 confirmationLabel: "Yes, remove it"
             }).then(() => {
                 this.removeFunction();
-            }, noop);
+            }, err => console.warn);
         } else {
             this.removeFunction();
         }

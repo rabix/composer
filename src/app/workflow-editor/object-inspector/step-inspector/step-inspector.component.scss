@@ -1,19 +1,21 @@
 @import "../../../../assets/sass/variables";
 
-.workflow-step-inspector-tabs {
-    text-align: center;
-    border-bottom: 1px solid $gui-section-border;
-    margin-bottom: 15px;
+:host {
+    .workflow-step-inspector-tabs {
+        text-align: center;
+        border-bottom: 1px solid $gui-section-border;
+        margin-bottom: 15px;
 
-    & > .single-tab {
-        padding-bottom: 6px;
-        &:hover {
-            cursor: pointer;
+        & > .single-tab {
+            padding-bottom: 6px;
+            &:hover {
+                cursor: pointer;
+            }
         }
-    }
 
-    & > .active {
-        color: $gui-section-list-item-select-bg;
-        border-bottom: 3px solid $gui-section-list-item-select-bg;
+        & > .active {
+            color: $gui-section-list-item-select-bg;
+            border-bottom: 3px solid $gui-section-list-item-select-bg;
+        }
     }
 }

@@ -1,6 +1,15 @@
 @import "../../../../assets/sass/variables";
 
-ct-revision-list {
+:host {
+    display: flex;
+    flex-grow: 1;
+
+    ct-line-loader {
+        position: absolute;
+        top: 0;
+        display:block;
+        width: 100%;
+    }
 
     .revision-entry {
         border-bottom: 1px solid $gui-section-border;
@@ -8,6 +17,7 @@ ct-revision-list {
         flex-direction: row;
         flex-wrap: nowrap;
         position: relative;
+        cursor: pointer;
 
         .loading-progress {
             position: absolute;
@@ -28,6 +38,10 @@ ct-revision-list {
             text-align: center;
             font-family: $font-family-title;
             flex-shrink: 0;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .revision-info {

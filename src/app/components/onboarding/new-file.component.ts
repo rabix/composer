@@ -6,34 +6,34 @@ import {Component, ViewEncapsulation} from "@angular/core";
     selector: "ct-new-file-tab",
     template: `
         <div class="content-container">
-        
+
             <!--Top empty space-->
             <div class="top-empty-space"></div>
-        
+
             <!--Apps container-->
             <div class="apps-container">
-        
+
                 <!--New app container-->
                 <div class="apps">
-        
+
                     <!--Container title-->
                     <div class="title">
                         <h5>
                             <p><b>CREATE NEW APP</b></p>
                         </h5>
                     </div>
-        
+
                     <!--Container context-->
                     <div class="app-container">
-        
+
                         <!--Workflow-->
                         <div class="app">
-        
+
                             <!--Image-->
-                            <div class="image">
-                                Image
+                            <div class="image-container">
+                                <div class="image workflow"></div>
                             </div>
-        
+
                             <!--Description-->
                             <div class="description">
                                 <h5>
@@ -44,15 +44,15 @@ import {Component, ViewEncapsulation} from "@angular/core";
                                 </p>
                             </div>
                         </div>
-        
+
                         <!--Tool-->
                         <div class="app">
-        
+
                             <!--Image-->
-                            <div class="image">
-                                Image
+                            <div class="image-container">
+                                <div class="image tool"></div>
                             </div>
-        
+
                             <!--Description-->
                             <div class="description">
                                 <h5>
@@ -65,17 +65,17 @@ import {Component, ViewEncapsulation} from "@angular/core";
                         </div>
                     </div>
                 </div>
-        
+
                 <!--Recent apps container-->
                 <div class="apps">
-        
+
                     <!--Container title-->
                     <div class="title">
                         <h5>
                             <p><b>RECENT APPS</b></p>
                         </h5>
                     </div>
-        
+
                     <!--Container context-->
                     <div class="app-container">
                         <div class="app">
@@ -83,15 +83,13 @@ import {Component, ViewEncapsulation} from "@angular/core";
                     </div>
                 </div>
             </div>
-        
+
             <!--Bottom empty space-->
             <div class="bottom-empty-space"></div>
-        
+
         </div>
-        
-        <ct-footer-tab>
-        
-        </ct-footer-tab>
+
+        <ct-getting-started></ct-getting-started>
     `
 })
 export class NewFileTabComponent {

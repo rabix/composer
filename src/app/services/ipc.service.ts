@@ -1,6 +1,7 @@
 import {Injectable, NgZone, Optional} from "@angular/core";
+import {AsyncSubject} from "rxjs/AsyncSubject";
+import {Subject} from "rxjs/Subject";
 import {GuidService} from "./guid.service";
-import {AsyncSubject, Subject} from "rxjs";
 
 const {ipcRenderer} = window["require"]("electron");
 
@@ -8,6 +9,25 @@ enum RequestType {
     Once,
     Watch
 }
+
+export type IPCRoute =
+    "accelerator"
+    | "createDirectory"
+    | "createFile"
+    | "deletePath"
+    | "getSetting"
+    | "hasDataCache"
+    | "pathExists"
+    | "putSetting"
+    | "readDirectory"
+    | "readFileContent"
+    | "resolve"
+    | "resolveContent"
+    | "scanPlatforms"
+    | "searchLocalProjects"
+    | "searchPublicApps"
+    | "searchUserProjects"
+    | "saveFileContent";
 
 @Injectable()
 export class IpcService {
@@ -23,12 +43,18 @@ export class IpcService {
     constructor(private guid: GuidService, @Optional() private zone: NgZone) {
         ipcRenderer.on("data-reply", (sender, response) => {
 
-            console.debug("Data reply received", response.id, response);
+            // console.debug("Data reply received", response.id, response);
 
+            if (!this.pendingRequests[response.id]) {
+                console.warn("Missing ipc request stream", response.id);
+                return;
+            }
             const {stream, type, zone} = this.pendingRequests[response.id];
+
 
             const action = () => {
                 if (response.error) {
+                    console.warn("Error on IPC Channel:", response.error, response.id);
                     stream.error(response.error);
                 }
                 stream.next(response.data);
@@ -49,8 +75,7 @@ export class IpcService {
         });
     }
 
-    public request(message: string, data = {}, zone?: NgZone) {
-
+    public request(message: IPCRoute, data = {}, zone?: NgZone) {
         const messageID = this.guid.generate();
 
         this.pendingRequests[messageID] = {
@@ -59,7 +84,7 @@ export class IpcService {
             stream: new AsyncSubject<any>(),
         };
 
-        console.trace("Sending", message, "(", messageID, ")", data);
+        // console.debug("Sending", message, "(", messageID, ")", data);
 
         ipcRenderer.send("data-request", {
             id: messageID,
@@ -70,7 +95,6 @@ export class IpcService {
     }
 
     public watch(message: string, data = {}, zone?: NgZone) {
-
         const messageID = this.guid.generate();
 
         this.pendingRequests[messageID] = {

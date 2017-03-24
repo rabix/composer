@@ -3,7 +3,7 @@ import {FormControl, FormGroup} from "@angular/forms";
 import {DockerRequirementModel} from "cwlts/models";
 import {ReplaySubject} from "rxjs";
 import {DockerRequirement} from "cwlts/mappings/d2sb/DockerRequirement";
-import {ComponentBase} from "../../../components/common/component-base";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -30,7 +30,7 @@ import {ComponentBase} from "../../../components/common/component-base";
         </ct-form-panel>
     `
 })
-export class DockerRequirementComponent extends ComponentBase implements OnChanges {
+export class DockerRequirementComponent extends DirectiveBase implements OnChanges {
     @Input()
     public dockerRequirement: DockerRequirementModel;
 

@@ -3,7 +3,7 @@
 
 $grid-gutter-width-half: $grid-gutter-width-base / 2;
 
-ct-workflow-step-inspector-inputs {
+:host {
     .input-box {
         margin-right: -$grid-gutter-width-half;
         margin-left: -$grid-gutter-width-half;

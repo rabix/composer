@@ -1,0 +1,9 @@
+@import "../../../assets/sass/variables";
+:host {
+    height: 100%;
+    z-index: 1;
+    display: flex;
+    align-content: space-around;
+    align-items: center;
+
+}

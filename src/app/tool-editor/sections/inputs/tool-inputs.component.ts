@@ -1,6 +1,5 @@
-import {Subject} from "rxjs";
 import {Component, Input, Output, ViewChild, EventEmitter} from "@angular/core";
-import {ComponentBase} from "../../../components/common/component-base";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
 import {ToolInputListComponent} from "./tool-input-list.component";
 
@@ -35,32 +34,32 @@ import {ToolInputListComponent} from "./tool-input-list.component";
         </ct-form-panel>
     `
 })
-export class ToolInputsComponent extends ComponentBase {
+export class ToolInputsComponent extends DirectiveBase {
 
     @Input()
-    public entries: CommandInputParameterModel[] = [];
+    entries: CommandInputParameterModel[] = [];
 
     /** Model location entry, used for tracing the path in the json document */
     @Input()
-    public location = "";
+    location = "";
 
     /** Context in which expression should be evaluated */
     @Input()
-    public context: { $job: any };
+    context: { $job: any };
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
     @Input()
-    public model: CommandLineToolModel;
+    model: CommandLineToolModel;
 
     @Output()
-    public update = new EventEmitter();
+    update = new EventEmitter();
 
+    @ViewChild(ToolInputListComponent)
+    private inputList: ToolInputListComponent;
 
-    @ViewChild(ToolInputListComponent) inputList: ToolInputListComponent;
-
-    private addEntry() {
+    addEntry() {
         this.inputList.addEntry();
     }
 

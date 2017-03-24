@@ -1,9 +1,9 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
 import {CommandOutputParameterModel} from "cwlts/models";
-import {ComponentBase} from "../../../../components/common/component-base";
 import {noop} from "../../../../lib/utils.lib";
 import {ParameterTypeModel} from "cwlts/models";
+import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -59,7 +59,7 @@ import {ParameterTypeModel} from "cwlts/models";
 
     `
 })
-export class BasicOutputSectionComponent extends ComponentBase implements ControlValueAccessor {
+export class BasicOutputSectionComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
     public readonly = false;

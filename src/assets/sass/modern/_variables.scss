@@ -1,0 +1,29 @@
+// @deprecated Use $brand-primary
+$color-primary: rgb(93, 149, 208);
+
+$layout-title-bar-background: #1e2124;
+$layout-title-bar-height: 36px;
+
+$layout-tab-height: 32px;
+$layout-tab-background-idle: #5c5f64;
+$layout-tab-background-active: white;
+
+$layout-element-background: #2e3136;
+$layout-element-alt-background: rgb(246, 246, 246);
+$layout-element-alt-foreground: white;
+$layout-element-separator-color: $layout-title-bar-background;
+
+$layout-status-bar-height: 32px;
+
+$layout-text-color: rgb(230, 230, 230);
+$layout-text-color-faded: rgb(153, 153, 153);
+
+// Typography
+$font-family-base: "arial";
+$font-family-title: "Montserrat";
+$font-size-base: 14px;
+$font-color: white;
+
+// Editors common
+$action-bar-height: 36px;
+$action-bar-color: $layout-element-alt-foreground;

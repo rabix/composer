@@ -1,13 +1,11 @@
-import {Component, ViewEncapsulation} from "@angular/core";
+import {Component, Input, ViewEncapsulation} from "@angular/core";
 import {EditorInspectorService} from "./editor-inspector.service";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-editor-inspector-content",
     styleUrls: ["./editor-inspector-content.component.scss"],
     template: `
-        <div class="form-section container">
+        <div class="form-section pl-1 pr-1">
             <div class="row header pt-1 pb-1">
                 <div class="col-xs-12">
                     <i class="fa clickable pull-right fa-times"
@@ -28,11 +26,14 @@ import {EditorInspectorService} from "./editor-inspector.service";
 })
 export class EditorInspectorContentComponent {
 
+    @Input()
+    collapsed = false;
+
     constructor(private inspector: EditorInspectorService) {
 
     }
 
-    private close() {
+    close() {
         this.inspector.hide();
     }
 }

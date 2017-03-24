@@ -1,7 +1,7 @@
 import {Component, ElementRef, forwardRef, Input, Renderer, ViewChild, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormControl, NG_VALIDATORS, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {noop} from "../../../lib/utils.lib";
-import {ModalService} from "../../../components/modal/modal.service";
+import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -170,6 +170,6 @@ export class CompactListComponent implements ControlValueAccessor {
         }).then(() => {
             this.tagList.splice(index, 1);
             this.propagateChange(this.tagList);
-        }, noop);
+        }, err => console.warn);
     }
 }

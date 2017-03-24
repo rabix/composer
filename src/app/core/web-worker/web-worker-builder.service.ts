@@ -6,14 +6,17 @@ export class WebWorkerBuilderService {
 
     create<T>(workerFunction: ((input: any) => T), scripts: string[] = [], context = {}): WebWorker<T> {
 
-        const url = this.compile(workerFunction, scripts, context);
+        const url    = this.compile(workerFunction, scripts, context);
         const worker = new Worker(url);
         return new WebWorker<T>(worker);
 
     }
 
     private compile(fn: Function, scripts = [], context = {}) {
-        let [origin]= document.location.href.replace("/index.html", "").split("#");
+        let [origin] = document.location.href.replace("/index.html", "").split("#");
+
+        [origin] = origin.split("?");
+
         if (origin.endsWith("/")) {
             origin = origin.slice(0, -1);
         }

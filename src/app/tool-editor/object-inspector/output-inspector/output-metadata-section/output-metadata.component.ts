@@ -1,9 +1,9 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {ComponentBase} from "../../../../components/common/component-base";
 import {CommandInputParameterModel} from "cwlts/models";
 import {SBDraft2ExpressionModel, SBDraft2CommandOutputParameterModel} from "cwlts/models/d2sb";
 import {noop} from "../../../../lib/utils.lib";
+import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -14,8 +14,9 @@ import {noop} from "../../../../lib/utils.lib";
         {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => OutputMetaDataSectionComponent), multi: true}
     ],
     template: `
-        <ct-form-panel *ngIf="output.type.type === 'File' || (output.type.type === 'array' && output.type.items === 'File')"
-                       class="borderless" [collapsed]="true">
+        <ct-form-panel
+                *ngIf="output.type.type === 'File' || (output.type.type === 'array' && output.type.items === 'File')"
+                class="borderless" [collapsed]="true">
 
             <div class="tc-header">Metadata</div>
             <div class="tc-body" *ngIf="metadataForm">
@@ -25,7 +26,8 @@ import {noop} from "../../../../lib/utils.lib";
                         <!--Inherit Metadata field-->
                         <div class="form-group">
                             <label class="form-control-label">Inherit</label>
-                            <select class="form-control" [formControl]="metadataForm.controls['inheritMetadata']">
+                            <select class="form-control"
+                                    [formControl]="metadataForm.controls['inheritMetadata']">
                                 <option value="">-- none --</option>
                                 <option *ngFor="let item of inputs" [value]="item.id">
                                     {{item.id}}
@@ -37,19 +39,19 @@ import {noop} from "../../../../lib/utils.lib";
 
 
                     <!--@todo Replace this key-value-list-->
-                    <key-value-list
-                        [addEntryText]="'Add Metadata'"
-                        [emptyListText]="'No metadata defined.'"
-                        [formControl]="metadataForm.controls['metadataList']"
-                        [readonly]="readonly">
-                    </key-value-list>
+                    <ct-key-value-list
+                            [addEntryText]="'Add Metadata'"
+                            [emptyListText]="'No metadata defined.'"
+                            [formControl]="metadataForm.controls['metadataList']"
+                            [readonly]="readonly">
+                    </ct-key-value-list>
                 </div>
             </div>
 
         </ct-form-panel>
     `
 })
-export class OutputMetaDataSectionComponent extends ComponentBase implements ControlValueAccessor {
+export class OutputMetaDataSectionComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
     public readonly = false;

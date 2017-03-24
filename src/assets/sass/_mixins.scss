@@ -1,4 +1,5 @@
 @import "~bootstrap/scss/mixins";
+@import "./variables";
 
 @mixin cli-border($color) {
   position: relative;

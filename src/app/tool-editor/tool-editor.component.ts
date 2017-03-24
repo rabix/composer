@@ -1,274 +1,136 @@
-import * as Yaml from "js-yaml";
 import {
+    AfterViewInit,
     Component,
     Input,
     OnDestroy,
     OnInit,
     TemplateRef,
     ViewChild,
-    ViewContainerRef,
-    ViewEncapsulation
+    ViewContainerRef
 } from "@angular/core";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
-import {BehaviorSubject, ReplaySubject, Subject} from "rxjs/Rx";
-import {Validation} from "cwlts/models/helpers/validation";
-import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
-import {EditorInspectorService} from "../editor-common/inspector/editor-inspector.service";
-import {ComponentBase} from "../components/common/component-base";
-import {WorkboxTab} from "../components/workbox/workbox-tab.interface";
-import {DataEntrySource} from "../sources/common/interfaces";
-import {UserPreferencesService} from "../services/storage/user-preferences.service";
-import {PlatformAPI} from "../services/api/platforms/platform-api.service";
-import {StatusBarService} from "../core/status-bar/status-bar.service";
-import {ModalService} from "../components/modal/modal.service";
-import {noop} from "../lib/utils.lib";
 import {CommandLineToolFactory} from "cwlts/models/generic/CommandLineToolFactory";
+import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
+import {Validation} from "cwlts/models/helpers/validation";
+import * as Yaml from "js-yaml";
+import {BehaviorSubject, ReplaySubject, Subject} from "rxjs/Rx";
+import {WorkboxTab} from "../core/workbox/workbox-tab.interface";
 import {
     CwlSchemaValidationWorkerService,
     ValidationResponse
 } from "../editor-common/cwl-schema-validation-worker/cwl-schema-validation-worker.service";
+import {EditorInspectorService} from "../editor-common/inspector/editor-inspector.service";
+import {StatusBarService} from "../layout/status-bar/status-bar.service";
+import {SystemService} from "../platform-providers/system.service";
+import {PlatformAPI} from "../services/api/platforms/platform-api.service";
+import {SettingsService} from "../services/settings/settings.service";
+import {UserPreferencesService} from "../services/storage/user-preferences.service";
+import {DataEntrySource} from "../sources/common/interfaces";
+import {ModalService} from "../ui/modal/modal.service";
+import {DirectiveBase} from "../util/directive-base/directive-base";
 import LoadOptions = jsyaml.LoadOptions;
+import {AppTabData} from "../core/workbox/app-tab-data";
+import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-tool-editor",
     styleUrls: ["./tool-editor.component.scss"],
-    host: {
-        "class": "tab-container"
-    },
     providers: [EditorInspectorService],
-    template: `
-        <block-loader *ngIf="isLoading"></block-loader>
-
-        <div class="editor-container" [hidden]="isLoading">
-
-            <!--Control Header-->
-            <ct-editor-controls>
-
-                <!--View Modes-->
-                <span class="btn-group pull-left">
-                    <button class="btn btn-secondary btn-sm"
-                            (click)="switchView(viewModes.Code)"
-                            [class.btn-primary]="viewMode === viewModes.Code"
-                            [class.btn-secondary]="viewMode !== viewModes.Code">Code</button>
-                            
-                    <button class="btn btn-secondary btn-sm"
-                            [disabled]="!isValidCWL"
-                            (click)="switchView(viewModes.Gui)"
-                            [class.btn-primary]="viewMode === viewModes.Gui"
-                            [class.btn-secondary]="viewMode !== viewModes.Gui">Visual</button>
-                            
-                    <button class="btn btn-secondary btn-sm"
-                            [disabled]="!isValidCWL"
-                            (click)="switchView(viewModes.Test)"
-                            [class.btn-primary]="viewMode === viewModes.Test"
-                            [class.btn-secondary]="viewMode !== viewModes.Test">Test</button>
-
-                    <button class="btn btn-secondary btn-sm"
-                            [disabled]="!isValidCWL"
-                            (click)="switchView(viewModes.Info)"
-                            [class.btn-primary]="viewMode === viewModes.Info"
-                            [class.btn-secondary]="viewMode !== viewModes.Info">App Info</button>
-
-                </span>
-
-                <!--CWLVersion-->
-                <span class="tag tag-default">{{ toolModel.cwlVersion }}</span>
-
-                <!--Revisions-->
-                <button class="btn btn-secondary btn-sm" type="button"
-                        [ct-editor-inspector]="revisions"
-                        *ngIf="this.data.data.source !== 'local'">
-                    Revision: {{ toolModel.customProps['sbg:revision']}}
-
-                    <template #revisions>
-                        <ct-revision-list [active]="toolModel.customProps['sbg:revision']"
-                                          [revisions]="toolModel.customProps['sbg:revisionsInfo']"
-                                          (select)="openRevision($event)">
-                        </ct-revision-list>
-                    </template>
-                </button>
-
-                <!--Copy-->
-                <button class="btn btn-secondary btn-sm" type="button">
-                    Copy...
-                </button>
-
-                <!--Save-->
-                <button [disabled]="!data.isWritable"
-                        (click)="save()"
-                        class="btn btn-secondary btn-sm" type="button">
-                    Save
-                </button>
-            </ct-editor-controls>
-
-            <!--Header & Editor Column-->
-            <div class="editor-content flex-row">
-                <!--Editor Row-->
-                <ct-code-editor-x *ngIf="viewMode === viewModes.Code" class="editor"
-                                  [class.flex-col]="showInspector"
-                                  [(content)]="rawEditorContent"
-                                  [options]="{theme: 'ace/theme/monokai'}"
-                                  [language]="'yaml'"
-                                  [readonly]="!data.isWritable"></ct-code-editor-x>
-
-                <!--GUI Editor-->
-                <ct-tool-visual-editor *ngIf="viewMode === viewModes.Gui"
-                                       class="gui-editor-component flex-col"
-                                       [readonly]="!data.isWritable"
-                                       [formGroup]="toolGroup"
-                                       [model]="toolModel"></ct-tool-visual-editor>
-
-                <ct-job-editor *ngIf="viewMode === viewModes.Test"
-                               class="gui-editor-component flex-col p-2"
-                               [job]="toolModel.job"
-                               (update)="onJobUpdate($event)"
-                               (reset)="resetJob()"
-                               [inputs]="toolModel.inputs"></ct-job-editor>
-
-                <ct-app-info *ngIf="viewMode === viewModes.Info"
-                             class="gui-editor-component p-2"
-                             [class.flex-col]="showInspector"
-                             [model]="toolModel"></ct-app-info>
-
-
-                <!--Object Inspector Column-->
-                <div class="flex-col inspector-col">
-                    <ct-editor-inspector class="object-inspector">
-                        <template #inspector></template>
-                    </ct-editor-inspector>
-                </div>
-            </div>
-
-            <div *ngIf="reportPanel" class="app-report-panel layout-section">
-                <ct-validation-report *ngIf="reportPanel === 'validation'"
-                                      [issues]="validation"></ct-validation-report>
-                <ct-command-line-preview *ngIf="reportPanel === 'commandLinePreview'"
-                                         [commandLineParts]="commandLineParts | async"></ct-command-line-preview>
-            </div>
-
-            <template #statusControls>
-                <span class="btn-group">
-                    <button [disabled]="!validation"
-                            [class.btn-primary]="reportPanel === 'validation'"
-                            [class.btn-secondary]="reportPanel !== 'validation'"
-                            (click)="toggleReport('validation')"
-                            class="btn btn-sm">
-                            
-                        <span *ngIf="validation?.errors?.length">
-                            <i class="fa fa-times-circle text-danger"></i> {{validation.errors.length}} Errors
-                        </span>
-                        
-                        <span *ngIf="validation?.warnings?.length"
-                              [class.pl-1]="validation?.errors?.length">
-                            <i class="fa fa-exclamation-triangle text-warning"></i> {{validation.warnings.length}} Warnings
-                        </span>
-                        
-                        <span *ngIf="!validation?.errors?.length && !validation?.warnings?.length">
-                            No Issues
-                        </span>
-                        
-                        
-                    </button>
-                    
-                    <button [class.btn-secondary]="reportPanel !== 'commandLinePreview'"
-                            [class.btn-primary]="reportPanel == 'commandLinePreview'"
-                            [disabled]="!isValidCWL"
-                            (click)="toggleReport('commandLinePreview')"
-                            class="btn btn-secondary btn-sm">Preview</button>
-                </span>
-            </template>
-        </div>
-    `
+    templateUrl: "./tool-editor.component.html"
 })
-export class ToolEditorComponent extends ComponentBase implements OnInit, OnDestroy, WorkboxTab {
+export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDestroy, WorkboxTab, AfterViewInit {
     @Input()
-    public data: DataEntrySource;
+    data: AppTabData;
 
     /** ValidationResponse for current document */
-    public validation: ValidationResponse;
+    validation: ValidationResponse;
 
     /** Default view mode. */
     @Input()
-    public viewMode;
+    viewMode: "code" | "gui" | "test" | "info";
 
     /** Flag to indicate the document is loading */
-    private isLoading = true;
+    isLoading = false;
 
     /** Flag for showing reformat prompt on GUI switch */
-    private showReformatPrompt = true;
+    showReformatPrompt = true;
 
     /** Flag for bottom panel, shows validation-issues, commandline, or neither */
-    private reportPanel: "validation" | "commandLinePreview" | undefined;
+    reportPanel: "validation" | "commandLinePreview" | undefined;
 
     /** Flag for validity of CWL document */
-    private isValidCWL = false;
-
-    /** Stream of contents in code editor */
-    private rawEditorContent = new BehaviorSubject("");
+    isValidCWL = false;
 
     /** Model that's recreated on document change */
-    private toolModel = CommandLineToolFactory.from(null, "document");
+    toolModel = CommandLineToolFactory.from(null, "document");
 
     /** Sorted array of resulting command line parts */
-    private commandLineParts: Subject<CommandLinePart[]> = new ReplaySubject();
+    commandLineParts: Subject<CommandLinePart[]> = new ReplaySubject();
 
     /** Template of the status controls that will be shown in the status bar */
     @ViewChild("statusControls")
     private statusControls: TemplateRef<any>;
 
-    private viewModes = {
-        Code: "code",
-        Gui: "gui",
-        Test: "test",
-        Info: "info"
-    };
-
-    private toolGroup: FormGroup;
+    toolGroup: FormGroup;
 
     @ViewChild("inspector", {read: ViewContainerRef})
     private inspectorHostView: ViewContainerRef;
 
     @Input()
-    public showInspector = false;
+    showInspector = false;
+
+    codeEditorContent = new FormControl(undefined);
+
+    priorityCodeUpdates = new Subject();
 
     constructor(private cwlValidatorService: CwlSchemaValidationWorkerService,
-                private userPrefService: UserPreferencesService,
                 private formBuilder: FormBuilder,
-                private platform: PlatformAPI,
                 private inspector: EditorInspectorService,
                 private statusBar: StatusBarService,
-                private modal: ModalService) {
+                private dataGateway: DataGatewayService,
+                private platformAPI: PlatformAPI,
+                private system: SystemService,
+                private settings: SettingsService) {
 
         super();
 
-        this.viewMode = this.viewModes.Code;
 
         this.toolGroup = formBuilder.group({});
 
-        this.tracked = this.userPrefService.get("show_reformat_prompt", true, true).subscribe(x => this.showReformatPrompt = x);
+        // @fixme Bring this back with the new service
+        // this.tracked = this.userPrefService.get("show_reformat_prompt", true, true).subscribe(x => this.showReformatPrompt = x);
 
-        this.tracked = this.inspector.inspectedObject.map(obj => obj !== undefined)
+        this.tracked = this.inspector.inspectedObject
+            .map(obj => obj !== undefined)
             .subscribe(show => this.showInspector = show);
     }
 
     ngOnInit(): void {
+        if (!this.data.isWritable) {
+            this.codeEditorContent.disable();
+        }
+
         // Whenever the editor content is changed, validate it using a JSON Schema.
-        this.tracked = this.rawEditorContent
-            .skip(1)
-            .distinctUntilChanged()
-            .subscribe(latestContent => {
+        this.tracked = this.codeEditorContent
+            .valueChanges
+            .debounceTime(1000)
+            .merge(this.priorityCodeUpdates)
+            .distinctUntilChanged().subscribe(latestContent => {
+
                 this.cwlValidatorService.validate(latestContent).then(r => {
                     if (!r.isValidCwl) {
                         // turn off loader and load document as code
-                        this.isLoading  = false;
+                        if (!this.viewMode) {
+                            this.viewMode = "code";
+                        }
+
+                        // this.isLoading  = false;
                         this.validation = r;
                         return r;
                     }
 
                     // load JSON to generate model
-                    let json = Yaml.safeLoad(this.rawEditorContent.getValue(), {
+                    const json = Yaml.safeLoad(this.codeEditorContent.value, {
                         json: true
                     } as LoadOptions);
 
@@ -277,33 +139,30 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
                         this.showReformatPrompt = false;
                     }
 
-                    this.data.resolve(latestContent).then((resolved) => {
+                    this.data.resolve(latestContent).subscribe((resolved) => {
                         // generate model and get command line parts
                         this.toolModel = CommandLineToolFactory.from(resolved as any, "document");
-                        this.toolModel.onCommandLineResult((res) => {
-                            this.commandLineParts.next(res);
-                        });
-                        this.toolModel.updateCommandLine();
+                        // this.toolModel.onCommandLineResult((res) => {
+                        //     this.commandLineParts.next(res);
+                        // });
+                        // this.toolModel.updateCommandLine();
 
                         // update validation stream on model validation updates
 
-                        this.toolModel.setValidationCallback((res: Validation) => {
-                            this.validation = {
-                                errors: res.errors,
-                                warnings: res.warnings,
-                                isValidatableCwl: true,
-                                isValidCwl: true,
-                                isValidJSON: true
-                            };
-                        });
+                        // this.toolModel.setValidationCallback((res: Validation) => {
+                        //     this.validation = {
+                        //         errors: res.errors,
+                        //         warnings: res.warnings,
+                        //         isValidatableCwl: true,
+                        //         isValidCwl: true,
+                        //         isValidJSON: true
+                        //     };
+                        // });
 
                         this.toolModel.validate();
 
                         // load document in GUI and turn off loader, only if loader was active
-                        if (this.isLoading) {
-                            this.viewMode  = this.viewModes.Gui;
-                            this.isLoading = false;
-                        }
+                        // this.isLoading = false;
 
                         const v = {
                             errors: this.toolModel.validation.errors,
@@ -315,9 +174,13 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
 
                         this.validation = v;
                         this.isValidCWL = v.isValidCwl;
+                        //
+                        if (!this.viewMode) {
+                            this.viewMode = "gui";
+                        }
                     }, (err) => {
-                        this.isLoading  = false;
-                        this.viewMode   = this.viewModes.Code;
+                        // this.isLoading  = false;
+                        this.viewMode   = "code";
                         this.isValidCWL = false;
                         this.validation = {
                             isValidatableCwl: true,
@@ -329,52 +192,61 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
                                 loc: "document"
                             }]
                         };
+
+                        if (!this.viewMode) {
+                            this.viewMode = "code";
+                        }
                     });
                 });
+
             });
 
-        // Whenever content of a file changes, forward the change to the raw editor content steam.
-        const statusID = this.statusBar.startProcess(`Loading ${this.data.data.id}`);
-        this.tracked   = this.data.content.subscribe(val => {
-            this.rawEditorContent.next(val);
-            this.statusBar.stopProcess(statusID);
-        });
+        this.codeEditorContent.setValue(this.data.fileContent);
+        this.tracked = this.priorityCodeUpdates.subscribe(txt => this.codeEditorContent.setValue(txt));
 
         this.statusBar.setControls(this.statusControls);
     }
 
-    private save() {
-        const text = this.toolGroup.dirty ? this.getModelText() : this.rawEditorContent.getValue();
+    save() {
 
-        // For local files, just save and that's it
-        if (this.data.data.source === "local") {
-            const path = this.data.data.path;
+        console.warn("Reimplement saving");
 
-            const statusID = this.statusBar.startProcess(`Saving ${path}...`, `Saved ${path}`);
-            this.data.data.save(text).subscribe(() => {
-                this.statusBar.stopProcess(statusID);
-            });
-            return;
-        }
-
-        // For Platform files, we need to ask for a revision note
-        this.modal.prompt({
-            cancellationLabel: "Cancel",
-            confirmationLabel: "Publish",
-            content: "Revision Note",
-            title: "Publish a new App Revision",
-            formControl: new FormControl("")
-        }).then(revisionNote => {
-
-            const path     = this.data.data["sbg:id"] || this.data.data.id;
-            const statusID = this.statusBar.startProcess(`Creating a new revision of ${path}`);
-            this.data.save(JSON.parse(text), revisionNote).subscribe(result => {
-                const cwl = JSON.stringify(result.message, null, 4);
-                this.rawEditorContent.next(cwl);
-                this.statusBar.stopProcess(statusID, `Created revision ${result.message["sbg:latestRevision"]} from ${path}`);
-
-            });
-        }, noop);
+        this.dataGateway.saveFile(this.data.id, this.getModelText()).subscribe(save => {
+            console.log("Saved", save);
+        }, err => {
+            console.log("Not saved", err);
+        });
+        // const text = this.toolGroup.dirty ? this.getModelText() : this.codeEditorContent.value;
+        //
+        // // For local files, just save and that's it
+        // if (this.data.data.source === "local") {
+        //     const path = this.data.data.path;
+        //
+        //     const statusID = this.statusBar.startProcess(`Saving ${path}...`, `Saved ${path}`);
+        //     this.data.data.save(text).subscribe(() => {
+        //         this.statusBar.stopProcess(statusID);
+        //     });
+        //     return;
+        // }
+        //
+        // // For Platform files, we need to ask for a revision note
+        // this.modal.prompt({
+        //     cancellationLabel: "Cancel",
+        //     confirmationLabel: "Publish",
+        //     content: "Revision Note",
+        //     title: "Publish a new App Revision",
+        //     formControl: new FormControl("")
+        // }).then(revisionNote => {
+        //
+        //     const path     = this.data.data["sbg:id"] || this.data.data.id;
+        //     const statusID = this.statusBar.startProcess(`Creating a new revision of ${path}`);
+        //     this.data.save(JSON.parse(text), revisionNote).subscribe(result => {
+        //         const cwl = JSON.stringify(result.message, null, 4);
+        //         this.rawEditorContent.next(cwl);
+        //         this.statusBar.stopProcess(statusID, `Created revision ${result.message["sbg:latestRevision"]} from ${path}`);
+        //
+        //     });
+        // }, err => console.warn);
 
     }
 
@@ -384,27 +256,27 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
      *
      * @param mode
      */
-    private switchView(mode): void {
+    switchView(mode): void {
 
-        if (mode === this.viewModes.Gui && this.showReformatPrompt) {
+        if (mode === "gui" && this.showReformatPrompt) {
 
-            this.modal.checkboxPrompt({
-                title: "Confirm GUI Formatting",
-                content: "Activating GUI mode might change the formatting of this document. Do you wish to continue?",
-                cancellationLabel: "Cancel",
-                confirmationLabel: "OK",
-                checkboxLabel: "Don't show this dialog again",
-            }).then(res => {
-                if (res) this.userPrefService.put("show_reformat_prompt", false);
-
-                this.showReformatPrompt = false;
-                this.viewMode           = mode;
-            }, noop);
-            return;
+            // this.modal.checkboxPrompt({
+            //     title: "Confirm GUI Formatting",
+            //     content: "Activating GUI mode might change the formatting of this document. Do you wish to continue?",
+            //     cancellationLabel: "Cancel",
+            //     confirmationLabel: "OK",
+            //     checkboxLabel: "Don't show this dialog again",
+            // }).then(res => {
+            //     if (res) this.userPrefService.put("show_reformat_prompt", false);
+            //
+            //     this.showReformatPrompt = false;
+            //     this.viewMode           = mode;
+            // }, noop);
+            // return;
         }
 
-        if (mode === this.viewModes.Code && this.toolGroup.dirty) {
-            this.rawEditorContent.next(this.getModelText());
+        if (mode === "code" && this.toolGroup.dirty) {
+            this.codeEditorContent.setValue(this.getModelText());
         }
 
         this.viewMode = mode;
@@ -417,27 +289,50 @@ export class ToolEditorComponent extends ComponentBase implements OnInit, OnDest
     private getModelText(): string {
         const modelObject = Object.assign(this.toolModel.serialize(), {"rbx:modified": true});
 
-        return this.data.language.value === "json" ? JSON.stringify(modelObject, null, 4) : Yaml.dump(modelObject);
+        return this.data.language === "json" ? JSON.stringify(modelObject, null, 4) : Yaml.dump(modelObject);
     }
 
-    private toggleReport(panel: "validation" | "commandLinePreview") {
+    toggleReport(panel: "validation" | "commandLinePreview") {
         this.reportPanel = this.reportPanel === panel ? undefined : panel;
     }
 
-    private openRevision(revisionNumber: number) {
-        this.platform.getAppCWL(this.data.data, revisionNumber).subscribe(cwl => {
-            this.rawEditorContent.next(cwl);
+    openRevision(revisionNumber: number) {
+        this.platformAPI.getAppCWL(this.data.parsedContent["sbg:id"], revisionNumber).subscribe(txt => {
+            this.priorityCodeUpdates.next(txt);
+            this.toolGroup.reset();
         });
     }
 
-    private onJobUpdate(job) {
-        console.log("Job is updated", job);
+    onJobUpdate(job) {
         this.toolModel.setJob(job);
         this.toolModel.updateCommandLine();
     }
 
-    private resetJob() {
+    resetJob() {
         this.toolModel.resetJobDefaults();
+    }
+
+    /**
+     * Open tool in browser
+     */
+    goToApp() {
+        const urlApp     = this.toolModel["sbgId"];
+        const urlProject = urlApp.split("/").splice(0, 2).join("/");
+
+        this.settings.platformConfiguration.first().map(settings => settings.url).subscribe((url) => {
+            this.system.openLink(`${url}/u/${urlProject}/apps/#${urlApp}`);
+        });
+    }
+
+
+    switchTab(tabName) {
+        setTimeout(() => {
+            this.viewMode = tabName;
+
+            if (tabName === "code" && this.toolGroup.dirty) {
+                this.codeEditorContent.setValue(this.getModelText());
+            }
+        });
     }
 
 

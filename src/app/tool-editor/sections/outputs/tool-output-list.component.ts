@@ -7,20 +7,20 @@ import {
     TemplateRef,
     ViewChildren
 } from "@angular/core";
-import {ComponentBase} from "../../../components/common/component-base";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
-import {ModalService} from "../../../components/modal/modal.service";
 import {noop} from "../../../lib/utils.lib";
 import {
     CommandInputParameterModel,
     CommandLineToolModel,
     CommandOutputParameterModel
 } from "cwlts/models";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
     selector: "ct-tool-output-list",
     template: `
-        <div class="container">
+        <div>
 
             <!--Blank Tool Screen-->
             <ct-blank-tool-state *ngIf="!readonly && !entries.length && isField"
@@ -30,10 +30,10 @@ import {
             </ct-blank-tool-state>
 
             <!--List Header Row-->
-            <div class="gui-section-list-title row" *ngIf="entries.length">
-                <div class="col-sm-4">ID</div>
-                <div class="col-sm-3">Type</div>
-                <div class="col-sm-5">Glob</div>
+            <div class="gui-section-list-title" *ngIf="entries.length">
+                <div class="col-xs-4">ID</div>
+                <div class="col-xs-3">Type</div>
+                <div class="col-xs-5">Glob</div>
             </div>
 
             <!--Output List Entries-->
@@ -41,24 +41,24 @@ import {
 
                 <!--List Entry-->
                 <li *ngFor="let entry of entries; let i = index"
-                    class="input-list-items container"
+                    class="input-list-items"
                     [class.record-input]="isRecordType(entry)">
 
-                    <div class="gui-section-list-item clickable row"
+                    <div class="gui-section-list-item clickable"
                          [ct-editor-inspector]="inspector"
                          [ct-editor-inspector-target]="entry.loc"
                          [ct-editor-inspector-readonly]="readonly"
                          [ct-validation-class]="entry.validation">
 
                         <!--ID Column-->
-                        <div class="col-sm-4 ellipsis" [title]="entry.id">
+                        <div class="col-xs-4 ellipsis" [title]="entry.id">
                             <ct-validation-preview
                                     [entry]="entry.validation"></ct-validation-preview>
                             {{ entry.id }}
                         </div>
 
                         <!--Type Column-->
-                        <div class="col-sm-3 ellipsis" [title]="entry.type">
+                        <div class="col-xs-3 ellipsis" [title]="entry.type">
                             {{ entry.type | commandParameterType }}
                         </div>
 
@@ -80,14 +80,14 @@ import {
                              [ct-tooltip]="ctt"
                              [tooltipPlacement]="'top'"
                              [ngClass]="{
-                                     'col-sm-4': !readonly,
-                                     'col-sm-5': readonly
+                                     'col-xs-4': !readonly,
+                                     'col-xs-5': readonly
                                  }">
                             {{ entry.outputBinding.glob}}
                         </div>
 
                         <!--Actions Column-->
-                        <div *ngIf="!readonly" class="col-sm-1 align-right">
+                        <div *ngIf="!readonly" class="col-xs-1 align-right">
                             <i [ct-tooltip]="'Delete'"
                                class="fa fa-trash text-hover-danger"
                                (click)="removeEntry(i)"></i>
@@ -112,7 +112,7 @@ import {
                     </template>
 
                     <!--Nested entries-->
-                    <div *ngIf="isRecordType(entry)" class="">
+                    <div *ngIf="isRecordType(entry)" class="children pl-1 pr-1">
                         <ct-tool-output-list [(entries)]="entry.type.fields"
                                              (entriesChange)="entriesChange.emit(entries)"
                                              [readonly]="readonly"
@@ -137,43 +137,43 @@ import {
 
     `
 })
-export class ToolOutputListComponent extends ComponentBase {
+export class ToolOutputListComponent extends DirectiveBase {
 
     @Input()
-    public inputs: CommandInputParameterModel[] = [];
+    inputs: CommandInputParameterModel[] = [];
 
     @Input()
-    public entries: CommandOutputParameterModel[] = [];
+    entries: CommandOutputParameterModel[] = [];
 
     /** Model location entry, used for tracing the path in the json document */
     @Input()
-    public location = "";
+    location = "";
 
     /** Context in which expression should be evaluated */
     @Input()
-    public context: { $job: any };
+    context: { $job: any };
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
     /** Flag if output is field of a record */
     @Input()
-    public isField = false;
+    isField = false;
 
     @Input()
-    public parent: CommandLineToolModel | CommandOutputParameterModel;
+    parent: CommandLineToolModel | CommandOutputParameterModel;
 
     @Output()
-    public readonly entriesChange = new EventEmitter();
+    readonly entriesChange = new EventEmitter();
 
     @ViewChildren("inspector", {read: TemplateRef})
-    private inspectorTemplate: QueryList<TemplateRef<any>>;
+    inspectorTemplate: QueryList<TemplateRef<any>>;
 
-    constructor(private inspector: EditorInspectorService, private modal: ModalService) {
+    constructor(public inspector: EditorInspectorService, private modal: ModalService) {
         super();
     }
 
-    private removeEntry(index) {
+    removeEntry(index) {
         this.modal.confirm({
             title: "Really Remove?",
             content: `Are you sure that you want to remove this output?`,
@@ -185,10 +185,10 @@ export class ToolOutputListComponent extends ComponentBase {
             }
             const entries = this.entries.slice(0, index).concat(this.entries.slice(index + 1));
             this.entriesChange.emit(entries);
-        }, noop);
+        }, err => console.warn);
     }
 
-    public addEntry() {
+    addEntry() {
         let newEntry;
 
         if (this.isField) {
@@ -210,11 +210,11 @@ export class ToolOutputListComponent extends ComponentBase {
             });
     }
 
-    private getFieldsLocation(index: number) {
+    getFieldsLocation(index: number) {
         return `${this.location}[${index}].type.fields`;
     }
 
-    private isRecordType(entry) {
+    isRecordType(entry) {
         return entry.type.type === "record" || (entry.type.type === "array" && entry.type.items === "record");
     }
 }

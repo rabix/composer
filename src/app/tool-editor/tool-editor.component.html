@@ -1,0 +1,137 @@
+<!--Control Header-->
+<ct-action-bar>
+    <ct-tab-selector [distribute]="'auto'" [active]="viewMode" (activeChange)="switchTab($event)">
+
+        <ct-tab-selector-entry [disabled]="!isValidCWL"
+                               [tabName]="'info'">App Info
+        </ct-tab-selector-entry>
+
+        <ct-tab-selector-entry [disabled]="!isValidCWL"
+                               [tabName]="'gui'">Visual
+        </ct-tab-selector-entry>
+
+        <ct-tab-selector-entry [disabled]="!isValidCWL"
+                               [tabName]="'test'">Test
+        </ct-tab-selector-entry>
+
+        <ct-tab-selector-entry [disabled]="!viewMode"
+                               [tabName]="'code'">Code
+        </ct-tab-selector-entry>
+    </ct-tab-selector>
+
+    <div class="document-controls">
+
+        <!--CWLVersion-->
+        <span class="btn btn-sm">{{toolModel.cwlVersion}}</span>
+
+        <!--Go to app-->
+        <button class="btn btn-sm btn-secondary " type="button" (click)="goToApp()">
+            <i class="fa fa-external-link"></i>
+        </button>
+
+        <!--Save-->
+        <button [disabled]="!data.isWritable"
+                (click)="save()"
+                class="btn btn-sm btn-secondary" type="button">
+            <i class="fa fa-save"></i>
+        </button>
+
+        <!--Copy-->
+        <button class="btn btn-sm btn-secondary " type="button">
+            <i class="fa fa-copy"></i>
+        </button>
+
+
+        <!--Revisions-->
+        <button *ngIf="data.dataSource !== 'local' && toolModel.customProps['sbg:revision']"
+                class="btn btn-sm btn-secondary" type="button"
+                [ct-editor-inspector-target]="'revisions'"
+                [ct-editor-inspector]="revisions">
+
+            Revision: {{ toolModel.customProps['sbg:revision']}}
+
+            <template #revisions>
+                <ct-revision-list [active]="toolModel.customProps['sbg:revision']"
+                                  [revisions]="toolModel.customProps['sbg:revisionsInfo']"
+                                  (select)="openRevision($event)">
+                </ct-revision-list>
+            </template>
+        </button>
+
+    </div>
+</ct-action-bar>
+
+<!--Header & Editor Column-->
+<div class="editor-layout">
+
+    <ct-block-loader *ngIf="isLoading"></ct-block-loader>
+
+    <!--Editor Row-->
+    <ct-code-editor *ngIf="viewMode === 'code' && !isLoading"
+                    [formControl]="codeEditorContent"
+                    [options]="{mode: 'ace/mode/yaml'}"
+                    class="editor">
+    </ct-code-editor>
+
+    <!--GUI Editor-->
+    <ct-tool-visual-editor *ngIf="viewMode === 'gui' && !isLoading"
+                           class="flex-col"
+                           [readonly]="!data.isWritable"
+                           [formGroup]="toolGroup"
+                           [model]="toolModel"></ct-tool-visual-editor>
+
+    <ct-job-editor *ngIf="viewMode === 'test' && !isLoading"
+                   class="flex-col"
+                   [job]="toolModel.job"
+                   (update)="onJobUpdate($event)"
+                   (reset)="resetJob()"
+                   [inputs]="toolModel.inputs"></ct-job-editor>
+
+    <ct-app-info *ngIf="viewMode === 'info' && !isLoading"
+                 class="gui-editor-component p-2"
+                 [class.flex-col]="showInspector"
+                 [model]="toolModel"></ct-app-info>
+
+
+    <!--Object Inspector Column-->
+    <ct-editor-inspector [class.flex-hide]="!showInspector && (viewMode === 'code' || viewMode === 'info')">
+        <template #inspector></template>
+    </ct-editor-inspector>
+</div>
+
+<div *ngIf="reportPanel" class="app-report-panel layout-section">
+    <ct-validation-report *ngIf="reportPanel === 'validation'"
+                          [issues]="validation"></ct-validation-report>
+    <ct-command-line-preview *ngIf="reportPanel === 'commandLinePreview'"
+                             [commandLineParts]="commandLineParts | async"></ct-command-line-preview>
+</div>
+
+<template #statusControls>
+                <span class="btn-group">
+                    <button [disabled]="!validation"
+                            [class.active]="reportPanel === 'validation'"
+                            (click)="toggleReport('validation')"
+                            class="btn btn-sm">
+
+                        <span *ngIf="validation?.errors?.length">
+                            <i class="fa fa-times-circle text-danger"></i> {{validation.errors.length}} Errors
+                        </span>
+
+                        <span *ngIf="validation?.warnings?.length"
+                              [class.pl-1]="validation?.errors?.length">
+                            <i class="fa fa-exclamation-triangle text-warning"></i> {{validation.warnings.length}} Warnings
+                        </span>
+
+                        <span *ngIf="!validation?.errors?.length && !validation?.warnings?.length">
+                            No Issues
+                        </span>
+
+
+                    </button>
+
+                    <button [class.active]="reportPanel == 'commandLinePreview'"
+                            [disabled]="!isValidCWL"
+                            (click)="toggleReport('commandLinePreview')"
+                            class="btn btn-secondary btn-sm">Preview</button>
+                </span>
+</template>

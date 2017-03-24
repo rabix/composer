@@ -1,15 +1,13 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, ViewEncapsulation} from "@angular/core";
-import {ComponentBase} from "../../../components/common/component-base";
-import {StepModel, WorkflowModel} from "cwlts/models";
-import {UserPreferencesService} from "../../../services/storage/user-preferences.service";
-import {ModalService} from "../../../components/modal/modal.service";
-import {PlatformAPI} from "../../../services/api/platforms/platform-api.service";
-import {UpdateStepModal} from "../../../components/modal/custom/update-step-modal.component";
 import {Workflow} from "cwl-svg";
+import {StepModel, WorkflowModel} from "cwlts/models";
+import {UpdateStepModal} from "../../../components/modal/custom/update-step-modal.component";
+import {PlatformAPI} from "../../../services/api/platforms/platform-api.service";
+import {UserPreferencesService} from "../../../services/storage/user-preferences.service";
+import {ModalService} from "../../../ui/modal/modal.service";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-workflow-step-inspector",
     changeDetection: ChangeDetectionStrategy.OnPush,
     styleUrls: ["./step-inspector.component.scss"],
@@ -61,51 +59,53 @@ import {Workflow} from "cwl-svg";
         </ct-workflow-step-inspector-step>
     `
 })
-export class WorkflowStepInspector extends ComponentBase {
+export class StepInspectorComponent extends DirectiveBase {
 
     @Input()
-    public step: StepModel;
+    step: StepModel;
 
     @Input()
-    public workflowModel: WorkflowModel;
+    workflowModel: WorkflowModel;
 
     @Input()
-    public graph: Workflow;
+    graph: Workflow;
 
-    public tabs = {
+    tabs = {
         Inputs: "inputs",
         Info: "info",
         Step: "step"
     };
 
-    public viewMode = this.tabs.Inputs;
+    viewMode = this.tabs.Inputs;
 
-    constructor(private userPrefService: UserPreferencesService, private modal: ModalService,
-                private platform: PlatformAPI, private cdr: ChangeDetectorRef) {
+    constructor(private modal: ModalService,
+                private platform: PlatformAPI,
+                private cdr: ChangeDetectorRef,
+                private userPrefService: UserPreferencesService) {
         super();
 
-        this.tracked = this.userPrefService.get("step_inspector_active_tab", this.tabs.Inputs, true)
-            .subscribe(x => this.viewMode = x);
+        // @fixme Bring this back with the new service
+        // this.tracked = this.userPrefService.get("step_inspector_active_tab", this.tabs.Inputs, true)
+        //     .subscribe(x => this.viewMode = x);
     }
 
 
-
-    private updateStep(ev: Event) {
+    updateStep(ev: Event) {
         ev.preventDefault();
 
-        const appId = this.step.run.customProps['sbg:id'].split('/');
+        const appId   = this.step.run.customProps["sbg:id"].split("/");
         const appData = [appId[0], appId[1], appId[2]].join("/");
 
 
         this.platform.getApp(appData).subscribe((app) => {
 
-            const component = this.modal.show(UpdateStepModal, {
+            const component = this.modal.fromComponent(UpdateStepModal, {
                 title: "Update available",
                 closeOnOutsideClick: true,
                 closeOnEscape: true
             });
 
-            component.step = this.step;
+            component.step         = this.step;
             component.updatedModel = app;
 
             component.confirm = () => {
@@ -115,11 +115,11 @@ export class WorkflowStepInspector extends ComponentBase {
                 this.cdr.markForCheck();
 
                 component.closeModal();
-            }
+            };
         });
     }
 
-    private changeTab(tab: string) {
+    changeTab(tab: string) {
         this.viewMode = tab;
         this.userPrefService.put("step_inspector_active_tab", tab);
     }

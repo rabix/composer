@@ -1,29 +1,18 @@
-import {
-    ChangeDetectionStrategy,
-    Component,
-    ElementRef,
-    Input,
-    TemplateRef,
-    ViewChild,
-    ViewEncapsulation
-} from "@angular/core";
-import {StepModel, WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
+import {Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, TemplateRef, ViewChild, ViewEncapsulation} from "@angular/core";
 import {Workflow} from "cwl-svg";
-import {StatusBarService} from "../../../core/status-bar/status-bar.service";
+import {StepModel, WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
+import {DataGatewayService} from "../../../core/data-gateway/data-gateway.service";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
-import {Observable} from "rxjs";
-import * as Yaml from "js-yaml";
+import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import LoadOptions = jsyaml.LoadOptions;
-import {ComponentBase} from "../../../components/common/component-base";
-import {noop} from "../../../lib/utils.lib";
 
 
 declare const Snap: any;
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
     selector: "ct-workflow-graph-editor",
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    encapsulation: ViewEncapsulation.None,
     styleUrls: ["./workflow-graph-editor.component.scss"],
     template: `
         <svg (dblclick)="openInspector($event)" #canvas class="cwl-workflow"
@@ -71,7 +60,7 @@ declare const Snap: any;
         </template>
     `
 })
-export class WorkflowGraphEditorComponent extends ComponentBase {
+export class WorkflowGraphEditorComponent extends DirectiveBase implements OnChanges, OnInit, OnDestroy {
 
     @Input()
     public model: WorkflowModel;
@@ -88,11 +77,12 @@ export class WorkflowGraphEditorComponent extends ComponentBase {
     @ViewChild("inspector", {read: TemplateRef})
     private inspectorTemplate: TemplateRef<any>;
 
-    private inspectedNode: StepModel | WorkflowOutputParameterModel | WorkflowInputParameterModel = null;
+    inspectedNode: StepModel | WorkflowOutputParameterModel | WorkflowInputParameterModel = null;
 
     public graph: Workflow;
 
     constructor(private statusBar: StatusBarService,
+                private gateway: DataGatewayService,
                 private inspector: EditorInspectorService) {
         super();
     }
@@ -110,16 +100,25 @@ export class WorkflowGraphEditorComponent extends ComponentBase {
     }
 
     ngOnChanges() {
-        this.graph = new Workflow(new Snap(this.canvas.nativeElement), this.model);
-        this.graph.command("workflow.fit");
-        this.statusBar.setControls(this.controlsTemplate);
+        this.graph          = new Workflow(new Snap(this.canvas.nativeElement), this.model as any);
+        const firstAnything = this.model.steps[0] || this.model.inputs[0] || this.model.outputs[0];
+
+        if (firstAnything && firstAnything.customProps["sbg:x"] === undefined) {
+            console.log("Should arrange");
+            // this.graph.command("workflow.arrange");
+        }
+
+        setTimeout(() => {
+            this.graph.command("workflow.fit");
+        });
+        // this.statusBar.setControls(this.controlsTemplate);
     }
 
-    private upscale() {
+    upscale() {
         this.graph.command("workflow.scale", this.graph.getScale() + .1);
     }
 
-    private downscale() {
+    downscale() {
         if (this.graph.getScale() > .1) {
             this.graph.command("workflow.scale", this.graph.getScale() - .1);
 
@@ -129,27 +128,21 @@ export class WorkflowGraphEditorComponent extends ComponentBase {
     /**
      * Triggers when app is dropped on canvas
      */
-    private onDrop(ev: MouseEvent, node: { content: Observable<string> }) {
-        node.content.first().subscribe((node) => {
-            try {
-                let json = Yaml.safeLoad(node, {
-                    json: true,
-                    onWarning: noop
-                } as LoadOptions);
+    onDrop(ev: MouseEvent, nodeID: string) {
+        console.log("Dropped!", nodeID);
 
+        this.gateway.fetchFileContent(nodeID, true).subscribe((app: any) => {
 
-                const step = this.model.addStepFromProcess(json);
-                const coords = this.graph.translateMouseCoords(ev.clientX, ev.clientY);
-                Object.assign(step.customProps, {
-                    "sbg:x": coords.x,
-                    "sbg:y": coords.y
-                });
+            const step   = this.model.addStepFromProcess(app);
+            const coords = this.graph.translateMouseCoords(ev.clientX, ev.clientY);
+            Object.assign(step.customProps, {
+                "sbg:x": coords.x,
+                "sbg:y": coords.y
+            });
 
-                this.graph.command("app.create.step", step);
-            } catch (ex) {
-                console.warn(ex);
-            }
-
+            this.graph.command("app.create.step", step);
+        }, err => {
+            console.warn("Could not add an app", err);
         });
     }
 
@@ -160,7 +153,7 @@ export class WorkflowGraphEditorComponent extends ComponentBase {
         let current = ev.target as Element;
 
         // Check if clicked element is a node or any descendant of a node (in order to open object inspector if so)
-        while (current != this.canvas.nativeElement) {
+        while (current !== this.canvas.nativeElement) {
             if (this.hasClassSvgElement(current, "node")) {
                 this.openNodeInInspector(current);
                 break;
@@ -172,7 +165,7 @@ export class WorkflowGraphEditorComponent extends ComponentBase {
     /**
      * Returns type of inspected node to determine which template to render for object inspector
      */
-    private typeOfInspectedNode() {
+    typeOfInspectedNode() {
         if (this.inspectedNode instanceof StepModel) {
             return "Step";
         } else if (this.inspectedNode instanceof WorkflowInputParameterModel) {

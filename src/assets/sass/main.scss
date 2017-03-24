@@ -1,3 +1,5 @@
+
+
 @import "variables";
 @import "bootstrap-pack";
 @import "mixins";
@@ -7,19 +9,18 @@
 @import "icons";
 @import "forms";
 @import "alerts";
+
 @import "./theme-variables";
-@import url(https://fonts.googleapis.com/css?family=Montserrat:400,700);
+@import "./modern/variables";
+
+@import "~selectize/dist/css/selectize.default.css";
+
+@import "./modern/theme.scss";
 
 html, body {
     width: 100%;
     height: 100%;
-    background: $body-bg;
-    color: $body-color;
-
-    background-repeat: repeat;
-    background-position: center center;
-    background-size: auto auto;
-    background-image: linear-gradient(225deg, $body-color 0%, $body-color 100%);
+    color: $font-color;
 }
 
 .loading-image {

@@ -1,9 +1,8 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
-import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {ComponentBase} from "../../../../components/common/component-base";
+import {ControlValueAccessor, FormControl, FormBuilder, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {CommandInputParameterModel} from "cwlts/models";
 import {noop} from "../../../../lib/utils.lib";
-import {FormControl} from "../../../../../../node_modules/@angular/forms/src/model";
+import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -50,7 +49,7 @@ import {FormControl} from "../../../../../../node_modules/@angular/forms/src/mod
     `
 })
 
-export class StageInputSectionComponent extends ComponentBase implements ControlValueAccessor {
+export class StageInputSectionComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
     public readonly = false;

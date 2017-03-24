@@ -1,9 +1,9 @@
-import {Component, Input, Output, ViewEncapsulation} from "@angular/core";
-import {Subject} from "rxjs";
-import {ComponentBase} from "../../../components/common/component-base";
+import {Component, Input, Output, ViewEncapsulation, OnInit} from "@angular/core";
+import {Subject} from "rxjs/Subject";
 import {FormControl, FormGroup} from "@angular/forms";
 import {FileDefModel} from "cwlts/models/d2sb";
 import {FileDef} from "cwlts/mappings/d2sb/FileDef";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -29,21 +29,21 @@ import {FileDef} from "cwlts/mappings/d2sb/FileDef";
             </div>
         </form>`
 })
-export class FileDefInspectorComponent extends ComponentBase {
+export class FileDefInspectorComponent extends DirectiveBase implements OnInit {
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
     @Input()
-    public fileDef: FileDefModel;
+    fileDef: FileDefModel;
 
     @Input()
-    public context: { $job?: any } = {};
+    context: { $job?: any } = {};
 
     @Output()
-    public save = new Subject<FileDef>();
+    save = new Subject<FileDef>();
 
-    private form: FormGroup;
+    form: FormGroup;
 
     get fileName(): string {
         const value = this.form.controls["filename"].value;

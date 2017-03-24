@@ -1,0 +1,19 @@
+@import "./../../../assets/sass/variables";
+
+:host {
+    font-size: 18px;
+    pointer-events: none;
+    display: inline-block;
+    box-sizing: border-box;
+    font-family: $font-family-title;
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.025em;
+
+    .product-name {
+        font-weight: 600;
+    }
+
+    .project-name {
+        font-weight: 300;
+    }
+}

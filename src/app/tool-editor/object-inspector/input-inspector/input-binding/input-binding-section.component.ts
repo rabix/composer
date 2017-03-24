@@ -1,4 +1,4 @@
-import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
+import {Component, forwardRef, Input} from "@angular/core";
 import {
     ControlValueAccessor,
     FormBuilder,
@@ -7,13 +7,11 @@ import {
     Validators
 } from "@angular/forms";
 import {CommandInputParameterModel} from "cwlts/models";
-import {ComponentBase} from "../../../../components/common/component-base";
 import {noop} from "../../../../lib/utils.lib";
+import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
-    selector: "input-binding-section",
+    selector: "ct-input-binding-section",
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
@@ -50,15 +48,13 @@ import {noop} from "../../../../lib/utils.lib";
                        [formControl]="form.controls['prefix']"/>
             </div>
 
-            <div class="form-group flex-container">
-                <label>Prefix and value separation</label>
-                <span class="align-right">
+            <div class="form-group">
+                <label>Separate value and prefix</label>
+                <span class="pull-right">
                     <ct-toggle-slider
                             [ct-disabled]="isType('record')"
                             [formControl]="form.controls['separate']"
-                            [on]="'Separate'"
-                            [readonly]="readonly"
-                            [off]="'Join'"></ct-toggle-slider>
+                            [readonly]="readonly"></ct-toggle-slider>
                 </span>
             </div>
 
@@ -81,27 +77,27 @@ import {noop} from "../../../../lib/utils.lib";
         </div>
     `
 })
-export class InputBindingSectionComponent extends ComponentBase implements ControlValueAccessor {
+export class InputBindingSectionComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
     /** The type of the property as an input, so we can react to changes in the component */
     @Input()
-    public propertyType: string;
+    propertyType: string;
 
     @Input()
-    public context: { $job?: any, $self?: any } = {};
+    context: { $job?: any, $self?: any } = {};
 
-    private input: CommandInputParameterModel;
+    input: CommandInputParameterModel;
 
-    public form: FormGroup;
+    form: FormGroup;
 
     private onTouched = noop;
 
     private propagateChange = noop;
 
-    public itemSeparators: { text: string, value: string }[] = [
+    itemSeparators: { text: string, value: string }[] = [
         {text: "equal", value: "="},
         {text: "comma", value: ","},
         {text: "semicolon", value: ";"},
@@ -129,7 +125,7 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
         this.onTouched = fn;
     }
 
-    private createInputBindingForm(input: CommandInputParameterModel): void {
+    createInputBindingForm(input: CommandInputParameterModel): void {
         this.form = this.formBuilder.group({
             stageInput: [input],
             valueFrom: [input.inputBinding.valueFrom, [Validators.required]],
@@ -142,12 +138,12 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
         this.listenToInputBindingFormChanges();
     }
 
-    private listenToInputBindingFormChanges(): void {
+    listenToInputBindingFormChanges(): void {
         this.tracked = this.form.valueChanges
             .distinctUntilChanged()
             .debounceTime(300)
             .subscribe(value => {
-                let binding:any = {
+                const binding: any = {
                     position: value.position || undefined,
                     prefix: value.prefix || undefined,
                     separate: value.separate,
@@ -172,7 +168,7 @@ export class InputBindingSectionComponent extends ComponentBase implements Contr
             });
     }
 
-    private isType(type) {
+    isType(type) {
         return this.propertyType === type || this.input.type.items === type;
     }
 }

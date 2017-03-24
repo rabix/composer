@@ -1,10 +1,18 @@
-import {ChangeDetectionStrategy, Component, Input, Output, ViewEncapsulation} from "@angular/core";
+import {
+    ChangeDetectionStrategy,
+    Component,
+    Input,
+    Output,
+    OnInit,
+    OnDestroy,
+    ViewEncapsulation
+} from "@angular/core";
 import {ExternalLinks} from "../../../cwl/external-links";
 import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 import {RequirementBaseModel} from "cwlts/models";
 import {FormControl} from "@angular/forms";
-import {ReplaySubject} from "rxjs";
-import {ComponentBase} from "../../../components/common/component-base";
+import {ReplaySubject} from "rxjs/ReplaySubject";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 // @todo move to editor common module
 @Component({
@@ -20,44 +28,44 @@ import {ComponentBase} from "../../../components/common/component-base";
 
             <div class="tc-body">
 
-                <key-value-list
-                    [addEntryText]="'Add a Hint'"
-                    [emptyListText]="'Special flags for tool execution'"
-                    [keyColumnText]="'Class'"
-                    [helpLink]="helpLink"
-                    [context]="context"
-                    [allowDuplicateKeys]="false"
-                    [keyValidator]="validateClassForm"
-                    [formControl]="form"></key-value-list>
+                <ct-key-value-list
+                        [addEntryText]="'Add a Hint'"
+                        [emptyListText]="'Special flags for tool execution'"
+                        [keyColumnText]="'Class'"
+                        [helpLink]="helpLink"
+                        [context]="context"
+                        [allowDuplicateKeys]="false"
+                        [keyValidator]="validateClassForm"
+                        [formControl]="form"></ct-key-value-list>
             </div>
         </ct-form-panel>
     `
 })
-export class HintListComponent extends ComponentBase {
+export class HintListComponent extends DirectiveBase implements OnInit, OnDestroy {
 
     /** Context in which expression should be evaluated */
     @Input()
-    public context: { $job: any } = {$job: {}};
+    context: { $job: any } = {$job: {}};
 
     /** List of entries that should be shown */
     @Input()
-    public entries: RequirementBaseModel[] = [];
+    entries: RequirementBaseModel[] = [];
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
-    private formList: {
+    formList: {
         key?: string,
         value: string | SBDraft2ExpressionModel,
         readonly: boolean
     }[] = [];
 
     @Output()
-    public update = new ReplaySubject<any>();
+    update = new ReplaySubject<any>();
 
-    private helpLink = ExternalLinks.hints;
+    helpLink = ExternalLinks.hints;
 
-    private form = new FormControl("");
+    form = new FormControl("");
 
     ngOnInit(): void {
         const entriesCopy: RequirementBaseModel[] = [...this.entries];
@@ -72,13 +80,13 @@ export class HintListComponent extends ComponentBase {
     }
 
 
-    private createFormList(entries: RequirementBaseModel[]): {
+    createFormList(entries: RequirementBaseModel[]): {
         key: string,
         value: string | SBDraft2ExpressionModel,
         readonly: boolean
     }[] {
         return entries.map((hint: RequirementBaseModel) => {
-            let newHint = {
+            const newHint = {
                 key: hint["class"],
                 value: <string | SBDraft2ExpressionModel>"",
                 readonly: false
@@ -101,11 +109,11 @@ export class HintListComponent extends ComponentBase {
         });
     }
 
-    private createHintList(formList: {
-                               key?: string,
-                               value: string | SBDraft2ExpressionModel,
-                               readonly: boolean
-                           }[]): any[] {
+    createHintList(formList: {
+                       key?: string,
+                       value: string | SBDraft2ExpressionModel,
+                       readonly: boolean
+                   }[]): any[] {
 
         return formList
             .map((item): RequirementBaseModel | any => {
@@ -132,7 +140,7 @@ export class HintListComponent extends ComponentBase {
             .filter(res => res !== undefined);
     }
 
-    private validateClassForm(c: FormControl) {
+    validateClassForm(c: FormControl) {
 
         if (c.value === "sbg:MemRequirement"
             || c.value === "sbg:CPURequirement"
@@ -142,7 +150,7 @@ export class HintListComponent extends ComponentBase {
                 warning: {
                     message: "This requirement is already defined and will be overwritten."
                 }
-            }
+            };
         }
 
         return null;

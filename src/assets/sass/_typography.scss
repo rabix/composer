@@ -1,30 +1,40 @@
+
 pre {
-  display: inherit;
-  margin: inherit;
-  font-size: inherit;
-  color: inherit;
+    display: inherit;
+    margin: inherit;
+    font-size: inherit;
+    color: inherit;
 }
 
-.text-mono { font-family: monospace; }
+.text-mono {
+    font-family: monospace;
+}
 
 .text-console-error {
-  color: $console-error-color;
+    color: $console-error-color;
 }
 
 .text-console-warning {
-  color: $console-warning-color;
+    color: $console-warning-color;
 }
 
 .text-hover-danger:hover {
-  color: $brand-danger !important;
+    color: $brand-danger !important;
 }
 
 .text-hover-warning:hover {
-  color: $brand-warning !important;
+    color: $brand-warning !important;
 }
 
 .no-outline {
-  &, &:focus, &:active {
-    outline: 0;
-  }
+    &, &:focus, &:active {
+        outline: 0;
+    }
+}
+
+.text-title {
+    font-family: $font-family-title, serif;
+    font-size: $font-size-base;
+    font-weight: 400;
+    text-transform: uppercase;
 }

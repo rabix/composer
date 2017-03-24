@@ -1,0 +1,14 @@
+@import "../../../assets/sass/_variables.scss";
+
+ct-code-editor-x,
+ct-code-preview {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-align: left
+}
+
+.modal-large {
+    width: $modal-lg;
+    height: 600px;
+}

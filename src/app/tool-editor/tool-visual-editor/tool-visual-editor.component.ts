@@ -1,4 +1,4 @@
-import {Component, Input} from "@angular/core";
+import {Component, Input, OnDestroy} from "@angular/core";
 import {FormGroup} from "@angular/forms";
 
 import {FileDefModel, ResourceRequirementModel} from "cwlts/models/d2sb";
@@ -6,14 +6,13 @@ import {CommandLineToolModel, RequirementBaseModel} from "cwlts/models";
 import {ProcessRequirement} from "cwlts/mappings/d2sb/ProcessRequirement";
 
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
-import {ComponentBase} from "../../components/common/component-base";
+import {DirectiveBase} from "../../util/directive-base/directive-base";
+
 @Component({
     selector: "ct-tool-visual-editor",
     styleUrls: ["./tool-visual-editor.component.scss"],
     template: `
-        <div class="row">
-            <form class="col-xs-12"
-                  [formGroup]="formGroup">
+            <form [formGroup]="formGroup">
                 
                 <ct-docker-requirement [dockerRequirement]="model.docker"
                                        (update)="setRequirement($event, true)"
@@ -74,32 +73,26 @@ import {ComponentBase} from "../../components/common/component-base";
                                   [readonly]="readonly">
                 </ct-file-def-list>
             </form>
-        </div>
 
     `
 })
-export class ToolVisualEditorComponent extends ComponentBase {
+export class ToolVisualEditorComponent extends DirectiveBase implements OnDestroy {
 
     @Input()
-    public model: CommandLineToolModel;
+    model: CommandLineToolModel;
 
     @Input()
-    public readonly: boolean;
+    readonly: boolean;
 
     /** ControlGroup that encapsulates the validation for all the nested forms */
     @Input()
-    public formGroup: FormGroup;
+    formGroup: FormGroup;
 
-    private resources: {
-        "sbg:CPURequirement"?: ResourceRequirementModel,
-        "sbg:MemRequirement"?: ResourceRequirementModel
-    } = {};
-
-    constructor(private inspector: EditorInspectorService) {
+    constructor(public inspector: EditorInspectorService) {
         super();
     }
 
-    private updateModel(category: string, data: any) {
+    updateModel(category: string, data: any) {
 
         if (category === "inputs" || category === "arguments") {
             this.model.updateCommandLine();
@@ -123,20 +116,22 @@ export class ToolVisualEditorComponent extends ComponentBase {
         this.formGroup.markAsDirty();
     }
 
-    private setStreams(change) {
+    setStreams(change) {
         ["stdin", "stdout"].forEach(str => {
-            if (change[str]) this.model.updateStream(change[str], <"stdin" | "stdout"> str);
+            if (change[str]) {
+                this.model.updateStream(change[str], <"stdin" | "stdout"> str);
+            }
         });
         this.model.updateCommandLine();
         this.formGroup.markAsDirty();
     }
 
-    private setRequirement(req: ProcessRequirement, hint: boolean) {
+    setRequirement(req: ProcessRequirement, hint: boolean) {
         this.model.setRequirement(req, hint);
         this.formGroup.markAsDirty();
     }
 
-    private setHints(hints: RequirementBaseModel[]) {
+    setHints(hints: RequirementBaseModel[]) {
         this.model.hints = [];
         hints.forEach(hint => {
             this.setRequirement(hint, true);
@@ -145,13 +140,15 @@ export class ToolVisualEditorComponent extends ComponentBase {
         this.formGroup.markAsDirty();
     }
 
-    private setResource(resource: ResourceRequirementModel) {
+    setResource(resource: ResourceRequirementModel) {
         this.model.setRequirement(resource.serialize(), true);
         this.formGroup.markAsDirty();
     }
 
     ngOnDestroy() {
         /* Close object inspector*/
-        this.inspector.hide();
+        if (this.inspector.inspectedObject.getValue() !== "revisions") {
+            this.inspector.hide();
+        }
     }
 }

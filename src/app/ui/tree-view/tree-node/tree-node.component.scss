@@ -1,0 +1,15 @@
+@import "../../../../assets/sass/variables";
+@import "../../../../assets/sass/mixins";
+
+:host {
+    display: block;
+    white-space: nowrap;
+
+    .node-base {
+        padding: .25em;
+    }
+
+    .selected {
+        background: $layout-title-bar-background;
+    }
+}

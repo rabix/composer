@@ -1,0 +1,25 @@
+@import "../../../assets/sass/mixins";
+@import "../../../assets/sass/variables";
+
+:host {
+    display: flex;
+    flex-basis: auto;
+    flex-direction: column;
+    border-top: 1px solid #ccc;
+    padding: 2em;
+
+    background: $layout-element-alt-foreground;
+
+    .subtitle {
+        font-weight: bold;
+    }
+
+    .items {
+        display: flex;
+    }
+
+    .item {
+        flex: 1;
+        padding-right: 1em;
+    }
+}

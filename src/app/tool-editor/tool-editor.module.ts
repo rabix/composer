@@ -1,8 +1,6 @@
 import {NgModule} from "@angular/core";
 import {BrowserModule} from "@angular/platform-browser";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {CoreModule} from "../core/core.module";
-import {EditorCommonModule} from "../editor-common/editor-common.module";
 import {ArgumentListComponent} from "./sections/arguments/argument-list.component";
 import {FileDefListComponent} from "./sections/file-def-list/file-def-list.component";
 import {ResourcesComponent} from "./sections/resources/resources.component";
@@ -10,8 +8,7 @@ import {ToolInputsComponent} from "./sections/inputs/tool-inputs.component";
 import {ToolInputListComponent} from "./sections/inputs/tool-input-list.component";
 import {ToolOutputListComponent} from "./sections/outputs/tool-output-list.component";
 import {ToolOutputsComponent} from "./sections/outputs/tool-outputs.component";
-import {CWLModule} from "../cwl/cwl.module";
-import {ArgumentInspector} from "./sections/arguments/argument-inspector.component";
+import {ArgumentInspectorComponent} from "./sections/arguments/argument-inspector.component";
 import {BasicInputSectionComponent} from "./object-inspector/input-inspector/basic-section/basic-input-section.component";
 import {BasicOutputSectionComponent} from "./object-inspector/output-inspector/output-basic-section/basic-output-section.component";
 import {DescriptionComponent} from "./object-inspector/common-sections/description-section/description.component";
@@ -30,10 +27,14 @@ import {BaseCommandComponent} from "./sections/base-command/base-command.compone
 import {HintListComponent} from "./sections/hints/hint-list.component";
 import {ToolInputInspector} from "./object-inspector/input-inspector/tool-input-inspector.component";
 import {ToolOutputInspector} from "./object-inspector/output-inspector/tool-output-inspector.component";
+import {EditorCommonModule} from "../editor-common/editor-common.module";
+import {UIModule} from "../ui/ui.module";
+import {CWLModule} from "../cwl/cwl.module";
+import {LayoutModule} from "../layout/layout.module";
 
 @NgModule({
     declarations: [
-        ArgumentInspector,
+        ArgumentInspectorComponent,
         ArgumentListComponent,
         BasicInputSectionComponent,
         BasicOutputSectionComponent,
@@ -65,11 +66,12 @@ import {ToolOutputInspector} from "./object-inspector/output-inspector/tool-outp
     ],
     imports: [
         BrowserModule,
-        CoreModule,
-        CWLModule,
-        EditorCommonModule,
         FormsModule,
-        ReactiveFormsModule
+        LayoutModule,
+        ReactiveFormsModule,
+        EditorCommonModule,
+        CWLModule,
+        UIModule
     ]
 })
 export class ToolEditorModule {

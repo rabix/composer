@@ -8,7 +8,7 @@ import {
     Validators
 } from "@angular/forms";
 import {CommandInputParameterModel} from "cwlts/models";
-import {ComponentBase} from "../../../../components/common/component-base";
+import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 import {noop} from "../../../../lib/utils.lib";
 
 @Component({
@@ -31,8 +31,6 @@ import {noop} from "../../../../lib/utils.lib";
                 <label>Required</label>
                 <span class="align-right">
                         <ct-toggle-slider [formControl]="form.controls['isRequired']"
-                                          [off]="'No'"
-                                          [on]="'Yes'"
                                           [readonly]="readonly">
                         </ct-toggle-slider>
                     </span>
@@ -62,20 +60,18 @@ import {noop} from "../../../../lib/utils.lib";
                 <label>Include in command line</label>
                 <span class="align-right">
                         <ct-toggle-slider [formControl]="form.controls['isBound']"
-                                          [off]="'No'"
-                                          [on]="'Yes'"
                                           [readonly]="readonly">
                         </ct-toggle-slider>
                     </span>
             </div>
 
             <!--Input Binding-->
-            <input-binding-section *ngIf="input.isBound"
-                                   [context]="context"
-                                   [propertyType]="input.type.type"
-                                   [readonly]="readonly"
-                                   [formControl]="form.controls['inputBinding']">
-            </input-binding-section>
+            <ct-input-binding-section *ngIf="input.isBound"
+                                      [context]="context"
+                                      [propertyType]="input.type.type"
+                                      [readonly]="readonly"
+                                      [formControl]="form.controls['inputBinding']">
+            </ct-input-binding-section>
 
             <ct-secondary-file *ngIf="isType('File') && form.controls['secondaryFiles']"
                                [formControl]="form.controls['secondaryFiles']"
@@ -85,18 +81,18 @@ import {noop} from "../../../../lib/utils.lib";
         </form>
     `
 })
-export class BasicInputSectionComponent extends ComponentBase implements ControlValueAccessor {
+export class BasicInputSectionComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
-    public context: { $job?: any, $self?: any } = {};
+    context: { $job?: any, $self?: any } = {};
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
     /** The currently displayed property */
-    public input: CommandInputParameterModel;
+    input: CommandInputParameterModel;
 
-    public form: FormGroup;
+    form: FormGroup;
 
     private onTouched = noop;
 
@@ -119,7 +115,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
         });
 
         // fetch secondaryFiles depending on their location
-        if (this.input.inputBinding.hasSecondaryFiles) {
+        if (this.input.inputBinding && this.input.inputBinding.hasSecondaryFiles) {
             this.form.addControl("secondaryFiles", new FormControl(this.input.inputBinding.secondaryFiles));
         } else if (this.input.hasSecondaryFiles) {
             this.form.addControl("secondaryFiles", new FormControl(this.input.secondaryFiles));
@@ -153,8 +149,10 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
             }
 
             // secondaryFiles changes
-            if(value.secondaryFiles) {
-                if (value.secondaryFiles && this.input.inputBinding.hasSecondaryFiles) {
+            if (value.secondaryFiles) {
+                if (value.secondaryFiles
+                    && this.input.inputBinding
+                    && this.input.inputBinding.hasSecondaryFiles) {
                     this.input.inputBinding.secondaryFiles = value.secondaryFiles;
                 } else if (value.secondaryFiles && this.input.hasSecondaryFiles) {
                     this.input.secondaryFiles = value.secondaryFiles;
@@ -209,7 +207,7 @@ export class BasicInputSectionComponent extends ComponentBase implements Control
         });
     }
 
-    private isType(type: string) {
+    isType(type: string) {
         return this.input.type.type === type || this.input.type.items === type;
     }
 }
