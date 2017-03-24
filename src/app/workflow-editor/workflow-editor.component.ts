@@ -84,12 +84,12 @@ import LoadOptions = jsyaml.LoadOptions;
 
                     Revision: {{ workflowModel.customProps['sbg:revision']}}
 
-                    <template #revisions>
+                    <ng-template #revisions>
                         <ct-revision-list [active]="workflowModel.customProps['sbg:revision']"
                                           [revisions]="workflowModel.customProps['sbg:revisionsInfo']"
                                           (select)="openRevision($event)">
                         </ct-revision-list>
-                    </template>
+                    </ng-template>
                 </button>
 
             </div>
@@ -125,7 +125,7 @@ import LoadOptions = jsyaml.LoadOptions;
 
             <!--Object Inspector Column-->
             <ct-editor-inspector [class.flex-hide]="!showInspector">
-                <template #inspector></template>
+                <ng-template #inspector></ng-template>
             </ct-editor-inspector>
         </div>
 
@@ -137,7 +137,7 @@ import LoadOptions = jsyaml.LoadOptions;
                                   [issues]="validation"></ct-validation-report>
         </div>
 
-        <template #statusControls>
+        <ng-template #statusControls>
             <span class="btn-group">
             <button [disabled]="!validation"
                     [class.btn-primary]="reportPanel === 'validation'"
@@ -160,7 +160,7 @@ import LoadOptions = jsyaml.LoadOptions;
             
             </button>
             </span>
-        </template>
+        </ng-template>
     `
 })
 export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy, OnInit, WorkboxTab {

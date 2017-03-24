@@ -96,7 +96,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                     </div>
 
                     <!--Object Inspector Template -->
-                    <template #inspector>
+                    <ng-template #inspector>
                         <ct-editor-inspector-content>
                             <div class="tc-header">{{ entry.id || entry.loc || "Output" }}</div>
                             <div class="tc-body">
@@ -109,7 +109,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                                 </ct-tool-output-inspector>
                             </div>
                         </ct-editor-inspector-content>
-                    </template>
+                    </ng-template>
 
                     <!--Nested entries-->
                     <div *ngIf="isRecordType(entry)" class="children pl-1 pr-1">

@@ -27,14 +27,14 @@
     },
     "private": true,
     "dependencies": {
-        "@angular/common": "^2.4.0",
-        "@angular/compiler": "^2.4.0",
-        "@angular/core": "^2.4.0",
-        "@angular/forms": "^2.4.0",
-        "@angular/http": "^2.4.0",
-        "@angular/platform-browser": "^2.4.0",
-        "@angular/platform-browser-dynamic": "^2.4.0",
-        "@angular/router": "^3.4.10",
+        "@angular/common": "^4.0.0",
+        "@angular/compiler": "^4.0.0",
+        "@angular/core": "^4.0.0",
+        "@angular/forms": "^4.0.0",
+        "@angular/http": "^4.0.0",
+        "@angular/platform-browser": "^4.0.0",
+        "@angular/platform-browser-dynamic": "^4.0.0",
+        "@angular/router": "^4.0.0",
         "ajv": "^4.11.3",
         "angular2-moment": "^1.2.0",
         "bootstrap": "4.0.0-alpha.5",
@@ -49,11 +49,11 @@
         "rxjs": "^5.1.0",
         "selectize": "^0.12.4",
         "snapsvg-cjs": "^0.0.4",
-        "zone.js": "^0.7.6"
+        "zone.js": "^0.8.5"
     },
     "devDependencies": {
-        "@angular/cli": "1.0.0-rc.2",
-        "@angular/compiler-cli": "^2.4.0",
+        "@angular/cli": "^1.0.0",
+        "@angular/compiler-cli": "^4.0.0",
         "@types/ace": "^0.0.32",
         "@types/jasmine": "2.5.38",
         "@types/jquery": "^2.0.41",
@@ -61,6 +61,7 @@
         "@types/markdown-it": "0.0.2",
         "@types/node": "~6.0.60",
         "@types/selectize": "^0.12.28",
+        "@types/snapsvg": "^0.4.27",
         "codelyzer": "^2.0.0",
         "electron": "^1.6.2",
         "electron-packager": "^8.5.2",
@@ -78,7 +79,7 @@
         "protractor": "~5.1.0",
         "ts-node": "~2.0.0",
         "tslint": "^4.5.1",
-        "typescript": "~2.1.4"
+        "typescript": "^2.2.1"
     },
     "engines": {
         "node": ">= 7.4.0",

@@ -50,10 +50,9 @@ import {noop} from "../../lib/utils.lib";
                                     </div>
 
                                     <!--Object Inspector Template -->
-                                    <template #inspector>
+                                    <ng-template #inspector>
                                         <ct-editor-inspector-content>
                                             <div class="tc-header">
-                                                <ct-tree-node-icon [type]="entry.run?.class" class="align-icon-height"></ct-tree-node-icon>
                                                 <span>{{ entry.label || entry.id || entry.loc || "Step" }}</span>
                                             </div>
                                             <div class="tc-body">
@@ -64,7 +63,7 @@ import {noop} from "../../lib/utils.lib";
                                                 </ct-workflow-step-inspector>
                                             </div>
                                         </ct-editor-inspector-content>
-                                    </template>
+                                    </ng-template>
                                 </li>
                             </ul>
                         </div>
@@ -113,7 +112,7 @@ import {noop} from "../../lib/utils.lib";
 
 
                                     <!--Object Inspector Template -->
-                                    <template #inspector>
+                                    <ng-template #inspector>
                                         <ct-editor-inspector-content>
                                             <div class="tc-header">{{ entry.id || entry.loc || "Input" }}</div>
                                             <div class="tc-body">
@@ -124,7 +123,7 @@ import {noop} from "../../lib/utils.lib";
                                                 </ct-workflow-io-inspector>
                                             </div>
                                         </ct-editor-inspector-content>
-                                    </template>
+                                    </ng-template>
                                 </li>
                             </ul>
                         </div>
@@ -171,7 +170,7 @@ import {noop} from "../../lib/utils.lib";
                                     </div>
 
                                     <!--Object Inspector Template -->
-                                    <template #inspector>
+                                    <ng-template #inspector>
                                         <ct-editor-inspector-content>
                                             <div class="tc-header">{{ entry.id || entry.loc || "Output" }}</div>
                                             <div class="tc-body">
@@ -180,7 +179,7 @@ import {noop} from "../../lib/utils.lib";
                                                 </ct-workflow-io-inspector>
                                             </div>
                                         </ct-editor-inspector-content>
-                                    </template>
+                                    </ng-template>
                                 </li>
                             </ul>
                         </div>

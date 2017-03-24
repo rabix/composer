@@ -1,4 +1,4 @@
-import {StatusControlProvider} from "../status-bar/status-control-provider.interface";
+import {StatusControlProvider} from "../../layout/status-bar/status-control-provider.interface";
 export interface WorkboxTab extends StatusControlProvider {
 
 }

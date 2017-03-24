@@ -102,7 +102,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                             </div>
 
                             <!--Object Inspector Template -->
-                            <template #inspector>
+                            <ng-template #inspector>
                                 <ct-editor-inspector-content>
                                     <div class="tc-header">{{ entry.loc || "Argument"}}</div>
                                     <div class="tc-body">
@@ -114,7 +114,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                                         </ct-argument-inspector>
                                     </div>
                                 </ct-editor-inspector-content>
-                            </template>
+                            </ng-template>
                         </li>
                     </ul>
 

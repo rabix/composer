@@ -38,7 +38,7 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
 
         <div class="body">
 
-            <template ngFor let-tab [ngForOf]="tabs">
+            <ng-template ngFor let-tab [ngForOf]="tabs">
 
                 <div class="component-container" [ngSwitch]="tab?.type" [hidden]="tab !== activeTab">
 
@@ -58,7 +58,7 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
                     <ct-tab-loader class="tab-component" *ngSwitchDefault></ct-tab-loader>
                 </div>
 
-            </template>
+            </ng-template>
 
         </div>
     `

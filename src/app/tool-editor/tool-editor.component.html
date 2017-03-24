@@ -50,12 +50,12 @@
 
             Revision: {{ toolModel.customProps['sbg:revision']}}
 
-            <template #revisions>
+            <ng-template #revisions>
                 <ct-revision-list [active]="toolModel.customProps['sbg:revision']"
                                   [revisions]="toolModel.customProps['sbg:revisionsInfo']"
                                   (select)="openRevision($event)">
                 </ct-revision-list>
-            </template>
+            </ng-template>
         </button>
 
     </div>
@@ -95,7 +95,7 @@
 
     <!--Object Inspector Column-->
     <ct-editor-inspector [class.flex-hide]="!showInspector && (viewMode === 'code' || viewMode === 'info')">
-        <template #inspector></template>
+        <ng-template #inspector></ng-template>
     </ct-editor-inspector>
 </div>
 
@@ -106,7 +106,7 @@
                              [commandLineParts]="commandLineParts | async"></ct-command-line-preview>
 </div>
 
-<template #statusControls>
+<ng-template #statusControls>
                 <span class="btn-group">
                     <button [disabled]="!validation"
                             [class.active]="reportPanel === 'validation'"
@@ -134,4 +134,4 @@
                             (click)="toggleReport('commandLinePreview')"
                             class="btn btn-secondary btn-sm">Preview</button>
                 </span>
-</template>
+</ng-template>
