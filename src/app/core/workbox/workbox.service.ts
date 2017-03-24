@@ -126,15 +126,15 @@ export class WorkboxService {
                     id: fileID,
                     isWritable: dataSource !== "public",
                     dataSource,
-                    language: "json",
+                    language: "yaml",
                     parsedContent: {},
                     fileContent: content,
                     resolve: (fcontent: string) => this.dataGateway.resolveContent(fcontent, fileID)
                 }
             };
 
-            if (fileID.endsWith(".yml") || fileID.endsWith(".yaml")) {
-                tab.data.language = "yaml";
+            if (fileID.endsWith(".json")) {
+                tab.data.language = "json";
             }
 
             try {
