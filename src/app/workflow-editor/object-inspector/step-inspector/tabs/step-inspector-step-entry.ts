@@ -18,57 +18,57 @@ import {WorkflowStepInputModel} from "cwlts/models";
             <div class="input-group">
 
                 <!--Enums-->
-                <template ngSwitchCase="enum">
+                <ng-template ngSwitchCase="enum">
                     <select [value]="value" class="form-control"
                             [attr.prefix]="prefix">
                         <option *ngFor="let val of input.type.symbols" [value]="val"> {{ val }}
                         </option>
                     </select>
-                </template>
+                </ng-template>
 
                 <!--Numbers-->
-                <template ngSwitchCase="int">
+                <ng-template ngSwitchCase="int">
                     <input [attr.prefix]="prefix"
                            type="number"
                            class="form-control"
                            [value]="value"/>
-                </template>
-                <template ngSwitchCase="float">
+                </ng-template>
+                <ng-template ngSwitchCase="float">
                     <input [attr.prefix]="prefix"
                            type="number"
                            class="form-control"
                            [value]="value"/>
-                </template>
+                </ng-template>
 
                 <!--Strings-->
-                <template ngSwitchCase="string">
+                <ng-template ngSwitchCase="string">
                     <input [attr.prefix]="prefix"
                            class="form-control"
                            [value]="value"/>
-                </template>
+                </ng-template>
 
                 <!--Booleans-->
-                <template ngSwitchCase="boolean">
+                <ng-template ngSwitchCase="boolean">
                     <ct-toggle-slider class="pull-right"
                                       [attr.prefix]="prefix"
                                       (change)="updateJob($event)"
                                       [value]="value"></ct-toggle-slider>
-                </template>
+                </ng-template>
 
                 <!--Maps-->
-                <template ngSwitchCase="map">
+                <ng-template ngSwitchCase="map">
                     <ct-map-list class="form-group"
                                  [attr.prefix]="prefix"
                                  (change)="updateMap($event)"
                                  [ngModel]="value"></ct-map-list>
-                </template>
+                </ng-template>
 
                 <!--Files and array of Files-->
-                <template ngSwitchCase="File">
+                <ng-template ngSwitchCase="File">
                     <span class="text-warning small">
                         Cannot set default values for type File and File[].
                     </span>
-                </template>
+                </ng-template>
 
                 <!--Every element that's a part of the array can be deleted, so we add a deletion button to it-->
                 <span class="input-group-btn" *ngIf="index !== -1">
@@ -80,7 +80,7 @@ import {WorkflowStepInputModel} from "cwlts/models";
             </div>
 
             <!--Records-->
-            <template ngSwitchCase="record">
+            <ng-template ngSwitchCase="record">
                 
                 <div *ngFor="let entry of input.type.fields" class="ml-1">
                     <label>{{entry?.label || entry.id}} <i class="fa fa-info-circle text-muted"
@@ -98,10 +98,10 @@ import {WorkflowStepInputModel} from "cwlts/models";
                         </div>
                     </ct-tooltip-content>
                 </div>
-            </template>
+            </ng-template>
 
             <!--Arrays-->
-            <template ngSwitchCase="array">
+            <ng-template ngSwitchCase="array">
                 <ct-workflow-step-inspector-entry *ngFor="let entry of value; let i = index"
                                                   [prefix]="prefix + '.[' + i +']'"
                                                   [index]="i"
@@ -115,12 +115,12 @@ import {WorkflowStepInputModel} from "cwlts/models";
                         class="btn pl-0 btn-link no-outline no-underline-hover">
                     <i class="fa fa-plus"></i> New {{ input.type.items }}
                 </button>
-            </template>
+            </ng-template>
 
             <!--Unknown-->
-            <template ngSwitchDefault>
+            <ng-template ngSwitchDefault>
                 <div class="alert alert-info">Unknown input type: {{ inputType || "null" }}</div>
-            </template>
+            </ng-template>
         </div>
     `
 })

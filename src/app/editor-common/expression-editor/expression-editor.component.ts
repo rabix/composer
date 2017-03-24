@@ -123,7 +123,7 @@ export class ExpressionEditorComponent extends DirectiveBase implements OnInit, 
                 icon: ""
             };
 
-            let type = typeof contextItem;
+            let type: string = typeof contextItem;
             if (Array.isArray(contextItem)) {
                 type = "array";
             } else if (contextItem === null) {

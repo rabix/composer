@@ -20,7 +20,7 @@ declare const Snap: any;
              [ct-drop-zones]="['zone1']"
              (onDropSuccess)="onDrop($event.detail.data.event, $event.detail.data.transfer_data)"></svg>
 
-        <template #controls>
+        <ng-template #controls>
             
             <span class="btn-group">
                     <button class="btn btn-sm btn-secondary" (click)="downscale()">-</button>
@@ -30,14 +30,12 @@ declare const Snap: any;
                 
                 </span>
 
-        </template>
+        </ng-template>
 
         <!--Inspector Template -->
-        <template #inspector>
+        <ng-template #inspector>
             <ct-editor-inspector-content>
                 <div class="tc-header">
-                    <ct-tree-node-icon *ngIf="inspectedNode.run" [type]="inspectedNode.run?.class"
-                                       class="align-icon-height"></ct-tree-node-icon>
                     {{ inspectedNode.label || inspectedNode.id || inspectedNode.loc || typeOfInspectedNode()}}
                 </div>
                 <div class="tc-body">
@@ -57,7 +55,7 @@ declare const Snap: any;
 
                 </div>
             </ct-editor-inspector-content>
-        </template>
+        </ng-template>
     `
 })
 export class WorkflowGraphEditorComponent extends DirectiveBase implements OnChanges, OnInit, OnDestroy {

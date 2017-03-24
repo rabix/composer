@@ -31,7 +31,6 @@ import {ToasterComponent} from "./toaster/toaster.component";
 import {ToggleComponent} from "./toggle-slider/toggle-slider.component";
 import {TooltipContentComponent} from "./tooltip/tooltip-content.component";
 import {TooltipDirective} from "./tooltip/tooltip.directive";
-import {TreeNodeIconComponent} from "./tree-view-old/tree-node-icon.component";
 import {TreeNodeComponent} from "./tree-view/tree-node/tree-node.component";
 import {TreeViewComponent} from "./tree-view/tree-view.component";
 import {TabsComponent} from "./tabs/tabs.component";
@@ -82,7 +81,6 @@ import {CheckboxPromptComponent} from "./modal/common/checkbox-prompt.component"
         TooltipContentComponent,
         TooltipDirective,
         TreeNodeComponent,
-        TreeNodeIconComponent,
         TreeViewComponent,
     ],
 
@@ -143,8 +141,6 @@ import {CheckboxPromptComponent} from "./modal/common/checkbox-prompt.component"
         TooltipContentComponent,
         TooltipDirective,
         TreeNodeComponent,
-        TreeNodeIconComponent,
-        TreeNodeIconComponent,
         TreeViewComponent
     ]
 })

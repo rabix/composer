@@ -72,7 +72,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                     </div>
 
                     <!--Object Inspector Template -->
-                    <template #inspector>
+                    <ng-template #inspector>
                         <ct-editor-inspector-content>
                             <div class="tc-header">{{ entry.id || entry.loc || "Input" }}</div>
                             <div class="tc-body">
@@ -84,7 +84,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                                 </ct-tool-input-inspector>
                             </div>
                         </ct-editor-inspector-content>
-                    </template>
+                    </ng-template>
 
                     <div *ngIf="isRecordType(entry)" class="children pl-1 pr-1">
                         <ct-tool-input-list [(entries)]="entry.type.fields"

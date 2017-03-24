@@ -85,12 +85,12 @@ import {ErrorBarService} from "../layout/error-bar/error-bar.service";
 
                     Revision: {{ workflowModel.customProps['sbg:revision']}}
 
-                    <template #revisions>
+                    <ng-template #revisions>
                         <ct-revision-list [active]="workflowModel.customProps['sbg:revision']"
                                           [revisions]="workflowModel.customProps['sbg:revisionsInfo']"
                                           (select)="openRevision($event)">
                         </ct-revision-list>
-                    </template>
+                    </ng-template>
                 </button>
 
             </div>
@@ -129,7 +129,7 @@ import {ErrorBarService} from "../layout/error-bar/error-bar.service";
 
             <!--Object Inspector Column-->
             <ct-editor-inspector [class.flex-hide]="!showInspector">
-                <template #inspector></template>
+                <ng-template #inspector></ng-template>
             </ct-editor-inspector>
         </div>
 
@@ -141,7 +141,7 @@ import {ErrorBarService} from "../layout/error-bar/error-bar.service";
                                   [issues]="validation"></ct-validation-report>
         </div>
 
-        <template #statusControls>
+        <ng-template #statusControls>
             <span class="btn-group">
             <button [disabled]="!validation"
                     [class.btn-primary]="reportPanel === 'validation'"
@@ -164,7 +164,7 @@ import {ErrorBarService} from "../layout/error-bar/error-bar.service";
             
             </button>
             </span>
-        </template>
+        </ng-template>
     `
 })
 export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy, OnInit, WorkboxTab {

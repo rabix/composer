@@ -20,53 +20,53 @@ import {ObjectHelper} from "../../helpers/object.helper";
             <div class="input-group">
 
                 <!--Enums-->
-                <template ngSwitchCase="enum">
+                <ng-template ngSwitchCase="enum">
                     <select [value]="value" class="form-control"
                             [attr.prefix]="prefix">
                         <option *ngFor="let val of input.type.symbols" [value]="val"> {{ val }}
                         </option>
                     </select>
-                </template>
+                </ng-template>
 
                 <!--Numbers-->
-                <template ngSwitchCase="int">
+                <ng-template ngSwitchCase="int">
                     <input [attr.prefix]="prefix"
                            type="number"
                            class="form-control"
                            [value]="value"/>
-                </template>
-                <template ngSwitchCase="float">
+                </ng-template>
+                <ng-template ngSwitchCase="float">
                     <input [attr.prefix]="prefix"
                            type="number"
                            class="form-control"
                            [value]="value"/>
-                </template>
+                </ng-template>
 
                 <!--Strings-->
-                <template ngSwitchCase="string">
+                <ng-template ngSwitchCase="string">
                     <input [attr.prefix]="prefix"
                            class="form-control"
                            [value]="value"/>
-                </template>
+                </ng-template>
 
                 <!--Booleans-->
-                <template ngSwitchCase="boolean">
+                <ng-template ngSwitchCase="boolean">
                     <ct-toggle-slider class="pull-right"
                                       [attr.prefix]="prefix"
                                       (change)="updateJob($event)"
                                       [value]="value"></ct-toggle-slider>
-                </template>
+                </ng-template>
 
                 <!--Maps-->
-                <template ngSwitchCase="map">
+                <ng-template ngSwitchCase="map">
                     <ct-map-list class="form-group"
                                  [attr.prefix]="prefix"
                                  (change)="updateMap(value)"
                                  [ngModel]="value"></ct-map-list>
-                </template>
+                </ng-template>
 
                 <!--Files-->
-                <template ngSwitchCase="File">
+                <ng-template ngSwitchCase="File">
                     <input [attr.jobPropPath]="'path'"
                            [attr.prefix]="prefix"
                            class="form-control"
@@ -79,7 +79,7 @@ import {ObjectHelper} from "../../helpers/object.helper";
                         </button>
                     </span>
 
-                    <template #fileInspector>
+                    <ng-template #fileInspector>
                         <ct-editor-inspector-content>
                             <div class="tc-header">{{ input?.id }}</div>
                             <div class="tc-body">
@@ -88,8 +88,8 @@ import {ObjectHelper} from "../../helpers/object.helper";
                                 </ct-file-input-inspector>
                             </div>
                         </ct-editor-inspector-content>
-                    </template>
-                </template>
+                    </ng-template>
+                </ng-template>
 
                 <!--Every element that's a part of the array can be deleted, so we add a deletion button to it-->
                 <span [class]="inputType !== 'record' ? 'input-group-btn' : 'record-delete'" *ngIf="index !== -1">
@@ -100,7 +100,7 @@ import {ObjectHelper} from "../../helpers/object.helper";
             </div>
 
             <!--Records-->
-            <template ngSwitchCase="record">
+            <ng-template ngSwitchCase="record">
                 <div *ngFor="let entry of input.type.fields" class="ml-1">
                     <label>{{ entry?.label || entry.id }} <i class="fa fa-info-circle text-muted"
                                                              *ngIf="entry.description"
@@ -119,10 +119,10 @@ import {ObjectHelper} from "../../helpers/object.helper";
                     </ct-tooltip-content>
                 </div>
                 
-            </template>
+            </ng-template>
 
             <!--Arrays-->
-            <template ngSwitchCase="array">
+            <ng-template ngSwitchCase="array">
                 <ct-job-editor-entry *ngFor="let entry of value; let i = index"
                                      [prefix]="prefix + '.[' + i +']'"
                                      [index]="i"
@@ -135,12 +135,12 @@ import {ObjectHelper} from "../../helpers/object.helper";
                         class="btn pl-0 btn-link no-outline no-underline-hover">
                     <i class="fa fa-plus"></i> New {{ input.type.items }}
                 </button>
-            </template>
+            </ng-template>
 
             <!--Unknown-->
-            <template ngSwitchDefault>
+            <ng-template ngSwitchDefault>
                 <div class="alert alert-info">Unknown input type: {{ inputType }}</div>
-            </template>
+            </ng-template>
         </div>
     `
 })
