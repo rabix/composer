@@ -31,6 +31,6 @@ export class SettingsButtonComponent {
             id: "?settings",
             label: "Settings",
             type: "Settings",
-        });
+        }, false);
     }
 }

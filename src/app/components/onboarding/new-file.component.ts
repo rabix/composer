@@ -1,4 +1,7 @@
-import {Component, ViewEncapsulation} from "@angular/core";
+import {Component, OnInit, ViewEncapsulation} from "@angular/core";
+import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {UserPreferencesService} from "../../services/storage/user-preferences.service";
+import {WorkboxService} from "../../core/workbox/workbox.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -79,6 +82,16 @@ import {Component, ViewEncapsulation} from "@angular/core";
                     <!--Container context-->
                     <div class="app-container">
                         <div class="app">
+                            <div class="revisions">
+                                <ct-nav-search-result *ngFor="let entry of recentApps" class="pl-1 pr-1 deep-unselectable"
+                                                      [id]="entry?.id"
+                                                      [icon]="entry.type === 'Workflow' ? 'fa-share-alt': 'fa-terminal'"
+                                                      [title]="entry?.title"
+                                                      [label]="entry?.label"
+                                                      (dblclick)="openRecentApp(entry)">
+                                </ct-nav-search-result>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -92,6 +105,25 @@ import {Component, ViewEncapsulation} from "@angular/core";
         <ct-getting-started></ct-getting-started>
     `
 })
-export class NewFileTabComponent {
+export class NewFileTabComponent extends DirectiveBase implements OnInit {
 
+    public recentApps = [];
+
+    constructor(private preferences: UserPreferencesService, private workbox: WorkboxService) {
+        super();
+    }
+
+    ngOnInit(): void {
+        this.tracked = this.preferences.get("recentApps", []).subscribe((items) => {
+            this.recentApps = items.reverse();
+        });
+    }
+
+    openRecentApp(entry: { id: string }) {
+        console.log("Open a recent item", entry);
+        this.workbox.getOrCreateFileTab(entry.id)
+            .take(1)
+            .subscribe(tab => this.workbox.openTab(tab));
+    }
 }
+
