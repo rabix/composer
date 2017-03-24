@@ -81,6 +81,8 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
 
     codeEditorContent = new FormControl(undefined);
 
+    priorityCodeUpdates = new Subject();
+
     constructor(private cwlValidatorService: CwlSchemaValidationWorkerService,
                 private formBuilder: FormBuilder,
                 private inspector: EditorInspectorService,
@@ -111,7 +113,8 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
         // Whenever the editor content is changed, validate it using a JSON Schema.
         this.tracked = this.codeEditorContent
             .valueChanges
-            // .debounceTime(1000)
+            .debounceTime(1000)
+            .merge(this.priorityCodeUpdates)
             .distinctUntilChanged().subscribe(latestContent => {
 
                 this.cwlValidatorService.validate(latestContent).then(r => {
@@ -199,6 +202,8 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
             });
 
         this.codeEditorContent.setValue(this.data.fileContent);
+        this.tracked = this.priorityCodeUpdates.subscribe(txt => this.codeEditorContent.setValue(txt));
+
         this.statusBar.setControls(this.statusControls);
     }
 
@@ -293,7 +298,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
 
     openRevision(revisionNumber: number) {
         this.platformAPI.getAppCWL(this.data.parsedContent["sbg:id"], revisionNumber).subscribe(txt => {
-            this.codeEditorContent.setValue(txt);
+            this.priorityCodeUpdates.next(txt);
             this.toolGroup.reset();
         });
     }
