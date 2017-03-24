@@ -48,15 +48,13 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                        [formControl]="form.controls['prefix']"/>
             </div>
 
-            <div class="form-group flex-container">
-                <label>Prefix and value separation</label>
-                <span class="align-right">
+            <div class="form-group">
+                <label>Separate value and prefix</label>
+                <span class="pull-right">
                     <ct-toggle-slider
                             [ct-disabled]="isType('record')"
                             [formControl]="form.controls['separate']"
-                            [on]="'Separate'"
-                            [readonly]="readonly"
-                            [off]="'Join'"></ct-toggle-slider>
+                            [readonly]="readonly"></ct-toggle-slider>
                 </span>
             </div>
 

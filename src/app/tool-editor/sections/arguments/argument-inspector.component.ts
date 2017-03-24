@@ -1,5 +1,5 @@
-import {Subject} from "rxjs";
-import {Component, Input, Output, ViewEncapsulation} from "@angular/core";
+import {Subject} from "rxjs/Subject";
+import {Component, Input, Output, ViewEncapsulation, OnInit} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {CommandArgumentModel} from "cwlts/models";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
@@ -11,7 +11,9 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         <form [formGroup]="form">
             <div class="form-group">
                 <label>CommandLineBinding</label>
-                <ct-toggle-slider on="" off="" [formControl]="form.controls['hasBinding']"></ct-toggle-slider>
+                <span class="pull-right">
+                    <ct-toggle-slider [formControl]="form.controls['hasBinding']"></ct-toggle-slider>
+                </span>
             </div>
 
             <div *ngIf="argument.hasBinding">
@@ -31,12 +33,10 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                     </ct-expression-input>
                 </div>
 
-                <div class="form-group flex-container">
-                    <label>Prefix and value separation</label>
-                    <span class="align-right">
+                <div class="form-group">
+                    <label>Separate value and prefix</label>
+                    <span class="pull-right">
                         <ct-toggle-slider [formControl]="form.controls['separate']"
-                                          [on]="'Separate'"
-                                          [off]="'Join'"
                                           [readonly]="readonly">
                         </ct-toggle-slider>
                     </span>
@@ -68,7 +68,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         </form>
     `
 })
-export class ArgumentInspector extends DirectiveBase {
+export class ArgumentInspectorComponent extends DirectiveBase implements OnInit {
 
     @Input()
     public readonly = false;
@@ -104,6 +104,7 @@ export class ArgumentInspector extends DirectiveBase {
                 this.argument.toggleBinding(val);
             } else if (val === false) {
                 this.argument.toggleBinding(val);
+                this.form.controls["primitive"].setValue(this.argument.primitive);
             }
         });
 

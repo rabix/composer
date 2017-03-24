@@ -24,12 +24,10 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <div class="block mb-1">
-            <div class="col-xs-12">
-                <button class="btn btn-secondary pull-right"
-                        (click)="reset.emit()">
-                    Reset to mock values
-                </button>
-            </div>
+            <button class="btn btn-secondary pull-right"
+                    (click)="reset.emit()">
+                Reset to mock values
+            </button>
         </div>
 
 

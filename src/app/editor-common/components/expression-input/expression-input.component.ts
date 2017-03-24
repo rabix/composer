@@ -64,13 +64,13 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
 
     /** When set to true, only expressions are allowed */
     @Input()
-    disableLiteralTextInput: boolean = false;
+    disableLiteralTextInput = false;
 
     @Input()
     readonly = false;
 
     /** Flag if model is expression or primitive */
-    isExpr: boolean = false;
+    isExpr = false;
 
     /**
      * Internal ExpressionModel on which changes are made
@@ -103,7 +103,7 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
     /**
      * Declaration of touch function
      */
-    private onTouch = noop;
+    onTouch = noop;
 
 
     /**
@@ -113,7 +113,7 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
      */
     writeValue(obj: ExpressionModel): void {
         if (!(obj instanceof ExpressionModel)) {
-            console.warn(`ct-expression-input expected ExpressionModel, instead got ${obj}`)
+            console.warn(`ct-expression-input expected ExpressionModel, instead got ${obj}`);
         }
 
         if (obj) {
@@ -152,7 +152,7 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
      * Callback for setting string value to model
      * @param str
      */
-    private editString(str: number | string) {
+    editString(str: number | string) {
         if (this.type === "number") {
             str = Number(str);
         }
@@ -165,7 +165,7 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
      * @param action
      * @param event
      */
-    private editExpr(action: "clear" | "edit", event: Event): void {
+    editExpr(action: "clear" | "edit", event: Event): void {
 
         if (!action) {
             return;
@@ -180,7 +180,7 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
 
             editor.readonly = this.readonly;
 
-            const cachedValue = this.model.serialize();
+            const cachedValue = this.model.serialize() || "";
             const cachedType = this.model.type;
 
             editor.model   = this.model;

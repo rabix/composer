@@ -38,7 +38,8 @@ import {AppTabData} from "../core/workbox/app-tab-data";
     template: `
         <!--Control Header-->
         <ct-action-bar>
-            <ct-tab-selector [distribute]="'auto'" [active]="viewMode" (activeChange)="switchTab($event)">
+            <ct-tab-selector [distribute]="'auto'" [active]="viewMode"
+                             (activeChange)="switchTab($event)">
 
                 <ct-tab-selector-entry [disabled]="!isValidCWL"
                                        [tabName]="'info'">App Info
@@ -58,6 +59,9 @@ import {AppTabData} from "../core/workbox/app-tab-data";
             </ct-tab-selector>
 
             <div class="document-controls">
+
+                <!--CWLVersion-->
+                <span class="btn btn-sm">{{toolModel.cwlVersion}}</span>
 
                 <!--Go to app-->
                 <button class="btn btn-sm btn-secondary " type="button" (click)="goToApp()">
@@ -129,7 +133,8 @@ import {AppTabData} from "../core/workbox/app-tab-data";
 
 
             <!--Object Inspector Column-->
-            <ct-editor-inspector [class.flex-hide]="!showInspector && (viewMode === 'code' || viewMode === 'info')">
+            <ct-editor-inspector
+                    [class.flex-hide]="!showInspector && (viewMode === 'code' || viewMode === 'info')">
                 <template #inspector></template>
             </ct-editor-inspector>
         </div>

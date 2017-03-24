@@ -8,7 +8,7 @@ import {ToolInputsComponent} from "./sections/inputs/tool-inputs.component";
 import {ToolInputListComponent} from "./sections/inputs/tool-input-list.component";
 import {ToolOutputListComponent} from "./sections/outputs/tool-output-list.component";
 import {ToolOutputsComponent} from "./sections/outputs/tool-outputs.component";
-import {ArgumentInspector} from "./sections/arguments/argument-inspector.component";
+import {ArgumentInspectorComponent} from "./sections/arguments/argument-inspector.component";
 import {BasicInputSectionComponent} from "./object-inspector/input-inspector/basic-section/basic-input-section.component";
 import {BasicOutputSectionComponent} from "./object-inspector/output-inspector/output-basic-section/basic-output-section.component";
 import {DescriptionComponent} from "./object-inspector/common-sections/description-section/description.component";
@@ -34,7 +34,7 @@ import {LayoutModule} from "../layout/layout.module";
 
 @NgModule({
     declarations: [
-        ArgumentInspector,
+        ArgumentInspectorComponent,
         ArgumentListComponent,
         BasicInputSectionComponent,
         BasicOutputSectionComponent,

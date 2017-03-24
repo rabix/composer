@@ -12,10 +12,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
     selector: "ct-tool-visual-editor",
     styleUrls: ["./tool-visual-editor.component.scss"],
     template: `
-            <form
-                  [formGroup]="formGroup">
-                
-                {{ formGroup.dirty }}
+            <form [formGroup]="formGroup">
                 
                 <ct-docker-requirement [dockerRequirement]="model.docker"
                                        (update)="setRequirement($event, true)"
