@@ -120,7 +120,7 @@ export class ModalService {
                content?: string,
                confirmationLabel?: string,
                cancellationLabel ?: string,
-               formControl: FormControl,
+               formControl?: FormControl,
            }) {
 
         return this.wrapPromise((resolve, reject) => {

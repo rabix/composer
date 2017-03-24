@@ -2,12 +2,13 @@ import {AfterViewInit, Component, Input, OnInit, Output} from "@angular/core";
 import {FormControl, FormGroup} from "@angular/forms";
 import {Subject} from "rxjs/Subject";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {AsyncSubject} from "rxjs";
 
 @Component({
     styleUrls: ["prompt.component.scss"],
     selector: "ct-modal-prompt",
     template: `
-        <form (ngSubmit)="decision.next(answer.value)" [formGroup]="form">
+        <form (ngSubmit)="decide(answer.value)" [formGroup]="form">
             <div class="body p-1">
                 <div class="form-group">
                     <label [innerHTML]="content"></label>
@@ -18,7 +19,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                 <div *ngFor="let err of errors">{{ err }}</div>
             </div>
             <div class="footer pr-1 pb-1">
-                <button class="btn btn-secondary" (click)="decision.next(false)" type="button">
+                <button class="btn btn-secondary" (click)="decide(false)" type="button">
                     {{ cancellationLabel }}
                 </button>
                 <button [disabled]="form.invalid" class="btn btn-success" type="submit">
@@ -40,7 +41,7 @@ export class PromptComponent extends DirectiveBase implements OnInit, AfterViewI
     confirmationLabel: string;
 
     @Output()
-    decision = new Subject<boolean>();
+    decision = new AsyncSubject<boolean>();
 
     @Input()
     formControl: FormControl;
@@ -52,7 +53,7 @@ export class PromptComponent extends DirectiveBase implements OnInit, AfterViewI
     constructor() {
 
         super();
-        this.content = "Are you sure?";
+        this.content           = "Are you sure?";
         this.cancellationLabel = "Cancel";
         this.confirmationLabel = "Yes";
 
@@ -60,6 +61,9 @@ export class PromptComponent extends DirectiveBase implements OnInit, AfterViewI
     }
 
     ngOnInit() {
+        if (!this.formControl) {
+            this.formControl = new FormControl("");
+        }
         this.form.addControl("formControl", this.formControl);
     }
 
@@ -68,5 +72,10 @@ export class PromptComponent extends DirectiveBase implements OnInit, AfterViewI
             this.errors = Object.keys(this.formControl.errors || {})
                 .map(key => this.formControl.errors[key]);
         });
+    }
+
+    decide(answer) {
+        this.decision.next(answer);
+        this.decision.complete();
     }
 }

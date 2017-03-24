@@ -1,14 +1,6 @@
-import {
-    ChangeDetectionStrategy,
-    Component,
-    Input,
-    OnChanges,
-    Output,
-    SimpleChanges,
-    ViewEncapsulation
-} from "@angular/core";
-import {PlatformAppRevisionEntry} from "../../../services/api/platforms/platform-api.types";
+import {ChangeDetectionStrategy, Component, Input, OnChanges, Output, SimpleChanges} from "@angular/core";
 import {Subject} from "rxjs/Subject";
+import {PlatformAppRevisionEntry} from "../../../services/api/platforms/platform-api.types";
 
 @Component({
 
@@ -24,6 +16,8 @@ import {Subject} from "rxjs/Subject";
                      (click)="selectRevision(revision)"
                      [class.active]="active === revision.number"
                      *ngFor="let revision of displayList">
+                    
+                    <ct-line-loader *ngIf="loadingRevision === revision"></ct-line-loader>
 
                     <div class="revision-number h5">
                         <div>{{ revision.number }}</div>
@@ -68,9 +62,9 @@ export class RevisionListComponent implements OnChanges {
             return;
         }
 
+        this.loadingRevision = revision;
         this.select.next(revision.number);
 
-        this.loadingRevision = revision;
     }
 
     ngOnChanges(changes: SimpleChanges): void {

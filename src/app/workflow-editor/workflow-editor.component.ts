@@ -51,7 +51,11 @@ import LoadOptions = jsyaml.LoadOptions;
                 <span class="btn btn-sm">{{workflowModel.cwlVersion}}</span>
 
                 <!--Go to app-->
-                <button class="btn btn-sm btn-secondary " type="button" (click)="goToApp()" ct-tooltip="See on Seven Bridges">
+                <button class="btn btn-sm btn-secondary " 
+                        type="button"
+                        (click)="goToApp()"
+                        tooltipPlacement="bottom"
+                        ct-tooltip="Open on Seven Bridges Platform">
                     <i class="fa fa-external-link"></i>
                 </button>
 
@@ -59,12 +63,13 @@ import LoadOptions = jsyaml.LoadOptions;
                 <button [disabled]="!data.isWritable"
                         (click)="save()"
                         ct-tooltip="Save"
+                        tooltipPlacement="bottom"
                         class="btn btn-sm btn-secondary" type="button">
                     <i class="fa fa-save"></i>
                 </button>
 
                 <!--Copy-->
-                <button class="btn btn-sm btn-secondary " type="button" ct-tooltip="Save As...">
+                <button class="btn btn-sm btn-secondary " type="button" ct-tooltip="Save As..." tooltipPlacement="bottom">
                     <i class="fa fa-copy"></i>
                 </button>
 
@@ -230,7 +235,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
         }
 
         // Whenever the editor content is changed, validate it using a JSON Schema.
-        this.tracked = this.codeEditorContent.valueChanges.distinctUntilChanged().subscribe(latestContent => {
+        this.tracked = this.codeEditorContent.valueChanges.debounceTime(1000).distinctUntilChanged().subscribe(latestContent => {
 
             this.cwlValidatorService.validate(latestContent).then(r => {
 

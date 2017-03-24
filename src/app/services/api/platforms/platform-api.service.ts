@@ -122,9 +122,9 @@ export class PlatformAPI {
         })))).first();
     }
 
-    public getAppCWL(app, revision?: number) {
+    public getAppCWL(appId, revision?: number) {
 
-        const id = app["sbg:id"].split("/").slice(0, -1).concat(revision).filter(x => x !== undefined).join("/");
+        const id = appId.split("/").slice(0, -1).concat(revision).filter(x => x !== undefined).join("/");
 
         return this.sessionID.switchMap(sessionID => this.http.get(`${this.platformServices.brood}/raw/${id}`, {
             headers: new Headers({

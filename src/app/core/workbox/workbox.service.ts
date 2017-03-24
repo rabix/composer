@@ -2,19 +2,33 @@ import {Injectable} from "@angular/core";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {DataGatewayService} from "../data-gateway/data-gateway.service";
 import * as YAML from "js-yaml";
-import {Observable} from "rxjs";
+import {Observable, ReplaySubject} from "rxjs";
 import {TabData} from "./tab-data.interface";
 import {AppTabData} from "./app-tab-data";
+import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 
 @Injectable()
 export class WorkboxService {
 
-    public tabs = new BehaviorSubject([]);
+    public tabs = new BehaviorSubject<TabData<any>[]>([]);
 
     public activeTab = new BehaviorSubject(undefined);
 
-    constructor(private dataGateway: DataGatewayService) {
+    constructor(private dataGateway: DataGatewayService,
+                private preferences: UserPreferencesService) {
 
+        this.tabs.skip(2).subscribe(tabs => {
+            const t = tabs.map(tab => {
+                const {id, label, type} = tab;
+                return {id, label, type};
+            });
+
+            this.preferences.put("openTabs", t);
+        });
+
+        this.activeTab.filter(t => t !== undefined).subscribe(tab => {
+            this.preferences.put("activeTab", tab.id);
+        });
     }
 
     public openTab(tab) {
@@ -29,7 +43,6 @@ export class WorkboxService {
 
         this.tabs.next(tabs.concat(tab));
         this.activateTab(tab);
-
     }
 
     public closeTab(tab?) {
@@ -155,5 +168,6 @@ export class WorkboxService {
 
         });
     }
+
 
 }

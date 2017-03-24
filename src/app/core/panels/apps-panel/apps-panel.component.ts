@@ -5,7 +5,7 @@ import {UserPreferencesService} from "../../../services/storage/user-preferences
     selector: "ct-apps-panel",
     template: `
         <ct-tab-selector distribute="equal" [active]="activeTab" (activeChange)="changeTab($event)">
-            <ct-tab-selector-entry [tabName]="'myApps'">My Apps</ct-tab-selector-entry>
+            <ct-tab-selector-entry [tabName]="'myApps'">My Projects</ct-tab-selector-entry>
             <ct-tab-selector-entry [tabName]="'publicApps'">Public Apps</ct-tab-selector-entry>
         </ct-tab-selector>
 

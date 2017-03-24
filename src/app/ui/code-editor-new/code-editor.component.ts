@@ -83,7 +83,7 @@ export class CodeEditorComponent implements OnInit, ControlValueAccessor, OnDest
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        if (!changes["options"].isFirstChange()) {
+        if (changes["options"] && !changes["options"].isFirstChange()) {
             this.editor.setOptions(changes["options"]);
         }
     }
