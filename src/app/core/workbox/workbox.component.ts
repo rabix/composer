@@ -111,11 +111,6 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
         this.tracked = this.workbox.tabs.subscribe(tabs => {
             this.tabs = tabs;
         });
-
-        setTimeout(() => {
-            this.openWelcomeTab();
-        });
-
     }
 
     ngAfterViewInit() {
@@ -123,7 +118,7 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
             this.statusBar.removeControls();
 
             this.activeTab = tab;
-            const idx      = this.tabs.findIndex(t => t === tab);
+            const idx = this.tabs.findIndex(t => t === tab);
 
             const component = this.tabComponents.find((item, index) => index === idx);
 
@@ -193,20 +188,35 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
     }
 
     restoreTabs() {
-        this.preferences.get("openTabs", []).take(1).subscribe(tabs => {
+        Observable.zip(this.preferences.get("localFolders", []), this.preferences.get("openProjects", [])
+            , this.preferences.get("openTabs", []), (localFolders, openProjects, openTabs) => {
 
-            console.log("Adding open tabs", tabs);
-            tabs.forEach(tab => {
-                if (tab.id.startsWith("?")) {
-                    this.workbox.openTab(tab);
+                // If there are no open local folders or user projects) open welcome tab
+                if (!(localFolders.length || openProjects.length)) {
+                    this.openWelcomeTab();
                 } else {
-                    this.workbox.getOrCreateFileTab(tab.id).take(1).subscribe(appTab => {
-                        this.workbox.openTab(appTab);
-                    }, err => {
-                        console.warn("Cannot open app tab", tab);
-                    });
+
+                    // If there are no open tabs (to restore), open new file tab
+                    if (!openTabs.length) {
+                        this.openNewFileTab();
+                    } else {
+
+                        // Restore open tabs
+                        console.log("Adding open tabs", openTabs);
+                        openTabs.forEach(tab => {
+                            if (tab.id.startsWith("?")) {
+                                this.workbox.openTab(tab);
+                            } else {
+                                this.workbox.getOrCreateFileTab(tab.id).take(1).subscribe(appTab => {
+                                    this.workbox.openTab(appTab);
+                                }, err => {
+                                    console.warn("Cannot open app tab", tab);
+                                });
+                            }
+                        });
+                    }
                 }
-            });
+            }).take(1).subscribe(() => {
         });
     }
 }
