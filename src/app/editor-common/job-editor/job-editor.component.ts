@@ -8,12 +8,12 @@ import {
     OnDestroy,
     Output,
     SimpleChanges,
-    ViewEncapsulation
 } from "@angular/core";
 import {ObjectHelper as OH} from "../../helpers/object.helper";
 import {CommandInputParameterModel} from "cwlts/models";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
+import {CommandLineToolModel} from "cwlts/models";
 
 /**
  * Job Editor modifies the test values of the job json.
@@ -94,21 +94,14 @@ export class JobEditorComponent implements OnChanges, OnDestroy {
     /**
      * Existing CWL job metadata.
      */
-    @Input()
-    context: {
-        $job?: {
-            allocatedResources?: { cpu: number, mem: number }, inputs?: {}
-        },
-        inputs?: {},
-        runtime?: { ram: number, cores: number }
-    } = {};
+    job: { allocatedResources?: { cpu: number, mem: number }, inputs?: {} } = {};
 
-    job: { inputs?: {}, allocatedResources?: {} };
+    @Input()
+    model: CommandLineToolModel;
 
     /**
      * CWL app input definitions.
      */
-    @Input()
     inputs: CommandInputParameterModel[] = [];
 
     @Output()
@@ -189,15 +182,10 @@ export class JobEditorComponent implements OnChanges, OnDestroy {
         this.statusBar.instant(`Updated job value of ${input ? input.label || input.id : inputId}.`);
 
         // Assign the given value to the job key
-        // if (this.context.$job) {
-        //     OH.addProperty(this.context.$job.inputs, inputId, jobValue);
-        // } else {
-        //     OH.addProperty(this.context.inputs, inputId, jobValue);
-        // }
         OH.addProperty(this.job.inputs, inputId, jobValue);
 
         // Send the update to the output of this component
-        this.update.emit(this.context);
+        this.update.emit(this.job);
         this.cdr.markForCheck();
     }
 
@@ -219,13 +207,17 @@ export class JobEditorComponent implements OnChanges, OnDestroy {
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        this.job = this.context.$job || {
-                inputs: this.context.inputs,
+        const context = this.model.getContext();
+
+        this.job = context.$job || {
+                inputs: context.inputs,
                 allocatedResources: {
-                    mem: this.context.runtime.ram,
-                    cpu: this.context.runtime.cores
+                    mem: context.runtime.ram,
+                    cpu: context.runtime.cores
                 }
             };
+
+        this.inputs = this.model.inputs;
 
         // Whenever inputs are updated, regroup them and sort them for display
         const grouped = this.inputs.reduce((acc, item) => {

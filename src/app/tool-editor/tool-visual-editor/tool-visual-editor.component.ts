@@ -1,4 +1,4 @@
-import {Component, Input, OnDestroy} from "@angular/core";
+import {Component, Input, OnDestroy, OnChanges} from "@angular/core";
 import {FormGroup} from "@angular/forms";
 
 import {CommandLineToolModel} from "cwlts/models";
@@ -18,7 +18,6 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
             </ct-docker-requirement>
 
             <ct-base-command [baseCommand]="model.baseCommand"
-                             [context]="model.context"
                              [model]="model"
                              [stdin]="model.stdin"
                              [stdout]="model.stdout"
@@ -28,15 +27,14 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
             </ct-base-command>
 
             <ct-tool-input [location]="model.loc + '.inputs'"
-                           [context]="model.context"
                            [model]="model"
                            (update)="formGroup.markAsDirty()"
                            [readonly]="readonly">
             </ct-tool-input>
 
             <ct-tool-output [location]="model.loc + '.outputs'"
-                            [context]="model.context"
                             [model]="model"
+                            [context]="context"
                             [inputs]="model.inputs || []"
                             (update)="formGroup.markAsDirty()"
                             [readonly]="readonly">
@@ -44,11 +42,12 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 
             <ct-resources [entries]="model.resources"
                           (update)="formGroup.markAsDirty()"
-                          [context]="model.context"
+                          [context]="context"
                           [readonly]="readonly">
             </ct-resources> 
             
             <ct-hints [model]="model"
+                      [context]="context"
                       (update)="formGroup.markAsDirty()"
                       [readonly]="readonly">
             </ct-hints>
@@ -56,21 +55,21 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
             <ct-argument-list [location]="model.loc + '.arguments'"
                               [model]="model"
                               (update)="formGroup.markAsDirty()"
-                              [context]="model.context"
+                              [context]="context"
                               [readonly]="readonly">
             </ct-argument-list>
 
             <ct-file-def-list [model]="model.fileRequirement || {}"
                               [location]="model.fileRequirement?.loc"
                               (update)="updateModel('fileRequirement', $event)"
-                              [context]="model.context"
+                              [context]="context"
                               [readonly]="readonly">
             </ct-file-def-list>
         </form>
 
     `
 })
-export class ToolVisualEditorComponent extends DirectiveBase implements OnDestroy {
+export class ToolVisualEditorComponent extends DirectiveBase implements OnDestroy, OnChanges {
 
     @Input()
     model: CommandLineToolModel;
@@ -82,8 +81,14 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
     @Input()
     formGroup: FormGroup;
 
+    context: any;
+
     constructor(public inspector: EditorInspectorService) {
         super();
+    }
+
+    ngOnChanges() {
+        this.context = this.model.getContext();
     }
 
     updateModel(category: string, data: any) {
