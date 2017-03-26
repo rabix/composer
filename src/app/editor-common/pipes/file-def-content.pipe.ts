@@ -1,31 +1,29 @@
 import {Pipe, PipeTransform} from "@angular/core";
-import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
-import {Expression} from "cwlts/mappings/d2sb/Expression";
+import {ExpressionModel} from "cwlts/models";
 
 @Pipe({
-    name: "fileDefContent"
+    name: "fileDefContent",
+    pure: false
 })
 
 export class FileDefContentPipe implements PipeTransform {
-    transform(value: SBDraft2ExpressionModel, args: any[]): any {
+    transform(value: ExpressionModel, args: any[]): any {
 
         if (!value) {
             return "";
         }
 
-        if (value instanceof SBDraft2ExpressionModel) {
+        if (value instanceof ExpressionModel) {
             const serialized = value.serialize();
-            if (serialized === undefined) return "";
-
-            if ((serialized as Expression).script) {
-                const lines = (serialized as Expression).script.split("\n").length + 1;
-                return `${lines} lines, expression`;
+            if (serialized === undefined) {
+                return "";
             }
 
-            if (typeof serialized === "string") {
-                const lines = serialized.split("\n").length + 1;
-                return `${lines} lines, literal`;
-            }
+            const str  = value.toString();
+            const type = value.isExpression ? "expression" : "literal";
+
+            const lines = str.split("\n").length + 1;
+            return `${lines} lines, ${type}`;
         }
     }
 }

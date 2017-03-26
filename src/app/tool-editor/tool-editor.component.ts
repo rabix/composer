@@ -291,7 +291,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
     private getModelText(): string {
         const modelObject = Object.assign(this.toolModel.serialize(), {"rbx:modified": true});
 
-        return this.data.language === "json" ? JSON.stringify(modelObject, null, 4) : Yaml.dump(modelObject);
+        return this.data.language === "json" || this.data.dataSource === "app" ? JSON.stringify(modelObject, null, 4) : Yaml.dump(modelObject);
     }
 
     toggleReport(panel: "validation" | "commandLinePreview") {

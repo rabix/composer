@@ -1,27 +1,20 @@
 import {
-    ChangeDetectionStrategy,
     Component,
     Input,
     Output,
     QueryList,
     TemplateRef,
     ViewChildren,
-    ViewEncapsulation
+    ChangeDetectorRef
 } from "@angular/core";
-import {FileDef} from "cwlts/mappings/d2sb/FileDef";
-import {FileDefModel} from "cwlts/models/d2sb";
+import {CreateFileRequirementModel, DirentModel} from "cwlts/models";
 import {Subject} from "rxjs/Subject";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
-import {noop} from "../../../lib/utils.lib";
-import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {ModalService} from "../../../ui/modal/modal.service";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-file-def-list",
-    styleUrls: ["./file-def-inspector.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <ct-form-panel [collapsed]="false">
             <span class="tc-header">
@@ -32,25 +25,26 @@ import {ModalService} from "../../../ui/modal/modal.service";
 
 
                 <!--Blank Tool Screen-->
-                <ct-blank-tool-state *ngIf="!readonly && !entries.length"
+                <ct-blank-tool-state *ngIf="!readonly && !model.listing?.length"
                                      [title]="'Create temporary files needed for the tools'"
                                      [buttonText]="'Create a file'"
                                      (buttonClick)="addEntry()">
                 </ct-blank-tool-state>
 
                 <!--List Header Row-->
-                <div class="gui-section-list-title" *ngIf="entries.length">
+                <div class="gui-section-list-title" *ngIf="model.listing?.length">
                     <div class="col-sm-5">Name</div>
                     <div class="col-sm-7">Content</div>
                 </div>
+
 
                 <!--FileDef List Entries-->
                 <ul class="gui-section-list">
 
                     <!--List Entry-->
-                    <li *ngFor="let entry of entries; let i = index"
+                    <li *ngFor="let entry of model.listing; let i = index"
                         class="input-list-items">
-
+                        
                         <div class="gui-section-list-item clickable"
                              [ct-validation-class]="entry.validation"
                              [ct-editor-inspector]="inspector"
@@ -58,15 +52,15 @@ import {ModalService} from "../../../ui/modal/modal.service";
 
                             <!--Name Column-->
                             <div class="col-sm-5 ellipsis">
-                                {{ entry?.filename | fileDefName }}
+                                {{ entry.entryName | fileDefName }}
                             </div>
 
                             <!--Content Column-->
                             <div class="ellipsis" [ngClass]="{
                                 'col-sm-6': !readonly,
                                 'col-sm-7': readonly
-                            }" [title]="entry?.fileContent | fileDefContent">
-                                {{ entry?.fileContent | fileDefContent }}
+                            }" [title]="entry.entry | fileDefContent">
+                                {{ entry.entry | fileDefContent }}
                             </div>
 
                             <!--Actions Column-->
@@ -86,7 +80,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                                     <ct-file-def-inspector
                                             (save)="updateFileDef($event, i)"
                                             [context]="context"
-                                            [fileDef]="entry"
+                                            [dirent]="entry"
                                             [readonly]="readonly">
                                     </ct-file-def-inspector>
                                 </div>
@@ -96,7 +90,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                 </ul>
 
                 <!--Add entry link-->
-                <button *ngIf="!readonly && entries.length"
+                <button *ngIf="!readonly && model.listing?.length"
                         (click)="addEntry()"
                         type="button"
                         class="btn pl-0 btn-link no-outline no-underline-hover">
@@ -109,9 +103,8 @@ import {ModalService} from "../../../ui/modal/modal.service";
 })
 export class FileDefListComponent extends DirectiveBase {
 
-    /** List of entries that should be shown */
     @Input()
-    entries: FileDefModel[] = [];
+    model: CreateFileRequirementModel;
 
     @Input()
     readonly = false;
@@ -123,20 +116,18 @@ export class FileDefListComponent extends DirectiveBase {
     location = "";
 
     @Output()
-    update = new Subject<FileDefModel[]>();
+    update = new Subject<DirentModel[]>();
 
     @ViewChildren("inspector", {read: TemplateRef})
     inspectorTemplate: QueryList<TemplateRef<any>>;
 
-    constructor(public inspector: EditorInspectorService, private modal: ModalService) {
+    constructor(public inspector: EditorInspectorService, private modal: ModalService, private cdr: ChangeDetectorRef) {
         super();
     }
 
     addEntry() {
-        const newLoc   = `${this.location}.fileDef[${this.entries.length}]`;
-        const newEntry = new FileDefModel({fileContent: "", filename: ""}, newLoc);
-        const entries  = this.entries.concat(newEntry);
-        this.update.next(entries);
+        const newEntry = this.model.addDirent({});
+        this.update.next(this.model.listing);
 
         this.inspectorTemplate.changes
             .take(1)
@@ -154,19 +145,22 @@ export class FileDefListComponent extends DirectiveBase {
             cancellationLabel: "No, keep it",
             confirmationLabel: "Yes, remove it"
         }).then(() => {
-            if (this.inspector.isInspecting(this.entries[index].loc)) {
+            if (this.inspector.isInspecting(this.model.listing[index].loc)) {
                 this.inspector.hide();
             }
 
-            this.entries = this.entries.slice(0, index).concat(this.entries.slice(index + 1));
-            this.update.next(this.entries);
+            this.model.listing = this.model.listing.slice(0, index).concat(this.model.listing.slice(index + 1));
+            this.update.next(this.model.listing);
         }, err => console.warn);
 
     }
 
-    updateFileDef(newDef: FileDef, index: number) {
-        const input = this.entries[index];
-        Object.assign(input, new FileDefModel(newDef));
-        this.update.next(this.entries.slice());
+    updateFileDef(newDef: { entryName, entry }, index: number) {
+        this.model.listing[index].entryName = newDef.entryName;
+        this.model.listing[index].entry     = newDef.entry;
+
+        this.cdr.markForCheck();
+
+        this.update.next(this.model.listing);
     }
 }

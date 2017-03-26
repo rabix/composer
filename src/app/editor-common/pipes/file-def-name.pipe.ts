@@ -1,15 +1,15 @@
 import {Pipe, PipeTransform} from "@angular/core";
-import {Expression} from "cwlts/mappings/d2sb/Expression";
-import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
+import {ExpressionModel} from "cwlts/models";
 
 @Pipe({
-    name: "fileDefName"
+    name: "fileDefName",
+    pure: false
 })
 
 export class FileDefNamePipe implements PipeTransform {
-    transform(value: string | Expression, args: any[]): any {
+    transform(value: string | ExpressionModel, args: any[]): any {
 
-        if (value instanceof SBDraft2ExpressionModel) {
+        if (value instanceof ExpressionModel) {
             return value.toString();
         }
 

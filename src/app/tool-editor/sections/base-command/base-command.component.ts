@@ -14,6 +14,7 @@ import {GuidService} from "../../../services/guid.service";
 import {noop} from "../../../lib/utils.lib";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {ModalService} from "../../../ui/modal/modal.service";
+import {FormArray} from "../../../../../node_modules/@angular/forms/src/model";
 
 @Component({
     selector: "ct-base-command",
@@ -139,10 +140,10 @@ export class BaseCommandComponent extends DirectiveBase implements OnInit, OnDes
     ngOnChanges(changes: SimpleChanges): void {
         if (this.streamsForm) {
             if (changes["stdin"]) {
-                this.streamsForm.controls["stdin"].setValue(changes["stdin"].currentValue);
+                this.streamsForm.controls["stdin"].setValue(changes["stdin"].currentValue, {onlySelf: true});
             }
             if (changes["stdout"]) {
-                this.streamsForm.controls["stdout"].setValue(changes["stdout"].currentValue);
+                this.streamsForm.controls["stdout"].setValue(changes["stdout"].currentValue,  {onlySelf: true});
             }
         }
 
@@ -167,7 +168,7 @@ export class BaseCommandComponent extends DirectiveBase implements OnInit, OnDes
             );
         });
 
-        this.baseCommandForm.valueChanges.first().subscribe(change => {
+        this.tracked = this.baseCommandForm.valueChanges.first().subscribe(change => {
             const v = Object.keys(change).map(key => change[key]);
             this.updateCmd.next(v);
         });

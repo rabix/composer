@@ -1,8 +1,8 @@
 @import "../../../../assets/sass/variables";
 
-ct-file-def-inspector {
+:host {
 
-    .file-content textarea {
+    /deep/ .file-content textarea {
         height: 400px;
     }
 }
