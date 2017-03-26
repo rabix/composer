@@ -28,7 +28,7 @@ import {TreeViewComponent} from "../../ui/tree-view/tree-view.component";
                 <ct-tree-view [nodes]="contextNodes"></ct-tree-view>
             </div>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer pb-1 pt-1 pr-1">
             <button *ngIf="!readonly" (click)="action.next('save')" class="btn btn-primary ml-1" type="button">Save</button>
             <button (click)="action.next('close')" class="btn btn-secondary " type="button mr-1">Cancel</button>
         </div>

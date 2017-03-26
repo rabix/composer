@@ -1,15 +1,13 @@
-import {Component, forwardRef, Input, OnInit, Output, ViewEncapsulation} from "@angular/core";
-import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
-import {noop} from "../../../lib/utils.lib";
-import {AsyncSubject} from "rxjs";
+import {Component, forwardRef, Input, OnInit, Output} from "@angular/core";
+import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {Expression} from "cwlts/mappings/d2sb/Expression";
-import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {ExpressionModel} from "cwlts/models";
+import {AsyncSubject} from "rxjs/AsyncSubject";
+import {noop} from "../../../lib/utils.lib";
 import {ModalService} from "../../../ui/modal/modal.service";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-quick-pick",
     styleUrls: ["./quick-pick.component.scss"],
     providers: [
@@ -24,9 +22,8 @@ import {ModalService} from "../../../ui/modal/modal.service";
 
             <div class="radio-container" *ngFor="let item of list">
                 <input type="radio"
-                       [class.selected]="computedVal === item.value"
                        [value]="item.value"
-                       [formControl]="radioForm"
+                       [formControl]="form.controls['radio']"
                        id="{{item.label}}"
                        required>
 
@@ -39,111 +36,79 @@ import {ModalService} from "../../../ui/modal/modal.service";
         </div>
 
         <button type="button"
-                class="btn btn-primary"
+                class="btn btn-secondary custom-btn"
                 *ngIf="!showCustom && !readonly"
-                (click)="createControl('')">Custom
+                (click)="addCustom('')">Custom
         </button>
 
         <div *ngIf="showCustom" class="removable-form-control">
             <ct-expression-input [context]="context"
-                                 [formControl]="customControl"
+                                 [formControl]="form.controls['custom']"
                                  [readonly]="readonly"
                                  [type]="type">
             </ct-expression-input>
 
-            <span class="remove-icon" (click)="removeControl($event)">
-            <i *ngIf="!readonly" [ct-tooltip]="'Delete'" class="fa fa-trash text-hover-danger"></i>
-        </span>
+            <span class="remove-icon clickable ml-1 text-hover-danger"
+                  (click)="removeCustom($event)">
+                <i *ngIf="!readonly" [ct-tooltip]="'Delete'" class="fa fa-trash"></i>
+            </span>
         </div>
     `
 })
 export class QuickPickComponent extends DirectiveBase implements ControlValueAccessor, OnInit {
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
     @Input()
-    public suggestions: { [label: string]: string | number } | string[];
+    suggestions: { [label: string]: string | number } | string[];
 
     @Input()
-    public context: any;
+    context: any;
 
     @Input()
-    public type: "string" | "number" = "string";
+    type: "string" | "number" = "string";
 
     @Output()
-    public update = new AsyncSubject<any>();
+    update = new AsyncSubject<any>();
 
-    public showCustom = false;
+    showCustom = false;
 
-    public list: { label: string, value: string | number }[] = [];
+    list: { label: string, value: string | number }[] = [];
 
-    public customControl: FormControl;
+    form = new FormGroup({
+        custom: new FormControl(),
+        radio: new FormControl()
+    });
 
     private onTouch = noop;
 
     private onChange = noop;
 
-    public computedVal: number | string | Expression;
+    computedVal: number | string | Expression;
 
-    public radioForm: FormControl;
-
-    get value(): string | number | SBDraft2ExpressionModel {
+    get value(): ExpressionModel {
         return this._value;
     }
 
-    set value(value: string | number | SBDraft2ExpressionModel) {
-        this.onChange(value);
+    set value(value: ExpressionModel) {
         this._value = value;
-        let val = value;
-
-        if (value instanceof SBDraft2ExpressionModel && value.type !== "expression") {
-            val = <string | number>value.serialize();
-        }
-
-        if (this.list && val !== "" && val !== null && val !== undefined) {
-            this.showCustom = !this.list.filter(item => {
-                return item.value === val;
-            }).length;
-        } else {
-            if (this.customControl) this.removeControl();
-            this.showCustom = false;
-        }
-
-        this.computedVal = <string | number> val;
-
-        this.radioForm = new FormControl(this.computedVal);
-        this.radioForm.valueChanges.subscribe(value => {
-            if (!this.readonly) {
-                this.setValue(value);
-            }
-        });
-
-        if (this.showCustom) this.createControl(value);
     }
 
-    private _value: string | number | SBDraft2ExpressionModel;
-
-    private setValue(val: string | number) {
-        this.onTouch();
-        this.computedVal = val;
-        if (this._value instanceof SBDraft2ExpressionModel) {
-            this.value = new SBDraft2ExpressionModel(val);
-        } else {
-            this.value = val;
-        }
-    }
+    private _value: ExpressionModel;
 
     constructor(private modal: ModalService) {
         super();
     }
 
     ngOnInit() {
+        // parses suggestions list for the radio buttons
         if (this.suggestions) {
             if (Array.isArray(this.suggestions)) {
                 const type = typeof this.suggestions[0];
                 if (type !== "string") {
-                    console.warn(`Please provide ct-quick-pick with correct suggested value format. Expected "string" got "${type}"`)
+                    console.warn(`Please provide ct-quick-pick with correct 
+                    suggested value format. Expected "string" got "${type}"`);
                 } else {
                     (<string[]>this.suggestions).forEach(item => {
                         this.list = this.list.concat([{label: item, value: item}]);
@@ -159,14 +124,43 @@ export class QuickPickComponent extends DirectiveBase implements ControlValueAcc
             }
         } else {
             console.warn(`Please provide ct-quick-pick with a list of suggested values
-available types: {[label: string]: string | number} | string[]`)
+available types: {[label: string]: string | number} | string[]`);
         }
+
+        // set up watcher for custom form
+        this.tracked = this.form.controls["custom"].valueChanges.skip(1).subscribe((expr: ExpressionModel) => {
+            this.computedVal = expr.serialize();
+            this._value      = expr;
+            this.onChange(this._value);
+            this.onTouch();
+        });
+
+        // set up watcher for radio button form
+        this.tracked = this.form.controls["radio"].valueChanges.skip(1).subscribe(primitive => {
+            this._value.setValue(primitive, this.type);
+            this.computedVal = primitive;
+            this.onChange(this._value);
+            this.onTouch();
+        });
     }
 
-    writeValue(value: string | number | SBDraft2ExpressionModel): void {
-        if (this.value !== value) {
-            this.value = value;
+    writeValue(value: ExpressionModel): void {
+
+        this.onChange(value);
+        this._value = value;
+
+        if (value instanceof ExpressionModel) {
+            this.computedVal = <string | number>value.serialize();
+        } else {
+            console.warn(`ct-quick-pick expected value to be instanceof ExpressionModel`);
         }
+
+        this.showCustom = !this.list.filter(item => {
+                return item.value === this.computedVal;
+            }).length && this.computedVal !== undefined;
+
+        this.form.controls["radio"].setValue(this.computedVal);
+        this.form.controls["custom"].setValue(value);
     }
 
     registerOnChange(fn: any): void {
@@ -177,20 +171,12 @@ available types: {[label: string]: string | number} | string[]`)
         this.onTouch = fn;
     }
 
-    private createControl(value: number | string | SBDraft2ExpressionModel): void {
-        this.customControl = new FormControl(value);
+    addCustom(value: string): void {
         this.showCustom = true;
-
-        if (!this.readonly) {
-            this.tracked = this.customControl.valueChanges
-                .subscribe((val: any) => {
-                    this.onTouch();
-                    this.value = val;
-                });
-        }
+        this._value.setValue(value, this.type);
     }
 
-    private removeControl(event?: Event): void {
+    removeCustom(event?: Event): void {
         if (!!event) {
             event.stopPropagation();
             this.modal.confirm({
@@ -206,17 +192,8 @@ available types: {[label: string]: string | number} | string[]`)
         }
     }
 
-    private removeFunction() {
-        if (this.customControl) {
-            this.computedVal = "";
-            this.showCustom = false;
-            this.customControl = undefined;
-
-            if (this._value instanceof SBDraft2ExpressionModel) {
-                this.value = new SBDraft2ExpressionModel("", "");
-            } else {
-                this.value = "";
-            }
-        }
+    removeFunction() {
+        this.showCustom = false;
+        this._value.setValue("", this.type);
     }
 }

@@ -1,8 +1,7 @@
 import {Component, Input, OnDestroy} from "@angular/core";
 import {FormGroup} from "@angular/forms";
 
-import {ResourceRequirementModel} from "cwlts/models/d2sb";
-import {CommandLineToolModel, RequirementBaseModel} from "cwlts/models";
+import {CommandLineToolModel} from "cwlts/models";
 import {ProcessRequirement} from "cwlts/mappings/d2sb/ProcessRequirement";
 
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
@@ -13,9 +12,8 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
     styleUrls: ["./tool-visual-editor.component.scss"],
     template: `
         <form [formGroup]="formGroup">
-
             <ct-docker-requirement [docker]="model.docker"
-                                   (update)="updateModel($event)"
+                                   (update)="formGroup.markAsDirty()"
                                    [readonly]="readonly">
             </ct-docker-requirement>
 
@@ -32,7 +30,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
             <ct-tool-input [location]="model.loc + '.inputs'"
                            [context]="{$job: model.job}"
                            [model]="model"
-                           (update)="updateModel('inputs', $event)"
+                           (update)="formGroup.markAsDirty()"
                            [readonly]="readonly">
             </ct-tool-input>
 
@@ -40,17 +38,16 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                             [context]="{$job: model.job}"
                             [model]="model"
                             [inputs]="model.inputs || []"
-                            (update)="updateModel('outputs', $event)"
+                            (update)="formGroup.markAsDirty()"
                             [readonly]="readonly">
             </ct-tool-output>
 
             <ct-resources [entries]="model.resources"
-                          *ngIf="model.cwlVersion === 'sbg:draft-2'"
-                          (update)="setResource($event)"
+                          (update)="formGroup.markAsDirty()"
                           [context]="{$job: model.job}"
                           [readonly]="readonly">
             </ct-resources>
-
+            
             <ct-hints [model]="model"
                       (update)="updateModel('hints')"
                       [readonly]="readonly">
@@ -58,7 +55,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
             
             <ct-argument-list [location]="model.loc + '.arguments'"
                               [model]="model"
-                              (update)="updateModel('arguments', $event)"
+                              (update)="formGroup.markAsDirty()"
                               [context]="{$job: model.job}"
                               [readonly]="readonly">
             </ct-argument-list>
@@ -90,10 +87,8 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
     }
 
     updateModel(category: string, data: any) {
-        if (category === "inputs" || category === "arguments") {
-            this.model.updateCommandLine();
 
-        } else if (category === "baseCommand") {
+        if (category === "baseCommand") {
             this.model.baseCommand = [];
             data.forEach(cmd => this.model.addBaseCommand(cmd));
             this.model.updateCommandLine();
@@ -125,26 +120,6 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
             }
         });
         this.model.updateCommandLine();
-        this.formGroup.markAsDirty();
-    }
-
-    setRequirement(req: ProcessRequirement, hint: boolean) {
-        this.model.setRequirement(req, hint);
-        this.formGroup.markAsDirty();
-    }
-
-    setHints(hints: RequirementBaseModel[]) {
-        this.model.hints = [];
-        hints.forEach(hint => {
-            this.setRequirement(hint, true);
-        });
-
-        this.formGroup.markAsDirty();
-    }
-
-    setResource(resource: ResourceRequirementModel) {
-        this.model.setRequirement(resource.serialize(), true);
-
         this.formGroup.markAsDirty();
     }
 

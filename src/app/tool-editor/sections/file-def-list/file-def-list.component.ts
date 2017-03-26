@@ -31,6 +31,10 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                      (buttonClick)="addEntry()">
                 </ct-blank-tool-state>
 
+                <div *ngIf="readonly && !model.listing?.length" class="text-xs-center h5">
+                    This tool doesn't create any files
+                </div>
+
                 <!--List Header Row-->
                 <div class="gui-section-list-title" *ngIf="model.listing?.length">
                     <div class="col-sm-5">Name</div>

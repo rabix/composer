@@ -29,6 +29,10 @@ import {ModalService} from "../../../ui/modal/modal.service";
                                  (buttonClick)="addEntry()">
             </ct-blank-tool-state>
 
+            <div *ngIf="readonly && !entries.length" class="text-xs-center h5">
+                This tool doesn't specify any outputs
+            </div>
+
             <!--List Header Row-->
             <div class="gui-section-list-title" *ngIf="entries.length">
                 <div class="col-xs-4">ID</div>

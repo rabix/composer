@@ -31,6 +31,10 @@ import {ModalService} from "../../../ui/modal/modal.service";
                                          (buttonClick)="addBaseCommand()">
                     </ct-blank-tool-state>
 
+                    <div *ngIf="readonly && !formList.length" class="text-xs-center h5">
+                        This tool doesn't specify any baseCommands
+                    </div>
+
                     <ol *ngIf="formList.length > 0" class="list-unstyled">
 
                         <li *ngFor="let item of formList"
@@ -42,7 +46,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                                     [readonly]="readonly">
                             </ct-expression-input>
 
-                            <div *ngIf="!readonly" class="remove-icon clickable text-hover-danger"
+                            <div *ngIf="!readonly" class="remove-icon clickable ml-1 text-hover-danger"
                                  [ct-tooltip]="'Delete'"
                                  (click)="removeBaseCommand(item)">
                                 <i class="fa fa-trash"></i>
