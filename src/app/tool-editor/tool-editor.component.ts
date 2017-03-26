@@ -1,4 +1,13 @@
-import {AfterViewInit, Component, Input, OnDestroy, OnInit, TemplateRef, ViewChild, ViewContainerRef} from "@angular/core";
+import {
+    AfterViewInit,
+    Component,
+    Input,
+    OnDestroy,
+    OnInit,
+    TemplateRef,
+    ViewChild,
+    ViewContainerRef
+} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {CommandLineToolFactory} from "cwlts/models/generic/CommandLineToolFactory";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
@@ -20,6 +29,8 @@ import {PlatformAPI} from "../services/api/platforms/platform-api.service";
 import {SettingsService} from "../services/settings/settings.service";
 import {DirectiveBase} from "../util/directive-base/directive-base";
 import LoadOptions = jsyaml.LoadOptions;
+import {AuthService} from "../auth/auth/auth.service";
+import {CredentialsEntry} from "../services/storage/user-preferences-types";
 
 @Component({
     selector: "ct-tool-editor",
@@ -81,6 +92,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
                 private dataGateway: DataGatewayService,
                 private platformAPI: PlatformAPI,
                 private system: SystemService,
+                private auth: AuthService,
                 private settings: SettingsService,
                 private errorBarService: ErrorBarService) {
 
@@ -301,7 +313,15 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
         const urlApp     = this.toolModel["sbgId"];
         const urlProject = urlApp.split("/").splice(0, 2).join("/");
 
-        this.settings.platformConfiguration.first().map(settings => settings.url).subscribe((url) => {
+        this.auth.connections.take(1).subscribe((cred: CredentialsEntry[]) => {
+            const hash = this.data.id.split("/")[0];
+            const urlBase = cred.find(c => c.hash === hash);
+            if (!urlBase) {
+                this.errorBarService.showError(`Could not externally open app "${urlApp}"`);
+                return;
+            }
+            const url = urlBase.url;
+
             this.system.openLink(`${url}/u/${urlProject}/apps/#${urlApp}`);
         });
     }
