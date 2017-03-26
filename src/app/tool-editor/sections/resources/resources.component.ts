@@ -12,10 +12,9 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
     <span class="tc-header">
         Computational Resources
     </span>
-
             <div class="tc-body">
                 <form [formGroup]="form">
-                    <label class="form-control-label">Memory</label>
+                    <label class="form-control-label">Memory (min)</label>
                     <ct-quick-pick [suggestions]="memSuggest"
                                    [formControl]="form.controls['mem']"
                                    [context]="context"
@@ -23,7 +22,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                    [readonly]="readonly">
                     </ct-quick-pick>
 
-                    <label class="form-control-label">CPU</label>
+                    <label class="form-control-label">CPU (min)</label>
                     <ct-quick-pick [suggestions]="cpuSuggest"
                                    [formControl]="form.controls['cores']"
                                    [context]="context"
@@ -66,12 +65,11 @@ export class ResourcesComponent extends DirectiveBase implements OnChanges, OnIn
     };
 
     ngOnChanges(changes: SimpleChanges) {
-        this.form.controls["mem"].setValue(this.entries.mem);
-        this.form.controls["cores"].setValue(this.entries.cores);
+        this.form.controls["mem"].setValue(this.entries.mem, {onlySelf: true});
+        this.form.controls["cores"].setValue(this.entries.cores, {onlySelf: true});
     }
 
     ngOnInit() {
-
         this.tracked = this.form.valueChanges.subscribe(change => {
             this.update.next(change);
         });

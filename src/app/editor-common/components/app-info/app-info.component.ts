@@ -1,12 +1,16 @@
 import {
     Component,
     Input,
-    OnChanges, OnInit,
+    OnChanges,
     SimpleChanges
 } from "@angular/core";
 import {WorkflowModel} from "cwlts/models";
 import {SystemService} from "../../../platform-providers/system.service";
-import {CommandInputParameterModel, WorkflowInputParameterModel, CommandLineToolModel} from "cwlts/models";
+import {
+    CommandInputParameterModel,
+    WorkflowInputParameterModel,
+    CommandLineToolModel
+} from "cwlts/models";
 
 @Component({
     selector: "ct-app-info",
@@ -58,7 +62,8 @@ import {CommandInputParameterModel, WorkflowInputParameterModel, CommandLineTool
                         <div>
                             <ct-inline-editor [disabled]="readonly" class="toolkit"
                                               [value]="model.customProps['sbg:toolkit']"
-                                              type="text" (saveData)="model.customProps['sbg:toolkit'] = $event">
+                                              type="text"
+                                              (saveData)="model.customProps['sbg:toolkit'] = $event">
                                 {{model.customProps['sbg:toolkit']}}
                             </ct-inline-editor>
                             <ct-inline-editor class="toolkit"
@@ -76,7 +81,8 @@ import {CommandInputParameterModel, WorkflowInputParameterModel, CommandLineTool
                         <h5>License</h5>
                         <ct-inline-editor [value]="model.customProps['sbg:license']"
                                           [disabled]="readonly"
-                                          type="text" (saveData)="model.customProps['sbg:license'] = $event">
+                                          type="text"
+                                          (saveData)="model.customProps['sbg:license'] = $event">
                             <div>{{model.customProps['sbg:license']}}</div>
                         </ct-inline-editor>
                     </div>
@@ -86,7 +92,8 @@ import {CommandInputParameterModel, WorkflowInputParameterModel, CommandLineTool
                         <h5>Author</h5>
                         <ct-inline-editor [value]="model.customProps['sbg:toolAuthor']"
                                           [disabled]="readonly"
-                                          type="text" (saveData)="model.customProps['sbg:toolAuthor'] = $event">
+                                          type="text"
+                                          (saveData)="model.customProps['sbg:toolAuthor'] = $event">
                             {{model.customProps['sbg:toolAuthor']}}
                         </ct-inline-editor>
                     </div>
@@ -94,7 +101,7 @@ import {CommandInputParameterModel, WorkflowInputParameterModel, CommandLineTool
                     <!--Contributors-->
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
                         <h5>Contributors</h5>
-                        {{(model.customProps['sbg:contributors'] || []).join(", ")}}
+                        {{(model.customProps['sbg:contributors']|| []).join(", ")}}
                     </div>
 
                     <!--CWL version-->
@@ -108,7 +115,8 @@ import {CommandInputParameterModel, WorkflowInputParameterModel, CommandLineTool
                         <h5>Links</h5>
                         <ct-inline-editor [value]="model.customProps['sbg:links']"
                                           [disabled]="readonly"
-                                          type="keyvalue" (saveData)="model.customProps['sbg:links'] = $event">
+                                          type="keyvalue"
+                                          (saveData)="model.customProps['sbg:links'] = $event">
 
                             <span *ngFor="let link of model.customProps['sbg:links']" class="links">
                                     <a href=""
@@ -162,7 +170,7 @@ import {CommandInputParameterModel, WorkflowInputParameterModel, CommandLineTool
                             <td>{{input.label}}</td>
                             <td>{{input.type | commandParameterType}}</td>
                             <td>{{input.type.isNullable ? 'False' : 'True'}}</td>
-                            <td>prefix</td>
+                            <td>{{input.inputBinding?.prefix || "-" }}</td>
                             <td>{{input.fileTypes ? input.fileTypes.join(', ') : '-'}}</td>
                         </tr>
                     </table>
@@ -188,7 +196,7 @@ import {CommandInputParameterModel, WorkflowInputParameterModel, CommandLineTool
                             <td>{{input.label}}</td>
                             <td>{{input.type | commandParameterType}}</td>
                             <td>{{input.type.isNullable ? 'False' : 'True'}}</td>
-                            <td>prefix</td>
+                            <td>{{input.inputBinding?.prefix || "-" }}</td>
                             <td>{{input.fileTypes ? input.fileTypes.join(', ') : '-'}}</td>
                         </tr>
                     </table>
@@ -277,14 +285,18 @@ export class AppInfoComponent implements OnChanges {
         this.revisionNote = this.model.customProps["sbg:revisionNotes"] || null;
 
 
-        this.inputs      = (this.model.inputs as Array<CommandInputParameterModel | WorkflowInputParameterModel>)
+        this.inputs      = (this.model.inputs as Array<
+            CommandInputParameterModel
+            | WorkflowInputParameterModel>)
             .filter((input) => input.type.type === "File" || input.type.items === "File");
-        this.appSettings = (this.model.inputs as Array<CommandInputParameterModel | WorkflowInputParameterModel>)
-            .filter((input) => input.type.type !== "File" || input.type.items !== "File");
+        this.appSettings = (this.model.inputs as Array<
+            CommandInputParameterModel
+            | WorkflowInputParameterModel>)
+            .filter((input) => input.type.type !== "File" && input.type.items !== "File");
     }
 
 
-    private openWebPage(url: string) {
+    openWebPage(url: string) {
         this.system.openLink(url);
     }
 
