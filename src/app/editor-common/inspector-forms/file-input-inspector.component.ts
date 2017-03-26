@@ -1,6 +1,6 @@
-import {Component, EventEmitter, Input, Output, ViewEncapsulation} from "@angular/core";
+import {Component, EventEmitter, Input, Output, ViewEncapsulation, OnInit, OnChanges} from "@angular/core";
 import {FormControl, FormGroup} from "@angular/forms";
-import {Observable} from "rxjs";
+import {Observable} from "rxjs/Observable";
 
 interface CWLFile {
     path?: string;
@@ -31,7 +31,8 @@ interface CWLFile {
             <!--Secondary Files-->
             <div class="form-group">
                 <label>Secondary Files</label>
-                <compact-list [addKeyCode]="13" formControlName="secondaryFiles"></compact-list>
+                <ct-compact-list [addKeyCode]="13"
+                                 formControlName="secondaryFiles"></ct-compact-list>
             </div>
 
             <div class="form-group">
@@ -48,7 +49,7 @@ interface CWLFile {
         </form>
     `
 })
-export class FileInputInspector {
+export class FileInputInspectorComponent implements OnInit, OnChanges {
 
     /** Input data for the component */
     @Input()

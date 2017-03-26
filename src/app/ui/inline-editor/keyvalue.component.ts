@@ -20,7 +20,7 @@ import {noop} from "../../lib/utils.lib";
     template: `
         <div [formGroup]="formGroup" (change)="onInputsFormChange($event)">
             <div formArrayName="pairs">
-                <div *ngFor="let item of formGroup.controls['pairs'].controls; let i = index"
+                <div *ngFor="let item of formGroup.controls.pairs.controls; let i = index"
                      [formGroupName]="i"
                      class="mb-1 input-group row">
 
@@ -65,23 +65,23 @@ export class KeyvalueComponent extends DirectiveBase implements ControlValueAcce
         super();
     }
 
-    private add() {
+    add() {
         this.list = this.list.concat({key: "", value: ""});
         this.resizeControls();
     }
 
-    private remove(i) {
+    remove(i) {
         this.list = this.list.slice(0, i).concat(this.list.slice(i + 1));
         (this.formGroup.get("pairs") as FormArray).removeAt(i);
 
     }
 
-    private resizeControls() {
+    resizeControls() {
         const newControlArray = new FormArray(this.list.map((pair) => {
             return new FormGroup({
                 key: new FormControl(pair.key),
                 value: new FormControl(pair.value)
-            })
+            });
         }));
 
         this.formGroup.setControl("pairs", newControlArray);
@@ -96,7 +96,7 @@ export class KeyvalueComponent extends DirectiveBase implements ControlValueAcce
                 .filter(i => i.key.trim())
                 .reduce((acc, item) => ({...acc, ...{[item.key.trim()]: item.value.toString().trim()}}), {}))
             .subscribe(val => {
-                this.onChangeCallback(Object.keys(val).map((keys) => ({'id': keys, 'label': val[keys]})));
+                this.onChangeCallback(Object.keys(val).map((keys) => ({"id": keys, "label": val[keys]})));
             });
     }
 
@@ -123,7 +123,7 @@ export class KeyvalueComponent extends DirectiveBase implements ControlValueAcce
     setDisabledState(isDisabled: boolean): void {
     }
 
-    private onInputsFormChange($event) {
+    onInputsFormChange($event) {
         $event.stopPropagation();
     }
 }

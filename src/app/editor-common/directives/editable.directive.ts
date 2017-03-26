@@ -2,6 +2,7 @@ import {Directive, ElementRef, forwardRef} from "@angular/core";
 import {ControlValueAccessor, FormControl, NG_VALIDATORS, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {noop} from "../../lib/utils.lib";
 
+// @deprecated
 @Directive({
     selector: "[ct-editable][contenteditable=true]",
     providers: [
@@ -15,8 +16,9 @@ import {noop} from "../../lib/utils.lib";
 })
 export class EditableDirective implements ControlValueAccessor {
 
+
     private propagateChange = noop;
-    private onTouched = noop;
+    private onTouched       = noop;
 
     private validateFn = noop;
 
@@ -46,7 +48,7 @@ export class EditableDirective implements ControlValueAccessor {
     private onKeyDown(event): void {
         const enterKeyCode = 13;
 
-        //Prevent new lines
+        // Prevent new lines
         if (event.keyCode === enterKeyCode) {
             event.preventDefault();
         }

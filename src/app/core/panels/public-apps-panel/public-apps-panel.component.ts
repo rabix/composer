@@ -241,7 +241,7 @@ export class PublicAppsPanelComponent extends DirectiveBase implements AfterView
                         iconExpanded: "fa-folder-open",
                         isExpanded: expanded.indexOf(id) !== -1,
                         children: listings[index].map(app => {
-                            const id = `${creds.hash}/${app.owner}/${app.slug}/${app["sbg:id"]}`
+                            const id = `${creds.hash}/${app.owner}/${app.slug}/${app["sbg:id"]}`;
                             return {
                                 id,
                                 label: app.label,

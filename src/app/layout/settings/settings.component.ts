@@ -49,7 +49,7 @@ export class SettingsComponent extends DirectiveBase {
     private credentialsFormComponent: CredentialsFormComponent;
 
     constructor(private settings: SettingsService,
-                private auth: AuthService) {
+                public auth: AuthService) {
 
         super();
     }

@@ -8,7 +8,6 @@ import {SystemService} from "../../platform-providers/system.service";
 import {ElectronUserProjectsService} from "../../platform-providers/user-projects/electron-user-projects.service";
 import {UserProjectsService} from "../../platform-providers/user-projects/user-projects.service";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
-import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {GuidService} from "../../services/guid.service";
 import {LocalDataSourceService} from "../../sources/local/local.source.service";
 import {ContextService} from "../../ui/context/context.service";
@@ -19,7 +18,7 @@ import {UrlValidator} from "../../validators/url.validator";
 @Component({
     encapsulation: ViewEncapsulation.None,
 
-    selector: "cottontail",
+    selector: "ct-cottontail",
     template: `
         <ct-layout></ct-layout>
         <div id="runnix" [class.active]="runnix | async"></div>
@@ -28,7 +27,6 @@ import {UrlValidator} from "../../validators/url.validator";
     `,
     styleUrls: ["./../../../assets/sass/main.scss", "./main.component.scss"],
     providers: [
-        EventHubService,
         UrlValidator,
         PlatformAPI,
         MarkdownService,

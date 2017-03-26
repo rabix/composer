@@ -1,4 +1,4 @@
-import {Component, EventEmitter, forwardRef, NgZone, Output, ViewEncapsulation} from "@angular/core";
+import {Component, EventEmitter, forwardRef, NgZone, Output, ViewEncapsulation, AfterViewInit} from "@angular/core";
 import {ControlValueAccessor, FormArray, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {noop} from "../../../lib/utils.lib";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
@@ -7,9 +7,6 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
     encapsulation: ViewEncapsulation.None,
 
     selector: "ct-map-list",
-    host: {
-        "class": "block container"
-    },
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
@@ -46,8 +43,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         </div>
     `
 })
-export class MapListComponent extends DirectiveBase implements ControlValueAccessor {
-
+export class MapListComponent extends DirectiveBase implements ControlValueAccessor, AfterViewInit {
     public list: { key: string, value: string }[] = [];
 
     public formGroup = new FormGroup({
@@ -110,7 +106,7 @@ export class MapListComponent extends DirectiveBase implements ControlValueAcces
                 entryList.splice(i, 0, e);
             }
         });
-        if (this.list.toString() == entryList.toString()) {
+        if (this.list.toString() === entryList.toString()) {
             return;
         }
         this.list = entryList;

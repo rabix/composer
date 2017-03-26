@@ -82,7 +82,7 @@ export class OutputMetaDataSectionComponent extends DirectiveBase implements Con
                 return {
                     key: key,
                     value: this.output.outputBinding.metadata[key]
-                }
+                };
             });
 
         this.metadataForm = this.formBuilder.group({

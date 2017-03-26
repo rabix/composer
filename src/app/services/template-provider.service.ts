@@ -14,7 +14,7 @@ export class TemplateProviderService {
         if (!templates[templateName]) {
             return "";
         }
-        console.debug("Compiling template", templateName);
+        // console.debug("Compiling template", templateName);
         let str = JSON.stringify(templates[templateName] || "", null, 4);
 
         Object.keys(data).forEach(key => {

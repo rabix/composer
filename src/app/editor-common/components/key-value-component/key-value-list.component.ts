@@ -31,7 +31,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
             </ct-blank-tool-state>
 
             <!--List Header Row-->
-            <div class="gui-section-list-title row" *ngIf="keyValueFormList.length">
+            <div class="gui-section-list-title row" *ngIf="!!keyValueFormList.length">
                 <div class="col-sm-5">{{keyColumnText}}</div>
                 <div class="col-sm-6">{{valueColumnText}}</div>
             </div>
@@ -64,7 +64,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
         </div>
 
         <!--Add entry link-->
-        <button *ngIf="!readonly && keyValueFormList.length"
+        <button *ngIf="!readonly && !!keyValueFormList.length"
                 (click)="addEntry()"
                 type="button"
                 class="btn pl-0 btn-link no-outline no-underline-hover">

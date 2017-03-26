@@ -1,5 +1,16 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, ViewEncapsulation} from "@angular/core";
-import {WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
+import {
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
+    Component,
+    Input,
+    ViewEncapsulation,
+    OnInit
+} from "@angular/core";
+import {
+    WorkflowInputParameterModel,
+    WorkflowModel,
+    WorkflowOutputParameterModel
+} from "cwlts/models";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {Workflow} from "cwl-svg";
@@ -9,8 +20,7 @@ import {Workflow} from "cwl-svg";
     changeDetection: ChangeDetectionStrategy.OnPush,
     selector: "ct-workflow-io-inspector",
     styleUrls: ["./workflow-io-inspector.components.scss"],
-    template:
-            `
+    template: `
         <!--Required-->
         <div *ngIf="isInputPort()" class="form-group flex-container">
             <label>Required</label>
@@ -59,15 +69,16 @@ import {Workflow} from "cwl-svg";
         </div>
 
         <!--Input Type -->
-        <input-type-select [formControl]="form.controls['typeForm']"
-                           [propertyTypes]="propertyTypes" [itemTypes]="itemTypes"></input-type-select>
+        <ct-input-type-select [formControl]="form.controls['typeForm']"
+                              [propertyTypes]="propertyTypes"
+                              [itemTypes]="itemTypes"></ct-input-type-select>
 
         <!--Symbols-->
-        <symbols-section class="form-group"
-                         *ngIf="isEnumType()"
-                         [formControl]="form.controls['symbols']"
-                         [readonly]="readonly">
-        </symbols-section>
+        <ct-symbols-section class="form-group"
+                            *ngIf="isEnumType()"
+                            [formControl]="form.controls['symbols']"
+                            [readonly]="readonly">
+        </ct-symbols-section>
 
         <!--File Types-->
         <div *ngIf="isFileType() && isInputPort()">
@@ -87,7 +98,7 @@ import {Workflow} from "cwl-svg";
     `
 
 })
-export class WorkflowIOInspector extends DirectiveBase {
+export class WorkflowIOInspectorComponent extends DirectiveBase implements OnInit {
 
     public propertyTypes = ["array", "enum", "File", "string", "int", "float", "boolean"];
 
@@ -105,7 +116,7 @@ export class WorkflowIOInspector extends DirectiveBase {
     @Input()
     public graph: Workflow;
 
-    private form: FormGroup;
+    form: FormGroup;
 
     private initSymbolsList: string[] = [];
 
@@ -138,11 +149,10 @@ export class WorkflowIOInspector extends DirectiveBase {
                 if (this.isEnumType()) {
                     this.port.type.name = value;
                 }
-            }
-            catch (e) {
-                this.form.controls['id'].setErrors({error: e.message});
+            } catch (e) {
+                this.form.controls["id"].setErrors({error: e.message});
                 // Because this comes outside of Angular (workflow model)
-                this.cdr.markForCheck()
+                this.cdr.markForCheck();
             }
         });
 
@@ -153,7 +163,11 @@ export class WorkflowIOInspector extends DirectiveBase {
         });
 
         this.tracked = this.form.controls["fileTypes"].valueChanges.subscribe((value) => {
-            value ? this.port.customProps["sbg:fileTypes"] = value : delete this.port.customProps["sbg:fileTypes"];
+            if (value) {
+                this.port.customProps["sbg:fileTypes"] = value;
+            } else {
+                delete this.port.customProps["sbg:fileTypes"];
+            };
         });
 
         this.tracked = this.form.controls["label"].valueChanges.subscribe((label) => {
@@ -171,11 +185,11 @@ export class WorkflowIOInspector extends DirectiveBase {
         return this.port instanceof WorkflowInputParameterModel;
     }
 
-    private isEnumType() {
+    isEnumType() {
         return this.port.type.type === "enum" || (this.port.type.type === "array" && this.port.type.items === "enum");
     }
 
-    private isFileType() {
+    isFileType() {
         return this.port.type.type === "File" || (this.port.type.type === "array" && this.port.type.items === "File");
     }
 }

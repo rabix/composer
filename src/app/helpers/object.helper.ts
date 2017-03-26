@@ -53,7 +53,7 @@ export class ObjectHelper {
             return defaultReturn;
         }
 
-        for (let key of parts) {
+        for (const key of parts) {
 
             if (Array.isArray(target) && key) {
                 const arrayMatch = key.match(/^\[([0-9]*?)\]$/);
@@ -81,7 +81,7 @@ export class ObjectHelper {
      * @link ObjectHelper-addEnumerablesTest
      */
     public static addEnumerables(target: Object, source: Object): void {
-        for (let key of Object.keys(source)) {
+        for (const key of Object.keys(source)) {
             if (target.propertyIsEnumerable(key)) {
                 target[key] = source[key];
             }
@@ -95,6 +95,6 @@ export class ObjectHelper {
      */
     public static isPrimitiveValue(arg: any) {
         const type = typeof arg;
-        return arg == null || (type != "object" && type != "function");
+        return arg == null || (type !== "object" && type !== "function");
     }
 }

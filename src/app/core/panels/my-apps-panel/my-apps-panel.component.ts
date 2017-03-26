@@ -20,6 +20,7 @@ import {AddSourceModalComponent} from "../../modals/add-source-modal/add-source-
 import {WorkboxService} from "../../workbox/workbox.service";
 import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.component";
 
+/** @deprecated */
 @Component({
     selector: "ct-my-apps-panel",
     providers: [LocalFileRepositoryService],

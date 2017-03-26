@@ -8,9 +8,13 @@ export class DisableFormControlDirective {
     @Input() formControl: FormControl;
 
     @Input("ct-disabled") set disableControl(s: boolean) {
-        if (!this.formControl) return;
-        else if (s) this.formControl.disable();
-        else this.formControl.enable();
+        if (!this.formControl) {
+            return;
+        } else if (s) {
+            this.formControl.disable();
+        } else {
+            this.formControl.enable();
+        }
 
     }
 }

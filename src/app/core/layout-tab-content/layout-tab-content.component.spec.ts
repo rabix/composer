@@ -1,8 +1,8 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { LayoutTabContentComponent } from './layout-tab-content.component';
+import { LayoutTabContentComponent } from "./layout-tab-content.component";
 
-describe('LayoutTabContentComponent', () => {
+describe("LayoutTabContentComponent", () => {
   let component: LayoutTabContentComponent;
   let fixture: ComponentFixture<LayoutTabContentComponent>;
 
@@ -19,7 +19,7 @@ describe('LayoutTabContentComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

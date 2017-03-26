@@ -104,7 +104,7 @@ export class NewFileModalComponent extends DirectiveBase {
         this.tracked = this.newFileForm.valueChanges.subscribe(_ => this.error = undefined);
     }
 
-    private onSubmit() {
+    onSubmit() {
 
         // If the overlay is shown right away, user working locally would just see
         // flashing darkening over the modal, so avoid that, but keep the delay low enough

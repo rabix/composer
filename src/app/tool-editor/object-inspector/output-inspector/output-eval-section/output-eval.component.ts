@@ -2,6 +2,7 @@ import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {CommandOutputParameterModel} from "cwlts/models";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
+import {noop} from "../../../../lib/utils.lib";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -54,13 +55,11 @@ export class OutputEvalSectionComponent extends DirectiveBase implements Control
 
     public output: CommandOutputParameterModel;
 
-    private onTouched = () => {
-    };
+    private onTouched = noop;
 
-    private propagateChange = (_) => {
-    };
+    private propagateChange = noop;
 
-    public outputEvalFormGroup: FormGroup;
+    outputEvalFormGroup: FormGroup;
 
     constructor(private formBuilder: FormBuilder) {
         super();

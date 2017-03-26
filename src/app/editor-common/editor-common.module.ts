@@ -21,7 +21,7 @@ import {CwlSchemaValidationWorkerService} from "./cwl-schema-validation-worker/c
 import {EditableDirective} from "./directives/editable.directive";
 import {ExpressionEditorComponent} from "./expression-editor/expression-editor.component";
 import {ModelExpressionEditorComponent} from "./expression-editor/model-expression-editor.component";
-import {FileInputInspector} from "./inspector-forms/file-input-inspector.component";
+import {FileInputInspectorComponent} from "./inspector-forms/file-input-inspector.component";
 import {EditorInspectorContentComponent} from "./inspector/editor-inspector-content.component";
 import {EditorInspectorComponent} from "./inspector/editor-inspector.component";
 import {EditorInspectorDirective} from "./inspector/editor-inspector.directive";
@@ -31,7 +31,7 @@ import {FileDefContentPipe} from "./pipes/file-def-content.pipe";
 import {FileDefNamePipe} from "./pipes/file-def-name.pipe";
 import {ValidationTextPipe} from "./pipes/validation-text.pipes";
 import {CWLModule} from "../cwl/cwl.module";
-import { EditorLayoutComponent } from './editor-layout/editor-layout.component';
+import {EditorLayoutComponent} from "./editor-layout/editor-layout.component";
 
 @NgModule({
     declarations: [
@@ -57,7 +57,7 @@ import { EditorLayoutComponent } from './editor-layout/editor-layout.component';
         ValidationComponent,
         ValidationReportComponent,
         ValidationTextPipe,
-        FileInputInspector,
+        FileInputInspectorComponent,
         MapListComponent,
         SymbolsComponent,
         InputTypeSelectComponent,
@@ -68,7 +68,7 @@ import { EditorLayoutComponent } from './editor-layout/editor-layout.component';
         MapListComponent,
         BlankToolStateComponent,
         CompactListComponent,
-        FileInputInspector,
+        FileInputInspectorComponent,
         EditableDirective,
         EditorInspectorComponent,
         EditorInspectorContentComponent,

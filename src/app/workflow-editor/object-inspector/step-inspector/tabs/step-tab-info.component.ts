@@ -37,7 +37,7 @@ export class WorkflowStepInspectorTabInfo {
     @Input()
     public step: StepModel;
 
-    private getDescription() {
+    getDescription() {
         return this.step.description || this.step.run.description;
     }
 }

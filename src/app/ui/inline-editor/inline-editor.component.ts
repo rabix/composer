@@ -67,25 +67,25 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 export class InlineEditorComponent extends DirectiveBase {
 
     @Input()
-    public options = [];
+    options = [];
 
     @Input()
-    public value: any;
+    value: any;
 
     @Input()
-    public label = "";
+    label = "";
 
     @Input()
-    public type = "text";
+    type = "text";
 
     @Input()
-    public disabled = false;
+    disabled = false;
 
     @Output()
-    public saveData: EventEmitter<string> = new EventEmitter<string>();
+    saveData: EventEmitter<string> = new EventEmitter<string>();
 
-    private editing = false;
-    private isHover = false;
+    editing = false;
+    isHover = false;
 
     onCancel($event: Event) {
         $event.preventDefault();
@@ -117,14 +117,14 @@ export class InlineEditorComponent extends DirectiveBase {
         this.editing = true;
     }
 
-    private showEdit() {
+    showEdit() {
         if (this.disabled) {
             return;
         }
         this.isHover = true;
     }
 
-    private hideEdit() {
+    hideEdit() {
         if (this.disabled) {
             return;
         }
@@ -132,7 +132,7 @@ export class InlineEditorComponent extends DirectiveBase {
     }
 
     // Is value is empty show "None"
-    private isEmpty() {
-        return Array.isArray(this.value) ? this.value.length === 0 : !!!this.value;
+    isEmpty() {
+        return Array.isArray(this.value) ? this.value.length === 0 : !this.value;
     }
 }

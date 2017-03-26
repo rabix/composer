@@ -48,7 +48,7 @@ import {CommandInputParameterModel, WorkflowInputParameterModel, CommandLineTool
                                           [disabled]="readonly"
                                           [options]="categories"
                                           (saveData)="model.customProps['sbg:categories'] = $event">
-                            {{model.customProps['sbg:categories'].join(", ")}}
+                            {{ (model.customProps['sbg:categories'] || []).join(", ")}}
                         </ct-inline-editor>
                     </div>
 

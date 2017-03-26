@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {DataEntrySource} from "../common/interfaces";
-import {Observable, Subject} from "rxjs";
+import {Observable, Subject} from "rxjs/Rx";
 import {IpcService} from "../../services/ipc.service";
 import {noop} from "../../lib/utils.lib";
 
@@ -12,7 +12,8 @@ const schemaSaladResolver = remote.require("./src/schema-salad-resolver.js");
 
 type LocalSource = DataEntrySource | { isDir: boolean, isFile: boolean };
 
-type FileIndex = { [folder: string]: LocalSource[] };
+interface FileIndex { [folder: string]: LocalSource[]; }
+
 @Injectable()
 export class LocalDataSourceService {
 
@@ -33,7 +34,7 @@ export class LocalDataSourceService {
 
             const patch = dirContent.reduce((acc, curr) => {
                 if (curr.isDir) {
-                    acc[curr.path] = []
+                    acc[curr.path] = [];
                 }
 
                 acc[curr.dirname] = [...acc[curr.dirname] || [], curr];
@@ -79,7 +80,7 @@ export class LocalDataSourceService {
                 return {
                     dir: file.dirname,
                     content: dirContent
-                }
+                };
             });
         }).subscribe(data => {
             this.fileUpdates.next((all) => Object.assign({}, all, {[data.dir]: data.content}));
@@ -108,7 +109,7 @@ export class LocalDataSourceService {
         if (entry.isFile) {
             content = Observable.of(1).switchMap(_ => this.readFileContent(entry.path)).share();
             save = this.getContentSavingFunction(entry.path);
-            resolve = (content) => this.ipc.request("resolveContent", {content, path:entry.path}).toPromise();
+            resolve = (content) => this.ipc.request("resolveContent", {content, path: entry.path}).toPromise();
         }
 
 

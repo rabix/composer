@@ -7,7 +7,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 @Component({
     encapsulation: ViewEncapsulation.None,
 
-    selector: "input-type-select",
+    selector: "ct-input-type-select",
     providers: [
         {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => InputTypeSelectComponent), multi: true}
     ],

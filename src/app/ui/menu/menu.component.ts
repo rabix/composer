@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, ViewEncapsulation} from "@angular/core";
+import {Component, ElementRef, Input, ViewEncapsulation, AfterViewInit} from "@angular/core";
 import {MenuItem} from "./menu-item";
 
 @Component({
@@ -10,9 +10,9 @@ import {MenuItem} from "./menu-item";
         <ct-menu-item *ngFor="let item of items" [item]="item"></ct-menu-item>
     `
 })
-export class MenuComponent {
+export class MenuComponent implements AfterViewInit {
     @Input()
-    private items;
+    items;
 
     private el;
 

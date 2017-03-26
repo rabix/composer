@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, ViewEncapsulation} from "@angular/core";
 import {Workflow} from "cwl-svg";
 import {StepModel, WorkflowModel} from "cwlts/models";
-import {UpdateStepModal} from "../../../components/modal/custom/update-step-modal.component";
+import {UpdateStepModalComponent} from "../../../components/modal/custom/update-step-modal.component";
 import {PlatformAPI} from "../../../services/api/platforms/platform-api.service";
 import {UserPreferencesService} from "../../../services/storage/user-preferences.service";
 import {ModalService} from "../../../ui/modal/modal.service";
@@ -99,7 +99,7 @@ export class StepInspectorComponent extends DirectiveBase {
 
         this.platform.getApp(appData).subscribe((app) => {
 
-            const component = this.modal.fromComponent(UpdateStepModal, {
+            const component = this.modal.fromComponent(UpdateStepModalComponent, {
                 title: "Update available",
                 closeOnOutsideClick: true,
                 closeOnEscape: true

@@ -180,7 +180,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
     showInspector = true;
 
     /** Default view mode. */
-    viewMode: "info" | "graph" | "code";
+    viewMode: "info" | "graph" | "code" | string;
 
     /** Flag to indicate the document is loading */
     isLoading = true;

@@ -34,7 +34,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
             </div>
 
             <!--List Header Row-->
-            <div class="gui-section-list-title" *ngIf="entries.length">
+            <div class="gui-section-list-title" *ngIf="!!entries.length">
                 <div class="col-xs-4">ID</div>
                 <div class="col-xs-3">Type</div>
                 <div class="col-xs-5">Glob</div>
@@ -132,7 +132,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
         </div>
 
         <!--Add Output Button-->
-        <button *ngIf="!readonly && entries.length"
+        <button *ngIf="!readonly && !!entries.length"
                 (click)="addEntry()"
                 type="button"
                 class="btn pl-0 btn-link no-outline no-underline-hover">

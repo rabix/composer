@@ -1,5 +1,5 @@
 import {Injectable, TemplateRef} from "@angular/core";
-import {BehaviorSubject, Observable, ReplaySubject, Subject} from "rxjs";
+import {BehaviorSubject, Observable, ReplaySubject, Subject} from "rxjs/Rx";
 import {StatusBarComponent} from "./status-bar.component";
 import {noop} from "../../lib/utils.lib";
 import {GuidService} from "../../services/guid.service";
@@ -65,7 +65,6 @@ export class StatusBarService {
 
         if (!p) {
             console.error(`Process “${id}” doesn't exist.`);
-            console.trace();
             return;
         }
 

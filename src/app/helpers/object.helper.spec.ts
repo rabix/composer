@@ -91,8 +91,8 @@ describe("ObjectHelper", () => {
      */
     describe("addEnumerables()", () => {
         it("should add source properties that exist on the target object", () => {
-            let target = {foo: "", bar: ""};
-            let source = {bar: "baz", goo: "moo"};
+            const target = {foo: "", bar: ""};
+            const source = {bar: "baz", goo: "moo"};
 
             ObjectHelper.addEnumerables(target, source);
 
@@ -106,8 +106,8 @@ describe("ObjectHelper", () => {
                 public third = null;
             }
 
-            let instance = new TestClass();
-            let source = {first: "foo", second: "bar", third: "baz"};
+            const instance = new TestClass();
+            const source = {first: "foo", second: "bar", third: "baz"};
 
             ObjectHelper.addEnumerables(instance, source);
             expect((<any>instance).first).toEqual("foo");

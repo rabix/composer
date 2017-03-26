@@ -1,4 +1,4 @@
-import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
+import {Component, forwardRef, Input, OnChanges} from "@angular/core";
 import {
     ControlValueAccessor,
     FormBuilder,
@@ -81,35 +81,35 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         <ng-content></ng-content>
     `
 })
-export class KeyValueInputComponent extends DirectiveBase implements ControlValueAccessor {
+export class KeyValueInputComponent extends DirectiveBase implements ControlValueAccessor, OnChanges {
 
     @Input()
-    public context: { $job: any } = {$job: {}};
+    context: { $job: any } = {$job: {}};
 
     @Input()
-    public keyValidator = noop;
+    keyValidator = noop;
 
     @Input()
-    private isDuplicate = false;
+    isDuplicate = false;
 
-    private onTouched = noop;
+    onTouched = noop;
 
-    private propagateChange = noop;
+    propagateChange = noop;
 
-    private form = new FormGroup({});
+    form = new FormGroup({});
 
-    private readonly = false;
+    readonly = false;
 
-    private duplicateErrorMessage = "Duplicate keys are not allowed.";
-
-    constructor(private formBuilder: FormBuilder) {
-        super();
-    }
+    duplicateErrorMessage = "Duplicate keys are not allowed.";
 
     validation: { warnings: string[], errors: string[] } = {
         warnings: [],
         errors: []
     };
+
+    constructor(private formBuilder: FormBuilder) {
+        super();
+    }
 
     validate() {
         this.validation.errors = [];
@@ -160,7 +160,7 @@ export class KeyValueInputComponent extends DirectiveBase implements ControlValu
             });
     }
 
-    private checkIfDuplicate(): void {
+    checkIfDuplicate(): void {
         const index = this.validation.errors.indexOf(this.duplicateErrorMessage);
 
         if (this.isDuplicate && index === -1) {

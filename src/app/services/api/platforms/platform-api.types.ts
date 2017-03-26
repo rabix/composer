@@ -46,10 +46,10 @@ export interface PlatformProjectEntry {
         copy: boolean,
         read: boolean,
         write: boolean
-    },
-    name: string,
+    };
+    name: string;
     owner_canonical: string;
-    project_type: "PRIVATE" | "PUBLIC",
+    project_type: "PRIVATE" | "PUBLIC";
     slug: string;
     state: string;
     tags: Array<any>;

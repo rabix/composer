@@ -5,6 +5,9 @@ import {
     HostBinding,
     HostListener,
     Input,
+    OnDestroy,
+    AfterViewInit,
+    OnInit,
     ViewChild,
     ViewEncapsulation
 } from "@angular/core";
@@ -33,23 +36,23 @@ import {Observable, Subject, Subscription} from "rxjs/Rx";
 
     `
 })
-export class MenuItemComponent {
+export class MenuItemComponent implements OnDestroy, AfterViewInit, OnInit {
     @Input()
-    private item: MenuItem;
+    item: MenuItem;
 
     @ViewChild("menu")
-    private hover: boolean;
+    hover: boolean;
 
     @HostBinding("class.disabled")
-    private isDisabled;
+    isDisabled;
 
-    private menuWidth: string;
+    menuWidth: string;
 
-    private subscriptions: Subscription[];
+    subscriptions: Subscription[];
 
     constructor(private el: ElementRef) {
-        this.hover = false;
-        this.isDisabled = false;
+        this.hover         = false;
+        this.isDisabled    = false;
         this.subscriptions = [];
     }
 
@@ -70,12 +73,12 @@ export class MenuItemComponent {
     }
 
     @HostListener("mouseenter")
-    private onMouseEnter() {
+    onMouseEnter() {
         this.hover = true;
     }
 
     @HostListener("mouseleave")
-    private onMouseLeave() {
+    onMouseLeave() {
         this.hover = false;
     }
 

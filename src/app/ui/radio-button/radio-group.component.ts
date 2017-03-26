@@ -33,7 +33,7 @@ export class RadioGroupComponent<T> {
     public readonly value: Observable<T>;
 
     @Input()
-    private items: GroupItem<T>[];
+    items: GroupItem<T>[];
 
     constructor() {
         this.value = new BehaviorSubject<T>(undefined);

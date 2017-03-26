@@ -2,10 +2,11 @@ import {BehaviorSubject, Observable, Subject} from "rxjs/Rx";
 
 interface MenuItemUpdates {
     click?: Subject<MenuItem> | Function;
-    isEnabled?: Observable<boolean> | boolean ;
+    isEnabled?: Observable<boolean> | boolean;
 }
 
 export class MenuItem {
+    public isDisabled: any;
     public readonly name: string;
     public readonly updates: MenuItemUpdates;
     public readonly children: MenuItem[];

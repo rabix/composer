@@ -1,4 +1,14 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewEncapsulation} from "@angular/core";
+import {
+    ChangeDetectionStrategy,
+    Component,
+    EventEmitter,
+    Input,
+    OnChanges,
+    Output,
+    OnInit,
+    SimpleChanges,
+    ViewEncapsulation
+} from "@angular/core";
 import {CommandInputParameterModel} from "cwlts/models";
 import {JobHelper} from "cwlts/models/helpers/JobHelper";
 import {ObjectHelper} from "../../helpers/object.helper";
@@ -92,7 +102,8 @@ import {ObjectHelper} from "../../helpers/object.helper";
                 </ng-template>
 
                 <!--Every element that's a part of the array can be deleted, so we add a deletion button to it-->
-                <span [class]="inputType !== 'record' ? 'input-group-btn' : 'record-delete'" *ngIf="index !== -1">
+                <span [class]="inputType !== 'record' ? 'input-group-btn' : 'record-delete'"
+                      *ngIf="index !== -1">
                     <button type="button" class="btn btn-secondary" (click)="deleteFromArray()">
                         <i class="fa fa-trash"></i>
                     </button>
@@ -118,7 +129,7 @@ import {ObjectHelper} from "../../helpers/object.helper";
                         </div>
                     </ct-tooltip-content>
                 </div>
-                
+
             </ng-template>
 
             <!--Arrays-->
@@ -144,51 +155,51 @@ import {ObjectHelper} from "../../helpers/object.helper";
         </div>
     `
 })
-export class JobEditorEntryComponent implements OnChanges {
+export class JobEditorEntryComponent implements OnChanges, OnInit {
 
     @Input()
-    public input: CommandInputParameterModel;
+    input: CommandInputParameterModel;
 
     @Input()
-    public value: any;
+    value: any;
 
     @Input()
-    public index = -1;
+    index = -1;
 
     @Input()
-    public prefix;
+    prefix;
 
     @Output()
-    public update = new EventEmitter<any>();
+    update = new EventEmitter<any>();
 
-    public inputType: string;
+    inputType: string;
 
     /**
      * We might want to show a warning next to a field.
      * This can happen for example if we encounter a mismatch between job value and the input type,
      * for example, an input can by File[], and the job value can be just a plain string.
      */
-    public warning: string;
+    warning: string;
 
-    public arrayModifiedInput;
+    arrayModifiedInput;
 
-    public updateJob(data) {
+    updateJob(data) {
         this.update.emit(data);
     }
 
-    private updateFile(data) {
+    updateFile(data) {
         this.updateJob(data);
     }
 
-    private updateMap(map) {
+    updateMap(map) {
         this.updateJob(map);
     }
 
-    private updateRecord(entryId, event) {
+    updateRecord(entryId, event) {
 
         const data = {...(this.value || {})};
         ObjectHelper.addProperty(data, entryId, event);
-        let d = {
+        const d = {
             ...data,
             [entryId]: Array.isArray(event) || ObjectHelper.isPrimitiveValue(event) ? event : {...event}
         };
@@ -196,7 +207,7 @@ export class JobEditorEntryComponent implements OnChanges {
         this.updateJob(d);
     }
 
-    public updateArray(index, data) {
+    updateArray(index, data) {
 
         // We need some kind of convention to broadcast information
         // that an array element should be deleted
@@ -215,13 +226,13 @@ export class JobEditorEntryComponent implements OnChanges {
         this.updateJob(this.value.slice());
     }
 
-    private addArrayEntry(input) {
-        this.warning = undefined;
+    addArrayEntry(input) {
+        this.warning         = undefined;
         const generatedEntry = JobHelper.generateMockJobData(input);
         this.updateJob((this.value || []).concat(generatedEntry.slice(0, 1)));
     }
 
-    private deleteFromArray() {
+    deleteFromArray() {
         this.updateJob(undefined);
     }
 
@@ -232,12 +243,12 @@ export class JobEditorEntryComponent implements OnChanges {
             && !Array.isArray(this.value)
             && this.value !== undefined) {
 
-            this.value = [];
+            this.value   = [];
             this.warning = `Type mismatch: the default job value for this input 
                             is of type “${typeof this.value}”, but the input is declared 
                             as “${this.inputType}”. 
                             You can generate a new set of test data for this input by clicking 
-                            on the “New ${this.input.type.items}” button.`
+                            on the “New ${this.input.type.items}” button.`;
         }
     }
 
@@ -252,7 +263,7 @@ export class JobEditorEntryComponent implements OnChanges {
                     ...this.input.type,
                     type: this.input.type.items
                 }
-            }
+            };
         }
     }
 }

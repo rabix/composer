@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {Observable} from "rxjs";
+import {Observable} from "rxjs/Observable";
 
 type ExtendedMouseEvent = MouseEvent & {
     ctName?: string;
@@ -9,14 +9,14 @@ type ExtendedMouseEvent = MouseEvent & {
 @Injectable()
 export class DomEventService {
 
-    public readonly ON_DRAG_ENTER_ZONE_EVENT: string = "onDragEnterZone";
-    public readonly ON_DRAG_LEAVE_ZONE_EVENT: string = "onDragLeaveZone";
+    public readonly ON_DRAG_ENTER_ZONE_EVENT = "onDragEnterZone";
+    public readonly ON_DRAG_LEAVE_ZONE_EVENT = "onDragLeaveZone";
 
-    public readonly ON_DRAG_ENTER_EVENT: string = "onDragEnter";
-    public readonly ON_DRAG_LEAVE_EVENT: string = "onDragLeave";
-    public readonly ON_DRAG_OVER_EVENT: string = "onDragOver";
+    public readonly ON_DRAG_ENTER_EVENT = "onDragEnter";
+    public readonly ON_DRAG_LEAVE_EVENT = "onDragLeave";
+    public readonly ON_DRAG_OVER_EVENT  = "onDragOver";
 
-    public readonly ON_DROP_SUCCESS_EVENT: string = "onDropSuccess";
+    public readonly ON_DROP_SUCCESS_EVENT = "onDropSuccess";
 
     private registeredShortcuts = new Map<string[], Observable<KeyboardEvent>>();
 
@@ -67,7 +67,7 @@ export class DomEventService {
 
         // We won't allow modifier-only shortcuts
         if (!mainKey) {
-            throw `Invalid shortcut "${shortcut}". It can't be made only of control characters.`;
+            throw new Error(`Invalid shortcut "${shortcut}". It can't be made only of control characters.`);
         }
 
         // Switch on modifiers that we should listen for
@@ -102,7 +102,7 @@ export class DomEventService {
      */
     public onMove(element: Element, ctName = "", ctData = {}): Observable<ExtendedMouseEvent> {
         const down = Observable.fromEvent(element, "mousedown");
-        const up = Observable.fromEvent(document, "mouseup");
+        const up   = Observable.fromEvent(document, "mouseup");
         const move = Observable.fromEvent(document, "mousemove");
         return down.flatMap(_ => move.takeUntil(up)).map((ev: MouseEvent) => Object.assign(ev, {ctData}, {ctName}));
     }
@@ -110,10 +110,14 @@ export class DomEventService {
     public onDrag(element: Element, ctName = "", ctData = {}) {
 
         const down = Observable.fromEvent(element, "mousedown").do((ev: MouseEvent) => {
-            ev.stopPropagation && ev.stopPropagation();
-            ev.preventDefault && ev.preventDefault();
+            if (ev.stopPropagation) {
+                ev.stopPropagation();
+            }
+            if (ev.preventDefault) {
+                ev.preventDefault();
+            }
         });
-        const up = Observable.fromEvent(document, "mouseup");
+        const up   = Observable.fromEvent(document, "mouseup");
         const move = Observable.fromEvent(document, "mousemove");
 
         return down.map(ev => new Observable(obs => {
@@ -132,7 +136,7 @@ export class DomEventService {
             return () => {
                 moveSub.unsubscribe();
                 upSub.unsubscribe();
-            }
+            };
         }));
     }
 

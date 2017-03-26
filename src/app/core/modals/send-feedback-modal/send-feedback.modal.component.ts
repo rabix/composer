@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Input, ViewEncapsulation} from "@angular/core";
+import {ChangeDetectionStrategy, Component, Input} from "@angular/core";
 import {FormControl, Validators} from "@angular/forms";
 import {ModalService} from "../../../ui/modal/modal.service";
 
@@ -124,7 +124,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
 
     `
 })
-export class SendFeedbackModal {
+export class SendFeedbackModalComponent {
 
     public feedbackType: "idea" | "problem" | "thought" = "idea";
 

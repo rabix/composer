@@ -6,7 +6,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 @Component({
     encapsulation: ViewEncapsulation.None,
 
-    selector: "symbols-section",
+    selector: "ct-symbols-section",
     styleUrls: ["symbols.component.scss"],
     providers: [
         {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => SymbolsComponent), multi: true}
@@ -15,11 +15,11 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         <div class="form-group" *ngIf="symbolsForm">
             <form>
                 <label>Symbols</label>
-                <compact-list *ngIf="symbolsForm"
-                              [addKeyCode]="13"
-                              [readonly]="readonly"
-                              [formControl]="symbolsForm">
-                </compact-list>
+                <ct-compact-list *ngIf="symbolsForm"
+                                 [addKeyCode]="13"
+                                 [readonly]="readonly"
+                                 [formControl]="symbolsForm">
+                </ct-compact-list>
 
             </form>
         </div>
@@ -28,13 +28,13 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 export class SymbolsComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
     private onTouched = noop;
 
     private propagateChange = noop;
 
-    private symbolsForm: FormControl;
+    symbolsForm: FormControl;
 
     writeValue(symbols: string[]): void {
         this.symbolsForm = new FormControl(symbols || []);

@@ -1,8 +1,8 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { EditorLayoutComponent } from './editor-layout.component';
+import { EditorLayoutComponent } from "./editor-layout.component";
 
-describe('EditorLayoutComponent', () => {
+describe("EditorLayoutComponent", () => {
   let component: EditorLayoutComponent;
   let fixture: ComponentFixture<EditorLayoutComponent>;
 
@@ -19,7 +19,7 @@ describe('EditorLayoutComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

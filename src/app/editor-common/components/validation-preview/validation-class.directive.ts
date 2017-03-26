@@ -14,10 +14,10 @@ export class ValidationClassDirective {
     entry: Validation;
 
     get errors() {
-        return this.entry ? this.entry.errors.length : false
+        return this.entry ? this.entry.errors.length : false;
     }
 
     get warnings() {
-        return this.entry ? this.entry.warnings.length : false
+        return this.entry ? this.entry.warnings.length : false;
     }
 }

@@ -158,7 +158,7 @@ export class ExpressionEditorComponent extends DirectiveBase implements OnInit, 
                 node.isExpandable = true;
                 node.children     = wrap(contextItem.reduce((acc, item, index) => ({acc, [index]: item}), {}), trace);
             } else {
-                node.id = trace.split(".").map(p => (parseInt(p, 10).toString() == p) ? `[${p}]` : p).join(".")
+                node.id = trace.split(".").map(p => (parseInt(p, 10).toString() === p) ? `[${p}]` : p).join(".")
                     .replace(/\]\.\[/g, "][")
                     .replace(/\.\[/g, "[");
             }

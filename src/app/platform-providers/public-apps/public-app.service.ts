@@ -1,4 +1,4 @@
-import {Observable} from "rxjs";
+import {Observable} from "rxjs/Observable";
 import {MenuItem} from "../../ui/menu/menu-item";
 
 export abstract class PublicAppService {

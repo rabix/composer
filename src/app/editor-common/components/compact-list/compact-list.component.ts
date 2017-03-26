@@ -1,15 +1,28 @@
-import {Component, ElementRef, forwardRef, Input, Renderer, ViewChild, ViewEncapsulation} from "@angular/core";
+import {
+    Component,
+    ElementRef,
+    forwardRef,
+    Input,
+    Renderer,
+    ViewChild,
+    ViewEncapsulation
+} from "@angular/core";
 import {ControlValueAccessor, FormControl, NG_VALIDATORS, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {noop} from "../../../lib/utils.lib";
 import {ModalService} from "../../../ui/modal/modal.service";
 
+/** @deprecated */
 @Component({
     encapsulation: ViewEncapsulation.None,
 
-    selector: "compact-list",
+    selector: "ct-compact-list",
     styleUrls: ["./compact-list.component.scss"],
     providers: [
-        {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => CompactListComponent), multi: true},
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => CompactListComponent),
+            multi: true
+        },
         {provide: NG_VALIDATORS, useExisting: forwardRef(() => CompactListComponent), multi: true}
     ],
     template: `
@@ -20,7 +33,8 @@ import {ModalService} from "../../../ui/modal/modal.service";
                     <span *ngFor="let tag of tagList; let i = index;"
                           class="tag tag-pill tag-default">
                           {{tag}}
-                          <i *ngIf="!readonly" class="fa fa-times remove-tag-icon text-hover-danger" [ct-tooltip]="'Delete'"
+                          <i *ngIf="!readonly" class="fa fa-times remove-tag-icon text-hover-danger"
+                             [ct-tooltip]="'Delete'"
                              (click)="removeTag(i, $event)"></i>
                     </span>
 
@@ -53,7 +67,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
 export class CompactListComponent implements ControlValueAccessor {
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
     /**
      * Key codes
@@ -62,23 +76,23 @@ export class CompactListComponent implements ControlValueAccessor {
      * Space: 32
      * */
     @Input()
-    public addKeyCode: number = 9;
+    addKeyCode = 9;
 
     @ViewChild("tagInput")
-    private tagInputElement: ElementRef;
+    tagInputElement: ElementRef;
 
     /** The form control for the input */
-    public control: FormControl;
+    control: FormControl;
 
-    public tagList: any[] = [];
+    tagList: any[] = [];
 
     /** Last value of the input validity */
-    private isValidInput = true;
+    isValidInput = true;
 
     /** FormControl for the tag input field */
-    private tagInputControl: FormControl;
+    tagInputControl: FormControl;
 
-    private validationMessage: string = "Input not valid.";
+    validationMessage = "Input not valid.";
 
     private onTouched = noop;
 
@@ -88,19 +102,19 @@ export class CompactListComponent implements ControlValueAccessor {
         this.tagInputControl = new FormControl("");
     }
 
-    public writeValue(value: any[]): void {
+    writeValue(value: any[]): void {
         this.tagList = value.slice();
     }
 
-    public registerOnChange(fn: any): void {
+    registerOnChange(fn: any): void {
         this.propagateChange = fn;
     }
 
-    public registerOnTouched(fn: any): void {
+    registerOnTouched(fn: any): void {
         this.onTouched = fn;
     }
 
-    private onListWrapperClick(): void {
+    onListWrapperClick(): void {
         this.renderer.invokeElementMethod(this.tagInputElement.nativeElement, "focus", []);
     }
 
@@ -108,12 +122,12 @@ export class CompactListComponent implements ControlValueAccessor {
         this.control = c;
     }
 
-    private onTagInputKeyDown(event): void {
+    onTagInputKeyDown(event): void {
         const tabKeyCode = 9;
         const backspaceCode = 8;
 
         const tagInputValue: string = this.tagInputControl.value;
-        const trimmedValue: string = tagInputValue.trim();
+        const trimmedValue: string  = tagInputValue.trim();
 
         const newControlList: string[] = [...this.tagList, trimmedValue];
 
@@ -122,7 +136,7 @@ export class CompactListComponent implements ControlValueAccessor {
             return;
         }
 
-        //make sure value was not a sequence of white spaces
+        // make sure value was not a sequence of white spaces
         if (event.keyCode === this.addKeyCode && !!trimmedValue) {
             if (this.addKeyCode === tabKeyCode) {
                 event.preventDefault();
@@ -135,13 +149,13 @@ export class CompactListComponent implements ControlValueAccessor {
                 this.tagList.push(trimmedValue);
                 this.tagInputControl.setValue("");
             } else {
-                //TODO: this will always return a string array
+                // TODO: this will always return a string array
                 this.propagateChange(newControlList.slice(0, -1));
             }
         }
     }
 
-    private onTagInputKeyUp(): void {
+    onTagInputKeyUp(): void {
         const tagInputValue: string = this.tagInputControl.value;
 
         if (tagInputValue.length === 0) {
@@ -149,18 +163,20 @@ export class CompactListComponent implements ControlValueAccessor {
         }
     }
 
-    private onTagInputBlur(): void {
+    onTagInputBlur(): void {
         this.tagInputControl.setValue("");
         this.isValidInput = true;
     }
 
-    private addTagInControl(tag: string): void {
+    addTagInControl(tag: string): void {
         this.propagateChange([...this.tagList, tag]);
     }
 
-    private removeTag(index: number, event?: Event): void {
+    removeTag(index: number, event?: Event): void {
 
-        !!event && event.stopPropagation();
+        if (!!event) {
+            event.stopPropagation();
+        }
 
         this.modal.confirm({
             title: "Really Remove?",

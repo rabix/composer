@@ -27,7 +27,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                 </div>
                 
                 <!--List Header Row-->
-                <div class="gui-section-list-title" *ngIf="model.hints.length">
+                <div class="gui-section-list-title" *ngIf="!!model.hints.length">
                     <div class="col-xs-6">
                         Class
                     </div>
@@ -61,7 +61,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                 </form>
 
                 <!--Add entry link-->
-                <button *ngIf="!readonly && model.hints.length"
+                <button *ngIf="!readonly && !!model.hints.length"
                         (click)="addEntry()"
                         type="button"
                         class="btn pl-0 btn-link no-outline no-underline-hover">

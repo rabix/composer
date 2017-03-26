@@ -1,6 +1,6 @@
 import {Component} from "@angular/core";
 import {ModalService} from "../../ui/modal/modal.service";
-import {SendFeedbackModal} from "../../core/modals/send-feedback-modal/send-feedback.modal.component";
+import {SendFeedbackModalComponent} from "../../core/modals/send-feedback-modal/send-feedback.modal.component";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {SystemService} from "../../platform-providers/system.service";
 import {AuthService} from "../../auth/auth/auth.service";
@@ -71,7 +71,7 @@ export class GettingStartedComponent {
 
             if (feedbackPlatform as CredentialsEntry) {
 
-                const modal = this.modal.fromComponent(SendFeedbackModal, {
+                const modal = this.modal.fromComponent(SendFeedbackModalComponent, {
                     title: "Send Feedback",
                     backdrop: true
                 });

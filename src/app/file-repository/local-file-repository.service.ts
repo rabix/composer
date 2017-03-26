@@ -1,9 +1,10 @@
 import {Injectable} from "@angular/core";
-import {Observable} from "rxjs";
+import {Observable} from "rxjs/Observable";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {IpcService} from "../services/ipc.service";
 
 
+/** @deprecated */
 @Injectable()
 export class LocalFileRepositoryService {
 

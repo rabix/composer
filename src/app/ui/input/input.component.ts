@@ -26,22 +26,22 @@ import {FormControl} from "@angular/forms";
 export class InputComponent implements AfterViewInit {
 
     @Input()
-    private control: FormControl;
+    control: FormControl;
 
     @Input()
-    private placeholder: string;
+    placeholder: string;
 
     @Input()
-    private autofocus: boolean;
+    autofocus: boolean;
 
     @Input()
-    private name: string;
+    name: string;
 
     @Input()
     public readonly = false;
 
     @ViewChild("inputField")
-    private inputField: ElementRef;
+    inputField: ElementRef;
 
     constructor(private renderer: Renderer) {
         this.name = "";

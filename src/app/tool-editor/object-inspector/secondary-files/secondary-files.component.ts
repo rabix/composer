@@ -16,12 +16,12 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             <div class="tc-header">Secondary Files</div>
             <div class="tc-body">
 
-                <expression-model-list
-                    [context]="context"
-                    [emptyListText]="'No Secondary Files defined.'"
-                    [addButtonText]="'Add secondary file'"
-                    [readonly]="readonly"
-                    [formControl]="form"></expression-model-list>
+                <ct-expression-model-list
+                        [context]="context"
+                        [emptyListText]="'No Secondary Files defined.'"
+                        [addButtonText]="'Add secondary file'"
+                        [readonly]="readonly"
+                        [formControl]="form"></ct-expression-model-list>
             </div>
         </ct-form-panel>
     `
@@ -42,7 +42,7 @@ export class SecondaryFilesComponent extends DirectiveBase implements ControlVal
 
     private propagateChange = noop;
 
-    private form: FormControl;
+    form: FormControl;
 
     writeValue(secondaryFiles: SBDraft2ExpressionModel[]): void {
         this.secondaryFiles = secondaryFiles;

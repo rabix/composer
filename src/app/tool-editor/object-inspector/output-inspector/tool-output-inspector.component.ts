@@ -107,11 +107,11 @@ export class ToolOutputInspector extends DirectiveBase implements OnChanges {
         });
     }
 
-    private onSubmit(form: FormGroup) {
+    onSubmit(form: FormGroup) {
         this.save.next(form.value);
     }
 
-    private isFileType() {
+    isFileType() {
         return this.output.type.type === "File" || (this.output.type.type === "array" && this.output.type.items === "File");
     }
 }

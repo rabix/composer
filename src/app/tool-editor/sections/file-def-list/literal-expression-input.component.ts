@@ -68,7 +68,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
     fileName: string;
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
     /**
      * Declaration of change function
@@ -78,24 +78,24 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
     /**
      * Declaration of touch function
      */
-    private onTouch = noop;
+    onTouch = noop;
 
     /** Flag if model is expression or primitive */
-    public isExpr: boolean = false;
+    isExpr = false;
 
     /**
      * Internal ExpressionModel on which changes are made
      */
-    public model: SBDraft2ExpressionModel;
+    model: SBDraft2ExpressionModel;
 
 
     /** getter for formControl value */
-    public get value() {
+    get value() {
         return this.model;
     }
 
     /** setter for formControl value */
-    public set value(val: SBDraft2ExpressionModel) {
+    set value(val: SBDraft2ExpressionModel) {
         if (val !== this.model) {
             this.model = val;
             this.onChange(val);
@@ -108,7 +108,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
 
     writeValue(obj: any): void {
         if (!(obj instanceof SBDraft2ExpressionModel)) {
-            console.warn(`ct-literal-expression-input expected ExpressionModel, instead got ${obj}`)
+            console.warn(`ct-literal-expression-input expected ExpressionModel, instead got ${obj}`);
         }
 
         if (obj) {
@@ -128,7 +128,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
         this.onTouch = fn;
     }
 
-    private openLiteralEditor() {
+    openLiteralEditor() {
         const editor = this.modal.fromComponent(MultilangCodeEditorComponent, {
             backdrop: true,
             closeOnOutsideClick: false,
@@ -159,7 +159,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
      * Callback for setting string value to model
      * @param str
      */
-    private editLiteral(str: number | string) {
+    editLiteral(str: number | string) {
         this.model.setValue(str, "string");
         this.onChange(this.model);
     }
@@ -169,9 +169,11 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
      * @param action
      * @param event
      */
-    private editExpr(action: "clear" | "edit", event: Event): void {
+    editExpr(action: "clear" | "edit", event: Event): void {
 
-        if (!action) return;
+        if (!action) {
+            return;
+        }
 
         if (action === "edit") {
             const editor = this.modal.fromComponent(ModelExpressionEditorComponent, {

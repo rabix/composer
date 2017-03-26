@@ -1,4 +1,4 @@
-import {Observable} from "rxjs";
+import {Observable} from "rxjs/Observable";
 
 export type SB_PLATFORM_SOURCE_ID = "sb_platform";
 export type SB_PUBLIC_SOURCE_ID = "sb_public";

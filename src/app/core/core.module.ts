@@ -16,7 +16,7 @@ import {LayoutTabContentComponent} from "./layout-tab-content/layout-tab-content
 import {LayoutComponent} from "./layout/layout.component";
 import {LogoComponent} from "./logo/logo.component";
 import {AddSourceModalComponent} from "./modals/add-source-modal/add-source-modal.component";
-import {SendFeedbackModal} from "./modals/send-feedback-modal/send-feedback.modal.component";
+import {SendFeedbackModalComponent} from "./modals/send-feedback-modal/send-feedback.modal.component";
 import {AppsPanelComponent} from "./panels/apps-panel/apps-panel.component";
 import {MyAppsPanelComponent} from "./panels/my-apps-panel/my-apps-panel.component";
 import {NavSearchResultComponent} from "./panels/nav-search-result/nav-search-result.component";
@@ -32,7 +32,7 @@ import {ErrorReportComponent} from "./error-report/error-report.component";
 @NgModule({
     entryComponents: [
         AddSourceModalComponent,
-        SendFeedbackModal,
+        SendFeedbackModalComponent,
         ErrorReportComponent
     ],
     declarations: [
@@ -50,7 +50,7 @@ import {ErrorReportComponent} from "./error-report/error-report.component";
         GettingStartedComponent,
         NewFileTabComponent,
         AddSourceModalComponent,
-        SendFeedbackModal,
+        SendFeedbackModalComponent,
         ErrorReportComponent,
     ],
     exports: [

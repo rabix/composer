@@ -1,7 +1,7 @@
-import {Component, Input, Output, ViewEncapsulation} from "@angular/core";
+import {Component, Input, Output, ViewEncapsulation, OnInit} from "@angular/core";
 import {CommandInputParameterModel} from "cwlts/models";
 import {FormBuilder, FormGroup} from "@angular/forms";
-import {Subject} from "rxjs";
+import {Subject} from "rxjs/Subject";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
@@ -23,22 +23,22 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         </form>
     `
 })
-export class ToolInputInspector extends DirectiveBase {
+export class ToolInputInspectorComponent extends DirectiveBase implements OnInit {
 
     @Input()
-    public input: CommandInputParameterModel;
+    input: CommandInputParameterModel;
 
     /** Context in which expression should be evaluated */
     @Input()
-    public context: { $job?: any, $self?: any } = {};
+    context: { $job?: any, $self?: any } = {};
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
-    public form: FormGroup;
+    form: FormGroup;
 
     @Output()
-    public save = new Subject<CommandInputParameterModel>();
+    save = new Subject<CommandInputParameterModel>();
 
     constructor(private formBuilder: FormBuilder) {
         super();
@@ -58,7 +58,7 @@ export class ToolInputInspector extends DirectiveBase {
         });
     }
 
-    private onSubmit(form: FormGroup) {
+    onSubmit(form: FormGroup) {
         this.save.next(form.value);
     }
 }

@@ -1,4 +1,4 @@
-import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
+import {Component, forwardRef, Input, ViewEncapsulation, OnDestroy} from "@angular/core";
 import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
 import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 import {GuidService} from "../../../services/guid.service";
@@ -10,7 +10,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
 @Component({
     encapsulation: ViewEncapsulation.None,
 
-    selector: "expression-model-list",
+    selector: "ct-expression-model-list",
     providers: [
         {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ExpressionModelListComponent), multi: true}
     ],
@@ -48,31 +48,31 @@ import {ModalService} from "../../../ui/modal/modal.service";
         </form>
     `
 })
-export class ExpressionModelListComponent extends DirectiveBase implements ControlValueAccessor {
+export class ExpressionModelListComponent extends DirectiveBase implements ControlValueAccessor, OnDestroy {
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
     @Input()
-    public addButtonText: string = "";
+    addButtonText = "";
 
     @Input()
-    public emptyListText: string = "";
+    emptyListText = "";
 
     /** Context in which expression should be evaluated */
     @Input()
-    public context: { $job: any } = {$job: {}};
+    context: { $job: any } = {$job: {}};
 
     /** List which connects model to forms */
-    private formList: Array<{ id: string, model: SBDraft2ExpressionModel }> = [];
+    formList: Array<{ id: string, model: SBDraft2ExpressionModel }> = [];
 
     private onTouched = noop;
 
     private propagateChange = noop;
 
-    private input: SBDraft2ExpressionModel[];
+    input: SBDraft2ExpressionModel[];
 
-    private form: FormGroup = new FormGroup({});
+    form: FormGroup = new FormGroup({});
 
     constructor(private guidService: GuidService, private modal: ModalService) {
         super();
@@ -97,7 +97,7 @@ export class ExpressionModelListComponent extends DirectiveBase implements Contr
         this.tracked = this.form.valueChanges.subscribe(change => {
             const values = Object.keys(change).map(key => change[key]);
             this.propagateChange(values);
-        })
+        });
     }
 
     registerOnChange(fn: any): void {
@@ -108,7 +108,7 @@ export class ExpressionModelListComponent extends DirectiveBase implements Contr
         this.onTouched = fn;
     }
 
-    private removeExpressionModel(ctrl: { id: string, model: SBDraft2ExpressionModel }): void {
+    removeExpressionModel(ctrl: { id: string, model: SBDraft2ExpressionModel }): void {
         this.modal.confirm({
             title: "Really Remove?",
             content: `Are you sure that you want to remove this secondary file?`,
@@ -121,7 +121,7 @@ export class ExpressionModelListComponent extends DirectiveBase implements Contr
         }, err => console.warn);
     }
 
-    private addExpressionModel(): void {
+    addExpressionModel(): void {
         const newCmd = {
             id: this.guidService.generate(),
             model: new SBDraft2ExpressionModel("")

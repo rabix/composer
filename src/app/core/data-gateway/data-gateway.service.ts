@@ -199,7 +199,6 @@ export class DataGatewayService {
             // Sample:
             console.log("Feching public app", almostID);
             const [, , , , , username, projectSlug, appSlug, revision] = almostID.split("/");
-            debugger;
 
             const request = this.api.getApp(`${username}/${projectSlug}/${appSlug}/${revision}`).take(1);
             if (parse) {

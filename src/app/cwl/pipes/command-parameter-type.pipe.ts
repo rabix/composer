@@ -9,7 +9,9 @@ export class CommandParameterTypePipe implements PipeTransform {
         try {
             let output = type.type;
 
-            if (output === undefined) return "n/a";
+            if (output === undefined) {
+                return "n/a";
+            }
 
             if (type.type === "array") {
                 output = `Array<${type.items}>`;

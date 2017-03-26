@@ -9,8 +9,8 @@ The Rabix Editor (codename Cottontail) is a graphical and code editor specially 
 ## Installation
 
 ```bash
-git clone https://github.com/rabix/cottontail-frontend
-cd cottontail-frontend
+git clone https://github.com/rabix/ct-cottontail-frontend
+cd ct-cottontail-frontend
 npm install
 ```
 
@@ -32,7 +32,7 @@ npm run package
 
 ### Adding local folders
 
-Local directories can be added to the cottontail workspace by clicking the plus icon next to Local Files, which will open the native file picker.
+Local directories can be added to the ct-cottontail workspace by clicking the plus icon next to Local Files, which will open the native file picker.
 
 ![Adding Local Folders](http://i.imgur.com/jNAnyQe.png)
 

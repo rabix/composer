@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Input, ViewEncapsulation} from "@angular/core";
+import {ChangeDetectionStrategy, Component, Input, ViewEncapsulation, OnInit} from "@angular/core";
 import {SystemService} from "../../../platform-providers/system.service";
 import {SettingsService} from "../../../services/settings/settings.service";
 import {StepModel} from "cwlts/models";
@@ -44,21 +44,21 @@ import {ModalService} from "../../../ui/modal/modal.service";
         </div>
     `
 })
-export class UpdateStepModal {
+export class UpdateStepModalComponent implements OnInit {
 
     @Input()
-    public step: StepModel;
+    step: StepModel;
 
     @Input()
-    public updatedModel: any;
+    updatedModel: any;
 
     @Input()
-    public confirm: () => void;
+    confirm: () => void;
 
-    public link;
+    link;
 
     constructor(private modal: ModalService,
-                private system: SystemService,
+                public system: SystemService,
                 private settings: SettingsService) {
     }
 
@@ -72,15 +72,15 @@ export class UpdateStepModal {
         });
     }
 
-    public onSubmit() {
+    onSubmit() {
         this.confirm();
     }
 
-    public onCancel() {
+    onCancel() {
         this.modal.close();
     }
 
-    public closeModal() {
+    closeModal() {
         this.modal.close();
     }
 }

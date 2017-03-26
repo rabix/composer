@@ -45,14 +45,14 @@ import {noop} from "../../../../lib/utils.lib";
             </div>
 
             <!--Input Type -->
-            <input-type-select [formControl]="form.controls['typeForm']"></input-type-select>
+            <ct-input-type-select [formControl]="form.controls['typeForm']"></ct-input-type-select>
 
             <!--Symbols-->
-            <symbols-section class="form-group"
-                             *ngIf="isType('enum')"
-                             [formControl]="form.controls['symbols']"
-                             [readonly]="readonly">
-            </symbols-section>
+            <ct-symbols-section class="form-group"
+                                *ngIf="isType('enum')"
+                                [formControl]="form.controls['symbols']"
+                                [readonly]="readonly">
+            </ct-symbols-section>
 
             <!--Include in command line -->
             <div class="form-group flex-container"
@@ -73,7 +73,7 @@ import {noop} from "../../../../lib/utils.lib";
                                       [formControl]="form.controls['inputBinding']">
             </ct-input-binding-section>
 
-            <ct-secondary-file *ngIf="isType('File') && form.controls['secondaryFiles']"
+            <ct-secondary-file *ngIf="isType('File') && !!form.controls['secondaryFiles']"
                                [formControl]="form.controls['secondaryFiles']"
                                [context]="context"
                                [readonly]="readonly">

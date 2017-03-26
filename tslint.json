@@ -38,8 +38,6 @@
       true,
       "debug",
       "info",
-      "time",
-      "timeEnd",
       "trace"
     ],
     "no-construct": true,
@@ -104,9 +102,7 @@
     ],
     "directive-selector": [
       true,
-      "attribute",
-      "app",
-      "camelCase"
+      "attribute"
     ],
     "component-selector": [
       true,
@@ -117,8 +113,8 @@
     "use-input-property-decorator": true,
     "use-output-property-decorator": true,
     "use-host-property-decorator": true,
-    "no-input-rename": true,
-    "no-output-rename": true,
+    "no-input-rename": false,
+    "no-output-rename": false,
     "use-life-cycle-interface": true,
     "use-pipe-transform-interface": true,
     "component-class-suffix": true,

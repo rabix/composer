@@ -1,5 +1,5 @@
 import {Component, Output, ViewEncapsulation} from "@angular/core";
-import {BehaviorSubject, Subject} from "rxjs";
+import {BehaviorSubject, Subject} from "rxjs/Rx";
 import {ACE_MODE_MAP} from "../code-editor-new/ace-mode-map";
 
 @Component({
@@ -42,7 +42,7 @@ export class MultilangCodeEditorComponent {
 
     public language = new BehaviorSubject<string>("text");
 
-    private languages = Object.keys(ACE_MODE_MAP)
+    languages = Object.keys(ACE_MODE_MAP)
         .map(key => ACE_MODE_MAP[key])
         .reduce((prev, curr) => {
             curr = curr.toUpperCase();

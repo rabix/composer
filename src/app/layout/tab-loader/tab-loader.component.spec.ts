@@ -1,8 +1,8 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { TabLoaderComponent } from './tab-loader.component';
+import { TabLoaderComponent } from "./tab-loader.component";
 
-describe('TabLoaderComponent', () => {
+describe("TabLoaderComponent", () => {
   let component: TabLoaderComponent;
   let fixture: ComponentFixture<TabLoaderComponent>;
 
@@ -19,7 +19,7 @@ describe('TabLoaderComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

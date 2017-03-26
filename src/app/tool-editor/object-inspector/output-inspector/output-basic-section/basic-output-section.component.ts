@@ -32,19 +32,21 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <!--ID-->
             <div class="form-group">
                 <label class="form-control-label">ID</label>
-                <input type="text" class="form-control" [formControl]="basicSectionForm.controls['propertyIdForm']">
+                <input type="text" class="form-control"
+                       [formControl]="basicSectionForm.controls['propertyIdForm']">
             </div>
 
             <!--Input Type -->
             <div class="form-group">
-                <input-type-select [formControl]="basicSectionForm.controls['typeForm']"></input-type-select>
+                <ct-input-type-select
+                        [formControl]="basicSectionForm.controls['typeForm']"></ct-input-type-select>
             </div>
 
             <!--Symbols-->
-            <symbols-section class="form-group"
-                             *ngIf="isEnumType()"
-                             [formControl]="basicSectionForm.controls['symbols']">
-            </symbols-section>
+            <ct-symbols-section class="form-group"
+                                *ngIf="isEnumType()"
+                                [formControl]="basicSectionForm.controls['symbols']">
+            </ct-symbols-section>
 
             <!--Glob-->
             <div class="form-group">
@@ -119,7 +121,7 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
     }
 
     validate() {
-        return this.basicSectionForm.valid ? null : {error: "Basic output section is not valid."}
+        return this.basicSectionForm.valid ? null : {error: "Basic output section is not valid."};
     }
 
     private listenToIdChanges(): void {
@@ -143,11 +145,11 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
         });
     }
 
-    private isRecordType() {
+    isRecordType() {
         return this.output.type.type === "record" || (this.output.type.type === "array" && this.output.type.items === "record");
     }
 
-    private isEnumType() {
+    isEnumType() {
         return this.output.type.type === "enum" || (this.output.type.type === "array" && this.output.type.items === "enum");
     }
 }
