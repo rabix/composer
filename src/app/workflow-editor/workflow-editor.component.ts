@@ -1,4 +1,12 @@
-import {Component, Input, OnDestroy, OnInit, TemplateRef, ViewChild, ViewContainerRef} from "@angular/core";
+import {
+    Component,
+    Input,
+    OnDestroy,
+    OnInit,
+    TemplateRef,
+    ViewChild,
+    ViewContainerRef
+} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {WorkflowFactory, WorkflowModel} from "cwlts/models";
 import {Validation} from "cwlts/models/helpers/validation";
@@ -30,7 +38,8 @@ import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow
     styleUrls: ["./workflow-editor.component.scss"],
     template: `
         <ct-action-bar>
-            <ct-tab-selector [distribute]="'auto'" [active]="viewMode" (activeChange)="switchView($event)">
+            <ct-tab-selector [distribute]="'auto'" [active]="viewMode"
+                             (activeChange)="switchView($event)">
 
                 <ct-tab-selector-entry [disabled]="!isValidCWL"
                                        [tabName]="'info'">App Info
@@ -77,7 +86,8 @@ import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow
                 </button>
 
                 <!--Revisions-->
-                <button *ngIf="data.dataSource !== 'local'" class="btn btn-sm btn-secondary" type="button"
+                <button *ngIf="data.dataSource !== 'local'" class="btn btn-sm btn-secondary"
+                        type="button"
                         ct-tooltip="See Revision History"
                         tooltipPlacement="bottom"
                         [ct-editor-inspector]="revisions">
@@ -167,8 +177,6 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
     @Input()
     data: AppTabData;
 
-    isDirty = false;
-
     /** ValidationResponse for current document */
     validation: ValidationResponse;
 
@@ -185,6 +193,8 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
 
     /** Flag for validity of CWL document */
     isValidCWL = false;
+
+    loadedModel = false;
 
     /** Model that's recreated on document change */
     workflowModel: WorkflowModel = WorkflowFactory.from(null, "document");
@@ -274,6 +284,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                         this.workflowModel = WorkflowFactory.from(resolved as any, "document");
                         console.timeEnd("Workflow Model");
 
+                        this.loadedModel = true;
 
                         // update validation stream on model validation updates
 
@@ -366,8 +377,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
     save() {
         console.warn("Reimplement the save functionality");
 
-
-        const text = this.getModelText();
+        const text = this.getModelText(this.data.dataSource === "app");
 
         this.dataGateway.saveFile(this.data.id, text).subscribe(save => {
             console.log("Saved", save);
@@ -438,7 +448,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
         setTimeout(() => {
 
             // @fixme should only serialize if form is dirty
-            if (mode === "code" && this.isDirty) {
+            if (mode === "code" && this.loadedModel) {
                 this.codeEditorContent.setValue(this.getModelText());
             }
 
@@ -454,8 +464,9 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
      * Serializes model to text. It also adds rbx:modified flag to indicate
      * the text has been formatted by the GUI editor
      */
-    private getModelText(): string {
-        const modelObject = Object.assign(this.workflowModel.serialize(), {"rbx:modified": true});
+    private getModelText(embed = false): string {
+        const wf = embed ? this.workflowModel.serializeEmbedded() : this.workflowModel.serialize();
+        const modelObject = Object.assign(wf, {"sbg:modified": true});
 
         return this.data.language === "json" ? JSON.stringify(modelObject, null, 4) : Yaml.dump(modelObject);
     }

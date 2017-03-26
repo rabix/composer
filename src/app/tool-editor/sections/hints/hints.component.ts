@@ -43,15 +43,15 @@ import {Subscription} from "rxjs/Subscription";
                             *ngFor="let control of form.controls['hints'].controls; let i = index">
                             <div class="gui-section-list-item">
                                 <ct-requirement-input [formControl]="control"
-                                                      [class.col-xs-12]="readonly"
-                                                      [class.col-xs-11]="!readonly"
+                                                      [context]="model.context"
+                                                      class="mr-1 ml-1"
                                                       [formControlName]="i"
                                                       [classSuggest]="classSuggest"
                                                       [readonly]="readonly">
                                 </ct-requirement-input>
 
                                 <!--Actions Column-->
-                                <div *ngIf="!readonly" class="col-xs-1 align-right">
+                                <div *ngIf="!readonly" class="mr-1">
                                     <i [ct-tooltip]="'Delete'"
                                        class="fa fa-trash text-hover-danger clickable"
                                        (click)="removeEntry(i)"></i>

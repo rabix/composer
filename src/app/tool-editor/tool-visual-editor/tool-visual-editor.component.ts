@@ -18,7 +18,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
             </ct-docker-requirement>
 
             <ct-base-command [baseCommand]="model.baseCommand"
-                             [context]="{$job: model.job}"
+                             [context]="model.context"
                              [model]="model"
                              [stdin]="model.stdin"
                              [stdout]="model.stdout"
@@ -28,14 +28,14 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
             </ct-base-command>
 
             <ct-tool-input [location]="model.loc + '.inputs'"
-                           [context]="{$job: model.job}"
+                           [context]="model.context"
                            [model]="model"
                            (update)="formGroup.markAsDirty()"
                            [readonly]="readonly">
             </ct-tool-input>
 
             <ct-tool-output [location]="model.loc + '.outputs'"
-                            [context]="{$job: model.job}"
+                            [context]="model.context"
                             [model]="model"
                             [inputs]="model.inputs || []"
                             (update)="formGroup.markAsDirty()"
@@ -44,9 +44,9 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 
             <ct-resources [entries]="model.resources"
                           (update)="formGroup.markAsDirty()"
-                          [context]="{$job: model.job}"
+                          [context]="model.context"
                           [readonly]="readonly">
-            </ct-resources>
+            </ct-resources> 
             
             <ct-hints [model]="model"
                       (update)="formGroup.markAsDirty()"
@@ -56,14 +56,14 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
             <ct-argument-list [location]="model.loc + '.arguments'"
                               [model]="model"
                               (update)="formGroup.markAsDirty()"
-                              [context]="{$job: model.job}"
+                              [context]="model.context"
                               [readonly]="readonly">
             </ct-argument-list>
 
             <ct-file-def-list [model]="model.fileRequirement || {}"
                               [location]="model.fileRequirement?.loc"
                               (update)="updateModel('fileRequirement', $event)"
-                              [context]="{$job: model.job}"
+                              [context]="model.context"
                               [readonly]="readonly">
             </ct-file-def-list>
         </form>

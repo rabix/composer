@@ -42,7 +42,7 @@ export class ResourcesComponent extends DirectiveBase implements OnChanges, OnIn
     readonly: boolean;
 
     @Input()
-    context: { $job?: any, $self?: any };
+    context: any = {};
 
     @Output()
     update = new ReplaySubject<any>();

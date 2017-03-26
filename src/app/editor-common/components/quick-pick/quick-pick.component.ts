@@ -64,7 +64,7 @@ export class QuickPickComponent extends DirectiveBase implements ControlValueAcc
     suggestions: { [label: string]: string | number } | string[];
 
     @Input()
-    context: any;
+    context: any = {};
 
     @Input()
     type: "string" | "number" = "string";
@@ -127,6 +127,10 @@ available types: {[label: string]: string | number} | string[]`);
 
 
     writeValue(value: ExpressionModel): void {
+        if (this._value && this._value.serialize() === value.serialize()) {
+            return;
+        }
+
         this._value = value;
 
         if (value instanceof ExpressionModel) {
@@ -167,6 +171,7 @@ available types: {[label: string]: string | number} | string[]`);
         this.tracked = this.form.controls["custom"].valueChanges.subscribe(expr => {
             this._value      = expr;
             this.computedVal = expr.serialize();
+            debugger;
             this.onChange(this._value);
         });
     }

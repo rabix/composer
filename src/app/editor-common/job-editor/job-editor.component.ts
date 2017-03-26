@@ -22,7 +22,7 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
     styleUrls: ["job-editor.component.scss"],
     selector: "ct-job-editor",
     changeDetection: ChangeDetectionStrategy.OnPush,
-    template: `        
+    template: `
         <ct-form-panel>
             <div class="tc-header">Computational Resources</div>
             <div class="tc-body">
@@ -95,7 +95,15 @@ export class JobEditorComponent implements OnChanges, OnDestroy {
      * Existing CWL job metadata.
      */
     @Input()
-    job: { allocatedResources?: { cpu: number, mem: number }, inputs?: {} } = {};
+    context: {
+        $job?: {
+            allocatedResources?: { cpu: number, mem: number }, inputs?: {}
+        },
+        inputs?: {},
+        runtime?: { ram: number, cores: number }
+    } = {};
+
+    job: { inputs?: {}, allocatedResources?: {} };
 
     /**
      * CWL app input definitions.
@@ -181,10 +189,15 @@ export class JobEditorComponent implements OnChanges, OnDestroy {
         this.statusBar.instant(`Updated job value of ${input ? input.label || input.id : inputId}.`);
 
         // Assign the given value to the job key
+        // if (this.context.$job) {
+        //     OH.addProperty(this.context.$job.inputs, inputId, jobValue);
+        // } else {
+        //     OH.addProperty(this.context.inputs, inputId, jobValue);
+        // }
         OH.addProperty(this.job.inputs, inputId, jobValue);
 
         // Send the update to the output of this component
-        this.update.emit(this.job);
+        this.update.emit(this.context);
         this.cdr.markForCheck();
     }
 
@@ -206,6 +219,14 @@ export class JobEditorComponent implements OnChanges, OnDestroy {
     }
 
     ngOnChanges(changes: SimpleChanges) {
+        this.job = this.context.$job || {
+                inputs: this.context.inputs,
+                allocatedResources: {
+                    mem: this.context.runtime.ram,
+                    cpu: this.context.runtime.cores
+                }
+            };
+
         // Whenever inputs are updated, regroup them and sort them for display
         const grouped = this.inputs.reduce((acc, item) => {
             const cat = OH.getProperty(item, "customProps.sbg:category", "Uncategorized");

@@ -57,7 +57,7 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
      * Context in which expression should be executed
      */
     @Input()
-    context: any;
+    context: any = {};
 
     @Input()
     type: "string" | "number" = "string";

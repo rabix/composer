@@ -38,6 +38,6 @@ export class WorkflowStepInspectorTabInfo {
     public step: StepModel;
 
     getDescription() {
-        return this.step.description || this.step.run.description;
+        return this.step.description || this.step.run ? this.step.run.description : "";
     }
 }

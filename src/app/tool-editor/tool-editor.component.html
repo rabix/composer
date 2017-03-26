@@ -86,7 +86,7 @@
 
     <ct-job-editor *ngIf="viewMode === 'test' && !isLoading"
                    class="flex-col"
-                   [job]="toolModel.job"
+                   [context]="toolModel.context"
                    (update)="onJobUpdate($event)"
                    (reset)="resetJob()"
                    [inputs]="toolModel.inputs"></ct-job-editor>

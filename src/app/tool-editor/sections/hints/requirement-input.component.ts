@@ -21,12 +21,12 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
         <div *ngIf="editType === 'half'" class="requirement-row">
             <!--Class autocomplete component-->
-            <ct-auto-complete [options]="classSuggest" 
-                              *ngIf="classSuggest" 
+            <ct-auto-complete [options]="classSuggest"
+                              *ngIf="classSuggest"
                               mono="true"
                               [formControl]="form.controls['class']">
             </ct-auto-complete>
-            
+
             <!--Regular input if no autocomplete for classes provided-->
             <input type="text" class="form-control"
                    *ngIf="!classSuggest"
@@ -41,13 +41,14 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                               mono="true"
                               [formControl]="form.controls['class']">
             </ct-auto-complete>
-            
+
             <!--Regular input if no autocomplete for classes provided-->
             <input type="text"
                    *ngIf="!classSuggest"
                    class="form-control"
                    [formControl]="form.controls['class']">
             <ct-expression-input
+                    [context]="context"
                     [readonly]="readonly"
                     [formControl]="form.controls['value']"
             ></ct-expression-input>
@@ -68,6 +69,9 @@ export class RequirementInputComponent extends DirectiveBase implements ControlV
 
     @Input()
     readonly = false;
+
+    @Input()
+    context: any = {};
 
     editType: "half" | "full" | "none";
 
