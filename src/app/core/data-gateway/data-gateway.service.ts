@@ -1,8 +1,12 @@
 import {Injectable} from "@angular/core";
+import {FormControl} from "@angular/forms";
 import {Observable} from "rxjs/Observable";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {Subject} from "rxjs/Subject";
-import {ProfileCredentialEntry, ProfileCredentials} from "../../../../electron/src/user-profile/profile";
+import {
+    ProfileCredentialEntry,
+    ProfileCredentials
+} from "../../../../electron/src/user-profile/profile";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {IpcService} from "../../services/ipc.service";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
@@ -224,15 +228,22 @@ export class DataGatewayService {
         }
 
         if (fileSource === "local") {
-            return this.saveLocalFileContent(fileID, content);
+            return this.saveLocalFileContent(fileID, content).map(() => content);
         }
+
+        const revNote = new FormControl("");
 
         return Observable.fromPromise(this.modal.prompt({
             title: "Publish New App Revision",
             content: "Revision Note",
             cancellationLabel: "Cancel",
             confirmationLabel: "Publish",
-        }));
+            formControl: revNote
+        })).flatMap(() => {
+            return this.api.saveApp(JSON.parse(content), revNote.value).map(r => JSON.stringify(r.message, null, 4));
+        }).catch(err => {
+            return Observable.of(false);
+        });
 
 
     }

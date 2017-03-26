@@ -1,0 +1,27 @@
+@import "../../../../assets/sass/variables";
+
+:host {
+  display: flex;
+  width: 100%;
+
+  .requirement-row {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+  }
+
+  input {
+    // magic (to level inputs with expression input)
+    height: 2.157rem;
+    position: relative;
+    top: 0.15rem;
+  }
+
+  input, ct-expression-input, ct-auto-complete {
+    flex: 1;
+  }
+
+  input ~ ct-expression-input, input ~ input {
+    margin-left: 1rem;
+  }
+}

@@ -13,6 +13,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
     styleUrls: ["./tool-visual-editor.component.scss"],
     template: `
         <form [formGroup]="formGroup">
+
             <ct-docker-requirement [docker]="model.docker"
                                    (update)="updateModel($event)"
                                    [readonly]="readonly">
@@ -50,13 +51,11 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                           [readonly]="readonly">
             </ct-resources>
 
-            <ct-hint-list [entries]="model.hints || []"
-                          [context]="{$job: model.job}"
-                          *ngIf="model.cwlVersion === 'sbg:draft-2'"
-                          (update)="setHints($event)"
-                          [readonly]="readonly">
-            </ct-hint-list>
-
+            <ct-hints [model]="model"
+                      (update)="updateModel('hints')"
+                      [readonly]="readonly">
+            </ct-hints>
+            
             <ct-argument-list [location]="model.loc + '.arguments'"
                               [model]="model"
                               (update)="updateModel('arguments', $event)"

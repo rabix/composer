@@ -11,10 +11,8 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {ExpressionModel, CommandLineToolModel} from "cwlts/models";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {GuidService} from "../../../services/guid.service";
-import {noop} from "../../../lib/utils.lib";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {ModalService} from "../../../ui/modal/modal.service";
-import {FormArray} from "../../../../../node_modules/@angular/forms/src/model";
 
 @Component({
     selector: "ct-base-command",

@@ -1,38 +1,30 @@
 @import "../../../../assets/sass/variables";
 
-ct-key-value-input {
+:host {
     display: flex;
     width: 100%;
-}
 
-.key-input {
-    display: inline;
-    border: 2px solid transparent;
-    border-radius: .38rem;
-}
+    .key-container {
+        border: 2px solid transparent;
+        display: flex;
 
-.readonly-value-input {
-    margin-left: 29px;
-    background: $readonly-input;
-    border: $border-color solid 1px;
+        .error-validation-icon, .warning-validation-icon {
+            margin: auto;
+        }
 
-    &.half-width-value-input {
-        margin-left: 15px;
+        .error-validation-icon {
+            color: $brand-danger;
+        }
+
+        .warning-validation-icon {
+            color: $brand-warning;
+        }
+    }
+
+    // @fixme this whole component should be rewritten, please disregard horrible hacky code
+    /deep/ .fa-trash {
+        position: relative;
+        top: 3px;
     }
 }
 
-.key-container {
-    display: flex;
-
-    .error-validation-icon, .warning-validation-icon {
-        margin: auto;
-    }
-
-    .error-validation-icon {
-        color: $brand-danger;
-    }
-
-    .warning-validation-icon {
-        color: $brand-warning;
-    }
-}

@@ -2,11 +2,15 @@ import {Component, OnInit, ChangeDetectionStrategy, forwardRef, Input} from "@an
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {SelectComponent} from "./select/select.component";
 import {Subject} from "rxjs/Subject";
+import {noop} from "../../lib/utils.lib";
 
 @Component({
     selector: "ct-auto-complete",
     providers: [
-        {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => AutoCompleteComponent), multi: true}
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => AutoCompleteComponent), multi: true
+        }
     ],
     template: `
         <input #el [placeholder]="placeholder">
@@ -26,11 +30,9 @@ export class AutoCompleteComponent extends SelectComponent implements ControlVal
 
     private update = new Subject();
 
-    private onTouched = () => {
-    }
+    private onTouched = noop;
 
-    private propagateChange = (_) => {
-    }
+    private propagateChange = noop;
 
     ngOnInit() {
         if (this.mono) {

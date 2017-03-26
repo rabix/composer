@@ -1,25 +1,15 @@
-import {
-    ChangeDetectionStrategy,
-    Component,
-    Input,
-    Output,
-    OnInit,
-    OnDestroy,
-    ViewEncapsulation
-} from "@angular/core";
-import {ExternalLinks} from "../../../cwl/external-links";
-import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
-import {RequirementBaseModel} from "cwlts/models";
+import {Component, Input, OnDestroy, OnInit, Output} from "@angular/core";
 import {FormControl} from "@angular/forms";
+import {ExpressionModel, RequirementBaseModel} from "cwlts/models";
 import {ReplaySubject} from "rxjs/ReplaySubject";
+import {ExternalLinks} from "../../../cwl/external-links";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
-// @todo move to editor common module
+/**
+ * @deprecated
+ */
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-hint-list",
-    changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <ct-form-panel [collapsed]="false">
             <div class="tc-header">
@@ -45,7 +35,7 @@ export class HintListComponent extends DirectiveBase implements OnInit, OnDestro
 
     /** Context in which expression should be evaluated */
     @Input()
-    context: { $job: any } = {$job: {}};
+    context: any = {};
 
     /** List of entries that should be shown */
     @Input()
@@ -56,7 +46,7 @@ export class HintListComponent extends DirectiveBase implements OnInit, OnDestro
 
     formList: {
         key?: string,
-        value: string | SBDraft2ExpressionModel,
+        value: string | ExpressionModel,
         readonly: boolean
     }[] = [];
 
@@ -82,17 +72,17 @@ export class HintListComponent extends DirectiveBase implements OnInit, OnDestro
 
     createFormList(entries: RequirementBaseModel[]): {
         key: string,
-        value: string | SBDraft2ExpressionModel,
+        value: string | ExpressionModel,
         readonly: boolean
     }[] {
         return entries.map((hint: RequirementBaseModel) => {
             const newHint = {
                 key: hint["class"],
-                value: <string | SBDraft2ExpressionModel>"",
+                value: <string | ExpressionModel>"",
                 readonly: false
             };
 
-            if (typeof hint.value === "string" || hint.value instanceof SBDraft2ExpressionModel) {
+            if (typeof hint.value === "string" || hint.value instanceof ExpressionModel) {
                 newHint.value = hint.value;
 
             } else {
@@ -111,7 +101,7 @@ export class HintListComponent extends DirectiveBase implements OnInit, OnDestro
 
     createHintList(formList: {
                        key?: string,
-                       value: string | SBDraft2ExpressionModel,
+                       value: string | ExpressionModel,
                        readonly: boolean
                    }[]): any[] {
 
@@ -133,7 +123,7 @@ export class HintListComponent extends DirectiveBase implements OnInit, OnDestro
                 if (!!item.key && !!item.key.trim() && !item.readonly) {
                     return new RequirementBaseModel({
                         "class": item.key,
-                        value: (<SBDraft2ExpressionModel>item.value).serialize()
+                        value: (<ExpressionModel>item.value).serialize()
                     }).serialize();
                 }
             })

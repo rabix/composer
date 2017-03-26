@@ -31,6 +31,8 @@ import {EditorCommonModule} from "../editor-common/editor-common.module";
 import {UIModule} from "../ui/ui.module";
 import {CWLModule} from "../cwl/cwl.module";
 import {LayoutModule} from "../layout/layout.module";
+import { HintsComponent } from "./sections/hints/hints.component";
+import { RequirementInputComponent } from "./sections/hints/requirement-input.component";
 
 @NgModule({
     declarations: [
@@ -60,6 +62,8 @@ import {LayoutModule} from "../layout/layout.module";
         DockerRequirementComponent,
         BaseCommandComponent,
         HintListComponent,
+        HintsComponent,
+        RequirementInputComponent,
     ],
     exports: [
         ToolEditorComponent

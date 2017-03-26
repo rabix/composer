@@ -8,12 +8,12 @@ declare const jsyaml;
 declare const Ajv;
 
 export interface ValidationResponse {
-    isValidatableCwl: boolean,
-    isValidCwl: boolean,
-    isValidJSON: boolean,
-    errors: { message: string, loc: string }[],
-    warnings: { message: string, loc: string }[],
-    class?: string
+    isValidatableCwl: boolean;
+    isValidCwl: boolean;
+    isValidJSON: boolean;
+    errors: { message: string, loc: string }[];
+    warnings: { message: string, loc: string }[];
+    class?: string;
 }
 
 @Injectable()
@@ -59,7 +59,7 @@ export class CwlSchemaValidationWorkerService {
 
         // First check if this is json or yaml content
         try {
-            let warnings = [];
+            const warnings = [];
             json         = jsyaml.safeLoad(content, {
                 json: true, onWarning: (warn) => {
                     warnings.push({
@@ -114,21 +114,22 @@ export class CwlSchemaValidationWorkerService {
         };
         const ajv        = new Ajv();
         let validation   = false;
-        let errors;
+        let errors = [];
+        let warnings = [];
 
         if (["sbg:draft-2", "v1.0"].indexOf(cwlVersion) !== -1) {
             validation = ajv.validate(schemaMap[cwlVersion][json.class], json);
             errors     = ajv.errors || [];
         } else {
-            errors = [{
-                message: `invalid cwlVersion "${cwlVersion}", expected "v1.0" or "sbg:draft-2"`,
+            warnings = [{
+                message: `unsupported cwlVersion "${cwlVersion}", expected "v1.0" or "sbg:draft-2"`,
                 loc: "document"
-            }]
+            }];
         }
-
 
         return Object.assign(response, {
             isValidCwl: validation,
+            warnings: warnings,
             errors: errors.map(err => {
                 let message = err.message;
                 if (err.keyword === "enum") {

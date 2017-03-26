@@ -135,7 +135,7 @@ export class ModalService {
             }, params);
 
             component.decision.subscribe(accepted => {
-                accepted ? resolve(true) : reject();
+                accepted !== undefined ? resolve(true) : reject();
                 this.close();
             });
         });

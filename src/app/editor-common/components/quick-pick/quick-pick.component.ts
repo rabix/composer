@@ -128,7 +128,7 @@ export class QuickPickComponent extends DirectiveBase implements ControlValueAcc
         this.onTouch();
         this.computedVal = val;
         if (this._value instanceof SBDraft2ExpressionModel) {
-            this.value = new SBDraft2ExpressionModel("", val);
+            this.value = new SBDraft2ExpressionModel(val);
         } else {
             this.value = val;
         }
@@ -154,7 +154,7 @@ export class QuickPickComponent extends DirectiveBase implements ControlValueAcc
                     return {
                         label: key,
                         value: this.suggestions[key]
-                    }
+                    };
                 });
             }
         } else {
@@ -183,9 +183,9 @@ available types: {[label: string]: string | number} | string[]`)
 
         if (!this.readonly) {
             this.tracked = this.customControl.valueChanges
-                .subscribe((value: any) => {
+                .subscribe((val: any) => {
                     this.onTouch();
-                    this.value = value;
+                    this.value = val;
                 });
         }
     }

@@ -111,7 +111,7 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
             // Refresh dropdown list
             this.component.refreshOptions(false);
 
-            if (items) {
+            if (items && Array.isArray(items)) {
                 items.forEach((item) => {
                     const num = this.component.items.length;
 
