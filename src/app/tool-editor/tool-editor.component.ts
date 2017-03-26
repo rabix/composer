@@ -31,11 +31,12 @@ import {DirectiveBase} from "../util/directive-base/directive-base";
 import LoadOptions = jsyaml.LoadOptions;
 import {AppTabData} from "../core/workbox/app-tab-data";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
+import {ErrorBarService} from "../layout/error-bar/error-bar.service";
 
 @Component({
     selector: "ct-tool-editor",
     styleUrls: ["./tool-editor.component.scss"],
-    providers: [EditorInspectorService],
+    providers: [EditorInspectorService, ErrorBarService],
     templateUrl: "./tool-editor.component.html"
 })
 export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDestroy, WorkboxTab, AfterViewInit {
@@ -90,7 +91,8 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
                 private dataGateway: DataGatewayService,
                 private platformAPI: PlatformAPI,
                 private system: SystemService,
-                private settings: SettingsService) {
+                private settings: SettingsService,
+                private errorBarService: ErrorBarService) {
 
         super();
 

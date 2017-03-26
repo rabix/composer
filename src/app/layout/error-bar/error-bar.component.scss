@@ -1,0 +1,34 @@
+@import "./../../../assets/sass/variables";
+@import "./../../../assets/sass/mixins";
+@import "./../../../assets/sass/theme-variables";
+
+:host {
+    .error-alert {
+        display: flex;
+        opacity: 0;
+        height: 0px;
+        line-height: $main-header-height;
+        color: white;
+        background-color: $brand-danger;
+        transition: opacity 2s, height 0.1s;
+        overflow: hidden;
+
+        .error-text {
+            flex: 1;
+            @include ellipsis();
+        }
+
+        i {
+            flex-basis: 30px;
+            font-weight: bolder;
+            font-size: 1rem;
+            line-height: $main-header-height;
+        }
+    }
+
+    .show {
+        opacity: 1;
+        height: $main-header-height;
+    }
+}
+

@@ -16,17 +16,21 @@ import {
     PanelGroupMap,
     PanelStatus
 } from "./layout.types";
+import {ErrorBarService} from "../../layout/error-bar/error-bar.service";
 
 @Component({
     selector: "ct-layout",
     providers: [WorkboxService],
     styleUrls: ["./layout.component.scss"],
     template: `
+        <ct-error-bar>
+        </ct-error-bar>
 
         <div class="main-content">
 
             <!--Panels Column-->
-            <div class="panel-column" [style.flexGrow]="treeSize" [class.hidden]="!sidebarExpanded || !(visiblePanels | async)?.length">
+            <div class="panel-column" [style.flexGrow]="treeSize"
+                 [class.hidden]="!sidebarExpanded || !(visiblePanels | async)?.length">
 
                 <ct-logo class="pl-1 logo title-bar-section"></ct-logo>
                 <ct-panel-container class="layout-section">
@@ -81,6 +85,7 @@ export class LayoutComponent extends DirectiveBase implements OnInit {
     constructor(private preferences: UserPreferencesService,
                 private domEvents: DomEventService,
                 private statusBar: StatusBarService,
+                private errorBarService: ErrorBarService,
                 el: ElementRef) {
         super();
 
@@ -131,9 +136,9 @@ export class LayoutComponent extends DirectiveBase implements OnInit {
                 // Take the width of the window
                 const docWidth = document.body.clientWidth;
                 // Set tree width to the given x
-                this.treeSize  = x;
+                this.treeSize = x;
                 // And fill document area with the rest
-                this.tabsSize  = docWidth - x;
+                this.tabsSize = docWidth - x;
             });
 
 
@@ -150,7 +155,7 @@ export class LayoutComponent extends DirectiveBase implements OnInit {
         // Whenever panels get changed, we want to register the shortcuts
         // we should unregister the old ones because of the check if a shortcut is already registered
         const shortcutSubs: Subscription[] = [];
-        this.tracked                       = this.panels.subscribe(panels => {
+        this.tracked = this.panels.subscribe(panels => {
             // Unsubscribe from all previous subscriptions on these shortcuts
             shortcutSubs.forEach(sub => sub.unsubscribe());
             shortcutSubs.length = 0;
@@ -180,7 +185,7 @@ export class LayoutComponent extends DirectiveBase implements OnInit {
 
     private onPanelSwitch(panels, position) {
 
-        const next     = this.panelSwitches.getValue();
+        const next = this.panelSwitches.getValue();
         next[position] = new PanelGroup(panels);
 
         // Preserve state of opened panels in local storage
@@ -203,7 +208,7 @@ export class LayoutComponent extends DirectiveBase implements OnInit {
 
         // If there is no active panel, make first one active and expand sidebar
         if (this.visiblePanels.getValue().length === 0) {
-            const next                   = this.panelSwitches.getValue();
+            const next = this.panelSwitches.getValue();
             next["top"].panels[0].active = true;
             this.onPanelSwitch(next["top"].panels, "top");
 
