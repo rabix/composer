@@ -1,11 +1,15 @@
-import {Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, TemplateRef, ViewChild, ViewEncapsulation} from "@angular/core";
+import {
+    AfterViewInit, Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, TemplateRef, ViewChild,
+    ViewEncapsulation
+} from "@angular/core";
 import {Workflow} from "cwl-svg";
-import {StepModel, WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
+import {StepModel, WorkflowFactory, WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
 import {DataGatewayService} from "../../../core/data-gateway/data-gateway.service";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import LoadOptions = jsyaml.LoadOptions;
+import {IpcService} from "../../../services/ipc.service";
 
 
 declare const Snap: any;
@@ -15,7 +19,7 @@ declare const Snap: any;
     encapsulation: ViewEncapsulation.None,
     styleUrls: ["./workflow-graph-editor.component.scss"],
     template: `
-        <svg (dblclick)="openInspector($event)" #canvas class="cwl-workflow"
+        <svg (dblclick)="openInspector($event)" #canvas class="cwl-workflow" tabindex="-1"
              [ct-drop-enabled]="true"
              [ct-drop-zones]="['zone1']"
              (onDropSuccess)="onDrop($event.detail.data.event, $event.detail.data.transfer_data)"></svg>
@@ -58,7 +62,7 @@ declare const Snap: any;
         </ng-template>
     `
 })
-export class WorkflowGraphEditorComponent extends DirectiveBase implements OnChanges, OnInit, OnDestroy {
+export class WorkflowGraphEditorComponent extends DirectiveBase implements OnChanges, OnInit, OnDestroy, AfterViewInit {
 
     @Input()
     public model: WorkflowModel;
@@ -79,8 +83,13 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
     public graph: Workflow;
 
+    private history = [];
+    private future  = [];
+    private historyHandler: (ev: KeyboardEvent) => void;
+
     constructor(private statusBar: StatusBarService,
                 private gateway: DataGatewayService,
+                private ipc: IpcService,
                 private inspector: EditorInspectorService) {
         super();
     }
@@ -97,18 +106,56 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         this.tracked = this.model.on("step.remove", removeHandler);
     }
 
-    ngOnChanges() {
-        this.graph          = new Workflow(new Snap(this.canvas.nativeElement), this.model as any);
-        const firstAnything = this.model.steps[0] || this.model.inputs[0] || this.model.outputs[0];
+    private canvasIsInFocus() {
+        const el = this.canvas.nativeElement;
+        return el.getClientRects().length > 0 && (document.activeElement === el || el.contains(document.activeElement));
+    }
 
-        if (firstAnything && firstAnything.customProps["sbg:x"] === undefined) {
-            console.log("Should arrange");
-            // this.graph.command("workflow.arrange");
-        }
+    ngAfterViewInit() {
 
-        setTimeout(() => {
-            this.graph.command("workflow.fit");
+        this.graph = new Workflow(new Snap(this.canvas.nativeElement), this.model as any);
+        this.graph.command("workflow.fit");
+
+        this.graph.on("beforeChange", () => {
+            if (this.history.length > 20) {
+                this.history.shift();
+            }
+            this.history.push(this.model.serialize());
+            this.future.length = 0;
         });
+
+        this.tracked = this.ipc.watch("accelerator", "CmdOrCtrl+Z")
+            .filter(() => this.canvasIsInFocus() && this.history.length > 0)
+            .subscribe(() => {
+                console.log("Undo");
+                this.future.push(this.model.serialize());
+                const hist = this.history.pop();
+                this.model = WorkflowFactory.from(hist);
+                this.graph.redraw(this.model as any);
+            });
+
+        this.tracked = this.ipc.watch("accelerator", "Shift+CmdOrCtrl+Z")
+            .filter(() => this.canvasIsInFocus() && this.future.length > 0)
+            .subscribe(() => {
+                console.log("Redo");
+                const future = this.future.pop();
+                this.history.push(this.model.serialize());
+                this.model = WorkflowFactory.from(future);
+                this.graph.redraw(this.model as any);
+            });
+    }
+
+
+    ngOnChanges() {
+        if (this.graph) {
+            this.graph.redraw();
+        }
+        // if (firstAnything && firstAnything.customProps["sbg:x"] === undefined) {
+        //     console.log("Should arrange");
+        //     // this.graph.command("workflow.arrange");
+        // }
+
+
         // this.statusBar.setControls(this.controlsTemplate);
     }
 
@@ -199,6 +246,8 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     }
 
     ngOnDestroy() {
+        window.removeEventListener("keypress", this.historyHandler);
         this.inspector.hide();
     }
+
 }
