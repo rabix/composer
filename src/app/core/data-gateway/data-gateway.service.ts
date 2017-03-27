@@ -180,9 +180,11 @@ export class DataGatewayService {
             // whole-genome-analysis-bwa-gatk-2-3-9-lite/2
             const [hash, , , ownerSlug, projectSlug, appSlug, revision] = almostID.split("/");
 
-            return this.apiGateway.forHash(hash)
-                .getApp(ownerSlug, projectSlug, appSlug, revision)
-                .map(app => JSON.stringify(app, null, 4));
+            const fetch = this.apiGateway.forHash(hash).getApp(ownerSlug, projectSlug, appSlug, revision);
+            if (parse) {
+                return fetch;
+            }
+            return fetch.map(app => JSON.stringify(app, null, 4));
         }
 
         if (source === "public") {
