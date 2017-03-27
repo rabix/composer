@@ -36,6 +36,7 @@ ct-new-file-tab {
                     text-align: center;
 
                     & > .app {
+                        padding: 1rem;
                         flex: 1;
                         display: flex;
                         flex-direction: column;
@@ -66,7 +67,19 @@ ct-new-file-tab {
 
                         & > .description {
                             flex: 1;
-                            padding: 5%;
+                        }
+
+                        & > .revisions {
+                            text-align: left;
+                            overflow-y: auto;
+
+                            ct-nav-search-result {
+                                border-bottom: 1px solid #ddd;
+
+                                &:hover {
+                                    background-color: #e8e8e8;
+                                }
+                            }
                         }
                     }
 
@@ -87,4 +100,15 @@ ct-new-file-tab {
             flex: 3;
         }
     }
+
+    /deep/ {
+        .fa-share-alt {
+            color: #e29834;
+        }
+
+        .fa-terminal {
+            color: #a184dc;
+        }
+    }
+
 }
