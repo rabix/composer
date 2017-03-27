@@ -65,7 +65,7 @@ export class WorkboxService {
                             idSplit.pop();
                             return idSplit.join("/");
                         })() : tab.data.parsedContent["sbg:project"],
-                        title: tab.data.parsedContent.label,
+                        title: tab.data.parsedContent.label || tab.label,
                         type: tab.type
                     };
 
