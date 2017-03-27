@@ -53,27 +53,21 @@ export class WorkboxService {
 
                 } else {
 
-                    let label;
-
-                    if (tab.data.dataSource === "local") {
-                        const idSplit = tab.id.split("/");
-                        idSplit.pop();
-                        label = idSplit.join("/");
-                    } else {
-                        label = tab.data.parsedContent["sbg:project"];
-                    }
-
-                    const itemToAdd = {
-                        id: tab.id,
-                        label,
-                        title: tab.data.parsedContent.label,
-                        type: tab.type
-                    };
-
                     // Maximum number of recent apps
                     if (items.length === 20) {
                         items.shift();
                     }
+
+                    const itemToAdd = {
+                        id: tab.id,
+                        label: tab.data.dataSource === "local" ? (() => {
+                            const idSplit = tab.id.split("/");
+                            idSplit.pop();
+                            return idSplit.join("/");
+                        })() : tab.data.parsedContent["sbg:project"],
+                        title: tab.data.parsedContent.label,
+                        type: tab.type
+                    };
 
                     items.push(itemToAdd);
                 }
@@ -208,6 +202,6 @@ export class WorkboxService {
 
         });
     }
-
-
 }
+
+

@@ -83,7 +83,8 @@ import {WorkboxService} from "../../core/workbox/workbox.service";
                     <div class="app-container">
                         <div class="app">
                             <div class="revisions">
-                                <ct-nav-search-result *ngFor="let entry of recentApps" class="pl-1 pr-1 deep-unselectable"
+                                <ct-nav-search-result *ngFor="let entry of recentApps"
+                                                      class="pl-1 pr-1 deep-unselectable"
                                                       [id]="entry?.id"
                                                       [icon]="entry.type === 'Workflow' ? 'fa-share-alt': 'fa-terminal'"
                                                       [title]="entry?.title"
@@ -115,7 +116,7 @@ export class NewFileTabComponent extends DirectiveBase implements OnInit {
 
     ngOnInit(): void {
         this.tracked = this.preferences.get("recentApps", []).subscribe((items) => {
-            this.recentApps = items.reverse();
+            this.recentApps = items.slice().reverse();
         });
     }
 
