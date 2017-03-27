@@ -11,5 +11,13 @@ export interface CredentialsEntry {
     profile: string;
     status: ConnectionState;
     sessionID: string;
+    user?: {
+        id: string,
+        email: string,
+        staff: string,
+        username: string
+        inactive: string,
+        superuser: string,
+    };
 }
 

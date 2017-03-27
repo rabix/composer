@@ -55,22 +55,25 @@ export class AuthService {
             .flatMap(creds => {
                 const checks = creds.map(c => {
                     const api = new PlatformAPI(this.http, c.url, c.token);
-                    return api.openSession().timeout(10000).catch(err => {
+                    return api.openSession()
+                        .flatMap(session => api.getUser(session), (session, user) => ({session, user}))
+                        .timeout(10000)
+                        .catch(err => {
 
-                        let errorMessage = `Cannot connect to ${c.url}.`;
-                        if (err.status === 0) {
-                            errorMessage += "Platform doesn't exist on that URL.";
-                        } else if (err.status === 504) {
-                            errorMessage += " API has timed out.";
-                        } else if (err instanceof Error) {
-                            errorMessage += " " + err.message + ".";
-                        } else if (err.status === 401) {
-                            errorMessage += " Invalid token.";
-                        }
+                            let errorMessage = `Cannot connect to ${c.url}.`;
+                            if (err.status === 0) {
+                                errorMessage += "Platform doesn't exist on that URL.";
+                            } else if (err.status === 504) {
+                                errorMessage += " API has timed out.";
+                            } else if (err instanceof Error) {
+                                errorMessage += " " + err.message + ".";
+                            } else if (err.status === 401) {
+                                errorMessage += " Invalid token.";
+                            }
 
-                        this.errorBar.showError(errorMessage);
-                        return Observable.of(err);
-                    });
+                            this.errorBar.showError(errorMessage);
+                            return Observable.of(err);
+                        });
                 });
 
                 return Observable.forkJoin(...checks);
@@ -78,11 +81,12 @@ export class AuthService {
             .subscribe(data => {
                 this.authenticationProgress.next(false);
                 const update = data.credentials.map((c, i) => {
-                    const session = data.sessions[i];
+                    const {session, user} = data.sessions[i] as any;
                     return {
                         ...c,
                         status: typeof session === "string" ? ConnectionState.Connected : ConnectionState.Disconnected,
-                        sessionID: typeof session === "string" ? session : null
+                        sessionID: typeof session === "string" ? session : null,
+                        user
                     };
                 });
                 this.prefs.setCredentials(update);

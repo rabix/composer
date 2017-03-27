@@ -115,4 +115,46 @@ export class PlatformAPI {
         }).map(r => r.json().message);
     }
 
+    public sendFeedback(userID: string, type: string, message: string, referrerURL?: string) {
+
+        const getFormatedCurrentTimeStamp = () => {
+            const date = new Date();
+            const pad  = (n) => (n < 10 ? "0" : "") + n;
+
+            // format is YYYYMMDDHHMMSS
+            return date.getFullYear() +
+                pad(date.getMonth() + 1) +
+                pad(date.getDate()) +
+                pad(date.getHours()) +
+                pad(date.getMinutes()) +
+                pad(date.getSeconds());
+        };
+
+        const data = {
+            "id": "user.feedback",
+            "data": {
+                "user": userID,
+                "referrer": "Cottontail " + referrerURL,
+                "user_agent": window.navigator.userAgent,
+                "timestamp": getFormatedCurrentTimeStamp(),
+                "text": message,
+                "type": type,
+            }
+        };
+
+        return this.http.post(this.getServiceURL("voyager") + "/send", data, {
+            headers: new Headers({
+                "session-id": this.sessionID
+            })
+        }).map(r => r.json().message);
+    }
+
+    getUser(sessionID) {
+        return this.http.get(this.getServiceURL("gatekeeper") + "/user", {
+            headers: new Headers({
+                "session-id": sessionID || this.sessionID
+            })
+        }).map(r => r.json().message);
+    }
+
 }

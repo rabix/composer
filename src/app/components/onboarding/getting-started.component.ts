@@ -3,6 +3,10 @@ import {ModalService} from "../../ui/modal/modal.service";
 import {SendFeedbackModal} from "../../core/modals/send-feedback-modal/send-feedback.modal.component";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {SystemService} from "../../platform-providers/system.service";
+import {AuthService} from "../../auth/auth/auth.service";
+import {PlatformAPIGatewayService} from "../../auth/api/platform-api-gateway.service";
+import {CredentialsEntry} from "../../services/storage/user-preferences-types";
+import {ErrorBarService} from "../../layout/error-bar/error-bar.service";
 
 @Component({
     styleUrls: ["getting-started.component.scss"],
@@ -39,9 +43,9 @@ import {SystemService} from "../../platform-providers/system.service";
                 <p class="subtitle">Need help?</p>
                 <p>If you have any problem, idea or a thought let us know.</p>
                 <p>
-                    <a href="#" class="btn btn-outline-primary" (click)="openFeedbackModal()">
+                    <button type="button" class="btn btn-outline-primary" (click)="openFeedbackModal()">
                         Get support
-                    </a>
+                    </button>
                 </p>
             </div>
         </div>
@@ -50,33 +54,49 @@ import {SystemService} from "../../platform-providers/system.service";
 export class GettingStartedComponent {
 
 
-    constructor(private modal: ModalService, private platformApi: PlatformAPI, private system: SystemService) {
+    constructor(private modal: ModalService,
+                private auth: AuthService,
+                private errorBar: ErrorBarService,
+                private apiGateway: PlatformAPIGatewayService,
+                private system: SystemService) {
     }
 
     openFeedbackModal() {
 
-        this.platformApi.sessionID.take(1).subscribe((sessionId) => {
-            if (sessionId) {
+        this.auth.connections.take(1).subscribe(credentials => {
+            let feedbackPlatform = credentials.find(c => c.url.indexOf("-vayu") === -1 && c.url.indexOf("staging") === -1);
+            if (!feedbackPlatform && credentials.length) {
+                feedbackPlatform = credentials[0];
+            }
 
-                // User has an account and is connected to the platform
+            if (feedbackPlatform as CredentialsEntry) {
 
                 const modal = this.modal.fromComponent(SendFeedbackModal, {
-                    title: "Send feedback",
+                    title: "Send Feedback",
                     backdrop: true
                 });
 
+
                 modal.sendFeedback = (feedbackType, message) => {
-                    this.platformApi.sendFeedback(feedbackType, message).subscribe(() => {
-                        modal.closeModal();
-                    });
+                    this.apiGateway.forHash(feedbackPlatform.hash)
+                        .sendFeedback(feedbackPlatform.user.id, feedbackType, message, feedbackPlatform.url)
+                        .subscribe(() => {
+                            modal.closeModal();
+                        }, err => {
+                            console.log("Error", err);
+                            if (err.status === 0) {
+                                this.errorBar.showError("Could not connect to the platform and send a feedback message");
+                            } else {
+                                this.errorBar.showError(err);
+                            }
+                        });
                 };
 
-            } else {
-
-                // User is not connected to the platform
-
-                this.system.openLink("mailto:support@sbgenomics.com?subject=Cottontail Feedback");
+                return;
             }
+
+            return this.system.openLink("mailto:support@sbgenomics.com?subject=Rabix Executor Feedback");
+
         });
     }
 }
