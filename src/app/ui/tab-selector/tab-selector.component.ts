@@ -33,7 +33,6 @@ import {TabSelectorService} from "./tab-selector.service";
         </div>
     `,
     styleUrls: ["./tab-selector.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TabSelectorComponent extends DirectiveBase implements OnInit, AfterViewInit, OnChanges {
 
