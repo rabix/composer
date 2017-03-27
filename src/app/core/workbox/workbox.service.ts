@@ -31,14 +31,48 @@ export class WorkboxService {
         });
     }
 
-    public openTab(tab) {
+    public openTab(tab, persistToRecentApps: boolean = true) {
 
-        const {tabs}   = this.extractValues();
+        const {tabs} = this.extractValues();
         const foundTab = tabs.find(existingTab => existingTab.id === tab.id);
 
         if (foundTab) {
             this.activateTab(foundTab);
             return;
+        }
+
+        if (persistToRecentApps) {
+            this.preferences.get("recentApps", []).take(1).subscribe((items) => {
+
+                const app = items.findIndex(item => item.id === tab.id);
+
+                // If app is already in recent apps
+                if (app !== -1) {
+                    items.push(items[app]);
+                    items.splice(app, 1);
+
+                } else {
+
+                    // Maximum number of recent apps
+                    if (items.length === 20) {
+                        items.shift();
+                    }
+
+                    const itemToAdd = {
+                        id: tab.id,
+                        label: tab.data.dataSource === "local" ? (() => {
+                            const idSplit = tab.id.split("/");
+                            idSplit.pop();
+                            return idSplit.join("/");
+                        })() : tab.data.parsedContent["sbg:project"],
+                        title: tab.data.parsedContent.label || tab.label,
+                        type: tab.type
+                    };
+
+                    items.push(itemToAdd);
+                }
+                this.preferences.put("recentApps", items);
+            });
         }
 
         this.tabs.next(tabs.concat(tab));
@@ -51,8 +85,8 @@ export class WorkboxService {
         }
 
         const currentlyOpenTabs = this.tabs.getValue();
-        const tabToRemove       = currentlyOpenTabs.find(t => t.id === tab.id);
-        const newTabList        = currentlyOpenTabs.filter(t => t !== tabToRemove);
+        const tabToRemove = currentlyOpenTabs.find(t => t.id === tab.id);
+        const newTabList = currentlyOpenTabs.filter(t => t !== tabToRemove);
 
         this.tabs.next(newTabList);
         this.ensureActiveTab();
@@ -69,16 +103,16 @@ export class WorkboxService {
 
     public activateNext() {
         const {tabs, activeTab} = this.extractValues();
-        const index             = tabs.indexOf(activeTab);
-        const newActiveTab      = index === (tabs.length - 1) ? tabs[0] : tabs[index + 1];
+        const index = tabs.indexOf(activeTab);
+        const newActiveTab = index === (tabs.length - 1) ? tabs[0] : tabs[index + 1];
 
         this.activateTab(newActiveTab);
     }
 
     public activatePrevious() {
         const {tabs, activeTab} = this.extractValues();
-        const index             = tabs.indexOf(activeTab);
-        const newActiveTab      = index ? tabs[index - 1] : tabs[tabs.length - 1];
+        const index = tabs.indexOf(activeTab);
+        const newActiveTab = index ? tabs[index - 1] : tabs[tabs.length - 1];
 
         this.activateTab(newActiveTab);
     }
@@ -153,7 +187,7 @@ export class WorkboxService {
 
 
                 tab.label = parsed.label || fileID;
-                tab.type  = parsed.class || "Code";
+                tab.type = parsed.class || "Code";
             } catch (ex) {
                 console.warn("Could not parse app", ex);
             }
@@ -166,6 +200,6 @@ export class WorkboxService {
 
         });
     }
-
-
 }
+
+

@@ -161,7 +161,7 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
             id: "?newFile",
             label: "New File",
             type: "NewFile",
-        });
+        }, false);
     }
 
     /**
@@ -172,7 +172,7 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
             id: "?welcome",
             label: "Welcome",
             type: "Welcome"
-        });
+        }, false);
     }
 
     createContextMenu(tab): MenuItem[] {
@@ -204,10 +204,10 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
                         // Restore open tabs
                         openTabs.forEach(tab => {
                             if (tab.id.startsWith("?")) {
-                                this.workbox.openTab(tab);
+                                this.workbox.openTab(tab, false);
                             } else {
                                 this.workbox.getOrCreateFileTab(tab.id).take(1).subscribe(appTab => {
-                                    this.workbox.openTab(appTab);
+                                    this.workbox.openTab(appTab, false);
                                 }, err => {
                                     console.warn("Cannot open app tab", tab);
                                 });
