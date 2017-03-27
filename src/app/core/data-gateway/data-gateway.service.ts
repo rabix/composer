@@ -137,19 +137,13 @@ export class DataGatewayService {
         return this.ipc.request("searchUserProjects", {term, limit});
     }
 
-    getPublicApps() {
-        return this.scanCompletion.flatMap(() => this.preferences.get("dataCache", {})).map(profiles => {
-            const mainProfile = Object.keys(profiles)[0];
-            if (mainProfile) {
-                return profiles[mainProfile]["publicApps"] || [];
-            }
-
-            return [];
-        });
-    }
-
-    searchPublicApps(term: any, limit = 20) {
-        return this.ipc.request("searchPublicApps", {term, limit});
+    getPublicApps(hash) {
+        return this.throughCache(
+            hash + ".getPublicApps",
+            this.apiGateway.forHash(hash).getPublicApps()
+                .publishReplay(1)
+                .refCount()
+        );
     }
 
     fetchFileContent(almostID: string, parse = false) {
@@ -178,7 +172,9 @@ export class DataGatewayService {
             // default_1b2a8fed50d9402593a57acddc7d7cfe/ivanbatic+admin/
             // dfghhm/ivanbatic+admin/dfghhm/
             // whole-genome-analysis-bwa-gatk-2-3-9-lite/2
-            const [hash, , , ownerSlug, projectSlug, appSlug, revision] = almostID.split("/");
+            const [h, , , ownerSlug, projectSlug, appSlug, revision] = almostID.split("/");
+
+            const [hash] = h.split("?");
 
             const fetch = this.apiGateway.forHash(hash).getApp(ownerSlug, projectSlug, appSlug, revision);
             if (parse) {
@@ -188,7 +184,10 @@ export class DataGatewayService {
         }
 
         if (source === "public") {
+            // Sample:
+            console.log("Feching public app", almostID);
             const [, , , , , username, projectSlug, appSlug, revision] = almostID.split("/");
+            debugger;
 
             const request = this.api.getApp(`${username}/${projectSlug}/${appSlug}/${revision}`).take(1);
             if (parse) {
@@ -256,4 +255,41 @@ export class DataGatewayService {
         return this.cache[key];
     }
 
+    static fuzzyMatch(needle, haystack) {
+
+        const noSpaceNeedle = needle.replace(/ /g, "");
+        const hlen          = haystack.length;
+        const nlen          = noSpaceNeedle.length;
+
+        if (nlen > hlen) {
+            return 0;
+        }
+        if (nlen === hlen) {
+            return 1;
+        }
+        let matchedCharacters = 0;
+        const spacings          = [];
+
+        let previousFoundIndex = 0;
+
+        outer: for (let i = 0, j = 0; i < nlen; i++) {
+            const nch = noSpaceNeedle.charCodeAt(i);
+            while (j < hlen) {
+                if (haystack.charCodeAt(j++) === nch) {
+                    spacings.push(j - previousFoundIndex);
+                    previousFoundIndex = j;
+                    matchedCharacters++;
+
+                    continue outer;
+                }
+            }
+            return 0;
+        }
+        const totalDistance  = spacings.reduce((acc, n) => acc + n, 0);
+        const adjacencyBonus = haystack.length / (totalDistance * (haystack.length / spacings.length));
+        const indexBonus     = needle.split(" ").map(word => haystack.indexOf(word)).reduce((acc, idx) => acc + Number(idx !== -1), 0);
+        const bonus          = adjacencyBonus + indexBonus;
+
+        return bonus + matchedCharacters / hlen;
+    }
 }

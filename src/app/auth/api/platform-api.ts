@@ -106,4 +106,13 @@ export class PlatformAPI {
         });
     }
 
+    getPublicApps() {
+        return this.http.get(this.getServiceURL("brood") + "/apps", {
+            search: "_order_by=label&visibility=public",
+            headers: new Headers({
+                "session-id": this.sessionID
+            })
+        }).map(r => r.json().message);
+    }
+
 }
