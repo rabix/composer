@@ -140,25 +140,25 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
             };
         }));
 
-        const projectsSearch = (term) => this.dataGateway.searchUserProjects(term).map(results => results.map(result => {
-
-            const id    = result.profile + "/" + result["sbg:projectName"] + "/" + result["sbg:id"];
-            const title = result.label;
-
-            return {
-                id,
-                icon: result.class === "Workflow" ? "fa-share-alt" : "fa-terminal",
-                title,
-                label: result.id.split("/").slice(5, 7).join(" → "),
-                relevance: result.relevance + 1,
-
-                dragEnabled: true,
-                dragTransferData: id,
-                dragLabel: title,
-                dragImageClass: result["class"] === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
-                dragDropZones: ["zone1"]
-            };
-        }));
+        // const projectsSearch = (term) => this.dataGateway.searchUserProjects(term).map(results => results.map(result => {
+        //
+        //     const id    = result.profile + "/" + result["sbg:projectName"] + "/" + result["sbg:id"];
+        //     const title = result.label;
+        //
+        //     return {
+        //         id,
+        //         icon: result.class === "Workflow" ? "fa-share-alt" : "fa-terminal",
+        //         title,
+        //         label: result.id.split("/").slice(5, 7).join(" → "),
+        //         relevance: result.relevance + 1,
+        //
+        //         dragEnabled: true,
+        //         dragTransferData: id,
+        //         dragLabel: title,
+        //         dragImageClass: result["class"] === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
+        //         dragDropZones: ["zone1"]
+        //     };
+        // }));
 
         this.searchContent.valueChanges
             .do(term => this.searchResults = undefined)
@@ -168,7 +168,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                 this.appliedSearchTerm = term;
             })
             .filter(term => term.trim().length !== 0)
-            .switchMap(term => Observable.forkJoin(localFileSearch(term), projectsSearch(term)))
+            .switchMap(term => Observable.forkJoin(localFileSearch(term), Observable.of([])))
             .subscribe(datasets => {
                 const combined     = [].concat(...datasets).sort((a, b) => b.relevance - a.relevance);
                 this.searchResults = combined;

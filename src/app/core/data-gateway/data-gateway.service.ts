@@ -14,6 +14,7 @@ import {ConnectionState} from "../../services/storage/user-preferences-types";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import Platform = NodeJS.Platform;
+import {AuthService} from "../../auth/auth/auth.service";
 
 @Injectable()
 export class DataGatewayService {
@@ -39,6 +40,7 @@ export class DataGatewayService {
                 private api: PlatformAPI,
                 private http: Http,
                 private modal: ModalService,
+                private auth: AuthService,
                 private apiGateway: PlatformAPIGatewayService,
                 private ipc: IpcService) {
 
@@ -125,6 +127,7 @@ export class DataGatewayService {
     }
 
     searchLocalProjects(term, limit = 20) {
+
         return this.preferences.get("localFolders", []).switchMap(folders => this.ipc.request("searchLocalProjects", {
             term,
             limit,
@@ -134,7 +137,10 @@ export class DataGatewayService {
 
     searchUserProjects(term: string, limit = 20) {
 
-        return this.ipc.request("searchUserProjects", {term, limit});
+        // this.auth.connections.take(1).flatMap(credentials => {
+        //     const hashes = credentials.map(c => c.hash);
+        // });
+        // return this.ipc.request("searchUserProjects", {term, limit});
     }
 
     getPublicApps(hash) {
@@ -268,7 +274,7 @@ export class DataGatewayService {
             return 1;
         }
         let matchedCharacters = 0;
-        const spacings          = [];
+        const spacings        = [];
 
         let previousFoundIndex = 0;
 
