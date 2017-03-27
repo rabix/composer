@@ -127,10 +127,7 @@ export class TreeNodeComponent<T> implements OnInit, AfterViewInit {
         this.isExpanded     = true;
 
         if (wasContracted || force) {
-            console.log("Emit expansion");
             this.tree.expansionChanges.next(this);
-        } else {
-            console.log("Dont emit expansion");
         }
     }
 
@@ -140,10 +137,7 @@ export class TreeNodeComponent<T> implements OnInit, AfterViewInit {
         this.isExpanded   = false;
 
         if (wasExpanded) {
-            console.log("Emit contraction");
             this.tree.expansionChanges.next(this);
-        } else {
-            console.log("Dont emit contraction");
         }
 
     }

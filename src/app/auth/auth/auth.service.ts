@@ -1,6 +1,7 @@
 import {Injectable} from "@angular/core";
 import {Http} from "@angular/http";
-import {BehaviorSubject, ReplaySubject} from "rxjs";
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {ReplaySubject} from "rxjs/ReplaySubject";
 import {Observable} from "rxjs/Observable";
 import {ErrorBarService} from "../../layout/error-bar/error-bar.service";
 import {ConnectionState, CredentialsEntry} from "../../services/storage/user-preferences-types";

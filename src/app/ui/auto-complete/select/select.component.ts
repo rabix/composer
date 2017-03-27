@@ -41,6 +41,32 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
     @Input()
     public delimiter = ",";
 
+    /**
+     * Option groups that options will be bucketed into.
+     * If your element is a <select> with <optgroup>s this property gets populated automatically.
+     * Make sure each object in the array has a property named whatever optgroupValueField is set to.
+     */
+    @Input()
+    public optgroups = [];
+
+    /**
+     * The name of the option group property that serves as its unique identifier.
+     */
+    @Input()
+    public optgroupValueField = "value";
+
+    /**
+     * The name of the property to render as an option group label (not needed when custom rendering functions are defined).
+     */
+    @Input()
+    public optgroupLabelField = "label";
+
+    /**
+     * The name of the property to group items by.
+     */
+    @Input()
+    optgroupField = "optgroup";
+
     // Allows the user to create new items that aren't in the initial list of options
     @Input()
     public create = false;
@@ -143,6 +169,10 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
             create: this.create,
             createOnBlur: this.createOnBlur,
             createFilter: this.createFilter,
+            optgroups: this.optgroups,
+            optgroupValueField: this.optgroupValueField,
+            optgroupLabelField: this.optgroupLabelField,
+            optgroupField: this.optgroupField,
             highlight: this.highlight,
             persist: this.persist,
             openOnFocus: this.openOnFocus,

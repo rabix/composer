@@ -91,4 +91,8 @@ export class UserPreferencesService {
     setCredentials(credentials) {
         return this.put("credentials", credentials);
     }
+
+    getOpenProjects() {
+        return this.get("openProjects", []);
+    }
 }

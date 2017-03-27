@@ -5,6 +5,8 @@ import {UserPreferencesService} from "../../../services/storage/user-preferences
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {ModalService} from "../../../ui/modal/modal.service";
+import {AuthService} from "../../../auth/auth/auth.service";
+import {Observable} from "rxjs/Observable";
 const {app, dialog} = window["require"]("electron").remote;
 
 @Component({
@@ -63,7 +65,12 @@ const {app, dialog} = window["require"]("electron").remote;
                     <strong>Add Projects to the Workspace</strong>
                 </p>
                 <div>
-                    <ct-auto-complete [(ngModel)]="selectedProjects" [options]="nonAddedUserProjects"></ct-auto-complete>
+                    <ct-auto-complete [(ngModel)]="selectedProjects"
+                                      [options]="nonAddedUserProjects"
+                                      [optgroups]="platformOptgroups"
+                                      optgroupField="hash">
+
+                    </ct-auto-complete>
                     <!--<select multiple class="form-control" [formControl]="projectSelectionControl">-->
                     <!--<option *ngFor="let project of nonAddedUserProjects" [value]="project.value">{{ project.label }}</option>-->
                     <!--</select>-->
@@ -110,42 +117,34 @@ export class AddSourceModalComponent extends DirectiveBase implements OnInit {
 
     selectedProjects = [];
 
-    constructor(settings: SettingsService,
-                data: DataGatewayService,
+    platformOptgroups = [];
+
+    constructor(private auth: AuthService,
+                private data: DataGatewayService,
                 public modal: ModalService,
                 private preferences: UserPreferencesService) {
 
         super();
 
-        const validity = settings.validity;
-        this.tracked   = validity.take(1).subscribe(isValid => {
-            this.isConnected = isValid;
-            this.connecting  = false;
-        });
+        this.tracked = auth.connections.flatMap(credentials => {
+            const listings = credentials.map(creds => this.data.getPlatformListing(creds.hash));
+            return Observable.forkJoin(...listings);
+        }, (credentials, listings) => ({credentials, listings}))
+            .withLatestFrom(this.preferences.getOpenProjects(), (data, openProjects) => ({...data, openProjects}))
+            .subscribe(data => {
+                const {credentials, listings, openProjects} = data;
+                this.platformOptgroups                      = credentials.map(creds => ({value: creds.hash, label: creds.profile}));
+                this.nonAddedUserProjects                   = listings.reduce((acc, listing, index) => {
+                    return acc.concat(listing.map((entry: any) => {
+                        return {
+                            value: credentials[index].hash + `/${entry.owner}/${entry.slug}`,
+                            text: entry.name,
+                            hash: credentials[index].hash
+                        } as any;
+                    }));
+                }, []).filter((entry: any) => openProjects.indexOf(entry.value) === -1);
 
-        this.tracked = data.scanCompletion
-            .flatMap(_ => settings.platformConfiguration)
-            .flatMap(config => {
-                const profile = SettingsService.urlToProfile(config.url);
-                return preferences.get(`dataCache.${profile}`, {projects: []}).map(cache => ({cache, profile}));
-            })
-            .withLatestFrom(preferences.get("openProjects", []),
-                (cacheData: any, openProjects) => {
-                    return {
-                        profile: cacheData.profile,
-                        projects: cacheData.cache.projects,
-                        openProjects
-                    };
-                })
-            .filter(stuff => stuff.projects.length)
-            .subscribe(stuff => {
-                this.nonAddedUserProjects = stuff.projects.filter(p => {
-                    return stuff.openProjects.indexOf(`${stuff.profile}/${p.slug}`) === -1;
-                }).map(p => ({
-                    value: stuff.profile + "/" + p.slug,
-                    text: p.name
-                }));
-
+                this.isConnected    = true;
                 this.loadedProjects = true;
             });
     }

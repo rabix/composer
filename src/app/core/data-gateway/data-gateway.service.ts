@@ -82,15 +82,11 @@ export class DataGatewayService {
      * @returns {any}
      */
     getPlatformListing(source: string): Observable<{ id: string, name: string }[]> {
-        const cacheKey = source + ".getPlatformListing";
 
-        if (this.cache[cacheKey]) {
-            return this.cache[cacheKey];
-        }
-
-        this.cache[cacheKey] = this.apiGateway.forHash(source).getRabixProjects().publishReplay(1).refCount();
-        return this.cache[cacheKey];
-
+        return this.throughCache(
+            `${source}.getPlatformListing`,
+            this.apiGateway.forHash(source).getRabixProjects().publishReplay(1).refCount()
+        );
 
         // const allProjects  = this.scanCompletion.flatMap(s => this.preferences.get(`dataCache.${source}.projects`, []));
         // const openProjects = this.preferences.get("openProjects", [])
@@ -105,7 +101,11 @@ export class DataGatewayService {
     }
 
     getProjectListing(hash, projectOwner: string, projectSlug: string): Observable<any[]> {
-        return this.apiGateway.forHash(hash).getProjectApps(projectOwner, projectSlug);
+        return this.throughCache(
+            hash + ".getProjectListing",
+            this.apiGateway.forHash(hash).getProjectApps(projectOwner, projectSlug).publishReplay(1).refCount()
+        );
+
 
         // return this.scanCompletion.flatMap(() => this.preferences.get(`dataCache.${profile}.apps`)).map((apps: any[] = []) => {
         //     return apps.filter(app => app["sbg:projectName"] === projectName);
@@ -229,7 +229,6 @@ export class DataGatewayService {
 
         const [hash] = fileID.split("/");
 
-        debugger;
         const revNote = new FormControl("");
         return Observable.fromPromise(this.modal.prompt({
             title: "Publish New App Revision",
@@ -239,11 +238,20 @@ export class DataGatewayService {
             formControl: revNote
         })).flatMap(() => {
 
-            return this.apiGateway.forHash(hash).saveApp(YAML.safeLoad(content, {json: true} as any), revNote.value).map(r => JSON.stringify(r.message, null, 4));
+            return this.apiGateway.forHash(hash)
+                .saveApp(YAML.safeLoad(content, {json: true} as any), revNote.value)
+                .map(r => JSON.stringify(r.message, null, 4));
         });
-
-
     }
 
+    private throughCache(key, handler) {
+        if (this.cache[key]) {
+            return this.cache[key];
+        }
+
+        this.cache[key] = handler;
+
+        return this.cache[key];
+    }
 
 }

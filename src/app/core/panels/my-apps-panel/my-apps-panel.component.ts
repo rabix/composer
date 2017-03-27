@@ -184,7 +184,19 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
         this.tree.expansionChanges
             .filter(node => node.isExpanded === true && node.type === "source" && node.id !== "local")
             .do(n => n.modify(() => n.loading = true))
-            .flatMap(n => this.dataGateway.getPlatformListing(n.id), (node, listing = []) => ({node, listing}))
+            .flatMap(node => {
+                return Observable.combineLatest(
+                    this.dataGateway.getPlatformListing(node.id),
+                    this.preferences.getOpenProjects(),
+                    (listing, openProjects) => ({node, listing, openProjects})
+                ).map(data => {
+                    const {node, listing, openProjects} = data as any;
+                    return {
+                        ...data,
+                        listing: listing.filter(item => openProjects.indexOf(`${node.id}/${item.owner}/${item.slug}`) !== -1)
+                    };
+                });
+            })
             .withLatestFrom(this.expandedNodes, (outer, expanded) => ({...outer, expanded}))
             .subscribe((data: { node: TreeNodeComponent<any>, listing: any, expanded: string[] }) => {
                 const children = data.listing.map((child, index) => {
