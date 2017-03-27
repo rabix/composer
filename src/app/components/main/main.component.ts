@@ -17,6 +17,8 @@ import {MarkdownService} from "../../ui/markdown/markdown.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {UrlValidator} from "../../validators/url.validator";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
+import {AuthService} from "../../auth/auth/auth.service";
+import {PlatformAPIGatewayService} from "../../auth/api/platform-api-gateway.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -51,27 +53,20 @@ export class MainComponent {
     constructor(modal: ModalService,
                 system: SystemService,
                 vcRef: ViewContainerRef,
+                auth: AuthService,
                 preferences: UserPreferencesService,
                 dataGateway: DataGatewayService,
                 statusBarService: StatusBarService) {
 
         system.boot();
 
+        auth.watchCredentials();
+
         /**
          * Hack for angular's inability to provide the vcRef to a service with DI.
          * {@link ModalService.rootViewRef}
          */
         modal.setViewContainer(vcRef);
-
-
-        preferences.get("credentials", [])
-            .map(_ => statusBarService.instant("Synchronizing with remote sources..."))
-            .flatMap(_ => dataGateway.scan())
-            .subscribe(() => {
-                statusBarService.instant("Remote sources synchronized.");
-            }, () => {
-                statusBarService.instant("Could not synchronize with remote data.");
-            });
 
         this.runnix = Observable.fromEvent(document, "keyup").map((e: KeyboardEvent) => e.keyCode).bufferCount(10, 1)
             .filter(seq => seq.toString() === [38, 38, 40, 40, 37, 39, 37, 39, 66, 65].toString())

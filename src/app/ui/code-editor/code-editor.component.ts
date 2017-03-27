@@ -87,7 +87,9 @@ export interface AceEditorOptions {
     spellcheck?: boolean;
     useElasticTabstops?: boolean;
 }
-
+/**
+ * @deprecated Use Regular CodeEditorComponent
+ */
 @Component({
     encapsulation: ViewEncapsulation.None,
 

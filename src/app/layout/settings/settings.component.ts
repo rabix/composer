@@ -1,145 +1,91 @@
 import {Component, OnInit} from "@angular/core";
-import {AbstractControl, FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {AbstractControl, FormArray, FormControl, FormGroup, Validators} from "@angular/forms";
+import {AuthService} from "../../auth/auth/auth.service";
 import {SystemService} from "../../platform-providers/system.service";
-import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
-import {IpcService} from "../../services/ipc.service";
 import {SettingsService} from "../../services/settings/settings.service";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
-import {StatusBarService} from "../status-bar/status-bar.service";
+import {ConnectionState} from "../../services/storage/user-preferences-types";
+
+type ViewMode = "auth" | "keyBindings" | "cache";
 
 @Component({
     selector: "ct-settings",
     styleUrls: ["./settings.component.scss"],
-    template: `
-
-        <div class="m-1">
-            <form class="m-t-1"
-                  (ngSubmit)="onSubmit()"
-                  [formGroup]="form"
-                  [class.has-success]="form.valid"
-                  [class.has-warning]="form.errors">
-
-                <!--Platform URL Input field-->
-                <div class="form-group"
-                     [class.has-danger]="form.controls.url.invalid">
-
-                    <label class="strong" for="sbgApiKey">Seven Bridges Platform URL</label>
-                    <input class="form-control form-control-success form-control-danger form-control-warning"
-                           formControlName="url"
-                           (blur)="expandPlatformUrl(form.controls.url)"
-                           id="sbgPlatform"
-                           placeholder="https://igor.sbgenomics.com"/>
-
-                    <div class="form-control-feedback" *ngIf="form.controls.url?.errors?.pattern">
-                        Invalid Platform Name. Try with something like <i>“https://igor.sbgenomics.com”</i>.
-                    </div>
-                </div>
-
-                <!--Platform Key Input Field-->
-                <div class="form-group"
-                     [class.has-danger]="form.controls.token.invalid">
-
-                    <label class="strong" for="sbgApiKey">Authentication Key</label>
-                    <input class="form-control form-control-success form-control-danger form-control-warning"
-                           formControlName="token"
-                           id="sbgApiKey"/>
-
-                    <div class="form-control-feedback" *ngIf="form.controls.token?.errors?.length">
-                        The Authentication Key must be 32 characters long.
-                    </div>
-
-                    <small class="form-text text-muted">
-                        You can generate and see the key on the
-
-                        <a href="" (click)="$event.preventDefault(); openTokenPage()">
-                            Seven Bridges Platform
-                        </a>
-                    </small>
-                </div>
-
-                <div *ngIf="form?.errors?.invalidKey" class="alert alert-warning">
-                    <strong>Warning!</strong> This authentication key is not valid on the given platform.
-                </div>
-                <div *ngIf="form?.errors?.invalidPlatform" class="alert alert-danger">
-                    <strong>Danger!</strong> Given platform does not exist.
-                </div>
-
-                <button type="submit"
-                        class="btn btn-primary"
-                        [disabled]="checkInProgress">Apply
-                </button>
-            </form>
-        </div>
-    `
+    templateUrl: "./settings.component.html"
 })
 export class SettingsComponent extends DirectiveBase implements OnInit {
+    viewMode: ViewMode = "auth";
+
     form: FormGroup;
 
-    checkInProgress = false;
-
     constructor(private settings: SettingsService,
-                private api: PlatformAPI,
-                private ipc: IpcService,
                 private profile: UserPreferencesService,
                 private system: SystemService,
-                private status: StatusBarService,
-                formBuilder: FormBuilder) {
+                private auth: AuthService) {
 
         super();
 
-        this.form = formBuilder.group({
-            url: ["https://igor.sbgenomics.com", [Validators.required, Validators.pattern("https://[^/?]+\.[^.]+\\.sbgenomics\\.com")]],
-            token: ["", [(control) => {
-
-                if (control.value.length === 32) {
-                    return null;
-                }
-
-                return {length: "Authentication token must be 32 characters long."};
-            }]]
+        this.form = new FormGroup({
+            pairs: new FormArray([])
         });
 
-        this.tracked = this.profile.get("credentials").subscribe(credentials => {
-            this.form.patchValue(credentials[0] || {});
+
+        this.profile.getCredentials().take(1).subscribe(credentials => {
+            (this.form.get("pairs") as FormArray).reset([]);
+            this.addEntry();
+
+            if (credentials.length > 1) {
+                for (let i = 0; i < credentials.length - 1; i++) {
+                    this.addEntry();
+                }
+            }
+            this.form.get("pairs").patchValue(credentials || []);
         });
     }
 
     ngOnInit() {
-        this.form.statusChanges.debounceTime(300)
-            .filter(status => status === "VALID")
-            .flatMap(_ => this.api.checkToken(this.form.value.url, this.form.value.token).map(res => {
-                if (res === true) {
-                    return null;
-                }
-
-                if (res === false) {
-                    return {invalidKey: true};
-                }
-
-                if (res === "invalid_platform") {
-                    return {invalidPlatform: true};
-                }
-
-
-            }))
-            .filter(err => !!err)
-            .subscribe(err => {
-                this.form.setErrors(err);
-            });
-
-        this.form.statusChanges.map(s => s === "VALID").subscribe(this.settings.validity);
+        // this.form.statusChanges.debounceTime(300)
+        //     .filter(status => status === "VALID")
+        //     .flatMap(_ => this.api.checkToken(this.form.value.url, this.form.value.token).map(res => {
+        //         if (res === true) {
+        //             return null;
+        //         }
+        //
+        //         if (res === false) {
+        //             return {invalidKey: true};
+        //         }
+        //
+        //         if (res === "invalid_platform") {
+        //             return {invalidPlatform: true};
+        //         }
+        //
+        //
+        //     }))
+        //     .filter(err => !!err)
+        //     .subscribe(err => {
+        //         this.form.setErrors(err);
+        //     });
+        //
+        // this.form.statusChanges.map(s => s === "VALID").subscribe(this.settings.validity);
     }
 
     onSubmit() {
-        const profile = SettingsService.urlToProfile(this.form.get("url").value);
-        this.profile.put("credentials", [{
-            profile: profile,
-            ...this.form.getRawValue()
-        }]);
+        const values = this.form.get("pairs").value.map(val => {
+            const hash    = AuthService.hashUrlTokenPair(val.url, val.token);
+            const profile = AuthService.urlToProfile(val.url);
+            return {...val, hash, profile, status: ConnectionState.Connecting};
+        }).filter((item, index, arr) => {
+            return arr.findIndex(it => it.hash === item.hash) === index;
+        });
+
+        this.profile.patchCredentials(values);
     }
 
-    openTokenPage() {
+    /**
+     * Opens the authentication token page on SevenBridges.com
+     */
+    openTokenPage(): void {
         let url = "https://igor.sbgenomics.com/developer/#token";
         if (this.form.controls["url"].valid) {
             url = this.form.controls["url"].value + "/developer/#token";
@@ -153,14 +99,47 @@ export class SettingsComponent extends DirectiveBase implements OnInit {
      * and updates the control values if the do
      * @param control
      */
-    expandPlatformUrl(control: AbstractControl) {
+    expandPlatformUrl(control: AbstractControl): void {
 
-        const httpCheck = /^https?:\/\//gi;
-
-        if (!httpCheck.test(control.value) && control.value.length > 2) {
+        if (!/^https?:\/\//gi.test(control.value) && control.value.length > 2) {
             control.setValue(`https://${control.value}.sbgenomics.com`);
         }
     }
 
+    /**
+     * Changes the view mode
+     * @param tab Name of the tab to switch to
+     */
+    switchTab(tab: ViewMode): void {
+        this.viewMode = tab;
+    }
+
+    /**
+     * Inserts a new key-token pair to the end of the form
+     */
+    addEntry(): void {
+        const pairs = this.form.get("pairs") as FormArray;
+        pairs.push(new FormGroup({
+            url: new FormControl("https://igor.sbgenomics.com",
+                [Validators.required, Validators.pattern("https://[^/?]+\.[^.]+\\.sbgenomics\\.com")]),
+            token: new FormControl("", [
+                (control) => {
+                    if (control.value.length === 32) {
+                        return null;
+                    }
+                    return {length: "Authentication token must be 32 characters long."};
+                }
+            ])
+        }));
+
+    }
+
+    /**
+     * Removes a url-token pair at the given index
+     * @param i Index of the pair to remove
+     */
+    removeIndex(i: number): void {
+        (this.form.get("pairs") as FormArray).removeAt(i);
+    }
 
 }

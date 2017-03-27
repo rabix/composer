@@ -45,6 +45,7 @@ import {RadioGroupComponent} from "./radio-button/radio-group.component";
 import {NewFileModalComponent} from "./modal/custom/new-file-modal.component";
 import {ProjectSelectionModal} from "./modal/custom/project-selection-modal.component";
 import {CheckboxPromptComponent} from "./modal/common/checkbox-prompt.component";
+import {CircularLoaderComponent} from "./circular-loader/circular-loader.component";
 
 @NgModule({
     imports: [
@@ -59,6 +60,7 @@ import {CheckboxPromptComponent} from "./modal/common/checkbox-prompt.component"
         CodeEditorComponent,
         CodeEditorXComponent,
         CodePreviewComponent,
+        CircularLoaderComponent,
         ContextDirective,
         DisableFormControlDirective,
         DragDirective,
@@ -141,7 +143,8 @@ import {CheckboxPromptComponent} from "./modal/common/checkbox-prompt.component"
         TooltipContentComponent,
         TooltipDirective,
         TreeNodeComponent,
-        TreeViewComponent
+        TreeViewComponent,
+        CircularLoaderComponent
     ]
 })
 export class UIModule {

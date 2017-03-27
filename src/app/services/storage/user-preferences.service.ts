@@ -4,6 +4,7 @@ import "rxjs/add/operator/take";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {IpcService} from "../ipc.service";
+import {CredentialsEntry} from "./user-preferences-types";
 import {UserProfileCacheKey} from "./user-profile-cache-key";
 
 @Injectable()
@@ -18,7 +19,7 @@ export class UserPreferencesService {
 
     }
 
-    public put(key: UserProfileCacheKey, value: any) {
+    public put<T>(key: UserProfileCacheKey, value: T): Observable<T> {
 
         this.updates.next({key, value});
 
@@ -63,5 +64,31 @@ export class UserPreferencesService {
             list.unshift(appID);
             return list.filter((e, i, a) => a.indexOf(e) === i).slice(0, 20);
         }).flatMap(list => this.put("recentApps", list));
+    }
+
+    patchCredentials(credentials: CredentialsEntry[]) {
+
+        const creds = this.get("credentials", [] as CredentialsEntry[]);
+
+        creds.take(1).subscribe(oldCredentials => {
+
+            const newCredentials = credentials.map(cred => {
+                const oldEntryButSame = oldCredentials.find(e => e.hash === cred.hash);
+                if (oldEntryButSame) {
+                    return oldEntryButSame;
+                }
+                return cred;
+            });
+
+            this.setCredentials(newCredentials);
+        });
+    }
+
+    getCredentials(): Observable<CredentialsEntry[]> {
+        return this.get("credentials", [] as CredentialsEntry[]);
+    }
+
+    setCredentials(credentials) {
+        return this.put("credentials", credentials);
     }
 }

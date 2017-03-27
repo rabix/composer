@@ -33,7 +33,7 @@ import {TreeViewService} from "../tree-view.service";
             <i *ngIf="!loading && (!isExpanded || (isExpanded && !iconExpanded))" class="fa fa-fw" [ngClass]="icon"></i>
             <!--Expansion icon if the node is expanded and there is an expansion icon-->
             <i *ngIf="!loading && isExpanded  && iconExpanded" class="fa fa-fw" [ngClass]="iconExpanded"></i>
-            
+
             <span [innerHTML]="label"></span>
         </div>
 
@@ -48,13 +48,13 @@ import {TreeViewService} from "../tree-view.service";
                           [isExpandable]="child.isExpandable"
                           [iconExpanded]="child?.iconExpanded"
                           [children]="child.children"
-                          
+
                           [dragEnabled]="child.dragEnabled"
                           [dragTransferData]="child.dragTransferData"
                           [dragLabel]="child.dragLabel"
                           [dragImageClass]="child.dragImageClass"
                           [dragDropZones]="child.dragDropZones"
-                          
+
                           [level]="level + 1"
             ></ct-tree-node>
         </div>
@@ -99,7 +99,7 @@ export class TreeNodeComponent<T> implements OnInit, AfterViewInit {
         this.tree.nodeInit.next(this);
 
         if (this.isExpanded) {
-            this.expand();
+            this.expand(true);
         }
     }
 
@@ -122,14 +122,30 @@ export class TreeNodeComponent<T> implements OnInit, AfterViewInit {
         this.tree.open.next(this);
     }
 
-    expand() {
-        this.isExpanded = true;
-        this.tree.expansionChanges.next(this);
+    expand(force = false) {
+        const wasContracted = this.isExpanded === false;
+        this.isExpanded     = true;
+
+        if (wasContracted || force) {
+            console.log("Emit expansion");
+            this.tree.expansionChanges.next(this);
+        } else {
+            console.log("Dont emit expansion");
+        }
     }
 
     contract() {
-        this.isExpanded = false;
-        this.tree.expansionChanges.next(this);
+
+        const wasExpanded = this.isExpanded === true;
+        this.isExpanded   = false;
+
+        if (wasExpanded) {
+            console.log("Emit contraction");
+            this.tree.expansionChanges.next(this);
+        } else {
+            console.log("Dont emit contraction");
+        }
+
     }
 
     select() {

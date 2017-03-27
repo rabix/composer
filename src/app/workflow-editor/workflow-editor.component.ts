@@ -3,7 +3,8 @@ import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {WorkflowFactory, WorkflowModel} from "cwlts/models";
 import {Validation} from "cwlts/models/helpers/validation";
 import * as Yaml from "js-yaml";
-import {Observable} from "rxjs/Rx";
+import {Observable, Subject} from "rxjs/Rx";
+import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
 import {AppTabData} from "../core/workbox/app-tab-data";
 import {WorkboxTab} from "../core/workbox/workbox-tab.interface";
 import {
@@ -11,16 +12,14 @@ import {
     ValidationResponse
 } from "../editor-common/cwl-schema-validation-worker/cwl-schema-validation-worker.service";
 import {EditorInspectorService} from "../editor-common/inspector/editor-inspector.service";
+import {ErrorBarService} from "../layout/error-bar/error-bar.service";
 import {StatusBarService} from "../layout/status-bar/status-bar.service";
 import {SystemService} from "../platform-providers/system.service";
 import {PlatformAPI} from "../services/api/platforms/platform-api.service";
 import {SettingsService} from "../services/settings/settings.service";
-import {UserPreferencesService} from "../services/storage/user-preferences.service";
-import {ModalService} from "../ui/modal/modal.service";
 import {DirectiveBase} from "../util/directive-base/directive-base";
 
 import LoadOptions = jsyaml.LoadOptions;
-import {ErrorBarService} from "../layout/error-bar/error-bar.service";
 
 @Component({
     selector: "ct-workflow-editor",
@@ -73,7 +72,7 @@ import {ErrorBarService} from "../layout/error-bar/error-bar.service";
                 <button class="btn btn-sm btn-secondary "
                         type="button"
                         ct-tooltip="Save As..."
-                        tooltipPlacement="bottom" >
+                        tooltipPlacement="bottom">
                     <i class="fa fa-copy"></i>
                 </button>
 
@@ -101,7 +100,7 @@ import {ErrorBarService} from "../layout/error-bar/error-bar.service";
 
         <div class="editor-layout">
 
-            <ct-block-loader *ngIf="isLoading"></ct-block-loader>
+            <ct-circular-loader *ngIf="isLoading"></ct-circular-loader>
 
             <!--Editor Row-->
             <ct-code-editor *ngIf="viewMode === 'code' && !isLoading"
@@ -183,7 +182,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
     viewMode: "info" | "graph" | "code";
 
     /** Flag to indicate the document is loading */
-    isLoading = false;
+    isLoading = true;
 
     /** Flag for bottom panel, shows validation-issues, commandline, or neither */
     reportPanel: "validation" | "commandLinePreview" | undefined;
@@ -195,6 +194,8 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
     workflowModel: WorkflowModel = WorkflowFactory.from(null, "document");
 
     codeEditorContent = new FormControl(undefined);
+
+    priorityCodeUpdates = new Subject<string>();
 
     /** Flag for showing reformat prompt on GUI switch */
     private showReformatPrompt = true;
@@ -210,15 +211,13 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
 
 
     constructor(private cwlValidatorService: CwlSchemaValidationWorkerService,
-                private userPrefService: UserPreferencesService,
                 private formBuilder: FormBuilder,
                 private platform: PlatformAPI,
                 private inspector: EditorInspectorService,
                 private statusBar: StatusBarService,
-                private modal: ModalService,
                 private system: SystemService,
                 private settings: SettingsService,
-                private errorBarService: ErrorBarService) {
+                private dataGateway: DataGatewayService) {
 
         super();
 
@@ -242,87 +241,92 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
         }
 
         // Whenever the editor content is changed, validate it using a JSON Schema.
-        this.tracked = this.codeEditorContent.valueChanges.debounceTime(1000).distinctUntilChanged().subscribe(latestContent => {
+        this.tracked = this.codeEditorContent
+            .valueChanges
+            .debounceTime(3000)
+            .distinctUntilChanged()
+            .merge(this.priorityCodeUpdates).subscribe(latestContent => {
 
-            this.cwlValidatorService.validate(latestContent).then(r => {
+                this.cwlValidatorService.validate(latestContent).then(r => {
 
-                if (!r.isValidCwl) {
-                    // turn off loader and load document as code
-                    this.validation = r;
-                    this.isLoading  = false;
+                    if (!r.isValidCwl) {
+                        // turn off loader and load document as code
+                        this.validation = r;
+                        this.isLoading  = false;
 
-                    this.viewMode = "code";
+                        this.viewMode = "code";
 
-                    return r;
-                }
+                        return r;
+                    }
 
-                // load JSON to generate model
-                const json = Yaml.safeLoad(this.codeEditorContent.value, {
-                    json: true
-                } as LoadOptions);
+                    // load JSON to generate model
+                    const json = Yaml.safeLoad(this.codeEditorContent.value, {
+                        json: true
+                    } as LoadOptions);
 
-                // should show prompt, but json is already reformatted
-                if (this.showReformatPrompt && json["rbx:modified"]) {
-                    this.showReformatPrompt = false;
-                }
+                    // should show prompt, but json is already reformatted
+                    if (this.showReformatPrompt && json["rbx:modified"]) {
+                        this.showReformatPrompt = false;
+                    }
 
-                this.data.resolve(latestContent).subscribe(resolved => {
-                    console.log("latest content of type", typeof resolved);
-                    console.time("Workflow Model");
-                    this.workflowModel = WorkflowFactory.from(resolved as any, "document");
-                    console.timeEnd("Workflow Model");
+                    this.data.resolve(latestContent).subscribe(resolved => {
+                        console.log("latest content of type", typeof resolved);
+                        console.time("Workflow Model");
+                        this.workflowModel = WorkflowFactory.from(resolved as any, "document");
+                        console.timeEnd("Workflow Model");
 
 
-                    // update validation stream on model validation updates
+                        // update validation stream on model validation updates
 
-                    this.workflowModel.setValidationCallback((res: Validation) => {
-                        this.validation = {
-                            errors: res.errors,
-                            warnings: res.warnings,
+                        this.workflowModel.setValidationCallback((res: Validation) => {
+                            this.validation = {
+                                errors: res.errors,
+                                warnings: res.warnings,
+                                isValidatableCwl: true,
+                                isValidCwl: true,
+                                isValidJSON: true
+                            };
+                        });
+
+                        this.workflowModel.validate();
+
+                        const out       = {
+                            errors: this.workflowModel.validation.errors,
+                            warnings: this.workflowModel.validation.warnings,
                             isValidatableCwl: true,
                             isValidCwl: true,
                             isValidJSON: true
                         };
+                        this.validation = out;
+                        this.isValidCWL = out.isValidCwl;
+
+
+                        // After wf is created get updates for steps
+                        this.getStepUpdates();
+
+                        if (!this.viewMode) {
+                            this.viewMode = "graph";
+                        }
+                        this.isLoading = false;
+
+                    }, (err) => {
+                        this.isLoading  = false;
+                        this.viewMode   = "code";
+                        this.isValidCWL = false;
+                        this.validation = {
+                            isValidatableCwl: true,
+                            isValidCwl: false,
+                            isValidJSON: true,
+                            warnings: [],
+                            errors: [{
+                                message: err.message,
+                                loc: "document"
+                            }]
+                        };
                     });
 
-                    this.workflowModel.validate();
-
-                    const out       = {
-                        errors: this.workflowModel.validation.errors,
-                        warnings: this.workflowModel.validation.warnings,
-                        isValidatableCwl: true,
-                        isValidCwl: true,
-                        isValidJSON: true
-                    };
-                    this.validation = out;
-                    this.isValidCWL = out.isValidCwl;
-
-
-                    // After wf is created get updates for steps
-                    this.getStepUpdates();
-
-                    if (!this.viewMode) {
-                        this.viewMode = "graph";
-                    }
-
-                }, (err) => {
-                    this.isLoading  = false;
-                    this.viewMode   = "code";
-                    this.isValidCWL = false;
-                    this.validation = {
-                        isValidatableCwl: true,
-                        isValidCwl: false,
-                        isValidJSON: true,
-                        warnings: [],
-                        errors: [{
-                            message: err.message,
-                            loc: "document"
-                        }]
-                    };
                 });
-
             });
-        });
 
         this.codeEditorContent.setValue(this.data.fileContent);
 
@@ -364,6 +368,16 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
 
     save() {
         console.warn("Reimplement the save functionality");
+
+
+        const text = this.getModelText();
+
+        this.dataGateway.saveFile(this.data.id, text).subscribe(save => {
+            console.log("Saved", save);
+            this.priorityCodeUpdates.next();
+        }, err => {
+            console.log("Not saved", err);
+        });
         // const text = this.toolGroup.dirty ? this.getModelText() : this.rawEditorContent.getValue();
         //
         // // For local files, just save and that's it

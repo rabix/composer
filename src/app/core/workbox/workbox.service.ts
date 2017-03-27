@@ -151,7 +151,6 @@ export class WorkboxService {
                     tab.data.fileContent = JSON.stringify(parsed, null, 4);
                 }
 
-                console.log("Parsed class", parsed);
 
                 tab.label = parsed.label || fileID;
                 tab.type  = parsed.class || "Code";
@@ -163,7 +162,6 @@ export class WorkboxService {
                 tab.label = fileID.split("/").pop();
             }
 
-            console.log("Prepared app tab", tab);
             return tab as any;
 
         });

@@ -26,6 +26,7 @@ import {PlatformConnectionFormComponent} from "./settings/platform-connection-fo
 import {WebWorkerBuilderService} from "./web-worker/web-worker-builder.service";
 import {SettingsButtonComponent} from "./workbox/settings-button.component";
 import {WorkboxComponent} from "./workbox/workbox.component";
+import {AuthModule} from "../auth/auth.module";
 
 @NgModule({
     entryComponents: [
@@ -65,6 +66,7 @@ import {WorkboxComponent} from "./workbox/workbox.component";
         LayoutModule,
         FormsModule,
         ReactiveFormsModule,
+        AuthModule,
         UIModule,
         EditorCommonModule,
         ToolEditorModule,
