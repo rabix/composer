@@ -6,9 +6,10 @@ import {noop} from "../../../lib/utils.lib";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {ModalService} from "../../../ui/modal/modal.service";
 
+/**
+ * @deprecated
+ */
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-key-value-list",
     styleUrls: ["./key-value-list.component.scss"],
     providers: [

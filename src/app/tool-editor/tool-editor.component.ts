@@ -144,22 +144,22 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
                     this.data.resolve(latestContent).subscribe((resolved) => {
                         // generate model and get command line parts
                         this.toolModel = CommandLineToolFactory.from(resolved as any, "document");
-                        // this.toolModel.onCommandLineResult((res) => {
-                        //     this.commandLineParts.next(res);
-                        // });
-                        // this.toolModel.updateCommandLine();
+                        this.toolModel.onCommandLineResult((res) => {
+                            this.commandLineParts.next(res);
+                        });
+                        this.toolModel.updateCommandLine();
 
                         // update validation stream on model validation updates
 
-                        // this.toolModel.setValidationCallback((res: Validation) => {
-                        //     this.validation = {
-                        //         errors: res.errors,
-                        //         warnings: res.warnings,
-                        //         isValidatableCwl: true,
-                        //         isValidCwl: true,
-                        //         isValidJSON: true
-                        //     };
-                        // });
+                        this.toolModel.setValidationCallback((res: Validation) => {
+                            this.validation = {
+                                errors: res.errors,
+                                warnings: res.warnings,
+                                isValidatableCwl: true,
+                                isValidCwl: true,
+                                isValidJSON: true
+                            };
+                        });
 
                         this.toolModel.validate();
 
@@ -210,11 +210,11 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
     }
 
     save() {
+        const text = this.toolGroup.dirty ? this.getModelText() : this.codeEditorContent.value;
 
-        console.warn("Reimplement saving");
-
-        this.dataGateway.saveFile(this.data.id, this.getModelText()).subscribe(save => {
+        this.dataGateway.saveFile(this.data.id, text).subscribe(save => {
             console.log("Saved", save);
+            this.priorityCodeUpdates.next(save);
         }, err => {
             console.log("Not saved", err);
         });
@@ -291,7 +291,8 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
     private getModelText(): string {
         const modelObject = Object.assign(this.toolModel.serialize(), {"rbx:modified": true});
 
-        return this.data.language === "json" ? JSON.stringify(modelObject, null, 4) : Yaml.dump(modelObject);
+        return this.data.language === "json" || this.data.dataSource === "app"
+            ? JSON.stringify(modelObject, null, 4) : Yaml.dump(modelObject);
     }
 
     toggleReport(panel: "validation" | "commandLinePreview") {

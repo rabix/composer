@@ -65,12 +65,12 @@ export class MapListComponent extends DirectiveBase implements ControlValueAcces
         super();
     }
 
-    private add() {
+    add() {
         this.list = this.list.concat({key: "", value: ""});
         this.resizeControls();
     }
 
-    private remove(i) {
+    remove(i) {
         this.list = this.list.slice(0, i).concat(this.list.slice(i + 1));
         (this.formGroup.get("pairs") as FormArray).removeAt(i);
 
@@ -131,7 +131,7 @@ export class MapListComponent extends DirectiveBase implements ControlValueAcces
     setDisabledState(isDisabled: boolean): void {
     }
 
-    private onInputsFormChange($event) {
+    onInputsFormChange($event) {
         $event.stopPropagation();
     }
 }

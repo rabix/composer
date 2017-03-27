@@ -1,12 +1,18 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
-import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR} from "@angular/forms";
+import {
+    ControlValueAccessor,
+    FormBuilder,
+    FormGroup,
+    NG_VALIDATORS,
+    NG_VALUE_ACCESSOR
+} from "@angular/forms";
 import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 import {noop} from "../../../lib/utils.lib";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
-
+/**
+ * @deprecated
+ */
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-key-value-input",
     styleUrls: ["./key-value-input.component.scss"],
     providers: [
@@ -35,34 +41,42 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                *ngIf="validation.warnings.length && !validation.errors.length"></i>
 
             <ct-tooltip-content #warnings>
-                <div class="text-console-warning px-1" *ngFor="let warning of validation.warnings">{{ warning }}</div>
+                <div class="text-console-warning px-1" *ngFor="let warning of validation.warnings">
+                    {{ warning }}
+                </div>
             </ct-tooltip-content>
 
             <ct-tooltip-content #errors>
-                <div class="text-console-error px-1" *ngFor="let error of validation.errors">{{ error }}</div>
+                <div class="text-console-error px-1" *ngFor="let error of validation.errors">
+                    {{ error }}
+                </div>
             </ct-tooltip-content>
 
-            <input class="ellipsis form-control key-input"
+            <input class="form-control"
                    [class.col-sm-12]="form.controls['keyForm'].valid"
                    [class.col-sm-11]="!form.controls['keyForm'].valid"
                    *ngIf="form.controls['keyForm']"
                    [formControl]="form.controls['keyForm']"/>
         </div>
 
-        <input *ngIf="form.controls['valueForm'] && readonly"
-               [class.col-sm-11]="form.controls['keyForm'].value === null"
-               [class.col-sm-6]="form.controls['keyForm'].value !== null"
-               [class.half-width-value-input]="form.controls['keyForm'].value !== null"
-               class="readonly-value-input"
-               [readonly]="readonly"
-               [formControl]="form.controls['valueForm']"/>
+        <div [class.col-sm-11]="form.controls['keyForm'].value === null"
+             *ngIf="form.controls['valueForm'] && readonly"
+             [class.col-sm-6]="form.controls['keyForm'].value !== null">
+            <input [class.half-width-value-input]="form.controls['keyForm'].value !== null"
+                   class="form-control"
+                   [readonly]="readonly"
+                   [formControl]="form.controls['valueForm']"/>
 
-        <ct-expression-input
-            *ngIf="form.controls['valueForm'] && !readonly"
-            class="col-sm-6"
-            [context]="context"
-            [formControl]="form.controls['valueForm']">
-        </ct-expression-input>
+        </div>
+
+        <div *ngIf="form.controls['valueForm'] && !readonly"
+             class="col-sm-6">
+
+            <ct-expression-input
+                    [context]="context"
+                    [formControl]="form.controls['valueForm']">
+            </ct-expression-input>
+        </div>
 
         <ng-content></ng-content>
     `
@@ -73,7 +87,7 @@ export class KeyValueInputComponent extends DirectiveBase implements ControlValu
     public context: { $job: any } = {$job: {}};
 
     @Input()
-    public keyValidator = () => null;
+    public keyValidator = noop;
 
     @Input()
     private isDuplicate = false;
@@ -92,7 +106,7 @@ export class KeyValueInputComponent extends DirectiveBase implements ControlValu
         super();
     }
 
-    private validation: { warnings: string[], errors: string[] } = {
+    validation: { warnings: string[], errors: string[] } = {
         warnings: [],
         errors: []
     };

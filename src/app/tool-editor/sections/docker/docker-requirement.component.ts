@@ -1,13 +1,20 @@
-import {ChangeDetectionStrategy, Component, Input, OnChanges, Output, SimpleChanges, ViewEncapsulation} from "@angular/core";
+import {
+    ChangeDetectionStrategy,
+    Component,
+    Input,
+    OnChanges,
+    OnDestroy,
+    OnInit,
+    Output,
+    SimpleChanges
+} from "@angular/core";
 import {FormControl, FormGroup} from "@angular/forms";
-import {DockerRequirementModel} from "cwlts/models";
-import {ReplaySubject} from "rxjs";
 import {DockerRequirement} from "cwlts/mappings/d2sb/DockerRequirement";
+import {DockerRequirementModel} from "cwlts/models";
+import {ReplaySubject} from "rxjs/ReplaySubject";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     changeDetection: ChangeDetectionStrategy.OnPush,
     selector: "ct-docker-requirement",
     template: `
@@ -30,9 +37,9 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         </ct-form-panel>
     `
 })
-export class DockerRequirementComponent extends DirectiveBase implements OnChanges {
+export class DockerRequirementComponent extends DirectiveBase implements OnChanges, OnDestroy, OnInit {
     @Input()
-    public dockerRequirement: DockerRequirementModel;
+    public docker: DockerRequirementModel;
 
     @Input()
     public readonly = false;
@@ -42,19 +49,24 @@ export class DockerRequirementComponent extends DirectiveBase implements OnChang
     @Output()
     public update = new ReplaySubject<DockerRequirement>();
 
-    ngOnChanges(simpleChanges: SimpleChanges): void {
-        if (!this.form) {
-            this.form = new FormGroup({});
-
-            const dockerPull = this.dockerRequirement ? this.dockerRequirement.dockerPull : "";
-            this.form.addControl("dockerPull", new FormControl({value: dockerPull, disabled: this.readonly}));
+    ngOnChanges(changes: SimpleChanges): void {
+        if (this.form && changes["docker"].currentValue) {
+            this.form.controls["dockerPull"].setValue(changes["docker"].currentValue.dockerPull, {onlySelf: true});
         }
+    }
 
-        this.form.valueChanges.first().subscribe(changes => {
-            const docker: DockerRequirementModel = this.dockerRequirement || new DockerRequirementModel();
-            docker.dockerPull = changes["dockerPull"];
+    ngOnInit() {
+        this.form = new FormGroup({});
 
-            this.update.next(docker.serialize());
+        const dockerPull = this.docker ? this.docker.dockerPull : "";
+        this.form.addControl("dockerPull", new FormControl({
+            value: dockerPull,
+            disabled: this.readonly
+        }));
+
+        this.tracked = this.form.valueChanges.subscribe(change => {
+            this.docker.dockerPull = change.dockerPull;
+            this.update.next(this.docker);
         });
     }
 

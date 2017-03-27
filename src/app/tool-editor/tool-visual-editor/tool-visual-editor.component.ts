@@ -1,7 +1,7 @@
 import {Component, Input, OnDestroy} from "@angular/core";
 import {FormGroup} from "@angular/forms";
 
-import {FileDefModel, ResourceRequirementModel} from "cwlts/models/d2sb";
+import {ResourceRequirementModel} from "cwlts/models/d2sb";
 import {CommandLineToolModel, RequirementBaseModel} from "cwlts/models";
 import {ProcessRequirement} from "cwlts/mappings/d2sb/ProcessRequirement";
 
@@ -12,67 +12,64 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
     selector: "ct-tool-visual-editor",
     styleUrls: ["./tool-visual-editor.component.scss"],
     template: `
-            <form [formGroup]="formGroup">
-                
-                <ct-docker-requirement [dockerRequirement]="model.docker"
-                                       (update)="setRequirement($event, true)"
-                                       [readonly]="readonly">
-                </ct-docker-requirement>
+        <form [formGroup]="formGroup">
 
-                <ct-base-command [baseCommand]="model.baseCommand"
-                                 [context]="{$job: model.job}"
-                                 [model]="model"
-                                 [stdin]="model.stdin"
-                                 [stdout]="model.stdout"
-                                 (updateCmd)="updateModel('baseCommand', $event)"
-                                 (updateStreams)="setStreams($event)"
-                                 [readonly]="readonly">
-                </ct-base-command>
+            <ct-docker-requirement [docker]="model.docker"
+                                   (update)="updateModel($event)"
+                                   [readonly]="readonly">
+            </ct-docker-requirement>
 
-                <ct-tool-input [location]="model.loc + '.inputs'"
-                               [context]="{$job: model.job}"
-                               [model]="model"
-                               (update)="updateModel('inputs', $event)"
-                               [readonly]="readonly">
-                </ct-tool-input>
+            <ct-base-command [baseCommand]="model.baseCommand"
+                             [context]="{$job: model.job}"
+                             [model]="model"
+                             [stdin]="model.stdin"
+                             [stdout]="model.stdout"
+                             (updateCmd)="updateModel('baseCommand', $event)"
+                             (updateStreams)="setStreams($event)"
+                             [readonly]="readonly">
+            </ct-base-command>
 
-                <ct-tool-output [location]="model.loc + '.outputs'" 
-                                [context]="{$job: model.job}"
-                                [model]="model"
-                                [inputs]="model.inputs || []"
-                                (update)="updateModel('outputs', $event)"
-                                [readonly]="readonly">
-                </ct-tool-output>
+            <ct-tool-input [location]="model.loc + '.inputs'"
+                           [context]="{$job: model.job}"
+                           [model]="model"
+                           (update)="updateModel('inputs', $event)"
+                           [readonly]="readonly">
+            </ct-tool-input>
 
-                <ct-resources [entries]="model.resources"
-                              *ngIf="model.cwlVersion === 'sbg:draft-2'"
-                              (update)="setResource($event)"
+            <ct-tool-output [location]="model.loc + '.outputs'"
+                            [context]="{$job: model.job}"
+                            [model]="model"
+                            [inputs]="model.inputs || []"
+                            (update)="updateModel('outputs', $event)"
+                            [readonly]="readonly">
+            </ct-tool-output>
+
+            <ct-resources [entries]="model.resources"
+                          *ngIf="model.cwlVersion === 'sbg:draft-2'"
+                          (update)="setResource($event)"
+                          [context]="{$job: model.job}"
+                          [readonly]="readonly">
+            </ct-resources>
+
+            <ct-hints [model]="model"
+                      (update)="updateModel('hints')"
+                      [readonly]="readonly">
+            </ct-hints>
+            
+            <ct-argument-list [location]="model.loc + '.arguments'"
+                              [model]="model"
+                              (update)="updateModel('arguments', $event)"
                               [context]="{$job: model.job}"
                               [readonly]="readonly">
-                </ct-resources>
+            </ct-argument-list>
 
-                <ct-hint-list [entries]="model.hints || []"
+            <ct-file-def-list [model]="model.fileRequirement || {}"
+                              [location]="model.fileRequirement?.loc"
+                              (update)="updateModel('fileRequirement', $event)"
                               [context]="{$job: model.job}"
-                              *ngIf="model.cwlVersion === 'sbg:draft-2'"
-                              (update)="setHints($event)"
                               [readonly]="readonly">
-                </ct-hint-list>
-
-                <ct-argument-list [location]="model.loc + '.arguments'"
-                                  [model]="model"
-                                  (update)="updateModel('arguments', $event)"
-                                  [context]="{$job: model.job}"
-                                  [readonly]="readonly">
-                </ct-argument-list>
-                
-                <ct-file-def-list [entries]="model.createFileRequirement?.fileDef || []"
-                                  [location]="model.createFileRequirement?.loc"
-                                  *ngIf="model.cwlVersion === 'sbg:draft-2'"
-                                  (update)="updateModel('createFileRequirement', $event)"
-                                  [context]="{$job: model.job}"
-                                  [readonly]="readonly">
-                </ct-file-def-list>
-            </form>
+            </ct-file-def-list>
+        </form>
 
     `
 })
@@ -93,7 +90,6 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
     }
 
     updateModel(category: string, data: any) {
-
         if (category === "inputs" || category === "arguments") {
             this.model.updateCommandLine();
 
@@ -102,18 +98,24 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
             data.forEach(cmd => this.model.addBaseCommand(cmd));
             this.model.updateCommandLine();
 
-        } else if (category === "createFileRequirement") {
-            if (this.model.createFileRequirement) {
-                this.model.createFileRequirement.fileDef = data;
-            } else {
-                this.model.setRequirement(<ProcessRequirement>{
-                    "class": "CreateFileRequirement",
-                    fileDef: data.map((d: FileDefModel) => d.serialize())
-                });
+        } else if (category === "fileRequirement") {
+            if (!this.model.fileRequirement) {
+                if (this.model.cwlVersion === "v1.0") {
+                    this.model.setRequirement(<ProcessRequirement>{
+                        "class": "InitialWorkDirRequirement",
+                        listing: data.map(d => d.serialize())
+                    });
+                } else if (this.model.cwlVersion === "sbg:draft-2") {
+                    this.model.setRequirement(<ProcessRequirement>{
+                        "class": "CreateFileRequirement",
+                        fileDef: data.map(d => d.serialize())
+                    });
+                }
             }
         }
 
         this.formGroup.markAsDirty();
+
     }
 
     setStreams(change) {
@@ -142,6 +144,7 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
 
     setResource(resource: ResourceRequirementModel) {
         this.model.setRequirement(resource.serialize(), true);
+
         this.formGroup.markAsDirty();
     }
 

@@ -1,19 +1,17 @@
-import {Component, Input, Output, ViewEncapsulation, OnInit} from "@angular/core";
-import {Subject} from "rxjs/Subject";
+import {Component, Input, OnInit, Output} from "@angular/core";
 import {FormControl, FormGroup} from "@angular/forms";
-import {FileDefModel} from "cwlts/models/d2sb";
-import {FileDef} from "cwlts/mappings/d2sb/FileDef";
+import {DirentModel} from "cwlts/models";
+import {Subject} from "rxjs/Subject";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
+    styleUrls: ["./file-def-inspector.component.scss"],
     selector: "ct-file-def-inspector",
     template: `
         <form *ngIf="form">
             <div class="form-group file-name">
                 <label class="form-control-label">File Name</label>
-                <ct-expression-input [formControl]="form.controls['filename']"
+                <ct-expression-input [formControl]="form.controls['entryName']"
                                      [context]="context"
                                      [readonly]="readonly">
                 </ct-expression-input>
@@ -21,7 +19,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
             <div class="form-group file-content">
                 <label class="form-control-label">File Content</label>
-                <ct-literal-expression-input [formControl]="form.controls['fileContent']"
+                <ct-literal-expression-input [formControl]="form.controls['entry']"
                                              [fileName]="fileName"
                                              [context]="context"
                                              [readonly]="readonly">
@@ -35,18 +33,18 @@ export class FileDefInspectorComponent extends DirectiveBase implements OnInit {
     readonly = false;
 
     @Input()
-    fileDef: FileDefModel;
+    dirent: DirentModel;
 
     @Input()
     context: { $job?: any } = {};
 
     @Output()
-    save = new Subject<FileDef>();
+    save = new Subject<{entryName, entry}>();
 
     form: FormGroup;
 
     get fileName(): string {
-        const value = this.form.controls["filename"].value;
+        const value = this.form.controls["entryName"].value;
 
         if (value) {
             if (value.result) {
@@ -61,14 +59,14 @@ export class FileDefInspectorComponent extends DirectiveBase implements OnInit {
 
     ngOnInit() {
         this.form = new FormGroup({
-            filename: new FormControl(this.fileDef.filename),
-            fileContent: new FormControl(this.fileDef.fileContent)
+            entryName: new FormControl(this.dirent.entryName),
+            entry: new FormControl(this.dirent.entry)
         });
 
         this.tracked = this.form.valueChanges.subscribe(change => {
             this.save.next({
-                filename: change.filename.serialize(),
-                fileContent: change.fileContent.serialize()
+                entryName: change.entryName,
+                entry: change.entry
             });
         });
     }
