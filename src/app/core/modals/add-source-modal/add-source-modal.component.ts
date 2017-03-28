@@ -1,12 +1,10 @@
 import {Component, OnInit} from "@angular/core";
-import {FormControl, FormGroup} from "@angular/forms";
-import {SettingsService} from "../../../services/settings/settings.service";
+import {Observable} from "rxjs/Observable";
+import {AuthService} from "../../../auth/auth/auth.service";
 import {UserPreferencesService} from "../../../services/storage/user-preferences.service";
+import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
-import {ModalService} from "../../../ui/modal/modal.service";
-import {AuthService} from "../../../auth/auth/auth.service";
-import {Observable} from "rxjs/Observable";
 const {app, dialog} = window["require"]("electron").remote;
 
 @Component({
@@ -134,7 +132,6 @@ export class AddSourceModalComponent extends DirectiveBase implements OnInit {
                 this.preferences.getOpenProjects(),
                 (data, openProjects) => ({...data, openProjects}))
             .subscribe(data => {
-                console.log("Again data", data);
                 this.connecting = false;
 
                 const {credentials, listings, openProjects} = data;
@@ -183,11 +180,6 @@ export class AddSourceModalComponent extends DirectiveBase implements OnInit {
                 this.modal.close();
             });
         }
-    }
-
-    onConnectionSubmission(val) {
-        this.projectStep = "add";
-        this.isConnected = true;
     }
 
     selectLocalFolders() {
