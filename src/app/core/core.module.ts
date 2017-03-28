@@ -26,13 +26,14 @@ import {WebWorkerBuilderService} from "./web-worker/web-worker-builder.service";
 import {SettingsButtonComponent} from "./workbox/settings-button.component";
 import {WorkboxComponent} from "./workbox/workbox.component";
 import {AuthModule} from "../auth/auth.module";
-import { ErrorReportComponent } from './error-report/error-report.component';
 import {ModalErrorHandler} from "./error-report/modal-error-handler";
+import {ErrorReportComponent} from "./error-report/error-report.component";
 
 @NgModule({
     entryComponents: [
         AddSourceModalComponent,
-        SendFeedbackModal
+        SendFeedbackModal,
+        ErrorReportComponent
     ],
     declarations: [
         LayoutComponent,

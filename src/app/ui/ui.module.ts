@@ -93,6 +93,7 @@ import {CircularLoaderComponent} from "./circular-loader/circular-loader.compone
         TooltipContentComponent,
         ConfirmComponent,
         CheckboxPromptComponent,
+        CodeEditorComponent,
         PromptComponent,
         MultilangCodeEditorComponent
     ],
