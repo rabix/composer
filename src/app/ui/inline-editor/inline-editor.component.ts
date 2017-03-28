@@ -1,108 +1,138 @@
 import {
     Component,
     Input,
-    ElementRef,
-    ViewChild,
-    Renderer,
     Output,
     EventEmitter,
     ViewEncapsulation
-} from '@angular/core';
+} from "@angular/core";
+
+import {DirectiveBase} from "../../util/directive-base/directive-base";
 
 @Component({
-    selector: 'ct-inline-editor',
+    selector: "ct-inline-editor",
     encapsulation: ViewEncapsulation.Emulated,
     styleUrls: ["./inline-editor.component.scss"],
     template: `
-    <div>
-      <div *ngIf="editing">
-        <input #inlineEditControl *ngIf="type === 'text' || type === 'tags'" [required]="required" [type]="type" [placeholder]="label" value="{{value}}" [(ngModel)]="inputval"/>
-        <textarea #inlineEditControl *ngIf="type === 'textarea'" [required]="required" [name]="value" rows="20" [(ngModel)]="inputval">{{value}}</textarea>
-        <ct-key-value #inlineEditControl *ngIf="type === 'keyvalue'" [(ngModel)]="inputval"></ct-key-value>
-      </div>
-      <div *ngIf="editing">
-        <input type="button" value="Ok" class="btn btn-primary btn-sm" (click)="onSave($event)"/>
-        <input type="button" value="Cancel" class="btn btn-secondary btn-sm" (click)="onCancel($event)"/>
-      </div>
-      <div *ngIf="!editing" (mouseenter)="showEdit($event);" (mouseleave)="hideEdit($event)">
-        <a *ngIf="isHover" href="" class="edit" (click)="edit($event)">Edit</a>
-        <ng-content></ng-content>
-      </div>
-    </div>
-  `
+        <div  (mouseenter)="showEdit()" (mouseleave)="hideEdit()">
+            <div [class.hover]="isHover && !editing" class="inline-section" (click)="edit($event)">
+
+                <!--Editing mode-->
+                <div *ngIf="editing">
+                    <input class="form-control" *ngIf="type === 'text'"
+                            [type]="type" [placeholder]="label" value="{{value}}"
+                           [(ngModel)]="value"/>
+                    <textarea class="form-control" *ngIf="type === 'textarea'"
+                              [name]="value" rows="20" [(ngModel)]="value">{{value}}</textarea>
+                    <ct-key-value *ngIf="type === 'keyvalue'" [(ngModel)]="value"></ct-key-value>
+
+                    <ct-auto-complete *ngIf="type === 'tags'"  [name]="value" [options]="options"
+                                      [(ngModel)]="value" [create]="true">
+
+                    </ct-auto-complete>
+
+                    <!--Save/Cancel button-->
+                    <div *ngIf="editing" class="button-section">
+                        <button type="button" class="btn btn-success btn-sm" (click)="onSave($event)">Save</button>
+                        <button type="button" class="btn btn-secondary btn-sm" (click)="onCancel($event)">Cancel</button>
+                    </div>
+                </div>
+
+                <!--Edit button-->
+                <div *ngIf="isHover && !editing" class="button-section">
+                    <button class="btn btn-secondary btn-sm"
+                            (click)="edit($event)">Edit
+                    </button>
+                </div>
+
+                <!--Not Editing mode mode-->
+                <div *ngIf="!editing">
+
+                    <div *ngIf="isHover" class="button-section">
+                        <button class="btn btn-secondary btn-sm"
+                                (click)="edit($event)">Edit
+                        </button>
+                    </div>
+                    
+                    <ng-content></ng-content>
+
+                    <!--Empty state-->
+                    <div *ngIf="isEmpty()">None</div>
+                </div>
+
+            </div>
+        </div>
+
+    `
 })
-export class InlineEditorComponent  {
-    @ViewChild('inlineEditControl')
-    inlineEditControl: ElementRef;
+export class InlineEditorComponent extends DirectiveBase {
+
+    @Input()
+    public options = [];
 
     @Input()
     public value: any;
 
     @Input()
-    public label: string = '';
+    public label = "";
 
     @Input()
-    public type: string = 'text';
+    public type = "text";
 
     @Input()
-    public required: boolean = false;
-
-    @Input()
-    public disabled: boolean = false;
+    public disabled = false;
 
     @Output()
     public saveData: EventEmitter<string> = new EventEmitter<string>();
 
-    private editing: boolean = false;
-    private inputval: any;
-    private isHover: boolean = false;
-
-    constructor(element: ElementRef, private _renderer: Renderer) {
-    }
+    private editing = false;
+    private isHover = false;
 
     onCancel($event: Event) {
+        $event.preventDefault();
+        $event.stopPropagation();
+
+        this.isHover = false;
         this.editing = false;
     }
 
     onSave($event: Event) {
-        let retValue = this.inputval;
+        $event.preventDefault();
+        $event.stopPropagation();
 
-        if (this.type === 'tags') {
-            retValue = retValue.split(',').map((item) => item.trim());
-        }
-
-        this.saveData.emit(retValue);
+        this.saveData.emit(this.value);
 
         this.editing = false;
+        this.isHover = false;
     }
 
     edit($event: Event) {
         $event.preventDefault();
+        $event.stopPropagation();
 
-        if (this.disabled) {
+        if (this.editing || this.disabled) {
             return;
         }
 
+        this.isHover = false;
         this.editing = true;
-        // Focus on the input element just as the editing begins
-        // setTimeout(_ => this._renderer.invokeElementMethod(this.inlineEditControl,
-        //                                                    'focus', []));
-
     }
 
-    ngOnInit() {
-        if (this.type === 'tags' && Array.isArray(this.value)) {
-            this.inputval = this.value.join(', ');
-        } else {
-            this.inputval = this.value;
+    private showEdit() {
+        if (this.disabled) {
+            return;
         }
-    }
-
-    private showEdit($event: Event) {
         this.isHover = true;
     }
 
-    private hideEdit($event: Event) {
+    private hideEdit() {
+        if (this.disabled) {
+            return;
+        }
         this.isHover = false;
+    }
+
+    // Is value is empty show "None"
+    private isEmpty() {
+        return Array.isArray(this.value) ? this.value.length === 0 : !!!this.value;
     }
 }

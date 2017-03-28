@@ -1,15 +1,24 @@
-textarea {
+@import "../../../assets/sass/variables";
+
+:host {
+    position:relative;
+    border: 1px solid white;
     width: 100%;
-}
 
-input {
-    border: 1px solid #ccc;
-    border-radius: 2px;
-    padding: 4px 10px;
-}
+    .inline-section {
+        border: 1px solid white;
+    }
 
-.edit {
-    float: right;
-    font-size: 1rem;
-    margin-right: 20px;
+    .hover {
+        border: 1px solid $form-elements-border-color;
+        border-radius: 2px;
+    }
+
+    .button-section {
+        position: absolute;
+        top: 100%;
+        z-index:1;
+    }
+
+    cursor: text;
 }

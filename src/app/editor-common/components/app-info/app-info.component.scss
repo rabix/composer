@@ -1,39 +1,62 @@
-.app-info {
-    margin: 20px;
-    min-width: 600px;
-}
+@import "../../../../assets/sass/variables";
 
-.app-info-item {
-    margin-bottom: 40px;
-}
+:host {
+    overflow-y: auto;
+    color: $text-dark;
+    width: 100%;
+    padding: 20px;
+    display: block;
+    background: white;
 
-.app-info-meta {
-    display: flex;
-}
-
-.app-info-meta-item {
-    flex-grow: 1;
-
-    ul {
-        list-style-type: none;
+    /deep/ ct-tab-selector {
+        font-size: 1rem;
+        .selection-underline {
+            background: $gui-section-border !important;
+        }
     }
-}
 
-.app-info-links {
-    ul {
+    ct-inline-editor {
+        display: inline-block;
+    }
+
+    .app-info {
+        margin: 20px;
+        min-width: 600px;
+    }
+
+    .info-section {
+        margin-bottom: 40px;
+    }
+
+    .app-info-meta {
         display: flex;
-        list-style-type: none;
+        flex-wrap: wrap;
+        flex-direction: row;
+        margin-top: -40px;
+
+        .toolkit {
+            display: inline-block;
+            width: initial;
+        }
+
+        .links {
+            word-spacing: 1rem;
+        }
+
+        .app-info-meta-item {
+            margin-top: 40px;
+            padding-left: 0;
+        }
     }
 
-    li {
-        margin-right: 30px;
+    .app-info-meta-item ~ .app-info-meta-item{
+
+        padding-right: 2rem;
+    }
+
+    h5 {
+        font-weight: bold;
     }
 }
 
-ct-inline-editor {
-    display: inline-block;
-}
 
-.app-info-details {
-    margin: 0 20px 0 16px;
-}
