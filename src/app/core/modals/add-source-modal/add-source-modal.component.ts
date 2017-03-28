@@ -21,31 +21,25 @@ const {app, dialog} = window["require"]("electron").remote;
         <div class="body">
             <div class="dialog-centered dialog-content" *ngIf="activeTab === 'local' && localFoldersToAdd.length === 0">
                 <p>
-                    <strong>Add a folder from your computer to the workspace</strong>
+                    <strong>Add one or more folders from your computer to the workspace</strong>
                 </p>
                 <div>
                     <button class="btn btn-secondary" (click)="selectLocalFolders()">Select a Folder...</button>
                 </div>
             </div>
 
-            <div class="dialog-connection dialog-content"
-                 *ngIf="activeTab === 'local' && localFoldersToAdd.length ">
-                <p>
-                    <strong>Add these folders your workspace:</strong>
-                </p>
-                <ul class="folder-list pl-2">
-                    <li *ngFor="let f of localFoldersToAdd">{{ f }}</li>
-                </ul>
-            </div>
-
             <div class="dialog-connection dialog-content" *ngIf="activeTab === 'platform' && !isConnected && !connecting">
                 <p>
                     <strong>Connect to the Seven Bridges Platform</strong>
                 </p>
-                <ct-platform-connection-form (submission)="onConnectionSubmission($event)"></ct-platform-connection-form>
+
+                <ct-credentials-form #credsForm [removable]="false"></ct-credentials-form>
+                <p>
+                    <button type="button" class="btn btn-success" (click)="credsForm.applyValues(); connecting = true;">Connect</button>
+                </p>
             </div>
 
-            <div class="dialog-connection" *ngIf="activeTab === 'platform' && !isConnected && connecting ">
+            <div class="dialog-connection" *ngIf="activeTab === 'platform' && connecting ">
                 <p>
                     <strong>Checking your connection to the platform...</strong>
                     <ct-line-loader></ct-line-loader>
@@ -126,12 +120,23 @@ export class AddSourceModalComponent extends DirectiveBase implements OnInit {
 
         super();
 
-        this.tracked = auth.connections.flatMap(credentials => {
-            const listings = credentials.map(creds => this.data.getPlatformListing(creds.hash));
-            return Observable.forkJoin(...listings);
-        }, (credentials, listings) => ({credentials, listings}))
-            .withLatestFrom(this.preferences.getOpenProjects(), (data, openProjects) => ({...data, openProjects}))
+        this.tracked = auth.connections
+            .flatMap((credentials: any) => {
+                const listings = credentials.map(creds => this.data.getPlatformListing(creds.hash));
+
+                if (listings.length === 0) {
+                    return Observable.of([]);
+                }
+
+                return Observable.zip(...listings);
+            }, (credentials, listings) => ({credentials, listings}))
+            .withLatestFrom(
+                this.preferences.getOpenProjects(),
+                (data, openProjects) => ({...data, openProjects}))
             .subscribe(data => {
+                console.log("Again data", data);
+                this.connecting = false;
+
                 const {credentials, listings, openProjects} = data;
                 this.platformOptgroups                      = credentials.map(creds => ({value: creds.hash, label: creds.profile}));
                 this.nonAddedUserProjects                   = listings.reduce((acc, listing, index) => {
@@ -144,7 +149,7 @@ export class AddSourceModalComponent extends DirectiveBase implements OnInit {
                     }));
                 }, []).filter((entry: any) => openProjects.indexOf(entry.value) === -1);
 
-                this.isConnected    = true;
+                this.isConnected    = data.credentials.length > 0;
                 this.loadedProjects = true;
             });
     }
@@ -155,7 +160,6 @@ export class AddSourceModalComponent extends DirectiveBase implements OnInit {
     }
 
     onDone() {
-        console.log("Done");
         if (this.activeTab === "platform" && this.loadedProjects) {
             const val = this.selectedProjects;
             if (val && val.length) {
@@ -194,6 +198,7 @@ export class AddSourceModalComponent extends DirectiveBase implements OnInit {
             properties: ["openDirectory", "multiSelections"]
         }, (paths) => {
             this.localFoldersToAdd = paths || [];
+            this.onDone();
         });
     }
 

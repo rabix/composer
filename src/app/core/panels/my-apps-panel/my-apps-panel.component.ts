@@ -82,7 +82,6 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
 
     private loadDataSources() {
         this.tracked = this.dataGateway.getDataSources()
-            .do(data => console.log("Loading Source", data))
             .withLatestFrom(this.expandedNodes, (sources, expanded) => ({sources, expanded}))
             .subscribe((data: { sources: any[], expanded: string[] }) => {
                 this.treeNodes = data.sources.map(source => {
@@ -168,26 +167,6 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
             }).reduce((acc, item) => acc.concat(...item), []);
         });
 
-        // const projectsSearch = (term) => this.dataGateway.searchUserProjects(term).map(results => results.map(result => {
-        //
-        //     const id    = result.profile + "/" + result["sbg:projectName"] + "/" + result["sbg:id"];
-        //     const title = result.label;
-        //
-        //     return {
-        //         id,
-        //         icon: result.class === "Workflow" ? "fa-share-alt" : "fa-terminal",
-        //         title,
-        //         label: result.id.split("/").slice(5, 7).join(" → "),
-        //         relevance: result.relevance + 1,
-        //
-        //         dragEnabled: true,
-        //         dragTransferData: id,
-        //         dragLabel: title,
-        //         dragImageClass: result["class"] === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
-        //         dragDropZones: ["zone1"]
-        //     };
-        // }));
-
         this.searchContent.valueChanges
             .do(term => this.searchResults = undefined)
             .debounceTime(250)
@@ -213,6 +192,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
             .filter(node => node.isExpanded === true && node.type === "source" && node.id !== "local")
             .do(n => n.modify(() => n.loading = true))
             .flatMap(node => {
+                console.log("Combining platform listing for", node.id, node);
                 return Observable.combineLatest(
                     this.dataGateway.getPlatformListing(node.id),
                     this.preferences.getOpenProjects(),

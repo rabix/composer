@@ -6,15 +6,27 @@ import {PlatformAPI} from "./platform-api";
 @Injectable()
 export class PlatformAPIGatewayService {
 
-    private apis = {};
+    private apis: { [hash: string]: PlatformAPI } = {};
 
     constructor(private http: Http, private prefs: UserPreferencesService) {
 
         prefs.getCredentials().subscribe(credentials => {
-            console.log("Got credentials");
-            this.apis = credentials.reduce((acc, item) => {
-                return {...acc, [item.hash]: new PlatformAPI(this.http, item.url, item.token, item.sessionID)};
-            }, {});
+            credentials.forEach(cred => {
+                if (this.apis[cred.hash]) {
+                    this.apis[cred.hash].setSessionID(cred.sessionID);
+                } else {
+                    this.apis[cred.hash] = new PlatformAPI(this.http, cred.url, cred.token, cred.sessionID);
+                }
+            });
+
+            const hashes = credentials.map(c => c.hash);
+            for (const hash in this.apis) {
+                if (hashes.indexOf(hash) === -1) {
+                    delete this.apis[hash];
+                }
+            }
+
+
         });
     }
 

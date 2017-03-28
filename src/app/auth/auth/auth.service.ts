@@ -76,6 +76,10 @@ export class AuthService {
                         });
                 });
 
+                if (checks.length === 0) {
+                    return Observable.of([]);
+                }
+
                 return Observable.forkJoin(...checks);
             }, (credentials, sessions) => ({credentials, sessions}))
             .subscribe(data => {
@@ -93,8 +97,6 @@ export class AuthService {
 
             }, err => {
                 console.log("Error on watch", err);
-            }, () => {
-                console.log("Completed watching");
             });
     }
 

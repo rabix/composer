@@ -34,7 +34,6 @@ export class TabSelectorEntryComponent extends DirectiveBase implements OnInit {
     ngOnInit() {
         this.tracked = this.selector.selectedTab.subscribe(tabName => {
             this.active = this.tabName === tabName;
-            console.log("Activated", tabName);
         });
     }
 }

@@ -53,7 +53,7 @@ export class DataGatewayService {
     }
 
     getDataSources(): Observable<ProfileCredentials> {
-        return this.preferences.getCredentials().map((credentials) => {
+        return this.auth.connections.map((credentials) => {
 
             const local = {
                 hash: "local",
@@ -81,14 +81,14 @@ export class DataGatewayService {
 
     /**
      * Gets the top-level data listing for a data source
-     * @param source hash
+     * @param hash hash
      * @returns {any}
      */
-    getPlatformListing(source: string): Observable<{ id: string, name: string }[]> {
+    getPlatformListing(hash: string): Observable<{ id: string, name: string }[]> {
 
         return this.throughCache(
-            `${source}.getPlatformListing`,
-            this.apiGateway.forHash(source).getRabixProjects().publishReplay(1).refCount()
+            `${hash}.getPlatformListing`,
+            this.apiGateway.forHash(hash).getRabixProjects().publishReplay(1).refCount()
         );
 
         // const allProjects  = this.scanCompletion.flatMap(s => this.preferences.get(`dataCache.${source}.projects`, []));

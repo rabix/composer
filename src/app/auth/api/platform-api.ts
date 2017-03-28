@@ -1,10 +1,13 @@
 import {Headers, Http} from "@angular/http";
 import {ENVP} from "app/config/env.config";
 import {Observable} from "rxjs/Observable";
+import {ReplaySubject} from "rxjs/ReplaySubject";
 import {PlatformProjectEntry} from "../../core/data-gateway/data-types/platform-api.types";
 import {PlatformAppEntry} from "../../services/api/platforms/platform-api.types";
 
 export class PlatformAPI {
+
+    readonly sessionID = new ReplaySubject<string>(1);
 
     static getServiceURL(platformUrl: string, serviceName: string) {
         const isVayu    = platformUrl.indexOf("-vayu.sbgenomics.com") !== -1;
@@ -21,8 +24,17 @@ export class PlatformAPI {
         return [serviceUrl, ENVP.serviceRoutes[serviceName].prefix].join("/");
     }
 
-    constructor(private http: Http, private url?: string, private token?: string, private sessionID?: string) {
+    constructor(private http: Http, private url?: string, private token?: string, sessionID?: string) {
+        if (sessionID && sessionID.length) {
+            this.setSessionID(sessionID);
+        }
+    }
 
+    setSessionID(sessionID: string) {
+        if (!sessionID) {
+            return;
+        }
+        this.sessionID.next(sessionID);
     }
 
     getServiceURL(service: string): string {
@@ -44,27 +56,30 @@ export class PlatformAPI {
             headers: new Headers({
                 "auth-token": this.token
             })
-        }).map(response => response.json().message.session_id);
+        }).map(response => response.json().message.session_id)
+            .do(sessionID => {
+                this.setSessionID(sessionID);
+            });
     }
 
 
     public getRabixProjects(): Observable<PlatformProjectEntry[]> {
-        return this.http.get(this.getServiceURL("watson") + "/projects", {
+        return this.sessionID.flatMap(sessionID => this.http.get(this.getServiceURL("watson") + "/projects", {
             search: "_role=minimal&is_rabix=true",
             headers: new Headers({
-                "session-id": this.sessionID
+                "session-id": sessionID
             })
-        }).map(r => r.json().message);
+        })).map(r => r.json().message);
     }
 
     public getProjectApps(ownerSlug: string, projectSlug: string) {
         const endpoint = `/apps/${ownerSlug}/${projectSlug}`;
-        return this.http.get(this.getServiceURL("brood") + endpoint, {
+        return this.sessionID.flatMap(sessionID => this.http.get(this.getServiceURL("brood") + endpoint, {
             search: "_role=minimal",
             headers: new Headers({
-                "session-id": this.sessionID
+                "session-id": sessionID
             })
-        }).map(r => r.json().message);
+        })).map(r => r.json().message);
     }
 
 
@@ -76,11 +91,11 @@ export class PlatformAPI {
             id = args.join("/");
         }
 
-        return this.http.get(this.getServiceURL("brood") + `/apps/${id}`, {
+        return this.sessionID.flatMap(sessionID => this.http.get(this.getServiceURL("brood") + `/apps/${id}`, {
             headers: new Headers({
-                "session-id": this.sessionID
+                "session-id": sessionID
             })
-        }).map(r => r.json().message);
+        })).map(r => r.json().message);
     }
 
     public saveApp(app: PlatformAppEntry, revisionNote: string) {
@@ -96,23 +111,23 @@ export class PlatformAPI {
             const nextRevision = (latestApp["sbg:latestRevision"] || 0) + 1;
             const endpoint     = this.getServiceURL("brood") + `/apps/${appPath}/${nextRevision}`;
 
-            return this.http.post(endpoint, Object.assign({}, app, {
+            return this.sessionID.flatMap(sessionID => this.http.post(endpoint, Object.assign({}, app, {
                 "sbg:revisionNotes": revisionNote
             }), {
                 headers: new Headers({
-                    "session-id": this.sessionID
+                    "session-id": sessionID
                 })
-            }).map(r => r.json());
+            })).map(r => r.json());
         });
     }
 
     getPublicApps() {
-        return this.http.get(this.getServiceURL("brood") + "/apps", {
+        return this.sessionID.flatMap(sessionID => this.http.get(this.getServiceURL("brood") + "/apps", {
             search: "_order_by=label&visibility=public",
             headers: new Headers({
-                "session-id": this.sessionID
+                "session-id": sessionID
             })
-        }).map(r => r.json().message);
+        })).map(r => r.json().message);
     }
 
     public sendFeedback(userID: string, type: string, message: string, referrerURL?: string) {
@@ -142,27 +157,38 @@ export class PlatformAPI {
             }
         };
 
-        return this.http.post(this.getServiceURL("voyager") + "/send", data, {
+        return this.sessionID.flatMap(sessionID => this.http.post(this.getServiceURL("voyager") + "/send", data, {
             headers: new Headers({
-                "session-id": this.sessionID
+                "session-id": sessionID
             })
-        }).map(r => r.json().message);
+        })).map(r => r.json().message);
     }
 
     getUser(sessionID) {
-        return this.http.get(this.getServiceURL("gatekeeper") + "/user", {
+        if (sessionID) {
+            return this.http.get(this.getServiceURL("gatekeeper") + "/user", {
+                headers: new Headers({
+                    "session-id": sessionID || this.sessionID
+                })
+            }).map(r => r.json().message);
+        }
+
+        return this.sessionID.flatMap(sessionID => this.http.get(this.getServiceURL("gatekeeper") + "/user", {
             headers: new Headers({
-                "session-id": sessionID || this.sessionID
+                "session-id": sessionID
             })
-        }).map(r => r.json().message);
+        })).map(r => r.json().message);
+
+
     }
 
     searchUserProjects(query: string, limit = 20): Observable<PlatformAppEntry[]> {
-        return this.http.get(this.getServiceURL("brood") + `/apps?_role=minimal&visibility=mine&_limit=${limit}&q=${query}`, {
-            headers: new Headers({
-                "session-id": this.sessionID
-            })
-        }).map(r => r.json().message);
+        return this.sessionID.flatMap(sessionID =>
+            this.http.get(this.getServiceURL("brood") + `/apps?_role=minimal&visibility=mine&_limit=${limit}&q=${query}`, {
+                headers: new Headers({
+                    "session-id": sessionID
+                })
+            })).map(r => r.json().message);
     }
 
 }
