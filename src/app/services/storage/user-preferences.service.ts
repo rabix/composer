@@ -53,7 +53,12 @@ export class UserPreferencesService {
             cacheItem = fallback;
             this.put(key, cacheItem);
         } else {
-            cacheItem = JSON.parse(hit);
+            try {
+                cacheItem = JSON.parse(hit);
+            } catch (ex) {
+                cacheItem = fallback;
+                window.localStorage.setItem(key, cacheItem);
+            }
         }
 
         return Observable.of(cacheItem).merge(this.updates.filter(u => u.key === key).map(u => u.value)).distinctUntilChanged();
@@ -68,7 +73,7 @@ export class UserPreferencesService {
 
     patchCredentials(credentials: CredentialsEntry[]) {
 
-        const creds = this.get("credentials", [] as CredentialsEntry[]);
+        const creds = this.getCredentials();
 
         creds.take(1).subscribe(oldCredentials => {
 
@@ -93,7 +98,6 @@ export class UserPreferencesService {
     }
 
     getOpenProjects() {
-        console.log("Asking for a list of open projects");
         return this.get("openProjects", []).do(data => console.log("Returning open projects", data));
     }
 }

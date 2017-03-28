@@ -1,4 +1,4 @@
-import {NgModule} from "@angular/core";
+import {ErrorHandler, NgModule} from "@angular/core";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {BrowserModule} from "@angular/platform-browser";
 import {GettingStartedComponent} from "../components/onboarding/getting-started.component";
@@ -22,11 +22,12 @@ import {MyAppsPanelComponent} from "./panels/my-apps-panel/my-apps-panel.compone
 import {NavSearchResultComponent} from "./panels/nav-search-result/nav-search-result.component";
 import {PanelContainerComponent} from "./panels/panel-container/panel-container.component";
 import {PublicAppsPanelComponent} from "./panels/public-apps-panel/public-apps-panel.component";
-import {PlatformConnectionFormComponent} from "./settings/platform-connection-form/platform-connection-form.component";
 import {WebWorkerBuilderService} from "./web-worker/web-worker-builder.service";
 import {SettingsButtonComponent} from "./workbox/settings-button.component";
 import {WorkboxComponent} from "./workbox/workbox.component";
 import {AuthModule} from "../auth/auth.module";
+import { ErrorReportComponent } from './error-report/error-report.component';
+import {ModalErrorHandler} from "./error-report/modal-error-handler";
 
 @NgModule({
     entryComponents: [
@@ -49,7 +50,7 @@ import {AuthModule} from "../auth/auth.module";
         NewFileTabComponent,
         AddSourceModalComponent,
         SendFeedbackModal,
-        PlatformConnectionFormComponent
+        ErrorReportComponent,
     ],
     exports: [
         LogoComponent,
@@ -60,6 +61,7 @@ import {AuthModule} from "../auth/auth.module";
         WebWorkerBuilderService,
         ModalService,
         PlatformAPI,
+        {provide: ErrorHandler, useClass: ModalErrorHandler},
     ],
     imports: [
         BrowserModule,

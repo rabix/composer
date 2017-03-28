@@ -79,7 +79,7 @@ import {Observable} from "rxjs/Observable";
 })
 export class PublicAppsPanelComponent extends DirectiveBase implements AfterViewInit {
 
-    treeNodes: TreeNode<any>[];
+    treeNodes: TreeNode<any>[] = [];
 
     searchContent = new FormControl();
 
@@ -223,7 +223,7 @@ export class PublicAppsPanelComponent extends DirectiveBase implements AfterView
         this.tracked = this.auth.connections.flatMap(credentials => {
             const hashes   = credentials.map(c => c.hash);
             const requests = hashes.map(hash => this.dataGateway.getPublicApps(hash));
-            return Observable.forkJoin(...requests);
+            return Observable.zip(...requests);
         }, (credentials, listings) => ({credentials, listings}))
             .withLatestFrom(this.preferences.get("expandedNodes"), (data, expanded) => ({...data, expanded}))
             .subscribe(data => {

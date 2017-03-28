@@ -30,25 +30,5 @@ export class SettingsService {
 
     constructor(private profile: UserPreferencesService) {
 
-        // this.profile.get("credentials", [
-        //     {
-        //         label: "Seven Bridges",
-        //         profile: "default",
-        //         url: "https://igor.sbgenomics.com",
-        //         sessionID: null,
-        //         token: "",
-        //     }
-        // ])
-        //     .distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
-        //     .map(prefs => prefs[0])
-        //     .subscribe(prefs => {
-        //
-        //         if (!prefs || !prefs.url || !prefs.token) {
-        //             return this.validity.next(false);
-        //         }
-        //
-        //         this.platformConfiguration.next(prefs);
-        //     });
-
     }
 }
