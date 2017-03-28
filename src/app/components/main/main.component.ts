@@ -1,6 +1,6 @@
 import {Component, ViewContainerRef, ViewEncapsulation} from "@angular/core";
 import {Observable} from "rxjs/Rx";
-import {DataGatewayService} from "../../core/data-gateway/data-gateway.service";
+import {AuthService} from "../../auth/auth/auth.service";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {ElectronPublicAppService} from "../../platform-providers/public-apps/electron-public-app.service";
 import {PublicAppService} from "../../platform-providers/public-apps/public-app.service";
@@ -11,12 +11,10 @@ import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {GuidService} from "../../services/guid.service";
 import {LocalDataSourceService} from "../../sources/local/local.source.service";
-import {SBPlatformDataSourceService} from "../../sources/sbg/sb-platform.source.service";
 import {ContextService} from "../../ui/context/context.service";
 import {MarkdownService} from "../../ui/markdown/markdown.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {UrlValidator} from "../../validators/url.validator";
-import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -33,7 +31,6 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
         EventHubService,
         UrlValidator,
         PlatformAPI,
-        SBPlatformDataSourceService,
         MarkdownService,
         ContextService,
         StatusBarService,
@@ -51,27 +48,17 @@ export class MainComponent {
     constructor(modal: ModalService,
                 system: SystemService,
                 vcRef: ViewContainerRef,
-                preferences: UserPreferencesService,
-                dataGateway: DataGatewayService,
-                statusBarService: StatusBarService) {
+                auth: AuthService) {
 
         system.boot();
+
+        auth.watchCredentials();
 
         /**
          * Hack for angular's inability to provide the vcRef to a service with DI.
          * {@link ModalService.rootViewRef}
          */
         modal.setViewContainer(vcRef);
-
-
-        preferences.get("credentials", [])
-            .map(_ => statusBarService.instant("Synchronizing with remote sources..."))
-            .flatMap(_ => dataGateway.scan())
-            .subscribe(() => {
-                statusBarService.instant("Remote sources synchronized.");
-            }, () => {
-                statusBarService.instant("Could not synchronize with remote data.");
-            });
 
         this.runnix = Observable.fromEvent(document, "keyup").map((e: KeyboardEvent) => e.keyCode).bufferCount(10, 1)
             .filter(seq => seq.toString() === [38, 38, 40, 40, 37, 39, 37, 39, 66, 65].toString())

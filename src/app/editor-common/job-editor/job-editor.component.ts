@@ -22,15 +22,7 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
     styleUrls: ["job-editor.component.scss"],
     selector: "ct-job-editor",
     changeDetection: ChangeDetectionStrategy.OnPush,
-    template: `
-        <div class="block mb-1">
-            <button class="btn btn-secondary pull-right"
-                    (click)="reset.emit()">
-                Reset to mock values
-            </button>
-        </div>
-
-
+    template: `        
         <ct-form-panel>
             <div class="tc-header">Computational Resources</div>
             <div class="tc-body">
@@ -87,6 +79,13 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
                     </form>
                 </div>
             </ct-form-panel>
+        </div>
+
+        <div class="block mb-1">
+            <button class="btn btn-secondary pull-right"
+                    (click)="reset.emit()">
+                Reset to mock values
+            </button>
         </div>
     `
 })

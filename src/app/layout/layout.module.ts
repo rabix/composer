@@ -11,6 +11,7 @@ import {ActionBarComponent} from "./action-bar/action-bar.component";
 import { TabLoaderComponent } from "./tab-loader/tab-loader.component";
 import {ErrorBarComponent} from "./error-bar/error-bar.component";
 import {ErrorBarService} from "./error-bar/error-bar.service";
+import {CredentialsFormComponent} from "./credentials-form/credentials-form.component";
 
 @NgModule({
     imports: [
@@ -28,6 +29,7 @@ import {ErrorBarService} from "./error-bar/error-bar.service";
         StatusBarComponent,
         TabLoaderComponent,
         ErrorBarComponent,
+        CredentialsFormComponent,
     ],
     exports: [
         ActionBarComponent,
@@ -36,7 +38,8 @@ import {ErrorBarService} from "./error-bar/error-bar.service";
         SettingsComponent,
         StatusBarComponent,
         TabLoaderComponent,
-        ErrorBarComponent
+        ErrorBarComponent,
+        CredentialsFormComponent
     ],
     providers: [
         ErrorBarService

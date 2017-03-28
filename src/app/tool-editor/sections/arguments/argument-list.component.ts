@@ -32,6 +32,10 @@ import {ModalService} from "../../../ui/modal/modal.service";
                                          [buttonText]="'Add an Argument'"
                                          (buttonClick)="addEntry()">
                     </ct-blank-tool-state>
+                    
+                    <div *ngIf="readonly && !model.arguments.length" class="text-xs-center h5">
+                        This tool doesn't specify any arguments
+                    </div>
 
                     <!--List Header Row-->
                     <div class="gui-section-list-title" *ngIf="model.arguments.length">

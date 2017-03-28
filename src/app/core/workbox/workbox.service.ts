@@ -1,11 +1,11 @@
 import {Injectable} from "@angular/core";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {DataGatewayService} from "../data-gateway/data-gateway.service";
 import * as YAML from "js-yaml";
-import {Observable, ReplaySubject} from "rxjs";
-import {TabData} from "./tab-data.interface";
-import {AppTabData} from "./app-tab-data";
+import {Observable} from "rxjs/Observable";
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
+import {DataGatewayService} from "../data-gateway/data-gateway.service";
+import {AppTabData} from "./app-tab-data";
+import {TabData} from "./tab-data.interface";
 
 @Injectable()
 export class WorkboxService {
@@ -185,7 +185,6 @@ export class WorkboxService {
                     tab.data.fileContent = JSON.stringify(parsed, null, 4);
                 }
 
-                console.log("Parsed class", parsed);
 
                 tab.label = parsed.label || fileID;
                 tab.type = parsed.class || "Code";
@@ -197,7 +196,6 @@ export class WorkboxService {
                 tab.label = fileID.split("/").pop();
             }
 
-            console.log("Prepared app tab", tab);
             return tab as any;
 
         });

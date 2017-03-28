@@ -1,25 +1,26 @@
 import {Injectable} from "@angular/core";
 import {FormControl} from "@angular/forms";
+import {Http} from "@angular/http";
+import * as YAML from "js-yaml";
 import {Observable} from "rxjs/Observable";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {Subject} from "rxjs/Subject";
-import {
-    ProfileCredentialEntry,
-    ProfileCredentials
-} from "../../../../electron/src/user-profile/profile";
+import {ProfileCredentials} from "../../../../electron/src/user-profile/profile";
+import {PlatformAPIGatewayService} from "../../auth/api/platform-api-gateway.service";
+import {noop} from "../../lib/utils.lib";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {IpcService} from "../../services/ipc.service";
+import {ConnectionState} from "../../services/storage/user-preferences-types";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
-import Platform = NodeJS.Platform;
-import {Http} from "@angular/http";
-import * as YAML from "js-yaml";
-import {noop} from "../../lib/utils.lib";
-import {LoadOptions} from "js-yaml";
 import {ModalService} from "../../ui/modal/modal.service";
-import {PromptComponent} from "../../ui/modal/common/prompt.component";
+import Platform = NodeJS.Platform;
+import {AuthService} from "../../auth/auth/auth.service";
+import {PlatformAppEntry} from "../../services/api/platforms/platform-api.types";
 
 @Injectable()
 export class DataGatewayService {
+
+    private cache = {};
 
     scans          = new Subject<Observable<any>>();
     scanCompletion = new ReplaySubject<string>();
@@ -40,6 +41,8 @@ export class DataGatewayService {
                 private api: PlatformAPI,
                 private http: Http,
                 private modal: ModalService,
+                private auth: AuthService,
+                private apiGateway: PlatformAPIGatewayService,
                 private ipc: IpcService) {
 
         this.ipc.request("hasDataCache").take(1).subscribe(hasCache => {
@@ -49,36 +52,14 @@ export class DataGatewayService {
         });
     }
 
-
-    scan(creds?) {
-        const c = creds ? Observable.of(creds) : this.preferences.get<any[]>("credentials");
-
-        const scan = c.filter((e: { token: string }[] = []) => {
-            let allHaveTokens = true;
-            e.forEach(platform => {
-                // @fixme: fix partial scanning
-                if (!platform.token.trim().length) {
-                    allHaveTokens = false;
-                }
-            });
-
-            return allHaveTokens;
-        }).switchMap(credentials => this.ipc.request("scanPlatforms", {credentials}))
-            .publishReplay(1)
-            .refCount();
-
-        scan.subscribe(this.scanCompletion);
-
-        return scan;
-    }
-
     getDataSources(): Observable<ProfileCredentials> {
-        return this.preferences.get("credentials").map((credentials: ProfileCredentials) => {
+        return this.auth.connections.map((credentials) => {
 
-            const local: ProfileCredentialEntry = {
+            const local = {
+                hash: "local",
                 label: "Local Files",
                 profile: "local",
-                connected: true
+                status: ConnectionState.Connected
             };
 
             const remote = credentials.map(c => {
@@ -95,32 +76,43 @@ export class DataGatewayService {
             });
 
             return [local, ...remote];
-        });
+        }).distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b));
     }
 
     /**
      * Gets the top-level data listing for a data source
-     * @param source "default", "igor"
+     * @param hash hash
      * @returns {any}
      */
-    getPlatformListing(source: string): Observable<{ id: string, name: string }[]> {
-        const allProjects  = this.scanCompletion.flatMap(s => this.preferences.get(`dataCache.${source}.projects`, []));
-        const openProjects = this.preferences.get("openProjects", [])
-            .map(projects => projects
-                .filter(p => p.startsWith(source + "/"))
-                .map(p => p.slice(source.length + 1))
-            );
+    getPlatformListing(hash: string): Observable<{ id: string, name: string }[]> {
 
-        return Observable.combineLatest(allProjects, openProjects, (all = [], open) => {
-            return all.filter(project => open.indexOf(project.slug) !== -1);
-        });
+        return this.throughCache(
+            `${hash}.getPlatformListing`,
+            this.apiGateway.forHash(hash).getRabixProjects().publishReplay(1).refCount()
+        );
+
+        // const allProjects  = this.scanCompletion.flatMap(s => this.preferences.get(`dataCache.${source}.projects`, []));
+        // const openProjects = this.preferences.get("openProjects", [])
+        //     .map(projects => projects
+        //         .filter(p => p.startsWith(source + "/"))
+        //         .map(p => p.slice(source.length + 1))
+        //     );
+        //
+        // return Observable.combineLatest(allProjects, openProjects, (all = [], open) => {
+        //     return all.filter(project => open.indexOf(project.slug) !== -1);
+        // });
     }
 
-    getProjectListing(profile, projectName): Observable<any[]> {
+    getProjectListing(hash, projectOwner: string, projectSlug: string): Observable<any[]> {
+        return this.throughCache(
+            hash + ".getProjectListing",
+            this.apiGateway.forHash(hash).getProjectApps(projectOwner, projectSlug).publishReplay(1).refCount()
+        );
 
-        return this.scanCompletion.flatMap(() => this.preferences.get(`dataCache.${profile}.apps`)).map((apps: any[] = []) => {
-            return apps.filter(app => app["sbg:projectName"] === projectName);
-        });
+
+        // return this.scanCompletion.flatMap(() => this.preferences.get(`dataCache.${profile}.apps`)).map((apps: any[] = []) => {
+        //     return apps.filter(app => app["sbg:projectName"] === projectName);
+        // });
     }
 
     getFolderListing(folder) {
@@ -136,6 +128,7 @@ export class DataGatewayService {
     }
 
     searchLocalProjects(term, limit = 20) {
+
         return this.preferences.get("localFolders", []).switchMap(folders => this.ipc.request("searchLocalProjects", {
             term,
             limit,
@@ -143,29 +136,32 @@ export class DataGatewayService {
         })).take(1);
     }
 
-    searchUserProjects(term: string, limit = 20) {
+    searchUserProjects(term: string, limit = 20): Observable<{ hash: string, results: PlatformAppEntry[] }[]> {
 
-        return this.ipc.request("searchUserProjects", {term, limit,});
-    }
-
-    getPublicApps() {
-        return this.scanCompletion.flatMap(() => this.preferences.get("dataCache", {})).map(profiles => {
-            const mainProfile = Object.keys(profiles)[0];
-            if (mainProfile) {
-                return profiles[mainProfile]["publicApps"] || [];
-            }
-
-            return [];
+        return this.auth.connections.take(1).flatMap(credentials => {
+            const hashes   = credentials.map(c => c.hash);
+            const requests = hashes.map(hash =>
+                this.apiGateway.forHash(hash)
+                    .searchUserProjects(term, limit)
+                    .map(results => ({results, hash}))
+            );
+            return Observable.forkJoin(requests);
         });
     }
 
-    searchPublicApps(term: any, limit = 20) {
-        return this.ipc.request("searchPublicApps", {term, limit});
+    getPublicApps(hash) {
+        return this.throughCache(
+            hash + ".getPublicApps",
+            this.apiGateway.forHash(hash).getPublicApps()
+                .publishReplay(1)
+                .refCount()
+        );
     }
 
     fetchFileContent(almostID: string, parse = false) {
 
         const source = DataGatewayService.getFileSource(almostID);
+        console.log("File source is", source, "for", almostID);
 
         if (source === "local") {
             const request = this.ipc.request("readFileContent", almostID).take(1);
@@ -184,18 +180,26 @@ export class DataGatewayService {
         }
 
         if (source === "app") {
-            const [profile, projectSlug, username, projectSlugAgain, appSlug, revision] = almostID.split("/");
+            // ID example, all concatenated:
+            // default_1b2a8fed50d9402593a57acddc7d7cfe/ivanbatic+admin/
+            // dfghhm/ivanbatic+admin/dfghhm/
+            // whole-genome-analysis-bwa-gatk-2-3-9-lite/2
+            const [h, , , ownerSlug, projectSlug, appSlug, revision] = almostID.split("/");
 
-            const request = this.api.getApp(`${username}/${projectSlugAgain}/${appSlug}/${revision}`).take(1);
+            const [hash] = h.split("?");
+
+            const fetch = this.apiGateway.forHash(hash).getApp(ownerSlug, projectSlug, appSlug, revision);
             if (parse) {
-                return request;
+                return fetch;
             }
-
-            return request.map(app => JSON.stringify(app, null, 4));
+            return fetch.map(app => JSON.stringify(app, null, 4));
         }
 
         if (source === "public") {
+            // Sample:
+            console.log("Feching public app", almostID);
             const [, , , , , username, projectSlug, appSlug, revision] = almostID.split("/");
+            debugger;
 
             const request = this.api.getApp(`${username}/${projectSlug}/${appSlug}/${revision}`).take(1);
             if (parse) {
@@ -220,7 +224,7 @@ export class DataGatewayService {
         return this.ipc.request("saveFileContent", {path, content});
     }
 
-    saveFile(fileID, content): Observable<boolean> {
+    saveFile(fileID, content): Observable<string> {
         const fileSource = DataGatewayService.getFileSource(fileID);
 
         if (fileSource === "public") {
@@ -231,8 +235,14 @@ export class DataGatewayService {
             return this.saveLocalFileContent(fileID, content).map(() => content);
         }
 
-        const revNote = new FormControl("");
+        /**
+         * File ID sample:
+         * "default_1b2a8fed50d9402593a57acddc7d7cfe/ivanbatic+admin/dfghhm/ivanbatic+admin/dfghhm/sbg-flatten/0"
+         */
 
+        const [hash] = fileID.split("/");
+
+        const revNote = new FormControl("");
         return Observable.fromPromise(this.modal.prompt({
             title: "Publish New App Revision",
             content: "Revision Note",
@@ -240,13 +250,58 @@ export class DataGatewayService {
             confirmationLabel: "Publish",
             formControl: revNote
         })).flatMap(() => {
-            return this.api.saveApp(JSON.parse(content), revNote.value).map(r => JSON.stringify(r.message, null, 4));
-        }).catch(err => {
-            return Observable.of(false);
+
+            return this.apiGateway.forHash(hash)
+                .saveApp(YAML.safeLoad(content, {json: true} as any), revNote.value)
+                .map(r => JSON.stringify(r.message, null, 4));
         });
-
-
     }
 
+    private throughCache(key, handler) {
+        if (this.cache[key]) {
+            return this.cache[key];
+        }
 
+        this.cache[key] = handler;
+
+        return this.cache[key];
+    }
+
+    static fuzzyMatch(needle, haystack) {
+
+        const noSpaceNeedle = needle.replace(/ /g, "");
+        const hlen          = haystack.length;
+        const nlen          = noSpaceNeedle.length;
+
+        if (nlen > hlen) {
+            return 0;
+        }
+        if (nlen === hlen) {
+            return 1;
+        }
+        let matchedCharacters = 0;
+        const spacings        = [];
+
+        let previousFoundIndex = 0;
+
+        outer: for (let i = 0, j = 0; i < nlen; i++) {
+            const nch = noSpaceNeedle.charCodeAt(i);
+            while (j < hlen) {
+                if (haystack.charCodeAt(j++) === nch) {
+                    spacings.push(j - previousFoundIndex);
+                    previousFoundIndex = j;
+                    matchedCharacters++;
+
+                    continue outer;
+                }
+            }
+            return 0;
+        }
+        const totalDistance  = spacings.reduce((acc, n) => acc + n, 0);
+        const adjacencyBonus = haystack.length / (totalDistance * (haystack.length / spacings.length));
+        const indexBonus     = needle.split(" ").map(word => haystack.indexOf(word)).reduce((acc, idx) => acc + Number(idx !== -1), 0);
+        const bonus          = adjacencyBonus + indexBonus;
+
+        return bonus + matchedCharacters / hlen;
+    }
 }

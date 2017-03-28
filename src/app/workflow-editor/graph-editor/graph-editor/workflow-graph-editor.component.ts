@@ -178,7 +178,9 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
         this.gateway.fetchFileContent(nodeID, true).subscribe((app: any) => {
 
-            const step   = this.model.addStepFromProcess(app);
+            debugger;
+            const step = this.model.addStepFromProcess(app);
+            console.log("adding step", step);
             const coords = this.graph.translateMouseCoords(ev.clientX, ev.clientY);
             Object.assign(step.customProps, {
                 "sbg:x": coords.x,

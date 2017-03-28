@@ -21,6 +21,7 @@
 
     <div class="document-controls">
 
+
         <!--CWLVersion-->
         <span class="btn btn-sm">{{toolModel.cwlVersion}}</span>
 
@@ -43,7 +44,7 @@
 
 
         <!--Revisions-->
-        <button *ngIf="data.dataSource !== 'local' && toolModel.customProps['sbg:revision']"
+        <button *ngIf="data.dataSource !== 'local' && toolModel.customProps['sbg:revisionsInfo']"
                 class="btn btn-sm btn-secondary" type="button"
                 [ct-editor-inspector-target]="'revisions'"
                 [ct-editor-inspector]="revisions">
@@ -67,7 +68,7 @@
 <!--Header & Editor Column-->
 <div class="editor-layout">
 
-    <ct-block-loader *ngIf="isLoading"></ct-block-loader>
+    <ct-circular-loader *ngIf="isLoading"></ct-circular-loader>
 
     <!--Editor Row-->
     <ct-code-editor *ngIf="viewMode === 'code' && !isLoading"

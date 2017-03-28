@@ -14,6 +14,8 @@ import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {PlatformAppEntry} from "../../data-gateway/data-types/platform-api.types";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.component";
+import {AuthService} from "../../../auth/auth/auth.service";
+import {Observable} from "rxjs/Observable";
 
 @Component({
     selector: "ct-public-apps-panel",
@@ -31,7 +33,7 @@ import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.c
             <button type="button"
                     (click)="regroup('category')"
                     [class.active]="grouping === 'category'"
-                    class="btn btn-sm btn-secondary">By Category
+                    class="btn btn-sm btn-secondary">By Categor
             </button>
         </div>
 
@@ -102,6 +104,7 @@ export class PublicAppsPanelComponent extends DirectiveBase implements AfterView
     constructor(private preferences: UserPreferencesService,
                 private cdr: ChangeDetectorRef,
                 private workbox: WorkboxService,
+                private auth: AuthService,
                 private dataGateway: DataGatewayService) {
         super();
 
@@ -144,112 +147,150 @@ export class PublicAppsPanelComponent extends DirectiveBase implements AfterView
         });
     }
 
-    private groupByToolkit(nodes: { data?: PlatformAppEntry }[], expandedNodes: string[] = []) {
+    private groupByToolkit(folders, expandedNodes: string[] = []) {
 
-        const groups = nodes.reduce((acc, node: TreeNode<PlatformAppEntry>) => {
-            const groupKey = (node.data["sbg:toolkit"] + " " + node.data["sbg:toolkitVersion"]).trim();
+        return folders.map(folder => {
 
-            if (!acc[groupKey]) {
-                const id      = "__toolkit/" + groupKey;
-                acc[groupKey] = {
-                    id,
-                    label: groupKey,
-                    isExpandable: true,
-                    isExpanded: expandedNodes.indexOf(id) !== -1,
-                    type: "toolkit",
-                    children: [],
-                    icon: "fa-folder"
-                };
-            }
-            acc[groupKey].children.push(node);
+            const groups = folder.children.reduce((acc, node) => {
 
-            return acc;
-        }, {});
+                const groupKey = (node.data["sbg:toolkit"] + " " + node.data["sbg:toolkitVersion"]).trim();
 
-
-        const sortedGroup = Object.keys(groups).sort((a, b) => {
-            return a.toLowerCase().localeCompare(b.toLowerCase());
-        }).map(key => groups[key]) as TreeNode<PlatformAppEntry>[];
-
-        if (groups[""]) {
-            const unnamedGroup = sortedGroup.shift();
-            return sortedGroup.concat(unnamedGroup.children);
-        }
-
-        return sortedGroup;
-    }
-
-    private groupByCategory(nodes: { data?: PlatformAppEntry }[], expandedNodes: string[] = []) {
-        const groups = nodes.reduce((acc, node: TreeNode<PlatformAppEntry>) => {
-
-            const groupKeys = node.data["sbg:categories"];
-
-            groupKeys.forEach(category => {
-
-                if (!acc[category]) {
-                    const id      = "__category/" + category;
-                    acc[category] = {
+                if (!acc[groupKey]) {
+                    const id      = "__toolkit/" + groupKey;
+                    acc[groupKey] = {
                         id,
-                        label: category,
+                        label: groupKey,
                         isExpandable: true,
                         isExpanded: expandedNodes.indexOf(id) !== -1,
-                        type: "category",
+                        type: "toolkit",
                         children: [],
                         icon: "fa-folder"
                     };
                 }
-                acc[category].children.push(node);
-            });
+                acc[groupKey].children.push(node);
 
-            return acc;
-        }, {});
+                return acc;
+            }, {});
 
+            const sortedGroup = Object.keys(groups).sort((a, b) => {
+                return a.toLowerCase().localeCompare(b.toLowerCase());
+            }).map(key => groups[key]) as TreeNode<PlatformAppEntry>[];
 
-        return Object.keys(groups).sort((a, b) => {
-            return a.toLowerCase().localeCompare(b.toLowerCase());
-        }).map(key => groups[key]) as TreeNode<PlatformAppEntry>[];
+            if (groups[""]) {
+                const unnamedGroup = sortedGroup.shift();
+                return sortedGroup.concat(unnamedGroup.children);
+            }
+            return {...folder, children: sortedGroup};
+        });
+    }
+
+    private groupByCategory(folders, expandedNodes: string[] = []) {
+        const categorized = folders.map(folder => {
+
+            const groups = folder.children.reduce((acc, node: TreeNode<PlatformAppEntry>) => {
+                const groupKeys = node.data["sbg:categories"] || [];
+                groupKeys.forEach(category => {
+
+                    if (!acc[category]) {
+                        const id      = "__category/" + category;
+                        acc[category] = {
+                            id,
+                            label: category,
+                            isExpandable: true,
+                            isExpanded: expandedNodes.indexOf(id) !== -1,
+                            type: "category",
+                            children: [],
+                            icon: "fa-folder"
+                        };
+                    }
+                    acc[category].children.push(node);
+                });
+
+                return acc;
+            }, {});
+
+            const sorted = Object.keys(groups).sort((a, b) => {
+                return a.toLowerCase().localeCompare(b.toLowerCase());
+            }).map(key => groups[key]) as TreeNode<PlatformAppEntry>[];
+
+            return {...folder, children: sorted};
+        });
+
+        return categorized;
     }
 
     private loadDataSources() {
-        this.tracked = this.dataGateway.getPublicApps().subscribe(apps => {
-            this.treeNodes = apps.map(app => {
-                return {
-                    id: app.id,
-                    label: app.label,
-                    type: "app",
-                    data: app,
-                    icon: app.class === "Workflow" ? "fa-share-alt" : "fa-terminal",
-                    dragEnabled: true,
-                    dragTransferData: app.id,
-                    dragDropZones: ["zone1"],
-                    dragLabel: app.label,
-                    dragImageClass: app.class === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
-                };
-            });
+        this.tracked = this.auth.connections.flatMap(credentials => {
+            const hashes   = credentials.map(c => c.hash);
+            const requests = hashes.map(hash => this.dataGateway.getPublicApps(hash));
+            return Observable.forkJoin(...requests);
+        }, (credentials, listings) => ({credentials, listings}))
+            .withLatestFrom(this.preferences.get("expandedNodes"), (data, expanded) => ({...data, expanded}))
+            .subscribe(data => {
+                const {credentials, listings, expanded} = data as any;
 
-            this.regroup(this.grouping, true);
-        });
+                this.treeNodes = credentials.map((creds, index) => {
+                    const id = `${creds.hash}?public`;
+                    return {
+                        id,
+                        label: creds.profile === "default" ? "Seven Bridges" : creds.profile,
+                        type: "folder",
+                        data: creds,
+                        icon: "fa-folder",
+                        isExpandable: true,
+                        iconExpanded: "fa-folder-open",
+                        isExpanded: expanded.indexOf(id) !== -1,
+                        children: listings[index].map(app => {
+                            const id = `${creds.hash}/${app.owner}/${app.slug}/${app["sbg:id"]}`
+                            return {
+                                id,
+                                label: app.label,
+                                type: "app",
+                                data: app,
+                                icon: app.class === "Workflow" ? "fa-share-alt" : "fa-terminal",
+                                dragEnabled: true,
+                                dragTransferData: id,
+                                dragDropZones: ["zone1"],
+                                dragLabel: app.label,
+                                dragImageClass: app.class === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
+                            };
+                        })
+
+                    };
+                });
+                this.regroup(this.grouping, true);
+            });
     }
 
     private attachSearchObserver() {
 
 
-        const appSearch = (term) => this.dataGateway.searchPublicApps(term).map(results => results.map(result => {
-            const id    = result.id;
-            const title = result.label;
-            return {
-                id,
-                title,
-                label: `${result["sbg:toolkit"]} / ${result["sbg:categories"].join(", ")}`,
-                icon: result.class === "Workflow" ? "fa-share-alt" : "fa-terminal",
+        const search = (term) => {
 
-                dragEnabled: true,
-                dragTransferData: id,
-                dragLabel: title,
-                dragImageClass: result["class"] === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
-                dragDropZones: ["zone1"]
-            };
-        }));
+
+            const reversedTerm = term.split("").reverse().join("");
+            return this.treeNodes.reduce((acc, node) => {
+                return acc.concat(node.children.map(child => Object.assign(child, {parentLabel: node.label})));
+            }, []).map((child) => {
+                const fuzziness = DataGatewayService.fuzzyMatch(reversedTerm, child.id.split("").reverse().join(""));
+                return {
+                    id: child.id,
+                    title: child.label,
+                    label: [child["parentLabel"], child.data["sbg:toolkit"], (child.data["sbg:categories"] || []).join(", ")].join("/"),
+                    icon: child.data.class === "Workflow" ? "fa-share-alt" : "fa-terminal",
+
+                    dragEnabled: true,
+                    dragTransferData: child.id,
+                    dragLabel: child.label,
+                    dragImageClass: child.data["class"] === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
+                    dragDropZones: ["zone1"],
+
+                    fuzziness
+                };
+            }).filter(child => child.fuzziness > 0.01)
+                .sort((a, b) => b.fuzziness - a.fuzziness)
+                .slice(0, 20);
+        };
 
         this.searchContent.valueChanges
             .do(term => this.searchResults = undefined)
@@ -259,9 +300,8 @@ export class PublicAppsPanelComponent extends DirectiveBase implements AfterView
                 this.appliedSearchTerm = term;
             })
             .filter(term => term.trim().length !== 0)
-            .switchMap(term => appSearch(term))
+            .switchMap(term => Observable.of(search(term)))
             .subscribe(results => {
-                console.log("Results", results);
                 this.searchResults = results;
                 this.cdr.markForCheck();
             });
@@ -288,12 +328,13 @@ export class PublicAppsPanelComponent extends DirectiveBase implements AfterView
 
     private listenForAppOpening() {
         this.tree.open.filter(n => n.type === "app")
-            .flatMap(node => this.workbox.getOrCreateFileTab(node.id + "/" + node.data["sbg:id"]))
+            .flatMap(node => this.workbox.getOrCreateFileTab(node.id))
             .subscribe(tab => this.workbox.openTab(tab));
     }
 
-    openSearchResult(entry: { id: string }) {
-        console.log("Open a search result", entry);
+    openSearchResult(entry: {
+                         id: string
+                     }) {
         this.workbox.getOrCreateFileTab(entry.id).take(1).subscribe(tab => this.workbox.openTab(tab));
     }
 }

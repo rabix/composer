@@ -22,6 +22,10 @@ import {ModalService} from "../../../ui/modal/modal.service";
                                      (buttonClick)="addEntry()">
                 </ct-blank-tool-state>
                 
+                <div *ngIf="readonly && !model.hints.length" class="text-xs-center h5">
+                    This tool doesn't specify any hints
+                </div>
+                
                 <!--List Header Row-->
                 <div class="gui-section-list-title" *ngIf="model.hints.length">
                     <div class="col-xs-6">

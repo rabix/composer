@@ -1,0 +1,47 @@
+<ct-search-field class="m-1" [formControl]="searchContent"
+                 [placeholder]="'Search My Apps...'"></ct-search-field>
+
+<div>
+    <button class="btn btn-link btn-primary app-sources-btn"
+            (click)="openAddAppSourcesDialog()">
+        <i class="fa fa-fw fa-plus"></i> Open a Project...
+    </button>
+</div>
+
+<div class="scroll-container">
+    <div *ngIf="searchContent?.value && searchResults" class="search-results">
+
+        <ct-nav-search-result *ngFor="let entry of searchResults" class="pl-1 pr-1 deep-unselectable"
+                              [id]="entry?.id"
+                              [icon]="entry?.icon"
+                              [title]="entry?.title"
+                              [label]="entry?.label"
+
+                              [ct-drag-enabled]="entry?.dragEnabled"
+                              [ct-drag-transfer-data]="entry?.dragTransferData"
+                              [ct-drag-image-caption]="entry?.dragLabel"
+                              [ct-drag-image-class]="entry?.dragImageClass"
+                              [ct-drop-zones]="entry?.dragDropZones"
+
+                              (dblclick)="openSearchResult(entry)">
+        </ct-nav-search-result>
+
+    </div>
+    <ct-line-loader class="m-1"
+                    *ngIf="searchContent.value
+                             && searchContent.value !== appliedSearchTerm
+                             && !searchResults"></ct-line-loader>
+
+    <div *ngIf="searchContent.value
+                        && searchContent.value === appliedSearchTerm
+                        && (searchResults && searchResults.length === 0)"
+         class="no-results m-1">
+        <p class="explanation">
+            No search results for “{{ searchContent.value }}.”
+        </p>
+        <i class="icon fa-4x fa fa-search"></i>
+    </div>
+
+    <ct-tree-view #tree [hidden]="searchContent?.value" [nodes]="treeNodes"
+                  [level]="1"></ct-tree-view>
+</div>

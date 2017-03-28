@@ -1,10 +1,10 @@
 import {Component, OnInit} from "@angular/core";
-import {FormControl, FormGroup} from "@angular/forms";
-import {SettingsService} from "../../../services/settings/settings.service";
+import {Observable} from "rxjs/Observable";
+import {AuthService} from "../../../auth/auth/auth.service";
 import {UserPreferencesService} from "../../../services/storage/user-preferences.service";
+import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
-import {ModalService} from "../../../ui/modal/modal.service";
 const {app, dialog} = window["require"]("electron").remote;
 
 @Component({
@@ -19,31 +19,25 @@ const {app, dialog} = window["require"]("electron").remote;
         <div class="body">
             <div class="dialog-centered dialog-content" *ngIf="activeTab === 'local' && localFoldersToAdd.length === 0">
                 <p>
-                    <strong>Add a folder from your computer to the workspace</strong>
+                    <strong>Add one or more folders from your computer to the workspace</strong>
                 </p>
                 <div>
                     <button class="btn btn-secondary" (click)="selectLocalFolders()">Select a Folder...</button>
                 </div>
             </div>
 
-            <div class="dialog-connection dialog-content"
-                 *ngIf="activeTab === 'local' && localFoldersToAdd.length ">
-                <p>
-                    <strong>Add these folders your workspace:</strong>
-                </p>
-                <ul class="folder-list pl-2">
-                    <li *ngFor="let f of localFoldersToAdd">{{ f }}</li>
-                </ul>
-            </div>
-
             <div class="dialog-connection dialog-content" *ngIf="activeTab === 'platform' && !isConnected && !connecting">
                 <p>
                     <strong>Connect to the Seven Bridges Platform</strong>
                 </p>
-                <ct-platform-connection-form (submission)="onConnectionSubmission($event)"></ct-platform-connection-form>
+
+                <ct-credentials-form #credsForm [removable]="false"></ct-credentials-form>
+                <p>
+                    <button type="button" class="btn btn-success" (click)="credsForm.applyValues(); connecting = true;">Connect</button>
+                </p>
             </div>
 
-            <div class="dialog-connection" *ngIf="activeTab === 'platform' && !isConnected && connecting ">
+            <div class="dialog-connection" *ngIf="activeTab === 'platform' && connecting ">
                 <p>
                     <strong>Checking your connection to the platform...</strong>
                     <ct-line-loader></ct-line-loader>
@@ -63,7 +57,12 @@ const {app, dialog} = window["require"]("electron").remote;
                     <strong>Add Projects to the Workspace</strong>
                 </p>
                 <div>
-                    <ct-auto-complete [(ngModel)]="selectedProjects" [options]="nonAddedUserProjects"></ct-auto-complete>
+                    <ct-auto-complete [(ngModel)]="selectedProjects"
+                                      [options]="nonAddedUserProjects"
+                                      [optgroups]="platformOptgroups"
+                                      optgroupField="hash">
+
+                    </ct-auto-complete>
                     <!--<select multiple class="form-control" [formControl]="projectSelectionControl">-->
                     <!--<option *ngFor="let project of nonAddedUserProjects" [value]="project.value">{{ project.label }}</option>-->
                     <!--</select>-->
@@ -110,42 +109,44 @@ export class AddSourceModalComponent extends DirectiveBase implements OnInit {
 
     selectedProjects = [];
 
-    constructor(settings: SettingsService,
-                data: DataGatewayService,
+    platformOptgroups = [];
+
+    constructor(private auth: AuthService,
+                private data: DataGatewayService,
                 public modal: ModalService,
                 private preferences: UserPreferencesService) {
 
         super();
 
-        const validity = settings.validity;
-        this.tracked   = validity.take(1).subscribe(isValid => {
-            this.isConnected = isValid;
-            this.connecting  = false;
-        });
+        this.tracked = auth.connections
+            .flatMap((credentials: any) => {
+                const listings = credentials.map(creds => this.data.getPlatformListing(creds.hash));
 
-        this.tracked = data.scanCompletion
-            .flatMap(_ => settings.platformConfiguration)
-            .flatMap(config => {
-                const profile = SettingsService.urlToProfile(config.url);
-                return preferences.get(`dataCache.${profile}`, {projects: []}).map(cache => ({cache, profile}));
-            })
-            .withLatestFrom(preferences.get("openProjects", []),
-                (cacheData: any, openProjects) => {
-                    return {
-                        profile: cacheData.profile,
-                        projects: cacheData.cache.projects,
-                        openProjects
-                    };
-                })
-            .filter(stuff => stuff.projects.length)
-            .subscribe(stuff => {
-                this.nonAddedUserProjects = stuff.projects.filter(p => {
-                    return stuff.openProjects.indexOf(`${stuff.profile}/${p.slug}`) === -1;
-                }).map(p => ({
-                    value: stuff.profile + "/" + p.slug,
-                    text: p.name
-                }));
+                if (listings.length === 0) {
+                    return Observable.of([]);
+                }
 
+                return Observable.zip(...listings);
+            }, (credentials, listings) => ({credentials, listings}))
+            .withLatestFrom(
+                this.preferences.getOpenProjects(),
+                (data, openProjects) => ({...data, openProjects}))
+            .subscribe(data => {
+                this.connecting = false;
+
+                const {credentials, listings, openProjects} = data;
+                this.platformOptgroups                      = credentials.map(creds => ({value: creds.hash, label: creds.profile}));
+                this.nonAddedUserProjects                   = listings.reduce((acc, listing, index) => {
+                    return acc.concat(listing.map((entry: any) => {
+                        return {
+                            value: credentials[index].hash + `/${entry.owner}/${entry.slug}`,
+                            text: entry.name,
+                            hash: credentials[index].hash
+                        } as any;
+                    }));
+                }, []).filter((entry: any) => openProjects.indexOf(entry.value) === -1);
+
+                this.isConnected    = data.credentials.length > 0;
                 this.loadedProjects = true;
             });
     }
@@ -156,7 +157,6 @@ export class AddSourceModalComponent extends DirectiveBase implements OnInit {
     }
 
     onDone() {
-        console.log("Done");
         if (this.activeTab === "platform" && this.loadedProjects) {
             const val = this.selectedProjects;
             if (val && val.length) {
@@ -182,11 +182,6 @@ export class AddSourceModalComponent extends DirectiveBase implements OnInit {
         }
     }
 
-    onConnectionSubmission(val) {
-        this.projectStep = "add";
-        this.isConnected = true;
-    }
-
     selectLocalFolders() {
         dialog.showOpenDialog({
             title: "Choose a Directory",
@@ -195,6 +190,7 @@ export class AddSourceModalComponent extends DirectiveBase implements OnInit {
             properties: ["openDirectory", "multiSelections"]
         }, (paths) => {
             this.localFoldersToAdd = paths || [];
+            this.onDone();
         });
     }
 

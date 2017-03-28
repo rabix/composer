@@ -37,8 +37,8 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
         </div>
 
         <div class="body">
-
-            <ng-template ngFor let-tab [ngForOf]="tabs">
+            
+            <ng-template hidden ngFor let-tab [ngForOf]="tabs">
 
                 <div class="component-container" [ngSwitch]="tab?.type" [hidden]="tab !== activeTab">
 
@@ -118,7 +118,7 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
             this.statusBar.removeControls();
 
             this.activeTab = tab;
-            const idx = this.tabs.findIndex(t => t === tab);
+            const idx      = this.tabs.findIndex(t => t === tab);
 
             const component = this.tabComponents.find((item, index) => index === idx);
 
@@ -202,7 +202,6 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
                     } else {
 
                         // Restore open tabs
-                        console.log("Adding open tabs", openTabs);
                         openTabs.forEach(tab => {
                             if (tab.id.startsWith("?")) {
                                 this.workbox.openTab(tab, false);

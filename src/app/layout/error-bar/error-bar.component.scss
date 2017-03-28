@@ -3,14 +3,15 @@
 @import "./../../../assets/sass/theme-variables";
 
 :host {
+    $height: $main-header-height * .8;
     .error-alert {
         display: flex;
         opacity: 0;
         height: 0px;
-        line-height: $main-header-height;
+        line-height: $height;
         color: white;
         background-color: $brand-danger;
-        transition: opacity 2s, height 0.1s;
+        transition: opacity .25s, height 0.25s;
         overflow: hidden;
 
         .error-text {
@@ -22,13 +23,13 @@
             flex-basis: 30px;
             font-weight: bolder;
             font-size: 1rem;
-            line-height: $main-header-height;
+            line-height: $height;
         }
     }
 
     .show {
         opacity: 1;
-        height: $main-header-height;
+        height: $height;
     }
 }
 

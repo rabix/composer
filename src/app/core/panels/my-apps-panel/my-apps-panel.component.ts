@@ -5,6 +5,7 @@ import "rxjs/add/operator/map";
 import {Observable} from "rxjs/Observable";
 
 import {LocalFileRepositoryService} from "../../../file-repository/local-file-repository.service";
+import {ConnectionState} from "../../../services/storage/user-preferences-types";
 import {UserPreferencesService} from "../../../services/storage/user-preferences.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {TreeNode} from "../../../ui/tree-view/tree-node";
@@ -21,56 +22,8 @@ import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.c
 
 @Component({
     selector: "ct-my-apps-panel",
-    template: `
-        <ct-search-field class="m-1" [formControl]="searchContent"
-                         [placeholder]="'Search My Apps...'"></ct-search-field>
-
-        <div>
-            <button class="btn btn-link btn-primary app-sources-btn"
-                    (click)="openAddAppSourcesDialog()">
-                <i class="fa fa-fw fa-plus"></i> Open a Project...
-            </button>
-        </div>
-
-        <div class="scroll-container">
-            <div *ngIf="searchContent?.value && searchResults" class="search-results">
-
-                <ct-nav-search-result *ngFor="let entry of searchResults" class="pl-1 pr-1 deep-unselectable"
-                                      [id]="entry?.id"
-                                      [icon]="entry?.icon"
-                                      [title]="entry?.title"
-                                      [label]="entry?.label"
-
-                                      [ct-drag-enabled]="entry?.dragEnabled"
-                                      [ct-drag-transfer-data]="entry?.dragTransferData"
-                                      [ct-drag-image-caption]="entry?.dragLabel"
-                                      [ct-drag-image-class]="entry?.dragImageClass"
-                                      [ct-drop-zones]="entry?.dragDropZones"
-
-                                      (dblclick)="openSearchResult(entry)">
-                </ct-nav-search-result>
-
-            </div>
-            <ct-line-loader class="m-1"
-                            *ngIf="searchContent.value 
-                             && searchContent.value !== appliedSearchTerm 
-                             && !searchResults"></ct-line-loader>
-
-            <div *ngIf="searchContent.value 
-                        && searchContent.value === appliedSearchTerm 
-                        && (searchResults && searchResults.length === 0)"
-                 class="no-results m-1">
-                <p class="explanation">
-                    No search results for “{{ searchContent.value }}.”
-                </p>
-                <i class="icon fa-4x fa fa-search"></i>
-            </div>
-
-            <ct-tree-view #tree [hidden]="searchContent?.value" [nodes]="treeNodes"
-                          [level]="1"></ct-tree-view>
-        </div>
-    `,
     providers: [LocalFileRepositoryService],
+    templateUrl: "./my-apps-panel.component.html",
     styleUrls: ["./my-apps-panel.component.scss"]
 })
 export class MyAppsPanelComponent extends DirectiveBase implements OnInit, AfterViewInit {
@@ -132,16 +85,23 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
             .withLatestFrom(this.expandedNodes, (sources, expanded) => ({sources, expanded}))
             .subscribe((data: { sources: any[], expanded: string[] }) => {
                 this.treeNodes = data.sources.map(source => {
-                    let icon = `fa-user-circle-o`;
-                    if (source.profile === "local") {
-                        icon = "fa-hdd-o";
+
+                    let icon = "fa-folder";
+                    if (source.status === ConnectionState.Disconnected) {
+                        icon = "fa-chain-broken";
+                    } else if (source.status === ConnectionState.Connecting) {
+                        icon = "fa-bolt";
                     }
+
+
                     return {
-                        id: source.profile,
+                        id: source.hash,
                         label: source.label,
                         isExpandable: true,
-                        isExpanded: data.expanded.indexOf(source.profile) !== -1,
+                        isExpanded: data.expanded.indexOf(source.hash) !== -1,
+                        iconExpanded: "fa-folder-open",
                         type: "source",
+                        data: source,
                         icon: `${icon} ${source.connected ? "connected" : "disconnected"}`
 
                     };
@@ -179,25 +139,33 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
             };
         }));
 
-        const projectsSearch = (term) => this.dataGateway.searchUserProjects(term).map(results => results.map(result => {
 
-            const id    = result.profile + "/" + result["sbg:projectName"] + "/" + result["sbg:id"];
-            const title = result.label;
+        const projectSearch = (term) => this.dataGateway.searchUserProjects(term).map(resultGroups => {
+            return resultGroups.map(group => {
 
-            return {
-                id,
-                icon: result.class === "Workflow" ? "fa-share-alt" : "fa-terminal",
-                title,
-                label: result.id.split("/").slice(5, 7).join(" → "),
-                relevance: result.relevance + 1,
+                const {results, hash} = group;
 
-                dragEnabled: true,
-                dragTransferData: id,
-                dragLabel: title,
-                dragImageClass: result["class"] === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
-                dragDropZones: ["zone1"]
-            };
-        }));
+                return results.map(result => {
+                    const id    = hash + "/" + result["owner"] + "/" + result["slug"] + "/" + result["sbg:id"];
+                    const title = result.label;
+
+                    return {
+                        id,
+                        icon: result.class === "Workflow" ? "fa-share-alt" : "fa-terminal",
+                        title,
+                        label: result.id.split("/").slice(5, 7).join(" → "),
+                        relevance: 1.5,
+
+                        dragEnabled: true,
+                        dragTransferData: id,
+                        dragLabel: title,
+                        dragImageClass: result["class"] === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
+                        dragDropZones: ["zone1"]
+                    };
+                });
+
+            }).reduce((acc, item) => acc.concat(...item), []);
+        });
 
         this.searchContent.valueChanges
             .do(term => this.searchResults = undefined)
@@ -207,7 +175,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                 this.appliedSearchTerm = term;
             })
             .filter(term => term.trim().length !== 0)
-            .switchMap(term => Observable.forkJoin(localFileSearch(term), projectsSearch(term)))
+            .switchMap(term => Observable.forkJoin(localFileSearch(term), projectSearch(term)))
             .subscribe(datasets => {
                 const combined     = [].concat(...datasets).sort((a, b) => b.relevance - a.relevance);
                 this.searchResults = combined;
@@ -223,17 +191,37 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
         this.tree.expansionChanges
             .filter(node => node.isExpanded === true && node.type === "source" && node.id !== "local")
             .do(n => n.modify(() => n.loading = true))
-            .flatMap(n => this.dataGateway.getPlatformListing(n.id), (node, listing = []) => ({node, listing}))
+            .flatMap(node => {
+                console.log("Combining platform listing for", node.id, node);
+                return Observable.combineLatest(
+                    this.dataGateway.getPlatformListing(node.id),
+                    this.preferences.getOpenProjects(),
+                    (listing, openProjects) => ({node, listing, openProjects})
+                ).map(data => {
+                    const {node, listing, openProjects} = data as any;
+                    return {
+                        ...data,
+                        listing: listing.filter(item => openProjects.indexOf(`${node.id}/${item.owner}/${item.slug}`) !== -1)
+                    };
+                });
+            })
             .withLatestFrom(this.expandedNodes, (outer, expanded) => ({...outer, expanded}))
             .subscribe((data: { node: TreeNodeComponent<any>, listing: any, expanded: string[] }) => {
-                const children = data.listing.map(child => {
-                    const id = `${data.node.id}/${child.slug}`;
+                const children = data.listing.map((child, index) => {
+                    const id = `${data.node.id}/${child.owner}/${child.slug}`;
+
+                    const duplicate = data.listing.slice(0, index).concat(data.listing.slice(index + 1)).find(c => c.name === child.name);
+                    let label       = child.name;
+
+                    if (duplicate) {
+                        label += ` (${child.owner})`;
+                    }
                     return {
                         id,
                         type: "project",
                         data: child,
                         icon: "fa-folder",
-                        label: child.name,
+                        label,
                         isExpandable: true,
                         isExpanded: data.expanded.indexOf(id) !== -1,
                         iconExpanded: "fa-folder-open",
@@ -279,9 +267,8 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
         this.tree.expansionChanges.filter(n => n.isExpanded === true && n.type === "project")
             .do(n => n.modify(() => n.loading = true))
             .flatMap(n => {
-                const source      = n.id.substr(0, n.id.indexOf("/"));
-                const projectName = n.id.substr(n.id.indexOf("/") + 1);
-                return this.dataGateway.getProjectListing(source, projectName);
+                const source = n.id.substr(0, n.id.indexOf("/"));
+                return this.dataGateway.getProjectListing(source, n.data.owner, n.data.slug);
             }, (node, listing) => ({node, listing}))
             .subscribe(data => {
 
@@ -381,7 +368,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
 
     private listenForAppOpening() {
         this.tree.open.filter(n => n.type === "app")
-            .flatMap(node => this.workbox.getOrCreateFileTab(node.id + "/" + node.data["sbg:id"]))
+            .flatMap(node => this.workbox.getOrCreateFileTab(node.id))
             .subscribe(tab => this.workbox.openTab(tab));
 
         this.tree.open.filter(n => n.type === "file")
@@ -397,7 +384,6 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
     }
 
     openSearchResult(entry: { id: string }) {
-        console.log("Open a search result", entry);
         this.workbox.getOrCreateFileTab(entry.id)
             .take(1)
             .subscribe(tab => this.workbox.openTab(tab));

@@ -8,9 +8,12 @@
     justify-content: space-between;
 
     /deep/ .btn {
+        &:not(".text-inherit") {
+            font-size: $font-size-base;
+        }
         height: 28px;
         margin-top: ($action-bar-height - 28px)/2;
-        font-size: $font-size-base;
+
         background: transparent;
         border-radius: 2px;
         border-color: transparent;
@@ -18,7 +21,12 @@
 
         &:hover {
             color: $layout-text-color;
+            background: #333;
             border: 1px solid #6d6d6d;
+
+            &:disabled {
+                border-color: transparent;
+            }
         }
 
         &:active, &:focus {

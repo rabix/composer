@@ -22,21 +22,17 @@
     }
 
     .removable-form-control {
+        display: flex;
         width: 100%;
-        position: relative;
 
-        ct-expression-input, input, input:not([type="radio"]), input:not([type="checkbox"]) {
-            width: calc(100% - 20px);
-            display: inline-block;
+        ct-expression-input {
+            flex: 1;
         }
 
         .remove-icon {
-            position: relative;
-            cursor: pointer;
-            top: 6px;
-            float: right;
+            display: flex;
+            align-items: center;
         }
     }
-
 }
 

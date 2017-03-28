@@ -17,6 +17,9 @@ import {TemplateProviderService} from "./services/template-provider.service";
 import {ToolEditorModule} from "./tool-editor/tool-editor.module";
 import {UIModule} from "./ui/ui.module";
 import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
+import {PlatformConnectionService} from "./core/auth/platform-connection.service";
+import {AuthService} from "./auth/auth/auth.service";
+import {PlatformAPIGatewayService} from "./auth/api/platform-api-gateway.service";
 
 @NgModule({
     providers: [
@@ -28,7 +31,10 @@ import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
         IpcService,
         PlatformAPI,
         SettingsService,
+        PlatformConnectionService,
+        PlatformAPIGatewayService,
         DataGatewayService,
+        AuthService
     ],
     declarations: [
         MainComponent,

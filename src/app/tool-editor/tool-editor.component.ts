@@ -1,37 +1,25 @@
-import {
-    AfterViewInit,
-    Component,
-    Input,
-    OnDestroy,
-    OnInit,
-    TemplateRef,
-    ViewChild,
-    ViewContainerRef
-} from "@angular/core";
+import {AfterViewInit, Component, Input, OnDestroy, OnInit, TemplateRef, ViewChild, ViewContainerRef} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {CommandLineToolFactory} from "cwlts/models/generic/CommandLineToolFactory";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
 import {Validation} from "cwlts/models/helpers/validation";
 import * as Yaml from "js-yaml";
-import {BehaviorSubject, ReplaySubject, Subject} from "rxjs/Rx";
+import {ReplaySubject, Subject} from "rxjs/Rx";
+import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
+import {AppTabData} from "../core/workbox/app-tab-data";
 import {WorkboxTab} from "../core/workbox/workbox-tab.interface";
 import {
     CwlSchemaValidationWorkerService,
     ValidationResponse
 } from "../editor-common/cwl-schema-validation-worker/cwl-schema-validation-worker.service";
 import {EditorInspectorService} from "../editor-common/inspector/editor-inspector.service";
+import {ErrorBarService} from "../layout/error-bar/error-bar.service";
 import {StatusBarService} from "../layout/status-bar/status-bar.service";
 import {SystemService} from "../platform-providers/system.service";
 import {PlatformAPI} from "../services/api/platforms/platform-api.service";
 import {SettingsService} from "../services/settings/settings.service";
-import {UserPreferencesService} from "../services/storage/user-preferences.service";
-import {DataEntrySource} from "../sources/common/interfaces";
-import {ModalService} from "../ui/modal/modal.service";
 import {DirectiveBase} from "../util/directive-base/directive-base";
 import LoadOptions = jsyaml.LoadOptions;
-import {AppTabData} from "../core/workbox/app-tab-data";
-import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
-import {ErrorBarService} from "../layout/error-bar/error-bar.service";
 
 @Component({
     selector: "ct-tool-editor",
@@ -51,7 +39,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
     viewMode: "code" | "gui" | "test" | "info";
 
     /** Flag to indicate the document is loading */
-    isLoading = false;
+    isLoading = true;
 
     /** Flag for showing reformat prompt on GUI switch */
     showReformatPrompt = true;
@@ -163,8 +151,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
 
                         this.toolModel.validate();
 
-                        // load document in GUI and turn off loader, only if loader was active
-                        // this.isLoading = false;
+                        this.isLoading = false;
 
                         const v = {
                             errors: this.toolModel.validation.errors,
@@ -180,8 +167,10 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
                         if (!this.viewMode) {
                             this.viewMode = "gui";
                         }
+
+                        this.isLoading = false;
                     }, (err) => {
-                        // this.isLoading  = false;
+                        this.isLoading  = false;
                         this.viewMode   = "code";
                         this.isValidCWL = false;
                         this.validation = {
@@ -210,6 +199,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
     }
 
     save() {
+
         const text = this.toolGroup.dirty ? this.getModelText() : this.codeEditorContent.value;
 
         this.dataGateway.saveFile(this.data.id, text).subscribe(save => {
@@ -231,25 +221,6 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
         //     return;
         // }
         //
-        // // For Platform files, we need to ask for a revision note
-        // this.modal.prompt({
-        //     cancellationLabel: "Cancel",
-        //     confirmationLabel: "Publish",
-        //     content: "Revision Note",
-        //     title: "Publish a new App Revision",
-        //     formControl: new FormControl("")
-        // }).then(revisionNote => {
-        //
-        //     const path     = this.data.data["sbg:id"] || this.data.data.id;
-        //     const statusID = this.statusBar.startProcess(`Creating a new revision of ${path}`);
-        //     this.data.save(JSON.parse(text), revisionNote).subscribe(result => {
-        //         const cwl = JSON.stringify(result.message, null, 4);
-        //         this.rawEditorContent.next(cwl);
-        //         this.statusBar.stopProcess(statusID, `Created revision ${result.message["sbg:latestRevision"]} from ${path}`);
-        //
-        //     });
-        // }, err => console.warn);
-
     }
 
     /**
@@ -299,8 +270,12 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
         this.reportPanel = this.reportPanel === panel ? undefined : panel;
     }
 
-    openRevision(revisionNumber: number) {
-        this.platformAPI.getAppCWL(this.data.parsedContent["sbg:id"], revisionNumber).subscribe(txt => {
+    openRevision(revisionNumber: number | string) {
+        const fileWithoutRevision = this.data.id.split("/");
+        fileWithoutRevision.pop();
+        fileWithoutRevision.push(revisionNumber.toString());
+        const fid = fileWithoutRevision.join("/");
+        this.dataGateway.fetchFileContent(fid).subscribe(txt => {
             this.priorityCodeUpdates.next(txt);
             this.toolGroup.reset();
         });

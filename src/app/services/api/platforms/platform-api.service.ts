@@ -11,6 +11,9 @@ export interface ServiceConfig {
     prefix?: string;
 }
 
+/**
+ * @deprecated Moving to PlatformAPIGatewayService and per-platform PlatformAPI instances from the auth module
+ */
 @Injectable()
 export class PlatformAPI {
 
@@ -39,11 +42,11 @@ export class PlatformAPI {
                     })
                 }))
                 .subscribe(res => {
-                    this.sessionID.next(res.json().message.session_id);
+                        this.sessionID.next(res.json().message.session_id);
 
-                    this.getUserInfo().subscribe((user) => this.userInfo = user);
-                }
-            )
+                        this.getUserInfo().subscribe((user) => this.userInfo = user);
+                    }
+                )
             ;
         });
     }
@@ -68,8 +71,14 @@ export class PlatformAPI {
         });
     }
 
+    /**
+     * @deprecated Moved to ApiService
+     * @param platformUrl
+     * @param serviceName
+     * @returns {string}
+     */
     static getServiceUrl(platformUrl: string, serviceName: string) {
-        const isVayu = platformUrl.indexOf("-vayu.sbgenomics.com") !== -1;
+        const isVayu    = platformUrl.indexOf("-vayu.sbgenomics.com") !== -1;
         const isStaging = platformUrl.indexOf("staging-igor.sbgenomics.com") !== -1;
 
         let serviceUrl = platformUrl.replace("igor", serviceName);
@@ -84,9 +93,7 @@ export class PlatformAPI {
     }
 
     /**
-     * @name PlatformApiService:getProjectApps
-     * @param ownerSlug
-     * @param projectSlug
+     * @deprecated Use PlatformAPIGatewayService for multiplatform support
      */
     public getProjectApps(ownerSlug: string, projectSlug: string) {
         const endpoint = `/apps/${ownerSlug}/${projectSlug}`;
@@ -111,6 +118,9 @@ export class PlatformAPI {
         }).map(r => r.json().message)).first();
     }
 
+    /**
+     * @deprecated Use PlatformAPIGatewayService for multiplatform support
+     */
     public getOwnProjects(): Observable<PlatformProjectEntry[]> {
         return this.sessionID.switchMap(sessionID => this.http.get(this.platformServices.watson + "/projects", {
             search: "_role=minimal&is_rabix=true",
@@ -122,6 +132,9 @@ export class PlatformAPI {
         })))).first();
     }
 
+    /**
+     * @deprecated Use PlatformAPIGatewayService for multiplatform support
+     */
     public getAppCWL(appId, revision?: number) {
 
         const id = appId.split("/").slice(0, -1).concat(revision).filter(x => x !== undefined).join("/");
@@ -136,6 +149,9 @@ export class PlatformAPI {
         });
     }
 
+    /**
+     * @deprecated Use PlatformAPIGatewayService for multiplatform support
+     */
     public getPublicApps() {
         return this.sessionID.switchMap(sessionID => this.http.get(`${this.platformServices.brood}/apps`, {
             search: "_order_by=label&visibility=public",
@@ -145,6 +161,9 @@ export class PlatformAPI {
         }).map(r => r.json().message)).first();
     }
 
+    /**
+     * @deprecated Use PlatformAPIGatewayService for multiplatform support
+     */
     public getApp(id) {
         return this.sessionID.switchMap(sessionID => this.http.get(`${this.platformServices.brood}/apps/${id}`, {
             headers: new Headers({
@@ -153,6 +172,9 @@ export class PlatformAPI {
         }).map(r => r.json().message)).first();
     }
 
+    /**
+     * @deprecated Use PlatformAPIGatewayService for multiplatform support
+     */
     public saveApp(app: PlatformAppEntry, revisionNote: string) {
 
         // Take the App id without the revision id
@@ -164,7 +186,7 @@ export class PlatformAPI {
         // Checkout the newest version of this App to get the latest revision
         return this.sessionID.switchMap(sessionID => this.getApp(appPath).flatMap(latestApp => {
             const nextRevision = (latestApp["sbg:latestRevision"] || 0) + 1;
-            const endpoint = `${this.platformServices.brood}/apps/${appPath}/${nextRevision}`;
+            const endpoint     = `${this.platformServices.brood}/apps/${appPath}/${nextRevision}`;
 
             return this.http.post(endpoint, Object.assign({}, app, {
                 "sbg:revisionNotes": revisionNote
@@ -176,6 +198,9 @@ export class PlatformAPI {
         }));
     }
 
+    /**
+     * @deprecated Use PlatformAPIGatewayService for multiplatform support
+     */
     public getUpdates(ids: string []) {
         return this.sessionID.switchMap(sessionID =>
             this.http.post(`${this.platformServices.brood}/updates`, ids, {
@@ -185,6 +210,9 @@ export class PlatformAPI {
             }).map(r => r.json().message).first());
     }
 
+    /**
+     * @deprecated Use PlatformAPIGatewayService for multiplatform support
+     */
     public getUserInfo() {
         return this.sessionID.switchMap(sessionID =>
             this.http.get(`${this.platformServices.gatekeeper}/user/`, {
@@ -194,6 +222,9 @@ export class PlatformAPI {
             }).map(r => r.json().message).first());
     }
 
+    /**
+     * @deprecated Use PlatformAPIGatewayService for multiplatform support
+     */
     public sendFeedback(type: string, message: string) {
         return this.settings.platformConfiguration.take(1).switchMap((conf) => {
                 const data = {
@@ -221,7 +252,7 @@ export class PlatformAPI {
     // FIXME should not be here but currently here is the only place where it is used
     private getFormatedCurrentTimeStamp() {
         const date = new Date();
-        const pad = (n) => (n < 10 ? "0" : "") + n;
+        const pad  = (n) => (n < 10 ? "0" : "") + n;
 
         // format is YYYYMMDDHHMMSS
         return date.getFullYear() +
@@ -239,4 +270,6 @@ export class PlatformAPI {
         });
         return params;
     }
+
+
 }
