@@ -49,7 +49,7 @@ export class AutoCompleteComponent extends SelectComponent implements ControlVal
     }
 
     onChange(value: string) {
-        this.update.next(this.mono ? value : value.split(this.delimiter));
+        this.update.next(this.mono ? value : (value ? value.split(this.delimiter) : []));
     }
 
     registerOnChange(fn: any): void {

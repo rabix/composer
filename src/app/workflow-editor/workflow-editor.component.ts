@@ -122,6 +122,7 @@ import LoadOptions = jsyaml.LoadOptions;
             </ct-workflow-graph-editor>
 
             <ct-app-info *ngIf="viewMode === 'info' && !isLoading"
+                         [readonly]="!data.isWritable"
                          [class.flex-col]="showInspector"
                          [model]="workflowModel">
             </ct-app-info>
