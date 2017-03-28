@@ -1,7 +1,7 @@
 import {
     Component,
     Input,
-    OnChanges,
+    OnChanges, OnInit,
     SimpleChanges
 } from "@angular/core";
 import {WorkflowModel} from "cwlts/models";
@@ -12,64 +12,143 @@ import {CommandInputParameterModel, WorkflowInputParameterModel, CommandLineTool
     selector: "ct-app-info",
     styleUrls: ["./app-info.component.scss"],
     template: `
-      <div class="app-info">
-          <div class="app-info-item app-info-header">
-              <h3>
-                  <ct-inline-editor  [value]="model.label"  label="Name" [required]="true" type="text" (saveData)="model.label = $event">
-                      <h3>{{model.label}}</h3>
-                  </ct-inline-editor>
-              </h3>
-              <div>Created by {{createdBy}} on {{createdOn | date}}. Last edited by {{editedBy}} on {{editedOn | date}}</div>
-              <div *ngIf="revisionNote">Revision note: "{{revisionNote}}"</div>
-          </div>
-          <h3>Description:</h3>
-          <ct-inline-editor [value]="model.description" label="Description" type="textarea" (saveData)="model.description = $event">
-              <div class="app-info-item app-info-description" [ct-markdown]="model.description"></div>
-          </ct-inline-editor>
+        <div class="app-info">
 
-          <div class="app-info-item app-info-meta">
-              <div class="app-info-meta-item">
-                  <ct-inline-editor [value]="model.customProps['sbg:categories']" label="Categories" type="tags" (saveData)="model.customProps['sbg:categories'] = $event">
-                      <h4>Categories</h4>
-                      <ul>
-                          <li *ngFor="let cat of model.customProps['sbg:categories'];">{{cat}}</li>
-                      </ul>
-                  </ct-inline-editor>
-              </div>
-              <div class="app-info-meta-item">
-                  <h4>Toolkit</h4>
-                  <div><ct-inline-editor  [value]="model.customProps['sbg:toolkit']"  label="Toolkit" [required]="false" type="text" (saveData)="model.customProps['sbg:toolkit'] = $event">{{model.customProps['sbg:toolkit']}}</ct-inline-editor>&nbsp;<ct-inline-editor  [value]="model.customProps['sbg:toolkitVersion']"  label="Toolkit version" [required]="false" type="text" (saveData)="model.customProps['sbg:toolkitVersion'] = $event">{{model.customProps['sbg:toolkitVersion']}}</ct-inline-editor></div>
-              </div>
-              <div class="app-info-meta-item">
-                  <ct-inline-editor  [value]="model.customProps['sbg:license']"  label="License" [required]="false" type="text" (saveData)="model.customProps['sbg:license'] = $event">
-                      <h4>License</h4>
-                      <div>{{model.customProps['sbg:license']}}</div>
-                  </ct-inline-editor>
-              </div>
-              <div class="app-info-meta-item">
-                  <ct-inline-editor [value]="model.customProps['sbg:contributors']" label="Contributors" type="tags" (saveData)="model.customProps['sbg:contributors'] = $event">
-                      <h4>Contributors</h4>
-                      <ul>
-                          <li *ngFor="let contrib of model.customProps['sbg:contributors']">{{contrib}}</li>
-                      </ul>
-                  </ct-inline-editor>
-              </div>
-          </div>
-          <div class="app-info-item app-info-links">
-              <ct-inline-editor [value]="model.customProps['sbg:links']"  label="Links" [required]="true" type="keyvalue" (saveData)="model.customProps['sbg:links'] = $event">
-                  <h3>Links</h3>
-                  <ul>
-                      <li *ngFor="let link of model.customProps['sbg:links']"><a href="" (click)="$event.preventDefault(); openWebPage(link.id)">{{link.label}}</a></li>
-                  </ul>
-              </ct-inline-editor>
-          </div>
-          <div class="app-info-item app-info-details">
-              <ct-tabs-component>
-                  <ct-tab-component tabTitle="Inputs">
-                     <div *ngIf="inputs.length === 0">
-                         No inputs.
-                     </div>
-                     <table class="table" *ngIf="inputs.length > 0">
+            <!--Header section-->
+            <div class="info-section">
+                    <ct-inline-editor [value]="model.label" type="text"
+                                      [disabled]="readonly"
+                                      (saveData)="model.label = $event">
+                       <h3>{{model.label}}</h3>
+                    </ct-inline-editor>
+                <div>Created by {{createdBy}} on {{createdOn | date}}. Last edited by {{editedBy}} on {{editedOn | date}}</div>
+                <div *ngIf="revisionNote">Revision note: "{{revisionNote}}"</div>
+            </div>
+
+            <!--Description section-->
+            <div class="info-section">
+                <h5>Description:</h5>
+                <ct-inline-editor [value]="model.description"
+                                  [disabled]="readonly"
+                                  type="textarea"
+                                  (saveData)="model.description = $event">
+                    <div [ct-markdown]="model.description"></div>
+                </ct-inline-editor>
+            </div>
+
+            <!--Meta section-->
+            <div class="info-section">
+                <div class="app-info-meta">
+
+                    <!--Categories-->
+                    <div class="col-lg-4 col-sm-6 app-info-meta-item">
+                        <h5>Categories</h5>
+                        <ct-inline-editor [value]="model.customProps['sbg:categories']"
+                                          type="tags"
+                                          [disabled]="readonly"
+                                          [options]="categories"
+                                          (saveData)="model.customProps['sbg:categories'] = $event">
+                            {{model.customProps['sbg:categories'].join(", ")}}
+                        </ct-inline-editor>
+                    </div>
+
+                    <!--Toolkit-->
+                    <div class="col-lg-4 col-sm-6 app-info-meta-item">
+                        <h5>Toolkit</h5>
+                        <div>
+                            <ct-inline-editor [disabled]="readonly" class="toolkit"
+                                              [value]="model.customProps['sbg:toolkit']"
+                                              type="text" (saveData)="model.customProps['sbg:toolkit'] = $event">
+                                {{model.customProps['sbg:toolkit']}}
+                            </ct-inline-editor>
+                            <ct-inline-editor class="toolkit"
+                                              [disabled]="readonly"
+                                              [value]="model.customProps['sbg:toolkitVersion']"
+                                              type="text"
+                                              (saveData)="model.customProps['sbg:toolkitVersion'] = $event">
+                                {{model.customProps['sbg:toolkitVersion']}}
+                            </ct-inline-editor>
+                        </div>
+                    </div>
+
+                    <!--License-->
+                    <div class="col-lg-4 col-sm-6 app-info-meta-item">
+                        <h5>License</h5>
+                        <ct-inline-editor [value]="model.customProps['sbg:license']"
+                                          [disabled]="readonly"
+                                          type="text" (saveData)="model.customProps['sbg:license'] = $event">
+                            <div>{{model.customProps['sbg:license']}}</div>
+                        </ct-inline-editor>
+                    </div>
+
+                    <!--Author-->
+                    <div class="col-lg-4 col-sm-6 app-info-meta-item">
+                        <h5>Author</h5>
+                        <ct-inline-editor [value]="model.customProps['sbg:toolAuthor']"
+                                          [disabled]="readonly"
+                                          type="text" (saveData)="model.customProps['sbg:toolAuthor'] = $event">
+                            {{model.customProps['sbg:toolAuthor']}}
+                        </ct-inline-editor>
+                    </div>
+
+                    <!--Contributors-->
+                    <div class="col-lg-4 col-sm-6 app-info-meta-item">
+                        <h5>Contributors</h5>
+                        {{model.customProps['sbg:contributors'].join(", ")}}
+                    </div>
+
+                    <!--CWL version-->
+                    <div class="col-lg-4 col-sm-6 app-info-meta-item">
+                        <h5>CWL version</h5>
+                        {{model['cwlVersion']}}
+                    </div>
+
+                    <!--Links-->
+                    <div class="col-lg-4 col-sm-6 app-info-meta-item">
+                        <h5>Links</h5>
+                        <ct-inline-editor [value]="model.customProps['sbg:links']"
+                                          [disabled]="readonly"
+                                          type="keyvalue" (saveData)="model.customProps['sbg:links'] = $event">
+
+                            <span *ngFor="let link of model.customProps['sbg:links']" class="links">
+                                    <a href=""
+                                       (click)="$event.preventDefault();
+                                       $event.stopPropagation();
+                                       openWebPage(link.id)">{{link.label}}</a>
+                            </span>
+
+                        </ct-inline-editor>
+                    </div>
+
+                    <!--ID-->
+                    <div class="col-lg-4 col-sm-6 app-info-meta-item">
+                        <h5>Id</h5>
+                        {{model.customProps['sbg:id']}}
+                    </div>
+                </div>
+
+            </div>
+
+            <!--Table section-->
+            <div class="info-section">
+
+                <ct-tab-selector class="inverse" [distribute]="'auto'" [active]="viewMode"
+                                 (activeChange)="switchTab($event)">
+                    <ct-tab-selector-entry [tabName]="'inputs'">Inputs
+                    </ct-tab-selector-entry>
+                    <ct-tab-selector-entry [tabName]="'appSettings'">App Settings
+                    </ct-tab-selector-entry>
+                    <ct-tab-selector-entry [tabName]="'outputs'">Outputs
+                    </ct-tab-selector-entry>
+                </ct-tab-selector>
+
+
+                <!--Inputs-->
+                <div *ngIf="viewMode === 'inputs'">
+                    <div *ngIf="inputs.length === 0">
+                        No inputs.
+                    </div>
+                    <table class="table" *ngIf="inputs.length > 0">
                         <tr>
                             <th>ID</th>
                             <th>Label</th>
@@ -79,63 +158,101 @@ import {CommandInputParameterModel, WorkflowInputParameterModel, CommandLineTool
                             <th>Format</th>
                         </tr>
                         <tr *ngFor="let input of inputs">
-                            <th scope="row">{{input.id}}</th>
+                            <td>{{input.id}}</td>
                             <td>{{input.label}}</td>
                             <td>{{input.type | commandParameterType}}</td>
                             <td>{{input.type.isNullable ? 'False' : 'True'}}</td>
                             <td>prefix</td>
                             <td>{{input.fileTypes ? input.fileTypes.join(', ') : '-'}}</td>
                         </tr>
-                     </table>
-                  </ct-tab-component>
-                  <ct-tab-component tabTitle="App Settings">
-                      <div *ngIf="appSettings.length === 0">
+                    </table>
+                </div>
+
+
+                <!--App settings-->
+                <div *ngIf="viewMode === 'appSettings'">
+                    <div *ngIf="appSettings.length === 0">
                         No settings.
-                      </div>
-                      <table class="table" *ngIf="appSettings.length > 0">
-                          <tr>
-                              <th>ID</th>
-                              <th>Label</th>
-                              <th>Type</th>
-                              <th>Required</th>
-                              <th>Prefix</th>
-                              <th>Format</th>
-                          </tr>
-                          <tr *ngFor="let input of appSettings">
-                              <th scope="row">{{input.id}}</th>
-                              <td>{{input.label}}</td>
-                              <td>{{input.type | commandParameterType}}</td>
-                              <td>{{input.type.isNullable ? 'False' : 'True'}}</td>
-                              <td>prefix</td>
-                              <td>{{input.fileTypes ? input.fileTypes.join(', ') : '-'}}</td>
-                          </tr>
-                      </table>
-                  </ct-tab-component>
-                  <ct-tab-component tabTitle="Outputs">
-                      <div *ngIf="model.outputs.length === 0">
-                          No outputs.
-                      </div>
-                      <table class="table">
-                          <tr>
-                              <th>ID</th>
-                              <th>Label</th>
-                              <th>Type</th>
-                              <th>Format</th>
-                          </tr>
-                          <tr *ngFor="let output of model.outputs">
-                              <th scope="row">{{output.id}}</th>
-                              <td>{{output.label}}</td>
-                              <td>{{output.type | commandParameterType}}</td>
-                              <td>{{output.fileTypes ? output.fileTypes.join(', ') : '-'}}</td>
-                          </tr>
-                      </table>
-                  </ct-tab-component>
-              </ct-tabs-component>
-          </div>
-      </div>
+                    </div>
+                    <table class="table" *ngIf="appSettings.length > 0">
+                        <tr>
+                            <th>ID</th>
+                            <th>Label</th>
+                            <th>Type</th>
+                            <th>Required</th>
+                            <th>Prefix</th>
+                            <th>Format</th>
+                        </tr>
+                        <tr *ngFor="let input of appSettings">
+                            <td>{{input.id}}</td>
+                            <td>{{input.label}}</td>
+                            <td>{{input.type | commandParameterType}}</td>
+                            <td>{{input.type.isNullable ? 'False' : 'True'}}</td>
+                            <td>prefix</td>
+                            <td>{{input.fileTypes ? input.fileTypes.join(', ') : '-'}}</td>
+                        </tr>
+                    </table>
+                </div>
+
+
+                <!--Outputs-->
+                <div *ngIf="viewMode === 'outputs'">
+                    <div *ngIf="model.outputs.length === 0">
+                        No outputs.
+                    </div>
+                    <table class="table">
+                        <tr>
+                            <th>ID</th>
+                            <th>Label</th>
+                            <th>Type</th>
+                            <th>Format</th>
+                        </tr>
+                        <tr *ngFor="let output of model.outputs">
+                            <td>{{output.id}}</td>
+                            <td>{{output.label}}</td>
+                            <td>{{output.type | commandParameterType}}</td>
+                            <td>{{output.fileTypes ? output.fileTypes.join(', ') : '-'}}</td>
+                        </tr>
+                    </table>
+                </div>
+
+            </div>
+        </div>
     `
 })
 export class AppInfoComponent implements OnChanges {
+
+    viewMode = "inputs";
+
+    categories = [
+        "DNA",
+        "WGS",
+        "WES (WXS)",
+        "RNA",
+        "Targeted sequencing",
+        "Assembly",
+        "Alignment",
+        "Annotation",
+        "BED Processing",
+        "Converters",
+        "Differential Expression",
+        "FASTA Processing",
+        "FASTQ Processing",
+        "Indexing",
+        "Other",
+        "Plotting and Rendering",
+        "Prioritization",
+        "SAM/BAM Processing",
+        "Text Processing",
+        "VCF Processing",
+        "Variant Calling",
+        "Quality Control",
+        "Quantification"
+    ];
+
+    @Input()
+    public readonly = false;
+
     @Input()
     model: WorkflowModel | CommandLineToolModel;
 
@@ -152,21 +269,28 @@ export class AppInfoComponent implements OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        this.createdBy = this.model.customProps['sbg:createdBy'];
-        this.createdOn = this.model.customProps['sbg:createdOn'] * 1000;
-        this.editedBy = this.model.customProps['sbg:modifiedBy'];
-        this.editedOn = this.model.customProps['sbg:modifiedOn'] * 1000;
-        this.revisionNote = this.model.customProps['sbg:revisionNotes'] || null;
+
+        this.createdBy = this.model.customProps["sbg:createdBy"];
+        this.createdOn = this.model.customProps["sbg:createdOn"] * 1000;
+        this.editedBy = this.model.customProps["sbg:modifiedBy"];
+        this.editedOn = this.model.customProps["sbg:modifiedOn"] * 1000;
+        this.revisionNote = this.model.customProps["sbg:revisionNotes"] || null;
 
 
         this.inputs = (this.model.inputs as Array<CommandInputParameterModel | WorkflowInputParameterModel>)
-            .filter((input) => input.type.type === 'File' || input.type.items === 'File');
+            .filter((input) => input.type.type === "File" || input.type.items === "File");
         this.appSettings = (this.model.inputs as Array<CommandInputParameterModel | WorkflowInputParameterModel>)
-            .filter((input) => input.type.type !== 'File' || input.type.items !== 'File');
+            .filter((input) => input.type.type !== "File" || input.type.items !== "File");
     }
 
 
     private openWebPage(url: string) {
         this.system.openLink(url);
+    }
+
+    switchTab(tabName) {
+        setTimeout(() => {
+            this.viewMode = tabName;
+        });
     }
 }

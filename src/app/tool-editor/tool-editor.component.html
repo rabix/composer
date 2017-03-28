@@ -93,6 +93,7 @@
 
     <ct-app-info *ngIf="viewMode === 'info' && !isLoading"
                  class="gui-editor-component p-2"
+                 [readonly]="!data.isWritable"
                  [class.flex-col]="showInspector"
                  [model]="toolModel"></ct-app-info>
 
