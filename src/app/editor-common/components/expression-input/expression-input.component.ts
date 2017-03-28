@@ -32,7 +32,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
 
                 <input class="form-control"
                        #input
-                       [type]="isExpr ? 'string' : type"
+                       [type]="isExpr ? 'text' : type"
                        [value]="value?.toString()"
                        [readonly]="isExpr || disableLiteralTextInput || readonly"
                        (blur)="onTouch()"
@@ -89,10 +89,8 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
 
     /** setter for formControl value */
     set value(val: ExpressionModel) {
-        if (val !== this.model) {
-            this.model = val;
-            this.onChange(val);
-        }
+        this.model = val;
+        this.onChange(val);
     }
 
     /**
@@ -175,13 +173,14 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
             const editor = this.modal.fromComponent(ModelExpressionEditorComponent, {
                 backdrop: true,
                 closeOnOutsideClick: false,
+                closeOnEscape: false,
                 title: "Edit Expression"
             });
 
             editor.readonly = this.readonly;
 
             const cachedValue = this.model.serialize() || "";
-            const cachedType = this.model.type;
+            const cachedType  = this.model.type;
 
             editor.model   = this.model;
             editor.context = this.context;
