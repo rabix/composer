@@ -140,6 +140,34 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
             };
         }));
 
+
+        const projectSearch = (term) => this.dataGateway.searchUserProjects(term).map(resultGroups => {
+            return resultGroups.map(group => {
+
+                const {results, hash} = group;
+
+                return results.map(result => {
+                    const id    = hash + "/" + result["owner"] + "/" + result["slug"] + "/" + result["sbg:id"];
+                    const title = result.label;
+
+                    return {
+                        id,
+                        icon: result.class === "Workflow" ? "fa-share-alt" : "fa-terminal",
+                        title,
+                        label: result.id.split("/").slice(5, 7).join(" → "),
+                        relevance: 1.5,
+
+                        dragEnabled: true,
+                        dragTransferData: id,
+                        dragLabel: title,
+                        dragImageClass: result["class"] === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
+                        dragDropZones: ["zone1"]
+                    };
+                });
+
+            }).reduce((acc, item) => acc.concat(...item), []);
+        });
+
         // const projectsSearch = (term) => this.dataGateway.searchUserProjects(term).map(results => results.map(result => {
         //
         //     const id    = result.profile + "/" + result["sbg:projectName"] + "/" + result["sbg:id"];
@@ -168,7 +196,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                 this.appliedSearchTerm = term;
             })
             .filter(term => term.trim().length !== 0)
-            .switchMap(term => Observable.forkJoin(localFileSearch(term), Observable.of([])))
+            .switchMap(term => Observable.forkJoin(localFileSearch(term), projectSearch(term)))
             .subscribe(datasets => {
                 const combined     = [].concat(...datasets).sort((a, b) => b.relevance - a.relevance);
                 this.searchResults = combined;

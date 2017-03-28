@@ -15,6 +15,7 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
 import {ModalService} from "../../ui/modal/modal.service";
 import Platform = NodeJS.Platform;
 import {AuthService} from "../../auth/auth/auth.service";
+import {PlatformAppEntry} from "../../services/api/platforms/platform-api.types";
 
 @Injectable()
 export class DataGatewayService {
@@ -135,12 +136,17 @@ export class DataGatewayService {
         })).take(1);
     }
 
-    searchUserProjects(term: string, limit = 20) {
+    searchUserProjects(term: string, limit = 20): Observable<{ hash: string, results: PlatformAppEntry[] }[]> {
 
-        // this.auth.connections.take(1).flatMap(credentials => {
-        //     const hashes = credentials.map(c => c.hash);
-        // });
-        // return this.ipc.request("searchUserProjects", {term, limit});
+        return this.auth.connections.take(1).flatMap(credentials => {
+            const hashes   = credentials.map(c => c.hash);
+            const requests = hashes.map(hash =>
+                this.apiGateway.forHash(hash)
+                    .searchUserProjects(term, limit)
+                    .map(results => ({results, hash}))
+            );
+            return Observable.forkJoin(requests);
+        });
     }
 
     getPublicApps(hash) {

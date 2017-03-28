@@ -157,4 +157,12 @@ export class PlatformAPI {
         }).map(r => r.json().message);
     }
 
+    searchUserProjects(query: string, limit = 20): Observable<PlatformAppEntry[]> {
+        return this.http.get(this.getServiceURL("brood") + `/apps?_role=minimal&visibility=mine&_limit=${limit}&q=${query}`, {
+            headers: new Headers({
+                "session-id": this.sessionID
+            })
+        }).map(r => r.json().message);
+    }
+
 }

@@ -1,6 +1,6 @@
 import {Component, ViewContainerRef, ViewEncapsulation} from "@angular/core";
 import {Observable} from "rxjs/Rx";
-import {DataGatewayService} from "../../core/data-gateway/data-gateway.service";
+import {AuthService} from "../../auth/auth/auth.service";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {ElectronPublicAppService} from "../../platform-providers/public-apps/electron-public-app.service";
 import {PublicAppService} from "../../platform-providers/public-apps/public-app.service";
@@ -11,14 +11,10 @@ import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {EventHubService} from "../../services/event-hub/event-hub.service";
 import {GuidService} from "../../services/guid.service";
 import {LocalDataSourceService} from "../../sources/local/local.source.service";
-import {SBPlatformDataSourceService} from "../../sources/sbg/sb-platform.source.service";
 import {ContextService} from "../../ui/context/context.service";
 import {MarkdownService} from "../../ui/markdown/markdown.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {UrlValidator} from "../../validators/url.validator";
-import {UserPreferencesService} from "../../services/storage/user-preferences.service";
-import {AuthService} from "../../auth/auth/auth.service";
-import {PlatformAPIGatewayService} from "../../auth/api/platform-api-gateway.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -35,7 +31,6 @@ import {PlatformAPIGatewayService} from "../../auth/api/platform-api-gateway.ser
         EventHubService,
         UrlValidator,
         PlatformAPI,
-        SBPlatformDataSourceService,
         MarkdownService,
         ContextService,
         StatusBarService,
@@ -53,10 +48,7 @@ export class MainComponent {
     constructor(modal: ModalService,
                 system: SystemService,
                 vcRef: ViewContainerRef,
-                auth: AuthService,
-                preferences: UserPreferencesService,
-                dataGateway: DataGatewayService,
-                statusBarService: StatusBarService) {
+                auth: AuthService) {
 
         system.boot();
 
