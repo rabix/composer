@@ -240,7 +240,7 @@ export class PublicAppsPanelComponent extends DirectiveBase implements AfterView
 
                     return {
                         id,
-                        label: creds.profile === "default" ? "Seven Bridges" : creds.profile,
+                        label: label,
                         type: "folder",
                         data: creds,
                         icon: "fa-folder",
