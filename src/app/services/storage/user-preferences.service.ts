@@ -98,6 +98,6 @@ export class UserPreferencesService {
     }
 
     getOpenProjects() {
-        return this.get("openProjects", []).do(data => console.log("Returning open projects", data));
+        return this.get("openProjects", []);
     }
 }

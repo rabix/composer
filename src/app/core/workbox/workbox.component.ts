@@ -37,7 +37,7 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
         </div>
 
         <div class="body">
-            
+
             <ng-template hidden ngFor let-tab [ngForOf]="tabs">
 
                 <div class="component-container" [ngSwitch]="tab?.type" [hidden]="tab !== activeTab">
@@ -124,6 +124,12 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
 
             if (component && (component as StatusControlProvider).provideStatusControls) {
                 this.statusBar.setControls(component.provideStatusControls());
+            }
+
+            if (component && typeof component.onTabActivation === "function") {
+                setTimeout(() => {
+                    component.onTabActivation();
+                });
             }
         });
 

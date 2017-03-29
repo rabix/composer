@@ -22,7 +22,6 @@ export class DataGatewayService {
 
     private cache = {};
 
-    scans          = new Subject<Observable<any>>();
     scanCompletion = new ReplaySubject<string>();
 
     static getFileSource(id): "local" | "public" | "app" {
@@ -90,17 +89,6 @@ export class DataGatewayService {
             `${hash}.getPlatformListing`,
             this.apiGateway.forHash(hash).getRabixProjects().publishReplay(1).refCount()
         );
-
-        // const allProjects  = this.scanCompletion.flatMap(s => this.preferences.get(`dataCache.${source}.projects`, []));
-        // const openProjects = this.preferences.get("openProjects", [])
-        //     .map(projects => projects
-        //         .filter(p => p.startsWith(source + "/"))
-        //         .map(p => p.slice(source.length + 1))
-        //     );
-        //
-        // return Observable.combineLatest(allProjects, openProjects, (all = [], open) => {
-        //     return all.filter(project => open.indexOf(project.slug) !== -1);
-        // });
     }
 
     getProjectListing(hash, projectOwner: string, projectSlug: string): Observable<any[]> {
@@ -116,10 +104,6 @@ export class DataGatewayService {
 
     getLocalListing() {
         return this.preferences.get("localFolders", []);
-    }
-
-    getLocalFile(path) {
-        return this.ipc.request("readFileContent", path);
     }
 
     searchLocalProjects(term, limit = 20) {

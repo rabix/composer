@@ -87,6 +87,8 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     private future  = [];
     private historyHandler: (ev: KeyboardEvent) => void;
 
+    private tryToFitWorkflowOnNextTabActivation = false;
+
     constructor(private statusBar: StatusBarService,
                 private gateway: DataGatewayService,
                 private ipc: IpcService,
@@ -113,8 +115,17 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
     ngAfterViewInit() {
 
+        if (Workflow.canDrawIn(this.canvas.nativeElement)) {
+            this.drawGraphAndAttachListeners();
+        } else {
+            this.tryToFitWorkflowOnNextTabActivation = true;
+        }
+    }
+
+    drawGraphAndAttachListeners() {
         this.graph = new Workflow(new Snap(this.canvas.nativeElement), this.model as any);
-        this.graph.command("workflow.fit");
+        this.graph.fitToViewport();
+
 
         this.graph.on("beforeChange", () => {
             if (this.history.length > 20) {
@@ -148,7 +159,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
     ngOnChanges() {
         if (this.graph) {
-            this.graph.redraw();
+            this.graph.redraw(this.model as any);
         }
         // if (firstAnything && firstAnything.customProps["sbg:x"] === undefined) {
         //     console.log("Should arrange");
@@ -252,4 +263,8 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         this.inspector.hide();
     }
 
+    checkOutstandingGraphFitting() {
+        this.drawGraphAndAttachListeners();
+        this.tryToFitWorkflowOnNextTabActivation = false;
+    }
 }

@@ -20,6 +20,7 @@ import {SettingsService} from "../services/settings/settings.service";
 import {DirectiveBase} from "../util/directive-base/directive-base";
 
 import LoadOptions = jsyaml.LoadOptions;
+import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow-graph-editor.component";
 
 @Component({
     selector: "ct-workflow-editor",
@@ -106,12 +107,6 @@ import LoadOptions = jsyaml.LoadOptions;
                             class="editor">
             </ct-code-editor>
 
-            <!--GUI Editor-->
-            <ct-workflow-not-graph-editor *ngIf="viewMode === 'list' && !isLoading"
-                                          class="editor-main"
-                                          [readonly]="!data.isWritable"
-                                          [model]="workflowModel"></ct-workflow-not-graph-editor>
-
             <ct-workflow-graph-editor *ngIf="viewMode === 'graph' && !isLoading"
                                       [readonly]="!data.isWritable"
                                       [model]="workflowModel"
@@ -166,6 +161,7 @@ import LoadOptions = jsyaml.LoadOptions;
 })
 export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy, OnInit, WorkboxTab {
 
+
     @Input()
     data: AppTabData;
 
@@ -194,6 +190,9 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
     codeEditorContent = new FormControl(undefined);
 
     priorityCodeUpdates = new Subject<string>();
+
+    @ViewChild(WorkflowGraphEditorComponent)
+    private graphEditor: WorkflowGraphEditorComponent;
 
     /** Flag for showing reformat prompt on GUI switch */
     private showReformatPrompt = true;
@@ -466,7 +465,15 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
     }
 
     openRevision(revisionNumber: number) {
-        console.warn("Fix revision opening");
+        const fileWithoutRevision = this.data.id.split("/");
+        fileWithoutRevision.pop();
+        fileWithoutRevision.push(revisionNumber.toString());
+
+        const fid = fileWithoutRevision.join("/");
+
+        this.dataGateway.fetchFileContent(fid).subscribe(txt => {
+            this.priorityCodeUpdates.next(txt);
+        });
         // this.platform.getAppCWL(this.data.data, revisionNumber).subscribe(cwl => {
         //     this.rawEditorContent.next(cwl);
         // });
@@ -487,6 +494,12 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
         this.settings.platformConfiguration.first().map(settings => settings.url).subscribe((url) => {
             this.system.openLink(`${url}/u/${urlProject}/apps/#${urlApp}`);
         });
+    }
+
+    onTabActivation(): void {
+        if (this.graphEditor) {
+            this.graphEditor.checkOutstandingGraphFitting();
+        }
     }
 
 }

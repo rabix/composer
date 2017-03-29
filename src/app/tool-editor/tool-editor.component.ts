@@ -28,6 +28,8 @@ import LoadOptions = jsyaml.LoadOptions;
     templateUrl: "./tool-editor.component.html"
 })
 export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDestroy, WorkboxTab, AfterViewInit {
+
+
     @Input()
     data: AppTabData;
 
@@ -321,5 +323,8 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
 
     provideStatusControls() {
         return this.statusControls;
+    }
+
+    onTabActivation(): void {
     }
 }
