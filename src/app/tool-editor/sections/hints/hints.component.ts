@@ -5,6 +5,7 @@ import {
 import {CommandLineToolModel} from "cwlts/models";
 import {FormArray, FormControl, FormGroup} from "@angular/forms";
 import {ModalService} from "../../../ui/modal/modal.service";
+import {Subscription} from "rxjs/Subscription";
 
 @Component({
     selector: "ct-hints",
@@ -89,6 +90,8 @@ export class HintsComponent implements OnChanges {
     @Output()
     update = new EventEmitter();
 
+    private sub: Subscription;
+
     constructor(private modal: ModalService) {
     }
 
@@ -100,11 +103,19 @@ export class HintsComponent implements OnChanges {
         }
 
         if (model.hints) {
+            if (this.sub) {
+                this.sub.unsubscribe();
+            }
+
             this.form.setControl("hints", new FormArray([]));
 
             model.hints.forEach(h => {
                 (this.form.get("hints") as FormArray)
                     .push(new FormControl({value: h, disabled: this.readonly}));
+            });
+
+            this.sub = this.form.valueChanges.subscribe(form => {
+                this.update.emit(this.model.hints);
             });
         }
     }

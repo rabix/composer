@@ -38,7 +38,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         <button type="button"
                 class="btn btn-secondary custom-btn"
                 *ngIf="!showCustom && !readonly"
-                (click)="addCustom('')">Custom
+                (click)="addCustom(true)">Custom
         </button>
 
         <div *ngIf="showCustom" class="removable-form-control">
@@ -49,7 +49,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             </ct-expression-input>
 
             <span class="remove-icon clickable ml-1 text-hover-danger"
-                  (click)="removeCustom($event)">
+                  (click)="removeCustom($event, true)">
                 <i *ngIf="!readonly" [ct-tooltip]="'Delete'" class="fa fa-trash"></i>
             </span>
         </div>
@@ -76,10 +76,7 @@ export class QuickPickComponent extends DirectiveBase implements ControlValueAcc
 
     list: { label: string, value: string | number }[] = [];
 
-    form = new FormGroup({
-        custom: new FormControl(),
-        radio: new FormControl()
-    });
+    form = new FormGroup({});
 
     private onTouch = noop;
 
@@ -126,27 +123,10 @@ export class QuickPickComponent extends DirectiveBase implements ControlValueAcc
             console.warn(`Please provide ct-quick-pick with a list of suggested values
 available types: {[label: string]: string | number} | string[]`);
         }
-
-        // set up watcher for custom form
-        this.tracked = this.form.controls["custom"].valueChanges.skip(1).subscribe((expr: ExpressionModel) => {
-            this.computedVal = expr.serialize();
-            this._value      = expr;
-            this.onChange(this._value);
-            this.onTouch();
-        });
-
-        // set up watcher for radio button form
-        this.tracked = this.form.controls["radio"].valueChanges.skip(1).subscribe(primitive => {
-            this._value.setValue(primitive, this.type);
-            this.computedVal = primitive;
-            this.onChange(this._value);
-            this.onTouch();
-        });
     }
 
-    writeValue(value: ExpressionModel): void {
 
-        this.onChange(value);
+    writeValue(value: ExpressionModel): void {
         this._value = value;
 
         if (value instanceof ExpressionModel) {
@@ -159,8 +139,11 @@ available types: {[label: string]: string | number} | string[]`);
                 return item.value === this.computedVal;
             }).length && this.computedVal !== undefined;
 
-        this.form.controls["radio"].setValue(this.computedVal);
-        this.form.controls["custom"].setValue(value);
+        if (this.showCustom) {
+            this.addCustom();
+        } else {
+            this.removeCustom();
+        }
     }
 
     registerOnChange(fn: any): void {
@@ -171,12 +154,24 @@ available types: {[label: string]: string | number} | string[]`);
         this.onTouch = fn;
     }
 
-    addCustom(value: string): void {
+    addCustom(reset?: boolean): void {
+        this.form.removeControl("radio");
         this.showCustom = true;
-        this._value.setValue(value, this.type);
+
+        if (reset) {
+            this._value.setValue("", this.type);
+        }
+
+        this.form.setControl("custom", new FormControl(this._value));
+
+        this.tracked = this.form.controls["custom"].valueChanges.subscribe(expr => {
+            this._value      = expr;
+            this.computedVal = expr.serialize();
+            this.onChange(this._value);
+        });
     }
 
-    removeCustom(event?: Event): void {
+    removeCustom(event?: Event, reset?: boolean): void {
         if (!!event) {
             event.stopPropagation();
             this.modal.confirm({
@@ -185,15 +180,27 @@ available types: {[label: string]: string | number} | string[]`);
                 cancellationLabel: "No, keep it",
                 confirmationLabel: "Yes, remove it"
             }).then(() => {
-                this.removeFunction();
+                this.removeFunction(reset);
             }, err => console.warn);
         } else {
-            this.removeFunction();
+            this.removeFunction(reset);
         }
     }
 
-    removeFunction() {
+    removeFunction(reset?: boolean) {
+        this.form.removeControl("custom");
         this.showCustom = false;
-        this._value.setValue("", this.type);
+
+        if (reset) {
+            this._value.setValue("", this.type);
+        }
+
+        this.form.setControl("radio", new FormControl(this._value.serialize()));
+
+        this.tracked = this.form.controls["radio"].valueChanges.subscribe(prim => {
+            this._value.setValue(prim, this.type);
+            this.computedVal = prim;
+            this.onChange(this._value);
+        });
     }
 }

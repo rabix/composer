@@ -86,15 +86,15 @@ export class RequirementInputComponent extends DirectiveBase implements ControlV
 
         if (obj.class !== undefined && obj.value !== undefined) {
             this.editType = "full";
-            this.form.controls["class"].setValue(obj.class);
+            this.form.controls["class"].setValue(obj.class, {onlySelf: true});
             if (this.readonly) {
                 this.form.controls["class"].disable();
             }
-            this.form.controls["value"].setValue(obj.value);
+            this.form.controls["value"].setValue(obj.value, {onlySelf: true});
 
         } else if (obj.class !== undefined && obj.value === undefined) {
             this.editType = "half";
-            this.form.controls["class"].setValue(obj.class);
+            this.form.controls["class"].setValue(obj.class, {onlySelf: true});
             if (this.readonly) {
                 this.form.controls["class"].disable();
             }
