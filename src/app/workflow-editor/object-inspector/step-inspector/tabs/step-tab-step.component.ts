@@ -1,4 +1,7 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, ViewEncapsulation} from "@angular/core";
+import {
+    ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnInit, SimpleChanges,
+    ViewEncapsulation
+} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {Workflow} from "cwl-svg";
 import {StepModel, WorkflowModel} from "cwlts/models";
@@ -52,7 +55,8 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             </select>
 
             <!--Multiple Scatter-->
-            <select *ngIf="step.hasMultipleScatter" class="form-control" multiple [formControl]="form.controls['scatter']">
+            <select *ngIf="step.hasMultipleScatter" class="form-control" multiple
+                    [formControl]="form.controls['scatter']">
                 <option *ngFor="let opt of step.in" [value]="opt.id">
                     {{opt.id}}
                 </option>
@@ -70,7 +74,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
     `
 })
-export class WorkflowStepInspectorTabStep extends DirectiveBase {
+export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnInit, OnChanges {
 
     @Input()
     public step: StepModel;
@@ -100,6 +104,19 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase {
 
     constructor(private formBuilder: FormBuilder, private cdr: ChangeDetectorRef) {
         super();
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+
+        if (this.form && changes["step"]) {
+            const newStep = changes["step"].currentValue;
+
+            this.form.controls["id"].setValue(newStep.id);
+            this.form.controls["label"].setValue(newStep.label);
+            this.form.controls["description"].setValue(newStep.description);
+            this.form.controls["scatterMethod"].setValue(newStep.scatterMethod);
+            this.form.controls["scatter"].setValue(newStep.scatter || "");
+        }
     }
 
     ngOnInit() {

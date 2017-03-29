@@ -1,5 +1,6 @@
 import {
-    AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, TemplateRef,
+    AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output,
+    TemplateRef,
     ViewChild,
     ViewEncapsulation
 } from "@angular/core";
@@ -108,6 +109,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         const removeHandler = (node) => {
             if (node === this.inspectedNode) {
                 this.inspector.hide();
+                this.inspectedNode = null;
             }
         };
 
@@ -134,6 +136,10 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             .filter(() => this.canvasIsInFocus() && this.workflowEditorService.canUndo())
             .subscribe(() => {
                 this.model = WorkflowFactory.from(this.workflowEditorService.historyUndo(this.model));
+
+                // Resets the reference of inspected node (reference is lost after model serialization)
+                this.resetInspectedNodeReference();
+
                 this.modelChange.next(this.model);
                 this.graph.redraw(this.model as any);
             });
@@ -142,11 +148,28 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             .filter(() => this.canvasIsInFocus() && this.workflowEditorService.canRedo())
             .subscribe(() => {
                 this.model = WorkflowFactory.from(this.workflowEditorService.historyRedo(this.model));
+
+                // Resets the reference of inspected node (reference is lost after model serialization)
+                this.resetInspectedNodeReference();
+
                 this.modelChange.next(this.model);
                 this.graph.redraw(this.model as any);
             });
     }
 
+    /**
+     * If inspector is open, set reference of inspected node to a new one
+     */
+    resetInspectedNodeReference() {
+        if (this.inspectedNode) {
+            const connectionId = this.inspectedNode.connectionId;
+
+            const step = this.model.steps.find((step) => connectionId === step.connectionId);
+            const input = this.model.inputs.find((input) => connectionId === input.connectionId);
+            const output = this.model.outputs.find((output) => connectionId === output.connectionId);
+            this.inspectedNode = step || input || output;
+        }
+    }
 
     ngOnChanges() {
         if (this.graph) {
