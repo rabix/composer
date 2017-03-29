@@ -1,5 +1,5 @@
 import {Component, Input, Output, ViewEncapsulation, OnInit} from "@angular/core";
-import {CommandInputParameterModel} from "cwlts/models";
+import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {Subject} from "rxjs/Subject";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
@@ -30,12 +30,14 @@ export class ToolInputInspectorComponent extends DirectiveBase implements OnInit
 
     /** Context in which expression should be evaluated */
     @Input()
-    context: { $job?: any, $self?: any } = {};
+    model: CommandLineToolModel;
 
     @Input()
     readonly = false;
 
     form: FormGroup;
+
+    context: any;
 
     @Output()
     save = new Subject<CommandInputParameterModel>();
@@ -45,7 +47,9 @@ export class ToolInputInspectorComponent extends DirectiveBase implements OnInit
     }
 
     ngOnInit() {
-        this.form = this.formBuilder.group({
+        this.context = this.model.getContext(this.input.id);
+
+        this.form    = this.formBuilder.group({
             basicInputSection: this.input,
             description: this.input,
             stageInputSection: this.input

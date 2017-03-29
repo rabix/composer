@@ -284,7 +284,9 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
     }
 
     onJobUpdate(job) {
-        this.toolModel.setJob(job);
+
+        this.toolModel.setJobInputs(job.inputs);
+        this.toolModel.setRuntime(job.allocatedResources);
         this.toolModel.updateCommandLine();
     }
 

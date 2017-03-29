@@ -1,7 +1,7 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {noop} from "../../../lib/utils.lib";
-import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
+import {ExpressionModel} from "cwlts/models";
 import {ModelExpressionEditorComponent} from "../../../editor-common/expression-editor/model-expression-editor.component";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {ACE_MODE_MAP} from "../../../ui/code-editor-new/ace-mode-map";
@@ -62,7 +62,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
 export class LiteralExpressionInputComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
-    context: { $job?: {} } = {};
+    context: any = {};
 
     @Input()
     fileName: string;
@@ -86,7 +86,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
     /**
      * Internal ExpressionModel on which changes are made
      */
-    model: SBDraft2ExpressionModel;
+    model: ExpressionModel;
 
 
     /** getter for formControl value */
@@ -95,7 +95,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
     }
 
     /** setter for formControl value */
-    set value(val: SBDraft2ExpressionModel) {
+    set value(val: ExpressionModel) {
         if (val !== this.model) {
             this.model = val;
             this.onChange(val);
@@ -107,7 +107,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
     }
 
     writeValue(obj: any): void {
-        if (!(obj instanceof SBDraft2ExpressionModel)) {
+        if (!(obj instanceof ExpressionModel)) {
             console.warn(`ct-literal-expression-input expected ExpressionModel, instead got ${obj}`);
         }
 
@@ -115,8 +115,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
             this.model = obj;
             this.isExpr = obj.isExpression;
         } else {
-            this.model = new SBDraft2ExpressionModel("", "");
-            this.isExpr = this.model.isExpression;
+            console.warn("supposed to get a value, but didn't... :(");
         }
     }
 
@@ -148,7 +147,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
         editor.action.first().subscribe(action => {
             if (action === "save") {
                 // save string
-                this.model = new SBDraft2ExpressionModel(this.model.loc, <string> editor.content.value);
+                this.model.setValue(editor.content.value, "string");
                 this.onChange(this.model);
             }
             this.modal.close();
@@ -188,7 +187,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
             editor.context = this.context;
             editor.action.first().subscribe(action => {
                 if (action === "save") {
-                    this.model = new SBDraft2ExpressionModel(this.model.loc, editor.model.serialize());
+                    this.model = editor.model;
                     this.model.evaluate(this.context); // to reset validation
                     this.isExpr = this.model.isExpression;
                     this.onChange(this.model);

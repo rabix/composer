@@ -26,7 +26,7 @@ import {ToolInputListComponent} from "./tool-input-list.component";
                                     (entriesChange)="update.emit($event)"
                                     [location]="location"
                                     [parent]="model"
-                                    [context]="context"
+                                    [model]="model"
                                     [readonly]="readonly">
                 </ct-tool-input-list>
 
@@ -42,10 +42,6 @@ export class ToolInputsComponent extends DirectiveBase {
     /** Model location entry, used for tracing the path in the json document */
     @Input()
     location = "";
-
-    /** Context in which expression should be evaluated */
-    @Input()
-    context: { $job: any };
 
     @Input()
     readonly = false;

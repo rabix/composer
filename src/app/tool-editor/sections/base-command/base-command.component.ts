@@ -109,7 +109,6 @@ export class BaseCommandComponent extends DirectiveBase implements OnInit, OnDes
     form: FormGroup;
 
     /** Context in which expression should be evaluated */
-    @Input()
     context: { $job: any };
 
     @Input()
@@ -152,6 +151,8 @@ export class BaseCommandComponent extends DirectiveBase implements OnInit, OnDes
         if (changes["baseCommand"]) {
             this.initCmdForm(changes["baseCommand"].currentValue);
         }
+
+        this.context = this.model.getContext();
     }
 
     private initCmdForm(cmdList: ExpressionModel[]) {

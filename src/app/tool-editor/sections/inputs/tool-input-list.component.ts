@@ -81,7 +81,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                             <div class="tc-header">{{ entry.id || entry.loc || "Input" }}</div>
                             <div class="tc-body">
                                 <ct-tool-input-inspector
-                                        [context]="context"
+                                        [model]="model"
                                         [input]="entry"
                                         (save)="entriesChange.emit(entries)"
                                         [readonly]="readonly">
@@ -95,6 +95,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                                             (entriesChange)="entriesChange.emit(entries)"
                                             [readonly]="readonly"
                                             [parent]="entry"
+                                            [model]="model"
                                             [location]="getFieldsLocation(i)"
                                             [isField]="true">
                         </ct-tool-input-list>
@@ -136,6 +137,9 @@ export class ToolInputListComponent extends DirectiveBase {
 
     @Input()
     parent: CommandLineToolModel | CommandInputParameterModel;
+
+    @Input()
+    model: CommandLineToolModel;
 
     @Output()
     readonly entriesChange = new EventEmitter();

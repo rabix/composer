@@ -22,11 +22,11 @@ import {Subscription} from "rxjs/Subscription";
                                      [buttonText]="'Add a Hint'"
                                      (buttonClick)="addEntry()">
                 </ct-blank-tool-state>
-                
+
                 <div *ngIf="readonly && !model.hints.length" class="text-xs-center h5">
                     This tool doesn't specify any hints
                 </div>
-                
+
                 <!--List Header Row-->
                 <div class="gui-section-list-title" *ngIf="!!model.hints.length">
                     <div class="col-xs-6">
@@ -43,15 +43,15 @@ import {Subscription} from "rxjs/Subscription";
                             *ngFor="let control of form.controls['hints'].controls; let i = index">
                             <div class="gui-section-list-item">
                                 <ct-requirement-input [formControl]="control"
-                                                      [class.col-xs-12]="readonly"
-                                                      [class.col-xs-11]="!readonly"
+                                                      [context]="context"
+                                                      class="mr-1 ml-1"
                                                       [formControlName]="i"
                                                       [classSuggest]="classSuggest"
                                                       [readonly]="readonly">
                                 </ct-requirement-input>
 
                                 <!--Actions Column-->
-                                <div *ngIf="!readonly" class="col-xs-1 align-right">
+                                <div *ngIf="!readonly" class="mr-1">
                                     <i [ct-tooltip]="'Delete'"
                                        class="fa fa-trash text-hover-danger clickable"
                                        (click)="removeEntry(i)"></i>
@@ -84,6 +84,9 @@ export class HintsComponent implements OnChanges {
 
     @Input()
     readonly = false;
+
+    @Input()
+    context: any;
 
     form: FormGroup;
 
@@ -137,7 +140,10 @@ export class HintsComponent implements OnChanges {
 
     addEntry() {
         const hint = this.model.addHint({class: "", value: ""});
-        (this.form.get("hints") as FormArray).push(new FormControl({value: hint, disabled: this.readonly}));
+        (this.form.get("hints") as FormArray).push(new FormControl({
+            value: hint,
+            disabled: this.readonly
+        }));
         this.update.emit(this.model.hints);
     }
 }

@@ -62,7 +62,7 @@ import {ErrorReportComponent} from "./error-report/error-report.component";
         WebWorkerBuilderService,
         ModalService,
         PlatformAPI,
-        {provide: ErrorHandler, useClass: ModalErrorHandler},
+        {provide: ErrorHandler, useClass: ModalErrorHandler}
     ],
     imports: [
         BrowserModule,
