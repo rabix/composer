@@ -18,12 +18,14 @@ import {SystemService} from "../platform-providers/system.service";
 import {PlatformAPI} from "../services/api/platforms/platform-api.service";
 import {SettingsService} from "../services/settings/settings.service";
 import {DirectiveBase} from "../util/directive-base/directive-base";
+import {WorkflowEditorService} from "./workflow-editor.service";
 
 import LoadOptions = jsyaml.LoadOptions;
 
+
 @Component({
     selector: "ct-workflow-editor",
-    providers: [EditorInspectorService, ErrorBarService],
+    providers: [EditorInspectorService, ErrorBarService, WorkflowEditorService],
     styleUrls: ["./workflow-editor.component.scss"],
     template: `
         <ct-action-bar>
@@ -114,7 +116,7 @@ import LoadOptions = jsyaml.LoadOptions;
 
             <ct-workflow-graph-editor *ngIf="viewMode === 'graph' && !isLoading"
                                       [readonly]="!data.isWritable"
-                                      [model]="workflowModel"
+                                      [(model)]="workflowModel"
                                       class="editor-main">
             </ct-workflow-graph-editor>
 
