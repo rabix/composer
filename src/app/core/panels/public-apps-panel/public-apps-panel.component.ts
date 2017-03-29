@@ -33,7 +33,7 @@ import {Observable} from "rxjs/Observable";
             <button type="button"
                     (click)="regroup('category')"
                     [class.active]="grouping === 'category'"
-                    class="btn btn-sm btn-secondary">By Categor
+                    class="btn btn-sm btn-secondary">By Category
             </button>
         </div>
 
