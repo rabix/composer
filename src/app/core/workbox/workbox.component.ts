@@ -37,25 +37,26 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
         </div>
 
         <div class="body">
-            
+
             <ng-template hidden ngFor let-tab [ngForOf]="tabs">
 
                 <div class="component-container" [ngSwitch]="tab?.type" [hidden]="tab !== activeTab">
 
-                    <ct-tool-editor class="tab-component" #tabComponent *ngSwitchCase="'CommandLineTool'"
+                    <ct-tool-editor #tabComponent class="tab-component" *ngSwitchCase="'CommandLineTool'"
                                     [data]="tab.data"></ct-tool-editor>
 
                     <ct-workflow-editor #tabComponent [data]="tab.data" *ngSwitchCase="'Workflow'"></ct-workflow-editor>
 
-                    <ct-file-editor class="tab-component" [data]="tab.data" *ngSwitchCase="'Code'"></ct-file-editor>
+                    <ct-file-editor #tabComponent class="tab-component" [data]="tab.data"
+                                    *ngSwitchCase="'Code'"></ct-file-editor>
 
-                    <ct-welcome-tab class="tab-component" *ngSwitchCase="'Welcome'"></ct-welcome-tab>
+                    <ct-welcome-tab #tabComponent class="tab-component" *ngSwitchCase="'Welcome'"></ct-welcome-tab>
 
-                    <ct-new-file-tab class="tab-component" *ngSwitchCase="'NewFile'"></ct-new-file-tab>
+                    <ct-new-file-tab #tabComponent class="tab-component" *ngSwitchCase="'NewFile'"></ct-new-file-tab>
 
-                    <ct-settings class="tab-component" *ngSwitchCase="'Settings'"></ct-settings>
+                    <ct-settings #tabComponent class="tab-component" *ngSwitchCase="'Settings'"></ct-settings>
 
-                    <ct-tab-loader class="tab-component" *ngSwitchDefault></ct-tab-loader>
+                    <ct-tab-loader #tabComponent class="tab-component" *ngSwitchDefault></ct-tab-loader>
                 </div>
 
             </ng-template>
