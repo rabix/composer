@@ -12,6 +12,7 @@ export class PlatformAPI {
     static getServiceURL(platformUrl: string, serviceName: string) {
         const isVayu    = platformUrl.indexOf("-vayu.sbgenomics.com") !== -1;
         const isStaging = platformUrl.indexOf("staging-igor.sbgenomics.com") !== -1;
+        const isCGC     = platformUrl.indexOf("cgc.sbgenomics.com") !== -1;
 
         let serviceUrl = platformUrl.replace("igor", serviceName);
 
@@ -19,6 +20,8 @@ export class PlatformAPI {
             serviceUrl = serviceUrl + ":" + ENVP.serviceRoutes[serviceName].port;
         } else if (isStaging) {
             serviceUrl = serviceUrl.replace("staging-igor", `staging-${serviceName}`);
+        } else if (isCGC) {
+            serviceUrl = serviceUrl.replace("cgc", `cgc-${serviceName}`);
         }
 
         return [serviceUrl, ENVP.serviceRoutes[serviceName].prefix].join("/");

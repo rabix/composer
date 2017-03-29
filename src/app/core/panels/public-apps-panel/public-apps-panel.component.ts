@@ -230,7 +230,14 @@ export class PublicAppsPanelComponent extends DirectiveBase implements AfterView
                 const {credentials, listings, expanded} = data as any;
 
                 this.treeNodes = credentials.map((creds, index) => {
-                    const id = `${creds.hash}?public`;
+                    const id  = `${creds.hash}?public`;
+                    let label = creds.profile;
+                    if (label === "default") {
+                        label = "Seven Bridges";
+                    } else if (label === "cgc") {
+                        label = "Cancer Genomics Cloud";
+                    }
+
                     return {
                         id,
                         label: creds.profile === "default" ? "Seven Bridges" : creds.profile,

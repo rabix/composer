@@ -67,7 +67,7 @@ export class DataGatewayService {
                 let label = c.profile;
 
                 if (c.profile === "cgc") {
-                    label = "CGC";
+                    label = "Cancer Genomics Cloud";
                 } else if (c.profile === "default" || c.profile === "igor") {
                     label = "Seven Bridges";
                 }
