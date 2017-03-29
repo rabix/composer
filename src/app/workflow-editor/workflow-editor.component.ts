@@ -27,7 +27,7 @@ import LoadOptions = jsyaml.LoadOptions;
     styleUrls: ["./workflow-editor.component.scss"],
     template: `
         <ct-action-bar>
-            <ct-tab-selector [distribute]="'auto'" [active]="viewMode" (activeChange)="switchView($event, isDirty)">
+            <ct-tab-selector [distribute]="'auto'" [active]="viewMode" (activeChange)="switchView($event)">
 
                 <ct-tab-selector-entry [disabled]="!isValidCWL"
                                        [tabName]="'info'">App Info
@@ -36,9 +36,6 @@ import LoadOptions = jsyaml.LoadOptions;
                 <ct-tab-selector-entry [disabled]="!isValidCWL"
                                        [tabName]="'graph'">Graph View
                 </ct-tab-selector-entry>
-
-                <!--<ct-tab-selector-entry [disabled]="!isValidCWL" [tabName]="'list'">List View-->
-                <!--</ct-tab-selector-entry>-->
 
                 <ct-tab-selector-entry [disabled]="!viewMode"
                                        [tabName]="'code'">Code

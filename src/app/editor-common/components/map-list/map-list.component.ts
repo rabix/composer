@@ -17,7 +17,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
     template: `
         <div [formGroup]="formGroup" (change)="onInputsFormChange($event)">
             <div formArrayName="pairs">
-                <div *ngFor="let item of formGroup.controls['pairs'].controls; let i = index"
+                <div *ngFor="let item of getPairControls(); let i = index"
                      [formGroupName]="i"
                      class="mb-1 input-group row">
 
@@ -129,5 +129,9 @@ export class MapListComponent extends DirectiveBase implements ControlValueAcces
 
     onInputsFormChange($event) {
         $event.stopPropagation();
+    }
+
+    getPairControls() {
+        return (this.formGroup.get("pairs") as FormArray).controls;
     }
 }

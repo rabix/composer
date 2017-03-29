@@ -137,15 +137,12 @@ export class DataGatewayService {
     }
 
     searchUserProjects(term: string, limit = 20): Observable<{ hash: string, results: PlatformAppEntry[] }[]> {
-
         return this.auth.connections.take(1).flatMap(credentials => {
             const hashes   = credentials.map(c => c.hash);
-            const requests = hashes.map(hash =>
-                this.apiGateway.forHash(hash)
-                    .searchUserProjects(term, limit)
-                    .map(results => ({results, hash}))
-            );
-            return Observable.forkJoin(requests);
+            const requests = hashes.map(hash => this.apiGateway.forHash(hash)
+                .searchUserProjects(term, limit)
+                .map(results => ({results, hash})));
+            return Observable.zip(...requests);
         });
     }
 

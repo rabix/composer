@@ -56,7 +56,7 @@ import {noop} from "../../../../lib/utils.lib";
 
             <!--Include in command line -->
             <div class="form-group flex-container"
-                 *ngIf="!isType('map') && form.controls['isBound']">
+                 *ngIf="!isType('map') && !!form.controls['isBound']">
                 <label>Include in command line</label>
                 <span class="align-right">
                         <ct-toggle-slider [formControl]="form.controls['isBound']"
@@ -207,7 +207,7 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
         });
     }
 
-    isType(type: string) {
+    isType(type: string): boolean {
         return this.input.type.type === type || this.input.type.items === type;
     }
 }

@@ -20,7 +20,7 @@ import {noop} from "../../lib/utils.lib";
     template: `
         <div [formGroup]="formGroup" (change)="onInputsFormChange($event)">
             <div formArrayName="pairs">
-                <div *ngFor="let item of formGroup.controls.pairs.controls; let i = index"
+                <div *ngFor="let item of getPairControls(); let i = index"
                      [formGroupName]="i"
                      class="mb-1 input-group row">
 
@@ -125,5 +125,9 @@ export class KeyvalueComponent extends DirectiveBase implements ControlValueAcce
 
     onInputsFormChange($event) {
         $event.stopPropagation();
+    }
+
+    getPairControls() {
+        return (this.formGroup.get("pairs") as FormArray).controls;
     }
 }

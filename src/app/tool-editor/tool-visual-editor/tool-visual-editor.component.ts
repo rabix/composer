@@ -49,7 +49,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
             </ct-resources>
             
             <ct-hints [model]="model"
-                      (update)="updateModel('hints')"
+                      (update)="formGroup.markAsDirty()"
                       [readonly]="readonly">
             </ct-hints>
             

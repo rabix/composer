@@ -141,7 +141,8 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
         }));
 
 
-        const projectSearch = (term) => this.dataGateway.searchUserProjects(term).map(resultGroups => {
+        const projectSearch = (term) => this.dataGateway.searchUserProjects(term)
+            .map(resultGroups => {
             return resultGroups.map(group => {
 
                 const {results, hash} = group;
@@ -176,7 +177,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                 this.appliedSearchTerm = term;
             })
             .filter(term => term.trim().length !== 0)
-            .switchMap(term => Observable.forkJoin(localFileSearch(term), projectSearch(term)))
+            .flatMap(term => Observable.zip(localFileSearch(term), projectSearch(term)))
             .subscribe(datasets => {
                 const combined     = [].concat(...datasets).sort((a, b) => b.relevance - a.relevance);
                 this.searchResults = combined;

@@ -14,7 +14,7 @@ import {AuthService} from "../../auth/auth/auth.service";
                 <label class="strong col-xs-6">Developer Token</label>
             </div>
 
-            <div *ngFor="let pair of form.get('pairs').controls; let i = index;" class="row" [class.has-success]="pair.valid">
+            <div *ngFor="let pair of getPairControls(); let i = index;" class="row" [class.has-success]="pair.valid">
 
                 <div class="form-group col-xs-5" [class.has-danger]="pair.dirty && pair.get('url').invalid">
 
@@ -126,6 +126,10 @@ export class CredentialsFormComponent implements OnInit {
         this.onSubmit.emit(values);
 
         this.preferences.patchCredentials(values);
+    }
+
+    getPairControls() {
+        return (this.form.get("pairs") as FormArray).controls;
     }
 
 }
