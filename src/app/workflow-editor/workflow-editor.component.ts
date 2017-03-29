@@ -355,8 +355,6 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
 
                 // load document in GUI and turn off loader, only if loader was active
                 if (this.isLoading) {
-                    // @todo: this.viewMode cannot be initially set to viewModeTypes.Graph because canvas dimensions are not initialized
-                    this.viewMode  = "info";
                     this.isLoading = false;
                 }
 
