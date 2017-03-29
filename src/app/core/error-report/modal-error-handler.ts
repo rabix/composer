@@ -13,8 +13,8 @@ export class ModalErrorHandler {
         const component = this.modal.fromComponent(ErrorReportComponent, {
             title: "An error has occured",
             backdrop: true,
-            closeOnEscape: false,
-            closeOnOutsideClick: false
+            closeOnEscape: true,
+            closeOnOutsideClick: true
         });
         component.code  = error.toString();
 
