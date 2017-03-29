@@ -1,15 +1,24 @@
 import {
-    AfterViewInit, Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, TemplateRef, ViewChild,
+    AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output,
+    TemplateRef,
+    ViewChild,
     ViewEncapsulation
 } from "@angular/core";
 import {Workflow} from "cwl-svg";
-import {StepModel, WorkflowFactory, WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
+import {
+    StepModel,
+    WorkflowFactory,
+    WorkflowInputParameterModel,
+    WorkflowModel,
+    WorkflowOutputParameterModel
+} from "cwlts/models";
 import {DataGatewayService} from "../../../core/data-gateway/data-gateway.service";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import LoadOptions = jsyaml.LoadOptions;
 import {IpcService} from "../../../services/ipc.service";
+import {WorkflowEditorService} from "../../workflow-editor.service";
 
 
 declare const Snap: any;
@@ -70,6 +79,9 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     @Input()
     public readonly = false;
 
+    @Output()
+    public modelChange = new EventEmitter();
+
     @ViewChild("canvas")
     private canvas: ElementRef;
 
@@ -83,8 +95,6 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
     public graph: Workflow;
 
-    private history = [];
-    private future  = [];
     private historyHandler: (ev: KeyboardEvent) => void;
 
     private tryToFitWorkflowOnNextTabActivation = false;
@@ -92,7 +102,8 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     constructor(private statusBar: StatusBarService,
                 private gateway: DataGatewayService,
                 private ipc: IpcService,
-                private inspector: EditorInspectorService) {
+                private inspector: EditorInspectorService,
+                private workflowEditorService: WorkflowEditorService) {
         super();
     }
 
@@ -100,6 +111,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         const removeHandler = (node) => {
             if (node === this.inspectedNode) {
                 this.inspector.hide();
+                this.inspectedNode = null;
             }
         };
 
@@ -128,34 +140,47 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
 
         this.graph.on("beforeChange", () => {
-            if (this.history.length > 20) {
-                this.history.shift();
-            }
-            this.history.push(this.model.serialize());
-            this.future.length = 0;
+            this.workflowEditorService.putInHistory(this.model);
         });
 
         this.tracked = this.ipc.watch("accelerator", "CmdOrCtrl+Z")
-            .filter(() => this.canvasIsInFocus() && this.history.length > 0)
+            .filter(() => this.canvasIsInFocus() && this.workflowEditorService.canUndo())
             .subscribe(() => {
-                console.log("Undo");
-                this.future.push(this.model.serialize());
-                const hist = this.history.pop();
-                this.model = WorkflowFactory.from(hist);
+                this.model = WorkflowFactory.from(this.workflowEditorService.historyUndo(this.model));
+
+                // Resets the reference of inspected node (reference is lost after model serialization)
+                this.resetInspectedNodeReference();
+
+                this.modelChange.next(this.model);
                 this.graph.redraw(this.model as any);
             });
 
         this.tracked = this.ipc.watch("accelerator", "Shift+CmdOrCtrl+Z")
-            .filter(() => this.canvasIsInFocus() && this.future.length > 0)
+            .filter(() => this.canvasIsInFocus() && this.workflowEditorService.canRedo())
             .subscribe(() => {
-                console.log("Redo");
-                const future = this.future.pop();
-                this.history.push(this.model.serialize());
-                this.model = WorkflowFactory.from(future);
+                this.model = WorkflowFactory.from(this.workflowEditorService.historyRedo(this.model));
+
+                // Resets the reference of inspected node (reference is lost after model serialization)
+                this.resetInspectedNodeReference();
+
+                this.modelChange.next(this.model);
                 this.graph.redraw(this.model as any);
             });
     }
 
+    /**
+     * If inspector is open, set reference of inspected node to a new one
+     */
+    resetInspectedNodeReference() {
+        if (this.inspectedNode) {
+            const connectionId = this.inspectedNode.connectionId;
+
+            const step = this.model.steps.find((step) => connectionId === step.connectionId);
+            const input = this.model.inputs.find((input) => connectionId === input.connectionId);
+            const output = this.model.outputs.find((output) => connectionId === output.connectionId);
+            this.inspectedNode = step || input || output;
+        }
+    }
 
     ngOnChanges() {
         if (this.graph) {
@@ -189,7 +214,6 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
         this.gateway.fetchFileContent(nodeID, true).subscribe((app: any) => {
 
-            debugger;
             const step = this.model.addStepFromProcess(app);
             console.log("adding step", step);
             const coords = this.graph.translateMouseCoords(ev.clientX, ev.clientY);

@@ -4,7 +4,7 @@ import {
     Component,
     Input,
     ViewEncapsulation,
-    OnInit
+    OnInit, SimpleChanges, OnChanges
 } from "@angular/core";
 import {
     WorkflowInputParameterModel,
@@ -98,7 +98,7 @@ import {Workflow} from "cwl-svg";
     `
 
 })
-export class WorkflowIOInspectorComponent extends DirectiveBase implements OnInit {
+export class WorkflowIOInspectorComponent extends DirectiveBase implements OnInit, OnChanges {
 
     public propertyTypes = ["array", "enum", "File", "string", "int", "float", "boolean"];
 
@@ -124,6 +124,21 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
         super();
     }
 
+    ngOnChanges(changes: SimpleChanges): void {
+
+        if (this.form && changes["port"]) {
+            const newIO = changes["port"].currentValue;
+
+            this.form.controls["isRequired"].setValue(newIO.type.isNullable);
+            this.form.controls["id"].setValue(newIO.id);
+            this.form.controls["label"].setValue(newIO.label);
+            this.form.controls["typeForm"].setValue(newIO.type);
+            this.form.controls["symbols"].setValue(newIO.type.symbols || this.initSymbolsList);
+            this.form.controls["description"].setValue(newIO.description);
+            this.form.controls["fileTypes"].setValue(newIO.customProps["sbg:fileTypes"]);
+        }
+    }
+
     ngOnInit() {
 
         this.form = this.formBuilder.group({
@@ -131,7 +146,7 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
             id: [{value: this.port.id, disabled: this.readonly}],
             label: [{value: this.port.label, disabled: this.readonly}],
             typeForm: [{value: this.port.type, disabled: this.readonly}],
-            symbols: [this.port.type.symbols ? this.port.type.symbols : this.initSymbolsList],
+            symbols: [this.port.type.symbols || this.initSymbolsList],
             description: [{value: this.port.description, disabled: this.readonly}],
             fileTypes: [{value: this.port.customProps["sbg:fileTypes"], disabled: this.readonly}]
         });
