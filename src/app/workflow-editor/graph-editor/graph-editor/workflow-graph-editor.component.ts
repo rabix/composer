@@ -175,15 +175,15 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         if (this.inspectedNode) {
             const connectionId = this.inspectedNode.connectionId;
 
-            const step = this.model.steps.find((step) => connectionId === step.connectionId);
-            const input = this.model.inputs.find((input) => connectionId === input.connectionId);
-            const output = this.model.outputs.find((output) => connectionId === output.connectionId);
+            const step         = this.model.steps.find((step) => connectionId === step.connectionId);
+            const input        = this.model.inputs.find((input) => connectionId === input.connectionId);
+            const output       = this.model.outputs.find((output) => connectionId === output.connectionId);
             this.inspectedNode = step || input || output;
         }
     }
 
     ngOnChanges() {
-        if (this.graph) {
+        if (this.graph && this.canvas && Workflow.canDrawIn(this.canvas.nativeElement)) {
             this.graph.redraw(this.model as any);
         }
         // if (firstAnything && firstAnything.customProps["sbg:x"] === undefined) {
