@@ -62,7 +62,7 @@ import {TreeViewService} from "../tree-view.service";
     styleUrls: ["./tree-node.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TreeNodeComponent<T> implements OnInit, AfterViewInit {
+export class TreeNodeComponent<T> implements OnInit {
 
 
     @Input() id: string;
@@ -103,9 +103,6 @@ export class TreeNodeComponent<T> implements OnInit, AfterViewInit {
         }
     }
 
-    ngAfterViewInit() {
-    }
-
     toggle() {
         if (this.isExpanded) {
             return this.contract();
@@ -123,6 +120,7 @@ export class TreeNodeComponent<T> implements OnInit, AfterViewInit {
     }
 
     expand(force = false) {
+
         const wasContracted = this.isExpanded === false;
         this.isExpanded     = true;
 

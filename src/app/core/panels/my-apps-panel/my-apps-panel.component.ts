@@ -143,31 +143,31 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
 
         const projectSearch = (term) => this.dataGateway.searchUserProjects(term)
             .map(resultGroups => {
-            return resultGroups.map(group => {
+                return resultGroups.map(group => {
 
-                const {results, hash} = group;
+                    const {results, hash} = group;
 
-                return results.map(result => {
-                    const id    = hash + "/" + result["owner"] + "/" + result["slug"] + "/" + result["sbg:id"];
-                    const title = result.label;
+                    return results.map(result => {
+                        const id    = hash + "/" + result["owner"] + "/" + result["slug"] + "/" + result["sbg:id"];
+                        const title = result.label;
 
-                    return {
-                        id,
-                        icon: result.class === "Workflow" ? "fa-share-alt" : "fa-terminal",
-                        title,
-                        label: result.id.split("/").slice(5, 7).join(" → "),
-                        relevance: 1.5,
+                        return {
+                            id,
+                            icon: result.class === "Workflow" ? "fa-share-alt" : "fa-terminal",
+                            title,
+                            label: result.id.split("/").slice(5, 7).join(" → "),
+                            relevance: 1.5,
 
-                        dragEnabled: true,
-                        dragTransferData: id,
-                        dragLabel: title,
-                        dragImageClass: result["class"] === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
-                        dragDropZones: ["zone1"]
-                    };
-                });
+                            dragEnabled: true,
+                            dragTransferData: id,
+                            dragLabel: title,
+                            dragImageClass: result["class"] === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
+                            dragDropZones: ["zone1"]
+                        };
+                    });
 
-            }).reduce((acc, item) => acc.concat(...item), []);
-        });
+                }).reduce((acc, item) => acc.concat(...item), []);
+            });
 
         this.searchContent.valueChanges
             .do(term => this.searchResults = undefined)
@@ -194,7 +194,6 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
             .filter(node => node.isExpanded === true && node.type === "source" && node.id !== "local")
             .do(n => n.modify(() => n.loading = true))
             .flatMap(node => {
-                console.log("Combining platform listing for", node.id, node);
                 return Observable.combineLatest(
                     this.dataGateway.getPlatformListing(node.id),
                     this.preferences.getOpenProjects(),
@@ -223,7 +222,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                         type: "project",
                         data: child,
                         icon: "fa-folder",
-                        label,
+                        label: "Project: " + label ,
                         isExpandable: true,
                         isExpanded: data.expanded.indexOf(id) !== -1,
                         iconExpanded: "fa-folder-open",

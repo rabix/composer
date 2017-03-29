@@ -105,14 +105,9 @@ export class DataGatewayService {
 
     getProjectListing(hash, projectOwner: string, projectSlug: string): Observable<any[]> {
         return this.throughCache(
-            hash + ".getProjectListing",
+            hash + `.getProjectListing.${projectOwner}.${projectSlug}`,
             this.apiGateway.forHash(hash).getProjectApps(projectOwner, projectSlug).publishReplay(1).refCount()
         );
-
-
-        // return this.scanCompletion.flatMap(() => this.preferences.get(`dataCache.${profile}.apps`)).map((apps: any[] = []) => {
-        //     return apps.filter(app => app["sbg:projectName"] === projectName);
-        // });
     }
 
     getFolderListing(folder) {
