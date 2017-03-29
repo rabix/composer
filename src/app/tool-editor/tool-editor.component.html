@@ -26,7 +26,10 @@
         <span class="btn btn-sm">{{toolModel.cwlVersion}}</span>
 
         <!--Go to app-->
-        <button class="btn btn-sm btn-secondary " type="button" (click)="goToApp()">
+        <button class="btn btn-sm btn-secondary"
+                type="button"
+                *ngIf="data.dataSource !== 'local'"
+                (click)="goToApp()">
             <i class="fa fa-external-link"></i>
         </button>
 
@@ -98,7 +101,8 @@
 
 
     <!--Object Inspector Column-->
-    <ct-editor-inspector [class.flex-hide]="!showInspector && (viewMode === 'code' || viewMode === 'info')">
+    <ct-editor-inspector
+            [class.flex-hide]="!showInspector && (viewMode === 'code' || viewMode === 'info')">
         <ng-template #inspector></ng-template>
     </ct-editor-inspector>
 </div>

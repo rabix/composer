@@ -30,6 +30,8 @@ import {WorkflowEditorService} from "./workflow-editor.service";
 
 import LoadOptions = jsyaml.LoadOptions;
 import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow-graph-editor.component";
+import {CredentialsEntry} from "../services/storage/user-preferences-types";
+import {AuthService} from "../auth/auth/auth.service";
 
 
 @Component({
@@ -64,6 +66,7 @@ import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow
                         type="button"
                         (click)="goToApp()"
                         tooltipPlacement="bottom"
+                        *ngIf="data.dataSource !== 'local'"
                         ct-tooltip="Open on Seven Bridges Platform">
                     <i class="fa fa-external-link"></i>
                 </button>
@@ -226,6 +229,8 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                 private statusBar: StatusBarService,
                 private system: SystemService,
                 private settings: SettingsService,
+                private auth: AuthService,
+                private errorBarService: ErrorBarService,
                 private dataGateway: DataGatewayService) {
 
         super();
@@ -502,7 +507,15 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
         const urlApp     = this.workflowModel["sbgId"];
         const urlProject = urlApp.split("/").splice(0, 2).join("/");
 
-        this.settings.platformConfiguration.first().map(settings => settings.url).subscribe((url) => {
+        this.auth.connections.take(1).subscribe((cred: CredentialsEntry[]) => {
+            const hash = this.data.id.split("/")[0];
+            const urlBase = cred.find(c => c.hash === hash);
+            if (!urlBase) {
+                this.errorBarService.showError(`Could not externally open app "${urlApp}"`);
+                return;
+            }
+            const url = urlBase.url;
+
             this.system.openLink(`${url}/u/${urlProject}/apps/#${urlApp}`);
         });
     }

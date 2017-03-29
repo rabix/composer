@@ -59,10 +59,10 @@ declare const Snap: any;
                     </ct-workflow-step-inspector>
 
                     <ct-workflow-io-inspector
-                        *ngIf="typeOfInspectedNode() === 'Input' || typeOfInspectedNode() === 'Output'"
-                        [port]="inspectedNode"
-                        [graph]="graph"
-                        [workflowModel]="model">
+                            *ngIf="typeOfInspectedNode() === 'Input' || typeOfInspectedNode() === 'Output'"
+                            [port]="inspectedNode"
+                            [graph]="graph"
+                            [workflowModel]="model">
 
                     </ct-workflow-io-inspector>
 
@@ -213,8 +213,22 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         console.log("Dropped!", nodeID);
 
         this.gateway.fetchFileContent(nodeID, true).subscribe((app: any) => {
+            // if the app is local, give it an id that's the same as its filename (if doesn't exist)
+            const isLocal = DataGatewayService.getFileSource(nodeID) === "local";
+            if (isLocal) {
+                const split = nodeID.split("/");
+                const id    = split[split.length - 1].split(".")[0];
+                app.id      = app.id || id;
+            }
 
             const step = this.model.addStepFromProcess(app);
+
+            // add local source so step can be serialized without embedding
+            if (isLocal) {
+                step.customProps["sbg:rdfSource"] = nodeID;
+                step.customProps["sbg:rdfId"]     = nodeID;
+            }
+
             console.log("adding step", step);
             const coords = this.graph.translateMouseCoords(ev.clientX, ev.clientY);
             Object.assign(step.customProps, {

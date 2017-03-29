@@ -1,7 +1,6 @@
-import {Component, Input, OnInit, ViewChild, ViewContainerRef} from "@angular/core";
+import {Component, Input} from "@angular/core";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {ErrorBarService} from "./error-bar.service";
-// import {StatusBarService} from "./status-bar.service";
 
 @Component({
     selector: "ct-error-bar",
