@@ -16,11 +16,11 @@ import {CommandInputParameterModel, WorkflowInputParameterModel, CommandLineTool
 
             <!--Header section-->
             <div class="info-section">
-                    <ct-inline-editor [value]="model.label" type="text"
-                                      [disabled]="readonly"
-                                      (saveData)="model.label = $event">
-                       <h3>{{model.label}}</h3>
-                    </ct-inline-editor>
+                <ct-inline-editor [value]="model.label" type="text"
+                                  [disabled]="readonly"
+                                  (saveData)="model.label = $event">
+                    <h3>{{model.label}}</h3>
+                </ct-inline-editor>
                 <div>Created by {{createdBy}} on {{createdOn | date}}. Last edited by {{editedBy}} on {{editedOn | date}}</div>
                 <div *ngIf="revisionNote">Revision note: "{{revisionNote}}"</div>
             </div>
@@ -94,7 +94,7 @@ import {CommandInputParameterModel, WorkflowInputParameterModel, CommandLineTool
                     <!--Contributors-->
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
                         <h5>Contributors</h5>
-                        {{model.customProps['sbg:contributors'].join(", ")}}
+                        {{(model.customProps['sbg:contributors'] || []).join(", ")}}
                     </div>
 
                     <!--CWL version-->
@@ -270,14 +270,14 @@ export class AppInfoComponent implements OnChanges {
 
     ngOnChanges(changes: SimpleChanges) {
 
-        this.createdBy = this.model.customProps["sbg:createdBy"];
-        this.createdOn = this.model.customProps["sbg:createdOn"] * 1000;
-        this.editedBy = this.model.customProps["sbg:modifiedBy"];
-        this.editedOn = this.model.customProps["sbg:modifiedOn"] * 1000;
+        this.createdBy    = this.model.customProps["sbg:createdBy"];
+        this.createdOn    = this.model.customProps["sbg:createdOn"] * 1000;
+        this.editedBy     = this.model.customProps["sbg:modifiedBy"];
+        this.editedOn     = this.model.customProps["sbg:modifiedOn"] * 1000;
         this.revisionNote = this.model.customProps["sbg:revisionNotes"] || null;
 
 
-        this.inputs = (this.model.inputs as Array<CommandInputParameterModel | WorkflowInputParameterModel>)
+        this.inputs      = (this.model.inputs as Array<CommandInputParameterModel | WorkflowInputParameterModel>)
             .filter((input) => input.type.type === "File" || input.type.items === "File");
         this.appSettings = (this.model.inputs as Array<CommandInputParameterModel | WorkflowInputParameterModel>)
             .filter((input) => input.type.type !== "File" || input.type.items !== "File");
