@@ -95,7 +95,8 @@ import {CircularLoaderComponent} from "./circular-loader/circular-loader.compone
         CheckboxPromptComponent,
         CodeEditorComponent,
         PromptComponent,
-        MultilangCodeEditorComponent
+        MultilangCodeEditorComponent,
+        MenuComponent
     ],
 
     declarations: [

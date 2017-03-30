@@ -1,8 +1,7 @@
 import {
-    AfterViewInit,
     ChangeDetectionStrategy,
     ChangeDetectorRef,
-    Component,
+    Component, HostListener,
     Input,
     OnInit,
     QueryList,
@@ -72,18 +71,18 @@ export class TreeNodeComponent<T> implements OnInit {
     @Input() isExpanded = false;
     @Input() iconExpanded: string;
     @Input() isExpandable: boolean;
-    @Input() children   = [];
+    @Input() children = [];
     @Input() data: T;
 
-    @Input() dragEnabled      = false;
+    @Input() dragEnabled = false;
     @Input() dragTransferData = {};
-    @Input() dragLabel        = "";
-    @Input() dragImageClass   = "";
-    @Input() dragDropZones    = [];
+    @Input() dragLabel = "";
+    @Input() dragImageClass = "";
+    @Input() dragDropZones = [];
 
     @Input() selected = false;
-    @Input() loading  = false;
-    @Input() level    = 0;
+    @Input() loading = false;
+    @Input() level = 0;
 
     @ViewChildren(TreeNodeComponent)
     private childrenTreeNodes: QueryList<TreeNodeComponent<any>>;
@@ -122,7 +121,7 @@ export class TreeNodeComponent<T> implements OnInit {
     expand(force = false) {
 
         const wasContracted = this.isExpanded === false;
-        this.isExpanded     = true;
+        this.isExpanded = true;
 
         if (wasContracted || force) {
             this.tree.expansionChanges.next(this);
@@ -132,7 +131,7 @@ export class TreeNodeComponent<T> implements OnInit {
     contract() {
 
         const wasExpanded = this.isExpanded === true;
-        this.isExpanded   = false;
+        this.isExpanded = false;
 
         if (wasExpanded) {
             this.tree.expansionChanges.next(this);
@@ -158,6 +157,12 @@ export class TreeNodeComponent<T> implements OnInit {
 
     getChildren(): QueryList<TreeNodeComponent<any>> {
         return this.childrenTreeNodes;
+    }
+
+    @HostListener("contextmenu", ["$event"])
+    private onRightClick(event: MouseEvent) {
+        event.stopPropagation();
+        this.tree.contextMenu.next({node: this, coordinates: {x: event.clientX, y: event.clientY}});
     }
 
 }

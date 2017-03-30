@@ -13,6 +13,7 @@ export class TreeViewService {
     readonly expansionChanges = new Subject<TreeNodeComponent<any>>();
     readonly selected         = new BehaviorSubject<TreeNodeComponent<any>>(undefined);
     readonly nodeInit         = new Subject<TreeNodeComponent<any>>();
+    readonly contextMenu      = new Subject<{node: TreeNodeComponent<any>, coordinates: { x: number, y: number }}>();
 
     constructor() {
     }
