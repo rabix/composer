@@ -395,7 +395,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
 
     private listenForContextMenu() {
         // When click on user project
-        this.tree.contextMenu.filter(eventInfo => eventInfo.node.type === "project")
+        this.tree.contextMenu.filter(data => data.node.type === "project")
             .subscribe(data => {
 
             const contextMenu = new MenuItem("Remove from Workspace", {
