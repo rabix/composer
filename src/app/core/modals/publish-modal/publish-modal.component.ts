@@ -80,7 +80,7 @@ export class PublishModalComponent extends DirectiveBase {
     checking          = false;
 
     constructor(private dataGateway: DataGatewayService,
-                private modal: ModalService,
+                public modal: ModalService,
                 private slugify: SlugifyPipe,
                 private apiGateway: PlatformAPIGatewayService,
                 private workbox: WorkboxService,

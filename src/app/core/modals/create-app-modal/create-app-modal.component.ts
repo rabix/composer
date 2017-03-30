@@ -114,9 +114,8 @@ export class CreateAppModalComponent extends DirectiveBase {
              checkingSlug                    = false;
 
     constructor(private dataGateway: DataGatewayService,
-                private modal: ModalService,
+                public modal: ModalService,
                 private slugify: SlugifyPipe,
-                private auth: AuthService,
                 private apiGateway: PlatformAPIGatewayService,
                 private cdr: ChangeDetectorRef,
                 private workbox: WorkboxService,
