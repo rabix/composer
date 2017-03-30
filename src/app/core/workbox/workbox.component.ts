@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, NgZone, OnInit, QueryList, ViewChildren} from "@angular/core";
+import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, NgZone, OnInit, QueryList, ViewChildren} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {StatusControlProvider} from "../../layout/status-bar/status-control-provider.interface";
@@ -81,6 +81,7 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
                 public workbox: WorkboxService,
                 private statusBar: StatusBarService,
                 private preferences: UserPreferencesService,
+                private cdr: ChangeDetectorRef,
                 el: ElementRef) {
         super();
         this.el = el.nativeElement;
@@ -114,7 +115,26 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
         });
     }
 
+    getTabComponent(tab) {
+        const idx       = this.tabs.findIndex(t => t === tab);
+        const component = this.tabComponents.find((item, index) => index === idx);
+        console.log("Component is", component);
+        return component;
+    }
+
     ngAfterViewInit() {
+
+        this.tracked = this.workbox.tabCreation.delay(1).subscribe(tab => {
+            const component = this.getTabComponent(tab);
+            if (component && typeof component.registerOnTabLabelChange === "function") {
+                console.log("Registering function");
+                component.registerOnTabLabelChange((title) => {
+                    tab.label = title;
+                    this.cdr.markForCheck();
+                }, tab.label);
+            }
+
+        });
         this.tracked = this.workbox.activeTab.subscribe(tab => {
             this.statusBar.removeControls();
 

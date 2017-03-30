@@ -134,7 +134,7 @@ export class NewFileTabComponent extends DirectiveBase implements OnInit {
             closeOnOutsideClick: false,
             backdrop: true,
             title: `Create a New App`,
-            closeOnEscape: false
+            closeOnEscape: true
         });
 
         modal.appType = type;

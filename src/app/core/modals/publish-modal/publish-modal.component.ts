@@ -55,7 +55,7 @@ import {PlatformAppEntry} from "../../../services/api/platforms/platform-api.typ
                         class="btn btn-success"
                         [disabled]="platformGroup.invalid">
                     <span *ngIf="checking">Checking...</span>
-                    <span *ngIf="!checking">Create</span>
+                    <span *ngIf="!checking">Publish</span>
                 </button>
             </div>
         </div>

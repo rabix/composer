@@ -19,8 +19,6 @@ export class ModalErrorHandler {
         component.code  = error.toString();
 
         component.textarea.nativeElement.value = error.message + "\n\n" + error.stack;
-        console.log("Component", component);
-        console.log("Got an error to handle", error.toString());
-        // console.error(error);
+        console.error(error);
     }
 }

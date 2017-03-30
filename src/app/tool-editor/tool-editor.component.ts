@@ -33,6 +33,8 @@ import {AuthService} from "../auth/auth/auth.service";
 import {CredentialsEntry} from "../services/storage/user-preferences-types";
 import {ModalService} from "../ui/modal/modal.service";
 import {PublishModalComponent} from "../core/modals/publish-modal/publish-modal.component";
+import {TabData} from "../core/workbox/tab-data.interface";
+import {Observable} from "rxjs/Observable";
 
 @Component({
     selector: "ct-tool-editor",
@@ -83,6 +85,9 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
     @Input()
     showInspector = false;
 
+    private changeTabLabel: (title: string) => void;
+    private originalTabLabel: string
+
     codeEditorContent = new FormControl(undefined);
 
     priorityCodeUpdates = new Subject();
@@ -111,6 +116,16 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
     }
 
     ngOnInit(): void {
+
+        this.tracked = Observable.combineLatest(
+            this.codeEditorContent.valueChanges.map(() => this.codeEditorContent.dirty),
+            (codeDirty) => codeDirty
+        ).debounceTime(250).subscribe(isDirty => {
+            console.log("Checking dirty state", isDirty);
+            const newLabel = isDirty ? `${this.originalTabLabel} (modified)` : this.originalTabLabel;
+            this.changeTabLabel(newLabel);
+        });
+
         if (!this.data.isWritable) {
             this.codeEditorContent.disable();
         }
@@ -349,6 +364,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
     }
 
     onTabActivation(): void {
+
     }
 
     publish() {
@@ -359,4 +375,10 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
 
         component.appContent = this.toolModel.serialize();
     }
+
+    registerOnTabLabelChange(update: (label: string) => void, originalLabel: string) {
+        this.changeTabLabel   = update;
+        this.originalTabLabel = originalLabel;
+    }
+
 }
