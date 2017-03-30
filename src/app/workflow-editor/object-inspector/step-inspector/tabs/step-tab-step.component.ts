@@ -129,13 +129,12 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
             scatter: [this.step.scatter || ""]
         });
 
-        this.tracked = this.form.controls["id"].valueChanges.debounceTime(200).subscribe((value) => {
+        this.tracked = this.form.controls["id"].valueChanges.debounceTime(1000).subscribe((value) => {
             try {
                 // Change id on workflow model so canvas can interact with it
                 this.workflowModel.changeStepId(this.step, value);
                 this.graph.redraw();
-            }
-            catch (e) {
+            } catch (e) {
                 this.form.controls["id"].setErrors({error: e.message});
                 // Because this comes outside of Angular (workflow model)
                 this.cdr.markForCheck();
@@ -146,7 +145,7 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
             this.step.description = description;
         });
 
-        this.tracked = this.form.controls["label"].valueChanges.subscribe((label) => {
+        this.tracked = this.form.controls["label"].valueChanges.debounceTime(1000).subscribe((label) => {
             this.step.label = label;
             this.graph.redraw();
         });
