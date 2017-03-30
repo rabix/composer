@@ -31,13 +31,15 @@ import {ErrorReportComponent} from "./error-report/error-report.component";
 import {CreateAppModalComponent} from "./modals/create-app-modal/create-app-modal.component";
 import {NgStringPipesModule} from "../../../node_modules/ngx-pipes/src/app/pipes/string/index";
 import {WorkboxService} from "./workbox/workbox.service";
+import {PublishModalComponent} from "app/core/modals/publish-modal/publish-modal.component";
 
 @NgModule({
     entryComponents: [
         AddSourceModalComponent,
         SendFeedbackModalComponent,
         ErrorReportComponent,
-        CreateAppModalComponent
+        CreateAppModalComponent,
+        PublishModalComponent
     ],
     declarations: [
         LayoutComponent,
@@ -57,6 +59,7 @@ import {WorkboxService} from "./workbox/workbox.service";
         SendFeedbackModalComponent,
         ErrorReportComponent,
         CreateAppModalComponent,
+        PublishModalComponent
     ],
     exports: [
         LogoComponent,

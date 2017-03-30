@@ -300,8 +300,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
         this.tree.expansionChanges
             .filter(n => n.isExpanded === true && n.type === "folder")
             .do(n => n.modify(() => n.loading = true))
-            .flatMap(n => this.dataGateway.getFolderListing(n.id)
-                .do(data => console.log("Got new folder listing in the tree", data)), (node, listing) => ({
+            .flatMap(n => this.dataGateway.getFolderListing(n.id), (node, listing) => ({
                 node,
                 listing
             }))

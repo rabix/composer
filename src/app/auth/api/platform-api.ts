@@ -87,10 +87,10 @@ export class PlatformAPI {
 
 
     public getApp(id: string);
-    public getApp(username: string, projectSlug: string, appSlug: string, revision: number | string);
+    public getApp(username: string, projectSlug: string, appSlug: string, revision?: number | string);
     public getApp(...args: any[]) {
         let id = args[0];
-        if (args.length === 4) {
+        if (args.length > 1) {
             id = args.join("/");
         }
 

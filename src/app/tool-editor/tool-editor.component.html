@@ -25,6 +25,7 @@
         <!--CWLVersion-->
         <span class="btn btn-sm">{{toolModel.cwlVersion}}</span>
 
+
         <!--Go to app-->
         <button class="btn btn-sm btn-secondary"
                 type="button"
@@ -37,12 +38,17 @@
         <button [disabled]="!data.isWritable"
                 (click)="save()"
                 class="btn btn-sm btn-secondary" type="button">
-            <i class="fa fa-save"></i>
+            <i class="fa fa-save"></i> Save
         </button>
 
         <!--Copy-->
         <button class="btn btn-sm btn-secondary " type="button">
-            <i class="fa fa-copy"></i>
+            <i class="fa fa-copy"></i> Save As
+        </button>
+
+
+        <button class="btn btn-sm" *ngIf="data.dataSource === 'local'" (click)="publish()">
+            <i class="fa fa-cloud-upload"></i> Publish
         </button>
 
 
@@ -102,7 +108,7 @@
 
     <!--Object Inspector Column-->
     <ct-editor-inspector
-            [class.flex-hide]="!showInspector && (viewMode === 'code' || viewMode === 'info')">
+        [class.flex-hide]="!showInspector && (viewMode === 'code' || viewMode === 'info')">
         <ng-template #inspector></ng-template>
     </ct-editor-inspector>
 </div>

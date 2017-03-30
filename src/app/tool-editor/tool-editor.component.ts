@@ -31,6 +31,8 @@ import {DirectiveBase} from "../util/directive-base/directive-base";
 import LoadOptions = jsyaml.LoadOptions;
 import {AuthService} from "../auth/auth/auth.service";
 import {CredentialsEntry} from "../services/storage/user-preferences-types";
+import {ModalService} from "../ui/modal/modal.service";
+import {PublishModalComponent} from "../core/modals/publish-modal/publish-modal.component";
 
 @Component({
     selector: "ct-tool-editor",
@@ -90,10 +92,9 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
                 private inspector: EditorInspectorService,
                 private statusBar: StatusBarService,
                 private dataGateway: DataGatewayService,
-                private platformAPI: PlatformAPI,
+                private modal: ModalService,
                 private system: SystemService,
                 private auth: AuthService,
-                private settings: SettingsService,
                 private errorBarService: ErrorBarService) {
 
         super();
@@ -314,7 +315,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
         const urlProject = urlApp.split("/").splice(0, 2).join("/");
 
         this.auth.connections.take(1).subscribe((cred: CredentialsEntry[]) => {
-            const hash = this.data.id.split("/")[0];
+            const hash    = this.data.id.split("/")[0];
             const urlBase = cred.find(c => c.hash === hash);
             if (!urlBase) {
                 this.errorBarService.showError(`Could not externally open app "${urlApp}"`);
@@ -348,5 +349,14 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
     }
 
     onTabActivation(): void {
+    }
+
+    publish() {
+        const component = this.modal.fromComponent(PublishModalComponent, {
+            title: "Publish an App",
+            backdrop: true
+        });
+
+        component.appContent = this.toolModel.serialize();
     }
 }

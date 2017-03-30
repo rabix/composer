@@ -144,7 +144,6 @@ export class CreateAppModalComponent extends DirectiveBase {
 
         });
 
-        console.log("Subscribe");
         this.tracked = this.platformGroup.valueChanges
             .debounceTime(300)
             .filter(val => this.platformGroup.get("name").valid && this.platformGroup.get("project").valid)
@@ -224,7 +223,6 @@ export class CreateAppModalComponent extends DirectiveBase {
         const fileBasename = filesplit.pop();
         const folder       = filesplit.join("/");
 
-
         const app  = AppGeneratorService.generate(this.cwlVersion, this.appType, fileBasename, appName);
         const dump = YAML.dump(app);
         this.dataGateway.saveLocalFileContent(filename, dump).subscribe(_ => {
@@ -233,7 +231,6 @@ export class CreateAppModalComponent extends DirectiveBase {
             this.workbox.getOrCreateFileTab(filename).subscribe(tab => {
                 this.workbox.openTab(tab);
             });
-
         }, err => {
             this.error = err;
         });
@@ -247,7 +244,6 @@ export class CreateAppModalComponent extends DirectiveBase {
         const [hash, owner, project] = this.projectSelection.value.split("/");
 
         this.apiGateway.forHash(hash).createApp(owner, project, slug, app).subscribe(data => {
-            console.log("Made an app", data);
             this.dataGateway.invalidateProjectListing(hash, owner, project);
             this.workbox.getOrCreateFileTab([hash, owner, project, owner, project, slug, 0].join("/")).subscribe(tab => {
                 this.workbox.openTab(tab);

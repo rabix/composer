@@ -32,6 +32,8 @@ import LoadOptions = jsyaml.LoadOptions;
 import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow-graph-editor.component";
 import {CredentialsEntry} from "../services/storage/user-preferences-types";
 import {AuthService} from "../auth/auth/auth.service";
+import {PublishModalComponent} from "../core/modals/publish-modal/publish-modal.component";
+import {ModalService} from "../ui/modal/modal.service";
 
 
 @Component({
@@ -86,6 +88,10 @@ import {AuthService} from "../auth/auth/auth.service";
                         ct-tooltip="Save As..."
                         tooltipPlacement="bottom">
                     <i class="fa fa-copy"></i>
+                </button>
+
+                <button class="btn btn-sm" *ngIf="data.dataSource === 'local'" (click)="publish()">
+                    <i class="fa fa-cloud-upload"></i> Publish
                 </button>
 
                 <!--Revisions-->
@@ -227,8 +233,8 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                 private platform: PlatformAPI,
                 private inspector: EditorInspectorService,
                 private statusBar: StatusBarService,
+                private modal: ModalService,
                 private system: SystemService,
-                private settings: SettingsService,
                 private auth: AuthService,
                 private errorBarService: ErrorBarService,
                 private dataGateway: DataGatewayService) {
@@ -258,8 +264,9 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
         this.tracked = this.codeEditorContent
             .valueChanges
             .debounceTime(3000)
+            .merge(this.priorityCodeUpdates)
             .distinctUntilChanged()
-            .merge(this.priorityCodeUpdates).subscribe(latestContent => {
+            .subscribe(latestContent => {
 
                 this.cwlValidatorService.validate(latestContent).then(r => {
 
@@ -388,7 +395,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
 
         this.dataGateway.saveFile(this.data.id, text).subscribe(save => {
             console.log("Saved", save);
-            this.priorityCodeUpdates.next();
+            this.priorityCodeUpdates.next(text);
         }, err => {
             console.log("Not saved", err);
         });
@@ -526,6 +533,15 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
         if (this.graphEditor) {
             this.graphEditor.checkOutstandingGraphFitting();
         }
+    }
+
+    publish() {
+        const component = this.modal.fromComponent(PublishModalComponent, {
+            title: "Publish an App",
+            backdrop: true
+        });
+
+        component.appContent = this.workflowModel.serialize();
     }
 
 }
