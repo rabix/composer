@@ -194,4 +194,24 @@ export class PlatformAPI {
             })).map(r => r.json().message);
     }
 
+    suggestSlug(owner, project, slug): Observable<{ app_name: string, rev: number }> {
+        return this.sessionID.flatMap(sessionID =>
+            this.http.post(this.getServiceURL("brood") + `/apps/${owner}/${project}/suggest-slug`, {
+                label: slug
+            }, {
+                headers: new Headers({
+                    "session-id": sessionID
+                })
+            })).map(r => r.json().message);
+    }
+
+    createApp(owner, project, name, appPayload): Observable<PlatformAppEntry> {
+        return this.sessionID.flatMap(sessionID =>
+            this.http.post(this.getServiceURL("brood") + `/apps/${owner}/${project}/${name}`, appPayload, {
+                headers: new Headers({
+                    "session-id": sessionID
+                })
+            })).map(r => r.json().message);
+    }
+
 }

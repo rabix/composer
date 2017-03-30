@@ -145,7 +145,7 @@ import {CircularLoaderComponent} from "./circular-loader/circular-loader.compone
         TooltipDirective,
         TreeNodeComponent,
         TreeViewComponent,
-        CircularLoaderComponent
+        CircularLoaderComponent,
     ]
 })
 export class UIModule {

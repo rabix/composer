@@ -100,4 +100,8 @@ export class UserPreferencesService {
     getOpenProjects() {
         return this.get("openProjects", []);
     }
+
+    getOpenFolders() {
+        return this.get("openFolders", []);
+    }
 }

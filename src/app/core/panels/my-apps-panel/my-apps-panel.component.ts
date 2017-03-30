@@ -222,7 +222,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                         type: "project",
                         data: child,
                         icon: "fa-folder",
-                        label: "Project: " + label ,
+                        label: label ,
                         isExpandable: true,
                         isExpanded: data.expanded.indexOf(id) !== -1,
                         iconExpanded: "fa-folder-open",

@@ -28,12 +28,15 @@ import {WorkboxComponent} from "./workbox/workbox.component";
 import {AuthModule} from "../auth/auth.module";
 import {ModalErrorHandler} from "./error-report/modal-error-handler";
 import {ErrorReportComponent} from "./error-report/error-report.component";
+import {CreateAppModalComponent} from "./modals/create-app-modal/create-app-modal.component";
+import {NgStringPipesModule} from "../../../node_modules/ngx-pipes/src/app/pipes/string/index";
 
 @NgModule({
     entryComponents: [
         AddSourceModalComponent,
         SendFeedbackModalComponent,
-        ErrorReportComponent
+        ErrorReportComponent,
+        CreateAppModalComponent
     ],
     declarations: [
         LayoutComponent,
@@ -52,6 +55,7 @@ import {ErrorReportComponent} from "./error-report/error-report.component";
         AddSourceModalComponent,
         SendFeedbackModalComponent,
         ErrorReportComponent,
+        CreateAppModalComponent,
     ],
     exports: [
         LogoComponent,
@@ -73,7 +77,8 @@ import {ErrorReportComponent} from "./error-report/error-report.component";
         UIModule,
         EditorCommonModule,
         ToolEditorModule,
-        WorkflowEditorModule
+        WorkflowEditorModule,
+        NgStringPipesModule,
     ]
 })
 export class CoreModule {

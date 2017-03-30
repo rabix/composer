@@ -136,7 +136,18 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
     drawGraphAndAttachListeners() {
         this.graph = new Workflow(new Snap(this.canvas.nativeElement), this.model as any);
-        this.graph.fitToViewport();
+        try {
+            this.graph.fitToViewport();
+        } catch (ex) {
+            setTimeout(() => {
+                console.warn("Workflow should be able to fit in by now...");
+                try {
+                    this.graph.fitToViewport();
+                } catch (ex) {
+                    console.warn("Screw fitting.");
+                }
+            }, 1);
+        }
 
 
         this.graph.on("beforeChange", () => {

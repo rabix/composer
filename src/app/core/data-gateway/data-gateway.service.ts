@@ -279,4 +279,28 @@ export class DataGatewayService {
 
         return bonus + matchedCharacters / hlen;
     }
+
+    getProjectsForAllConnections(all = false) {
+        return this.auth.connections.flatMap((credentials: any) => {
+            const listings = credentials.map(creds => this.getPlatformListing(creds.hash));
+
+            if (listings.length === 0) {
+                return Observable.of([]);
+            }
+
+            return Observable.zip(...listings);
+        }, (credentials, listings) => ({credentials, listings}));
+    }
+
+    suggestSlug(hash, owner, project, slug) {
+        return this.auth.connections.switchMap((credentials: any) => {
+            const listings = credentials.map(creds => this.getPlatformListing(creds.hash));
+
+            if (listings.length === 0) {
+                return Observable.of([]);
+            }
+
+            return Observable.zip(...listings);
+        }, (credentials, listings) => ({credentials, listings}));
+    }
 }

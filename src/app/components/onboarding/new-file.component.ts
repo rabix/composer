@@ -2,12 +2,15 @@ import {Component, OnInit, ViewEncapsulation} from "@angular/core";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {WorkboxService} from "../../core/workbox/workbox.service";
+import {ModalService} from "../../ui/modal/modal.service";
+import {CreateAppModalComponent} from "../../core/modals/create-app-modal/create-app-modal.component";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
     styleUrls: ["new-file.component.scss"],
     selector: "ct-new-file-tab",
     template: `
+        <ct-action-bar></ct-action-bar>
         <div class="content-container">
 
             <!--Top empty space-->
@@ -30,7 +33,7 @@ import {WorkboxService} from "../../core/workbox/workbox.service";
                     <div class="app-container">
 
                         <!--Workflow-->
-                        <div class="app">
+                        <div class="app clickable" (click)="openAppCreation('workflow')">
 
                             <!--Image-->
                             <div class="image-container">
@@ -49,7 +52,7 @@ import {WorkboxService} from "../../core/workbox/workbox.service";
                         </div>
 
                         <!--Tool-->
-                        <div class="app">
+                        <div class="app clickable" (click)="openAppCreation('tool')">
 
                             <!--Image-->
                             <div class="image-container">
@@ -110,7 +113,9 @@ export class NewFileTabComponent extends DirectiveBase implements OnInit {
 
     public recentApps = [];
 
-    constructor(private preferences: UserPreferencesService, private workbox: WorkboxService) {
+    constructor(private preferences: UserPreferencesService,
+                private modal: ModalService,
+                private workbox: WorkboxService) {
         super();
     }
 
@@ -121,10 +126,18 @@ export class NewFileTabComponent extends DirectiveBase implements OnInit {
     }
 
     openRecentApp(entry: { id: string }) {
-        console.log("Open a recent item", entry);
-        this.workbox.getOrCreateFileTab(entry.id)
-            .take(1)
-            .subscribe(tab => this.workbox.openTab(tab));
+        this.workbox.getOrCreateFileTab(entry.id).take(1).subscribe(tab => this.workbox.openTab(tab));
+    }
+
+    openAppCreation(type: "workflow" | "tool") {
+        const modal = this.modal.fromComponent(CreateAppModalComponent, {
+            closeOnOutsideClick: false,
+            backdrop: true,
+            title: `Create a New App`,
+            closeOnEscape: false
+        });
+
+        modal.appType = type;
     }
 }
 
