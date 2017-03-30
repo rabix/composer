@@ -22,6 +22,7 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
                     (onDragOver)="workbox.openTab(tab)"
                     (click)="workbox.openTab(tab)"
                     [class.active]="tab === (workbox.activeTab | async)"
+                    [ct-context]="createContextMenu(tab)"
                     class="tab clickable">
                     <div class="title">{{ tab.label }}</div>
                     <div (click)="removeTab(tab)" class="close-icon"><b>×</b></div>

@@ -1,4 +1,13 @@
-import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren} from "@angular/core";
+import {
+    AfterViewInit,
+    ChangeDetectorRef,
+    Component,
+    ElementRef,
+    OnInit,
+    QueryList,
+    ViewChild,
+    ViewChildren
+} from "@angular/core";
 import {FormControl} from "@angular/forms";
 
 import "rxjs/add/operator/map";
@@ -19,6 +28,8 @@ import {PlatformAppEntry} from "../../data-gateway/data-types/platform-api.types
 import {AddSourceModalComponent} from "../../modals/add-source-modal/add-source-modal.component";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.component";
+import {ContextService} from "../../../ui/context/context.service";
+import {MenuItem} from "../../../ui/menu/menu-item";
 
 /** @deprecated */
 @Component({
@@ -51,7 +62,8 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                 private cdr: ChangeDetectorRef,
                 private workbox: WorkboxService,
                 private modal: ModalService,
-                private dataGateway: DataGatewayService) {
+                private dataGateway: DataGatewayService,
+                private context: ContextService) {
         super();
 
         this.expandedNodes = this.preferences.get("expandedNodes", []).take(1).publishReplay(1).refCount();
@@ -73,6 +85,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
             this.listenForFolderExpansion();
             this.attachExpansionStateSaving();
             this.listenForAppOpening();
+            this.listenForContextMenu();
         });
 
 
@@ -115,11 +128,11 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
 
         const localFileSearch = (term) => this.dataGateway.searchLocalProjects(term).map(results => results.map(result => {
 
-            const id    = result.path;
+            const id = result.path;
             const label = result.path.split("/").slice(-3, -1).join("/");
             const title = result.path.split("/").pop();
 
-            let icon      = "fa-file";
+            let icon = "fa-file";
             let relevance = result.relevance;
 
             if (result.type === "Workflow") {
@@ -148,7 +161,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                     const {results, hash} = group;
 
                     return results.map(result => {
-                        const id    = hash + "/" + result["owner"] + "/" + result["slug"] + "/" + result["sbg:id"];
+                        const id = hash + "/" + result["owner"] + "/" + result["slug"] + "/" + result["sbg:id"];
                         const title = result.label;
 
                         return {
@@ -179,7 +192,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
             .filter(term => term.trim().length !== 0)
             .flatMap(term => Observable.zip(localFileSearch(term), projectSearch(term)))
             .subscribe(datasets => {
-                const combined     = [].concat(...datasets).sort((a, b) => b.relevance - a.relevance);
+                const combined = [].concat(...datasets).sort((a, b) => b.relevance - a.relevance);
                 this.searchResults = combined;
                 this.cdr.markForCheck();
             });
@@ -212,7 +225,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                     const id = `${data.node.id}/${child.owner}/${child.slug}`;
 
                     const duplicate = data.listing.slice(0, index).concat(data.listing.slice(index + 1)).find(c => c.name === child.name);
-                    let label       = child.name;
+                    let label = child.name;
 
                     if (duplicate) {
                         label += ` (${child.owner})`;
@@ -231,7 +244,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
 
                 // Update the tree view
                 data.node.modify(() => {
-                    data.node.loading  = false;
+                    data.node.loading = false;
                     data.node.children = children;
                 });
             });
@@ -259,7 +272,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                 // Update the tree view
                 data.node.modify(() => {
                     data.node.children = children;
-                    data.node.loading  = false;
+                    data.node.loading = false;
                 });
             });
     }
@@ -291,7 +304,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                 });
                 data.node.modify(() => {
                     data.node.children = children;
-                    data.node.loading  = false;
+                    data.node.loading = false;
                 });
             });
     }
@@ -316,7 +329,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                     let iconExpanded;
 
                     if (entry.isDir) {
-                        icon         = "fa-folder";
+                        icon = "fa-folder";
                         iconExpanded = "fa-folder-open";
                     } else if (entry.type === "Workflow") {
                         icon = "fa-share-alt";
@@ -324,7 +337,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                         icon = "fa-terminal";
                     }
 
-                    const id    = entry.path;
+                    const id = entry.path;
                     const label = entry.path.split("/").pop();
 
                     return {
@@ -347,7 +360,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
 
                 data.node.modify(() => {
                     data.node.children = children;
-                    data.node.loading  = false;
+                    data.node.loading = false;
                 });
             });
     }
@@ -378,6 +391,32 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
         this.tree.open.filter(n => n.type === "file")
             .flatMap(node => this.workbox.getOrCreateFileTab(node.data.path))
             .subscribe(tab => this.workbox.openTab(tab));
+    }
+
+    private listenForContextMenu() {
+        // When click on user project
+        this.tree.contextMenu.filter(data => data.node.type === "project")
+            .subscribe(data => {
+
+            const contextMenu = new MenuItem("Remove from Workspace", {
+                click: () => {
+                    this.preferences.get("openProjects", []).take(1).subscribe(openProjects => {
+
+                        const projects = openProjects.slice();
+                        const findIndex = projects.findIndex(project => project === data.node.id);
+
+                        if (findIndex !== -1) {
+                            projects.splice(findIndex, 1);
+                        }
+
+                        this.preferences.put("openProjects", projects);
+                    });
+                }
+            });
+
+            this.context.showAt(data.node.getViewContainer(), [contextMenu], data.coordinates);
+
+        });
     }
 
     openAddAppSourcesDialog() {
