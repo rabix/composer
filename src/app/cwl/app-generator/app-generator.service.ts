@@ -12,7 +12,7 @@ export class AppGeneratorService {
             label,
             description: "",
             class: type === "workflow" ? "Workflow" : "CommandLineTool",
-            cwlVersion: version === "d2sb" ? "draft-2" : version
+            cwlVersion: version === "d2sb" ? "sbg:draft-2" : version
         };
 
 

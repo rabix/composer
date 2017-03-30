@@ -102,6 +102,10 @@ export class UserPreferencesService {
     }
 
     getOpenFolders() {
-        return this.get("openFolders", []);
+        return this.get("localFolders", []);
+    }
+
+    getExpandedNodes() {
+        return this.get("expandedNodes", []);
     }
 }

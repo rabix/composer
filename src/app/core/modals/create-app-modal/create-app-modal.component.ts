@@ -10,6 +10,8 @@ import {PlatformAPIGatewayService} from "../../../auth/api/platform-api-gateway.
 import {AppGeneratorService} from "../../../cwl/app-generator/app-generator.service";
 const {app, dialog} = window["require"]("electron").remote;
 import * as YAML from "js-yaml";
+import {WorkboxService} from "../../workbox/workbox.service";
+import {Observable} from "rxjs/Observable";
 
 @Component({
     selector: "ct-create-app-modal",
@@ -117,6 +119,7 @@ export class CreateAppModalComponent extends DirectiveBase {
                 private auth: AuthService,
                 private apiGateway: PlatformAPIGatewayService,
                 private cdr: ChangeDetectorRef,
+                private workbox: WorkboxService,
                 private preferences: UserPreferencesService) {
 
         super();
@@ -181,8 +184,15 @@ export class CreateAppModalComponent extends DirectiveBase {
 
     chooseFolder() {
 
-        this.preferences.getOpenFolders().take(1).subscribe(folders => {
-            const path = folders[0] || app.getPath("home");
+        Observable.zip(this.preferences.getOpenFolders(), this.preferences.getExpandedNodes(), (openFolders, expandedNodes) => {
+            for (let i = 0; i < expandedNodes.length; i++) {
+                if (openFolders.indexOf(expandedNodes[i]) !== -1) {
+                    return Observable.of(expandedNodes[i]);
+                }
+            }
+            return Observable.of(null);
+        }).take(1).subscribe(folder => {
+            const path = folder || app.getPath("home");
 
             const defaultFilename   = `new-${this.appType}.cwl`;
             const val               = this.localNameControl.value;
@@ -208,12 +218,21 @@ export class CreateAppModalComponent extends DirectiveBase {
     createLocal() {
         this.error = undefined;
 
-        const appName  = this.localNameControl.value;
-        const filename = this.chosenLocalFilename;
-        const app      = AppGeneratorService.generate(this.cwlVersion, this.appType, filename.split("/").pop(), appName);
-        const dump     = YAML.dump(app);
+        const appName      = this.localNameControl.value;
+        const filename     = this.chosenLocalFilename;
+        const filesplit    = filename.split("/")
+        const fileBasename = filesplit.pop();
+        const folder       = filesplit.join("/");
+
+
+        const app  = AppGeneratorService.generate(this.cwlVersion, this.appType, fileBasename, appName);
+        const dump = YAML.dump(app);
         this.dataGateway.saveLocalFileContent(filename, dump).subscribe(_ => {
+            this.dataGateway.invalidateFolderListing(folder);
             this.modal.close();
+            this.workbox.getOrCreateFileTab(filename).subscribe(tab => {
+                this.workbox.openTab(tab);
+            });
 
         }, err => {
             this.error = err;
@@ -229,6 +248,10 @@ export class CreateAppModalComponent extends DirectiveBase {
 
         this.apiGateway.forHash(hash).createApp(owner, project, slug, app).subscribe(data => {
             console.log("Made an app", data);
+            this.dataGateway.invalidateProjectListing(hash, owner, project);
+            this.workbox.getOrCreateFileTab([hash, owner, project, owner, project, slug, 0].join("/")).subscribe(tab => {
+                this.workbox.openTab(tab);
+            });
             this.modal.close();
         }, err => {
             this.error = err;

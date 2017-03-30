@@ -30,6 +30,7 @@ import {ModalErrorHandler} from "./error-report/modal-error-handler";
 import {ErrorReportComponent} from "./error-report/error-report.component";
 import {CreateAppModalComponent} from "./modals/create-app-modal/create-app-modal.component";
 import {NgStringPipesModule} from "../../../node_modules/ngx-pipes/src/app/pipes/string/index";
+import {WorkboxService} from "./workbox/workbox.service";
 
 @NgModule({
     entryComponents: [
@@ -64,6 +65,7 @@ import {NgStringPipesModule} from "../../../node_modules/ngx-pipes/src/app/pipes
     providers: [
         GuidService,
         WebWorkerBuilderService,
+        WorkboxService,
         ModalService,
         PlatformAPI,
         {provide: ErrorHandler, useClass: ModalErrorHandler}

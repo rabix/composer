@@ -20,7 +20,6 @@ import {ErrorBarService} from "../../layout/error-bar/error-bar.service";
 
 @Component({
     selector: "ct-layout",
-    providers: [WorkboxService],
     styleUrls: ["./layout.component.scss"],
     template: `
         <ct-error-bar>

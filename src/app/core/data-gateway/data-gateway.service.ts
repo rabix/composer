@@ -24,6 +24,8 @@ export class DataGatewayService {
 
     scanCompletion = new ReplaySubject<string>();
 
+    cacheInvalidation = new Subject<string>();
+
     static getFileSource(id): "local" | "public" | "app" {
         if (id.startsWith("/")) {
             return "local";
@@ -87,19 +89,28 @@ export class DataGatewayService {
 
         return this.throughCache(
             `${hash}.getPlatformListing`,
-            this.apiGateway.forHash(hash).getRabixProjects().publishReplay(1).refCount()
+            this.apiGateway.forHash(hash).getRabixProjects()
         );
     }
 
     getProjectListing(hash, projectOwner: string, projectSlug: string): Observable<any[]> {
-        return this.throughCache(
-            hash + `.getProjectListing.${projectOwner}.${projectSlug}`,
-            this.apiGateway.forHash(hash).getProjectApps(projectOwner, projectSlug).publishReplay(1).refCount()
-        );
+        const cacheKey = hash + `.getProjectListing.${projectOwner}.${projectSlug}`;
+
+        return this.throughCache(cacheKey,
+            this.apiGateway.forHash(hash)
+                .getProjectApps(projectOwner, projectSlug));
+    }
+
+    invalidateProjectListing(hash, owner: string, project: string) {
+        this.invalidateCache(`${hash}.getProjectListing.${owner}.${project}`);
     }
 
     getFolderListing(folder) {
-        return this.ipc.request("readDirectory", folder);
+        return this.throughCache(`readDirectory.${folder}`, this.ipc.request("readDirectory", folder));
+    }
+
+    invalidateFolderListing(folder) {
+        this.cacheInvalidation.next(`readDirectory.${folder}`);
     }
 
     getLocalListing() {
@@ -128,10 +139,7 @@ export class DataGatewayService {
     getPublicApps(hash) {
         return this.throughCache(
             hash + ".getPublicApps",
-            this.apiGateway.forHash(hash).getPublicApps()
-                .publishReplay(1)
-                .refCount()
-        );
+            this.apiGateway.forHash(hash).getPublicApps());
     }
 
     fetchFileContent(almostID: string, parse = false) {
@@ -233,13 +241,17 @@ export class DataGatewayService {
     }
 
     private throughCache(key, handler) {
-        if (this.cache[key]) {
-            return this.cache[key];
-        }
+        return new Observable(subscriber => {
+            const cacheSub = Observable.merge(
+                Observable.of(1),
+                this.cacheInvalidation.filter(k => k === key)
+            ).flatMap(() => handler).subscribe(subscriber);
 
-        this.cache[key] = handler;
+            return () => {
+                cacheSub.unsubscribe();
+            };
 
-        return this.cache[key];
+        }).publishReplay().refCount();
     }
 
     static fuzzyMatch(needle, haystack) {
@@ -292,15 +304,7 @@ export class DataGatewayService {
         }, (credentials, listings) => ({credentials, listings}));
     }
 
-    suggestSlug(hash, owner, project, slug) {
-        return this.auth.connections.switchMap((credentials: any) => {
-            const listings = credentials.map(creds => this.getPlatformListing(creds.hash));
-
-            if (listings.length === 0) {
-                return Observable.of([]);
-            }
-
-            return Observable.zip(...listings);
-        }, (credentials, listings) => ({credentials, listings}));
+    invalidateCache(key: string) {
+        this.cacheInvalidation.next(key);
     }
 }
