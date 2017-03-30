@@ -9,7 +9,7 @@
     $topOffset: 3px;
 
     .tab {
-        display: inline-block;
+        display: flex;
         padding: 0 5px 0 5px;
     }
 
@@ -76,20 +76,30 @@
         border-right: 1px solid #373a3c;
         line-height: 36px;
 
+        .tab-icon {
+            flex-basis: 18px;
+        }
+
         .title {
+            flex:1;
             overflow: hidden;
-            position: relative;
+            padding-right: 5px;
             text-overflow: ellipsis;
             white-space: pre;
             z-index: 1;
         }
 
         .close-icon {
+            color: $layout-text-color-faded;
             position: absolute;
             top: 0;
             right: 10px;
             font-size: 16px;
             z-index: 10;
+
+            &:hover {
+                color: white;
+            }
         }
 
         &.active, &.active:before, &.active:after {

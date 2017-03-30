@@ -30,7 +30,7 @@ export class SettingsButtonComponent {
         this.workbox.openTab({
             id: "?settings",
             label: "Settings",
-            type: "Settings",
+            type: "Settings"
         }, false);
     }
 }

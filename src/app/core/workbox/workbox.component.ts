@@ -24,6 +24,18 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
                     [class.active]="tab === (workbox.activeTab | async)"
                     [ct-context]="createContextMenu(tab)"
                     class="tab clickable">
+
+                    <div class="tab-icon">
+                        <i class="fa" 
+                           [class.fa-home]="tab?.type === 'Welcome'"
+                           [class.fa-file-text-o]="tab?.type === 'Code'"
+                           [class.fa-share-alt]="tab?.type === 'Workflow'"
+                           [class.fa-terminal]="tab?.type === 'CommandLineTool'"
+                           [class.fa-file-o]="tab?.type === 'NewFile'"
+                           [class.fa-sliders]="tab?.type === 'Settings'"
+                        ></i>
+                    </div>
+
                     <div class="title">{{ tab.label }}</div>
                     <div (click)="removeTab(tab)" class="close-icon"><b>×</b></div>
                 </li>
@@ -188,7 +200,7 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
         this.workbox.openTab({
             id: "?newFile",
             label: "New File",
-            type: "NewFile",
+            type: "NewFile"
         }, false);
     }
 
