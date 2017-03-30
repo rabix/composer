@@ -128,6 +128,9 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
 
         if (this.form && changes["port"]) {
             const newIO = changes["port"].currentValue;
+            if (!newIO) { // Happens when you go through wf history to the beginning
+                return;
+            }
 
             this.form.controls["isRequired"].setValue(newIO.type.isNullable);
             this.form.controls["id"].setValue(newIO.id);
@@ -182,7 +185,8 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
                 this.port.customProps["sbg:fileTypes"] = value;
             } else {
                 delete this.port.customProps["sbg:fileTypes"];
-            };
+            }
+            ;
         });
 
         this.tracked = this.form.controls["label"].valueChanges.subscribe((label) => {

@@ -183,6 +183,7 @@ import {ModalService} from "../ui/modal/modal.service";
 export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy, OnInit, WorkboxTab {
 
 
+
     @Input()
     data: AppTabData;
 
@@ -542,6 +543,9 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
         });
 
         component.appContent = this.workflowModel.serialize();
+    }
+
+    registerOnTabLabelChange(update: (label: string) => void, originalLabel: string) {
     }
 
 }

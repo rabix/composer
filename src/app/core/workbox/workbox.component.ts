@@ -119,7 +119,6 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
     getTabComponent(tab) {
         const idx       = this.tabs.findIndex(t => t === tab);
         const component = this.tabComponents.find((item, index) => index === idx);
-        console.log("Component is", component);
         return component;
     }
 
@@ -128,7 +127,6 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
         this.tracked = this.workbox.tabCreation.delay(1).subscribe(tab => {
             const component = this.getTabComponent(tab);
             if (component && typeof component.registerOnTabLabelChange === "function") {
-                console.log("Registering function");
                 component.registerOnTabLabelChange((title) => {
                     tab.label = title;
                     this.cdr.markForCheck();
