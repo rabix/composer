@@ -86,7 +86,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
     showInspector = false;
 
     private changeTabLabel: (title: string) => void;
-    private originalTabLabel: string
+    private originalTabLabel: string;
 
     codeEditorContent = new FormControl(undefined);
 
