@@ -319,8 +319,10 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                         // After wf is created get updates for steps
                         this.getStepUpdates();
 
-                        if (!this.viewMode) {
+                        if (!this.viewMode && this.workflowModel.steps.length) {
                             this.viewMode = "graph";
+                        } else {
+                            this.viewMode = "code";
                         }
                         this.isLoading = false;
 
@@ -470,7 +472,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
      * the text has been formatted by the GUI editor
      */
     private getModelText(embed = false): string {
-        const wf = embed ? this.workflowModel.serializeEmbedded() : this.workflowModel.serialize();
+        const wf          = embed ? this.workflowModel.serializeEmbedded() : this.workflowModel.serialize();
         const modelObject = Object.assign(wf, {"sbg:modified": true});
 
         return this.data.language === "json" ? JSON.stringify(modelObject, null, 4) : Yaml.dump(modelObject);
@@ -508,7 +510,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
         const urlProject = urlApp.split("/").splice(0, 2).join("/");
 
         this.auth.connections.take(1).subscribe((cred: CredentialsEntry[]) => {
-            const hash = this.data.id.split("/")[0];
+            const hash    = this.data.id.split("/")[0];
             const urlBase = cred.find(c => c.hash === hash);
             if (!urlBase) {
                 this.errorBarService.showError(`Could not externally open app "${urlApp}"`);
