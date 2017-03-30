@@ -61,15 +61,17 @@ import {ModalService} from "../ui/modal/modal.service";
             <div class="document-controls">
 
                 <!--CWLVersion-->
-                <span class="btn btn-sm">{{workflowModel.cwlVersion}}</span>
+                <span class="btn btn-sm btn-secondary" 
+                      ct-tooltip="CWL Version" 
+                      tooltipPlacement="bottom">{{workflowModel.cwlVersion}}</span>
 
                 <!--Go to app-->
-                <button class="btn btn-sm btn-secondary "
+                <button class="btn btn-sm btn-secondary"
                         type="button"
                         (click)="goToApp()"
                         tooltipPlacement="bottom"
                         *ngIf="data.dataSource !== 'local'"
-                        ct-tooltip="Open on Seven Bridges Platform">
+                        ct-tooltip="Open on Platform">
                     <i class="fa fa-external-link"></i>
                 </button>
 
@@ -79,7 +81,7 @@ import {ModalService} from "../ui/modal/modal.service";
                         ct-tooltip="Save"
                         [tooltipPlacement]="'bottom'"
                         class="btn btn-sm btn-secondary" type="button">
-                    <i class="fa fa-save"></i>
+                    <i class="fa fa-save"></i> Save
                 </button>
 
                 <!--Copy-->
@@ -87,7 +89,7 @@ import {ModalService} from "../ui/modal/modal.service";
                         type="button"
                         ct-tooltip="Save As..."
                         tooltipPlacement="bottom">
-                    <i class="fa fa-copy"></i>
+                    <i class="fa fa-copy"></i> Save As...
                 </button>
 
                 <button class="btn btn-sm" *ngIf="data.dataSource === 'local'" (click)="publish()">
@@ -287,7 +289,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                     } as LoadOptions);
 
                     // should show prompt, but json is already reformatted
-                    if (this.showReformatPrompt && json["rbx:modified"]) {
+                    if (this.showReformatPrompt && json["sbg:modified"]) {
                         this.showReformatPrompt = false;
                     }
 
@@ -327,10 +329,8 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                         // After wf is created get updates for steps
                         this.getStepUpdates();
 
-                        if (!this.viewMode && this.workflowModel.steps.length) {
+                        if (!this.viewMode) {
                             this.viewMode = "graph";
-                        } else {
-                            this.viewMode = "code";
                         }
                         this.isLoading = false;
 
@@ -396,42 +396,11 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
 
         this.dataGateway.saveFile(this.data.id, text).subscribe(save => {
             console.log("Saved", save);
-            this.priorityCodeUpdates.next(text);
+            this.priorityCodeUpdates.next(save);
         }, err => {
             console.log("Not saved", err);
+            this.errorBarService.showError(`Unable to save Workflow: ${err.message || err}`);
         });
-        // const text = this.toolGroup.dirty ? this.getModelText() : this.rawEditorContent.getValue();
-        //
-        // // For local files, just save and that's it
-        // if (this.data.dataSource === "local") {
-        //     const path = this.data.data.path;
-        //
-        //     const statusID = this.statusBar.startProcess(`Saving ${path}...`, `Saved ${path}`);
-        //     this.data.data.save(text).subscribe(() => {
-        //         this.statusBar.stopProcess(statusID);
-        //     });
-        //     return;
-        // }
-
-        // For Platform files, we need to ask for a revision note
-        // this.modal.prompt({
-        //     cancellationLabel: "Cancel",
-        //     confirmationLabel: "Publish",
-        //     content: "Revision Note",
-        //     title: "Publish a new App Revision",
-        //     formControl: new FormControl("")
-        // }).then(revisionNote => {
-        //
-        //     const path     = this.data.data["sbg:id"] || this.data.data.id;
-        //     const statusID = this.statusBar.startProcess(`Creating a new revision of ${path}`);
-        //     this.data.save(JSON.parse(text), revisionNote).subscribe(result => {
-        //         const cwl = JSON.stringify(result.message, null, 4);
-        //         this.rawEditorContent.next(cwl);
-        //         this.statusBar.stopProcess(statusID, `Created revision ${result.message["sbg:latestRevision"]} from ${path}`);
-        //
-        //     });
-        // }, err => console.warn);
-
     }
 
     /**
@@ -476,14 +445,17 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
     }
 
     /**
-     * Serializes model to text. It also adds rbx:modified flag to indicate
+     * Serializes model to text. It also adds sbg:modified flag to indicate
      * the text has been formatted by the GUI editor
      */
     private getModelText(embed = false): string {
         const wf          = embed ? this.workflowModel.serializeEmbedded() : this.workflowModel.serialize();
         const modelObject = Object.assign(wf, {"sbg:modified": true});
 
-        return this.data.language === "json" ? JSON.stringify(modelObject, null, 4) : Yaml.dump(modelObject);
+        console.log("serialized workflow", modelObject);
+
+        return this.data.language === "json" || this.data.dataSource === "app" ?
+            JSON.stringify(modelObject, null, 4) : Yaml.dump(modelObject);
     }
 
     toggleReport(panel: "validation") {
@@ -500,9 +472,6 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
         this.dataGateway.fetchFileContent(fid).subscribe(txt => {
             this.priorityCodeUpdates.next(txt);
         });
-        // this.platform.getAppCWL(this.data.data, revisionNumber).subscribe(cwl => {
-        //     this.rawEditorContent.next(cwl);
-        // });
     }
 
     provideStatusControls() {
@@ -542,7 +511,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
             backdrop: true
         });
 
-        component.appContent = this.workflowModel.serialize();
+        component.appContent = this.workflowModel.serializeEmbedded();
     }
 
     registerOnTabLabelChange(update: (label: string) => void, originalLabel: string) {

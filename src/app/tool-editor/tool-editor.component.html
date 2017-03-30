@@ -23,13 +23,17 @@
 
 
         <!--CWLVersion-->
-        <span class="btn btn-sm">{{toolModel.cwlVersion}}</span>
+        <span class="btn btn-sm btn-secondary"
+              ct-tooltip="CWL Version"
+              tooltipPlacement="bottom">{{toolModel.cwlVersion}}</span>
 
 
         <!--Go to app-->
         <button class="btn btn-sm btn-secondary"
                 type="button"
                 *ngIf="data.dataSource !== 'local'"
+                ct-tooltip="Open on Platform"
+                tooltipPlacement="bottom"
                 (click)="goToApp()">
             <i class="fa fa-external-link"></i>
         </button>
@@ -37,17 +41,26 @@
         <!--Save-->
         <button [disabled]="!data.isWritable"
                 (click)="save()"
+                ct-tooltip="Save"
+                tooltipPlacement="bottom"
                 class="btn btn-sm btn-secondary" type="button">
             <i class="fa fa-save"></i> Save
         </button>
 
         <!--Copy-->
-        <button class="btn btn-sm btn-secondary " type="button">
-            <i class="fa fa-copy"></i> Save As
+        <button class="btn btn-sm btn-secondary"
+                ct-tooltip="Save As..."
+                tooltipPlacement="bottom"
+                type="button">
+            <i class="fa fa-copy"></i> Save As...
         </button>
 
 
-        <button class="btn btn-sm" *ngIf="data.dataSource === 'local'" (click)="publish()">
+        <button class="btn btn-sm"
+                *ngIf="data.dataSource === 'local'"
+                ct-tooltip="Publish"
+                tooltipPlacement="bottom"
+                (click)="publish()">
             <i class="fa fa-cloud-upload"></i> Publish
         </button>
 

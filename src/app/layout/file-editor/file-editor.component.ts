@@ -14,7 +14,7 @@ import {StatusBarService} from "../status-bar/status-bar.service";
                 <button [disabled]="!data.isWritable"
                         class="btn btn-secondary btn-sm"
                         tooltipPlacement="bottom"
-                        ct-tooltip="Save As..."
+                        ct-tooltip="Save"
                         (click)="save()"
                         type="button">
                     <i class="fa fa-fw fa-save"></i>

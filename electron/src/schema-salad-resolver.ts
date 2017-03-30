@@ -45,7 +45,6 @@ function traverse(data, source) {
                                 Object.assign(data, content);
                                 break;
                             case "$include":
-                                debugger;
                                 data[key] = content;
 
                                 break;

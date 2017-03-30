@@ -233,7 +233,6 @@ export class DataGatewayService {
             confirmationLabel: "Publish",
             formControl: revNote
         })).flatMap(() => {
-
             return this.apiGateway.forHash(hash)
                 .saveApp(YAML.safeLoad(content, {json: true} as any), revNote.value)
                 .map(r => JSON.stringify(r.message, null, 4));

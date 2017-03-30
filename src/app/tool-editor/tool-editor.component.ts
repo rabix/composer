@@ -155,7 +155,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
                     } as LoadOptions);
 
                     // should show prompt, but json is already reformatted
-                    if (this.showReformatPrompt && json["rbx:modified"]) {
+                    if (this.showReformatPrompt && json["sbg:modified"]) {
                         this.showReformatPrompt = false;
                     }
 
@@ -236,21 +236,9 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
             console.log("Saved", save);
             this.priorityCodeUpdates.next(save);
         }, err => {
+            this.errorBarService.showError(`Unable to save Tool: ${err.message || err}`);
             console.log("Not saved", err);
         });
-        // const text = this.toolGroup.dirty ? this.getModelText() : this.codeEditorContent.value;
-        //
-        // // For local files, just save and that's it
-        // if (this.data.data.source === "local") {
-        //     const path = this.data.data.path;
-        //
-        //     const statusID = this.statusBar.startProcess(`Saving ${path}...`, `Saved ${path}`);
-        //     this.data.data.save(text).subscribe(() => {
-        //         this.statusBar.stopProcess(statusID);
-        //     });
-        //     return;
-        // }
-        //
     }
 
     /**
@@ -286,11 +274,11 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
     }
 
     /**
-     * Serializes model to text. It also adds rbx:modified flag to indicate
+     * Serializes model to text. It also adds sbg:modified flag to indicate
      * the text has been formatted by the GUI editor
      */
     private getModelText(): string {
-        const modelObject = Object.assign(this.toolModel.serialize(), {"rbx:modified": true});
+        const modelObject = Object.assign(this.toolModel.serialize(), {"sbg:modified": true});
 
         return this.data.language === "json" || this.data.dataSource === "app"
             ? JSON.stringify(modelObject, null, 4) : Yaml.dump(modelObject);

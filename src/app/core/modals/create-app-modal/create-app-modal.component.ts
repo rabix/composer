@@ -218,7 +218,7 @@ export class CreateAppModalComponent extends DirectiveBase {
 
         const appName      = this.localNameControl.value;
         const filename     = this.chosenLocalFilename;
-        const filesplit    = filename.split("/")
+        const filesplit    = filename.split("/");
         const fileBasename = filesplit.pop();
         const folder       = filesplit.join("/");
 

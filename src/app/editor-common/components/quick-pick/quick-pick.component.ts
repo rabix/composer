@@ -171,7 +171,6 @@ available types: {[label: string]: string | number} | string[]`);
         this.tracked = this.form.controls["custom"].valueChanges.subscribe(expr => {
             this._value      = expr;
             this.computedVal = expr.serialize();
-            debugger;
             this.onChange(this._value);
         });
     }

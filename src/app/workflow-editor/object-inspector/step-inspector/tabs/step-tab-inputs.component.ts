@@ -22,13 +22,13 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                             <!--Label and port options-->
                             <div class="input-title flex-baseline">
 
-                                <label class="input-label">
+                                <label class="input-label" title="{{ input.label || input.id }}">
                                     <span class="text-danger" *ngIf="!input.type.isNullable">*</span>
-                                    {{ input.label || input.id }}
                                     <i class="fa fa-info-circle text-muted"
                                        *ngIf="input.description"
                                        [ct-tooltip]="ctt"
                                        [tooltipPlacement]="'top'"></i>
+                                    {{ input.label || input.id }}
                                 </label>
 
                                 <!--Port options for File and array of Files-->
@@ -85,17 +85,15 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
                                 <h4>{{input.label || input.id}}</h4>
 
-                                <ul>
                                     <!--Description-->
-                                    <li>
+                                    <div>
                                         <span class="title">
                                             Description:
                                         </span>
                                         <span class="value">
                                             {{input.description}}
                                         </span>
-                                    </li>
-                                </ul>
+                                    </div>
 
                             </ct-tooltip-content>
 
