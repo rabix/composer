@@ -42,6 +42,7 @@ ct-new-file-tab {
                         flex-direction: column;
                         border: 1px solid #ccc;
                         background: white;
+                        overflow:hidden;
 
                         .image-container {
                             flex: 3;
