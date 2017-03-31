@@ -1,4 +1,5 @@
 import {
+    AfterViewInit,
     Component,
     ComponentFactory,
     ComponentRef,
@@ -28,7 +29,7 @@ import {ModalService} from "./modal.service";
     `,
     styleUrls: ["./modal.component.scss"],
 })
-export class ModalComponent extends DirectiveBase {
+export class ModalComponent extends DirectiveBase implements AfterViewInit {
 
     @HostBinding("class.backdrop")
     public backdrop = false;
@@ -94,17 +95,20 @@ export class ModalComponent extends DirectiveBase {
         }
     }
 
-    // ngAfterViewInit() {
+    ngAfterViewInit() {
 
-    // this.tracked = this.domEvents.onDrag(this.headerElement.nativeElement).subscribe(dragObs => {
-    //   dragObs.pairwise().map((moves: [MouseEvent, MouseEvent]) => ({
-    //     dx: moves[1].clientX - moves[0].clientX,
-    //     dy: moves[1].clientY - moves[0].clientY
-    //   })).subscribe((ev) => {
-    //     this.reposition({left: ev.dx, top: ev.dy});
-    //   });
-    // });
-    // }
+        // this.tracked = this.domEvents.onDrag(this.headerElement.nativeElement).subscribe(dragObs => {
+        //   dragObs.pairwise().map((moves: [MouseEvent, MouseEvent]) => ({
+        //     dx: moves[1].clientX - moves[0].clientX,
+        //     dy: moves[1].clientY - moves[0].clientY
+        //   })).subscribe((ev) => {
+        //     this.reposition({left: ev.dx, top: ev.dy});
+        //   });
+        // });
+
+        this.reposition();
+
+    }
 
     public configure(config: ModalOptions) {
 
@@ -118,7 +122,7 @@ export class ModalComponent extends DirectiveBase {
 
         this.nestedComponentRef = this.nestedComponent.createComponent(factory, 0, this.injector);
 
-        Observable.of(1).merge(Observable.fromEvent(window, "resize").debounceTime(50)).subscribe(() => {
+        this.tracked = Observable.of(1).merge(Observable.fromEvent(window, "resize").debounceTime(50)).subscribe(() => {
             this.reposition();
         });
 
@@ -133,7 +137,8 @@ export class ModalComponent extends DirectiveBase {
 
     private reposition(tweak?: { left: number, top: number }) {
 
-        const el                                           = this.modalWindow.element.nativeElement as HTMLElement;
+        const el = this.modalWindow.element.nativeElement as HTMLElement;
+
         const {clientWidth: wWidth, clientHeight: wHeight} = this.hostElement.nativeElement;
         const {clientWidth: mWidth, clientHeight: mHeight} = el;
         const styleUpdate                                  = {
