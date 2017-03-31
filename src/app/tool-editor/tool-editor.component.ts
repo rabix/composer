@@ -122,7 +122,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
             (codeDirty) => codeDirty
         ).debounceTime(250).subscribe(isDirty => {
             console.log("Checking dirty state", isDirty);
-            const newLabel = isDirty ? `${this.originalTabLabel} (modified)` : this.originalTabLabel;
+            const newLabel = isDirty ? `${this.originalTabLabel}` : this.originalTabLabel;
             this.changeTabLabel(newLabel);
         });
 
@@ -229,15 +229,17 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
     }
 
     save() {
-
+        const proc = this.statusBar.startProcess(`Saving: ${this.originalTabLabel}`);
         const text = this.toolGroup.dirty ? this.getModelText() : this.codeEditorContent.value;
 
         this.dataGateway.saveFile(this.data.id, text).subscribe(save => {
             console.log("Saved", save);
+            this.statusBar.stopProcess(proc, `Saved: ${this.originalTabLabel}`);
             this.priorityCodeUpdates.next(save);
         }, err => {
-            this.errorBarService.showError(`Unable to save Tool: ${err.message || err}`);
             console.log("Not saved", err);
+            this.statusBar.stopProcess(proc, `Could not save ${this.originalTabLabel}`);
+            this.errorBarService.showError(`Unable to save Tool: ${err.message || err}`);
         });
     }
 

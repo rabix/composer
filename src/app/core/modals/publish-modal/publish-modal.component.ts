@@ -99,8 +99,7 @@ export class PublishModalComponent extends DirectiveBase {
 
         this.platformGroup = new FormGroup({
             name: this.remoteSlugControl,
-            project: this.projectSelection,
-            revisionNote: this.revisionNote
+            project: this.projectSelection
         });
 
         this.tracked = this.platformGroup.valueChanges.subscribe(change => {
@@ -137,7 +136,7 @@ export class PublishModalComponent extends DirectiveBase {
                 if (data) {
                     const nextRevision = ~~data["sbg:latestRevision"] + 1;
                     this.info          =
-                        "An app by this slug already exists in the selected project.<br/>" +
+                        "An app by this id already exists in the selected project.<br/>" +
                         `Publishing will create a revision <strong>${nextRevision}</strong>`;
                 }
             }, err => {
