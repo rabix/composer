@@ -131,6 +131,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
         const editor = this.modal.fromComponent(MultilangCodeEditorComponent, {
             backdrop: true,
             closeOnOutsideClick: false,
+            closeOnEscape: false,
             title: "Edit File Content"
         });
 
@@ -140,7 +141,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
             const nameParts = this.fileName.split(".");
             const ext = nameParts[nameParts.length - 1].toLowerCase();
             if (ACE_MODE_MAP[ext]) {
-                editor.language.next(ext);
+                editor.language.next(ACE_MODE_MAP[ext]);
             }
         }
 

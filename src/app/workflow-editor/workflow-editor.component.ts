@@ -61,8 +61,8 @@ import {ModalService} from "../ui/modal/modal.service";
             <div class="document-controls">
 
                 <!--CWLVersion-->
-                <span class="btn btn-sm btn-secondary" 
-                      ct-tooltip="CWL Version" 
+                <span class="btn btn-sm btn-secondary"
+                      ct-tooltip="CWL Version"
                       tooltipPlacement="bottom">{{workflowModel.cwlVersion}}</span>
 
                 <!--Go to app-->
@@ -185,7 +185,6 @@ import {ModalService} from "../ui/modal/modal.service";
 export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy, OnInit, WorkboxTab {
 
 
-
     @Input()
     data: AppTabData;
 
@@ -214,6 +213,8 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
     codeEditorContent = new FormControl(undefined);
 
     priorityCodeUpdates = new Subject<string>();
+
+    private originalTabLabel: string;
 
     @ViewChild(WorkflowGraphEditorComponent)
     private graphEditor: WorkflowGraphEditorComponent;
@@ -390,15 +391,16 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
     }
 
     save() {
-        console.warn("Reimplement the save functionality");
-
+        const proc = this.statusBar.startProcess(`Saving: ${this.originalTabLabel}`);
         const text = this.getModelText(this.data.dataSource === "app");
 
         this.dataGateway.saveFile(this.data.id, text).subscribe(save => {
             console.log("Saved", save);
+            this.statusBar.stopProcess(proc, `Saved: ${this.originalTabLabel}`);
             this.priorityCodeUpdates.next(save);
         }, err => {
             console.log("Not saved", err);
+            this.statusBar.stopProcess(proc, `Could not save ${this.originalTabLabel} (${err})`);
             this.errorBarService.showError(`Unable to save Workflow: ${err.message || err}`);
         });
     }
@@ -515,6 +517,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
     }
 
     registerOnTabLabelChange(update: (label: string) => void, originalLabel: string) {
+        this.originalTabLabel = originalLabel;
     }
 
 }
