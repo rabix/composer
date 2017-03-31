@@ -5,7 +5,7 @@ import {WorkflowModel} from "cwlts/models";
 export class WorkflowEditorService {
 
     private history = [];
-    private future = [];
+    private future  = [];
 
     public putInHistory(model: WorkflowModel) {
         if (this.history.length > 20) {
@@ -31,5 +31,10 @@ export class WorkflowEditorService {
 
     public canRedo() {
         return this.future.length > 0;
+    }
+
+    emptyHistory() {
+        this.history.length = 0;
+        this.future.length  = 0;
     }
 }

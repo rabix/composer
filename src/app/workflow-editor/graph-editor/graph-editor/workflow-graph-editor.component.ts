@@ -59,10 +59,10 @@ declare const Snap: any;
                     </ct-workflow-step-inspector>
 
                     <ct-workflow-io-inspector
-                            *ngIf="typeOfInspectedNode() === 'Input' || typeOfInspectedNode() === 'Output'"
-                            [port]="inspectedNode"
-                            [graph]="graph"
-                            [workflowModel]="model">
+                        *ngIf="typeOfInspectedNode() === 'Input' || typeOfInspectedNode() === 'Output'"
+                        [port]="inspectedNode"
+                        [graph]="graph"
+                        [workflowModel]="model">
 
                     </ct-workflow-io-inspector>
 
@@ -99,8 +99,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
     private tryToFitWorkflowOnNextTabActivation = false;
 
-    constructor(private statusBar: StatusBarService,
-                private gateway: DataGatewayService,
+    constructor(private gateway: DataGatewayService,
                 private ipc: IpcService,
                 private inspector: EditorInspectorService,
                 private workflowEditorService: WorkflowEditorService) {
@@ -240,7 +239,6 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
                 step.customProps["sbg:rdfId"]     = nodeID;
             }
 
-            console.log("adding step", step);
             const coords = this.graph.translateMouseCoords(ev.clientX, ev.clientY);
             Object.assign(step.customProps, {
                 "sbg:x": coords.x,
@@ -308,6 +306,9 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     }
 
     ngOnDestroy() {
+        super.ngOnDestroy();
+        this.graph.destroy();
+        this.workflowEditorService.emptyHistory();
         window.removeEventListener("keypress", this.historyHandler);
         this.inspector.hide();
     }

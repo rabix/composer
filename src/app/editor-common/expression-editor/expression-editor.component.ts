@@ -38,7 +38,7 @@ export class ExpressionEditorComponent extends DirectiveBase implements OnInit, 
 
     @Input()
     @HostBinding("style.height.px")
-    height = 600;
+    height = 500;
 
     @Input()
     @HostBinding("style.width.px")

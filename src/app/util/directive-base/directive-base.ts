@@ -1,8 +1,8 @@
-import {OnDestroy} from "@angular/core";
+import {AfterViewInit, OnDestroy} from "@angular/core";
 import {AsyncSubject} from "rxjs/AsyncSubject";
 import {Subscription} from "rxjs/Subscription";
 
-export abstract class DirectiveBase implements OnDestroy {
+export abstract class DirectiveBase implements OnDestroy, AfterViewInit {
 
     /**
      * Holds the subscriptions that need to be disposed when the component gets removed.
