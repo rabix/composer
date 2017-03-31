@@ -394,29 +394,36 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
     }
 
     private listenForContextMenu() {
+
         // When click on user project
-        this.tree.contextMenu.filter(data => data.node.type === "project")
+        this.tree.contextMenu.filter((data) => data.node.type === "project")
             .subscribe(data => {
+                const contextMenu = new MenuItem("Remove from Workspace", {
+                    click: () => {
+                        this.preferences.get("openProjects", []).take(1).subscribe(openProjects => {
 
-            const contextMenu = new MenuItem("Remove from Workspace", {
-                click: () => {
-                    this.preferences.get("openProjects", []).take(1).subscribe(openProjects => {
+                            this.preferences.put("openProjects", openProjects.filter((el) => el !== data.node.id));
+                        });
+                    }
+                });
+                this.context.showAt(data.node.getViewContainer(), [contextMenu], data.coordinates);
 
-                        const projects = openProjects.slice();
-                        const findIndex = projects.findIndex(project => project === data.node.id);
-
-                        if (findIndex !== -1) {
-                            projects.splice(findIndex, 1);
-                        }
-
-                        this.preferences.put("openProjects", projects);
-                    });
-                }
             });
 
-            this.context.showAt(data.node.getViewContainer(), [contextMenu], data.coordinates);
+        // When click on some root local folder
+        this.tree.contextMenu.filter((data) => data.node.type === "folder" && data.node.level === 2)
+            .subscribe(data => {
+                const contextMenu = new MenuItem("Remove from Workspace", {
+                    click: () => {
+                        this.preferences.get("localFolders", []).take(1).subscribe(openFolders => {
 
-        });
+                            this.preferences.put("localFolders", openFolders.filter((el) => el !== data.node.id));
+                        });
+                    }
+                });
+
+                this.context.showAt(data.node.getViewContainer(), [contextMenu], data.coordinates);
+            });
     }
 
     openAddAppSourcesDialog() {
