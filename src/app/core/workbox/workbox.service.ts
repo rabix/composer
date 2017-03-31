@@ -1,12 +1,13 @@
 import {Injectable} from "@angular/core";
 import * as YAML from "js-yaml";
+import {Subject} from "rxjs/Subject";
 import {Observable} from "rxjs/Observable";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {DataGatewayService} from "../data-gateway/data-gateway.service";
 import {AppTabData} from "./app-tab-data";
 import {TabData} from "./tab-data.interface";
-import {Subject} from "rxjs";
+
 
 @Injectable()
 export class WorkboxService {
@@ -36,7 +37,7 @@ export class WorkboxService {
 
     public openTab(tab, persistToRecentApps: boolean = true) {
 
-        const {tabs}   = this.extractValues();
+        const {tabs} = this.extractValues();
         const foundTab = tabs.find(existingTab => existingTab.id === tab.id);
 
         if (foundTab) {
@@ -45,36 +46,30 @@ export class WorkboxService {
         }
 
         if (persistToRecentApps) {
-            this.preferences.get("recentApps", []).take(1).subscribe((items) => {
+            this.preferences.get("recentApps", []).take(1).subscribe((recentApps) => {
 
-                const app = items.findIndex(item => item.id === tab.id);
+                // Remove from the recent apps if tab is already in the list
+                const newArray = recentApps.filter((item) => item.id !== tab.id);
 
-                // If app is already in recent apps
-                if (app !== -1) {
-                    items.push(items[app]);
-                    items.splice(app, 1);
-
-                } else {
-
-                    // Maximum number of recent apps
-                    if (items.length === 20) {
-                        items.shift();
-                    }
-
-                    const itemToAdd = {
-                        id: tab.id,
-                        label: tab.data.dataSource === "local" ? (() => {
-                            const idSplit = tab.id.split("/");
-                            idSplit.pop();
-                            return idSplit.join("/");
-                        })() : tab.data.parsedContent["sbg:project"],
-                        title: tab.data.parsedContent.label || tab.label,
-                        type: tab.type
-                    };
-
-                    items.push(itemToAdd);
+                // Maximum number of recent apps
+                if (newArray.length === 20) {
+                    newArray.shift();
                 }
-                this.preferences.put("recentApps", items);
+
+                const itemToAdd = {
+                    id: tab.id,
+                    label: tab.data.dataSource === "local" ? (() => {
+                        const idSplit = tab.id.split("/");
+                        idSplit.pop();
+                        return idSplit.join("/");
+                    })() : tab.data.parsedContent["sbg:project"],
+                    title: tab.data.parsedContent.label || tab.label,
+                    type: tab.type
+                };
+
+                newArray.push(itemToAdd);
+
+                this.preferences.put("recentApps", newArray);
             });
         }
 
@@ -89,8 +84,8 @@ export class WorkboxService {
         }
 
         const currentlyOpenTabs = this.tabs.getValue();
-        const tabToRemove       = currentlyOpenTabs.find(t => t.id === tab.id);
-        const newTabList        = currentlyOpenTabs.filter(t => t !== tabToRemove);
+        const tabToRemove = currentlyOpenTabs.find(t => t.id === tab.id);
+        const newTabList = currentlyOpenTabs.filter(t => t !== tabToRemove);
 
         this.tabs.next(newTabList);
         this.ensureActiveTab();
@@ -107,16 +102,16 @@ export class WorkboxService {
 
     public activateNext() {
         const {tabs, activeTab} = this.extractValues();
-        const index             = tabs.indexOf(activeTab);
-        const newActiveTab      = index === (tabs.length - 1) ? tabs[0] : tabs[index + 1];
+        const index = tabs.indexOf(activeTab);
+        const newActiveTab = index === (tabs.length - 1) ? tabs[0] : tabs[index + 1];
 
         this.activateTab(newActiveTab);
     }
 
     public activatePrevious() {
         const {tabs, activeTab} = this.extractValues();
-        const index             = tabs.indexOf(activeTab);
-        const newActiveTab      = index ? tabs[index - 1] : tabs[tabs.length - 1];
+        const index = tabs.indexOf(activeTab);
+        const newActiveTab = index ? tabs[index - 1] : tabs[tabs.length - 1];
 
         this.activateTab(newActiveTab);
     }
@@ -191,7 +186,7 @@ export class WorkboxService {
 
 
                 tab.label = parsed.label || fileID;
-                tab.type  = parsed.class || "Code";
+                tab.type = parsed.class || "Code";
             } catch (ex) {
                 console.warn("Could not parse app", ex);
             }
