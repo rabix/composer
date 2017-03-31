@@ -36,7 +36,7 @@ import {CreateAppModalComponent} from "../../core/modals/create-app-modal/create
                         <div class="app clickable" (click)="openAppCreation('workflow')">
 
                             <!--Image-->
-                            <div class="image-container">
+                            <div class="image-container p-2">
                                 <div class="image workflow"></div>
                             </div>
 
@@ -55,7 +55,7 @@ import {CreateAppModalComponent} from "../../core/modals/create-app-modal/create
                         <div class="app clickable" (click)="openAppCreation('tool')">
 
                             <!--Image-->
-                            <div class="image-container">
+                            <div class="image-container p-2">
                                 <div class="image tool"></div>
                             </div>
 

@@ -21,7 +21,7 @@ import {ErrorBarService} from "../../layout/error-bar/error-bar.service";
             <div class="item">
                 <p class="subtitle">New to Rabix Composer?</p>
                 <p>Rabix Composer is a standalone editor Common Workflow Language tools and workflows.
-                    <a href="#">
+                    <a href>
                         Learn more
                     </a>
                 </p>
@@ -32,7 +32,7 @@ import {ErrorBarService} from "../../layout/error-bar/error-bar.service";
                 <p class="subtitle">Learn how to build a tool</p>
                 <p>Having uploaded a Docker image containing your tool to the image registry, you can specify its
                     behavior, including its inputs and outputs.
-                    <a href="#">
+                    <a href>
                         Learn more
                     </a>
                 </p>
@@ -95,7 +95,7 @@ export class GettingStartedComponent {
                 return;
             }
 
-            return this.system.openLink("mailto:support@sbgenomics.com?subject=Rabix Executor Feedback");
+            return this.system.openLink("mailto:support@sbgenomics.com?subject=Rabix Composer Feedback");
 
         });
     }
