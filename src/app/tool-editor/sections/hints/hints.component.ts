@@ -6,6 +6,7 @@ import {CommandLineToolModel} from "cwlts/models";
 import {FormArray, FormControl, FormGroup} from "@angular/forms";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {Subscription} from "rxjs/Subscription";
+import {SystemService} from "../../../platform-providers/system.service";
 
 @Component({
     selector: "ct-hints",
@@ -21,7 +22,11 @@ import {Subscription} from "rxjs/Subscription";
                                      [buttonText]="'Add a Hint'"
                                      (buttonClick)="addEntry()">
                     Execution hints and their values, which specify execution requirements and suggestions, for example, the AWS instance
-                    type to use. For a list of execution hints you can set, see http://docs.sevenbridges.com/docs/list-of-execution-hints.
+                    type to use. For a list of execution hints you can set, see
+                    <a #link href="http://docs.sevenbridges.com/docs/list-of-execution-hints"
+                       (click)="$event.preventDefault(); system.openLink('http://docs.sevenbridges.com/docs/list-of-execution-hints')">
+                        http://docs.sevenbridges.com/docs/list-of-execution-hints.
+                    </a>
                 </ct-blank-tool-state>
 
                 <div *ngIf="readonly && !model.hints.length" class="text-xs-center h5">
@@ -96,7 +101,7 @@ export class HintsComponent implements OnChanges {
 
     private sub: Subscription;
 
-    constructor(private modal: ModalService) {
+    constructor(private modal: ModalService, public system: SystemService) {
     }
 
     ngOnChanges(changes: SimpleChanges) {
