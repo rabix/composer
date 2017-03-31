@@ -18,9 +18,10 @@ import {Subscription} from "rxjs/Subscription";
             <div class="tc-body">
                 <!--Blank Tool Screen-->
                 <ct-blank-tool-state *ngIf="!readonly && !model.hints.length"
-                                     [title]="'Special flags for tool execution'"
                                      [buttonText]="'Add a Hint'"
                                      (buttonClick)="addEntry()">
+                    Execution hints and their values, which specify execution requirements and suggestions, for example, the AWS instance
+                    type to use. For a list of execution hints you can set, see http://docs.sevenbridges.com/docs/list-of-execution-hints.
                 </ct-blank-tool-state>
 
                 <div *ngIf="readonly && !model.hints.length" class="text-xs-center h5">

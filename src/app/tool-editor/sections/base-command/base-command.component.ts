@@ -26,9 +26,12 @@ import {ModalService} from "../../../ui/modal/modal.service";
                 <form *ngIf="form">
 
                     <ct-blank-tool-state *ngIf="!readonly && !formList.length"
-                                         [title]="'Base command for running your tool'"
                                          [buttonText]="'Add base command'"
                                          (buttonClick)="addBaseCommand()">
+
+                        The part of the command that comes before any tool parameters or options. You can also include parameters or options
+                        that you want to be fixed for every execution of the tool (provided they can be placed before any variable
+                        parameters and options in the command line), or these can be set as arguments below.
                     </ct-blank-tool-state>
 
                     <div *ngIf="readonly && !formList.length" class="text-xs-center h5">
@@ -41,9 +44,9 @@ import {ModalService} from "../../../ui/modal/modal.service";
                             class="removable-form-control">
 
                             <ct-expression-input
-                                    [context]="context"
-                                    [formControl]="baseCommandForm.controls[item.id]"
-                                    [readonly]="readonly">
+                                [context]="context"
+                                [formControl]="baseCommandForm.controls[item.id]"
+                                [readonly]="readonly">
                             </ct-expression-input>
 
                             <div *ngIf="!readonly" class="remove-icon clickable ml-1 text-hover-danger"
@@ -71,17 +74,17 @@ import {ModalService} from "../../../ui/modal/modal.service";
                         <div class="stream">
                             <label class="form-control-label">Stdin redirect</label>
                             <ct-expression-input
-                                    [formControl]="streamsForm.controls['stdin']"
-                                    [context]="context"
-                                    [readonly]="readonly">
+                                [formControl]="streamsForm.controls['stdin']"
+                                [context]="context"
+                                [readonly]="readonly">
                             </ct-expression-input>
                         </div>
                         <div class="stream">
                             <label class="form-control-label">Stdout redirect</label>
                             <ct-expression-input
-                                    [formControl]="streamsForm.controls['stdout']"
-                                    [context]="context"
-                                    [readonly]="readonly">
+                                [formControl]="streamsForm.controls['stdout']"
+                                [context]="context"
+                                [readonly]="readonly">
                             </ct-expression-input>
                         </div>
                     </div>
@@ -144,7 +147,7 @@ export class BaseCommandComponent extends DirectiveBase implements OnInit, OnDes
                 this.streamsForm.controls["stdin"].setValue(changes["stdin"].currentValue, {onlySelf: true});
             }
             if (changes["stdout"]) {
-                this.streamsForm.controls["stdout"].setValue(changes["stdout"].currentValue,  {onlySelf: true});
+                this.streamsForm.controls["stdout"].setValue(changes["stdout"].currentValue, {onlySelf: true});
             }
         }
 

@@ -26,9 +26,10 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
                 <!--Blank Tool Screen-->
                 <ct-blank-tool-state *ngIf="!readonly && !model.listing?.length"
-                                     [title]="'Create temporary files needed for the tools'"
                                      [buttonText]="'Create a file'"
                                      (buttonClick)="addEntry()">
+                    Any config or temporary files the tool expects to be present when it executes, that aren’t already present in the Docker
+                    container. These files will be created in the tool’s working directory from the text content you specify here.
                 </ct-blank-tool-state>
 
                 <div *ngIf="readonly && !model.listing?.length" class="text-xs-center h5">
@@ -48,7 +49,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                     <!--List Entry-->
                     <li *ngFor="let entry of model.listing; let i = index"
                         class="input-list-items">
-                        
+
                         <div class="gui-section-list-item clickable"
                              [ct-validation-class]="entry.validation"
                              [ct-editor-inspector]="inspector"
@@ -82,10 +83,10 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                 <div class="tc-header">{{ entry.loc || "FileDef" }}</div>
                                 <div class="tc-body">
                                     <ct-file-def-inspector
-                                            (save)="updateFileDef($event, i)"
-                                            [context]="context"
-                                            [dirent]="entry"
-                                            [readonly]="readonly">
+                                        (save)="updateFileDef($event, i)"
+                                        [context]="context"
+                                        [dirent]="entry"
+                                        [readonly]="readonly">
                                     </ct-file-def-inspector>
                                 </div>
                             </ct-editor-inspector-content>

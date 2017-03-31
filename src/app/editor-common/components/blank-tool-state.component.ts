@@ -6,9 +6,10 @@ import {SystemService} from "../../platform-providers/system.service";
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <div>
-            <div class="row text-xs-center mb-1" *ngIf="title">
-                <div class="offset-xs-1 col-xs-10 h5">
-                    {{ title }}
+            <div class="row text-xs-center mb-1">
+                <div class="offset-xs-1 col-xs-10">
+                    <span *ngIf="title" class="h5">{{ title }}</span>
+                    <ng-content></ng-content>
                 </div>
             </div>
 

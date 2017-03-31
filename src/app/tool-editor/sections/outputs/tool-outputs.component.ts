@@ -20,10 +20,11 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
                 <!--Blank Tool Screen-->
                 <ct-blank-tool-state *ngIf="!readonly && !model?.outputs.length"
-                                     [title]="'Everything your tool generates as a result'"
                                      [buttonText]="'Add an Output'"
                                      [learnMoreURL]="helpLink"
                                      (buttonClick)="addEntry()">
+                    The connections to tool outputs. Create an output port for each output file and data item, and also intermediate files
+                    if they need to be saved for later. Add secondary files to file ports for related index files.
                 </ct-blank-tool-state>
 
                 <!--List of entries-->

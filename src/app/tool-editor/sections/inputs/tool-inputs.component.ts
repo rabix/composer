@@ -16,9 +16,11 @@ import {ToolInputListComponent} from "./tool-input-list.component";
 
                 <!--Blank Tool Screen-->
                 <ct-blank-tool-state *ngIf="!readonly && !model?.inputs.length"
-                                     [title]="'Files, parameters, and other stuff displayed in the tools command line'"
                                      [buttonText]="'Add an Input'"
                                      (buttonClick)="addEntry()">
+                    The connections to tool parameters or options that can be set each time the tool is executed. Create a port for each
+                    input data file and for other variable parameters and options here. Add secondary files to file ports for related index
+                    files.
                 </ct-blank-tool-state>
 
                 <!--List of entries-->

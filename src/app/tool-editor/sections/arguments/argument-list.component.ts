@@ -28,11 +28,12 @@ import {ModalService} from "../../../ui/modal/modal.service";
 
                     <!--Blank Tool Screen-->
                     <ct-blank-tool-state *ngIf="!readonly && !model.arguments.length"
-                                         [title]="'Command line arguments for your tool'"
                                          [buttonText]="'Add an Argument'"
                                          (buttonClick)="addEntry()">
+                        Any parameters or options that are fixed for every execution of the tool. For example, you may always want an output
+                        file to have a fixed name, so that would be an argument, not an output port.
                     </ct-blank-tool-state>
-                    
+
                     <div *ngIf="readonly && !model.arguments.length" class="text-xs-center h5">
                         This tool doesn't specify any arguments
                     </div>
