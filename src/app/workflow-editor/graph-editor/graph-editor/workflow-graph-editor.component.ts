@@ -228,6 +228,12 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
     private historyHandler: (ev: KeyboardEvent) => void;
 
+    /**
+     * If we're trying to trigger operations on graph that require viewport calculations (like fitting to viewport)
+     * it might break because the viewport might not be available. This can happen if n tabs are being opened at the same time
+     * so n-1 tabs are rendering without their SVG containers having bounding boxes.
+     * So, we will schedule the fitting to be done when user opens the tab next time.
+     */
     private tryToFitWorkflowOnNextTabActivation = false;
 
     private emptyState = false;
@@ -267,6 +273,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     }
 
     drawGraphAndAttachListeners() {
+
         this.graph = new Workflow(new Snap(this.canvas.nativeElement), this.model as any);
 
         try {
@@ -448,6 +455,9 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     }
 
     checkOutstandingGraphFitting() {
+        if (this.tryToFitWorkflowOnNextTabActivation === false) {
+            return;
+        }
         this.drawGraphAndAttachListeners();
         this.tryToFitWorkflowOnNextTabActivation = false;
     }
