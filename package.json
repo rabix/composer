@@ -77,7 +77,6 @@
         "karma-jasmine": "~1.1.0",
         "karma-jasmine-html-reporter": "^0.2.2",
         "markdown-it": "^8.3.0",
-        "mocha": "^3.2.0",
         "protractor": "~5.1.0",
         "ts-node": "^3.0.2",
         "tslint": "^5.0.0",
