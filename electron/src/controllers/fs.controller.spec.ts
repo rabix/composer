@@ -11,7 +11,7 @@ tmp.setGracefulCleanup();
 
 describe("FS Controller", () => {
 
-    function assertStandardEntryInfo(entry, values) {
+    function assertStandardEntryInfo(entry, values = {}) {
         assert.isObject(entry);
         values = values || {};
 
@@ -48,7 +48,7 @@ describe("FS Controller", () => {
             tmp.file({postfix: ".json"}, (err, path, fd, cleanup) => {
                 if (err) throw err;
 
-                fs.writeFile(fd, `{ "class": "Expression" }`, null, (err) => {
+                fs.writeFile(fd.toString(), `{ "class": "Expression" }`, null, (err) => {
                     if (err) throw err;
 
                     ctrl.getPotentialCWLClassFromFile(path, (err, cls) => {
@@ -66,7 +66,7 @@ describe("FS Controller", () => {
             tmp.file({postfix: ".json"}, (err, path, fd, cleanup) => {
                 if (err) throw err;
 
-                fs.writeFile(fd, `
+                fs.writeFile(fd.toString(), `
                     { 
                         "label": "Ariana Sans", 
                         "nested": { 
@@ -92,7 +92,7 @@ describe("FS Controller", () => {
         it("should return “Workflow” if file has that class", (done) => {
             tmp.file({postfix: ".json"}, (err, path, fd, cleanup) => {
                 if (err) throw err;
-                fs.writeFile(fd, `
+                fs.writeFile(fd.toString(), `
                     { 
                         "label": "Gerard Grande", 
                         "nested": { 
@@ -192,7 +192,7 @@ describe("FS Controller", () => {
                 if (err) throw err;
 
 
-                fs.writeFile(fd, `{ "class": "CommandLineTool" }`, null, (err) => {
+                fs.writeFile(fd.toString(), `{ "class": "CommandLineTool" }`, null, (err) => {
                     if (err) throw err;
 
                     ctrl.getFileOutputInfo(fpath, (err, info) => {
@@ -263,7 +263,7 @@ describe("FS Controller", () => {
             tmp.file((err, path, fd, cleanup) => {
                 if (err) throw err;
 
-                ctrl.createFile(path, (err, info) => {
+                ctrl.createFile(path, "", (err) => {
                     assert.isNotNull(err);
                     assert.instanceOf(err, Error);
 
@@ -296,7 +296,7 @@ describe("FS Controller", () => {
             tmp.tmpName((err, path) => {
                 if (err) throw err;
 
-                ctrl.saveFileContent(path, "", (err, info) => {
+                ctrl.saveFileContent(path, "", (err) => {
                     assert.isNull(err);
 
                     fs.access(path, fs.constants.F_OK, (err) => {
@@ -312,7 +312,7 @@ describe("FS Controller", () => {
         it("should overwrite the file with the given content", (done) => {
             tmp.file({postfix: ".json"}, (err, path, fd, cleanup) => {
 
-                fs.writeFile(fd, "test data", (err) => {
+                fs.writeFile(fd.toString(), "test data", (err) => {
                     if (err) throw err;
 
                     const newContent = "{ \"class\": \"Workflow\" }";
@@ -345,12 +345,12 @@ describe("FS Controller", () => {
         it("should replace file content when new content is shorter than the old one", (done) => {
             tmp.file({postfix: ".json"}, (err, path, fd, cleanup) => {
 
-                fs.writeFile(fd, "test data", (err) => {
+                fs.writeFile(fd.toString(), "test data", (err) => {
                     if (err) throw err;
 
                     const overwrite = "hello";
 
-                    ctrl.saveFileContent(path, overwrite, (err, info) => {
+                    ctrl.saveFileContent(path, overwrite, (err) => {
                         if (err) throw err;
 
                         fs.readFile(path, "utf8", (err, content) => {
@@ -385,7 +385,7 @@ describe("FS Controller", () => {
 
                 const fileContent = `demo file content that should be matched`;
 
-                fs.writeFile(fd, fileContent, (err) => {
+                fs.writeFile(fd.toString(), fileContent, (err) => {
                     if (err) throw err;
 
                     ctrl.readFileContent(path, (err, raw) => {
@@ -419,7 +419,7 @@ describe("FS Controller", () => {
 
                     assert.isNull(err);
 
-                    fs.access(path, fs.F_OK, (err) => {
+                    fs.access(path, fs.constants.F_OK, (err) => {
                         assert.instanceOf(err, Error);
 
                         if (!err) {
@@ -446,7 +446,7 @@ describe("FS Controller", () => {
                         ctrl.deletePath(parentDir, (err) => {
                             assert.isNull(err);
 
-                            fs.access(parentDir, fs.F_OK, (err) => {
+                            fs.access(parentDir, fs.constants.F_OK, (err) => {
                                 assert.instanceOf(err, Error);
 
                                 if (!err) {

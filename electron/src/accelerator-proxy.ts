@@ -1,21 +1,21 @@
-const registry: { [hash: string]: Function[] } = {};
+export class AcceleratorProxy {
 
-module.exports = {
+    private registry: { [hash: string]: Function[] } = {};
 
-    on: (accelerator, callback) => {
-        if (!registry[accelerator]) {
-            registry[accelerator] = [];
+    on(accelerator, callback) {
+        if (!this.registry[accelerator]) {
+            this.registry[accelerator] = [];
         }
-        registry[accelerator].push(callback);
-    },
+        this.registry[accelerator].push(callback);
+    }
 
-    pass: (menu, browser, event) => {
-        if (Array.isArray(registry[menu.accelerator])) {
-            registry[menu.accelerator].forEach(callback => {
+    pass(menu, browser, event) {
+        if (Array.isArray(this.registry[menu.accelerator])) {
+            this.registry[menu.accelerator].forEach(callback => {
                 if (typeof callback === "function") {
                     callback(menu, browser, event);
                 }
             });
         }
     }
-};
+}

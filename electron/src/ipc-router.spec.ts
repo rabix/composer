@@ -1,8 +1,8 @@
-const chai = require("chai");
+import chai = require("chai");
 const assert = chai.assert;
 
-const proxy = require("proxyquire");
-const sinon = require("sinon");
+import proxy = require("proxyquire");
+import sinon = require("sinon");
 
 
 describe("IPC Router", () => {
@@ -10,7 +10,7 @@ describe("IPC Router", () => {
     it("should register the data-request event callback", (done) => {
 
         const electron = {ipcMain: {on: sinon.spy()}};
-        const router = proxy("./ipc-router", {electron});
+        const router   = proxy("./ipc-router", {electron});
         router.start();
 
         assert.isTrue(electron.ipcMain.on.calledOnce);
@@ -29,8 +29,8 @@ describe("IPC Router", () => {
             callback(null, {name: "Zoro"});
         });
 
-        const event = {sender: {send}};
-        const routes = {testRouteEndpoint};
+        const event    = {sender: {send}};
+        const routes   = {testRouteEndpoint};
         const electron = {
             ipcMain: {
                 on: (route, callback) => {

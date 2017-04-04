@@ -5,15 +5,12 @@ app.setPath("userData", app.getPath("home") + "/.sevenbridges/rabix-composer");
 const router           = require("./ipc-router");
 const acceleratorProxy = require("./accelerator-proxy");
 
-import profile = require("./user-profile/profile");
-
 let win;
 let splash;
 
 function start(config: { devTools: boolean, url: string }) {
 
     router.start();
-    profile.boot();
 
     splash = new BrowserWindow({
         width: 580,

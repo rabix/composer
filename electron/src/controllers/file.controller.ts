@@ -1,5 +1,4 @@
 import fsController = require("./fs.controller");
-import settings = require("electron-settings");
 
 function isLocalFile(path) {
     return path.startsWith("/");
@@ -16,15 +15,4 @@ export function get(filePath, callback) {
     if (isLocalFile(filePath)) {
         return fsController.readFileContent(filePath, callback);
     }
-
-    /**
-     * If it's an url, we need to check first if we can fetch it
-     */
-    if (isURL) {
-
-    }
-}
-
-export function search(term, config = {}, callback){
-
 }

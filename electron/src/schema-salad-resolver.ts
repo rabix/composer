@@ -2,6 +2,7 @@ import fs = require("fs");
 import http = require("http");
 import request = require("request");
 import yaml = require("js-yaml");
+import {LoadOptions} from "js-yaml";
 
 function isUrl(s) {
     const regexp = /^(ftp|http|https):\/\/.*/i;
@@ -106,7 +107,7 @@ function parseJSON(content, source) {
                     console.log(warning);
                 },
                 json: true
-            }) || {};
+            } as LoadOptions) || {};
 
         traverse(data, source).then(resolve, reject);
     });
@@ -132,7 +133,7 @@ function fetch(filename, options) {
                     resolve(body);
                 });
             } else {
-                fs.readFile(filename, {encoding: "utf8", mode: "r"}, (err, data) => {
+                fs.readFile(filename, {encoding: "utf8", flag: "r"}, (err, data) => {
                     if (err) return reject(err);
 
                     resolve(data);
