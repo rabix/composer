@@ -27,7 +27,6 @@ import {ProgressComponent} from "./progress/progress.component";
 import {TabSelectorEntryComponent} from "./tab-selector/tab-selector-entry/tab-selector-entry.component";
 import {TabSelectorComponent} from "./tab-selector/tab-selector.component";
 import {TabComponent} from "./tabs/tab.component";
-import {ToasterComponent} from "./toaster/toaster.component";
 import {ToggleComponent} from "./toggle-slider/toggle-slider.component";
 import {TooltipContentComponent} from "./tooltip/tooltip-content.component";
 import {TooltipDirective} from "./tooltip/tooltip.directive";
@@ -140,7 +139,6 @@ import {CircularLoaderComponent} from "./circular-loader/circular-loader.compone
         TabSelectorComponent,
         TabSelectorComponent,
         TabSelectorEntryComponent,
-        ToasterComponent,
         ToggleComponent,
         TooltipContentComponent,
         TooltipDirective,

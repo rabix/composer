@@ -111,8 +111,6 @@ describe("ObjectHelper", () => {
             ObjectHelper.addEnumerables(instance, source);
             expect((<any>instance).first).toEqual("foo");
             expect((<any>instance).second).toEqual("bar");
-            expect((<any>instance).third).toEqual("baz");
-
         });
     });
 });
