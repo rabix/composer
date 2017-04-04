@@ -5,12 +5,11 @@ import * as YAML from "js-yaml";
 import {Observable} from "rxjs/Observable";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {Subject} from "rxjs/Subject";
-import {ProfileCredentials} from "../../../../electron/src/user-profile/profile";
 import {PlatformAPIGatewayService} from "../../auth/api/platform-api-gateway.service";
 import {noop} from "../../lib/utils.lib";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {IpcService} from "../../services/ipc.service";
-import {ConnectionState} from "../../services/storage/user-preferences-types";
+import {ConnectionState, CredentialsEntry} from "../../services/storage/user-preferences-types";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import Platform = NodeJS.Platform;
@@ -53,7 +52,7 @@ export class DataGatewayService {
         });
     }
 
-    getDataSources(): Observable<ProfileCredentials> {
+    getDataSources(): Observable<CredentialsEntry[]> {
         return this.auth.connections.map((credentials) => {
 
             const local = {
@@ -61,7 +60,7 @@ export class DataGatewayService {
                 label: "Local Files",
                 profile: "local",
                 status: ConnectionState.Connected
-            };
+            } as Partial<CredentialsEntry>;
 
             const remote = credentials.map(c => {
 
