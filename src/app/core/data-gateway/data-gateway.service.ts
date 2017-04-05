@@ -19,10 +19,6 @@ import {PlatformAppEntry} from "../../services/api/platforms/platform-api.types"
 @Injectable()
 export class DataGatewayService {
 
-    private cache = {};
-
-    scanCompletion = new ReplaySubject<string>();
-
     cacheInvalidation = new Subject<string>();
 
     static getFileSource(id): "local" | "public" | "app" {
@@ -44,12 +40,6 @@ export class DataGatewayService {
                 private auth: AuthService,
                 private apiGateway: PlatformAPIGatewayService,
                 private ipc: IpcService) {
-
-        this.ipc.request("hasDataCache").take(1).subscribe(hasCache => {
-            if (hasCache) {
-                this.scanCompletion.next("");
-            }
-        });
     }
 
     getDataSources(): Observable<CredentialsEntry[]> {

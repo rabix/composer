@@ -4,7 +4,7 @@ const routes    = require("./routes");
 function bindDataRequestListener() {
     ipcMain.on("data-request", (event, request) => {
 
-        console.log("Request (", new Date().valueOf(), ")", request.id, request.data);
+        console.log("Request (", new Date().valueOf(), ")", request.message, request.id, request.data);
 
         const controllerFn = routes[request.message];
 
