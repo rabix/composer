@@ -1,6 +1,6 @@
 {
     "name": "cottontail-frontend",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "license": "Apache-2.0",
     "homepage": "https://github.com/rabix/cottontail-frontend#readme",
     "angular-cli": {},
@@ -13,6 +13,7 @@
     },
     "scripts": {
         "serve": "./node_modules/.bin/ng serve",
+        "changelog": "./node_modules/.bin/git-changelog",
         "electron:compile": "./node_modules/.bin/tsc -p electron || cp -R electron/src/splash electron/dist/src",
         "electron:compile:watch": "./node_modules/.bin/tsc -p electron --watch",
         "electron": "./node_modules/.bin/electron ./electron",
@@ -66,6 +67,7 @@
         "codelyzer": "^2.1.1",
         "electron": "^1.6.2",
         "electron-packager": "^8.5.2",
+        "git-changelog": "^1.1.2",
         "glob": "^7.1.1",
         "jasmine-core": "~2.5.2",
         "jasmine-spec-reporter": "~3.2.0",
