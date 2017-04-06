@@ -1,9 +1,8 @@
 const {app, Menu, BrowserWindow} = require("electron");
-
+import * as acceleratorProxy from "./accelerator-proxy";
 app.setPath("userData", app.getPath("home") + "/.sevenbridges/rabix-composer");
 
-const router           = require("./ipc-router");
-const acceleratorProxy = require("./accelerator-proxy");
+const router = require("./ipc-router");
 
 let win;
 let splash;
