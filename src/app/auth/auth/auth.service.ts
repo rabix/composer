@@ -16,9 +16,16 @@ export class AuthService {
 
     connections = new ReplaySubject<CredentialsEntry[]>();
 
+    /**
+     * Converts a https://*.sbgenomics.com url to a profile name
+     */
     static urlToProfile(url) {
-        const profile = url.match("https:\/\/(.*?)\.sbgenomics\.com")[1].toLowerCase();
-        return profile === "igor" ? "default" : profile;
+        const match = url.match("https:\/\/(.*?)\.sbgenomics\.com");
+        if (Array.isArray(match) && match[1]) {
+            const profile = match[1].toLowerCase();
+            return profile === "igor" ? "default" : profile;
+        }
+        throw "Could not convert a non-sbg url to profile";
     }
 
     static hashUrlTokenPair(url: string, token: string) {

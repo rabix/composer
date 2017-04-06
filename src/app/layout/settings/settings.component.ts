@@ -3,6 +3,8 @@ import {AuthService} from "../../auth/auth/auth.service";
 import {SettingsService} from "../../services/settings/settings.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {CredentialsFormComponent} from "../credentials-form/credentials-form.component";
+import {UserPreferencesService} from "../../services/storage/user-preferences.service";
+import {CredentialsEntry} from "../../services/storage/user-preferences-types";
 
 type ViewMode = "auth" | "keyBindings" | "cache";
 
@@ -21,13 +23,14 @@ type ViewMode = "auth" | "keyBindings" | "cache";
             <div class="document-controls pr-1">
 
                 <!--Add Another-->
-                <button (click)="addEntry()"
+                <button (click)="creds.addEntry()"
                         class="btn btn-sm btn-secondary text-inherit"
                         type="button"> Add an Account
                 </button>
 
                 <!--Save-->
-                <button (click)="applyChanges()"
+                <button (click)="creds.submit()"
+                        [disabled]="creds.form.invalid"
                         class="btn btn-sm btn-secondary text-inherit"
                         type="button"> Apply Changes
                 </button>
@@ -35,23 +38,30 @@ type ViewMode = "auth" | "keyBindings" | "cache";
             </div>
 
         </ct-action-bar>
-        
-        <ct-line-loader *ngIf="auth.authenticationProgress | async"></ct-line-loader>
-        
-        <ct-credentials-form class="m-2"></ct-credentials-form>
 
+        <ct-line-loader *ngIf="auth.authenticationProgress | async"></ct-line-loader>
+
+        <ct-credentials-form #creds [credentials]="credentials"
+                             (onSubmit)="preferences.setCredentials($event)"
+                             class="m-2"></ct-credentials-form>
     `
 })
 export class SettingsComponent extends DirectiveBase {
     viewMode: ViewMode = "auth";
 
-    @ViewChild(CredentialsFormComponent)
-    private credentialsFormComponent: CredentialsFormComponent;
+    credentials: CredentialsEntry[];
 
     constructor(private settings: SettingsService,
+                public preferences: UserPreferencesService,
                 public auth: AuthService) {
 
         super();
+    }
+
+    ngOnInit() {
+        this.preferences.getCredentials().take(1).subscribe(c => {
+            this.credentials = c;
+        })
     }
 
     /**
@@ -61,14 +71,5 @@ export class SettingsComponent extends DirectiveBase {
     switchTab(tab: ViewMode): void {
         this.viewMode = tab;
     }
-
-    addEntry() {
-        this.credentialsFormComponent.addEntry();
-    }
-
-    applyChanges() {
-        this.credentialsFormComponent.applyValues();
-    }
-
 
 }
