@@ -29,7 +29,7 @@ module.exports = function (config) {
         },
         coverageIstanbulReporter: {
             reports: ['html', 'lcovonly'],
-            fixWebpackSourcePaths: true
+            fixWebpackSourcePaths: true,
         },
         angularCli: {
             config: './.angular-cli.json',

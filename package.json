@@ -14,7 +14,7 @@
     "scripts": {
         "serve": "./node_modules/.bin/ng serve",
         "changelog": "./node_modules/.bin/git-changelog",
-        "electron:compile": "./node_modules/.bin/tsc -p electron || cp -R electron/src/splash electron/dist/src",
+        "electron:compile": "./node_modules/.bin/tsc -p electron && cp -R electron/src/splash electron/dist/src",
         "electron:compile:watch": "./node_modules/.bin/tsc -p electron --watch",
         "electron": "./node_modules/.bin/electron ./electron",
         "postinstall": "npm run update-webdriver && cd electron && npm install",
@@ -24,6 +24,7 @@
         "test-once": "./node_modules/.bin/ng test --watch false",
         "lint": "./node_modules/.bin/ng lint",
         "e2e": "./node_modules/.bin/ng e2e",
+        "travis": "npm run build && npm run electron:compile && npm run package && npm run test-once",
         "update-webdriver": "node node_modules/protractor/bin/webdriver-manager update"
     },
     "private": true,

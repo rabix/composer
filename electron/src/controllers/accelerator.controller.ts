@@ -1,9 +1,8 @@
-import {AcceleratorProxy} from "../accelerator-proxy";
+import * as acceleratorProxy from "../accelerator-proxy";
 
-const proxy = new AcceleratorProxy();
 module.exports = {
     register: (accelerator, callback) => {
-        proxy.on(accelerator, (menu) => {
+        acceleratorProxy.on(accelerator, (menu) => {
             callback(null, menu);
         });
     }
