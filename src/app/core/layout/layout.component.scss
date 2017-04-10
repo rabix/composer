@@ -2,8 +2,6 @@
 
 :host {
 
-    background: $layout-element-background;
-
     display: flex;
     height: 100%;
     width: 100%;
@@ -47,7 +45,7 @@
     }
 
     .handle-vertical {
-        background: $panel-resize-handle-color;
+        //background: $panel-resize-handle-color;
         cursor: col-resize;
         display: inline-block;
         width: $panel-resize-handle-width;

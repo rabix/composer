@@ -63,7 +63,7 @@ import {ObjectHelper} from "../../helpers/object.helper";
                 <ng-template ngSwitchCase="boolean">
                     <ct-toggle-slider class="pull-right"
                                       [attr.prefix]="prefix"
-                                      (change)="updateJob($event)"
+                                      (valueChange)="updateJob($event)"
                                       [value]="value"></ct-toggle-slider>
                 </ng-template>
 

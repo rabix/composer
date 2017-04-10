@@ -2,7 +2,7 @@
 
 .ct-tabs-component {
     text-align: center;
-    border-bottom: 1px solid $gui-section-border;
+    //border-bottom: 1px solid $gui-section-border;
     margin-bottom: 15px;
 
     & > .single-tab {
@@ -13,7 +13,7 @@
     }
 
     & > .active {
-        color: $gui-section-list-item-select-bg;
-        border-bottom: 3px solid $gui-section-list-item-select-bg;
+        //color: $editor-list-item-select-bg;
+        //border-bottom: 3px solid $editor-list-item-select-bg;
     }
 }

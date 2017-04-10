@@ -1,10 +1,10 @@
 @import "../../../../assets/sass/variables";
 
 .validatable {
-    border: $gui-section-list-item-border-size solid transparent;
+    //border: $editor-list-item-border-size solid transparent;
 
     &:hover {
-        border-color: $gui-section-list-item-hover-border;
+        //border-color: $editor-list-item-hover-border;
     }
 
     &.error {
@@ -37,7 +37,7 @@
 
     &.selected, &.ct-inspected {
         .validation-icon {
-            color: $gui-section-list-item-select-icon-color;
+            //color: $editor-list-item-select-icon-color;
         }
     }
 }

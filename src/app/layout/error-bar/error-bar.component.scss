@@ -1,15 +1,14 @@
 @import "./../../../assets/sass/variables";
 @import "./../../../assets/sass/mixins";
-@import "./../../../assets/sass/theme-variables";
 
+/** @name ErrorBarComponentStyle */
 :host {
-    $height: $main-header-height * .8;
     .error-alert {
         display: flex;
         opacity: 0;
-        height: 0px;
-        line-height: $height;
-        color: white;
+        height: 0;
+        line-height: $error-bar-height;
+        color: $brand-danger-inverse-color;
         background-color: $brand-danger;
         transition: opacity .25s, height 0.25s;
         overflow: hidden;
@@ -23,13 +22,13 @@
             flex-basis: 30px;
             font-weight: bolder;
             font-size: 1rem;
-            line-height: $height;
+            line-height: $error-bar-height;
         }
     }
 
     .show {
         opacity: 1;
-        height: $height;
+        height: $error-bar-height;
     }
 }
 

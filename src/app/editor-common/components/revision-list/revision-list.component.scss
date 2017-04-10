@@ -7,12 +7,15 @@
     ct-line-loader {
         position: absolute;
         top: 0;
-        display:block;
+        display: block;
         width: 100%;
     }
 
     .revision-entry {
-        border-bottom: 1px solid $gui-section-border;
+
+        border-bottom: 1px solid $body-bg;
+
+        //border-bottom: 1px solid $gui-section-border;
         display: flex;
         flex-direction: row;
         flex-wrap: nowrap;
@@ -26,19 +29,18 @@
         }
 
         &.active {
-            background-color: $light-border-color;
+            background-color: $revision-list-entry-active-bg;
         }
 
         &:hover:not(.active) {
-            background-color: lighten($light-border-color, 5%)
+            background-color: $revision-list-entry-hover-bg;
         }
 
         .revision-number {
+            position: relative;
             flex-basis: 60px;
             text-align: center;
-            font-family: $font-family-title;
             flex-shrink: 0;
-
             display: flex;
             align-items: center;
             justify-content: center;

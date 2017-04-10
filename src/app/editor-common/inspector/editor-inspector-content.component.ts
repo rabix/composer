@@ -5,14 +5,15 @@ import {EditorInspectorService} from "./editor-inspector.service";
     selector: "ct-editor-inspector-content",
     styleUrls: ["./editor-inspector-content.component.scss"],
     template: `
-        <div class="form-section pl-1 pr-1">
-            <div class="row header pt-1 pb-1">
+        <div class="form-section pl-1 pr-1 pt-0">
+            <div class="row header pt-1 pb-1 mb-1">
                 <div class="col-xs-12">
-                    <i class="fa clickable pull-right fa-times"
-                       (click)="close()"></i>
-                    <h3 class="gui-section-header">
+                    
+                    <i class="fa clickable pull-right fa-times" (click)="close()"></i>
+                    
+                    <div class="text-title">
                         <ng-content select=".tc-header"></ng-content>
-                    </h3>
+                    </div>
                 </div>
             </div>
 

@@ -2,8 +2,13 @@
 
 .expression-input-group {
     position: relative;
-    border-radius: .38rem; // needs to round to underlying form
-    border: 2px solid transparent;
+    border-radius: $input-border-radius;
+    border: 1px solid transparent;
+
+
+    &:hover {
+        border: 1px solid $input-bg-hover;
+    }
 
     .input-group-btn button {
         width: 46px;

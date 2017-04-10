@@ -66,9 +66,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
 
                     <hr>
                     <div>
-                        <h3 class="gui-section-header mb-1">
-                            Streams
-                        </h3>
+                        <div class="text-title mb-1">Streams</div>
                     </div>
                     <div class="streams-row">
                         <div class="stream">

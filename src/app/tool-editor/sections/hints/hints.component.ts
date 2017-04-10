@@ -34,7 +34,7 @@ import {SystemService} from "../../../platform-providers/system.service";
                 </div>
 
                 <!--List Header Row-->
-                <div class="gui-section-list-title" *ngIf="!!model.hints.length">
+                <div class="editor-list-title" *ngIf="!!model.hints.length">
                     <div class="col-xs-6">
                         Class
                     </div>
@@ -44,10 +44,10 @@ import {SystemService} from "../../../platform-providers/system.service";
                 </div>
 
                 <form [formGroup]="form" *ngIf="form">
-                    <ul class="gui-section-list" formArrayName="hints">
+                    <ul class="editor-list" formArrayName="hints">
                         <li class="input-list-items"
                             *ngFor="let control of form.controls['hints'].controls; let i = index">
-                            <div class="gui-section-list-item">
+                            <div class="editor-list-item">
                                 <ct-requirement-input [formControl]="control"
                                                       [context]="context"
                                                       class="mr-1 ml-1"

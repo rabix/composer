@@ -1,20 +1,14 @@
-import {
-    AfterViewInit,
-    Component,
-    Input,
-    OnDestroy,
-    OnInit,
-    TemplateRef,
-    ViewChild,
-    ViewContainerRef
-} from "@angular/core";
+import {AfterViewInit, Component, Input, OnDestroy, OnInit, TemplateRef, ViewChild, ViewContainerRef} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {CommandLineToolFactory} from "cwlts/models/generic/CommandLineToolFactory";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
 import {Validation} from "cwlts/models/helpers/validation";
 import * as Yaml from "js-yaml";
+import {Observable} from "rxjs/Observable";
 import {ReplaySubject, Subject} from "rxjs/Rx";
+import {AuthService} from "../auth/auth/auth.service";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
+import {PublishModalComponent} from "../core/modals/publish-modal/publish-modal.component";
 import {AppTabData} from "../core/workbox/app-tab-data";
 import {WorkboxTab} from "../core/workbox/workbox-tab.interface";
 import {
@@ -25,16 +19,10 @@ import {EditorInspectorService} from "../editor-common/inspector/editor-inspecto
 import {ErrorBarService} from "../layout/error-bar/error-bar.service";
 import {StatusBarService} from "../layout/status-bar/status-bar.service";
 import {SystemService} from "../platform-providers/system.service";
-import {PlatformAPI} from "../services/api/platforms/platform-api.service";
-import {SettingsService} from "../services/settings/settings.service";
-import {DirectiveBase} from "../util/directive-base/directive-base";
-import LoadOptions = jsyaml.LoadOptions;
-import {AuthService} from "../auth/auth/auth.service";
 import {CredentialsEntry} from "../services/storage/user-preferences-types";
 import {ModalService} from "../ui/modal/modal.service";
-import {PublishModalComponent} from "../core/modals/publish-modal/publish-modal.component";
-import {TabData} from "../core/workbox/tab-data.interface";
-import {Observable} from "rxjs/Observable";
+import {DirectiveBase} from "../util/directive-base/directive-base";
+import LoadOptions = jsyaml.LoadOptions;
 
 @Component({
     selector: "ct-tool-editor",

@@ -19,7 +19,7 @@ import {noop} from "../../lib/utils.lib";
                     <div class="tc-body">
                         <div>
                             <!--List Header Row-->
-                            <div class="gui-section-list-title row">
+                            <div class="editor-list-title row">
                                 <div class="col-sm-6">ID</div>
                                 <div class="col-sm-6">Run</div>
                             </div>
@@ -31,7 +31,7 @@ import {noop} from "../../lib/utils.lib";
                                 <li *ngFor="let entry of model.steps"
                                     class="input-list-items">
 
-                                    <div class="gui-section-list-item clickable row"
+                                    <div class="editor-list-item clickable row"
                                          [ct-editor-inspector]="inspector"
                                          [ct-editor-inspector-target]="entry.loc"
                                          [ct-validation-class]="entry.validation">
@@ -79,7 +79,7 @@ import {noop} from "../../lib/utils.lib";
                     <div class="tc-body">
                         <div>
                             <!--List Header Row-->
-                            <div class="gui-section-list-title row">
+                            <div class="editor-list-title row">
                                 <div class="col-sm-6">ID</div>
                                 <div class="col-sm-6">Type</div>
                             </div>
@@ -91,7 +91,7 @@ import {noop} from "../../lib/utils.lib";
                                 <li *ngFor="let entry of model.inputs"
                                     class="input-list-items">
 
-                                    <div class="gui-section-list-item clickable row"
+                                    <div class="editor-list-item clickable row"
                                          [ct-editor-inspector]="inspector"
                                          [ct-editor-inspector-target]="entry.loc"
                                          [ct-validation-class]="entry.validation">
@@ -138,7 +138,7 @@ import {noop} from "../../lib/utils.lib";
                     <div class="tc-body">
                         <div>
                             <!--List Header Row-->
-                            <div class="gui-section-list-title row">
+                            <div class="editor-list-title row">
                                 <div class="col-sm-6">ID</div>
                                 <div class="col-sm-6">Type</div>
                             </div>
@@ -150,7 +150,7 @@ import {noop} from "../../lib/utils.lib";
                                 <li *ngFor="let entry of model.outputs"
                                     class="input-list-items">
 
-                                    <div class="gui-section-list-item clickable row"
+                                    <div class="editor-list-item clickable row"
                                          [ct-editor-inspector]="inspector"
                                          [ct-editor-inspector-target]="entry.loc"
                                          [ct-validation-class]="entry.validation">

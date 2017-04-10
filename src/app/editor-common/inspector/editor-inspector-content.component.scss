@@ -8,14 +8,13 @@
 
     .header {
         border: 1px solid transparent;
-        border-bottom-color: $gui-section-border;
+        background: $toolbar-header-background;
     }
 
     .form-section {
         position: relative;
         display: block;
         overflow: auto;
-        background: $gui-section-bg;
         height: 100%;
 
         .borderless & {
@@ -25,8 +24,6 @@
 
         .hide-button {
             position: absolute;
-            top: $padding-md;
-            right: $padding-md;
         }
 
         .add-btn-link {
@@ -35,21 +32,14 @@
         }
     }
 
-    .gui-section-list-title {
+    .editor-list-title {
         font-family: $font-family-title;
         font-size: $font-size-sm;
         font-weight: 400;
         text-transform: uppercase;
     }
 
-    .gui-section-header {
-        font-family: $font-family-title;
-        color: $gui-section-header-color;
-        margin: 0;
-        font-size: $font-size-base;
-        font-weight: 400;
-        text-transform: uppercase;
-
+    .text-title {
         .tc-header {
             @include ellipsis();
         }
@@ -64,7 +54,6 @@
         }
 
         &.show {
-            padding-top: $gui-section-padding;
             height: auto;
         }
     }

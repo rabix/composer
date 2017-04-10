@@ -34,21 +34,21 @@ import {ModalService} from "../../../ui/modal/modal.service";
             </div>
 
             <!--List Header Row-->
-            <div class="gui-section-list-title" *ngIf="!!entries.length">
+            <div class="editor-list-title" *ngIf="!!entries.length">
                 <div class="col-xs-4">ID</div>
                 <div class="col-xs-3">Type</div>
                 <div class="col-xs-5">Glob</div>
             </div>
 
             <!--Output List Entries-->
-            <ul class="gui-section-list">
+            <ul class="editor-list">
 
                 <!--List Entry-->
                 <li *ngFor="let entry of entries; let i = index"
                     class="input-list-items"
                     [class.record-input]="isRecordType(entry)">
 
-                    <div class="gui-section-list-item clickable"
+                    <div class="editor-list-item clickable"
                          [ct-editor-inspector]="inspector"
                          [ct-editor-inspector-target]="entry.loc"
                          [ct-editor-inspector-readonly]="readonly"

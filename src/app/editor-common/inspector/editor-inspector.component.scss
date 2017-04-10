@@ -6,5 +6,6 @@
     overflow-y: auto;
     overflow-x: hidden;
     border: 1px solid transparent;
-    border-left-color: $gui-section-border;
+    background: $toolbar-header-background;
+    //border-left-color: $gui-section-border;
 }

@@ -4,7 +4,6 @@ import {ChangeDetectionStrategy, Component, Input} from "@angular/core";
 
     selector: "ct-form-panel",
     styleUrls: ["./form-panel.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <div class="form-section pl-1 pr-1">
             <i class="fa clickable pull-right"
@@ -13,11 +12,11 @@ import {ChangeDetectionStrategy, Component, Input} from "@angular/core";
                             'fa-caret-down': !collapsed,
                             'fa-caret-up': collapsed
                        }"></i>
-            <h3 class="gui-section-header clickable" (click)="collapsed = !collapsed">
+            <div class="text-title clickable" (click)="collapsed = !collapsed">
                 <ng-content select=".tc-header"></ng-content>
-            </h3>
+            </div>
 
-            <div *ngIf="!collapsed" class="gui-section-body show">
+            <div *ngIf="!collapsed" class="gui-section-body mt-1 show">
                 <ng-content select=".tc-body"></ng-content>
             </div>
         </div>

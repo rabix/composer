@@ -1,11 +1,9 @@
-import {Component, EventEmitter, forwardRef, NgZone, Output, ViewEncapsulation, AfterViewInit} from "@angular/core";
+import {AfterViewInit, Component, EventEmitter, forwardRef, Output} from "@angular/core";
 import {ControlValueAccessor, FormArray, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {noop} from "../../../lib/utils.lib";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-map-list",
     providers: [
         {
@@ -17,15 +15,12 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
     template: `
         <div [formGroup]="formGroup" (change)="onInputsFormChange($event)">
             <div formArrayName="pairs">
-                <div *ngFor="let item of getPairControls(); let i = index"
-                     [formGroupName]="i"
-                     class="mb-1 input-group row">
+                <div *ngFor="let item of getPairControls(); let i = index" [formGroupName]="i" class="mb-1 input-group row">
 
                     <input class="form-control  col-xs-5" formControlName="key" placeholder="key"/>
-                    <span class="input-group-addon">:</span>
-                    <input class="form-control col-xs-5" formControlName="value"
-                           placeholder="value"/>
-                    <span class="input-group-btn">
+                    <span class="input-group-addon col-xs-1">:</span>
+                    <input class="form-control col-xs-5" formControlName="value" placeholder="value"/>
+                    <span class="input-group-btn col-xs-1">
                         <button (click)="remove(i)" type="button"
                                 class="input-group-addon btn btn-secondary ">
                             <i class="fa fa-trash"></i></button>
@@ -34,10 +29,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                 </div>
 
                 <div class="row">
-                    <button class="pull-right btn btn-secondary btn-sm"
-                            type="button"
-                            (click)="add()">Add an Entry
-                    </button>
+                    <button class="pull-right btn btn-secondary btn-sm" type="button" (click)="add()">Add an Entry</button>
                 </div>
             </div>
         </div>
@@ -56,10 +48,6 @@ export class MapListComponent extends DirectiveBase implements ControlValueAcces
 
     @Output()
     public change = new EventEmitter();
-
-    constructor(private zone: NgZone) {
-        super();
-    }
 
     add() {
         this.list = this.list.concat({key: "", value: ""});
