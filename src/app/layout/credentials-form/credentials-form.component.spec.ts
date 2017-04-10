@@ -231,7 +231,7 @@ describe("Layout", () => {
 
             const form     = fixture.debugElement.query(By.css("[data-test='form']"));
             const applySpy = spyOn(component, "applyValues");
-            form.nativeElement.submit();
+            form.triggerEventHandler("submit", new Event("submit"));
             expect(applySpy.calls.count()).toBe(0);
         });
     });
