@@ -105,7 +105,7 @@ export class HintsComponent implements OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        const model = changes["model"].currentValue;
+        const model = this.model;
 
         if (!this.form) {
             this.form = new FormGroup({});

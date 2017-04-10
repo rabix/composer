@@ -9,7 +9,6 @@ import {
 } from "@angular/core";
 import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
-import {noop} from "../../../lib/utils.lib";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {ModalService} from "../../../ui/modal/modal.service";
 
