@@ -1,0 +1,45 @@
+@import "./variables";
+
+.btn-icon {
+    background: none;
+    color: $text-muted;
+    padding-left: $input-padding-x;
+    padding-right: $input-padding-x;
+
+    &:hover {
+        color: $text-color;
+    }
+}
+
+.form-section {
+    background: $panel-bg;
+    border-radius: $border-radius;
+    padding: 1em;
+}
+
+.form-control[readonly] {
+    color: $input-color-disabled;
+}
+
+.btn-secondary {
+    &:hover {
+        background: $btn-secondary-hover-bg;
+    }
+    &.input-addition {
+        border-left: none;
+
+    }
+}
+.btn-secondary.input-addition {
+}
+
+.input-group {
+    .btn {
+        border: 1px solid $input-border-color;
+        border-radius: $input-border-radius;
+    }
+    .btn:first-child {
+        border-left: none;
+    }
+}
+

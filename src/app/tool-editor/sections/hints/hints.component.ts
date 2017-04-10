@@ -12,21 +12,21 @@ import {SystemService} from "../../../platform-providers/system.service";
     selector: "ct-hints",
     template: `
         <ct-form-panel>
-            <div class="tc-header">
-                Hints
-            </div>
+            <div class="tc-header">Hints</div>
 
             <div class="tc-body">
+
                 <!--Blank Tool Screen-->
-                <ct-blank-tool-state *ngIf="!readonly && !model.hints.length"
-                                     [buttonText]="'Add a Hint'"
-                                     (buttonClick)="addEntry()">
+                <ct-blank-tool-state *ngIf="!readonly && !model.hints.length" [buttonText]="'Add a Hint'" (buttonClick)="addEntry()">
+                    
                     Execution hints and their values, which specify execution requirements and suggestions, for example, the AWS instance
                     type to use. For a list of execution hints you can set, see
+                    
                     <a #link href="http://docs.sevenbridges.com/docs/list-of-execution-hints"
                        (click)="$event.preventDefault(); system.openLink('http://docs.sevenbridges.com/docs/list-of-execution-hints')">
                         http://docs.sevenbridges.com/docs/list-of-execution-hints.
                     </a>
+                    
                 </ct-blank-tool-state>
 
                 <div *ngIf="readonly && !model.hints.length" class="text-xs-center h5">

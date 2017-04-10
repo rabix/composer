@@ -1,0 +1,32 @@
+@import "../../sass/variables";
+
+//.editor-panel {
+
+.editor-list {
+
+    .editor-list-item {
+        transition: all .1s;
+        display: flex;
+        overflow: hidden;
+        background: $input-bg;
+        border-radius: $input-border-radius;
+        border: 1px solid $input-border-color;
+        padding: .5em 0;
+
+        &.ct-inspected {
+            background: $editor-panel-selected-background;
+            color: white;
+        }
+
+        &.selected,
+        &.ct-inspected,
+        &:hover {
+            border-color: $editor-panel-selected-border;
+        }
+
+
+
+    }
+}
+
+//}
