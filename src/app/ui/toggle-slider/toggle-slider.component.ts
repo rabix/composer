@@ -1,50 +1,33 @@
-import {
-    ChangeDetectionStrategy,
-    Component,
-    EventEmitter,
-    forwardRef,
-    Input,
-    OnInit,
-    Output,
-    Renderer,
-    ViewChild,
-    ViewEncapsulation
-} from "@angular/core";
+import {Component, EventEmitter, forwardRef, Input, OnInit, Output, Renderer, ViewChild} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {noop} from "../../lib/utils.lib";
-/**
- * @FIXME rename to ToggleSlider or rename the file
- */
-@Component({
-    encapsulation: ViewEncapsulation.None,
 
+@Component({
     selector: "ct-toggle-slider",
     styleUrls: ["./toggle-slider.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
-        {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ToggleComponent), multi: true}
+        {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ToggleSliderComponent), multi: true}
     ],
     template: `
-        <span>{{ on ? on : "" }}</span>
-
-        <label class="switch">
-            <input #checkbox type="checkbox" [checked]="value" (change)="toggleCheck($event)" [disabled]="disabled">
-            <div class="slider round" [class.disabled]="disabled"></div>
+        <label class="clickable">
+            {{ value ? on : off }}
+            <div class="switch">
+                <input class="toggle-input" #checkbox type="checkbox" [checked]="value" (change)="toggleCheck($event)" [disabled]="disabled">
+                <div class="slider round" [class.disabled]="disabled"></div>
+            </div>
         </label>
     `
 })
-export class ToggleComponent implements ControlValueAccessor, OnInit {
-
-    isDisabled = false;
+export class ToggleSliderComponent implements ControlValueAccessor, OnInit {
 
     @Input()
     readonly = false;
 
     @Input()
-    on: string;
+    on = "Yes";
 
     @Input()
-    off: string;
+    off = "No";
 
     @Input()
     value = false;
@@ -53,7 +36,7 @@ export class ToggleComponent implements ControlValueAccessor, OnInit {
     disabled = false;
 
     @Output()
-    change = new EventEmitter();
+    valueChange = new EventEmitter();
 
     @ViewChild("checkbox") checkbox;
 
@@ -74,7 +57,7 @@ export class ToggleComponent implements ControlValueAccessor, OnInit {
         event.stopPropagation();
 
         this.value = !this.value;
-        this.change.emit(this.value);
+        this.valueChange.emit(this.value);
         this.propagateChange(this.value);
     }
 

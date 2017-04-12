@@ -12,15 +12,15 @@ import {PlatformAppRevisionEntry} from "../../../services/api/platforms/platform
             <div class="tc-header">Revisions</div>
             <div class="tc-body">
 
-                <div class="revision-entry row pt-1 clickable"
+                <div class="revision-entry row clickable pt-1"
                      (click)="selectRevision(revision)"
                      [class.active]="active === revision.number"
                      *ngFor="let revision of displayList">
-                    
-                    <ct-line-loader *ngIf="loadingRevision === revision"></ct-line-loader>
+
 
                     <div class="revision-number h5">
-                        <div>{{ revision.number }}</div>
+                        <ct-circular-loader class="loader-75" *ngIf="loadingRevision === revision; else revNum"></ct-circular-loader>
+                        <ng-template #revNum>{{ revision.number }}</ng-template>
                     </div>
                     <div class="revision-info">
                         <div class="revision-note" *ngIf="revision.note">

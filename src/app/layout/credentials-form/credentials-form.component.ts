@@ -16,10 +16,9 @@ import {AuthService} from "../../auth/auth/auth.service";
 
             <div *ngFor="let pair of getPairControls(); let i = index;"
                  class="row"
-                 data-test="credentials-entry"
-                 [class.has-success]="pair.valid">
+                 data-test="credentials-entry">
 
-                <div class="form-group col-xs-5" [class.has-danger]="pair.dirty && pair.get('url').invalid">
+                <div class="col-xs-5" [class.has-danger]="pair.dirty && pair.get('url').invalid">
 
                     <input class="form-control"
                            data-test="url-field"
@@ -31,7 +30,7 @@ import {AuthService} from "../../auth/auth/auth.service";
                     </div>
                 </div>
 
-                <div class="form-group col-xs-5" [class.has-danger]="pair.dirty && pair.get('token').invalid">
+                <div class="col-xs-5 pr-0" [class.has-danger]="pair.dirty && pair.get('token').invalid">
                     <input data-test="token-field" #tin class="form-control" type="password" [formControl]="pair.get('token')"/>
 
                     <div class="form-control-feedback" *ngIf="pair.dirty && pair.get('token').errors?.length">
@@ -39,21 +38,20 @@ import {AuthService} from "../../auth/auth/auth.service";
                     </div>
                 </div>
 
-                <div class="col-xs-2 form-control-static deep-unselectable">
+                <div class="col-xs-2 deep-unselectable">
 
                     <!--Eye icon that covers and uncovers the password-->
-                    <i class="fa clickable mr-1"
-                       data-test="token-cover-toggle"
-                       [class.fa-eye]="tin.type === 'text'"
-                       [class.fa-eye-slash]="tin.type === 'password'"
-                       (click)="tin.type = tin.type === 'text' ? 'password' : 'text'">
-                    </i>
+                    <button class="btn btn-icon" data-test="token-cover-toggle" type="button"
+                            (click)="tin.type = tin.type === 'text' ? 'password' : 'text'">
+                        <i class="fa" [class.fa-eye]="tin.type === 'text'" [class.fa-eye-slash]="tin.type === 'password'"></i>
+                    </button>
 
                     <!--Thrash can (delete button)-->
-                    <i *ngIf="removable"
-                       data-test="delete-handle"
-                       class="fa fa-trash clickable"
-                       (click)="removeIndex(i)"></i>
+                    <button *ngIf="removable" class="btn btn-icon" data-test="delete-handle" type="button" (click)="removeIndex(i)">
+                        <i class="fa fa-trash"></i>
+                    </button>
+
+
                 </div>
             </div>
         </form>

@@ -17,10 +17,7 @@ before_script:
   - sh -e /etc/init.d/xvfb start
   - sleep 3
 script:
-  - npm run build
-  - npm run electron:compile
-  - npm run package
-  - npm run test-once
+  - npm run travis
 
 notifications:
   email: false

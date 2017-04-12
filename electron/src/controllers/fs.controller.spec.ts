@@ -48,7 +48,7 @@ describe("FS Controller", () => {
             tmp.file({postfix: ".json"}, (err, path, fd, cleanup) => {
                 if (err) throw err;
 
-                fs.writeFile(fd.toString(), `{ "class": "Expression" }`, null, (err) => {
+                fs.writeFile(fd as any, `{ "class": "Expression" }`, null, (err) => {
                     if (err) throw err;
 
                     ctrl.getPotentialCWLClassFromFile(path, (err, cls) => {
@@ -66,7 +66,7 @@ describe("FS Controller", () => {
             tmp.file({postfix: ".json"}, (err, path, fd, cleanup) => {
                 if (err) throw err;
 
-                fs.writeFile(fd.toString(), `
+                fs.writeFile(fd as any, `
                     { 
                         "label": "Ariana Sans", 
                         "nested": { 
@@ -92,7 +92,7 @@ describe("FS Controller", () => {
         it("should return “Workflow” if file has that class", (done) => {
             tmp.file({postfix: ".json"}, (err, path, fd, cleanup) => {
                 if (err) throw err;
-                fs.writeFile(fd.toString(), `
+                fs.writeFile(fd as any, `
                     { 
                         "label": "Gerard Grande", 
                         "nested": { 
@@ -192,7 +192,7 @@ describe("FS Controller", () => {
                 if (err) throw err;
 
 
-                fs.writeFile(fd.toString(), `{ "class": "CommandLineTool" }`, null, (err) => {
+                fs.writeFile(fd as any, `{ "class": "CommandLineTool" }`, null, (err) => {
                     if (err) throw err;
 
                     ctrl.getFileOutputInfo(fpath, (err, info) => {
@@ -312,7 +312,7 @@ describe("FS Controller", () => {
         it("should overwrite the file with the given content", (done) => {
             tmp.file({postfix: ".json"}, (err, path, fd, cleanup) => {
 
-                fs.writeFile(fd.toString(), "test data", (err) => {
+                fs.writeFile(fd as any, "test data", (err) => {
                     if (err) throw err;
 
                     const newContent = "{ \"class\": \"Workflow\" }";
@@ -345,7 +345,7 @@ describe("FS Controller", () => {
         it("should replace file content when new content is shorter than the old one", (done) => {
             tmp.file({postfix: ".json"}, (err, path, fd, cleanup) => {
 
-                fs.writeFile(fd.toString(), "test data", (err) => {
+                fs.writeFile(fd as any, "test data", (err) => {
                     if (err) throw err;
 
                     const overwrite = "hello";
@@ -385,7 +385,7 @@ describe("FS Controller", () => {
 
                 const fileContent = `demo file content that should be matched`;
 
-                fs.writeFile(fd.toString(), fileContent, (err) => {
+                fs.writeFile(fd as any, fileContent, (err) => {
                     if (err) throw err;
 
                     ctrl.readFileContent(path, (err, raw) => {

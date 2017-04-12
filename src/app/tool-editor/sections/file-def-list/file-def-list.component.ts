@@ -37,20 +37,20 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                 </div>
 
                 <!--List Header Row-->
-                <div class="gui-section-list-title" *ngIf="model.listing?.length">
+                <div class="editor-list-title" *ngIf="model.listing?.length">
                     <div class="col-sm-5">Name</div>
                     <div class="col-sm-7">Content</div>
                 </div>
 
 
                 <!--FileDef List Entries-->
-                <ul class="gui-section-list">
+                <ul class="editor-list">
 
                     <!--List Entry-->
                     <li *ngFor="let entry of model.listing; let i = index"
                         class="input-list-items">
 
-                        <div class="gui-section-list-item clickable"
+                        <div class="editor-list-item clickable"
                              [ct-validation-class]="entry.validation"
                              [ct-editor-inspector]="inspector"
                              [ct-editor-inspector-target]="entry.loc">

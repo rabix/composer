@@ -1,10 +1,9 @@
-import {Component, ViewChild} from "@angular/core";
+import {Component} from "@angular/core";
 import {AuthService} from "../../auth/auth/auth.service";
 import {SettingsService} from "../../services/settings/settings.service";
-import {DirectiveBase} from "../../util/directive-base/directive-base";
-import {CredentialsFormComponent} from "../credentials-form/credentials-form.component";
-import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {CredentialsEntry} from "../../services/storage/user-preferences-types";
+import {UserPreferencesService} from "../../services/storage/user-preferences.service";
+import {DirectiveBase} from "../../util/directive-base/directive-base";
 
 type ViewMode = "auth" | "keyBindings" | "cache";
 
@@ -24,14 +23,14 @@ type ViewMode = "auth" | "keyBindings" | "cache";
 
                 <!--Add Another-->
                 <button (click)="creds.addEntry()"
-                        class="btn btn-sm btn-secondary text-inherit"
+                        class="btn btn-secondary text-inherit"
                         type="button"> Add an Account
                 </button>
 
                 <!--Save-->
                 <button (click)="creds.submit()"
                         [disabled]="creds.form.invalid"
-                        class="btn btn-sm btn-secondary text-inherit"
+                        class="btn btn-secondary text-inherit"
                         type="button"> Apply Changes
                 </button>
 

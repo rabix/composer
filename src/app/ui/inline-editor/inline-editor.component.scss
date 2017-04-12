@@ -2,15 +2,10 @@
 
 :host {
     position:relative;
-    border: 1px solid white;
     width: 100%;
 
-    .inline-section {
-        border: 1px solid white;
-    }
-
     .hover {
-        border: 1px solid $form-elements-border-color;
+        //border: 1px solid $form-elements-border-color;
         border-radius: 2px;
     }
 

@@ -23,15 +23,16 @@ import {
                 <ct-inline-editor [value]="model.label" type="text"
                                   [disabled]="readonly"
                                   (saveData)="model.label = $event">
-                    <h3>{{model.label}}</h3>
+
+                    <h1 class="h3">{{model.label}}</h1>
                 </ct-inline-editor>
                 <div>Created by {{createdBy}} on {{createdOn | date}}. Last edited by {{editedBy}} on {{editedOn | date}}</div>
-                <div *ngIf="revisionNote">Revision note: "{{revisionNote}}"</div>
+                <div *ngIf="revisionNote">Revision note: “<em>{{revisionNote}}</em>”</div>
             </div>
 
             <!--Description section-->
             <div class="info-section">
-                <h5>Description:</h5>
+                <div class="text-title">Description:</div>
                 <ct-inline-editor [value]="model.description"
                                   [disabled]="readonly"
                                   type="textarea"
@@ -46,7 +47,7 @@ import {
 
                     <!--Categories-->
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
-                        <h5>Categories</h5>
+                        <div class="text-title">Categories:</div>
                         <ct-inline-editor [value]="model.customProps['sbg:categories']"
                                           type="tags"
                                           [disabled]="readonly"
@@ -58,7 +59,7 @@ import {
 
                     <!--Toolkit-->
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
-                        <h5>Toolkit</h5>
+                        <div class="text-title">Toolkit:</div>
                         <div>
                             <ct-inline-editor [disabled]="readonly" class="toolkit"
                                               [value]="model.customProps['sbg:toolkit']"
@@ -78,7 +79,7 @@ import {
 
                     <!--License-->
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
-                        <h5>License</h5>
+                        <div class="text-title">License:</div>
                         <ct-inline-editor [value]="model.customProps['sbg:license']"
                                           [disabled]="readonly"
                                           type="text"
@@ -89,7 +90,7 @@ import {
 
                     <!--Author-->
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
-                        <h5>Author</h5>
+                        <div class="text-title">Author:</div>
                         <ct-inline-editor [value]="model.customProps['sbg:toolAuthor']"
                                           [disabled]="readonly"
                                           type="text"
@@ -100,19 +101,19 @@ import {
 
                     <!--Contributors-->
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
-                        <h5>Contributors</h5>
-                        {{(model.customProps['sbg:contributors']|| []).join(", ")}}
+                        <div class="text-title">Contributors:</div>
+                        {{(model.customProps['sbg:contributors'] || []).join(", ")}}
                     </div>
 
                     <!--CWL version-->
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
-                        <h5>CWL version</h5>
+                        <div class="text-title">CWL Version:</div>
                         {{model['cwlVersion']}}
                     </div>
 
                     <!--Links-->
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
-                        <h5>Links</h5>
+                        <div class="text-title">Links:</div>
                         <ct-inline-editor [value]="model.customProps['sbg:links']"
                                           [disabled]="readonly"
                                           type="keyvalue"
@@ -130,7 +131,7 @@ import {
 
                     <!--ID-->
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
-                        <h5>Id</h5>
+                        <div class="text-title">ID</div>
                         {{model.customProps['sbg:id']}}
                     </div>
                 </div>
@@ -140,14 +141,10 @@ import {
             <!--Table section-->
             <div class="info-section">
 
-                <ct-tab-selector class="inverse" [distribute]="'auto'" [active]="viewMode"
-                                 (activeChange)="switchTab($event)">
-                    <ct-tab-selector-entry [tabName]="'inputs'">Inputs
-                    </ct-tab-selector-entry>
-                    <ct-tab-selector-entry [tabName]="'appSettings'">App Settings
-                    </ct-tab-selector-entry>
-                    <ct-tab-selector-entry [tabName]="'outputs'">Outputs
-                    </ct-tab-selector-entry>
+                <ct-tab-selector distribute="auto" [active]="viewMode" (activeChange)="switchTab($event)">
+                    <ct-tab-selector-entry tabName="inputs">Inputs</ct-tab-selector-entry>
+                    <ct-tab-selector-entry tabName="appSettings">App Settings</ct-tab-selector-entry>
+                    <ct-tab-selector-entry tabName="outputs">Outputs</ct-tab-selector-entry>
                 </ct-tab-selector>
 
 
@@ -285,12 +282,10 @@ export class AppInfoComponent implements OnChanges {
         this.revisionNote = this.model.customProps["sbg:revisionNotes"] || null;
 
 
-        this.inputs      = (this.model.inputs as Array<
-            CommandInputParameterModel
+        this.inputs      = (this.model.inputs as Array<CommandInputParameterModel
             | WorkflowInputParameterModel>)
             .filter((input) => input.type.type === "File" || input.type.items === "File");
-        this.appSettings = (this.model.inputs as Array<
-            CommandInputParameterModel
+        this.appSettings = (this.model.inputs as Array<CommandInputParameterModel
             | WorkflowInputParameterModel>)
             .filter((input) => input.type.type !== "File" && input.type.items !== "File");
     }

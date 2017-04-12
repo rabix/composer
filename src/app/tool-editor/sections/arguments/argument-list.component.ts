@@ -39,7 +39,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                     </div>
 
                     <!--List Header Row-->
-                    <div class="gui-section-list-title" *ngIf="!!model.arguments.length">
+                    <div class="editor-list-title" *ngIf="!!model.arguments.length">
                         <div class="col-sm-4">Value</div>
                         <div class="col-sm-3">Prefix</div>
                         <div class="col-sm-3">Separate</div>
@@ -47,13 +47,13 @@ import {ModalService} from "../../../ui/modal/modal.service";
                     </div>
 
                     <!--Argument List Entries-->
-                    <ul class="gui-section-list">
+                    <ul class="editor-list">
 
                         <!--List Entry-->
                         <li *ngFor="let entry of model.arguments; let i = index"
                             class="input-list-items">
 
-                            <div class="gui-section-list-item clickable"
+                            <div class="editor-list-item clickable"
                                  [ct-validation-class]="entry.validation"
                                  [ct-editor-inspector]="inspector"
                                  [ct-editor-inspector-target]="entry.loc">

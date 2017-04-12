@@ -9,20 +9,17 @@
     .form-section {
         position: relative;
         display: block;
-        background: $gui-section-bg;
+        //background: $gui-section-bg;
         margin-bottom: 20px;
-        padding: $gui-section-padding;
-        border: 1px solid $gui-section-border;
+        //padding: $gui-section-padding;
+        //border: 1px solid $gui-section-border;
 
         .borderless & {
             border: none;
             padding: 0;
         }
 
-        /deep/ .gui-section-list-title {
-            font-family: $font-family-title;
-            font-size: $font-size-sm;
-            font-weight: 400;
+        /deep/ .editor-list-title {
             text-transform: uppercase;
             display: flex;
         }
@@ -31,15 +28,15 @@
             height: 0;
 
             &.show {
-                padding-top: $gui-section-padding;
+                //padding-top: $gui-section-padding;
                 height: auto;
             }
         }
 
         .hide-button {
             position: absolute;
-            top: $padding-md;
-            right: $padding-md;
+            //top: $padding-md;
+            //right: $padding-md;
         }
 
         /deep/ .add-btn-link {
