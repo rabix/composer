@@ -14,7 +14,7 @@ export class AuthService {
 
     authenticationProgress = new BehaviorSubject(false);
 
-    connections = new ReplaySubject<CredentialsEntry[]>();
+    connections = new ReplaySubject<CredentialsEntry[]>(1);
 
     /**
      * Converts a https://*.sbgenomics.com url to a profile name
