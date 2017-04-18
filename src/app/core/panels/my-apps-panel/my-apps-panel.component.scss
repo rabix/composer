@@ -1,0 +1,65 @@
+@import "../../../../assets/sass/variables";
+
+:host {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    ct-nav-search-result {
+        opacity: 0;
+        margin-left: -1em;
+
+        &.shown {
+            transition: all .1s;
+            opacity: 1;
+            margin-left: 0;
+        }
+    }
+
+    .no-results {
+        text-align: center;
+        color: $layout-text-color-faded;
+        .icon {
+            color: #212121;
+        }
+    }
+
+    /deep/ {
+
+        .fa-folder-open,
+        .fa-folder {
+            color: #a8b2c1;
+        }
+
+        .fa-file {
+            color: #e6e6e6;
+        }
+
+        .fa-share-alt {
+            color: #e29834;
+            -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=#{0}, mirror=1)";
+            -webkit-transform: scale(-1, 1);
+            -ms-transform: scale(-1, 1);
+            transform: scale(-1, 1);
+        }
+
+        .fa-terminal {
+            color: #a184dc;
+        }
+    }
+
+    .app-sources-btn {
+        text-decoration: none;
+        color: $brand-primary;
+        padding-top: 0;
+
+        &:active, &:focus {
+            color: $brand-primary;
+            border-color: transparent;
+            background: none;
+            outline: none;
+        }
+    }
+}
+
+

@@ -1,0 +1,19 @@
+@import "../../../assets/sass/variables";
+
+:host {
+    position:relative;
+    width: 100%;
+
+    .hover {
+        //border: 1px solid $form-elements-border-color;
+        border-radius: 2px;
+    }
+
+    .button-section {
+        position: absolute;
+        top: 100%;
+        z-index:1;
+    }
+
+    cursor: text;
+}

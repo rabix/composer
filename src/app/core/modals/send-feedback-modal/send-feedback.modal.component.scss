@@ -1,0 +1,74 @@
+@import "../../../../assets/sass/variables";
+
+:host {
+    display: flex;
+    flex-direction: column;
+
+    .body {
+        flex: 1 1 auto;
+        min-height: 300px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .dialog-content {
+        max-height: 500px;
+        overflow: auto;
+        flex: 1;
+        padding: 1em;
+    }
+
+    .feedback-prompt {
+        margin-bottom: 1rem;
+    }
+
+    .feedback-type {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+
+        .feedback {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #ccc;
+            border-radius: 2px;
+
+            .caption {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+
+                .caption-text {
+                    padding-left: 5px;
+                }
+            }
+
+            &.active, &:hover {
+                border-color: $brand-primary;
+
+                .caption {
+                    color: $brand-primary;
+                }
+            }
+        }
+
+        .feedback ~ .feedback {
+            margin-left: 1em;
+        }
+    }
+
+    .description {
+        margin-bottom: 1rem;
+    }
+
+    textarea {
+        resize: none;
+    }
+
+    .footer {
+        text-align: right;
+    }
+}

@@ -1,15 +1,15 @@
 import {Pipe, PipeTransform} from "@angular/core";
-import {ExpressionModel} from "cwlts/models/d2sb";
+import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 
-@Pipe({name: "commandOutputGlob"})
+@Pipe({name: "commandOutputGlob", pure: false})
 export class CommandOutputGlobPipe implements PipeTransform {
     transform(glob): any {
 
-        if(!glob){
+        if (!glob) {
             return "n/a";
         }
 
-        if (glob instanceof ExpressionModel) {
+        if (glob instanceof SBDraft2ExpressionModel) {
             return glob.toString();
         }
 

@@ -1,0 +1,86 @@
+@import "../../../assets/sass/variables";
+
+:host {
+    $switch-height: 20px;
+    $switch-width: 40px;
+
+    &:hover {
+        cursor: pointer !important;
+    }
+
+    /* The switch - the box around the slider */
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: $switch-width;
+        height: $switch-height;
+        margin: 0;
+        vertical-align: text-top;
+    }
+
+    /* Hide default HTML checkbox */
+    .switch input {
+        display: none;
+    }
+
+    /* The slider */
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: $input-bg;
+        -webkit-transition: .4s;
+        transition: .4s;
+        border: 1px solid $input-border-color;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: $switch-height - 3px;
+        width: $switch-height - 3px;
+        left: 2px;
+        bottom: 1px;
+        //background-color: $background-light;
+        -webkit-transition: .4s;
+        transition: .4s;
+        background: $text-color;
+    }
+
+    .slider:before {
+    }
+
+    .toggle-input:checked + .slider {
+        background-color: $brand-primary;
+    }
+
+    .toggle-input:focus + .slider {
+        box-shadow: 0 0 1px $brand-primary;
+    }
+
+    .toggle-input:checked + .slider:before {
+        -webkit-transform: translateX($switch-width / 2);
+        -ms-transform: translateX($switch-width / 2);
+        transform: translateX($switch-width / 2);
+
+    }
+
+    /* Rounded sliders */
+    .slider.round {
+        border-radius: $switch-width / 2;
+    }
+
+    .slider.round:before {
+        border-radius: 50%;
+    }
+
+    .slider.round.disabled {
+        background-color: $input-bg-disabled;
+        cursor: $cursor-disabled;
+    }
+
+}
+

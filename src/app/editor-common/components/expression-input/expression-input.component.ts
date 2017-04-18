@@ -1,15 +1,16 @@
-import {Component, Input, forwardRef} from "@angular/core";
-import {NG_VALUE_ACCESSOR, ControlValueAccessor} from "@angular/forms";
-import {ExpressionModel} from "cwlts/models/d2sb";
-import {ComponentBase} from "../../../components/common/component-base";
+import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
+import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
+import {ExpressionModel} from "cwlts/models";
 import {noop} from "../../../lib/utils.lib";
 import {ModelExpressionEditorComponent} from "../../expression-editor/model-expression-editor.component";
-import {ModalService} from "../../../components/modal/modal.service";
-
-require("./expression-input.component.scss");
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
-    selector: 'ct-expression-input',
+    encapsulation: ViewEncapsulation.None,
+
+    selector: "ct-expression-input",
+    styleUrls: ["./expression-input.component.scss"],
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
@@ -18,80 +19,90 @@ require("./expression-input.component.scss");
         }
     ],
     template: `
-            <div class="expression-input-group clickable"
-                 [class.expr]="isExpr"
-                 [ct-validation-class]="model.validation">
-                 
-                <ct-validation-preview [entry]="model.validation"></ct-validation-preview>
-                <b class="validation-icon result"
-                    *ngIf="model.result && isExpr"
-                    [title]="model.result">E:</b>
-                
-                <div class="input-group">
-                
-                    <input class="form-control"
-                            #input
-                            *ngIf="type === 'string'"
-                            type="text"
-                            [value]="value?.toString()"
-                            [readonly]="isExpr"
-                            (blur)="onTouch()"
-                            (click)="editExpr(isExpr ? 'edit' : null, $event)"
-                            (change)="editString(input.value)"/>
-                            
-                    <input class="form-control"
-                            #input
-                            type="number"
-                            *ngIf="type === 'number'"
-                            [value]="value?.toString()"
-                            [readonly]="isExpr"
-                            (blur)="onTouch()"
-                            (click)="editExpr(isExpr ? 'edit' : null, $event)"
-                            (change)="editString(input.value)"/>
-                        
-                    <span class="input-group-btn">
+        <div class="expression-input-group clickable"
+             [class.expr]="isExpr || disableLiteralTextInput"
+             [ct-validation-class]="model?.validation">
+
+            <ct-validation-preview [entry]="model?.validation"></ct-validation-preview>
+            <b class="validation-icon result"
+               *ngIf="model?.result && isExpr"
+               [title]="result">E:</b>
+
+            <div class="input-group">
+
+                <input class="form-control"
+                       #input
+                       [type]="isExpr ? 'text' : type"
+                       [value]="value?.toString()"
+                       [readonly]="isExpr || disableLiteralTextInput || readonly"
+                       (blur)="onTouch()"
+                       (click)="editExpr(isExpr || disableLiteralTextInput && !readonly ? 'edit' : null, $event)"
+                       (change)="editString(input.value)"/>
+
+                <span class="input-group-btn" *ngIf="!readonly">
                         <button type="button"
-                            class="btn btn-secondary" 
-                            (click)="editExpr(isExpr ? 'clear' : 'edit', $event)">
+                                class="btn btn-secondary"
+                                (click)="editExpr(isExpr ? 'clear' : 'edit', $event)">
                             <i class="fa"
-                                [ngClass]="{'fa-times': isExpr,
+                               [ngClass]="{'fa-times': isExpr,
                                             'fa-code': !isExpr}"></i>
                         </button>
-                    </span>  
+                    </span>
             </div>
         </div>
-        `
+    `
 })
-export class ExpressionInputComponent extends ComponentBase implements ControlValueAccessor {
+export class ExpressionInputComponent extends DirectiveBase implements ControlValueAccessor {
     /**
      * Context in which expression should be executed
      */
     @Input()
-    public context: any;
+    context: any = {};
 
     @Input()
-    public type: "string" | "number" = "string";
+    type: "string" | "number" = "string";
+
+    /** When set to true, only expressions are allowed */
+    @Input()
+    disableLiteralTextInput = false;
+
+    @Input()
+    readonly = false;
 
     /** Flag if model is expression or primitive */
-    private isExpr: boolean = false;
+    isExpr = false;
 
     /**
      * Internal ExpressionModel on which changes are made
      */
-    private model: ExpressionModel;
+    model: ExpressionModel;
+
+    /**
+     * Result gotten from expression evaluation
+     */
+    result: any;
 
     /** getter for formControl value */
-    public get value() {
+    get value() {
         return this.model;
     }
 
     /** setter for formControl value */
-    public set value(val: ExpressionModel) {
-        if (val !== this.model) {
-            this.model = val;
-            this.onChange(val);
-        }
+    set value(val: ExpressionModel) {
+        this.model = val;
+        this.onChange(val);
     }
+
+    /**
+     * Declaration of change function
+     */
+    private onChange = noop;
+
+    /**
+     * Declaration of touch function
+     */
+    onTouch = noop;
+
 
     /**
      * From ControlValueAccessor
@@ -100,15 +111,18 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
      */
     writeValue(obj: ExpressionModel): void {
         if (!(obj instanceof ExpressionModel)) {
-            console.warn(`ct-expression-input expected ExpressionModel, instead got ${obj}`)
+            console.warn(`ct-expression-input expected ExpressionModel, instead got ${obj}`);
         }
 
         if (obj) {
             this.model  = obj;
             this.isExpr = obj.isExpression;
-        } else {
-            this.model  = new ExpressionModel("", "");
-            this.isExpr = this.model.isExpression;
+
+            this.model.evaluate(this.context).then(res => {
+                this.result = res;
+            }, err => {
+                console.warn("ExpressionInputComponent got an error while evaluating an expression", err);
+            });
         }
     }
 
@@ -128,17 +142,6 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
         this.onTouch = fn;
     }
 
-    /**
-     * Declaration of change function
-     */
-    private onChange = noop;
-
-    /**
-     * Declaration of touch function
-     */
-    private onTouch = noop;
-
-
     constructor(private modal: ModalService) {
         super();
     }
@@ -147,9 +150,10 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
      * Callback for setting string value to model
      * @param str
      */
-    private editString(str: number | string) {
-        //@fixme: returning string on change in number field
-        if (this.type === "number") str = Number(str);
+    editString(str: number | string) {
+        if (this.type === "number") {
+            str = Number(str);
+        }
         this.model.setValue(str, this.type);
         this.onChange(this.model);
     }
@@ -159,36 +163,62 @@ export class ExpressionInputComponent extends ComponentBase implements ControlVa
      * @param action
      * @param event
      */
-    private editExpr(action: "clear" | "edit", event: Event): void {
+    editExpr(action: "clear" | "edit", event: Event): void {
 
-        if (!action) return;
+        if (!action) {
+            return;
+        }
 
         if (action === "edit") {
-            const editor = this.modal.show(ModelExpressionEditorComponent, {
+            const editor = this.modal.fromComponent(ModelExpressionEditorComponent, {
                 backdrop: true,
                 closeOnOutsideClick: false,
+                closeOnEscape: false,
                 title: "Edit Expression"
             });
 
+            editor.readonly = this.readonly;
+
+            const cachedValue = this.model.serialize() || "";
+            const cachedType  = this.model.type;
+
             editor.model   = this.model;
             editor.context = this.context;
-            editor.action.first().subscribe(action => {
-                if (action === "save") {
-                    this.model = new ExpressionModel(this.model.loc, editor.model.serialize());
-                    this.model.evaluate(this.context); // to reset validation
-                    this.isExpr = this.model.isExpression;
-                    this.onChange(this.model);
+            editor.action.first().subscribe(editorAction => {
+                if (editorAction === "save") {
+                    const val = editor.model.serialize();
+                    this.model.setValue(val, "expression");
+
+                    this.model.evaluate(this.context).then(() => {
+                            // to reset validation
+                            this.isExpr = this.model.isExpression;
+                            this.onChange(this.model);
+                        },
+                        () => {
+                            // to reset validation
+                            this.isExpr = this.model.isExpression;
+                            this.onChange(this.model);
+                        });
+                } else {
+                    this.model.setValue(cachedValue, cachedType);
                 }
                 this.modal.close();
             });
         }
 
         if (action === "clear") {
-            this.model.setValue("", this.type);
-            this.model.result = null;
-            this.isExpr       = false;
-            event.stopPropagation();
-            this.onChange(this.model);
+            this.modal.confirm({
+                title: "Really Remove?",
+                content: `Are you sure that you want to remove this expression?`,
+                cancellationLabel: "No, keep it",
+                confirmationLabel: "Yes, delete it"
+            }).then(() => {
+                this.model.setValue("", this.type);
+                this.model.result = null;
+                this.isExpr       = false;
+                event.stopPropagation();
+                this.onChange(this.model);
+            }, err => console.warn);
         }
     }
 }

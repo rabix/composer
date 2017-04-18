@@ -1,4 +1,4 @@
-import {Injectable, ViewContainerRef, EmbeddedViewRef, TemplateRef} from "@angular/core";
+import {EmbeddedViewRef, Injectable, TemplateRef, ViewContainerRef} from "@angular/core";
 import {BehaviorSubject} from "rxjs";
 
 @Injectable()
@@ -26,7 +26,7 @@ export class EditorInspectorService {
         return obj === this.inspectedObject.getValue();
     }
 
-    public inspect(obj: any){
+    public inspect(obj: any) {
         this.inspectedObject.next(obj);
     }
 
@@ -42,12 +42,22 @@ export class EditorInspectorService {
     }
 
     private clearView() {
+
         if (this.embeddedView) {
             this.embeddedView.destroy();
             this.embeddedView = undefined;
         }
 
-        this.hostView.clear();
+
+        try {
+            this.hostView.clear();
+
+        } catch (ex) {
+            throw new Error("Trying to clear an invalid host view. " +
+                "You need to set the host view of the inspector using the “setHostView” method. " +
+                "Original Error: " + ex);
+
+        }
     }
 
 }

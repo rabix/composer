@@ -1,0 +1,112 @@
+ct-new-file-tab {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    & > .content-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+
+        & > .top-empty-space {
+            flex: 1;
+        }
+
+        & > .apps-container {
+            flex: 5;
+            display: flex;
+            flex-direction: row;
+
+            padding-left: 2rem;
+            padding-right: 2rem;
+
+            & > .apps {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+
+                & > .title {
+                    margin-bottom: 1rem;
+                }
+
+                & > .app-container {
+                    flex: 1;
+                    display: flex;
+                    flex-direction: row;
+                    text-align: center;
+
+                    & > .app {
+                        padding: 1rem;
+                        flex: 1;
+                        display: flex;
+                        flex-direction: column;
+                        border: 1px solid #ccc;
+                        background: white;
+                        overflow:hidden;
+
+                        .image-container {
+                            flex: 3;
+
+                            .image {
+                                width: 100%;
+                                height: 100%;
+
+                                &.workflow {
+                                    background-size: contain;
+
+                                }
+
+                                &.tool {
+                                    background-size: contain;
+                                }
+                            }
+
+                        }
+
+                        & > .description {
+                            flex: 1;
+                        }
+
+                        & > .revisions {
+                            text-align: left;
+                            overflow-y: auto;
+
+                            ct-nav-search-result {
+                                border-bottom: 1px solid #ddd;
+
+                                &:hover {
+                                    background-color: #e8e8e8;
+                                }
+                            }
+                        }
+                    }
+
+                    & > .app ~ .app {
+                        margin-left: 2rem;
+                    }
+                }
+
+            }
+
+            & > .apps ~ .apps {
+                margin-left: 2rem;
+            }
+
+        }
+
+        & > .bottom-empty-space {
+            flex: 3;
+        }
+    }
+
+    /deep/ {
+        .fa-share-alt {
+            color: #e29834;
+        }
+
+        .fa-terminal {
+            color: #a184dc;
+        }
+    }
+
+}

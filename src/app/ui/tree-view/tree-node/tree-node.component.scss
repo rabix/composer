@@ -1,0 +1,16 @@
+@import "../../../../assets/sass/variables";
+@import "../../../../assets/sass/mixins";
+
+:host {
+    display: block;
+    white-space: nowrap;
+
+    .node-base {
+        padding: .25em;
+    }
+
+    .selected {
+        background: $tree-node-selected-background;
+        color: $tree-node-selected-color;
+    }
+}

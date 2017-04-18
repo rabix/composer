@@ -1,85 +1,77 @@
-import {Component, Input} from "@angular/core";
-import {FormControl} from "@angular/forms";
-import {ResourceRequirementModel} from "cwlts/models/d2sb";
-import {Output} from "@angular/core";
-import {ReplaySubject} from "rxjs";
-
+import {Component, Input, OnChanges, OnInit, Output, SimpleChanges} from "@angular/core";
+import {FormControl, FormGroup} from "@angular/forms";
+import {ResourceRequirementModel} from "cwlts/models";
+import {ReplaySubject} from "rxjs/ReplaySubject";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
     selector: "ct-resources",
     template: `
 
-<ct-form-panel [collapsed]="false">
+        <ct-form-panel [collapsed]="false">
     <span class="tc-header">
-        Resources
+        Computational Resources
     </span>
+            <div class="tc-body">
+                <form [formGroup]="form">
+                    <label class="form-control-label">Memory (min)</label>
+                    <ct-quick-pick [suggestions]="memSuggest"
+                                   [formControl]="form.controls['mem']"
+                                   [context]="context"
+                                   [type]="'number'"
+                                   [readonly]="readonly">
+                    </ct-quick-pick>
 
-    <div class="tc-body">
-    
-        <label class="form-control-label">Memory</label>
-        <ct-quick-pick [suggestions]="memSuggest" 
-                       [formControl]="memControl"
-                       [context]="context"
-                       [type]="'number'">
-        </ct-quick-pick>
-        
-        <label class="form-control-label">CPU</label>
-        <ct-quick-pick [suggestions]="cpuSuggest" 
-                       [formControl]="cpuControl"
-                       [context]="context"
-                       [type]="'number'">
-        </ct-quick-pick>
-    </div>
-
-</ct-form-panel>
-
-`
+                    <label class="form-control-label">CPU (min)</label>
+                    <ct-quick-pick [suggestions]="cpuSuggest"
+                                   [formControl]="form.controls['cores']"
+                                   [context]="context"
+                                   [type]="'number'"
+                                   [readonly]="readonly">
+                    </ct-quick-pick>
+                </form>
+            </div>
+        </ct-form-panel>
+    `
 })
-export class ResourcesComponent {
+export class ResourcesComponent extends DirectiveBase implements OnChanges, OnInit {
     @Input()
-    entries: {
-        "sbg:CPURequirement"?: ResourceRequirementModel,
-        "sbg:MemRequirement"?: ResourceRequirementModel
-    };
+    entries: ResourceRequirementModel;
 
     @Input()
     readonly: boolean;
 
     @Input()
-    context: {$job?: any, $self?: any};
+    context: any = {};
 
     @Output()
     update = new ReplaySubject<any>();
 
-    private memControl = new FormControl();
-    private cpuControl = new FormControl();
+    form = new FormGroup({
+        mem: new FormControl(),
+        cores: new FormControl()
+    });
 
-    private memSuggest = {
+    memSuggest = {
         "100MB": 100,
         "1GB": 1000,
         "2GB": 2000,
         "4GB": 4000,
         "8GB": 8000,
     };
-    private cpuSuggest = {
+    cpuSuggest = {
         "single-thread": 1,
         "multi-thread": 0
     };
 
+    ngOnChanges(changes: SimpleChanges) {
+        this.form.controls["mem"].setValue(this.entries.mem, {onlySelf: true});
+        this.form.controls["cores"].setValue(this.entries.cores, {onlySelf: true});
+    }
+
     ngOnInit() {
-        this.memControl.setValue(this.entries["sbg:MemRequirement"].value);
-        this.cpuControl.setValue(this.entries["sbg:CPURequirement"].value);
-
-        this.memControl.valueChanges.subscribe(val => {
-            const res = this.entries["sbg:MemRequirement"];
-            res.value = val;
-            this.update.next(res);
-        });
-
-        this.cpuControl.valueChanges.subscribe(val => {
-            const res = this.entries["sbg:CPURequirement"];
-            res.value = val;
-            this.update.next(res);
+        this.tracked = this.form.valueChanges.subscribe(change => {
+            this.update.next(change);
         });
     }
 }

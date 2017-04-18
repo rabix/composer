@@ -3,36 +3,49 @@
 @import "mixins";
 @import "resets";
 @import "utils";
-@import "~font-awesome/scss/font-awesome";
-@import "../../app/components/block-loader/block-loader.component";
 @import "typography";
 @import "icons";
 @import "forms";
 @import "alerts";
-
-@keyframes progress-bar-stripes {
-  0% { margin-left: 20px; background-position: 20px 0; }
-  100% { margin-left: 0px; background-position: 0 0; }
-}
-
-@import url(https://fonts.googleapis.com/css?family=Montserrat:400,700);
+@import "./variables";
+@import "~selectize/dist/css/selectize.default.css";
+@import "./theme";
 
 html, body {
-  width: 100%;
-  height: 100%;
-  background: $body-bg;
-  color: $body-color;
-
-  background-repeat: repeat;
-  background-position: center center;
-  background-size: auto auto;
-  background-image: linear-gradient(225deg,$brand-primary-bg 0%,$brand-primary-bg-dark 100%);
+    width: 100%;
+    height: 100%;
+    color: $text-color;
+    background: $body-bg;
 }
 
 .loading-image {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+[data-marker] {
+    display: none;
+}
+
+.input-list-items {
+    //border-radius: $editor-list-item-border-radius;
+    margin-bottom: 10px;
+    list-style: none;
+
+    &.record-input {
+        //border: 1px solid $editor-list-item-bg;
+
+        > .editor-list-item {
+            margin-bottom: 10px;
+            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+    }
+
+    .editor-list-item {
+        margin-bottom: 0;
+    }
 }

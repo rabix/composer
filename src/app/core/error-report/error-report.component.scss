@@ -1,0 +1,68 @@
+@import "../../../assets/sass/variables";
+
+:host {
+    display: flex;
+    flex-direction: column;
+
+    .main-content {
+        flex: 1;
+        display: flex;
+    }
+
+    .textbox {
+        height: 500px;
+        width: 100%;
+    }
+
+    .code {
+        flex: 3;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+
+    }
+
+    .editor {
+        flex: 3;
+        width: 100%;
+        height: 100%;
+    }
+
+    .preview {
+        flex: 1;
+        height: 100%;
+    }
+
+    .tree {
+        flex: 1;
+        //min-width: 0;
+    }
+
+    .footer {
+        flex-basis: 3em;
+    }
+
+    ct-tree-view {
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        padding: 0 10px 0 4px;
+        border-left: 1px solid #222;
+    }
+
+    .modal-footer {
+        padding: 1em;
+        display: flex;
+        flex-direction: row-reverse;
+        border-top: 1px solid #222;
+    }
+
+    /deep/ .varname {
+        font-family: monospace;
+    }
+
+    /deep/ .vartype {
+        color: $layout-text-color-faded;
+    }
+
+}

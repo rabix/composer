@@ -1,0 +1,76 @@
+@import "../../../assets/sass/variables";
+@import "../../../assets/sass/mixins";
+
+:host {
+    $tab-height: $action-bar-height;
+
+    display: block;
+
+    .tab-container {
+        width: 100%;
+        display: flex;
+        height: $tab-height;
+        flex-direction: row;
+    }
+
+
+
+    /deep/ ct-tab-selector-entry {
+
+        @include ellipsis();
+        display: inline-block;
+        flex: 1;
+        text-align: center;
+        line-height: $action-bar-height;
+        background: none;
+        cursor: pointer;
+        color: $layout-text-color-faded;
+
+        &.active {
+            color: $layout-text-color;
+        }
+
+        &.disabled {
+            cursor: not-allowed;
+            color: gray;
+        }
+    }
+
+    .auto {
+        /deep/ ct-tab-selector-entry {
+            flex: 0 0 auto;
+            //flex-basis: auto;
+            padding: 0 1em;
+        }
+    }
+
+    .selection-underline {
+        position: relative;
+        height: 1px;
+        //background: $layout-element-separator-color;
+        margin-top: -2px;
+    }
+
+    .underline-highlight {
+        transition: .2s all;
+        height: 100%;
+        position: absolute;
+        background: $brand-primary;
+    }
+
+    &.inverse {
+
+        /deep/ ct-tab-selector-entry {
+            color: #222; // @FIXME add theme variable
+
+            &.disabled {
+                color: #ccc;
+            }
+        }
+
+        .selection-underline {
+            background: $layout-element-alt-foreground;
+
+        }
+    }
+}

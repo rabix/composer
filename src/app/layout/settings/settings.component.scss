@@ -1,0 +1,14 @@
+@import "../../../assets/sass/variables";
+
+:host {
+    display: block;
+
+    ct-line-loader {
+        height: auto;
+        margin-top: -2px;
+        /deep/ ct-progress {
+            height: 1px;
+        }
+    }
+
+}

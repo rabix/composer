@@ -1,0 +1,72 @@
+@import "./../../../assets/sass/variables";
+
+:host {
+
+    display: flex;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    flex-direction: column;
+
+
+    .main-content {
+        display: flex;
+        flex-direction: row;
+        flex: 1 0 0;
+        border-bottom: $layout-section-border-light;
+    }
+
+    .panel-column {
+        min-width:0; // Chromium hack, otherwise wide nodes would push the column width
+        flex: 1 0 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    ct-status-bar {
+        flex-basis: $layout-stripe-width;
+        border-top: $layout-section-border-dark;
+        background: $layout-section-background;
+    }
+
+    .title-bar-section {
+        background: $layout-title-bar-background;
+        height: $layout-title-bar-height;
+    }
+
+    .logo {
+        width: 100%;
+        line-height: $layout-title-bar-height;
+    }
+
+    .layout-section {
+        color: $layout-section-font-color;
+        background: $layout-section-background;
+    }
+
+    .handle-vertical {
+        //background: $panel-resize-handle-color;
+        cursor: col-resize;
+        display: inline-block;
+        width: $panel-resize-handle-width;
+        border-right: $layout-section-border-light;
+
+        &:before {
+            content: '';
+            display: block;
+            position: relative;
+            background-color: $layout-title-bar-background;
+            width: $panel-resize-handle-width;
+            height: $layout-title-bar-height;
+        }
+
+        &.hidden {
+            width: 1px;
+        }
+
+    }
+
+    .top-bar {
+        height: $main-header-height;
+    }
+}

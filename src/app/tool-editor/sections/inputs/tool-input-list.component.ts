@@ -1,170 +1,201 @@
 import {
     Component,
+    EventEmitter,
     Input,
-    ChangeDetectionStrategy,
     Output,
-    ViewChildren,
+    QueryList,
     TemplateRef,
-    QueryList
+    ViewChildren
 } from "@angular/core";
-import {ComponentBase} from "../../../components/common/component-base";
-import {CommandInputParameterModel} from "cwlts/models/d2sb";
+import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
-import {Subject} from "rxjs";
-
-require("./input-list.component.scss");
+import {noop} from "../../../lib/utils.lib";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
     selector: "ct-tool-input-list",
-    changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-        <ct-form-panel [collapsed]="false">
-            <span class="tc-header">
-                Inputs
-            </span>
-            
-            <div class="tc-body">
-                
-                <!--Blank Tool Screen-->
-                <ct-blank-tool-state *ngIf="!readonly && !entries.length"
-                                     [title]="'Tool Inputs'"
-                                     [buttonText]="'Add an Input'"
-                                     (buttonClick)="addEntry()">
-                </ct-blank-tool-state>
-                
-                <!--Input List Block-->
-                <div *ngIf="entries.length" class="container">
-                
-                    <!--List Header Row-->
-                    <div class="gui-section-list-title row">
-                        <div class="col-sm-4">ID</div>
-                        <div class="col-sm-3">Type</div>
-                        <div class="col-sm-4">Binding</div>
-                    </div>
-                
-                    <!--Input List Entries-->
-                    <ul class="gui-section-list">
-                    
-                        <!--List Entry-->
-                        <li *ngFor="let entry of entries; let i = index"
-                            [ct-editor-inspector]="inspector"
-                            [ct-editor-inspector-target]="entry"
-                            [ct-validation-class]="entry.validation"
-                            class="gui-section-list-item clickable row">
-        
-                            <!--ID Column-->
-                            <div class="col-sm-4 ellipsis">
-                                <ct-validation-preview [entry]="entry.validation"></ct-validation-preview>
-                                {{ entry.id }}
-                            </div>
-                            
-                            <!--Type Column-->
-                            <div class="col-sm-3 ellipsis">
-                                {{ entry.type | commandParameterType }}
-                            </div>
-                            
-                            <!--Binding Column-->
-                            <div class="col-sm-4 ellipsis" [class.col-sm-5]="readonly">
-                                {{ entry.inputBinding | commandInputBinding }}
-                            </div>
-                            
-                            <!--Actions Column-->
-                            <div *ngIf="!readonly" class="col-sm-1 align-right">
-                                <i [ct-tooltip]="'Delete'"
-                                   class="fa fa-trash text-hover-danger" 
-                                   (click)="removeEntry(i)"></i>
-                            </div>
-                            
-                            <!--Object Inspector Template -->
-                            <template #inspector>
-                                <ct-editor-inspector-content>
-                                    <div class="tc-header">{{ entry.loc || "Input" }}</div>
-                                    <div class="tc-body">
-                                        <ct-tool-input-inspector 
-                                            (save)="updateInput($event, i)" 
-                                            [context]="context"
-                                            [input]="entry">
-                                        </ct-tool-input-inspector>
-                                    </div>
-                                </ct-editor-inspector-content>
-                            </template>
-                        </li>
-                    </ul>
-                </div>
-            
-                <!--Add Input Button-->
-                <button *ngIf="!readonly && entries.length" 
-                        (click)="addEntry()" 
-                        type="button" 
-                        class="btn pl-0 btn-link no-outline no-underline-hover">
-                    <i class="fa fa-plus"></i> Add an Input
-                </button>
+        <div>
+
+            <!--Blank Tool Screen-->
+            <ct-blank-tool-state *ngIf="!readonly && !entries.length && isField"
+                                 [title]="'Click the button to define a field for record.'"
+                                 [buttonText]="'Add field'"
+                                 (buttonClick)="addEntry()">
+            </ct-blank-tool-state>
+
+            <div *ngIf="readonly && !entries.length" class="text-xs-center h5">
+                This tool doesn't specify any inputs
             </div>
-        </ct-form-panel>
+            
+            <!--List Header Row-->
+            <div class="editor-list-title" *ngIf="!!entries.length">
+                <div class="col-xs-4">ID</div>
+                <div class="col-xs-3">Type</div>
+                <div class="col-xs-4">Binding</div>
+            </div>
+
+            <!--Input List Entries-->
+            <ul class="editor-list">
+
+                <!--List Entry-->
+                <li *ngFor="let entry of entries; let i = index"
+                    class="input-list-items"
+                    [class.record-input]="isRecordType(entry)">
+                    
+                    <div class="editor-list-item clickable"
+                         [ct-editor-inspector]="inspector"
+                         [ct-editor-inspector-target]="entry.loc"
+                         [ct-editor-inspector-readonly]="readonly"
+                         [ct-validation-class]="entry.validation">
+
+                        <!--ID Column-->
+                        <div class="col-xs-4 ellipsis">
+                            <ct-validation-preview
+                                    [entry]="entry.validation"></ct-validation-preview>
+                            {{ entry.id }}
+                        </div>
+
+                        <!--Type Column-->
+                        <div class="col-xs-3 ellipsis">
+                            {{ entry.type | commandParameterType }}
+                        </div>
+
+                        <!--Binding Column-->
+                        <div class="col-xs-4 ellipsis" [class.col-xs-5]="readonly">
+                            {{ entry.inputBinding | commandInputBinding }}
+                        </div>
+
+                        <!--Actions Column-->
+                        <div *ngIf="!readonly" class="col-xs-1 align-right">
+                            <i [ct-tooltip]="'Delete'"
+                               class="fa fa-trash text-hover-danger"
+                               (click)="removeEntry(i)"></i>
+                        </div>
+                    </div>
+
+                    <!--Object Inspector Template -->
+                    <ng-template #inspector>
+                        <ct-editor-inspector-content>
+                            <div class="tc-header">{{ entry.id || entry.loc || "Input" }}</div>
+                            <div class="tc-body">
+                                <ct-tool-input-inspector
+                                        [model]="model"
+                                        [input]="entry"
+                                        (save)="entriesChange.emit(entries)"
+                                        [readonly]="readonly">
+                                </ct-tool-input-inspector>
+                            </div>
+                        </ct-editor-inspector-content>
+                    </ng-template>
+
+                    <div *ngIf="isRecordType(entry)" class="children pl-1 pr-1">
+                        <ct-tool-input-list [(entries)]="entry.type.fields"
+                                            (entriesChange)="entriesChange.emit(entries)"
+                                            [readonly]="readonly"
+                                            [parent]="entry"
+                                            [model]="model"
+                                            [location]="getFieldsLocation(i)"
+                                            [isField]="true">
+                        </ct-tool-input-list>
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <!--Add entry link-->
+        <button *ngIf="!readonly && !!entries.length"
+                (click)="addEntry()"
+                type="button"
+                class="btn pl-0 btn-link no-outline no-underline-hover">
+            <i class="fa fa-plus"></i> Add an Input
+        </button>
+
     `
 })
-export class ToolInputListComponent extends ComponentBase {
+export class ToolInputListComponent extends DirectiveBase {
 
     @Input()
-    public entries: CommandInputParameterModel[] = [];
+    entries: CommandInputParameterModel[] = [];
 
     /** Model location entry, used for tracing the path in the json document */
     @Input()
-    public location = "";
+    location = "";
 
     /** Context in which expression should be evaluated */
     @Input()
-    public context: {$job: any};
+    context: { $job: any };
 
     @Input()
-    public readonly = false;
+    readonly = false;
+
+    /** Flag if input is field of a record */
+    @Input()
+    isField = false;
+
+    @Input()
+    parent: CommandLineToolModel | CommandInputParameterModel;
+
+    @Input()
+    model: CommandLineToolModel;
 
     @Output()
-    public readonly update = new Subject();
+    readonly entriesChange = new EventEmitter();
 
     @ViewChildren("inspector", {read: TemplateRef})
-    private inspectorTemplate: QueryList<TemplateRef<any>>;
+    inspectorTemplate: QueryList<TemplateRef<any>>;
 
-    constructor(private inspector: EditorInspectorService) {
+    constructor(public inspector: EditorInspectorService, private modal: ModalService) {
         super();
     }
 
-    private removeEntry(index) {
+    removeEntry(index) {
+        this.modal.confirm({
+            title: "Really Remove?",
+            content: `Are you sure that you want to remove this input?`,
+            cancellationLabel: "No, keep it",
+            confirmationLabel: "Yes, remove it"
+        }).then(() => {
+            if (this.inspector.isInspecting(this.entries[index].loc)) {
+                this.inspector.hide();
+            }
 
-        if (this.inspector.isInspecting(this.entries[index])) {
-            this.inspector.hide();
-        }
-
-        const entries = this.entries.slice(0, index).concat(this.entries.slice(index + 1));
-        this.update.next(entries);
+            const entries = this.entries.slice(0, index).concat(this.entries.slice(index + 1));
+            this.entriesChange.emit(entries);
+        }, err => console.warn);
     }
 
-    private addEntry() {
-        const newEntryLocation = `${this.location}[${this.entries.length}]`;
-        const newEntry         = new CommandInputParameterModel(newEntryLocation);
-        const entries          = this.entries.concat(newEntry);
-        this.update.next(entries);
+    addEntry() {
+        let newEntry: CommandInputParameterModel;
+
+        if (this.isField) {
+            newEntry = (this.parent as CommandInputParameterModel).type.addField({});
+        } else {
+            newEntry = (this.parent as CommandLineToolModel).addInput({});
+        }
+
+        newEntry.createInputBinding();
+        newEntry.isField   = this.isField;
+        newEntry.type.type = "File";
+
+        this.entriesChange.emit(this.entries);
 
         this.inspectorTemplate.changes
             .take(1)
             .delay(1)
             .map(list => list.last)
             .subscribe(templateRef => {
-                this.inspector.show(templateRef, newEntry);
+                this.inspector.show(templateRef, newEntry.loc);
             });
     }
 
-    private updateInput(newInput: CommandInputParameterModel, index: number) {
+    getFieldsLocation(index: number) {
+        return `${this.location}[${index}].type.fields`;
+    }
 
-        // FIXME: cloning an object ditches its prototype chain, but we need it
-        const input = this.entries[index];
-
-        /**
-         * FIXME: input parameter type needs to be able to switch references
-         * then make {@link CommandParameterTypePipe} pure again.
-         */
-        Object.assign(input, newInput);
-
-        this.update.next(this.entries.slice());
+    isRecordType(entry) {
+        return entry.type.type === "record" || (entry.type.type === "array" && entry.type.items === "record");
     }
 }

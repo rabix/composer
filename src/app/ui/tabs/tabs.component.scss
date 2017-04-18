@@ -1,0 +1,19 @@
+@import "../../../assets/sass/variables";
+
+.ct-tabs-component {
+    text-align: center;
+    //border-bottom: 1px solid $gui-section-border;
+    margin-bottom: 15px;
+
+    & > .single-tab {
+        padding-bottom: 6px;
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+    & > .active {
+        //color: $editor-list-item-select-bg;
+        //border-bottom: 3px solid $editor-list-item-select-bg;
+    }
+}

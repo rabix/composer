@@ -1,0 +1,9 @@
+@import "../../../../assets/sass/variables";
+
+:host {
+    .invalid-entry {
+        border: 2px solid $brand-danger;
+    }
+}
+
+

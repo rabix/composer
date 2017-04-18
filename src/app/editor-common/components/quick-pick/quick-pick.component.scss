@@ -1,21 +1,31 @@
 @import "../../../../assets/sass/variables";
 
-ct-quick-pick {
+:host {
     margin-bottom: 10px;
-    display: block;
+    display: flex;
 
     .suggestions {
-        display: inline-block;
+        display: flex;
+        flex-direction: row;
+        flex: 1;
 
         .btn {
-            height: $btn-line-height + 2 * $btn-padding-y;
+            flex: 1;
             margin-right: 10px;
-
-            &.selected {
-                line-height: $btn-line-height - .25rem;
-                border: 2px solid $brand-primary;
-            }
         }
+    }
+
+    .btn {
+        flex: 1;
+    }
+
+    .btn.selected {
+        border: 2px solid $brand-primary;
+    }
+
+    .custom-btn {
+        flex-grow: 0;
+        flex-shrink: 1;
     }
 
     .custom-wrapper {
@@ -26,5 +36,30 @@ ct-quick-pick {
             margin-right: 30px;
         }
     }
+
+    .radio-container {
+        display: flex;
+        flex: 1;
+
+        input[type=radio] {
+            display: none;
+        }
+    }
+
+    .removable-form-control {
+        display: flex;
+        width: 100%;
+
+        ct-expression-input {
+            flex: 1;
+        }
+
+        .remove-icon {
+            display: flex;
+            align-items: center;
+        }
+    }
 }
+
+
 

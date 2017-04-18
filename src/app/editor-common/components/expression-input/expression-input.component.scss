@@ -2,34 +2,37 @@
 
 .expression-input-group {
     position: relative;
-    border-radius: .38rem; // needs to round to underlying form
-    border: 2px solid transparent;
+    border-radius: $input-border-radius;
+    border: 1px solid transparent;
+
+
+    &:hover {
+        border: 1px solid $input-bg-hover;
+    }
 
     .input-group-btn button {
         width: 46px;
     }
 
-    &.expr {
-        position: relative;
-        .input-group-btn, input {
-            cursor: pointer;
-        }
+    .input-group-btn, input {
+        cursor: pointer;
+    }
 
-        .form-control {
-            padding-left: 30px;
-        }
+    &.expr .form-control {
+        padding-left: 30px;
+    }
 
-        .validation-icon {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            z-index: 4;
+    .validation-icon {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        z-index: 4;
 
-            &.result {
-                color: $text-muted;
-                top: 5px;
-                font-weight: bold;
-            }
+        &.result {
+            color: $text-muted;
+            top: 5px;
+            font-weight: bold;
         }
     }
+
 }

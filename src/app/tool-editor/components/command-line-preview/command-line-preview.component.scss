@@ -1,0 +1,36 @@
+@import "../../../../assets/sass/variables";
+
+:host {
+    display: block;
+    height: 100%;
+    font-family: monospace;
+    padding: 10px;
+    overflow: auto;
+    background: $layout-section-terminal-background;
+
+    .command-line-part{
+        display: inline-block;
+        border: 1px solid transparent;
+
+        &:hover {
+            border-color: $brand-primary;
+            border-radius: $border-radius-sm;
+        }
+    }
+
+    .input-cli {
+        //color: $input-port-color;
+    }
+
+    .baseCmd-cli {
+        //color: $base-cmd-color;
+    }
+
+    .arg-cli {
+        //color: $arg-color;
+    }
+
+    .stream-cli {
+        color: #ddd;
+    }
+}

@@ -1,30 +1,34 @@
 import {Injectable} from "@angular/core";
-import {ReplaySubject} from "rxjs";
+import {ReplaySubject} from "rxjs/ReplaySubject";
 import {UserPreferencesService} from "../storage/user-preferences.service";
-import {ComponentBase} from "../../components/common/component-base";
-
-export type PlatformSettings = {
-    url: string,
-    key: string,
-    enabled: boolean
-}
 
 @Injectable()
-export class SettingsService extends ComponentBase {
+export class SettingsService {
 
-    public platformConfiguration = new ReplaySubject<PlatformSettings>(1);
+    public platformConfiguration = new ReplaySubject<{
+        profile: string,
+        url: string;
+        token: string;
+    }>(1);
+
+    public userInfo = new ReplaySubject<{
+        email: string,
+        id: string,
+        staff: boolean,
+        username: string
+    }>(1);
 
     public validity = new ReplaySubject<boolean>(1);
 
-    constructor(private userPreferencesService: UserPreferencesService) {
-        super();
+    /**
+     * @deprecated Use PlatformConnectionService.urlToProfile
+     */
+    static urlToProfile(url) {
+        const profile = url.match("https:\/\/(.*?)\.sbgenomics\.com")[1].toLowerCase();
+        return profile === "igor" ? "default" : profile;
+    }
 
-        this.tracked = this.userPreferencesService.get("platformConnectionSettings", false)
-            .subscribe(prefs => prefs ? this.platformConfiguration.next(prefs) : this.validity.next(false));
+    constructor(private profile: UserPreferencesService) {
 
-        this.platformConfiguration.subscribe(settings => {
-            this.userPreferencesService.put("platformConnectionSettings", settings);
-            this.validity.next(true);
-        });
     }
 }

@@ -1,0 +1,10 @@
+@import "../../../assets/sass/variables";
+
+ct-editor-controls {
+    display: block;
+    flex-grow: 0;
+    text-align: right;
+    //border-bottom: 1px solid $gui-editor-header-border;
+    //background: $gui-editor-header-bg;
+    padding: 4px 6px;
+}

@@ -1,0 +1,133 @@
+@import "~bootstrap/scss/variables";
+
+//
+//
+// ----- Color Scheme -----
+//
+// # Brand Colors
+$brand-success: #3eb157;
+$brand-primary: #5d95d0;
+$brand-danger: #dd4a38;
+$brand-warning: #f89406;
+$brand-info: #f3f8fc;
+// # Other Colors
+
+// ----- General Shapes -----
+$border-radius: 2px;
+
+// ----- Typography ------
+$font-size-base: 13px;
+$text-color: rgba(231, 231, 231, 1);
+$text-muted: darken($text-color, 30);
+
+
+// ----- Forms -----
+$input-bg: #333333;
+$input-border-color: rgb(58, 58, 58);
+$input-bg-focus: $input-bg;
+$input-color-focus: $text-color;
+$input-color: $text-color;
+$input-border-radius: $border-radius;
+$input-padding-x: .55rem;
+$input-padding-y: .4rem;
+$input-border-color: rgb(38, 38, 38);
+$input-bg-disabled: rgb(38, 38, 38);
+$input-color-disabled: $text-muted;
+$input-bg-hover: $brand-primary;
+$input-group-addon-bg: $input-bg;
+
+// ----- Code -----
+$code-bg: $input-bg;
+$code-color: $brand-primary;
+
+// ----- Buttons -----
+$btn-secondary-bg: rgb(60, 60, 60);
+$btn-secondary-color: $text-color;
+$btn-secondary-hover-bg: $brand-primary;
+$btn-line-height: 1em;
+$link-color: $brand-primary;
+$link-hover-color: lighten($brand-primary, 10%);
+
+// ----- Tables -----
+$table-border-color: $input-border-color;
+
+
+// ----- Global Layout Elements -----
+$body-bg: rgb(48, 48, 48);
+$panel-bg: #434343;
+$toolbar-height: 2em;
+$toolbar-header-background: #333;
+
+// ----- Layout Uniques -----
+$main-header-height: 35px; // Logo/tabs row
+$panel-resize-handle-width: 6px; // drag handle for resizing nav tree
+
+// ----- Misc -----
+
+/**
+ * SIDE PANELS
+ */
+
+/** button borders */
+$btn-success-border: #328e46;
+$btn-primary-border: #296394;
+$btn-danger-border: #804c03; // not according to style guide
+$btn-warning-border: #bc7e20; // not according to style guide
+
+
+/** Layout */
+$layout-stripe-width: 28px;
+$layout-section-background: #333;
+$layout-section-terminal-background: #222;
+$layout-section-border-dark: 1px solid #1a1a1a;
+$layout-section-border-light: 1px solid #4d4d4d;
+$layout-section-font-color: #f3f3f3;
+
+$layout-section-alt-border-color: #ccc;
+
+/**
+* Action Bar
+ */
+$action-bar-border-color: $layout-section-alt-border-color;
+$action-bar-background: white; // @TODO Fix theme variable, bottom of tab value
+
+$layout-title-bar-background: #1e2124;
+$layout-title-bar-height: 36px;
+
+$layout-tab-height: 32px;
+$layout-tab-background-idle: #5c5f64;
+$layout-tab-background-active: white;
+
+$layout-element-alt-background: rgb(246, 246, 246);
+$layout-element-alt-foreground: white;
+$layout-element-separator-color: $layout-title-bar-background;
+
+$layout-status-bar-height: 32px;
+
+$layout-text-color: rgb(230, 230, 230);
+$layout-text-color-faded: rgb(153, 153, 153);
+
+// Typography
+$font-family-title: "Montserrat";
+
+// Editors common
+$action-bar-height: 36px;
+$action-bar-color: $layout-element-alt-foreground;
+
+$brand-danger-inverse-color: white;
+
+// ErrorBarComponent
+$error-bar-height: $main-header-height * .8;
+
+// Tree View
+$tree-node-selected-color: white;
+$tree-node-selected-background: #455c7d;
+
+// Editor Panel
+$editor-panel-selected-background: #455c7d;
+$editor-panel-selected-border: $brand-primary;
+$editor-panel-selected-color: white;
+
+// Revision List
+$revision-list-entry-active-bg: $input-bg;
+$revision-list-entry-hover-bg: $panel-bg;

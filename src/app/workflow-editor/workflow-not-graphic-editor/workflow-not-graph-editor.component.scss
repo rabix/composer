@@ -1,0 +1,9 @@
+@import "../../../assets/sass/variables";
+
+:host {
+    overflow-y: auto;
+    width: 100%;
+    padding: 20px;
+    display: block;
+
+}

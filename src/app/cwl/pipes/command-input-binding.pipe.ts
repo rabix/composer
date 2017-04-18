@@ -13,7 +13,7 @@ export class CommandInputBindingPipe implements PipeTransform {
         }
 
         if (inputBinding.position) {
-            return `pos: ${inputBinding.position}`
+            return `pos: ${inputBinding.position}`;
         }
 
         return "pos: 0";

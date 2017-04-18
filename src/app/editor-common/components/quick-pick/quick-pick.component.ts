@@ -1,15 +1,15 @@
-import {Component, Input, forwardRef, OnInit, Output} from "@angular/core";
-import {FormControl, NG_VALUE_ACCESSOR, ControlValueAccessor} from "@angular/forms";
-import {ExpressionModel} from "cwlts/models/d2sb";
-import {ComponentBase} from "../../../components/common/component-base";
-import {noop} from "../../../lib/utils.lib";
-import {BehaviorSubject} from "rxjs";
+import {Component, forwardRef, Input, OnInit, Output} from "@angular/core";
+import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {Expression} from "cwlts/mappings/d2sb/Expression";
-
-require("./quick-pick.component.scss");
+import {ExpressionModel} from "cwlts/models";
+import {AsyncSubject} from "rxjs/AsyncSubject";
+import {noop} from "../../../lib/utils.lib";
+import {ModalService} from "../../../ui/modal/modal.service";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
     selector: "ct-quick-pick",
+    styleUrls: ["./quick-pick.component.scss"],
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
@@ -18,105 +18,94 @@ require("./quick-pick.component.scss");
         }
     ],
     template: `
-    <div class="suggestions" *ngIf="!showCustom">
+        <div class="suggestions" *ngIf="!showCustom">
 
-        <button class="btn btn-secondary"
-                [class.selected]="computedVal === item.value"
-                (click)="setValue(item.value)"
-                *ngFor="let item of list">
-            {{ item.label }}
+            <div class="radio-container" *ngFor="let item of list">
+                <input type="radio"
+                       [value]="item.value"
+                       [formControl]="form.controls['radio']"
+                       id="{{item.label}}"
+                       required>
+
+                <label class="radio-label btn btn-secondary"
+                       for="{{item.label}}"
+                       [class.selected]="computedVal === item.value">
+                    {{ item.label }}
+                </label>
+            </div>
+        </div>
+
+        <button type="button"
+                class="btn btn-secondary custom-btn"
+                *ngIf="!showCustom && !readonly"
+                (click)="addCustom(true)">Custom
         </button>
-    </div>
-    
-    <button type="button"
-            class="btn btn-primary"
-            *ngIf="!showCustom"
-            (click)="createControl('')">Custom
-    </button>
 
-    <div *ngIf="showCustom" ngSwitch="type" class="removable-form-control">
-        <ct-expression-input [context]="context" 
-                             [formControl]="customControl" 
-                             [type]="type">
-        </ct-expression-input>
-        
-        <span class="remove-icon" (click)="removeControl()">
-            <i class="fa fa-trash"></i>
-        </span>
-    </div>
+        <div *ngIf="showCustom" class="removable-form-control">
+            <ct-expression-input [context]="context"
+                                 [formControl]="form.controls['custom']"
+                                 [readonly]="readonly"
+                                 [type]="type">
+            </ct-expression-input>
+
+            <span class="remove-icon clickable ml-1 text-hover-danger"
+                  (click)="removeCustom($event, true)">
+                <i *ngIf="!readonly" [ct-tooltip]="'Delete'" class="fa fa-trash"></i>
+            </span>
+        </div>
     `
 })
-export class QuickPickComponent extends ComponentBase implements ControlValueAccessor, OnInit {
+export class QuickPickComponent extends DirectiveBase implements ControlValueAccessor, OnInit {
 
     @Input()
-    public suggestions: {[label: string]: string | number} | string[];
+    readonly = false;
 
     @Input()
-    public context: any;
+    suggestions: { [label: string]: string | number } | string[];
 
     @Input()
-    public type: "string" | "number" = "string";
+    context: any = {};
+
+    @Input()
+    type: "string" | "number" = "string";
 
     @Output()
-    public update = BehaviorSubject<any>();
+    update = new AsyncSubject<any>();
 
-    private showCustom = false;
+    showCustom = false;
 
-    private list: {label: string, value: string | number}[] = [];
+    list: { label: string, value: string | number }[] = [];
 
-    private customControl: FormControl;
+    form = new FormGroup({});
 
     private onTouch = noop;
 
     private onChange = noop;
 
-    private computedVal: number | string | Expression;
+    computedVal: number | string | Expression;
 
-    get value(): string|number|ExpressionModel {
+    get value(): ExpressionModel {
         return this._value;
     }
 
-    set value(value: string|number|ExpressionModel) {
-        this.onChange(value);
+    set value(value: ExpressionModel) {
         this._value = value;
-        let val     = value;
-
-        if (value instanceof ExpressionModel && value.type !== "expression") {
-            val = <string | number>value.serialize();
-        }
-
-        if (this.list && val !== '' && val !== null && val !== undefined) {
-            this.showCustom = !this.list.filter(item => {
-                return item.value === val;
-            }).length;
-        } else {
-            if (this.customControl) this.removeControl();
-            this.showCustom = false;
-        }
-
-        this.computedVal = <string | number> val;
-
-        if (this.showCustom) this.createControl(value);
     }
 
-    private _value: string | number | ExpressionModel;
+    private _value: ExpressionModel;
 
-    private setValue(val: string | number) {
-        this.onTouch();
-        this.computedVal = val;
-        if (this._value instanceof ExpressionModel) {
-            this.value = new ExpressionModel("", val);
-        } else {
-            this.value = val;
-        }
+    constructor(private modal: ModalService) {
+        super();
     }
 
     ngOnInit() {
+        // parses suggestions list for the radio buttons
         if (this.suggestions) {
             if (Array.isArray(this.suggestions)) {
-                let type = typeof this.suggestions[0];
+                const type = typeof this.suggestions[0];
                 if (type !== "string") {
-                    console.warn(`Please provide ct-quick-pick with correct suggested value format. Expected "string" got "${type}"`)
+                    console.warn(`Please provide ct-quick-pick with correct 
+                    suggested value format. Expected "string" got "${type}"`);
                 } else {
                     (<string[]>this.suggestions).forEach(item => {
                         this.list = this.list.concat([{label: item, value: item}]);
@@ -127,17 +116,38 @@ export class QuickPickComponent extends ComponentBase implements ControlValueAcc
                     return {
                         label: key,
                         value: this.suggestions[key]
-                    }
+                    };
                 });
             }
         } else {
             console.warn(`Please provide ct-quick-pick with a list of suggested values
-available types: {[label: string]: string | number} | string[]`)
+available types: {[label: string]: string | number} | string[]`);
         }
     }
 
-    writeValue(value: string | number | ExpressionModel): void {
-        this.value = value;
+
+    writeValue(value: ExpressionModel): void {
+        if (this._value && this._value.serialize() === value.serialize()) {
+            return;
+        }
+
+        this._value = value;
+
+        if (value instanceof ExpressionModel) {
+            this.computedVal = <string | number>value.serialize();
+        } else {
+            console.warn(`ct-quick-pick expected value to be instanceof ExpressionModel`);
+        }
+
+        this.showCustom = !this.list.filter(item => {
+                return item.value === this.computedVal;
+            }).length && this.computedVal !== undefined;
+
+        if (this.showCustom) {
+            this.addCustom();
+        } else {
+            this.removeCustom();
+        }
     }
 
     registerOnChange(fn: any): void {
@@ -148,29 +158,53 @@ available types: {[label: string]: string | number} | string[]`)
         this.onTouch = fn;
     }
 
-    private createControl(value: number | string | ExpressionModel): void {
-        this.customControl = new FormControl(value);
-        this.showCustom    = true;
+    addCustom(reset?: boolean): void {
+        this.form.removeControl("radio");
+        this.showCustom = true;
 
-        this.tracked = this.customControl.valueChanges
-            .subscribe((value: any) => {
-                this.onTouch();
-                this.value = value;
-            });
+        if (reset) {
+            this._value.setValue("", this.type);
+        }
+
+        this.form.setControl("custom", new FormControl(this._value));
+
+        this.tracked = this.form.controls["custom"].valueChanges.subscribe(expr => {
+            this._value      = expr;
+            this.computedVal = expr.serialize();
+            this.onChange(this._value);
+        });
     }
 
-    private removeControl(): void {
-        if (this.customControl) {
-            this.computedVal   = "";
-            this.showCustom    = false;
-            this.customControl = undefined;
-
-            if (this._value instanceof ExpressionModel) {
-                this.value = new ExpressionModel("", "");
-            } else {
-                this.value = "";
-            }
-
+    removeCustom(event?: Event, reset?: boolean): void {
+        if (!!event) {
+            event.stopPropagation();
+            this.modal.confirm({
+                title: "Really Remove?",
+                content: `Are you sure that you want to remove this custom resource?`,
+                cancellationLabel: "No, keep it",
+                confirmationLabel: "Yes, remove it"
+            }).then(() => {
+                this.removeFunction(reset);
+            }, err => console.warn);
+        } else {
+            this.removeFunction(reset);
         }
+    }
+
+    removeFunction(reset?: boolean) {
+        this.form.removeControl("custom");
+        this.showCustom = false;
+
+        if (reset) {
+            this._value.setValue("", this.type);
+        }
+
+        this.form.setControl("radio", new FormControl(this._value.serialize()));
+
+        this.tracked = this.form.controls["radio"].valueChanges.subscribe(prim => {
+            this._value.setValue(prim, this.type);
+            this.computedVal = prim;
+            this.onChange(this._value);
+        });
     }
 }

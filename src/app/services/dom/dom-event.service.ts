@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {Observable} from "rxjs";
+import {Observable} from "rxjs/Observable";
 
 type ExtendedMouseEvent = MouseEvent & {
     ctName?: string;
@@ -8,6 +8,15 @@ type ExtendedMouseEvent = MouseEvent & {
 
 @Injectable()
 export class DomEventService {
+
+    public readonly ON_DRAG_ENTER_ZONE_EVENT = "onDragEnterZone";
+    public readonly ON_DRAG_LEAVE_ZONE_EVENT = "onDragLeaveZone";
+
+    public readonly ON_DRAG_ENTER_EVENT = "onDragEnter";
+    public readonly ON_DRAG_LEAVE_EVENT = "onDragLeave";
+    public readonly ON_DRAG_OVER_EVENT  = "onDragOver";
+
+    public readonly ON_DROP_SUCCESS_EVENT = "onDropSuccess";
 
     private registeredShortcuts = new Map<string[], Observable<KeyboardEvent>>();
 
@@ -58,7 +67,7 @@ export class DomEventService {
 
         // We won't allow modifier-only shortcuts
         if (!mainKey) {
-            throw `Invalid shortcut "${shortcut}". It can't be made only of control characters.`;
+            throw new Error(`Invalid shortcut "${shortcut}". It can't be made only of control characters.`);
         }
 
         // Switch on modifiers that we should listen for
@@ -91,12 +100,55 @@ export class DomEventService {
     /**
      * Observes the dragging of an element.
      */
-    public onDrag(element: Element, ctName = "", ctData = {}): Observable<ExtendedMouseEvent> {
+    public onMove(element: Element, ctName = "", ctData = {}): Observable<ExtendedMouseEvent> {
         const down = Observable.fromEvent(element, "mousedown");
         const up   = Observable.fromEvent(document, "mouseup");
         const move = Observable.fromEvent(document, "mousemove");
         return down.flatMap(_ => move.takeUntil(up)).map((ev: MouseEvent) => Object.assign(ev, {ctData}, {ctName}));
     }
 
+    public onDrag(element: Element, ctName = "", ctData = {}) {
 
+        const down = Observable.fromEvent(element, "mousedown").do((ev: MouseEvent) => {
+            if (ev.stopPropagation) {
+                ev.stopPropagation();
+            }
+            if (ev.preventDefault) {
+                ev.preventDefault();
+            }
+        });
+        const up   = Observable.fromEvent(document, "mouseup");
+        const move = Observable.fromEvent(document, "mousemove");
+
+        return down.map(ev => new Observable(obs => {
+
+            const decorate = event => Object.assign(event, {ctData}, {ctName});
+
+            obs.next(decorate(ev));
+
+            const moveSub = move.subscribe(moveEv => obs.next(decorate(moveEv)));
+
+            const upSub = up.first().subscribe(upEvent => {
+                obs.next(decorate(upEvent));
+                obs.complete();
+            });
+
+            return () => {
+                moveSub.unsubscribe();
+                upSub.unsubscribe();
+            };
+        }));
+    }
+
+    public triggerCustomEventOnElements(elements: Element [], eventName: string, data?: any) {
+        // FIXME: Should be added support for IE
+        elements.forEach(element => {
+            const event = new CustomEvent(eventName, {
+                detail: {
+                    data
+                }
+            });
+            element.dispatchEvent(event);
+        });
+    }
 }

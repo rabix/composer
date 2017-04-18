@@ -1,7 +1,9 @@
 @import "../../../../assets/sass/variables";
 @import "../../../../assets/sass/mixins";
 
-ct-argument-list .form-section {
-  @include cli-border($arg-color);
+:host{
+    /deep/ .form-section {
+        //@include cli-border($arg-color);
+    }
 }
 

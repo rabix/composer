@@ -6,12 +6,12 @@ import {Injectable} from "@angular/core";
 @Injectable()
 export class GuidService {
     public generate() {
-        let mask = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
+        const mask = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
         return mask.replace(/[xy]/g, (replacer) => {
-            let x = Math.random() * 16 | 0,
+            const x = Math.random() * 16 | 0,
                 y = x & 0x3 | 0x8;
 
-            let guid = replacer === "x" ? x : y;
+            const guid = replacer === "x" ? x : y;
 
             return guid.toString(16);
         });

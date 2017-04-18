@@ -1,5 +1,3 @@
-import * as _ from "lodash";
-
 export class ObjectHelper {
 
     private static pathDelimiter = ".";
@@ -12,11 +10,24 @@ export class ObjectHelper {
      * @param value value to add to the "baz" key
      */
     public static addProperty(target: Object, path: string[] | string, value: any): void {
-
         // Ensure that path is an array of path elements
-        const resolvedPath = typeof path === "string" ? path.split(ObjectHelper.pathDelimiter) : path;
+        const resolvedPath = typeof path === "string" ? path.split(ObjectHelper.pathDelimiter).filter(v => v.length) : path;
 
-        (<Array<string>> resolvedPath).reduce((acc, curr, index, arr)=> {
+        if (!resolvedPath) {
+            return;
+        }
+
+        (<Array<string>> resolvedPath).reduce((acc, curr, index, arr) => {
+
+
+            const arrayMatch = curr.match(/^\[([0-9]*?)\]$/);
+            if (arrayMatch && arrayMatch.length === 2 && Array.isArray(acc)) {
+                if (index !== arr.length - 1) {
+                    return acc[arrayMatch[1]];
+                }
+                return acc[arrayMatch[1]] = value;
+            }
+
             if (index === arr.length - 1) {
                 return acc[curr] = value;
             }
@@ -25,11 +36,41 @@ export class ObjectHelper {
                 acc[curr] = {};
                 return acc[curr];
             } else if (typeof acc[curr] === "object" && acc[curr] !== null) {
+                if (Array.isArray(acc[curr])) {
+                    return acc[curr];
+                }
+
                 return acc[curr];
             } else {
                 throw new Error("Couldn't add a nested property to type " + typeof acc);
             }
         }, target);
+    }
+
+    public static getProperty<T, R>(target: T, path: string, defaultReturn?: R): R | any {
+        const parts = path.split(this.pathDelimiter).filter(v => v.length);
+        if (!target) {
+            return defaultReturn;
+        }
+
+        for (const key of parts) {
+
+            if (Array.isArray(target) && key) {
+                const arrayMatch = key.match(/^\[([0-9]*?)\]$/);
+                if (Array.isArray(arrayMatch) && arrayMatch.length === 2) {
+                    return target[arrayMatch[1]];
+                }
+
+            }
+
+            if (!target[key]) {
+                return defaultReturn;
+            }
+
+            target = target[key];
+        }
+
+        return target;
     }
 
     /**
@@ -40,10 +81,20 @@ export class ObjectHelper {
      * @link ObjectHelper-addEnumerablesTest
      */
     public static addEnumerables(target: Object, source: Object): void {
-        for (let key of Object.keys(source)) {
+        for (const key of Object.keys(source)) {
             if (target.propertyIsEnumerable(key)) {
                 target[key] = source[key];
             }
         }
+    }
+
+    /**
+     * Returns true if arg is one of: [undefined, null, number, boolean, string]
+     * @param arg
+     * @returns boolean
+     */
+    public static isPrimitiveValue(arg: any) {
+        const type = typeof arg;
+        return arg == null || (type !== "object" && type !== "function");
     }
 }

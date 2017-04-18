@@ -1,0 +1,27 @@
+@import "../../../assets/sass/variables";
+
+ct-menu-item {
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    color: $gray-dark;
+    cursor: pointer;
+    font-size: $font-size-sm;
+    font-weight: 500;
+    padding: 2px 10px 2px 20px;
+    position: relative;
+    white-space: nowrap;
+
+    &.disabled {
+        color: lighten($gray-dark, 20%);
+    }
+
+    &:not(.disabled):hover {
+        color: white;
+        background: $brand-primary;
+    }
+
+    .expander {
+        margin-left: 30px;
+        float: right;
+    }
+}

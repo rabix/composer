@@ -1,0 +1,11 @@
+@import "../../../assets/sass/variables";
+
+:host {
+    position: static;
+    display: flex;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border: 1px solid transparent;
+    background: $toolbar-header-background;
+    //border-left-color: $gui-section-border;
+}

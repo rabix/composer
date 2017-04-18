@@ -1,146 +1,172 @@
-import {Component, Input, HostBinding, Output, ViewChild} from "@angular/core";
-import {BehaviorSubject, Observable, Subject} from "rxjs";
-import {TreeNode} from "../../core/ui/tree-view/types";
-import {ComponentBase} from "../../components/common/component-base";
-import {CodeEditorComponent} from "../../core/ui/code-editor/code-editor.component";
-
-require("./expression-editor.component.scss");
+import {AfterViewInit, Component, HostBinding, Input, OnInit, Output, ViewChild} from "@angular/core";
+import {FormControl} from "@angular/forms";
+import {Subject} from "rxjs/Subject";
+import {CodeEditorComponent} from "../../ui/code-editor-new/code-editor.component";
+import {AceEditorOptions} from "../../ui/code-editor/code-editor.component";
+import {TreeNode} from "../../ui/tree-view/tree-node";
+import {TreeViewService} from "../../ui/tree-view/tree-view.service";
+import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {TreeViewComponent} from "../../ui/tree-view/tree-view.component";
 
 @Component({
     selector: "ct-expression-editor",
+    styleUrls: ["./expression-editor.component.scss"],
+    providers: [TreeViewService],
     template: `
-        <div class="p-0 flex-row-container" style="width:1024px;height: 600px;">
-            
-            <div class="main-row">
-                <div class="flex-col code-col">
-                    <div class="title" >Expression:</div>
-                    <div class="code-main">
-                        <ct-code-editor-x #editor [content]="editorContent" [language]="'javascript'" [options]="{
-                        'theme': 'ace/theme/monokai',
-                        'showGutter': false,
-                        'wrap': true
-                        }"></ct-code-editor-x>
-                    </div>
-                    
-                    <div class="title">Output:</div>
-                    <div class="code-preview">
-                        
-                        <ct-code-editor-x  [content]="previewContent" [language]="'javascript'" [options]="{
-                            'theme': 'ace/theme/monokai',
-                            'showGutter': false,
-                            'wrap': true,
-                            'readOnly': true,
-                            'useWorker': false
-                        }"></ct-code-editor-x>
-                    </div>
+        <div class="main-content">
+            <div class="code">
+
+                <div class="editor">
+                    <ct-code-editor #editor [formControl]="editorControl" [options]="editorOptions"></ct-code-editor>
                 </div>
-                
-                <div class="context-col">
-                    <ct-tree-view [nodes]="contextNodes"></ct-tree-view>
+
+                <div class="preview">
+                    <ct-code-editor [formControl]="previewControl" [options]="previewOptions"></ct-code-editor>
                 </div>
             </div>
-            
-            <div class="modal-footer">
-                <button (click)="action.next('close')" class="btn btn-secondary btn-sm" type="button">Cancel</button>
-                <button (click)="action.next('save')" class="btn btn-primary btn-sm" type="button">Save</button>
+            <div class="tree">
+                <ct-tree-view [nodes]="contextNodes"></ct-tree-view>
             </div>
         </div>
-        
+        <div class="modal-footer pb-1 pt-1 pr-1">
+            <button *ngIf="!readonly" (click)="action.next('save')" class="btn btn-primary ml-1" type="button">Save</button>
+            <button (click)="action.next('close')" class="btn btn-secondary " type="button mr-1">Cancel</button>
+        </div>
     `
 })
-export class ExpressionEditorComponent extends ComponentBase {
+export class ExpressionEditorComponent extends DirectiveBase implements OnInit, AfterViewInit {
 
     @Input()
     @HostBinding("style.height.px")
-    public height;
+    height = 500;
 
     @Input()
     @HostBinding("style.width.px")
-    public width;
+    width = 800;
 
     @Input()
-    public context: {$job?: Object, $self?: Object};
+    context: { $job?: Object, $self?: Object };
 
     @Input()
-    public editorContent: Observable<string>;
+    code: string;
 
     @Input()
-    public evaluator: (code: string) => string;
+    evaluator: (code: string) => Promise<string>;
+
+    @Input()
+    readonly = false;
 
     @Output()
-    public action = new Subject<"close"|"save">();
+    action = new Subject<"close" | "save">();
 
-    private previewContent = new BehaviorSubject("");
+    @ViewChild(TreeViewComponent)
+    treeView: TreeViewComponent;
 
-    private contextNodes: TreeNode[];
+    tree: TreeViewService;
+
+    editorOptions: Partial<AceEditorOptions>;
+    previewOptions: Partial<AceEditorOptions> = {
+        wrap: true,
+        readOnly: true,
+        showLineNumbers: false,
+        useWorker: false,
+    };
+
+    editorControl  = new FormControl(undefined);
+    previewControl = new FormControl(undefined);
+
+    contextNodes: TreeNode<any>[];
 
     @ViewChild("editor", {read: CodeEditorComponent})
     private editor: CodeEditorComponent;
 
 
     ngOnInit() {
-        this.tracked = this.editorContent.debounceTime(250)
+
+        this.editorOptions = {
+            wrap: true,
+            useWorker: false,
+            showLineNumbers: false,
+            readOnly: this.readonly,
+            mode: "ace/mode/javascript",
+            enableBasicAutocompletion: true,
+        };
+
+        this.tracked = this.editorControl.valueChanges.debounceTime(300)
             .filter(e => typeof e === "string")
             .distinctUntilChanged()
             .subscribe(content => {
-                this.previewContent.next(this.evaluator(content));
+                this.evaluator(content).then(res => {
+                    this.previewControl.setValue(res);
+                });
             });
 
+        this.editorControl.setValue(this.code);
         this.contextNodes = this.transformContext(this.context);
     }
 
+    ngAfterViewInit() {
+        this.tree = this.treeView.getService();
 
-    private transformContext(context: {$job?: Object, $self?: Object} = {}): TreeNode[] {
+        this.tracked = this.tree.open.subscribe(node => {
+            this.editor.editor.session.insert(this.editor.getEditorInstance().getCursorPosition(), String(node.id));
+        });
+    }
 
-        const wrap = (nodes, path = "") => Object.keys(nodes).map(key => {
-            const node = nodes[key];
 
-            let type = typeof node;
-            if (Array.isArray(node)) {
+    private transformContext(context: { $job?: Object, $self?: Object } = {}): TreeNode<any>[] {
+
+        const wrap = (nodes, path = ""): TreeNode<any>[] => Object.keys(nodes).map(key => {
+            const contextItem = nodes[key];
+
+            const node: TreeNode<any> = {
+                icon: ""
+            };
+
+            let type: string = typeof contextItem;
+            if (Array.isArray(contextItem)) {
                 type = "array";
-            } else if (node === null) {
-                type = "null"
+            } else if (contextItem === null) {
+                type = "null";
             }
 
             const isIterable = type === "array" || type === "object";
-            const isNothing  = node === undefined || node === null;
+            const isNothing  = contextItem === undefined || contextItem === null;
 
-            let typeDisplay = isIterable ? type : `"${node}"`;
+            let typeDisplay = isIterable ? type : `"${contextItem}"`;
             if (isNothing) {
-                typeDisplay = String(node);
+                typeDisplay = String(contextItem);
             } else if (type === "array") {
-                typeDisplay = type + "[" + node.length + "]";
+                typeDisplay = type + "[" + contextItem.length + "]";
             }
 
-            const icon = isIterable ? "angle" : "";
-            const name = `<pre>${key}: <i>${typeDisplay}</i></pre>`;
 
-            let childrenProvider = undefined;
-            let openHandler      = undefined;
+            if (isIterable) {
+                node.icon         = "fa-angle-right";
+                node.iconExpanded = "fa-angle-down";
+            }
 
-            let trace = [path, key].filter(e => e).join(".");
+            node.label = `<span class="varname">${key}: <span class="vartype">${typeDisplay}</span></span>`;
+
+            const trace = [path, key].filter(e => e).join(".");
+
             if (type === "object") {
-                childrenProvider = () => Observable.of(wrap(node, trace));
+                node.isExpandable = true;
+                node.children     = wrap(contextItem, trace);
+
             } else if (type === "array") {
-                childrenProvider = () => Observable.of(wrap(node.reduce((acc, item, index) => {
-                    return Object.assign(acc, {[index]: item});
-                }, {}), trace));
+                node.isExpandable = true;
+                node.children     = wrap(contextItem.reduce((acc, item, index) => ({acc, [index]: item}), {}), trace);
             } else {
-                openHandler = () => {
-
-
-                    trace = trace.split(".").map(p => (parseInt(p) == p) ? `[${p}]` : p).join(".")
-                        .replace(/\]\.\[/g, "][")
-                        .replace(/\.\[/g, "[");
-                    console.log("Trace is now", trace);
-                    this.editor.editor.session.insert(this.editor.editor.getCursorPosition(), String(trace));
-                };
+                node.id = trace.split(".").map(p => (parseInt(p, 10).toString() === p) ? `[${p}]` : p).join(".")
+                    .replace(/\]\.\[/g, "][")
+                    .replace(/\.\[/g, "[");
             }
 
-            return {name, childrenProvider, icon, openHandler};
+            return node;
         });
 
-        return wrap(context);
+        return wrap(context) as TreeNode<any>[];
 
     }
 }

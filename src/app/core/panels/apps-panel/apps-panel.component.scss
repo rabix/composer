@@ -1,0 +1,24 @@
+@import "../../../../assets/sass/variables";
+:host {
+
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    /deep/ .scroll-container {
+        flex: 1;
+        overflow: auto;
+    }
+
+    /deep/ .panel-container {
+        font-size: .95em;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+
+    ct-tab-selector {
+        border-bottom: 1px solid #292929;
+    }
+}

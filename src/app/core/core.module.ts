@@ -1,88 +1,90 @@
-import {NgModule} from "@angular/core";
+import {ErrorHandler, NgModule} from "@angular/core";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {BrowserModule} from "@angular/platform-browser";
-import {FormPanelComponent} from "./elements/form-panel.component";
-import {TooltipDirective} from "./ui/tooltip/tooltip.directive";
-import {TooltipContentComponent} from "./ui/tooltip/tooltip-content.component";
-import {CodeEditorComponent} from "./ui/code-editor/code-editor.component";
-import {IpcService} from "../services/ipc.service";
+import {GettingStartedComponent} from "../components/onboarding/getting-started.component";
+import {NewFileTabComponent} from "../components/onboarding/new-file.component";
+import {WelcomeTabComponent} from "../components/onboarding/welcome.component";
+import {EditorCommonModule} from "../editor-common/editor-common.module";
+import {LayoutModule} from "../layout/layout.module";
+import {PlatformAPI} from "../services/api/platforms/platform-api.service";
 import {GuidService} from "../services/guid.service";
-import {CodePreviewComponent} from "./ui/code-editor/code-preview.component";
-import {TreeViewComponent} from "./ui/tree-view/tree-view.component";
-import {TreeNodeComponent} from "./ui/tree-view/tree-node.component";
-import {TreeNodeIconComponent} from "./ui/tree-view/tree-node-icon.component";
-import {MenuItemComponent} from "./ui/menu/menu-item.component";
-import {MenuComponent} from "./ui/menu/menu.component";
-import {ContextDirective} from "./ui/context/context.directive";
-import {ContextService} from "./ui/context/context.service";
+import {ToolEditorModule} from "../tool-editor/tool-editor.module";
+import {ModalService} from "../ui/modal/modal.service";
+import {UIModule} from "../ui/ui.module";
+import {WorkflowEditorModule} from "../workflow-editor/workflow-editor.module";
+import {LayoutTabContentComponent} from "./layout-tab-content/layout-tab-content.component";
+import {LayoutComponent} from "./layout/layout.component";
+import {LogoComponent} from "./logo/logo.component";
+import {AddSourceModalComponent} from "./modals/add-source-modal/add-source-modal.component";
+import {SendFeedbackModalComponent} from "./modals/send-feedback-modal/send-feedback.modal.component";
+import {AppsPanelComponent} from "./panels/apps-panel/apps-panel.component";
+import {MyAppsPanelComponent} from "./panels/my-apps-panel/my-apps-panel.component";
+import {NavSearchResultComponent} from "./panels/nav-search-result/nav-search-result.component";
+import {PanelContainerComponent} from "./panels/panel-container/panel-container.component";
+import {PublicAppsPanelComponent} from "./panels/public-apps-panel/public-apps-panel.component";
+import {WebWorkerBuilderService} from "./web-worker/web-worker-builder.service";
+import {SettingsButtonComponent} from "./workbox/settings-button.component";
+import {WorkboxComponent} from "./workbox/workbox.component";
+import {AuthModule} from "../auth/auth.module";
+import {ModalErrorHandler} from "./error-report/modal-error-handler";
+import {ErrorReportComponent} from "./error-report/error-report.component";
+import {CreateAppModalComponent} from "./modals/create-app-modal/create-app-modal.component";
+import {NgStringPipesModule} from "../../../node_modules/ngx-pipes/src/app/pipes/string/index";
+import {WorkboxService} from "./workbox/workbox.service";
+import {PublishModalComponent} from "app/core/modals/publish-modal/publish-modal.component";
 
 @NgModule({
     entryComponents: [
-        TooltipContentComponent,
-
-        // Menu
-        MenuItemComponent,
-        MenuComponent,
-
-        // Context
-        // ContextDirective,
+        AddSourceModalComponent,
+        SendFeedbackModalComponent,
+        ErrorReportComponent,
+        CreateAppModalComponent,
+        PublishModalComponent
     ],
     declarations: [
-        // Code Editor Components
-        CodeEditorComponent,
-        CodePreviewComponent,
-
-        // Form Components
-        FormPanelComponent,
-
-        // Tree Components
-        TreeViewComponent,
-        TreeNodeComponent,
-        TreeNodeIconComponent,
-
-        // Tooltip
-        TooltipContentComponent,
-        TooltipDirective,
-
-        // Menu
-        MenuItemComponent,
-        MenuComponent,
-
-        // Context
-        ContextDirective
-
+        LayoutComponent,
+        LogoComponent,
+        LayoutTabContentComponent,
+        WorkboxComponent,
+        SettingsButtonComponent,
+        AppsPanelComponent,
+        PanelContainerComponent,
+        MyAppsPanelComponent,
+        PublicAppsPanelComponent,
+        NavSearchResultComponent,
+        WelcomeTabComponent,
+        GettingStartedComponent,
+        NewFileTabComponent,
+        AddSourceModalComponent,
+        SendFeedbackModalComponent,
+        ErrorReportComponent,
+        CreateAppModalComponent,
+        PublishModalComponent
     ],
     exports: [
-        // Code Editor
-        CodeEditorComponent,
-        CodePreviewComponent,
-
-        // Forms
-        FormPanelComponent,
-
-        // Tooltip
-        TooltipContentComponent,
-
-        // Tree
-        TreeViewComponent,
-
-        // Directives
-        TooltipDirective,
-
-        // Menu
-        MenuItemComponent,
-        MenuComponent,
-
-        // Context
-        ContextDirective,
-
+        LogoComponent,
+        LayoutComponent,
     ],
     providers: [
-        IpcService,
         GuidService,
-        ContextService,
+        WebWorkerBuilderService,
+        WorkboxService,
+        ModalService,
+        PlatformAPI,
+        {provide: ErrorHandler, useClass: ModalErrorHandler}
     ],
-    imports: [BrowserModule]
+    imports: [
+        BrowserModule,
+        LayoutModule,
+        FormsModule,
+        ReactiveFormsModule,
+        AuthModule,
+        UIModule,
+        EditorCommonModule,
+        ToolEditorModule,
+        WorkflowEditorModule,
+        NgStringPipesModule,
+    ]
 })
 export class CoreModule {
-
 }

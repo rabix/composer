@@ -3,9 +3,9 @@ BASEDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd )"
 
 cd $BASEDIR
 
-cp ./electron/package.json ./dist/package.json
-cp ./electron/main.prod.js ./dist/main.js
-cp -r ./electron/src ./dist
-cp -r ./electron/node_modules ./dist
+cp $BASEDIR/electron/package.prod.json $BASEDIR/dist/package.json
+cp $BASEDIR/electron/dist/main.prod.js $BASEDIR/dist/main.js
+cp -r $BASEDIR/electron/dist/src $BASEDIR/dist/
+cp -r $BASEDIR/electron/node_modules $BASEDIR/dist/
 
-./node_modules/.bin/electron-packager ./dist "rabix-editor-$(date +%s)" --overwrite --out build --icon ./electron/rabix-icon.icns --build-version "0.1.0"
+$BASEDIR/node_modules/.bin/electron-packager $BASEDIR/dist "rabix-editor" --overwrite --out build --icon $BASEDIR/electron/rabix-icon.icns --build-version "0.1.0"

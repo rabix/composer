@@ -1,0 +1,30 @@
+@import "../../../../assets/sass/variables";
+
+:host {
+    display: flex;
+    width: 100%;
+
+    .key-container {
+        border: 2px solid transparent;
+        display: flex;
+
+        .error-validation-icon, .warning-validation-icon {
+            margin: auto;
+        }
+
+        .error-validation-icon {
+            color: $brand-danger;
+        }
+
+        .warning-validation-icon {
+            color: $brand-warning;
+        }
+    }
+
+    // @fixme this whole component should be rewritten, please disregard horrible hacky code
+    /deep/ .fa-trash {
+        position: relative;
+        top: 3px;
+    }
+}
+

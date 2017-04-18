@@ -1,0 +1,28 @@
+@import "../../../../assets/sass/variables";
+
+ct-literal-expression-input {
+    display: block;
+
+    .textarea-btn-group {
+        height: 100%;
+        position: relative;
+
+        .btn-group {
+            position: absolute;
+            top: 0;
+            right: 0;
+
+            .btn {
+                border-radius: 0;
+
+                &:first-of-type {
+                    border-bottom-left-radius: $border-radius;
+                }
+
+                &:last-of-type {
+                    border-top-right-radius: $border-radius;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,69 @@
+@import "../../../../assets/sass/variables";
+
+:host {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    ct-nav-search-result {
+        opacity: 0;
+        margin-left: -1em;
+
+        &.shown {
+            transition: all .1s;
+            opacity: 1;
+            margin-left: 0;
+        }
+    }
+
+    .no-results {
+        text-align: center;
+        color: $layout-text-color-faded;
+        .icon {
+            color: #212121;
+        }
+    }
+
+    .grouping-toggle {
+        padding: 0 1em 1em 1em;
+
+        .btn {
+            width: 50%;
+            border-color: #454546;
+            background: #485057;
+            color: $layout-text-color;
+
+            &:active,
+            &:focus {
+                outline: none;
+            }
+
+        }
+
+        .active {
+            background: #3a6ea5;
+        }
+    }
+
+    /deep/ {
+
+        .fa-folder-open,
+        .fa-folder {
+            color: #a8b2c1;
+        }
+
+        .fa-file {
+            color: #e6e6e6;
+        }
+
+        .fa-share-alt {
+            color: #e29834;
+        }
+
+        .fa-terminal {
+            color: #a184dc;
+        }
+    }
+}
+
+

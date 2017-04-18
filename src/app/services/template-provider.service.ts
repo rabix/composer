@@ -11,10 +11,10 @@ type TemplateType = "draft-2-workflow" | "draft-2-command-line-tool" | string;
 export class TemplateProviderService {
 
     public compile(templateName: TemplateType, data = {}) {
-        if(!templates[templateName]){
+        if (!templates[templateName]) {
             return "";
         }
-        console.debug("Compiling template", templateName);
+        // console.debug("Compiling template", templateName);
         let str = JSON.stringify(templates[templateName] || "", null, 4);
 
         Object.keys(data).forEach(key => {

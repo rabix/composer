@@ -1,23 +1,54 @@
 @import "../../../assets/sass/variables";
 
 .component-main {
-  width: 100%;
-  height: 100%;
+    width: 100%;
+    height: 100%;
 }
 
 #runnix {
-  left: 100%;
-  bottom: -50px;
-  width: 100px;
-  height: 100px;
-  z-index: 1000;
-  display: block;
-  position: fixed;
-  background: url("../../../assets/img/runny.gif") no-repeat;
-  background-size: contain;
+    left: 100%;
+    bottom: -50px;
+    width: 100px;
+    height: 100px;
+    z-index: 1000;
+    display: block;
+    position: fixed;
+    background: url("../../../assets/img/runny.gif") no-repeat;
+    background-size: contain;
 
-  &.active {
-    transition: left 3s ease-out;
-    left: -200px;
-  }
+    &.active {
+        transition: left 3s ease-out;
+        left: -200px;
+    }
 }
+
+.app-report-panel {
+    display: flex;
+    flex-direction: column;
+    flex-basis: 150px;
+    overflow: auto;
+    background: #2d2d2d;
+}
+
+.drag-container {
+    position: fixed;
+    cursor: -webkit-grab;
+    z-index: 6;
+
+    & > .drag-image {
+        width: 75px;
+        height: 65px;
+        opacity: 0.95;
+        margin: 0 auto;
+    }
+
+    & > .drag-text {
+        text-align: center;
+        font-family: sans-serif;
+        font-style: italic;
+        padding: 5px;
+        max-width: 200px;
+    }
+}
+
+

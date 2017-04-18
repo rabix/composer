@@ -1,33 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-
-    <title><%= webpackConfig.metadata.title %></title>
-
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RabixComposer</title>
+    <base href="./">
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="<%= webpackConfig.metadata.title %>">
-
-    <!-- base url -->
-    <base href="<%= webpackConfig.metadata.baseUrl %>">
-    <script>
-
-    </script>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="css/font-awesome.min.css"/>
 
 </head>
-
 <body>
-
-    <cottontail>
-        <div class="loading-image">
-            <img src="assets/img/rabix-logo.png"/>
-        </div>
-    </cottontail>
-
-<% if (webpackConfig.metadata.ENV === 'development') { %>
-<script src="/webpack-dev-server.js"></script>
-<% } %>
-
+<ct-cottontail>Loading...</ct-cottontail>
 </body>
 </html>

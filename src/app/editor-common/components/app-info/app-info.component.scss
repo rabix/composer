@@ -1,0 +1,54 @@
+@import "../../../../assets/sass/variables";
+
+:host {
+    overflow-y: auto;
+    width: 100%;
+    padding: 20px;
+    display: block;
+    background: $panel-bg;
+
+    ct-inline-editor {
+        display: inline-block;
+    }
+
+    .app-info {
+        margin: 20px;
+        min-width: 600px;
+    }
+
+    .info-section {
+        margin-bottom: 40px;
+    }
+
+    .app-info-meta {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        margin-top: -40px;
+
+        .toolkit {
+            display: inline-block;
+            width: initial;
+        }
+
+        .links {
+            word-spacing: 1rem;
+        }
+
+        .app-info-meta-item {
+            margin-top: 40px;
+            padding-left: 0;
+        }
+    }
+
+    .app-info-meta-item ~ .app-info-meta-item{
+
+        padding-right: 2rem;
+    }
+
+    h5 {
+        font-weight: bold;
+    }
+}
+
+

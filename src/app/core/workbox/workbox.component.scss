@@ -1,0 +1,110 @@
+@import "../../../assets/sass/variables";
+
+:host {
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 0;
+    min-width: 0;
+
+    $topOffset: 3px;
+
+    .tab {
+        display: flex;
+        padding: 0 5px 0 5px;
+    }
+
+    .head {
+        background: $layout-title-bar-background;
+        flex-basis: $layout-title-bar-height;
+        line-height: $layout-title-bar-height;
+        width: 100%;
+        display: flex;
+        margin-left: -2px
+    }
+
+    .body {
+        //background: $editor-bg;
+        //color: $editor-color;
+        overflow-x: hidden;
+        overflow-y: auto;
+        flex: 1 0 0;
+    }
+
+    .component-container,
+    .tab-component {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+
+    .component-container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .ct-workbox-add-tab-icon {
+        width: 30px;
+        font-weight: bolder;
+        text-align: center;
+        font-size: 1rem;
+    }
+
+    .tab-bar {
+        display: flex;
+        flex: 1;
+        -webkit-user-select: none;
+        padding: 0 10px 0 1px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        list-style: none;
+    }
+
+    .tab {
+        flex: 1;
+        max-width: 275px;
+        min-width: 40px;
+        padding: 0 24px 10px 10px;
+        position: relative;
+        color: $text-muted;
+        background: $body-bg;
+        border-left: 1px solid #4d4d4d;
+        border-right: 1px solid #373a3c;
+        line-height: 36px;
+
+        .tab-icon {
+            flex-basis: 18px;
+        }
+
+        .title {
+            flex: 1;
+            overflow: hidden;
+            padding-right: 5px;
+            text-overflow: ellipsis;
+            white-space: pre;
+            z-index: 1;
+        }
+
+        .close-icon {
+            color: $text-muted;
+            position: absolute;
+            top: 0;
+            right: 10px;
+            font-size: 16px;
+            z-index: 10;
+
+            &:hover {
+                color: white;
+            }
+        }
+
+        &.active, &.active:before, &.active:after {
+            z-index: 1;
+            color: $layout-text-color;
+            background: $panel-bg;
+        }
+    }
+
+    ct-settings-button {
+        flex-basis: 30px;
+    }
+}

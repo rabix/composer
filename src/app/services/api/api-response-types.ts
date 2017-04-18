@@ -6,14 +6,3 @@ export interface FilePath {
     isEmpty?: boolean;
     content?: string;
 }
-
-export interface HttpError {
-    message: string;
-    statusCode: number;
-    error: string;
-}
-
-export interface FS {
-    baseDir: string;
-    paths: FilePath[]
-}

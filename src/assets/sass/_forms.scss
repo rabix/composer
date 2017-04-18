@@ -17,21 +17,16 @@
 .flex-item {
   flex-grow: 1;
   flex-basis: 0;
-  //padding: 5px;
-  //width: 200px;
-  //height: 150px;
-  //margin-top: 10px;
-  //
-  //line-height: 150px;
-  //color: white;
-  //font-weight: bold;
-  //font-size: 3em;
-  //text-align: center;
 }
 
 .form-control-label {
-  color: $input-label-color;
-  font-size: $input-label-size;
-  margin-bottom: .3em;
+  //color: $input-label-color;
+  //font-size: $input-label-size;
+  margin-bottom: .3rem;
 }
 
+.form-text {
+  font-size: $font-size-sm;
+  color: $text-muted;
+  margin-bottom: 1rem;
+}

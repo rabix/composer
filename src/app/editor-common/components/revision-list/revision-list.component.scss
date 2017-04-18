@@ -1,0 +1,58 @@
+@import "../../../../assets/sass/variables";
+
+:host {
+    display: flex;
+    flex-grow: 1;
+
+    ct-line-loader {
+        position: absolute;
+        top: 0;
+        display: block;
+        width: 100%;
+    }
+
+    .revision-entry {
+
+        border-bottom: 1px solid $body-bg;
+
+        //border-bottom: 1px solid $gui-section-border;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        position: relative;
+        cursor: pointer;
+
+        .loading-progress {
+            position: absolute;
+            top: 0;
+            height: 2px;
+        }
+
+        &.active {
+            background-color: $revision-list-entry-active-bg;
+        }
+
+        &:hover:not(.active) {
+            background-color: $revision-list-entry-hover-bg;
+        }
+
+        .revision-number {
+            position: relative;
+            flex-basis: 60px;
+            text-align: center;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .revision-info {
+            flex-shrink: 1;
+        }
+    }
+
+    .form-section .gui-section-body {
+        padding-top: 0;
+    }
+
+}

@@ -1,17 +1,20 @@
-import {Directive, Input, HostListener, TemplateRef, HostBinding, ChangeDetectorRef} from "@angular/core";
+import {ChangeDetectorRef, Directive, HostBinding, HostListener, Input, TemplateRef} from "@angular/core";
 import {EditorInspectorService} from "./editor-inspector.service";
-import {ComponentBase} from "../../components/common/component-base";
+import {DirectiveBase} from "../../util/directive-base/directive-base";
 
 @Directive({
     selector: "[ct-editor-inspector]",
 })
-export class EditorInspectorDirective extends ComponentBase {
+export class EditorInspectorDirective extends DirectiveBase {
 
     @Input("ct-editor-inspector")
     public content: TemplateRef<any>;
 
     @Input("ct-editor-inspector-target")
     public target: any = this;
+
+    @Input("ct-editor-inspector-readonly")
+    public readonly = false;
 
     @HostBinding("class.ct-inspected")
     private isInspected = false;
@@ -28,8 +31,9 @@ export class EditorInspectorDirective extends ComponentBase {
             });
     }
 
-    @HostListener("click")
-    public open() {
+    @HostListener("click", ["$event"])
+    public open(event: any) {
+        event.stopPropagation();
         this.inspector.show(this.content, this.target);
     }
 

@@ -1,50 +1,48 @@
-import {Component, Input, Output} from "@angular/core";
-import {ExpressionModel} from "cwlts/models/d2sb";
-import {ReplaySubject, Subject} from "rxjs";
+import {Component, Input, OnInit, Output} from "@angular/core";
+import {ExpressionModel} from "cwlts/models";
+import {Subject} from "rxjs/Subject";
 
 @Component({
     selector: "ct-model-expression-editor",
     template: `
-        <ct-expression-editor [evaluator]="evaluator" 
+        <ct-expression-editor [evaluator]="evaluator"
                               [context]="context"
                               (action)="action.next($event)"
-                              [editorContent]="rawCode"></ct-expression-editor>
+                              [code]="code"
+                              [readonly]="readonly">
+        </ct-expression-editor>
     `
 })
-export class ModelExpressionEditorComponent {
+export class ModelExpressionEditorComponent implements OnInit {
 
     @Input()
-    public model: ExpressionModel;
+    model: ExpressionModel;
 
     @Input()
-    public context: {$job?: any, $self?: any};
+    context: { $job?: any, $self?: any };
+
+    @Input()
+    readonly = false;
 
     @Output()
-    public action = new Subject<"close" | "save">();
+    action = new Subject<"close" | "save">();
 
-    private rawCode = new ReplaySubject<string>();
-
-    private evaluator: (code: string) => string;
+    code: string;
+    evaluator: (code: string) => Promise<string>;
 
     ngOnInit() {
-
-        this.rawCode.next(this.model.getScript() || "");
+        this.code = this.model.getScript() || "";
 
         this.evaluator = (content: string) => {
 
-            this.model = new ExpressionModel(this.model.loc, this.model.serialize());
+            // this.model = new ExpressionModel(this.model.loc, this.model.serialize());
             this.model.setValue(content, "expression");
 
-            const result             = this.model.evaluate(this.context);
-            const {errors, warnings} = this.model.validation;
-            const [err]              = [...errors, ...warnings];
-
-            if (err) {
+            return this.model.evaluate(this.context).then(res => {
+                return JSON.stringify(res, null, 4) || "";
+            }, err => {
                 return err.message + " on " + err.loc;
-            }
-
-            return JSON.stringify(result, null, 4) || "";
-
-        }
+            });
+        };
     }
 }

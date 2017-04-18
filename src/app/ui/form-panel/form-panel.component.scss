@@ -1,0 +1,52 @@
+@import "../../../assets/sass/variables";
+
+:host {
+    &.borderless .form-section {
+        border: none;
+        padding: 0 !important;
+    }
+
+    .form-section {
+        position: relative;
+        display: block;
+        //background: $gui-section-bg;
+        margin-bottom: 20px;
+        //padding: $gui-section-padding;
+        //border: 1px solid $gui-section-border;
+
+        .borderless & {
+            border: none;
+            padding: 0;
+        }
+
+        /deep/ .editor-list-title {
+            text-transform: uppercase;
+            display: flex;
+        }
+
+        .gui-section-body {
+            height: 0;
+
+            &.show {
+                //padding-top: $gui-section-padding;
+                height: auto;
+            }
+        }
+
+        .hide-button {
+            position: absolute;
+            //top: $padding-md;
+            //right: $padding-md;
+        }
+
+        /deep/ .add-btn-link {
+            padding: 0;
+        }
+    }
+
+    /deep/ hr { //element selector because that's how bootstrap styles it
+        margin-left: - $grid-gutter-width-base/2;
+        margin-right: - $grid-gutter-width-base/2;
+    }
+
+}
