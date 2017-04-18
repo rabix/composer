@@ -33,7 +33,7 @@ import {CreateAppModalComponent} from "../../core/modals/create-app-modal/create
                     <div class="app-container">
 
                         <!--Workflow-->
-                        <div class="app clickable" (click)="openAppCreation('workflow')">
+                        <div data-test="create-workflow-btn" class="app clickable" (click)="openAppCreation('workflow')">
 
                             <!--Image-->
                             <div class="image-container p-2">
@@ -108,7 +108,7 @@ import {CreateAppModalComponent} from "../../core/modals/create-app-modal/create
                         </div>
 
                         <!--Tool-->
-                        <div class="app clickable" (click)="openAppCreation('tool')">
+                        <div data-test="create-tool-btn" class="app clickable" (click)="openAppCreation('tool')">
 
                             <!--Image-->
                             <div class="image-container p-2">
@@ -168,7 +168,7 @@ import {CreateAppModalComponent} from "../../core/modals/create-app-modal/create
                                                       [icon]="entry.type === 'Workflow' ? 'fa-share-alt': 'fa-terminal'"
                                                       [title]="entry?.title"
                                                       [label]="entry?.label"
-                                                      (dblclick)="openRecentApp(entry)">
+                                                      (dblclick)="openRecentApp(entry?.id)">
                                 </ct-nav-search-result>
                             </div>
 
@@ -201,8 +201,8 @@ export class NewFileTabComponent extends DirectiveBase implements OnInit {
         });
     }
 
-    openRecentApp(entry: { id: string }) {
-        this.workbox.getOrCreateFileTab(entry.id).take(1).subscribe(tab => this.workbox.openTab(tab));
+    openRecentApp(id: string) {
+        this.workbox.getOrCreateFileTabAndOpenIt(id);
     }
 
     openAppCreation(type: "workflow" | "tool") {

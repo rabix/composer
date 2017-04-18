@@ -138,6 +138,10 @@ export class WorkboxService {
         this.activeTab.next(tab);
     }
 
+    public getOrCreateFileTabAndOpenIt(fileID) {
+        this.getOrCreateFileTab(fileID).take(1).subscribe((tab) => this.openTab(tab));
+    }
+
     public getOrCreateFileTab(fileID): Observable<TabData<AppTabData>> {
 
         const currentTab = this.tabs.getValue().find(tab => tab.id === fileID);
