@@ -1,6 +1,7 @@
 import {Component, ElementRef, Input, ViewChild, OnInit} from "@angular/core";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {Subscription} from "rxjs/Subscription";
+import {LayoutService} from "./layout.service";
 import {StatusBarComponent} from "../../layout/status-bar/status-bar.component";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {DomEventService} from "../../services/dom/dom-event.service";
@@ -21,6 +22,7 @@ import {ErrorBarService} from "../../layout/error-bar/error-bar.service";
 @Component({
     selector: "ct-layout",
     styleUrls: ["./layout.component.scss"],
+    providers: [LayoutService],
     template: `
         <ct-error-bar>
         </ct-error-bar>
@@ -29,7 +31,7 @@ import {ErrorBarService} from "../../layout/error-bar/error-bar.service";
 
             <!--Panels Column-->
             <div class="panel-column" [style.flexGrow]="treeSize"
-                 [class.hidden]="!sidebarExpanded || !(visiblePanels | async)?.length">
+                 [class.hidden]="!layoutService.sidebarExpanded">
 
                 <ct-logo class="pl-1 logo title-bar-section"></ct-logo>
                 <ct-panel-container class="layout-section">
@@ -39,7 +41,7 @@ import {ErrorBarService} from "../../layout/error-bar/error-bar.service";
 
             <!--Panel/Content Resize Handle-->
             <div #handle class="handle-vertical"
-                 [class.hidden]="!sidebarExpanded">
+                 [class.hidden]="!layoutService.sidebarExpanded">
             </div>
 
             <!--Editor Content Column-->
@@ -85,6 +87,7 @@ export class LayoutComponent extends DirectiveBase implements OnInit {
                 private domEvents: DomEventService,
                 private statusBar: StatusBarService,
                 private errorBarService: ErrorBarService,
+                private layoutService: LayoutService,
                 el: ElementRef) {
         super();
 

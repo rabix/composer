@@ -19,10 +19,10 @@
     }
 
     .panel-column {
-        min-width:0; // Chromium hack, otherwise wide nodes would push the column width
-        flex: 1 0 0;
         display: flex;
+        flex: 1 0 0;
         flex-direction: column;
+        min-width:0; // Chromium hack, otherwise wide nodes would push the column width
     }
 
     ct-status-bar {

@@ -8,7 +8,7 @@ import {Observable} from "rxjs";
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <ul class="dropdown-menu dropdown-menu-right" aria-haspopup="true" aria-expanded="true" style="display:initial">
-            <li class="dropdown-item cursor-pointer" *ngFor="let item of dropDownOptions" (click)="selectItem(item)"
+            <li class="dropdown-item clickable" *ngFor="let item of dropDownOptions" (click)="selectItem(item)"
                 [class.active]="item.value === selected?.value">
 
                 <div>
