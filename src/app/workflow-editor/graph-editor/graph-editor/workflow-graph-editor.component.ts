@@ -21,8 +21,6 @@ import {IpcService} from "../../../services/ipc.service";
 import {WorkflowEditorService} from "../../workflow-editor.service";
 
 
-declare const Snap: any;
-
 @Component({
     selector: "ct-workflow-graph-editor",
     encapsulation: ViewEncapsulation.None,
@@ -274,7 +272,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
     drawGraphAndAttachListeners() {
 
-        this.graph = new Workflow(new Snap(this.canvas.nativeElement), this.model as any);
+        this.graph = new Workflow(this.canvas.nativeElement, this.model as any);
 
         try {
             this.graph.fitToViewport();
@@ -380,7 +378,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
                 step.customProps["sbg:rdfId"]     = nodeID;
             }
 
-            const coords = this.graph.translateMouseCoords(ev.clientX, ev.clientY);
+            const coords = this.graph.transformScreenCTMtoCanvas(ev.clientX, ev.clientY);
             Object.assign(step.customProps, {
                 "sbg:x": coords.x,
                 "sbg:y": coords.y
