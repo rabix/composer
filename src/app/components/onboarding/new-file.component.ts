@@ -23,7 +23,8 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 
                     <div class="text-title">Actions</div>
 
-                    <div class="creation-entry p-1 mt-1 clickable deep-unselectable" (click)="openAppCreation('workflow')">
+                    <div class="creation-entry p-1 mt-1 clickable deep-unselectable" data-test="create-workflow-btn"
+                         (click)="openAppCreation('workflow')">
                         <i class="fa fa-fw fa-share-alt fa-4x float-sm-left "></i>
                         <div class="content float-sm-left">
                             <div class="title text-title">Create a Workflow</div>
@@ -31,7 +32,8 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                         </div>
                     </div>
 
-                    <div class="creation-entry p-1 mt-1 clickable deep-unselectable" (click)="openAppCreation('tool')">
+                    <div class="creation-entry p-1 mt-1 clickable deep-unselectable" data-test="create-tool-btn"
+                         (click)="openAppCreation('tool')">
                         <i class="fa fa-fw fa-terminal fa-4x float-sm-left"></i>
                         <div class="content float-sm-left">
                             <div class="title text-title">Create a Command Line Tool</div>
@@ -55,7 +57,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                                                       [icon]="entry.type === 'Workflow' ? 'fa-share-alt': 'fa-terminal'"
                                                       [title]="entry?.title"
                                                       [label]="entry?.label"
-                                                      (dblclick)="openRecentApp(entry)">
+                                                      (dblclick)="openRecentApp(entry?.id)">
                                 </ct-nav-search-result>
                             </div>
 
@@ -84,8 +86,8 @@ export class NewFileTabComponent extends DirectiveBase implements OnInit {
         });
     }
 
-    openRecentApp(entry: { id: string }) {
-        this.workbox.getOrCreateFileTab(entry.id).take(1).subscribe(tab => this.workbox.openTab(tab));
+    openRecentApp(id: string) {
+        this.workbox.getOrCreateFileTabAndOpenIt(id);
     }
 
     openAppCreation(type: "workflow" | "tool") {
