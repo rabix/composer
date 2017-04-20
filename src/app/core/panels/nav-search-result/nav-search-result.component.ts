@@ -23,9 +23,9 @@ export class NavSearchResultComponent implements OnInit {
     @Input() label: string;
 
     @Input() dragEnabled      = false;
-    @Input() dragTransferData = {};
     @Input() dragLabel        = "";
     @Input() dragImageClass   = "";
+    @Input() dragTransferData = {};
     @Input() dragDropZones    = ["zone1"];
 
     @Output()

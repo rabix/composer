@@ -8,6 +8,7 @@ export class PlatformAPIGatewayService {
 
     private apis: { [hash: string]: PlatformAPI } = {};
 
+
     constructor(private http: Http, private prefs: UserPreferencesService) {
 
         prefs.getCredentials().subscribe(credentials => {

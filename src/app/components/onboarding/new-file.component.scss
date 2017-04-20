@@ -1,102 +1,65 @@
-ct-new-file-tab {
+@import "../../../assets/sass/variables";
+
+:host {
     display: flex;
     flex-direction: column;
     height: 100%;
 
-    & > .content-container {
+    .creation-entry {
+        background: $panel-bg;
+        border-radius: $border-radius;
+        border: 1px solid $input-border-color;
+
+        &:hover {
+            border-color: $input-bg-hover;
+        }
+    }
+
+    ct-nav-search-result {
+        border-radius: $border-radius;
+        border-bottom: 1px solid $body-bg;
+
+        &:hover {
+            background-color: $body-bg;
+        }
+    }
+
+    .content-container {
         flex: 1;
         display: flex;
         flex-direction: column;
+    }
+    .apps-container {
+        display: flex;
+        flex-direction: row;
 
-        & > .top-empty-space {
-            flex: 1;
-        }
+    }
 
-        & > .apps-container {
-            flex: 5;
-            display: flex;
-            flex-direction: row;
+    .apps {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
 
-            padding-left: 2rem;
-            padding-right: 2rem;
+    .app-container {
+        flex: 1;
+        display: flex;
+        flex-direction: row;
+        text-align: center;
+    }
 
-            & > .apps {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
+    .app {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid $input-border-color;
+        background: $panel-bg;
+        overflow: hidden;
+    }
+    .revisions {
+        text-align: left;
+        overflow-y: auto;
 
-                & > .title {
-                    margin-bottom: 1rem;
-                }
-
-                & > .app-container {
-                    flex: 1;
-                    display: flex;
-                    flex-direction: row;
-                    text-align: center;
-
-                    & > .app {
-                        padding: 1rem;
-                        flex: 1;
-                        display: flex;
-                        flex-direction: column;
-                        border: 1px solid #ccc;
-                        background: white;
-                        overflow:hidden;
-
-                        .image-container {
-                            flex: 3;
-
-                            .image {
-                                width: 100%;
-                                height: 100%;
-
-                                &.workflow {
-                                    background-size: contain;
-
-                                }
-
-                                &.tool {
-                                    background-size: contain;
-                                }
-                            }
-
-                        }
-
-                        & > .description {
-                            flex: 1;
-                        }
-
-                        & > .revisions {
-                            text-align: left;
-                            overflow-y: auto;
-
-                            ct-nav-search-result {
-                                border-bottom: 1px solid #ddd;
-
-                                &:hover {
-                                    background-color: #e8e8e8;
-                                }
-                            }
-                        }
-                    }
-
-                    & > .app ~ .app {
-                        margin-left: 2rem;
-                    }
-                }
-
-            }
-
-            & > .apps ~ .apps {
-                margin-left: 2rem;
-            }
-
-        }
-
-        & > .bottom-empty-space {
-            flex: 3;
-        }
     }
 
     /deep/ {
@@ -108,5 +71,4 @@ ct-new-file-tab {
             color: #a184dc;
         }
     }
-
 }

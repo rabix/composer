@@ -50,14 +50,9 @@ import LoadOptions = jsyaml.LoadOptions;
             </ct-tab-selector>
 
             <div class="document-controls">
-
-                <!--CWLVersion-->
-                <span class="btn btn-sm btn-secondary"
-                      ct-tooltip="CWL Version"
-                      tooltipPlacement="bottom">{{workflowModel.cwlVersion}}</span>
-
+                
                 <!--Go to app-->
-                <button class="btn btn-secondary"
+                <button class="btn"
                         type="button"
                         (click)="goToApp()"
                         tooltipPlacement="bottom"
@@ -71,24 +66,24 @@ import LoadOptions = jsyaml.LoadOptions;
                         (click)="save()"
                         ct-tooltip="Save"
                         [tooltipPlacement]="'bottom'"
-                        class="btn btn-secondary" type="button">
-                    <i class="fa fa-save"></i> Save
+                        class="btn" type="button">
+                    <i class="fa fa-save"></i>
                 </button>
 
                 <!--Copy-->
-                <button class="btn btn-secondary "
+                <button class="btn"
                         type="button"
                         ct-tooltip="Save As..."
                         tooltipPlacement="bottom">
-                    <i class="fa fa-copy"></i> Save As...
+                    <i class="fa fa-copy"></i>
                 </button>
 
-                <button class="btn btn-sm" *ngIf="data.dataSource === 'local'" (click)="publish()">
-                    <i class="fa fa-cloud-upload"></i> Publish
+                <button class="btn" *ngIf="data.dataSource === 'local'" (click)="publish()">
+                    <i class="fa fa-cloud-upload"></i>
                 </button>
 
                 <!--Revisions-->
-                <button *ngIf="data.dataSource !== 'local'" class="btn btn-secondary"
+                <button *ngIf="data.dataSource !== 'local'" class="btn"
                         type="button"
                         ct-tooltip="See Revision History"
                         tooltipPlacement="bottom"
@@ -148,12 +143,12 @@ import LoadOptions = jsyaml.LoadOptions;
         </div>
 
         <ng-template #statusControls>
+            <span class="tag tag-warning">{{ workflowModel.cwlVersion }}</span>
             <span class="btn-group">
             <button [disabled]="!validation"
-                    [class.btn-primary]="reportPanel === 'validation'"
-                    [class.btn-secondary]="reportPanel !== 'validation'"
+                    [class.active]="reportPanel === 'validation'"
                     (click)="toggleReport('validation')"
-                    class="btn btn-sm">
+                    class="btn">
             
             <span *ngIf="validation?.errors?.length">
             <i class="fa fa-times-circle text-danger"></i> {{validation.errors.length}} Errors
