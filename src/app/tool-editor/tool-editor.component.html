@@ -21,13 +21,6 @@
 
     <div class="document-controls">
 
-
-        <!--CWLVersion-->
-        <span class="btn"
-              ct-tooltip="CWL Version"
-              tooltipPlacement="bottom">{{toolModel.cwlVersion}}</span>
-
-
         <!--Go to app-->
         <button class="btn"
                 type="button"
@@ -136,11 +129,12 @@
 </div>
 
 <ng-template #statusControls>
+                <span class="tag tag-warning">{{ toolModel.cwlVersion }}</span>
                 <span class="btn-group">
                     <button [disabled]="!validation"
                             [class.active]="reportPanel === 'validation'"
                             (click)="toggleReport('validation')"
-                            class="btn btn-sm">
+                            class="btn">
 
                         <span *ngIf="validation?.errors?.length">
                             <i class="fa fa-times-circle text-danger"></i> {{validation.errors.length}} Errors
@@ -161,6 +155,6 @@
                     <button [class.active]="reportPanel == 'commandLinePreview'"
                             [disabled]="!isValidCWL"
                             (click)="toggleReport('commandLinePreview')"
-                            class="btn btn-secondary btn-sm">Preview</button>
+                            class="btn">Preview</button>
                 </span>
 </ng-template>
