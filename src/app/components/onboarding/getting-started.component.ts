@@ -19,7 +19,7 @@ import {CredentialsEntry} from "../../services/storage/user-preferences-types";
             <div class="item">
                 <p class="subtitle">New to Rabix Composer?</p>
                 <p>Rabix Composer is a standalone editor Common Workflow Language tools and workflows.
-                    <a data-test="new-to-link" href (click)="system.openLink('http://rabix.io/'); false;">
+                    <a data-test="new-to-link" href (click)="openLink('http://rabix.io/'); false;">
                         Learn more
                     </a>
                 </p>
@@ -30,7 +30,7 @@ import {CredentialsEntry} from "../../services/storage/user-preferences-types";
                 <p class="subtitle">Learn how to build a tool</p>
                 <p>Having uploaded a Docker image containing your tool to the image registry, you can specify its
                     behavior, including its inputs and outputs.
-                    <a href data-test="learn-how-to-link" (click)="system.openLink('http://rabix.io/'); false;">
+                    <a href data-test="learn-how-to-link" (click)="openLink('http://rabix.io/'); false;">
                         Learn more
                     </a>
                 </p>
@@ -57,6 +57,10 @@ export class GettingStartedComponent {
     constructor(private modal: ModalService,
                 private auth: AuthService,
                 private system: SystemService) {
+    }
+
+    openLink(link: string) {
+        this.system.openLink(link)
     }
 
     openFeedbackModal() {
