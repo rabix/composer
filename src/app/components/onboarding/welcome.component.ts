@@ -19,7 +19,7 @@ import {SystemService} from "../../platform-providers/system.service";
                 with online services like DockerHub.
                 <br/>
                 Visit <a href data-test="info-link"
-                         (click)="system.openLink('http://rabix.io/'); false;">
+                         (click)="openLink('http://rabix.io/'); false;">
                     rabix.io</a> for more info.
             </p>
 
@@ -44,6 +44,10 @@ export class WelcomeTabComponent {
 
     constructor(private modal: ModalService, private system: SystemService) {
 
+    }
+
+    openLink(link: string) {
+        this.system.openLink(link);
     }
 
     onOpenProjectButtonClick() {
