@@ -5,7 +5,7 @@
 :host {
 
     /deep/ .form-section {
-        //@include cli-border($base-cmd-color);
+        @include cli-border($code-base-cmd);
     }
 
     .stream {
