@@ -30,20 +30,21 @@ import {ModalService} from "../../../ui/modal/modal.service";
                                  (buttonClick)="addEntry()">
             </ct-blank-tool-state>
 
+            
             <!--List Header Row-->
-            <div class="gui-section-list-title row" *ngIf="!!keyValueFormList.length">
+            <div class="editor-list-title row" *ngIf="!!keyValueFormList.length">
                 <div class="col-sm-5">{{keyColumnText}}</div>
                 <div class="col-sm-6">{{valueColumnText}}</div>
             </div>
 
             <!--Input List Entries-->
-            <ul class="gui-section-list">
+            <ul class="editor-list">
 
                 <!--List Entry-->
                 <li class="input-list-items container"
                     *ngFor="let entry of keyValueFormList; let i = index">
 
-                    <div class="gui-section-list-item clickable row"
+                    <div class="editor-list-item clickable row"
                          [class.invalid-entry]="duplicateKeys.has(form.controls[entry.id].value.key)">
 
                         <ct-key-value-input

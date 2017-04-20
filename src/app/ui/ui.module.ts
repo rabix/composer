@@ -27,7 +27,7 @@ import {ProgressComponent} from "./progress/progress.component";
 import {TabSelectorEntryComponent} from "./tab-selector/tab-selector-entry/tab-selector-entry.component";
 import {TabSelectorComponent} from "./tab-selector/tab-selector.component";
 import {TabComponent} from "./tabs/tab.component";
-import {ToggleComponent} from "./toggle-slider/toggle-slider.component";
+import {ToggleSliderComponent} from "./toggle-slider/toggle-slider.component";
 import {TooltipContentComponent} from "./tooltip/tooltip-content.component";
 import {TooltipDirective} from "./tooltip/tooltip.directive";
 import {TreeNodeComponent} from "./tree-view/tree-node/tree-node.component";
@@ -78,7 +78,7 @@ import {CircularLoaderComponent} from "./circular-loader/circular-loader.compone
         TabsComponent,
         TabSelectorComponent,
         TabSelectorEntryComponent,
-        ToggleComponent,
+        ToggleSliderComponent,
         TooltipContentComponent,
         TooltipDirective,
         TreeNodeComponent,
@@ -139,7 +139,7 @@ import {CircularLoaderComponent} from "./circular-loader/circular-loader.compone
         TabSelectorComponent,
         TabSelectorComponent,
         TabSelectorEntryComponent,
-        ToggleComponent,
+        ToggleSliderComponent,
         TooltipContentComponent,
         TooltipDirective,
         TreeNodeComponent,

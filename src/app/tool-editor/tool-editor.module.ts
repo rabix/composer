@@ -24,7 +24,6 @@ import {ToolEditorComponent} from "./tool-editor.component";
 import {ToolVisualEditorComponent} from "./tool-visual-editor/tool-visual-editor.component";
 import {DockerRequirementComponent} from "./sections/docker/docker-requirement.component";
 import {BaseCommandComponent} from "./sections/base-command/base-command.component";
-import {HintListComponent} from "./sections/hints/hint-list.component";
 import {ToolInputInspectorComponent} from "./object-inspector/input-inspector/tool-input-inspector.component";
 import {ToolOutputInspector} from "./object-inspector/output-inspector/tool-output-inspector.component";
 import {EditorCommonModule} from "../editor-common/editor-common.module";
@@ -61,7 +60,6 @@ import { RequirementInputComponent } from "./sections/hints/requirement-input.co
         ToolVisualEditorComponent,
         DockerRequirementComponent,
         BaseCommandComponent,
-        HintListComponent,
         HintsComponent,
         RequirementInputComponent,
     ],

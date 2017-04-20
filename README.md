@@ -17,13 +17,16 @@ yarn install
 ## Starting the dev environment
 ```bash
 yarn run serve // starts the dev server
-yarn run electron:compile // compiles electron backend
-yarn run electron // opens the app shell
+yarn run compile:electron // compiles electron backend
+yarn run start:electron // opens the app shell
 ```
 
 ## Packaging the build as a desktop app for the host system and architecture
 ```bash
 yarn run build
-yarn run electron:compile
-yarn run package
+```
+
+## Running the tests
+```bash
+yarn test
 ```

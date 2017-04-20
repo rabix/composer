@@ -10,6 +10,7 @@
     }
 
     .selected {
-        background: $layout-title-bar-background;
+        background: $tree-node-selected-background;
+        color: $tree-node-selected-color;
     }
 }

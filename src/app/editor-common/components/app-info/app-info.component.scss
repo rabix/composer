@@ -2,18 +2,10 @@
 
 :host {
     overflow-y: auto;
-    color: $text-dark;
     width: 100%;
     padding: 20px;
     display: block;
-    background: white;
-
-    /deep/ ct-tab-selector {
-        font-size: 1rem;
-        .selection-underline {
-            background: $gui-section-border !important;
-        }
-    }
+    background: $panel-bg;
 
     ct-inline-editor {
         display: inline-block;

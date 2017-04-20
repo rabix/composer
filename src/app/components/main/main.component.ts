@@ -2,14 +2,9 @@ import {Component, ViewContainerRef, ViewEncapsulation} from "@angular/core";
 import {Observable} from "rxjs/Rx";
 import {AuthService} from "../../auth/auth/auth.service";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
-import {ElectronPublicAppService} from "../../platform-providers/public-apps/electron-public-app.service";
-import {PublicAppService} from "../../platform-providers/public-apps/public-app.service";
 import {SystemService} from "../../platform-providers/system.service";
-import {ElectronUserProjectsService} from "../../platform-providers/user-projects/electron-user-projects.service";
-import {UserProjectsService} from "../../platform-providers/user-projects/user-projects.service";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {GuidService} from "../../services/guid.service";
-import {LocalDataSourceService} from "../../sources/local/local.source.service";
 import {ContextService} from "../../ui/context/context.service";
 import {MarkdownService} from "../../ui/markdown/markdown.service";
 import {ModalService} from "../../ui/modal/modal.service";
@@ -34,9 +29,6 @@ import {UrlValidator} from "../../validators/url.validator";
         StatusBarService,
         // FIXME: this needs to be handled in a system-specific way
         GuidService,
-        LocalDataSourceService,
-        {provide: PublicAppService, useClass: ElectronPublicAppService},
-        {provide: UserProjectsService, useClass: ElectronUserProjectsService}
     ],
 })
 export class MainComponent {

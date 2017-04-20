@@ -1,11 +1,9 @@
-import {PlatformGateway} from "./gateways/platform.gateway";
 import * as SearchController from "./controllers/search.controller";
 const fsController          = require("./controllers/fs.controller");
 const acceleratorController = require("./controllers/accelerator.controller");
 const resolver              = require("./schema-salad-resolver");
-const settings              = require("electron-settings");
 
-module.exports         = {
+module.exports = {
 
     // File System Routes
 
@@ -31,15 +29,6 @@ module.exports         = {
         fsController.pathExists(path, callback);
     },
 
-    hasDataCache: (data, callback) => {
-        settings.has("dataCache").then(yeah => {
-                callback(null, yeah);
-            }, err => {
-                callback(err);
-            }
-        )
-    },
-
     resolve: (path, callback) => {
         resolver.resolve(path).then(result => {
             callback(null, result);
@@ -61,92 +50,7 @@ module.exports         = {
         acceleratorController.register(name, callback);
     },
 
-    getSetting: (key, callback) => {
-        settings.get(key).then(result => {
-            callback(null, result);
-        }, err => {
-            callback(err);
-        });
-    },
-
-    putSetting: (data, callback) => {
-        settings.set(data.key, data.value).then(result => {
-            callback(null, result);
-        }, err => {
-            callback(err);
-        });
-    },
-
     searchLocalProjects: (data: { term: string, limit: number, folders: string[] }, callback) => {
         SearchController.searchLocalProjects(data.folders, data.term, data.limit, callback);
-    },
-
-    searchUserProjects: (data: { term: string, limit: number }, callback) => {
-        SearchController.searchUserProjects(data.term, data.limit, callback);
-    },
-
-    searchPublicApps: (data: { term: string, limit: number }, callback) => {
-        SearchController.searchPublicApps(data.term, data.limit, callback);
-    },
-
-    scanPlatforms: (data, callback) => {
-
-        const {credentials} = data;
-
-        const promises = credentials.map(source => {
-
-            return new Promise((resolve, reject) => {
-
-                const platform = new PlatformGateway(source.url);
-
-                platform.getSessionID(source.token, (err, message) => {
-                    if (err) {
-                        return reject(err);
-                    }
-
-                    source.sessionID = platform.sessionID;
-
-                    const publicProm = new Promise((resolve, reject) => {
-                        platform.getPublicApps((err, apps) => {
-                            if (err) {
-                                return reject(err);
-                            }
-                            resolve(apps);
-                        });
-                    });
-
-                    const userProm = new Promise((resolve, reject) => {
-                        platform.getUserApps((err, apps) => {
-                            if (err) {
-                                return reject(err);
-                            }
-                            resolve(apps);
-                        });
-                    });
-
-                    const projectProm = new Promise((resolve, reject) => {
-                        platform.getProjects((err, projects) => {
-                            if (err) {
-                                return reject(err);
-                            }
-                            resolve(projects);
-                        });
-                    });
-
-                    Promise.all([publicProm, userProm, projectProm]).then(values => {
-                        const [publicApps, apps, projects] = values;
-
-                        settings.set(`dataCache.${source.profile}`, {publicApps, apps, projects}).then(resolve, reject);
-
-                    }, reject);
-                });
-
-            });
-        });
-
-        Promise.all(promises).then(values => {
-            callback(null, values);
-        }, err => callback(err));
     }
-
 };

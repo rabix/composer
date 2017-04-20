@@ -1,7 +1,6 @@
 import {ChildProcess} from "child_process";
 import * as async from "async";
 
-const settings     = require("electron-settings");
 const fsController = require("./fs.controller");
 const cp           = require("child_process");
 
@@ -50,45 +49,6 @@ export function searchLocalProjects(folders: string[] = [], term: string, limit 
         });
 
     });
-}
-
-export function searchUserProjects(term, limit = 10, callback) {
-    settings.get("dataCache").then(profiles => {
-        const apps = [];
-        for (let profile in profiles) {
-            profiles[profile].apps.forEach(app => {
-                const relevance = fuzzysearch(term.split("").reverse().join("").toLowerCase(), app.id.split("").reverse("").join("").toLowerCase())
-                if (relevance > relevanceThreshold) {
-                    apps.push({...app, relevance, profile});
-                }
-            });
-        }
-        const results = apps.sort((a, b) => b.relevance - a.relevance).slice(0, limit);
-        callback(null, results);
-    }, err => callback(err));
-}
-
-/**
- *
- * @FIXME(refactor) This is a copy of the searchUserProjects funciton, fix the abstraction
- * @param term
- * @param limit
- * @param callback
- */
-export function searchPublicApps(term, limit = 10, callback) {
-    settings.get("dataCache").then(profiles => {
-        const apps = [];
-        for (let profile in profiles) {
-            profiles[profile].publicApps.forEach(app => {
-                const relevance = fuzzysearch(term.split("").reverse().join("").toLowerCase(), app.id.split("").reverse("").join("").toLowerCase())
-                if (relevance > relevanceThreshold) {
-                    apps.push({...app, relevance, profile});
-                }
-            });
-        }
-        const results = apps.sort((a, b) => b.relevance - a.relevance).slice(0, limit);
-        callback(null, results);
-    }, err => callback(err));
 }
 
 /**

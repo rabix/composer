@@ -23,8 +23,8 @@
     }
 
     .body {
-        background: $editor-bg;
-        color: $editor-color;
+        //background: $editor-bg;
+        //color: $editor-color;
         overflow-x: hidden;
         overflow-y: auto;
         flex: 1 0 0;
@@ -53,8 +53,6 @@
         display: flex;
         flex: 1;
         -webkit-user-select: none;
-        font-size: $font-size-xs;
-        //box-shadow: inset 0 -8px 8px -4px rgba(0, 0, 0, 0.15);
         padding: 0 10px 0 1px;
         overflow-x: auto;
         overflow-y: hidden;
@@ -62,16 +60,13 @@
     }
 
     .tab {
-        border: none;
         flex: 1;
-        font-size: $font-size-sm;
-
         max-width: 275px;
         min-width: 40px;
         padding: 0 24px 10px 10px;
         position: relative;
-        background: #2d2d2d;
-        color: $layout-text-color-faded;
+        color: $text-muted;
+        background: $body-bg;
         border-left: 1px solid #4d4d4d;
         border-right: 1px solid #373a3c;
         line-height: 36px;
@@ -81,7 +76,7 @@
         }
 
         .title {
-            flex:1;
+            flex: 1;
             overflow: hidden;
             padding-right: 5px;
             text-overflow: ellipsis;
@@ -90,7 +85,7 @@
         }
 
         .close-icon {
-            color: $layout-text-color-faded;
+            color: $text-muted;
             position: absolute;
             top: 0;
             right: 10px;
@@ -105,39 +100,8 @@
         &.active, &.active:before, &.active:after {
             z-index: 1;
             color: $layout-text-color;
-            background: #3B3B3B;
-            //background-image: -webkit-linear-gradient(top, $tab-select-bg, $tab-select-bg);
+            background: $panel-bg;
         }
-
-        //&, &:before, &:after {
-        //    height: 34px;
-        //    background: $tabBackground;
-        //    //background-image: -webkit-linear-gradient(top, lighten($tab-bg, 5%), $tab-bg);
-        //}
-        //
-        //&:before, &:after {
-        //    content: '';
-        //    position: absolute;
-        //    top: 0;
-        //    width: 25px;
-        //    height: 35px;
-        //}
-        //
-        //// triangle to left
-        //&:before {
-        //    left: -14px;
-        //    border-top-left-radius: 3px;
-        //    box-shadow: inset 1px 1px 0 $tab-bg, -4px 0px 4px rgba(0, 0, 0, 0.1);
-        //    -webkit-transform: skewX(-30deg);
-        //}
-        //
-        //// triangle to right
-        //&:after {
-        //    right: -14px;
-        //    border-top-right-radius: 3px;
-        //    box-shadow: inset -1px 1px 0 $tab-bg, 4px 0px 4px rgba(0, 0, 0, 0.1);
-        //    -webkit-transform: skewX(30deg);
-        //}
     }
 
     ct-settings-button {

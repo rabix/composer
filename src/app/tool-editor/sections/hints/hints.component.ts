@@ -12,21 +12,21 @@ import {SystemService} from "../../../platform-providers/system.service";
     selector: "ct-hints",
     template: `
         <ct-form-panel>
-            <div class="tc-header">
-                Hints
-            </div>
+            <div class="tc-header">Hints</div>
 
             <div class="tc-body">
+
                 <!--Blank Tool Screen-->
-                <ct-blank-tool-state *ngIf="!readonly && !model.hints.length"
-                                     [buttonText]="'Add a Hint'"
-                                     (buttonClick)="addEntry()">
+                <ct-blank-tool-state *ngIf="!readonly && !model.hints.length" [buttonText]="'Add a Hint'" (buttonClick)="addEntry()">
+                    
                     Execution hints and their values, which specify execution requirements and suggestions, for example, the AWS instance
                     type to use. For a list of execution hints you can set, see
+                    
                     <a #link href="http://docs.sevenbridges.com/docs/list-of-execution-hints"
                        (click)="$event.preventDefault(); system.openLink('http://docs.sevenbridges.com/docs/list-of-execution-hints')">
                         http://docs.sevenbridges.com/docs/list-of-execution-hints.
                     </a>
+                    
                 </ct-blank-tool-state>
 
                 <div *ngIf="readonly && !model.hints.length" class="text-xs-center h5">
@@ -34,7 +34,7 @@ import {SystemService} from "../../../platform-providers/system.service";
                 </div>
 
                 <!--List Header Row-->
-                <div class="gui-section-list-title" *ngIf="!!model.hints.length">
+                <div class="editor-list-title" *ngIf="!!model.hints.length">
                     <div class="col-xs-6">
                         Class
                     </div>
@@ -44,10 +44,10 @@ import {SystemService} from "../../../platform-providers/system.service";
                 </div>
 
                 <form [formGroup]="form" *ngIf="form">
-                    <ul class="gui-section-list" formArrayName="hints">
+                    <ul class="editor-list" formArrayName="hints">
                         <li class="input-list-items"
                             *ngFor="let control of form.controls['hints'].controls; let i = index">
-                            <div class="gui-section-list-item">
+                            <div class="editor-list-item">
                                 <ct-requirement-input [formControl]="control"
                                                       [context]="context"
                                                       class="mr-1 ml-1"

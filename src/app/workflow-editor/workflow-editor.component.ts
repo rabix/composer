@@ -1,18 +1,12 @@
-import {
-    Component,
-    Input,
-    OnDestroy,
-    OnInit,
-    TemplateRef,
-    ViewChild,
-    ViewContainerRef
-} from "@angular/core";
+import {Component, Input, OnDestroy, OnInit, TemplateRef, ViewChild, ViewContainerRef} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {WorkflowFactory, WorkflowModel} from "cwlts/models";
 import {Validation} from "cwlts/models/helpers/validation";
 import * as Yaml from "js-yaml";
 import {Observable, Subject} from "rxjs/Rx";
+import {AuthService} from "../auth/auth/auth.service";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
+import {PublishModalComponent} from "../core/modals/publish-modal/publish-modal.component";
 import {AppTabData} from "../core/workbox/app-tab-data";
 import {WorkboxTab} from "../core/workbox/workbox-tab.interface";
 import {
@@ -24,16 +18,13 @@ import {ErrorBarService} from "../layout/error-bar/error-bar.service";
 import {StatusBarService} from "../layout/status-bar/status-bar.service";
 import {SystemService} from "../platform-providers/system.service";
 import {PlatformAPI} from "../services/api/platforms/platform-api.service";
-import {SettingsService} from "../services/settings/settings.service";
+import {CredentialsEntry} from "../services/storage/user-preferences-types";
+import {ModalService} from "../ui/modal/modal.service";
 import {DirectiveBase} from "../util/directive-base/directive-base";
+import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow-graph-editor.component";
 import {WorkflowEditorService} from "./workflow-editor.service";
 
 import LoadOptions = jsyaml.LoadOptions;
-import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow-graph-editor.component";
-import {CredentialsEntry} from "../services/storage/user-preferences-types";
-import {AuthService} from "../auth/auth/auth.service";
-import {PublishModalComponent} from "../core/modals/publish-modal/publish-modal.component";
-import {ModalService} from "../ui/modal/modal.service";
 
 
 @Component({
@@ -66,7 +57,7 @@ import {ModalService} from "../ui/modal/modal.service";
                       tooltipPlacement="bottom">{{workflowModel.cwlVersion}}</span>
 
                 <!--Go to app-->
-                <button class="btn btn-sm btn-secondary"
+                <button class="btn btn-secondary"
                         type="button"
                         (click)="goToApp()"
                         tooltipPlacement="bottom"
@@ -80,12 +71,12 @@ import {ModalService} from "../ui/modal/modal.service";
                         (click)="save()"
                         ct-tooltip="Save"
                         [tooltipPlacement]="'bottom'"
-                        class="btn btn-sm btn-secondary" type="button">
+                        class="btn btn-secondary" type="button">
                     <i class="fa fa-save"></i> Save
                 </button>
 
                 <!--Copy-->
-                <button class="btn btn-sm btn-secondary "
+                <button class="btn btn-secondary "
                         type="button"
                         ct-tooltip="Save As..."
                         tooltipPlacement="bottom">
@@ -97,7 +88,7 @@ import {ModalService} from "../ui/modal/modal.service";
                 </button>
 
                 <!--Revisions-->
-                <button *ngIf="data.dataSource !== 'local'" class="btn btn-sm btn-secondary"
+                <button *ngIf="data.dataSource !== 'local'" class="btn btn-secondary"
                         type="button"
                         ct-tooltip="See Revision History"
                         tooltipPlacement="bottom"

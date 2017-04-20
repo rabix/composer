@@ -1,5 +1,3 @@
-
-
 @import "variables";
 @import "bootstrap-pack";
 @import "mixins";
@@ -9,18 +7,15 @@
 @import "icons";
 @import "forms";
 @import "alerts";
-
-@import "./theme-variables";
-@import "./modern/variables";
-
+@import "./variables";
 @import "~selectize/dist/css/selectize.default.css";
-
-@import "./modern/theme.scss";
+@import "./theme";
 
 html, body {
     width: 100%;
     height: 100%;
-    color: $font-color;
+    color: $text-color;
+    background: $body-bg;
 }
 
 .loading-image {
@@ -36,21 +31,21 @@ html, body {
 }
 
 .input-list-items {
-    border-radius: $gui-section-list-item-border-radius;
+    //border-radius: $editor-list-item-border-radius;
     margin-bottom: 10px;
     list-style: none;
 
     &.record-input {
-        border: 1px solid $gui-section-list-item-bg;
+        //border: 1px solid $editor-list-item-bg;
 
-        > .gui-section-list-item {
+        > .editor-list-item {
             margin-bottom: 10px;
             border-bottom-right-radius: 0;
             border-bottom-left-radius: 0;
         }
     }
 
-    .gui-section-list-item {
+    .editor-list-item {
         margin-bottom: 0;
     }
 }

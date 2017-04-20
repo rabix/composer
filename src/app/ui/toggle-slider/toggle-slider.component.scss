@@ -1,9 +1,13 @@
 @import "../../../assets/sass/variables";
 
-$switch-height: 15px;
-$switch-width: 34px;
+:host {
+    $switch-height: 20px;
+    $switch-width: 40px;
 
-ct-toggle-slider {
+    &:hover {
+        cursor: pointer !important;
+    }
+
     /* The switch - the box around the slider */
     .switch {
         position: relative;
@@ -27,35 +31,41 @@ ct-toggle-slider {
         left: 0;
         right: 0;
         bottom: 0;
-        background-color: $toggle-bg;
+        background-color: $input-bg;
         -webkit-transition: .4s;
         transition: .4s;
+        border: 1px solid $input-border-color;
     }
 
     .slider:before {
         position: absolute;
         content: "";
-        height: $switch-height - 2px;
-        width: $switch-height - 2px;
+        height: $switch-height - 3px;
+        width: $switch-height - 3px;
         left: 2px;
         bottom: 1px;
-        background-color: $background-light;
+        //background-color: $background-light;
         -webkit-transition: .4s;
         transition: .4s;
+        background: $text-color;
     }
 
-    input:checked + .slider {
+    .slider:before {
+    }
+
+    .toggle-input:checked + .slider {
         background-color: $brand-primary;
     }
 
-    input:focus + .slider {
+    .toggle-input:focus + .slider {
         box-shadow: 0 0 1px $brand-primary;
     }
 
-    input:checked + .slider:before {
+    .toggle-input:checked + .slider:before {
         -webkit-transform: translateX($switch-width / 2);
         -ms-transform: translateX($switch-width / 2);
         transform: translateX($switch-width / 2);
+
     }
 
     /* Rounded sliders */

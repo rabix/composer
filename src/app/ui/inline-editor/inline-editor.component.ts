@@ -32,8 +32,8 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 
                     <!--Save/Cancel button-->
                     <div *ngIf="editing" class="button-section">
-                        <button type="button" class="btn btn-success btn-sm" (click)="onSave($event)">Save</button>
                         <button type="button" class="btn btn-secondary btn-sm" (click)="onCancel($event)">Cancel</button>
+                        <button type="button" class="btn btn-success btn-sm" (click)="onSave($event)">Save</button>
                     </div>
                 </div>
 
