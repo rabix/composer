@@ -1,9 +1,10 @@
-import {Headers, Http} from "@angular/http";
+import {Headers} from "@angular/http";
 import {ENVP} from "app/config/env.config";
 import {Observable} from "rxjs/Observable";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {PlatformProjectEntry} from "../../core/data-gateway/data-types/platform-api.types";
 import {PlatformAppEntry} from "../../services/api/platforms/platform-api.types";
+import {CtHttp} from "../../http/ct-http.service";
 
 export class PlatformAPI {
 
@@ -27,7 +28,7 @@ export class PlatformAPI {
         return [serviceUrl, ENVP.serviceRoutes[serviceName].prefix].join("/");
     }
 
-    constructor(private http: Http, private url?: string, private token?: string, sessionID?: string) {
+    constructor(private http: CtHttp, private url?: string, private token?: string, sessionID?: string) {
         if (sessionID && sessionID.length) {
             this.setSessionID(sessionID);
         }
@@ -59,30 +60,68 @@ export class PlatformAPI {
             headers: new Headers({
                 "auth-token": this.token
             })
+        }).catch((error) => {
+
+            // Set sessionID to null in case that there are already some subscriptions on sessionID set
+            // before openSession() is called
+            this.sessionID.next(null);
+
+            return Observable.throw(error)
         }).map(response => response.json().message.session_id)
             .do(sessionID => {
                 this.setSessionID(sessionID);
-            });
+            }).take(1);
     }
 
+    /**
+     * Calls the hhtp service with session ID and in case of
+     * error (403 or 404) try to set a new session and call service again
+     */
+    callService(service: Function): Observable<any> {
+        return this.sessionID.take(1).flatMap((sessionID) => service(sessionID)).retryWhen(errors => {
+                let attempts = 0;
+
+                return errors.flatMap((err) => {
+
+                    if (!(err.status === 404 || err.status === 403) || attempts >= 1) {
+                        throw new Error(err);
+                    }
+
+                    ++attempts;
+
+                    // If status is 403 or 404 (invalid session...) try to set a new session and call service again
+                    return this.openSession()
+                });
+            }
+        )
+    }
 
     public getRabixProjects(): Observable<PlatformProjectEntry[]> {
-        return this.sessionID.flatMap(sessionID => this.http.get(this.getServiceURL("watson") + "/projects", {
-            search: "_role=minimal&is_rabix=true",
-            headers: new Headers({
-                "session-id": sessionID
-            })
-        })).map(r => r.json().message);
+
+        return this.callService((sessionID) => {
+
+            return this.http.get(this.getServiceURL("watson") + "/projects", {
+                search: "_role=minimal&is_rabix=true",
+                headers: new Headers({
+                    "session-id": sessionID
+                })
+            });
+        }).map(r => r.json().message).take(1);
     }
 
     public getProjectApps(ownerSlug: string, projectSlug: string) {
+
         const endpoint = `/apps/${ownerSlug}/${projectSlug}`;
-        return this.sessionID.flatMap(sessionID => this.http.get(this.getServiceURL("brood") + endpoint, {
-            search: "_role=minimal",
-            headers: new Headers({
-                "session-id": sessionID
-            })
-        })).map(r => r.json().message);
+
+        return this.callService((sessionID) => {
+
+            return this.http.get(this.getServiceURL("brood") + endpoint, {
+                search: "_role=minimal",
+                headers: new Headers({
+                    "session-id": sessionID
+                })
+            });
+        }).map(r => r.json().message).take(1);
     }
 
 
@@ -94,11 +133,14 @@ export class PlatformAPI {
             id = args.join("/");
         }
 
-        return this.sessionID.flatMap(sessionID => this.http.get(this.getServiceURL("brood") + `/apps/${id}`, {
-            headers: new Headers({
-                "session-id": sessionID
-            })
-        })).map(r => r.json().message);
+        return this.callService((sessionID) => {
+
+            return this.http.get(this.getServiceURL("brood") + `/apps/${id}`, {
+                headers: new Headers({
+                    "session-id": "nesto"
+                })
+            });
+        }).map(r => r.json().message);
     }
 
     public saveApp(app: PlatformAppEntry, revisionNote: string) {
@@ -114,23 +156,28 @@ export class PlatformAPI {
             const nextRevision = (latestApp["sbg:latestRevision"] || 0) + 1;
             const endpoint     = this.getServiceURL("brood") + `/apps/${appPath}/${nextRevision}`;
 
-            return this.sessionID.flatMap(sessionID => this.http.post(endpoint, Object.assign({}, app, {
-                "sbg:revisionNotes": revisionNote
-            }), {
-                headers: new Headers({
-                    "session-id": sessionID
+            return this.callService((sessionID) => {
+                return this.http.post(endpoint, Object.assign({}, app, {
+                    "sbg:revisionNotes": revisionNote
+                }), {
+                    headers: new Headers({
+                        "session-id": sessionID
+                    })
                 })
-            })).map(r => r.json());
+            }).map(r => r.json());
         });
     }
 
     getPublicApps() {
-        return this.sessionID.flatMap(sessionID => this.http.get(this.getServiceURL("brood") + "/apps", {
-            search: "_order_by=label&visibility=public",
-            headers: new Headers({
-                "session-id": sessionID
-            })
-        })).map(r => r.json().message);
+        return this.callService((sessionID) => {
+
+            return this.http.get(this.getServiceURL("brood") + "/apps", {
+                search: "_order_by=label&visibility=public",
+                headers: new Headers({
+                    "session-id": sessionID
+                })
+            });
+        }).map(r => r.json().message);
     }
 
     public sendFeedback(userID: string, type: string, message: string, referrerURL?: string) {
@@ -160,11 +207,13 @@ export class PlatformAPI {
             }
         };
 
-        return this.sessionID.flatMap(sessionID => this.http.post(this.getServiceURL("voyager") + "/send", data, {
-            headers: new Headers({
-                "session-id": sessionID
-            })
-        })).map(r => r.json().message);
+        return this.callService((sessionID) => {
+            return this.http.post(this.getServiceURL("voyager") + "/send", data, {
+                headers: new Headers({
+                    "session-id": sessionID
+                })
+            });
+        }).map(r => r.json().message);
     }
 
     getUser(sessionID) {
@@ -176,42 +225,45 @@ export class PlatformAPI {
             }).map(r => r.json().message);
         }
 
-        return this.sessionID.flatMap(sessionID => this.http.get(this.getServiceURL("gatekeeper") + "/user", {
-            headers: new Headers({
-                "session-id": sessionID
-            })
-        })).map(r => r.json().message);
+        return this.callService((sessionID) => {
 
-
-    }
-
-    searchUserProjects(query: string, limit = 20): Observable<PlatformAppEntry[]> {
-        return this.sessionID.flatMap(sessionID =>
-            this.http.get(this.getServiceURL("brood") + `/apps?_role=minimal&visibility=mine&_limit=${limit}&q=${query}`, {
+            return this.http.get(this.getServiceURL("gatekeeper") + "/user", {
                 headers: new Headers({
                     "session-id": sessionID
                 })
-            })).map(r => r.json().message);
+            });
+        }).map(r => r.json().message);
+    }
+
+    searchUserProjects(query: string, limit = 20): Observable<PlatformAppEntry[]> {
+        return this.callService((sessionID) => {
+            return this.http.get(this.getServiceURL("brood") + `/apps?_role=minimal&visibility=mine&_limit=${limit}&q=${query}`, {
+                headers: new Headers({
+                    "session-id": sessionID
+                })
+            });
+        }).map(r => r.json().message);
     }
 
     suggestSlug(owner, project, slug): Observable<{ app_name: string, rev: number }> {
-        return this.sessionID.flatMap(sessionID =>
-            this.http.post(this.getServiceURL("brood") + `/apps/${owner}/${project}/suggest-slug`, {
+        return this.callService((sessionID) => {
+            return this.http.post(this.getServiceURL("brood") + `/apps/${owner}/${project}/suggest-slug`, {
                 label: slug
             }, {
                 headers: new Headers({
                     "session-id": sessionID
                 })
-            })).map(r => r.json().message);
+            });
+        }).map(r => r.json().message);
     }
 
     createApp(owner, project, name, appPayload): Observable<PlatformAppEntry> {
-        return this.sessionID.flatMap(sessionID =>
-            this.http.post(this.getServiceURL("brood") + `/apps/${owner}/${project}/${name}`, appPayload, {
+        return this.callService((sessionID) => {
+            return this.http.post(this.getServiceURL("brood") + `/apps/${owner}/${project}/${name}`, appPayload, {
                 headers: new Headers({
                     "session-id": sessionID
                 })
-            })).map(r => r.json().message);
+            });
+        }).map(r => r.json().message);
     }
-
 }
