@@ -4,6 +4,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
 import {CredentialsEntry} from "../../../services/storage/user-preferences-types";
 import {ErrorBarService} from "../../../layout/error-bar/error-bar.service";
 import {PlatformAPIGatewayService} from "../../../auth/api/platform-api-gateway.service";
+import {Observable} from "rxjs/Observable";
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,7 +37,8 @@ import {PlatformAPIGatewayService} from "../../../auth/api/platform-api-gateway.
                     </div>
 
                     <!--Problem-->
-                    <div data-test="problem-region" class="feedback clickable" [class.active]="feedbackType === 'problem'"
+                    <div data-test="problem-region" class="feedback clickable"
+                         [class.active]="feedbackType === 'problem'"
                          (click)="selectFeedbackType('problem')">
 
                         <!--Caption-->
@@ -51,7 +53,8 @@ import {PlatformAPIGatewayService} from "../../../auth/api/platform-api-gateway.
                     </div>
 
                     <!--Thought-->
-                    <div data-test="thought-region" class="feedback clickable" [class.active]="feedbackType === 'thought'"
+                    <div data-test="thought-region" class="feedback clickable"
+                         [class.active]="feedbackType === 'thought'"
                          (click)="selectFeedbackType('thought')">
 
                         <!--Caption-->
@@ -153,19 +156,25 @@ export class SendFeedbackModalComponent {
     public onSendFeedback() {
 
         if (this.feedbackPlatform) {
-            this.apiGateway.forHash(this.feedbackPlatform.hash)
-                .sendFeedback(this.feedbackPlatform.user.id, this.feedbackType,
-                    this.feedbackTextControl.controls["sendFeedBack"].value, this.feedbackPlatform.url)
-                .subscribe(() => {
-                    this.closeModal();
-                }, err => {
-                    console.log("Error", err);
-                    if (err.status === 0) {
-                        this.errorBar.showError("Could not connect to the platform and send a feedback message");
-                    } else {
-                        this.errorBar.showError(err);
-                    }
-                });
+
+            const platform = this.apiGateway.forHash(this.feedbackPlatform.hash);
+
+            const call = platform ? platform.sendFeedback(this.feedbackPlatform.user.id, this.feedbackType,
+                this.feedbackTextControl.controls["sendFeedBack"].value, this.feedbackPlatform.url)
+                : Observable.throw(
+                    new Error("Could not connect to the platform and send a feedback message"));
+
+            call.subscribe(() => {
+                this.closeModal();
+            }, err => {
+                console.log("Error", err);
+                if (err.status === 0) {
+                    this.errorBar.showError("Could not connect to the platform and send a feedback message");
+                } else {
+                    this.errorBar.showError(err);
+                }
+            });
+
         }
     }
 
