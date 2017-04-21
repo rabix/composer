@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from "@angular/core/testing";
+import {async, fakeAsync, tick, ComponentFixture, TestBed} from "@angular/core/testing";
 import {FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {CredentialsFormComponent} from "./credentials-form.component";
@@ -30,13 +30,14 @@ describe("Layout", () => {
         }));
 
 
-        beforeEach(() => {
+        beforeEach(fakeAsync(() => {
             fixture       = TestBed.createComponent(CredentialsFormComponent);
             component     = fixture.componentInstance;
             userPrefsStub = fixture.debugElement.injector.get(UserPreferencesService);
 
             fixture.detectChanges();
-        });
+            tick();
+        }));
 
         //
         it("should create", () => {
@@ -152,9 +153,18 @@ describe("Layout", () => {
         it("#applyValues should emit unique values when called", () => {
 
             component.form.setControl("pairs", new FormArray([
-                new FormGroup({url: new FormControl("https://igor.sbgenomics.com"), token: new FormControl("token1")}),
-                new FormGroup({url: new FormControl("https://cgc.sbgenomics.com"), token: new FormControl("token2")}),
-                new FormGroup({url: new FormControl("https://cgc.sbgenomics.com"), token: new FormControl("token2")}),
+                new FormGroup({
+                    url: new FormControl("https://igor.sbgenomics.com"),
+                    token: new FormControl("token1")
+                }),
+                new FormGroup({
+                    url: new FormControl("https://cgc.sbgenomics.com"),
+                    token: new FormControl("token2")
+                }),
+                new FormGroup({
+                    url: new FormControl("https://cgc.sbgenomics.com"),
+                    token: new FormControl("token2")
+                }),
             ]));
             fixture.detectChanges();
 
@@ -223,15 +233,15 @@ describe("Layout", () => {
         });
 
         it("should not submit values if form is invalid", () => {
-            component.form.setControl("pairs", new FormArray([
-                new FormGroup({url: new FormControl("https://igor.randomsite.com"), token: new FormControl("")}),
-            ]));
+            component.addEntry();
+            (component.form.controls["pairs"] as FormArray).controls[0].setValue({url: "https://igor.randomsite.com/", token: ""});
 
             fixture.detectChanges();
 
             const form     = fixture.debugElement.query(By.css("[data-test='form']"));
             const applySpy = spyOn(component, "applyValues");
-            form.triggerEventHandler("submit", new Event("submit"));
+            form.nativeElement.dispatchEvent(new Event("submit"));
+
             expect(applySpy.calls.count()).toBe(0);
         });
     });
