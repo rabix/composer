@@ -20,6 +20,10 @@ $font-size-base: 13px;
 $text-color: rgba(231, 231, 231, 1);
 $text-muted: darken($text-color, 30);
 
+// ----- Tag -----
+$tag-primary-bg: $brand-primary;
+$tag-color: black;
+
 
 // ----- Forms -----
 $input-bg: #333333;
@@ -36,11 +40,14 @@ $input-color-disabled: $text-muted;
 $input-bg-hover: $brand-primary;
 $input-group-addon-bg: $input-bg;
 
+
+
 // ----- Code -----
 $code-bg: $input-bg;
 $code-color: $brand-primary;
 
 // ----- Buttons -----
+$btn-primary-bg: $brand-primary;
 $btn-secondary-bg: rgb(60, 60, 60);
 $btn-secondary-color: $text-color;
 $btn-secondary-hover-bg: $brand-primary;
