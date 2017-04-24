@@ -43,10 +43,15 @@
     }
 
     .ct-workbox-add-tab-icon {
+        color: $text-muted;
         width: 30px;
         font-weight: bolder;
         text-align: center;
         font-size: 1rem;
+
+        i:hover {
+            color: white;
+        }
     }
 
     .tab-bar {
@@ -88,11 +93,11 @@
             color: $text-muted;
             position: absolute;
             top: 0;
-            right: 10px;
-            font-size: 16px;
+            right: 8px;
+            font-size: 12px;
             z-index: 10;
 
-            &:hover {
+            i:hover {
                 color: white;
             }
         }
