@@ -37,7 +37,6 @@ export class WorkboxService {
 
     public openTab(tab, persistToRecentApps: boolean = true) {
 
-        debugger;
         const {tabs} = this.extractValues();
         const foundTab = tabs.find(existingTab => existingTab.id === tab.id);
 

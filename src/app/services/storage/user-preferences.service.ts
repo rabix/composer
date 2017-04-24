@@ -108,4 +108,12 @@ export class UserPreferencesService {
     getExpandedNodes() {
         return this.get("expandedNodes", []);
     }
+
+    getSidebarHidden() {
+        return this.get("sidebarHidden", []);
+    }
+
+    setSidebarHidden(hidden: boolean) {
+        return this.put("sidebarHidden", hidden);
+    }
 }

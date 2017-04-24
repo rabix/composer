@@ -10,11 +10,15 @@ import {StatusBarService} from "./status-bar.service";
 
         <!--Status & panel toggle button-->
         <span class="status-item status-buttons">
-            <button class="panel-toggle btn btn-sm" [ngClass]="!layoutService.sidebarExpanded ? 'active' : ''"
-                    (click)="layoutService.toggleSidebar()">
-                <i class="fa" [ngClass]="layoutService.sidebarExpanded ? 
-                    'fa-angle-double-left' : 'fa-angle-double-right'"></i>
-            </button>
+            <span class="btn-group">
+                <button class="sidebar-toggle btn btn-sm"
+                        [class.active]="!layoutService.sidebarHidden"
+                        (click)="layoutService.toggleSidebar()">
+                    <i class="fa"
+                       [class.fa-angle-double-left] = "layoutService.sidebarHidden"
+                       [class.fa-angle-double-right] = "!layoutService.sidebarHidden"></i>
+                </button>
+            </span>
             <span *ngIf="status">
                 {{ status.message }}
                 <span *ngIf="status.time">({{ status.time | amTimeAgo }})</span>

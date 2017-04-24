@@ -9,12 +9,8 @@
     height: 2em;
     line-height: $layout-stripe-width - 6;
 
-    .panel-toggle {
-        cursor: pointer;
-        display: inline-block;
+    .sidebar-toggle {
         font-size: 1.3rem;
-        margin-left: 2px;
-        padding: 0 5px;
     }
 
     .status-item {
@@ -47,12 +43,6 @@
             border-left-color: #222;
             padding: 0 20px;
             border-radius: 0;
-
-            &.panel-toggle {
-                line-height: 1;
-                margin-top: 2px;
-                padding: 0 5px;
-            }
 
             &.active {
                 background: $layout-title-bar-background;
