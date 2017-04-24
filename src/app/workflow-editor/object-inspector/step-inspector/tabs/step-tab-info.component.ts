@@ -54,8 +54,4 @@ export class WorkflowStepInspectorTabInfo {
     getDescription() {
         return this.step.description || this.step.run ? this.step.run.description : "";
     }
-
-    ngOnInit() {
-        console.log("Step", this.step);
-    }
 }
