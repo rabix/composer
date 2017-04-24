@@ -137,7 +137,7 @@ export class PlatformAPI {
 
             return this.http.get(this.getServiceURL("brood") + `/apps/${id}`, {
                 headers: new Headers({
-                    "session-id": "nesto"
+                    "session-id": sessionID
                 })
             });
         }).map(r => r.json().message);
