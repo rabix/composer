@@ -4,7 +4,6 @@ import {FormControl} from "@angular/forms";
 import "rxjs/add/operator/map";
 
 import {LocalFileRepositoryService} from "../../../file-repository/local-file-repository.service";
-import {PlatformAPI} from "../../../services/api/platforms/platform-api.service";
 import {UserPreferencesService} from "../../../services/storage/user-preferences.service";
 import {TreeNode} from "../../../ui/tree-view/tree-node";
 import {TreeViewComponent} from "../../../ui/tree-view/tree-view.component";
@@ -335,7 +334,9 @@ export class PublicAppsPanelComponent extends DirectiveBase implements AfterView
 
     private listenForAppOpening() {
         this.tree.open.filter(n => n.type === "app")
-            .flatMap(node => this.workbox.getOrCreateFileTab(node.id))
+            .flatMap(node => this.workbox.getOrCreateFileTab(node.id).catch(() => {
+                return Observable.empty()
+            }))
             .subscribe(tab => this.workbox.openTab(tab));
     }
 
