@@ -10,6 +10,15 @@ export class PlatformAPI {
 
     readonly sessionID = new ReplaySubject<string>(1);
 
+    /**
+     * When we have 2 or more parallel calls of openSession()
+     * and each new sessionID, that is a response of a call, invalidates the previous set sessionID so api calls that are waiting
+     * for a new SessionID can fail because of invalid session)
+     */
+    readonly openSession = Observable.of(1).flatMap(() => {
+        return this.openSessionApi()
+    }).share();
+
     static getServiceURL(platformUrl: string, serviceName: string) {
         const isVayu    = platformUrl.indexOf("-vayu.sbgenomics.com") !== -1;
         const isStaging = platformUrl.indexOf("staging-igor.sbgenomics.com") !== -1;
@@ -54,7 +63,8 @@ export class PlatformAPI {
         });
     }
 
-    openSession() {
+    // Use openSession stream when you need a call, because of a race condition
+    openSessionApi() {
         const gatekeeper = this.getServiceURL("gatekeeper");
         return this.http.post(gatekeeper + "/session/open/auth", {}, {
             headers: new Headers({
@@ -70,7 +80,7 @@ export class PlatformAPI {
         }).map(response => response.json().message.session_id)
             .do(sessionID => {
                 this.setSessionID(sessionID);
-            }).take(1);
+            });
     }
 
     /**
@@ -90,7 +100,7 @@ export class PlatformAPI {
                     ++attempts;
 
                     // If status is 403 or 404 (invalid session...) try to set a new session and call service again
-                    return this.openSession()
+                    return this.openSession;
                 });
             }
         )

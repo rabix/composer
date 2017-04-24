@@ -62,7 +62,7 @@ export class AuthService {
                 const checks = creds.map(c => {
                     const platform = this.api.forHash(c.hash);
 
-                    const call = platform ? platform.openSession()
+                    const call = platform ? platform.openSession
                         : Observable.throw(
                             new Error("Could not open session because you are not connected to the necessary platform."));
 

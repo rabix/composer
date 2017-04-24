@@ -21,7 +21,6 @@ import {UIModule} from "./ui/ui.module";
 import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
 import {CtHttp} from "./http/ct-http.service";
 
-
 @NgModule({
     providers: [
         FormBuilder,
@@ -60,6 +59,12 @@ import {CtHttp} from "./http/ct-http.service";
     bootstrap: [MainComponent]
 })
 export class AppModule {
+
+    constructor (userPref: UserPreferencesService) {
+        // When having an active connection, and restarting the app, new session ID call may end up in a race
+        // condition with other API calls which are using the old session ID, which gets invalidated in the meantime
+        userPref.clearSessions();
+    }
 }
 
 export function ctHttpFactory(xhrBackend: XHRBackend, requestOptions: RequestOptions): CtHttp {
