@@ -75,7 +75,7 @@ export class LayoutComponent extends DirectiveBase implements OnInit {
                 private domEvents: DomEventService,
                 private statusBar: StatusBarService,
                 private errorBarService: ErrorBarService,
-                private layoutService: LayoutService,
+                public layoutService: LayoutService,
                 el: ElementRef) {
         super();
 
