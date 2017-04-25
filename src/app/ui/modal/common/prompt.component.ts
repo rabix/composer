@@ -22,7 +22,7 @@ import {AsyncSubject} from "rxjs";
                 <button class="btn btn-secondary" (click)="decide(false)" type="button">
                     {{ cancellationLabel }}
                 </button>
-                <button [disabled]="form.invalid" class="btn btn-success" type="submit">
+                <button [disabled]="form.invalid" class="btn btn-primary" type="submit">
                     {{ confirmationLabel }}
                 </button>
             </div>

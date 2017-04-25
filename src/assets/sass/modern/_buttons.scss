@@ -1,0 +1,26 @@
+@import "../../sass/variables";
+
+.btn,
+.btn-primary,
+.btn-secondary {
+    border: 1px solid $btn-border-color;
+    border-radius: $btn-border-radius;
+}
+
+.btn-link {
+    border: none;
+    background: none;
+}
+
+.btn:hover {
+    border-color: $btn-border-hover-color;
+}
+
+.btn-primary {
+    background: linear-gradient($btn-primary-bg, darken($btn-primary-bg, 5%));
+
+}
+
+.btn-secondary {
+    background: linear-gradient($btn-secondary-bg, darken($btn-secondary-bg, 5%));
+}

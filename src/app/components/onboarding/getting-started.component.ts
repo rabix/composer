@@ -43,7 +43,7 @@ import {ErrorBarService} from "../../layout/error-bar/error-bar.service";
                 <p class="subtitle">Need help?</p>
                 <p>If you have any problem, idea or a thought let us know.</p>
                 <p>
-                    <button type="button" class="btn btn-outline-primary" (click)="openFeedbackModal()">
+                    <button type="button" class="btn btn-secondary" (click)="openFeedbackModal()">
                         Get support
                     </button>
                 </p>

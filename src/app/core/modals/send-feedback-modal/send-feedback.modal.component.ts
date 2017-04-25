@@ -114,7 +114,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
             <div class="footer pr-1 pb-1">
                 <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
                 
-                <button type="button" class="btn btn-success" [disabled]="!feedbackTextControl.valid"
+                <button type="button" class="btn btn-primary" [disabled]="!feedbackTextControl.valid"
                         (click)="onSendFeedback()">Send
                 </button>
             </div>
