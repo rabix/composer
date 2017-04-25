@@ -11,7 +11,7 @@ const {app, dialog} = window["require"]("electron").remote;
     selector: "ct-add-source-modal",
     template: `
         <div class="header">
-            <ct-tab-selector [distribute]="'auto'" [(active)]="activeTab" class="inverse">
+            <ct-tab-selector [distribute]="'auto'" [(active)]="activeTab">
                 <ct-tab-selector-entry tabName="local">Local</ct-tab-selector-entry>
                 <ct-tab-selector-entry tabName="platform">Platform</ct-tab-selector-entry>
             </ct-tab-selector>
@@ -33,7 +33,7 @@ const {app, dialog} = window["require"]("electron").remote;
 
                 <ct-credentials-form #credsForm [removable]="false"></ct-credentials-form>
                 <p>
-                    <button type="button" class="btn btn-success" (click)="credsForm.applyValues(); connecting = true;">Connect</button>
+                    <button type="button" class="btn btn-primary" (click)="credsForm.applyValues(); connecting = true;">Connect</button>
                 </p>
             </div>
 
@@ -76,12 +76,9 @@ const {app, dialog} = window["require"]("electron").remote;
                 </p>
             </div>
 
-
-            <div class="footer pr-1 pb-1">
+            <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" (click)="modal.close()">Cancel</button>
-                <button type="button" class="btn btn-success"
-                        (click)="onDone()">Done
-                </button>
+                <button type="button" class="btn btn-primary" (click)="onDone()">Done</button>
             </div>
         </div>
     `,

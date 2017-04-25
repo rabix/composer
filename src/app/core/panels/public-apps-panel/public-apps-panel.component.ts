@@ -26,20 +26,20 @@ import {Observable} from "rxjs/Observable";
             <button type="button"
                     (click)="regroup('toolkit')"
                     [class.active]="grouping === 'toolkit'"
-                    class="btn btn-sm btn-secondary">By Toolkit
+                    class="btn btn-secondary">By Toolkit
             </button>
 
             <button type="button"
                     (click)="regroup('category')"
                     [class.active]="grouping === 'category'"
-                    class="btn btn-sm btn-secondary">By Category
+                    class="btn btn-secondary">By Category
             </button>
         </div>
 
         <div class="scroll-container">
 
             <div *ngIf="searchContent?.value && searchResults" class="search-results">
-                <ct-nav-search-result *ngFor="let entry of searchResults" class="pl-1 pr-1" ct-drag-enabled=""
+                <ct-nav-search-result *ngFor="let entry of searchResults" class="pl-1 pr-1"
                                       [id]="entry?.id"
                                       [icon]="entry?.icon"
                                       [label]="entry?.label"

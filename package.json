@@ -55,7 +55,7 @@
         "ngx-pipes": "^1.5.7",
         "rxjs": "^5.1.0",
         "selectize": "^0.12.4",
-        "zone.js": "^0.8.5"
+        "zone.js": "0.8.5"
     },
     "devDependencies": {
         "@angular/cli": "^1.0.0",

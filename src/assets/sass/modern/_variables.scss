@@ -17,59 +17,69 @@ $border-radius: 2px;
 
 // ----- Typography ------
 $font-size-base: 13px;
-$text-color: rgba(231, 231, 231, 1);
+$text-color: #e7e7e7;
 $text-muted: darken($text-color, 30);
 
 // ----- Tag -----
 $tag-primary-bg: $brand-primary;
 $tag-color: black;
 
-
 // ----- Forms -----
 $input-bg: #333333;
-$input-border-color: rgb(58, 58, 58);
+$input-border-color: #3a3a3a;
 $input-bg-focus: $input-bg;
 $input-color-focus: $text-color;
 $input-color: $text-color;
 $input-border-radius: $border-radius;
 $input-padding-x: .55rem;
 $input-padding-y: .4rem;
-$input-border-color: rgb(38, 38, 38);
-$input-bg-disabled: rgb(38, 38, 38);
+$input-border-color: #262626;
+$input-bg-disabled: #262626;
 $input-color-disabled: $text-muted;
 $input-bg-hover: $brand-primary;
 $input-group-addon-bg: $input-bg;
-
-
 
 // ----- Code -----
 $code-bg: $input-bg;
 $code-color: $brand-primary;
 
 // ----- Buttons -----
-$btn-primary-bg: $brand-primary;
-$btn-secondary-bg: rgb(60, 60, 60);
-$btn-secondary-color: $text-color;
-$btn-secondary-hover-bg: $brand-primary;
+$btn-border-color: #595b5d;
+$btn-border-hover-color: #476588; // not bootstrap
+$btn-border-radius: 3px;
 $btn-line-height: 1em;
+$btn-padding-x: 1.2em;
+$btn-padding-y: .55em;
+$btn-primary-bg: #3e5167;
+$btn-secondary-bg: #373a3c;
+$btn-secondary-color: $text-color;
+
+// ----- Links -----
 $link-color: $brand-primary;
 $link-hover-color: lighten($brand-primary, 10%);
 
 // ----- Tables -----
 $table-border-color: $input-border-color;
 
-
 // ----- Global Layout Elements -----
-$body-bg: rgb(48, 48, 48);
+$body-bg: #303030;
 $panel-bg: #434343;
 $toolbar-height: 2em;
-$toolbar-header-background: #333;
+$toolbar-header-bg: #333;
 
 // ----- Layout Uniques -----
 $main-header-height: 35px; // Logo/tabs row
 $panel-resize-handle-width: 6px; // drag handle for resizing nav tree
 
 // ----- Misc -----
+
+// ----- Modals -----
+$modal-content-bg: $body-bg;
+$modal-header-bg: $toolbar-header-bg;
+$modal-content-bg: $panel-bg;
+$modal-backdrop-opacity: .25;
+$modal-footer-border-color: transparent;
+
 
 /**
  * SIDE PANELS
@@ -80,7 +90,6 @@ $btn-success-border: #328e46;
 $btn-primary-border: #296394;
 $btn-danger-border: #804c03; // not according to style guide
 $btn-warning-border: #bc7e20; // not according to style guide
-
 
 /** Layout */
 $layout-stripe-width: 28px;

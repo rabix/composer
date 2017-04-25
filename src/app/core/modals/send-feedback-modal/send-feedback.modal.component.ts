@@ -1,10 +1,11 @@
 import {ChangeDetectionStrategy, Component, Input} from "@angular/core";
-import {FormBuilder, FormControl, Validators} from "@angular/forms";
+import {FormBuilder, Validators} from "@angular/forms";
+import {Observable} from "rxjs/Observable";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {CredentialsEntry} from "../../../services/storage/user-preferences-types";
 import {ErrorBarService} from "../../../layout/error-bar/error-bar.service";
 import {PlatformAPIGatewayService} from "../../../auth/api/platform-api-gateway.service";
-import {Observable} from "rxjs/Observable";
+
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -123,7 +124,7 @@ import {Observable} from "rxjs/Observable";
                         (click)="closeModal()">Cancel
                 </button>
 
-                <button type="button" class="btn btn-success" data-test='send-button'
+                <button type="button" class="btn btn-primary" data-test='send-button'
                         [disabled]="!feedbackTextControl.valid"
                         (click)="onSendFeedback()">Send
                 </button>

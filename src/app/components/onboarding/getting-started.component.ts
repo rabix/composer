@@ -41,8 +41,7 @@ import {CredentialsEntry} from "../../services/storage/user-preferences-types";
                 <p class="subtitle">Need help?</p>
                 <p>If you have any problem, idea or a thought let us know.</p>
                 <p>
-                    <button type="button" data-test="get-support-btn" class="btn btn-outline-primary" 
-                            (click)="openFeedbackModal()">
+                    <button type="button" data-test="get-support-btn" class="btn btn-secondary" (click)="openFeedbackModal()">
                         Get support
                     </button>
                 </p>

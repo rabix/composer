@@ -33,9 +33,9 @@ export class ModalService {
         this.close();
 
         config = {
-            backdrop: false,
+            backdrop: true,
             closeOnEscape: true,
-            closeOnOutsideClick: true,
+            closeOnOutsideClick: false,
             title: "",
             ...config
         };
@@ -55,9 +55,9 @@ export class ModalService {
     public fromTemplate<T>(template: TemplateRef<T>, config?: Partial<ModalOptions>): void {
         this.close();
         config = {
-            backdrop: false,
+            backdrop: true,
             closeOnEscape: true,
-            closeOnOutsideClick: true,
+            closeOnOutsideClick: false,
             title: "",
             ...config
         };
@@ -91,11 +91,11 @@ export class ModalService {
     }
 
     confirm(params: {
-                title?: string,
-                content?: string,
-                confirmationLabel?: string,
-                cancellationLabel ?: string
-            }) {
+        title?: string,
+        content?: string,
+        confirmationLabel?: string,
+        cancellationLabel ?: string
+    }) {
 
         return this.wrapPromise((resolve, reject) => {
             const component = this.fromComponent(ConfirmComponent, {
@@ -116,12 +116,12 @@ export class ModalService {
     }
 
     prompt(params: {
-               title?: string,
-               content?: string,
-               confirmationLabel?: string,
-               cancellationLabel ?: string,
-               formControl?: FormControl,
-           }) {
+        title?: string,
+        content?: string,
+        confirmationLabel?: string,
+        cancellationLabel ?: string,
+        formControl?: FormControl,
+    }) {
 
         return this.wrapPromise((resolve, reject) => {
             const component = this.fromComponent(PromptComponent, {

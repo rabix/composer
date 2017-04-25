@@ -10,7 +10,7 @@ import {Subject} from "rxjs/Subject";
             </div>
             <div class="footer pr-1 pb-1">
                 <button class="btn btn-secondary" (click)="decision.next(false)" type="button">{{ cancellationLabel }}</button>
-                <button class="btn btn-success" type="submit">{{ confirmationLabel }}</button>
+                <button class="btn btn-primary" type="submit">{{ confirmationLabel }}</button>
             </div>
         </form>
     `

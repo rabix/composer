@@ -80,14 +80,14 @@ import {Observable} from "rxjs/Observable";
                 <button type="button" class="btn btn-secondary" (click)="modal.close()"> Cancel</button>
                 <button type="button"
                         (click)="createRemote()"
-                        class="btn btn-success"
+                        class="btn btn-primary"
                         *ngIf="destination=== 'remote'"
                         [disabled]="platformGroup.invalid">
                     <span *ngIf="checkingSlug">Checking...</span>
                     <span *ngIf="!checkingSlug">Create</span>
                 </button>
                 <button type="button"
-                        class="btn btn-success"
+                        class="btn btn-primary"
                         *ngIf="destination=== 'local'"
                         (click)="createLocal()"
                         [disabled]="localNameControl.invalid || !chosenLocalFilename">
