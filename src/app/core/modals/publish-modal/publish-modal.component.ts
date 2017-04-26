@@ -52,7 +52,7 @@ import {PlatformAppEntry} from "../../../services/api/platforms/platform-api.typ
                 <button type="button" class="btn btn-secondary" (click)="modal.close()"> Cancel</button>
                 <button type="button"
                         (click)="publish()"
-                        class="btn btn-success"
+                        class="btn btn-primary"
                         [disabled]="platformGroup.invalid">
                     <span *ngIf="checking">Checking...</span>
                     <span *ngIf="!checking">Publish</span>

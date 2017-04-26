@@ -15,8 +15,8 @@ import {SystemService} from "../../platform-providers/system.service";
             </div>
         </div>
         <div class="modal-footer pb-1 pt-1 pr-1">
-            <button (click)="report()" class="btn ml-1 btn-success" type="button mr-1">Report</button>
-            <button (click)="clearCacheAndRestart()" class="btn btn-primary btn-outline-primary ml-1" type="button">Clear Cache and
+            <button (click)="report()" class="btn ml-1 btn-primary" type="button mr-1">Report</button>
+            <button (click)="clearCacheAndRestart()" class="btn btn-secondary ml-1" type="button">Clear Cache and
                 Restart
             </button>
             <button (click)="restart()" class="btn btn-secondary ml-1" type="button">Restart</button>
