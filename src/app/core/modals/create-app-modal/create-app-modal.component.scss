@@ -8,6 +8,7 @@
     }
 
     .platform {
+
         flex: 1;
         margin: 1em;
         border: 2px solid #c7c7c7;
@@ -17,12 +18,12 @@
         line-height: 4.4em;
         font-size: 1.1em;
         font-weight: 600;
-        color: #55595c;
+        background: $body-bg;
     }
 
     .active {
         border-color: $brand-primary;
-        color: #333;
+        background: $panel-bg;
     }
 
     .modal-footer {
