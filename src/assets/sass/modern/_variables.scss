@@ -39,13 +39,19 @@ $input-color-disabled: $text-muted;
 $input-bg-hover: $brand-primary;
 $input-group-addon-bg: $input-bg;
 
+// ----- Dropdowns ------
+$dropdown-content-bg: #3e3e3e;
+$dropdown-content-color: $text-color;
+$dropdown-tag-bg: $btn-primary-bg;
+$dropdown-active-bg: $input-border-color;
+
 // ----- Code -----
 $code-bg: $input-bg;
 $code-color: $brand-primary;
 
 // ----- Buttons -----
-$btn-border-color: #595b5d;
-$btn-border-hover-color: #476588; // not bootstrap
+$btn-primary-border-color: #3e3d3d;
+$btn-border-color: #313030;
 $btn-border-radius: 3px;
 $btn-line-height: 1em;
 $btn-padding-x: 1.2em;
@@ -53,6 +59,8 @@ $btn-padding-y: .55em;
 $btn-primary-bg: #3e5167;
 $btn-secondary-bg: #373a3c;
 $btn-secondary-color: $text-color;
+$btn-border-hover-color: $input-border-color;
+$btn-gradient-active: true;
 
 // ----- Links -----
 $link-color: $brand-primary;
@@ -79,7 +87,6 @@ $modal-header-bg: $toolbar-header-bg;
 $modal-content-bg: $panel-bg;
 $modal-backdrop-opacity: .25;
 $modal-footer-border-color: transparent;
-
 
 /**
  * SIDE PANELS

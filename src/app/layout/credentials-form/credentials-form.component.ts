@@ -15,7 +15,7 @@ import {AuthService} from "../../auth/auth/auth.service";
             </div>
 
             <div *ngFor="let pair of getPairControls(); let i = index;"
-                 class="row"
+                 class="row mb-1"
                  data-test="credentials-entry">
 
                 <div class="col-xs-5" [class.has-danger]="pair.dirty && pair.get('url').invalid">
