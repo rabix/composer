@@ -1,7 +1,7 @@
 import {Pipe, PipeTransform} from "@angular/core";
 import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 
-@Pipe({name: "commandOutputGlob", pure: false})
+@Pipe({name: "commandOutputGlob", pure: true})
 export class CommandOutputGlobPipe implements PipeTransform {
     transform(glob): any {
 
@@ -15,5 +15,4 @@ export class CommandOutputGlobPipe implements PipeTransform {
 
         return glob;
     }
-
 }
