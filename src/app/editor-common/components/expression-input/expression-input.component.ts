@@ -25,7 +25,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
 
             <ct-validation-preview [entry]="model?.validation"></ct-validation-preview>
             <b class="validation-icon result"
-               *ngIf="model?.result && isExpr"
+               *ngIf="isExpr && !(model?.hasErrors() || model?.hasWarnings())"
                [title]="result">E:</b>
 
             <div class="input-group">
@@ -154,6 +154,8 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
         if (this.type === "number") {
             str = Number(str);
         }
+
+        this.model = this.model.clone();
         this.model.setValue(str, this.type);
         this.onChange(this.model);
     }
@@ -179,29 +181,28 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
 
             editor.readonly = this.readonly;
 
-            const cachedValue = this.model.serialize() || "";
-            const cachedType  = this.model.type;
-
-            editor.model   = this.model;
+            editor.model = this.model.clone();
             editor.context = this.context;
             editor.action.first().subscribe(editorAction => {
+
                 if (editorAction === "save") {
                     const val = editor.model.serialize();
-                    this.model.setValue(val, "expression");
 
-                    this.model.evaluate(this.context).then(() => {
-                            // to reset validation
-                            this.isExpr = this.model.isExpression;
-                            this.onChange(this.model);
-                        },
-                        () => {
-                            // to reset validation
-                            this.isExpr = this.model.isExpression;
-                            this.onChange(this.model);
-                        });
-                } else {
-                    this.model.setValue(cachedValue, cachedType);
+                    if (val) {
+                        this.model = editor.model;
+                    } else {
+                        this.model.setValue("", this.type)
+                    }
+
+                    const resetValidation = ()=> {
+                        // to reset validation
+                        this.isExpr = this.model.isExpression;
+                        this.onChange(this.model);
+                    }
+
+                    this.model.evaluate(this.context).then(resetValidation, resetValidation);
                 }
+
                 this.modal.close();
             });
         }
