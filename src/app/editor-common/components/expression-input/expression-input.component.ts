@@ -187,10 +187,9 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
 
                 if (editorAction === "save") {
                     const val = editor.model.serialize();
+                    this.model = editor.model;
 
-                    if (val) {
-                        this.model = editor.model;
-                    } else {
+                    if (!val) {
                         this.model.setValue("", this.type)
                     }
 
@@ -214,6 +213,7 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
                 cancellationLabel: "No, keep it",
                 confirmationLabel: "Yes, delete it"
             }).then(() => {
+                this.model = this.model.clone();
                 this.model.setValue("", this.type);
                 this.model.result = null;
                 this.isExpr       = false;
