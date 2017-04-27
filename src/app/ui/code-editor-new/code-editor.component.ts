@@ -1,5 +1,6 @@
 import {
-    ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, OnChanges, OnDestroy, OnInit,
+    ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, NgZone, OnChanges, OnDestroy,
+    OnInit,
     SimpleChanges
 } from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
@@ -56,13 +57,18 @@ export class CodeEditorComponent implements OnInit, ControlValueAccessor, OnDest
 
     private onTouch: () => {};
 
-    constructor(private elementRef: ElementRef) {
+    constructor(private elementRef: ElementRef, private zone: NgZone) {
     }
 
     ngOnInit() {
         console.log("Got options", this.options);
         // Instantiate an editor
-        this.editor = ace.edit(this.elementRef.nativeElement);
+
+        // To avoid unnecessary change detection cycle because of mouse and other events that occur on Ace editor
+        this.zone.runOutsideAngular(() => {
+            this.editor = ace.edit(this.elementRef.nativeElement);
+        });
+
         this.editor.setOptions(Object.assign({
             theme: "ace/theme/idle_fingers",
             mode: "ace/mode/text",
