@@ -38,6 +38,9 @@ export class WorkboxService {
     public openTab(tab, persistToRecentApps: boolean = true) {
 
         const {tabs} = this.extractValues();
+
+        // When opening an app, we use id with revision number because we can have cases when we can open the same app
+        // different revisions (when we publish a local file with existing id, new tab is open ...)
         const foundTab = tabs.find(existingTab => existingTab.id === tab.id);
 
         if (foundTab) {
@@ -48,8 +51,17 @@ export class WorkboxService {
         if (persistToRecentApps) {
             this.preferences.get("recentApps", []).take(1).subscribe((recentApps) => {
 
+                const tabIdSplit = tab.id.split("/");
+
+                // Persist an app without revision number so in recently opened apps we can have only one app (no multiple
+                // apps with different revisions)
+                const tabId = isNaN(Number([...tabIdSplit].pop())) ? tab.id : (() => {
+                    tabIdSplit.pop();
+                    return tabIdSplit.join("/");
+                })();
+
                 // Remove from the recent apps if tab is already in the list
-                const newArray = recentApps.filter((item) => item.id !== tab.id);
+                const newArray = recentApps.filter((item) => item.id !== tabId);
 
                 // Maximum number of recent apps
                 if (newArray.length === 20) {
@@ -57,7 +69,7 @@ export class WorkboxService {
                 }
 
                 const itemToAdd = {
-                    id: tab.id,
+                    id: tabId,
                     label: tab.data.dataSource === "local" ? (() => {
                         const idSplit = tab.id.split("/");
                         idSplit.pop();
@@ -136,6 +148,10 @@ export class WorkboxService {
         }
 
         this.activeTab.next(tab);
+    }
+
+    public getOrCreateFileTabAndOpenIt(fileID) {
+        this.getOrCreateFileTab(fileID).take(1).subscribe((tab) => this.openTab(tab));
     }
 
     public getOrCreateFileTab(fileID): Observable<TabData<AppTabData>> {

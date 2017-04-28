@@ -8,7 +8,6 @@ import {
     ViewChildren
 } from "@angular/core";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
-import {noop} from "../../../lib/utils.lib";
 import {
     CommandInputParameterModel,
     CommandLineToolModel,
@@ -87,7 +86,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                                      'col-xs-4': !readonly,
                                      'col-xs-5': readonly
                                  }">
-                            {{ entry.outputBinding.glob}}
+                            {{ entry.outputBinding.glob | commandOutputGlob}}
                         </div>
 
                         <!--Actions Column-->

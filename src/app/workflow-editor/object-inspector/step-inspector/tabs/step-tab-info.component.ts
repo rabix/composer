@@ -7,23 +7,37 @@ import {StepModel} from "cwlts/models";
     selector: "ct-workflow-step-inspector-info",
     template: `
         <div>
+            <!--Type-->
             <p>
                 <strong>Type:</strong>
                 <span> {{ step.run['class'] }} </span>
             </p>
+
+            <!--Cwl Version-->
+            <p>
+                <strong>Cwl Version:</strong>
+                <span> {{ step.run['cwlVersion'] }} </span>
+            </p>
+
+            <!--Revision-->
             <p>
                 <strong>Revision:</strong>
                 <span>{{ step.run.customProps['sbg:revision'] }}</span>
             </p>
+
+            <!--Toolkit Version-->
             <p>
                 <strong>Toolkit Version:</strong>
                 <span>{{ step.run.customProps['sbg:toolkitVersion'] }}</span>
             </p>
+
+            <!--Author-->
             <p>
                 <strong>Author:</strong>
                 <span> {{ step.run.customProps['sbg:createdBy'] }} </span>
             </p>
-        
+
+            <!--Description-->
             <div>
                 <strong>Description{{ getDescription() ? '' : ':'}}</strong>
                 <div class="form-group" [ngClass]="{'format': getDescription()}">
