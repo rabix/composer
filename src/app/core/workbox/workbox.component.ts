@@ -42,8 +42,8 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
                     </div>
                 </li>
 
-                <li class="ct-workbox-add-tab-icon">
-                    <i class="fa fa-plus clickable" (click)="openNewFileTab()"></i>
+                <li class="ct-workbox-add-tab-icon clickable" (click)="openNewFileTab()">
+                    <i class="fa fa-plus"></i>
                 </li>
 
             </ul>
