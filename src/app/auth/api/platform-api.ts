@@ -94,7 +94,7 @@ export class PlatformAPI {
                 return errors.flatMap((err) => {
 
                     if (!(err.status === 404 || err.status === 403) || attempts >= 1) {
-                        throw new Error(err);
+                        return Observable.throw(err);
                     }
 
                     ++attempts;
