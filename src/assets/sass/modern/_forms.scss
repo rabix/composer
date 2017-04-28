@@ -22,14 +22,13 @@
 }
 
 .btn-secondary {
-    &:hover {
-        background: $btn-secondary-hover-bg;
-    }
+
     &.input-addition {
         border-left: none;
 
     }
 }
+
 .btn-secondary.input-addition {
 }
 
@@ -43,3 +42,48 @@
     }
 }
 
+.selectize-control {
+
+    &.single, &.multi {
+        .selectize-input {
+            background: $input-bg;
+            border: $input-btn-border-width solid $input-border-color;
+            box-shadow: none;
+
+            &.dropdown-active::before,
+            &.input-active {
+                background: $input-bg;
+                border: $input-btn-border-width solid $input-border-focus;
+            }
+
+            input {
+                color: $input-color;
+            }
+        }
+
+        .selectize-dropdown {
+
+            background: $dropdown-content-bg;
+            color: $text-color;
+
+            border-color: $input-border-color;
+
+            .optgroup-header,
+            .option {
+                background: $dropdown-content-bg;
+                color: $text-color;
+            }
+
+            .option {
+                &.active {
+                    background: $dropdown-active-bg;
+                }
+            }
+        }
+    }
+
+    &.multi .selectize-input [data-value] {
+        background: $btn-primary-bg;
+        border-color: $btn-primary-border;
+    }
+}

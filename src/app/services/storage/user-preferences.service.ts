@@ -97,6 +97,16 @@ export class UserPreferencesService {
         return this.put("credentials", credentials);
     }
 
+    clearSessions() {
+        this.getCredentials().take(1).subscribe((creds: CredentialsEntry[]) => {
+            creds.forEach((item) => {
+                item.sessionID = null;
+            });
+
+            this.setCredentials(creds);
+        });
+    }
+
     getOpenProjects() {
         return this.get("openProjects", []);
     }
@@ -107,5 +117,13 @@ export class UserPreferencesService {
 
     getExpandedNodes() {
         return this.get("expandedNodes", []);
+    }
+
+    getSidebarHidden() {
+        return this.get("sidebarHidden", []);
+    }
+
+    setSidebarHidden(hidden: boolean) {
+        return this.put("sidebarHidden", hidden);
     }
 }

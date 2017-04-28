@@ -9,11 +9,11 @@ import {UserPreferencesService} from "../../../services/storage/user-preferences
             <ct-tab-selector-entry [tabName]="'publicApps'">Public Apps</ct-tab-selector-entry>
         </ct-tab-selector>
 
-        <div class="panel-container" [hidden]="activeTab !== 'myApps'">
+        <div class="panel-container" [class.hidden]="activeTab !== 'myApps'">
             <ct-my-apps-panel></ct-my-apps-panel>
         </div>
 
-        <div class="panel-container" [hidden]="activeTab !== 'publicApps'">
+        <div class="panel-container" [class.hidden]="activeTab !== 'publicApps'">
             <ct-public-apps-panel></ct-public-apps-panel>
         </div>
     `,

@@ -18,7 +18,9 @@ import {SystemService} from "../../platform-providers/system.service";
                 integration
                 with online services like DockerHub.
                 <br/>
-                Visit <a href (click)="openLink($event, 'http://rabix.io/')">rabix.io</a> for more info.
+                Visit <a href data-test="info-link"
+                         (click)="openLink('http://rabix.io/'); false;">
+                    rabix.io</a> for more info.
             </p>
 
             <h2 class="h5 mt-1">
@@ -26,7 +28,8 @@ import {SystemService} from "../../platform-providers/system.service";
             </h2>
 
             <p>
-                <button type="button" (click)="onOpenProjectButtonClick()" class="btn btn-primary">
+                <button data-test="open-project-btn" type="button" (click)="onOpenProjectButtonClick()"
+                        class="btn btn-primary">
                     Open a Project
                 </button>
             </p>
@@ -43,9 +46,7 @@ export class WelcomeTabComponent {
 
     }
 
-    openLink($event, link) {
-        $event.preventDefault();
-        $event.stopPropagation();
+    openLink(link: string) {
         this.system.openLink(link);
     }
 

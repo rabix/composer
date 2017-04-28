@@ -4,7 +4,6 @@ import {FormControl} from "@angular/forms";
 import "rxjs/add/operator/map";
 
 import {LocalFileRepositoryService} from "../../../file-repository/local-file-repository.service";
-import {PlatformAPI} from "../../../services/api/platforms/platform-api.service";
 import {UserPreferencesService} from "../../../services/storage/user-preferences.service";
 import {TreeNode} from "../../../ui/tree-view/tree-node";
 import {TreeViewComponent} from "../../../ui/tree-view/tree-view.component";
@@ -27,20 +26,20 @@ import {Observable} from "rxjs/Observable";
             <button type="button"
                     (click)="regroup('toolkit')"
                     [class.active]="grouping === 'toolkit'"
-                    class="btn btn-sm btn-secondary">By Toolkit
+                    class="btn btn-secondary">By Toolkit
             </button>
 
             <button type="button"
                     (click)="regroup('category')"
                     [class.active]="grouping === 'category'"
-                    class="btn btn-sm btn-secondary">By Category
+                    class="btn btn-secondary">By Category
             </button>
         </div>
 
         <div class="scroll-container">
 
             <div *ngIf="searchContent?.value && searchResults" class="search-results">
-                <ct-nav-search-result *ngFor="let entry of searchResults" class="pl-1 pr-1" ct-drag-enabled=""
+                <ct-nav-search-result *ngFor="let entry of searchResults" class="pl-1 pr-1"
                                       [id]="entry?.id"
                                       [icon]="entry?.icon"
                                       [label]="entry?.label"
@@ -70,7 +69,7 @@ import {Observable} from "rxjs/Observable";
                 <i class="icon fa-4x fa fa-search"></i>
             </div>
 
-            <ct-tree-view #tree [hidden]="searchContent?.value" [nodes]="groupedNodes"
+            <ct-tree-view #tree [class.hidden]="searchContent?.value" [nodes]="groupedNodes"
                           [level]="1"></ct-tree-view>
         </div>
     `,
@@ -335,7 +334,9 @@ export class PublicAppsPanelComponent extends DirectiveBase implements AfterView
 
     private listenForAppOpening() {
         this.tree.open.filter(n => n.type === "app")
-            .flatMap(node => this.workbox.getOrCreateFileTab(node.id))
+            .flatMap(node => this.workbox.getOrCreateFileTab(node.id).catch(() => {
+                return Observable.empty()
+            }))
             .subscribe(tab => this.workbox.openTab(tab));
     }
 

@@ -9,6 +9,10 @@
     height: 2em;
     line-height: $layout-stripe-width - 6;
 
+    .sidebar-toggle {
+        font-size: 1.3rem;
+    }
+
     .status-item {
         flex: 1 1 0;
         text-align: center;
