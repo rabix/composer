@@ -17,7 +17,6 @@
         "compile:angular": "./node_modules/.bin/ng build -prod -aot",
         "compile:electron": "./node_modules/.bin/tsc -p electron && cp -R electron/src/splash electron/dist/src",
         "compile:electron:watch": "./node_modules/.bin/tsc -p electron --watch",
-        "e2e": "./node_modules/.bin/ng e2e",
         "lint": "./node_modules/.bin/ng lint",
         "package": "./scripts/electron-build.sh",
         "postinstall": "npm run update-webdriver && cd electron && npm install",
@@ -26,6 +25,7 @@
         "test": "npm run test:electron && npm run test:angular",
         "test:angular": "./node_modules/.bin/ng test --watch false",
         "test:angular:watch": "./node_modules/.bin/ng test",
+        "test:e2e": "./node_modules/.bin/ng e2e",
         "test:electron": "./node_modules/electron/cli.js ./electron/node_modules/.bin/_mocha --recursive --ui bdd 'electron/dist/**/*.spec.js'",
         "travis": "npm run build && npm test",
         "update-webdriver": "node node_modules/protractor/bin/webdriver-manager update",
@@ -55,7 +55,7 @@
         "ngx-pipes": "^1.5.7",
         "rxjs": "^5.1.0",
         "selectize": "^0.12.4",
-        "zone.js": "^0.8.5"
+        "zone.js": "0.8.5"
     },
     "devDependencies": {
         "@angular/cli": "^1.0.0",
