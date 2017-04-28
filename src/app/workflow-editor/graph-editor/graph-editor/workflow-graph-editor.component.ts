@@ -446,7 +446,12 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
     ngOnDestroy() {
         super.ngOnDestroy();
-        this.graph.destroy();
+
+        // When you click on remove tab (X) on non active tab which has no graph rendered yet
+        if (this.graph) {
+            this.graph.destroy();
+        }
+
         this.workflowEditorService.emptyHistory();
         window.removeEventListener("keypress", this.historyHandler);
         this.inspector.hide();

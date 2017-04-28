@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
-import {Http} from "@angular/http";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {PlatformAPI} from "./platform-api";
+import {CtHttp} from "../../http/ct-http.service";
 
 @Injectable()
 export class PlatformAPIGatewayService {
@@ -9,7 +9,7 @@ export class PlatformAPIGatewayService {
     private apis: { [hash: string]: PlatformAPI } = {};
 
 
-    constructor(private http: Http, private prefs: UserPreferencesService) {
+    constructor(private http: CtHttp, private prefs: UserPreferencesService) {
 
         prefs.getCredentials().subscribe(credentials => {
             credentials.forEach(cred => {
@@ -33,5 +33,29 @@ export class PlatformAPIGatewayService {
 
     forHash(hash: string): PlatformAPI {
         return this.apis[hash];
+    }
+
+    addBeforeInterceptor(callback: Function) {
+        this.http.addBeforeInterceptor(callback);
+    }
+
+    removeBeforeInterceptor(callback: Function) {
+        this.http.removeBeforeInterceptor(callback);
+    }
+
+    addAfterInterceptor(callback: Function) {
+        this.http.addAfterInterceptor(callback);
+    }
+
+    removeAfterInterceptor(callback: Function) {
+        this.http.removeAfterInterceptor(callback);
+    }
+
+    addErrorInterceptor(callback: Function) {
+        this.http.addErrorInterceptor(callback);
+    }
+
+    removeErrorInterceptor(callback: Function) {
+        this.http.removeErrorInterceptor(callback);
     }
 }

@@ -385,11 +385,15 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
 
     private listenForAppOpening() {
         this.tree.open.filter(n => n.type === "app")
-            .flatMap(node => this.workbox.getOrCreateFileTab(node.id))
+            .flatMap(node => this.workbox.getOrCreateFileTab(node.id).catch(() => {
+                return Observable.empty();
+            }))
             .subscribe(tab => this.workbox.openTab(tab));
 
         this.tree.open.filter(n => n.type === "file")
-            .flatMap(node => this.workbox.getOrCreateFileTab(node.data.path))
+            .flatMap(node => this.workbox.getOrCreateFileTab(node.data.path).catch(() => {
+                return Observable.empty();
+            }))
             .subscribe(tab => this.workbox.openTab(tab));
     }
 

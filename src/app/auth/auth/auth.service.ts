@@ -1,12 +1,11 @@
 import {Injectable} from "@angular/core";
-import {Http} from "@angular/http";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {Observable} from "rxjs/Observable";
 import {ErrorBarService} from "../../layout/error-bar/error-bar.service";
 import {ConnectionState, CredentialsEntry} from "../../services/storage/user-preferences-types";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
-import {PlatformAPI} from "../api/platform-api";
+import {PlatformAPIGatewayService} from "../api/platform-api-gateway.service";
 
 
 @Injectable()
@@ -14,7 +13,7 @@ export class AuthService {
 
     authenticationProgress = new BehaviorSubject(false);
 
-    connections = new ReplaySubject<CredentialsEntry[]>();
+    connections = new ReplaySubject<CredentialsEntry[]>(1);
 
     /**
      * Converts a https://*.sbgenomics.com url to a profile name
@@ -35,7 +34,7 @@ export class AuthService {
 
     constructor(private prefs: UserPreferencesService,
                 private errorBar: ErrorBarService,
-                private http: Http) {
+                private api: PlatformAPIGatewayService) {
         this.invalidateConnections();
 
         this.prefs.getCredentials()
@@ -59,11 +58,16 @@ export class AuthService {
                 this.authenticationProgress.next(true);
                 return this.prefs.setCredentials(m);
             })
-            .flatMap(creds => {
+            .flatMap((creds: CredentialsEntry[]) => {
                 const checks = creds.map(c => {
-                    const api = new PlatformAPI(this.http, c.url, c.token);
-                    return api.openSession()
-                        .flatMap(session => api.getUser(session), (session, user) => ({session, user}))
+                    const platform = this.api.forHash(c.hash);
+
+                    const call = platform ? platform.openSession
+                        : Observable.throw(
+                            new Error("Could not open session because you are not connected to the necessary platform."));
+
+                    return call
+                        .flatMap(session => platform.getUser(session), (session, user) => ({session, user}))
                         .timeout(10000)
                         .catch(err => {
 

@@ -7,7 +7,7 @@ import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {DomEventService} from "../../services/dom/dom-event.service";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
-import {WorkboxService} from "../workbox/workbox.service";
+
 import {
     PANEL_LOCAL_FILES,
     PANEL_PUBLIC_APPS,

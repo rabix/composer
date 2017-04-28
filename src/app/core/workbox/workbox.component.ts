@@ -23,7 +23,7 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
                     (click)="workbox.openTab(tab)"
                     [class.active]="tab === (workbox.activeTab | async)"
                     [ct-context]="createContextMenu(tab)"
-                    class="tab clickable">
+                    class="tab">
 
                     <div class="tab-icon">
                         <i class="fa" 
@@ -37,11 +37,13 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
                     </div>
 
                     <div class="title">{{ tab.label }}</div>
-                    <div (click)="removeTab(tab)" class="close-icon"><b>×</b></div>
+                    <div class="close-icon">
+                        <i class="fa fa-times clickable" (click)="removeTab(tab)"></i>
+                    </div>
                 </li>
 
-                <li class="ct-workbox-add-tab-icon clickable">
-                    <i class="fa fa-plus" aria-hidden="true" (click)="openNewFileTab()"></i>
+                <li class="ct-workbox-add-tab-icon clickable" (click)="openNewFileTab()">
+                    <i class="fa fa-plus"></i>
                 </li>
 
             </ul>
