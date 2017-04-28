@@ -31,7 +31,7 @@ import {ErrorBarService} from "../../layout/error-bar/error-bar.service";
 
             <!--Panels Column-->
             <div class="panel-column" [style.flexGrow]="treeSize"
-                 [class.hidden]="!layoutService.sidebarHidden">
+                 [class.hidden]="layoutService.sidebarHidden">
 
                 <ct-logo class="pl-1 logo title-bar-section"></ct-logo>
                 <ct-panel-container class="layout-section">
@@ -41,7 +41,7 @@ import {ErrorBarService} from "../../layout/error-bar/error-bar.service";
 
             <!--Panel/Content Resize Handle-->
             <div #handle class="handle-vertical"
-                 [class.hidden]="!layoutService.sidebarHidden">
+                 [class.hidden]="layoutService.sidebarHidden">
             </div>
 
             <!--Editor Content Column-->
