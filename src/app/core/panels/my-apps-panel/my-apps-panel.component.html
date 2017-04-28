@@ -42,6 +42,6 @@
         <i class="icon fa-4x fa fa-search"></i>
     </div>
 
-    <ct-tree-view #tree [hidden]="searchContent?.value" [nodes]="treeNodes"
+    <ct-tree-view #tree [class.hidden]="searchContent?.value" [nodes]="treeNodes"
                   [level]="1"></ct-tree-view>
 </div>

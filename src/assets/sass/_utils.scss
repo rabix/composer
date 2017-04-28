@@ -32,10 +32,6 @@
     }
 }
 
-.cursor-pointer {
-    cursor: pointer;
-}
-
 .no-underline-hover:hover,
 .no-underline-hover:focus {
     text-decoration: none;
@@ -59,6 +55,10 @@
 
 .block {
     display: block;
+}
+
+.hidden {
+    display: none !important;
 }
 
 .flex-fill {
