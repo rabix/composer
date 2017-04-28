@@ -24,7 +24,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 
         <div class="form-group">
-            <div [hidden]="paramType?.type !== 'array'">
+            <div [class.hidden]="paramType?.type !== 'array'">
                 <label class="form-control-label">Items Type</label>
                 <select class="form-control"
                         [formControl]="form.controls['items']">

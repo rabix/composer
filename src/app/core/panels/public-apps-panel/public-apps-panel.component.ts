@@ -69,7 +69,7 @@ import {Observable} from "rxjs/Observable";
                 <i class="icon fa-4x fa fa-search"></i>
             </div>
 
-            <ct-tree-view #tree [hidden]="searchContent?.value" [nodes]="groupedNodes"
+            <ct-tree-view #tree [class.hidden]="searchContent?.value" [nodes]="groupedNodes"
                           [level]="1"></ct-tree-view>
         </div>
     `,

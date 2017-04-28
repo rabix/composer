@@ -55,7 +55,7 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
 
             <ng-template hidden ngFor let-tab [ngForOf]="tabs">
 
-                <div class="component-container" [ngSwitch]="tab?.type" [hidden]="tab !== activeTab">
+                <div class="component-container" [ngSwitch]="tab?.type" [class.hidden]="tab !== activeTab">
 
                     <ct-tool-editor #tabComponent class="tab-component" *ngSwitchCase="'CommandLineTool'"
                                     [data]="tab.data"></ct-tool-editor>
