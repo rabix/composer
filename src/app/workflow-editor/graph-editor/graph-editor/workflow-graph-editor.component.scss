@@ -8,7 +8,17 @@ svg.cwl-workflow {
     height: 100%;
     position: relative;
 
+}
 
+.svg-btns.btn-group {
+    bottom: 30px;
+    float: right;
+    position: relative;
+    right: 10px;
+
+    >.btn:nth-of-type(4), >.btn:nth-of-type(5) {
+        margin-left: 7px;
+    }
 }
 
 .svg-graph-empty-state {
