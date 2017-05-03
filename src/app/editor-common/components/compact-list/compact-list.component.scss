@@ -5,9 +5,10 @@
 }
 
 .compact-list-wrapper {
-    //border: 1px solid $border-color;
+    border: 1px solid $input-border-color;
+    background: $input-bg;
     padding: 5px;
-    border-radius: 5px;
+    border-radius: $border-radius;
     overflow: hidden;
 }
 
