@@ -3,6 +3,6 @@
 
 :host {
   /deep/ .form-section {
-    //@include cli-border($input-port-color);
+    @include cli-border($code-inputs);
   }
 }

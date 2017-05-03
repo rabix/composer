@@ -2,7 +2,6 @@ import {ChangeDetectionStrategy, Component, Input} from "@angular/core";
 import {FormBuilder, Validators} from "@angular/forms";
 import {Observable} from "rxjs/Observable";
 import {ModalService} from "../../../ui/modal/modal.service";
-import {CredentialsEntry} from "../../../services/storage/user-preferences-types";
 import {ErrorBarService} from "../../../layout/error-bar/error-bar.service";
 import {PlatformAPIGatewayService} from "../../../auth/api/platform-api-gateway.service";
 
@@ -144,7 +143,7 @@ export class SendFeedbackModalComponent {
     });
 
     @Input()
-    public feedbackPlatform: CredentialsEntry = null;
+    public feedbackPlatform = null;
 
     constructor(private modal: ModalService, private formBuilder: FormBuilder, private errorBar: ErrorBarService,
                 private apiGateway: PlatformAPIGatewayService) {

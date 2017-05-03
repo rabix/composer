@@ -46,6 +46,7 @@
 
     &.single, &.multi {
         .selectize-input {
+            color: $input-color;
             background: $input-bg;
             border: $input-btn-border-width solid $input-border-color;
             box-shadow: none;
