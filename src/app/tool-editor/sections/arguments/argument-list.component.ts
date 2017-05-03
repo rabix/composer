@@ -8,7 +8,6 @@ import {
     ViewChildren
 } from "@angular/core";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
-import {noop} from "../../../lib/utils.lib";
 import {CommandLineToolModel} from "cwlts/models";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {ModalService} from "../../../ui/modal/modal.service";
@@ -174,8 +173,8 @@ export class ArgumentListComponent extends DirectiveBase {
                 this.inspector.hide();
             }
 
-            const args = this.model.arguments.slice(0, index).concat(this.model.arguments.slice(index + 1));
-            this.update.emit(args);
+            this.model.removeArgument(this.model.arguments[index]);
+            this.update.emit(this.model.arguments);
         }, err => console.warn);
     }
 

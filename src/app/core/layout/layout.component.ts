@@ -7,7 +7,7 @@ import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {DomEventService} from "../../services/dom/dom-event.service";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
-import {WorkboxService} from "../workbox/workbox.service";
+
 import {
     PANEL_LOCAL_FILES,
     PANEL_PUBLIC_APPS,
@@ -31,7 +31,7 @@ import {ErrorBarService} from "../../layout/error-bar/error-bar.service";
 
             <!--Panels Column-->
             <div class="panel-column" [style.flexGrow]="treeSize"
-                 [class.hidden]="!layoutService.sidebarHidden">
+                 [class.hidden]="layoutService.sidebarHidden">
 
                 <ct-logo class="pl-1 logo title-bar-section"></ct-logo>
                 <ct-panel-container class="layout-section">
@@ -41,7 +41,7 @@ import {ErrorBarService} from "../../layout/error-bar/error-bar.service";
 
             <!--Panel/Content Resize Handle-->
             <div #handle class="handle-vertical"
-                 [class.hidden]="!layoutService.sidebarHidden">
+                 [class.hidden]="layoutService.sidebarHidden">
             </div>
 
             <!--Editor Content Column-->

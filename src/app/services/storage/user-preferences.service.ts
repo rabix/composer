@@ -97,6 +97,16 @@ export class UserPreferencesService {
         return this.put("credentials", credentials);
     }
 
+    clearSessions() {
+        this.getCredentials().take(1).subscribe((creds: CredentialsEntry[]) => {
+            creds.forEach((item) => {
+                item.sessionID = null;
+            });
+
+            this.setCredentials(creds);
+        });
+    }
+
     getOpenProjects() {
         return this.get("openProjects", []);
     }

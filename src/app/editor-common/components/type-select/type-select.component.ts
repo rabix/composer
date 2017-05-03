@@ -21,8 +21,14 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                 </option>
             </select>
         </div><!--Type-->
-
-
+        
+        <div class="form-group" *ngIf="paramType.type !== 'array'">
+            <label>Allow single item or array</label>
+            <span class="pull-right">
+                    <ct-toggle-slider [formControl]="form.controls['isItemOrArray']"></ct-toggle-slider>
+                </span>
+        </div>
+        
         <div class="form-group">
             <div [class.hidden]="paramType?.type !== 'array'">
                 <label class="form-control-label">Items Type</label>
@@ -49,7 +55,8 @@ export class InputTypeSelectComponent extends DirectiveBase implements ControlVa
 
     public form: FormGroup = new FormGroup({
         type: new FormControl(null),
-        items: new FormControl(null)
+        items: new FormControl(null),
+        isItemOrArray: new FormControl(null)
     });
 
     private onTouched = noop;
@@ -63,11 +70,18 @@ export class InputTypeSelectComponent extends DirectiveBase implements ControlVa
 
         this.form.controls["type"].setValue(this.paramType.type);
         this.form.controls["items"].setValue(this.paramType.items);
+        this.form.controls["isItemOrArray"].setValue(this.paramType.isItemOrArray);
 
         this.tracked = this.form.valueChanges.subscribe(change => {
             this.paramType.type = change.type;
+            this.paramType.isItemOrArray = change.isItemOrArray;
+
             if (change.type === "array") {
                 this.paramType.items = change.items;
+                if (this.paramType.isItemOrArray) {
+                    this.paramType.isItemOrArray = false;
+                    this.form.controls["isItemOrArray"].setValue(false);
+                }
             }
 
             if (this.paramType.type === "array" && !this.paramType.items) {

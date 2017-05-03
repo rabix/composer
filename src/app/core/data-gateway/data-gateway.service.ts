@@ -3,7 +3,6 @@ import {FormControl} from "@angular/forms";
 import {Http} from "@angular/http";
 import * as YAML from "js-yaml";
 import {Observable} from "rxjs/Observable";
-import {ReplaySubject} from "rxjs/ReplaySubject";
 import {Subject} from "rxjs/Subject";
 import {PlatformAPIGatewayService} from "../../auth/api/platform-api-gateway.service";
 import {noop} from "../../lib/utils.lib";
@@ -76,18 +75,27 @@ export class DataGatewayService {
      */
     getPlatformListing(hash: string): Observable<{ id: string, name: string }[]> {
 
+        const platform = this.apiGateway.forHash(hash);
+
+        const call = platform ? platform.getRabixProjects()
+            : Observable.throw(
+                new Error("Cannot get rabix projects because you are not connected to the necessary platform."));
+
         return this.throughCache(
-            `${hash}.getPlatformListing`,
-            this.apiGateway.forHash(hash).getRabixProjects()
+            `${hash}.getPlatformListing`, call
         );
     }
 
     getProjectListing(hash, projectOwner: string, projectSlug: string): Observable<any[]> {
         const cacheKey = hash + `.getProjectListing.${projectOwner}.${projectSlug}`;
 
-        return this.throughCache(cacheKey,
-            this.apiGateway.forHash(hash)
-                .getProjectApps(projectOwner, projectSlug));
+        const platform = this.apiGateway.forHash(hash);
+
+        const call = platform ? platform.getProjectApps(projectOwner, projectSlug)
+            : Observable.throw(
+                new Error("Cannot get project apps because you are not connected to the necessary platform."));
+
+        return this.throughCache(cacheKey, call);
     }
 
     invalidateProjectListing(hash, owner: string, project: string) {
@@ -117,18 +125,31 @@ export class DataGatewayService {
 
     searchUserProjects(term: string, limit = 20): Observable<{ hash: string, results: PlatformAppEntry[] }[]> {
         return this.auth.connections.take(1).flatMap(credentials => {
-            const hashes   = credentials.map(c => c.hash);
-            const requests = hashes.map(hash => this.apiGateway.forHash(hash)
-                .searchUserProjects(term, limit)
-                .map(results => ({results, hash})));
+            const hashes = credentials.map(c => c.hash);
+            const requests = hashes.map(hash => {
+
+                    const platform = this.apiGateway.forHash(hash);
+
+                    return platform ? platform.searchUserProjects(term, limit).map(results => ({results, hash}))
+                        : Observable.throw(
+                            new Error("Cannot get public apps because you are not connected to the necessary platform."));
+
+                });
+
             return Observable.zip(...requests);
         });
     }
 
     getPublicApps(hash) {
+
+        const platform = this.apiGateway.forHash(hash);
+
+        const call = platform ? platform.getPublicApps()
+            : Observable.throw(
+                new Error("Cannot get public apps because you are not connected to the necessary platform."));
+
         return this.throughCache(
-            hash + ".getPublicApps",
-            this.apiGateway.forHash(hash).getPublicApps());
+            hash + ".getPublicApps", call);
     }
 
     fetchFileContent(almostID: string, parse = false) {
@@ -161,7 +182,12 @@ export class DataGatewayService {
 
             const [hash] = h.split("?");
 
-            const fetch = this.apiGateway.forHash(hash).getApp(ownerSlug, projectSlug, appSlug, revision);
+            const platform = this.apiGateway.forHash(hash);
+
+            const fetch = platform ? platform.getApp(ownerSlug, projectSlug, appSlug, revision)
+                : Observable.throw(
+                    new Error("Cannot open the app because you are not connected to the necessary platform."));
+
             if (parse) {
                 return fetch;
             }
@@ -222,9 +248,14 @@ export class DataGatewayService {
             confirmationLabel: "Publish",
             formControl: revNote
         })).flatMap(() => {
-            return this.apiGateway.forHash(hash)
-                .saveApp(YAML.safeLoad(content, {json: true} as any), revNote.value)
-                .map(r => JSON.stringify(r.message, null, 4));
+            const platform = this.apiGateway.forHash(hash);
+
+            const call = platform ? platform.saveApp(YAML.safeLoad(content, {json: true} as any), revNote.value)
+                : Observable.throw(
+                    new Error("Could not save the app because you are not connected to the necessary platform."));
+
+            return call.map(r => JSON.stringify(r.message, null, 4));
+
         });
     }
 

@@ -1,6 +1,10 @@
 import {ChangeDetectionStrategy, Component, Input} from "@angular/core";
-import {FormControl, Validators} from "@angular/forms";
+import {FormBuilder, Validators} from "@angular/forms";
+import {Observable} from "rxjs/Observable";
 import {ModalService} from "../../../ui/modal/modal.service";
+import {ErrorBarService} from "../../../layout/error-bar/error-bar.service";
+import {PlatformAPIGatewayService} from "../../../auth/api/platform-api-gateway.service";
+
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -19,7 +23,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                 <div class="feedback-type">
 
                     <!--Idea-->
-                    <div class="feedback clickable" [class.active]="feedbackType === 'idea'"
+                    <div data-test="idea-region" class="feedback clickable" [class.active]="feedbackType === 'idea'"
                          (click)="selectFeedbackType('idea')">
 
                         <!--Caption-->
@@ -33,7 +37,8 @@ import {ModalService} from "../../../ui/modal/modal.service";
                     </div>
 
                     <!--Problem-->
-                    <div class="feedback clickable" [class.active]="feedbackType === 'problem'"
+                    <div data-test="problem-region" class="feedback clickable"
+                         [class.active]="feedbackType === 'problem'"
                          (click)="selectFeedbackType('problem')">
 
                         <!--Caption-->
@@ -48,7 +53,8 @@ import {ModalService} from "../../../ui/modal/modal.service";
                     </div>
 
                     <!--Thought-->
-                    <div class="feedback clickable" [class.active]="feedbackType === 'thought'"
+                    <div data-test="thought-region" class="feedback clickable"
+                         [class.active]="feedbackType === 'thought'"
                          (click)="selectFeedbackType('thought')">
 
                         <!--Caption-->
@@ -70,10 +76,10 @@ import {ModalService} from "../../../ui/modal/modal.service";
                     Please let us know:
                     <ul class="ml-2">
                         <li>
-                            Which feature would you like
+                            Which feature you would like
                         </li>
                         <li>
-                            Why is it important for you
+                            Why it is important for you
                         </li>
                         <li>
                             The problem it would solve
@@ -104,7 +110,8 @@ import {ModalService} from "../../../ui/modal/modal.service";
 
                 <!--Feedback text-area-->
                 <div class="form-group">
-                    <textarea [formControl]="feedbackTextControl" class="form-control" rows="6">                    
+                    <textarea data-test="feedback-text" [formControl]="feedbackTextControl.controls['sendFeedBack']"
+                              class="form-control" rows="6">                    
                     </textarea>
                 </div>
             </div>
@@ -112,9 +119,12 @@ import {ModalService} from "../../../ui/modal/modal.service";
 
             <!--Footer-->
             <div class="footer pr-1 pb-1">
-                <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
-                
-                <button type="button" class="btn btn-primary" [disabled]="!feedbackTextControl.valid"
+                <button type="button" class="btn btn-secondary" data-test='cancel-button'
+                        (click)="closeModal()">Cancel
+                </button>
+
+                <button type="button" class="btn btn-primary" data-test='send-button'
+                        [disabled]="!feedbackTextControl.valid"
                         (click)="onSendFeedback()">Send
                 </button>
             </div>
@@ -128,12 +138,15 @@ export class SendFeedbackModalComponent {
 
     public feedbackType: "idea" | "problem" | "thought" = "idea";
 
-    public feedbackTextControl = new FormControl("", Validators.required);
+    public feedbackTextControl = this.formBuilder.group({
+        sendFeedBack: ["", [Validators.required]],
+    });
 
     @Input()
-    public sendFeedback: (feedbackType: string, feedbackText: string) => void;
+    public feedbackPlatform = null;
 
-    constructor(private modal: ModalService) {
+    constructor(private modal: ModalService, private formBuilder: FormBuilder, private errorBar: ErrorBarService,
+                private apiGateway: PlatformAPIGatewayService) {
     }
 
     selectFeedbackType(type: "idea" | "problem" | "thought") {
@@ -141,11 +154,28 @@ export class SendFeedbackModalComponent {
     }
 
     public onSendFeedback() {
-        this.sendFeedback(this.feedbackType, this.feedbackTextControl.value);
-    }
 
-    public onCancel() {
-        this.modal.close();
+        if (this.feedbackPlatform) {
+
+            const platform = this.apiGateway.forHash(this.feedbackPlatform.hash);
+
+            const call = platform ? platform.sendFeedback(this.feedbackPlatform.user.id, this.feedbackType,
+                this.feedbackTextControl.controls["sendFeedBack"].value, this.feedbackPlatform.url)
+                : Observable.throw(
+                    new Error("Could not connect to the platform and send a feedback message"));
+
+            call.subscribe(() => {
+                this.closeModal();
+            }, err => {
+                console.log("Error", err);
+                if (err.status === 0) {
+                    this.errorBar.showError("Could not connect to the platform and send a feedback message");
+                } else {
+                    this.errorBar.showError(err);
+                }
+            });
+
+        }
     }
 
     public closeModal() {

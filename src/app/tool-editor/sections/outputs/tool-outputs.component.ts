@@ -34,6 +34,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                      [location]="location"
                                      [context]="context"
                                      [parent]="model"
+                                     [model]="model"
                                      [readonly]="readonly">
                 </ct-tool-output-list>
 
