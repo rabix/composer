@@ -121,6 +121,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                                              [readonly]="readonly"
                                              [inputs]="inputs"
                                              [parent]="entry"
+                                             [model]="model"
                                              [location]="getFieldsLocation(i)"
                                              [isField]="true">
                         </ct-tool-output-list>
@@ -166,6 +167,9 @@ export class ToolOutputListComponent extends DirectiveBase {
     @Input()
     parent: CommandLineToolModel | CommandOutputParameterModel;
 
+    @Input()
+    model: CommandLineToolModel;
+
     @Output()
     readonly entriesChange = new EventEmitter();
 
@@ -186,8 +190,9 @@ export class ToolOutputListComponent extends DirectiveBase {
             if (this.inspector.isInspecting(this.entries[index].loc)) {
                 this.inspector.hide();
             }
-            const entries = this.entries.slice(0, index).concat(this.entries.slice(index + 1));
-            this.entriesChange.emit(entries);
+
+            this.model.removeOutput(this.entries[index]);
+            this.entriesChange.emit(this.model.outputs);
         }, err => console.warn);
     }
 

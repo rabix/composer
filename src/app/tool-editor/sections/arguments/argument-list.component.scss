@@ -3,7 +3,7 @@
 
 :host{
     /deep/ .form-section {
-        //@include cli-border($arg-color);
+        @include cli-border($code-args);
     }
 }
 
