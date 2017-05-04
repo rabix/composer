@@ -88,6 +88,28 @@ import {
                         </ct-inline-editor>
                     </div>
 
+                    <!--Wrapper Author-->
+                    <div class="col-lg-4 col-sm-6 app-info-meta-item">
+                        <div class="text-title">Wrapper Author:</div>
+                        <ct-inline-editor [value]="model.customProps['sbg:wrapperAuthor']"
+                                          [disabled]="readonly"
+                                          type="text"
+                                          (saveData)="model.customProps['sbg:wrapperAuthor'] = $event">
+                            <div>{{model.customProps['sbg:wrapperAuthor']}}</div>
+                        </ct-inline-editor>
+                    </div>
+
+                    <!--Wrapper License-->
+                    <div class="col-lg-4 col-sm-6 app-info-meta-item">
+                        <div class="text-title">Wrapper License:</div>
+                        <ct-inline-editor [value]="model.customProps['sbg:wrapperLicense']"
+                                          [disabled]="readonly"
+                                          type="text"
+                                          (saveData)="model.customProps['sbg:wrapperLicense'] = $event">
+                            <div>{{model.customProps['sbg:wrapperLicense']}}</div>
+                        </ct-inline-editor>
+                    </div>
+
                     <!--Author-->
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
                         <div class="text-title">Author:</div>

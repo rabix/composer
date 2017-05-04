@@ -161,8 +161,8 @@ export class ToolInputListComponent extends DirectiveBase {
                 this.inspector.hide();
             }
 
-            const entries = this.entries.slice(0, index).concat(this.entries.slice(index + 1));
-            this.entriesChange.emit(entries);
+            this.model.removeInput(this.entries[index]);
+            this.entriesChange.emit(this.model.inputs);
         }, err => console.warn);
     }
 

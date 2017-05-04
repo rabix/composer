@@ -83,8 +83,8 @@ import {Workflow} from "cwl-svg";
         <!--File Types-->
         <div *ngIf="isFileType() && isInputPort()">
             <label class="form-control-label">File types</label>
-            <input class="form-control"
-                   [formControl]="form.controls['fileTypes']"/>
+            <ct-auto-complete [formControl]="form.controls['fileTypes']"
+                              [create]="true"></ct-auto-complete>
         </div>
 
         <!--Description-->
@@ -186,7 +186,6 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
             } else {
                 delete this.port.customProps["sbg:fileTypes"];
             }
-            ;
         });
 
         this.tracked = this.form.controls["label"].valueChanges.subscribe((label) => {

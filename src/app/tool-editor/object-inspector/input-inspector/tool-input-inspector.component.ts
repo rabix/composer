@@ -13,6 +13,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
             <ct-basic-input-section [formControl]="form.controls['basicInputSection']"
                                     [context]="context"
+                                    [model]="model"
                                     [readonly]="readonly">
             </ct-basic-input-section>
 
