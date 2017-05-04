@@ -12,11 +12,11 @@ import {StatusBarService} from "./status-bar.service";
         <span class="status-item status-buttons">
             <span class="btn-group">
                 <button class="sidebar-toggle btn btn-sm"
-                        [class.active]="!layoutService.sidebarHidden"
+                        [class.active]="layoutService.sidebarHidden"
                         (click)="layoutService.toggleSidebar()">
                     <i class="fa"
-                       [class.fa-angle-double-left] = "layoutService.sidebarHidden"
-                       [class.fa-angle-double-right] = "!layoutService.sidebarHidden"></i>
+                       [class.fa-angle-double-left] = "!layoutService.sidebarHidden"
+                       [class.fa-angle-double-right] = "layoutService.sidebarHidden"></i>
                 </button>
             </span>
             <span *ngIf="status">
