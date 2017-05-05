@@ -162,26 +162,36 @@ import {WorkflowEditorService} from "../../workflow-editor.service";
              [ct-drop-zones]="['zone1']"
              (onDropSuccess)="onDrop($event.detail.data.event, $event.detail.data.transfer_data)"></svg>
             
-        <span class="svg-btns btn-group">
-            <button class="btn btn-sm btn-secondary" (click)="upscale()"
-                [disabled]="graph !== undefined && graph.getScale() >= 2">
-                <i class="fa fa-plus"></i>
-            </button>
-            <button class="btn btn-sm btn-secondary" (click)="downscale()"
-                [disabled]="graph !== undefined && graph.getScale() <= 0.2">
-                <i class="fa fa-minus"></i>
-            </button>
-            <button class="btn btn-sm btn-secondary"
-                    (click)="fitToViewport()">
-                <i class="fa fa-compress"></i>
-            </button>
-            <button class="btn btn-sm btn-secondary" (click)="arrange()">
-                <i class="fa fa-share-alt"></i>
-            </button>
-            <button *ngIf="selectedElement" class="btn btn-sm btn-secondary" 
-                    (click)="deleteSelectedElement()">
-                <i class="fa fa-scissors"></i>
-            </button>
+        <span class="svg-btns">
+            <span class="btn-group">
+                <button class="btn btn-sm btn-secondary"
+                        (click)="upscale()"
+                        [disabled]="graph !== undefined && graph.getScale() >= 2">
+                    <i class="fa fa-plus"></i>
+                </button>
+                <button class="btn btn-sm btn-secondary"
+                        (click)="downscale()"
+                        [disabled]="graph !== undefined && graph.getScale() <= 0.2">
+                    <i class="fa fa-minus"></i>
+                </button>
+                <button class="btn btn-sm btn-secondary"
+                        (click)="fitToViewport()">
+                    <i class="fa fa-compress"></i>
+                </button>
+            </span>
+            <span class="btn-group">
+                <button class="btn btn-sm btn-secondary"
+                        (click)="arrange()">
+                    <i class="fa fa-share-alt"></i>
+                </button>
+            </span>
+            <span class="btn-group">
+                <button *ngIf="selectedElement"
+                        class="btn btn-sm btn-secondary"
+                        (click)="deleteSelectedElement()">
+                    <i class="fa fa-scissors"></i>
+                </button>
+            </span>
         </span>
 
         <!--Inspector Template --> 
