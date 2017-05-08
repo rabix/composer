@@ -156,24 +156,21 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
                         this.toolModel.updateCommandLine();
 
                         // update validation stream on model validation updates
-
-                        this.toolModel.setValidationCallback((res: Validation) => {
+                        this.toolModel.setValidationCallback(() => {
                             this.validation = {
-                                errors: res.errors,
-                                warnings: res.warnings,
+                                errors: this.toolModel.filterIssues("error"),
+                                warnings: this.toolModel.filterIssues("warning"),
                                 isValidatableCwl: true,
                                 isValidCwl: true,
                                 isValidJSON: true
                             };
                         });
 
-                        this.toolModel.validate();
-
                         this.isLoading = false;
 
                         const v = {
-                            errors: this.toolModel.validation.errors,
-                            warnings: this.toolModel.validation.warnings,
+                            errors: [],
+                            warnings: [],
                             isValidatableCwl: true,
                             isValidCwl: true,
                             isValidJSON: true

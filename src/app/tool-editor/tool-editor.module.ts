@@ -32,6 +32,8 @@ import {CWLModule} from "../cwl/cwl.module";
 import {LayoutModule} from "../layout/layout.module";
 import { HintsComponent } from "./sections/hints/hints.component";
 import { RequirementInputComponent } from "./sections/hints/requirement-input.component";
+import { BaseCommandListComponent } from './sections/base-command/base-command-list/base-command-list.component';
+import { StreamsComponent } from './sections/streams/streams.component';
 
 @NgModule({
     declarations: [
@@ -62,6 +64,8 @@ import { RequirementInputComponent } from "./sections/hints/requirement-input.co
         BaseCommandComponent,
         HintsComponent,
         RequirementInputComponent,
+        BaseCommandListComponent,
+        StreamsComponent,
     ],
     exports: [
         ToolEditorComponent

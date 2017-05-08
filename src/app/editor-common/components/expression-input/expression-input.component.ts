@@ -20,17 +20,20 @@ import {ModalService} from "../../../ui/modal/modal.service";
     ],
     template: `
         <div class="expression-input-group clickable"
-             [class.expr]="isExpr || disableLiteralTextInput"
-             [ct-validation-class]="model?.validation">
+             [class.expr]="isExpr || disableLiteralTextInput">
+            
+            <pre>{{ model.issues | json}}</pre>
+            <pre>{{ model.loc | json }}</pre>
 
-            <ct-validation-preview [entry]="model?.validation"></ct-validation-preview>
-            <b class="validation-icon result"
-               *ngIf="isExpr && !(model?.hasErrors() || model?.hasWarnings())"
-               [title]="result">E:</b>
+            <!--<ct-validation-preview [entry]="model?.validation"></ct-validation-preview>-->
+            <!--<b class="validation-icon result"-->
+               <!--*ngIf="isExpr && !(model?.hasErrors() || model?.hasWarnings())"-->
+               <!--[title]="result">E:</b>-->
 
             <div class="input-group">
 
                 <input class="form-control"
+                       data-test="expression-input"
                        #input
                        [type]="isExpr ? 'text' : type"
                        [value]="value?.toString()"
@@ -193,11 +196,11 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
                         this.model.setValue("", this.type)
                     }
 
-                    const resetValidation = ()=> {
+                    const resetValidation = () => {
                         // to reset validation
                         this.isExpr = this.model.isExpression;
                         this.onChange(this.model);
-                    }
+                    };
 
                     this.model.evaluate(this.context).then(resetValidation, resetValidation);
                 }

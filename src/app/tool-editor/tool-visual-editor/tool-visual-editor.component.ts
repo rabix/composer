@@ -12,6 +12,9 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
     styleUrls: ["./tool-visual-editor.component.scss"],
     template: `
         <form [formGroup]="formGroup">
+            
+            <pre>{{ model.issues | json }}</pre>
+            
             <ct-docker-requirement [docker]="model.docker"
                                    (update)="formGroup.markAsDirty()"
                                    [readonly]="readonly">
@@ -22,7 +25,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                              [stdin]="model.stdin"
                              [stdout]="model.stdout"
                              (updateCmd)="updateModel('baseCommand', $event)"
-                             (updateStreams)="setStreams($event)"
+                             (updateStream)="setStreams($event)"
                              [readonly]="readonly">
             </ct-base-command>
 
@@ -115,7 +118,6 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
         }
 
         this.formGroup.markAsDirty();
-
     }
 
     setStreams(change) {
