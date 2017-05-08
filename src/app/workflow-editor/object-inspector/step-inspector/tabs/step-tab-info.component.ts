@@ -37,6 +37,12 @@ import {StepModel} from "cwlts/models";
                 <span> {{ step.run.customProps['sbg:createdBy'] }} </span>
             </p>
 
+            <!--Author-->
+            <p>
+                <strong>Source:</strong>
+                <span> {{ getSource() }} </span>
+            </p>
+
             <!--Description-->
             <div>
                 <strong>Description{{ getDescription() ? '' : ':'}}</strong>
@@ -44,12 +50,20 @@ import {StepModel} from "cwlts/models";
                     <div [ct-markdown]="getDescription()"></div>
                 </div>
             </div>
-        </div>        
+        </div>
     `
 })
 export class WorkflowStepInspectorTabInfo {
     @Input()
     public step: StepModel;
+
+    getSource() {
+        return this.step.customProps["sbg:rdfId"] ? (() => {
+            const idSplit = this.step.customProps["sbg:rdfId"].split("/");
+            idSplit.pop();
+            return idSplit.join("/");
+        })() : this.step.run.customProps["sbg:project"] || "Embedded";
+    }
 
     getDescription() {
         return this.step.description || this.step.run ? this.step.run.description : "";
