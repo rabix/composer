@@ -344,6 +344,10 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             const input        = this.model.inputs.find((input) => connectionId === input.connectionId);
             const output       = this.model.outputs.find((output) => connectionId === output.connectionId);
             this.inspectedNode = step || input || output;
+
+            // When you create some node (i/o or step by dropping it on a canvas) and open it in object inspector, when
+            // you go backward in history (undo) object inspector should be closed
+            if (!this.inspectedNode) this.inspector.hide();
         }
     }
 
