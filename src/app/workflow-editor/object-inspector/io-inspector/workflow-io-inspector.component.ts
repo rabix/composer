@@ -158,7 +158,7 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
             this.port.type.isNullable = !value;
         });
 
-        this.tracked = this.form.controls["id"].valueChanges.debounceTime(200).subscribe((value) => {
+        this.tracked = this.form.controls["id"].valueChanges.debounceTime(1000).subscribe((value) => {
             try {
                 // Change id on workflow model so canvas can interact with it
                 this.workflowModel.changeIONodeId(this.port, value);
@@ -188,7 +188,7 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
             }
         });
 
-        this.tracked = this.form.controls["label"].valueChanges.subscribe((label) => {
+        this.tracked = this.form.controls["label"].valueChanges.debounceTime(1000).subscribe((label) => {
             this.port.label = label;
             this.graph.redraw();
         });
