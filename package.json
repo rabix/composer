@@ -67,7 +67,7 @@
         "@types/markdown-it": "0.0.2",
         "@types/node": "^7.0.12",
         "@types/selectize": "^0.12.28",
-        "codelyzer": "^2.1.1",
+        "codelyzer": "^3.0.1",
         "electron": "^1.6.6",
         "electron-packager": "^8.5.2",
         "git-changelog": "^1.1.2",

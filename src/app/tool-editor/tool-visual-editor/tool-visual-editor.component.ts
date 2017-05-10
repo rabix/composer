@@ -12,9 +12,9 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
     styleUrls: ["./tool-visual-editor.component.scss"],
     template: `
         <form [formGroup]="formGroup">
-            
+
             <pre>{{ model.issues | json }}</pre>
-            
+
             <ct-docker-requirement [docker]="model.docker"
                                    (update)="formGroup.markAsDirty()"
                                    [readonly]="readonly">
@@ -22,6 +22,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 
             <ct-base-command [baseCommand]="model.baseCommand"
                              [model]="model"
+                             [context]="context"
                              [stdin]="model.stdin"
                              [stdout]="model.stdout"
                              (updateCmd)="updateModel('baseCommand', $event)"
@@ -47,14 +48,14 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                           (update)="formGroup.markAsDirty()"
                           [context]="context"
                           [readonly]="readonly">
-            </ct-resources> 
-            
+            </ct-resources>
+
             <ct-hints [model]="model"
                       [context]="context"
                       (update)="formGroup.markAsDirty()"
                       [readonly]="readonly">
             </ct-hints>
-            
+
             <ct-argument-list [location]="model.loc + '.arguments'"
                               [model]="model"
                               (update)="formGroup.markAsDirty()"

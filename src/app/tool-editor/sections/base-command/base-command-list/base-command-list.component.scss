@@ -1,0 +1,15 @@
+:host {
+    .removable-form-control {
+        display: flex;
+        width: 100%;
+
+        ct-expression-input {
+            flex: 1;
+        }
+
+        .remove-icon {
+            display: flex;
+            align-items: center;
+        }
+    }
+}

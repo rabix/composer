@@ -1,17 +1,20 @@
-import {Component, EventEmitter, Input, OnChanges, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output} from "@angular/core";
+import {FormControl, FormGroup} from "@angular/forms";
 import {ExpressionModel} from "cwlts/models";
-import {FormControl} from "@angular/forms";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
-import {Observable} from "rxjs/Observable";
 
 @Component({
-    selector: 'ct-streams',
+    selector: "ct-streams",
     template: `
-        <form class="streams-row">
+        <div>
+            <div class="text-title mb-1">Streams</div>
+        </div>
+
+        <form class="streams-row" [formGroup]="form">
             <div class="stream">
                 <label class="form-control-label">Stdin redirect</label>
                 <ct-expression-input
-                        [formControl]="stdinControl"
+                        [formControl]="form.controls['stdin']"
                         data-test="stdin-input"
                         [context]="context"
                         [readonly]="readonly">
@@ -20,7 +23,7 @@ import {Observable} from "rxjs/Observable";
             <div class="stream">
                 <label class="form-control-label">Stdout redirect</label>
                 <ct-expression-input
-                        [formControl]="stdoutControl"
+                        [formControl]="form.controls['stdout']"
                         data-test="stdout-input"
                         [context]="context"
                         [readonly]="readonly">
@@ -28,9 +31,10 @@ import {Observable} from "rxjs/Observable";
             </div>
         </form>
     `,
-    styleUrls: ['./streams.component.scss']
+    styleUrls: ["./streams.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class StreamsComponent extends DirectiveBase implements OnChanges {
+export class StreamsComponent extends DirectiveBase implements OnInit, OnChanges {
 
     @Input()
     stdin: ExpressionModel;
@@ -47,29 +51,24 @@ export class StreamsComponent extends DirectiveBase implements OnChanges {
     @Output()
     update = new EventEmitter<any>();
 
-    stdinControl  = new FormControl();
-    stdoutControl = new FormControl();
+    form = new FormGroup({
+        stdin: new FormControl(),
+        stdout: new FormControl()
+    });
 
     ngOnInit(): void {
-        this.tracked = Observable
-            .merge(this.stdinControl.valueChanges, this.stdoutControl.valueChanges)
-            .subscribe(() => {
-                this.update.emit({
-                    stdin: this.stdinControl.value,
-                    stdout: this.stdoutControl.value
-                });
-            });
+        this.tracked = this.form.valueChanges.subscribe((form) => {
+            this.update.emit(form);
+        });
     }
 
     ngOnChanges(): void {
-        console.log("setting update");
-        if (this.stdinControl && this.stdin !== this.stdinControl.value) {
-            console.log("updating value");
-            this.stdinControl.setValue(this.stdin, {onlySelf: true});
+        if (this.stdin !== this.form.get("stdin").value) {
+            this.form.get("stdin").setValue(this.stdin, {onlySelf: true});
         }
 
-        if (this.stdoutControl && this.stdout !== this.stdoutControl.value) {
-            this.stdoutControl.setValue(this.stdout, {onlySelf: true});
+        if (this.stdout !== this.form.get("stdout").value) {
+            this.form.get("stdout").setValue(this.stdout, {onlySelf: true});
         }
     }
 }

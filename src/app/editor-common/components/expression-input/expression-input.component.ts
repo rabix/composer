@@ -21,9 +21,9 @@ import {ModalService} from "../../../ui/modal/modal.service";
     template: `
         <div class="expression-input-group clickable"
              [class.expr]="isExpr || disableLiteralTextInput">
-            
-            <pre>{{ model.issues | json}}</pre>
-            <pre>{{ model.loc | json }}</pre>
+
+            <!--<pre>{{ model.issues | json}}</pre>-->
+            <!--<pre>{{ model.loc | json }}</pre>-->
 
             <!--<ct-validation-preview [entry]="model?.validation"></ct-validation-preview>-->
             <!--<b class="validation-icon result"-->
@@ -193,7 +193,7 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
                     this.model = editor.model;
 
                     if (!val) {
-                        this.model.setValue("", this.type)
+                        this.model.setValue("", this.type);
                     }
 
                     const resetValidation = () => {
