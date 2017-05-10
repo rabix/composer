@@ -56,6 +56,7 @@ describe("StatusBarComponent", () => {
     it("should change icon arrow direction", () => {
         const toggleBtnIcon = fixture.debugElement.query(By.css(".sidebar-toggle .fa"));
         layoutService.sidebarHidden = true;
+        fixture.detectChanges();
         expect(toggleBtnIcon.nativeElement.classList.contains("fa-angle-double-right")).toBe(true);
     });
 });
