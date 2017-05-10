@@ -111,7 +111,9 @@ export class BaseCommandListComponent implements OnInit, OnChanges, OnDestroy {
         this.form.setControl("list", new FormArray(formList));
 
         // re-subscribe update output to form changes
-        this.subscription = this.form.valueChanges.map(form => (form.list || [])).subscribe(this.update);
+        this.subscription = this.form.valueChanges.map(form => (form.list || [])).subscribe((list) => {
+            this.update.emit(list);
+        });
     }
 
     ngOnDestroy() {

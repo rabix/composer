@@ -1,6 +1,6 @@
 import {DockerRequirementComponent} from "./docker-requirement.component";
-import {ComponentFixture, TestBed, async, fakeAsync, tick} from '@angular/core/testing';
-import {By}              from '@angular/platform-browser';
+import {ComponentFixture, TestBed, async, fakeAsync, tick} from "@angular/core/testing";
+import {By} from "@angular/platform-browser";
 import {DockerRequirementModel} from "cwlts/models";
 import {Component} from "@angular/core";
 import {ReactiveFormsModule, FormsModule} from "@angular/forms";

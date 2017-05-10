@@ -1,7 +1,6 @@
 import {Component, forwardRef, Input, NO_ERRORS_SCHEMA} from "@angular/core";
 import {async, ComponentFixture, fakeAsync, TestBed, tick} from "@angular/core/testing";
 import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule} from "@angular/forms";
-import {By} from "@angular/platform-browser";
 import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 import {V1ExpressionModel} from "cwlts/models/v1.0";
 import {StreamsComponent} from "./streams.component";
@@ -34,8 +33,6 @@ class ExpressionInputStubComponent implements ControlValueAccessor {
 describe("StreamsComponent", () => {
     let component: StreamsComponent;
     let fixture: ComponentFixture<StreamsComponent>;
-    let stdinEl: HTMLInputElement;
-    let stdoutEl: HTMLInputElement;
     let v1Expr: V1ExpressionModel;
     let d2Expr: SBDraft2ExpressionModel;
 
@@ -51,9 +48,6 @@ describe("StreamsComponent", () => {
         fixture   = TestBed.createComponent(StreamsComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
-
-        stdinEl  = <HTMLInputElement> fixture.debugElement.query(By.css("[data-test='stdin-input'] .log")).nativeElement;
-        stdoutEl = <HTMLInputElement> fixture.debugElement.query(By.css("[data-test='stdout-input'] .log")).nativeElement;
 
         v1Expr = new V1ExpressionModel("expression");
         d2Expr = new SBDraft2ExpressionModel("expression");
