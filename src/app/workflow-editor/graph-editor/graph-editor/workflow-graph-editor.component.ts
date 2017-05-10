@@ -161,20 +161,40 @@ import {WorkflowEditorService} from "../../workflow-editor.service";
              [ct-drop-enabled]="true"
              [ct-drop-zones]="['zone1']"
              (onDropSuccess)="onDrop($event.detail.data.event, $event.detail.data.transfer_data)"></svg>
-
-        <ng-template #controls>
             
+        <span class="svg-btns">
             <span class="btn-group">
-                    <button class="btn btn-sm btn-secondary" (click)="downscale()">-</button>
-                    <button class="btn btn-sm btn-secondary"
-                            (click)="graph.command('workflow.fit')">Fit to Viewport</button>
-                    <button class="btn btn-sm btn-secondary" (click)="upscale()">+</button>
-                
-                </span>
+                <button class="btn btn-sm btn-secondary"
+                        (click)="upscale()"
+                        [disabled]="graph !== undefined && graph.getScale() >= 2">
+                    <i class="fa fa-plus"></i>
+                </button>
+                <button class="btn btn-sm btn-secondary"
+                        (click)="downscale()"
+                        [disabled]="graph !== undefined && graph.getScale() <= 0.2">
+                    <i class="fa fa-minus"></i>
+                </button>
+                <button class="btn btn-sm btn-secondary"
+                        (click)="fitToViewport()">
+                    <i class="fa fa-compress"></i>
+                </button>
+            </span>
+            <span class="btn-group">
+                <button class="btn btn-sm btn-secondary"
+                        (click)="arrange()">
+                    <i class="fa fa-share-alt"></i>
+                </button>
+            </span>
+            <span class="btn-group">
+                <button *ngIf="selectedElement"
+                        class="btn btn-sm btn-secondary"
+                        (click)="deleteSelectedElement()">
+                    <i class="fa fa-scissors"></i>
+                </button>
+            </span>
+        </span>
 
-        </ng-template>
-
-        <!--Inspector Template -->
+        <!--Inspector Template --> 
         <ng-template #inspector>
             <ct-editor-inspector-content>
                 <div class="tc-header">
@@ -223,6 +243,8 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     inspectedNode: StepModel | WorkflowOutputParameterModel | WorkflowInputParameterModel = null;
 
     public graph: Workflow;
+
+    public selectedElement: SVGElement;
 
     private historyHandler: (ev: KeyboardEvent) => void;
 
@@ -287,9 +309,12 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             }, 1);
         }
 
-
         this.graph.on("beforeChange", () => {
             this.workflowEditorService.putInHistory(this.model);
+        });
+
+        this.graph.on("selectionChange", (ev) => {
+            this.selectedElement = ev;
         });
 
         this.tracked = this.ipc.watch("accelerator", "CmdOrCtrl+Z")
@@ -345,15 +370,34 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     }
 
     upscale() {
-        this.graph.command("workflow.scale", this.graph.getScale() + .1);
+        if (this.graph.getScale() <= Workflow.maxScale) {
+            const newScale = this.graph.getScale() + .1;
+            this.graph.scaleWorkflowCenter(newScale > Workflow.maxScale ?
+                Workflow.maxScale : newScale);
+        }
     }
 
     downscale() {
-        if (this.graph.getScale() > .1) {
-            this.graph.command("workflow.scale", this.graph.getScale() - .1);
-
+        if (this.graph.getScale() >= Workflow.minScale) {
+            const newScale = this.graph.getScale() - .1;
+            this.graph.scaleWorkflowCenter(newScale < Workflow.minScale ?
+                Workflow.minScale : newScale);
         }
     }
+
+    fitToViewport() {
+        this.graph.fitToViewport();
+    }
+
+    arrange() {
+        this.graph.arrange();
+    }
+
+    deleteSelectedElement() {
+        this.graph.deleteSelection();
+        this.selectedElement = null;
+    }
+
 
     /**
      * Triggers when app is dropped on canvas
