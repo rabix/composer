@@ -106,7 +106,7 @@ import {Workflow} from "cwl-svg";
             </label>
 
             <!--Batch select-->
-            <select class="form-control" *ngIf="!workflowModel['batchInput'] || workflowModel['batchInput'] === port.id"
+            <select class="form-control" *ngIf="!workflowModel.batchInput || workflowModel.batchInput === port.id"
                     [formControl]="form.controls['batchType']">
                 <option *ngFor="let propertyType of batchByList" [ngValue]="propertyType.value">
                     {{propertyType.label}}
@@ -115,7 +115,7 @@ import {Workflow} from "cwl-svg";
 
             <!--Warning when some other input is already configured as batch-->
             <div class="text-warning small"
-                 *ngIf="workflowModel['batchInput'] && workflowModel['batchInput'] !== port.id">
+                 *ngIf="workflowModel.batchInput && workflowModel.batchInput !== port.id">
                 <i class="fa fa-warning fa-fw"></i>
                 Only one input per workflow can be configured as batch. Grouping criteria has already been set on
                 #{{workflowModel['batchInput']}}.
@@ -209,13 +209,15 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
                     return;
                 }
 
-                this.form.controls["isRequired"].setValue(!newIO.type.isNullable);
-                this.form.controls["id"].setValue(newIO.id);
-                this.form.controls["label"].setValue(newIO.label);
-                this.form.controls["typeForm"].setValue(newIO.type);
-                this.form.controls["symbols"].setValue(newIO.type.symbols || this.initSymbolsList);
-                this.form.controls["description"].setValue(newIO.description);
-                this.form.controls["fileTypes"].setValue(newIO.customProps["sbg:fileTypes"]);
+                this.form.patchValue({
+                    isRequired: !newIO.type.isNullable,
+                    id: newIO.id,
+                    label: newIO.label,
+                    typeForm: newIO.type,
+                    symbols: newIO.type.symbols || this.initSymbolsList,
+                    description: newIO.description,
+                    fileTypes: newIO.fileTypes
+                });
             }
 
             if (changes["workflow"]) {
@@ -272,7 +274,7 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
             typeForm: [{value: this.port.type, disabled: this.readonly}],
             symbols: [this.port.type.symbols || this.initSymbolsList],
             description: [{value: this.port.description, disabled: this.readonly}],
-            fileTypes: [{value: this.port.customProps["sbg:fileTypes"], disabled: this.readonly}],
+            fileTypes: [{value: this.port.fileTypes, disabled: this.readonly}],
             batchType: [{value: this.selectedBatchByOption, disabled: this.readonly}]
         });
 
@@ -304,9 +306,9 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
 
         this.tracked = this.form.controls["fileTypes"].valueChanges.subscribe((value) => {
             if (value) {
-                this.port.customProps["sbg:fileTypes"] = value;
+                this.port.fileTypes = value;
             } else {
-                delete this.port.customProps["sbg:fileTypes"];
+                delete this.port.fileTypes;
             }
         });
 
