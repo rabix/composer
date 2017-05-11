@@ -7,12 +7,15 @@ export class LayoutService {
     public sidebarHidden = false;
 
     constructor(@Optional() private preferences: UserPreferencesService) {
-
-        this.preferences.getSidebarHidden().take(1).subscribe(val => this.sidebarHidden = !val);
+        if (this.preferences) {
+            this.preferences.getSidebarHidden().take(1).subscribe(val => this.sidebarHidden = !val);
+        }
     }
 
     toggleSidebar() {
         this.sidebarHidden = !this.sidebarHidden;
-        this.preferences.setSidebarHidden(!this.sidebarHidden);
+        if (this.preferences) {
+            this.preferences.setSidebarHidden(!this.sidebarHidden);
+        }
     }
 }
