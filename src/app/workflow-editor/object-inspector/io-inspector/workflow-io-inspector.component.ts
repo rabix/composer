@@ -308,7 +308,7 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
             if (value) {
                 this.port.fileTypes = value;
             } else {
-                delete this.port.fileTypes;
+                this.port.fileTypes = [];
             }
         });
 
