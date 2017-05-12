@@ -51,12 +51,12 @@ import {ModalService} from "../../../ui/modal/modal.service";
                          [ct-editor-inspector]="inspector"
                          [ct-editor-inspector-target]="entry.loc"
                          [ct-editor-inspector-readonly]="readonly"
-                         [ct-validation-class]="entry.validation">
+                         [ct-validation-class]="entry">
 
                         <!--ID Column-->
                         <div class="col-xs-4 ellipsis" [title]="entry.id">
                             <ct-validation-preview
-                                    [entry]="entry.validation"></ct-validation-preview>
+                                    [entry]="entry"></ct-validation-preview>
                             {{ entry.id }}
                         </div>
 

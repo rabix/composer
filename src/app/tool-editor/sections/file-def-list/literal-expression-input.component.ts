@@ -23,15 +23,15 @@ import {ModalService} from "../../../ui/modal/modal.service";
     template: `
         <div class="expression-input-group clickable"
              [class.expr]="isExpr"
-             [ct-validation-class]="model.validation">
+             [ct-validation-class]="model">
 
-            <ct-validation-preview [entry]="model?.validation"></ct-validation-preview>
+            <ct-validation-preview [entry]="model"></ct-validation-preview>
             <b class="validation-icon result"
-               *ngIf="isExpr && !(model?.hasErrors() || model?.hasWarnings())"
+               *ngIf="isExpr && !(model?.hasErrors || model?.hasWarnings)"
                [title]="model.result">E:</b>
 
             <div class="textarea-btn-group">
-                
+
                     <textarea class="form-control"
                               #input
                               [readonly]="isExpr"
@@ -113,7 +113,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
         }
 
         if (obj) {
-            this.model = obj;
+            this.model  = obj;
             this.isExpr = obj.isExpression;
         } else {
             console.warn("supposed to get a value, but didn't... :(");
@@ -140,7 +140,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
 
         if (this.fileName) {
             const nameParts = this.fileName.split(".");
-            const ext = nameParts[nameParts.length - 1].toLowerCase();
+            const ext       = nameParts[nameParts.length - 1].toLowerCase();
             if (ACE_MODE_MAP[ext]) {
                 editor.language.next(ACE_MODE_MAP[ext]);
             }
@@ -187,7 +187,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
 
             editor.readonly = this.readonly;
 
-            editor.model = this.model.clone();
+            editor.model   = this.model.clone();
             editor.context = this.context;
             editor.action.first().subscribe(action => {
                 if (action === "save") {
@@ -197,7 +197,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
                     this.model = editor.model;
 
                     if (!val) {
-                        this.model.setValue("", "string")
+                        this.model.setValue("", "string");
                     }
 
                     const resetValidation = () => {
@@ -223,7 +223,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
                 this.model = this.model.clone();
                 this.model.setValue("", "string");
                 this.model.result = null;
-                this.isExpr = false;
+                this.isExpr       = false;
                 event.stopPropagation();
                 this.onChange(this.model);
             }, err => console.warn);

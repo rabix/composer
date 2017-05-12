@@ -1,23 +1,27 @@
-import {Directive, Input} from "@angular/core";
-import {Validation} from "cwlts/models/helpers/validation";
+import {Directive, HostBinding, Input, OnChanges} from "@angular/core";
+import {ValidationBase} from "cwlts/models/helpers/validation";
 
 @Directive({
-    host: {
-        "[class.error]": "errors",
-        "[class.warning]": "warnings && !errors",
-        "[class.validatable]": "'true'"
-    },
     selector: "[ct-validation-class]"
 })
-export class ValidationClassDirective {
+export class ValidationClassDirective implements OnChanges {
     @Input("ct-validation-class")
-    entry: Validation;
+    entry: ValidationBase;
 
-    get errors() {
-        return this.entry ? this.entry.errors.length : false;
+    @HostBinding("class.error")
+    error = false;
+
+    @HostBinding("class.warning")
+    warning = false;
+
+    @HostBinding("class.validatable")
+    validatable = true;
+
+    ngOnChanges(): void {
+        if (this.entry && this.entry instanceof ValidationBase) {
+            this.error   = this.entry.hasErrors;
+            this.warning = this.entry.hasWarnings && !this.error;
+        }
     }
 
-    get warnings() {
-        return this.entry ? this.entry.warnings.length : false;
-    }
 }

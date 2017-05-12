@@ -23,8 +23,8 @@ import {Subscription} from "rxjs/Subscription";
             </div>
 
             <ol *ngIf="baseCommand.length > 0" class="list-unstyled">
-
-                <li *ngFor="let control of form.get('list').controls"
+                
+                <li *ngFor="let control of form.get('list').controls; let i = index"
                     class="removable-form-control">
 
                     <ct-expression-input
@@ -35,7 +35,7 @@ import {Subscription} from "rxjs/Subscription";
 
                     <div *ngIf="!readonly" class="remove-icon clickable ml-1 text-hover-danger"
                          [ct-tooltip]="'Delete'"
-                         (click)="removeBaseCommand(index)">
+                         (click)="removeBaseCommand(i)">
                         <i class="fa fa-trash"></i>
                     </div>
                 </li>
@@ -86,6 +86,8 @@ export class BaseCommandListComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     public removeBaseCommand(i: number) {
+        // reset the expression's validity
+        this.baseCommand[i].setValue("", "string");
         (this.form.get("list") as FormArray).removeAt(i);
     }
 

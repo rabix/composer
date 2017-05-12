@@ -9,29 +9,29 @@
 
     &.error {
         .validation-icon {
-            color: $brand-danger;
+            color: $code-error;
         }
 
         &:hover, &.selected, &.ct-inspected {
-            border-color: $brand-danger;
+            border-color: $code-error;
         }
 
         &.selected, &.ct-inspected {
-            background-color: $brand-danger;
+            background-color: $code-error;
         }
     }
 
     &.warning {
         .validation-icon {
-            color: $brand-warning;
+            color: $code-warning;
         }
 
         &:hover, &.selected, &.ct-inspected {
-            border-color: $brand-warning;
+            border-color: $code-warning;
         }
 
         &.selected, &.ct-inspected {
-            background-color: $brand-warning;
+            background-color: $code-warning;
         }
     }
 

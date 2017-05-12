@@ -2,8 +2,6 @@ import {ChangeDetectionStrategy, Component, Input, ViewEncapsulation} from "@ang
 import {Validation} from "cwlts/models/helpers/validation/Validation";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-validation-report",
     styleUrls: ["./validation-report.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,

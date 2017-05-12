@@ -1,4 +1,4 @@
-import {Component, forwardRef, Input, NO_ERRORS_SCHEMA} from "@angular/core";
+import {Component, CUSTOM_ELEMENTS_SCHEMA, forwardRef, Input, NO_ERRORS_SCHEMA} from "@angular/core";
 import {async, ComponentFixture, fakeAsync, TestBed, tick} from "@angular/core/testing";
 import {ControlValueAccessor, FormArray, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule} from "@angular/forms";
 
@@ -103,14 +103,31 @@ describe("BaseCommandListComponent", () => {
         expect((component.form.get("list") as FormArray).controls.length).toEqual(2, "Did not remove baseCommand");
     });
 
+    it("should remove the correct expression form the list", () => {
+        component.baseCommand = [
+            new SBDraft2ExpressionModel("one"),
+            new SBDraft2ExpressionModel("two"),
+            new SBDraft2ExpressionModel("three")
+        ];
+        component.model       = mockModel;
+        component.ngOnChanges();
+        fixture.detectChanges();
+
+        component.removeBaseCommand(1);
+
+        expect((component.form.get("list") as FormArray).controls.length).toEqual(2, "Did not remove baseCommand");
+        expect((component.form.get("list") as FormArray).controls[0].value.toString()).toEqual("one");
+        expect((component.form.get("list") as FormArray).controls[1].value.toString()).toEqual("three");
+    });
+
     it("should trigger change event on form changes", () => {
         component.baseCommand = mockModel.baseCommand;
         component.ngOnChanges();
+        fixture.detectChanges();
 
         const updateSpy = spyOn(component.update, "emit");
 
         (component.form.get("list") as FormArray).controls[0].setValue("different value");
-        fixture.detectChanges();
 
         expect(updateSpy.calls.count()).toEqual(1, "Did not call update correct number of times");
     });

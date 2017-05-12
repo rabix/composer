@@ -1,6 +1,6 @@
 @import "../../../../assets/sass/variables";
 
-ct-validation-report {
+:host {
     font-family: monospace;
     padding: 10px;
     display: block;
@@ -10,5 +10,13 @@ ct-validation-report {
 
     p {
         margin: 0;
+    }
+
+    .text-console-warning {
+        color: $code-warning;
+    }
+
+    .text-console-error {
+        color: $code-error;
     }
 }

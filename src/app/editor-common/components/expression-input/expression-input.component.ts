@@ -20,15 +20,13 @@ import {ModalService} from "../../../ui/modal/modal.service";
     ],
     template: `
         <div class="expression-input-group clickable"
+             [ct-validation-class]="model"
              [class.expr]="isExpr || disableLiteralTextInput">
 
-            <!--<pre>{{ model.issues | json}}</pre>-->
-            <!--<pre>{{ model.loc | json }}</pre>-->
-
-            <!--<ct-validation-preview [entry]="model?.validation"></ct-validation-preview>-->
-            <!--<b class="validation-icon result"-->
-               <!--*ngIf="isExpr && !(model?.hasErrors() || model?.hasWarnings())"-->
-               <!--[title]="result">E:</b>-->
+            <ct-validation-preview [entry]="model"></ct-validation-preview>
+            <b class="validation-icon result"
+               *ngIf="isExpr && !(model?.hasErrors || model?.hasWarnings)"
+               [title]="result">E:</b>
 
             <div class="input-group">
 
@@ -120,12 +118,6 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
         if (obj) {
             this.model  = obj;
             this.isExpr = obj.isExpression;
-
-            this.model.evaluate(this.context).then(res => {
-                this.result = res;
-            }, err => {
-                console.warn("ExpressionInputComponent got an error while evaluating an expression", err);
-            });
         }
     }
 
@@ -184,12 +176,12 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
 
             editor.readonly = this.readonly;
 
-            editor.model = this.model.clone();
+            editor.model   = this.model.clone();
             editor.context = this.context;
             editor.action.first().subscribe(editorAction => {
 
                 if (editorAction === "save") {
-                    const val = editor.model.serialize();
+                    const val  = editor.model.serialize();
                     this.model = editor.model;
 
                     if (!val) {
@@ -197,7 +189,6 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
                     }
 
                     const resetValidation = () => {
-                        // to reset validation
                         this.isExpr = this.model.isExpression;
                         this.onChange(this.model);
                     };
@@ -216,10 +207,10 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
                 cancellationLabel: "No, keep it",
                 confirmationLabel: "Yes, delete it"
             }).then(() => {
-                this.model = this.model.clone();
                 this.model.setValue("", this.type);
                 this.model.result = null;
                 this.isExpr       = false;
+                this.model = this.model.clone();
                 event.stopPropagation();
                 this.onChange(this.model);
             }, err => console.warn);

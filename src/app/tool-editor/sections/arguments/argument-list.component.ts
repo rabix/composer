@@ -70,7 +70,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
 
                                 <!--Value Column-->
                                 <div class="col-sm-4 ellipsis" [ct-tooltip]="ctt" [tooltipPlacement]="'top'">
-                                    <ct-validation-preview [entry]="entry.validation"></ct-validation-preview>
+                                    <ct-validation-preview [entry]="entry"></ct-validation-preview>
                                     <span>
                                     {{ entry.toString() }}
                                 </span>

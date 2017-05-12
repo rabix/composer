@@ -100,7 +100,9 @@
     ],
     "directive-selector": [
       true,
-      "attribute"
+      "attribute",
+      "ct",
+      "kebab-case"
     ],
     "component-selector": [
       true,

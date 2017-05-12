@@ -27,7 +27,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
             <div *ngIf="readonly && !entries.length" class="text-xs-center h5">
                 This tool doesn't specify any inputs
             </div>
-            
+
             <!--List Header Row-->
             <div class="editor-list-title" *ngIf="!!entries.length">
                 <div class="col-xs-4">ID</div>
@@ -42,17 +42,17 @@ import {ModalService} from "../../../ui/modal/modal.service";
                 <li *ngFor="let entry of entries; let i = index"
                     class="input-list-items"
                     [class.record-input]="isRecordType(entry)">
-                    
+
                     <div class="editor-list-item clickable"
                          [ct-editor-inspector]="inspector"
                          [ct-editor-inspector-target]="entry.loc"
                          [ct-editor-inspector-readonly]="readonly"
-                         [ct-validation-class]="entry.validation">
+                         [ct-validation-class]="entry">
 
                         <!--ID Column-->
                         <div class="col-xs-4 ellipsis">
                             <ct-validation-preview
-                                    [entry]="entry.validation"></ct-validation-preview>
+                                    [entry]="entry"></ct-validation-preview>
                             {{ entry.id }}
                         </div>
 
