@@ -155,8 +155,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
                         });
                         this.toolModel.updateCommandLine();
 
-                        // update validation stream on model validation updates
-                        this.toolModel.setValidationCallback(() => {
+                        const updateValidity = () => {
                             this.validation = {
                                 errors: this.toolModel.filterIssues("error"),
                                 warnings: this.toolModel.filterIssues("warning"),
@@ -164,8 +163,12 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
                                 isValidCwl: true,
                                 isValidJSON: true
                             };
-                        });
+                        };
 
+                        // update validation stream on model validation updates
+                        this.toolModel.setValidationCallback(updateValidity);
+
+                        this.toolModel.validate().then(updateValidity);
                         this.isLoading = false;
 
                         const v = {

@@ -50,7 +50,7 @@ import LoadOptions = jsyaml.LoadOptions;
             </ct-tab-selector>
 
             <div class="document-controls">
-                
+
                 <!--Go to app-->
                 <button class="btn"
                         type="button"
@@ -149,20 +149,20 @@ import LoadOptions = jsyaml.LoadOptions;
                     [class.active]="reportPanel === 'validation'"
                     (click)="toggleReport('validation')"
                     class="btn">
-            
+
             <span *ngIf="validation?.errors?.length">
             <i class="fa fa-times-circle text-danger"></i> {{validation.errors.length}} Errors
             </span>
-            
+
             <span *ngIf="validation?.warnings?.length" [class.pl-1]="validation?.errors?.length">
             <i class="fa fa-exclamation-triangle text-warning"></i> {{validation.warnings.length}} Warnings
             </span>
-            
+
             <span *ngIf="!validation?.errors?.length && !validation?.warnings?.length">
             No Issues
             </span>
-            
-            
+
+
             </button>
             </span>
         </ng-template>
@@ -290,10 +290,10 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
 
                         // update validation stream on model validation updates
 
-                        this.workflowModel.setValidationCallback((res: Validation) => {
+                        this.workflowModel.setValidationCallback((res) => {
                             this.validation = {
-                                errors: res.errors,
-                                warnings: res.warnings,
+                                errors: this.workflowModel.filterIssues("error"),
+                                warnings: this.workflowModel.filterIssues("warning"),
                                 isValidatableCwl: true,
                                 isValidCwl: true,
                                 isValidJSON: true
