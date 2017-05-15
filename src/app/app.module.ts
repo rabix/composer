@@ -54,7 +54,7 @@ import {CtHttp} from "./http/ct-http.service";
         CWLModule,
         EditorCommonModule,
         ToolEditorModule,
-        WorkflowEditorModule,
+        WorkflowEditorModule
     ],
     bootstrap: [MainComponent]
 })
