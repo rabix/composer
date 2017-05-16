@@ -98,11 +98,7 @@ export class DescriptionComponent extends DirectiveBase implements ControlValueA
     }
 
     private setFileTypes(fileTypes: string []): void {
-        if (fileTypes.length > 0) {
-            this.port.fileTypes = fileTypes;
-        } else {
-            this.port.fileTypes = undefined;
-        }
+        this.port.fileTypes = fileTypes || [];
     }
 
     registerOnChange(fn: any): void {

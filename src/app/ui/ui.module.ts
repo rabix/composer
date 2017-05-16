@@ -45,12 +45,14 @@ import {NewFileModalComponent} from "./modal/custom/new-file-modal.component";
 import {ProjectSelectionModal} from "./modal/custom/project-selection-modal.component";
 import {CheckboxPromptComponent} from "./modal/common/checkbox-prompt.component";
 import {CircularLoaderComponent} from "./circular-loader/circular-loader.component";
+import {TrimValueAccessorModule} from 'ng-trim-value-accessor';
 
 @NgModule({
     imports: [
         CommonModule,
         FormsModule,
         ReactiveFormsModule,
+        TrimValueAccessorModule,
     ],
     exports: [
         AutoCompleteComponent,
@@ -83,6 +85,7 @@ import {CircularLoaderComponent} from "./circular-loader/circular-loader.compone
         TooltipDirective,
         TreeNodeComponent,
         TreeViewComponent,
+        TrimValueAccessorModule
     ],
 
     entryComponents: [

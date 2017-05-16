@@ -1,5 +1,5 @@
 import {
-    AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output,
+    AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges,
     TemplateRef,
     ViewChild,
     ViewEncapsulation
@@ -220,10 +220,14 @@ import {WorkflowEditorService} from "../../workflow-editor.service";
         </ng-template>
     `
 })
-export class WorkflowGraphEditorComponent extends DirectiveBase implements OnChanges, OnInit, OnDestroy, AfterViewInit {
+export class WorkflowGraphEditorComponent extends DirectiveBase implements OnChanges, OnDestroy, AfterViewInit {
 
     @Input()
     public model: WorkflowModel;
+
+    modelEventListeners = [];
+
+    modelChangedFromHistory: WorkflowModel;
 
     @Input()
     public readonly = false;
@@ -263,19 +267,6 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
                 private inspector: EditorInspectorService,
                 private workflowEditorService: WorkflowEditorService) {
         super();
-    }
-
-    ngOnInit() {
-        const removeHandler = (node) => {
-            if (node === this.inspectedNode) {
-                this.inspector.hide();
-                this.inspectedNode = null;
-            }
-        };
-
-        this.tracked = this.model.on("output.remove", removeHandler);
-        this.tracked = this.model.on("input.remove", removeHandler);
-        this.tracked = this.model.on("step.remove", removeHandler);
     }
 
     private canvasIsInFocus() {
@@ -320,25 +311,25 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         this.tracked = this.ipc.watch("accelerator", "CmdOrCtrl+Z")
             .filter(() => this.canvasIsInFocus() && this.workflowEditorService.canUndo())
             .subscribe(() => {
-                this.model = WorkflowFactory.from(this.workflowEditorService.historyUndo(this.model));
+
+                this.modelChangedFromHistory = WorkflowFactory.from(this.workflowEditorService.historyUndo(this.model));
 
                 // Resets the reference of inspected node (reference is lost after model serialization)
                 this.resetInspectedNodeReference();
 
-                this.modelChange.next(this.model);
-                this.graph.redraw(this.model as any);
+                this.modelChange.next(this.modelChangedFromHistory);
             });
 
         this.tracked = this.ipc.watch("accelerator", "Shift+CmdOrCtrl+Z")
             .filter(() => this.canvasIsInFocus() && this.workflowEditorService.canRedo())
             .subscribe(() => {
-                this.model = WorkflowFactory.from(this.workflowEditorService.historyRedo(this.model));
+
+                this.modelChangedFromHistory =  WorkflowFactory.from(this.workflowEditorService.historyRedo(this.model));
 
                 // Resets the reference of inspected node (reference is lost after model serialization)
                 this.resetInspectedNodeReference();
 
-                this.modelChange.next(this.model);
-                this.graph.redraw(this.model as any);
+                this.modelChange.next(this.modelChangedFromHistory);
             });
     }
 
@@ -353,10 +344,43 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             const input        = this.model.inputs.find((input) => connectionId === input.connectionId);
             const output       = this.model.outputs.find((output) => connectionId === output.connectionId);
             this.inspectedNode = step || input || output;
+
+            // When you create some node (i/o or step by dropping it on a canvas) and open it in object inspector, when
+            // you go backward in history (undo) object inspector should be closed
+            if (!this.inspectedNode) this.inspector.hide();
         }
     }
 
-    ngOnChanges() {
+    /**
+     * Register event listeners on a current model
+     */
+    registerModelEventListeners() {
+        // Close object inspector if step/input/output is removed
+        const removeHandler = (node) => {
+            if (this.inspectedNode && this.inspectedNode.id === node.id) {
+                this.inspector.hide();
+                this.inspectedNode = null;
+            }
+        };
+
+        this.modelEventListeners = [
+            this.model.on("output.remove", removeHandler),
+            this.model.on("input.remove", removeHandler),
+            this.model.on("step.remove", removeHandler)
+        ];
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+
+        // When model is changed we have to know whether change is external (change revision/copy app...)
+        // or internal (undo/redo from history)
+        if (this.model !== changes["model"].previousValue && this.model !== this.modelChangedFromHistory) {
+
+            this.workflowEditorService.emptyHistory();
+            this.registerModelEventListeners();
+            this.resetInspectedNodeReference();
+        }
+
         if (this.graph && this.canvas && Workflow.canDrawIn(this.canvas.nativeElement)) {
             this.graph.redraw(this.model as any);
         }
@@ -490,6 +514,11 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
     ngOnDestroy() {
         super.ngOnDestroy();
+
+        // Dispose model event listeners (remove step/input/output ...)
+        this.modelEventListeners.forEach((item) => {
+            item.dispose();
+        });
 
         // When you click on remove tab (X) on non active tab which has no graph rendered yet
         if (this.graph) {
