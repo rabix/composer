@@ -30,6 +30,7 @@ import {WorkboxService} from "../../workbox/workbox.service";
 import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.component";
 import {ContextService} from "../../../ui/context/context.service";
 import {MenuItem} from "../../../ui/menu/menu-item";
+import {CreateAppModalComponent} from "../../modals/create-app-modal/create-app-modal.component";
 
 /** @deprecated */
 @Component({
@@ -400,9 +401,37 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
     private listenForContextMenu() {
 
         // When click on user project
+        const contextMenu = [
+            null,
+            new MenuItem("Create new Workflow", {
+                click: () => {
+                    const modal = this.modal.fromComponent(CreateAppModalComponent, {
+                        closeOnOutsideClick: false,
+                        backdrop: true,
+                        title: `Create a New App`,
+                        closeOnEscape: true
+                    });
+
+                    modal.appType = 'workflow';
+                }
+            }),
+            new MenuItem("Create new Command Line Tool", {
+                click: () => {
+                    const modal = this.modal.fromComponent(CreateAppModalComponent, {
+                        closeOnOutsideClick: false,
+                        backdrop: true,
+                        title: `Create a New App`,
+                        closeOnEscape: true
+                    });
+
+                    modal.appType = 'tool';
+                }
+            })
+        ];
+
         this.tree.contextMenu.filter((data) => data.node.type === "project")
             .subscribe(data => {
-                const contextMenu = new MenuItem("Remove from Workspace", {
+                contextMenu[0] = new MenuItem("Remove from Workspace", {
                     click: () => {
                         this.preferences.get("openProjects", []).take(1).subscribe(openProjects => {
 
@@ -410,14 +439,13 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                         });
                     }
                 });
-                this.context.showAt(data.node.getViewContainer(), [contextMenu], data.coordinates);
-
+                this.context.showAt(data.node.getViewContainer(), contextMenu, data.coordinates);
             });
 
         // When click on some root local folder
         this.tree.contextMenu.filter((data) => data.node.type === "folder" && data.node.level === 2)
             .subscribe(data => {
-                const contextMenu = new MenuItem("Remove from Workspace", {
+                contextMenu[0] = new MenuItem("Remove from Workspace", {
                     click: () => {
                         this.preferences.get("localFolders", []).take(1).subscribe(openFolders => {
 
@@ -426,7 +454,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                     }
                 });
 
-                this.context.showAt(data.node.getViewContainer(), [contextMenu], data.coordinates);
+                this.context.showAt(data.node.getViewContainer(), contextMenu, data.coordinates);
             });
     }
 
