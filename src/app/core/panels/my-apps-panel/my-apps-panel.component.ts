@@ -401,8 +401,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
     private listenForContextMenu() {
 
         // When click on user project
-        const contextMenu = [
-            null,
+        const contextMenuStaticOptions = [
             new MenuItem("Create new Workflow", {
                 click: () => {
                     const modal = this.modal.fromComponent(CreateAppModalComponent, {
@@ -431,28 +430,28 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
 
         this.tree.contextMenu.filter((data) => data.node.type === "project")
             .subscribe(data => {
-                contextMenu[0] = new MenuItem("Remove from Workspace", {
+                const contextMenu = [new MenuItem("Remove from Workspace", {
                     click: () => {
                         this.preferences.get("openProjects", []).take(1).subscribe(openProjects => {
 
                             this.preferences.put("openProjects", openProjects.filter((el) => el !== data.node.id));
                         });
                     }
-                });
+                })].concat(contextMenuStaticOptions);
                 this.context.showAt(data.node.getViewContainer(), contextMenu, data.coordinates);
             });
 
         // When click on some root local folder
         this.tree.contextMenu.filter((data) => data.node.type === "folder" && data.node.level === 2)
             .subscribe(data => {
-                contextMenu[0] = new MenuItem("Remove from Workspace", {
+                const contextMenu = [new MenuItem("Remove from Workspace", {
                     click: () => {
                         this.preferences.get("localFolders", []).take(1).subscribe(openFolders => {
 
                             this.preferences.put("localFolders", openFolders.filter((el) => el !== data.node.id));
                         });
                     }
-                });
+                })].concat(contextMenuStaticOptions);
 
                 this.context.showAt(data.node.getViewContainer(), contextMenu, data.coordinates);
             });
