@@ -20,7 +20,7 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
                 <li *ngFor="let tab of tabs"
                     [ct-drag-over]="true"
                     (onDragOver)="workbox.openTab(tab)"
-                    (mouseup)="onTabClick($event)"
+                    (mouseup)="onTabClick($event, tab)"
                     [class.active]="tab === (workbox.activeTab | async)"
                     [ct-context]="createContextMenu(tab)"
                     class="tab">
