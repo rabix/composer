@@ -20,7 +20,7 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
                 <li *ngFor="let tab of tabs"
                     [ct-drag-over]="true"
                     (onDragOver)="workbox.openTab(tab)"
-                    (click)="workbox.openTab(tab)"
+                    (mouseup)="onTabClick($event)"
                     [class.active]="tab === (workbox.activeTab | async)"
                     [ct-context]="createContextMenu(tab)"
                     class="tab">
@@ -177,6 +177,18 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
         setTimeout(() => {
             this.restoreTabs();
         });
+    }
+
+    /**
+     * When you click on tab
+     */
+    onTabClick(event: MouseEvent, tab) {
+        // Middle click
+        if (event.button === 1) {
+            this.removeTab(tab);
+        } else {
+            this.workbox.openTab(tab);
+        }
     }
 
     /**
