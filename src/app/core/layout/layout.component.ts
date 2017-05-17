@@ -22,7 +22,6 @@ import {ErrorBarService} from "../../layout/error-bar/error-bar.service";
 @Component({
     selector: "ct-layout",
     styleUrls: ["./layout.component.scss"],
-    providers: [LayoutService],
     template: `
         <ct-error-bar>
         </ct-error-bar>

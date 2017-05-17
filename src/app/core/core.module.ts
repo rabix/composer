@@ -32,6 +32,7 @@ import {CreateAppModalComponent} from "./modals/create-app-modal/create-app-moda
 import {NgStringPipesModule} from "../../../node_modules/ngx-pipes/src/app/pipes/string/index";
 import {WorkboxService} from "./workbox/workbox.service";
 import {PublishModalComponent} from "app/core/modals/publish-modal/publish-modal.component";
+import {LayoutService} from "./layout/layout.service";
 
 @NgModule({
     entryComponents: [
@@ -70,6 +71,7 @@ import {PublishModalComponent} from "app/core/modals/publish-modal/publish-modal
         WebWorkerBuilderService,
         WorkboxService,
         ModalService,
+        LayoutService,
         PlatformAPI,
         {provide: ErrorHandler, useClass: ModalErrorHandler}
     ],
