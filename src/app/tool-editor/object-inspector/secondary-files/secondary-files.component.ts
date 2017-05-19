@@ -5,8 +5,7 @@ import {FormArray, FormControl, FormGroup} from "@angular/forms";
 import {Subscription} from "rxjs/Subscription";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
+    styleUrls: ["./secondary-files.component.scss"],
     selector: "ct-secondary-file",
     template: `
         <ct-form-panel class="borderless" [collapsed]="true">
