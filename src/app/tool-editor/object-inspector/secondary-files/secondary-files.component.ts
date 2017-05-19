@@ -102,11 +102,6 @@ export class SecondaryFilesComponent extends DirectiveBase implements OnChanges,
 
     private updateFileList() {
         this.secondaryFiles = this.port.secondaryFiles;
-        // if (this.port.hasSecondaryFiles) {
-        //     this.secondaryFiles = this.port.secondaryFiles;
-        // } else if (this.port[this.bindingName] && this.port[this.bindingName].hasSecondaryFiles) {
-        //     this.secondaryFiles = this.port[this.bindingName].secondaryFiles;
-        // }
     }
 
     private updateFormArray() {
@@ -130,7 +125,6 @@ export class SecondaryFilesComponent extends DirectiveBase implements OnChanges,
         // re-subscribe update output to form changes
         this.subscription = this.form.valueChanges.map(form => (form.list)).subscribe((list) => {
             if (list) {
-                debugger;
                 this.port.updateSecondaryFiles(list);
                 this.updateFileList();
                 this.secondaryFiles.forEach(file => file.validate(this.context));
