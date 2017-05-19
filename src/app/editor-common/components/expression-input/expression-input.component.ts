@@ -19,6 +19,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
         }
     ],
     template: `
+        {{ model.issues | json }}
         <div class="expression-input-group clickable"
              [ct-validation-class]="model"
              [class.expr]="isExpr || disableLiteralTextInput">
@@ -181,19 +182,16 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
             editor.action.first().subscribe(editorAction => {
 
                 if (editorAction === "save") {
-                    const val  = editor.model.serialize();
-                    this.model = editor.model;
+                    const val = editor.model.serialize();
 
                     if (!val) {
-                        this.model.setValue("", this.type);
+                        editor.model.setValue("", this.type);
                     }
 
-                    const resetValidation = () => {
-                        this.isExpr = this.model.isExpression;
-                        this.onChange(this.model);
-                    };
+                    this.model.cloneStatus(editor.model);
 
-                    this.model.evaluate(this.context).then(resetValidation, resetValidation);
+                    this.isExpr = this.model.isExpression;
+                    this.onChange(this.model);
                 }
 
                 this.modal.close();
@@ -210,7 +208,7 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
                 this.model.setValue("", this.type);
                 this.model.result = null;
                 this.isExpr       = false;
-                this.model = this.model.clone();
+                this.model        = this.model.clone();
                 event.stopPropagation();
                 this.onChange(this.model);
             }, err => console.warn);

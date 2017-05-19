@@ -152,19 +152,10 @@ export class InputBindingSectionComponent extends DirectiveBase implements Contr
                     loadContents: value.stageInput.inputBinding.loadContents,
                 };
 
-                if (value.secondaryFiles && this.input.inputBinding.hasSecondaryFiles) {
-                    binding.secondaryFiles = value.secondaryFiles.map(file => file.serialize());
-                } else if (value.secondaryFiles && this.input.hasSecondaryFiles) {
-                    this.input.secondaryFiles = value.secondaryFiles;
-                }
-
                 if (!this.readonly) {
                     this.input.updateInputBinding(binding);
                     Object.assign(this.input.customProps, value.stageInput.customProps);
-
-                    this.propagateChange(this.input);
                 }
-
             });
     }
 

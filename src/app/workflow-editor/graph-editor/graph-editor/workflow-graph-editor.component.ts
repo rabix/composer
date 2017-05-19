@@ -347,7 +347,9 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
             // When you create some node (i/o or step by dropping it on a canvas) and open it in object inspector, when
             // you go backward in history (undo) object inspector should be closed
-            if (!this.inspectedNode) this.inspector.hide();
+            if (!this.inspectedNode) {
+                this.inspector.hide();
+            }
         }
     }
 

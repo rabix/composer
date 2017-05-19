@@ -156,6 +156,13 @@ $editor-panel-selected-background: #455c7d;
 $editor-panel-selected-border: $brand-primary;
 $editor-panel-selected-color: white;
 
+// Editor Panel Error States
+$editor-panel-error-selected-background: #a54134;
+$editor-panel-error-selected-border: $brand-danger;
+$editor-panel-warning-selected-background: #9c6e2c;
+$editor-panel-warning-selected-border: $brand-warning;
+$editor-panel-icon-selected-color: white;
+
 // Revision List
 $revision-list-entry-active-bg: $input-bg;
 $revision-list-entry-hover-bg: $panel-bg;

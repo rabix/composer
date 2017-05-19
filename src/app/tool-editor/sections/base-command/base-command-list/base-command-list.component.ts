@@ -23,7 +23,7 @@ import {Subscription} from "rxjs/Subscription";
             </div>
 
             <ol *ngIf="baseCommand.length > 0" class="list-unstyled">
-                
+
                 <li *ngFor="let control of form.get('list').controls; let i = index"
                     class="removable-form-control">
 

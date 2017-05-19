@@ -2,7 +2,7 @@ import {
     Component,
     EventEmitter,
     Input,
-    OnChanges,
+    OnChanges, OnInit,
     Output,
     SimpleChanges,
     ViewEncapsulation
@@ -33,8 +33,11 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                             [readonly]="readonly">
             </ct-output-eval>
 
-            <ct-secondary-file *ngIf="isFileType() && form.controls['secondaryFiles']"
-                               [formControl]="form.controls['secondaryFiles']"
+            <ct-secondary-file *ngIf="showSecondaryFiles()"
+                               [context]="context"
+                               [port]="output"
+                               [bindingName]="'outputBinding'"
+                               (update)="save.next(output)"
                                [readonly]="readonly">
             </ct-secondary-file>
 
@@ -45,7 +48,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         </form>
     `
 })
-export class ToolOutputInspector extends DirectiveBase implements OnChanges {
+export class ToolOutputInspectorComponent extends DirectiveBase implements OnChanges, OnInit {
 
     @Input()
     public readonly = false;
@@ -107,11 +110,13 @@ export class ToolOutputInspector extends DirectiveBase implements OnChanges {
         });
     }
 
-    onSubmit(form: FormGroup) {
-        this.save.next(form.value);
+    showSecondaryFiles(): boolean {
+        const isFile      = this.output.type.type === "File" || (this.output.type.type === "array" && this.output.type.items === "File");
+        const hasSecFiles = this.output.hasSecondaryFilesInRoot || !!this.output.outputBinding;
+        return isFile && hasSecFiles;
     }
 
-    isFileType() {
-        return this.output.type.type === "File" || (this.output.type.type === "array" && this.output.type.items === "File");
+    onSubmit(form: FormGroup) {
+        this.save.next(form.value);
     }
 }

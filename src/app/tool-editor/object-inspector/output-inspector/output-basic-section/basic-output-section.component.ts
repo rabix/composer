@@ -20,7 +20,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <!-- Required -->
             <div class="form-group flex-container">
                 <label class="form-control-label">Required</label>
-                <span class="align-right">                        
+                <span class="align-right">
                         <ct-toggle-slider [formControl]="basicSectionForm.controls['isRequired']"
                                           [on]="'Yes'"
                                           [off]="'No'"
@@ -101,7 +101,7 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
         this.listenToIdChanges();
 
         this.tracked = this.basicSectionForm.valueChanges.subscribe(value => {
-            this.output.type.isNullable = !value.isRequired;
+            this.output.type.isNullable    = !value.isRequired;
             this.output.outputBinding.glob = value.glob;
 
             if (value.symbols.length > 0 && this.isEnumType()) {

@@ -99,7 +99,7 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
 
         if (category === "baseCommand") {
             this.model.baseCommand = [];
-            data.forEach(cmd => this.model.addBaseCommand(cmd));
+            data.forEach(cmd => this.model.addBaseCommand(cmd.serialize()));
             this.model.updateCommandLine();
 
         } else if (category === "fileRequirement") {
