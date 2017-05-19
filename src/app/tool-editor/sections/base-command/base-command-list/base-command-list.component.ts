@@ -2,6 +2,7 @@ import {Component, OnInit, ChangeDetectionStrategy, Input, EventEmitter, Output,
 import {CommandLineToolModel, ExpressionModel} from "cwlts/models";
 import {FormArray, FormControl, FormGroup} from "@angular/forms";
 import {Subscription} from "rxjs/Subscription";
+import {ModalService} from "../../../../ui/modal/modal.service";
 
 @Component({
     selector: "ct-base-command-list",
@@ -72,7 +73,7 @@ export class BaseCommandListComponent implements OnInit, OnChanges, OnDestroy {
 
     private subscription: Subscription;
 
-    constructor() {
+    constructor(private modal: ModalService) {
     }
 
     ngOnInit() {
@@ -86,9 +87,18 @@ export class BaseCommandListComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     public removeBaseCommand(i: number) {
-        // reset the expression's validity
-        this.baseCommand[i].setValue("", "string");
-        (this.form.get("list") as FormArray).removeAt(i);
+        this.modal.confirm({
+            title: "Really Remove?",
+            content: `Are you sure that you want to remove this base command?`,
+            cancellationLabel: "No, keep it",
+            confirmationLabel: "Yes, remove it"
+        }).then(() => {
+            // reset the expression's validity
+            this.baseCommand[i].setValue("", "string");
+            (this.form.get("list") as FormArray).removeAt(i);
+        }, err => {
+            console.warn(err);
+        });
     }
 
     public addBaseCommand() {

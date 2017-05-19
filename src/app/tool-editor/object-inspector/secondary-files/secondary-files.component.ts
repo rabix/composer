@@ -3,6 +3,7 @@ import {CommandInputParameterModel, CommandOutputParameterModel, ExpressionModel
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {FormArray, FormControl, FormGroup} from "@angular/forms";
 import {Subscription} from "rxjs/Subscription";
+import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
     styleUrls: ["./secondary-files.component.scss"],
@@ -77,9 +78,23 @@ export class SecondaryFilesComponent extends DirectiveBase implements OnChanges,
 
     private subscription: Subscription;
 
+    constructor(private modal: ModalService) {
+        super();
+    }
+
     removeFile(i) {
-        this.secondaryFiles[i].setValue("", "string");
-        (this.form.get("list") as FormArray).removeAt(i);
+        this.modal.confirm({
+            title: "Really Remove?",
+            content: `Are you sure that you want to remove this secondary file?`,
+            cancellationLabel: "No, keep it",
+            confirmationLabel: "Yes, remove it"
+        }).then(() => {
+            // reset the expression's validity
+            this.secondaryFiles[i].setValue("", "string");
+            (this.form.get("list") as FormArray).removeAt(i);
+        }, err => {
+            console.warn(err);
+        });
     }
 
     addFile() {
@@ -114,7 +129,7 @@ export class SecondaryFilesComponent extends DirectiveBase implements OnChanges,
 
         const formList = [];
 
-        // create formControls from each baseCommand
+        // create formControls from each secondaryFile
         for (let i = 0; i < this.secondaryFiles.length; i++) {
             formList.push(new FormControl(this.secondaryFiles[i]));
         }
