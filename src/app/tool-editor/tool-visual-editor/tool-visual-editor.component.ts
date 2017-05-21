@@ -6,6 +6,9 @@ import {ProcessRequirement} from "cwlts/mappings/d2sb/ProcessRequirement";
 
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {SBGCPURequirement} from "cwlts/mappings/d2sb/SBGCPURequirement";
+import {SBGMemRequirement} from "cwlts/mappings/d2sb/SBGMemRequirement";
+import {ResourceRequirement} from "cwlts/mappings/v1.0";
 
 @Component({
     selector: "ct-tool-visual-editor",
@@ -45,7 +48,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
             </ct-tool-output>
 
             <ct-resources [entries]="model.resources"
-                          (update)="formGroup.markAsDirty()"
+                          (update)="updateModel('resources', $event)"
                           [context]="context"
                           [readonly]="readonly">
             </ct-resources>
@@ -115,6 +118,24 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
                         fileDef: data.map(d => d.serialize())
                     });
                 }
+            }
+        } else if (category === "resources") {
+            if (this.model.cwlVersion === "v1.0") {
+                this.model.setRequirement(<ResourceRequirement>{...data, ...{
+                    "class": "ResourceRequirement",
+                    ramMin: data.mem.serialize(),
+                    coresMin: data.cores.serialize()
+                }});
+
+            } else if (this.model.cwlVersion === "sbg:draft-2") {
+                this.model.setRequirement(<SBGCPURequirement>{
+                    "class": "sbg:CPURequirement",
+                    value: data.cores.serialize()
+                });
+                this.model.setRequirement(<SBGMemRequirement>{
+                    "class": "sbg:MemRequirement",
+                    value: data.mem.serialize()
+                });
             }
         }
 
