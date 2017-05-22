@@ -19,7 +19,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
         }
     ],
     template: `
-        <!--{{ model.issues | json }}-->
+        {{ model.issues | json }}
         <div class="expression-input-group clickable"
              [ct-validation-class]="model"
              [class.expr]="isExpr || disableLiteralTextInput">
