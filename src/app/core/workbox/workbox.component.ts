@@ -1,4 +1,4 @@
-import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, NgZone, OnInit, QueryList, ViewChildren} from "@angular/core";
+import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {StatusControlProvider} from "../../layout/status-bar/status-control-provider.interface";
@@ -20,7 +20,7 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
                 <li *ngFor="let tab of tabs"
                     [ct-drag-over]="true"
                     (onDragOver)="workbox.openTab(tab)"
-                    (click)="workbox.openTab(tab)"
+                    (mouseup)="onTabClick($event, tab)"
                     [class.active]="tab === (workbox.activeTab | async)"
                     [ct-context]="createContextMenu(tab)"
                     class="tab">
@@ -36,10 +36,17 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
                         ></i>
                     </div>
 
-                    <div class="title">{{ tab.label }}</div>
+                    <div class="title" [ct-tooltip]="ctt" [tooltipPlacement]="'bottom'">{{ tab.label }}</div>
                     <div class="close-icon">
                         <i class="fa fa-times clickable" (click)="removeTab(tab)"></i>
                     </div>
+
+                    <!--Tooltip content-->
+                    <ct-tooltip-content [maxWidth]="500" #ctt>
+                        <div>
+                            {{ tab.data ? tab.data.parsedContent["sbg:id"] || tab.data.id : tab.label }}
+                        </div>
+                    </ct-tooltip-content>
                 </li>
 
                 <li class="ct-workbox-add-tab-icon clickable" (click)="openNewFileTab()">
@@ -170,6 +177,18 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
         setTimeout(() => {
             this.restoreTabs();
         });
+    }
+
+    /**
+     * When you click on tab
+     */
+    onTabClick(event: MouseEvent, tab) {
+        // Middle click
+        if (event.button === 1) {
+            this.removeTab(tab);
+        } else {
+            this.workbox.openTab(tab);
+        }
     }
 
     /**
