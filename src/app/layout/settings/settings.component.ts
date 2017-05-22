@@ -13,13 +13,7 @@ type ViewMode = "auth" | "keyBindings" | "cache";
     template: `
         <ct-action-bar>
 
-            <ct-tab-selector [distribute]="'auto'" [active]="viewMode" (activeChange)="switchTab($event)">
-                <ct-tab-selector-entry tabName="auth">Authentication</ct-tab-selector-entry>
-                <ct-tab-selector-entry tabName="keyBindings">Key Bindings</ct-tab-selector-entry>
-                <ct-tab-selector-entry tabName="cache">Cache</ct-tab-selector-entry>
-            </ct-tab-selector>
-
-            <div class="document-controls pr-1">
+            <div class="document-controls pl-1">
 
                 <!--Add Another-->
                 <button (click)="creds.addEntry()"
