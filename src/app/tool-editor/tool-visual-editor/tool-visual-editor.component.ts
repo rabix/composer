@@ -35,7 +35,7 @@ import {ResourceRequirement} from "cwlts/mappings/v1.0";
 
             <ct-tool-input [location]="model.loc + '.inputs'"
                            [model]="model"
-                           (update)="formGroup.markAsDirty()"
+                           (update)="formGroup.markAsDirty(); model.updateCommandLine()"
                            [readonly]="readonly">
             </ct-tool-input>
 
@@ -61,7 +61,7 @@ import {ResourceRequirement} from "cwlts/mappings/v1.0";
 
             <ct-argument-list [location]="model.loc + '.arguments'"
                               [model]="model"
-                              (update)="formGroup.markAsDirty()"
+                              (update)="formGroup.markAsDirty(); model.updateCommandLine()"
                               [context]="context"
                               [readonly]="readonly">
             </ct-argument-list>
