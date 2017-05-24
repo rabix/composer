@@ -20,6 +20,7 @@ import {ToolEditorModule} from "./tool-editor/tool-editor.module";
 import {UIModule} from "./ui/ui.module";
 import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
 import {CtHttp} from "./http/ct-http.service";
+import {JavascriptEvalService} from "./services/javascript-eval/javascript-eval.service";
 
 @NgModule({
     providers: [
@@ -38,7 +39,8 @@ import {CtHttp} from "./http/ct-http.service";
             provide: CtHttp,
             useFactory: ctHttpFactory,
             deps: [XHRBackend, RequestOptions]
-        }
+        },
+        JavascriptEvalService
 
     ],
     declarations: [

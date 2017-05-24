@@ -13,6 +13,9 @@ import {SystemService} from "../../platform-providers/system.service";
                 <ct-logo></ct-logo>
             </h1>
 
+            <div class="background-logo">
+            </div>
+
             <p class="welcome-text">The Rabix Composer is a standalone integrated development environment for workflow
                 description languages that enables rapid workflow composition, testing, and
                 integration

@@ -28,7 +28,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 
             <ct-tool-input [location]="model.loc + '.inputs'"
                            [model]="model"
-                           (update)="formGroup.markAsDirty()"
+                           (update)="formGroup.markAsDirty(); model.updateCommandLine()"
                            [readonly]="readonly">
             </ct-tool-input>
 
@@ -54,7 +54,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
             
             <ct-argument-list [location]="model.loc + '.arguments'"
                               [model]="model"
-                              (update)="formGroup.markAsDirty()"
+                              (update)="formGroup.markAsDirty(); model.updateCommandLine()"
                               [context]="context"
                               [readonly]="readonly">
             </ct-argument-list>

@@ -9,6 +9,7 @@ import {ContextService} from "../../ui/context/context.service";
 import {MarkdownService} from "../../ui/markdown/markdown.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {UrlValidator} from "../../validators/url.validator";
+import {JavascriptEvalService} from "../../services/javascript-eval/javascript-eval.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -28,7 +29,7 @@ import {UrlValidator} from "../../validators/url.validator";
         ContextService,
         StatusBarService,
         // FIXME: this needs to be handled in a system-specific way
-        GuidService,
+        GuidService
     ],
 })
 export class MainComponent {
@@ -38,7 +39,7 @@ export class MainComponent {
     constructor(modal: ModalService,
                 system: SystemService,
                 vcRef: ViewContainerRef,
-                auth: AuthService) {
+                auth: AuthService, js: JavascriptEvalService) {
 
         system.boot();
 
