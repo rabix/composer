@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, Input} from "@angular/core";
+import {ChangeDetectorRef, Component, Input, OnInit} from "@angular/core";
 import {UserPreferencesService} from "../../../services/storage/user-preferences.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
@@ -57,11 +57,11 @@ import {Observable} from "rxjs/Observable";
             </div>
 
             <div class="form-group" *ngIf="destination === 'local'">
-                <label>Destination Folder:</label>
-                <button class="btn btn-secondary block" type="button" (click)="chooseFolder()">Choose a Local Folder
+                <label>Destination Path:</label>
+                <button class="btn btn-secondary block" type="button" (click)="chooseFolder()">Choose a Local Path
                 </button>
                 <p class="form-text text-muted" *ngIf="chosenLocalFilename">
-                    Chosen Folder: {{ chosenLocalFilename }}
+                    Chosen Path: {{ chosenLocalFilename }}
                 </p>
             </div>
 
@@ -98,12 +98,14 @@ import {Observable} from "rxjs/Observable";
     `,
     styleUrls: ["./create-app-modal.component.scss"],
 })
-export class CreateAppModalComponent extends DirectiveBase {
+export class CreateAppModalComponent extends DirectiveBase implements OnInit {
 
     @Input() appType: "tool" | "workflow"    = "tool";
     @Input() destination: "local" | "remote" = "local";
     @Input() cwlVersion: "v1.0" | "d2sb"     = "v1.0";
     @Input() chosenLocalFilename;
+    @Input() defaultFolder: string;
+    @Input() defaultProject: string;
              platformGroup: FormGroup;
              projectSelection: FormControl;
              localNameControl: FormControl;
@@ -127,43 +129,10 @@ export class CreateAppModalComponent extends DirectiveBase {
         this.remoteNameControl = new FormControl("", [Validators.required]);
         this.remoteSlugControl = new FormControl("", [Validators.required]);
         this.localNameControl  = new FormControl("", [Validators.required]);
-        this.projectSelection  = new FormControl("", [Validators.required]);
 
         this.remoteNameControl.valueChanges
             .map(value => this.slugify.transform(value))
             .subscribe(val => this.remoteSlugControl.setValue(val));
-
-        this.platformGroup = new FormGroup({
-            name: this.remoteSlugControl,
-            project: this.projectSelection,
-        });
-
-        this.tracked = this.platformGroup.valueChanges.subscribe(change => {
-
-            this.platformGroup.setErrors({});
-
-        });
-
-        this.tracked = this.platformGroup.valueChanges
-            .debounceTime(300)
-            .filter(val => this.platformGroup.get("name").valid && this.platformGroup.get("project").valid)
-            .do(() => this.checkingSlug = true)
-            .switchMap((values: { name: string, project: string }) => {
-                const {name, project}    = values;
-                const [hash, owner, app] = project.split("/");
-                const slug               = this.slugify.transform(name);
-                const platform           = this.apiGateway.forHash(hash);
-
-                return platform ? platform.suggestSlug(owner, app, slug)
-                    : Observable.throw(
-                        new Error("Cannot suggest slug because you are not connected to the necessary platform."));
-            })
-            .subscribe(data => {
-                this.remoteSlugControl.setValue(data.app_name, {
-                    emitEvent: false
-                });
-                this.checkingSlug = false;
-            });
 
         this.tracked = this.dataGateway.getProjectsForAllConnections().withLatestFrom(
             this.preferences.getOpenProjects(),
@@ -184,10 +153,12 @@ export class CreateAppModalComponent extends DirectiveBase {
             });
     }
 
-
     chooseFolder() {
 
         Observable.zip(this.preferences.getOpenFolders(), this.preferences.getExpandedNodes(), (openFolders, expandedNodes) => {
+            if (this.defaultFolder) {
+                return Observable.of(this.defaultFolder);
+            }
             for (let i = 0; i < expandedNodes.length; i++) {
                 if (openFolders.indexOf(expandedNodes[i]) !== -1) {
                     return Observable.of(expandedNodes[i]);
@@ -262,6 +233,41 @@ export class CreateAppModalComponent extends DirectiveBase {
         }, err => {
             this.error = err;
         });
+    }
 
+    ngOnInit() {
+        this.projectSelection = new FormControl(this.defaultProject || "", [Validators.required]);
+
+        this.platformGroup = new FormGroup({
+            name: this.remoteSlugControl,
+            project: this.projectSelection,
+        });
+
+        this.tracked = this.platformGroup.valueChanges.subscribe(change => {
+
+            this.platformGroup.setErrors({});
+
+        });
+
+        this.tracked = this.platformGroup.valueChanges
+            .debounceTime(300)
+            .filter(val => this.platformGroup.get("name").valid && this.platformGroup.get("project").valid)
+            .do(() => this.checkingSlug = true)
+            .switchMap((values: { name: string, project: string }) => {
+                const {name, project}    = values;
+                const [hash, owner, app] = project.split("/");
+                const slug               = this.slugify.transform(name);
+                const platform           = this.apiGateway.forHash(hash);
+
+                return platform ? platform.suggestSlug(owner, app, slug)
+                    : Observable.throw(
+                        new Error("Cannot suggest slug because you are not connected to the necessary platform."));
+            })
+            .subscribe(data => {
+                this.remoteSlugControl.setValue(data.app_name, {
+                    emitEvent: false
+                });
+                this.checkingSlug = false;
+            });
     }
 }

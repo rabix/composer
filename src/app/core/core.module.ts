@@ -33,6 +33,7 @@ import {NgStringPipesModule} from "../../../node_modules/ngx-pipes/src/app/pipes
 import {WorkboxService} from "./workbox/workbox.service";
 import {PublishModalComponent} from "app/core/modals/publish-modal/publish-modal.component";
 import {LayoutService} from "./layout/layout.service";
+import {CreateLocalFolderModalComponent} from "./modals/create-local-folder-modal/create-local-folder-modal.component";
 
 @NgModule({
     entryComponents: [
@@ -40,6 +41,7 @@ import {LayoutService} from "./layout/layout.service";
         SendFeedbackModalComponent,
         ErrorReportComponent,
         CreateAppModalComponent,
+        CreateLocalFolderModalComponent,
         PublishModalComponent
     ],
     declarations: [
@@ -60,6 +62,7 @@ import {LayoutService} from "./layout/layout.service";
         SendFeedbackModalComponent,
         ErrorReportComponent,
         CreateAppModalComponent,
+        CreateLocalFolderModalComponent,
         PublishModalComponent
     ],
     exports: [

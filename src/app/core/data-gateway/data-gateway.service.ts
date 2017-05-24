@@ -102,6 +102,10 @@ export class DataGatewayService {
         this.invalidateCache(`${hash}.getProjectListing.${owner}.${project}`);
     }
 
+    createLocalFolder(folderPath) {
+        return this.ipc.request("createDirectory", folderPath);;
+    }
+
     getFolderListing(folder) {
         return this.throughCache(`readDirectory.${folder}`, this.ipc.request("readDirectory", folder));
     }
