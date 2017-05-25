@@ -30,6 +30,7 @@ import {WorkboxService} from "../../workbox/workbox.service";
 import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.component";
 import {ContextService} from "../../../ui/context/context.service";
 import {MenuItem} from "../../../ui/menu/menu-item";
+import {CreateAppModalComponent} from "../../modals/create-app-modal/create-app-modal.component";
 
 /** @deprecated */
 @Component({
@@ -128,11 +129,11 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
 
         const localFileSearch = (term) => this.dataGateway.searchLocalProjects(term).map(results => results.map(result => {
 
-            const id = result.path;
+            const id    = result.path;
             const label = result.path.split("/").slice(-3, -1).join("/");
             const title = result.path.split("/").pop();
 
-            let icon = "fa-file";
+            let icon      = "fa-file";
             let relevance = result.relevance;
 
             if (result.type === "Workflow") {
@@ -161,7 +162,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                     const {results, hash} = group;
 
                     return results.map(result => {
-                        const id = hash + "/" + result["owner"] + "/" + result["slug"] + "/" + result["sbg:id"];
+                        const id    = hash + "/" + result["owner"] + "/" + result["slug"] + "/" + result["sbg:id"];
                         const title = result.label;
 
                         return {
@@ -192,7 +193,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
             .filter(term => term.trim().length !== 0)
             .flatMap(term => Observable.zip(localFileSearch(term), projectSearch(term)))
             .subscribe(datasets => {
-                const combined = [].concat(...datasets).sort((a, b) => b.relevance - a.relevance);
+                const combined     = [].concat(...datasets).sort((a, b) => b.relevance - a.relevance);
                 this.searchResults = combined;
                 this.cdr.markForCheck();
             });
@@ -225,7 +226,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                     const id = `${data.node.id}/${child.owner}/${child.slug}`;
 
                     const duplicate = data.listing.slice(0, index).concat(data.listing.slice(index + 1)).find(c => c.name === child.name);
-                    let label = child.name;
+                    let label       = child.name;
 
                     if (duplicate) {
                         label += ` (${child.owner})`;
@@ -244,7 +245,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
 
                 // Update the tree view
                 data.node.modify(() => {
-                    data.node.loading = false;
+                    data.node.loading  = false;
                     data.node.children = children;
                 });
             });
@@ -272,7 +273,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                 // Update the tree view
                 data.node.modify(() => {
                     data.node.children = children;
-                    data.node.loading = false;
+                    data.node.loading  = false;
                 });
             });
     }
@@ -304,7 +305,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                 });
                 data.node.modify(() => {
                     data.node.children = children;
-                    data.node.loading = false;
+                    data.node.loading  = false;
                 });
             });
     }
@@ -319,17 +320,17 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
             }))
             .withLatestFrom(this.expandedNodes, (outer, expanded) => ({...outer, expanded}))
             .subscribe((data: {
-                            node: TreeNodeComponent<FilesystemEntry>
-                            listing: FolderListing,
-                            expanded: string[]
-                        }) => {
+                node: TreeNodeComponent<FilesystemEntry>
+                listing: FolderListing,
+                expanded: string[]
+            }) => {
                 const children = data.listing.map(entry => {
 
                     let icon = "fa-file";
                     let iconExpanded;
 
                     if (entry.isDir) {
-                        icon = "fa-folder";
+                        icon         = "fa-folder";
                         iconExpanded = "fa-folder-open";
                     } else if (entry.type === "Workflow") {
                         icon = "fa-share-alt";
@@ -337,7 +338,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                         icon = "fa-terminal";
                     }
 
-                    const id = entry.path;
+                    const id    = entry.path;
                     const label = entry.path.split("/").pop();
 
                     return {
@@ -360,7 +361,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
 
                 data.node.modify(() => {
                     data.node.children = children;
-                    data.node.loading = false;
+                    data.node.loading  = false;
                 });
             });
     }
@@ -385,44 +386,74 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
 
     private listenForAppOpening() {
         this.tree.open.filter(n => n.type === "app")
-            .flatMap(node => this.workbox.getOrCreateFileTab(node.id))
+            .flatMap(node => this.workbox.getOrCreateFileTab(node.id).catch(() => {
+                return Observable.empty();
+            }))
             .subscribe(tab => this.workbox.openTab(tab));
 
         this.tree.open.filter(n => n.type === "file")
-            .flatMap(node => this.workbox.getOrCreateFileTab(node.data.path))
+            .flatMap(node => this.workbox.getOrCreateFileTab(node.data.path).catch(() => {
+                return Observable.empty();
+            }))
             .subscribe(tab => this.workbox.openTab(tab));
     }
 
     private listenForContextMenu() {
 
         // When click on user project
+        const contextMenuStaticOptions = [
+            new MenuItem("Create new Workflow", {
+                click: () => {
+                    const modal = this.modal.fromComponent(CreateAppModalComponent, {
+                        closeOnOutsideClick: false,
+                        backdrop: true,
+                        title: `Create a New App`,
+                        closeOnEscape: true
+                    });
+
+                    modal.appType = 'workflow';
+                }
+            }),
+            new MenuItem("Create new Command Line Tool", {
+                click: () => {
+                    const modal = this.modal.fromComponent(CreateAppModalComponent, {
+                        closeOnOutsideClick: false,
+                        backdrop: true,
+                        title: `Create a New App`,
+                        closeOnEscape: true
+                    });
+
+                    modal.appType = 'tool';
+                }
+            })
+        ];
+
         this.tree.contextMenu.filter((data) => data.node.type === "project")
             .subscribe(data => {
-                const contextMenu = new MenuItem("Remove from Workspace", {
+                const contextMenu = [new MenuItem("Remove from Workspace", {
                     click: () => {
                         this.preferences.get("openProjects", []).take(1).subscribe(openProjects => {
 
                             this.preferences.put("openProjects", openProjects.filter((el) => el !== data.node.id));
                         });
                     }
-                });
-                this.context.showAt(data.node.getViewContainer(), [contextMenu], data.coordinates);
-
+                })].concat(contextMenuStaticOptions);
+                this.context.showAt(data.node.getViewContainer(), contextMenu, data.coordinates);
             });
 
         // When click on some root local folder
         this.tree.contextMenu.filter((data) => data.node.type === "folder" && data.node.level === 2)
             .subscribe(data => {
-                const contextMenu = new MenuItem("Remove from Workspace", {
+                const contextMenu = [new MenuItem("Remove from Workspace", {
                     click: () => {
                         this.preferences.get("localFolders", []).take(1).subscribe(openFolders => {
 
                             this.preferences.put("localFolders", openFolders.filter((el) => el !== data.node.id));
                         });
                     }
-                });
+                })].concat(contextMenuStaticOptions);
 
-                this.context.showAt(data.node.getViewContainer(), [contextMenu], data.coordinates);
+                this.context.showAt(data.node.getViewContainer(), contextMenu, data.coordinates);
             });
     }
 

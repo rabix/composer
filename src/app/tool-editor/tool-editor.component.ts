@@ -132,7 +132,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
                             this.viewMode = "code";
                         }
 
-                        // this.isLoading  = false;
+                        this.isLoading  = false;
                         this.validation = r;
                         return r;
                     }

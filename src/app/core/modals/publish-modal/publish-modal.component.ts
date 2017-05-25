@@ -52,7 +52,7 @@ import {PlatformAppEntry} from "../../../services/api/platforms/platform-api.typ
                 <button type="button" class="btn btn-secondary" (click)="modal.close()"> Cancel</button>
                 <button type="button"
                         (click)="publish()"
-                        class="btn btn-success"
+                        class="btn btn-primary"
                         [disabled]="platformGroup.invalid">
                     <span *ngIf="checking">Checking...</span>
                     <span *ngIf="!checking">Publish</span>
@@ -119,9 +119,14 @@ export class PublishModalComponent extends DirectiveBase {
             .switchMap((values: { name: string, project: string }) => {
                 const {name, project}    = values;
                 const [hash, owner, app] = project.split("/");
-                const slug               = this.slugify.transform(name);
+                const slug = this.slugify.transform(name);
+                const platform = this.apiGateway.forHash(hash);
 
-                return this.apiGateway.forHash(hash).getApp(owner, app, slug).catch(err => {
+                const call = platform ? platform.getApp(owner, app, slug)
+                    : Observable.throw(
+                        new Error("Could not get the app because you are not connected to the necessary platform."));
+
+                return call.catch(err => {
                     if (err.status === 404) {
                         return Observable.of(null);
                     } else {
@@ -173,15 +178,23 @@ export class PublishModalComponent extends DirectiveBase {
         const [hash, owner, project] = this.projectSelection.value.split("/");
 
         let call;
-        content["label"] = label;
-        if (this.originalApp) {
-            content["sbg:id"] = this.originalApp["sbg:id"];
 
-            call = this.apiGateway.forHash(hash).saveApp(content as any, revisionNote);
+        const platform = this.apiGateway.forHash(hash);
+
+        if (platform) {
+            content["label"] = label;
+            if (this.originalApp) {
+                content["sbg:id"] = this.originalApp["sbg:id"];
+
+                call = platform.saveApp(content as any, revisionNote);
+            } else {
+                content["sbg:id"] = [owner, project, slug, 0].join("/");
+
+                call = platform.createApp(owner, project, slug, content as any);
+            }
+
         } else {
-            content["sbg:id"] = [owner, project, slug, 0].join("/");
-
-            call = this.apiGateway.forHash(hash).createApp(owner, project, slug, content as any);
+            call = Observable.throw("Could not publish the app because you are not connected to the necessary platform.");
         }
 
         call.subscribe(app => {

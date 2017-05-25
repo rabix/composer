@@ -9,7 +9,6 @@ import {
 } from "@angular/core";
 import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
-import {noop} from "../../../lib/utils.lib";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {ModalService} from "../../../ui/modal/modal.service";
 
@@ -162,8 +161,8 @@ export class ToolInputListComponent extends DirectiveBase {
                 this.inspector.hide();
             }
 
-            const entries = this.entries.slice(0, index).concat(this.entries.slice(index + 1));
-            this.entriesChange.emit(entries);
+            this.model.removeInput(this.entries[index]);
+            this.entriesChange.emit(this.model.inputs);
         }, err => console.warn);
     }
 

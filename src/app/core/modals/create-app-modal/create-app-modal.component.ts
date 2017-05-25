@@ -58,7 +58,8 @@ import {Observable} from "rxjs/Observable";
 
             <div class="form-group" *ngIf="destination === 'local'">
                 <label>Destination Folder:</label>
-                <button class="btn btn-secondary block" type="button" (click)="chooseFolder()">Choose a Local Folder</button>
+                <button class="btn btn-secondary block" type="button" (click)="chooseFolder()">Choose a Local Folder
+                </button>
                 <p class="form-text text-muted" *ngIf="chosenLocalFilename">
                     Chosen Folder: {{ chosenLocalFilename }}
                 </p>
@@ -79,14 +80,14 @@ import {Observable} from "rxjs/Observable";
                 <button type="button" class="btn btn-secondary" (click)="modal.close()"> Cancel</button>
                 <button type="button"
                         (click)="createRemote()"
-                        class="btn btn-success"
+                        class="btn btn-primary"
                         *ngIf="destination=== 'remote'"
                         [disabled]="platformGroup.invalid">
                     <span *ngIf="checkingSlug">Checking...</span>
                     <span *ngIf="!checkingSlug">Create</span>
                 </button>
                 <button type="button"
-                        class="btn btn-success"
+                        class="btn btn-primary"
                         *ngIf="destination=== 'local'"
                         (click)="createLocal()"
                         [disabled]="localNameControl.invalid || !chosenLocalFilename">
@@ -151,7 +152,11 @@ export class CreateAppModalComponent extends DirectiveBase {
                 const {name, project}    = values;
                 const [hash, owner, app] = project.split("/");
                 const slug               = this.slugify.transform(name);
-                return this.apiGateway.forHash(hash).suggestSlug(owner, app, slug);
+                const platform           = this.apiGateway.forHash(hash);
+
+                return platform ? platform.suggestSlug(owner, app, slug)
+                    : Observable.throw(
+                        new Error("Cannot suggest slug because you are not connected to the necessary platform."));
             })
             .subscribe(data => {
                 this.remoteSlugControl.setValue(data.app_name, {
@@ -242,7 +247,13 @@ export class CreateAppModalComponent extends DirectiveBase {
 
         const [hash, owner, project] = this.projectSelection.value.split("/");
 
-        this.apiGateway.forHash(hash).createApp(owner, project, slug, app).subscribe(data => {
+        const platform = this.apiGateway.forHash(hash);
+
+        const call = platform ? platform.createApp(owner, project, slug, app)
+            : Observable.throw(
+                new Error("You cannot create the app because you are not connected to the necessary platform."));
+
+        call.subscribe(data => {
             this.dataGateway.invalidateProjectListing(hash, owner, project);
             this.workbox.getOrCreateFileTab([hash, owner, project, owner, project, slug, 0].join("/")).subscribe(tab => {
                 this.workbox.openTab(tab);

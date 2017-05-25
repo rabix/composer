@@ -92,7 +92,7 @@ export class ExpressionEditorComponent extends DirectiveBase implements OnInit, 
             enableBasicAutocompletion: true,
         };
 
-        this.tracked = this.editorControl.valueChanges.debounceTime(300)
+        this.tracked = this.editorControl.valueChanges.debounceTime(500)
             .filter(e => typeof e === "string")
             .distinctUntilChanged()
             .subscribe(content => {

@@ -3,38 +3,35 @@
 :host {
 
     &.backdrop {
-        background: rgba(105, 105, 105, .5);
+        background: transparentize($modal-backdrop-bg, $modal-backdrop-opacity);
     }
 
-    color: black;
-    display: block;
-    height: 100%;
-    left: 0;
-    position: absolute;
     top: 0;
+    left: 0;
     width: 100%;
+    height: 100%;
     z-index: 10000;
+    display: block;
+    position: absolute;
 
     .ui-modal-frame {
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        background: $modal-content-bg;
         min-width: 600px;
         display: block;
-        border-radius: 4px;
-        background: white;
+        border-radius: $border-radius;
         position: absolute;
         transition: all .2s;
+
     }
 
     .ui-modal-header {
         border: 0 solid;
-        height: 3em;
-        line-height: 3em;
-        text-align: left;
-        font-weight: 600;
-        color: #424141;
+        line-height: 2.5em;
+        text-align: center;
         border-radius: 2px 2px 0 0;
-        background: $layout-element-alt-background;
-        border-bottom: 1px solid $layout-section-alt-border-color;
+        background: linear-gradient($modal-header-bg, darken($modal-header-bg, 2%));
+        border-bottom: 1px solid $modal-footer-border-color;
     }
 
     .modal-title {
@@ -69,20 +66,25 @@
     .modal-header {
         padding: 6px;
         border-bottom: 1px solid gray;
+        background: $modal-header-bg;
     }
 
     // Modal body
     // Where all modal tabData resides (sibling of .modal-header and .modal-footer)
     .modal-body {
+        background: $modal-content-bg;
         position: relative;
         padding: 6px;
     }
 
     // Footer (for actions)
-    .modal-footer {
-        padding: 6px;
+    /deep/ .modal-footer {
         text-align: right; // right align buttons
-        border-top: 1px solid gray;
+        padding: .5em;
+
+        .btn {
+            min-width: 80px; // This is roughly the width of a "Cancel" button
+        }
 
         // Properly space out buttons
         .btn + .btn {

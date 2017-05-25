@@ -1,5 +1,6 @@
 import {Component, OnInit, ViewChild, ViewContainerRef} from "@angular/core";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {LayoutService} from "../../core/layout/layout.service";
 import {StatusBarService} from "./status-bar.service";
 
 @Component({
@@ -7,8 +8,17 @@ import {StatusBarService} from "./status-bar.service";
     styleUrls: ["./status-bar.component.scss"],
     template: `
 
-        <!--Status-->
-        <span class="status-item">
+        <!--Status & panel toggle button-->
+        <span class="status-item status-buttons">
+            <span class="btn-group">
+                <button class="sidebar-toggle btn btn-sm"
+                        [class.active]="layoutService.sidebarHidden"
+                        (click)="layoutService.toggleSidebar()">
+                    <i class="fa"
+                       [class.fa-angle-double-left] = "!layoutService.sidebarHidden"
+                       [class.fa-angle-double-right] = "layoutService.sidebarHidden"></i>
+                </button>
+            </span>
             <span *ngIf="status">
                 {{ status.message }}
                 <span *ngIf="status.time">({{ status.time | amTimeAgo }})</span>
@@ -40,7 +50,8 @@ export class StatusBarComponent extends DirectiveBase implements OnInit {
     @ViewChild("controlHost", {read: ViewContainerRef})
     private controlHost: ViewContainerRef;
 
-    constructor(public statusBar: StatusBarService) {
+    constructor(public statusBar: StatusBarService,
+                public layoutService: LayoutService) {
         super();
         this.tracked = this.statusBar.status.subscribe(s => this.status = s);
         this.tracked = this.statusBar.queueSize.subscribe(s => this.queueSize = s);

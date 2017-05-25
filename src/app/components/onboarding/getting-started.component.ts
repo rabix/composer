@@ -1,15 +1,13 @@
-import {Component} from "@angular/core";
+import {ChangeDetectionStrategy, Component} from "@angular/core";
 import {ModalService} from "../../ui/modal/modal.service";
 import {SendFeedbackModalComponent} from "../../core/modals/send-feedback-modal/send-feedback.modal.component";
-import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {SystemService} from "../../platform-providers/system.service";
 import {AuthService} from "../../auth/auth/auth.service";
-import {PlatformAPIGatewayService} from "../../auth/api/platform-api-gateway.service";
 import {CredentialsEntry} from "../../services/storage/user-preferences-types";
-import {ErrorBarService} from "../../layout/error-bar/error-bar.service";
 
 @Component({
     styleUrls: ["getting-started.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     selector: "ct-getting-started",
     template: `
         <!--Caption-->
@@ -21,7 +19,7 @@ import {ErrorBarService} from "../../layout/error-bar/error-bar.service";
             <div class="item">
                 <p class="subtitle">New to Rabix Composer?</p>
                 <p>Rabix Composer is a standalone editor Common Workflow Language tools and workflows.
-                    <a href>
+                    <a data-test="new-to-link" href (click)="openLink('http://rabix.io/'); false;">
                         Learn more
                     </a>
                 </p>
@@ -32,7 +30,7 @@ import {ErrorBarService} from "../../layout/error-bar/error-bar.service";
                 <p class="subtitle">Learn how to build a tool</p>
                 <p>Having uploaded a Docker image containing your tool to the image registry, you can specify its
                     behavior, including its inputs and outputs.
-                    <a href>
+                    <a href data-test="learn-how-to-link" (click)="openLink('http://rabix.io/'); false;">
                         Learn more
                     </a>
                 </p>
@@ -43,7 +41,7 @@ import {ErrorBarService} from "../../layout/error-bar/error-bar.service";
                 <p class="subtitle">Need help?</p>
                 <p>If you have any problem, idea or a thought let us know.</p>
                 <p>
-                    <button type="button" class="btn btn-outline-primary" (click)="openFeedbackModal()">
+                    <button type="button" data-test="get-support-btn" class="btn btn-secondary" (click)="openFeedbackModal()">
                         Get support
                     </button>
                 </p>
@@ -53,12 +51,15 @@ import {ErrorBarService} from "../../layout/error-bar/error-bar.service";
 })
 export class GettingStartedComponent {
 
+    // FIXME Add correct url links
 
     constructor(private modal: ModalService,
                 private auth: AuthService,
-                private errorBar: ErrorBarService,
-                private apiGateway: PlatformAPIGatewayService,
                 private system: SystemService) {
+    }
+
+    openLink(link: string) {
+        this.system.openLink(link)
     }
 
     openFeedbackModal() {
@@ -76,21 +77,7 @@ export class GettingStartedComponent {
                     backdrop: true
                 });
 
-
-                modal.sendFeedback = (feedbackType, message) => {
-                    this.apiGateway.forHash(feedbackPlatform.hash)
-                        .sendFeedback(feedbackPlatform.user.id, feedbackType, message, feedbackPlatform.url)
-                        .subscribe(() => {
-                            modal.closeModal();
-                        }, err => {
-                            console.log("Error", err);
-                            if (err.status === 0) {
-                                this.errorBar.showError("Could not connect to the platform and send a feedback message");
-                            } else {
-                                this.errorBar.showError(err);
-                            }
-                        });
-                };
+                modal.feedbackPlatform = feedbackPlatform;
 
                 return;
             }

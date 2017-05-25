@@ -174,8 +174,10 @@ export class JobEditorComponent implements OnChanges, OnDestroy {
     /**
      * Updates the job value for a given input and emits the updated job.
      */
-    jobValueUpdate(inputId, jobValue) {
+    jobValueUpdate(prefix, jobValue) {
 
+        // Get top level id from prefix
+        const inputId = prefix.split(".")[0];
         const input = this.inputs.find(i => i.id === inputId);
 
         // Show a message in the status bar about what's changed.
@@ -189,7 +191,7 @@ export class JobEditorComponent implements OnChanges, OnDestroy {
         }
 
         // Assign the given value to the job key
-        OH.addProperty(this.job.inputs, inputId, jobValue);
+        OH.addProperty(this.job.inputs, prefix, jobValue);
 
         // Send the update to the output of this component
         this.update.emit(this.job);

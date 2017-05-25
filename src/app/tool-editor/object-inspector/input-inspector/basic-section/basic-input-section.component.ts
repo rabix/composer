@@ -7,7 +7,7 @@ import {
     NG_VALUE_ACCESSOR,
     Validators
 } from "@angular/forms";
-import {CommandInputParameterModel} from "cwlts/models";
+import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 import {noop} from "../../../../lib/utils.lib";
 
@@ -37,11 +37,14 @@ import {noop} from "../../../../lib/utils.lib";
             </div>
 
             <!--ID-->
-            <div class="form-group">
+            <div class="form-group"  [class.has-danger]="form.controls['id'].errors">
                 <label class="form-control-label">ID</label>
                 <input type="text"
                        class="form-control"
                        [formControl]="form.controls['id']">
+                <div *ngIf="form.controls['id'].errors" class="form-control-feedback">
+                    {{form.controls['id'].errors['error']}}
+                </div>
             </div>
 
             <!--Input Type -->
@@ -88,6 +91,9 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
 
     @Input()
     readonly = false;
+
+    @Input()
+    model: CommandLineToolModel;
 
     /** The currently displayed property */
     input: CommandInputParameterModel;
@@ -141,10 +147,14 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
 
             // id changes
             if (this.input.id !== value.id) {
-                this.input.id = value.id;
+                try {
+                    this.model.changeIOId(this.input, value.id);
 
-                if (this.isType("enum") || this.isType("record")) {
-                    this.input.type.name = value.id;
+                    if (this.isType("enum") || this.isType("record")) {
+                        this.input.type.name = value.id;
+                    }
+                } catch (ex) {
+                    this.form.controls["id"].setErrors({error: ex.message});
                 }
             }
 

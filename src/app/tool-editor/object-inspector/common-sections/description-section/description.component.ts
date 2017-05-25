@@ -41,8 +41,8 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                 <!--File Types-->
                 <div *ngIf="isFileType()">
                     <label class="form-control-label">File types</label>
-                    <input class="form-control"
-                           [formControl]="form.controls['fileTypes']"/>
+                    <ct-auto-complete [formControl]="form.controls['fileTypes']"
+                                      [create]="true"></ct-auto-complete>
                 </div>
             </div>
         </ct-form-panel>
@@ -97,14 +97,8 @@ export class DescriptionComponent extends DirectiveBase implements ControlValueA
         }
     }
 
-    private setFileTypes(fileTypes: string): void {
-        const trimmedFileTypes = fileTypes.trim();
-
-        if (trimmedFileTypes.length > 0) {
-            this.port.fileTypes = trimmedFileTypes.split(",");
-        } else {
-            this.port.fileTypes = undefined;
-        }
+    private setFileTypes(fileTypes: string []): void {
+        this.port.fileTypes = fileTypes || [];
     }
 
     registerOnChange(fn: any): void {
