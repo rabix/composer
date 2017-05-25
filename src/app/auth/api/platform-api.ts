@@ -1,5 +1,5 @@
 import {Headers} from "@angular/http";
-import {ENVP} from "app/config/env.config";
+import {ENVP} from "../../config/env.config";
 import {Observable} from "rxjs/Observable";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {PlatformProjectEntry} from "../../core/data-gateway/data-types/platform-api.types";
