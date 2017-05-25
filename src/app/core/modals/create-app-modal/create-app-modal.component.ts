@@ -3,7 +3,7 @@ import {UserPreferencesService} from "../../../services/storage/user-preferences
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
-import {SlugifyPipe} from "../../../../../node_modules/ngx-pipes/src/app/pipes/string/slugify";
+import {SlugifyPipe} from "ngx-pipes";
 import {FormControl, Validators, FormGroup} from "@angular/forms";
 import {AuthService} from "../../../auth/auth/auth.service";
 import {PlatformAPIGatewayService} from "../../../auth/api/platform-api-gateway.service";
