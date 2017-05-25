@@ -119,13 +119,19 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
             }
         } else if (category === "resources") {
             if (this.model.cwlVersion === "v1.0") {
-                this.model.setRequirement(<ResourceRequirement>{
+                // extending the data object gotten to recapture any other requirement properties (ramMax, coresMax, etc)
+                const req = <ResourceRequirement>{
                     ...data, ...{
                         "class": "ResourceRequirement",
                         ramMin: data.mem.serialize(),
                         coresMin: data.cores.serialize()
                     }
-                });
+                };
+
+                // remove cottontail specific properties so they aren't serialized as customProps
+                delete (<any> req).cores;
+                delete (<any> req).mem;
+                this.model.setRequirement(req);
 
             } else if (this.model.cwlVersion === "sbg:draft-2") {
                 this.model.setRequirement(<SBGCPURequirement>{
