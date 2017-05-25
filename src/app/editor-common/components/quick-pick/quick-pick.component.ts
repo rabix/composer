@@ -22,7 +22,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
             <div class="radio-container" *ngFor="let item of list">
                 <button class="btn btn-secondary"
-                        [class.active]="computedVal.toString() === item.value.toString()"
+                        type="button"
+                        [class.active]="computedVal?.toString() === item.value.toString()"
                         (click)="selectDefault(item.value)">
                     {{ item.label }}
                 </button>
@@ -133,7 +134,7 @@ available types: {[label: string]: string | number} | string[]`);
         }
 
         this.showCustom = !this.list.filter(item => {
-                return item.value.toString() === this.computedVal.toString();
+                return this.computedVal !== undefined && item.value.toString() === this.computedVal.toString();
             }).length && this.computedVal !== undefined;
 
         if (this.showCustom) {

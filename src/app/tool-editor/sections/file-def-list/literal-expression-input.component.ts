@@ -36,14 +36,14 @@ import {ModalService} from "../../../ui/modal/modal.service";
                               #input
                               [readonly]="isExpr"
                               (blur)="onTouch()"
-                              [value]="value?.toString()"
+                              [value]="model?.toString()"
                               (click)="editExpr(isExpr ? 'edit' : null, $event)"
                               (change)="editLiteral(input.value)"></textarea>
 
                 <span class="btn-group">
                         <button type="button"
                                 (click)="openLiteralEditor()"
-                                [disabled]="value.isExpression"
+                                [disabled]="model.isExpression"
                                 class="btn btn-secondary">
                             <i class="fa fa-expand"></i>
                         </button>
@@ -89,20 +89,6 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
      */
     model: ExpressionModel;
 
-
-    /** getter for formControl value */
-    get value() {
-        return this.model;
-    }
-
-    /** setter for formControl value */
-    set value(val: ExpressionModel) {
-        if (val !== this.model) {
-            this.model = val;
-            this.onChange(val);
-        }
-    }
-
     constructor(private modal: ModalService) {
         super();
     }
@@ -115,6 +101,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
         if (obj) {
             this.model  = obj;
             this.isExpr = obj.isExpression;
+            this.model.validate(this.context).then(noop, noop);
         } else {
             console.warn("supposed to get a value, but didn't... :(");
         }
@@ -136,7 +123,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
             title: "Edit File Content"
         });
 
-        editor.content.next(this.value.toString());
+        editor.content.next(this.model.toString());
 
         if (this.fileName) {
             const nameParts = this.fileName.split(".");
@@ -191,23 +178,18 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
             editor.context = this.context;
             editor.action.first().subscribe(action => {
                 if (action === "save") {
-
                     const val = editor.model.serialize();
 
-                    this.model = editor.model;
-
                     if (!val) {
-                        this.model.setValue("", "string");
+                        editor.model.setValue("", "string");
                     }
 
-                    const resetValidation = () => {
-                        // to reset validation
-                        this.isExpr = this.model.isExpression;
+                    this.model.cloneStatus(editor.model);
+
+                    this.isExpr = this.model.isExpression;
+                    this.model.validate(this.context).then(() => {
                         this.onChange(this.model);
-                    };
-
-                    this.model.evaluate(this.context).then(resetValidation, resetValidation);
-
+                    },  err => console.warn);
                 }
                 this.modal.close();
             });
@@ -220,12 +202,13 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
                 cancellationLabel: "No, keep it",
                 confirmationLabel: "Yes, delete it"
             }).then(() => {
-                this.model = this.model.clone();
                 this.model.setValue("", "string");
                 this.model.result = null;
                 this.isExpr       = false;
                 event.stopPropagation();
-                this.onChange(this.model);
+                this.model.validate(this.context).then(() => {
+                    this.onChange(this.model);
+                }, console.warn);
             }, err => console.warn);
         }
     }

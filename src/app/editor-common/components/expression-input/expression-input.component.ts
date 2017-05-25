@@ -180,7 +180,9 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
                     this.model.cloneStatus(editor.model);
 
                     this.isExpr = this.model.isExpression;
-                    this.model.validate(this.context).then(suc => this.onChange(this.model), err => this.onChange(this.model));
+                    this.model.validate(this.context).then(() => {
+                        this.onChange(this.model);
+                    }, err => console.warn);
                 }
 
                 this.modal.close();
@@ -197,9 +199,10 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
                 this.model.setValue("", this.type);
                 this.model.result = null;
                 this.isExpr       = false;
-                this.model        = this.model.clone();
                 event.stopPropagation();
-                this.onChange(this.model);
+                this.model.validate(this.context).then(() => {
+                    this.onChange(this.model);
+                }, err => console.warn);
             }, err => console.warn);
         }
     }
