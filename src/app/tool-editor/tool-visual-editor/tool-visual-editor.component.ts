@@ -1,22 +1,20 @@
-import {Component, Input, OnDestroy, OnChanges} from "@angular/core";
+import {Component, Input, OnChanges, OnDestroy} from "@angular/core";
 import {FormGroup} from "@angular/forms";
-
-import {CommandLineToolModel} from "cwlts/models";
 import {ProcessRequirement} from "cwlts/mappings/d2sb/ProcessRequirement";
-
-import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
-import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {SBGCPURequirement} from "cwlts/mappings/d2sb/SBGCPURequirement";
 import {SBGMemRequirement} from "cwlts/mappings/d2sb/SBGMemRequirement";
 import {ResourceRequirement} from "cwlts/mappings/v1.0";
+
+import {CommandLineToolModel} from "cwlts/models";
+
+import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
+import {DirectiveBase} from "../../util/directive-base/directive-base";
 
 @Component({
     selector: "ct-tool-visual-editor",
     styleUrls: ["./tool-visual-editor.component.scss"],
     template: `
         <form [formGroup]="formGroup">
-
-            <pre>{{ model.issues | json }}</pre>
 
             <ct-docker-requirement [docker]="model.docker"
                                    (update)="formGroup.markAsDirty()"
@@ -121,11 +119,13 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
             }
         } else if (category === "resources") {
             if (this.model.cwlVersion === "v1.0") {
-                this.model.setRequirement(<ResourceRequirement>{...data, ...{
-                    "class": "ResourceRequirement",
-                    ramMin: data.mem.serialize(),
-                    coresMin: data.cores.serialize()
-                }});
+                this.model.setRequirement(<ResourceRequirement>{
+                    ...data, ...{
+                        "class": "ResourceRequirement",
+                        ramMin: data.mem.serialize(),
+                        coresMin: data.cores.serialize()
+                    }
+                });
 
             } else if (this.model.cwlVersion === "sbg:draft-2") {
                 this.model.setRequirement(<SBGCPURequirement>{

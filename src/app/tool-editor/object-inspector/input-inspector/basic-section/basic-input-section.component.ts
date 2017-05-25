@@ -137,12 +137,6 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
                 this.input.type.symbols = value.symbols;
             }
 
-            // binding changes
-            if (value.inputBinding) {
-                this.input.updateInputBinding(value.inputBinding.inputBinding);
-                Object.assign(this.input.customProps, value.inputBinding.customProps);
-            }
-
             // id changes
             if (value.id && this.input.id !== value.id) {
                 try {

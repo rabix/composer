@@ -135,27 +135,38 @@ export class InputBindingSectionComponent extends DirectiveBase implements Contr
             itemSeparator: [!!input.inputBinding.itemSeparator ? input.inputBinding.itemSeparator : null]
         });
 
-        this.listenToInputBindingFormChanges();
+        if (!this.readonly) {
+            this.listenToInputBindingFormChanges();
+        }
     }
 
     listenToInputBindingFormChanges(): void {
         this.tracked = this.form.valueChanges
             .distinctUntilChanged()
             .debounceTime(300)
-            .subscribe(value => {
-                const binding: any = {
-                    position: value.position || undefined,
-                    prefix: value.prefix || undefined,
-                    separate: value.separate,
-                    itemSeparator: value.itemSeparator || undefined,
-                    valueFrom: value.valueFrom ? value.valueFrom.serialize() : undefined,
-                    loadContents: value.stageInput.inputBinding.loadContents,
-                };
-
-                if (!this.readonly) {
-                    this.input.updateInputBinding(binding);
-                    Object.assign(this.input.customProps, value.stageInput.customProps);
+            .subscribe(form => {
+                if (form.position !== undefined) {
+                    this.input.inputBinding.position = form.position || 0;
                 }
+
+                if (form.prefix !== undefined) {
+                    this.input.inputBinding.prefix = form.prefix;
+                }
+
+
+                if (form.itemSeparator !== undefined) {
+                    this.input.inputBinding.itemSeparator = form.itemSeparator;
+                }
+
+                if (form.valueFrom !== undefined && form.valueFrom.serialize() === undefined) {
+                    this.input.inputBinding.valueFrom.setValue("", "string");
+                }
+
+                if (form.loadContents !== undefined) {
+                    this.input.inputBinding.loadContents = form.loadContents;
+                }
+
+                this.propagateChange(this.input);
             });
     }
 

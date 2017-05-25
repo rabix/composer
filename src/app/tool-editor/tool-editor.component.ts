@@ -2,7 +2,6 @@ import {AfterViewInit, Component, Input, OnDestroy, OnInit, TemplateRef, ViewChi
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {CommandLineToolFactory} from "cwlts/models/generic/CommandLineToolFactory";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
-import {Validation} from "cwlts/models/helpers/validation";
 import * as Yaml from "js-yaml";
 import {Observable} from "rxjs/Observable";
 import {ReplaySubject, Subject} from "rxjs/Rx";
@@ -157,8 +156,8 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
 
                         const updateValidity = () => {
                             this.validation = {
-                                errors: this.toolModel.filterIssues("error"),
-                                warnings: this.toolModel.filterIssues("warning"),
+                                errors: this.toolModel.errors,
+                                warnings: this.toolModel.warnings,
                                 isValidatableCwl: true,
                                 isValidCwl: true,
                                 isValidJSON: true
@@ -198,7 +197,8 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
                             warnings: [],
                             errors: [{
                                 message: err.message,
-                                loc: "document"
+                                loc: "document",
+                                type: "error"
                             }]
                         };
 

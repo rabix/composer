@@ -49,8 +49,7 @@ import {ModalService} from "../../../../ui/modal/modal.service";
             </button>
         </form>
     `,
-    styleUrls: ["./base-command-list.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    styleUrls: ["./base-command-list.component.scss"]
 })
 export class BaseCommandListComponent implements OnInit, OnChanges, OnDestroy {
 

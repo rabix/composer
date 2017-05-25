@@ -31,8 +31,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             </div>
         </form>
     `,
-    styleUrls: ["./streams.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    styleUrls: ["./streams.component.scss"]
 })
 export class StreamsComponent extends DirectiveBase implements OnInit, OnChanges {
 

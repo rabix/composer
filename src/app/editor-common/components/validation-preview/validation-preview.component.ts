@@ -7,7 +7,7 @@ import {Validation, ValidationBase} from "cwlts/models/helpers/validation";
     styleUrls: ["./validation-preview.component.scss"],
     template: `
         <i class="fa fa-times-circle validation-icon"
-           *ngIf="entry.errors.length"
+           *ngIf="entry.hasErrors"
            [ct-tooltip]="errorsTooltip"></i>
 
         <ct-tooltip-content #errorsTooltip>
@@ -17,11 +17,11 @@ import {Validation, ValidationBase} from "cwlts/models/helpers/validation";
 
         <i class="fa fa-warning validation-icon"
            [ct-tooltip]="warningsTooltip"
-           *ngIf="!entry.errors.length && entry.warnings.length"></i>
+           *ngIf="!entry.hasErrors && entry.hasWarnings"></i>
 
         <ct-tooltip-content #warningsTooltip>
             <p class="warning-text px-1" *ngFor="let warning of entry?.warnings">
-               {{warning.loc}}: {{ warning.message }}</p>
+                {{warning.loc}}: {{ warning.message }}</p>
         </ct-tooltip-content>
     `
 })

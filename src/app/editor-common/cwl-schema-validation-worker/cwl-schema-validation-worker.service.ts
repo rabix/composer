@@ -3,6 +3,7 @@ import {WebWorkerBuilderService} from "../../core/web-worker/web-worker-builder.
 import {WebWorker} from "../../core/web-worker/web-worker";
 
 import * as cwlSchemas from "cwlts/schemas";
+import {Issue} from "cwlts/models/helpers/validation";
 
 declare const jsyaml;
 declare const Ajv;
@@ -11,8 +12,8 @@ export interface ValidationResponse {
     isValidatableCwl: boolean;
     isValidCwl: boolean;
     isValidJSON: boolean;
-    errors: { message: string, loc: string }[];
-    warnings: { message: string, loc: string }[];
+    errors: Issue[];
+    warnings: Issue[];
     class?: string;
 }
 

@@ -1,7 +1,6 @@
 import {Component, Input, OnDestroy, OnInit, TemplateRef, ViewChild, ViewContainerRef} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {WorkflowFactory, WorkflowModel} from "cwlts/models";
-import {Validation} from "cwlts/models/helpers/validation";
 import * as Yaml from "js-yaml";
 import {Observable, Subject} from "rxjs/Rx";
 import {AuthService} from "../auth/auth/auth.service";
@@ -292,8 +291,8 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
 
                         this.workflowModel.setValidationCallback((res) => {
                             this.validation = {
-                                errors: this.workflowModel.filterIssues("error"),
-                                warnings: this.workflowModel.filterIssues("warning"),
+                                errors: this.workflowModel.errors,
+                                warnings: this.workflowModel.warnings,
                                 isValidatableCwl: true,
                                 isValidCwl: true,
                                 isValidJSON: true
@@ -303,8 +302,8 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                         this.workflowModel.validate();
 
                         const out       = {
-                            errors: this.workflowModel.validation.errors,
-                            warnings: this.workflowModel.validation.warnings,
+                            errors: this.workflowModel.errors,
+                            warnings: this.workflowModel.warnings,
                             isValidatableCwl: true,
                             isValidCwl: true,
                             isValidJSON: true
@@ -332,7 +331,8 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                             warnings: [],
                             errors: [{
                                 message: err.message,
-                                loc: "document"
+                                loc: "document",
+                                type: "error"
                             }]
                         };
                     });

@@ -19,7 +19,6 @@ import {ModalService} from "../../../ui/modal/modal.service";
         }
     ],
     template: `
-        {{ model.issues | json }}
         <div class="expression-input-group clickable"
              [ct-validation-class]="model"
              [class.expr]="isExpr || disableLiteralTextInput">
@@ -35,7 +34,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                        data-test="expression-input"
                        #input
                        [type]="isExpr ? 'text' : type"
-                       [value]="value?.toString()"
+                       [value]="model?.toString()"
                        [readonly]="isExpr || disableLiteralTextInput || readonly"
                        (blur)="onTouch()"
                        (click)="editExpr(isExpr || disableLiteralTextInput && !readonly ? 'edit' : null, $event)"
@@ -84,17 +83,6 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
      */
     result: any;
 
-    /** getter for formControl value */
-    get value() {
-        return this.model;
-    }
-
-    /** setter for formControl value */
-    set value(val: ExpressionModel) {
-        this.model = val;
-        this.onChange(val);
-    }
-
     /**
      * Declaration of change function
      */
@@ -119,6 +107,7 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
         if (obj) {
             this.model  = obj;
             this.isExpr = obj.isExpression;
+            this.model.validate(this.context).then(noop, noop);
         }
     }
 
@@ -191,7 +180,7 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
                     this.model.cloneStatus(editor.model);
 
                     this.isExpr = this.model.isExpression;
-                    this.onChange(this.model);
+                    this.model.validate(this.context).then(suc => this.onChange(this.model), err => this.onChange(this.model));
                 }
 
                 this.modal.close();
