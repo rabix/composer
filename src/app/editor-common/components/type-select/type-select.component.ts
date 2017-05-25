@@ -23,7 +23,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         </div><!--Type-->
         
         <div class="form-group" *ngIf="paramType.type !== 'array'">
-            <label>Allow single item or array</label>
+            <label>Allow array as well as single item</label>
             <span class="pull-right">
                     <ct-toggle-slider [formControl]="form.controls['isItemOrArray']"></ct-toggle-slider>
                 </span>

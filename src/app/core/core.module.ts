@@ -29,10 +29,10 @@ import {AuthModule} from "../auth/auth.module";
 import {ModalErrorHandler} from "./error-report/modal-error-handler";
 import {ErrorReportComponent} from "./error-report/error-report.component";
 import {CreateAppModalComponent} from "./modals/create-app-modal/create-app-modal.component";
-import {NgStringPipesModule} from "../../../node_modules/ngx-pipes/src/app/pipes/string/index";
+import {NgStringPipesModule} from "ngx-pipes";
 import {WorkboxService} from "./workbox/workbox.service";
-import {PublishModalComponent} from "app/core/modals/publish-modal/publish-modal.component";
 import {LayoutService} from "./layout/layout.service";
+import {PublishModalComponent} from "./modals/publish-modal/publish-modal.component";
 import {CreateLocalFolderModalComponent} from "./modals/create-local-folder-modal/create-local-folder-modal.component";
 
 @NgModule({
