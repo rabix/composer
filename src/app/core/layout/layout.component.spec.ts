@@ -7,7 +7,7 @@ import {LayoutComponent} from "./layout.component";
 import {LayoutService} from "./layout.service";
 import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {DomEventService} from "../../services/dom/dom-event.service";
-import {StatusBarService} from "app/layout/status-bar/status-bar.service";
+import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {ErrorBarService} from "../../layout/error-bar/error-bar.service";
 
 describe("LayoutComponent", () => {

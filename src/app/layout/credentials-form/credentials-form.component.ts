@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from "@angular/core";
 import {AbstractControl, FormArray, FormControl, FormGroup, Validators} from "@angular/forms";
-import {ConnectionState, CredentialsEntry} from "app/services/storage/user-preferences-types";
+import {ConnectionState, CredentialsEntry} from "../../services/storage/user-preferences-types";
 import {AuthService} from "../../auth/auth/auth.service";
 
 @Component({
