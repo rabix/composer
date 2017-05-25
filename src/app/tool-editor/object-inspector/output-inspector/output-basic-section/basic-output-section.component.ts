@@ -102,7 +102,6 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
 
         this.tracked = this.basicSectionForm.valueChanges.subscribe(value => {
             this.output.type.isNullable    = !value.isRequired;
-            this.output.outputBinding.glob = value.glob;
 
             if (value.symbols.length > 0 && this.isEnumType()) {
                 this.output.type.symbols = value.symbols;
