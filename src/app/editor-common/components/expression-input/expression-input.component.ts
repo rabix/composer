@@ -195,6 +195,7 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
                 cancellationLabel: "No, keep it",
                 confirmationLabel: "Yes, delete it"
             }).then(() => {
+                this.model.cleanValidity();
                 this.model.setValue("", this.type);
                 this.model.result = null;
                 this.isExpr       = false;

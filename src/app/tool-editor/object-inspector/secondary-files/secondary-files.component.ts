@@ -90,7 +90,7 @@ export class SecondaryFilesComponent extends DirectiveBase implements OnChanges,
             confirmationLabel: "Yes, remove it"
         }).then(() => {
             // reset the expression's validity
-            this.secondaryFiles[i].setValue("", "string");
+            this.secondaryFiles[i].cleanValidity();
             (this.form.get("list") as FormArray).removeAt(i);
         }, err => {
             console.warn(err);
