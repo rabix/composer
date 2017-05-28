@@ -53,7 +53,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                             class="input-list-items">
 
                             <div class="editor-list-item clickable"
-                                 [ct-validation-class]="entry.validation"
+                                 [ct-validation-class]="entry"
                                  [ct-editor-inspector]="inspector"
                                  [ct-editor-inspector-target]="entry.loc">
 
