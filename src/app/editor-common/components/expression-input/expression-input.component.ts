@@ -34,7 +34,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                        data-test="expression-input"
                        #input
                        [type]="isExpr ? 'text' : type"
-                       [value]="model?.toString()"
+                       [value]="model?.toString() || ''"
                        [readonly]="isExpr || disableLiteralTextInput || readonly"
                        (blur)="onTouch()"
                        (click)="editExpr(isExpr || disableLiteralTextInput && !readonly ? 'edit' : null, $event)"

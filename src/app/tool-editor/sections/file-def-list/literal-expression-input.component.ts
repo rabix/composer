@@ -36,7 +36,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                               #input
                               [readonly]="isExpr"
                               (blur)="onTouch()"
-                              [value]="model?.toString()"
+                              [value]="model?.toString() || ''"
                               (click)="editExpr(isExpr ? 'edit' : null, $event)"
                               (change)="editLiteral(input.value)"></textarea>
 
