@@ -84,10 +84,10 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                 <div class="tc-header">{{ entry.loc || "FileDef" }}</div>
                                 <div class="tc-body">
                                     <ct-file-def-inspector
-                                        (save)="updateFileDef($event, i)"
-                                        [context]="context"
-                                        [dirent]="entry"
-                                        [readonly]="readonly">
+                                            (save)="updateFileDef($event, i)"
+                                            [context]="context"
+                                            [dirent]="entry"
+                                            [readonly]="readonly">
                                     </ct-file-def-inspector>
                                 </div>
                             </ct-editor-inspector-content>
@@ -155,6 +155,10 @@ export class FileDefListComponent extends DirectiveBase {
                 this.inspector.hide();
             }
 
+            const {entry, entryName} = this.model.listing[index];
+            entry.cleanValidity();
+            entryName.cleanValidity();
+            
             this.model.listing = this.model.listing.slice(0, index).concat(this.model.listing.slice(index + 1));
             this.update.next(this.model.listing);
         }, err => console.warn);

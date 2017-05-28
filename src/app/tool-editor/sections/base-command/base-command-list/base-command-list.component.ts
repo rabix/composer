@@ -93,7 +93,7 @@ export class BaseCommandListComponent implements OnInit, OnChanges, OnDestroy {
             confirmationLabel: "Yes, remove it"
         }).then(() => {
             // reset the expression's validity
-            this.baseCommand[i].setValue("", "string");
+            this.baseCommand[i].cleanValidity();
             (this.form.get("list") as FormArray).removeAt(i);
         }, err => {
             console.warn(err);
