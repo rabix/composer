@@ -16,7 +16,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
     selector: "ct-tool-output-inspector",
     template: `
-        <form [formGroup]="form" (ngSubmit)="onSubmit(form)">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
             <ct-basic-output-section [formControl]="form.controls['basicOutputSection']"
                                      [readonly]="readonly"
@@ -61,7 +61,7 @@ export class ToolOutputInspectorComponent extends DirectiveBase implements OnCha
 
     /** Context in which expression should be evaluated */
     @Input()
-    public context: { $job?: any, $self?: any } = {};
+    public context: any = {};
 
     public inputList: CommandInputParameterModel[] = [];
 
@@ -93,12 +93,6 @@ export class ToolOutputInspectorComponent extends DirectiveBase implements OnCha
             this.form.addControl("metaData", new FormControl(this.output));
         }
 
-        if (this.output.outputBinding.hasSecondaryFiles) {
-            this.form.addControl("secondaryFiles", new FormControl(this.output.outputBinding.secondaryFiles || []));
-        } else if (this.output.hasSecondaryFiles) {
-            this.form.addControl("secondaryFiles", new FormControl(this.output.secondaryFiles || []));
-        }
-
         this.tracked = this.form.valueChanges.subscribe(value => {
             if (value.secondaryFiles && this.output.outputBinding.hasSecondaryFiles) {
                 this.output.outputBinding.secondaryFiles = value.secondaryFiles;
@@ -116,7 +110,7 @@ export class ToolOutputInspectorComponent extends DirectiveBase implements OnCha
         return isFile && hasSecFiles;
     }
 
-    onSubmit(form: FormGroup) {
-        this.save.next(form.value);
+    onSubmit() {
+        this.save.next(this.output);
     }
 }

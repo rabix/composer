@@ -140,7 +140,6 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
             str = Number(str);
         }
 
-        this.model = this.model.clone();
         this.model.setValue(str, this.type);
         this.onChange(this.model);
     }
