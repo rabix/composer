@@ -93,13 +93,7 @@ export class ToolOutputInspectorComponent extends DirectiveBase implements OnCha
             this.form.addControl("metaData", new FormControl(this.output));
         }
 
-        this.tracked = this.form.valueChanges.subscribe(value => {
-            if (value.secondaryFiles && this.output.outputBinding.hasSecondaryFiles) {
-                this.output.outputBinding.secondaryFiles = value.secondaryFiles;
-            } else if (value.secondaryFiles && this.output.hasSecondaryFiles) {
-                this.output.secondaryFiles = value.secondaryFiles;
-            }
-
+        this.tracked = this.form.valueChanges.subscribe(() => {
             this.save.next(this.output);
         });
     }
