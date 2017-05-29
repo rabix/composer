@@ -13,7 +13,7 @@ type ViewMode = "auth" | "keyBindings" | "cache";
     template: `
         <ct-action-bar>
 
-            <div class="document-controls pl-1">
+            <div class="document-controls pr-1">
 
                 <!--Add Another-->
                 <button (click)="creds.addEntry()"

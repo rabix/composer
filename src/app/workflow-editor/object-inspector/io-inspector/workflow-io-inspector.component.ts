@@ -4,7 +4,7 @@ import {
     Component,
     Input,
     ViewEncapsulation,
-    OnInit, SimpleChanges, OnChanges
+    OnInit, SimpleChanges, OnChanges, ElementRef, ViewChild
 } from "@angular/core";
 import {
     WorkflowInputParameterModel,
@@ -14,6 +14,7 @@ import {
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {Workflow} from "cwl-svg";
+import {Observable} from "rxjs/Observable";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -65,7 +66,8 @@ import {Workflow} from "cwl-svg";
             <label class="form-control-label">Label</label>
             <input type="text"
                    class="form-control"
-                   [formControl]="form.controls['label']">
+                   [formControl]="form.controls['label']"
+                   #labelElement>
         </div>
 
         <!--Input Type -->
@@ -195,6 +197,9 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
 
     private initSymbolsList: string[] = [];
 
+    @ViewChild("labelElement")
+    labelElement: ElementRef;
+
     constructor(private formBuilder: FormBuilder, private cdr: ChangeDetectorRef) {
         super();
     }
@@ -308,11 +313,6 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
             this.port.fileTypes = value || [];
         });
 
-        this.tracked = this.form.controls["label"].valueChanges.debounceTime(1000).subscribe((label) => {
-            this.port.label = label;
-            this.graph.redraw();
-        });
-
         this.tracked = this.form.controls["description"].valueChanges.subscribe((description) => {
             this.port.description = description;
         });
@@ -322,6 +322,20 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
             this.workflowModel.setBatch(this.port.id, batchType);
         });
 
+        // cannot use 'valueChanges' because it
+        this.tracked = Observable.fromEvent(this.labelElement.nativeElement, "blur")
+            .subscribe((ev: FocusEvent) => {
+                const val = this.labelElement.nativeElement.value;
+
+                if (!val) {
+                    this.labelElement.nativeElement.value = this.port.label;
+                }
+
+                if (this.port.label !== val) {
+                    this.port.label = val;
+                    this.graph.redraw();
+                }
+            });
     }
 
     /**
