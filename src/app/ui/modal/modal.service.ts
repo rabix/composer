@@ -135,7 +135,8 @@ export class ModalService {
             }, params);
 
             component.decision.subscribe(accepted => {
-                accepted !== undefined ? resolve(true) : reject();
+                // If click on Cancel button or Esc on your keyboard then accepted is false
+                accepted === false ? reject() : resolve(true);
                 this.close();
             });
         });
