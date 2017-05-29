@@ -3,11 +3,11 @@
 
 
 "@angular/cli@^1.0.0":
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/@angular/cli/-/cli-1.0.6.tgz#a2e861f202131a8139882c78f1859cbefcbea77e"
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@angular/cli/-/cli-1.0.4.tgz#507c0b977ad43b02edad4b3ad32d745d599f9129"
   dependencies:
-    "@ngtools/json-schema" "1.0.10"
-    "@ngtools/webpack" "1.3.3"
+    "@ngtools/json-schema" "1.0.9"
+    "@ngtools/webpack" "1.3.1"
     autoprefixer "^6.5.3"
     chalk "^1.1.3"
     common-tags "^1.3.1"
@@ -113,13 +113,13 @@
   dependencies:
     tsickle "^0.21.0"
 
-"@ngtools/json-schema@1.0.10":
-  version "1.0.10"
-  resolved "https://registry.yarnpkg.com/@ngtools/json-schema/-/json-schema-1.0.10.tgz#2d1222f84ecb53deb2d619d0db8bd5edccb00b61"
+"@ngtools/json-schema@1.0.9":
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/@ngtools/json-schema/-/json-schema-1.0.9.tgz#19e46db409c66b4c43841eab514ff9640871affc"
 
-"@ngtools/webpack@1.3.3":
-  version "1.3.3"
-  resolved "https://registry.yarnpkg.com/@ngtools/webpack/-/webpack-1.3.3.tgz#f7941eb4fe9c77ef28fe7aec15f58a64a7be1457"
+"@ngtools/webpack@1.3.1":
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/@ngtools/webpack/-/webpack-1.3.1.tgz#12149b6b9cb3bf858f4b2ae9650456e17674d2eb"
   dependencies:
     enhanced-resolve "^3.1.0"
     loader-utils "^1.0.2"
@@ -202,8 +202,8 @@ after@0.8.2:
   resolved "https://registry.yarnpkg.com/after/-/after-0.8.2.tgz#fedb394f9f0e02aa9768e702bda23b505fae7e1f"
 
 agent-base@2:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/agent-base/-/agent-base-2.1.0.tgz#193455e4347bca6b05847cb81e939bb325446da8"
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/agent-base/-/agent-base-2.0.1.tgz#bd8f9e86a8eb221fffa07bd14befd55df142815e"
   dependencies:
     extend "~3.0.0"
     semver "~5.0.1"
@@ -526,9 +526,9 @@ base64id@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/base64id/-/base64id-1.0.0.tgz#47688cb99bb6804f0e06d3e763b1c32e57d8e6b6"
 
-batch@0.6.1:
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/batch/-/batch-0.6.1.tgz#dc34314f4e679318093fc760272525f94bf25c16"
+batch@0.5.3:
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/batch/-/batch-0.5.3.tgz#3f3414f380321743bfc1042f9a83ff1d5824d464"
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.1"
@@ -782,8 +782,8 @@ caniuse-api@^1.5.2:
     lodash.uniq "^4.5.0"
 
 caniuse-db@^1.0.30000529, caniuse-db@^1.0.30000634, caniuse-db@^1.0.30000639:
-  version "1.0.30000674"
-  resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000674.tgz#d78e99a3291341f53830e96ad2f12921b9715e8d"
+  version "1.0.30000670"
+  resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000670.tgz#90d33b79e3090e25829c311113c56d6b1788bf43"
 
 cardinal@0.4.x:
   version "0.4.4"
@@ -1187,8 +1187,8 @@ css-color-names@0.0.4:
   resolved "https://registry.yarnpkg.com/css-color-names/-/css-color-names-0.0.4.tgz#808adc2e79cf84738069b646cb20ec27beb629e0"
 
 css-loader@^0.28.1:
-  version "0.28.3"
-  resolved "https://registry.yarnpkg.com/css-loader/-/css-loader-0.28.3.tgz#9fd5e0b8c405b6df927ba1103887015d360640ce"
+  version "0.28.2"
+  resolved "https://registry.yarnpkg.com/css-loader/-/css-loader-0.28.2.tgz#0ff48e1d6013afcdb585d46c1e61a5fcd036404e"
   dependencies:
     babel-code-frame "^6.11.0"
     css-selector-tokenizer "^0.7.0"
@@ -1301,9 +1301,9 @@ custom-event@~1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/custom-event/-/custom-event-1.0.1.tgz#5d02a46850adf1b4a317946a3928fccb5bfd0425"
 
-cwl-svg@^0.0.33:
-  version "0.0.33"
-  resolved "https://registry.yarnpkg.com/cwl-svg/-/cwl-svg-0.0.33.tgz#bbc7569584e5ec5bc19a1a9538c75720bd1688e2"
+cwl-svg@^0.0.32:
+  version "0.0.32"
+  resolved "https://registry.yarnpkg.com/cwl-svg/-/cwl-svg-0.0.32.tgz#2c8bb6c4243a41b2b06424fd5317d7746329c401"
   dependencies:
     core-js "^2.4.1"
     cwlts "^1.12.18"
@@ -1327,7 +1327,7 @@ date-now@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/date-now/-/date-now-0.1.4.tgz#eaf439fd4d4848ad74e5cc7dbef200672b9e345b"
 
-debug@*, debug@2, debug@2.6.8, debug@^2.1.3, debug@^2.2.0, debug@^2.6.1, debug@^2.6.3, debug@^2.6.8:
+debug@*, debug@2, debug@^2.1.3, debug@^2.2.0, debug@^2.6.1, debug@^2.6.3, debug@^2.6.8:
   version "2.6.8"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.8.tgz#e731531ca2ede27d188222427da17821d68ff4fc"
   dependencies:
@@ -1429,10 +1429,6 @@ detect-indent@^4.0.0:
   resolved "https://registry.yarnpkg.com/detect-indent/-/detect-indent-4.0.0.tgz#f76d064352cdf43a1cb6ce619c4ee3a9475de208"
   dependencies:
     repeating "^2.0.0"
-
-detect-node@^2.0.3:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.0.3.tgz#a2033c09cc8e158d37748fbde7507832bd6ce127"
 
 di@^0.0.1:
   version "0.0.1"
@@ -1581,12 +1577,12 @@ electron-packager@^8.5.2:
     semver "^5.3.0"
 
 electron-to-chromium@^1.2.7:
-  version "1.3.13"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.13.tgz#1b3a5eace6e087bb5e257a100b0cbfe81b2891fc"
+  version "1.3.11"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.11.tgz#744761df1d67b492b322ce9aa0aba5393260eb61"
 
 electron@^1.6.6:
-  version "1.7.2"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-1.7.2.tgz#8115e6ae86128a8cd99360d3793d3618ca2c7619"
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-1.7.1.tgz#a93b8abd1fd6df794839d8602903aacbce74d388"
   dependencies:
     "@types/node" "^7.0.18"
     electron-download "^3.0.1"
@@ -2381,8 +2377,8 @@ html-entities@^1.2.0:
   resolved "https://registry.yarnpkg.com/html-entities/-/html-entities-1.2.1.tgz#0df29351f0721163515dfb9e5543e5f6eed5162f"
 
 html-minifier@^3.2.3:
-  version "3.5.2"
-  resolved "https://registry.yarnpkg.com/html-minifier/-/html-minifier-3.5.2.tgz#d73bc3ff448942408818ce609bf3fb0ea7ef4eb7"
+  version "3.5.1"
+  resolved "https://registry.yarnpkg.com/html-minifier/-/html-minifier-3.5.1.tgz#0fbba015129b4ac9a30b887aec66f39d57cd37a9"
   dependencies:
     camel-case "3.0.x"
     clean-css "4.1.x"
@@ -2416,6 +2412,14 @@ htmlparser2@~3.3.0:
 http-deceiver@^1.2.7:
   version "1.2.7"
   resolved "https://registry.yarnpkg.com/http-deceiver/-/http-deceiver-1.2.7.tgz#fa7168944ab9a519d337cb0bec7284dc3e723d87"
+
+http-errors@~1.5.0:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/http-errors/-/http-errors-1.5.1.tgz#788c0d2c1de2c81b9e6e8c01843b6b97eb920750"
+  dependencies:
+    inherits "2.0.3"
+    setprototypeof "1.0.2"
+    statuses ">= 1.3.1 < 2"
 
 http-errors@~1.6.1:
   version "1.6.1"
@@ -2687,10 +2691,10 @@ is-plain-obj@^1.0.0:
   resolved "https://registry.yarnpkg.com/is-plain-obj/-/is-plain-obj-1.1.0.tgz#71a50c8429dfca773c92a390a4a03b39fcd51d3e"
 
 is-plain-object@^2.0.1:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/is-plain-object/-/is-plain-object-2.0.2.tgz#1d9ab795669937de31998071ca1f701770b375a4"
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/is-plain-object/-/is-plain-object-2.0.1.tgz#4d7ca539bc9db9b737b8acb612f2318ef92f294f"
   dependencies:
-    isobject "^3.0.0"
+    isobject "^1.0.0"
 
 is-posix-bracket@^0.1.0:
   version "0.1.1"
@@ -2742,32 +2746,32 @@ isexe@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/isexe/-/isexe-2.0.0.tgz#e8fbf374dc556ff8947a10dcb0572d633f2cfa10"
 
+isobject@^1.0.0:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/isobject/-/isobject-1.0.2.tgz#f0f9b8ce92dd540fa0740882e3835a2e022ec78a"
+
 isobject@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/isobject/-/isobject-2.1.0.tgz#f065561096a3f1da2ef46272f815c840d87e0c89"
   dependencies:
     isarray "1.0.0"
 
-isobject@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/isobject/-/isobject-3.0.0.tgz#39565217f3661789e8a0a0c080d5f7e6bc46e1a0"
-
 isstream@0.1.x, isstream@~0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/isstream/-/isstream-0.1.2.tgz#47e63f7af55afa6f92e1500e690eb8b8529c099a"
 
 istanbul-api@^1.1.8:
-  version "1.1.9"
-  resolved "https://registry.yarnpkg.com/istanbul-api/-/istanbul-api-1.1.9.tgz#2827920d380d4286d857d57a2968a841db8a7ec8"
+  version "1.1.8"
+  resolved "https://registry.yarnpkg.com/istanbul-api/-/istanbul-api-1.1.8.tgz#a844e55c6f9aeee292e7f42942196f60b23dc93e"
   dependencies:
     async "^2.1.4"
     fileset "^2.0.2"
-    istanbul-lib-coverage "^1.1.1"
-    istanbul-lib-hook "^1.0.7"
-    istanbul-lib-instrument "^1.7.2"
-    istanbul-lib-report "^1.1.1"
-    istanbul-lib-source-maps "^1.2.1"
-    istanbul-reports "^1.1.1"
+    istanbul-lib-coverage "^1.1.0"
+    istanbul-lib-hook "^1.0.6"
+    istanbul-lib-instrument "^1.7.1"
+    istanbul-lib-report "^1.1.0"
+    istanbul-lib-source-maps "^1.2.0"
+    istanbul-reports "^1.1.0"
     js-yaml "^3.7.0"
     mkdirp "^0.5.1"
     once "^1.4.0"
@@ -2781,50 +2785,50 @@ istanbul-instrumenter-loader@^2.0.0:
     loader-utils "^0.2.16"
     object-assign "^4.1.0"
 
-istanbul-lib-coverage@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/istanbul-lib-coverage/-/istanbul-lib-coverage-1.1.1.tgz#73bfb998885299415c93d38a3e9adf784a77a9da"
+istanbul-lib-coverage@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/istanbul-lib-coverage/-/istanbul-lib-coverage-1.1.0.tgz#caca19decaef3525b5d6331d701f3f3b7ad48528"
 
-istanbul-lib-hook@^1.0.7:
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/istanbul-lib-hook/-/istanbul-lib-hook-1.0.7.tgz#dd6607f03076578fe7d6f2a630cf143b49bacddc"
+istanbul-lib-hook@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/istanbul-lib-hook/-/istanbul-lib-hook-1.0.6.tgz#c0866d1e81cf2d5319249510131fc16dee49231f"
   dependencies:
     append-transform "^0.4.0"
 
-istanbul-lib-instrument@^1.1.3, istanbul-lib-instrument@^1.7.2:
-  version "1.7.2"
-  resolved "https://registry.yarnpkg.com/istanbul-lib-instrument/-/istanbul-lib-instrument-1.7.2.tgz#6014b03d3470fb77638d5802508c255c06312e56"
+istanbul-lib-instrument@^1.1.3, istanbul-lib-instrument@^1.7.1:
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/istanbul-lib-instrument/-/istanbul-lib-instrument-1.7.1.tgz#169e31bc62c778851a99439dd99c3cc12184d360"
   dependencies:
     babel-generator "^6.18.0"
     babel-template "^6.16.0"
     babel-traverse "^6.18.0"
     babel-types "^6.18.0"
     babylon "^6.13.0"
-    istanbul-lib-coverage "^1.1.1"
+    istanbul-lib-coverage "^1.1.0"
     semver "^5.3.0"
 
-istanbul-lib-report@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/istanbul-lib-report/-/istanbul-lib-report-1.1.1.tgz#f0e55f56655ffa34222080b7a0cd4760e1405fc9"
+istanbul-lib-report@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/istanbul-lib-report/-/istanbul-lib-report-1.1.0.tgz#444c4ecca9afa93cf584f56b10f195bf768c0770"
   dependencies:
-    istanbul-lib-coverage "^1.1.1"
+    istanbul-lib-coverage "^1.1.0"
     mkdirp "^0.5.1"
     path-parse "^1.0.5"
     supports-color "^3.1.2"
 
-istanbul-lib-source-maps@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/istanbul-lib-source-maps/-/istanbul-lib-source-maps-1.2.1.tgz#a6fe1acba8ce08eebc638e572e294d267008aa0c"
+istanbul-lib-source-maps@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/istanbul-lib-source-maps/-/istanbul-lib-source-maps-1.2.0.tgz#8c7706d497e26feeb6af3e0c28fd5b0669598d0e"
   dependencies:
     debug "^2.6.3"
-    istanbul-lib-coverage "^1.1.1"
+    istanbul-lib-coverage "^1.1.0"
     mkdirp "^0.5.1"
     rimraf "^2.6.1"
     source-map "^0.5.3"
 
-istanbul-reports@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/istanbul-reports/-/istanbul-reports-1.1.1.tgz#042be5c89e175bc3f86523caab29c014e77fee4e"
+istanbul-reports@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/istanbul-reports/-/istanbul-reports-1.1.0.tgz#1ef3b795889219cfb5fad16365f6ce108d5f8c66"
   dependencies:
     handlebars "^4.0.3"
 
@@ -2975,11 +2979,10 @@ karma-cli@~1.0.1:
     resolve "^1.1.6"
 
 karma-coverage-istanbul-reporter@^1.0.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/karma-coverage-istanbul-reporter/-/karma-coverage-istanbul-reporter-1.3.0.tgz#d142cd9c55731c9e363ef7374e8ef1a31bebfadb"
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/karma-coverage-istanbul-reporter/-/karma-coverage-istanbul-reporter-1.2.1.tgz#5e3ca7b9a153db1cbadffef4c46d978d38a53154"
   dependencies:
     istanbul-api "^1.1.8"
-    minimatch "^3.0.4"
 
 karma-electron@^5.1.1:
   version "5.2.1"
@@ -4875,15 +4878,15 @@ send@0.15.3:
     statuses "~1.3.1"
 
 serve-index@^1.7.2:
-  version "1.9.0"
-  resolved "https://registry.yarnpkg.com/serve-index/-/serve-index-1.9.0.tgz#d2b280fc560d616ee81b48bf0fa82abed2485ce7"
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/serve-index/-/serve-index-1.8.0.tgz#7c5d96c13fb131101f93c1c5774f8516a1e78d3b"
   dependencies:
     accepts "~1.3.3"
-    batch "0.6.1"
-    debug "2.6.8"
+    batch "0.5.3"
+    debug "~2.2.0"
     escape-html "~1.0.3"
-    http-errors "~1.6.1"
-    mime-types "~2.1.15"
+    http-errors "~1.5.0"
+    mime-types "~2.1.11"
     parseurl "~1.3.1"
 
 serve-static@1.12.3:
@@ -4906,6 +4909,10 @@ set-immediate-shim@^1.0.1:
 setimmediate@^1.0.4:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/setimmediate/-/setimmediate-1.0.5.tgz#290cbb232e306942d7d7ea9b83732ab7856f8285"
+
+setprototypeof@1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/setprototypeof/-/setprototypeof-1.0.2.tgz#81a552141ec104b88e89ce383103ad5c66564d08"
 
 setprototypeof@1.0.3:
   version "1.0.3"
@@ -5077,11 +5084,10 @@ spdx-license-ids@^1.0.2:
   resolved "https://registry.yarnpkg.com/spdx-license-ids/-/spdx-license-ids-1.2.2.tgz#c9df7a3424594ade6bd11900d596696dc06bac57"
 
 spdy-transport@^2.0.18:
-  version "2.0.20"
-  resolved "https://registry.yarnpkg.com/spdy-transport/-/spdy-transport-2.0.20.tgz#735e72054c486b2354fe89e702256004a39ace4d"
+  version "2.0.19"
+  resolved "https://registry.yarnpkg.com/spdy-transport/-/spdy-transport-2.0.19.tgz#f4bb95424296cd52927485ddd88a821682f196eb"
   dependencies:
     debug "^2.6.8"
-    detect-node "^2.0.3"
     hpack.js "^2.1.6"
     obuf "^1.1.1"
     readable-stream "^2.2.9"
@@ -5472,8 +5478,8 @@ tslint@^5.0.0:
     tsutils "^2.0.0"
 
 tsutils@^2.0.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/tsutils/-/tsutils-2.2.0.tgz#218614657f21c677e4536b4ba75daf8ebce1b367"
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/tsutils/-/tsutils-2.1.0.tgz#5be8376c929528f65b302de9e17b0004e4c1eb20"
 
 tty-browserify@0.0.0:
   version "0.0.0"
@@ -5517,8 +5523,8 @@ uc.micro@^1.0.1, uc.micro@^1.0.3:
   resolved "https://registry.yarnpkg.com/uc.micro/-/uc.micro-1.0.3.tgz#7ed50d5e0f9a9fb0a573379259f2a77458d50192"
 
 uglify-js@3.0.x:
-  version "3.0.13"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.0.13.tgz#1871d736aa1e550c728d7e5a6556579e70925d68"
+  version "3.0.11"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.0.11.tgz#81f594b9a24dad76e39da92f8f06e5b3bc8c2e11"
   dependencies:
     commander "~2.9.0"
     source-map "~0.5.1"
@@ -5884,9 +5890,16 @@ wrappy@1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/wrappy/-/wrappy-1.0.2.tgz#b5243d8f3ec1aa35f1364605bc0d1036e30ab69f"
 
-ws@1.1.2, ws@^1.0.1:
+ws@1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/ws/-/ws-1.1.2.tgz#8a244fa052401e08c9886cf44a85189e1fd4067f"
+  dependencies:
+    options ">=0.0.5"
+    ultron "1.0.x"
+
+ws@^1.0.1:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-1.1.4.tgz#57f40d036832e5f5055662a397c4de76ed66bf61"
   dependencies:
     options ">=0.0.5"
     ultron "1.0.x"
