@@ -136,7 +136,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
         editor.action.first().subscribe(action => {
             if (action === "save") {
                 // save string
-                this.model = this.model.clone();
+                // this.model = this.model.clone();
                 this.model.setValue(editor.content.value, "string");
                 this.onChange(this.model);
             }
