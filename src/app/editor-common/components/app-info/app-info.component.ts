@@ -23,7 +23,7 @@ import {
             <div class="info-section">
                 <ct-inline-editor [value]="model.label" type="text"
                                   [disabled]="readonly"
-                                  (saveData)="model.label = $event">
+                                  (saveData)="updateLabel($event)">
 
                     <h1 class="h3">{{model.label}}</h1>
                 </ct-inline-editor>
@@ -317,6 +317,10 @@ export class AppInfoComponent implements OnChanges {
             .filter((input) => input.type.type !== "File" && input.type.items !== "File");
     }
 
+    updateLabel(value: string) {
+        this.model.label = value;
+        this.formGroup.markAsDirty();
+    }
 
     updateDescription(value: string) {
         this.model.description = value;
