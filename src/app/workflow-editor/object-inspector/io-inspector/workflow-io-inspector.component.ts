@@ -66,8 +66,8 @@ import {Observable} from "rxjs/Observable";
             <label class="form-control-label">Label</label>
             <input type="text"
                    class="form-control"
-                   [formControl]="form.controls['label']"
-                   #labelElement>
+                   (blur)="labelUpdate($event)"
+                   [formControl]="form.controls['label']">
         </div>
 
         <!--Input Type -->
@@ -197,9 +197,6 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
 
     private initSymbolsList: string[] = [];
 
-    @ViewChild("labelElement")
-    labelElement: ElementRef;
-
     constructor(private formBuilder: FormBuilder, private cdr: ChangeDetectorRef) {
         super();
     }
@@ -321,21 +318,19 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
             this.selectedBatchByOption = batchType;
             this.workflowModel.setBatch(this.port.id, batchType);
         });
+    }
 
-        // cannot use 'valueChanges' because it
-        this.tracked = Observable.fromEvent(this.labelElement.nativeElement, "blur")
-            .subscribe((ev: FocusEvent) => {
-                const val = this.labelElement.nativeElement.value;
+    labelUpdate(ev: FocusEvent) {
+        let val = (<HTMLInputElement>ev.srcElement).value;
 
-                if (!val) {
-                    this.labelElement.nativeElement.value = this.port.label;
-                }
+        if (!val) {
+            val = (<HTMLInputElement>ev.srcElement).value = this.port.label;
+        }
 
-                if (this.port.label !== val) {
-                    this.port.label = val;
-                    this.graph.redraw();
-                }
-            });
+        if (this.port.label !== val) {
+            this.port.label = val;
+            this.graph.redraw();
+        }
     }
 
     /**

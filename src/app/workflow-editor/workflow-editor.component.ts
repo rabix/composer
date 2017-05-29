@@ -69,14 +69,6 @@ import LoadOptions = jsyaml.LoadOptions;
                     <i class="fa fa-save"></i>
                 </button>
 
-                <!--Copy-->
-                <button class="btn"
-                        type="button"
-                        ct-tooltip="Save As..."
-                        tooltipPlacement="bottom">
-                    <i class="fa fa-copy"></i>
-                </button>
-
                 <button class="btn" *ngIf="data.dataSource === 'local'" (click)="publish()">
                     <i class="fa fa-cloud-upload"></i>
                 </button>
