@@ -6,6 +6,8 @@ import {BaseCommandListComponent} from "./base-command-list.component";
 import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 import {ExpressionModel} from "cwlts/models";
 import {By} from "@angular/platform-browser";
+import {ModalService} from "../../../../ui/modal/modal.service";
+import {noop} from "../../../../lib/utils.lib";
 
 @Component({
     selector: "ct-expression-input",
@@ -36,6 +38,14 @@ class ExpressionInputStubComponent implements ControlValueAccessor {
     }
 }
 
+const modalServiceStub = {
+    confirm: () => {
+        return new Promise((res) => {
+            res(true);
+        });
+    }
+};
+
 describe("BaseCommandListComponent", () => {
     let component: BaseCommandListComponent;
     let fixture: ComponentFixture<BaseCommandListComponent>;
@@ -45,6 +55,7 @@ describe("BaseCommandListComponent", () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [BaseCommandListComponent, ExpressionInputStubComponent],
+            providers: [{provide: ModalService, useValue: modalServiceStub}],
             imports: [ReactiveFormsModule, FormsModule],
             schemas: [NO_ERRORS_SCHEMA]
         }).compileComponents();
@@ -99,8 +110,11 @@ describe("BaseCommandListComponent", () => {
         fixture.detectChanges();
 
         component.removeBaseCommand(0);
+        fixture.detectChanges();
+        fixture.whenStable().then(() => {
+            expect((component.form.get("list") as FormArray).controls.length).toEqual(2, "Did not remove baseCommand");
+        });
 
-        expect((component.form.get("list") as FormArray).controls.length).toEqual(2, "Did not remove baseCommand");
     });
 
     it("should remove the correct expression form the list", () => {
@@ -114,10 +128,15 @@ describe("BaseCommandListComponent", () => {
         fixture.detectChanges();
 
         component.removeBaseCommand(1);
+        fixture.detectChanges();
 
-        expect((component.form.get("list") as FormArray).controls.length).toEqual(2, "Did not remove baseCommand");
-        expect((component.form.get("list") as FormArray).controls[0].value.toString()).toEqual("one");
-        expect((component.form.get("list") as FormArray).controls[1].value.toString()).toEqual("three");
+        fixture.whenStable().then(() => {
+
+            expect((component.form.get("list") as FormArray).controls.length).toEqual(2, "Did not remove baseCommand");
+            expect((component.form.get("list") as FormArray).controls[0].value.toString()).toEqual("one");
+            expect((component.form.get("list") as FormArray).controls[1].value.toString()).toEqual("three");
+        });
+
     });
 
     it("should trigger change event on form changes", () => {
