@@ -48,8 +48,6 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
 
     searchResults = undefined;
 
-    appliedSearchTerm: string;
-
     expandedNodes: Observable<string[]>;
 
     @ViewChild(TreeViewComponent)
@@ -188,9 +186,6 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
             .do(term => this.searchResults = undefined)
             .debounceTime(250)
             .distinctUntilChanged()
-            .do(term => {
-                this.appliedSearchTerm = term;
-            })
             .filter(term => term.trim().length !== 0)
             .flatMap(term => Observable.zip(localFileSearch(term), projectSearch(term)))
             .subscribe(datasets => {
