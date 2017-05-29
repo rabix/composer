@@ -1,23 +1,23 @@
-import {Directive, Input} from "@angular/core";
-import {Validation} from "cwlts/models/helpers/validation";
+import {Directive, HostBinding, Input} from "@angular/core";
+import {ValidationBase} from "cwlts/models/helpers/validation";
 
 @Directive({
-    host: {
-        "[class.error]": "errors",
-        "[class.warning]": "warnings && !errors",
-        "[class.validatable]": "'true'"
-    },
     selector: "[ct-validation-class]"
 })
 export class ValidationClassDirective {
     @Input("ct-validation-class")
-    entry: Validation;
+    entry: ValidationBase;
 
-    get errors() {
-        return this.entry ? this.entry.errors.length : false;
+    @HostBinding("class.error")
+    get error() {
+        return this.entry ? this.entry.hasErrors : false;
     }
 
-    get warnings() {
-        return this.entry ? this.entry.warnings.length : false;
+    @HostBinding("class.warning")
+    get warning() {
+        return this.entry ? this.entry.hasWarnings && !this.error : false;
     }
+
+    @HostBinding("class.validatable")
+    validatable = true;
 }

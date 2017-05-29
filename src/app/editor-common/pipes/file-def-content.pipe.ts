@@ -1,7 +1,7 @@
 import {Pipe, PipeTransform} from "@angular/core";
 import {ExpressionModel} from "cwlts/models";
 
-@Pipe({ name: "fileDefContent", pure: true })
+@Pipe({ name: "fileDefContent", pure: false })
 export class FileDefContentPipe implements PipeTransform {
     transform(value: ExpressionModel, args: any[]): any {
 

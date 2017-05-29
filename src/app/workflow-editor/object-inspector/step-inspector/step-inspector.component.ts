@@ -19,24 +19,25 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         </div>
 
         <!--View Modes-->
-        <div class="row workflow-step-inspector-tabs">
+        <ct-action-bar class="row workflow-step-inspector-tabs">
+            <ct-tab-selector class="full-width"
+                             [distribute]="'equal'"
+                             [active]="viewMode"
+                             (activeChange)="changeTab($event)">
 
-            <!--Tab Info-->
-            <div class="single-tab col-sm-4" [class.active]="viewMode == tabs.Info" (click)="changeTab(tabs.Info)">
-                <span>App Info</span>
-            </div>
+                <ct-tab-selector-entry [tabName]="tabs.Info">
+                    <span>App Info</span>
+                </ct-tab-selector-entry>
 
-            <!--Tab Inputs-->
-            <div class="single-tab col-sm-4" [class.active]="viewMode == tabs.Inputs" (click)="changeTab(tabs.Inputs)">
-                <span>Inputs</span>
-            </div>
+                <ct-tab-selector-entry [tabName]="tabs.Inputs">
+                    <span>Inputs</span>
+                </ct-tab-selector-entry>
 
-            <!--Tab Step-->
-            <div class="single-tab col-sm-4" [class.active]="viewMode == tabs.Step" (click)="changeTab(tabs.Step)">
-                <span>Step</span>
-            </div>
-
-        </div>
+                <ct-tab-selector-entry [tabName]="tabs.Step">
+                    <span>Step</span>
+                </ct-tab-selector-entry>
+            </ct-tab-selector>
+        </ct-action-bar>
 
         <!--Info-->
         <ct-workflow-step-inspector-inputs *ngIf="viewMode === tabs.Inputs"

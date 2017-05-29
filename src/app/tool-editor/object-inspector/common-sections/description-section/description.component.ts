@@ -109,7 +109,7 @@ export class DescriptionComponent extends DirectiveBase implements ControlValueA
         this.onTouched = fn;
     }
 
-    private isFileType() {
+    isFileType() {
         return this.port.type.type === "File" || this.port.type.items === "File";
     }
 }

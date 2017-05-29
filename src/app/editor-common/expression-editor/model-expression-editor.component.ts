@@ -39,11 +39,16 @@ export class ModelExpressionEditorComponent implements OnInit {
             this.model.setValue(content, "expression");
 
             return this.model.evaluate(this.context).then(res => {
-                if (this.model.getScript() === "") return "There is no expression defined.";
+                if (this.model.getScript() === "") {
+                    return "There is no expression defined.";
+                }
 
                 return JSON.stringify(res, null, 4) || "undefined";
             }, err => {
-                return err.message + " on " + err.loc;
+                return {
+                    message: err.message + " on " + err.loc,
+                    type: err.type
+                };
             });
         };
     }

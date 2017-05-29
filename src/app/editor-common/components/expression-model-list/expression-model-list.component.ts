@@ -7,6 +7,7 @@ import {noop} from "../../../lib/utils.lib";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {ModalService} from "../../../ui/modal/modal.service";
 
+/** @deprecated */
 @Component({
     encapsulation: ViewEncapsulation.None,
 
@@ -23,9 +24,9 @@ import {ModalService} from "../../../ui/modal/modal.service";
                     class="removable-form-control">
 
                     <ct-expression-input
-                        [context]="context"
-                        [formControl]="form.controls[item.id]"
-                        [readonly]="readonly">
+                            [context]="context"
+                            [formControl]="form.controls[item.id]"
+                            [readonly]="readonly">
                     </ct-expression-input>
 
                     <div *ngIf="!readonly" class="remove-icon clickable" (click)="removeExpressionModel(item)">

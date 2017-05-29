@@ -26,6 +26,14 @@
     .preview {
         flex: 1;
         height: 100%;
+
+        &.warning .ace-idle-fingers {
+            color: $code-warning;
+        }
+
+        &.error .ace-idle-fingers {
+            color: $code-error;
+        }
     }
 
     .tree {

@@ -101,7 +101,7 @@ export class StageInputSectionComponent extends DirectiveBase implements Control
             });
     }
 
-    private isFileType() {
+    isFileType() {
         return this.input.type.type === "File" || this.input.type.items === "File";
     }
 

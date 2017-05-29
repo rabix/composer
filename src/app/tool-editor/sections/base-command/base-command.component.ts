@@ -1,18 +1,7 @@
-import {
-    Component,
-    Input,
-    OnChanges,
-    OnDestroy,
-    OnInit,
-    Output,
-    SimpleChanges
-} from "@angular/core";
-import {FormControl, FormGroup, Validators} from "@angular/forms";
-import {ExpressionModel, CommandLineToolModel} from "cwlts/models";
-import {ReplaySubject} from "rxjs/ReplaySubject";
-import {GuidService} from "../../../services/guid.service";
+import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {FormGroup} from "@angular/forms";
+import {CommandLineToolModel, ExpressionModel} from "cwlts/models";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
-import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
     selector: "ct-base-command",
@@ -23,76 +12,24 @@ import {ModalService} from "../../../ui/modal/modal.service";
                 Base Command
             </div>
             <div class="tc-body">
-                <form *ngIf="form">
+                <ct-base-command-list [baseCommand]="baseCommand"
+                                      [context]="context"
+                                      [readonly]="readonly"
+                                      [model]="model"
+                                      (update)="updateCmd.emit($event)"></ct-base-command-list>
+                <hr>
 
-                    <ct-blank-tool-state *ngIf="!readonly && !formList.length"
-                                         [buttonText]="'Add base command'"
-                                         (buttonClick)="addBaseCommand()">
-
-                        The part of the command that comes before any tool parameters or options. You can also include parameters or options
-                        that you want to be fixed for every execution of the tool (provided they can be placed before any variable
-                        parameters and options in the command line), or these can be set as arguments below.
-                    </ct-blank-tool-state>
-
-                    <div *ngIf="readonly && !formList.length" class="text-xs-center h5">
-                        This tool doesn't specify any baseCommands
-                    </div>
-
-                    <ol *ngIf="formList.length > 0" class="list-unstyled">
-
-                        <li *ngFor="let item of formList"
-                            class="removable-form-control">
-
-                            <ct-expression-input
-                                [context]="context"
-                                [formControl]="baseCommandForm.controls[item.id]"
-                                [readonly]="readonly">
-                            </ct-expression-input>
-
-                            <div *ngIf="!readonly" class="remove-icon clickable ml-1 text-hover-danger"
-                                 [ct-tooltip]="'Delete'"
-                                 (click)="removeBaseCommand(item)">
-                                <i class="fa fa-trash"></i>
-                            </div>
-                        </li>
-                    </ol>
-
-
-                    <button type="button" *ngIf="formList.length > 0 && !readonly"
-                            class="btn btn-link add-btn-link no-underline-hover"
-                            (click)="addBaseCommand()">
-                        <i class="fa fa-plus"></i> Add base command
-                    </button>
-
-                    <hr>
-                    <div>
-                        <div class="text-title mb-1">Streams</div>
-                    </div>
-                    <div class="streams-row">
-                        <div class="stream">
-                            <label class="form-control-label">Stdin redirect</label>
-                            <ct-expression-input
-                                [formControl]="streamsForm.controls['stdin']"
-                                [context]="context"
-                                [readonly]="readonly">
-                            </ct-expression-input>
-                        </div>
-                        <div class="stream">
-                            <label class="form-control-label">Stdout redirect</label>
-                            <ct-expression-input
-                                [formControl]="streamsForm.controls['stdout']"
-                                [context]="context"
-                                [readonly]="readonly">
-                            </ct-expression-input>
-                        </div>
-                    </div>
-
-                </form>
+                <ct-streams [stdin]="stdin"
+                            [stdout]="stdout"
+                            [context]="context"
+                            [readonly]="readonly"
+                            (update)="updateStream.emit($event)">
+                </ct-streams>
             </div>
         </ct-form-panel>
     `
 })
-export class BaseCommandComponent extends DirectiveBase implements OnInit, OnDestroy, OnChanges {
+export class BaseCommandComponent extends DirectiveBase {
     /** baseCommand property of model */
     @Input()
     baseCommand: ExpressionModel[];
@@ -110,7 +47,8 @@ export class BaseCommandComponent extends DirectiveBase implements OnInit, OnDes
     form: FormGroup;
 
     /** Context in which expression should be evaluated */
-    context: { $job: any };
+    @Input()
+    context: any;
 
     @Input()
     readonly = false;
@@ -120,107 +58,8 @@ export class BaseCommandComponent extends DirectiveBase implements OnInit, OnDes
 
     /** Update event triggered on command form changes (add, remove, edit) */
     @Output()
-    updateCmd = new ReplaySubject<ExpressionModel[]>();
+    updateCmd = new EventEmitter<ExpressionModel[]>();
 
-    /** Update event triggered on stream changes */
     @Output()
-    updateStreams = new ReplaySubject<ExpressionModel[]>();
-
-    /** form group for streams */
-    streamsForm: FormGroup;
-
-    /** form group for base command */
-    baseCommandForm: FormGroup;
-
-    /** List which connects model to forms */
-    formList: Array<{ id: string, model: ExpressionModel }> = [];
-
-    constructor(private guidService: GuidService, private modal: ModalService) {
-        super();
-    }
-
-    ngOnChanges(changes: SimpleChanges): void {
-        if (this.streamsForm) {
-            if (changes["stdin"]) {
-                this.streamsForm.controls["stdin"].setValue(changes["stdin"].currentValue, {onlySelf: true});
-            }
-            if (changes["stdout"]) {
-                this.streamsForm.controls["stdout"].setValue(changes["stdout"].currentValue, {onlySelf: true});
-            }
-        }
-
-        if (changes["baseCommand"]) {
-            this.initCmdForm(changes["baseCommand"].currentValue);
-        }
-
-        this.context = this.model.getContext();
-    }
-
-    private initCmdForm(cmdList: ExpressionModel[]) {
-        this.formList = cmdList.map(model => {
-            return {
-                id: this.guidService.generate(), model
-            };
-        });
-
-        this.baseCommandForm = new FormGroup({});
-
-        this.formList.forEach((item) => {
-            this.baseCommandForm.addControl(
-                item.id,
-                new FormControl(item.model, [Validators.required])
-            );
-        });
-
-        this.tracked = this.baseCommandForm.valueChanges.first().subscribe(change => {
-            const v = Object.keys(change).map(key => change[key]);
-            this.updateCmd.next(v);
-        });
-    }
-
-
-    ngOnInit(): void {
-
-        this.form = new FormGroup({});
-
-        this.form.addControl("baseCommand", this.baseCommandForm);
-
-        // Streams
-        this.streamsForm = new FormGroup({
-            stdin: new FormControl(this.stdin),
-            stdout: new FormControl(this.stdout)
-        });
-
-        this.form.addControl("streams", this.streamsForm);
-
-        this.tracked = this.streamsForm.valueChanges.subscribe(change => {
-            this.updateStreams.next(change);
-        });
-    }
-
-    removeBaseCommand(ctrl: { id: string, model: ExpressionModel }): void {
-        this.modal.confirm({
-            title: "Really Remove?",
-            content: `Are you sure that you want to remove this base command?`,
-            cancellationLabel: "No, keep it",
-            confirmationLabel: "Yes, remove it"
-        }).then(() => {
-            this.formList = this.formList.filter(item => item.id !== ctrl.id);
-            this.form.removeControl(ctrl.id);
-            this.updateCmd.next(this.formList.map(data => data.model));
-        }, err => {
-            console.warn(err);
-        });
-    }
-
-    addBaseCommand(): void {
-        this.model.addBaseCommand();
-        this.updateCmd.next(this.model.baseCommand);
-    }
-
-    ngOnDestroy() {
-        super.ngOnDestroy();
-        this.form.removeControl("baseCommand");
-        this.form.removeControl("streams");
-    }
+    updateStream = new EventEmitter<ExpressionModel>();
 }

@@ -34,12 +34,12 @@ import {noop} from "../../lib/utils.lib";
                                     <div class="editor-list-item clickable row"
                                          [ct-editor-inspector]="inspector"
                                          [ct-editor-inspector-target]="entry.loc"
-                                         [ct-validation-class]="entry.validation">
+                                         [ct-validation-class]="entry">
 
                                         <!--ID Column-->
                                         <div class="col-sm-6" [title]="entry.id">
                                             <ct-validation-preview
-                                                [entry]="entry.validation"></ct-validation-preview>
+                                                [entry]="entry"></ct-validation-preview>
                                             {{ entry.id }}
                                             <br>
                                         </div>
@@ -94,12 +94,12 @@ import {noop} from "../../lib/utils.lib";
                                     <div class="editor-list-item clickable row"
                                          [ct-editor-inspector]="inspector"
                                          [ct-editor-inspector-target]="entry.loc"
-                                         [ct-validation-class]="entry.validation">
+                                         [ct-validation-class]="entry">
 
                                         <!--ID Column-->
                                         <div class="col-sm-6 ellipsis" [title]="entry.id">
                                             <ct-validation-preview
-                                                [entry]="entry.validation"></ct-validation-preview>
+                                                [entry]="entry"></ct-validation-preview>
                                             {{ entry.id }}
                                         </div>
 
@@ -153,12 +153,12 @@ import {noop} from "../../lib/utils.lib";
                                     <div class="editor-list-item clickable row"
                                          [ct-editor-inspector]="inspector"
                                          [ct-editor-inspector-target]="entry.loc"
-                                         [ct-validation-class]="entry.validation">
+                                         [ct-validation-class]="entry">
 
                                         <!--ID Column-->
                                         <div class="col-sm-6 ellipsis" [title]="entry.id">
                                             <ct-validation-preview
-                                                [entry]="entry.validation"></ct-validation-preview>
+                                                [entry]="entry"></ct-validation-preview>
                                             {{ entry.id }}
                                         </div>
 

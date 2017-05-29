@@ -1301,17 +1301,17 @@ custom-event@~1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/custom-event/-/custom-event-1.0.1.tgz#5d02a46850adf1b4a317946a3928fccb5bfd0425"
 
-cwl-svg@^0.0.32:
-  version "0.0.32"
-  resolved "https://registry.yarnpkg.com/cwl-svg/-/cwl-svg-0.0.32.tgz#2c8bb6c4243a41b2b06424fd5317d7746329c401"
+cwl-svg@^0.0.33:
+  version "0.0.33"
+  resolved "https://registry.yarnpkg.com/cwl-svg/-/cwl-svg-0.0.33.tgz#bbc7569584e5ec5bc19a1a9538c75720bd1688e2"
   dependencies:
     core-js "^2.4.1"
     cwlts "^1.12.18"
     phantom "^4.0.2"
 
 cwlts@^1.12.18, cwlts@^1.13.2:
-  version "1.13.8"
-  resolved "https://registry.yarnpkg.com/cwlts/-/cwlts-1.13.8.tgz#3780d3a3991f3a541bc26c173a47fb751973234a"
+  version "1.13.7"
+  resolved "https://registry.yarnpkg.com/cwlts/-/cwlts-1.13.7.tgz#6232fa75bee8a8ad11a98e2b19a1d59e7f6c90e3"
 
 cycle@1.0.x:
   version "1.0.3"

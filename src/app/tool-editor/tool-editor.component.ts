@@ -2,7 +2,6 @@ import {AfterViewInit, Component, Input, OnDestroy, OnInit, TemplateRef, ViewChi
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {CommandLineToolFactory} from "cwlts/models/generic/CommandLineToolFactory";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
-import {Validation} from "cwlts/models/helpers/validation";
 import * as Yaml from "js-yaml";
 import {Observable} from "rxjs/Observable";
 import {ReplaySubject, Subject} from "rxjs/Rx";
@@ -155,25 +154,25 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
                         });
                         this.toolModel.updateCommandLine();
 
-                        // update validation stream on model validation updates
-
-                        this.toolModel.setValidationCallback((res: Validation) => {
+                        const updateValidity = () => {
                             this.validation = {
-                                errors: res.errors,
-                                warnings: res.warnings,
+                                errors: this.toolModel.errors,
+                                warnings: this.toolModel.warnings,
                                 isValidatableCwl: true,
                                 isValidCwl: true,
                                 isValidJSON: true
                             };
-                        });
+                        };
 
-                        this.toolModel.validate();
+                        // update validation stream on model validation updates
+                        this.toolModel.setValidationCallback(updateValidity);
 
+                        this.toolModel.validate().then(updateValidity);
                         this.isLoading = false;
 
                         const v = {
-                            errors: this.toolModel.validation.errors,
-                            warnings: this.toolModel.validation.warnings,
+                            errors: [],
+                            warnings: [],
                             isValidatableCwl: true,
                             isValidCwl: true,
                             isValidJSON: true
@@ -198,7 +197,8 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
                             warnings: [],
                             errors: [{
                                 message: err.message,
-                                loc: "document"
+                                loc: "document",
+                                type: "error"
                             }]
                         };
 

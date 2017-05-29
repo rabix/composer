@@ -1,6 +1,6 @@
 import {DockerRequirementComponent} from "./docker-requirement.component";
-import {ComponentFixture, TestBed, async, fakeAsync, tick} from '@angular/core/testing';
-import {By}              from '@angular/platform-browser';
+import {ComponentFixture, TestBed, async, fakeAsync, tick} from "@angular/core/testing";
+import {By} from "@angular/platform-browser";
 import {DockerRequirementModel} from "cwlts/models";
 import {Component} from "@angular/core";
 import {ReactiveFormsModule, FormsModule} from "@angular/forms";
@@ -70,7 +70,7 @@ describe("DockerRequirementComponent", () => {
         el.dispatchEvent(new Event("input"));
         fixture.detectChanges();
 
-        expect(updateSpy.calls.count()).toBe(1, "Did not call updated method correct number of times");
+        expect(updateSpy.calls.count()).toBe(1, "Did not call update method correct number of times");
         expect(component.updateDockerPull).toHaveBeenCalledWith("ubuntu");
     });
 
