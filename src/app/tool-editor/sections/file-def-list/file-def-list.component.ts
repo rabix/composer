@@ -51,12 +51,13 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                         class="input-list-items">
 
                         <div class="editor-list-item clickable"
-                             [ct-validation-class]="entry.validation"
+                             [ct-validation-class]="entry"
                              [ct-editor-inspector]="inspector"
                              [ct-editor-inspector-target]="entry.loc">
 
                             <!--Name Column-->
                             <div class="col-sm-5 ellipsis">
+                                <ct-validation-preview [entry]="entry"></ct-validation-preview>
                                 {{ entry.entryName | fileDefName }}
                             </div>
 
@@ -83,10 +84,10 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                 <div class="tc-header">{{ entry.loc || "FileDef" }}</div>
                                 <div class="tc-body">
                                     <ct-file-def-inspector
-                                        (save)="updateFileDef($event, i)"
-                                        [context]="context"
-                                        [dirent]="entry"
-                                        [readonly]="readonly">
+                                            (save)="updateFileDef($event, i)"
+                                            [context]="context"
+                                            [dirent]="entry"
+                                            [readonly]="readonly">
                                     </ct-file-def-inspector>
                                 </div>
                             </ct-editor-inspector-content>
@@ -154,6 +155,10 @@ export class FileDefListComponent extends DirectiveBase {
                 this.inspector.hide();
             }
 
+            const {entry, entryName} = this.model.listing[index];
+            entry.cleanValidity();
+            entryName.cleanValidity();
+            
             this.model.listing = this.model.listing.slice(0, index).concat(this.model.listing.slice(index + 1));
             this.update.next(this.model.listing);
         }, err => console.warn);
@@ -161,8 +166,8 @@ export class FileDefListComponent extends DirectiveBase {
     }
 
     updateFileDef(newDef: { entryName, entry }, index: number) {
-        this.model.listing[index].entryName = newDef.entryName;
-        this.model.listing[index].entry     = newDef.entry;
+        this.model.listing[index].entryName.setValue(newDef.entryName.serialize(), newDef.entryName.type);
+        this.model.listing[index].entry.setValue(newDef.entry.serialize(), newDef.entry.type);
 
         this.cdr.markForCheck();
 

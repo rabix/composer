@@ -7,7 +7,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 @Component({
     encapsulation: ViewEncapsulation.None,
     selector: "ct-argument-inspector",
-    template: `        
+    template: `
         <form [formGroup]="form">
             <div class="form-group">
                 <label>CommandLineBinding</label>
@@ -48,19 +48,19 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                     <input type="number" class="form-control" [formControl]="form.controls['position']">
                 </div>
             </div>
-            
+
             <div *ngIf="!argument.hasBinding">
                 <div class="form-group">
                     <label class="form-control-label">Value</label>
-                    <input type="text" 
-                           class="form-control" 
+                    <input type="text"
+                           class="form-control"
                            *ngIf="!argument.hasExprPrimitive"
                            [formControl]="form.controls['primitive']">
-                    
-                    <ct-expression-input type="string" 
-                                         *ngIf="argument.hasExprPrimitive" 
+
+                    <ct-expression-input type="string"
+                                         *ngIf="argument.hasExprPrimitive"
                                          [formControl]="form.controls['primitive']">
-                        
+
                     </ct-expression-input>
                 </div>
             </div>
@@ -114,8 +114,7 @@ export class ArgumentInspectorComponent extends DirectiveBase implements OnInit 
                 this.argument.updateBinding({
                     position: form.position,
                     separate: form.separate,
-                    prefix: form.prefix,
-                    valueFrom: form.valueFrom ? form.valueFrom.serialize() : ""
+                    prefix: form.prefix
                 });
             } else {
                 this.argument.updatePrimitive(form.primitive.serialize ? form.primitive.serialize() : form.primitive);

@@ -1,8 +1,11 @@
-import {Component, Input, OnDestroy, OnChanges} from "@angular/core";
+import {Component, Input, OnChanges, OnDestroy} from "@angular/core";
 import {FormGroup} from "@angular/forms";
+import {ProcessRequirement} from "cwlts/mappings/d2sb/ProcessRequirement";
+import {SBGCPURequirement} from "cwlts/mappings/d2sb/SBGCPURequirement";
+import {SBGMemRequirement} from "cwlts/mappings/d2sb/SBGMemRequirement";
+import {ResourceRequirement} from "cwlts/mappings/v1.0";
 
 import {CommandLineToolModel} from "cwlts/models";
-import {ProcessRequirement} from "cwlts/mappings/d2sb/ProcessRequirement";
 
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
@@ -12,6 +15,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
     styleUrls: ["./tool-visual-editor.component.scss"],
     template: `
         <form [formGroup]="formGroup">
+
             <ct-docker-requirement [docker]="model.docker"
                                    (update)="formGroup.markAsDirty()"
                                    [readonly]="readonly">
@@ -19,10 +23,11 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 
             <ct-base-command [baseCommand]="model.baseCommand"
                              [model]="model"
+                             [context]="context"
                              [stdin]="model.stdin"
                              [stdout]="model.stdout"
                              (updateCmd)="updateModel('baseCommand', $event)"
-                             (updateStreams)="setStreams($event)"
+                             (updateStream)="setStreams($event)"
                              [readonly]="readonly">
             </ct-base-command>
 
@@ -41,17 +46,17 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
             </ct-tool-output>
 
             <ct-resources [entries]="model.resources"
-                          (update)="formGroup.markAsDirty()"
+                          (update)="updateModel('resources', $event)"
                           [context]="context"
                           [readonly]="readonly">
-            </ct-resources> 
-            
+            </ct-resources>
+
             <ct-hints [model]="model"
                       [context]="context"
                       (update)="formGroup.markAsDirty()"
                       [readonly]="readonly">
             </ct-hints>
-            
+
             <ct-argument-list [location]="model.loc + '.arguments'"
                               [model]="model"
                               (update)="formGroup.markAsDirty(); model.updateCommandLine()"
@@ -95,7 +100,7 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
 
         if (category === "baseCommand") {
             this.model.baseCommand = [];
-            data.forEach(cmd => this.model.addBaseCommand(cmd));
+            data.forEach(cmd => this.model.addBaseCommand(cmd.serialize()));
             this.model.updateCommandLine();
 
         } else if (category === "fileRequirement") {
@@ -112,10 +117,35 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
                     });
                 }
             }
+        } else if (category === "resources") {
+            if (this.model.cwlVersion === "v1.0") {
+                // extending the data object gotten to recapture any other requirement properties (ramMax, coresMax, etc)
+                const req = <ResourceRequirement>{
+                    ...data, ...{
+                        "class": "ResourceRequirement",
+                        ramMin: data.mem.serialize(),
+                        coresMin: data.cores.serialize()
+                    }
+                };
+
+                // remove cottontail specific properties so they aren't serialized as customProps
+                delete (<any> req).cores;
+                delete (<any> req).mem;
+                this.model.setRequirement(req);
+
+            } else if (this.model.cwlVersion === "sbg:draft-2") {
+                this.model.setRequirement(<SBGCPURequirement>{
+                    "class": "sbg:CPURequirement",
+                    value: data.cores.serialize()
+                });
+                this.model.setRequirement(<SBGMemRequirement>{
+                    "class": "sbg:MemRequirement",
+                    value: data.mem.serialize()
+                });
+            }
         }
 
         this.formGroup.markAsDirty();
-
     }
 
     setStreams(change) {

@@ -20,20 +20,21 @@ import {ModalService} from "../../../ui/modal/modal.service";
     ],
     template: `
         <div class="expression-input-group clickable"
-             [class.expr]="isExpr || disableLiteralTextInput"
-             [ct-validation-class]="model?.validation">
+             [ct-validation-class]="model"
+             [class.expr]="isExpr || disableLiteralTextInput">
 
-            <ct-validation-preview [entry]="model?.validation"></ct-validation-preview>
+            <ct-validation-preview [entry]="model"></ct-validation-preview>
             <b class="validation-icon result"
-               *ngIf="isExpr && !(model?.hasErrors() || model?.hasWarnings())"
+               *ngIf="isExpr && !(model?.hasErrors || model?.hasWarnings)"
                [title]="result">E:</b>
 
             <div class="input-group">
 
                 <input class="form-control"
+                       data-test="expression-input"
                        #input
                        [type]="isExpr ? 'text' : type"
-                       [value]="value?.toString()"
+                       [value]="model?.toString() || ''"
                        [readonly]="isExpr || disableLiteralTextInput || readonly"
                        (blur)="onTouch()"
                        (click)="editExpr(isExpr || disableLiteralTextInput && !readonly ? 'edit' : null, $event)"
@@ -82,17 +83,6 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
      */
     result: any;
 
-    /** getter for formControl value */
-    get value() {
-        return this.model;
-    }
-
-    /** setter for formControl value */
-    set value(val: ExpressionModel) {
-        this.model = val;
-        this.onChange(val);
-    }
-
     /**
      * Declaration of change function
      */
@@ -117,12 +107,7 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
         if (obj) {
             this.model  = obj;
             this.isExpr = obj.isExpression;
-
-            this.model.evaluate(this.context).then(res => {
-                this.result = res;
-            }, err => {
-                console.warn("ExpressionInputComponent got an error while evaluating an expression", err);
-            });
+            this.model.validate(this.context).then(noop, noop);
         }
     }
 
@@ -155,7 +140,6 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
             str = Number(str);
         }
 
-        this.model = this.model.clone();
         this.model.setValue(str, this.type);
         this.onChange(this.model);
     }
@@ -181,25 +165,23 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
 
             editor.readonly = this.readonly;
 
-            editor.model = this.model.clone();
+            editor.model   = this.model.clone();
             editor.context = this.context;
             editor.action.first().subscribe(editorAction => {
 
                 if (editorAction === "save") {
                     const val = editor.model.serialize();
-                    this.model = editor.model;
 
                     if (!val) {
-                        this.model.setValue("", this.type)
+                        editor.model.setValue("", this.type);
                     }
 
-                    const resetValidation = ()=> {
-                        // to reset validation
-                        this.isExpr = this.model.isExpression;
+                    this.model.cloneStatus(editor.model);
+
+                    this.isExpr = this.model.isExpression;
+                    this.model.validate(this.context).then(() => {
                         this.onChange(this.model);
-                    }
-
-                    this.model.evaluate(this.context).then(resetValidation, resetValidation);
+                    }, err => console.warn);
                 }
 
                 this.modal.close();
@@ -213,12 +195,14 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
                 cancellationLabel: "No, keep it",
                 confirmationLabel: "Yes, delete it"
             }).then(() => {
-                this.model = this.model.clone();
+                this.model.cleanValidity();
                 this.model.setValue("", this.type);
                 this.model.result = null;
                 this.isExpr       = false;
                 event.stopPropagation();
-                this.onChange(this.model);
+                this.model.validate(this.context).then(() => {
+                    this.onChange(this.model);
+                }, err => console.warn);
             }, err => console.warn);
         }
     }
