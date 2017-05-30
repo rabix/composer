@@ -77,7 +77,11 @@ import LoadOptions = jsyaml.LoadOptions;
                     <i class="fa fa-copy"></i>
                 </button>
 
-                <button class="btn" *ngIf="data.dataSource === 'local'" (click)="publish()">
+                <button class="btn" 
+                        *ngIf="data.dataSource === 'local'"
+                        ct-tooltip="Publish to Platform"
+                        tooltipPlacement="bottom"
+                        (click)="publish()">
                     <i class="fa fa-cloud-upload"></i>
                 </button>
 
