@@ -115,7 +115,8 @@ export class CompactListComponent implements ControlValueAccessor {
     }
 
     onListWrapperClick(): void {
-        this.renderer.invokeElementMethod(this.tagInputElement.nativeElement, "focus", []);
+        // https://github.com/angular/angular/issues/15008#issuecomment-285141070
+        this.tagInputElement.nativeElement.focus();
     }
 
     validate(c: FormControl): void {
