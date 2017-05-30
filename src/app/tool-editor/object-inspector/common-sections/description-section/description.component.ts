@@ -128,16 +128,15 @@ export class DescriptionComponent extends DirectiveBase implements ControlValueA
 
     private setTextProperty(propertyName: string, newValue: string, custom?: boolean): void {
         if (typeof newValue !== 'undefined') {
-            const trimmedValue = newValue.trim();
             if (custom) {
-                if (trimmedValue.length > 0) {
-                    this.port.customProps[propertyName] = trimmedValue;
+                if (newValue.length > 0) {
+                    this.port.customProps[propertyName] = newValue;
                 } else if (this.port.customProps[propertyName]) {
                     delete this.port.customProps[propertyName];
                 }
             }
             else {
-                this.port[propertyName] = trimmedValue.length > 0 ? trimmedValue : undefined;
+                this.port[propertyName] = newValue.length > 0 ? newValue : undefined;
             }
         }
     }
