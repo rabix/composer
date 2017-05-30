@@ -11,8 +11,15 @@ The Rabix Composer (codename Cottontail) is a graphical and code editor speciall
 ```bash
 git clone https://github.com/rabix/cottontail-frontend
 cd cottontail-frontend
-yarn install
+yarn install // linux users see instructions below for yarn install
 ```
+
+**If you are using Linux:**
+
+Install node.js from https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions
+
+Install yarn using Linux instructions provided on https://yarnpkg.com/lang/en/docs/install/
+
 
 ## Starting the dev environment
 ```bash
