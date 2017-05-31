@@ -280,7 +280,12 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
 
     openRevision(revisionNumber: number | string) {
         const fileWithoutRevision = this.data.id.split("/");
-        fileWithoutRevision.pop();
+
+        // In the case when id is without revision number
+        if (!isNaN(+fileWithoutRevision[fileWithoutRevision.length -1])) {
+            fileWithoutRevision.pop();
+        }
+
         fileWithoutRevision.push(revisionNumber.toString());
         const fid = fileWithoutRevision.join("/");
         this.dataGateway.fetchFileContent(fid).subscribe(txt => {
