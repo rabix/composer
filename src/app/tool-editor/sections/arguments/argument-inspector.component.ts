@@ -47,6 +47,13 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                     <label class="form-control-label">Position</label>
                     <input type="number" class="form-control" [formControl]="form.controls['position']">
                 </div>
+
+                <div class="form-group" *ngIf="argument.hasShellQuote">
+                    <label>shellQuote</label>
+                    <span class="pull-right">
+                    <ct-toggle-slider [formControl]="form.controls['shellQuote']"></ct-toggle-slider>
+                </span>
+                </div>
             </div>
 
             <div *ngIf="!argument.hasBinding">
@@ -96,7 +103,8 @@ export class ArgumentInspectorComponent extends DirectiveBase implements OnInit 
             separate: new FormControl(this.argument.separate !== false),
             position: new FormControl({value: this.argument.position || 0, disabled: this.readonly}),
             prefix: new FormControl({value: this.argument.prefix || "", disabled: this.readonly}),
-            primitive: new FormControl({value: this.argument.primitive || "", disabled: this.readonly})
+            primitive: new FormControl({value: this.argument.primitive || "", disabled: this.readonly}),
+            shellQuote: new FormControl(this.argument.shellQuote)
         });
 
         this.tracked = this.form.controls["hasBinding"].valueChanges.subscribe(val => {
@@ -114,7 +122,8 @@ export class ArgumentInspectorComponent extends DirectiveBase implements OnInit 
                 this.argument.updateBinding({
                     position: form.position,
                     separate: form.separate,
-                    prefix: form.prefix
+                    prefix: form.prefix,
+                    shellQuote: form.shellQuote
                 });
             } else {
                 this.argument.updatePrimitive(form.primitive.serialize ? form.primitive.serialize() : form.primitive);
