@@ -43,7 +43,7 @@ import {Observable} from "rxjs/Observable";
                     <label class="">CWL Version:</label>
                     <select class="form-control" [(ngModel)]="cwlVersion">
                         <option value="v1.0">v1.0</option>
-                        <option value="d2sb">Draft 2 (SB)</option>
+                        <option value="d2sb">sbg:draft-2</option>
                     </select>
                 </div>
 

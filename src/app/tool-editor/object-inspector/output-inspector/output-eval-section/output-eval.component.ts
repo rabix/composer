@@ -21,6 +21,7 @@ import {noop} from "../../../../lib/utils.lib";
                     <label class="form-control-label">Output eval</label>
                     <ct-expression-input [disableLiteralTextInput]="true"
                                          [readonly]="readonly"
+                                         [context]="context"
                                          [formControl]="outputEvalFormGroup.controls['outputEval']">
                     </ct-expression-input>
                 </div>
@@ -52,6 +53,10 @@ export class OutputEvalSectionComponent extends DirectiveBase implements Control
 
     @Input()
     public readonly = false;
+
+    /** Context in which expression should be evaluated */
+    @Input()
+    public context: any = {};
 
     public output: CommandOutputParameterModel;
 

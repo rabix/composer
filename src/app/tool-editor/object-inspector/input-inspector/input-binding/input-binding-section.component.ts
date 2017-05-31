@@ -70,6 +70,13 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                 </select>
             </div>
 
+            <div class="form-group" *ngIf="input.inputBinding.hasShellQuote">
+                <label>shellQuote</label>
+                <span class="pull-right">
+                    <ct-toggle-slider [formControl]="form.controls['shellQuote']"></ct-toggle-slider>
+                </span>
+            </div>
+
             <ct-stage-input *ngIf="isType('record') || isType('File') && form.controls['stageInput']"
                             [formControl]="form.controls['stageInput']"
                             [readonly]="readonly">
@@ -132,7 +139,8 @@ export class InputBindingSectionComponent extends DirectiveBase implements Contr
             position: [input.inputBinding.position, [Validators.pattern(/^\d+$/)]],
             prefix: [input.inputBinding.prefix],
             separate: [input.inputBinding.separate !== false],
-            itemSeparator: [!!input.inputBinding.itemSeparator ? input.inputBinding.itemSeparator : null]
+            itemSeparator: [!!input.inputBinding.itemSeparator ? input.inputBinding.itemSeparator : null],
+            shellQuote: [input.inputBinding.shellQuote]
         });
 
         if (!this.readonly) {
@@ -164,6 +172,10 @@ export class InputBindingSectionComponent extends DirectiveBase implements Contr
 
                 if (form.loadContents !== undefined) {
                     this.input.inputBinding.loadContents = form.loadContents;
+                }
+
+                if (form.shellQuote !== undefined) {
+                    this.input.inputBinding.shellQuote = form.shellQuote;
                 }
 
                 this.propagateChange(this.input);

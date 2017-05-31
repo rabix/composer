@@ -30,6 +30,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             </ct-output-metadata-section>
 
             <ct-output-eval [formControl]="form.controls['outputEval']"
+                            [context]="context"
                             [readonly]="readonly">
             </ct-output-eval>
 

@@ -56,11 +56,9 @@ import {Observable} from "rxjs/Observable";
             </div>
             <ct-line-loader class="m-1"
                             *ngIf="searchContent.value 
-                             && searchContent.value !== appliedSearchTerm 
                              && !searchResults"></ct-line-loader>
 
             <div *ngIf="searchContent.value 
-                        && searchContent.value === appliedSearchTerm 
                         && (searchResults && searchResults?.length === 0)"
                  class="no-results m-1">
                 <p class="explanation">
@@ -83,8 +81,6 @@ export class PublicAppsPanelComponent extends DirectiveBase implements AfterView
     searchContent = new FormControl();
 
     searchResults = undefined;
-
-    appliedSearchTerm: string;
 
     expandedNodes;
 
@@ -302,9 +298,6 @@ export class PublicAppsPanelComponent extends DirectiveBase implements AfterView
             .do(term => this.searchResults = undefined)
             .debounceTime(250)
             .distinctUntilChanged()
-            .do(term => {
-                this.appliedSearchTerm = term;
-            })
             .filter(term => term.trim().length !== 0)
             .switchMap(term => Observable.of(search(term)))
             .subscribe(results => {

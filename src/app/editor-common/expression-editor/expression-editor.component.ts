@@ -167,13 +167,9 @@ export class ExpressionEditorComponent extends DirectiveBase implements OnInit, 
 
             const trace = [path, key].filter(e => e).join(".");
 
-            if (type === "object") {
+            if (type === "object" || type === "array") {
                 node.isExpandable = true;
                 node.children     = wrap(contextItem, trace);
-
-            } else if (type === "array") {
-                node.isExpandable = true;
-                node.children     = wrap(contextItem.reduce((acc, item, index) => ({acc, [index]: item}), {}), trace);
             } else {
                 node.id = trace.split(".").map(p => (parseInt(p, 10).toString() === p) ? `[${p}]` : p).join(".")
                     .replace(/\]\.\[/g, "][")
