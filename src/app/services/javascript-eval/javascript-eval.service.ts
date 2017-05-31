@@ -62,45 +62,45 @@ export class JavascriptEvalService {
                 // Blob code for worker
                 var blobCode = \`
                     self.addEventListener("message", function(m) {       
-        
-                        // Make local variables in order to be able to use context ($job ...)
-                        Object.keys(m.data.context).forEach(function (item) {
-                                self[item] = m.data.context[item];
-                            }
-                        );
-                        
-                        // Eval the expression
-                        self.postMessage(runHidden(m.data.script));     
+                        self.postMessage(runHidden(m.data.script, m.data.context));     
                     });
         
                 // Blacklisted properties
-                var runHidden = function(code) {
-                    var indexedDB = null;
-                    var location = null;
-                    var navigator = null;
-                    var onerror = null;
-                    var onmessage = null;
-                    var performance = null;
+                var runHidden = function(code, context) {
                     var self = null;
-                    var webkitIndexedDB = null;
-                    var postMessage = null;
-                    var close = null;
-                    var openDatabase = null;
-                    var openDatabaseSync = null;
-                    var webkitRequestFileSystem = null;
-                    var webkitRequestFileSystemSync = null;
-                    var webkitResolveLocalFileSystemSyncURL = null;
-                    var webkitResolveLocalFileSystemURL = null;
-                    var addEventListener = null;
-                    var dispatchEvent = null;
-                    var removeEventListener = null;
-                    var dump = null;
-                    var onoffline = null;
-                    var ononline = null;
-                    var importScripts = null;
-                    var console = null;
-                    var application = null;
-                    var XMLHttpRequest = null;
+                    this.indexedDB = null;
+                    this.location = null;
+                    this.navigator = null;
+                    this.onerror = null;
+                    this.onmessage = null;
+                    this.performance = null;
+                    this.webkitIndexedDB = null;
+                    this.close = null;
+                    this.openDatabase = null;
+                    this.openDatabaseSync = null;
+                    this.webkitRequestFileSystem = null;
+                    this.webkitRequestFileSystemSync = null;
+                    this.webkitResolveLocalFileSystemSyncURL = null;
+                    this.webkitResolveLocalFileSystemURL = null;
+                    this.addEventListener = null;
+                    this.dispatchEvent = null;
+                    this.removeEventListener = null;
+                    this.dump = null;
+                    this.onoffline = null;
+                    this.ononline = null;
+                    this.importScripts = null;
+                    this.console = null;
+                    this.application = null;
+                    this.XMLHttpRequest = null;                    
+                    
+                    // Make local variables in order to be able to use context ($job, self...)
+                    for(var item in context) {
+                    
+                        // Using eval and not this[item] because of keywords (for an example if we use "self" and its
+                        // readonly, we would not be able to use "self" when executing)
+                        eval("var " + item + " = " + JSON.stringify(context[item]));  
+                    }                
+                    
                     return eval(code);
                 } \`
                 

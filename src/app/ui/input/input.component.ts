@@ -51,7 +51,8 @@ export class InputComponent implements AfterViewInit {
 
     ngAfterViewInit() {
         if (this.autofocus) {
-            this.renderer.invokeElementMethod(this.inputField.nativeElement, "focus");
+            // https://github.com/angular/angular/issues/15008#issuecomment-285141070
+            this.inputField.nativeElement.focus();
         }
     }
 }
