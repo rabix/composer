@@ -69,15 +69,8 @@ import LoadOptions = jsyaml.LoadOptions;
                     <i class="fa fa-save"></i>
                 </button>
 
-                <!--Copy-->
+                <!--Publish to Platform-->
                 <button class="btn"
-                        type="button"
-                        ct-tooltip="Save As..."
-                        tooltipPlacement="bottom">
-                    <i class="fa fa-copy"></i>
-                </button>
-
-                <button class="btn" 
                         *ngIf="data.dataSource === 'local'"
                         ct-tooltip="Publish to Platform"
                         tooltipPlacement="bottom"
