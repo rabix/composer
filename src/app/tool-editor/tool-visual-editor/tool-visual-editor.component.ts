@@ -5,7 +5,7 @@ import {SBGCPURequirement} from "cwlts/mappings/d2sb/SBGCPURequirement";
 import {SBGMemRequirement} from "cwlts/mappings/d2sb/SBGMemRequirement";
 import {ResourceRequirement} from "cwlts/mappings/v1.0";
 
-import {CommandLineToolModel} from "cwlts/models";
+import {CommandLineToolModel, ExpressionModel} from "cwlts/models";
 
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
@@ -24,10 +24,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
             <ct-base-command [baseCommand]="model.baseCommand"
                              [model]="model"
                              [context]="context"
-                             [stdin]="model.stdin"
-                             [stdout]="model.stdout"
                              (updateCmd)="updateModel('baseCommand', $event)"
-                             (updateStream)="setStreams($event)"
                              [readonly]="readonly">
             </ct-base-command>
 
@@ -100,7 +97,13 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
 
         if (category === "baseCommand") {
             this.model.baseCommand = [];
-            data.forEach(cmd => this.model.addBaseCommand(cmd.serialize()));
+
+            data.forEach(cmd => {
+                if (cmd instanceof ExpressionModel) {
+                    cmd = cmd.serialize();
+                }
+                this.model.addBaseCommand(cmd);
+            });
             this.model.updateCommandLine();
 
         } else if (category === "fileRequirement") {

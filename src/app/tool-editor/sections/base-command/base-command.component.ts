@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {Component, EventEmitter, Input, OnChanges, Output} from "@angular/core";
 import {FormGroup} from "@angular/forms";
 import {CommandLineToolModel, ExpressionModel} from "cwlts/models";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
@@ -13,34 +13,27 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             </div>
             <div class="tc-body">
                 <ct-base-command-list [baseCommand]="baseCommand"
+                                      *ngIf="version === 'sbg:draft-2'"
                                       [context]="context"
                                       [readonly]="readonly"
                                       [model]="model"
                                       (update)="updateCmd.emit($event)"></ct-base-command-list>
-                <hr>
 
-                <ct-streams [stdin]="stdin"
-                            [stdout]="stdout"
-                            [context]="context"
-                            [readonly]="readonly"
-                            (update)="updateStream.emit($event)">
-                </ct-streams>
+                <ct-base-command-string [baseCommand]="baseCommand"
+                                        *ngIf="version === 'v1.0'"
+                                        (update)="updateCmd.emit($event)"
+                                        [readonly]="readonly">
+                </ct-base-command-string>
             </div>
         </ct-form-panel>
     `
 })
-export class BaseCommandComponent extends DirectiveBase {
+export class BaseCommandComponent extends DirectiveBase implements OnChanges {
     /** baseCommand property of model */
     @Input()
-    baseCommand: ExpressionModel[];
+    baseCommand: ExpressionModel[] | string[];
 
-    /** Stdin property of model */
-    @Input()
-    stdin: ExpressionModel;
-
-    /** Stdout property of model */
-    @Input()
-    stdout: ExpressionModel;
+    version: "sbg:draft-2" | "v1.0" | string;
 
     /** The parent forms group which is already in the clt-editor form tree */
     @Input()
@@ -60,6 +53,9 @@ export class BaseCommandComponent extends DirectiveBase {
     @Output()
     updateCmd = new EventEmitter<ExpressionModel[]>();
 
-    @Output()
-    updateStream = new EventEmitter<ExpressionModel>();
+    ngOnChanges() {
+        if (this.model) {
+            this.version = this.model.cwlVersion;
+        }
+    }
 }
