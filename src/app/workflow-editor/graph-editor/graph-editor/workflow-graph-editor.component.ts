@@ -157,7 +157,7 @@ import {WorkflowEditorService} from "../../workflow-editor.service";
                     transform="translate(-27.44 -58)" style="fill:#7a7a7a"/>
             </g>
         </svg>
-        <svg (dblclick)="openInspector($event)" #canvas class="cwl-workflow" tabindex="-1"
+        <svg (dblclick)="openInspector($event)" (mouseup)="setFocusOnCanvas()" #canvas class="cwl-workflow" tabindex="-1"
              [ct-drop-enabled]="true"
              [ct-drop-zones]="['zone1']"
              (onDropSuccess)="onDrop($event.detail.data.event, $event.detail.data.transfer_data)"></svg>
@@ -347,7 +347,9 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
             // When you create some node (i/o or step by dropping it on a canvas) and open it in object inspector, when
             // you go backward in history (undo) object inspector should be closed
-            if (!this.inspectedNode) this.inspector.hide();
+            if (!this.inspectedNode) {
+                this.inspector.hide();
+            }
         }
     }
 
@@ -472,6 +474,14 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             }
             current = current.parentNode as Element;
         }
+    }
+
+    /**
+     * Set focus on Canvas
+     */
+    setFocusOnCanvas() {
+        // https://github.com/angular/angular/issues/15008#issuecomment-285141070
+        this.canvas.nativeElement.focus();
     }
 
     /**

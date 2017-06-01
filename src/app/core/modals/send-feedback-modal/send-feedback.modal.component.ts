@@ -167,7 +167,6 @@ export class SendFeedbackModalComponent {
             call.subscribe(() => {
                 this.closeModal();
             }, err => {
-                console.log("Error", err);
                 if (err.status === 0) {
                     this.errorBar.showError("Could not connect to the platform and send a feedback message");
                 } else {

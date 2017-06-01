@@ -4,7 +4,7 @@ import {
     Component,
     Input,
     ViewEncapsulation,
-    OnInit, SimpleChanges, OnChanges
+    OnInit, SimpleChanges, OnChanges, ElementRef, ViewChild
 } from "@angular/core";
 import {
     WorkflowInputParameterModel,
@@ -14,6 +14,7 @@ import {
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {Workflow} from "cwl-svg";
+import {Observable} from "rxjs/Observable";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -65,6 +66,7 @@ import {Workflow} from "cwl-svg";
             <label class="form-control-label">Label</label>
             <input type="text"
                    class="form-control"
+                   (blur)="labelUpdate($event)"
                    [formControl]="form.controls['label']">
         </div>
 
@@ -308,11 +310,6 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
             this.port.fileTypes = value || [];
         });
 
-        this.tracked = this.form.controls["label"].valueChanges.debounceTime(1000).subscribe((label) => {
-            this.port.label = label;
-            this.graph.redraw();
-        });
-
         this.tracked = this.form.controls["description"].valueChanges.subscribe((description) => {
             this.port.description = description;
         });
@@ -321,7 +318,19 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
             this.selectedBatchByOption = batchType;
             this.workflowModel.setBatch(this.port.id, batchType);
         });
+    }
 
+    labelUpdate(ev: FocusEvent) {
+        let val = (<HTMLInputElement>ev.srcElement).value;
+
+        if (!val) {
+            val = (<HTMLInputElement>ev.srcElement).value = this.port.label;
+        }
+
+        if (this.port.label !== val) {
+            this.port.label = val;
+            this.graph.redraw();
+        }
     }
 
     /**

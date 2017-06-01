@@ -51,6 +51,8 @@ $code-color: $brand-primary;
 $code-base-cmd: #a77ed7;
 $code-inputs: #7ac24d;
 $code-args: #fda365;
+$code-warning: $brand-warning;
+$code-error: $brand-danger;
 
 // ----- Buttons -----
 $btn-primary-border-color: #3e3d3d;
@@ -153,6 +155,13 @@ $tree-node-selected-background: #455c7d;
 $editor-panel-selected-background: #455c7d;
 $editor-panel-selected-border: $brand-primary;
 $editor-panel-selected-color: white;
+
+// Editor Panel Error States
+$editor-panel-error-selected-background: #a54134;
+$editor-panel-error-selected-border: $brand-danger;
+$editor-panel-warning-selected-background: #9c6e2c;
+$editor-panel-warning-selected-border: $brand-warning;
+$editor-panel-icon-selected-color: white;
 
 // Revision List
 $revision-list-entry-active-bg: $input-bg;

@@ -29,11 +29,9 @@
     </div>
     <ct-line-loader class="m-1"
                     *ngIf="searchContent.value
-                             && searchContent.value !== appliedSearchTerm
                              && !searchResults"></ct-line-loader>
 
     <div *ngIf="searchContent.value
-                        && searchContent.value === appliedSearchTerm
                         && (searchResults && searchResults.length === 0)"
          class="no-results m-1">
         <p class="explanation">

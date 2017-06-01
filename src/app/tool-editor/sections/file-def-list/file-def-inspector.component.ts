@@ -39,7 +39,7 @@ export class FileDefInspectorComponent extends DirectiveBase implements OnInit {
     context: { $job?: any } = {};
 
     @Output()
-    save = new Subject<{entryName, entry}>();
+    save = new Subject<{ entryName, entry }>();
 
     form: FormGroup;
 

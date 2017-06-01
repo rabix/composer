@@ -37,7 +37,7 @@ import {noop} from "../../../../lib/utils.lib";
             </div>
 
             <!--ID-->
-            <div class="form-group"  [class.has-danger]="form.controls['id'].errors">
+            <div class="form-group" [class.has-danger]="form.controls['id'].errors">
                 <label class="form-control-label">ID</label>
                 <input type="text"
                        class="form-control"
@@ -76,9 +76,12 @@ import {noop} from "../../../../lib/utils.lib";
                                       [formControl]="form.controls['inputBinding']">
             </ct-input-binding-section>
 
-            <ct-secondary-file *ngIf="isType('File') && !!form.controls['secondaryFiles']"
-                               [formControl]="form.controls['secondaryFiles']"
+
+            <ct-secondary-file *ngIf="isType('File') && showSecondaryFiles()"
                                [context]="context"
+                               [port]="input"
+                               [bindingName]="'inputBinding'"
+                               (update)="propagateChange(input)"
                                [readonly]="readonly">
             </ct-secondary-file>
         </form>
@@ -120,33 +123,22 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
             symbols: [this.input.type.symbols ? this.input.type.symbols : []]
         });
 
-        // fetch secondaryFiles depending on their location
-        if (this.input.inputBinding && this.input.inputBinding.hasSecondaryFiles) {
-            this.form.addControl("secondaryFiles", new FormControl(this.input.inputBinding.secondaryFiles));
-        } else if (this.input.hasSecondaryFiles) {
-            this.form.addControl("secondaryFiles", new FormControl(this.input.secondaryFiles));
-        }
-
         // track separately because it causes changes to the rest of the form
         this.listenToIsBoundChanges();
 
         this.tracked = this.form.valueChanges.subscribe(value => {
             // nullable changes
-            this.input.type.isNullable = !value.isRequired;
+            if (value.isRequired !== undefined) {
+                this.input.type.isNullable = !value.isRequired;
+            }
 
             // symbols changes
-            if (value.symbols.length > 0 && this.isType("enum")) {
+            if (value.symbols && value.symbols.length > 0 && this.isType("enum")) {
                 this.input.type.symbols = value.symbols;
             }
 
-            // binding changes
-            if (value.inputBinding) {
-                this.input.updateInputBinding(value.inputBinding.inputBinding);
-                Object.assign(this.input.customProps, value.inputBinding.customProps);
-            }
-
             // id changes
-            if (this.input.id !== value.id) {
+            if (value.id && this.input.id !== value.id) {
                 try {
                     this.model.changeIOId(this.input, value.id);
 
@@ -155,17 +147,6 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
                     }
                 } catch (ex) {
                     this.form.controls["id"].setErrors({error: ex.message});
-                }
-            }
-
-            // secondaryFiles changes
-            if (value.secondaryFiles) {
-                if (value.secondaryFiles
-                    && this.input.inputBinding
-                    && this.input.inputBinding.hasSecondaryFiles) {
-                    this.input.inputBinding.secondaryFiles = value.secondaryFiles;
-                } else if (value.secondaryFiles && this.input.hasSecondaryFiles) {
-                    this.input.secondaryFiles = value.secondaryFiles;
                 }
             }
 
@@ -192,7 +173,6 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
                 }
             }
 
-            this.input.validate();
             this.propagateChange(this.input);
         });
     }
@@ -215,6 +195,10 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
                 this.form.removeControl("inputBinding");
             }
         });
+    }
+
+    showSecondaryFiles(): boolean {
+        return this.input.hasSecondaryFilesInRoot || !!this.input.inputBinding;
     }
 
     isType(type: string): boolean {

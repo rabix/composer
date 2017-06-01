@@ -3,36 +3,8 @@
 
 
 :host {
-
     /deep/ .form-section {
         @include cli-border($code-base-cmd);
-    }
-
-    .stream {
-        flex: 1;
-
-        & ~ .stream {
-            padding-left: 1rem;
-        }
-    }
-
-    .streams-row {
-        display: flex;
-        flex-direction: row;
-    }
-
-    .removable-form-control {
-        display: flex;
-        width: 100%;
-
-        ct-expression-input {
-            flex: 1;
-        }
-
-        .remove-icon {
-            display: flex;
-            align-items: center;
-        }
     }
 }
 

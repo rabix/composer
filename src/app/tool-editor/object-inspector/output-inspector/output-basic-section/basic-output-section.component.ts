@@ -1,4 +1,4 @@
-import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
+import {AfterViewInit, Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
 import {CommandOutputParameterModel} from "cwlts/models";
 import {noop} from "../../../../lib/utils.lib";
@@ -20,7 +20,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <!-- Required -->
             <div class="form-group flex-container">
                 <label class="form-control-label">Required</label>
-                <span class="align-right">                        
+                <span class="align-right">
                         <ct-toggle-slider [formControl]="basicSectionForm.controls['isRequired']"
                                           [on]="'Yes'"
                                           [off]="'No'"
@@ -61,7 +61,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
     `
 })
-export class BasicOutputSectionComponent extends DirectiveBase implements ControlValueAccessor {
+export class BasicOutputSectionComponent extends DirectiveBase implements ControlValueAccessor, AfterViewInit {
 
     @Input()
     public readonly = false;
@@ -102,10 +102,14 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
 
         this.tracked = this.basicSectionForm.valueChanges.subscribe(value => {
             this.output.type.isNullable = !value.isRequired;
-            this.output.outputBinding.glob = value.glob;
 
             if (value.symbols.length > 0 && this.isEnumType()) {
                 this.output.type.symbols = value.symbols;
+            }
+
+            if (value.glob) {
+                this.output.outputBinding.glob.setValue(value.glob.serialize(), value.glob.type);
+                this.checkGlob();
             }
 
             this.propagateChange(this.output);
@@ -145,11 +149,36 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
         });
     }
 
+    private checkGlob() {
+            // add warning about empty glob if glob is empty
+            if (this.output.outputBinding.glob && this.output.outputBinding.glob.serialize() === undefined) {
+                this.output.outputBinding.glob.updateValidity({
+                    [this.output.outputBinding.glob.loc]: {
+                        message: "Glob should be specified",
+                        type: "warning"
+                    }
+                });
+            } else if (this.output.outputBinding.glob &&
+                // remove warning about empty glob if glob isn't empty and that warning exists
+                this.output.outputBinding.warnings.length === 1 &&
+                this.output.outputBinding.warnings[0].message === "Glob should be specified") {
+                this.output.outputBinding.glob.cleanValidity();
+            }
+    }
+
     isRecordType() {
         return this.output.type.type === "record" || (this.output.type.type === "array" && this.output.type.items === "record");
     }
 
     isEnumType() {
         return this.output.type.type === "enum" || (this.output.type.type === "array" && this.output.type.items === "enum");
+    }
+
+    ngAfterViewInit() {
+        // checking after view init because loading expression model will clear its validity based on the provided context
+        // wrapping it in a set timeout to avoid ExpressionChangedAfterItWasChecked
+        setTimeout(() => {
+            this.checkGlob();
+        });
     }
 }

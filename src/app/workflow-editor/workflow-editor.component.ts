@@ -1,7 +1,6 @@
 import {Component, Input, OnDestroy, OnInit, TemplateRef, ViewChild, ViewContainerRef} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {WorkflowFactory, WorkflowModel} from "cwlts/models";
-import {Validation} from "cwlts/models/helpers/validation";
 import * as Yaml from "js-yaml";
 import {Observable, Subject} from "rxjs/Rx";
 import {AuthService} from "../auth/auth/auth.service";
@@ -50,7 +49,7 @@ import LoadOptions = jsyaml.LoadOptions;
             </ct-tab-selector>
 
             <div class="document-controls">
-                
+
                 <!--Go to app-->
                 <button class="btn"
                         type="button"
@@ -70,15 +69,12 @@ import LoadOptions = jsyaml.LoadOptions;
                     <i class="fa fa-save"></i>
                 </button>
 
-                <!--Copy-->
+                <!--Publish to Platform-->
                 <button class="btn"
-                        type="button"
-                        ct-tooltip="Save As..."
-                        tooltipPlacement="bottom">
-                    <i class="fa fa-copy"></i>
-                </button>
-
-                <button class="btn" *ngIf="data.dataSource === 'local'" (click)="publish()">
+                        *ngIf="data.dataSource === 'local'"
+                        ct-tooltip="Publish to Platform"
+                        tooltipPlacement="bottom"
+                        (click)="publish()">
                     <i class="fa fa-cloud-upload"></i>
                 </button>
 
@@ -149,20 +145,20 @@ import LoadOptions = jsyaml.LoadOptions;
                     [class.active]="reportPanel === 'validation'"
                     (click)="toggleReport('validation')"
                     class="btn">
-            
+
             <span *ngIf="validation?.errors?.length">
             <i class="fa fa-times-circle text-danger"></i> {{validation.errors.length}} Errors
             </span>
-            
+
             <span *ngIf="validation?.warnings?.length" [class.pl-1]="validation?.errors?.length">
             <i class="fa fa-exclamation-triangle text-warning"></i> {{validation.warnings.length}} Warnings
             </span>
-            
+
             <span *ngIf="!validation?.errors?.length && !validation?.warnings?.length">
             No Issues
             </span>
-            
-            
+
+
             </button>
             </span>
         </ng-template>
@@ -290,10 +286,10 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
 
                         // update validation stream on model validation updates
 
-                        this.workflowModel.setValidationCallback((res: Validation) => {
+                        this.workflowModel.setValidationCallback((res) => {
                             this.validation = {
-                                errors: res.errors,
-                                warnings: res.warnings,
+                                errors: this.workflowModel.errors,
+                                warnings: this.workflowModel.warnings,
                                 isValidatableCwl: true,
                                 isValidCwl: true,
                                 isValidJSON: true
@@ -303,8 +299,8 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                         this.workflowModel.validate();
 
                         const out       = {
-                            errors: this.workflowModel.validation.errors,
-                            warnings: this.workflowModel.validation.warnings,
+                            errors: this.workflowModel.errors,
+                            warnings: this.workflowModel.warnings,
                             isValidatableCwl: true,
                             isValidCwl: true,
                             isValidJSON: true
@@ -332,7 +328,8 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                             warnings: [],
                             errors: [{
                                 message: err.message,
-                                loc: "document"
+                                loc: "document",
+                                type: "error"
                             }]
                         };
                     });
@@ -452,7 +449,12 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
 
     openRevision(revisionNumber: number) {
         const fileWithoutRevision = this.data.id.split("/");
-        fileWithoutRevision.pop();
+
+        // In the case when id is without revision number
+        if (!isNaN(+fileWithoutRevision[fileWithoutRevision.length -1])) {
+            fileWithoutRevision.pop();
+        }
+
         fileWithoutRevision.push(revisionNumber.toString());
 
         const fid = fileWithoutRevision.join("/");

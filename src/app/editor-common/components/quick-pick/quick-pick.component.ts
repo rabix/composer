@@ -21,17 +21,12 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         <div class="suggestions" *ngIf="!showCustom">
 
             <div class="radio-container" *ngFor="let item of list">
-                <input type="radio"
-                       [value]="item.value"
-                       [formControl]="form.controls['radio']"
-                       id="{{item.label}}"
-                       required>
-
-                <label class="radio-label btn btn-secondary"
-                       for="{{item.label}}"
-                       [class.selected]="computedVal === item.value">
+                <button class="btn btn-secondary"
+                        type="button"
+                        [class.active]="computedVal?.toString() === item.value.toString()"
+                        (click)="selectDefault(item.value)">
                     {{ item.label }}
-                </label>
+                </button>
             </div>
         </div>
 
@@ -125,7 +120,6 @@ available types: {[label: string]: string | number} | string[]`);
         }
     }
 
-
     writeValue(value: ExpressionModel): void {
         if (this._value && this._value.serialize() === value.serialize()) {
             return;
@@ -140,7 +134,7 @@ available types: {[label: string]: string | number} | string[]`);
         }
 
         this.showCustom = !this.list.filter(item => {
-                return item.value === this.computedVal;
+                return this.computedVal !== undefined && item.value.toString() === this.computedVal.toString();
             }).length && this.computedVal !== undefined;
 
         if (this.showCustom) {
@@ -159,7 +153,6 @@ available types: {[label: string]: string | number} | string[]`);
     }
 
     addCustom(reset?: boolean): void {
-        this.form.removeControl("radio");
         this.showCustom = true;
 
         if (reset) {
@@ -198,13 +191,11 @@ available types: {[label: string]: string | number} | string[]`);
         if (reset) {
             this._value.setValue("", this.type);
         }
+    }
 
-        this.form.setControl("radio", new FormControl(this._value.serialize()));
-
-        this.tracked = this.form.controls["radio"].valueChanges.subscribe(prim => {
-            this._value.setValue(prim, this.type);
-            this.computedVal = prim;
-            this.onChange(this._value);
-        });
+    selectDefault(prim) {
+        this._value.setValue(prim, this.type);
+        this.computedVal = prim;
+        this.onChange(this._value);
     }
 }

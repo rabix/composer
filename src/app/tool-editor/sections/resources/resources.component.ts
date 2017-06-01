@@ -59,19 +59,23 @@ export class ResourcesComponent extends DirectiveBase implements OnChanges, OnIn
         "4GB": 4000,
         "8GB": 8000,
     };
+
     cpuSuggest = {
         "single-thread": 1,
         "multi-thread": 0
     };
 
+    private custom: any = {};
+
     ngOnChanges(changes: SimpleChanges) {
+        this.custom = this.entries.customProps;
         this.form.controls["mem"].setValue(this.entries.mem, {onlySelf: true});
         this.form.controls["cores"].setValue(this.entries.cores, {onlySelf: true});
     }
 
     ngOnInit() {
         this.tracked = this.form.valueChanges.subscribe(change => {
-            this.update.next(change);
+            this.update.next({...this.custom, ...change});
         });
     }
 }

@@ -29,8 +29,8 @@ import {ModalService} from "../../../ui/modal/modal.service";
                     <ct-blank-tool-state *ngIf="!readonly && !model.arguments.length"
                                          [buttonText]="'Add an Argument'"
                                          (buttonClick)="addEntry()">
-                        Any parameters or options that are fixed for every execution of the tool. For example, you may always want an output
-                        file to have a fixed name, so that would be an argument, not an output port.
+                        Parameters or options that are hard-coded for every execution of the tool. For example, you may 
+                        want to use a fixed name for an output file, so the output file name would be an argument not an input port.
                     </ct-blank-tool-state>
 
                     <div *ngIf="readonly && !model.arguments.length" class="text-xs-center h5">
@@ -53,7 +53,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                             class="input-list-items">
 
                             <div class="editor-list-item clickable"
-                                 [ct-validation-class]="entry.validation"
+                                 [ct-validation-class]="entry"
                                  [ct-editor-inspector]="inspector"
                                  [ct-editor-inspector-target]="entry.loc">
 
@@ -70,7 +70,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
 
                                 <!--Value Column-->
                                 <div class="col-sm-4 ellipsis" [ct-tooltip]="ctt" [tooltipPlacement]="'top'">
-                                    <ct-validation-preview [entry]="entry.validation"></ct-validation-preview>
+                                    <ct-validation-preview [entry]="entry"></ct-validation-preview>
                                     <span>
                                     {{ entry.toString() }}
                                 </span>

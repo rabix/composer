@@ -2,7 +2,7 @@ import {
     Component,
     EventEmitter,
     Input,
-    OnChanges,
+    OnChanges, OnInit,
     Output,
     SimpleChanges,
     ViewEncapsulation
@@ -16,7 +16,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
     selector: "ct-tool-output-inspector",
     template: `
-        <form [formGroup]="form" (ngSubmit)="onSubmit(form)">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
             <ct-basic-output-section [formControl]="form.controls['basicOutputSection']"
                                      [readonly]="readonly"
@@ -30,11 +30,15 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             </ct-output-metadata-section>
 
             <ct-output-eval [formControl]="form.controls['outputEval']"
+                            [context]="context"
                             [readonly]="readonly">
             </ct-output-eval>
 
-            <ct-secondary-file *ngIf="isFileType() && form.controls['secondaryFiles']"
-                               [formControl]="form.controls['secondaryFiles']"
+            <ct-secondary-file *ngIf="showSecondaryFiles()"
+                               [context]="context"
+                               [port]="output"
+                               [bindingName]="'outputBinding'"
+                               (update)="save.next(output)"
                                [readonly]="readonly">
             </ct-secondary-file>
 
@@ -45,7 +49,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         </form>
     `
 })
-export class ToolOutputInspector extends DirectiveBase implements OnChanges {
+export class ToolOutputInspectorComponent extends DirectiveBase implements OnChanges, OnInit {
 
     @Input()
     public readonly = false;
@@ -58,7 +62,7 @@ export class ToolOutputInspector extends DirectiveBase implements OnChanges {
 
     /** Context in which expression should be evaluated */
     @Input()
-    public context: { $job?: any, $self?: any } = {};
+    public context: any = {};
 
     public inputList: CommandInputParameterModel[] = [];
 
@@ -90,28 +94,18 @@ export class ToolOutputInspector extends DirectiveBase implements OnChanges {
             this.form.addControl("metaData", new FormControl(this.output));
         }
 
-        if (this.output.outputBinding.hasSecondaryFiles) {
-            this.form.addControl("secondaryFiles", new FormControl(this.output.outputBinding.secondaryFiles || []));
-        } else if (this.output.hasSecondaryFiles) {
-            this.form.addControl("secondaryFiles", new FormControl(this.output.secondaryFiles || []));
-        }
-
-        this.tracked = this.form.valueChanges.subscribe(value => {
-            if (value.secondaryFiles && this.output.outputBinding.hasSecondaryFiles) {
-                this.output.outputBinding.secondaryFiles = value.secondaryFiles;
-            } else if (value.secondaryFiles && this.output.hasSecondaryFiles) {
-                this.output.secondaryFiles = value.secondaryFiles;
-            }
-
+        this.tracked = this.form.valueChanges.subscribe(() => {
             this.save.next(this.output);
         });
     }
 
-    onSubmit(form: FormGroup) {
-        this.save.next(form.value);
+    showSecondaryFiles(): boolean {
+        const isFile      = this.output.type.type === "File" || (this.output.type.type === "array" && this.output.type.items === "File");
+        const hasSecFiles = this.output.hasSecondaryFilesInRoot || !!this.output.outputBinding;
+        return isFile && hasSecFiles;
     }
 
-    isFileType() {
-        return this.output.type.type === "File" || (this.output.type.type === "array" && this.output.type.items === "File");
+    onSubmit() {
+        this.save.next(this.output);
     }
 }

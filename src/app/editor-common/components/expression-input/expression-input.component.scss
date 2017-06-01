@@ -18,7 +18,7 @@
         cursor: pointer;
     }
 
-    &.expr .form-control {
+    &.expr .form-control, &.warning .form-control, &.error .form-control {
         padding-left: 30px;
     }
 

@@ -1,33 +1,60 @@
-import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
-import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
-import {noop} from "../../../lib/utils.lib";
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, ViewEncapsulation} from "@angular/core";
+import {CommandInputParameterModel, CommandOutputParameterModel, ExpressionModel} from "cwlts/models";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {FormArray, FormControl, FormGroup} from "@angular/forms";
+import {Subscription} from "rxjs/Subscription";
+import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
+    styleUrls: ["./secondary-files.component.scss"],
     selector: "ct-secondary-file",
-    providers: [
-        {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => SecondaryFilesComponent), multi: true}
-    ],
     template: `
-        <ct-form-panel class="borderless" *ngIf="form" [collapsed]="true">
+        <ct-form-panel class="borderless" [collapsed]="true">
             <div class="tc-header">Secondary Files</div>
             <div class="tc-body">
+                <form [formGroup]="form">
+                    <ct-blank-tool-state *ngIf="!readonly && !secondaryFiles.length"
+                                         [buttonText]="'Add secondary file'"
+                                         (buttonClick)="addFile()">
+                        No Secondary Files defined.
+                    </ct-blank-tool-state>
 
-                <ct-expression-model-list
-                        [context]="context"
-                        [emptyListText]="'No Secondary Files defined.'"
-                        [addButtonText]="'Add secondary file'"
-                        [readonly]="readonly"
-                        [formControl]="form"></ct-expression-model-list>
+                    <div *ngIf="readonly && !secondaryFiles.length" class="text-xs-center h5">
+                        No Secondary Files defined.
+                    </div>
+
+                    <ol *ngIf="secondaryFiles.length > 0" class="list-unstyled">
+
+                        <li *ngFor="let control of form.get('list').controls; let i = index"
+                            class="removable-form-control">
+
+                            <ct-expression-input
+                                    [context]="context"
+                                    [formControl]="control"
+                                    [readonly]="readonly">
+                            </ct-expression-input>
+
+                            <div *ngIf="!readonly" class="remove-icon clickable ml-1 text-hover-danger"
+                                 [ct-tooltip]="'Delete'"
+                                 (click)="removeFile(i)">
+                                <i class="fa fa-trash"></i>
+                            </div>
+                        </li>
+                    </ol>
+
+                    <button type="button" *ngIf="secondaryFiles.length > 0 && !readonly"
+                            class="btn btn-link add-btn-link no-underline-hover"
+                            (click)="addFile()">
+                        <i class="fa fa-plus"></i> Add secondary file
+                    </button>
+                </form>
+
             </div>
         </ct-form-panel>
     `
 })
 
-export class SecondaryFilesComponent extends DirectiveBase implements ControlValueAccessor {
+export class SecondaryFilesComponent extends DirectiveBase implements OnChanges, OnInit {
 
     @Input()
     public readonly = false;
@@ -36,29 +63,87 @@ export class SecondaryFilesComponent extends DirectiveBase implements ControlVal
     @Input()
     public context: { $job: any } = {$job: {}};
 
-    private secondaryFiles: SBDraft2ExpressionModel[];
+    @Input()
+    port: CommandInputParameterModel | CommandOutputParameterModel;
 
-    private onTouched = noop;
+    @Input()
+    bindingName: string;
 
-    private propagateChange = noop;
+    secondaryFiles: ExpressionModel[] = [];
 
-    form: FormControl;
+    @Output()
+    update = new EventEmitter<ExpressionModel[]>();
 
-    writeValue(secondaryFiles: SBDraft2ExpressionModel[]): void {
-        this.secondaryFiles = secondaryFiles;
+    form = new FormGroup({list: new FormArray([])});
 
-        this.form = new FormControl(this.secondaryFiles);
+    private subscription: Subscription;
 
-        this.tracked = this.form.valueChanges.subscribe((fileList: SBDraft2ExpressionModel[]) => {
-            this.propagateChange(fileList);
+    constructor(private modal: ModalService) {
+        super();
+    }
+
+    removeFile(i) {
+        this.modal.confirm({
+            title: "Really Remove?",
+            content: `Are you sure that you want to remove this secondary file?`,
+            cancellationLabel: "No, keep it",
+            confirmationLabel: "Yes, remove it"
+        }).then(() => {
+            // reset the expression's validity
+            this.secondaryFiles[i].cleanValidity();
+            (this.form.get("list") as FormArray).removeAt(i);
+        }, err => {
+            console.warn(err);
         });
     }
 
-    registerOnChange(fn: any): void {
-        this.propagateChange = fn;
+    addFile() {
+        const cmd = this.port.addSecondaryFile(null);
+        (this.form.get("list") as FormArray).push(new FormControl(cmd));
     }
 
-    registerOnTouched(fn: any): void {
-        this.onTouched = fn;
+    ngOnInit() {
+        if (this.port) {
+            this.updateFormArray();
+        }
+    }
+
+    ngOnChanges() {
+        if (this.port) {
+            this.updateFormArray();
+        }
+    }
+
+    private updateFileList() {
+        this.secondaryFiles = this.port.secondaryFiles;
+    }
+
+    private updateFormArray() {
+        // cancel previous subscription so recreation of form doesn't trigger an update
+        if (this.subscription) {
+            this.subscription.unsubscribe();
+            this.subscription = null;
+        }
+
+        this.updateFileList();
+
+        const formList = [];
+
+        // create formControls from each secondaryFile
+        for (let i = 0; i < this.secondaryFiles.length; i++) {
+            formList.push(new FormControl(this.secondaryFiles[i]));
+        }
+
+        this.form.setControl("list", new FormArray(formList));
+
+        // re-subscribe update output to form changes
+        this.subscription = this.form.valueChanges.map(form => (form.list)).subscribe((list) => {
+            if (list) {
+                this.port.updateSecondaryFiles(list);
+                this.updateFileList();
+                this.secondaryFiles.forEach(file => file.validate(this.context));
+                this.update.emit(list);
+            }
+        });
     }
 }

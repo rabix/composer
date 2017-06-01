@@ -8,9 +8,9 @@ import {EditorInspectorService} from "./editor-inspector.service";
         <div class="form-section pl-1 pr-1 pt-0">
             <div class="row header pt-1 pb-1 mb-1">
                 <div class="col-xs-12">
-                    
+
                     <i class="fa clickable pull-right fa-times" (click)="close()"></i>
-                    
+
                     <div class="text-title">
                         <ng-content select=".tc-header"></ng-content>
                     </div>

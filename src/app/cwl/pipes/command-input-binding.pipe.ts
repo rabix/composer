@@ -1,6 +1,6 @@
 import {Pipe, PipeTransform} from "@angular/core";
 
-@Pipe({name: "commandInputBinding"})
+@Pipe({name: "commandInputBinding", pure: false})
 export class CommandInputBindingPipe implements PipeTransform {
     transform(inputBinding): any {
 

@@ -70,6 +70,13 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                 </select>
             </div>
 
+            <div class="form-group" *ngIf="input.inputBinding.hasShellQuote">
+                <label>shellQuote</label>
+                <span class="pull-right">
+                    <ct-toggle-slider [formControl]="form.controls['shellQuote']"></ct-toggle-slider>
+                </span>
+            </div>
+
             <ct-stage-input *ngIf="isType('record') || isType('File') && form.controls['stageInput']"
                             [formControl]="form.controls['stageInput']"
                             [readonly]="readonly">
@@ -132,39 +139,46 @@ export class InputBindingSectionComponent extends DirectiveBase implements Contr
             position: [input.inputBinding.position, [Validators.pattern(/^\d+$/)]],
             prefix: [input.inputBinding.prefix],
             separate: [input.inputBinding.separate !== false],
-            itemSeparator: [!!input.inputBinding.itemSeparator ? input.inputBinding.itemSeparator : null]
+            itemSeparator: [!!input.inputBinding.itemSeparator ? input.inputBinding.itemSeparator : null],
+            shellQuote: [input.inputBinding.shellQuote]
         });
 
-        this.listenToInputBindingFormChanges();
+        if (!this.readonly) {
+            this.listenToInputBindingFormChanges();
+        }
     }
 
     listenToInputBindingFormChanges(): void {
         this.tracked = this.form.valueChanges
             .distinctUntilChanged()
             .debounceTime(300)
-            .subscribe(value => {
-                const binding: any = {
-                    position: value.position || undefined,
-                    prefix: value.prefix || undefined,
-                    separate: value.separate,
-                    itemSeparator: value.itemSeparator || undefined,
-                    valueFrom: value.valueFrom ? value.valueFrom.serialize() : undefined,
-                    loadContents: value.stageInput.inputBinding.loadContents,
-                };
-
-                if (value.secondaryFiles && this.input.inputBinding.hasSecondaryFiles) {
-                    binding.secondaryFiles = value.secondaryFiles.map(file => file.serialize());
-                } else if (value.secondaryFiles && this.input.hasSecondaryFiles) {
-                    this.input.secondaryFiles = value.secondaryFiles;
+            .subscribe(form => {
+                if (form.position !== undefined) {
+                    this.input.inputBinding.position = form.position || 0;
                 }
 
-                if (!this.readonly) {
-                    this.input.updateInputBinding(binding);
-                    Object.assign(this.input.customProps, value.stageInput.customProps);
-
-                    this.propagateChange(this.input);
+                if (form.prefix !== undefined) {
+                    this.input.inputBinding.prefix = form.prefix;
                 }
 
+
+                if (form.itemSeparator !== undefined) {
+                    this.input.inputBinding.itemSeparator = form.itemSeparator;
+                }
+
+                if (form.valueFrom !== undefined && form.valueFrom.serialize() === undefined) {
+                    this.input.inputBinding.valueFrom.setValue("", "string");
+                }
+
+                if (form.loadContents !== undefined) {
+                    this.input.inputBinding.loadContents = form.loadContents;
+                }
+
+                if (form.shellQuote !== undefined) {
+                    this.input.inputBinding.shellQuote = form.shellQuote;
+                }
+
+                this.propagateChange(this.input);
             });
     }
 

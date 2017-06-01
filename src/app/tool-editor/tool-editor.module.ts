@@ -25,13 +25,15 @@ import {ToolVisualEditorComponent} from "./tool-visual-editor/tool-visual-editor
 import {DockerRequirementComponent} from "./sections/docker/docker-requirement.component";
 import {BaseCommandComponent} from "./sections/base-command/base-command.component";
 import {ToolInputInspectorComponent} from "./object-inspector/input-inspector/tool-input-inspector.component";
-import {ToolOutputInspector} from "./object-inspector/output-inspector/tool-output-inspector.component";
+import {ToolOutputInspectorComponent} from "./object-inspector/output-inspector/tool-output-inspector.component";
 import {EditorCommonModule} from "../editor-common/editor-common.module";
 import {UIModule} from "../ui/ui.module";
 import {CWLModule} from "../cwl/cwl.module";
 import {LayoutModule} from "../layout/layout.module";
 import { HintsComponent } from "./sections/hints/hints.component";
 import { RequirementInputComponent } from "./sections/hints/requirement-input.component";
+import { BaseCommandListComponent } from './sections/base-command/base-command-list/base-command-list.component';
+import { StreamsComponent } from './sections/streams/streams.component';
 
 @NgModule({
     declarations: [
@@ -53,7 +55,7 @@ import { RequirementInputComponent } from "./sections/hints/requirement-input.co
         ToolInputInspectorComponent,
         ToolInputListComponent,
         ToolInputsComponent,
-        ToolOutputInspector,
+        ToolOutputInspectorComponent,
         ToolOutputListComponent,
         ToolOutputsComponent,
         ToolEditorComponent,
@@ -62,6 +64,8 @@ import { RequirementInputComponent } from "./sections/hints/requirement-input.co
         BaseCommandComponent,
         HintsComponent,
         RequirementInputComponent,
+        BaseCommandListComponent,
+        StreamsComponent,
     ],
     exports: [
         ToolEditorComponent

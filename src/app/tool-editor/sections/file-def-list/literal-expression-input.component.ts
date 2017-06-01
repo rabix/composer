@@ -23,27 +23,27 @@ import {ModalService} from "../../../ui/modal/modal.service";
     template: `
         <div class="expression-input-group clickable"
              [class.expr]="isExpr"
-             [ct-validation-class]="model.validation">
+             [ct-validation-class]="model">
 
-            <ct-validation-preview [entry]="model?.validation"></ct-validation-preview>
+            <ct-validation-preview [entry]="model"></ct-validation-preview>
             <b class="validation-icon result"
-               *ngIf="isExpr && !(model?.hasErrors() || model?.hasWarnings())"
+               *ngIf="isExpr && !(model?.hasErrors || model?.hasWarnings)"
                [title]="model.result">E:</b>
 
             <div class="textarea-btn-group">
-                
+
                     <textarea class="form-control"
                               #input
                               [readonly]="isExpr"
                               (blur)="onTouch()"
-                              [value]="value?.toString()"
+                              [value]="model?.toString() || ''"
                               (click)="editExpr(isExpr ? 'edit' : null, $event)"
                               (change)="editLiteral(input.value)"></textarea>
 
                 <span class="btn-group">
                         <button type="button"
                                 (click)="openLiteralEditor()"
-                                [disabled]="value.isExpression"
+                                [disabled]="model.isExpression"
                                 class="btn btn-secondary">
                             <i class="fa fa-expand"></i>
                         </button>
@@ -89,20 +89,6 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
      */
     model: ExpressionModel;
 
-
-    /** getter for formControl value */
-    get value() {
-        return this.model;
-    }
-
-    /** setter for formControl value */
-    set value(val: ExpressionModel) {
-        if (val !== this.model) {
-            this.model = val;
-            this.onChange(val);
-        }
-    }
-
     constructor(private modal: ModalService) {
         super();
     }
@@ -113,8 +99,9 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
         }
 
         if (obj) {
-            this.model = obj;
+            this.model  = obj;
             this.isExpr = obj.isExpression;
+            this.model.validate(this.context).then(noop, noop);
         } else {
             console.warn("supposed to get a value, but didn't... :(");
         }
@@ -136,11 +123,11 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
             title: "Edit File Content"
         });
 
-        editor.content.next(this.value.toString());
+        editor.content.next(this.model.toString());
 
         if (this.fileName) {
             const nameParts = this.fileName.split(".");
-            const ext = nameParts[nameParts.length - 1].toLowerCase();
+            const ext       = nameParts[nameParts.length - 1].toLowerCase();
             if (ACE_MODE_MAP[ext]) {
                 editor.language.next(ACE_MODE_MAP[ext]);
             }
@@ -149,7 +136,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
         editor.action.first().subscribe(action => {
             if (action === "save") {
                 // save string
-                this.model = this.model.clone();
+                // this.model = this.model.clone();
                 this.model.setValue(editor.content.value, "string");
                 this.onChange(this.model);
             }
@@ -187,27 +174,22 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
 
             editor.readonly = this.readonly;
 
-            editor.model = this.model.clone();
+            editor.model   = this.model.clone();
             editor.context = this.context;
             editor.action.first().subscribe(action => {
                 if (action === "save") {
-
                     const val = editor.model.serialize();
 
-                    this.model = editor.model;
-
                     if (!val) {
-                        this.model.setValue("", "string")
+                        editor.model.setValue("", "string");
                     }
 
-                    const resetValidation = () => {
-                        // to reset validation
-                        this.isExpr = this.model.isExpression;
+                    this.model.cloneStatus(editor.model);
+
+                    this.isExpr = this.model.isExpression;
+                    this.model.validate(this.context).then(() => {
                         this.onChange(this.model);
-                    };
-
-                    this.model.evaluate(this.context).then(resetValidation, resetValidation);
-
+                    },  err => console.warn);
                 }
                 this.modal.close();
             });
@@ -220,12 +202,13 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
                 cancellationLabel: "No, keep it",
                 confirmationLabel: "Yes, delete it"
             }).then(() => {
-                this.model = this.model.clone();
                 this.model.setValue("", "string");
                 this.model.result = null;
-                this.isExpr = false;
+                this.isExpr       = false;
                 event.stopPropagation();
-                this.onChange(this.model);
+                this.model.validate(this.context).then(() => {
+                    this.onChange(this.model);
+                }, console.warn);
             }, err => console.warn);
         }
     }

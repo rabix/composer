@@ -255,7 +255,10 @@ export class DataGatewayService {
             cancellationLabel: "Cancel",
             confirmationLabel: "Publish",
             formControl: revNote
-        })).flatMap(() => {
+        })).catch(() => {
+            // In case when you click on Cancel button or Esc button on your keyboard
+            return Observable.empty()
+        }).flatMap(() => {
             const platform = this.apiGateway.forHash(hash);
 
             const call = platform ? platform.saveApp(YAML.safeLoad(content, {json: true} as any), revNote.value)

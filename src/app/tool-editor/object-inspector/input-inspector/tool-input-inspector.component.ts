@@ -9,7 +9,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
     selector: "ct-tool-input-inspector",
     template: `
-        <form [formGroup]="form" (ngSubmit)="onSubmit(form)">
+        <form [formGroup]="form">
 
             <ct-basic-input-section [formControl]="form.controls['basicInputSection']"
                                     [context]="context"
@@ -56,14 +56,8 @@ export class ToolInputInspectorComponent extends DirectiveBase implements OnInit
             stageInputSection: this.input
         });
 
-
-        // Skipping 1 because the first changes are from the form initializing
-        this.tracked = this.form.valueChanges.skip(1).subscribe(() => {
+        this.tracked = this.form.valueChanges.subscribe(() => {
             this.save.next(this.input);
         });
-    }
-
-    onSubmit(form: FormGroup) {
-        this.save.next(form.value);
     }
 }

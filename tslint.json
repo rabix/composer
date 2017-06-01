@@ -72,9 +72,7 @@
       "double"
     ],
     "radix": true,
-    "semicolon": [
-      "always"
-    ],
+    "semicolon": true,
     "triple-equals": [
       true,
       "allow-null-check"
@@ -102,7 +100,9 @@
     ],
     "directive-selector": [
       true,
-      "attribute"
+      "attribute",
+      "ct",
+      "kebab-case"
     ],
     "component-selector": [
       true,

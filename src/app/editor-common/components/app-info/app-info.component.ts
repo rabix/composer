@@ -4,6 +4,7 @@ import {
     OnChanges,
     SimpleChanges
 } from "@angular/core";
+import {FormGroup} from "@angular/forms";
 import {WorkflowModel} from "cwlts/models";
 import {SystemService} from "../../../platform-providers/system.service";
 import {
@@ -22,7 +23,7 @@ import {
             <div class="info-section">
                 <ct-inline-editor [value]="model.label" type="text"
                                   [disabled]="readonly"
-                                  (saveData)="model.label = $event">
+                                  (saveData)="updateLabel($event)">
 
                     <h1 class="h3">{{model.label}}</h1>
                 </ct-inline-editor>
@@ -36,7 +37,7 @@ import {
                 <ct-inline-editor [value]="model.description"
                                   [disabled]="readonly"
                                   type="textarea"
-                                  (saveData)="model.description = $event">
+                                  (saveData)="updateDescription($event)">
                     <div [ct-markdown]="model.description"></div>
                 </ct-inline-editor>
             </div>
@@ -52,7 +53,7 @@ import {
                                           type="tags"
                                           [disabled]="readonly"
                                           [options]="categories"
-                                          (saveData)="model.customProps['sbg:categories'] = $event">
+                                          (saveData)="updateCustomProp('sbg:categories', $event)">
                             {{ (model.customProps['sbg:categories'] || []).join(", ")}}
                         </ct-inline-editor>
                     </div>
@@ -64,14 +65,14 @@ import {
                             <ct-inline-editor [disabled]="readonly" class="toolkit"
                                               [value]="model.customProps['sbg:toolkit']"
                                               type="text"
-                                              (saveData)="model.customProps['sbg:toolkit'] = $event">
+                                              (saveData)="updateCustomProp('sbg:toolkit', $event)">
                                 {{model.customProps['sbg:toolkit']}}
                             </ct-inline-editor>
                             <ct-inline-editor class="toolkit"
                                               [disabled]="readonly"
                                               [value]="model.customProps['sbg:toolkitVersion']"
                                               type="text"
-                                              (saveData)="model.customProps['sbg:toolkitVersion'] = $event">
+                                              (saveData)="updateCustomProp('sbg:toolkitVersion', $event)">
                                 {{model.customProps['sbg:toolkitVersion']}}
                             </ct-inline-editor>
                         </div>
@@ -83,7 +84,7 @@ import {
                         <ct-inline-editor [value]="model.customProps['sbg:license']"
                                           [disabled]="readonly"
                                           type="text"
-                                          (saveData)="model.customProps['sbg:license'] = $event">
+                                          (saveData)="updateCustomProp('sbg:license', $event)">
                             <div>{{model.customProps['sbg:license']}}</div>
                         </ct-inline-editor>
                     </div>
@@ -94,7 +95,7 @@ import {
                         <ct-inline-editor [value]="model.customProps['sbg:wrapperAuthor']"
                                           [disabled]="readonly"
                                           type="text"
-                                          (saveData)="model.customProps['sbg:wrapperAuthor'] = $event">
+                                          (saveData)="updateCustomProp('sbg:wrapperAuthor', $event)">
                             <div>{{model.customProps['sbg:wrapperAuthor']}}</div>
                         </ct-inline-editor>
                     </div>
@@ -105,7 +106,7 @@ import {
                         <ct-inline-editor [value]="model.customProps['sbg:wrapperLicense']"
                                           [disabled]="readonly"
                                           type="text"
-                                          (saveData)="model.customProps['sbg:wrapperLicense'] = $event">
+                                          (saveData)="updateCustomProp('sbg:wrapperLicense', $event)">
                             <div>{{model.customProps['sbg:wrapperLicense']}}</div>
                         </ct-inline-editor>
                     </div>
@@ -116,7 +117,7 @@ import {
                         <ct-inline-editor [value]="model.customProps['sbg:toolAuthor']"
                                           [disabled]="readonly"
                                           type="text"
-                                          (saveData)="model.customProps['sbg:toolAuthor'] = $event">
+                                          (saveData)="updateCustomProp('sbg:toolAuthor', $event)">
                             {{model.customProps['sbg:toolAuthor']}}
                         </ct-inline-editor>
                     </div>
@@ -139,7 +140,7 @@ import {
                         <ct-inline-editor [value]="model.customProps['sbg:links']"
                                           [disabled]="readonly"
                                           type="keyvalue"
-                                          (saveData)="model.customProps['sbg:links'] = $event">
+                                          (saveData)="updateCustomProp('sbg:links', $event)">
 
                             <span *ngFor="let link of model.customProps['sbg:links']" class="links">
                                     <a href=""
@@ -227,7 +228,7 @@ import {
                     <div *ngIf="model.outputs.length === 0">
                         No outputs.
                     </div>
-                    <table class="table">
+                    <table class="table" *ngIf="model.outputs.length > 0">
                         <tr>
                             <th>ID</th>
                             <th>Label</th>
@@ -280,6 +281,10 @@ export class AppInfoComponent implements OnChanges {
     @Input()
     public readonly = false;
 
+    /** ControlGroup that encapsulates the validation for all the nested forms */
+    @Input()
+    formGroup: FormGroup;
+
     @Input()
     model: WorkflowModel | CommandLineToolModel;
 
@@ -312,6 +317,20 @@ export class AppInfoComponent implements OnChanges {
             .filter((input) => input.type.type !== "File" && input.type.items !== "File");
     }
 
+    updateLabel(value: string) {
+        this.model.label = value;
+        this.formGroup.markAsDirty();
+    }
+
+    updateDescription(value: string) {
+        this.model.description = value;
+        this.formGroup.markAsDirty();
+    }
+
+    updateCustomProp(key: string, value: any) {
+        this.model.customProps[key] = value;
+        this.formGroup.markAsDirty();
+    }
 
     openWebPage(url: string) {
         this.system.openLink(url);

@@ -40,14 +40,6 @@
             <i class="fa fa-save"></i>
         </button>
 
-        <!--Copy-->
-        <button class="btn"
-                ct-tooltip="Save As..."
-                tooltipPlacement="bottom"
-                type="button">
-            <i class="fa fa-copy"></i>
-        </button>
-
 
         <button class="btn"
                 *ngIf="data.dataSource === 'local'"
@@ -110,6 +102,7 @@
     <ct-app-info *ngIf="viewMode === 'info' && !isLoading"
                  class="gui-editor-component p-2"
                  [readonly]="!data.isWritable"
+                 [formGroup]="toolGroup"
                  [class.flex-col]="showInspector"
                  [model]="toolModel"></ct-app-info>
 

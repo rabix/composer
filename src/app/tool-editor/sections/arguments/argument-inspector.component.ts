@@ -7,7 +7,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 @Component({
     encapsulation: ViewEncapsulation.None,
     selector: "ct-argument-inspector",
-    template: `        
+    template: `
         <form [formGroup]="form">
             <div class="form-group">
                 <label>CommandLineBinding</label>
@@ -47,20 +47,27 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                     <label class="form-control-label">Position</label>
                     <input type="number" class="form-control" [formControl]="form.controls['position']">
                 </div>
+
+                <div class="form-group" *ngIf="argument.hasShellQuote">
+                    <label>shellQuote</label>
+                    <span class="pull-right">
+                    <ct-toggle-slider [formControl]="form.controls['shellQuote']"></ct-toggle-slider>
+                </span>
+                </div>
             </div>
-            
+
             <div *ngIf="!argument.hasBinding">
                 <div class="form-group">
                     <label class="form-control-label">Value</label>
-                    <input type="text" 
-                           class="form-control" 
+                    <input type="text"
+                           class="form-control"
                            *ngIf="!argument.hasExprPrimitive"
                            [formControl]="form.controls['primitive']">
-                    
-                    <ct-expression-input type="string" 
-                                         *ngIf="argument.hasExprPrimitive" 
+
+                    <ct-expression-input type="string"
+                                         *ngIf="argument.hasExprPrimitive"
                                          [formControl]="form.controls['primitive']">
-                        
+
                     </ct-expression-input>
                 </div>
             </div>
@@ -96,7 +103,8 @@ export class ArgumentInspectorComponent extends DirectiveBase implements OnInit 
             separate: new FormControl(this.argument.separate !== false),
             position: new FormControl({value: this.argument.position || 0, disabled: this.readonly}),
             prefix: new FormControl({value: this.argument.prefix || "", disabled: this.readonly}),
-            primitive: new FormControl({value: this.argument.primitive || "", disabled: this.readonly})
+            primitive: new FormControl({value: this.argument.primitive || "", disabled: this.readonly}),
+            shellQuote: new FormControl(this.argument.shellQuote)
         });
 
         this.tracked = this.form.controls["hasBinding"].valueChanges.subscribe(val => {
@@ -115,7 +123,7 @@ export class ArgumentInspectorComponent extends DirectiveBase implements OnInit 
                     position: form.position,
                     separate: form.separate,
                     prefix: form.prefix,
-                    valueFrom: form.valueFrom ? form.valueFrom.serialize() : ""
+                    shellQuote: form.shellQuote
                 });
             } else {
                 this.argument.updatePrimitive(form.primitive.serialize ? form.primitive.serialize() : form.primitive);
