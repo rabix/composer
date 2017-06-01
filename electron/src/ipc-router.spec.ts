@@ -56,7 +56,7 @@ describe("IPC Router", () => {
         assert.equal(replyMessage, "data-reply");
         assert.property(replyData, "id");
         assert.property(replyData, "data");
-        assert.deepPropertyVal(replyData, "data.name", "Zoro");
+        assert.equal(replyData.data.name, "Zoro");
 
         done();
     });

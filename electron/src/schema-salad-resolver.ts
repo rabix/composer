@@ -1,7 +1,6 @@
 import fs = require("fs");
-import http = require("http");
-import request = require("request");
 import yaml = require("js-yaml");
+import request = require("request");
 import {LoadOptions} from "js-yaml";
 
 function isUrl(s) {
@@ -9,7 +8,7 @@ function isUrl(s) {
     return regexp.test(s);
 }
 
-function traverse(data, source) {
+function traverse(data, source, root, graph = {}) {
     return new Promise((resolve, reject) => {
 
         const future = [];
@@ -19,13 +18,46 @@ function traverse(data, source) {
             const entry = data[key];
 
             const isExternalResource = typeof entry === "string" && [
-                    "run",
-                    "$mixin",
-                    "$import",
-                    "$include"
-                ].indexOf(key) !== -1;
-            if (isExternalResource) {
+                "run",
+                "$mixin",
+                "$import",
+                "$include"
+            ].indexOf(key) !== -1;
 
+            const isGraphReference    = isExternalResource && key === "run" && entry.startsWith("#");
+            const isGraphSubreference = !isExternalResource && typeof entry === "string" && entry.startsWith("#") && entry.indexOf("/") !== -1;
+
+            if (isGraphSubreference) {
+
+                const [graphKey, ...rest] = entry.substr(1).split("/");
+                const remains             = rest.join("/");
+
+                if (graph[graphKey]) {
+                    data[key] = remains;
+                    future.push(Promise.resolve(1));
+                } else {
+                    future.push(Promise.reject(`Could not dereference a non-existing $graph path for “${entry}”`));
+                }
+
+
+            } else if (isGraphReference) {
+                const embedding = new Promise((resolve, reject) => {
+                    const graphID = entry.slice(1);
+                    if (graph[graphID]) {
+
+                        Object.assign(data, {
+                            [key]: graph[graphID]
+                        });
+
+                        resolve();
+                        return;
+                    }
+
+                    reject(`Graph id “${entry}” has no corresponding $graph entry`);
+                });
+
+                future.push(embedding);
+            } else if (isExternalResource) {
                 future.push(new Promise((resolve, reject) => {
 
                     let externalPath = source.split("/").slice(0, -1).concat(entry).join("/");
@@ -78,8 +110,7 @@ function traverse(data, source) {
                     }, reject);
                 }));
             } else if (entry && typeof entry === "object") {
-
-                future.push(traverse(entry, source));
+                future.push(traverse(entry, source, root, graph));
             } else {
                 future.push(new Promise(resolve => resolve()));
             }
@@ -99,17 +130,26 @@ function traverse(data, source) {
     });
 }
 
-function parseJSON(content, source) {
+function parseJSON(content, source, root?, graph?) {
     return new Promise((resolve, reject) => {
         const data = yaml.safeLoad(content, {
-                filename: source,
-                onWarning: (warning) => {
-                    console.log(warning);
-                },
-                json: true
-            } as LoadOptions) || {};
+            filename: source,
+            onWarning: (warning) => {
+                console.log(warning);
+            },
+            json: true
+        } as LoadOptions) || {};
 
-        traverse(data, source).then(resolve, reject);
+        if (!graph) {
+            graph = {};
+            if (data.$graph && Array.isArray(data.$graph)) {
+                graph = data.$graph.reduce((acc, entry) => {
+                    return Object.assign(acc, {[entry.id]: entry});
+                }, {});
+            }
+        }
+
+        traverse(data, source, root, graph).then(resolve, reject);
     });
 }
 
@@ -164,7 +204,7 @@ module.exports = {
     resolveContent: (content, path) => {
         return new Promise((resolve, reject) => {
             try {
-                parseJSON(content, path).then(resolve, reject);
+                parseJSON(content, path, content).then(resolve, reject);
             } catch (ex) {
                 reject(ex);
             }
