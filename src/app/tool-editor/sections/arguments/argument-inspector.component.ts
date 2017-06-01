@@ -120,7 +120,7 @@ export class ArgumentInspectorComponent extends DirectiveBase implements OnInit 
 
             if (this.argument.hasBinding) {
                 this.argument.updateBinding({
-                    position: form.position,
+                    position: form.position ? parseInt(form.position, 10) : 0,
                     separate: form.separate,
                     prefix: form.prefix,
                     shellQuote: form.shellQuote
