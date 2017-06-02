@@ -33,4 +33,12 @@
     .stream-cli {
         color: #ddd;
     }
+
+    .text-console-warning {
+        color: $code-warning;
+    }
+
+    .text-console-error {
+        color: $code-error;
+    }
 }
