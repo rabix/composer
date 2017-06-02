@@ -138,7 +138,7 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
             }
 
             // id changes
-            if (value.id && this.input.id !== value.id) {
+            if (value.id !== undefined && this.input.id !== value.id) {
                 try {
                     this.model.changeIOId(this.input, value.id);
 
