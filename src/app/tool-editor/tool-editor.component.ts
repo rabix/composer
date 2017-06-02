@@ -285,7 +285,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
                 this.errorBarService.showError(`Unable to save Tool: ${err.message || err}`);
             });
         } else {
-            this.errorBarService.showError(`Unable to save Tool because CWL Schema is invalid`);
+            this.errorBarService.showError(`Unable to save Tool because JSON Schema is invalid`);
         }
     }
 
