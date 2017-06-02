@@ -7,6 +7,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
     template: `
         <form [formGroup]="form" data-test="base-command-form" (ngSubmit)="sendUpdate(form.value)">
             <input class="form-control"
+                   (blur)="sendUpdate(form.value)"
                    data-test="base-command-string"
                    [formControl]="form.controls['baseCommand']"
                    [readonly]="readonly"/>

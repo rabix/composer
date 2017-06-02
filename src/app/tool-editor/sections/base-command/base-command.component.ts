@@ -17,7 +17,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                       [context]="context"
                                       [readonly]="readonly"
                                       [model]="model"
-                                      (update)="updateCmd.emit($event)"></ct-base-command-list>
+                                      (update)="updateCmd.emit($event)">
+                </ct-base-command-list>
 
                 <ct-base-command-string [baseCommand]="baseCommand"
                                         *ngIf="version === 'v1.0'"
