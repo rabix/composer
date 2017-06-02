@@ -45,7 +45,8 @@ import {NewFileModalComponent} from "./modal/custom/new-file-modal.component";
 import {ProjectSelectionModal} from "./modal/custom/project-selection-modal.component";
 import {CheckboxPromptComponent} from "./modal/common/checkbox-prompt.component";
 import {CircularLoaderComponent} from "./circular-loader/circular-loader.component";
-import {TrimValueAccessorModule} from 'ng-trim-value-accessor';
+import {TrimValueAccessorModule} from "ng-trim-value-accessor";
+import {MouseClickDirective} from "./behaviors/mouse-click.directive";
 
 @NgModule({
     imports: [
@@ -85,7 +86,8 @@ import {TrimValueAccessorModule} from 'ng-trim-value-accessor';
         TooltipDirective,
         TreeNodeComponent,
         TreeViewComponent,
-        TrimValueAccessorModule
+        TrimValueAccessorModule,
+        MouseClickDirective
     ],
 
     entryComponents: [
@@ -148,6 +150,7 @@ import {TrimValueAccessorModule} from 'ng-trim-value-accessor';
         TreeNodeComponent,
         TreeViewComponent,
         CircularLoaderComponent,
+        MouseClickDirective
     ]
 })
 export class UIModule {

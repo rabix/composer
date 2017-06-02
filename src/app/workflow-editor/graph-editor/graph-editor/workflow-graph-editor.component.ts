@@ -157,7 +157,9 @@ import {WorkflowEditorService} from "../../workflow-editor.service";
                     transform="translate(-27.44 -58)" style="fill:#7a7a7a"/>
             </g>
         </svg>
-        <svg (dblclick)="openInspector($event)" (mouseup)="setFocusOnCanvas()" #canvas class="cwl-workflow" tabindex="-1"
+        <svg (dblclick)="openInspector($event)" 
+             ct-click
+             (onMouseClick)="setFocusOnCanvas()" #canvas class="cwl-workflow" tabindex="-1"
              [ct-drop-enabled]="true"
              [ct-drop-zones]="['zone1']"
              (onDropSuccess)="onDrop($event.detail.data.event, $event.detail.data.transfer_data)"></svg>

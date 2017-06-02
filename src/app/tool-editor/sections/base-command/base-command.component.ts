@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {Component, EventEmitter, Input, OnChanges, Output} from "@angular/core";
 import {FormGroup} from "@angular/forms";
 import {CommandLineToolModel, ExpressionModel} from "cwlts/models";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
@@ -13,12 +13,20 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             </div>
             <div class="tc-body">
                 <ct-base-command-list [baseCommand]="baseCommand"
+                                      *ngIf="version === 'sbg:draft-2'"
                                       [context]="context"
                                       [readonly]="readonly"
                                       [model]="model"
-                                      (update)="updateCmd.emit($event)"></ct-base-command-list>
-                <hr>
+                                      (update)="updateCmd.emit($event)">
+                </ct-base-command-list>
 
+                <ct-base-command-string [baseCommand]="baseCommand"
+                                        *ngIf="version === 'v1.0'"
+                                        (update)="updateCmd.emit($event)"
+                                        [readonly]="readonly">
+                </ct-base-command-string>
+
+                <hr>
                 <ct-streams [stdin]="stdin"
                             [stdout]="stdout"
                             [context]="context"
@@ -29,10 +37,12 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         </ct-form-panel>
     `
 })
-export class BaseCommandComponent extends DirectiveBase {
+export class BaseCommandComponent extends DirectiveBase implements OnChanges {
     /** baseCommand property of model */
     @Input()
-    baseCommand: ExpressionModel[];
+    baseCommand: ExpressionModel[] | string[];
+
+    version: "sbg:draft-2" | "v1.0" | string;
 
     /** Stdin property of model */
     @Input()
@@ -62,4 +72,10 @@ export class BaseCommandComponent extends DirectiveBase {
 
     @Output()
     updateStream = new EventEmitter<ExpressionModel>();
+
+    ngOnChanges() {
+        if (this.model) {
+            this.version = this.model.cwlVersion;
+        }
+    }
 }
