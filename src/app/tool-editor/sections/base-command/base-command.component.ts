@@ -26,6 +26,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                         [readonly]="readonly">
                 </ct-base-command-string>
 
+                <hr>
                 <ct-streams [stdin]="stdin"
                             [stdout]="stdout"
                             [context]="context"
