@@ -25,6 +25,13 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                         (update)="updateCmd.emit($event)"
                                         [readonly]="readonly">
                 </ct-base-command-string>
+
+                <ct-streams [stdin]="stdin"
+                            [stdout]="stdout"
+                            [context]="context"
+                            [readonly]="readonly"
+                            (update)="updateStream.emit($event)">
+                </ct-streams>
             </div>
         </ct-form-panel>
     `
@@ -35,6 +42,14 @@ export class BaseCommandComponent extends DirectiveBase implements OnChanges {
     baseCommand: ExpressionModel[] | string[];
 
     version: "sbg:draft-2" | "v1.0" | string;
+
+    /** Stdin property of model */
+    @Input()
+    stdin: ExpressionModel;
+
+    /** Stdout property of model */
+    @Input()
+    stdout: ExpressionModel;
 
     /** The parent forms group which is already in the clt-editor form tree */
     @Input()
@@ -53,6 +68,9 @@ export class BaseCommandComponent extends DirectiveBase implements OnChanges {
     /** Update event triggered on command form changes (add, remove, edit) */
     @Output()
     updateCmd = new EventEmitter<ExpressionModel[]>();
+
+    @Output()
+    updateStream = new EventEmitter<ExpressionModel>();
 
     ngOnChanges() {
         if (this.model) {

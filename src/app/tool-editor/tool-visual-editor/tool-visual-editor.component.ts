@@ -24,7 +24,10 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
             <ct-base-command [baseCommand]="model.baseCommand"
                              [model]="model"
                              [context]="context"
+                             [stdin]="model.stdin"
+                             [stdout]="model.stdout"
                              (updateCmd)="updateModel('baseCommand', $event)"
+                             (updateStream)="setStreams($event)"
                              [readonly]="readonly">
             </ct-base-command>
 
