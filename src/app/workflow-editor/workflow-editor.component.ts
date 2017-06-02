@@ -450,7 +450,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                 this.errorBarService.showError(`Unable to save Workflow: ${err.message || err}`);
             });
         } else {
-            this.errorBarService.showError(`Unable to save Workflow because CWL Schema is invalid`);
+            this.errorBarService.showError(`Unable to save Workflow because JSON Schema is invalid`);
         }
     }
 
