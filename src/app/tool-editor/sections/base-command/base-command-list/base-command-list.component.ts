@@ -86,12 +86,7 @@ export class BaseCommandListComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     public removeBaseCommand(i: number) {
-        this.modal.confirm({
-            title: "Really Remove?",
-            content: `Are you sure that you want to remove this base command?`,
-            cancellationLabel: "No, keep it",
-            confirmationLabel: "Yes, remove it"
-        }).then(() => {
+        this.modal.delete("base command").then(() => {
             // reset the expression's validity
             this.baseCommand[i].cleanValidity();
             (this.form.get("list") as FormArray).removeAt(i);

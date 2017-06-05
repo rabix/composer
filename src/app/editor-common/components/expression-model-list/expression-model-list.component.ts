@@ -110,12 +110,7 @@ export class ExpressionModelListComponent extends DirectiveBase implements Contr
     }
 
     removeExpressionModel(ctrl: { id: string, model: SBDraft2ExpressionModel }): void {
-        this.modal.confirm({
-            title: "Really Remove?",
-            content: `Are you sure that you want to remove this secondary file?`,
-            cancellationLabel: "No, keep it",
-            confirmationLabel: "Yes, remove it"
-        }).then(() => {
+        this.modal.delete("secondary file").then(() => {
             this.formList = this.formList.filter(item => item.id !== ctrl.id);
             this.form.removeControl(ctrl.id);
             this.form.markAsDirty();

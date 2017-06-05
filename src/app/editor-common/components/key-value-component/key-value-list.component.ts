@@ -203,12 +203,7 @@ export class KeyValueListComponent extends DirectiveBase implements ControlValue
     }
 
     removeEntry(ctrl: { id: string, model: SBDraft2ExpressionModel }): void {
-        this.modal.confirm({
-            title: "Really Remove?",
-            content: `Are you sure that you want to remove this key-value pair?`,
-            cancellationLabel: "No, keep it",
-            confirmationLabel: "Yes, remove it"
-        }).then(() => {
+        this.modal.delete("key-value pair").then(() => {
             this.keyValueFormList = this.keyValueFormList.filter(item => item.id !== ctrl.id);
             this.form.removeControl(ctrl.id);
             this.form.markAsDirty();
