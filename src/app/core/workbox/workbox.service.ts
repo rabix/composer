@@ -200,9 +200,12 @@ export class WorkboxService {
                     tab.data.fileContent = JSON.stringify(parsed, null, 4);
                 }
 
-
                 tab.label = parsed.label || fileID;
-                tab.type = parsed.class || "Code";
+
+                if (["CommandLineTool", "Workflow"].indexOf(parsed.class) !== -1) {
+                    tab.type = parsed.class;
+                }
+
             } catch (ex) {
                 console.warn("Could not parse app", ex);
             }

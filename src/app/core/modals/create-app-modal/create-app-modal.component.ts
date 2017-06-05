@@ -17,7 +17,7 @@ import {Observable} from "rxjs/Observable";
     selector: "ct-create-app-modal",
     providers: [SlugifyPipe],
     template: `
-        <div class="destination-selection">
+        <div *ngIf="!defaultFolder && !defaultProject" class="destination-selection">
             <div class="platform clickable" [class.active]="destination === 'local'" (click)="destination = 'local'">
                 <span><i class="fa fa-desktop"></i> Local Files</span>
             </div>
@@ -28,7 +28,7 @@ import {Observable} from "rxjs/Observable";
 
         <div class="p-1">
 
-            <div class="form-group">
+            <div *ngIf="!defaultFolder" class="form-group">
                 <label class="">App Name:</label>
                 <input class="form-control" *ngIf="destination=== 'remote'" [formControl]="remoteNameControl"/>
                 <input class="form-control" *ngIf="destination=== 'local'" [formControl]="localNameControl"/>
@@ -38,8 +38,15 @@ import {Observable} from "rxjs/Observable";
                 </p>
             </div>
 
+            <div *ngIf="defaultFolder" class="form-group">
+                <label>File Name:</label>
+                <input class="form-control" [formControl]="localFileControl">
+            </div>
+
             <div class="row">
-                <div class="form-group col-sm-6">
+                <div class="form-group"
+                     [class.col-sm-6]="!appTypeLocked"
+                     [class.col-sm-12]="appTypeLocked">
                     <label class="">CWL Version:</label>
                     <select class="form-control" [(ngModel)]="cwlVersion">
                         <option value="v1.0">v1.0</option>
@@ -47,7 +54,8 @@ import {Observable} from "rxjs/Observable";
                     </select>
                 </div>
 
-                <div class="form-group col-sm-6">
+                <div class="form-group col-sm-6"
+                     [class.hidden]="appTypeLocked">
                     <label class="">App Type:</label>
                     <select class="form-control" [(ngModel)]="appType">
                         <option value="workflow">Workflow</option>
@@ -58,10 +66,11 @@ import {Observable} from "rxjs/Observable";
 
             <div class="form-group" *ngIf="destination === 'local'">
                 <label>Destination Path:</label>
-                <button class="btn btn-secondary block" type="button" (click)="chooseFolder()">Choose a Local Path
+                <button *ngIf="!defaultFolder" class="btn btn-secondary block" type="button" (click)="chooseFolder()">Choose a Local Path
                 </button>
-                <p class="form-text text-muted" *ngIf="chosenLocalFilename">
-                    Chosen Path: {{ chosenLocalFilename }}
+                <p class="form-text text-muted" 
+                   *ngIf="chosenLocalFilename || defaultFolder">
+                    Chosen Path: {{ chosenPath() }}
                 </p>
             </div>
 
@@ -74,7 +83,10 @@ import {Observable} from "rxjs/Observable";
                                   placeholder="Choose a destination project..."
                                   optgroupField="hash"></ct-auto-complete>
             </div>
-            <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+            
+            <div class="alert alert-danger" *ngIf="localFileControl.errors && localFileControl.errors.exists">
+                A file with this name already exists. Choose another name!
+            </div>
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" (click)="modal.close()"> Cancel</button>
@@ -90,7 +102,7 @@ import {Observable} from "rxjs/Observable";
                         class="btn btn-primary"
                         *ngIf="destination=== 'local'"
                         (click)="createLocal()"
-                        [disabled]="localNameControl.invalid || !chosenLocalFilename">
+                        [disabled]="isLocalButtonDisabled()">
                     Create
                 </button>
             </div>
@@ -103,18 +115,20 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
     @Input() appType: "tool" | "workflow"    = "tool";
     @Input() destination: "local" | "remote" = "local";
     @Input() cwlVersion: "v1.0" | "d2sb"     = "v1.0";
-    @Input() chosenLocalFilename;
+    @Input() chosenLocalFilename             = "";
     @Input() defaultFolder: string;
     @Input() defaultProject: string;
              platformGroup: FormGroup;
              projectSelection: FormControl;
              localNameControl: FormControl;
+             localFileControl: FormControl;
              remoteNameControl: FormControl;
              remoteSlugControl: FormControl;
              error: string;
              projectOptions                  = [];
              platformOptgroups               = [];
              checkingSlug                    = false;
+             appTypeLocked                   = false;
 
     constructor(private dataGateway: DataGatewayService,
                 public modal: ModalService,
@@ -192,8 +206,8 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
     createLocal() {
         this.error = undefined;
 
-        const appName      = this.localNameControl.value;
-        const filename     = this.chosenLocalFilename;
+        const appName      = this.defaultFolder ? this.localFileControl.value : this.localNameControl.value;
+        const filename     = this.defaultFolder ? this.defaultFolder + this.chosenLocalFilename : this.chosenLocalFilename;
         const filesplit    = filename.split("/");
         const fileBasename = filesplit.pop();
         const folder       = filesplit.join("/");
@@ -235,7 +249,41 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
         });
     }
 
+    hasLocalFileAsyncValidator(control: FormControl) {
+        return new Promise(resolve => {
+
+            this.dataGateway.checkIfPathExists(this.defaultFolder + control.value + ".cwl")
+                .subscribe((val) => {
+                    if (val.exists) {
+                        resolve({"exists": true});
+                    } else {
+                        resolve(null);
+                    }
+                });
+        });
+    }
+
+    chosenPath() {
+        return this.defaultFolder ? this.localFileControl.valid ?
+            this.defaultFolder + this.chosenLocalFilename :
+            this.defaultFolder : this.chosenLocalFilename;
+    }
+
+    isLocalButtonDisabled() {
+        return (this.defaultFolder && this.localFileControl.invalid) ||
+            (!this.defaultFolder && this.localNameControl.invalid) ||
+            !this.chosenLocalFilename;
+    }
+
     ngOnInit() {
+        if (this.appType) {
+            this.appTypeLocked = true;
+        }
+
+        this.localFileControl  = new FormControl("",
+            [Validators.required, Validators.pattern('^[a-zA-Zа-яА-Я0-9_!-]+$')],
+            [this.hasLocalFileAsyncValidator.bind(this)]);
+
         this.projectSelection = new FormControl(this.defaultProject || "", [Validators.required]);
 
         this.platformGroup = new FormGroup({
@@ -268,6 +316,12 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
                     emitEvent: false
                 });
                 this.checkingSlug = false;
+            });
+
+        this.tracked = this.localFileControl.valueChanges
+            .debounceTime(300)
+            .subscribe(val => {
+                this.chosenLocalFilename = val ? val + ".cwl" : "";
             });
     }
 }

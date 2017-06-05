@@ -140,6 +140,17 @@ export class DomEventService {
         }));
     }
 
+    /**
+     * Some browsers do not fire click events for mouse clicks other than a mouse left button click
+     */
+    public onMouseClick(element: Element) {
+
+        const down = Observable.fromEvent(element, "mousedown").do((e: MouseEvent) => e.preventDefault());
+        const up = Observable.fromEvent(document, "mouseup");
+
+        return down.flatMap(() => up.first().filter((e: MouseEvent) => element.contains(e.target as Node)));
+    }
+
     public triggerCustomEventOnElements(elements: Element [], eventName: string, data?: any) {
         // FIXME: Should be added support for IE
         elements.forEach(element => {

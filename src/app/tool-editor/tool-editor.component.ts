@@ -1,4 +1,13 @@
-import {AfterViewInit, Component, Input, OnDestroy, OnInit, TemplateRef, ViewChild, ViewContainerRef} from "@angular/core";
+import {
+    AfterViewInit,
+    Component,
+    Input,
+    OnDestroy,
+    OnInit,
+    TemplateRef,
+    ViewChild,
+    ViewContainerRef
+} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {CommandLineToolFactory} from "cwlts/models/generic/CommandLineToolFactory";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
@@ -22,6 +31,7 @@ import {CredentialsEntry} from "../services/storage/user-preferences-types";
 import {ModalService} from "../ui/modal/modal.service";
 import {DirectiveBase} from "../util/directive-base/directive-base";
 import LoadOptions = jsyaml.LoadOptions;
+import {noop} from "../lib/utils.lib";
 
 @Component({
     selector: "ct-tool-editor",
@@ -30,7 +40,6 @@ import LoadOptions = jsyaml.LoadOptions;
     templateUrl: "./tool-editor.component.html"
 })
 export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDestroy, WorkboxTab, AfterViewInit {
-
 
     @Input()
     data: AppTabData;
@@ -79,6 +88,9 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
 
     priorityCodeUpdates = new Subject();
 
+    /** Indicates if we are changing the revision manually (saving an app is also the case) */
+    private changingRevision = false;
+
     constructor(private cwlValidatorService: CwlSchemaValidationWorkerService,
                 private formBuilder: FormBuilder,
                 private inspector: EditorInspectorService,
@@ -120,56 +132,33 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
         // Whenever the editor content is changed, validate it using a JSON Schema.
         this.tracked = this.codeEditorContent
             .valueChanges
-            .debounceTime(1000)
+            .debounceTime(250)
             .merge(this.priorityCodeUpdates)
-            .distinctUntilChanged().subscribe(latestContent => {
+            .subscribe(latestContent => {
 
                 this.cwlValidatorService.validate(latestContent).then(r => {
+
+                    this.isLoading = false;
+
                     if (!r.isValidCwl) {
                         // turn off loader and load document as code
-                        if (!this.viewMode) {
-                            this.viewMode = "code";
-                        }
+                        this.viewMode = "code";
+                        this.isValidCWL = false;
 
-                        this.isLoading  = false;
                         this.validation = r;
                         return r;
                     }
 
-                    // load JSON to generate model
-                    const json = Yaml.safeLoad(this.codeEditorContent.value, {
-                        json: true
-                    } as LoadOptions);
+                    this.isValidCWL = true;
 
-                    // should show prompt, but json is already reformatted
-                    if (this.showReformatPrompt && json["sbg:modified"]) {
-                        this.showReformatPrompt = false;
-                    }
-
-                    this.data.resolve(latestContent).subscribe((resolved) => {
-                        // generate model and get command line parts
-                        this.toolModel = CommandLineToolFactory.from(resolved as any, "document");
-                        this.toolModel.onCommandLineResult((res) => {
-                            this.commandLineParts.next(res);
-                        });
-                        this.toolModel.updateCommandLine();
-
-                        const updateValidity = () => {
-                            this.validation = {
-                                errors: this.toolModel.errors,
-                                warnings: this.toolModel.warnings,
-                                isValidatableCwl: true,
-                                isValidCwl: true,
-                                isValidJSON: true
-                            };
-                        };
-
-                        // update validation stream on model validation updates
-                        this.toolModel.setValidationCallback(updateValidity);
-
-                        this.toolModel.validate().then(updateValidity);
-                        this.isLoading = false;
-
+                    // If you are in mode other than Code mode or mode is undefined (opening app)
+                    // Also changingRevision is added when you are in Code mode and you are changing revision to know
+                    // when to generate a new toolModel
+                    if (this.viewMode !== "code" || this.changingRevision) {
+                        this.changingRevision = false;
+                        this.resolveContent(latestContent).then(noop, noop);
+                    } else {
+                        // In case when you are in Code mode just reset validations
                         const v = {
                             errors: [],
                             warnings: [],
@@ -179,33 +168,8 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
                         };
 
                         this.validation = v;
-                        this.isValidCWL = v.isValidCwl;
-                        //
-                        if (!this.viewMode) {
-                            this.viewMode = "gui";
-                        }
+                    }
 
-                        this.isLoading = false;
-                    }, (err) => {
-                        this.isLoading  = false;
-                        this.viewMode   = "code";
-                        this.isValidCWL = false;
-                        this.validation = {
-                            isValidatableCwl: true,
-                            isValidCwl: false,
-                            isValidJSON: true,
-                            warnings: [],
-                            errors: [{
-                                message: err.message,
-                                loc: "document",
-                                type: "error"
-                            }]
-                        };
-
-                        if (!this.viewMode) {
-                            this.viewMode = "code";
-                        }
-                    });
                 });
 
             });
@@ -216,19 +180,113 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
         this.statusBar.setControls(this.statusControls);
     }
 
-    save() {
-        const proc = this.statusBar.startProcess(`Saving: ${this.originalTabLabel}`);
-        const text = this.toolGroup.dirty ? this.getModelText() : this.codeEditorContent.value;
+    /**
+     * Resolve content and create a new tool model
+     */
+    resolveContent(latestContent) {
 
-        this.dataGateway.saveFile(this.data.id, text).subscribe(save => {
-            console.log("Saved", save);
-            this.statusBar.stopProcess(proc, `Saved: ${this.originalTabLabel}`);
-            this.priorityCodeUpdates.next(save);
-        }, err => {
-            console.log("Not saved", err);
-            this.statusBar.stopProcess(proc, `Could not save ${this.originalTabLabel}`);
-            this.errorBarService.showError(`Unable to save Tool: ${err.message || err}`);
+        this.isLoading = true;
+
+        return new Promise((resolve, reject) => {
+
+            // Create ToolModel from json and set model validations
+            const createToolModel = (json) => {
+                this.toolModel = CommandLineToolFactory.from(json as any, "document");
+                this.toolModel.onCommandLineResult((res) => {
+                    this.commandLineParts.next(res);
+                });
+                this.toolModel.updateCommandLine();
+
+                const updateValidity = () => {
+                    this.validation = {
+                        errors: this.toolModel.errors,
+                        warnings: this.toolModel.warnings,
+                        isValidatableCwl: true,
+                        isValidCwl: true,
+                        isValidJSON: true
+                    };
+                };
+
+                // update validation stream on model validation updates
+                this.toolModel.setValidationCallback(updateValidity);
+
+                this.toolModel.validate().then(updateValidity);
+
+                if (!this.viewMode) {
+                    this.viewMode = "gui";
+                }
+
+                this.isLoading = false;
+            };
+
+            // If app is a local file
+            if (this.data.dataSource !== "local") {
+                // load JSON to generate model
+                const json = Yaml.safeLoad(latestContent, {
+                    json: true
+                } as LoadOptions);
+
+                createToolModel(json);
+                resolve();
+
+            } else {
+                this.data.resolve(latestContent).subscribe((resolved) => {
+
+                    createToolModel(resolved);
+                    resolve();
+
+                }, (err) => {
+                    this.isLoading = false;
+                    this.viewMode = "code";
+                    this.validation = {
+                        isValidatableCwl: true,
+                        isValidCwl: false,
+                        isValidJSON: true,
+                        warnings: [],
+                        errors: [{
+                            message: err.message,
+                            loc: "document",
+                            type: "error"
+                        }]
+                    };
+
+                    if (!this.viewMode) {
+                        this.viewMode = "code";
+                    }
+
+                    reject();
+                });
+            }
         });
+    }
+
+    /**
+     * When click on Resolve button (visible only if app is a local file and you are in Code mode)
+     */
+    resolveButtonClick() {
+        this.resolveContent(this.codeEditorContent.value).then(noop, noop);
+    }
+
+    save() {
+
+        if (this.data.dataSource === "local" || this.isValidCWL) {
+
+            const proc = this.statusBar.startProcess(`Saving: ${this.originalTabLabel}`);
+            const text = this.viewMode !== "code" ? this.getModelText() : this.codeEditorContent.value;
+
+            this.dataGateway.saveFile(this.data.id, text).subscribe(save => {
+                console.log("Saved", save);
+                this.statusBar.stopProcess(proc, `Saved: ${this.originalTabLabel}`);
+                this.priorityCodeUpdates.next(save);
+                this.changingRevision = true;
+            }, err => {
+                console.log("Not saved", err);
+                this.statusBar.stopProcess(proc, `Could not save ${this.originalTabLabel} (${err})`);
+                this.errorBarService.showError(`Unable to save Tool: ${err.message || err}`);
+            });
+        } else {
+            this.errorBarService.showError(`Unable to save Tool because JSON Schema is invalid`);
+        }
     }
 
     /**
@@ -282,7 +340,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
         const fileWithoutRevision = this.data.id.split("/");
 
         // In the case when id is without revision number
-        if (!isNaN(+fileWithoutRevision[fileWithoutRevision.length -1])) {
+        if (!isNaN(+fileWithoutRevision[fileWithoutRevision.length - 1])) {
             fileWithoutRevision.pop();
         }
 
@@ -291,6 +349,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
         this.dataGateway.fetchFileContent(fid).subscribe(txt => {
             this.priorityCodeUpdates.next(txt);
             this.toolGroup.reset();
+            this.changingRevision = true;
         });
     }
 
@@ -309,11 +368,11 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
      * Open tool in browser
      */
     goToApp() {
-        const urlApp     = this.toolModel["sbgId"];
+        const urlApp = this.toolModel["sbgId"];
         const urlProject = urlApp.split("/").splice(0, 2).join("/");
 
         this.auth.connections.take(1).subscribe((cred: CredentialsEntry[]) => {
-            const hash    = this.data.id.split("/")[0];
+            const hash = this.data.id.split("/")[0];
             const urlBase = cred.find(c => c.hash === hash);
             if (!urlBase) {
                 this.errorBarService.showError(`Could not externally open app "${urlApp}"`);
@@ -325,13 +384,39 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
         });
     }
 
-
     switchTab(tabName) {
-        setTimeout(() => {
-            this.viewMode = tabName;
 
-            if (tabName === "code" && this.toolGroup.dirty) {
+        if (!tabName) {
+            return;
+        }
+
+        setTimeout(() => {
+
+            // If you are changing from other mode to a Code mode
+            if (this.viewMode !== "code" && tabName === "code") {
                 this.codeEditorContent.setValue(this.getModelText());
+                this.viewMode = tabName;
+                return;
+            }
+
+            // If you are changing from Code mode to another mode you have to resolve the content
+            if ((this.viewMode === "code" || !this.viewMode) && tabName !== "code") {
+
+                // Trick that will change reference for tabselector highlight line (to reset it to a Code mode if resolve fails)
+                this.viewMode = undefined;
+
+                // Resolve content
+                this.resolveContent(this.codeEditorContent.value).then(() => {
+                    this.viewMode = tabName;
+                }, () => {
+                    // If fails open Code mode
+                    this.viewMode = "code";
+                });
+
+
+            } else {
+                // If changing from|to mode that is not a Code mode, just switch
+                this.viewMode = tabName;
             }
         });
     }
@@ -351,17 +436,25 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
     }
 
     publish() {
-        const component = this.modal.fromComponent(PublishModalComponent, {
-            title: "Publish an App",
-            backdrop: true
-        });
+        if (this.isValidCWL) {
+            // Before you publish a local file you have to resolve the content
+            this.resolveContent(this.codeEditorContent.value).then(() => {
+                const component = this.modal.fromComponent(PublishModalComponent, {
+                    title: "Publish an App",
+                    backdrop: true
+                });
 
-        component.appContent = this.toolModel.serialize();
+                component.appContent = this.toolModel.serialize();
+            }, () => {
+                this.errorBarService.showError(`Unable to Publish Tool because Schema Salad Resolver failed`);
+            });
+        } else {
+            this.errorBarService.showError(`Unable to Publish Tool because JSON Schema is invalid`);
+        }
     }
 
     registerOnTabLabelChange(update: (label: string) => void, originalLabel: string) {
-        this.changeTabLabel   = update;
+        this.changeTabLabel = update;
         this.originalTabLabel = originalLabel;
     }
-
 }

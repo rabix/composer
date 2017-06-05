@@ -21,6 +21,16 @@
 
     <div class="document-controls">
 
+        <!--Resolve-->
+        <button class="btn"
+                type="button"
+                *ngIf="viewMode === 'code' && data.dataSource === 'local'"
+                ct-tooltip="Resolve"
+                tooltipPlacement="bottom"
+                (click)="resolveButtonClick()">
+            <i class="fa fa-refresh"></i>
+        </button>
+
         <!--Go to app-->
         <button class="btn"
                 type="button"
@@ -71,7 +81,7 @@
     </div>
 </ct-action-bar>
 
-<ct-error-bar>
+<ct-error-bar [autoClose]="true" [fadeOutTime]="5000">
 </ct-error-bar>
 
 <!--Header & Editor Column-->

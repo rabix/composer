@@ -154,7 +154,7 @@ export class InputBindingSectionComponent extends DirectiveBase implements Contr
             .debounceTime(300)
             .subscribe(form => {
                 if (form.position !== undefined) {
-                    this.input.inputBinding.position = form.position || 0;
+                    this.input.inputBinding.position = parseInt(form.position, 10) || 0;
                 }
 
                 if (form.prefix !== undefined) {
