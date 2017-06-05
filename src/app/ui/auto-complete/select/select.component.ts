@@ -196,6 +196,9 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
         })[0].selectize;
 
         setTimeout(() => {
+            if (!this.options.length) {
+                this.setOptions = !Array.isArray(this.items) ? [this.items] : this.items;
+            }
             this.updateOptions(this.items);
         });
     }

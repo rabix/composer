@@ -400,20 +400,12 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
         this.tree.contextMenu.filter((data) => data.node.type === "project")
             .subscribe(data => {
                 const contextMenu = [
-                    new MenuItem("Remove from Workspace", {
-                        click: () => {
-                            this.preferences.get("openProjects", []).take(1).subscribe(openProjects => {
-
-                                this.preferences.put("openProjects", openProjects.filter((el) => el !== data.node.id));
-                            });
-                        }
-                    }),
                     new MenuItem("Create new Workflow", {
                         click: () => {
                             const modal = this.modal.fromComponent(CreateAppModalComponent, {
                                 closeOnOutsideClick: false,
                                 backdrop: true,
-                                title: `Create a New App`,
+                                title: `Create a new Workflow in "${data.node.label}"`,
                                 closeOnEscape: true
                             });
 
@@ -427,13 +419,21 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                             const modal = this.modal.fromComponent(CreateAppModalComponent, {
                                 closeOnOutsideClick: false,
                                 backdrop: true,
-                                title: `Create a New App`,
+                                title: `Create a new Command Line Tool in "${data.node.label}"`,
                                 closeOnEscape: true
                             });
 
                             modal.appType = 'tool';
                             modal.destination = 'remote';
                             modal.defaultProject = data.node.id;
+                        }
+                    }),
+                    new MenuItem("Remove from Workspace", {
+                        click: () => {
+                            this.preferences.get("openProjects", []).take(1).subscribe(openProjects => {
+
+                                this.preferences.put("openProjects", openProjects.filter((el) => el !== data.node.id));
+                            });
                         }
                     })
                 ];
@@ -449,11 +449,37 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                             const modal = this.modal.fromComponent(CreateLocalFolderModalComponent, {
                                 closeOnOutsideClick: false,
                                 backdrop: true,
-                                title: `Create New Folder`,
+                                title: `Create a new Folder in "${data.node.label}"`,
                                 closeOnEscape: true
                             });
 
                             modal.folderPath = data.node.id;
+                        }
+                    }),
+                    new MenuItem("Create new Workflow", {
+                        click: () => {
+                            const modal = this.modal.fromComponent(CreateAppModalComponent, {
+                                closeOnOutsideClick: false,
+                                backdrop: true,
+                                title: `Create a new Workflow in "${data.node.label}"`,
+                                closeOnEscape: true
+                            });
+
+                            modal.appType = 'workflow';
+                            modal.defaultFolder = data.node.id + "/";
+                        }
+                    }),
+                    new MenuItem("Create new Command Line Tool", {
+                        click: () => {
+                            const modal = this.modal.fromComponent(CreateAppModalComponent, {
+                                closeOnOutsideClick: false,
+                                backdrop: true,
+                                title: `Create a new Command Line Tool in "${data.node.label}"`,
+                                closeOnEscape: true
+                            });
+
+                            modal.appType = 'tool';
+                            modal.defaultFolder = data.node.id + "/";
                         }
                     }),
                     new MenuItem("Remove from Workspace", {
@@ -462,32 +488,6 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
 
                                 this.preferences.put("localFolders", openFolders.filter((el) => el !== data.node.id));
                             });
-                        }
-                    }),
-                    new MenuItem("Create new Workflow", {
-                        click: () => {
-                            const modal = this.modal.fromComponent(CreateAppModalComponent, {
-                                closeOnOutsideClick: false,
-                                backdrop: true,
-                                title: `Create a New App`,
-                                closeOnEscape: true
-                            });
-
-                            modal.appType = 'workflow';
-                            modal.defaultFolder = data.node.id;
-                        }
-                    }),
-                    new MenuItem("Create new Command Line Tool", {
-                        click: () => {
-                            const modal = this.modal.fromComponent(CreateAppModalComponent, {
-                                closeOnOutsideClick: false,
-                                backdrop: true,
-                                title: `Create a New App`,
-                                closeOnEscape: true
-                            });
-
-                            modal.appType = 'tool';
-                            modal.defaultFolder = data.node.id;
                         }
                     })
                 ];
