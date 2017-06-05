@@ -94,7 +94,7 @@ export class NewFileTabComponent extends DirectiveBase implements OnInit {
         const modal = this.modal.fromComponent(CreateAppModalComponent, {
             closeOnOutsideClick: false,
             backdrop: true,
-            title: `Create a New App`,
+            title: `Create a new ${type === "workflow" ? "Workflow" : "Command Line Tool"}`,
             closeOnEscape: true
         });
 
