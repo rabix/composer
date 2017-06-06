@@ -19,7 +19,8 @@ import {CredentialsEntry} from "../../services/storage/user-preferences-types";
             <div class="item">
                 <p class="subtitle">New to Rabix Composer?</p>
                 <p>Rabix Composer is a standalone editor Common Workflow Language tools and workflows.
-                    <a data-test="new-to-link" href (click)="openLink('http://rabix.io/'); false;">
+                    <a data-test="new-to-link" href
+                       (click)="openLink('https://github.com/rabix/cottontail-frontend/wiki/Introduction-to-Rabix-and-Rabix-Composer'); false;">
                         Learn more
                     </a>
                 </p>
@@ -30,7 +31,8 @@ import {CredentialsEntry} from "../../services/storage/user-preferences-types";
                 <p class="subtitle">Learn how to build a tool</p>
                 <p>Having uploaded a Docker image containing your tool to the image registry, you can specify its
                     behavior, including its inputs and outputs.
-                    <a href data-test="learn-how-to-link" (click)="openLink('http://rabix.io/'); false;">
+                    <a href data-test="learn-how-to-link"
+                       (click)="openLink('https://github.com/rabix/cottontail-frontend/wiki/About-the-tool-editor'); false;">
                         Learn more
                     </a>
                 </p>
@@ -41,7 +43,8 @@ import {CredentialsEntry} from "../../services/storage/user-preferences-types";
                 <p class="subtitle">Need help?</p>
                 <p>If you have any problem, idea or a thought let us know.</p>
                 <p>
-                    <button type="button" data-test="get-support-btn" class="btn btn-secondary" (click)="openFeedbackModal()">
+                    <button type="button" data-test="get-support-btn" class="btn btn-secondary"
+                            (click)="openFeedbackModal()">
                         Get support
                     </button>
                 </p>
@@ -51,15 +54,13 @@ import {CredentialsEntry} from "../../services/storage/user-preferences-types";
 })
 export class GettingStartedComponent {
 
-    // FIXME Add correct url links
-
     constructor(private modal: ModalService,
                 private auth: AuthService,
                 private system: SystemService) {
     }
 
     openLink(link: string) {
-        this.system.openLink(link)
+        this.system.openLink(link);
     }
 
     openFeedbackModal() {

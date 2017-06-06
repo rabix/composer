@@ -189,12 +189,7 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
         }
 
         if (action === "clear") {
-            this.modal.confirm({
-                title: "Really Remove?",
-                content: `Are you sure that you want to remove this expression?`,
-                cancellationLabel: "No, keep it",
-                confirmationLabel: "Yes, delete it"
-            }).then(() => {
+            this.modal.delete("expression").then(() => {
                 this.model.cleanValidity();
                 this.model.setValue("", this.type);
                 this.model.result = null;
