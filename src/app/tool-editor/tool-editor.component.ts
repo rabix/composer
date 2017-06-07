@@ -1,7 +1,7 @@
 import {
     AfterViewInit,
     Component,
-    Input,
+    Input, NgZone,
     OnDestroy,
     OnInit,
     TemplateRef,
@@ -63,6 +63,12 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
     /** Flag for validity of CWL document */
     isValidCWL = false;
 
+    /** Flag to indicate if CWL validation is in progress */
+    isValidatingCWL = false;
+
+    /** Flag to indicate if resolving content is in progress */
+    isResolvingContent = false;
+
     /** Model that's recreated on document change */
     toolModel = CommandLineToolFactory.from(null, "document");
 
@@ -99,6 +105,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
                 private modal: ModalService,
                 private system: SystemService,
                 private auth: AuthService,
+                private zone: NgZone,
                 private errorBarService: ErrorBarService) {
 
         super();
@@ -132,21 +139,36 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
         // Whenever the editor content is changed, validate it using a JSON Schema.
         this.tracked = this.codeEditorContent
             .valueChanges
-            .debounceTime(250)
+            .debounceTime(100)
             .merge(this.priorityCodeUpdates)
-            .subscribe(latestContent => {
+            .do(() => {
+                this.isValidatingCWL = true;
+            })
+            .switchMap((latestContent) => Observable.fromPromise(this.cwlValidatorService.validate(latestContent))
+                .map((result) => {
+                        return {
+                            latestContent: latestContent,
+                            result: result
+                        };
+                    }
+                ))
+            .subscribe(r => {
 
-                this.cwlValidatorService.validate(latestContent).then(r => {
+                this.isValidatingCWL = false;
+
+                // Wrap it in zone in order to see changes immediately in status bar (cwlValidatorService.validate is
+                // in world out of Angular)
+                this.zone.run(() => {
 
                     this.isLoading = false;
 
-                    if (!r.isValidCwl) {
+                    if (!r.result.isValidCwl) {
                         // turn off loader and load document as code
                         this.viewMode = "code";
                         this.isValidCWL = false;
 
-                        this.validation = r;
-                        return r;
+                        this.validation = r.result;
+                        return r.result;
                     }
 
                     this.isValidCWL = true;
@@ -156,7 +178,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
                     // when to generate a new toolModel
                     if (this.viewMode !== "code" || this.changingRevision) {
                         this.changingRevision = false;
-                        this.resolveContent(latestContent).then(noop, noop);
+                        this.resolveContent(r.latestContent).then(noop, noop);
                     } else {
                         // In case when you are in Code mode just reset validations
                         const v = {
@@ -186,6 +208,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
     resolveContent(latestContent) {
 
         this.isLoading = true;
+        this.isResolvingContent = true;
 
         return new Promise((resolve, reject) => {
 
@@ -227,16 +250,20 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
                 } as LoadOptions);
 
                 createToolModel(json);
+                this.isResolvingContent = false;
                 resolve();
 
             } else {
                 this.data.resolve(latestContent).subscribe((resolved) => {
 
                     createToolModel(resolved);
+                    this.isResolvingContent = false;
                     resolve();
 
                 }, (err) => {
+
                     this.isLoading = false;
+                    this.isResolvingContent = false;
                     this.viewMode = "code";
                     this.validation = {
                         isValidatableCwl: true,
@@ -249,10 +276,6 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
                             type: "error"
                         }]
                     };
-
-                    if (!this.viewMode) {
-                        this.viewMode = "code";
-                    }
 
                     reject();
                 });
@@ -456,5 +479,9 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
     registerOnTabLabelChange(update: (label: string) => void, originalLabel: string) {
         this.changeTabLabel = update;
         this.originalTabLabel = originalLabel;
+    }
+
+    isValidatingOrResolvingCWL() {
+        return this.isValidatingCWL || this.isResolvingContent;
     }
 }
