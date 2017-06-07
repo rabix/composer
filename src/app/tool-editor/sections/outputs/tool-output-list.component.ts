@@ -104,8 +104,9 @@ import {ModalService} from "../../../ui/modal/modal.service";
                             <div class="tc-header">{{ entry.id || entry.loc || "Output" }}</div>
                             <div class="tc-body">
                                 <ct-tool-output-inspector
-                                        (save)="entriesChange.emit(entries)"
+                                        (save)="update.emit(model.outputs)"
                                         [context]="context"
+                                        [model]="model"
                                         [output]="entry"
                                         [inputs]="inputs"
                                         [readonly]="readonly">
@@ -117,7 +118,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                     <!--Nested entries-->
                     <div *ngIf="isRecordType(entry)" class="children pl-1 pr-1">
                         <ct-tool-output-list [(entries)]="entry.type.fields"
-                                             (entriesChange)="entriesChange.emit(entries)"
+                                             (update)="update.emit(model.outputs)"
                                              [readonly]="readonly"
                                              [inputs]="inputs"
                                              [parent]="entry"
@@ -136,7 +137,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                 (click)="addEntry()"
                 type="button"
                 class="btn pl-0 btn-link no-outline no-underline-hover">
-            <i class="fa fa-plus"></i> Add Output
+            <i class="fa fa-plus"></i> Add {{ isField ? "a Field" : "an Output" }}
         </button>
 
     `
@@ -171,7 +172,7 @@ export class ToolOutputListComponent extends DirectiveBase {
     model: CommandLineToolModel;
 
     @Output()
-    readonly entriesChange = new EventEmitter();
+    readonly update = new EventEmitter();
 
     @ViewChildren("inspector", {read: TemplateRef})
     inspectorTemplate: QueryList<TemplateRef<any>>;
@@ -191,8 +192,13 @@ export class ToolOutputListComponent extends DirectiveBase {
                 this.inspector.hide();
             }
 
-            this.model.removeOutput(this.entries[index]);
-            this.entriesChange.emit(this.model.outputs);
+            if (this.isField) {
+                (this.parent as CommandOutputParameterModel).type.removeField(this.entries[index]);
+            } else {
+                (this.parent as CommandLineToolModel).removeOutput(this.entries[index]);
+            }
+
+            this.update.emit(this.model.outputs);
         }, err => console.warn);
     }
 
@@ -207,7 +213,7 @@ export class ToolOutputListComponent extends DirectiveBase {
         newEntry.isField       = this.isField;
         newEntry.type.type     = "File";
 
-        this.entriesChange.emit(this.entries);
+        this.update.emit(this.model.outputs);
 
         this.inspectorTemplate.changes
             .take(1)

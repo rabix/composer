@@ -25,7 +25,7 @@ import {ToolInputListComponent} from "./tool-input-list.component";
 
                 <!--List of entries-->
                 <ct-tool-input-list [(entries)]="model.inputs"
-                                    (entriesChange)="update.emit($event)"
+                                    (update)="update.emit($event)"
                                     [location]="location"
                                     [parent]="model"
                                     [model]="model"

@@ -56,7 +56,7 @@ export class ToolInputInspectorComponent extends DirectiveBase implements OnInit
             stageInputSection: this.input
         });
 
-        this.tracked = this.form.valueChanges.subscribe(() => {
+        this.tracked = this.form.valueChanges.skip(1).subscribe(() => {
             this.save.next(this.input);
         });
     }
