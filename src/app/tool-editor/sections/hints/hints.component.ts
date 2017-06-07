@@ -130,12 +130,7 @@ export class HintsComponent implements OnChanges {
     }
 
     removeEntry(i: number) {
-        this.modal.confirm({
-            title: "Really Remove?",
-            content: `Are you sure that you want to remove this base command?`,
-            cancellationLabel: "No, keep it",
-            confirmationLabel: "Yes, remove it"
-        }).then(() => {
+        this.modal.delete("hint").then(() => {
             this.model.hints.splice(i, 1);
             (this.form.get("hints") as FormArray).removeAt(i);
             this.update.emit(this.model.hints);

@@ -179,12 +179,7 @@ export class CompactListComponent implements ControlValueAccessor {
             event.stopPropagation();
         }
 
-        this.modal.confirm({
-            title: "Really Remove?",
-            content: `Are you sure that you want to remove this symbol?`,
-            cancellationLabel: "No, keep it",
-            confirmationLabel: "Yes, remove it"
-        }).then(() => {
+        this.modal.delete("symbol").then(() => {
             this.tagList.splice(index, 1);
             this.propagateChange(this.tagList);
         }, err => console.warn);

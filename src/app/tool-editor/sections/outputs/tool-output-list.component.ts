@@ -182,12 +182,7 @@ export class ToolOutputListComponent extends DirectiveBase {
     }
 
     removeEntry(index) {
-        this.modal.confirm({
-            title: "Really Remove?",
-            content: `Are you sure that you want to remove this output?`,
-            cancellationLabel: "No, keep it",
-            confirmationLabel: "Yes, remove it"
-        }).then(() => {
+        this.modal.delete("output").then(() => {
             if (this.inspector.isInspecting(this.entries[index].loc)) {
                 this.inspector.hide();
             }

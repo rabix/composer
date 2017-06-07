@@ -152,12 +152,7 @@ export class ToolInputListComponent extends DirectiveBase {
     }
 
     removeEntry(index) {
-        this.modal.confirm({
-            title: "Really Remove?",
-            content: `Are you sure that you want to remove this input?`,
-            cancellationLabel: "No, keep it",
-            confirmationLabel: "Yes, remove it"
-        }).then(() => {
+        this.modal.delete("input").then(() => {
             if (this.inspector.isInspecting(this.entries[index].loc)) {
                 this.inspector.hide();
             }

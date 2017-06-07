@@ -115,6 +115,15 @@ export class ModalService {
         });
     }
 
+    delete(objectName: string) {
+        return this.confirm({
+            title: `Delete ${objectName}`,
+            content: `Are you sure you want to delete this ${objectName}?`,
+            confirmationLabel: "Delete",
+            cancellationLabel: "Cancel"
+        });
+    }
+
     prompt(params: {
         title?: string,
         content?: string,

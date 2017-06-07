@@ -87,9 +87,13 @@ export class InlineEditorComponent extends DirectiveBase {
     editing = false;
     isHover = false;
 
+    originalValue: any;
+
     onCancel($event: Event) {
         $event.preventDefault();
         $event.stopPropagation();
+
+        this.value = this.originalValue;
 
         this.isHover = false;
         this.editing = false;
@@ -112,6 +116,8 @@ export class InlineEditorComponent extends DirectiveBase {
         if (this.editing || this.disabled) {
             return;
         }
+
+        this.originalValue = this.value;
 
         this.isHover = false;
         this.editing = true;
