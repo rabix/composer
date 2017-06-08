@@ -147,12 +147,12 @@
                             class="btn">
 
                         <span *ngIf="validation?.errors?.length">
-                            <i class="fa fa-times-circle text-danger"></i> {{validation.errors.length}} Errors
+                            <i class="fa fa-times-circle text-danger"></i> {{validation.errors.length}} {{ validation.warnings.length === 1 ? "Error" : "Errors"}}
                         </span>
 
                         <span *ngIf="validation?.warnings?.length"
                               [class.pl-1]="validation?.errors?.length">
-                            <i class="fa fa-exclamation-triangle text-warning"></i> {{validation.warnings.length}} Warnings
+                            <i class="fa fa-exclamation-triangle text-warning"></i> {{validation.warnings.length}} {{ validation.warnings.length === 1 ? "Warning" : "Warnings"}}
                         </span>
 
                         <span *ngIf="!validation?.errors?.length && !validation?.warnings?.length">
@@ -165,6 +165,6 @@
                     <button [class.active]="reportPanel == 'commandLinePreview'"
                             [disabled]="!isValidCWL || isValidatingOrResolvingCWL()"
                             (click)="toggleReport('commandLinePreview')"
-                            class="btn">Preview</button>
+                            class="btn">Command Line</button>
                 </span>
 </ng-template>

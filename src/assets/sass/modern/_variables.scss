@@ -55,17 +55,17 @@ $code-warning: $brand-warning;
 $code-error: $brand-danger;
 
 // ----- Buttons -----
-$btn-primary-border-color: #3e3d3d;
+$btn-primary-border-color: #0c263c;
 $btn-border-color: #313030;
 $btn-border-radius: 3px;
 $btn-line-height: 1em;
 $btn-padding-x: 1.2em;
-$btn-padding-y: .55em;
-$btn-primary-bg: #3e5167;
+$btn-padding-y: .64em;
+$btn-primary-bg: #337cb9;
 $btn-secondary-bg: #373a3c;
 $btn-secondary-color: $text-color;
 $btn-border-hover-color: $input-border-color;
-$btn-gradient-active: true;
+$btn-gradient-active: false;
 
 // ----- Links -----
 $link-color: $brand-primary;
@@ -79,6 +79,7 @@ $body-bg: #303030;
 $panel-bg: #434343;
 $toolbar-height: 2em;
 $toolbar-header-bg: #333;
+$toolbar-border: #333;
 
 // ----- Layout Uniques -----
 $main-header-height: 35px; // Logo/tabs row
