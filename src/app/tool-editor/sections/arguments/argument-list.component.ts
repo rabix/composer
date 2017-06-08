@@ -162,12 +162,7 @@ export class ArgumentListComponent extends DirectiveBase {
     }
 
     removeEntry(index) {
-        this.modal.confirm({
-            title: "Really Remove?",
-            content: `Are you sure that you want to remove this argument?`,
-            cancellationLabel: "No, keep it",
-            confirmationLabel: "Yes, remove it"
-        }).then(() => {
+        this.modal.delete("argument").then(() => {
 
             if (this.inspector.isInspecting(this.model.arguments[index].loc)) {
                 this.inspector.hide();

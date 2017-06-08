@@ -171,12 +171,7 @@ available types: {[label: string]: string | number} | string[]`);
     removeCustom(event?: Event, reset?: boolean): void {
         if (!!event) {
             event.stopPropagation();
-            this.modal.confirm({
-                title: "Really Remove?",
-                content: `Are you sure that you want to remove this custom resource?`,
-                cancellationLabel: "No, keep it",
-                confirmationLabel: "Yes, remove it"
-            }).then(() => {
+            this.modal.delete("custom resource").then(() => {
                 this.removeFunction(reset);
             }, err => console.warn);
         } else {

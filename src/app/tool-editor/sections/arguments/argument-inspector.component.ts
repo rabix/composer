@@ -10,7 +10,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
     template: `
         <form [formGroup]="form">
             <div class="form-group">
-                <label>CommandLineBinding</label>
+                <label>Use command line binding</label>
                 <span class="pull-right">
                     <ct-toggle-slider [formControl]="form.controls['hasBinding']"></ct-toggle-slider>
                 </span>

@@ -164,7 +164,7 @@ import {WorkflowEditorService} from "../../workflow-editor.service";
              [ct-drop-zones]="['zone1']"
              (onDropSuccess)="onDrop($event.detail.data.event, $event.detail.data.transfer_data)"></svg>
             
-        <span class="svg-btns">
+        <span class="svg-btns" (click)="setFocusOnCanvas()">
             <span class="btn-group">
                 <button class="btn btn-sm btn-secondary"
                         (click)="upscale()"

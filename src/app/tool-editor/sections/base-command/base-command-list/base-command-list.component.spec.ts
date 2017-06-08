@@ -39,7 +39,7 @@ class ExpressionInputStubComponent implements ControlValueAccessor {
 }
 
 const modalServiceStub = {
-    confirm: () => {
+    delete: () => {
         return new Promise((res) => {
             res(true);
         });

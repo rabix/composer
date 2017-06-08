@@ -32,7 +32,7 @@ import {FileDefNamePipe} from "./pipes/file-def-name.pipe";
 import {ValidationTextPipe} from "./pipes/validation-text.pipes";
 import {CWLModule} from "../cwl/cwl.module";
 import {EditorLayoutComponent} from "./editor-layout/editor-layout.component";
-import { EditorPanelComponent } from './layout/editor-panel/editor-panel.component';
+import { EditorPanelComponent } from "./layout/editor-panel/editor-panel.component";
 
 @NgModule({
     declarations: [
