@@ -35,7 +35,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                                 <div *ngIf="isFileType(input)" class="port-controls">
                                     <ct-toggle-slider
                                         (valueChange)="onPortOptionChange(input, $event ? 'port' : 'editable')"
-                                        [disabled]="!input.type.isNullable"
+                                        *ngIf="input.type.isNullable"
                                         [on]="'Show'"
                                         [off]="'Hide'"
                                         [value]="input.isVisible">

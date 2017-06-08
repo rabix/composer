@@ -42,7 +42,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
 
                 <span class="input-group-btn" *ngIf="!readonly">
                         <button type="button"
-                                class="btn btn-secondary"
+                                class="btn btn-secondary btn-icon"
                                 (click)="editExpr(isExpr ? 'clear' : 'edit', $event)">
                             <i class="fa"
                                [ngClass]="{'fa-times': isExpr,
