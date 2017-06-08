@@ -42,7 +42,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <!--Input Type -->
             <div class="form-group">
                 <ct-input-type-select
-                        [formControl]="form.controls['typeForm']"></ct-input-type-select>
+                        [formControl]="form.controls['type']"></ct-input-type-select>
             </div>
 
             <!--Symbols-->
@@ -96,7 +96,7 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
 
         this.form = this.formBuilder.group({
             id: [{value: this.output.id, disabled: this.readonly}],
-            typeForm: [{value: this.output.type, disabled: this.readonly}, [Validators.required]],
+            type: [{value: this.output.type, disabled: this.readonly}, [Validators.required]],
             glob: [this.output.outputBinding.glob],
             isRequired: [!this.output.type.isNullable],
             itemType: [!!this.output.type.items ? this.output.type.items : "File"],
@@ -108,7 +108,7 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
         this.tracked = this.form.valueChanges.subscribe(value => {
             this.output.type.isNullable = !value.isRequired;
 
-            if (value.symbols.length > 0 && this.isType("enum")) {
+            if (value.symbols && this.isType("enum")) {
                 this.output.type.symbols = value.symbols;
             }
 

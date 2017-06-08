@@ -48,7 +48,7 @@ import {noop} from "../../../../lib/utils.lib";
             </div>
 
             <!--Input Type -->
-            <ct-input-type-select [formControl]="form.controls['typeForm']"></ct-input-type-select>
+            <ct-input-type-select [formControl]="form.controls['type']"></ct-input-type-select>
 
             <!--Symbols-->
             <ct-symbols-section class="form-group"
@@ -116,7 +116,7 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
 
         this.form = this.formBuilder.group({
             id: [{value: this.input.id, disabled: this.readonly}],
-            typeForm: [{value: this.input.type, disabled: this.readonly}, [Validators.required]],
+            type: [{value: this.input.type, disabled: this.readonly}, [Validators.required]],
             isBound: [this.input.isBound],
             isRequired: [!this.input.type.isNullable],
             inputBinding: [this.input],
