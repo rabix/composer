@@ -196,12 +196,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
         }
 
         if (action === "clear") {
-            this.modal.confirm({
-                title: "Really Remove?",
-                content: `Are you sure that you want to remove this expression?`,
-                cancellationLabel: "No, keep it",
-                confirmationLabel: "Yes, delete it"
-            }).then(() => {
+            this.modal.delete("expression").then(() => {
                 this.model.setValue("", "string");
                 this.model.result = null;
                 this.isExpr       = false;

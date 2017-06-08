@@ -164,7 +164,7 @@ describe("GettingStartedComponent", () => {
 
         newToLink.triggerEventHandler("click", {});
 
-        expect(spy).toHaveBeenCalledWith("http://rabix.io/");
+        expect(spy).toHaveBeenCalledWith("https://github.com/rabix/cottontail-frontend/wiki/Introduction-to-Rabix-and-Rabix-Composer");
     });
 
     it("should open 'Learn how to build a tool' link in browser", () => {
@@ -172,7 +172,7 @@ describe("GettingStartedComponent", () => {
 
         learnHowToLink.triggerEventHandler("click", {});
 
-        expect(spy).toHaveBeenCalledWith("http://rabix.io/");
+        expect(spy).toHaveBeenCalledWith("https://github.com/rabix/cottontail-frontend/wiki/About-the-tool-editor");
     });
 
     it("should open mail client when click on 'Get support' button", () => {
