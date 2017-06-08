@@ -1,5 +1,5 @@
 import {noop} from "../lib/utils.lib";
-import {Component, Input, OnDestroy, OnInit, TemplateRef, ViewChild, ViewContainerRef} from "@angular/core";
+import {Component, Input, NgZone, OnDestroy, OnInit, TemplateRef, ViewChild, ViewContainerRef} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {WorkflowFactory, WorkflowModel} from "cwlts/models";
 import * as Yaml from "js-yaml";
@@ -36,15 +36,15 @@ import LoadOptions = jsyaml.LoadOptions;
             <ct-tab-selector [distribute]="'auto'" [active]="viewMode"
                              (activeChange)="switchView($event)">
 
-                <ct-tab-selector-entry [disabled]="!isValidCWL"
+                <ct-tab-selector-entry [disabled]="!isValidCWL || isValidatingOrResolvingCWL()"
                                        [tabName]="'info'">App Info
                 </ct-tab-selector-entry>
 
-                <ct-tab-selector-entry [disabled]="!isValidCWL"
+                <ct-tab-selector-entry [disabled]="!isValidCWL || isValidatingOrResolvingCWL()"
                                        [tabName]="'graph'">Graph View
                 </ct-tab-selector-entry>
 
-                <ct-tab-selector-entry [disabled]="!viewMode"
+                <ct-tab-selector-entry [disabled]="!viewMode || isValidatingOrResolvingCWL()"
                                        [tabName]="'code'">Code
                 </ct-tab-selector-entry>
             </ct-tab-selector>
@@ -54,6 +54,7 @@ import LoadOptions = jsyaml.LoadOptions;
                 <!--Resolve-->
                 <button class="btn"
                         type="button"
+                        [disabled]="isValidatingOrResolvingCWL()"
                         *ngIf="viewMode === 'code' && data.dataSource === 'local'"
                         ct-tooltip="Resolve"
                         tooltipPlacement="bottom"
@@ -72,7 +73,7 @@ import LoadOptions = jsyaml.LoadOptions;
                 </button>
 
                 <!--Save-->
-                <button [disabled]="!data.isWritable"
+                <button [disabled]="!data.isWritable || isValidatingCWL"
                         (click)="save()"
                         ct-tooltip="Save"
                         [tooltipPlacement]="'bottom'"
@@ -82,6 +83,7 @@ import LoadOptions = jsyaml.LoadOptions;
 
                 <!--Publish to Platform-->
                 <button class="btn"
+                        [disabled]="isValidatingOrResolvingCWL()"
                         *ngIf="data.dataSource === 'local'"
                         ct-tooltip="Publish to Platform"
                         tooltipPlacement="bottom"
@@ -150,6 +152,12 @@ import LoadOptions = jsyaml.LoadOptions;
         </div>
 
         <ng-template #statusControls>
+
+            <!--Perpetual spinner that indicates if CWL validation is in progress-->
+            <i *ngIf="isValidatingCWL"
+               class="fa fa-circle-o-notch fa-spin">
+            </i>
+
             <span class="tag tag-warning">{{ workflowModel.cwlVersion }}</span>
             <span class="btn-group">
             <button [disabled]="!validation"
@@ -157,18 +165,17 @@ import LoadOptions = jsyaml.LoadOptions;
                     (click)="toggleReport('validation')"
                     class="btn">
 
-            <span *ngIf="validation?.errors?.length">
-            <i class="fa fa-times-circle text-danger"></i> {{validation.errors.length}} Errors
-            </span>
-
-            <span *ngIf="validation?.warnings?.length" [class.pl-1]="validation?.errors?.length">
-            <i class="fa fa-exclamation-triangle text-warning"></i> {{validation.warnings.length}} Warnings
-            </span>
-
-            <span *ngIf="!validation?.errors?.length && !validation?.warnings?.length">
-            No Issues
-            </span>
-
+                <span *ngIf="validation?.errors?.length">
+                <i class="fa fa-times-circle text-danger"></i> {{validation.errors.length}} Errors
+                </span>
+    
+                <span *ngIf="validation?.warnings?.length" [class.pl-1]="validation?.errors?.length">
+                <i class="fa fa-exclamation-triangle text-warning"></i> {{validation.warnings.length}} Warnings
+                </span>
+    
+                <span *ngIf="!validation?.errors?.length && !validation?.warnings?.length">
+                No Issues
+                </span>
 
             </button>
             </span>
@@ -197,6 +204,12 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
 
     /** Flag for validity of CWL document */
     isValidCWL = false;
+
+    /** Flag to indicate if CWL Validation is in progress */
+    isValidatingCWL = false;
+
+    /** Flag to indicate if resolving content is in progress */
+    isResolvingContent = false;
 
     /** Model that's recreated on document change */
     workflowModel: WorkflowModel = WorkflowFactory.from(null, "document");
@@ -234,7 +247,8 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                 private system: SystemService,
                 private auth: AuthService,
                 private errorBarService: ErrorBarService,
-                private dataGateway: DataGatewayService) {
+                private dataGateway: DataGatewayService,
+                private zone: NgZone) {
 
         super();
 
@@ -260,20 +274,35 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
         // Whenever the editor content is changed, validate it using a JSON Schema.
         this.tracked = this.codeEditorContent
             .valueChanges
-            .debounceTime(250)
+            .debounceTime(100)
             .merge(this.priorityCodeUpdates)
-            .subscribe(latestContent => {
+            .do(() => {
+                this.isValidatingCWL = true;
+            })
+            .switchMap((latestContent) => Observable.fromPromise(this.cwlValidatorService.validate(latestContent))
+                .map((result) => {
+                        return {
+                            latestContent: latestContent,
+                            result: result
+                        };
+                    }
+                ))
+            .subscribe(r => {
 
-                this.cwlValidatorService.validate(latestContent).then(r => {
+                this.isValidatingCWL = false;
+
+                // Wrap it in zone in order to see changes immediately in status bar (cwlValidatorService.validate is
+                // in world out of Angular)
+                this.zone.run(() => {
 
                     this.isLoading = false;
 
-                    if (!r.isValidCwl) {
+                    if (!r.result.isValidCwl) {
                         // turn off loader and load document as code
                         this.viewMode = "code";
                         this.isValidCWL = false;
 
-                        this.validation = r;
+                        this.validation = r.result;
                         return r;
                     }
 
@@ -284,7 +313,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                     // a new toolModel
                     if (this.viewMode !== "code" || this.changingRevision) {
                         this.changingRevision = false;
-                        this.resolveContent(latestContent).then(noop, noop);
+                        this.resolveContent(r.latestContent).then(noop, noop);
                     } else {
                         // In case when you are in Code mode just reset validations
                         const v = {
@@ -309,6 +338,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
     resolveContent(latestContent) {
 
         this.isLoading = true;
+        this.isResolvingContent = true;
 
         return new Promise((resolve, reject) => {
 
@@ -359,16 +389,19 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                 } as LoadOptions);
 
                 createWorkflowModel(json);
+                this.isResolvingContent = false;
                 resolve();
 
             } else {
                 this.data.resolve(latestContent).subscribe((resolved) => {
 
                     createWorkflowModel(resolved);
+                    this.isResolvingContent = false;
                     resolve();
 
                 }, (err) => {
                     this.isLoading = false;
+                    this.isResolvingContent = false;
                     this.viewMode = "code";
                     this.validation = {
                         isValidatableCwl: true,
@@ -381,10 +414,6 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                             type: "error"
                         }]
                     };
-
-                    if (!this.viewMode) {
-                        this.viewMode = "code";
-                    }
 
                     reject();
                 });
@@ -587,4 +616,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
         this.originalTabLabel = originalLabel;
     }
 
+    isValidatingOrResolvingCWL() {
+        return this.isValidatingCWL || this.isResolvingContent;
+    }
 }

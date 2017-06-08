@@ -196,7 +196,8 @@ export class ToolInputListComponent extends DirectiveBase {
     }
 
     isRecordType(entry) {
-        return entry.type.type === "record" || (entry.type.type === "array" && entry.type.items === "record");
+        return entry.type.type === "record" || (entry.type.type === "array" && entry.type.items === "record")
+            && entry.type.fields;
     }
 
     updateInput(input: CommandInputParameterModel, from: string) {
