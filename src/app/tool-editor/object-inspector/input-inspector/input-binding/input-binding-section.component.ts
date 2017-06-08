@@ -141,7 +141,7 @@ export class InputBindingSectionComponent extends DirectiveBase implements Contr
             separate: [input.inputBinding.separate !== false],
             itemSeparator: [!!input.inputBinding.itemSeparator ? input.inputBinding.itemSeparator : null],
             shellQuote: [input.inputBinding.shellQuote]
-        });
+        }, {onlySelf: true});
 
         if (!this.readonly) {
             this.listenToInputBindingFormChanges();

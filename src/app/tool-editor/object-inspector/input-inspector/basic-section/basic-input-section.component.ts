@@ -152,8 +152,6 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
 
             // type changes
             if (value.type) {
-                this.input.type.setType(value.type.type);
-
                 if (value.type.type !== "array" && this.input.isBound) {
                     this.input.inputBinding.itemSeparator = undefined;
                 }
@@ -162,10 +160,6 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
 
                     this.input.removeInputBinding();
                     this.form.controls["isBound"].setValue(this.input.isBound);
-                }
-
-                if (!!value.type.items && this.input.type.type === "array") {
-                    this.input.type.items = value.type.items;
                 }
 
                 if (this.isType("enum") || this.isType("record")) {

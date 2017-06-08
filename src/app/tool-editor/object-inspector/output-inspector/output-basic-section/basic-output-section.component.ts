@@ -146,9 +146,7 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
     }
 
     private listenToTypeFormChanges(): void {
-        this.tracked = this.form.controls["typeForm"].valueChanges.subscribe((value: ParameterTypeModel) => {
-
-            this.output.type.setType(value.type);
+        this.tracked = this.form.controls["type"].valueChanges.subscribe((value: ParameterTypeModel) => {
 
             if (this.isType("enum") || this.isType("record")) {
                 this.output.type.name = this.output.id;
