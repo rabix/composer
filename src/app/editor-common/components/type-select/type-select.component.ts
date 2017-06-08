@@ -68,9 +68,9 @@ export class InputTypeSelectComponent extends DirectiveBase implements ControlVa
     writeValue(paramType: ParameterTypeModel): void {
         this.paramType = paramType;
 
-        this.form.controls["type"].setValue(this.paramType.type);
-        this.form.controls["items"].setValue(this.paramType.items);
-        this.form.controls["isItemOrArray"].setValue(this.paramType.isItemOrArray);
+        this.form.controls["type"].setValue(this.paramType.type, {onlySelf: true});
+        this.form.controls["items"].setValue(this.paramType.items, {onlySelf: true});
+        this.form.controls["isItemOrArray"].setValue(this.paramType.isItemOrArray, {onlySelf: true});
 
         this.tracked = this.form.valueChanges.subscribe(change => {
             this.paramType.type = change.type;
@@ -80,13 +80,13 @@ export class InputTypeSelectComponent extends DirectiveBase implements ControlVa
                 this.paramType.items = change.items;
                 if (this.paramType.isItemOrArray) {
                     this.paramType.isItemOrArray = false;
-                    this.form.controls["isItemOrArray"].setValue(false);
+                    this.form.controls["isItemOrArray"].setValue(false, {onlySelf: true});
                 }
             }
 
             if (this.paramType.type === "array" && !this.paramType.items) {
                 this.paramType.items = "File";
-                this.form.controls["items"].setValue("File");
+                this.form.controls["items"].setValue("File", {onlySelf: true});
             }
 
             // This method gets triggered if we set disabled state

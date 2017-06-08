@@ -11,6 +11,7 @@ import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {ModalService} from "../../../ui/modal/modal.service";
+import {noop} from "rxjs/util/noop";
 
 @Component({
     selector: "ct-tool-input-list",
@@ -82,7 +83,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                                 <ct-tool-input-inspector
                                         [model]="model"
                                         [input]="entry"
-                                        (save)="entriesChange.emit(entries)"
+                                        (save)="updateInput($event, 'inspector')"
                                         [readonly]="readonly">
                                 </ct-tool-input-inspector>
                             </div>
@@ -91,7 +92,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
 
                     <div *ngIf="isRecordType(entry)" class="children pl-1 pr-1">
                         <ct-tool-input-list [(entries)]="entry.type.fields"
-                                            (entriesChange)="entriesChange.emit(entries)"
+                                            (update)="updateInput(entry, 'recursive')"
                                             [readonly]="readonly"
                                             [parent]="entry"
                                             [model]="model"
@@ -109,7 +110,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                 (click)="addEntry()"
                 type="button"
                 class="btn pl-0 btn-link no-outline no-underline-hover">
-            <i class="fa fa-plus"></i> Add an Input
+            <i class="fa fa-plus"></i> Add {{ isField ? "a Field" : "an Input" }}
         </button>
 
     `
@@ -141,7 +142,7 @@ export class ToolInputListComponent extends DirectiveBase {
     model: CommandLineToolModel;
 
     @Output()
-    readonly entriesChange = new EventEmitter();
+    readonly update = new EventEmitter();
 
     @ViewChildren("inspector", {read: TemplateRef})
     inspectorTemplate: QueryList<TemplateRef<any>>;
@@ -156,8 +157,13 @@ export class ToolInputListComponent extends DirectiveBase {
                 this.inspector.hide();
             }
 
-            this.model.removeInput(this.entries[index]);
-            this.entriesChange.emit(this.model.inputs);
+            if (this.isField) {
+                (this.parent as CommandInputParameterModel).type.removeField(this.entries[index]);
+            } else {
+                (this.parent as CommandLineToolModel).removeInput(this.entries[index]);
+            }
+
+            this.update.emit(this.model.inputs);
         }, err => console.warn);
     }
 
@@ -174,7 +180,7 @@ export class ToolInputListComponent extends DirectiveBase {
         newEntry.isField   = this.isField;
         newEntry.type.type = "File";
 
-        this.entriesChange.emit(this.entries);
+        this.update.emit(this.model.inputs);
 
         this.inspectorTemplate.changes
             .take(1)
@@ -190,6 +196,12 @@ export class ToolInputListComponent extends DirectiveBase {
     }
 
     isRecordType(entry) {
-        return entry.type.type === "record" || (entry.type.type === "array" && entry.type.items === "record");
+        return entry.type.type === "record" || (entry.type.type === "array" && entry.type.items === "record")
+            && entry.type.fields;
+    }
+
+    updateInput(input: CommandInputParameterModel, from: string) {
+        input.validate(this.context).then(noop, noop);
+        this.update.emit(this.model.inputs);
     }
 }
