@@ -42,8 +42,19 @@
             <i class="fa fa-external-link"></i>
         </button>
 
+        <!--Edit-->
+        <button *ngIf="!data.isWritable && data.dataSource !== 'public'"
+                class="btn"
+                type="button"
+                ct-tooltip="Edit"
+                tooltipPlacement="bottom"
+                (click)="edit()">
+            <i class="fa fa-edit"></i>
+        </button>
+
         <!--Save-->
-        <button [disabled]="!data.isWritable || isValidatingCWL"
+        <button *ngIf="data.isWritable"
+                [disabled]="isValidatingCWL"
                 (click)="save()"
                 ct-tooltip="Save"
                 tooltipPlacement="bottom"
