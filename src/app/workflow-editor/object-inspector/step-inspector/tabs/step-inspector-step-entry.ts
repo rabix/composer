@@ -49,8 +49,7 @@ import {WorkflowStepInputModel} from "cwlts/models";
 
                 <!--Booleans-->
                 <ng-template ngSwitchCase="boolean">
-                    <ct-toggle-slider class="pull-right"
-                                      [attr.prefix]="prefix"
+                    <ct-toggle-slider [attr.prefix]="prefix"
                                       (valueChange)="updateJob($event)"
                                       [value]="value"></ct-toggle-slider>
                 </ng-template>
@@ -160,15 +159,15 @@ export class WorkflowStepInspectorInputEntry implements OnChanges {
         this.update.emit(data);
     }
 
-    private updateMap(map) {
+    updateMap(map) {
         this.updateJob(map);
     }
 
-    private updateRecord(entryId, event) {
+    updateRecord(entryId, event) {
 
         const data = {...(this.value || {})};
         ObjectHelper.addProperty(data, entryId, event);
-        let d = {
+        const d = {
             ...data,
             [entryId]: Array.isArray(event) || ObjectHelper.isPrimitiveValue(event) ? event : {...event}
         };
@@ -194,13 +193,13 @@ export class WorkflowStepInspectorInputEntry implements OnChanges {
         this.updateJob(this.value.slice());
     }
 
-    private addArrayEntry(input) {
+    addArrayEntry(input) {
         this.warning = undefined;
         const generatedEntry = JobHelper.generateMockJobData(input);
         this.updateJob((this.value || []).concat(generatedEntry.slice(0, 1)));
     }
 
-    private deleteFromArray() {
+    deleteFromArray() {
         this.updateJob(undefined);
     }
 
@@ -235,7 +234,7 @@ export class WorkflowStepInspectorInputEntry implements OnChanges {
                         ...this.input.type,
                         type: this.input.type.items
                     }
-                }
+                };
             }
         }
     }

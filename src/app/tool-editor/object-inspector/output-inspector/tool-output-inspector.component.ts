@@ -7,7 +7,7 @@ import {
     SimpleChanges,
     ViewEncapsulation
 } from "@angular/core";
-import {CommandInputParameterModel, CommandOutputParameterModel} from "cwlts/models";
+import {CommandInputParameterModel, CommandOutputParameterModel, CommandLineToolModel} from "cwlts/models";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
@@ -20,6 +20,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
             <ct-basic-output-section [formControl]="form.controls['basicOutputSection']"
                                      [readonly]="readonly"
+                                     [model]="model"
                                      [context]="context">
             </ct-basic-output-section>
 
@@ -63,6 +64,9 @@ export class ToolOutputInspectorComponent extends DirectiveBase implements OnCha
     /** Context in which expression should be evaluated */
     @Input()
     public context: any = {};
+
+    @Input()
+    public model: CommandLineToolModel;
 
     public inputList: CommandInputParameterModel[] = [];
 

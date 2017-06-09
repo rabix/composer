@@ -2,7 +2,7 @@ import {AfterViewInit, Component, forwardRef, Input, ViewEncapsulation} from "@a
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
 import {CommandOutputParameterModel} from "cwlts/models";
 import {noop} from "../../../../lib/utils.lib";
-import {ParameterTypeModel} from "cwlts/models";
+import {ParameterTypeModel, CommandLineToolModel} from "cwlts/models";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
 @Component({
@@ -21,7 +21,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <div class="form-group flex-container">
                 <label class="form-control-label">Required</label>
                 <span class="align-right">
-                        <ct-toggle-slider [formControl]="basicSectionForm.controls['isRequired']"
+                        <ct-toggle-slider [formControl]="form.controls['isRequired']"
                                           [on]="'Yes'"
                                           [off]="'No'"
                                           [readonly]="readonly">
@@ -30,29 +30,32 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             </div>
 
             <!--ID-->
-            <div class="form-group">
+            <div class="form-group" [class.has-danger]="form.controls['id'].errors">
                 <label class="form-control-label">ID</label>
                 <input type="text" class="form-control"
-                       [formControl]="basicSectionForm.controls['propertyIdForm']">
+                       [formControl]="form.controls['id']">
+                <div *ngIf="form.controls['id'].errors" class="form-control-feedback">
+                    {{form.controls['id'].errors['error']}}
+                </div>
             </div>
 
             <!--Input Type -->
             <div class="form-group">
                 <ct-input-type-select
-                        [formControl]="basicSectionForm.controls['typeForm']"></ct-input-type-select>
+                        [formControl]="form.controls['type']"></ct-input-type-select>
             </div>
 
             <!--Symbols-->
             <ct-symbols-section class="form-group"
-                                *ngIf="isEnumType()"
-                                [formControl]="basicSectionForm.controls['symbols']">
+                                *ngIf="isType('enum')"
+                                [formControl]="form.controls['symbols']">
             </ct-symbols-section>
 
             <!--Glob-->
             <div class="form-group">
                 <label class="form-control-label">Glob</label>
                 <ct-expression-input [context]="context"
-                                     [formControl]="basicSectionForm.controls['glob']"
+                                     [formControl]="form.controls['glob']"
                                      [readonly]="readonly">
                 </ct-expression-input>
             </div>
@@ -69,10 +72,13 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
     @Input()
     public context: { $job?: any, $self?: any } = {};
 
+    @Input()
+    public model: CommandLineToolModel;
+
     /** The currently displayed property */
     private output: CommandOutputParameterModel;
 
-    public basicSectionForm: FormGroup;
+    public form: FormGroup;
 
     private onTouched = noop;
 
@@ -88,9 +94,9 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
 
         this.output = output;
 
-        this.basicSectionForm = this.formBuilder.group({
-            propertyIdForm: [{value: this.output.id, disabled: this.readonly}],
-            typeForm: [{value: this.output.type, disabled: this.readonly}, [Validators.required]],
+        this.form = this.formBuilder.group({
+            id: [{value: this.output.id, disabled: this.readonly}],
+            type: [{value: this.output.type, disabled: this.readonly}, [Validators.required]],
             glob: [this.output.outputBinding.glob],
             isRequired: [!this.output.type.isNullable],
             itemType: [!!this.output.type.items ? this.output.type.items : "File"],
@@ -98,18 +104,29 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
         });
 
         this.listenToTypeFormChanges();
-        this.listenToIdChanges();
 
-        this.tracked = this.basicSectionForm.valueChanges.subscribe(value => {
+        this.tracked = this.form.valueChanges.subscribe(value => {
             this.output.type.isNullable = !value.isRequired;
 
-            if (value.symbols.length > 0 && this.isEnumType()) {
+            if (value.symbols && this.isType("enum")) {
                 this.output.type.symbols = value.symbols;
             }
 
             if (value.glob) {
                 this.output.outputBinding.glob.setValue(value.glob.serialize(), value.glob.type);
                 this.checkGlob();
+            }
+
+            if (value.id !== undefined && this.output.id !== value.id) {
+                try {
+                    this.model.changeIOId(this.output, value.id);
+
+                    if (this.isType("enum") || this.isType("record")) {
+                        this.output.type.name = value.id;
+                    }
+                } catch (ex) {
+                    this.form.controls["id"].setErrors({error: ex.message});
+                }
             }
 
             this.propagateChange(this.output);
@@ -125,53 +142,37 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
     }
 
     validate() {
-        return this.basicSectionForm.valid ? null : {error: "Basic output section is not valid."};
-    }
-
-    private listenToIdChanges(): void {
-        this.tracked = this.basicSectionForm.controls["propertyIdForm"].valueChanges
-            .subscribe((id: string) => {
-                this.output.id = id;
-                if (this.isEnumType() || this.isRecordType()) {
-                    this.output.type.name = id;
-                }
-            });
+        return this.form.valid ? null : {error: "Basic output section is not valid."};
     }
 
     private listenToTypeFormChanges(): void {
-        this.tracked = this.basicSectionForm.controls["typeForm"].valueChanges.subscribe((value: ParameterTypeModel) => {
+        this.tracked = this.form.controls["type"].valueChanges.subscribe((value: ParameterTypeModel) => {
 
-            this.output.type.setType(value.type);
-
-            if (this.isEnumType() || this.isRecordType()) {
+            if (this.isType("enum") || this.isType("record")) {
                 this.output.type.name = this.output.id;
             }
         });
     }
 
     private checkGlob() {
-            // add warning about empty glob if glob is empty
-            if (this.output.outputBinding.glob && this.output.outputBinding.glob.serialize() === undefined) {
-                this.output.outputBinding.glob.updateValidity({
-                    [this.output.outputBinding.glob.loc]: {
-                        message: "Glob should be specified",
-                        type: "warning"
-                    }
-                });
-            } else if (this.output.outputBinding.glob &&
-                // remove warning about empty glob if glob isn't empty and that warning exists
-                this.output.outputBinding.warnings.length === 1 &&
-                this.output.outputBinding.warnings[0].message === "Glob should be specified") {
-                this.output.outputBinding.glob.cleanValidity();
-            }
+        // add warning about empty glob if glob is empty
+        if (this.output.outputBinding.glob && this.output.outputBinding.glob.serialize() === undefined) {
+            this.output.outputBinding.glob.updateValidity({
+                [this.output.outputBinding.glob.loc]: {
+                    message: "Glob should be specified",
+                    type: "warning"
+                }
+            }, true);
+        } else if (this.output.outputBinding.glob &&
+            // remove warning about empty glob if glob isn't empty and that warning exists
+            this.output.outputBinding.warnings.length === 1 &&
+            this.output.outputBinding.warnings[0].message === "Glob should be specified") {
+            this.output.outputBinding.glob.cleanValidity();
+        }
     }
 
-    isRecordType() {
-        return this.output.type.type === "record" || (this.output.type.type === "array" && this.output.type.items === "record");
-    }
-
-    isEnumType() {
-        return this.output.type.type === "enum" || (this.output.type.type === "array" && this.output.type.items === "enum");
+    isType(type: string): boolean {
+        return this.output.type.type === type || this.output.type.items === type;
     }
 
     ngAfterViewInit() {

@@ -48,7 +48,7 @@ import {noop} from "../../../../lib/utils.lib";
             </div>
 
             <!--Input Type -->
-            <ct-input-type-select [formControl]="form.controls['typeForm']"></ct-input-type-select>
+            <ct-input-type-select [formControl]="form.controls['type']"></ct-input-type-select>
 
             <!--Symbols-->
             <ct-symbols-section class="form-group"
@@ -116,7 +116,7 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
 
         this.form = this.formBuilder.group({
             id: [{value: this.input.id, disabled: this.readonly}],
-            typeForm: [{value: this.input.type, disabled: this.readonly}, [Validators.required]],
+            type: [{value: this.input.type, disabled: this.readonly}, [Validators.required]],
             isBound: [this.input.isBound],
             isRequired: [!this.input.type.isNullable],
             inputBinding: [this.input],
@@ -152,8 +152,6 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
 
             // type changes
             if (value.type) {
-                this.input.type.setType(value.type.type);
-
                 if (value.type.type !== "array" && this.input.isBound) {
                     this.input.inputBinding.itemSeparator = undefined;
                 }
@@ -162,10 +160,6 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
 
                     this.input.removeInputBinding();
                     this.form.controls["isBound"].setValue(this.input.isBound);
-                }
-
-                if (!!value.type.items && this.input.type.type === "array") {
-                    this.input.type.items = value.type.items;
                 }
 
                 if (this.isType("enum") || this.isType("record")) {

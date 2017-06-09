@@ -5,6 +5,7 @@
   width: 100%;
 
   .requirement-row {
+    margin-bottom: 1rem;
     display: flex;
     flex-direction: row;
     width: 100%;
@@ -12,9 +13,9 @@
 
   input {
     // magic (to level inputs with expression input)
-    height: 2.157rem;
+    height: 1.89rem;
     position: relative;
-    top: 0.15rem;
+    top: 1px;
   }
 
   input, ct-expression-input, ct-auto-complete {
