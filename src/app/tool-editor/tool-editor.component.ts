@@ -18,7 +18,6 @@ import {AuthService} from "../auth/auth/auth.service";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
 import {PublishModalComponent} from "../core/modals/publish-modal/publish-modal.component";
 import {AppTabData} from "../core/workbox/app-tab-data";
-import {WorkboxTab} from "../core/workbox/workbox-tab.interface";
 import {
     CwlSchemaValidationWorkerService,
     ValidationResponse
@@ -39,7 +38,7 @@ import {noop} from "../lib/utils.lib";
     providers: [EditorInspectorService, ErrorBarService],
     templateUrl: "./tool-editor.component.html"
 })
-export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDestroy, WorkboxTab, AfterViewInit {
+export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDestroy, AfterViewInit {
 
     @Input()
     data: AppTabData;

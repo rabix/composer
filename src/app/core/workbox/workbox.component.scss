@@ -30,16 +30,13 @@
         flex: 1 0 0;
     }
 
-    .component-container,
-    .tab-component {
-        position: relative;
-        width: 100%;
-        height: 100%;
-    }
-
     .component-container {
         display: flex;
         flex-direction: column;
+
+        position: relative;
+        width: 100%;
+        height: 100%;
     }
 
     .ct-workbox-add-tab-icon {
