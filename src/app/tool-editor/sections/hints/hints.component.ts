@@ -127,6 +127,7 @@ export class HintsComponent implements OnChanges {
 
     removeEntry(i: number) {
         this.modal.delete("hint").then(() => {
+            this.model.hints[i].cleanValidity();
             this.model.hints.splice(i, 1);
             (this.form.get("hints") as FormArray).removeAt(i);
             this.update.emit(this.model.hints);
