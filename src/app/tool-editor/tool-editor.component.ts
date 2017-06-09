@@ -58,7 +58,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
     showReformatPrompt = true;
 
     /** Flag for bottom panel, shows validation-issues, commandline, or neither */
-    reportPanel: "validation" | "commandLinePreview" | undefined;
+    reportPanel: "validation" | "commandLinePreview" | undefined = "commandLinePreview";
 
     /** Flag for validity of CWL document */
     isValidCWL = false;
