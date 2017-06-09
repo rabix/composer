@@ -167,6 +167,8 @@ import {WorkflowEditorService} from "../../workflow-editor.service";
         <span class="svg-btns" (click)="setFocusOnCanvas()">
             <span class="btn-group">
                 <button *ngIf="selectedElement"
+                        ct-tooltip="Delete"
+                        tooltipPlacement="top"
                         class="btn btn-sm btn-secondary"
                         (click)="deleteSelectedElement()">
                     <i class="fa fa-trash"></i>
@@ -175,6 +177,8 @@ import {WorkflowEditorService} from "../../workflow-editor.service";
             
             <span class="btn-group">
                 <button class="btn btn-sm btn-secondary"
+                        ct-tooltip="Auto-arrange"
+                        tooltipPlacement="top"
                         (click)="arrange()">
                     <i class="fa fa-paint-brush"></i>
                 </button>
@@ -183,15 +187,21 @@ import {WorkflowEditorService} from "../../workflow-editor.service";
             <span class="btn-group">
                 <button class="btn btn-sm btn-secondary"
                         (click)="upscale()"
+                        ct-tooltip="Zoom In"
+                        tooltipPlacement="top"
                         [disabled]="graph !== undefined && graph.getScale() >= 2">
                     <i class="fa fa-plus"></i>
                 </button>
                 <button class="btn btn-sm btn-secondary"
                         (click)="downscale()"
+                        ct-tooltip="Zoom Out"
+                        tooltipPlacement="top"
                         [disabled]="graph !== undefined && graph.getScale() <= 0.2">
                     <i class="fa fa-minus"></i>
                 </button>
                 <button class="btn btn-sm btn-secondary"
+                        ct-tooltip="Fit to Viewport"
+                        tooltipPlacement="top"
                         (click)="fitToViewport()">
                     <i class="fa fa-compress"></i>
                 </button>
