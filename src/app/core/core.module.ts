@@ -24,7 +24,8 @@ import {PanelContainerComponent} from "./panels/panel-container/panel-container.
 import {PublicAppsPanelComponent} from "./panels/public-apps-panel/public-apps-panel.component";
 import {WebWorkerBuilderService} from "./web-worker/web-worker-builder.service";
 import {SettingsButtonComponent} from "./workbox/settings-button.component";
-import {WorkboxComponent} from "./workbox/workbox.component";
+import {WorkBoxComponent} from "./workbox/workbox.component";
+import {WorkBoxTabComponent} from "./workbox/workbox-tab.component";
 import {AuthModule} from "../auth/auth.module";
 import {ModalErrorHandler} from "./error-report/modal-error-handler";
 import {ErrorReportComponent} from "./error-report/error-report.component";
@@ -48,7 +49,8 @@ import {CreateLocalFolderModalComponent} from "./modals/create-local-folder-moda
         LayoutComponent,
         LogoComponent,
         LayoutTabContentComponent,
-        WorkboxComponent,
+        WorkBoxComponent,
+        WorkBoxTabComponent,
         SettingsButtonComponent,
         AppsPanelComponent,
         PanelContainerComponent,

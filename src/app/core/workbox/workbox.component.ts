@@ -1,7 +1,6 @@
 import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
-import {StatusControlProvider} from "../../layout/status-bar/status-control-provider.interface";
 import {IpcService} from "../../services/ipc.service";
 import {MenuItem} from "../../ui/menu/menu-item";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
@@ -61,33 +60,16 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
 
         <div class="body">
 
-            <ng-template hidden ngFor let-tab [ngForOf]="tabs">
+            <div class="component-container" *ngFor="let tab of tabs" [class.hidden]="tab !== activeTab">
+                
+                <ct-workbox-tab #workBoxTabComponent [tab]="tab" [activeTab]="activeTab"></ct-workbox-tab>
 
-                <div class="component-container" [ngSwitch]="tab?.type" [class.hidden]="tab !== activeTab">
-
-                    <ct-tool-editor #tabComponent class="tab-component" *ngSwitchCase="'CommandLineTool'"
-                                    [data]="tab.data"></ct-tool-editor>
-
-                    <ct-workflow-editor #tabComponent [data]="tab.data" *ngSwitchCase="'Workflow'"></ct-workflow-editor>
-
-                    <ct-file-editor #tabComponent class="tab-component" [data]="tab.data"
-                                    *ngSwitchCase="'Code'"></ct-file-editor>
-
-                    <ct-welcome-tab #tabComponent class="tab-component" *ngSwitchCase="'Welcome'"></ct-welcome-tab>
-
-                    <ct-new-file-tab #tabComponent class="tab-component" *ngSwitchCase="'NewFile'"></ct-new-file-tab>
-
-                    <ct-settings #tabComponent class="tab-component" *ngSwitchCase="'Settings'"></ct-settings>
-
-                    <ct-tab-loader #tabComponent class="tab-component" *ngSwitchDefault></ct-tab-loader>
-                </div>
-
-            </ng-template>
+            </div>
 
         </div>
     `
 })
-export class WorkboxComponent extends DirectiveBase implements OnInit, AfterViewInit {
+export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterViewInit {
 
     /** List of tab data objects */
     public tabs: TabData<any>[] = [];
@@ -97,7 +79,7 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
 
     private el: Element;
 
-    @ViewChildren("tabComponent")
+    @ViewChildren("workBoxTabComponent")
     private tabComponents: QueryList<any>;
 
     constructor(private ipc: IpcService,
@@ -164,11 +146,14 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
 
             const component = this.tabComponents.find((item, index) => index === idx);
 
-            if (component && (component as StatusControlProvider).provideStatusControls) {
-                this.statusBar.setControls(component.provideStatusControls());
-            }
+            if (component) {
 
-            if (component && typeof component.onTabActivation === "function") {
+                const statusControl = component.provideStatusControls();
+
+                if (statusControl) {
+                    this.statusBar.setControls(statusControl);
+                }
+
                 setTimeout(() => {
                     component.onTabActivation();
                 });
