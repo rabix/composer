@@ -77,7 +77,7 @@ export class StageInputSectionComponent extends DirectiveBase implements Control
 
         this.form = this.formBuilder.group({
             loadContent: [!!this.input.inputBinding && this.input.inputBinding.loadContents ? this.input.inputBinding.loadContents : false]
-        });
+        }, {onlySelf: true});
 
         if (this.input.hasStageInput) {
             this.form.addControl("stageInput", new FormControl({

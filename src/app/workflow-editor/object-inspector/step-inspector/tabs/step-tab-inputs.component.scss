@@ -8,7 +8,7 @@ $grid-gutter-width-half: $grid-gutter-width-base / 2;
         margin-right: -$grid-gutter-width-half;
         margin-left: -$grid-gutter-width-half;
         padding: 1rem $grid-gutter-width-half;
-        border-bottom: 1px solid #ddd;
+        border-bottom: 1px solid $toolbar-border;
 
         ct-dropdown-button {
             button {
