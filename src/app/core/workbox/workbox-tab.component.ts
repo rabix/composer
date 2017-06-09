@@ -50,6 +50,7 @@ export class WorkBoxTabComponent implements OnChanges, WorkboxTab {
             this.cdr.detach();
         } else {
             this.cdr.reattach();
+            this.cdr.markForCheck();
         }
     }
 
