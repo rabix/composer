@@ -5,6 +5,7 @@ import {UserPreferencesService} from "../../../services/storage/user-preferences
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
+import {WorkboxService} from "../../workbox/workbox.service";
 const {app, dialog} = window["require"]("electron").remote;
 
 @Component({
@@ -27,13 +28,15 @@ const {app, dialog} = window["require"]("electron").remote;
             </div>
 
             <div class="dialog-connection dialog-content" *ngIf="activeTab === 'platform' && !isConnected && !connecting">
+                
                 <p>
                     Connect to the Seven Bridges Platform
                 </p>
 
-                <ct-credentials-form #credsForm [removable]="false"></ct-credentials-form>
+                <!--<ct-credentials-form #credsForm [removable]="false"></ct-credentials-form>-->
                 <p>
-                    <button type="button" class="btn btn-primary" (click)="credsForm.applyValues(); connecting = true;">Connect</button>
+                    <!--<button type="button" class="btn btn-primary" (click)="credsForm.applyValues(); connecting = true;">Connect</button>-->
+                    <button type="button" class="btn btn-primary" (click)="openSettings()">Connect</button>
                 </p>
             </div>
 
@@ -111,7 +114,8 @@ export class AddSourceModalComponent extends DirectiveBase implements OnInit {
     constructor(private auth: AuthService,
                 private data: DataGatewayService,
                 public modal: ModalService,
-                private preferences: UserPreferencesService) {
+                private preferences: UserPreferencesService,
+                private workbox: WorkboxService) {
 
         super();
 
@@ -191,5 +195,8 @@ export class AddSourceModalComponent extends DirectiveBase implements OnInit {
         });
     }
 
-
+    openSettingsTab() {
+       this.workbox.openSettingsTab();
+       this.modal.close();
+    }
 }
