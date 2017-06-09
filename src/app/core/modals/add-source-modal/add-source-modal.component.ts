@@ -27,7 +27,7 @@ const {app, dialog} = window["require"]("electron").remote;
                 </div>
             </div>
 
-            <div class="dialog-connection dialog-content" *ngIf="activeTab === 'platform' && !isConnected && !connecting">
+            <div class="dialog-centered dialog-content" *ngIf="activeTab === 'platform' && !isConnected && !connecting">
                 
                 <p>
                     Connect to the Seven Bridges Platform
@@ -36,7 +36,7 @@ const {app, dialog} = window["require"]("electron").remote;
                 <!--<ct-credentials-form #credsForm [removable]="false"></ct-credentials-form>-->
                 <p>
                     <!--<button type="button" class="btn btn-primary" (click)="credsForm.applyValues(); connecting = true;">Connect</button>-->
-                    <button type="button" class="btn btn-primary" (click)="openSettings()">Connect</button>
+                    <button type="button" class="btn btn-secondary" (click)="openSettingsTab()">Connect</button>
                 </p>
             </div>
 
