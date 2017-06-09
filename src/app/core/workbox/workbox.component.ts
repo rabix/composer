@@ -185,10 +185,10 @@ export class WorkboxComponent extends DirectiveBase implements OnInit, AfterView
      */
     onTabClick(event: MouseEvent, tab) {
         // Middle click
-        if (event.button === 1) {
-            this.removeTab(tab);
-        } else {
+        if (event.button === 0) {
             this.workbox.openTab(tab);
+        } else if (event.button === 1) {
+            this.removeTab(tab);
         }
     }
 
