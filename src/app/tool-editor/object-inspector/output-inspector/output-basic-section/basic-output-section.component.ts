@@ -178,6 +178,7 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
     ngAfterViewInit() {
         // checking after view init because loading expression model will clear its validity based on the provided context
         // wrapping it in a set timeout to avoid ExpressionChangedAfterItWasChecked
+        // @fixme
         setTimeout(() => {
             this.checkGlob();
         });

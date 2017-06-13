@@ -22,6 +22,8 @@ export class CwlSchemaValidationWorkerService {
 
     private worker: WebWorker<any>;
 
+    private draft4;
+
     private schemas = {
         v1: cwlSchemas.schemas.v1,
         d2sb: cwlSchemas.schemas.d2sb
@@ -33,7 +35,8 @@ export class CwlSchemaValidationWorkerService {
             "ajv.min.js",
             "js-yaml.min.js"
         ], {
-            schemas: this.schemas
+            schemas: this.schemas,
+            draft4: require("ajv/lib/refs/json-schema-draft-04.json")
         });
     }
 
@@ -61,7 +64,7 @@ export class CwlSchemaValidationWorkerService {
         // First check if this is json or yaml content
         try {
             const warnings = [];
-            json         = jsyaml.safeLoad(content, {
+            json           = jsyaml.safeLoad(content, {
                 json: true, onWarning: (warn) => {
                     warnings.push({
                         loc: "document",
@@ -114,9 +117,10 @@ export class CwlSchemaValidationWorkerService {
             }
         };
         const ajv        = new Ajv();
-        let validation   = false;
-        let errors = [];
-        let warnings = [];
+        ajv.addMetaSchema(this.draft4);
+        let validation = false;
+        let errors     = [];
+        let warnings   = [];
 
         if (["sbg:draft-2", "v1.0"].indexOf(cwlVersion) !== -1) {
             validation = ajv.validate(schemaMap[cwlVersion][json.class], json);
