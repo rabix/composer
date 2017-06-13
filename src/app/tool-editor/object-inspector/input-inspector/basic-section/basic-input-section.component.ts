@@ -133,7 +133,7 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
             }
 
             // symbols changes
-            if (value.symbols && value.symbols.length > 0 && this.isType("enum")) {
+            if (value.symbols && this.isType("enum")) {
                 this.input.type.symbols = value.symbols;
             }
 

@@ -73,8 +73,7 @@ import {SystemService} from "../../../platform-providers/system.service";
             </div>
         </ct-form-panel>
     `,
-    styleUrls: ["./hints.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    styleUrls: ["./hints.component.scss"]
 })
 export class HintsComponent implements OnChanges {
 
