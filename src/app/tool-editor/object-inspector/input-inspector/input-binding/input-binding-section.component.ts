@@ -161,6 +161,9 @@ export class InputBindingSectionComponent extends DirectiveBase implements Contr
                     this.input.inputBinding.prefix = form.prefix;
                 }
 
+                if (form.separate !== undefined) {
+                    this.input.inputBinding.separate = form.separate;
+                }
 
                 if (form.itemSeparator !== undefined) {
                     this.input.inputBinding.itemSeparator = form.itemSeparator;

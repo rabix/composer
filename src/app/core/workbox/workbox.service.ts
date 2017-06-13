@@ -90,6 +90,14 @@ export class WorkboxService {
         this.activateTab(tab);
     }
 
+    openSettingsTab() {
+        this.openTab({
+            id: "?settings",
+            label: "Settings",
+            type: "Settings"
+        }, false);
+    }
+
     public closeTab(tab?) {
         if (!tab) {
             tab = this.extractValues().activeTab;

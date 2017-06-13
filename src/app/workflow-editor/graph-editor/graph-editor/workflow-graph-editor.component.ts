@@ -295,11 +295,15 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
     ngAfterViewInit() {
 
-        if (Workflow.canDrawIn(this.canvas.nativeElement)) {
-            this.drawGraphAndAttachListeners();
-        } else {
-            this.tryToFitWorkflowOnNextTabActivation = true;
-        }
+        // Apparently this is the desired and documented solution?
+        // https://angular.io/docs/ts/latest/cookbook/component-communication.html#!#parent-to-view-child
+        setTimeout(() => {
+            if (Workflow.canDrawIn(this.canvas.nativeElement)) {
+                this.drawGraphAndAttachListeners();
+            } else {
+                this.tryToFitWorkflowOnNextTabActivation = true;
+            }
+        });
     }
 
     drawGraphAndAttachListeners() {

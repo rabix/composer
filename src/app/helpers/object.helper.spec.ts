@@ -84,6 +84,18 @@ describe("ObjectHelper", () => {
             expect(ObjectHelper.getProperty(arr, "ray.[1]")).toEqual("bar");
         });
 
+        it("should retrieve array indexes in array of records structure", () => {
+            const target = {
+                array: [{
+                        "abc": "data1"
+                    }, {
+                        "bcd": "data2"
+                    }]
+            };
+            expect(ObjectHelper.getProperty(target, "array.[0].abc")).toEqual("data1");
+            expect(ObjectHelper.getProperty(target, "array.[1].bcd")).toEqual("data2");
+        });
+
     });
 
     /**

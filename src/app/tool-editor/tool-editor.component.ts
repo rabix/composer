@@ -18,7 +18,6 @@ import {AuthService} from "../auth/auth/auth.service";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
 import {PublishModalComponent} from "../core/modals/publish-modal/publish-modal.component";
 import {AppTabData} from "../core/workbox/app-tab-data";
-import {WorkboxTab} from "../core/workbox/workbox-tab.interface";
 import {ProceedToEditingModalComponent} from "../core/modals/proceed-to-editing-modal/proceed-to-editing-modal.component";
 import {
     CwlSchemaValidationWorkerService,
@@ -40,7 +39,7 @@ import {noop} from "../lib/utils.lib";
     providers: [EditorInspectorService, ErrorBarService],
     templateUrl: "./tool-editor.component.html"
 })
-export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDestroy, WorkboxTab, AfterViewInit {
+export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDestroy, AfterViewInit {
 
     @Input()
     data: AppTabData;
@@ -59,7 +58,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
     showReformatPrompt = true;
 
     /** Flag for bottom panel, shows validation-issues, commandline, or neither */
-    reportPanel: "validation" | "commandLinePreview" | undefined;
+    reportPanel: "validation" | "commandLinePreview" | undefined = "commandLinePreview";
 
     /** Flag for validity of CWL document */
     isValidCWL = false;

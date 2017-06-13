@@ -58,7 +58,8 @@ export class ObjectHelper {
             if (Array.isArray(target) && key) {
                 const arrayMatch = key.match(/^\[([0-9]*?)\]$/);
                 if (Array.isArray(arrayMatch) && arrayMatch.length === 2) {
-                    return target[arrayMatch[1]];
+                    target = target[arrayMatch[1]];
+                    continue;
                 }
 
             }

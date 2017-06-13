@@ -1,5 +1,4 @@
 import {Component} from "@angular/core";
-import {Observable} from "rxjs/Observable";
 import {SettingsService} from "../../services/settings/settings.service";
 import {WorkboxService} from "./workbox.service";
 
@@ -26,11 +25,6 @@ export class SettingsButtonComponent {
     }
 
     openSettings() {
-
-        this.workbox.openTab({
-            id: "?settings",
-            label: "Settings",
-            type: "Settings"
-        }, false);
+        this.workbox.openSettingsTab();
     }
 }

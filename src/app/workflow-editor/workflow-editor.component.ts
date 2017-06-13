@@ -8,7 +8,6 @@ import {AuthService} from "../auth/auth/auth.service";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
 import {PublishModalComponent} from "../core/modals/publish-modal/publish-modal.component";
 import {AppTabData} from "../core/workbox/app-tab-data";
-import {WorkboxTab} from "../core/workbox/workbox-tab.interface";
 import {
     CwlSchemaValidationWorkerService,
     ValidationResponse
@@ -194,8 +193,7 @@ import LoadOptions = jsyaml.LoadOptions;
         </ng-template>
     `
 })
-export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy, OnInit, WorkboxTab {
-
+export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy, OnInit {
 
     @Input()
     data: AppTabData;
