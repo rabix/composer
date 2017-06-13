@@ -454,6 +454,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
             this.data.isWritable = val;
             if (val) {
                 this.codeEditorContent.enable();
+                this.graphEditor.enableGraphManipulations();
             }
         })
     }

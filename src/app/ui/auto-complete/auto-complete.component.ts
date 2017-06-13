@@ -13,7 +13,7 @@ import {noop} from "../../lib/utils.lib";
         }
     ],
     template: `
-        <input #el [placeholder]="placeholder">
+        <input #el [placeholder]="placeholder" [disabled]="readonly">
     `,
     styleUrls: ["./auto-complete.component.scss"],
 })
@@ -22,6 +22,9 @@ export class AutoCompleteComponent extends SelectComponent implements ControlVal
     // Important inputs -> [options], [create], see parent class...
 
     // True makes control mono-selection (suggested input)
+    @Input()
+    public readonly = false;
+
     @Input()
     public mono = false;
 

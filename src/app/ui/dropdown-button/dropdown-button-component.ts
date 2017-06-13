@@ -29,7 +29,10 @@ import {noop} from "../../lib/utils.lib";
     template: `
         <div class="btn-group dropdown" [class.open]="toggle" (click)="showMenu(!toggle)">
 
-            <button #button class="btn btn-secondary dropdown-toggle" type="button">
+            <button #button 
+                    class="btn btn-secondary dropdown-toggle" 
+                    type="button"
+                    [disabled]="readonly">
                 {{selected?.caption}}
             </button>
 
@@ -37,6 +40,9 @@ import {noop} from "../../lib/utils.lib";
     `
 })
 export class DropDownButtonComponent extends DirectiveBase implements ControlValueAccessor {
+
+    @Input()
+    public readonly = false;
 
     @Input()
     public dropDownOptions: { value, caption, description }[] = [];
