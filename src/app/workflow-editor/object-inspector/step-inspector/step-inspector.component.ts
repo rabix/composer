@@ -1,11 +1,12 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, ViewEncapsulation} from "@angular/core";
 import {Workflow} from "cwl-svg";
 import {StepModel, WorkflowModel} from "cwlts/models";
-import {UpdateStepModalComponent} from "../../../components/modal/custom/update-step-modal.component";
 import {PlatformAPI} from "../../../services/api/platforms/platform-api.service";
 import {UserPreferencesService} from "../../../services/storage/user-preferences.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {PlatformAPIGatewayService} from "../../../auth/api/platform-api-gateway.service";
+import {UpdateStepModalComponent} from "../../update-step-modal/update-step-modal.component";
 
 @Component({
     selector: "ct-workflow-step-inspector",
@@ -15,7 +16,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
         <!--Update warning-->
         <div class="alert alert-warning form-control-label" *ngIf="step.hasUpdate">
-            Update available.<a href="" (click)="updateStep($event)"> Click here for update!</a>
+            Update available.<a href="" (click)="updateStep($event)"> Click here to update.</a>
         </div>
 
         <!--View Modes-->
@@ -71,6 +72,9 @@ export class StepInspectorComponent extends DirectiveBase {
     @Input()
     graph: Workflow;
 
+    @Input()
+    fileID:string;
+
     tabs = {
         Inputs: "inputs",
         Info: "info",
@@ -81,6 +85,7 @@ export class StepInspectorComponent extends DirectiveBase {
 
     constructor(private modal: ModalService,
                 private platform: PlatformAPI,
+                private apiGateway: PlatformAPIGatewayService,
                 private cdr: ChangeDetectorRef,
                 private userPrefService: UserPreferencesService) {
         super();
@@ -97,8 +102,12 @@ export class StepInspectorComponent extends DirectiveBase {
         const appId   = this.step.run.customProps["sbg:id"].split("/");
         const appData = [appId[0], appId[1], appId[2]].join("/");
 
+        console.log("Should update app", ev, this);
 
-        this.platform.getApp(appData).subscribe((app) => {
+        const [appHash] = this.fileID.split("/");
+        const api = this.apiGateway.forHash(appHash);
+
+        api.getApp(appData).subscribe((app) => {
 
             const component = this.modal.fromComponent(UpdateStepModalComponent, {
                 title: "Update available",

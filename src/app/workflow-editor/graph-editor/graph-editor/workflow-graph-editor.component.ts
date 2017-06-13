@@ -217,6 +217,7 @@ import {WorkflowEditorService} from "../../workflow-editor.service";
                 </div>
                 <div class="tc-body">
                     <ct-workflow-step-inspector *ngIf="typeOfInspectedNode() === 'Step'"
+                                                [fileID]="appData.id"
                                                 [step]="inspectedNode"
                                                 [graph]="graph"
                                                 [workflowModel]="model">
@@ -239,6 +240,9 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
     @Input()
     public model: WorkflowModel;
+
+    @Input()
+    appData;
 
     modelEventListeners = [];
 
