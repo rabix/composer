@@ -1,10 +1,10 @@
 import {Headers} from "@angular/http";
-import {ENVP} from "../../config/env.config";
 import {Observable} from "rxjs/Observable";
 import {ReplaySubject} from "rxjs/ReplaySubject";
+import {ENVP} from "../../config/env.config";
 import {PlatformProjectEntry} from "../../core/data-gateway/data-types/platform-api.types";
-import {PlatformAppEntry} from "../../services/api/platforms/platform-api.types";
 import {CtHttp} from "../../http/ct-http.service";
+import {PlatformAppEntry} from "../../services/api/platforms/platform-api.types";
 
 export class PlatformAPI {
 
@@ -274,6 +274,16 @@ export class PlatformAPI {
                     "session-id": sessionID
                 })
             });
+        }).map(r => r.json().message);
+    }
+
+    getUpdates(appIDs: string[]) {
+        return this.callService((sessionID) =>{
+           return this.http.post(this.getServiceURL("brood") + "/updates", appIDs, {
+               headers: new Headers({
+                   "session-id": sessionID
+               })
+           })
         }).map(r => r.json().message);
     }
 }

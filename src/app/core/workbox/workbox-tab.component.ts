@@ -1,4 +1,5 @@
 import {
+    AfterViewInit,
     ChangeDetectorRef, Component, Input, OnChanges, ViewChild,
 } from "@angular/core";
 
@@ -30,13 +31,15 @@ import {WorkboxTab} from "./workbox-tab.interface";
         </ng-container>
     `
 })
-export class WorkBoxTabComponent implements OnChanges, WorkboxTab {
+export class WorkBoxTabComponent implements OnChanges, WorkboxTab, AfterViewInit {
 
     @Input()
-    activeTab;
+    isActive;
 
     @Input()
     tab;
+
+    private isTabViewInitialized = false;
 
     @ViewChild("tabComponent")
     private tabComponent: any;
@@ -45,13 +48,17 @@ export class WorkBoxTabComponent implements OnChanges, WorkboxTab {
     }
 
     ngOnChanges() {
-        // If tab is not active detach its change detector from the main change detector (significant performance boost)
-        if (this.tab !== this.activeTab) {
-            this.cdr.detach();
-        } else {
-            this.cdr.reattach();
-            this.cdr.markForCheck();
+
+        if (this.isTabViewInitialized) {
+            // If tab is not active detach its change detector from the main change detector (significant performance boost)
+            if (this.isActive) {
+                this.cdr.reattach();
+                this.cdr.markForCheck();
+            } else {
+                this.cdr.detach();
+            }
         }
+
     }
 
     provideStatusControls() {
@@ -69,6 +76,15 @@ export class WorkBoxTabComponent implements OnChanges, WorkboxTab {
     registerOnTabLabelChange(update: (label: string) => void, originalLabel: string) {
         if (this.tabComponent.registerOnTabLabelChange) {
             this.tabComponent.registerOnTabLabelChange(update, originalLabel);
+        }
+    }
+
+    ngAfterViewInit(): void {
+        this.isTabViewInitialized = true;
+
+        // If tab is changed (not active) in the meanwhile, detach its cdr from main cdr
+        if (!this.isActive) {
+            this.cdr.detach();
         }
     }
 }

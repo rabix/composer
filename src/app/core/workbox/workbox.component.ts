@@ -61,8 +61,8 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
         <div class="body">
 
             <div class="component-container" *ngFor="let tab of tabs" [class.hidden]="tab !== activeTab">
-                
-                <ct-workbox-tab #workBoxTabComponent [tab]="tab" [activeTab]="activeTab"></ct-workbox-tab>
+
+                <ct-workbox-tab #workBoxTabComponent [tab]="tab" [isActive]="activeTab === tab"></ct-workbox-tab>
 
             </div>
 

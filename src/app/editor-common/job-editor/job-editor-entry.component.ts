@@ -71,7 +71,7 @@ import {ObjectHelper} from "../../helpers/object.helper";
                 <ng-template ngSwitchCase="map">
                     <ct-map-list class="form-group"
                                  [attr.prefix]="prefix"
-                                 (change)="updateMap(value)"
+                                 (change)="updateMap($event)"
                                  [ngModel]="value"></ct-map-list>
                 </ng-template>
 

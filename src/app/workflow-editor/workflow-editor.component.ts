@@ -1,9 +1,9 @@
-import {noop} from "../lib/utils.lib";
 import {Component, Input, NgZone, OnDestroy, OnInit, TemplateRef, ViewChild, ViewContainerRef} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {WorkflowFactory, WorkflowModel} from "cwlts/models";
 import * as Yaml from "js-yaml";
 import {Observable, Subject} from "rxjs/Rx";
+import {PlatformAPIGatewayService} from "../auth/api/platform-api-gateway.service";
 import {AuthService} from "../auth/auth/auth.service";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
 import {PublishModalComponent} from "../core/modals/publish-modal/publish-modal.component";
@@ -15,6 +15,7 @@ import {
 import {EditorInspectorService} from "../editor-common/inspector/editor-inspector.service";
 import {ErrorBarService} from "../layout/error-bar/error-bar.service";
 import {StatusBarService} from "../layout/status-bar/status-bar.service";
+import {noop} from "../lib/utils.lib";
 import {SystemService} from "../platform-providers/system.service";
 import {PlatformAPI} from "../services/api/platforms/platform-api.service";
 import {CredentialsEntry} from "../services/storage/user-preferences-types";
@@ -137,6 +138,7 @@ import LoadOptions = jsyaml.LoadOptions;
             </ct-code-editor>
 
             <ct-workflow-graph-editor *ngIf="viewMode === 'graph' && !isLoading"
+                                      [appData]="data"
                                       [readonly]="!data.isWritable"
                                       [(model)]="workflowModel"
                                       class="editor-main">
@@ -257,6 +259,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                 private system: SystemService,
                 private auth: AuthService,
                 private errorBarService: ErrorBarService,
+                private apiGateway: PlatformAPIGatewayService,
                 private dataGateway: DataGatewayService,
                 private zone: NgZone) {
 
@@ -469,31 +472,43 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
      * Call updates service to get information about steps if they have updates and mark ones that can be updated
      */
     private getStepUpdates() {
-        Observable.of(1).switchMap(() =>
+
+        Observable.of(1).switchMap(() => {
+            console.log("Should check for updates", this);
             // Call service only if wf is in user projects
-            this.data.dataSource !== "local" && this.data.isWritable ?
-                this.platform.getUpdates(this.workflowModel.steps
+            if (this.data.dataSource !== "local" && this.data.isWritable) {
+
+                const [appHash] = this.data.id.split("/");
+                const api       = this.apiGateway.forHash(appHash);
+
+                return api.getUpdates(this.workflowModel.steps
                     .map(step => step.run ? step.run.customProps["sbg:id"] : null)
-                    .filter(s => !!s))
-                : Observable.of(undefined))
-            .subscribe((response) => {
+                    .filter(s => !!s));
 
-                if (response) {
-                    Object.keys(response).forEach(key => {
-                        if (response[key] === true) {
-                            this.workflowModel.steps
-                                .filter(step => step.run.customProps["sbg:id"] === key)
-                                .forEach(step => step.hasUpdate = true);
-                        }
-                    });
-                }
+                // return this.platform.getUpdates(this.workflowModel.steps
+                //     .map(step => step.run ? step.run.customProps["sbg:id"] : null)
+                //     .filter(s => !!s))
+            }
 
-                // load document in GUI and turn off loader, only if loader was active
-                if (this.isLoading) {
-                    this.isLoading = false;
-                }
+            return Observable.of(undefined);
+        }).subscribe((response) => {
 
-            });
+            if (response) {
+                Object.keys(response).forEach(key => {
+                    if (response[key] === true) {
+                        this.workflowModel.steps
+                            .filter(step => step.run.customProps["sbg:id"] === key)
+                            .forEach(step => step.hasUpdate = true);
+                    }
+                });
+            }
+
+            // load document in GUI and turn off loader, only if loader was active
+            if (this.isLoading) {
+                this.isLoading = false;
+            }
+
+        });
     }
 
     save() {

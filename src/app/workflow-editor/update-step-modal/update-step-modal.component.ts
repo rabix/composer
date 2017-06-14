@@ -1,27 +1,25 @@
-import {ChangeDetectionStrategy, Component, Input, ViewEncapsulation, OnInit} from "@angular/core";
-import {SystemService} from "../../../platform-providers/system.service";
-import {SettingsService} from "../../../services/settings/settings.service";
+import {ChangeDetectionStrategy, Component, Input, OnInit, ViewEncapsulation} from "@angular/core";
 import {StepModel} from "cwlts/models";
-import {ModalService} from "../../../ui/modal/modal.service";
+import {SystemService} from "../../platform-providers/system.service";
+import {SettingsService} from "../../services/settings/settings.service";
+import {ModalService} from "../../ui/modal/modal.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
-    changeDetection: ChangeDetectionStrategy.OnPush,
     selector: "ct-project-selection-modal",
     template: `
-        <div>
+        <div class="p-1">
             <form (ngSubmit)="onSubmit()" class="flex-form">
 
                 <div class="modal-body">
                     <p>
-                        You are currently using <a href="" (click)="$event.preventDefault(); system.openLink(link)">
-                        {{step.label}}</a> (Revision {{step.run.customProps['sbg:latestRevision']}})
+                        You are currently using {{step.label}} (Revision {{step.run.customProps['sbg:latestRevision']}})
                         which has a new update available.
                         <br>
                         Do you want to update this node?
                     </p>
 
-                    <div class="alert alert-info" *ngIf="updatedModel['sbg:revisionNotes']">
+                    <div class="" *ngIf="updatedModel['sbg:revisionNotes']">
                         <p><strong>Revision note:</strong></p>
                         <p>"{{ updatedModel['sbg:revisionNotes']}}"</p>
                         <p class="text-muted small">by {{ updatedModel['sbg:modifiedBy'] }}
@@ -35,8 +33,8 @@ import {ModalService} from "../../../ui/modal/modal.service";
                 </div>
 
                 <div class="modal-footer">
-                    <button class="btn btn-secondary btn-sm" type="button" (click)="onCancel()">Cancel</button>
-                    <button class="btn btn-primary btn-sm" type="submit">
+                    <button class="btn btn-secondary" type="button" (click)="onCancel()">Cancel</button>
+                    <button class="btn btn-primary" type="submit">
                         Update
                     </button>
                 </div>
@@ -44,7 +42,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
         </div>
     `
 })
-export class UpdateStepModalComponent implements OnInit {
+export class UpdateStepModalComponent {
 
     @Input()
     step: StepModel;
@@ -55,21 +53,9 @@ export class UpdateStepModalComponent implements OnInit {
     @Input()
     confirm: () => void;
 
-    link;
 
     constructor(private modal: ModalService,
-                public system: SystemService,
-                private settings: SettingsService) {
-    }
-
-    ngOnInit() {
-
-        const urlApp     = this.step.run.customProps["sbg:id"];
-        const urlProject = urlApp.split("/").splice(0, 2).join("/");
-
-        this.settings.platformConfiguration.first().map(settings => settings.url).subscribe((url) => {
-            this.link = `${url}/u/${urlProject}/apps/#${urlApp}`;
-        });
+                public system: SystemService) {
     }
 
     onSubmit() {
