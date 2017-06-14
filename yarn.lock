@@ -1336,7 +1336,7 @@ cwl-svg@^0.0.34:
     cwlts "^1.12.18"
     phantom "^4.0.2"
 
-cwlts@^1.12.18, cwlts@^1.13.14:
+cwlts@^1.12.18, cwlts@^1.13.15:
   version "1.13.15"
   resolved "https://registry.yarnpkg.com/cwlts/-/cwlts-1.13.15.tgz#af1fca6956a217326f048ecdbb6d15f2cc5d597f"
 
@@ -5551,13 +5551,13 @@ typedarray@^0.0.6, typedarray@~0.0.5:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
+typescript@2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.4.0.tgz#aef5a8d404beba36ad339abf079ddddfffba86dd"
+
 "typescript@>=2.0.0 <2.4.0":
   version "2.3.4"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.3.4.tgz#3d38321828231e434f287514959c37a82b629f42"
-
-typescript@^2.4.0:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.4.0.tgz#aef5a8d404beba36ad339abf079ddddfffba86dd"
 
 uc.micro@^1.0.1, uc.micro@^1.0.3:
   version "1.0.3"
