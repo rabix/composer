@@ -25,7 +25,7 @@ import {noop} from "rxjs/util/noop";
                                  (buttonClick)="addEntry()">
             </ct-blank-tool-state>
 
-            <div *ngIf="readonly && !entries.length" class="text-xs-center h5">
+            <div *ngIf="readonly && !entries.length" class="text-xs-center">
                 This tool doesn't specify any inputs
             </div>
 
