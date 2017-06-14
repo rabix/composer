@@ -79,7 +79,7 @@ export class ModalService {
             this.onClose.first().subscribe(reject);
         }) as Promise<T>;
 
-        return Promise.race([insideClosing, outsideClosing]);
+        return Promise.race([insideClosing, outsideClosing]) as Promise<T>;
     }
 
     private cleanComponentRef() {

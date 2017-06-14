@@ -21,10 +21,10 @@ export class AutoCompleteComponent extends SelectComponent implements ControlVal
 
     // Important inputs -> [options], [create], see parent class...
 
-    // True makes control mono-selection (suggested input)
     @Input()
     public readonly = false;
 
+    // True makes control mono-selection (suggested input)
     @Input()
     public mono = false;
 
