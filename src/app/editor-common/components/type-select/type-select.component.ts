@@ -110,6 +110,7 @@ export class InputTypeSelectComponent extends DirectiveBase implements ControlVa
         if (isDisabled) {
             this.skipOnChange = true;
             this.form.controls["type"].disable();
+            this.form.controls["isItemOrArray"].disable();
             this.form.controls["items"].disable();
         }
     }

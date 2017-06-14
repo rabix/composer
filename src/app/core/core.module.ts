@@ -24,7 +24,8 @@ import {PanelContainerComponent} from "./panels/panel-container/panel-container.
 import {PublicAppsPanelComponent} from "./panels/public-apps-panel/public-apps-panel.component";
 import {WebWorkerBuilderService} from "./web-worker/web-worker-builder.service";
 import {SettingsButtonComponent} from "./workbox/settings-button.component";
-import {WorkboxComponent} from "./workbox/workbox.component";
+import {WorkBoxComponent} from "./workbox/workbox.component";
+import {WorkBoxTabComponent} from "./workbox/workbox-tab.component";
 import {AuthModule} from "../auth/auth.module";
 import {ModalErrorHandler} from "./error-report/modal-error-handler";
 import {ErrorReportComponent} from "./error-report/error-report.component";
@@ -34,6 +35,7 @@ import {WorkboxService} from "./workbox/workbox.service";
 import {LayoutService} from "./layout/layout.service";
 import {PublishModalComponent} from "./modals/publish-modal/publish-modal.component";
 import {CreateLocalFolderModalComponent} from "./modals/create-local-folder-modal/create-local-folder-modal.component";
+import {ProceedToEditingModalComponent} from "./modals/proceed-to-editing-modal/proceed-to-editing-modal.component";
 
 @NgModule({
     entryComponents: [
@@ -42,13 +44,15 @@ import {CreateLocalFolderModalComponent} from "./modals/create-local-folder-moda
         ErrorReportComponent,
         CreateAppModalComponent,
         CreateLocalFolderModalComponent,
+        ProceedToEditingModalComponent,
         PublishModalComponent
     ],
     declarations: [
         LayoutComponent,
         LogoComponent,
         LayoutTabContentComponent,
-        WorkboxComponent,
+        WorkBoxComponent,
+        WorkBoxTabComponent,
         SettingsButtonComponent,
         AppsPanelComponent,
         PanelContainerComponent,
@@ -63,6 +67,7 @@ import {CreateLocalFolderModalComponent} from "./modals/create-local-folder-moda
         ErrorReportComponent,
         CreateAppModalComponent,
         CreateLocalFolderModalComponent,
+        ProceedToEditingModalComponent,
         PublishModalComponent
     ],
     exports: [

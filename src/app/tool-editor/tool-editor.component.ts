@@ -18,7 +18,7 @@ import {AuthService} from "../auth/auth/auth.service";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
 import {PublishModalComponent} from "../core/modals/publish-modal/publish-modal.component";
 import {AppTabData} from "../core/workbox/app-tab-data";
-import {WorkboxTab} from "../core/workbox/workbox-tab.interface";
+import {ProceedToEditingModalComponent} from "../core/modals/proceed-to-editing-modal/proceed-to-editing-modal.component";
 import {
     CwlSchemaValidationWorkerService,
     ValidationResponse
@@ -39,7 +39,7 @@ import {noop} from "../lib/utils.lib";
     providers: [EditorInspectorService, ErrorBarService],
     templateUrl: "./tool-editor.component.html"
 })
-export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDestroy, WorkboxTab, AfterViewInit {
+export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDestroy, AfterViewInit {
 
     @Input()
     data: AppTabData;
@@ -58,7 +58,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
     showReformatPrompt = true;
 
     /** Flag for bottom panel, shows validation-issues, commandline, or neither */
-    reportPanel: "validation" | "commandLinePreview" | undefined;
+    reportPanel: "validation" | "commandLinePreview" | undefined = "commandLinePreview";
 
     /** Flag for validity of CWL document */
     isValidCWL = false;
@@ -131,6 +131,10 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
             const newLabel = isDirty ? `${this.originalTabLabel}` : this.originalTabLabel;
             this.changeTabLabel(newLabel);
         });
+
+        if (this.data.dataSource === "app" && this.hasCopyOfProperty()) {
+            this.data.isWritable = false;
+        }
 
         if (!this.data.isWritable) {
             this.codeEditorContent.disable();
@@ -281,6 +285,27 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
                 });
             }
         });
+    }
+
+    hasCopyOfProperty() {
+        return typeof this.data.parsedContent["sbg:copyOf"] !== undefined;
+    }
+
+    edit() {
+        const modal = this.modal.fromComponent(ProceedToEditingModalComponent, {
+            closeOnOutsideClick: false,
+            backdrop: true,
+            title: `Edit ${(this.data.parsedContent.label)}?`,
+            closeOnEscape: true
+        });
+
+        modal.appName = this.data.parsedContent.label;
+        modal.response.subscribe(val => {
+            this.data.isWritable = val;
+            if (val) {
+                this.codeEditorContent.enable();
+            }
+        })
     }
 
     /**

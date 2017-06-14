@@ -1,14 +1,13 @@
-import {noop} from "../lib/utils.lib";
 import {Component, Input, NgZone, OnDestroy, OnInit, TemplateRef, ViewChild, ViewContainerRef} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {WorkflowFactory, WorkflowModel} from "cwlts/models";
 import * as Yaml from "js-yaml";
 import {Observable, Subject} from "rxjs/Rx";
+import {PlatformAPIGatewayService} from "../auth/api/platform-api-gateway.service";
 import {AuthService} from "../auth/auth/auth.service";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
 import {PublishModalComponent} from "../core/modals/publish-modal/publish-modal.component";
 import {AppTabData} from "../core/workbox/app-tab-data";
-import {WorkboxTab} from "../core/workbox/workbox-tab.interface";
 import {
     CwlSchemaValidationWorkerService,
     ValidationResponse
@@ -16,6 +15,7 @@ import {
 import {EditorInspectorService} from "../editor-common/inspector/editor-inspector.service";
 import {ErrorBarService} from "../layout/error-bar/error-bar.service";
 import {StatusBarService} from "../layout/status-bar/status-bar.service";
+import {noop} from "../lib/utils.lib";
 import {SystemService} from "../platform-providers/system.service";
 import {PlatformAPI} from "../services/api/platforms/platform-api.service";
 import {CredentialsEntry} from "../services/storage/user-preferences-types";
@@ -23,6 +23,7 @@ import {ModalService} from "../ui/modal/modal.service";
 import {DirectiveBase} from "../util/directive-base/directive-base";
 import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow-graph-editor.component";
 import {WorkflowEditorService} from "./workflow-editor.service";
+import {ProceedToEditingModalComponent} from "../core/modals/proceed-to-editing-modal/proceed-to-editing-modal.component";
 
 import LoadOptions = jsyaml.LoadOptions;
 
@@ -72,8 +73,19 @@ import LoadOptions = jsyaml.LoadOptions;
                     <i class="fa fa-external-link"></i>
                 </button>
 
+                <!--Edit-->
+                <button *ngIf="!data.isWritable && data.dataSource !== 'public'"
+                        class="btn"
+                        type="button"
+                        ct-tooltip="Edit"
+                        tooltipPlacement="bottom"
+                        (click)="edit()">
+                    <i class="fa fa-edit"></i>
+                </button>
+
                 <!--Save-->
-                <button [disabled]="!data.isWritable || isValidatingCWL"
+                <button *ngIf="data.isWritable"
+                        [disabled]="isValidatingCWL"
                         (click)="save()"
                         ct-tooltip="Save"
                         [tooltipPlacement]="'bottom'"
@@ -126,6 +138,7 @@ import LoadOptions = jsyaml.LoadOptions;
             </ct-code-editor>
 
             <ct-workflow-graph-editor *ngIf="viewMode === 'graph' && !isLoading"
+                                      [appData]="data"
                                       [readonly]="!data.isWritable"
                                       [(model)]="workflowModel"
                                       class="editor-main">
@@ -182,8 +195,7 @@ import LoadOptions = jsyaml.LoadOptions;
         </ng-template>
     `
 })
-export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy, OnInit, WorkboxTab {
-
+export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy, OnInit {
 
     @Input()
     data: AppTabData;
@@ -247,6 +259,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                 private system: SystemService,
                 private auth: AuthService,
                 private errorBarService: ErrorBarService,
+                private apiGateway: PlatformAPIGatewayService,
                 private dataGateway: DataGatewayService,
                 private zone: NgZone) {
 
@@ -266,6 +279,10 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
 
         this.statusBar.setControls(this.statusControls);
         this.inspector.setHostView(this.inspectorHostView);
+
+        if (this.data.dataSource === "app" && this.hasCopyOfProperty()) {
+            this.data.isWritable = false;
+        }
 
         if (!this.data.isWritable) {
             this.codeEditorContent.disable();
@@ -421,6 +438,28 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
         });
     }
 
+    hasCopyOfProperty() {
+        return typeof this.data.parsedContent["sbg:copyOf"] !== undefined;
+    }
+
+    edit() {
+        const modal = this.modal.fromComponent(ProceedToEditingModalComponent, {
+            closeOnOutsideClick: false,
+            backdrop: true,
+            title: `Edit ${(this.data.parsedContent.label)}?`,
+            closeOnEscape: true
+        });
+
+        modal.appName = this.data.parsedContent.label;
+        modal.response.subscribe(val => {
+            this.data.isWritable = val;
+            if (val) {
+                this.codeEditorContent.enable();
+                this.graphEditor.enableGraphManipulations();
+            }
+        })
+    }
+
     /**
      * When click on Resolve button (visible only if app is a local file and you are in Code mode)
      */
@@ -433,31 +472,43 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
      * Call updates service to get information about steps if they have updates and mark ones that can be updated
      */
     private getStepUpdates() {
-        Observable.of(1).switchMap(() =>
+
+        Observable.of(1).switchMap(() => {
+            console.log("Should check for updates", this);
             // Call service only if wf is in user projects
-            this.data.dataSource !== "local" && this.data.isWritable ?
-                this.platform.getUpdates(this.workflowModel.steps
+            if (this.data.dataSource !== "local" && this.data.isWritable) {
+
+                const [appHash] = this.data.id.split("/");
+                const api       = this.apiGateway.forHash(appHash);
+
+                return api.getUpdates(this.workflowModel.steps
                     .map(step => step.run ? step.run.customProps["sbg:id"] : null)
-                    .filter(s => !!s))
-                : Observable.of(undefined))
-            .subscribe((response) => {
+                    .filter(s => !!s));
 
-                if (response) {
-                    Object.keys(response).forEach(key => {
-                        if (response[key] === true) {
-                            this.workflowModel.steps
-                                .filter(step => step.run.customProps["sbg:id"] === key)
-                                .forEach(step => step.hasUpdate = true);
-                        }
-                    });
-                }
+                // return this.platform.getUpdates(this.workflowModel.steps
+                //     .map(step => step.run ? step.run.customProps["sbg:id"] : null)
+                //     .filter(s => !!s))
+            }
 
-                // load document in GUI and turn off loader, only if loader was active
-                if (this.isLoading) {
-                    this.isLoading = false;
-                }
+            return Observable.of(undefined);
+        }).subscribe((response) => {
 
-            });
+            if (response) {
+                Object.keys(response).forEach(key => {
+                    if (response[key] === true) {
+                        this.workflowModel.steps
+                            .filter(step => step.run.customProps["sbg:id"] === key)
+                            .forEach(step => step.hasUpdate = true);
+                    }
+                });
+            }
+
+            // load document in GUI and turn off loader, only if loader was active
+            if (this.isLoading) {
+                this.isLoading = false;
+            }
+
+        });
     }
 
     save() {

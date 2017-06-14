@@ -52,7 +52,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                 <label>Separate value and prefix</label>
                 <span class="pull-right">
                     <ct-toggle-slider
-                            [ct-disabled]="isType('record')"
+                            [ct-disabled]="isType('record') || readonly"
                             [formControl]="form.controls['separate']"
                             [readonly]="readonly"></ct-toggle-slider>
                 </span>
@@ -161,6 +161,9 @@ export class InputBindingSectionComponent extends DirectiveBase implements Contr
                     this.input.inputBinding.prefix = form.prefix;
                 }
 
+                if (form.separate !== undefined) {
+                    this.input.inputBinding.separate = form.separate;
+                }
 
                 if (form.itemSeparator !== undefined) {
                     this.input.inputBinding.itemSeparator = form.itemSeparator;

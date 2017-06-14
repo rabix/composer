@@ -124,10 +124,6 @@ export class ToolInputListComponent extends DirectiveBase {
     @Input()
     location = "";
 
-    /** Context in which expression should be evaluated */
-    @Input()
-    context: { $job: any };
-
     @Input()
     readonly = false;
 
@@ -200,8 +196,8 @@ export class ToolInputListComponent extends DirectiveBase {
             && entry.type.fields;
     }
 
-    updateInput(input: CommandInputParameterModel, from: string) {
-        input.validate(this.context).then(noop, noop);
+    updateInput(input: CommandInputParameterModel) {
+        input.validate(this.model.getContext(input.id)).then(noop, noop);
         this.update.emit(this.model.inputs);
     }
 }

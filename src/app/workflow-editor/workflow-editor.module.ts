@@ -14,7 +14,7 @@ import {WorkflowIOInspectorComponent} from "./object-inspector/io-inspector/work
 import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow-graph-editor.component";
 import {UIModule} from "../ui/ui.module";
 import {LayoutModule} from "../layout/layout.module";
-import {UpdateStepModalComponent} from "../components/modal/custom/update-step-modal.component";
+import {UpdateStepModalComponent} from "./update-step-modal/update-step-modal.component";
 
 @NgModule({
     declarations: [
@@ -28,6 +28,9 @@ import {UpdateStepModalComponent} from "../components/modal/custom/update-step-m
         WorkflowStepInspectorTabInfo,
         WorkflowStepInspectorTabStep,
         UpdateStepModalComponent
+    ],
+    entryComponents: [
+      UpdateStepModalComponent,
     ],
     exports: [
         WorkflowEditorComponent
