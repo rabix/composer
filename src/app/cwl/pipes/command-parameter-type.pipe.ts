@@ -8,7 +8,7 @@ import {ParameterTypeModel} from "cwlts/models";
 export class CommandParameterTypePipe implements PipeTransform {
     transform(type: ParameterTypeModel): any {
         try {
-            let output:string = type.type;
+            let output: string = type.type;
             const nullable = type.isNullable ? "?" : "";
 
             if (output === undefined) {

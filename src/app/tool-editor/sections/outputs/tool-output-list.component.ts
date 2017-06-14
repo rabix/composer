@@ -28,7 +28,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                                  (buttonClick)="addEntry()">
             </ct-blank-tool-state>
 
-            <div *ngIf="readonly && !entries.length" class="text-xs-center h5">
+            <div *ngIf="readonly && !entries.length" class="text-xs-center">
                 This tool doesn't specify any outputs
             </div>
 
