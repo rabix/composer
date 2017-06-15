@@ -49,7 +49,7 @@ export class DataGatewayService {
                 label: "Local Files",
                 profile: "local",
                 status: ConnectionState.Connected
-            } as Partial<CredentialsEntry>;
+            } as CredentialsEntry;
 
             const remote = credentials.map(c => {
 
@@ -83,7 +83,7 @@ export class DataGatewayService {
 
         return this.throughCache(
             `${hash}.getPlatformListing`, call
-        );
+        ) as Observable<{ id: string, name: string }[]>;
     }
 
     getProjectListing(hash, projectOwner: string, projectSlug: string): Observable<any[]> {
@@ -95,7 +95,7 @@ export class DataGatewayService {
             : Observable.throw(
                 new Error("Cannot get project apps because you are not connected to the necessary platform."));
 
-        return this.throughCache(cacheKey, call);
+        return this.throughCache(cacheKey, call) as Observable<any[]>;
     }
 
     invalidateProjectListing(hash, owner: string, project: string) {

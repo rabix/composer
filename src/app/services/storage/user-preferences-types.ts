@@ -5,12 +5,12 @@ export enum ConnectionState {
 }
 
 export interface CredentialsEntry {
-    url: string;
+    url?: string;
     hash: string;
-    token: string;
+    token?: string;
     profile: string;
     status: ConnectionState;
-    sessionID: string;
+    sessionID?: string;
     user?: {
         id: string,
         email: string,
