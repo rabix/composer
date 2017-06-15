@@ -13,6 +13,10 @@ $gradientDarken: 4%;
 .btn-link {
     border: none;
     background: none;
+
+    &:disabled {
+        border: none;
+    }
 }
 
 .btn-primary:active {
