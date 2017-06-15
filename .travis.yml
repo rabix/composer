@@ -10,6 +10,8 @@ language: node_js
 node_js:
   - "7"
 
+before_install:
+  - npm install -g npm@'>=5.0.3'
 install:
   - npm install
 before_script:
