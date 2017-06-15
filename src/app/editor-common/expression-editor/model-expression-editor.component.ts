@@ -28,7 +28,7 @@ export class ModelExpressionEditorComponent implements OnInit {
     action = new Subject<"close" | "save">();
 
     code: string;
-    evaluator: (code: string) => Promise<string>;
+    evaluator: (code: string) => Promise<string | { message: string; type: any; }>;
 
     ngOnInit() {
         this.code = this.model.getScript() || "";
