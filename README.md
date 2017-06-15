@@ -1,6 +1,6 @@
 
 
-# Cottontail (Rabix Composer)
+# Rabix Composer
 [![Build Status](https://travis-ci.org/rabix/cottontail-frontend.svg?branch=master)](https://travis-ci.org/rabix/cottontail-frontend)
 
 
@@ -37,3 +37,7 @@ yarn run build
 ```bash
 yarn test
 ```
+
+## Documentation
+
+Now you can read the [Rabix Composer documentation](https://github.com/rabix/cottontail-frontend/wiki) to learn more about Rabix Composer.
