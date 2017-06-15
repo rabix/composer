@@ -32,7 +32,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                     container. These files will be created in the tool’s working directory from the text content you specify here.
                 </ct-blank-tool-state>
 
-                <div *ngIf="readonly && !model.listing?.length" class="text-xs-center h5">
+                <div *ngIf="readonly && !model.listing?.length" class="text-xs-center ">
                     This tool doesn't create any files
                 </div>
 

@@ -26,7 +26,7 @@ import {SystemService} from "../../../platform-providers/system.service";
                     type to use.
                 </ct-blank-tool-state>
 
-                <div *ngIf="readonly && !model.hints.length" class="text-xs-center h5">
+                <div *ngIf="readonly && !model.hints.length" class="text-xs-center">
                     This tool doesn't specify any hints
                 </div>
 

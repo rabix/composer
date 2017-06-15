@@ -1,6 +1,6 @@
 {
-    "name": "rabix-editor",
-    "version": "alpha",
+    "name": "rabix-composer",
+    "version": "beta",
     "main": "main.js",
     "scripts": {
         "test": "mocha dist/**/*.spec.js"
