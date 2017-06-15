@@ -152,6 +152,15 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
 
             // type changes
             if (value.type) {
+
+                if (!this.isType("File")) {
+                    this.input.updateSecondaryFiles([]);
+                    delete this.input.customProps["sbg:stageInput"];
+                    if (this.input.inputBinding) {
+                        this.input.inputBinding.loadContents = false;
+                    }
+                }
+
                 if (value.type.type !== "array" && this.input.isBound) {
                     this.input.inputBinding.itemSeparator = undefined;
                 }
