@@ -10,13 +10,10 @@ $gradientDarken: 4%;
     border-radius: $btn-border-radius;
 }
 
-.btn-link {
+.btn-link,
+.btn-link:disabled {
     border: none;
     background: none;
-
-    &:disabled {
-        border: none;
-    }
 }
 
 .btn-primary:active {
