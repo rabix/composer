@@ -67,6 +67,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                 <div *ngIf="isFileType()" class="form-group">
                     <label class="form-control-label">File types</label>
                     <ct-auto-complete [formControl]="form.controls['fileTypes']"
+                                      [readonly]="readonly"
                                       [create]="true"></ct-auto-complete>
                 </div>
             </div>

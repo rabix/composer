@@ -1,10 +1,7 @@
 import {Pipe, PipeTransform} from "@angular/core";
 import {ParameterTypeModel} from "cwlts/models";
 
-/**
- * FIXME: make this pure -> {@link ToolInputListComponent.updateInput}
- */
-@Pipe({name: "commandParameterType", pure: false})
+@Pipe({name: "commandParameterType", pure: true})
 export class CommandParameterTypePipe implements PipeTransform {
     transform(type: ParameterTypeModel): any {
         try {

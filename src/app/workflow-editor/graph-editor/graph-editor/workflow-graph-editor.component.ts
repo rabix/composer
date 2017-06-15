@@ -170,7 +170,8 @@ import {WorkflowEditorService} from "../../workflow-editor.service";
                         ct-tooltip="Delete"
                         tooltipPlacement="top"
                         class="btn btn-sm btn-secondary"
-                        (click)="deleteSelectedElement()">
+                        (click)="deleteSelectedElement()"
+                        [disabled]="readonly">
                     <i class="fa fa-trash"></i>
                 </button>
             </span>
@@ -179,7 +180,8 @@ import {WorkflowEditorService} from "../../workflow-editor.service";
                 <button class="btn btn-sm btn-secondary"
                         ct-tooltip="Auto-arrange"
                         tooltipPlacement="top"
-                        (click)="arrange()">
+                        (click)="arrange()"
+                        [disabled]="readonly">
                     <i class="fa fa-paint-brush"></i>
                 </button>
             </span>
@@ -220,14 +222,16 @@ import {WorkflowEditorService} from "../../workflow-editor.service";
                                                 [fileID]="appData.id"
                                                 [step]="inspectedNode"
                                                 [graph]="graph"
-                                                [workflowModel]="model">
+                                                [workflowModel]="model"
+                                                [readonly]="readonly">
                     </ct-workflow-step-inspector>
 
                     <ct-workflow-io-inspector
                             *ngIf="typeOfInspectedNode() === 'Input' || typeOfInspectedNode() === 'Output'"
                             [port]="inspectedNode"
                             [graph]="graph"
-                            [workflowModel]="model">
+                            [workflowModel]="model"
+                            [readonly]="readonly">
 
                     </ct-workflow-io-inspector>
 
@@ -309,6 +313,9 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     drawGraphAndAttachListeners() {
 
         this.graph = new Workflow(this.canvas.nativeElement, this.model as any);
+        if (this.readonly) {
+            this.graph.disableGraphManipulations();
+        }
 
         try {
             this.graph.fitToViewport();
@@ -399,7 +406,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
         // When model is changed we have to know whether change is external (change revision/copy app...)
         // or internal (undo/redo from history)
-        if (this.model !== changes["model"].previousValue && this.model !== this.modelChangedFromHistory) {
+        if (changes["model"] && this.model !== changes["model"].previousValue && this.model !== this.modelChangedFromHistory) {
 
             this.workflowEditorService.emptyHistory();
             this.registerModelEventListeners();
@@ -452,6 +459,10 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
      * Triggers when app is dropped on canvas
      */
     onDrop(ev: MouseEvent, nodeID: string) {
+        if (this.readonly) {
+            return;
+        }
+
         console.log("Dropped!", nodeID);
 
         this.gateway.fetchFileContent(nodeID, true).subscribe((app: any) => {
@@ -561,6 +572,10 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         this.workflowEditorService.emptyHistory();
         window.removeEventListener("keypress", this.historyHandler);
         this.inspector.hide();
+    }
+
+    enableGraphManipulations() {
+        this.graph.enableGraphManipulations();
     }
 
     checkOutstandingGraphFitting() {

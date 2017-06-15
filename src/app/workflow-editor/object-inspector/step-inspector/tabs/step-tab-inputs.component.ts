@@ -36,6 +36,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                                     <ct-toggle-slider
                                         (valueChange)="onPortOptionChange(input, $event ? 'port' : 'editable')"
                                         *ngIf="input.type.isNullable"
+                                        [disabled]="readonly"
                                         [on]="'Show'"
                                         [off]="'Hide'"
                                         [value]="input.isVisible">
@@ -46,7 +47,8 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                                 <div *ngIf="!isFileType(input)" class="input-control">
                                     <ct-dropdown-button [dropDownOptions]="dropDownPortOptions"
                                                         (change)="onPortOptionChange(input, $event)"
-                                                        [value]="input.status">
+                                                        [value]="input.status"
+                                                        [readonly]="readonly">
                                     </ct-dropdown-button>
                                 </div>
                             </div>
@@ -56,6 +58,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                                                               [prefix]="input.id"
                                                               [value]="input.default"
                                                               [type]="input.type"
+                                                              [readonly]="readonly"
                                                               *ngIf="!isFileType(input)"
                                                               (update)="stepValueUpdate(input.id + '.default', $event)"
                                                               class="mb-0">
@@ -123,6 +126,9 @@ export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase {
             description: "Connect the port with other ports"
         }
     ];
+
+    @Input()
+    public readonly = false;
 
     @Input()
     public workflowModel: WorkflowModel;
