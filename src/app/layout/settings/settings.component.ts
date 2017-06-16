@@ -1,4 +1,4 @@
-import {Component} from "@angular/core";
+import {Component, OnInit} from "@angular/core";
 import {AuthService} from "../../auth/auth/auth.service";
 import {SettingsService} from "../../services/settings/settings.service";
 import {CredentialsEntry} from "../../services/storage/user-preferences-types";
@@ -11,35 +11,30 @@ type ViewMode = "auth" | "keyBindings" | "cache";
     selector: "ct-settings",
     styleUrls: ["./settings.component.scss"],
     template: `
-        <ct-action-bar>
-
-            <div class="document-controls pr-1">
-
-                <!--Add Another-->
-                <button (click)="creds.addEntry()"
-                        class="btn btn-secondary text-inherit"
-                        type="button"> Add an Account
-                </button>
-
-                <!--Save-->
-                <button (click)="creds.submit()"
-                        [disabled]="creds.form.invalid"
-                        class="btn btn-secondary text-inherit"
-                        type="button"> Apply Changes
-                </button>
-
-            </div>
-
-        </ct-action-bar>
 
         <ct-line-loader *ngIf="auth.authenticationProgress | async"></ct-line-loader>
 
         <ct-credentials-form #creds [credentials]="credentials"
                              (onSubmit)="preferences.setCredentials($event)"
-                             class="m-2"></ct-credentials-form>
+                             class="p-2"></ct-credentials-form>
+
+        <div class="pull-right col-sm-2">
+            <!--Add Another-->
+            <button (click)="creds.addEntry()"
+                    class="btn btn-secondary"
+                    type="button"> Add an Account
+            </button>
+
+            <!--Save-->
+            <button (click)="creds.submit()"
+                    [disabled]="creds.form.invalid"
+                    class="btn btn-primary"
+                    type="button"> Apply Changes
+            </button>
+        </div>
     `
 })
-export class SettingsComponent extends DirectiveBase {
+export class SettingsComponent extends DirectiveBase implements OnInit {
     viewMode: ViewMode = "auth";
 
     credentials: CredentialsEntry[];
@@ -54,15 +49,7 @@ export class SettingsComponent extends DirectiveBase {
     ngOnInit() {
         this.preferences.getCredentials().take(1).subscribe(c => {
             this.credentials = c;
-        })
-    }
-
-    /**
-     * Changes the view mode
-     * @param tab Name of the tab to switch to
-     */
-    switchTab(tab: ViewMode): void {
-        this.viewMode = tab;
+        });
     }
 
 }

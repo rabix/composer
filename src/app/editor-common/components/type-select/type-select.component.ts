@@ -1,13 +1,11 @@
-import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
+import {Component, forwardRef, Input, OnChanges} from "@angular/core";
 import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {noop} from "../../../lib/utils.lib";
 import {ParameterTypeModel} from "cwlts/models";
+import {noop} from "../../../lib/utils.lib";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
-    selector: "ct-input-type-select",
+    selector: "ct-type-select",
     providers: [
         {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => InputTypeSelectComponent), multi: true}
     ],
@@ -16,19 +14,19 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             <label class="form-control-label">Type</label>
             <select class="form-control"
                     [formControl]="form.controls['type']">
-                <option *ngFor="let propertyType of propertyTypes" [value]="propertyType">
-                    {{propertyType}}
+                <option *ngFor="let type of types" [value]="type">
+                    {{type}}
                 </option>
             </select>
         </div><!--Type-->
-        
+
         <div class="form-group" *ngIf="paramType.type !== 'array'">
             <label>Allow array as well as single item</label>
             <span class="pull-right">
                     <ct-toggle-slider [formControl]="form.controls['isItemOrArray']"></ct-toggle-slider>
                 </span>
         </div>
-        
+
         <div class="form-group">
             <div [class.hidden]="paramType?.type !== 'array'">
                 <label class="form-control-label">Items Type</label>
@@ -47,10 +45,8 @@ export class InputTypeSelectComponent extends DirectiveBase implements ControlVa
 
     public paramType: ParameterTypeModel;
 
-    @Input("propertyTypes")
-    public propertyTypes = ["array", "enum", "record", "File", "string", "int", "float", "boolean", "map"];
+    public types = ["array", "enum", "record", "File", "string", "int", "float", "boolean", "map"];
 
-    @Input("itemTypes")
     public itemTypes = ["enum", "record", "File", "string", "int", "float", "boolean", "map"];
 
     public form: FormGroup = new FormGroup({
@@ -68,12 +64,17 @@ export class InputTypeSelectComponent extends DirectiveBase implements ControlVa
     writeValue(paramType: ParameterTypeModel): void {
         this.paramType = paramType;
 
+        if (paramType.hasDirectoryType) {
+            this.types.push("Directory");
+            this.itemTypes.push("Directory");
+        }
+
         this.form.controls["type"].setValue(this.paramType.type, {onlySelf: true});
         this.form.controls["items"].setValue(this.paramType.items, {onlySelf: true});
         this.form.controls["isItemOrArray"].setValue(this.paramType.isItemOrArray, {onlySelf: true});
 
         this.tracked = this.form.valueChanges.subscribe(change => {
-            this.paramType.type = change.type;
+            this.paramType.type          = change.type;
             this.paramType.isItemOrArray = change.isItemOrArray;
 
             if (change.type === "array") {

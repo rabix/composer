@@ -71,9 +71,7 @@ import {Observable} from "rxjs/Observable";
         </div>
 
         <!--Input Type -->
-        <ct-input-type-select [formControl]="form.controls['typeForm']"
-                              [propertyTypes]="propertyTypes"
-                              [itemTypes]="itemTypes"></ct-input-type-select>
+        <ct-type-select [formControl]="form.controls['typeForm']"></ct-type-select>
 
         <!--Symbols-->
         <ct-symbols-section class="form-group"
@@ -97,7 +95,7 @@ import {Observable} from "rxjs/Observable";
                 <span class="text-warning small" *ngIf="customValueIsNotSelected()">
                       <i class="fa fa-warning fa-fw" [ct-tooltip]="ctt"></i>
                 </span>
- 
+
                 <ct-tooltip-content #ctt>
                     <div class="tooltip-info">
                         This workflow has a batch criteria which has been set via the API. If you change it,
@@ -144,32 +142,32 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
     public batchByList: { label: string, value: string | string [] } [] =
         [
             {
-                label: 'None',
-                value: 'none'
+                label: "None",
+                value: "none"
             },
             {
-                label: 'File',
-                value: 'item'
+                label: "File",
+                value: "item"
             },
             {
-                label: 'Sample',
-                value: ['metadata.sample_id']
+                label: "Sample",
+                value: ["metadata.sample_id"]
             },
             {
-                label: 'Case',
-                value: ['metadata.case_id']
+                label: "Case",
+                value: ["metadata.case_id"]
             },
             {
-                label: 'Library (Sample + Library)',
-                value: ['metadata.sample_id', 'metadata.library_id']
+                label: "Library (Sample + Library)",
+                value: ["metadata.sample_id", "metadata.library_id"]
             },
             {
-                label: 'Platform unit (Sample + Library + Platform unit)',
-                value: ['metadata.sample_id', 'metadata.library_id', 'metadata.platform_unit_id']
+                label: "Platform unit (Sample + Library + Platform unit)",
+                value: ["metadata.sample_id", "metadata.library_id", "metadata.platform_unit_id"]
             },
             {
-                label: 'File segment (Sample + Library + Platform unit + File segment)',
-                value: ['metadata.sample_id', 'metadata.library_id', 'metadata.platform_unit_id', 'metadata.file_segment_number']
+                label: "File segment (Sample + Library + Platform unit + File segment)",
+                value: ["metadata.sample_id", "metadata.library_id", "metadata.platform_unit_id", "metadata.file_segment_number"]
             }
         ];
 
@@ -241,7 +239,7 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
 
         if (!batchTypeValue) {
             // None value
-            return this.batchByList.find((item) => item.value === 'none').value;
+            return this.batchByList.find((item) => item.value === "none").value;
         }
 
         // Find if batchTypeValue is in batchByList
