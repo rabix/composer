@@ -73,7 +73,9 @@ export class InputTypeSelectComponent extends DirectiveBase implements ControlVa
         this.form.controls["isItemOrArray"].setValue(this.paramType.isItemOrArray, {onlySelf: true});
 
         this.tracked = this.form.valueChanges.subscribe(change => {
-            this.paramType.type = change.type;
+            if (change.type !== undefined) {
+                this.paramType.type = change.type;
+            }
             this.paramType.isItemOrArray = change.isItemOrArray;
 
             if (change.type === "array") {
