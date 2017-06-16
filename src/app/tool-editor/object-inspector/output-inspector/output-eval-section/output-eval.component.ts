@@ -1,6 +1,8 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {CommandOutputParameterModel} from "cwlts/models";
+import {SBDraft2CommandOutputBindingModel, SBDraft2CommandOutputParameterModel} from "cwlts/models/d2sb";
+import {V1CommandOutputBindingModel, V1CommandOutputParameterModel} from "cwlts/models/v1.0";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 import {noop} from "../../../../lib/utils.lib";
 
@@ -82,10 +84,16 @@ export class OutputEvalSectionComponent extends DirectiveBase implements Control
             .distinctUntilChanged()
             .subscribe(value => {
 
-                // this.output.updateOutputBinding(new CommandOutputBindingModel({
-                //     loadContents: value.loadContents,
-                //     outputEval: value.outputEval.serialize()
-                // }));
+                const outputBinding = {
+                    loadContents: value.loadContents,
+                    outputEval: value.outputEval.serialize()
+                };
+
+                if (output instanceof SBDraft2CommandOutputParameterModel) {
+                    this.output.updateOutputBinding(new SBDraft2CommandOutputBindingModel(outputBinding));
+                } else if (output instanceof V1CommandOutputParameterModel) {
+                    this.output.updateOutputBinding(new V1CommandOutputBindingModel(outputBinding));
+                }
 
                 this.propagateChange(this.output);
             });
