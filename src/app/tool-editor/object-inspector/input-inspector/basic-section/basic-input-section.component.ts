@@ -8,6 +8,7 @@ import {
     Validators
 } from "@angular/forms";
 import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
+import {SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 import {noop} from "../../../../lib/utils.lib";
 
@@ -194,6 +195,11 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
                 this.input.createInputBinding();
                 this.form.setControl("inputBinding", new FormControl(this.input));
             } else {
+
+                if (this.input instanceof SBDraft2CommandInputParameterModel) {
+                    this.input.updateSecondaryFiles([]);
+                }
+
                 this.input.removeInputBinding();
                 this.form.removeControl("inputBinding");
             }
