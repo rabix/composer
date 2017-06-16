@@ -17,7 +17,8 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <label class="form-control-label">ID</label>
             <input type="text"
                    class="form-control"
-                   [formControl]="form.controls['id']">
+                   [formControl]="form.controls['id']"
+                   [readonly]="readonly">
             <div *ngIf="form.controls['id'].errors" class="form-control-feedback">
                 {{form.controls['id'].errors['error']}}
             </div>
@@ -28,13 +29,16 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <label class="form-control-label">Label</label>
             <input type="text"
                    class="form-control"
-                   [formControl]="form.controls['label']">
+                   [formControl]="form.controls['label']"
+                   [readonly]="readonly">
         </div>
 
         <!--Scatter Method-->
         <div *ngIf="step.hasScatterMethod" class="form-group">
             <label class="form-control-label">Scatter Method</label>
-            <select class="form-control" [formControl]="form.controls['scatterMethod']">
+            <select class="form-control" 
+                    [formControl]="form.controls['scatterMethod']"
+                    [attr.disabled]="readonly">
                 <option *ngFor="let method of scatterMethodOptions" [value]="method.value">
                     {{method.caption}}
                 </option>
@@ -47,7 +51,10 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <label class="form-control-label">Scatter</label>
 
             <!--Single Scatter-->
-            <select *ngIf="!step.hasMultipleScatter" class="form-control" [formControl]="form.controls['scatter']">
+            <select *ngIf="!step.hasMultipleScatter" 
+                    class="form-control" 
+                    [formControl]="form.controls['scatter']"
+                    [attr.disabled]="readonly">
                 <option value="">-- none --</option>
                 <option *ngFor="let input of step.in" [value]="input.id">
                     {{input.label}} (#{{input.id}})
@@ -55,8 +62,11 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             </select>
 
             <!--Multiple Scatter-->
-            <select *ngIf="step.hasMultipleScatter" class="form-control" multiple
-                    [formControl]="form.controls['scatter']">
+            <select *ngIf="step.hasMultipleScatter" 
+                    class="form-control" 
+                    multiple
+                    [formControl]="form.controls['scatter']"
+                    [attr.disabled]="readonly">
                 <option *ngFor="let opt of step.in" [value]="opt.id">
                     {{opt.id}}
                 </option>
@@ -69,12 +79,16 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <label class="form-control-label">Description</label>
             <textarea class="form-control"
                       rows="4"
-                      [formControl]="form.controls['description']"></textarea>
+                      [formControl]="form.controls['description']"
+                      [readonly]="readonly"></textarea>
         </div>
 
     `
 })
 export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnInit, OnChanges {
+
+    @Input()
+    public readonly = false;
 
     @Input()
     public step: StepModel;

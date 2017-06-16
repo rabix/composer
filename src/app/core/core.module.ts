@@ -35,6 +35,7 @@ import {WorkboxService} from "./workbox/workbox.service";
 import {LayoutService} from "./layout/layout.service";
 import {PublishModalComponent} from "./modals/publish-modal/publish-modal.component";
 import {CreateLocalFolderModalComponent} from "./modals/create-local-folder-modal/create-local-folder-modal.component";
+import {ProceedToEditingModalComponent} from "./modals/proceed-to-editing-modal/proceed-to-editing-modal.component";
 
 @NgModule({
     entryComponents: [
@@ -43,6 +44,7 @@ import {CreateLocalFolderModalComponent} from "./modals/create-local-folder-moda
         ErrorReportComponent,
         CreateAppModalComponent,
         CreateLocalFolderModalComponent,
+        ProceedToEditingModalComponent,
         PublishModalComponent
     ],
     declarations: [
@@ -65,6 +67,7 @@ import {CreateLocalFolderModalComponent} from "./modals/create-local-folder-moda
         ErrorReportComponent,
         CreateAppModalComponent,
         CreateLocalFolderModalComponent,
+        ProceedToEditingModalComponent,
         PublishModalComponent
     ],
     exports: [

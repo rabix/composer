@@ -52,7 +52,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                 <label>Separate value and prefix</label>
                 <span class="pull-right">
                     <ct-toggle-slider
-                            [ct-disabled]="isType('record')"
+                            [ct-disabled]="isType('record') || readonly"
                             [formControl]="form.controls['separate']"
                             [readonly]="readonly"></ct-toggle-slider>
                 </span>
