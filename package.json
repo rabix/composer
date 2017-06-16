@@ -46,7 +46,7 @@
         "bootstrap": "4.0.0-alpha.5",
         "brace": "^0.10.0",
         "core-js": "^2.4.1",
-        "cwl-svg": "^0.0.33",
+        "cwl-svg": "^0.0.34",
         "cwlts": "^1.13.15",
         "font-awesome": "^4.7.0",
         "jquery": "^3.2.1",
@@ -86,7 +86,7 @@
         "protractor": "~5.1.0",
         "ts-node": "^3.0.6",
         "tslint": "^5.4.3",
-        "typescript": "^2.4.0",
+        "typescript": "^2.3.4",
         "v8-profiler": "^5.7.0"
     },
     "engines": {
