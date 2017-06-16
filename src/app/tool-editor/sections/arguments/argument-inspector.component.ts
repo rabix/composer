@@ -65,6 +65,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                            [formControl]="form.controls['primitive']">
 
                     <ct-expression-input type="string"
+                                         [context]="context"
                                          *ngIf="argument.hasExprPrimitive"
                                          [formControl]="form.controls['primitive']">
 
