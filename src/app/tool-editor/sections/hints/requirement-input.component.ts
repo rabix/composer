@@ -55,8 +55,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         </div>
 
     `,
-    styleUrls: ["./requirement-input.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    styleUrls: ["./requirement-input.component.scss"]
 })
 export class RequirementInputComponent extends DirectiveBase implements ControlValueAccessor {
 

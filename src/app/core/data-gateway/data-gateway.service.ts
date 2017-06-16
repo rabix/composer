@@ -25,7 +25,7 @@ export class DataGatewayService {
             return "local";
         }
 
-        if (id.startsWith("http://") || id.startsWith("https://")) {
+        if (id.includes("sbg-public-data")) {
             return "public";
         }
 
@@ -49,7 +49,7 @@ export class DataGatewayService {
                 label: "Local Files",
                 profile: "local",
                 status: ConnectionState.Connected
-            } as Partial<CredentialsEntry>;
+            } as CredentialsEntry;
 
             const remote = credentials.map(c => {
 
@@ -83,7 +83,7 @@ export class DataGatewayService {
 
         return this.throughCache(
             `${hash}.getPlatformListing`, call
-        );
+        ) as Observable<{ id: string, name: string }[]>;
     }
 
     getProjectListing(hash, projectOwner: string, projectSlug: string): Observable<any[]> {
@@ -95,7 +95,7 @@ export class DataGatewayService {
             : Observable.throw(
                 new Error("Cannot get project apps because you are not connected to the necessary platform."));
 
-        return this.throughCache(cacheKey, call);
+        return this.throughCache(cacheKey, call) as Observable<any[]>;
     }
 
     invalidateProjectListing(hash, owner: string, project: string) {
@@ -181,7 +181,7 @@ export class DataGatewayService {
             return request;
         }
 
-        if (source === "app") {
+        if (source === "app" || source === "public") {
             // ID example, all concatenated:
             // default_1b2a8fed50d9402593a57acddc7d7cfe/ivanbatic+admin/
             // dfghhm/ivanbatic+admin/dfghhm/
@@ -200,19 +200,6 @@ export class DataGatewayService {
                 return fetch;
             }
             return fetch.map(app => JSON.stringify(app, null, 4));
-        }
-
-        if (source === "public") {
-            // Sample:
-            console.log("Feching public app", almostID);
-            const [, , , , , username, projectSlug, appSlug, revision] = almostID.split("/");
-
-            const request = this.api.getApp(`${username}/${projectSlug}/${appSlug}/${revision}`).take(1);
-            if (parse) {
-                return request;
-            }
-
-            return request.map(app => JSON.stringify(app, null, 4));
         }
     }
 

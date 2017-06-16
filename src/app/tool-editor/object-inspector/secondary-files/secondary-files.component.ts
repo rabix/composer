@@ -19,7 +19,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                         No Secondary Files defined.
                     </ct-blank-tool-state>
 
-                    <div *ngIf="readonly && !secondaryFiles.length" class="text-xs-center h5">
+                    <div *ngIf="readonly && !secondaryFiles.length" class="text-xs-center">
                         No Secondary Files defined.
                     </div>
 

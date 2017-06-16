@@ -59,7 +59,7 @@ export class TooltipDirective extends DirectiveBase {
 
         instance.show();
 
-        this.tracked = Observable.fromEvent(window, "scroll", true).first().subscribe(_ => {
+        this.tracked = Observable.fromEvent(window, "wheel").first().subscribe(_ => {
             this.hide();
         });
 

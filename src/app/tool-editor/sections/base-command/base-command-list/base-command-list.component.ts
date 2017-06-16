@@ -19,7 +19,7 @@ import {ModalService} from "../../../../ui/modal/modal.service";
                 parameters and options in the command line), or these can be set as arguments below.
             </ct-blank-tool-state>
 
-            <div *ngIf="readonly && !baseCommand.length" class="text-xs-center h5">
+            <div *ngIf="readonly && !baseCommand.length" class="text-xs-center">
                 This tool doesn't specify any baseCommands
             </div>
 

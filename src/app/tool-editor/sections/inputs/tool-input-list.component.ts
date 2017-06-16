@@ -25,7 +25,7 @@ import {noop} from "rxjs/util/noop";
                                  (buttonClick)="addEntry()">
             </ct-blank-tool-state>
 
-            <div *ngIf="readonly && !entries.length" class="text-xs-center h5">
+            <div *ngIf="readonly && !entries.length" class="text-xs-center">
                 This tool doesn't specify any inputs
             </div>
 
@@ -124,10 +124,6 @@ export class ToolInputListComponent extends DirectiveBase {
     @Input()
     location = "";
 
-    /** Context in which expression should be evaluated */
-    @Input()
-    context: { $job: any };
-
     @Input()
     readonly = false;
 
@@ -200,8 +196,8 @@ export class ToolInputListComponent extends DirectiveBase {
             && entry.type.fields;
     }
 
-    updateInput(input: CommandInputParameterModel, from: string) {
-        input.validate(this.context).then(noop, noop);
+    updateInput(input: CommandInputParameterModel) {
+        input.validate(this.model.getContext(input.id)).then(noop, noop);
         this.update.emit(this.model.inputs);
     }
 }
