@@ -1,4 +1,11 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
+import {
+    ChangeDetectionStrategy,
+    Component,
+    EventEmitter,
+    Input,
+    OnInit,
+    Output
+} from "@angular/core";
 import {FormControl, FormGroup} from "@angular/forms";
 
 @Component({
@@ -11,29 +18,11 @@ import {FormControl, FormGroup} from "@angular/forms";
                 <input class="form-control" formControlName="path" [value]="input.path || ''"/>
             </div>
 
-            <!--Size-->
+            <!--Basename-->
             <div class="form-group">
-                <label>Size</label>
-                <input class="form-control" formControlName="size" [value]="input.size || 0"/>
-            </div>
-
-            <!--Secondary Files-->
-            <div class="form-group">
-                <label>Secondary Files</label>
-                <ct-compact-list [addKeyCode]="13"
-                                 formControlName="secondaryFiles"></ct-compact-list>
-            </div>
-
-            <div class="form-group">
-                <label>Metadata</label>
-                <ct-map-list formControlName="metadata"></ct-map-list>
-            </div>
-
-            <!--Content-->
-            <div class="form-group">
-                <label>Content</label>
-                <textarea rows="10" class="form-control" formControlName="contents"
-                          [value]="input.contents || ''"></textarea>
+                <label>Basename</label>
+                <input class="form-control" formControlName="basename"
+                       [value]="input.basename || ''"/>
             </div>
         </form>
     `,
@@ -54,9 +43,11 @@ export class DirectoryInputInspectorComponent implements OnInit {
 
         this.formGroup = new FormGroup({
             path: new FormControl(this.input.path),
-            contents: new FormControl(this.input.contents),
-            metadata: new FormControl(this.input.metadata)
+            basename: new FormControl(this.input.basename),
         });
 
+        this.formGroup.valueChanges.subscribe(data => {
+            this.update.emit(data);
+        });
     }
 }

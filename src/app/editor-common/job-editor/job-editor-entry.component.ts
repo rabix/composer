@@ -116,7 +116,7 @@ import {ObjectHelper} from "../../helpers/object.helper";
                             <div class="tc-header">{{ input?.id }}</div>
                             <div class="tc-body">
                                 <ct-directory-input-inspector [input]="value || {}"
-                                                         (update)="updateFile($event)">
+                                                         (update)="updateDirectory($event)">
                                 </ct-directory-input-inspector>
                             </div>
                         </ct-editor-inspector-content>
@@ -210,6 +210,10 @@ export class JobEditorEntryComponent implements OnChanges, OnInit {
     }
 
     updateFile(data) {
+        this.updateJob(data);
+    }
+
+    updateDirectory(data) {
         this.updateJob(data);
     }
 

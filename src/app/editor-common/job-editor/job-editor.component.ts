@@ -190,6 +190,13 @@ export class JobEditorComponent implements OnChanges, OnDestroy {
             jobValue.class = "File";
         }
 
+        // If type is Directory, add class field to object
+        if (input.type.type === "Directory" &&
+            typeof jobValue === "object" &&
+            jobValue !== null) {
+            jobValue.class = "Directory";
+        }
+
         // Assign the given value to the job key
         OH.addProperty(this.job.inputs, prefix, jobValue);
 
