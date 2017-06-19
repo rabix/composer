@@ -29,7 +29,7 @@ import {Observable} from "rxjs/Observable";
                         <ct-toggle-slider [formControl]="form.controls['isRequired']"
                                           [off]="'No'"
                                           [on]="'Yes'"
-                                          [readonly]="readonly">
+                                          [disabled]="readonly">
                         </ct-toggle-slider>
                     </span>
         </div>
@@ -86,7 +86,8 @@ import {Observable} from "rxjs/Observable";
         <div *ngIf="isFileType() && isInputPort()">
             <label class="form-control-label">File types</label>
             <ct-auto-complete [formControl]="form.controls['fileTypes']"
-                              [create]="true"></ct-auto-complete>
+                              [create]="true"
+                              [readonly]="readonly"></ct-auto-complete>
         </div>
 
         <!--Batch group-->

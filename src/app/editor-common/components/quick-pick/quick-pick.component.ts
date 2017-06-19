@@ -24,6 +24,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                 <button class="btn btn-secondary"
                         type="button"
                         [class.active]="computedVal?.toString() === item.value.toString()"
+                        [disabled]="readonly"
                         (click)="selectDefault(item.value)">
                     {{ item.label }}
                 </button>
