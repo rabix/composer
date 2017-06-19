@@ -23,6 +23,8 @@ import {ModalService} from "../ui/modal/modal.service";
 import {DirectiveBase} from "../util/directive-base/directive-base";
 import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow-graph-editor.component";
 import {WorkflowEditorService} from "./workflow-editor.service";
+import {ProceedToEditingModalComponent} from "../core/modals/proceed-to-editing-modal/proceed-to-editing-modal.component";
+
 import LoadOptions = jsyaml.LoadOptions;
 
 
@@ -71,8 +73,19 @@ import LoadOptions = jsyaml.LoadOptions;
                     <i class="fa fa-external-link"></i>
                 </button>
 
+                <!--Edit-->
+                <button *ngIf="!data.isWritable && data.dataSource !== 'public'"
+                        class="btn"
+                        type="button"
+                        ct-tooltip="Edit"
+                        tooltipPlacement="bottom"
+                        (click)="edit()">
+                    <i class="fa fa-edit"></i>
+                </button>
+
                 <!--Save-->
-                <button [disabled]="!data.isWritable || isValidatingCWL"
+                <button *ngIf="data.isWritable"
+                        [disabled]="isValidatingCWL"
                         (click)="save()"
                         ct-tooltip="Save"
                         [tooltipPlacement]="'bottom'"
@@ -267,6 +280,10 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
         this.statusBar.setControls(this.statusControls);
         this.inspector.setHostView(this.inspectorHostView);
 
+        if (this.data.dataSource === "app" && this.hasCopyOfProperty()) {
+            this.data.isWritable = false;
+        }
+
         if (!this.data.isWritable) {
             this.codeEditorContent.disable();
         }
@@ -419,6 +436,28 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
                 });
             }
         });
+    }
+
+    hasCopyOfProperty() {
+        return typeof this.data.parsedContent["sbg:copyOf"] !== undefined;
+    }
+
+    edit() {
+        const modal = this.modal.fromComponent(ProceedToEditingModalComponent, {
+            closeOnOutsideClick: false,
+            backdrop: true,
+            title: `Edit ${(this.data.parsedContent.label)}?`,
+            closeOnEscape: true
+        });
+
+        modal.appName = this.data.parsedContent.label;
+        modal.response.subscribe(val => {
+            this.data.isWritable = val;
+            if (val) {
+                this.codeEditorContent.enable();
+                this.graphEditor.enableGraphManipulations();
+            }
+        })
     }
 
     /**

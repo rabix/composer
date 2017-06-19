@@ -74,7 +74,9 @@ export class InputTypeSelectComponent extends DirectiveBase implements ControlVa
         this.form.controls["isItemOrArray"].setValue(this.paramType.isItemOrArray, {onlySelf: true});
 
         this.tracked = this.form.valueChanges.subscribe(change => {
-            this.paramType.type          = change.type;
+            if (change.type !== undefined) {
+                this.paramType.type = change.type;
+            }
             this.paramType.isItemOrArray = change.isItemOrArray;
 
             if (change.type === "array") {
@@ -111,6 +113,7 @@ export class InputTypeSelectComponent extends DirectiveBase implements ControlVa
         if (isDisabled) {
             this.skipOnChange = true;
             this.form.controls["type"].disable();
+            this.form.controls["isItemOrArray"].disable();
             this.form.controls["items"].disable();
         }
     }

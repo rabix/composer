@@ -45,7 +45,8 @@ import {UpdateStepModalComponent} from "../../update-step-modal/update-step-moda
                                            [step]="step"
                                            [inputs]="step.in"
                                            [graph]="graph"
-                                           [workflowModel]="workflowModel">
+                                           [workflowModel]="workflowModel"
+                                           [readonly]="readonly">
         </ct-workflow-step-inspector-inputs>
 
         <!--Inputs-->
@@ -57,11 +58,15 @@ import {UpdateStepModalComponent} from "../../update-step-modal/update-step-moda
         <ct-workflow-step-inspector-step *ngIf="viewMode === tabs.Step"
                                          [step]="step"
                                          [graph]="graph"
-                                         [workflowModel]="workflowModel">
+                                         [workflowModel]="workflowModel"
+                                         [readonly]="readonly">
         </ct-workflow-step-inspector-step>
     `
 })
 export class StepInspectorComponent extends DirectiveBase {
+
+    @Input()
+    readonly = false;
 
     @Input()
     step: StepModel;

@@ -73,13 +73,13 @@ export class ModalService {
     private wrapPromise<T>(handler: (resolve, reject) => void): Promise<T> {
         const insideClosing = new Promise((resolve, reject) => {
             handler(resolve, reject);
-        });
+        }) as Promise<T>;
 
         const outsideClosing = new Promise((resolve, reject) => {
             this.onClose.first().subscribe(reject);
-        });
+        }) as Promise<T>;
 
-        return Promise.race([insideClosing, outsideClosing]);
+        return Promise.race([insideClosing, outsideClosing]) as Promise<T>;
     }
 
     private cleanComponentRef() {
