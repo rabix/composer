@@ -143,7 +143,7 @@ import {WorkflowStepInputModel} from "cwlts/models";
         </div>
     `
 })
-export class WorkflowStepInspectorInputEntry implements OnChanges, OnInit {
+export class WorkflowStepInspectorInputEntryComponent implements OnChanges, OnInit {
 
     @Input()
     public readonly = false;
@@ -236,7 +236,7 @@ export class WorkflowStepInspectorInputEntry implements OnChanges, OnInit {
                             is of type “${typeof this.value}”, but the input is declared 
                             as “${this.inputType}”. 
                             You can generate a new set of test data for this input by clicking 
-                            on the “New ${this.input.type.items}” button.`
+                            on the “New ${this.input.type.items}” button.`;
         }
     }
 
