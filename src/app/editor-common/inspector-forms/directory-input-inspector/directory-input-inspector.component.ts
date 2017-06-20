@@ -15,14 +15,13 @@ import {FormControl, FormGroup} from "@angular/forms";
             <!--Path-->
             <div class="form-group">
                 <label>Path</label>
-                <input class="form-control" formControlName="path" [value]="input.path || ''"/>
+                <input class="form-control" formControlName="path"/>
             </div>
 
             <!--Basename-->
             <div class="form-group">
                 <label>Basename</label>
-                <input class="form-control" formControlName="basename"
-                       [value]="input.basename || ''"/>
+                <input class="form-control" formControlName="basename"/>
             </div>
         </form>
     `,
@@ -42,8 +41,8 @@ export class DirectoryInputInspectorComponent implements OnInit {
     ngOnInit(): void {
 
         this.formGroup = new FormGroup({
-            path: new FormControl(this.input.path),
-            basename: new FormControl(this.input.basename),
+            path: new FormControl(this.input.path || ""),
+            basename: new FormControl(this.input.basename || ""),
         });
 
         this.formGroup.valueChanges.subscribe(data => {

@@ -65,8 +65,12 @@ export class InputTypeSelectComponent extends DirectiveBase implements ControlVa
         this.paramType = paramType;
 
         if (paramType.hasDirectoryType) {
-            this.types.push("Directory");
-            this.itemTypes.push("Directory");
+            if (this.types.indexOf("Directory") === -1) {
+                this.types.push("Directory");
+            }
+            if (this.itemTypes.indexOf("Directory") === -1) {
+                this.itemTypes.push("Directory");
+            }
         }
 
         this.form.controls["type"].setValue(this.paramType.type, {onlySelf: true});

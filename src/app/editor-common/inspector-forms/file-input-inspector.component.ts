@@ -30,13 +30,13 @@ interface CWLFile {
             <!--Path-->
             <div class="form-group">
                 <label>Path</label>
-                <input class="form-control" formControlName="path" [value]="input.path || ''"/>
+                <input class="form-control" formControlName="path"/>
             </div>
 
             <!--Size-->
             <div class="form-group">
                 <label>Size</label>
-                <input class="form-control" formControlName="size" [value]="input.size || 0"/>
+                <input class="form-control" formControlName="size"/>
             </div>
 
             <!--Secondary Files-->
@@ -55,26 +55,25 @@ interface CWLFile {
             <!--Content-->
             <div class="form-group">
                 <label>Content</label>
-                <textarea rows="10" class="form-control" formControlName="contents"
-                          [value]="input.contents || ''"></textarea>
+                <textarea rows="10" class="form-control" formControlName="contents"></textarea>
             </div>
             
             <!--Basename-->
             <div class="form-group" *ngIf="formGroup.controls['basename']">
                 <label>Basename</label>
-                <input class="form-control" formControlName="basename" [value]="input.basename || ''"/>
+                <input class="form-control" formControlName="basename"/>
             </div>
 
             <!--Nameroot-->
             <div class="form-group" *ngIf="formGroup.controls['nameroot']">
                 <label>Nameroot</label>
-                <input class="form-control" formControlName="nameroot" [value]="input.nameroot || ''"/>
+                <input class="form-control" formControlName="nameroot"/>
             </div>
 
             <!--Nameext-->
             <div class="form-group" *ngIf="formGroup.controls['nameext']">
                 <label>Nameext</label>
-                <input class="form-control" formControlName="nameext" [value]="input.nameext || ''"/>
+                <input class="form-control" formControlName="nameext"/>
             </div>
         </form>
     `

@@ -195,17 +195,11 @@ export class JobEditorComponent implements OnChanges, OnDestroy {
         this.statusBar.instant(`Updated job value of ${input ? input.label || input.id : inputId}.`);
 
         // If type is File, add class field to object
-        if (input.type.type === "File" &&
+        if ((input.type.type === "File" ||
+            input.type.type === "Directory") &&
             typeof jobValue === "object" &&
             jobValue !== null) {
-            jobValue.class = "File";
-        }
-
-        // If type is Directory, add class field to object
-        if (input.type.type === "Directory" &&
-            typeof jobValue === "object" &&
-            jobValue !== null) {
-            jobValue.class = "Directory";
+            jobValue.class = input.type.type;
         }
 
         // Assign the given value to the job key

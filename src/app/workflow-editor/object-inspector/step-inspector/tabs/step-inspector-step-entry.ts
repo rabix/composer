@@ -83,6 +83,13 @@ import {WorkflowStepInputModel} from "cwlts/models";
                     </span>
                 </ng-template>
 
+                <!--Directories and array of Directories-->
+                <ng-template ngSwitchCase="Directory">
+                    <span class="small text-muted">
+                        Cannot set default values for type Directory and Directory[].
+                    </span>
+                </ng-template>
+
                 <!--Every element that's a part of the array can be deleted, so we add a deletion button to it-->
                 <span class="input-group-btn" *ngIf="index !== -1">
                     <button type="button" 
