@@ -1,4 +1,7 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewEncapsulation} from "@angular/core";
+import {
+    ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges,
+    ViewEncapsulation
+} from "@angular/core";
 import {ObjectHelper} from "../../../../helpers/object.helper";
 import {JobHelper} from "cwlts/models/helpers/JobHelper";
 import {WorkflowStepInputModel} from "cwlts/models";
@@ -21,6 +24,7 @@ import {WorkflowStepInputModel} from "cwlts/models";
                 <ng-template ngSwitchCase="enum">
                     <select [value]="value" class="form-control"
                             [attr.prefix]="prefix"
+                            [attr.fieldType]="inputType"
                             [disabled]="readonly">
                         <option *ngFor="let val of input.type.symbols" [value]="val"> {{ val }}
                         </option>
@@ -30,6 +34,7 @@ import {WorkflowStepInputModel} from "cwlts/models";
                 <!--Numbers-->
                 <ng-template ngSwitchCase="int">
                     <input [attr.prefix]="prefix"
+                           [attr.fieldType]="inputType"
                            type="number"
                            class="form-control"
                            [value]="value"
@@ -37,6 +42,7 @@ import {WorkflowStepInputModel} from "cwlts/models";
                 </ng-template>
                 <ng-template ngSwitchCase="float">
                     <input [attr.prefix]="prefix"
+                           [attr.fieldType]="inputType"
                            type="number"
                            class="form-control"
                            [value]="value"
@@ -46,6 +52,7 @@ import {WorkflowStepInputModel} from "cwlts/models";
                 <!--Strings-->
                 <ng-template ngSwitchCase="string">
                     <input [attr.prefix]="prefix"
+                           [attr.fieldType]="inputType"
                            class="form-control"
                            [value]="value"
                            [disabled]="readonly"/>
@@ -54,6 +61,7 @@ import {WorkflowStepInputModel} from "cwlts/models";
                 <!--Booleans-->
                 <ng-template ngSwitchCase="boolean">
                     <ct-toggle-slider [attr.prefix]="prefix"
+                                      [attr.fieldType]="inputType"
                                       (valueChange)="updateJob($event)"
                                       [value]="value"
                                       [disabled]="readonly"></ct-toggle-slider>
@@ -63,6 +71,7 @@ import {WorkflowStepInputModel} from "cwlts/models";
                 <ng-template ngSwitchCase="map">
                     <ct-map-list class="form-group"
                                  [attr.prefix]="prefix"
+                                 [attr.fieldType]="inputType"
                                  (change)="updateMap($event)"
                                  [ngModel]="value"></ct-map-list>
                 </ng-template>
@@ -134,7 +143,7 @@ import {WorkflowStepInputModel} from "cwlts/models";
         </div>
     `
 })
-export class WorkflowStepInspectorInputEntry implements OnChanges {
+export class WorkflowStepInspectorInputEntry implements OnChanges, OnInit {
 
     @Input()
     public readonly = false;

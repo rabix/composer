@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, Input, Output, ViewEncapsulation} from "@angular/core";
+import {ChangeDetectorRef, Component, Input, OnChanges, OnInit, Output, ViewEncapsulation} from "@angular/core";
 import {Workflow} from "cwl-svg";
 import {StepModel, WorkflowModel, WorkflowStepInputModel} from "cwlts/models";
 import {Subject} from "rxjs/Subject";
@@ -107,7 +107,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
         </div>
     `
 })
-export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase {
+export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase implements OnInit, OnChanges {
 
     public dropDownPortOptions = [
         {
@@ -185,8 +185,19 @@ export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase {
         // Get field path (for an example -> "inputId.[0].record.[2]")
         const fieldPath = formField.getAttribute("prefix");
 
-        // Get the new value that we should set input to
-        const val = formField.value;
+        // Get input type (number, text...)
+        const type = formField.getAttribute("type");
+
+        // Get field type (int, float, string, map ...)
+        const fieldType = formField.getAttribute("fieldType");
+
+        // Get field value
+        const fieldValue = formField.value;
+
+        // Get the new value that we should set the job to
+        const val = type === "number" ?
+            (fieldType === "int" ? parseInt(fieldValue, 10) : parseFloat(fieldValue))
+            : fieldValue;
 
         // Form field might not have prefix, so if we missed it,
         // it's better to do nothing than break the app.

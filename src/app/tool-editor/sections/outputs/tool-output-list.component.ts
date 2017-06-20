@@ -1,3 +1,4 @@
+import {noop} from "../../../lib/utils.lib";
 import {
     Component,
     EventEmitter,
@@ -104,7 +105,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                             <div class="tc-header">{{ entry.id || entry.loc || "Output" }}</div>
                             <div class="tc-body">
                                 <ct-tool-output-inspector
-                                        (save)="update.emit(model.outputs)"
+                                        (save)="updateOutput(entry)"
                                         [context]="context"
                                         [model]="model"
                                         [output]="entry"
@@ -118,7 +119,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                     <!--Nested entries-->
                     <div *ngIf="isRecordType(entry)" class="children pl-1 pr-1">
                         <ct-tool-output-list [(entries)]="entry.type.fields"
-                                             (update)="update.emit(model.outputs)"
+                                             (update)="updateOutput(entry)"
                                              [readonly]="readonly"
                                              [inputs]="inputs"
                                              [parent]="entry"
@@ -226,5 +227,10 @@ export class ToolOutputListComponent extends DirectiveBase {
     isRecordType(entry) {
         return entry.type.type === "record" || (entry.type.type === "array" && entry.type.items === "record")
             && entry.type.fields;
+    }
+
+    updateOutput(output: CommandOutputParameterModel) {
+        output.validate(this.model.getContext(output.id)).then(noop, noop);
+        this.update.emit(this.model.outputs);
     }
 }
