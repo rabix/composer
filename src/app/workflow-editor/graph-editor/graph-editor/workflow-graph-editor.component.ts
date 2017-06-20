@@ -330,8 +330,14 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             }, 1);
         }
 
-        this.graph.on("beforeChange", () => {
-            this.workflowEditorService.putInHistory(this.model);
+        this.graph.on("beforeChange", (event) => {
+
+            // When event is "step.create", model is already in history, so do not push it
+            // This is when you drop external node from the tree or you create an input/output port
+            if (event && event.type !== "step.create") {
+                this.workflowEditorService.putInHistory(this.model);
+            }
+
         });
 
         this.graph.on("selectionChange", (ev) => {
@@ -474,6 +480,8 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
                 app.id      = app.id || id;
             }
 
+            this.workflowEditorService.putInHistory(this.model);
+
             const step = this.model.addStepFromProcess(app);
 
             // add local source so step can be serialized without embedding
@@ -489,6 +497,8 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             });
 
             this.graph.command("app.create.step", step);
+
+            this.setFocusOnCanvas();
         }, err => {
             console.warn("Could not add an app", err);
         });
