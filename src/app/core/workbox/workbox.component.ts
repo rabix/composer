@@ -44,7 +44,7 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
                     <!--Tooltip content-->
                     <ct-tooltip-content [maxWidth]="500" #ctt>
                         <div>
-                            {{ tab.data ? tab.data.parsedContent["sbg:id"] || tab.data.id : tab.label }}
+                            {{ tab.data ? (tab.data.dataSource === "local" ? tab.data.id : tab.data.parsedContent["sbg:id"]) : tab.label }}
                         </div>
                     </ct-tooltip-content>
                 </li>

@@ -141,8 +141,19 @@ export class JobEditorComponent implements OnChanges, OnDestroy {
         // Get field path (for an example -> "inputId.[0].record.[2]")
         const fieldPath = formField.getAttribute("prefix");
 
+        // Get input type (number, text...)
+        const type = formField.getAttribute("type");
+
+        // Get field type (int, float, string, map ...)
+        const fieldType = formField.getAttribute("fieldType");
+
+        // Get field value
+        const fieldValue = formField.value;
+
         // Get the new value that we should set the job to
-        const val = formField.value;
+        const val = type === "number" ?
+            (fieldType === "int" ? parseInt(fieldValue, 10) : parseFloat(fieldValue))
+            : fieldValue;
 
         // Form field might not have fieldPath, so if we missed it,
         // it's better to do nothing than break the app.

@@ -82,12 +82,9 @@ export class OutputEvalSectionComponent extends DirectiveBase implements Control
             .distinctUntilChanged()
             .subscribe(value => {
 
-                // this.output.updateOutputBinding(new CommandOutputBindingModel({
-                //     loadContents: value.loadContents,
-                //     outputEval: value.outputEval.serialize()
-                // }));
-
+                this.output.outputBinding.loadContents = value.loadContents;
                 this.propagateChange(this.output);
+
             });
     }
 
