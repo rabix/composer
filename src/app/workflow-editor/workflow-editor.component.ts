@@ -439,7 +439,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
     }
 
     hasCopyOfProperty() {
-        return typeof this.data.parsedContent["sbg:copyOf"] !== undefined;
+        return typeof this.data.parsedContent["sbg:copyOf"] !== "undefined";
     }
 
     edit() {
