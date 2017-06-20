@@ -67,6 +67,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                            [formControl]="form.controls['primitive']">
 
                     <ct-expression-input type="string"
+                                         [context]="context"
                                          *ngIf="argument.hasExprPrimitive"
                                          [formControl]="form.controls['primitive']">
 
@@ -112,6 +113,7 @@ export class ArgumentInspectorComponent extends DirectiveBase implements OnInit 
         this.tracked = this.form.controls["hasBinding"].valueChanges.subscribe(val => {
             if (val === true) {
                 this.argument.toggleBinding(val);
+                this.form.controls["valueFrom"].setValue(this.argument.valueFrom);
             } else if (val === false) {
                 this.argument.toggleBinding(val);
                 this.form.controls["primitive"].setValue(this.argument.primitive);
@@ -125,7 +127,8 @@ export class ArgumentInspectorComponent extends DirectiveBase implements OnInit 
                     position: form.position ? parseInt(form.position, 10) : 0,
                     separate: form.separate,
                     prefix: form.prefix,
-                    shellQuote: form.shellQuote
+                    shellQuote: form.shellQuote,
+                    valueFrom: form.valueFrom.serialize && form.valueFrom.serialize()
                 });
             } else {
                 this.argument.updatePrimitive(form.primitive.serialize ? form.primitive.serialize() : form.primitive);

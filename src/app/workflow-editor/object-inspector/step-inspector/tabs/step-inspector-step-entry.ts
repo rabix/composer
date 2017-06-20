@@ -1,4 +1,7 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewEncapsulation} from "@angular/core";
+import {
+    ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges,
+    ViewEncapsulation
+} from "@angular/core";
 import {ObjectHelper} from "../../../../helpers/object.helper";
 import {JobHelper} from "cwlts/models/helpers/JobHelper";
 import {WorkflowStepInputModel} from "cwlts/models";
@@ -21,6 +24,7 @@ import {WorkflowStepInputModel} from "cwlts/models";
                 <ng-template ngSwitchCase="enum">
                     <select [value]="value" class="form-control"
                             [attr.prefix]="prefix"
+                            [attr.fieldType]="inputType"
                             [disabled]="readonly">
                         <option *ngFor="let val of input.type.symbols" [value]="val"> {{ val }}
                         </option>
@@ -30,6 +34,7 @@ import {WorkflowStepInputModel} from "cwlts/models";
                 <!--Numbers-->
                 <ng-template ngSwitchCase="int">
                     <input [attr.prefix]="prefix"
+                           [attr.fieldType]="inputType"
                            type="number"
                            class="form-control"
                            [value]="value"
@@ -37,6 +42,7 @@ import {WorkflowStepInputModel} from "cwlts/models";
                 </ng-template>
                 <ng-template ngSwitchCase="float">
                     <input [attr.prefix]="prefix"
+                           [attr.fieldType]="inputType"
                            type="number"
                            class="form-control"
                            [value]="value"
@@ -46,6 +52,7 @@ import {WorkflowStepInputModel} from "cwlts/models";
                 <!--Strings-->
                 <ng-template ngSwitchCase="string">
                     <input [attr.prefix]="prefix"
+                           [attr.fieldType]="inputType"
                            class="form-control"
                            [value]="value"
                            [disabled]="readonly"/>
@@ -54,6 +61,7 @@ import {WorkflowStepInputModel} from "cwlts/models";
                 <!--Booleans-->
                 <ng-template ngSwitchCase="boolean">
                     <ct-toggle-slider [attr.prefix]="prefix"
+                                      [attr.fieldType]="inputType"
                                       (valueChange)="updateJob($event)"
                                       [value]="value"
                                       [disabled]="readonly"></ct-toggle-slider>
@@ -63,6 +71,7 @@ import {WorkflowStepInputModel} from "cwlts/models";
                 <ng-template ngSwitchCase="map">
                     <ct-map-list class="form-group"
                                  [attr.prefix]="prefix"
+                                 [attr.fieldType]="inputType"
                                  (change)="updateMap($event)"
                                  [ngModel]="value"></ct-map-list>
                 </ng-template>
@@ -71,6 +80,13 @@ import {WorkflowStepInputModel} from "cwlts/models";
                 <ng-template ngSwitchCase="File">
                     <span class="text-warning small">
                         Cannot set default values for type File and File[].
+                    </span>
+                </ng-template>
+
+                <!--Directories and array of Directories-->
+                <ng-template ngSwitchCase="Directory">
+                    <span class="small text-muted">
+                        Cannot set default values for type Directory and Directory[].
                     </span>
                 </ng-template>
 
@@ -134,7 +150,7 @@ import {WorkflowStepInputModel} from "cwlts/models";
         </div>
     `
 })
-export class WorkflowStepInspectorInputEntry implements OnChanges {
+export class WorkflowStepInspectorInputEntryComponent implements OnChanges, OnInit {
 
     @Input()
     public readonly = false;
@@ -227,7 +243,7 @@ export class WorkflowStepInspectorInputEntry implements OnChanges {
                             is of type “${typeof this.value}”, but the input is declared 
                             as “${this.inputType}”. 
                             You can generate a new set of test data for this input by clicking 
-                            on the “New ${this.input.type.items}” button.`
+                            on the “New ${this.input.type.items}” button.`;
         }
     }
 

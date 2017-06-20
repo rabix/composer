@@ -11,17 +11,18 @@ export class WorkflowEditorService {
         if (this.history.length > 20) {
             this.history.shift();
         }
-        this.history.push(model.serialize());
+
+        this.history.push(model.serializeEmbedded(true));
         this.future.length = 0;
     }
 
     public historyUndo(model: WorkflowModel) {
-        this.future.push(model.serialize());
+        this.future.push(model.serializeEmbedded(true));
         return this.history.pop();
     }
 
     public historyRedo(model: WorkflowModel) {
-        this.history.push(model.serialize());
+        this.history.push(model.serializeEmbedded(true));
         return this.future.pop();
     }
 

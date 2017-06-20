@@ -8,6 +8,7 @@ import {
     Validators
 } from "@angular/forms";
 import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
+import {SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 import {noop} from "../../../../lib/utils.lib";
 
@@ -48,7 +49,7 @@ import {noop} from "../../../../lib/utils.lib";
             </div>
 
             <!--Input Type -->
-            <ct-input-type-select [formControl]="form.controls['type']"></ct-input-type-select>
+            <ct-type-select [formControl]="form.controls['type']"></ct-type-select>
 
             <!--Symbols-->
             <ct-symbols-section class="form-group"
@@ -152,6 +153,15 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
 
             // type changes
             if (value.type) {
+
+                if (!this.isType("File")) {
+                    this.input.updateSecondaryFiles([]);
+                    delete this.input.customProps["sbg:stageInput"];
+                    if (this.input.inputBinding) {
+                        this.input.inputBinding.loadContents = false;
+                    }
+                }
+
                 if (value.type.type !== "array" && this.input.isBound) {
                     this.input.inputBinding.itemSeparator = undefined;
                 }
@@ -185,6 +195,11 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
                 this.input.createInputBinding();
                 this.form.setControl("inputBinding", new FormControl(this.input));
             } else {
+
+                if (this.input instanceof SBDraft2CommandInputParameterModel) {
+                    this.input.updateSecondaryFiles([]);
+                }
+
                 this.input.removeInputBinding();
                 this.form.removeControl("inputBinding");
             }

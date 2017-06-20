@@ -1,4 +1,11 @@
-import {ChangeDetectorRef, Component, Input, Output, ViewEncapsulation} from "@angular/core";
+import {
+    ChangeDetectorRef,
+    Component,
+    Input,
+    OnChanges,
+    OnInit,
+    Output,
+} from "@angular/core";
 import {Workflow} from "cwl-svg";
 import {StepModel, WorkflowModel, WorkflowStepInputModel} from "cwlts/models";
 import {Subject} from "rxjs/Subject";
@@ -23,7 +30,8 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                             <div class="input-title flex-baseline">
 
                                 <label class="input-label" title="{{ input.label || input.id }}">
-                                    <span class="text-danger" *ngIf="!input.type.isNullable">*</span>
+                                    <span class="text-danger"
+                                          *ngIf="!input.type.isNullable">*</span>
                                     <i class="fa fa-info-circle text-muted"
                                        *ngIf="input.description"
                                        [ct-tooltip]="ctt"
@@ -32,19 +40,19 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                                 </label>
 
                                 <!--Port options for File and array of Files-->
-                                <div *ngIf="isFileType(input)" class="port-controls">
+                                <div *ngIf="isType(input, ['File', 'Directory'])" class="port-controls">
                                     <ct-toggle-slider
-                                        (valueChange)="onPortOptionChange(input, $event ? 'port' : 'editable')"
-                                        *ngIf="input.type.isNullable"
-                                        [disabled]="readonly"
-                                        [on]="'Show'"
-                                        [off]="'Hide'"
-                                        [value]="input.isVisible">
+                                            (valueChange)="onPortOptionChange(input, $event ? 'port' : 'editable')"
+                                            *ngIf="input.type.isNullable"
+                                            [disabled]="readonly"
+                                            [on]="'Show'"
+                                            [off]="'Hide'"
+                                            [value]="input.isVisible">
                                     </ct-toggle-slider>
                                 </div>
 
                                 <!--Port options for all other types-->
-                                <div *ngIf="!isFileType(input)" class="input-control">
+                                <div *ngIf="!isType(input, ['File', 'Directory'])" class="input-control">
                                     <ct-dropdown-button [dropDownOptions]="dropDownPortOptions"
                                                         (change)="onPortOptionChange(input, $event)"
                                                         [value]="input.status"
@@ -59,7 +67,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                                                               [value]="input.default"
                                                               [type]="input.type"
                                                               [readonly]="readonly"
-                                                              *ngIf="!isFileType(input)"
+                                                              *ngIf="!isType(input, 'File')"
                                                               (update)="stepValueUpdate(input.id + '.default', $event)"
                                                               class="mb-0">
                             </ct-workflow-step-inspector-entry>
@@ -88,15 +96,15 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
                                 <h4>{{input.label || input.id}}</h4>
 
-                                    <!--Description-->
-                                    <div>
+                                <!--Description-->
+                                <div>
                                         <span class="title">
                                             Description:
                                         </span>
-                                        <span class="value">
+                                    <span class="value">
                                             {{input.description}}
                                         </span>
-                                    </div>
+                                </div>
 
                             </ct-tooltip-content>
 
@@ -107,7 +115,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
         </div>
     `
 })
-export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase {
+export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase implements OnInit, OnChanges {
 
     public dropDownPortOptions = [
         {
@@ -185,8 +193,19 @@ export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase {
         // Get field path (for an example -> "inputId.[0].record.[2]")
         const fieldPath = formField.getAttribute("prefix");
 
-        // Get the new value that we should set input to
-        const val = formField.value;
+        // Get input type (number, text...)
+        const type = formField.getAttribute("type");
+
+        // Get field type (int, float, string, map ...)
+        const fieldType = formField.getAttribute("fieldType");
+
+        // Get field value
+        const fieldValue = formField.value;
+
+        // Get the new value that we should set the job to
+        const val = type === "number" ?
+            (fieldType === "int" ? parseInt(fieldValue, 10) : parseFloat(fieldValue))
+            : fieldValue;
 
         // Form field might not have prefix, so if we missed it,
         // it's better to do nothing than break the app.
@@ -237,7 +256,7 @@ export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase {
 
         // Whenever inputs are updated, regroup them and sort them for display
         const grouped = this.inputs.reduce((acc, item) => {
-            const group = this.isFileType(item) ? "Files" : "App parameters";
+            const group = this.isType(item, "File") ? "Files" : "App parameters";
             return Object.assign(acc, group ? {[group]: (acc[group] || []).concat(item)} : null);
 
         }, {});
@@ -249,8 +268,13 @@ export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase {
         }));
     }
 
-    isFileType(input) {
-        return input.type.type === "File" || (input.type.type === "array" && input.type.items === "File");
-    }
+    isType(input: WorkflowStepInputModel, types: string | string[]): boolean {
+        if (typeof types === "string") {
+            types = [types];
+        }
 
+        return !!types.find(type => {
+            return input.type.type === type || input.type.items === type;
+        });
+    }
 }

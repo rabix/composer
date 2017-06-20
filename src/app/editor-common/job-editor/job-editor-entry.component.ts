@@ -32,7 +32,8 @@ import {ObjectHelper} from "../../helpers/object.helper";
                 <!--Enums-->
                 <ng-template ngSwitchCase="enum">
                     <select [value]="value" class="form-control"
-                            [attr.prefix]="prefix">
+                            [attr.prefix]="prefix"
+                            [attr.fieldType]="inputType">
                         <option *ngFor="let val of input.type.symbols" [value]="val"> {{ val }}
                         </option>
                     </select>
@@ -41,12 +42,14 @@ import {ObjectHelper} from "../../helpers/object.helper";
                 <!--Numbers-->
                 <ng-template ngSwitchCase="int">
                     <input [attr.prefix]="prefix"
+                           [attr.fieldType]="inputType"
                            type="number"
                            class="form-control"
                            [value]="value"/>
                 </ng-template>
                 <ng-template ngSwitchCase="float">
                     <input [attr.prefix]="prefix"
+                           [attr.fieldType]="inputType"
                            type="number"
                            class="form-control"
                            [value]="value"/>
@@ -55,6 +58,7 @@ import {ObjectHelper} from "../../helpers/object.helper";
                 <!--Strings-->
                 <ng-template ngSwitchCase="string">
                     <input [attr.prefix]="prefix"
+                           [attr.fieldType]="inputType"
                            class="form-control"
                            [value]="value"/>
                 </ng-template>
@@ -63,6 +67,7 @@ import {ObjectHelper} from "../../helpers/object.helper";
                 <ng-template ngSwitchCase="boolean">
                     <ct-toggle-slider class="pull-right"
                                       [attr.prefix]="prefix"
+                                      [attr.fieldType]="inputType"
                                       (valueChange)="updateJob($event)"
                                       [value]="value"></ct-toggle-slider>
                 </ng-template>
@@ -71,6 +76,7 @@ import {ObjectHelper} from "../../helpers/object.helper";
                 <ng-template ngSwitchCase="map">
                     <ct-map-list class="form-group"
                                  [attr.prefix]="prefix"
+                                 [attr.fieldType]="inputType"
                                  (change)="updateMap($event)"
                                  [ngModel]="value"></ct-map-list>
                 </ng-template>
@@ -79,6 +85,7 @@ import {ObjectHelper} from "../../helpers/object.helper";
                 <ng-template ngSwitchCase="File">
                     <input [attr.jobPropPath]="'path'"
                            [attr.prefix]="prefix"
+                           [attr.fieldType]="inputType"
                            class="form-control"
                            [value]="value?.path"/>
                     <span class="input-group-btn">
@@ -96,6 +103,28 @@ import {ObjectHelper} from "../../helpers/object.helper";
                                 <ct-file-input-inspector [input]="value || {}"
                                                          (update)="updateFile($event)">
                                 </ct-file-input-inspector>
+                            </div>
+                        </ct-editor-inspector-content>
+                    </ng-template>
+                </ng-template>
+
+                <!--Directories-->
+                <ng-template ngSwitchCase="Directory">
+                    <input [attr.jobPropPath]="'path'"
+                           [attr.prefix]="prefix" class="form-control" [value]="value?.path"/>
+                    <span class="input-group-btn">
+                        <button class="btn btn-secondary" [ct-editor-inspector]="directoryInspector">
+                                                        <i class="fa fa-ellipsis-h"></i>
+
+                        </button>
+                    </span>
+                    <ng-template #directoryInspector>
+                        <ct-editor-inspector-content>
+                            <div class="tc-header">{{ input?.id }}</div>
+                            <div class="tc-body">
+                                <ct-directory-input-inspector [input]="value || {}"
+                                                         (update)="updateDirectory($event)">
+                                </ct-directory-input-inspector>
                             </div>
                         </ct-editor-inspector-content>
                     </ng-template>
@@ -188,6 +217,10 @@ export class JobEditorEntryComponent implements OnChanges, OnInit {
     }
 
     updateFile(data) {
+        this.updateJob(data);
+    }
+
+    updateDirectory(data) {
         this.updateJob(data);
     }
 

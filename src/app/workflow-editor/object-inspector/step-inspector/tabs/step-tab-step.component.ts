@@ -36,9 +36,8 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
         <!--Scatter Method-->
         <div *ngIf="step.hasScatterMethod" class="form-group">
             <label class="form-control-label">Scatter Method</label>
-            <select class="form-control" 
-                    [formControl]="form.controls['scatterMethod']"
-                    [attr.disabled]="readonly">
+            <select class="form-control"
+                    [formControl]="form.controls['scatterMethod']">
                 <option *ngFor="let method of scatterMethodOptions" [value]="method.value">
                     {{method.caption}}
                 </option>
@@ -51,10 +50,9 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <label class="form-control-label">Scatter</label>
 
             <!--Single Scatter-->
-            <select *ngIf="!step.hasMultipleScatter" 
-                    class="form-control" 
-                    [formControl]="form.controls['scatter']"
-                    [attr.disabled]="readonly">
+            <select *ngIf="!step.hasMultipleScatter"
+                    class="form-control"
+                    [formControl]="form.controls['scatter']">
                 <option value="">-- none --</option>
                 <option *ngFor="let input of step.in" [value]="input.id">
                     {{input.label}} (#{{input.id}})
@@ -62,11 +60,10 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             </select>
 
             <!--Multiple Scatter-->
-            <select *ngIf="step.hasMultipleScatter" 
-                    class="form-control" 
+            <select *ngIf="step.hasMultipleScatter"
+                    class="form-control"
                     multiple
-                    [formControl]="form.controls['scatter']"
-                    [attr.disabled]="readonly">
+                    [formControl]="form.controls['scatter']">
                 <option *ngFor="let opt of step.in" [value]="opt.id">
                     {{opt.id}}
                 </option>
@@ -130,6 +127,8 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
             this.form.controls["description"].setValue(newStep.description);
             this.form.controls["scatterMethod"].setValue(newStep.scatterMethod);
             this.form.controls["scatter"].setValue(newStep.scatter || "");
+
+            this.disableScatter();
         }
     }
 
@@ -142,6 +141,8 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
             scatterMethod: [this.step.scatterMethod],
             scatter: [this.step.scatter || ""]
         });
+
+        this.disableScatter();
 
         this.tracked = this.form.controls["id"].valueChanges.debounceTime(1000).subscribe((value) => {
             try {
@@ -172,6 +173,19 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
             this.step.scatterMethod = scatterMethod;
         });
 
+    }
+
+    disableScatter() {
+        // using [disabled] doesn't work for whatever reason
+        // binding readonly to [attr.disabled] makes the select ALWAYS disabled
+        // because it has the disabled attribute, regardless if it's true or false
+        if (this.readonly) {
+            this.form.controls["scatter"].disable();
+            this.form.controls["scatterMethod"].disable();
+        } else {
+            this.form.controls["scatter"].enable();
+            this.form.controls["scatterMethod"].enable();
+        }
     }
 
 }
