@@ -288,7 +288,7 @@ export class ToolEditorComponent extends DirectiveBase implements OnInit, OnDest
     }
 
     hasCopyOfProperty() {
-        return typeof this.data.parsedContent["sbg:copyOf"] !== undefined;
+        return typeof this.data.parsedContent["sbg:copyOf"] !== "undefined";
     }
 
     edit() {
