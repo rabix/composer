@@ -108,6 +108,28 @@ import {ObjectHelper} from "../../helpers/object.helper";
                     </ng-template>
                 </ng-template>
 
+                <!--Directories-->
+                <ng-template ngSwitchCase="Directory">
+                    <input [attr.jobPropPath]="'path'"
+                           [attr.prefix]="prefix" class="form-control" [value]="value?.path"/>
+                    <span class="input-group-btn">
+                        <button class="btn btn-secondary" [ct-editor-inspector]="directoryInspector">
+                                                        <i class="fa fa-ellipsis-h"></i>
+
+                        </button>
+                    </span>
+                    <ng-template #directoryInspector>
+                        <ct-editor-inspector-content>
+                            <div class="tc-header">{{ input?.id }}</div>
+                            <div class="tc-body">
+                                <ct-directory-input-inspector [input]="value || {}"
+                                                         (update)="updateDirectory($event)">
+                                </ct-directory-input-inspector>
+                            </div>
+                        </ct-editor-inspector-content>
+                    </ng-template>
+                </ng-template>
+
                 <!--Every element that's a part of the array can be deleted, so we add a deletion button to it-->
                 <span [class]="inputType !== 'record' ? 'input-group-btn' : 'record-delete'"
                       *ngIf="index !== -1">
@@ -195,6 +217,10 @@ export class JobEditorEntryComponent implements OnChanges, OnInit {
     }
 
     updateFile(data) {
+        this.updateJob(data);
+    }
+
+    updateDirectory(data) {
         this.updateJob(data);
     }
 

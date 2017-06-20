@@ -48,7 +48,7 @@ export class ToolInputInspectorComponent extends DirectiveBase implements OnInit
     }
 
     ngOnInit() {
-        this.context = this.model.getContext(this.input.id);
+        this.context = this.model.getContext(this.input);
 
         this.form    = this.formBuilder.group({
             basicInputSection: this.input,
