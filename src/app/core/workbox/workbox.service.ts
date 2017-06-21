@@ -23,6 +23,9 @@ export class WorkboxService {
 
         this.tabs.skip(2).subscribe(tabs => {
             const t = tabs.map(tab => {
+                if (tab.data) {
+                    tab.id = tab.data.id;
+                }
                 const {id, label, type} = tab;
                 return {id, label, type};
             });
@@ -70,6 +73,7 @@ export class WorkboxService {
 
                 const itemToAdd = {
                     id: tabId,
+                    dataId: tab.data.id,
                     label: tab.data.dataSource === "local" ? (() => {
                         const idSplit = tab.id.split("/");
                         idSplit.pop();
