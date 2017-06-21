@@ -1,6 +1,6 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {CommandOutputParameterModel} from "cwlts/models";
+import {CommandLineToolModel, CommandOutputParameterModel} from "cwlts/models";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 import {noop} from "../../../../lib/utils.lib";
 
@@ -52,10 +52,12 @@ import {noop} from "../../../../lib/utils.lib";
 export class OutputEvalSectionComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
+    public model: CommandLineToolModel;
+
+    @Input()
     public readonly = false;
 
     /** Context in which expression should be evaluated */
-    @Input()
     public context: any = {};
 
     public output: CommandOutputParameterModel;
@@ -72,6 +74,8 @@ export class OutputEvalSectionComponent extends DirectiveBase implements Control
 
     writeValue(output: CommandOutputParameterModel): void {
         this.output = output;
+
+        this.context = this.model.getContext(this.output);
 
         this.outputEvalFormGroup = this.formBuilder.group({
             loadContents: [this.output.outputBinding.loadContents],

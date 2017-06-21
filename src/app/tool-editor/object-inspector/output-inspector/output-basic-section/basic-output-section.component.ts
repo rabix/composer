@@ -68,7 +68,7 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
     @Input()
     public readonly = false;
 
-    @Input()
+    /** Context in which expression should be evaluated */
     public context: { $job?: any, $self?: any } = {};
 
     @Input()
@@ -92,6 +92,8 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
     writeValue(output: CommandOutputParameterModel): void {
 
         this.output = output;
+
+        this.context = this.model.getContext(this.output);
 
         this.form = this.formBuilder.group({
             id: [{value: this.output.id, disabled: this.readonly}],
