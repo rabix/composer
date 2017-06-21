@@ -49,7 +49,7 @@ import {noop} from "../../../../lib/utils.lib";
             </div>
 
             <!--Input Type -->
-            <ct-input-type-select [formControl]="form.controls['type']"></ct-input-type-select>
+            <ct-type-select [formControl]="form.controls['type']"></ct-type-select>
 
             <!--Symbols-->
             <ct-symbols-section class="form-group"

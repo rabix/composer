@@ -83,6 +83,13 @@ import {WorkflowStepInputModel} from "cwlts/models";
                     </span>
                 </ng-template>
 
+                <!--Directories and array of Directories-->
+                <ng-template ngSwitchCase="Directory">
+                    <span class="small text-muted">
+                        Cannot set default values for type Directory and Directory[].
+                    </span>
+                </ng-template>
+
                 <!--Every element that's a part of the array can be deleted, so we add a deletion button to it-->
                 <span class="input-group-btn" *ngIf="index !== -1">
                     <button type="button" 
@@ -143,7 +150,7 @@ import {WorkflowStepInputModel} from "cwlts/models";
         </div>
     `
 })
-export class WorkflowStepInspectorInputEntry implements OnChanges, OnInit {
+export class WorkflowStepInspectorInputEntryComponent implements OnChanges, OnInit {
 
     @Input()
     public readonly = false;
@@ -236,7 +243,7 @@ export class WorkflowStepInspectorInputEntry implements OnChanges, OnInit {
                             is of type “${typeof this.value}”, but the input is declared 
                             as “${this.inputType}”. 
                             You can generate a new set of test data for this input by clicking 
-                            on the “New ${this.input.type.items}” button.`
+                            on the “New ${this.input.type.items}” button.`;
         }
     }
 

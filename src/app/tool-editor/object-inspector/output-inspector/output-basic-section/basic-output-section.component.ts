@@ -41,8 +41,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
             <!--Input Type -->
             <div class="form-group">
-                <ct-input-type-select
-                        [formControl]="form.controls['type']"></ct-input-type-select>
+                <ct-type-select [formControl]="form.controls['type']"></ct-type-select>
             </div>
 
             <!--Symbols-->

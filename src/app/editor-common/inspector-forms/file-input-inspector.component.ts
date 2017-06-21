@@ -13,6 +13,9 @@ import {Observable} from "rxjs/Observable";
 interface CWLFile {
     path?: string;
     size?: number;
+    basename?: string;
+    nameext?: string;
+    nameroot?: string;
     contents?: string;
     metadata?: {};
     secondaryFiles?: [{ path?: string }];
@@ -27,13 +30,13 @@ interface CWLFile {
             <!--Path-->
             <div class="form-group">
                 <label>Path</label>
-                <input class="form-control" formControlName="path" [value]="input.path || ''"/>
+                <input class="form-control" formControlName="path"/>
             </div>
 
             <!--Size-->
             <div class="form-group">
                 <label>Size</label>
-                <input class="form-control" formControlName="size" [value]="input.size || 0"/>
+                <input class="form-control" formControlName="size"/>
             </div>
 
             <!--Secondary Files-->
@@ -43,6 +46,7 @@ interface CWLFile {
                                  formControlName="secondaryFiles"></ct-compact-list>
             </div>
 
+            <!--Metadata-->
             <div class="form-group">
                 <label>Metadata</label>
                 <ct-map-list formControlName="metadata"></ct-map-list>
@@ -51,8 +55,25 @@ interface CWLFile {
             <!--Content-->
             <div class="form-group">
                 <label>Content</label>
-                <textarea rows="10" class="form-control" formControlName="contents"
-                          [value]="input.contents || ''"></textarea>
+                <textarea rows="10" class="form-control" formControlName="contents"></textarea>
+            </div>
+            
+            <!--Basename-->
+            <div class="form-group" *ngIf="formGroup.controls['basename']">
+                <label>Basename</label>
+                <input class="form-control" formControlName="basename"/>
+            </div>
+
+            <!--Nameroot-->
+            <div class="form-group" *ngIf="formGroup.controls['nameroot']">
+                <label>Nameroot</label>
+                <input class="form-control" formControlName="nameroot"/>
+            </div>
+
+            <!--Nameext-->
+            <div class="form-group" *ngIf="formGroup.controls['nameext']">
+                <label>Nameext</label>
+                <input class="form-control" formControlName="nameext"/>
             </div>
         </form>
     `
@@ -74,14 +95,28 @@ export class FileInputInspectorComponent implements OnInit, OnChanges {
     public formGroup: FormGroup;
 
     ngOnInit() {
-
-        this.formGroup = new FormGroup({
+        const controls = {
             path: new FormControl(this.input.path),
             size: new FormControl(this.input.size),
             secondaryFiles: new FormControl(this.secondaryFilePaths),
             contents: new FormControl(this.input.contents),
             metadata: new FormControl(this.input.metadata)
-        });
+        };
+
+        // Add v1.0 properties to controls only if they are defined on the input
+        if (this.input.basename !== undefined) {
+            controls["basename"] = new FormControl(this.input.basename);
+        }
+
+        if (this.input.nameext !== undefined) {
+            controls["nameext"] = new FormControl(this.input.nameext);
+        }
+
+        if (this.input.nameroot !== undefined) {
+            controls["nameroot"] = new FormControl(this.input.nameroot);
+        }
+
+        this.formGroup = new FormGroup(controls);
 
         // We need to combine changes from two different sources
         Observable.merge(

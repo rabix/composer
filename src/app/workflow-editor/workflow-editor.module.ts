@@ -7,7 +7,7 @@ import {StepInspectorComponent} from "./object-inspector/step-inspector/step-ins
 import {WorkflowStepInspectorTabInputsComponent} from "./object-inspector/step-inspector/tabs/step-tab-inputs.component";
 import {WorkflowStepInspectorTabInfo} from "./object-inspector/step-inspector/tabs/step-tab-info.component";
 import {WorkflowStepInspectorTabStep} from "./object-inspector/step-inspector/tabs/step-tab-step.component";
-import {WorkflowStepInspectorInputEntry} from "./object-inspector/step-inspector/tabs/step-inspector-step-entry";
+import {WorkflowStepInspectorInputEntryComponent} from "./object-inspector/step-inspector/tabs/step-inspector-step-entry";
 import {WorkflowEditorComponent} from "./workflow-editor.component";
 import {WorkflowNotGraphEditorComponent} from "./workflow-not-graphic-editor/workflow-not-graph-editor.component";
 import {WorkflowIOInspectorComponent} from "./object-inspector/io-inspector/workflow-io-inspector.component";
@@ -23,7 +23,7 @@ import {UpdateStepModalComponent} from "./update-step-modal/update-step-modal.co
         WorkflowNotGraphEditorComponent,
         WorkflowIOInspectorComponent,
         StepInspectorComponent,
-        WorkflowStepInspectorInputEntry,
+        WorkflowStepInspectorInputEntryComponent,
         WorkflowStepInspectorTabInputsComponent,
         WorkflowStepInspectorTabInfo,
         WorkflowStepInspectorTabStep,
