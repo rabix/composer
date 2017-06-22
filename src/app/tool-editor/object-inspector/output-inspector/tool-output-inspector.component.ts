@@ -20,8 +20,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
             <ct-basic-output-section [formControl]="form.controls['basicOutputSection']"
                                      [readonly]="readonly"
-                                     [model]="model"
-                                     [context]="context">
+                                     [model]="model">
             </ct-basic-output-section>
 
             <ct-output-metadata-section [inputs]="inputList"
@@ -31,7 +30,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             </ct-output-metadata-section>
 
             <ct-output-eval [formControl]="form.controls['outputEval']"
-                            [context]="context"
+                            [model]="model"
                             [readonly]="readonly">
             </ct-output-eval>
 

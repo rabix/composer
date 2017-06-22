@@ -1,0 +1,17 @@
+:host {
+    .stream {
+        flex-grow: 1;
+        width: 50%;
+        max-width: 50%;
+    }
+
+    .stream:nth-child(even) {
+        padding-left: 1rem;
+    }
+
+    .streams-row {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+}
