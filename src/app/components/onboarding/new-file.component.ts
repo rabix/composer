@@ -57,7 +57,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                                                       [icon]="entry.type === 'Workflow' ? 'fa-share-alt': 'fa-terminal'"
                                                       [title]="entry?.title"
                                                       [label]="entry?.label"
-                                                      (dblclick)="openRecentApp(entry?.id)">
+                                                      (dblclick)="openRecentApp(entry?.dataId)">
                                 </ct-nav-search-result>
                             </div>
 
