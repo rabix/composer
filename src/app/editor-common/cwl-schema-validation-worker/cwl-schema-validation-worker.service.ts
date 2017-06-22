@@ -24,10 +24,8 @@ export class CwlSchemaValidationWorkerService {
 
     private draft4;
 
-    private schemas = {
-        v1: cwlSchemas.schemas.v1,
-        d2sb: cwlSchemas.schemas.d2sb
-    };
+    private cwlSchema = cwlSchemas.schemas.mixed;
+
 
     constructor(private workerBuilder: WebWorkerBuilderService) {
 
@@ -35,7 +33,7 @@ export class CwlSchemaValidationWorkerService {
             "ajv.min.js",
             "js-yaml.min.js"
         ], {
-            schemas: this.schemas,
+            cwlSchema: this.cwlSchema,
             draft4: require("ajv/lib/refs/json-schema-draft-04.json")
         });
     }
@@ -51,7 +49,7 @@ export class CwlSchemaValidationWorkerService {
     private workerFunction(content) {
 
         let json;
-        const schemas  = this.schemas;
+        const cwlSchema  = this.cwlSchema;
         const response = {
             isValidatableCwl: false,
             isValidCwl: false,
@@ -104,26 +102,15 @@ export class CwlSchemaValidationWorkerService {
         response.class            = json.class;
 
         const cwlVersion = json.cwlVersion || "sbg:draft-2";
-        const schemaMap  = {
-            "sbg:draft-2": {
-                CommandLineTool: schemas.d2sb.cltSchema,
-                Workflow: schemas.d2sb.wfSchema,
-                ExpressionTool: schemas.d2sb.etSchema
-            },
-            "v1.0": {
-                CommandLineTool: schemas.v1.cltSchema,
-                Workflow: schemas.v1.wfSchema,
-                ExpressionTool: schemas.v1.etSchema
-            }
-        };
         const ajv        = new Ajv();
         ajv.addMetaSchema(this.draft4);
+
         let validation = false;
         let errors     = [];
         let warnings   = [];
 
         if (["sbg:draft-2", "v1.0"].indexOf(cwlVersion) !== -1) {
-            validation = ajv.validate(schemaMap[cwlVersion][json.class], json);
+            validation = ajv.validate(cwlSchema, json);
             errors     = ajv.errors || [];
         } else {
             warnings = [{
