@@ -52,11 +52,13 @@ import {noop} from "../../../../lib/utils.lib";
             <ct-type-select [formControl]="form.controls['type']"></ct-type-select>
 
             <!--Symbols-->
-            <ct-symbols-section class="form-group"
-                                *ngIf="isType('enum')"
-                                [formControl]="form.controls['symbols']"
-                                [readonly]="readonly">
-            </ct-symbols-section>
+            <div class="form-group"
+                 *ngIf="isType('enum')">
+                <label>Symbols</label>
+                <ct-auto-complete [create]="true"
+                                  [formControl]="form.controls['symbols']"
+                                  [readonly]="readonly"></ct-auto-complete>
+            </div>
 
             <!--Include in command line -->
             <div class="form-group flex-container"

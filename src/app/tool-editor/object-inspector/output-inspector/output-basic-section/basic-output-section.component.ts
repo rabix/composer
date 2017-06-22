@@ -45,10 +45,13 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             </div>
 
             <!--Symbols-->
-            <ct-symbols-section class="form-group"
-                                *ngIf="isType('enum')"
-                                [formControl]="form.controls['symbols']">
-            </ct-symbols-section>
+            <div class="form-group"
+                 *ngIf="isType('enum')">
+                <label>Symbols</label>
+                <ct-auto-complete [create]="true"
+                                  [formControl]="form.controls['symbols']"
+                                  [readonly]="readonly"></ct-auto-complete>
+            </div>
 
             <!--Glob-->
             <div class="form-group">
