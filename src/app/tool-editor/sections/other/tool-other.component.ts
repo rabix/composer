@@ -19,7 +19,7 @@ import {CommandLineToolModel, ExpressionModel} from "cwlts/models";
                                  (update)="updateStream.emit($event)">
                 </ct-tool-streams>
 
-                <hr/>
+                <hr class="mt-0 mb-1"/>
 
                 <ct-tool-codes [model]="model"
                                [successCodes]="model.successCodes"
