@@ -19,6 +19,9 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
     // An object containing the entire pool of options. The object is keyed by each object's value
     private options = [];
 
+    // Disabled/enabled state
+    private disabled = false;
+
     @Input("options")
     set setOptions(opt: any []) {
 
@@ -121,6 +124,10 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
     @Input()
     public labelField = "text";
 
+    // When onChange is triggered and this flag is false we know that change comes during items/options initializing process
+    // and we should not propagate the change (if we would, we would always have form dirty flag set)
+    protected shouldTriggerChange = false;
+
     @ViewChild("el", {read: ElementRef})
     private el;
 
@@ -130,6 +137,9 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
     }
 
     protected updateOptions(items: any []) {
+
+        this.shouldTriggerChange = false;
+
         if (this.component) {
 
             // Clear dropdown options and load new ones
@@ -165,6 +175,8 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
         } else {
             this.items = items;
         }
+
+        this.shouldTriggerChange = true;
     }
 
     ngAfterViewInit() {
@@ -200,6 +212,11 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
             })[0].selectize;
         });
 
+        // Set initial disable/enable state for the component
+        if (this.disabled) {
+            this.component.disable();
+        }
+
         setTimeout(() => {
             if (!this.options.length) {
                 this.setOptions = !Array.isArray(this.items) ? [this.items] : this.items;
@@ -208,9 +225,20 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
         });
     }
 
+    setDisabledState(disabled: boolean) {
+
+        this.disabled = disabled;
+
+        // If component is null, disable/enable state will be set after component is initialized
+        if (this.component) {
+
+            this.disabled ? this.component.disable() : this.component.enable();
+        }
+    }
+
     // Triggers when value in component is changed
     onChange(string: any): void {
-    };
+    }
 
     ngOnDestroy(): void {
         this.component.destroy();

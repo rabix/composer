@@ -13,7 +13,7 @@ import {noop} from "../../lib/utils.lib";
         }
     ],
     template: `
-        <input #el [placeholder]="placeholder" [disabled]="readonly">
+        <input #el [placeholder]="placeholder">
     `,
     styleUrls: ["./auto-complete.component.scss"],
 })
@@ -21,12 +21,18 @@ export class AutoCompleteComponent extends SelectComponent implements ControlVal
 
     // Important inputs -> [options], [create], see parent class...
 
-    @Input()
-    public readonly = false;
+    // Set disabled/enabled state
+    @Input("readonly") set disableControl(disabled: boolean) {
+        this.setDisabledState(disabled);
+    }
 
     // True makes control mono-selection (suggested input)
     @Input()
     public mono = false;
+
+    // Specify the return type of a value that will be propagated
+    @Input()
+    public type: "string" | "number" = "string";
 
     @Input()
     public placeholder = "";
@@ -52,7 +58,14 @@ export class AutoCompleteComponent extends SelectComponent implements ControlVal
     }
 
     onChange(value: string) {
-        this.update.next(this.mono ? value : (value ? value.split(this.delimiter) : []));
+        // If onChange is triggered because of user actions (add/remove item)
+        if (this.shouldTriggerChange) {
+
+            const parse = this.type === "string" ? (value) => value : (value) => parseFloat(value);
+
+            this.update.next(this.mono ?
+                parse(value) : (value ? value.split(this.delimiter).map((item) => parse(item)) : []));
+        }
     }
 
     registerOnChange(fn: any): void {
