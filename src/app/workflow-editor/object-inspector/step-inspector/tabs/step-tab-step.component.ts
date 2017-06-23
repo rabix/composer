@@ -38,7 +38,9 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <label class="form-control-label">Scatter Method</label>
             <select class="form-control"
                     [formControl]="form.controls['scatterMethod']">
-                <option *ngFor="let method of scatterMethodOptions" [value]="method.value">
+                <option *ngFor="let method of scatterMethodOptions" 
+                        [disabled]="readonly"
+                        [value]="method.value">
                     {{method.caption}}
                 </option>
             </select>
@@ -53,8 +55,11 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <select *ngIf="!step.hasMultipleScatter"
                     class="form-control"
                     [formControl]="form.controls['scatter']">
-                <option value="">-- none --</option>
-                <option *ngFor="let input of step.in" [value]="input.id">
+                <option value=""
+                        [disabled]="readonly">-- none --</option>
+                <option *ngFor="let input of step.in"
+                        [disabled]="readonly"
+                        [value]="input.id">
                     {{input.label}} (#{{input.id}})
                 </option>
             </select>
@@ -64,7 +69,9 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     class="form-control"
                     multiple
                     [formControl]="form.controls['scatter']">
-                <option *ngFor="let opt of step.in" [value]="opt.id">
+                <option *ngFor="let opt of step.in"
+                        [disabled]="readonly"
+                        [value]="opt.id">
                     {{opt.id}}
                 </option>
             </select>
@@ -141,8 +148,6 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
             scatterMethod: [this.step.scatterMethod],
             scatter: [this.step.scatter || ""]
         });
-
-        this.disableScatter();
 
         this.tracked = this.form.controls["id"].valueChanges.debounceTime(1000).subscribe((value) => {
             try {

@@ -27,6 +27,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <label class="form-control-label">Label</label>
                     <input type="text"
                            class="form-control"
+                           [readonly]="readonly"
                            [formControl]="form.controls['label']">
                 </div>
 
@@ -35,6 +36,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <label class="form-control-label">Description</label>
                     <textarea class="form-control"
                               rows="4"
+                              [readonly]="readonly"
                               [formControl]="form.controls['description']"></textarea>
                 </div>
                 
@@ -44,6 +46,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <label class="form-control-label">Alternative Prefix</label>
                     <input class="form-control"
                            type="text"
+                           [readonly]="readonly"
                            [formControl]="form.controls['alternativePrefix']">
                 </div>
 
@@ -52,6 +55,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <label class="form-control-label">Category</label>
                     <input class="form-control"
                            type="text"
+                           [readonly]="readonly"
                            [formControl]="form.controls['category']">
                 </div>
 
@@ -60,6 +64,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <label class="form-control-label">Tool Defaults</label>
                     <input class="form-control"
                            type="text"
+                           [readonly]="readonly"
                            [formControl]="form.controls['toolDefaults']">
                 </div>
 
@@ -95,11 +100,11 @@ export class DescriptionComponent extends DirectiveBase implements ControlValueA
         this.port = port;
 
         this.form = this.formBuilder.group({
-            label: [{value: this.port.label, disabled: this.readonly}],
-            description: [{value: this.port.description, disabled: this.readonly}],
-            alternativePrefix: [{value: this.port.customProps["sbg:alternativePrefix"], disabled: this.readonly}],
-            category: [{value: this.port.customProps["sbg:category"], disabled: this.readonly}],
-            toolDefaults: [{value: this.port.customProps["sbg:toolDefaultValue"], disabled: this.readonly}],
+            label: [this.port.label],
+            description: [this.port.description],
+            alternativePrefix: [this.port.customProps["sbg:alternativePrefix"]],
+            category: [this.port.customProps["sbg:category"]],
+            toolDefaults: [this.port.customProps["sbg:toolDefaultValue"]],
             fileTypes: [{value: this.port.fileTypes, disabled: this.readonly}]
         });
 
