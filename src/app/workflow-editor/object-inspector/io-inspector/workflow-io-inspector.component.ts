@@ -74,11 +74,13 @@ import {Observable} from "rxjs/Observable";
         <ct-type-select [formControl]="form.controls['typeForm']"></ct-type-select>
 
         <!--Symbols-->
-        <ct-symbols-section class="form-group"
-                            *ngIf="isEnumType()"
-                            [formControl]="form.controls['symbols']"
-                            [readonly]="readonly">
-        </ct-symbols-section>
+        <div class="form-group"
+             *ngIf="isEnumType()">
+            <label>Symbols</label>
+            <ct-auto-complete [create]="true"
+                              [formControl]="form.controls['symbols']"
+                              [readonly]="readonly"></ct-auto-complete>
+        </div>
 
         <!--File Types-->
         <div *ngIf="isFileType() && isInputPort()">
