@@ -19,6 +19,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import LoadOptions = jsyaml.LoadOptions;
 import {IpcService} from "../../../services/ipc.service";
 import {WorkflowEditorService} from "../../workflow-editor.service";
+import {ModalService} from "../../../ui/modal/modal.service";
+import {HintsModalComponent} from "../../../core/modals/hints-modal/hints-modal.component";
 
 
 @Component({
@@ -165,6 +167,8 @@ import {WorkflowEditorService} from "../../workflow-editor.service";
              (onDropSuccess)="onDrop($event.detail.data.event, $event.detail.data.transfer_data)"></svg>
 
         <span class="svg-btns" (click)="setFocusOnCanvas()">
+            
+            <!--Delete button-->
             <span class="btn-group">
                 <button *ngIf="selectedElement"
                         ct-tooltip="Delete"
@@ -175,7 +179,8 @@ import {WorkflowEditorService} from "../../workflow-editor.service";
                     <i class="fa fa-trash"></i>
                 </button>
             </span>
-            
+
+            <!--Auto-arrange button-->
             <span class="btn-group">
                 <button class="btn btn-sm btn-secondary"
                         ct-tooltip="Auto-arrange"
@@ -185,8 +190,20 @@ import {WorkflowEditorService} from "../../workflow-editor.service";
                     <i class="fa fa-paint-brush"></i>
                 </button>
             </span>
+
+            <!--Hints button-->
+            <span class="btn-group">
+                <button ct-tooltip="Hints"
+                        tooltipPlacement="top"
+                        class="btn btn-sm btn-secondary"
+                        (click)="setHints()">
+                    <i class="fa fa-ellipsis-h"></i>
+                </button>
+            </span>
             
             <span class="btn-group">
+                
+                <!--Zoom in button-->
                 <button class="btn btn-sm btn-secondary"
                         (click)="upscale()"
                         ct-tooltip="Zoom In"
@@ -194,6 +211,8 @@ import {WorkflowEditorService} from "../../workflow-editor.service";
                         [disabled]="graph !== undefined && graph.getScale() >= 2">
                     <i class="fa fa-plus"></i>
                 </button>
+
+                <!--Zoom out button-->
                 <button class="btn btn-sm btn-secondary"
                         (click)="downscale()"
                         ct-tooltip="Zoom Out"
@@ -201,6 +220,8 @@ import {WorkflowEditorService} from "../../workflow-editor.service";
                         [disabled]="graph !== undefined && graph.getScale() <= 0.2">
                     <i class="fa fa-minus"></i>
                 </button>
+
+                <!--Fit to Viewport button-->
                 <button class="btn btn-sm btn-secondary"
                         ct-tooltip="Fit to Viewport"
                         tooltipPlacement="top"
@@ -288,7 +309,8 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     constructor(private gateway: DataGatewayService,
                 private ipc: IpcService,
                 private inspector: EditorInspectorService,
-                private workflowEditorService: WorkflowEditorService) {
+                private workflowEditorService: WorkflowEditorService,
+                private modal: ModalService) {
         super();
     }
 
@@ -594,5 +616,17 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         }
         this.drawGraphAndAttachListeners();
         this.tryToFitWorkflowOnNextTabActivation = false;
+    }
+
+    setHints() {
+
+        const hints = this.modal.fromComponent(HintsModalComponent, {
+            title: "Set Hints",
+            backdrop: true,
+            closeOnEscape: true
+        });
+
+        hints.model = this.model;
+        hints.readonly = this.readonly;
     }
 }
