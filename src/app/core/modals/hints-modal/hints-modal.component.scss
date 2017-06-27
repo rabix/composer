@@ -1,0 +1,13 @@
+:host {
+    .body {
+        width: 800px;
+        position: relative;
+        display: block;
+        margin-bottom: 20px;
+    }
+
+    /deep/ .editor-list-title {
+        text-transform: uppercase;
+        display: flex;
+    }
+}
