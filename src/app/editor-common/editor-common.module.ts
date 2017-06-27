@@ -34,6 +34,8 @@ import {CWLModule} from "../cwl/cwl.module";
 import {EditorLayoutComponent} from "./editor-layout/editor-layout.component";
 import {EditorPanelComponent} from "./layout/editor-panel/editor-panel.component";
 import {DirectoryInputInspectorComponent} from "./inspector-forms/directory-input-inspector/directory-input-inspector.component";
+import {HintsComponent} from "./components/hint-list/hint-list.component";
+import {RequirementInputComponent} from "./components/hint-list/requirement-input.component";
 
 @NgModule({
     declarations: [
@@ -66,7 +68,9 @@ import {DirectoryInputInspectorComponent} from "./inspector-forms/directory-inpu
         AppInfoComponent,
         EditorLayoutComponent,
         EditorPanelComponent,
-        DirectoryInputInspectorComponent
+        DirectoryInputInspectorComponent,
+        HintsComponent,
+        RequirementInputComponent
     ],
     exports: [
         MapListComponent,
@@ -94,7 +98,9 @@ import {DirectoryInputInspectorComponent} from "./inspector-forms/directory-inpu
         SymbolsComponent,
         InputTypeSelectComponent,
         AppInfoComponent,
-        EditorLayoutComponent
+        EditorLayoutComponent,
+        HintsComponent,
+        RequirementInputComponent
     ],
     entryComponents: [
         EditorInspectorComponent,
