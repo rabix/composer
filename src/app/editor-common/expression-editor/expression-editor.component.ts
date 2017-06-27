@@ -127,7 +127,10 @@ export class ExpressionEditorComponent extends DirectiveBase implements OnInit, 
 
         this.tracked = this.tree.open.subscribe(node => {
             this.editor.editor.session.insert(this.editor.getEditorInstance().getCursorPosition(), String(node.id));
+            this.editor.setFocus();
         });
+
+        this.editor.setFocus();
     }
 
 
