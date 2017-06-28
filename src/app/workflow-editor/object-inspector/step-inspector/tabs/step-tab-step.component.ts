@@ -6,6 +6,8 @@ import {FormBuilder, FormGroup} from "@angular/forms";
 import {Workflow} from "cwl-svg";
 import {StepModel, WorkflowModel} from "cwlts/models";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
+import {ModalService} from "../../../../ui/modal/modal.service";
+import {HintsModalComponent} from "../../../../core/modals/hints-modal/hints-modal.component";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -80,6 +82,9 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                       [readonly]="readonly"></textarea>
         </div>
 
+        <!--Set Hints-->
+        <button type="button" class="btn btn-secondary" (click)="setHints()">Set Hints</button>
+
     `
 })
 export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnInit, OnChanges {
@@ -113,7 +118,7 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
 
     public form: FormGroup;
 
-    constructor(private formBuilder: FormBuilder, private cdr: ChangeDetectorRef) {
+    constructor(private formBuilder: FormBuilder, private cdr: ChangeDetectorRef, private modal: ModalService) {
         super();
     }
 
@@ -188,4 +193,14 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
         }
     }
 
+    setHints() {
+        const hints = this.modal.fromComponent(HintsModalComponent, {
+            title: "Set Hints",
+            backdrop: true,
+            closeOnEscape: true
+        });
+
+        hints.model = this.step;
+        hints.readonly = this.readonly;
+    }
 }

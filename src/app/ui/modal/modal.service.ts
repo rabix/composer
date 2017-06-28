@@ -11,7 +11,7 @@ export class ModalService {
 
     private rootViewContainer: ViewContainerRef;
 
-    private modalComponentRef: ComponentRef<ModalComponent>;
+    private modalComponentsRefStack: ComponentRef<ModalComponent> [] = [];
 
     private onClose = new Subject();
 
@@ -30,8 +30,6 @@ export class ModalService {
 
     public fromComponent<T>(component: { new (...args: any[]): T; }, config?: Partial<ModalOptions>): T {
 
-        this.close();
-
         config = {
             backdrop: true,
             closeOnEscape: true,
@@ -43,17 +41,19 @@ export class ModalService {
         const modalFactory     = this.resolver.resolveComponentFactory(ModalComponent);
         const componentFactory = this.resolver.resolveComponentFactory(component);
 
-        this.modalComponentRef = this.rootViewContainer.createComponent(modalFactory);
+        const modalComponentRef = this.rootViewContainer.createComponent(modalFactory);
 
-        this.modalComponentRef.instance.configure(config as ModalOptions);
+        modalComponentRef.instance.configure(config as ModalOptions);
 
-        const componentRef = this.modalComponentRef.instance.produce(componentFactory);
+        const componentRef = modalComponentRef.instance.produce(componentFactory);
+
+        this.modalComponentsRefStack.push(modalComponentRef);
 
         return componentRef.instance;
     }
 
     public fromTemplate<T>(template: TemplateRef<T>, config?: Partial<ModalOptions>): void {
-        this.close();
+
         config = {
             backdrop: true,
             closeOnEscape: true,
@@ -63,11 +63,13 @@ export class ModalService {
         };
 
         const modalFactory     = this.resolver.resolveComponentFactory(ModalComponent);
-        this.modalComponentRef = this.rootViewContainer.createComponent(modalFactory);
+        const modalComponentRef = this.rootViewContainer.createComponent(modalFactory);
 
-        this.modalComponentRef.instance.configure(config as ModalOptions);
+        modalComponentRef.instance.configure(config as ModalOptions);
 
-        this.modalComponentRef.instance.embed(template);
+        modalComponentRef.instance.embed(template);
+
+        this.modalComponentsRefStack.push(modalComponentRef);
     }
 
     private wrapPromise<T>(handler: (resolve, reject) => void): Promise<T> {
@@ -84,8 +86,8 @@ export class ModalService {
 
     private cleanComponentRef() {
 
-        if (this.modalComponentRef) {
-            this.modalComponentRef.destroy();
+        if (this.modalComponentsRefStack.length) {
+            this.modalComponentsRefStack.pop().destroy();
         }
 
     }
