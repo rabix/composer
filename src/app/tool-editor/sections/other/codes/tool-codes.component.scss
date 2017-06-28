@@ -1,0 +1,18 @@
+:host {
+    .code {
+        flex-grow: 1;
+        width: 50%;
+        max-width: 50%;
+        margin-bottom: 1rem;
+    }
+
+    .code:nth-child(even) {
+        padding-left: 1rem;
+    }
+
+    .codes-row {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+}

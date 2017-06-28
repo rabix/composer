@@ -45,10 +45,13 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             </div>
 
             <!--Symbols-->
-            <ct-symbols-section class="form-group"
-                                *ngIf="isType('enum')"
-                                [formControl]="form.controls['symbols']">
-            </ct-symbols-section>
+            <div class="form-group"
+                 *ngIf="isType('enum')">
+                <label>Symbols</label>
+                <ct-auto-complete [create]="true"
+                                  [formControl]="form.controls['symbols']"
+                                  [readonly]="readonly"></ct-auto-complete>
+            </div>
 
             <!--Glob-->
             <div class="form-group">
@@ -68,7 +71,7 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
     @Input()
     public readonly = false;
 
-    @Input()
+    /** Context in which expression should be evaluated */
     public context: { $job?: any, $self?: any } = {};
 
     @Input()
@@ -92,6 +95,8 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
     writeValue(output: CommandOutputParameterModel): void {
 
         this.output = output;
+
+        this.context = this.model.getContext(this.output);
 
         this.form = this.formBuilder.group({
             id: [{value: this.output.id, disabled: this.readonly}],

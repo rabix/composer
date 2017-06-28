@@ -125,6 +125,10 @@ export class CodeEditorComponent implements OnInit, ControlValueAccessor, OnDest
         this.onTouch = fn;
     }
 
+    setFocus(): void {
+        this.editor.focus();
+    }
+
     setDisabledState(isDisabled: boolean): void {
         this.editor.setReadOnly(isDisabled);
     }

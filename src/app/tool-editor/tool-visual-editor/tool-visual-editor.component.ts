@@ -24,8 +24,6 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
             <ct-base-command [baseCommand]="model.baseCommand"
                              [model]="model"
                              [context]="context"
-                             [stdin]="model.stdin"
-                             [stdout]="model.stdout"
                              (updateCmd)="updateModel('baseCommand', $event)"
                              (updateStream)="setStreams($event)"
                              [readonly]="readonly">
@@ -51,11 +49,11 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                           [readonly]="readonly">
             </ct-resources>
 
-            <ct-hints [model]="model"
-                      [context]="context"
-                      (update)="formGroup.markAsDirty()"
-                      [readonly]="readonly">
-            </ct-hints>
+            <ct-tool-hints [model]="model"
+                           [context]="context"
+                           (update)="formGroup.markAsDirty()"
+                           [readonly]="readonly">
+            </ct-tool-hints>
 
             <ct-argument-list [location]="model.loc + '.arguments'"
                               [model]="model"
@@ -70,6 +68,13 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                               [context]="context"
                               [readonly]="readonly">
             </ct-file-def-list>
+
+            <ct-tool-other  [model]="model"
+                            [context]="context"
+                            (updateStream)="setStreams($event)"
+                            (updateCodes)="formGroup.markAsDirty()"
+                            [readonly]="readonly">
+            </ct-tool-other>
         </form>
 
     `

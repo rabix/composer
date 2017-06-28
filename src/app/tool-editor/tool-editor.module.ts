@@ -30,11 +30,12 @@ import {EditorCommonModule} from "../editor-common/editor-common.module";
 import {UIModule} from "../ui/ui.module";
 import {CWLModule} from "../cwl/cwl.module";
 import {LayoutModule} from "../layout/layout.module";
-import { HintsComponent } from "./sections/hints/hints.component";
-import { RequirementInputComponent } from "./sections/hints/requirement-input.component";
+import {ToolHintsComponent} from "./sections/hints/tool-hints.component";
 import { BaseCommandListComponent } from "./sections/base-command/base-command-list/base-command-list.component";
-import { StreamsComponent } from "./sections/streams/streams.component";
 import { BaseCommandStringComponent } from "./sections/base-command/base-command-string/base-command-string.component";
+import { ToolOtherComponent } from "./sections/other/tool-other.component";
+import { ToolStreamsComponent } from "./sections/other/streams/tool-streams.component";
+import { ToolCodesComponent } from "./sections/other/codes/tool-codes.component";
 
 @NgModule({
     declarations: [
@@ -63,11 +64,12 @@ import { BaseCommandStringComponent } from "./sections/base-command/base-command
         ToolVisualEditorComponent,
         DockerRequirementComponent,
         BaseCommandComponent,
-        HintsComponent,
-        RequirementInputComponent,
+        ToolHintsComponent,
         BaseCommandListComponent,
-        StreamsComponent,
+        ToolStreamsComponent,
         BaseCommandStringComponent,
+        ToolOtherComponent,
+        ToolCodesComponent
     ],
     exports: [
         ToolEditorComponent
