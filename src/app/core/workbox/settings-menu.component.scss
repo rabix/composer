@@ -1,0 +1,30 @@
+@import "../../../assets/sass/variables";
+
+:host {
+    margin-right: 1rem;
+
+    li {
+        border-bottom: 1px solid $toolbar-border;
+        line-height: $line-height-base;
+        padding: .55rem 1rem;
+        cursor: pointer;
+        min-width: 150px;
+
+        .text-muted {
+            white-space: nowrap;
+        }
+
+        &:hover {
+            background: darken($panel-bg, 3);
+        }
+    }
+
+    .active-icon {
+        color: $brand-primary;
+    }
+
+    .settings-icon {
+        display: inline-block;
+        font-size: 1rem;
+    }
+}

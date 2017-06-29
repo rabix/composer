@@ -6,9 +6,6 @@ export interface FilesystemEntry {
     isWritable: boolean;
     language: string;
     name: boolean;
-    path: "Workflow" | "CommandLineTool" | string;
-    type: string;
+    path: string;
+    type: "Workflow" | "CommandLineTool" | string;
 }
-
-
-export type FolderListing = FilesystemEntry[];

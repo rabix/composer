@@ -1,30 +1,18 @@
-import {Component, ElementRef, Input, ViewChild, OnInit} from "@angular/core";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {Subscription} from "rxjs/Subscription";
-import {LayoutService} from "./layout.service";
+import {Component, ElementRef, Input, OnInit, ViewChild} from "@angular/core";
 import {StatusBarComponent} from "../../layout/status-bar/status-bar.component";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {DomEventService} from "../../services/dom/dom-event.service";
-import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {LayoutService} from "./layout.service";
 
-import {
-    PANEL_LOCAL_FILES,
-    PANEL_PUBLIC_APPS,
-    PANEL_STRUCTURE,
-    PANEL_USER_PROJECTS,
-    PanelGroup,
-    PanelGroupMap,
-    PanelStatus
-} from "./layout.types";
-import {ErrorBarService} from "../../layout/error-bar/error-bar.service";
+import {PANEL_LOCAL_FILES, PANEL_PUBLIC_APPS, PANEL_STRUCTURE, PANEL_USER_PROJECTS, PanelGroup, PanelStatus} from "./layout.types";
 
 @Component({
     selector: "ct-layout",
     styleUrls: ["./layout.component.scss"],
     template: `
-        <ct-error-bar>
-        </ct-error-bar>
+        <ct-notification-bar>
+        </ct-notification-bar>
 
         <div class="main-content">
 
@@ -70,10 +58,8 @@ export class LayoutComponent extends DirectiveBase implements OnInit {
 
     private el: Element;
 
-    constructor(private preferences: UserPreferencesService,
-                private domEvents: DomEventService,
+    constructor(private domEvents: DomEventService,
                 private statusBar: StatusBarService,
-                private errorBarService: ErrorBarService,
                 public layoutService: LayoutService,
                 el: ElementRef) {
         super();
@@ -92,7 +78,6 @@ export class LayoutComponent extends DirectiveBase implements OnInit {
     }
 
     ngOnInit() {
-
         this.statusBar.host = this.statusBarComponent;
 
         // Layout is resizable, so we need to react when user drags the handle
@@ -119,9 +104,9 @@ export class LayoutComponent extends DirectiveBase implements OnInit {
                 // Take the width of the window
                 const docWidth = document.body.clientWidth;
                 // Set tree width to the given x
-                this.treeSize = x;
+                this.treeSize  = x;
                 // And fill document area with the rest
-                this.tabsSize = docWidth - x;
+                this.tabsSize  = docWidth - x;
             });
     }
 }

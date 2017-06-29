@@ -12,6 +12,13 @@ $brand-warning: #f89406;
 $brand-info: #f3f8fc;
 // # Other Colors
 
+
+// ----- Global Layout Elements -----
+$body-bg: #303030;
+$panel-bg: #434343;
+$toolbar-height: 2em;
+$toolbar-header-bg: #333;
+
 // ----- General Shapes -----
 $border-radius: 2px;
 
@@ -39,6 +46,7 @@ $input-bg-disabled: #262626;
 $input-color-disabled: $text-muted;
 $input-bg-hover: $brand-primary;
 $input-group-addon-bg: $input-bg;
+$input-bg-disabled: $panel-bg;
 
 // ----- Dropdowns ------
 $dropdown-content-bg: #3e3e3e;
@@ -56,30 +64,32 @@ $code-warning: $brand-warning;
 $code-error: $brand-danger;
 
 // ----- Buttons -----
-$btn-primary-border-color: #0c263c;
+$btn-primary-border-color: #1a4365;
 $btn-border-color: #313030;
 $btn-border-radius: 3px;
 $btn-line-height: 1rem;
 $btn-padding-x: 1.2rem;
 $btn-padding-y: .4rem;
-$btn-primary-bg: #337cb9;
+$btn-primary-bg: #366b95;
 $btn-secondary-bg: #373a3c;
 $btn-secondary-color: $text-color;
 $btn-border-hover-color: $input-border-color;
-$btn-gradient-active: false;
+$btn-gradient-active: true;
+
+// ----- Alerts -----
+$alert-border-radius: $border-radius;
+$alert-padding-x: $input-padding-x;
+$alert-padding-y: $input-padding-y;
+$alert-danger-bg: #623a3a;
+$alert-danger-border: #561d1d;
+$alert-danger-text: $text-color;
 
 // ----- Links -----
 $link-color: $brand-primary;
 $link-hover-color: lighten($brand-primary, 10%);
 
 // ----- Tables -----
-$table-border-color: $input-border-color;
-
-// ----- Global Layout Elements -----
-$body-bg: #303030;
-$panel-bg: #434343;
-$toolbar-height: 2em;
-$toolbar-header-bg: #333;
+$table-border-color: $body-bg;
 $toolbar-border: #333;
 
 // ----- Layout Uniques -----
@@ -124,9 +134,9 @@ $action-bar-background: white; // @TODO Fix theme variable, bottom of tab value
 $layout-title-bar-background: #1e2124;
 $layout-title-bar-height: 36px;
 
-$layout-tab-height: 32px;
-$layout-tab-background-idle: #5c5f64;
-$layout-tab-background-active: white;
+$layout-tab-height: 32px; // @fixme unused?
+$layout-tab-background-idle: #5c5f64; // @fixme unused?
+$layout-tab-background-active: white; // @fixme unused?
 
 $layout-element-alt-background: rgb(246, 246, 246);
 $layout-element-alt-foreground: white;
@@ -143,11 +153,12 @@ $font-family-title: "Montserrat";
 // Editors common
 $action-bar-height: 36px;
 $action-bar-color: $layout-element-alt-foreground;
+$sidebar-panel-bg: #36383a;
 
 $brand-danger-inverse-color: white;
 
 // ErrorBarComponent
-$error-bar-height: $main-header-height * .8;
+$notification-bar-height: $main-header-height * .8;
 
 // Tree View
 $tree-node-selected-color: white;

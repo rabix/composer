@@ -16,6 +16,7 @@
         display: block;
         overflow: auto;
         height: 100%;
+        overflow-x: hidden;
 
         .borderless & {
             border: none;

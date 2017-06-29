@@ -1,7 +1,9 @@
 import {NgModule} from "@angular/core";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {BrowserModule} from "@angular/platform-browser";
+import {CWLModule} from "../cwl/cwl.module";
 import {UIModule} from "../ui/ui.module";
+import {AppValidatorService} from "./app-validator/app-validator.service";
 import {AppInfoComponent} from "./components/app-info/app-info.component";
 import {BlankToolStateComponent} from "./components/blank-tool-state.component";
 import {CompactListComponent} from "./components/compact-list/compact-list.component";
@@ -15,25 +17,24 @@ import {RevisionListComponent} from "./components/revision-list/revision-list.co
 import {SymbolsComponent} from "./components/symbols/symbols.component";
 import {InputTypeSelectComponent} from "./components/type-select/type-select.component";
 import {ValidationClassDirective} from "./components/validation-preview/validation-class.directive";
-import {ValidationComponent} from "./components/validation-preview/validation-preview.component";
+import {ValidationPreviewComponent} from "./components/validation-preview/validation-preview.component";
 import {ValidationReportComponent} from "./components/validation-report/validation-report.component";
 import {CwlSchemaValidationWorkerService} from "./cwl-schema-validation-worker/cwl-schema-validation-worker.service";
 import {EditableDirective} from "./directives/editable.directive";
+import {EditorLayoutComponent} from "./editor-layout/editor-layout.component";
 import {ExpressionEditorComponent} from "./expression-editor/expression-editor.component";
 import {ModelExpressionEditorComponent} from "./expression-editor/model-expression-editor.component";
+import {DirectoryInputInspectorComponent} from "./inspector-forms/directory-input-inspector/directory-input-inspector.component";
 import {FileInputInspectorComponent} from "./inspector-forms/file-input-inspector.component";
 import {EditorInspectorContentComponent} from "./inspector/editor-inspector-content.component";
 import {EditorInspectorComponent} from "./inspector/editor-inspector.component";
 import {EditorInspectorDirective} from "./inspector/editor-inspector.directive";
 import {JobEditorEntryComponent} from "./job-editor/job-editor-entry.component";
 import {JobEditorComponent} from "./job-editor/job-editor.component";
+import {EditorPanelComponent} from "./layout/editor-panel/editor-panel.component";
 import {FileDefContentPipe} from "./pipes/file-def-content.pipe";
 import {FileDefNamePipe} from "./pipes/file-def-name.pipe";
 import {ValidationTextPipe} from "./pipes/validation-text.pipes";
-import {CWLModule} from "../cwl/cwl.module";
-import {EditorLayoutComponent} from "./editor-layout/editor-layout.component";
-import {EditorPanelComponent} from "./layout/editor-panel/editor-panel.component";
-import {DirectoryInputInspectorComponent} from "./inspector-forms/directory-input-inspector/directory-input-inspector.component";
 import {HintsComponent} from "./components/hint-list/hint-list.component";
 import {RequirementInputComponent} from "./components/hint-list/requirement-input.component";
 
@@ -58,7 +59,7 @@ import {RequirementInputComponent} from "./components/hint-list/requirement-inpu
         QuickPickComponent,
         RevisionListComponent,
         ValidationClassDirective,
-        ValidationComponent,
+        ValidationPreviewComponent,
         ValidationReportComponent,
         ValidationTextPipe,
         FileInputInspectorComponent,
@@ -68,8 +69,8 @@ import {RequirementInputComponent} from "./components/hint-list/requirement-inpu
         AppInfoComponent,
         EditorLayoutComponent,
         EditorPanelComponent,
-        DirectoryInputInspectorComponent,
         HintsComponent,
+        DirectoryInputInspectorComponent,
         RequirementInputComponent
     ],
     exports: [
@@ -93,7 +94,7 @@ import {RequirementInputComponent} from "./components/hint-list/requirement-inpu
         QuickPickComponent,
         RevisionListComponent,
         ValidationClassDirective,
-        ValidationComponent,
+        ValidationPreviewComponent,
         ValidationReportComponent,
         SymbolsComponent,
         InputTypeSelectComponent,
@@ -109,7 +110,8 @@ import {RequirementInputComponent} from "./components/hint-list/requirement-inpu
         ModelExpressionEditorComponent,
     ],
     providers: [
-        CwlSchemaValidationWorkerService
+        CwlSchemaValidationWorkerService,
+        AppValidatorService,
     ],
     imports: [
         BrowserModule,

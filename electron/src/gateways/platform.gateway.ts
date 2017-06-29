@@ -68,7 +68,6 @@ export class PlatformGateway {
 
     getSessionID(authToken: string, callback) {
         const gk = this.serviceRoutes.gatekeeper;
-        console.log("Checking session ID");
 
         request.post({
             url: gk + "/session/open/auth",
@@ -83,7 +82,6 @@ export class PlatformGateway {
             if (!message.session_id) {
                 return callback(new Error("Missing session ID"));
             }
-            console.log("Setting session id", message);
 
             this.sessionID = message.session_id;
             callback(null, message);
@@ -91,7 +89,6 @@ export class PlatformGateway {
     }
 
     getProjects(callback) {
-        console.log("Getting projects", this.sessionID);
         request({
             url: this.serviceRoutes.watson + "/projects",
             headers: {"session-id": this.sessionID}
@@ -120,7 +117,6 @@ export class PlatformGateway {
         } else if (typeof projectID === "function") {
             callback = projectID;
         }
-        console.log("Getting apps", this.sessionID);
 
         request({
             url: endpoint,

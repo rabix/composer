@@ -1,10 +1,10 @@
 import {ComponentFactoryResolver, ComponentRef, Injectable, TemplateRef, ViewContainerRef} from "@angular/core";
-import {ModalOptions} from "./modal-options";
+import {FormControl} from "@angular/forms";
 import {Subject} from "rxjs/Subject";
-import {ModalComponent} from "./modal.component";
 import {ConfirmComponent} from "./common/confirm.component";
 import {PromptComponent} from "./common/prompt.component";
-import {FormControl} from "@angular/forms";
+import {ModalOptions} from "./modal-options";
+import {ModalComponent} from "./modal.component";
 
 @Injectable()
 export class ModalService {
@@ -28,7 +28,8 @@ export class ModalService {
         this.onClose.next();
     }
 
-    public fromComponent<T>(component: { new (...args: any[]): T; }, config?: Partial<ModalOptions>): T {
+    public fromComponent<T>(component: { new (...args: any[]): T; },
+                            config?: Partial<ModalOptions>): T {
 
         config = {
             backdrop: true,
@@ -132,12 +133,17 @@ export class ModalService {
         confirmationLabel?: string,
         cancellationLabel ?: string,
         formControl?: FormControl,
+        minWidth?: string
     }) {
 
         return this.wrapPromise((resolve, reject) => {
             const component = this.fromComponent(PromptComponent, {
                 title: params.title || "Are you sure?"
             });
+
+            if (params.minWidth) {
+                component.minWidth = params.minWidth;
+            }
 
             Object.assign(component, {
                 content: "Are you sure?",

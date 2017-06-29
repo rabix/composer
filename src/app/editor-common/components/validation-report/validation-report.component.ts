@@ -1,21 +1,20 @@
-import {ChangeDetectionStrategy, Component, Input, ViewEncapsulation} from "@angular/core";
-import {Validation} from "cwlts/models/helpers/validation/Validation";
+import {ChangeDetectionStrategy, Component, Input} from "@angular/core";
 
 @Component({
     selector: "ct-validation-report",
     styleUrls: ["./validation-report.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-        <p *ngIf="!issues.errors.length && !issues.warnings.length">
+        <p *ngIf="!errors.length && !warnings.length">
             No issues found.
         </p>
 
-        <p class="text-console-error" *ngFor="let error of issues.errors">
+        <p class="text-console-error" *ngFor="let error of errors">
             {{ error.loc ? error.loc + ": " : ""}}
             {{ error.message }}
         </p>
 
-        <p class="text-console-warning" *ngFor="let warning of issues.warnings">
+        <p class="text-console-warning" *ngFor="let warning of warnings">
             {{ warning.loc ? warning.loc + ": " : ""}}
             {{ warning.message }}
         </p>
@@ -23,5 +22,8 @@ import {Validation} from "cwlts/models/helpers/validation/Validation";
 })
 export class ValidationReportComponent {
     @Input()
-    public issues: Validation;
+    errors: { message: string; loc: string }[]   = [];
+
+    @Input()
+    warnings: { message: string; loc: string }[] = [];
 }

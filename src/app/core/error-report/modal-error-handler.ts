@@ -10,15 +10,15 @@ export class ModalErrorHandler {
 
     handleError(error: Error) {
 
-        const component = this.modal.fromComponent(ErrorReportComponent, {
-            title: "An error has occured",
-            backdrop: true,
-            closeOnEscape: true,
-            closeOnOutsideClick: true
-        });
-        component.code  = error.toString();
-
-        component.textarea.nativeElement.value = error.message + "\n\n" + error.stack;
+        // const component = this.modal.fromComponent(ErrorReportComponent, {
+        //     title: "An error has occured",
+        //     backdrop: true,
+        //     closeOnEscape: true,
+        //     closeOnOutsideClick: true
+        // });
+        // component.code  = error.toString();
+        //
+        // component.textarea.nativeElement.value = error.message + "\n\n" + error.stack;
         console.error(error);
     }
 }

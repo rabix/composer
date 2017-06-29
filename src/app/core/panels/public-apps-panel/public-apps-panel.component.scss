@@ -1,4 +1,5 @@
 @import "../../../../assets/sass/variables";
+@import "../../../../assets/sass/mixins";
 
 :host {
     flex: 1;
@@ -28,6 +29,8 @@
         padding: 0 1em 1em 1em;
 
         .btn {
+
+            @include ellipsis();
             width: 50%;
             border-color: #454546;
             background: #485057;

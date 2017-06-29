@@ -1,210 +1,149 @@
-import {ChangeDetectorRef, Component, Input} from "@angular/core";
-import {UserPreferencesService} from "../../../services/storage/user-preferences.service";
+import {Component, Input} from "@angular/core";
+import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {SlugifyPipe} from "ngx-pipes";
+import {PlatformAppSavingService} from "../../../editor-common/services/app-saving/platform-app-saving.service";
+import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
-import {SlugifyPipe} from "ngx-pipes";
-import {FormControl, Validators, FormGroup} from "@angular/forms";
-import {AuthService} from "../../../auth/auth/auth.service";
-import {PlatformAPIGatewayService} from "../../../auth/api/platform-api-gateway.service";
-import {AppGeneratorService} from "../../../cwl/app-generator/app-generator.service";
+import {FormAsyncValidator} from "../../forms/helpers/form-async-validator";
+
 const {app, dialog} = window["require"]("electron").remote;
-import * as YAML from "js-yaml";
-import {WorkboxService} from "../../workbox/workbox.service";
-import {Observable} from "rxjs/Observable";
-import {PlatformAppEntry} from "../../../services/api/platforms/platform-api.types";
 
 @Component({
     selector: "ct-publish-modal",
-    providers: [SlugifyPipe],
+    providers: [SlugifyPipe, PlatformAppSavingService],
     template: `
-        <div class="p-1">
+        <form [formGroup]="inputForm" (submit)="onSubmit()">
 
-            <div class="form-group">
-                <label class="">App Name:</label>
-                <input class="form-control" [formControl]="remoteNameControl"/>
+            <div class="p-1">
 
-                <p *ngIf="remoteNameControl.value" class="form-text text-muted">
-                    App ID: {{ remoteSlugControl.value }}
-                </p>
+                <div class="form-group">
+                    <label class="">App Name:</label>
+                    <input class="form-control" formControlName="name"/>
+
+                    <p *ngIf="inputForm.controls.name" class="form-text text-muted">
+                        App ID: {{ inputForm.controls.name.value | slugify }}
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label>Destination Project:</label>
+                    <ct-auto-complete formControlName="project"
+                                      [mono]="true"
+                                      [options]="projectOptions"
+                                      placeholder="Choose a destination project...">
+                    </ct-auto-complete>
+                </div>
+
+                <div class="form-group" *ngIf="revision > 0">
+                    <label>Revision Note:</label>
+                    <input class="form-control" [formControl]="outputForm.controls.revisionNote"/>
+                    <div class="form-text text-muted">
+                        An app with this ID already exists.<br/>
+                        Publishing will create a revision <strong>{{ revision }}</strong>.
+                    </div>
+                </div>
+
+                <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="close()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" [disabled]="!inputForm.valid || isPublishing">
+                        <ct-loader-button-content [isLoading]="inputForm.pending || isPublishing">Publish</ct-loader-button-content>
+                    </button>
+                </div>
             </div>
-
-            <div class="form-group" *ngIf="info">
-                <label class="">Revision Note:</label>
-                <input class="form-control" [formControl]="revisionNote"/>
-            </div>
-
-
-            <div class="form-group">
-                <label>Destination Project:</label>
-                <ct-auto-complete [formControl]="projectSelection"
-                                  [mono]="true"
-                                  [options]="projectOptions"
-                                  [optgroups]="platformOptgroups"
-                                  placeholder="Choose a destination project..."
-                                  optgroupField="hash"></ct-auto-complete>
-            </div>
-
-            <div class="alert alert-info" *ngIf="info" [innerHTML]="info"></div>
-            <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" (click)="modal.close()"> Cancel</button>
-                <button type="button"
-                        (click)="publish()"
-                        class="btn btn-primary"
-                        [disabled]="platformGroup.invalid">
-                    <span *ngIf="checking">Checking...</span>
-                    <span *ngIf="!checking">Publish</span>
-                </button>
-            </div>
-        </div>
+        </form>
     `,
     styleUrls: ["./publish-modal.component.scss"],
 })
 export class PublishModalComponent extends DirectiveBase {
 
     @Input()
-    appContent: object;
-
-    revisionNote: FormControl;
-    platformGroup: FormGroup;
-    projectSelection: FormControl;
-    remoteNameControl: FormControl;
-    remoteSlugControl: FormControl;
+    appContent: string;
     error: string;
-    info: string;
-    originalApp: PlatformAppEntry;
-    projectOptions    = [];
-    platformOptgroups = [];
-    checking          = false;
+    projectOptions = [];
+
+    isPublishing = false;
+
+    revision: number = 0;
+
+    inputForm: FormGroup;
+
+    outputForm: FormGroup;
 
     constructor(private dataGateway: DataGatewayService,
                 public modal: ModalService,
-                private slugify: SlugifyPipe,
-                private apiGateway: PlatformAPIGatewayService,
-                private workbox: WorkboxService,
-                private preferences: UserPreferencesService) {
+                private platformRepository: PlatformRepositoryService,
+                private slugify: SlugifyPipe) {
 
         super();
-
-        this.remoteNameControl = new FormControl("", [Validators.required]);
-        this.remoteSlugControl = new FormControl("", [Validators.required]);
-        this.projectSelection  = new FormControl("", [Validators.required]);
-        this.revisionNote      = new FormControl("");
-
-        this.remoteNameControl.valueChanges
-            .map(value => this.slugify.transform(value))
-            .subscribe(val => this.remoteSlugControl.setValue(val));
-
-        this.platformGroup = new FormGroup({
-            name: this.remoteSlugControl,
-            project: this.projectSelection
-        });
-
-        this.tracked = this.platformGroup.valueChanges.subscribe(change => {
-
-            this.platformGroup.setErrors({});
-
-        });
-
-        this.tracked = this.platformGroup.valueChanges
-            .debounceTime(300)
-            .filter(val => this.platformGroup.get("name").valid && this.platformGroup.get("project").valid)
-            .do(() => {
-                this.checking = true;
-                this.error    = undefined;
-                this.info     = undefined;
-            })
-            .switchMap((values: { name: string, project: string }) => {
-                const {name, project}    = values;
-                const [hash, owner, app] = project.split("/");
-                const slug = this.slugify.transform(name);
-                const platform = this.apiGateway.forHash(hash);
-
-                const call = platform ? platform.getApp(owner, app, slug)
-                    : Observable.throw(
-                        new Error("Could not get the app because you are not connected to the necessary platform."));
-
-                return call.catch(err => {
-                    if (err.status === 404) {
-                        return Observable.of(null);
-                    } else {
-                        throw err;
-                    }
-                });
-            })
-            .subscribe((data: PlatformAppEntry) => {
-                this.checking = false;
-                this.platformGroup.setErrors(null);
-                this.originalApp = data;
-                if (data) {
-                    const nextRevision = ~~data["sbg:latestRevision"] + 1;
-                    this.info          =
-                        "An app by this id already exists in the selected project.<br/>" +
-                        `Publishing will create a revision <strong>${nextRevision}</strong>`;
-                }
-            }, err => {
-                this.error = err;
-            });
-
-        this.tracked = this.dataGateway.getProjectsForAllConnections().withLatestFrom(
-            this.preferences.getOpenProjects(),
-            (data, openProjects) => ({...data, openProjects}))
-            .subscribe(data => {
-
-                const {credentials, listings, openProjects} = data;
-
-                this.platformOptgroups = credentials.map(creds => ({value: creds.hash, label: creds.profile}));
-                this.projectOptions    = listings.reduce((acc, listing, index) => {
-
-                    return acc.concat(listing.map((entry: any) => {
-                        return {
-                            value: credentials[index].hash + `/${entry.owner}/${entry.slug}`,
-                            text: entry.name,
-                            hash: credentials[index].hash
-                        } as any;
-                    }));
-                }, []).filter((entry: any) => openProjects.indexOf(entry.value) !== -1);
-            });
     }
 
-    publish() {
-        const slug         = this.remoteSlugControl.value;
-        const label        = this.remoteNameControl.value;
-        const revisionNote = this.revisionNote.value;
-        const content      = this.appContent;
+    ngOnInit() {
+        this.inputForm = new FormGroup({
+            name: new FormControl("", [Validators.required]),
+            project: new FormControl("", [Validators.required]),
+        }, null, FormAsyncValidator.debounceValidator((group: FormGroup) => {
+            const {name, project} = group.getRawValue();
 
-        const [hash, owner, project] = this.projectSelection.value.split("/");
+            const appID = `${project}/${name}`;
 
-        let call;
+            return this.dataGateway.fetchFileContent(appID, true).toPromise().then((app: any) => {
+                this.revision = app["sbg:latestRevision"] + 1;
+                return Promise.resolve(null);
+            }, () => {
+                this.revision = 0;
+                return Promise.resolve(null);
+            });
 
-        const platform = this.apiGateway.forHash(hash);
+        }));
 
-        if (platform) {
-            content["label"] = label;
-            if (this.originalApp) {
-                content["sbg:id"] = this.originalApp["sbg:id"];
+        this.outputForm = new FormGroup({
+            revisionNote: new FormControl(undefined),
+            appID: new FormControl(undefined, [Validators.required]),
+            content: new FormControl(this.appContent)
+        });
 
-                call = platform.saveApp(content as any, revisionNote);
-            } else {
-                content["sbg:id"] = [owner, project, slug, 0].join("/");
+        this.inputForm.statusChanges.filter(() => this.inputForm.valid).subscribe(() => {
+            console.log("Updating from", this.inputForm.getRawValue());
+            const {name, project} = this.inputForm.getRawValue();
+            this.outputForm.patchValue({
+                appID: project + "/" + this.slugify.transform(name.toLowerCase()) + "/" + this.revision
+            });
+        });
 
-                call = platform.createApp(owner, project, slug, content as any);
-            }
+        this.platformRepository.getOpenProjects().take(1)
+            .subscribeTracked(this, (projects) => this.projectOptions = projects.map(project => ({
+                value: project.id,
+                text: project.name
+            })));
+    }
 
+    onSubmit() {
+        const {revisionNote, appID, content} = this.outputForm.getRawValue();
+        this.isPublishing                    = true;
+        let saveCall: Promise<any>;
+
+        if (this.revision !== 0) {
+            saveCall = this.platformRepository.saveAppRevision(appID, content, revisionNote);
         } else {
-            call = Observable.throw("Could not publish the app because you are not connected to the necessary platform.");
+            saveCall = this.platformRepository.createApp(appID, content);
         }
 
-        call.subscribe(app => {
-            this.dataGateway.invalidateProjectListing(hash, owner, project);
-            this.workbox.getOrCreateFileTab([hash, owner, project, owner, project, slug].join("/")).subscribe(tab => {
-                this.workbox.openTab(tab);
-            });
-            this.modal.close();
-        }, err => {
-            this.error = err;
+        saveCall.then(yay => {
+            this.isPublishing = false;
+            this.close();
+        }, (nay) => {
+            this.error        = nay.error ? nay.error.message : nay.message;
+            this.isPublishing = false;
         });
     }
+
+    close() {
+        this.modal.close();
+    }
+
+
 }

@@ -1,7 +1,4 @@
-import {
-    Component, ViewChild, ElementRef, AfterViewInit, Input,
-    OnDestroy, NgZone
-} from "@angular/core";
+import {AfterViewInit, Component, ElementRef, Input, NgZone, OnDestroy, ViewChild} from "@angular/core";
 import * as jQuery from "jquery";
 import "selectize";
 import {ObjectHelper} from "../../../helpers/object.helper";
@@ -23,7 +20,7 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
     private disabled = false;
 
     @Input("options")
-    set setOptions(opt: any []) {
+    set setOptions(opt: any[]) {
 
         // If options is array of primitive values ["1","2","3"] instead of ([{text:"", value:""}])
         if (opt.length && ObjectHelper.isPrimitiveValue(opt[0])) {
@@ -128,18 +125,23 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
     // and we should not propagate the change (if we would, we would always have form dirty flag set)
     protected shouldTriggerChange = false;
 
+    @Input()
+    sortField = "text";
+
+    @Input()
+    sortDirection = "asc";
+
     @ViewChild("el", {read: ElementRef})
     private el;
 
-    private component = null;
+    protected component = null;
 
     constructor(private zone: NgZone) {
     }
 
-    protected updateOptions(items: any []) {
+    protected updateOptions(items?: any []) {
 
         this.shouldTriggerChange = false;
-
         if (this.component) {
 
             // Clear dropdown options and load new ones
@@ -203,10 +205,10 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
                 selectOnTab: this.selectOnTab,
                 valueField: this.valueField,
                 labelField: this.labelField,
-                sortField: {
-                    field: this.labelField,
-                    direction: "asc"
-                },
+                sortField: this.sortField ? {
+                    field: this.sortField,
+                    direction: this.sortDirection || "asc"
+                } : undefined,
                 onChange: this.onChange.bind(this)
 
             })[0].selectize;
@@ -241,6 +243,8 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.component.destroy();
+        if (this.component) {
+            this.component.destroy();
+        }
     }
 }

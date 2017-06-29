@@ -1,16 +1,16 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, ViewEncapsulation} from "@angular/core";
+import {ChangeDetectorRef, Component, Input} from "@angular/core";
 import {Workflow} from "cwl-svg";
 import {StepModel, WorkflowModel} from "cwlts/models";
-import {PlatformAPI} from "../../../services/api/platforms/platform-api.service";
-import {UserPreferencesService} from "../../../services/storage/user-preferences.service";
+import {RawApp} from "../../../../../electron/src/sbg-api-client/interfaces/raw-app";
+import {NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
+import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
+import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
-import {PlatformAPIGatewayService} from "../../../auth/api/platform-api-gateway.service";
 import {UpdateStepModalComponent} from "../../update-step-modal/update-step-modal.component";
 
 @Component({
     selector: "ct-workflow-step-inspector",
-    changeDetection: ChangeDetectionStrategy.OnPush,
     styleUrls: ["./step-inspector.component.scss"],
     template: `
 
@@ -78,7 +78,7 @@ export class StepInspectorComponent extends DirectiveBase {
     graph: Workflow;
 
     @Input()
-    fileID:string;
+    fileID: string;
 
     tabs = {
         Inputs: "inputs",
@@ -89,53 +89,42 @@ export class StepInspectorComponent extends DirectiveBase {
     viewMode = this.tabs.Inputs;
 
     constructor(private modal: ModalService,
-                private platform: PlatformAPI,
-                private apiGateway: PlatformAPIGatewayService,
+                private platformRepository: PlatformRepositoryService,
                 private cdr: ChangeDetectorRef,
-                private userPrefService: UserPreferencesService) {
+                private notificationBar: NotificationBarService,
+                private statusBar: StatusBarService) {
         super();
-
-        // @fixme Bring this back with the new service
-        // this.tracked = this.userPrefService.get("step_inspector_active_tab", this.tabs.Inputs, true)
-        //     .subscribe(x => this.viewMode = x);
     }
 
 
     updateStep(ev: Event) {
         ev.preventDefault();
 
-        const appId   = this.step.run.customProps["sbg:id"].split("/");
-        const appData = [appId[0], appId[1], appId[2]].join("/");
+        const appID = this.step.run.customProps["sbg:id"].split("/").slice(0, 3).join("/");
+        const proc  = this.statusBar.startProcess("Updating " + appID);
 
-        console.log("Should update app", ev, this);
+        const modal = this.modal.fromComponent(UpdateStepModalComponent, {title: `Update ${appID}?`});
+        modal.step  = this.step;
 
-        const [appHash] = this.fileID.split("/");
-        const api = this.apiGateway.forHash(appHash);
-
-        api.getApp(appData).subscribe((app) => {
-
-            const component = this.modal.fromComponent(UpdateStepModalComponent, {
-                title: "Update available",
-                closeOnOutsideClick: true,
-                closeOnEscape: true
-            });
-
-            component.step         = this.step;
-            component.updatedModel = app;
-
-            component.confirm = () => {
-                this.step.setRunProcess(app);
+        this.platformRepository.getApp(appID).then((app: RawApp) => {
+            this.statusBar.stopProcess(proc);
+            modal.updatedApp = app;
+            modal.isLoading  = false;
+            modal.onSubmit   = () => {
+                this.step.setRunProcess(app as any);
                 this.step.hasUpdate = false;
-
                 this.cdr.markForCheck();
-
-                component.closeModal();
-            };
+                this.cdr.detectChanges();
+                modal.closeModal();
+            }
+        }).catch(err => {
+            modal.closeModal();
+            this.statusBar.stopProcess(proc);
+            this.notificationBar.showError(err.error ? err.error.message : err.message);
         });
     }
 
     changeTab(tab: string) {
         this.viewMode = tab;
-        this.userPrefService.put("step_inspector_active_tab", tab);
     }
 }

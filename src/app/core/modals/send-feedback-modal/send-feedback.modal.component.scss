@@ -1,6 +1,8 @@
 @import "../../../../assets/sass/variables";
 
 :host {
+
+    width: 600px;
     display: flex;
     flex-direction: column;
 

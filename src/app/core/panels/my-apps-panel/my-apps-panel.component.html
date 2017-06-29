@@ -1,5 +1,4 @@
-<ct-search-field class="m-1" [formControl]="searchContent"
-                 [placeholder]="'Search My Apps...'"></ct-search-field>
+<ct-search-field class="m-1" [formControl]="searchContent" [placeholder]="'Search My Apps...'"></ct-search-field>
 
 <div>
     <button class="btn btn-link app-sources-btn"
@@ -16,23 +15,22 @@
                               [icon]="entry?.icon"
                               [title]="entry?.title"
                               [label]="entry?.label"
+                              [tabData]="entry?.tabData"
 
+                              [ct-drop-zones]="entry?.dragDropZones"
                               [ct-drag-enabled]="entry?.dragEnabled"
-                              [ct-drag-transfer-data]="entry?.dragTransferData"
                               [ct-drag-image-caption]="entry?.dragLabel"
                               [ct-drag-image-class]="entry?.dragImageClass"
-                              [ct-drop-zones]="entry?.dragDropZones"
+                              [ct-drag-transfer-data]="entry?.dragTransferData"
 
                               (dblclick)="openSearchResult(entry)">
         </ct-nav-search-result>
 
     </div>
-    <ct-line-loader class="m-1"
-                    *ngIf="searchContent.value
-                             && !searchResults"></ct-line-loader>
 
-    <div *ngIf="searchContent.value
-                        && (searchResults && searchResults.length === 0)"
+    <ct-line-loader class="m-1" *ngIf="searchContent.value && !searchResults"></ct-line-loader>
+
+    <div *ngIf="searchContent.value && (searchResults && searchResults.length === 0)"
          class="no-results m-1">
         <p class="explanation">
             No search results for “{{ searchContent.value }}.”
@@ -40,6 +38,8 @@
         <i class="icon fa-4x fa fa-search"></i>
     </div>
 
-    <ct-tree-view #tree [class.hidden]="searchContent?.value" [nodes]="treeNodes"
+    <ct-tree-view #tree
+                  [class.hidden]="searchContent?.value"
+                  [nodes]="rootFolders"
                   [level]="1"></ct-tree-view>
 </div>

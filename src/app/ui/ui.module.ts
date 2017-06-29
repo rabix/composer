@@ -18,7 +18,6 @@ import {FormPanelComponent} from "./form-panel/form-panel.component";
 import {InputFieldComponent} from "./forms/input-field/input-field.component";
 import {SearchFieldComponent} from "./forms/search-field/search-field.component";
 import {InlineEditorComponent} from "./inline-editor/inline-editor.component";
-import {KeyvalueComponent} from "./inline-editor/keyvalue.component";
 import {MarkdownDirective} from "./markdown/markdown.directive";
 import {MenuItemComponent} from "./menu/menu-item.component";
 import {MenuComponent} from "./menu/menu.component";
@@ -32,28 +31,29 @@ import {TooltipContentComponent} from "./tooltip/tooltip-content.component";
 import {TooltipDirective} from "./tooltip/tooltip.directive";
 import {TreeNodeComponent} from "./tree-view/tree-node/tree-node.component";
 import {TreeViewComponent} from "./tree-view/tree-view.component";
-import {TabsComponent} from "./tabs/tabs.component";
+import {MouseClickDirective} from "./behaviors/mouse-click.directive";
 import {LineLoaderComponent} from "./line-loader/line-loader.component";
+import {CircularLoaderComponent} from "./circular-loader/circular-loader.component";
+import {KeyvalueComponent} from "./inline-editor/keyvalue.component";
+import {TabsComponent} from "./tabs/tabs.component";
 import {ConfirmComponent} from "./modal/common/confirm.component";
+import {CheckboxPromptComponent} from "./modal/common/checkbox-prompt.component";
 import {PromptComponent} from "./modal/common/prompt.component";
-import {SelectComponent} from "./auto-complete/select/select.component";
 import {MultilangCodeEditorComponent} from "./code-editor/multilang-code-editor.component";
 import {InputComponent} from "./input/input.component";
+import {ProjectSelectionModal} from "./modal/custom/project-selection-modal.component";
 import {RadioButtonComponent} from "./radio-button/radio-button.component";
 import {RadioGroupComponent} from "./radio-button/radio-group.component";
-import {NewFileModalComponent} from "./modal/custom/new-file-modal.component";
-import {ProjectSelectionModal} from "./modal/custom/project-selection-modal.component";
-import {CheckboxPromptComponent} from "./modal/common/checkbox-prompt.component";
-import {CircularLoaderComponent} from "./circular-loader/circular-loader.component";
-import {TrimValueAccessorModule} from "ng-trim-value-accessor";
-import {MouseClickDirective} from "./behaviors/mouse-click.directive";
+import {SelectComponent} from "./auto-complete/select/select.component";
+import {LoaderButtonContentComponent} from "./loader-button/loader-button-content.component";
+import {TrimValueAccessor} from "./accessors/trim-value-accessor/trim-value-accessor.directive";
+import {GenericDropDownMenuComponent} from "./generic-drop-down-menu/generic-drop-down-menu.component";
 
 @NgModule({
     imports: [
         CommonModule,
         FormsModule,
         ReactiveFormsModule,
-        TrimValueAccessorModule,
     ],
     exports: [
         AutoCompleteComponent,
@@ -69,6 +69,7 @@ import {MouseClickDirective} from "./behaviors/mouse-click.directive";
         DragOverDirective,
         DropDirective,
         DropDownButtonComponent,
+        GenericDropDownMenuComponent,
         DropZones,
         FormPanelComponent,
         InlineEditorComponent,
@@ -86,8 +87,9 @@ import {MouseClickDirective} from "./behaviors/mouse-click.directive";
         TooltipDirective,
         TreeNodeComponent,
         TreeViewComponent,
-        TrimValueAccessorModule,
-        MouseClickDirective
+        MouseClickDirective,
+        TrimValueAccessor,
+        LoaderButtonContentComponent
     ],
 
     entryComponents: [
@@ -131,7 +133,6 @@ import {MouseClickDirective} from "./behaviors/mouse-click.directive";
         MenuItemComponent,
         ModalComponent,
         MultilangCodeEditorComponent,
-        NewFileModalComponent,
         ProgressComponent,
         ProjectSelectionModal,
         PromptComponent,
@@ -140,6 +141,7 @@ import {MouseClickDirective} from "./behaviors/mouse-click.directive";
         SearchFieldComponent,
         SelectComponent,
         TabComponent,
+        TrimValueAccessor,
         TabsComponent,
         TabSelectorComponent,
         TabSelectorComponent,
@@ -150,7 +152,9 @@ import {MouseClickDirective} from "./behaviors/mouse-click.directive";
         TreeNodeComponent,
         TreeViewComponent,
         CircularLoaderComponent,
-        MouseClickDirective
+        MouseClickDirective,
+        LoaderButtonContentComponent,
+        GenericDropDownMenuComponent
     ]
 })
 export class UIModule {

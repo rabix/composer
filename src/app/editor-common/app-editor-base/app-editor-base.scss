@@ -1,0 +1,46 @@
+@import "../../../assets/sass/_variables.scss";
+
+ct-app-info {
+    overflow: scroll !important;
+}
+
+:host {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    .document-controls {
+        margin-right: .5em;
+    }
+
+    .btn-edit-lock {
+        background: $btn-primary-bg;
+        color: $btn-primary-color;
+        height: 65%;
+        padding-right: 10px;
+        &:hover {
+            background: $btn-primary-bg;
+            border-color: $btn-primary-border;
+            color: $btn-primary-color;
+        }
+    }
+
+    .editor-layout {
+        position: relative;
+        display: flex;
+        flex: 1;
+    }
+
+    .editor-main {
+        flex: 3;
+    }
+
+    ct-editor-inspector {
+        flex-basis: 320px;
+        flex-shrink: 0;
+    }
+
+    .flex-hide {
+        display: none;
+    }
+}

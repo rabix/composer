@@ -1,7 +1,10 @@
 import {Component, ViewContainerRef, ViewEncapsulation} from "@angular/core";
-import {Observable} from "rxjs/Rx";
-import {AuthService} from "../../auth/auth/auth.service";
-import {StatusBarService} from "../../layout/status-bar/status-bar.service";
+import "rxjs/add/observable/fromEvent";
+import "rxjs/add/operator/bufferCount";
+import "rxjs/add/operator/concat";
+import "rxjs/add/operator/concatAll";
+import "rxjs/add/operator/delay";
+import {Observable} from "rxjs/Observable";
 import {SystemService} from "../../platform-providers/system.service";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {GuidService} from "../../services/guid.service";
@@ -27,7 +30,6 @@ import {JavascriptEvalService} from "../../services/javascript-eval/javascript-e
         PlatformAPI,
         MarkdownService,
         ContextService,
-        StatusBarService,
         // FIXME: this needs to be handled in a system-specific way
         GuidService
     ],
@@ -39,11 +41,10 @@ export class MainComponent {
     constructor(modal: ModalService,
                 system: SystemService,
                 vcRef: ViewContainerRef,
-                auth: AuthService, js: JavascriptEvalService) {
+                // DON'T REMOVE THIS PLEASE I KNOW IT DOESN'T HAVE ANY USAGES
+                js: JavascriptEvalService ) {
 
         system.boot();
-
-        auth.watchCredentials();
 
         /**
          * Hack for angular's inability to provide the vcRef to a service with DI.

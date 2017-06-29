@@ -4,7 +4,7 @@ const routes    = require("./routes");
 function bindDataRequestListener() {
     ipcMain.on("data-request", (event, request) => {
 
-        console.log("Request (", new Date().valueOf(), ")", request.message, request.id, request.data);
+        // console.log("Request", request.message, request.id, request.data.length);
 
         const controllerFn = routes[request.message];
 
@@ -12,7 +12,7 @@ function bindDataRequestListener() {
             if (error) {
                 error = Object.assign({}, error, {message: error.message});
 
-                console.log("Reply (", new Date().valueOf(), ")", request.id);
+                // console.log("Reply", request.id);
                 return event.sender.send("data-reply", {id, error});
             }
 

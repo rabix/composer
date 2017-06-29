@@ -4,14 +4,16 @@ import {AppTabData} from "../../core/workbox/app-tab-data";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {DataGatewayService} from "../../core/data-gateway/data-gateway.service";
 import {StatusBarService} from "../status-bar/status-bar.service";
+import {CodeSwapService} from "../../core/code-content-service/code-content.service";
 
 @Component({
     selector: "ct-file-editor",
     styleUrls: ["./file-editor.component.scss"],
+    providers: [CodeSwapService],
     template: `
         <ct-action-bar>
             <div class="document-controls">
-                <button [disabled]="!data.isWritable"
+                <button [disabled]="!tabData.isWritable"
                         class="btn btn-secondary btn-sm"
                         tooltipPlacement="bottom"
                         ct-tooltip="Save"
@@ -21,44 +23,41 @@ import {StatusBarService} from "../status-bar/status-bar.service";
                 </button>
             </div>
         </ct-action-bar>
-        <ct-code-editor [formControl]="fileContent" [filePath]="data.id"></ct-code-editor>
+        <ct-code-editor [formControl]="fileContent" [filePath]="tabData.id"></ct-code-editor>
     `
 })
 export class FileEditorComponent extends DirectiveBase implements OnInit {
     @Input()
-    data: AppTabData;
+    tabData: AppTabData;
 
     fileContent = new FormControl(undefined);
 
-    constructor(private gateway: DataGatewayService,
+    constructor(private dataGateway: DataGatewayService,
+                private codeSwapService: CodeSwapService,
                 private status: StatusBarService) {
         super();
     }
 
     ngOnInit(): void {
-        this.fileContent.setValue(this.data.fileContent);
+        // Subscribe editor content to tabData code changes
+        this.tabData.fileContent.subscribeTracked(this, (code: string) => this.fileContent.setValue(code));
+
+        // Set this app's ID to the code content service
+        this.codeSwapService.appID = this.tabData.id;
+
+        /** Save to swap all code changes*/
+        this.fileContent.valueChanges.subscribeTracked(this, content => this.codeSwapService.codeContent.next(content));
     }
 
     save() {
-        const filename = this.data.id.split("/").pop();
+        const filename = this.tabData.id.split("/").pop();
         const proc     = this.status.startProcess(`Saving: ${filename}`);
 
-        this.gateway.saveFile(this.data.id, this.fileContent.value).subscribe(() => {
+        this.dataGateway.saveFile(this.tabData.id, this.fileContent.value).subscribe(() => {
             this.status.stopProcess(proc, `Saved: ${filename}`);
         }, err => {
             this.status.stopProcess(proc, `Could not save ${filename} (${err})`);
             console.warn("Error with file saving", err);
         });
-        // // For local files, just save and that's it
-        // if (this.data.data.source === "local") {
-        //     const path = this.data.data.path;
-        //
-        //     const statusID = this.statusBar.startProcess(`Saving ${path}...`, `Saved ${path}`);
-        //     this.data.data.save(this.rawEditorContent.getValue()).subscribe(() => {
-        //         this.statusBar.stopProcess(statusID);
-        //     });
-        //     return;
-        // }
-
     }
 }

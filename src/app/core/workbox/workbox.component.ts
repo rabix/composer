@@ -1,12 +1,13 @@
 import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren} from "@angular/core";
 import {Observable} from "rxjs/Observable";
+import {AuthService} from "../../auth/auth.service";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
+import {LocalRepositoryService} from "../../repository/local-repository.service";
 import {IpcService} from "../../services/ipc.service";
 import {MenuItem} from "../../ui/menu/menu-item";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {TabData} from "./tab-data.interface";
 import {WorkboxService} from "./workbox.service";
-import {UserPreferencesService} from "../../services/storage/user-preferences.service";
 
 @Component({
     selector: "ct-workbox",
@@ -26,7 +27,7 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
                     class="tab">
 
                     <div class="tab-icon">
-                        <i class="fa" 
+                        <i class="fa"
                            [class.fa-home]="tab?.type === 'Welcome'"
                            [class.fa-file-text-o]="tab?.type === 'Code'"
                            [class.fa-share-alt]="tab?.type === 'Workflow'"
@@ -36,7 +37,9 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
                         ></i>
                     </div>
 
-                    <div class="title" [ct-tooltip]="ctt" [tooltipPlacement]="'bottom'">{{ tab.label }}</div>
+                    <div class="title" [ct-tooltip]="ctt" [tooltipPlacement]="'bottom'">{{ tab.label
+                        }}
+                    </div>
                     <div class="close-icon">
                         <i class="fa fa-times clickable" (click)="removeTab(tab)"></i>
                     </div>
@@ -44,7 +47,7 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
                     <!--Tooltip content-->
                     <ct-tooltip-content [maxWidth]="500" #ctt>
                         <div>
-                            {{ tab.data ? (tab.data.dataSource === "local" ? tab.data.id : tab.data.parsedContent["sbg:id"]) : tab.label }}
+                            {{ tab.data?.id}}
                         </div>
                     </ct-tooltip-content>
                 </li>
@@ -55,7 +58,7 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
 
             </ul>
 
-            <ct-settings-button></ct-settings-button>
+            <ct-settings-menu></ct-settings-menu>
         </div>
 
         <div class="body">
@@ -75,7 +78,7 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
     public tabs: TabData<any>[] = [];
 
     /** Reference to an active tab object */
-    public activeTab;
+    public activeTab: TabData<any>;
 
     private el: Element;
 
@@ -84,8 +87,9 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
 
     constructor(private ipc: IpcService,
                 public workbox: WorkboxService,
+                private auth: AuthService,
+                private local: LocalRepositoryService,
                 private statusBar: StatusBarService,
-                private preferences: UserPreferencesService,
                 private cdr: ChangeDetectorRef,
                 el: ElementRef) {
         super();
@@ -96,26 +100,26 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
 
         // FIXME: this needs to be handled in a system-specific way
         // Listen for a shortcut that should close the active tab
-        this.tracked = this.ipc.watch("accelerator", "CmdOrCtrl+W").subscribe(() => {
+        this.ipc.watch("accelerator", "CmdOrCtrl+W").subscribeTracked(this, () => {
             this.workbox.closeTab();
         });
 
         // Switch to the tab on the right
-        this.tracked = this.ipc.watch("accelerator", "CmdOrCtrl+Shift+]")
+        this.ipc.watch("accelerator", "CmdOrCtrl+Shift+]")
             .filter(_ => this.activeTab && this.tabs.length > 1)
-            .subscribe(() => {
+            .subscribeTracked(this, () => {
                 this.workbox.activateNext();
             });
 
         // Switch to the tab on the left
-        this.tracked = this.ipc.watch("accelerator", "CmdOrCtrl+Shift+[")
+        this.ipc.watch("accelerator", "CmdOrCtrl+Shift+[")
             .filter(_ => this.activeTab && this.tabs.length > 1)
-            .subscribe(() => {
+            .subscribeTracked(this, () => {
                 this.workbox.activatePrevious();
             });
 
 
-        this.tracked = this.workbox.tabs.subscribe(tabs => {
+        this.workbox.tabs.subscribeTracked(this, tabs => {
             this.tabs = tabs;
         });
     }
@@ -128,7 +132,7 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
 
     ngAfterViewInit() {
 
-        this.tracked = this.workbox.tabCreation.delay(1).subscribe(tab => {
+        this.workbox.tabCreation.delay(1).subscribeTracked(this, tab => {
             const component = this.getTabComponent(tab);
             if (component && typeof component.registerOnTabLabelChange === "function") {
                 component.registerOnTabLabelChange((title) => {
@@ -138,7 +142,7 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
             }
 
         });
-        this.tracked = this.workbox.activeTab.subscribe(tab => {
+        this.workbox.activeTab.subscribeTracked(this, tab => {
             this.statusBar.removeControls();
 
             this.activeTab = tab;
@@ -233,34 +237,44 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
     }
 
     restoreTabs() {
-        Observable.zip(this.preferences.get("localFolders", []), this.preferences.get("openProjects", [])
-            , this.preferences.get("openTabs", []), (localFolders, openProjects, openTabs) => {
 
-                // If there are no open local folders or user projects) open welcome tab
-                if (!(localFolders.length || openProjects.length)) {
-                    this.openWelcomeTab();
-                } else {
+        this.workbox.startingTabs.subscribeTracked(this, tabDataList => {
 
-                    // If there are no open tabs (to restore), open new file tab
-                    if (!openTabs.length) {
+            // const lastActiveTab = this.activeTab;
+            this.workbox.tabs.next([]);
+            this.workbox.activeTab.next(undefined);
+
+            if (tabDataList.length === 0) {
+
+                Observable.combineLatest(this.local.getLocalFolders(), this.auth.getActive(), (folders, cred) => {
+                    return folders.length || cred;
+                }).subscribeTracked(this, (hasSettings) => {
+                    if (hasSettings) {
                         this.openNewFileTab();
                     } else {
-
-                        // Restore open tabs
-                        openTabs.forEach(tab => {
-                            if (tab.id.startsWith("?")) {
-                                this.workbox.openTab(tab, false);
-                            } else {
-                                this.workbox.getOrCreateFileTab(tab.id).take(1).subscribe(appTab => {
-                                    this.workbox.openTab(appTab, false);
-                                }, err => {
-                                    console.warn("Cannot open app tab", tab);
-                                });
-                            }
-                        });
+                        this.openWelcomeTab();
                     }
+                });
+
+                return;
+            }
+
+
+            tabDataList.forEach(tabDataEntry => {
+
+                if (tabDataEntry.id.startsWith("?")) {
+                    this.workbox.openTab(tabDataEntry);
+                    return;
                 }
-            }).take(1).subscribe(() => {
+
+                const tab = this.workbox.getOrCreateAppTab(tabDataEntry);
+                this.workbox.openTab(tab);
+            });
+
+            // if (lastActiveTab && lastActiveTab.id === "?settings") {
+            //     this.workbox.activeTab.next(lastActiveTab);
+            // }
+
         });
     }
 }

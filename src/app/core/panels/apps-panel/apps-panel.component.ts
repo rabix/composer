@@ -1,5 +1,6 @@
-import {AfterViewInit, ChangeDetectorRef, Component} from "@angular/core";
-import {UserPreferencesService} from "../../../services/storage/user-preferences.service";
+import {Component} from "@angular/core";
+import {LocalRepositoryService} from "../../../repository/local-repository.service";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
     selector: "ct-apps-panel",
@@ -19,38 +20,24 @@ import {UserPreferencesService} from "../../../services/storage/user-preferences
     `,
     styleUrls: ["./apps-panel.component.scss"],
 })
-export class AppsPanelComponent implements AfterViewInit {
+export class AppsPanelComponent extends DirectiveBase {
 
+    constructor(private localRepository: LocalRepositoryService) {
+        super();
+    }
 
     activeTab = "myApps";
 
-    constructor(private prefs: UserPreferencesService, private cdr: ChangeDetectorRef) {
-    }
-
     changeTab(tab) {
-        if (tab !== this.activeTab) {
-            this.prefs.put("selectedAppPanel", tab);
-        }
-
+        this.activeTab = tab;
+        this.localRepository.setSelectedAppsPanel(tab);
     }
 
-    ngAfterViewInit() {
-        this.prefs.get("selectedAppPanel", "myApps").subscribe(tabName => {
-
-            // Fix badly written data
-            if (["myApps", "publicApps"].indexOf(tabName) === -1) {
-                this.prefs.put("selectedAppPanel", "myApps");
-                tabName = "myApps";
-            }
-
-            setTimeout(() => {
-
-                this.activeTab = tabName;
-
-                this.cdr.markForCheck();
-                this.cdr.detectChanges();
-            });
+    ngOnInit() {
+        this.localRepository.getSelectedAppsPanel().take(1).subscribeTracked(this, panel => {
+            this.activeTab = panel;
         });
-
     }
+
+
 }

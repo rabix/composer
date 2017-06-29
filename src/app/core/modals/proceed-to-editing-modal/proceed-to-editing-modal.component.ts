@@ -1,10 +1,10 @@
 import {Component, Input} from "@angular/core";
-
-import {ModalService} from "../../../ui/modal/modal.service";
 import {Subject} from "rxjs/Subject";
 
+import {ModalService} from "../../../ui/modal/modal.service";
+
 @Component({
-    selector: 'ct-create-local-folder-modal',
+    selector: "ct-create-local-folder-modal",
     template: `
         <div class="p-1">
             <p>
@@ -14,20 +14,26 @@ import {Subject} from "rxjs/Subject";
         </div>
 
         <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="close()">Cancel</button>
             <button type="button"
                     class="btn btn-primary"
                     (click)="proceedToEditing()">
                 Proceed to Editing
             </button>
-            <button type="button" class="btn btn-secondary" (click)="modal.close()">Cancel</button>
         </div>
-    `
+    `,
+    styles: [`
+        :host {
+            display: block;
+            width: 440px;
+        }
+    `]
 })
 export class ProceedToEditingModalComponent {
     @Input()
     appName: string;
 
-    public response: Subject<boolean>;
+    response: Subject<boolean>;
 
     constructor(public modal: ModalService) {
         this.response = new Subject<boolean>();
@@ -35,6 +41,10 @@ export class ProceedToEditingModalComponent {
 
     proceedToEditing() {
         this.response.next(true);
+        this.modal.close();
+    }
+
+    close() {
         this.modal.close();
     }
 }

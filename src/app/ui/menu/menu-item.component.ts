@@ -12,7 +12,9 @@ import {
     ViewEncapsulation
 } from "@angular/core";
 import {MenuItem} from "./menu-item";
-import {Observable, Subject, Subscription} from "rxjs/Rx";
+import {Subscription} from "rxjs/Subscription";
+import {Observable} from "rxjs/Observable";
+import {Subject} from "rxjs/Subject";
 
 @Component({
     encapsulation: ViewEncapsulation.None,

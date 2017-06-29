@@ -1,0 +1,28 @@
+@import "../../../assets/sass/variables";
+
+:host {
+    display: inline-block;
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .loader {
+        border: 1.5px solid $btn-primary-bg;
+        border-top: 1.5px solid $brand-primary;
+
+        border-radius: 50%;
+        width: 11px;
+        height: 11px;
+        top: 1px;
+        position: relative;
+        display: inline-block;
+        animation: spin .65s linear infinite;
+    }
+
+}

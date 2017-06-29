@@ -1,8 +1,7 @@
-import {AfterViewInit, Component, Input, OnInit, Output} from "@angular/core";
+import {AfterViewInit, Component, HostBinding, Input, OnInit, Output} from "@angular/core";
 import {FormControl, FormGroup} from "@angular/forms";
-import {Subject} from "rxjs/Subject";
+import {AsyncSubject} from "rxjs/AsyncSubject";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
-import {AsyncSubject} from "rxjs";
 
 @Component({
     styleUrls: ["prompt.component.scss"],
@@ -45,6 +44,10 @@ export class PromptComponent extends DirectiveBase implements OnInit, AfterViewI
 
     @Input()
     formControl: FormControl;
+
+    @Input()
+    @HostBinding("style.min-width")
+    minWidth: string = "500px";
 
     form: FormGroup;
 

@@ -25,7 +25,7 @@ import {Validation, ValidationBase} from "cwlts/models/helpers/validation";
         </ct-tooltip-content>
     `
 })
-export class ValidationComponent {
+export class ValidationPreviewComponent {
     @Input()
     public entry: ValidationBase;
 }

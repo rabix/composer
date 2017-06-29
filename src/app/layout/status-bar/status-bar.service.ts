@@ -1,29 +1,34 @@
 import {Injectable, TemplateRef} from "@angular/core";
-import {BehaviorSubject, Observable, ReplaySubject, Subject} from "rxjs/Rx";
-import {StatusBarComponent} from "./status-bar.component";
+
+import "rxjs/add/observable/concat";
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {Observable} from "rxjs/Observable";
+import {ReplaySubject} from "rxjs/ReplaySubject";
+import {Subject} from "rxjs/Subject";
 import {noop} from "../../lib/utils.lib";
 import {GuidService} from "../../services/guid.service";
+import {StatusBarComponent} from "./status-bar.component";
+
 
 @Injectable()
 export class StatusBarService {
 
-    public host: StatusBarComponent;
+    host: StatusBarComponent;
 
-    public status = new ReplaySubject<{ message: string, time?: Date }>();
+    status = new ReplaySubject<{ message: string, time?: Date }>();
 
-    public queueSize = new BehaviorSubject(0);
+    queueSize = new BehaviorSubject(0);
 
-    public process: Observable<string>;
+    process: Observable<string>;
 
-    public readonly controls = new ReplaySubject<TemplateRef<any>>();
+    controls = new ReplaySubject<TemplateRef<any>>();
 
     private processMap = {};
 
     constructor(private guid: GuidService) {
-
     }
 
-    public enqueue(process: Observable<string>, completionMessage = "") {
+    enqueue(process: Observable<string>, completionMessage = "") {
 
         this.queueSize.next(this.queueSize.getValue() + 1);
 
@@ -41,7 +46,7 @@ export class StatusBarService {
         return process;
     }
 
-    public startProcess(firstMessage = "", completionMessage = "") {
+    startProcess(firstMessage = "", completionMessage = "") {
         const id = this.guid.generate();
 
         const p = new BehaviorSubject(firstMessage);
@@ -56,11 +61,11 @@ export class StatusBarService {
         return id;
     }
 
-    public getProcess(id: string): Subject<string> {
+    getProcess(id: string): Subject<string> {
         return this.processMap[id];
     }
 
-    public stopProcess(id, status?: string) {
+    stopProcess(id, status?: string) {
         const p = this.getProcess(id);
 
         if (!p) {
@@ -75,19 +80,19 @@ export class StatusBarService {
         p.complete();
     }
 
-    public setStatus(message, time = true) {
+    setStatus(message, time = true) {
         this.status.next({message, time: time ? new Date() : undefined});
     }
 
-    public setControls(tpl: TemplateRef<any>) {
+    setControls(tpl: TemplateRef<any>) {
         this.controls.next(tpl);
     }
 
-    public removeControls() {
+    removeControls() {
         this.controls.next(undefined);
     }
 
-    public instant(message: string): void {
+    instant(message: string): void {
         this.stopProcess(this.startProcess(""), message);
     }
 

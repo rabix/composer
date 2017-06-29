@@ -1,6 +1,6 @@
 import {Component, OnInit, ViewChild, ViewContainerRef} from "@angular/core";
-import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {LayoutService} from "../../core/layout/layout.service";
+import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {StatusBarService} from "./status-bar.service";
 
 @Component({
@@ -11,12 +11,12 @@ import {StatusBarService} from "./status-bar.service";
         <!--Status & panel toggle button-->
         <span class="status-item status-buttons">
             <span class="btn-group">
-                <button class="sidebar-toggle btn btn-sm"
+                <button class="sidebar-toggle btn btn-sm" data-test="sidebar-toggle"
                         [class.active]="layoutService.sidebarHidden"
                         (click)="layoutService.toggleSidebar()">
                     <i class="fa"
-                       [class.fa-angle-double-left] = "!layoutService.sidebarHidden"
-                       [class.fa-angle-double-right] = "layoutService.sidebarHidden"></i>
+                       [class.fa-angle-double-left]="!layoutService.sidebarHidden"
+                       [class.fa-angle-double-right]="layoutService.sidebarHidden"></i>
                 </button>
             </span>
             <span *ngIf="status">
@@ -27,7 +27,8 @@ import {StatusBarService} from "./status-bar.service";
 
         <!--Process-->
         <span class="status-item">
-            <span *ngIf="queueSize">
+            <span *ngIf="queueSize" [ct-tooltip]="statusBar.process | async">
+                <span class="loader"></span>
                 {{ statusBar.process | async }}
                 <span *ngIf="queueSize > 1">
                     and {{ queueSize - 1 }} more
@@ -53,6 +54,7 @@ export class StatusBarComponent extends DirectiveBase implements OnInit {
     constructor(public statusBar: StatusBarService,
                 public layoutService: LayoutService) {
         super();
+
         this.tracked = this.statusBar.status.subscribe(s => this.status = s);
         this.tracked = this.statusBar.queueSize.subscribe(s => this.queueSize = s);
     }

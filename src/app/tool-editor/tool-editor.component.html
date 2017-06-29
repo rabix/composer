@@ -2,90 +2,94 @@
 <ct-action-bar>
     <ct-tab-selector [distribute]="'auto'" [active]="viewMode" (activeChange)="switchTab($event)">
 
-        <ct-tab-selector-entry [disabled]="!isValidCWL || isValidatingOrResolvingCWL()"
+        <ct-tab-selector-entry [disabled]="!validationState?.isValid"
                                [tabName]="'info'">App Info
         </ct-tab-selector-entry>
 
-        <ct-tab-selector-entry [disabled]="!isValidCWL || isValidatingOrResolvingCWL()"
+        <ct-tab-selector-entry [disabled]="!validationState?.isValid"
                                [tabName]="'gui'">Visual
         </ct-tab-selector-entry>
 
-        <ct-tab-selector-entry [disabled]="!isValidCWL || isValidatingOrResolvingCWL()"
+        <ct-tab-selector-entry [disabled]=" !validationState?.isValid"
                                [tabName]="'test'">Test
         </ct-tab-selector-entry>
 
-        <ct-tab-selector-entry [disabled]="!viewMode || isValidatingOrResolvingCWL()"
-                               [tabName]="'code'">Code
+        <ct-tab-selector-entry [tabName]="'code'"
+                               [disabled]="!!unavailableError">Code
         </ct-tab-selector-entry>
     </ct-tab-selector>
 
     <div class="document-controls">
 
+        <!--Edit-->
+        <button *ngIf="isReadonly"
+                class="btn btn-edit-lock"
+                type="button"
+                ct-tooltip="Unlock this app for editing"
+                tooltipPlacement="bottom"
+
+                (click)="unlockEditing()">
+            <i class="fa fa-fw fa-lock"></i> Edit
+        </button>
+
         <!--Resolve-->
         <button class="btn"
                 type="button"
-                [disabled] = "isValidatingOrResolvingCWL()"
-                *ngIf="viewMode === 'code' && data.dataSource === 'local'"
+                [disabled]="!validationState?.isValid"
+                *ngIf="viewMode === 'code' && tabData.dataSource === 'local'"
                 ct-tooltip="Resolve"
                 tooltipPlacement="bottom"
                 (click)="resolveButtonClick()">
-            <i class="fa fa-refresh"></i>
+            <i class="fa fa-fw fa-refresh"></i>
         </button>
 
         <!--Go to app-->
         <button class="btn"
                 type="button"
-                *ngIf="data.dataSource !== 'local'"
+                [disabled]="dataModel === undefined"
+                *ngIf="tabData.dataSource !== 'local'"
                 ct-tooltip="Open on Platform"
                 tooltipPlacement="bottom"
-                (click)="goToApp()">
-            <i class="fa fa-external-link"></i>
+                (click)="openOnPlatform(dataModel.sbgId)">
+            <i class="fa fa-fw fa-external-link"></i>
         </button>
 
-        <!--Edit-->
-        <button *ngIf="!data.isWritable && data.dataSource !== 'public'"
-                class="btn"
-                type="button"
-                ct-tooltip="Edit"
-                tooltipPlacement="bottom"
-                (click)="edit()">
-            <i class="fa fa-edit"></i>
-        </button>
+
 
         <!--Save-->
-        <button *ngIf="data.isWritable"
-                [disabled]="isValidatingCWL"
+        <button *ngIf="tabData.isWritable"
+                [disabled]="isValidatingCWL || !!unavailableError || !dataModel"
                 (click)="save()"
                 ct-tooltip="Save"
                 tooltipPlacement="bottom"
                 class="btn" type="button">
-            <i class="fa fa-save"></i>
+            <i class="fa fa-fw fa-save"></i>
         </button>
 
         <!--Publish to Platform-->
         <button class="btn"
-                [disabled]="isValidatingOrResolvingCWL()"
-                *ngIf="data.dataSource === 'local'"
+                [disabled]="!validationState?.isValid || !dataModel"
+                *ngIf="tabData.dataSource === 'local'"
                 ct-tooltip="Publish to Platform"
                 tooltipPlacement="bottom"
                 (click)="publish()">
-            <i class="fa fa-cloud-upload"></i>
+            <i class="fa fa-fw fa-cloud-upload"></i>
         </button>
 
 
         <!--Revisions-->
-        <button *ngIf="data.dataSource !== 'local' && toolModel.customProps['sbg:revisionsInfo']"
+        <button *ngIf="tabData.dataSource !== 'local' && dataModel && dataModel.customProps['sbg:revisionsInfo']"
                 class="btn" type="button"
                 ct-tooltip="See Revision History"
                 tooltipPlacement="bottom"
                 [ct-editor-inspector-target]="'revisions'"
                 [ct-editor-inspector]="revisions">
 
-            Revision: {{ toolModel.customProps['sbg:revision']}}
+            Revision: {{ dataModel.customProps['sbg:revision']}}
 
             <ng-template #revisions>
-                <ct-revision-list [active]="toolModel.customProps['sbg:revision']"
-                                  [revisions]="toolModel.customProps['sbg:revisionsInfo']"
+                <ct-revision-list *ngIf="dataModel" [active]="dataModel.customProps['sbg:revision']"
+                                  [revisions]="dataModel.customProps['sbg:revisionsInfo']"
                                   (select)="openRevision($event)">
                 </ct-revision-list>
             </ng-template>
@@ -94,13 +98,20 @@
     </div>
 </ct-action-bar>
 
-<ct-error-bar [autoClose]="true" [fadeOutTime]="5000">
-</ct-error-bar>
+<ct-notification-bar [autoClose]="true" [fadeOutTime]="5000"></ct-notification-bar>
 
 <!--Header & Editor Column-->
 <div class="editor-layout">
 
     <ct-circular-loader *ngIf="isLoading"></ct-circular-loader>
+
+    <div class="full-size-table-display" *ngIf="!!unavailableError">
+        <div class="vertically-aligned-cell text-md-center">
+            <p>This tool is currently unavailable.</p>
+            <p>{{ unavailableError }}</p>
+        </div>
+    </div>
+
 
     <!--Editor Row-->
     <ct-code-editor *ngIf="viewMode === 'code' && !isLoading"
@@ -110,63 +121,66 @@
     </ct-code-editor>
 
     <!--GUI Editor-->
-    <ct-tool-visual-editor *ngIf="viewMode === 'gui' && !isLoading"
+    <ct-tool-visual-editor *ngIf="viewMode === 'gui' && !isLoading && dataModel"
                            class="flex-col"
-                           [readonly]="!data.isWritable"
+                           [readonly]="!tabData.isWritable"
                            [formGroup]="toolGroup"
-                           [model]="toolModel"></ct-tool-visual-editor>
+                           [model]="dataModel"></ct-tool-visual-editor>
 
-    <ct-job-editor *ngIf="viewMode === 'test' && !isLoading"
+    <ct-job-editor *ngIf="viewMode === 'test' && !isLoading && dataModel"
                    class="flex-col"
-                   [model]="toolModel"
+                   [model]="dataModel"
                    (update)="onJobUpdate($event)"
                    (reset)="resetJob()"></ct-job-editor>
 
-    <ct-app-info *ngIf="viewMode === 'info' && !isLoading"
+    <ct-app-info *ngIf="viewMode === 'info' && !isLoading && dataModel"
                  class="gui-editor-component p-2"
-                 [readonly]="!data.isWritable"
+                 [readonly]="!tabData.isWritable"
                  [formGroup]="toolGroup"
                  [class.flex-col]="showInspector"
-                 [model]="toolModel"></ct-app-info>
+                 [model]="dataModel"></ct-app-info>
 
 
     <!--Object Inspector Column-->
     <ct-editor-inspector
-        [class.flex-hide]="!showInspector && (viewMode === 'code' || viewMode === 'info')">
+        [class.flex-hide]="isLoading || !showInspector && (viewMode === 'code' || viewMode === 'info')">
         <ng-template #inspector></ng-template>
     </ct-editor-inspector>
 </div>
 
 <div *ngIf="reportPanel" class="app-report-panel layout-section">
+
     <ct-validation-report *ngIf="reportPanel === 'validation'"
-                          [issues]="validation"></ct-validation-report>
+                          [errors]="validationState.errors"
+                          [warnings]="validationState.warnings"></ct-validation-report>
+
     <ct-command-line-preview *ngIf="reportPanel === 'commandLinePreview'"
                              [commandLineParts]="commandLineParts | async"></ct-command-line-preview>
 </div>
 
 <ng-template #statusControls>
-                <!--Perpetual spinner that indicates if CWL validation is in progress-->
-                <i *ngIf= "isValidatingCWL"
-                   class="fa fa-circle-o-notch fa-spin">
-                </i>
+    <!--Perpetual spinner that indicates if CWL validation is in progress-->
+    <i *ngIf="isValidatingCWL"
+       class="fa fa-circle-o-notch fa-spin">
+    </i>
 
-                <span class="tag tag-warning">{{ toolModel.cwlVersion }}</span>
-                <span class="btn-group">
-                    <button [disabled]="!validation"
+    <span class="tag tag-warning" *ngIf="dataModel">{{ dataModel.cwlVersion }}</span>
+    <span class="btn-group">
+                    <button [disabled]="!validationState"
                             [class.active]="reportPanel === 'validation'"
                             (click)="toggleReport('validation')"
                             class="btn">
 
-                        <span *ngIf="validation?.errors?.length">
-                            <i class="fa fa-times-circle text-danger"></i> {{validation.errors.length}} {{ validation.warnings.length === 1 ? "Error" : "Errors"}}
+                        <span *ngIf="validationState?.errors?.length">
+                            <i class="fa fa-times-circle text-danger"></i> {{validationState.errors.length}} {{ validationState.warnings.length === 1 ? "Error" : "Errors"}}
                         </span>
 
-                        <span *ngIf="validation?.warnings?.length"
-                              [class.pl-1]="validation?.errors?.length">
-                            <i class="fa fa-exclamation-triangle text-warning"></i> {{validation.warnings.length}} {{ validation.warnings.length === 1 ? "Warning" : "Warnings"}}
+                        <span *ngIf="validationState?.warnings?.length"
+                              [class.pl-1]="validationState?.errors?.length">
+                            <i class="fa fa-exclamation-triangle text-warning"></i> {{validationState.warnings.length}} {{ validationState.warnings.length === 1 ? "Warning" : "Warnings"}}
                         </span>
 
-                        <span *ngIf="!validation?.errors?.length && !validation?.warnings?.length">
+                        <span *ngIf="!validationState?.errors?.length && !validationState?.warnings?.length">
                             No Issues
                         </span>
 
@@ -174,7 +188,7 @@
                     </button>
 
                     <button [class.active]="reportPanel == 'commandLinePreview'"
-                            [disabled]="!isValidCWL || isValidatingOrResolvingCWL()"
+                            [disabled]="!validationState?.isValid"
                             (click)="toggleReport('commandLinePreview')"
                             class="btn">Command Line</button>
                 </span>

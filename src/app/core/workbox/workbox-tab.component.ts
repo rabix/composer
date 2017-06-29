@@ -1,7 +1,4 @@
-import {
-    AfterViewInit,
-    ChangeDetectorRef, Component, Input, OnChanges, ViewChild,
-} from "@angular/core";
+import {AfterViewInit, ChangeDetectorRef, Component, Input, OnChanges, ViewChild,} from "@angular/core";
 
 import {WorkboxTab} from "./workbox-tab.interface";
 
@@ -11,14 +8,11 @@ import {WorkboxTab} from "./workbox-tab.interface";
     template: `
         <ng-container [ngSwitch]="tab?.type">
 
-            <ct-tool-editor #tabComponent class="tab-component" *ngSwitchCase="'CommandLineTool'"
-                            [data]="tab.data"></ct-tool-editor>
+            <ct-tool-editor #tabComponent class="tab-component" *ngSwitchCase="'CommandLineTool'" [tabData]="tab.data"></ct-tool-editor>
 
-            <ct-workflow-editor #tabComponent class="tab-component"[data]="tab.data" *ngSwitchCase="'Workflow'">
-            </ct-workflow-editor>
+            <ct-workflow-editor #tabComponent class="tab-component" [tabData]="tab.data" *ngSwitchCase="'Workflow'"></ct-workflow-editor>
 
-            <ct-file-editor #tabComponent class="tab-component" [data]="tab.data"
-                            *ngSwitchCase="'Code'"></ct-file-editor>
+            <ct-file-editor #tabComponent class="tab-component" [tabData]="tab.data" *ngSwitchCase="'Code'"></ct-file-editor>
 
             <ct-welcome-tab #tabComponent class="tab-component" *ngSwitchCase="'Welcome'"></ct-welcome-tab>
 
@@ -27,7 +21,7 @@ import {WorkboxTab} from "./workbox-tab.interface";
             <ct-settings #tabComponent class="tab-component" *ngSwitchCase="'Settings'"></ct-settings>
 
             <ct-tab-loader #tabComponent class="tab-component" *ngSwitchDefault></ct-tab-loader>
-            
+
         </ng-container>
     `
 })
@@ -67,7 +61,7 @@ export class WorkBoxTabComponent implements OnChanges, WorkboxTab, AfterViewInit
         }
     }
 
-    onTabActivation () {
+    onTabActivation() {
         if (this.tabComponent.onTabActivation) {
             return this.tabComponent.onTabActivation();
         }
