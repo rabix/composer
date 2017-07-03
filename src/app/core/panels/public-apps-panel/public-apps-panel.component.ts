@@ -242,20 +242,21 @@ export class PublicAppsPanelComponent extends DirectiveBase implements AfterView
                         isExpandable: true,
                         iconExpanded: "fa-folder-open",
                         isExpanded: expanded.indexOf(id) !== -1,
-                        children: listings[index].map(app => {
-                            const id = `${creds.hash}/${app.owner}/${app.slug}/${app["sbg:id"]}`;
-                            return {
-                                id,
-                                label: app.label,
-                                type: "app",
-                                data: app,
-                                icon: app.class === "Workflow" ? "fa-share-alt" : "fa-terminal",
-                                dragEnabled: true,
-                                dragTransferData: id,
-                                dragDropZones: ["zone1"],
-                                dragLabel: app.label,
-                                dragImageClass: app.class === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
-                            };
+                        children: listings[index].filter(item => !item["sbg:blackbox"])
+                            .map(app => {
+                                const id = `${creds.hash}/${app.owner}/${app.slug}/${app["sbg:id"]}`;
+                                return {
+                                    id,
+                                    label: app.label,
+                                    type: "app",
+                                    data: app,
+                                    icon: app.class === "Workflow" ? "fa-share-alt" : "fa-terminal",
+                                    dragEnabled: true,
+                                    dragTransferData: id,
+                                    dragDropZones: ["zone1"],
+                                    dragLabel: app.label,
+                                    dragImageClass: app.class === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
+                                };
                         })
 
                     };
