@@ -1,7 +1,8 @@
-import {Observable} from "rxjs";
 import {Directive, ElementRef, Input} from "@angular/core";
 import {DomEventService} from "../../../services/dom/dom-event.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import "rxjs/add/operator/last";
+import "rxjs/add/operator/skip";
 
 @Directive({selector: "[ct-drag-enabled]"})
 export class DragDirective extends DirectiveBase {

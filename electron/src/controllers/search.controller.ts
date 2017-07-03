@@ -5,18 +5,16 @@ const fsController = require("./fs.controller");
 const cp           = require("child_process");
 
 let searchProcess: ChildProcess;
-const relevanceThreshold = 0.1;
+const relevanceThreshold = 0.05;
 
 export function searchLocalProjects(folders: string[] = [], term: string, limit = 10, callback) {
-
-    console.log("Searching through local folders", folders);
 
     if (searchProcess) {
         searchProcess.kill();
         searchProcess = undefined;
     }
 
-    searchProcess = cp.fork(`${__dirname}/../workers/search-worker.js`);
+    searchProcess = cp.fork(`${__dirname}/../workers/fuzzy-search-worker.js`);
 
     searchProcess.send({
         term,

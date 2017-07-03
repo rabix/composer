@@ -1,25 +1,44 @@
 import {Injectable} from "@angular/core";
 import {Observable} from "rxjs/Observable";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {Subject} from "rxjs/Subject";
 import {IpcService} from "../services/ipc.service";
 
 
-/** @deprecated */
 @Injectable()
 export class LocalFileRepositoryService {
 
-    private registry = new BehaviorSubject([]);
+
+    private directoryReloads = new Subject<string>();
+
 
     constructor(private ipc: IpcService) {
     }
 
-    watch(directoryPath: string): Observable<any> {
-        return this.readDirectory(directoryPath).do(r => {
+    watch(path: string): Observable<any> {
+
+        return new Observable(observer => {
+
+            const sub = Observable.merge(
+                Observable.of(path),
+                this.directoryReloads.filter(dir => dir === path)
+            ).flatMap((path) => {
+                return this.ipc.request("readDirectory", path);
+            }).subscribe(data => {
+                observer.next(data);
+            }, err => observer.error(err));
+
+            return () => {
+                sub.unsubscribe();
+            }
         });
     }
 
     fetchDirectoryContent() {
 
+    }
+
+    reloadPath(path: string): void {
+        this.directoryReloads.next(path);
     }
 
     readDirectory(path): Observable<{

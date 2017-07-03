@@ -1,7 +1,12 @@
 import {Component, OnInit} from "@angular/core";
+import "rxjs/add/observable/combineLatest";
+import "rxjs/add/operator/startWith";
+import {Observable} from "rxjs/Observable";
+import {RecentAppTab} from "../../../../electron/src/storage/types/recent-app-tab";
 import {CreateAppModalComponent} from "../../core/modals/create-app-modal/create-app-modal.component";
 import {WorkboxService} from "../../core/workbox/workbox.service";
-import {UserPreferencesService} from "../../services/storage/user-preferences.service";
+import {LocalRepositoryService} from "../../repository/local-repository.service";
+import {PlatformRepositoryService} from "../../repository/platform-repository.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 
@@ -51,13 +56,13 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                     <div class="app-container">
                         <div class="app p-1">
                             <div class="revisions">
-                                <ct-nav-search-result *ngFor="let entry of recentApps"
+                                <ct-nav-search-result *ngFor="let entry of recentApps | async"
                                                       class="pl-1 pr-1 deep-unselectable"
                                                       [id]="entry?.id"
                                                       [icon]="entry.type === 'Workflow' ? 'fa-share-alt': 'fa-terminal'"
-                                                      [title]="entry?.title"
-                                                      [label]="entry?.label"
-                                                      (dblclick)="openRecentApp(entry?.id)">
+                                                      [title]="entry?.label"
+                                                      [label]="entry?.description"
+                                                      (dblclick)="openRecentApp(entry)">
                                 </ct-nav-search-result>
                             </div>
 
@@ -72,30 +77,32 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 })
 export class NewFileTabComponent extends DirectiveBase implements OnInit {
 
-    recentApps = [];
+    recentApps: Observable<RecentAppTab[]>;
 
-    constructor(private preferences: UserPreferencesService,
-                private modal: ModalService,
+    constructor(private modal: ModalService,
+                private localRepository: LocalRepositoryService,
+                private platformRepository: PlatformRepositoryService,
                 private workbox: WorkboxService) {
         super();
     }
 
     ngOnInit(): void {
-        this.tracked = this.preferences.get("recentApps", []).subscribe((items) => {
-            this.recentApps = items.slice().reverse();
-        });
+        this.recentApps = Observable.combineLatest(
+            this.localRepository.getRecentApps().startWith([]),
+            this.platformRepository.getRecentApps().startWith([]),
+            (localApps, platformApps) => [...localApps, ...platformApps].sort((a, b) => b.time - a.time).slice(0, 20)
+        );
     }
 
-    openRecentApp(id: string) {
-        this.workbox.getOrCreateFileTabAndOpenIt(id);
+    openRecentApp(appData: RecentAppTab) {
+
+        const tab = this.workbox.getOrCreateAppTab(appData);
+        this.workbox.openTab(tab);
     }
 
     openAppCreation(type: "workflow" | "tool") {
         const modal = this.modal.fromComponent(CreateAppModalComponent, {
-            closeOnOutsideClick: false,
-            backdrop: true,
             title: `Create a new ${type === "workflow" ? "Workflow" : "Command Line Tool"}`,
-            closeOnEscape: true
         });
 
         modal.appType = type;

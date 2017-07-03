@@ -13,6 +13,29 @@
         font-size: 1.3rem;
     }
 
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .loader {
+        border: 1.5px solid $layout-section-background;
+        border-top: 1.5px solid $brand-primary;
+
+        border-radius: 50%;
+        width: 12px;
+        height: 12px;
+        position: relative;
+        top: 2px;
+        margin-right: 2px;
+        display: inline-block;
+        animation: spin .65s linear infinite;
+    }
+
     .status-item {
         flex: 1 1 0;
         text-align: center;
@@ -52,6 +75,14 @@
                 outline: none;
             }
         }
+
+        .tag {
+            font-size: 100%;
+            font-weight: normal;
+            margin-right: 2px;
+
+        }
+
         i {
             margin-right: 2px;
         }

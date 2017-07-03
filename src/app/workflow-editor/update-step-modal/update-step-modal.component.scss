@@ -1,0 +1,12 @@
+:host {
+    display: block;
+    width: 600px;
+    min-height: 200px;
+
+    display:flex;
+    align-items:center;
+
+    .content {
+        flex: 1;
+    }
+}

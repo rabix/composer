@@ -1,8 +1,8 @@
 import {ComponentFactoryResolver, ComponentRef, Directive, HostListener, Input, ViewContainerRef} from "@angular/core";
 import {TooltipContentComponent} from "./tooltip-content.component";
 import {TooltipPlacement} from "./types";
-import {Observable} from "rxjs";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {Observable} from "rxjs/Observable";
 
 
 @Directive({

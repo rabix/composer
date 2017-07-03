@@ -1,6 +1,7 @@
 import {AfterViewInit, OnDestroy} from "@angular/core";
 import {AsyncSubject} from "rxjs/AsyncSubject";
 import {Subscription} from "rxjs/Subscription";
+import "../rx-extensions/subscribe-tracked";
 
 export abstract class DirectiveBase implements OnDestroy, AfterViewInit {
 
@@ -9,12 +10,12 @@ export abstract class DirectiveBase implements OnDestroy, AfterViewInit {
      */
     private __disposables: { dispose: string, track: Object }[] = [];
 
-    public viewReady = new AsyncSubject();
+    viewReady = new AsyncSubject();
 
     /**
      * Tracks the given value and disposes of it when the object gets destroyed
      */
-    public set tracked(track: Object) {
+    set tracked(track: Object) {
 
         if (track instanceof Subscription) {
             this.__disposables.push({
@@ -43,6 +44,10 @@ export abstract class DirectiveBase implements OnDestroy, AfterViewInit {
         throw new Error("Could not find a method that would destroy an object");
     }
 
+    track(obj: Object) {
+        this.tracked = obj;
+    }
+
     ngOnDestroy(): void {
         this.__disposables.forEach(d => d.track[d.dispose]());
     }
@@ -50,6 +55,5 @@ export abstract class DirectiveBase implements OnDestroy, AfterViewInit {
     ngAfterViewInit() {
         this.viewReady.next(true);
         this.viewReady.complete();
-
     }
 }

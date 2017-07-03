@@ -1,0 +1,18 @@
+@import "../../../assets/sass/variables";
+
+:host {
+
+    &.has-warning /deep/ .selectize-control .selectize-input {
+        border: 1px solid $brand-warning;
+    }
+
+    &.has-danger /deep/ .selectize-control .selectize-input {
+        border: 1px solid $brand-danger;
+    }
+
+    /deep/ .selectize-input {
+        border-radius: $border-radius;
+        line-height: $input-line-height;
+        padding: $input-padding-y $input-padding-x;
+    }
+}

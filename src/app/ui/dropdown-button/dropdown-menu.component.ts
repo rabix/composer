@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewEncapsulation} from "@angular/core";
-import {Observable} from "rxjs";
+import {Observable} from "rxjs/Observable";
 
 @Component({
     encapsulation: ViewEncapsulation.None,

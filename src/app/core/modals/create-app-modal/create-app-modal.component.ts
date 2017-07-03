@@ -1,17 +1,19 @@
 import {ChangeDetectorRef, Component, Input, OnInit} from "@angular/core";
-import {UserPreferencesService} from "../../../services/storage/user-preferences.service";
+import {FormControl, FormGroup, Validators} from "@angular/forms";
+import * as YAML from "js-yaml";
+import {SlugifyPipe} from "ngx-pipes";
+import {Observable} from "rxjs/Observable";
+import {Project} from "../../../../../electron/src/sbg-api-client/interfaces/project";
+import {AppGeneratorService} from "../../../cwl/app-generator/app-generator.service";
+import {LocalFileRepositoryService} from "../../../file-repository/local-file-repository.service";
+import {LocalRepositoryService} from "../../../repository/local-repository.service";
+import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
-import {SlugifyPipe} from "ngx-pipes";
-import {FormControl, Validators, FormGroup} from "@angular/forms";
-import {AuthService} from "../../../auth/auth/auth.service";
-import {PlatformAPIGatewayService} from "../../../auth/api/platform-api-gateway.service";
-import {AppGeneratorService} from "../../../cwl/app-generator/app-generator.service";
-const {app, dialog} = window["require"]("electron").remote;
-import * as YAML from "js-yaml";
 import {WorkboxService} from "../../workbox/workbox.service";
-import {Observable} from "rxjs/Observable";
+
+const {app, dialog} = window["require"]("electron").remote;
 
 @Component({
     selector: "ct-create-app-modal",
@@ -68,7 +70,7 @@ import {Observable} from "rxjs/Observable";
                 <label>Destination Path:</label>
                 <button *ngIf="!defaultFolder" class="btn btn-secondary block" type="button" (click)="chooseFolder()">Choose a Local Path
                 </button>
-                <p class="form-text text-muted" 
+                <p class="form-text text-muted"
                    *ngIf="chosenLocalFilename || defaultFolder">
                     Chosen Path: {{ chosenPath() }}
                 </p>
@@ -79,14 +81,18 @@ import {Observable} from "rxjs/Observable";
                 <ct-auto-complete [formControl]="projectSelection"
                                   [mono]="true"
                                   [options]="projectOptions"
-                                  [optgroups]="platformOptgroups"
                                   placeholder="Choose a destination project..."
                                   optgroupField="hash"></ct-auto-complete>
             </div>
-            
+
             <div class="alert alert-danger" *ngIf="localFileControl.errors && localFileControl.errors.exists">
                 A file with this name already exists. Choose another name!
             </div>
+
+            <div class="alert alert-danger" *ngIf="destination === 'remote' && remoteAppCreationError ">
+                {{ remoteAppCreationError }}
+            </div>
+
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" (click)="modal.close()"> Cancel</button>
@@ -94,10 +100,14 @@ import {Observable} from "rxjs/Observable";
                         (click)="createRemote()"
                         class="btn btn-primary"
                         *ngIf="destination=== 'remote'"
-                        [disabled]="platformGroup.invalid">
-                    <span *ngIf="checkingSlug">Checking...</span>
-                    <span *ngIf="!checkingSlug">Create</span>
+                        [disabled]="!platformGroup.valid || appCreationInProgress">
+
+                    <ct-loader-button-content [isLoading]="appCreationInProgress">
+                        <span *ngIf="checkingSlug">Checking...</span>
+                        <span *ngIf="!checkingSlug">Create</span>
+                    </ct-loader-button-content>
                 </button>
+
                 <button type="button"
                         class="btn btn-primary"
                         *ngIf="destination=== 'local'"
@@ -126,17 +136,19 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
              remoteSlugControl: FormControl;
              error: string;
              projectOptions                  = [];
-             platformOptgroups               = [];
              checkingSlug                    = false;
              appTypeLocked                   = false;
+             appCreationInProgress           = false;
+             remoteAppCreationError;
 
     constructor(private dataGateway: DataGatewayService,
                 public modal: ModalService,
                 private slugify: SlugifyPipe,
-                private apiGateway: PlatformAPIGatewayService,
                 private cdr: ChangeDetectorRef,
                 private workbox: WorkboxService,
-                private preferences: UserPreferencesService) {
+                private platformRepository: PlatformRepositoryService,
+                private localRepository: LocalRepositoryService,
+                private localFileRepository: LocalFileRepositoryService) {
 
         super();
 
@@ -146,41 +158,59 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
 
         this.remoteNameControl.valueChanges
             .map(value => this.slugify.transform(value))
-            .subscribe(val => this.remoteSlugControl.setValue(val));
+            .subscribeTracked(this, val => this.remoteSlugControl.setValue(val));
 
-        this.tracked = this.dataGateway.getProjectsForAllConnections().withLatestFrom(
-            this.preferences.getOpenProjects(),
-            (data, openProjects) => ({...data, openProjects}))
-            .subscribe(data => {
+        /** Check out open projects on platform and map them to select box options */
+        this.platformRepository.getOpenProjects().subscribeTracked(this, projects => {
+            this.projectOptions = projects.map((project: Project) => ({
+                value: project.id,
+                text: project.name
+            }));
+        });
+    }
 
-                const {credentials, listings, openProjects} = data;
-                this.platformOptgroups                      = credentials.map(creds => ({value: creds.hash, label: creds.profile}));
-                this.projectOptions                         = listings.reduce((acc, listing, index) => {
-                    return acc.concat(listing.map((entry: any) => {
-                        return {
-                            value: credentials[index].hash + `/${entry.owner}/${entry.slug}`,
-                            text: entry.name,
-                            hash: credentials[index].hash
-                        } as any;
-                    }));
-                }, []).filter((entry: any) => openProjects.indexOf(entry.value) !== -1);
+    ngOnInit() {
+        if (this.appType) {
+            this.appTypeLocked = true;
+        }
+
+        this.localFileControl = new FormControl("",
+            [Validators.required, Validators.pattern("^[a-zA-Zа-яА-Я0-9_!-]+$")],
+            [this.hasLocalFileAsyncValidator.bind(this)]);
+
+        this.projectSelection = new FormControl(this.defaultProject || "", [Validators.required]);
+
+        this.platformGroup = new FormGroup({
+            name: this.remoteSlugControl,
+            project: this.projectSelection,
+        });
+
+        this.tracked = this.localFileControl.valueChanges
+            .debounceTime(300)
+            .subscribe(val => {
+                this.chosenLocalFilename = val ? val + ".cwl" : "";
             });
     }
 
     chooseFolder() {
 
-        Observable.zip(this.preferences.getOpenFolders(), this.preferences.getExpandedNodes(), (openFolders, expandedNodes) => {
-            if (this.defaultFolder) {
-                return Observable.of(this.defaultFolder);
+        const defaultFolder = Observable.combineLatest(
+            this.localRepository.getExpandedFolders(),
+            this.localRepository.getLocalFolders()
+        ).map(list => {
+            const [expanded, all] = list;
+            if (expanded.length) {
+                return expanded[expanded.length - 1];
             }
-            for (let i = 0; i < expandedNodes.length; i++) {
-                if (openFolders.indexOf(expandedNodes[i]) !== -1) {
-                    return Observable.of(expandedNodes[i]);
-                }
+
+            if (all.length) {
+                return all[all.length - 1];
             }
-            return Observable.of(null);
-        }).take(1).subscribe(folder => {
-            const path = folder || app.getPath("home");
+
+            return app.getPath("home");
+        }).take(1);
+
+        defaultFolder.subscribeTracked(this, path => {
 
             const defaultFilename   = `new-${this.appType}.cwl`;
             const val               = this.localNameControl.value;
@@ -214,39 +244,52 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
 
         const app  = AppGeneratorService.generate(this.cwlVersion, this.appType, fileBasename, appName);
         const dump = YAML.dump(app);
+
         this.dataGateway.saveLocalFileContent(filename, dump).subscribe(_ => {
-            this.dataGateway.invalidateFolderListing(folder);
+            this.localFileRepository.reloadPath(folder);
+
+            this.workbox.openTab(this.workbox.getOrCreateAppTab({
+                id: filename,
+                isWritable: true,
+                language: "yaml",
+                label: filename.split("/").pop(),
+                type: this.appType === "workflow" ? "Workflow" : "CommandLineTool",
+            }));
+
             this.modal.close();
-            this.workbox.getOrCreateFileTab(filename).subscribe(tab => {
-                this.workbox.openTab(tab);
-            });
         }, err => {
             this.error = err;
         });
     }
 
     createRemote() {
+        this.appCreationInProgress  = true;
+        this.remoteAppCreationError = undefined;
+
         const slug  = this.remoteSlugControl.value;
         const label = this.remoteNameControl.value;
         const app   = AppGeneratorService.generate(this.cwlVersion, this.appType, slug, label);
 
-        const [hash, owner, project] = this.projectSelection.value.split("/");
+        const newAppID = `${this.projectSelection.value}/${slug}`.split("/").slice(0, 3).concat("0").join("/");
 
-        const platform = this.apiGateway.forHash(hash);
-
-        const call = platform ? platform.createApp(owner, project, slug, app)
-            : Observable.throw(
-                new Error("You cannot create the app because you are not connected to the necessary platform."));
-
-        call.subscribe(data => {
-            this.dataGateway.invalidateProjectListing(hash, owner, project);
-            this.workbox.getOrCreateFileTab([hash, owner, project, owner, project, slug, 0].join("/")).subscribe(tab => {
-                this.workbox.openTab(tab);
+        this.platformRepository.createApp(newAppID, JSON.stringify(app, null, 4)).then(app => {
+            const tab = this.workbox.getOrCreateAppTab({
+                id: newAppID,
+                type: this.appType === "workflow" ? "Workflow" : "CommandLineTool",
+                label: label,
+                isWritable: true,
+                language: "json"
             });
+            this.workbox.openTab(tab);
             this.modal.close();
+
+            this.appCreationInProgress = false;
         }, err => {
-            this.error = err;
+            this.remoteAppCreationError = err.message;
+            this.appCreationInProgress  = false;
         });
+
+        return;
     }
 
     hasLocalFileAsyncValidator(control: FormControl) {
@@ -263,65 +306,23 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
         });
     }
 
+    /**
+     * @FIXME(nikolab): remove nested ternary operators, remove function call from template, change detenction performance
+     */
     chosenPath() {
         return this.defaultFolder ? this.localFileControl.valid ?
             this.defaultFolder + this.chosenLocalFilename :
             this.defaultFolder : this.chosenLocalFilename;
     }
 
+    /**
+     * @FIXME(nikolab): remove function call from template, change detection performance
+     */
     isLocalButtonDisabled() {
         return (this.defaultFolder && this.localFileControl.invalid) ||
             (!this.defaultFolder && this.localNameControl.invalid) ||
             !this.chosenLocalFilename;
     }
 
-    ngOnInit() {
-        if (this.appType) {
-            this.appTypeLocked = true;
-        }
 
-        this.localFileControl  = new FormControl("",
-            [Validators.required, Validators.pattern('^[a-zA-Zа-яА-Я0-9_!-]+$')],
-            [this.hasLocalFileAsyncValidator.bind(this)]);
-
-        this.projectSelection = new FormControl(this.defaultProject || "", [Validators.required]);
-
-        this.platformGroup = new FormGroup({
-            name: this.remoteSlugControl,
-            project: this.projectSelection,
-        });
-
-        this.tracked = this.platformGroup.valueChanges.subscribe(change => {
-
-            this.platformGroup.setErrors({});
-
-        });
-
-        this.tracked = this.platformGroup.valueChanges
-            .debounceTime(300)
-            .filter(val => this.platformGroup.get("name").valid && this.platformGroup.get("project").valid)
-            .do(() => this.checkingSlug = true)
-            .switchMap((values: { name: string, project: string }) => {
-                const {name, project}    = values;
-                const [hash, owner, app] = project.split("/");
-                const slug               = this.slugify.transform(name);
-                const platform           = this.apiGateway.forHash(hash);
-
-                return platform ? platform.suggestSlug(owner, app, slug)
-                    : Observable.throw(
-                        new Error("Cannot suggest slug because you are not connected to the necessary platform."));
-            })
-            .subscribe(data => {
-                this.remoteSlugControl.setValue(data.app_name, {
-                    emitEvent: false
-                });
-                this.checkingSlug = false;
-            });
-
-        this.tracked = this.localFileControl.valueChanges
-            .debounceTime(300)
-            .subscribe(val => {
-                this.chosenLocalFilename = val ? val + ".cwl" : "";
-            });
-    }
 }

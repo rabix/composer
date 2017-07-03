@@ -15,7 +15,7 @@ import {SystemService} from "../../platform-providers/system.service";
 
             <div class="row text-xs-center mb-1" *ngIf="buttonText && !readonly">
                 <div class="col-xs-12">
-                    <button class="btn btn-primary" type="button" (click)="buttonClick.emit(true)">
+                    <button class="btn btn-secondary" type="button" (click)="buttonClick.emit(true)">
                         {{ buttonText }}
                     </button>
                 </div>

@@ -21,6 +21,13 @@
     color: $input-color-disabled;
 }
 
+//Disable shadows on focused inputs
+.form-control:focus {
+    .has-warning & {
+        box-shadow: none;
+    }
+}
+
 .btn-secondary {
 
     &.input-addition {
@@ -45,11 +52,21 @@
 .selectize-control {
 
     &.single, &.multi {
+
         .selectize-input {
             color: $input-color;
             background: $input-bg;
             border: $input-btn-border-width solid $input-border-color;
             box-shadow: none;
+
+            &.disabled {
+                opacity: 1;
+                background: $input-bg-disabled;
+            }
+
+            .has-warning & {
+                border-color: $brand-warning;
+            }
 
             &.dropdown-active::before,
             &.input-active {

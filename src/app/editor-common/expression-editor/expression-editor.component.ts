@@ -7,6 +7,8 @@ import {TreeNode} from "../../ui/tree-view/tree-node";
 import {TreeViewService} from "../../ui/tree-view/tree-view.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {TreeViewComponent} from "../../ui/tree-view/tree-view.component";
+import {Observable} from "rxjs/Observable";
+import "rxjs/add/observable/of";
 
 @Component({
     selector: "ct-expression-editor",
@@ -127,7 +129,10 @@ export class ExpressionEditorComponent extends DirectiveBase implements OnInit, 
 
         this.tracked = this.tree.open.subscribe(node => {
             this.editor.editor.session.insert(this.editor.getEditorInstance().getCursorPosition(), String(node.id));
+            this.editor.setFocus();
         });
+
+        this.editor.setFocus();
     }
 
 
@@ -169,7 +174,7 @@ export class ExpressionEditorComponent extends DirectiveBase implements OnInit, 
 
             if (type === "object" || type === "array") {
                 node.isExpandable = true;
-                node.children     = wrap(contextItem, trace);
+                node.children     = Observable.of(wrap(contextItem, trace));
             } else {
                 node.id = trace.split(".").map(p => (parseInt(p, 10).toString() === p) ? `[${p}]` : p).join(".")
                     .replace(/\]\.\[/g, "][")

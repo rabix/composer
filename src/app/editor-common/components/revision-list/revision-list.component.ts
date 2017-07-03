@@ -6,7 +6,7 @@ import {PlatformAppRevisionEntry} from "../../../services/api/platforms/platform
 
     selector: "ct-revision-list",
     styleUrls: ["./revision-list.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    // changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <ct-editor-inspector-content class="p-0">
             <div class="tc-header">Revisions</div>
@@ -19,7 +19,7 @@ import {PlatformAppRevisionEntry} from "../../../services/api/platforms/platform
 
 
                     <div class="revision-number h5">
-                        <ct-circular-loader class="loader-75" *ngIf="loadingRevision === revision; else revNum"></ct-circular-loader>
+                        <ct-circular-loader class="loader-50" *ngIf="loadingRevision === revision; else revNum"></ct-circular-loader>
                         <ng-template #revNum>{{ revision.number }}</ng-template>
                     </div>
                     <div class="revision-info">

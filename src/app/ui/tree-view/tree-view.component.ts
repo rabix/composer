@@ -13,11 +13,11 @@ import {TreeViewService} from "./tree-view.service";
                       [icon]="node?.icon"
                       [label]="node?.label"
                       [data]="node?.data || {}"
-                      [children]="node.children"
+                      [children]="node?.children"
                       [dragLabel]="node?.dragLabel"
                       [isExpanded]="node?.isExpanded"
                       [dragEnabled]="node?.dragEnabled"
-                      [dragDropZones]="node?.dropZones"
+                      [dragDropZones]="node?.dragDropZones"
                       [isExpandable]="node?.isExpandable"
                       [iconExpanded]="node?.iconExpanded"
                       [dragImageClass]="node?.dragImageClass"
@@ -30,6 +30,8 @@ import {TreeViewService} from "./tree-view.service";
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TreeViewComponent {
+
+
     @Input()
     nodes: TreeNode<any>[];
 

@@ -1,5 +1,5 @@
 import {Component, Input, Output, ViewEncapsulation} from "@angular/core";
-import {Subject} from "rxjs";
+import {Subject} from "rxjs/Subject";
 @Component({
     encapsulation: ViewEncapsulation.None,
 

@@ -1,9 +1,9 @@
 import {ChangeDetectionStrategy, Component} from "@angular/core";
-import {ModalService} from "../../ui/modal/modal.service";
+import {AuthService} from "../../auth/auth.service";
 import {SendFeedbackModalComponent} from "../../core/modals/send-feedback-modal/send-feedback.modal.component";
 import {SystemService} from "../../platform-providers/system.service";
-import {AuthService} from "../../auth/auth/auth.service";
 import {CredentialsEntry} from "../../services/storage/user-preferences-types";
+import {ModalService} from "../../ui/modal/modal.service";
 
 @Component({
     styleUrls: ["getting-started.component.scss"],
@@ -44,7 +44,7 @@ import {CredentialsEntry} from "../../services/storage/user-preferences-types";
                 <p>If you have any problem, idea or a thought let us know.</p>
                 <p>
                     <button type="button" data-test="get-support-btn" class="btn btn-secondary"
-                            (click)="openFeedbackModal()">
+                            (click)="initiateFeedbackDialog()">
                         Get support
                     </button>
                 </p>
@@ -63,27 +63,21 @@ export class GettingStartedComponent {
         this.system.openLink(link);
     }
 
-    openFeedbackModal() {
+    openMailClient(): void {
+        this.system.openLink("mailto:support@sbgenomics.com?subject=Rabix Composer Feedback");
+    }
 
-        this.auth.connections.take(1).subscribe(credentials => {
-            let feedbackPlatform = credentials.find(c => c.url.indexOf("-vayu") === -1 && c.url.indexOf("staging") === -1);
-            if (!feedbackPlatform && credentials.length) {
-                feedbackPlatform = credentials[0];
-            }
+    initiateFeedbackDialog() {
 
-            if (feedbackPlatform as CredentialsEntry) {
-
-                const modal = this.modal.fromComponent(SendFeedbackModalComponent, {
-                    title: "Send Feedback",
-                    backdrop: true
-                });
-
-                modal.feedbackPlatform = feedbackPlatform;
-
+        this.auth.getActive().take(1).toPromise().then((credentials) => {
+            if (!credentials) {
+                this.openMailClient();
                 return;
             }
 
-            return this.system.openLink("mailto:support@sbgenomics.com?subject=Rabix Composer Feedback");
+            const modal = this.modal.fromComponent(SendFeedbackModalComponent, {title: "Send Feedback"});
+
+
 
         });
     }

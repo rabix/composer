@@ -1,17 +1,17 @@
 import {ComponentFactoryResolver, ComponentRef, Injectable, TemplateRef, ViewContainerRef} from "@angular/core";
-import {ModalOptions} from "./modal-options";
+import {FormControl} from "@angular/forms";
 import {Subject} from "rxjs/Subject";
-import {ModalComponent} from "./modal.component";
 import {ConfirmComponent} from "./common/confirm.component";
 import {PromptComponent} from "./common/prompt.component";
-import {FormControl} from "@angular/forms";
+import {ModalOptions} from "./modal-options";
+import {ModalComponent} from "./modal.component";
 
 @Injectable()
 export class ModalService {
 
     private rootViewContainer: ViewContainerRef;
 
-    private modalComponentRef: ComponentRef<ModalComponent>;
+    private modalComponentsRefStack: ComponentRef<ModalComponent> [] = [];
 
     private onClose = new Subject();
 
@@ -28,9 +28,8 @@ export class ModalService {
         this.onClose.next();
     }
 
-    public fromComponent<T>(component: { new (...args: any[]): T; }, config?: Partial<ModalOptions>): T {
-
-        this.close();
+    public fromComponent<T>(component: { new (...args: any[]): T; },
+                            config?: Partial<ModalOptions>): T {
 
         config = {
             backdrop: true,
@@ -43,17 +42,19 @@ export class ModalService {
         const modalFactory     = this.resolver.resolveComponentFactory(ModalComponent);
         const componentFactory = this.resolver.resolveComponentFactory(component);
 
-        this.modalComponentRef = this.rootViewContainer.createComponent(modalFactory);
+        const modalComponentRef = this.rootViewContainer.createComponent(modalFactory);
 
-        this.modalComponentRef.instance.configure(config as ModalOptions);
+        modalComponentRef.instance.configure(config as ModalOptions);
 
-        const componentRef = this.modalComponentRef.instance.produce(componentFactory);
+        const componentRef = modalComponentRef.instance.produce(componentFactory);
+
+        this.modalComponentsRefStack.push(modalComponentRef);
 
         return componentRef.instance;
     }
 
     public fromTemplate<T>(template: TemplateRef<T>, config?: Partial<ModalOptions>): void {
-        this.close();
+
         config = {
             backdrop: true,
             closeOnEscape: true,
@@ -63,11 +64,13 @@ export class ModalService {
         };
 
         const modalFactory     = this.resolver.resolveComponentFactory(ModalComponent);
-        this.modalComponentRef = this.rootViewContainer.createComponent(modalFactory);
+        const modalComponentRef = this.rootViewContainer.createComponent(modalFactory);
 
-        this.modalComponentRef.instance.configure(config as ModalOptions);
+        modalComponentRef.instance.configure(config as ModalOptions);
 
-        this.modalComponentRef.instance.embed(template);
+        modalComponentRef.instance.embed(template);
+
+        this.modalComponentsRefStack.push(modalComponentRef);
     }
 
     private wrapPromise<T>(handler: (resolve, reject) => void): Promise<T> {
@@ -84,8 +87,8 @@ export class ModalService {
 
     private cleanComponentRef() {
 
-        if (this.modalComponentRef) {
-            this.modalComponentRef.destroy();
+        if (this.modalComponentsRefStack.length) {
+            this.modalComponentsRefStack.pop().destroy();
         }
 
     }
@@ -130,12 +133,17 @@ export class ModalService {
         confirmationLabel?: string,
         cancellationLabel ?: string,
         formControl?: FormControl,
+        minWidth?: string
     }) {
 
         return this.wrapPromise((resolve, reject) => {
             const component = this.fromComponent(PromptComponent, {
                 title: params.title || "Are you sure?"
             });
+
+            if (params.minWidth) {
+                component.minWidth = params.minWidth;
+            }
 
             Object.assign(component, {
                 content: "Are you sure?",

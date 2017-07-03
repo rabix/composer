@@ -4,6 +4,7 @@
         "target": "es6",
         "noImplicitAny": false,
         "inlineSourceMap": true,
+        "lib": [ "es6", "dom" ],
         "outDir": "dist",
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,

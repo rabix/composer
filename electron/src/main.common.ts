@@ -1,14 +1,14 @@
-const {app, Menu, BrowserWindow} = require("electron");
 import * as acceleratorProxy from "./accelerator-proxy";
-app.setPath("userData", app.getPath("home") + "/.sevenbridges/rabix-composer");
 
+const {app, Menu, BrowserWindow} = require("electron");
+
+app.setPath("userData", app.getPath("home") + "/.sevenbridges/rabix-composer");
 const router = require("./ipc-router");
 
 let win;
 let splash;
 
 function start(config: { devTools: boolean, url: string }) {
-
     router.start();
 
     splash = new BrowserWindow({
@@ -16,12 +16,18 @@ function start(config: { devTools: boolean, url: string }) {
         height: 310,
         frame: false,
         show: false,
-        resizable: false
+        resizable: false,
+        closable: true,
     });
     splash.loadURL(`file://${__dirname}/splash/index.html`);
     splash.once("ready-to-show", () => {
         splash.show();
     });
+
+    splash.once("closed", () =>{
+        splash = undefined;
+    });
+
 
     win = new BrowserWindow({
         show: false
@@ -129,7 +135,6 @@ export = {
 
 // Quit when all windows are closed.
         app.on("window-all-closed", () => {
-
             // On macOS it is common for applications and their menu bar
             // to stay active until the user quits explicitly with Cmd + Q
             if (process.platform !== "darwin") {

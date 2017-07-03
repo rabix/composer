@@ -1,15 +1,17 @@
-import {ChangeDetectionStrategy, Component, Input, OnInit, ViewEncapsulation} from "@angular/core";
+import {Component, Input} from "@angular/core";
 import {StepModel} from "cwlts/models";
+import "rxjs/add/operator/first";
+import {RawApp} from "../../../../electron/src/sbg-api-client/interfaces/raw-app";
 import {SystemService} from "../../platform-providers/system.service";
-import {SettingsService} from "../../services/settings/settings.service";
 import {ModalService} from "../../ui/modal/modal.service";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
     selector: "ct-project-selection-modal",
+    styleUrls: ["./update-step-modal.component.scss"],
     template: `
-        <div class="p-1">
-            <form (ngSubmit)="onSubmit()" class="flex-form">
+        <div class="p-1 content">
+
+            <form (ngSubmit)="onSubmit()" class="flex-form" *ngIf="!isLoading; else loader">
 
                 <div class="modal-body">
                     <p>
@@ -19,14 +21,14 @@ import {ModalService} from "../../ui/modal/modal.service";
                         Do you want to update this node?
                     </p>
 
-                    <div class="" *ngIf="updatedModel['sbg:revisionNotes']">
+                    <div class="" *ngIf="updatedApp['sbg:revisionNotes']">
                         <p><strong>Revision note:</strong></p>
-                        <p>"{{ updatedModel['sbg:revisionNotes']}}"</p>
-                        <p class="text-muted small">by {{ updatedModel['sbg:modifiedBy'] }}
-                            on {{ updatedModel['sbg:modifiedOn'] * 1000 | date: 'MMM d, y hh:mm'}}</p>
+                        <p>"{{ updatedApp['sbg:revisionNotes']}}"</p>
+                        <p class="text-muted small">by {{ updatedApp['sbg:modifiedBy'] }}
+                            on {{ updatedApp['sbg:modifiedOn'] * 1000 | date: 'MMM d, y hh:mm'}}</p>
                     </div>
 
-                    <div class="alert alert-danger" *ngIf="!updatedModel">
+                    <div class="alert alert-danger" *ngIf="!updatedApp">
                         Failed to retrieve the latest revision of this app.
                     </div>
 
@@ -39,19 +41,23 @@ import {ModalService} from "../../ui/modal/modal.service";
                     </button>
                 </div>
             </form>
+
+            <ng-template #loader>
+                <div class="loading">
+                    <ct-circular-loader></ct-circular-loader>
+                    <br/>
+                    <p class="text-xs-center">Checking new app version</p>
+                </div>
+            </ng-template>
         </div>
     `
 })
 export class UpdateStepModalComponent {
 
-    @Input()
-    step: StepModel;
-
-    @Input()
-    updatedModel: any;
-
-    @Input()
-    confirm: () => void;
+    @Input() error: string;
+    @Input() step: StepModel;
+    @Input() isLoading = true;
+    @Input() updatedApp: RawApp;
 
 
     constructor(private modal: ModalService,
@@ -59,7 +65,6 @@ export class UpdateStepModalComponent {
     }
 
     onSubmit() {
-        this.confirm();
     }
 
     onCancel() {

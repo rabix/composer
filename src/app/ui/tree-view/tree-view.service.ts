@@ -15,6 +15,8 @@ export class TreeViewService {
     readonly nodeInit         = new Subject<TreeNodeComponent<any>>();
     readonly contextMenu      = new Subject<{node: TreeNodeComponent<any>, coordinates: { x: number, y: number }}>();
 
+
+
     constructor() {
     }
 

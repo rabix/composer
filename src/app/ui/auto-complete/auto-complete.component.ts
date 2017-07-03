@@ -1,20 +1,16 @@
-import {Component, OnInit, ChangeDetectionStrategy, forwardRef, Input} from "@angular/core";
+import {Component, forwardRef, Input, OnInit} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {SelectComponent} from "./select/select.component";
 import {Subject} from "rxjs/Subject";
 import {noop} from "../../lib/utils.lib";
+import {SelectComponent} from "./select/select.component";
 
 @Component({
     selector: "ct-auto-complete",
-    providers: [
-        {
-            provide: NG_VALUE_ACCESSOR,
-            useExisting: forwardRef(() => AutoCompleteComponent), multi: true
-        }
-    ],
-    template: `
-        <input #el [placeholder]="placeholder">
-    `,
+    providers: [{
+        provide: NG_VALUE_ACCESSOR,
+        useExisting: forwardRef(() => AutoCompleteComponent), multi: true
+    }],
+    template: `<input #el [placeholder]="placeholder">`,
     styleUrls: ["./auto-complete.component.scss"],
 })
 export class AutoCompleteComponent extends SelectComponent implements ControlValueAccessor, OnInit {
@@ -27,21 +23,18 @@ export class AutoCompleteComponent extends SelectComponent implements ControlVal
     }
 
     // True makes control mono-selection (suggested input)
-    @Input()
-    public mono = false;
+    @Input() mono        = false;
+
+    @Input() placeholder = "";
 
     // Specify the return type of a value that will be propagated
     @Input()
     public type: "string" | "number" = "string";
 
-    @Input()
-    public placeholder = "";
-
-    private update = new Subject();
-
-    private onTouched = noop;
-
+    private update          = new Subject();
+    private onTouched       = noop;
     private propagateChange = noop;
+
 
     ngOnInit() {
         if (this.mono) {
@@ -62,10 +55,10 @@ export class AutoCompleteComponent extends SelectComponent implements ControlVal
         if (this.shouldTriggerChange) {
 
             const parse = this.type === "string" ? (value) => value : (value) => parseFloat(value);
-
             this.update.next(this.mono ?
                 parse(value) : (value ? value.split(this.delimiter).map((item) => parse(item)) : []));
         }
+
     }
 
     registerOnChange(fn: any): void {

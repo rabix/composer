@@ -22,9 +22,9 @@ import "brace/theme/monokai";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 
-import Editor = AceAjax.Editor;
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {ACE_MODE_MAP} from "../code-editor-new/ace-mode-map";
+import * as AceAjax from "brace";
 
 export interface AceEditorOptions {
 
@@ -109,7 +109,7 @@ export class CodeEditorXComponent extends DirectiveBase {
     public language: Observable<string> | string;
 
     /* Instance of the Ace editor */
-    public editor: Editor;
+    public editor: AceAjax.Editor;
 
     @Input()
     public options: AceEditorOptions = {};

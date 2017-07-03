@@ -1,12 +1,14 @@
+import {Observable} from "rxjs/Observable";
+
 export interface TreeNode<T> {
     id?: string;
     type?: string;
     icon?: string;
     label?: string;
-    isExpanded?: boolean;
     iconExpanded?: string;
     isExpandable?: boolean;
-    children?: TreeNode<any>[];
+    isExpanded?: Observable<boolean>;
+    children?: Observable<TreeNode<any>[]>;
     data?: T;
 
     dragEnabled?: boolean;

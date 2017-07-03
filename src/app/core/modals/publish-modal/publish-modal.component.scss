@@ -1,6 +1,9 @@
 @import "../../../../assets/sass/variables";
 
 :host {
+    display: block;
+    width: 450px;
+
     .destination-selection {
         width: 100%;
         height: 100px;

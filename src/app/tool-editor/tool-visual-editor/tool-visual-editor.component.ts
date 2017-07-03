@@ -49,11 +49,11 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                           [readonly]="readonly">
             </ct-resources>
 
-            <ct-hints [model]="model"
-                      [context]="context"
-                      (update)="formGroup.markAsDirty()"
-                      [readonly]="readonly">
-            </ct-hints>
+            <ct-tool-hints [model]="model"
+                           [context]="context"
+                           (update)="formGroup.markAsDirty()"
+                           [readonly]="readonly">
+            </ct-tool-hints>
 
             <ct-argument-list [location]="model.loc + '.arguments'"
                               [model]="model"

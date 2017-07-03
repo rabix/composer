@@ -1,4 +1,5 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, OnInit, Output} from "@angular/core";
+import {Component, EventEmitter, HostListener, Input, Output} from "@angular/core";
+import {TabData} from "../../workbox/tab-data.interface";
 
 @Component({
     selector: "ct-nav-search-result",
@@ -13,9 +14,8 @@ import {ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, O
         </div>
     `,
     styleUrls: ["./nav-search-result.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NavSearchResultComponent implements OnInit {
+export class NavSearchResultComponent {
 
     @Input() id: string;
     @Input() title: string;
@@ -28,18 +28,13 @@ export class NavSearchResultComponent implements OnInit {
     @Input() dragTransferData = {};
     @Input() dragDropZones    = ["zone1"];
 
+    @Input() tabData?: TabData<any>;
+
     @Output()
     open = new EventEmitter<any>();
 
     @HostListener("dblclick")
     triggerOpen() {
-        this.open.emit(this.id);
+        this.open.emit(this);
     }
-
-    constructor() {
-    }
-
-    ngOnInit() {
-    }
-
 }
