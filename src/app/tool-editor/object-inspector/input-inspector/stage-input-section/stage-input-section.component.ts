@@ -26,6 +26,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                             [formControl]="form.controls['stageInput']">
 
                         <option *ngFor="let item of stageInputOptions"
+                                [disabled]="readonly"
                                 [value]="item.value">
                             {{item.text}}
                         </option>
@@ -39,7 +40,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <ct-toggle-slider [formControl]="form.controls['loadContent']"
                                       [off]="'No'"
                                       [on]="'Yes'"
-                                      [readonly]="readonly">
+                                      [disabled]="readonly">
                     </ct-toggle-slider>
                 </span>
                 </div>
@@ -80,11 +81,7 @@ export class StageInputSectionComponent extends DirectiveBase implements Control
         }, {onlySelf: true});
 
         if (this.input.hasStageInput) {
-            this.form.addControl("stageInput", new FormControl({
-                    value: this.input.customProps["sbg:stageInput"] || null,
-                    disabled: this.readonly
-                })
-            );
+            this.form.addControl("stageInput", new FormControl(this.input.customProps["sbg:stageInput"] || null));
         }
 
         this.tracked = this.form.valueChanges

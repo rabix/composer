@@ -28,8 +28,10 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                             <label class="form-control-label">Inherit</label>
                             <select class="form-control"
                                     [formControl]="metadataForm.controls['inheritMetadata']">
-                                <option value="">-- none --</option>
-                                <option *ngFor="let item of inputs" [value]="item.id">
+                                <option value="" [disabled]="readonly">-- none --</option>
+                                <option *ngFor="let item of inputs" 
+                                        [disabled]="readonly"
+                                        [value]="item.id">
                                     {{item.id}}
                                 </option>
                             </select>
@@ -86,7 +88,7 @@ export class OutputMetaDataSectionComponent extends DirectiveBase implements Con
             });
 
         this.metadataForm = this.formBuilder.group({
-            inheritMetadata: [{value: this.output.outputBinding.inheritMetadataFrom || "", disabled: this.readonly}],
+            inheritMetadata: [this.output.outputBinding.inheritMetadataFrom || ""],
             metadataList: [{value: this.keyValueFormList, disabled: this.readonly}]
         });
 
