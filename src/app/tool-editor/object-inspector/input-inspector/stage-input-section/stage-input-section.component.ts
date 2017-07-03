@@ -40,7 +40,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <ct-toggle-slider [formControl]="form.controls['loadContent']"
                                       [off]="'No'"
                                       [on]="'Yes'"
-                                      [readonly]="readonly">
+                                      [disabled]="readonly">
                     </ct-toggle-slider>
                 </span>
                 </div>
