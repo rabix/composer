@@ -4,6 +4,7 @@ import {LocalRepositoryService} from "../../../repository/local-repository.servi
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {WorkboxService} from "../../workbox/workbox.service";
 
 const {app, dialog} = window["require"]("electron").remote;
 
@@ -35,7 +36,7 @@ const {app, dialog} = window["require"]("electron").remote;
                 <div class="dialog-content dialog-connection" *ngIf="auth.active | async; else noActiveConnection">
 
                     <!--Projects are loaded-->
-                    <ng-container *ngIf="closedProjectOptions; else projectsNotLoadedYet">
+                    <ng-container *ngIf="(repository.getProjects() | async).length > 0; else projectsNotLoadedYet">
 
                         <!--Offer projects so users can choose which to add-->
                         <div *ngIf="closedProjectOptions.length > 0; else allProjectsAreAdded">
@@ -53,16 +54,14 @@ const {app, dialog} = window["require"]("electron").remote;
 
             <ng-template #noActiveConnection>
 
-                <div *ngIf="(auth.getCredentials() | async).length === 0; else platformActivation" class="dialog-content dialog-centered">
-                    User has no platforms listed
-                </div>
-
-            </ng-template>
-
-            <ng-template #platformActivation>
                 <div class="dialog-content dialog-centered">
-                    User has platforms listed but no connected ones.
-                </div>
+                    <p>You are not connected to any platform</p>
+                    <p>
+                        <button type="button" class="btn btn-primary" (click)="openSettingsTab()">Connect</button>
+                    </p>
+                </div>            
+
+
             </ng-template>
 
             <ng-template #projectsNotLoadedYet>
@@ -85,11 +84,12 @@ export class AddSourceModalComponent extends DirectiveBase {
     activeTab         = "local";
     selectedProjects  = [];
     localFoldersToAdd = [];
-    closedProjectOptions: { value: string, text: string }[];
+    closedProjectOptions: { value: string, text: string }[] = null;
 
     constructor(public modal: ModalService,
                 private localRepository: LocalRepositoryService,
                 private repository: PlatformRepositoryService,
+                private workbox: WorkboxService,
                 public auth: AuthService) {
 
         super();
@@ -99,7 +99,7 @@ export class AddSourceModalComponent extends DirectiveBase {
                 return {
                     value: project.id,
                     text: project.name
-                }
+                };
             });
         });
     }
@@ -129,5 +129,10 @@ export class AddSourceModalComponent extends DirectiveBase {
             this.localRepository.addLocalFolders(...paths);
             this.modal.close();
         });
+    }
+
+    openSettingsTab() {
+        this.workbox.openSettingsTab();
+        this.modal.close();
     }
 }
