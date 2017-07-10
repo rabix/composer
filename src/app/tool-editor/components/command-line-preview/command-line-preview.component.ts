@@ -1,11 +1,11 @@
-import {ChangeDetectionStrategy, Component, Input} from "@angular/core";
+import {ChangeDetectionStrategy, Component, Input, OnChanges} from "@angular/core";
 
 @Component({
     selector: "ct-command-line-preview",
     styleUrls: ["./command-line-preview.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-        <span *ngFor="let p of commandLineParts"
+        <span *ngFor="let p of list"
               [class.text-console-warning]="p.type === 'warning'"
               [class.text-console-error]="p.type === 'error'"
               [class.baseCmd-cli]="p.type === 'baseCommand'"
@@ -17,11 +17,23 @@ import {ChangeDetectionStrategy, Component, Input} from "@angular/core";
                     {{ p.loc }}
                 </span>
             </ct-tooltip-content></div>
+        </span>     
+
+        <span *ngIf="list.length === 0">
+            Your command line preview will appear here
         </span>
     `
 })
-export class CommandLinePreviewComponent {
+export class CommandLinePreviewComponent implements OnChanges {
+
+    list: { type: string, value: string }[] = [];
 
     @Input()
     public commandLineParts: { type: string, value: string }[] = [];
+
+    ngOnChanges() {
+        if (this.commandLineParts) {
+            this.list = this.commandLineParts.filter((item) => !!item.value);
+        }
+    }
 }
