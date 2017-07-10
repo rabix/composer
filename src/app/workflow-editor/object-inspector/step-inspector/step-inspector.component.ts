@@ -15,8 +15,9 @@ import {UpdateStepModalComponent} from "../../update-step-modal/update-step-moda
     template: `
 
         <!--Update warning-->
-        <div class="alert alert-warning form-control-label" *ngIf="step.hasUpdate">
-            Update available.<a href="" (click)="updateStep($event)"> Click here to update.</a>
+        <div class="alert alert-update form-control-label" *ngIf="step.hasUpdate && !readonly">
+            A new version of this app is available! 
+            <a href="" (click)="updateStep($event)">Update</a> to get the latest changes.
         </div>
 
         <!--View Modes-->
@@ -116,7 +117,7 @@ export class StepInspectorComponent extends DirectiveBase {
                 this.cdr.markForCheck();
                 this.cdr.detectChanges();
                 modal.closeModal();
-            }
+            };
         }).catch(err => {
             modal.closeModal();
             this.statusBar.stopProcess(proc);

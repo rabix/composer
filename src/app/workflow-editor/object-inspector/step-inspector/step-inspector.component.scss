@@ -18,4 +18,15 @@
             //border-bottom: 3px solid $editor-list-item-select-bg;
         }
     }
+
+    .alert-update {
+        background-color: $brand-warning;
+        color: white;
+        border: none;
+
+        & > a {
+            color:white;
+            text-decoration: underline;
+        }
+    }
 }
