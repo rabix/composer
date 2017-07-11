@@ -16,8 +16,8 @@ export class GlobalService {
         this.platformRepository.fetch().subscribe((data) => {
             this.statusBar.stopProcess(process, "Fetched platform data");
 
-        }, (err: Error) => {
-            this.notification.showError("Cannot sync platform data. " + err["error"] ? err["error"]["message"] : err.message);
+        }, err => {
+            this.notification.showError("Cannot sync platform data. " + (err.error ? err.error.message : err.message));
             this.statusBar.stopProcess(process, "Failed to fetch platform data.");
         });
     }
