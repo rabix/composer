@@ -13,6 +13,7 @@ export interface ServiceConfig {
 
 /**
  * @deprecated Moving to PlatformAPIGatewayService and per-platform PlatformAPI instances from the auth module
+ * @TODO remove this service
  */
 @Injectable()
 export class PlatformAPI {
