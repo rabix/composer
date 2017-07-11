@@ -1,4 +1,5 @@
 import {Component} from "@angular/core";
+import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {AuthService} from "../../auth/auth.service";
 import {AuthCredentials} from "../../auth/model/auth-credentials";
@@ -22,7 +23,7 @@ import {WorkboxService} from "./workbox.service";
 
         <ng-template #menu class="mr-1">
             <ul class="list-unstyled">
-                <li *ngFor="let c of auth.getCredentials() | async"
+                <li *ngFor="let c of credentials | async"
                     (click)="setActiveUser(c)">
                     <span>
                         {{ c.user.username }} 
@@ -39,7 +40,7 @@ import {WorkboxService} from "./workbox.service";
 })
 export class SettingsMenuComponent extends DirectiveBase {
 
-    public hasWarning = false;
+    hasWarning = false;
 
     active: AuthCredentials;
 
@@ -47,14 +48,20 @@ export class SettingsMenuComponent extends DirectiveBase {
 
     openStatus = new Subject<boolean>();
 
+    credentials: Observable<AuthCredentials[]>;
+
     constructor(private workbox: WorkboxService,
                 private settings: SettingsService,
                 private modal: ModalService,
                 private system: SystemService,
                 private global: GlobalService,
-                public auth: AuthService) {
+                private auth: AuthService) {
         super();
+
         settings.validity.subscribeTracked(this, isValid => this.hasWarning = !isValid);
+
+        // Store the stream locally so we don't have a auth.getCredentials function call in the template
+        this.credentials = auth.getCredentials();
 
         auth.getActive().subscribeTracked(this, cred => {
             this.active = cred;
@@ -64,12 +71,12 @@ export class SettingsMenuComponent extends DirectiveBase {
         });
     }
 
-    openSettings() {
+    openSettings(): void {
         this.workbox.openSettingsTab();
         this.openStatus.next(false);
     }
 
-    openFeedback() {
+    openFeedback(): void {
         if (!this.active) {
             this.system.openLink("mailto:support@sbgenomics.com?subject=Rabix Composer Feedback");
             return;
@@ -80,7 +87,14 @@ export class SettingsMenuComponent extends DirectiveBase {
         this.openStatus.next(false);
     }
 
-    setActiveUser(c) {
+    setActiveUser(c): void {
+
+        // If we click on a user that is already active, nothing should be done.
+        if (this.active === c) {
+            this.openStatus.next(false);
+            return;
+        }
+
         this.auth.setActiveCredentials(c).then((user) => {
             if (c) {
                 this.global.reloadPlatformData();
