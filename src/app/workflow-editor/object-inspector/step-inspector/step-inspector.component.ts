@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, Input} from "@angular/core";
+import {ChangeDetectorRef, Component, Input, Output, EventEmitter} from "@angular/core";
 import {Workflow} from "cwl-svg";
 import {StepModel, WorkflowModel} from "cwlts/models";
 import {RawApp} from "../../../../../electron/src/sbg-api-client/interfaces/raw-app";
@@ -41,17 +41,18 @@ import {UpdateStepModalComponent} from "../../update-step-modal/update-step-moda
             </ct-tab-selector>
         </ct-action-bar>
 
-        <!--Info-->
+        <!--Inputs-->        
         <ct-workflow-step-inspector-inputs *ngIf="viewMode === tabs.Inputs"
                                            [step]="step"
                                            [inputs]="step.in"
                                            [graph]="graph"
+                                           (change)="change.next()"
                                            [workflowModel]="workflowModel"
                                            [readonly]="readonly">
         </ct-workflow-step-inspector-inputs>
 
-        <!--Inputs-->
-        <ct-workflow-step-inspector-info *ngIf="viewMode === tabs.Info"
+        <!--Info-->
+        <ct-workflow-step-inspector-info *ngIf="viewMode === tabs.Info"                                         
                                          [step]="step">
         </ct-workflow-step-inspector-info>
 
@@ -60,6 +61,7 @@ import {UpdateStepModalComponent} from "../../update-step-modal/update-step-moda
                                          [step]="step"
                                          [graph]="graph"
                                          [workflowModel]="workflowModel"
+                                         (change)="change.next()"
                                          [readonly]="readonly">
         </ct-workflow-step-inspector-step>
     `
@@ -80,6 +82,9 @@ export class StepInspectorComponent extends DirectiveBase {
 
     @Input()
     fileID: string;
+
+    @Output()
+    change = new EventEmitter();
 
     tabs = {
         Inputs: "inputs",

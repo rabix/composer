@@ -1,6 +1,6 @@
 import {
-    ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnInit, SimpleChanges,
-    ViewEncapsulation
+    ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnInit, Output, SimpleChanges,
+    ViewEncapsulation, EventEmitter
 } from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {Workflow} from "cwl-svg";
@@ -101,6 +101,9 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
     @Input()
     public graph: Workflow;
 
+    @Output()
+    public change = new EventEmitter();
+
     public scatterMethodOptions = [
         {
             value: "dotproduct",
@@ -148,6 +151,10 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
         });
 
         this.disableScatter();
+
+        this.tracked = this.form.valueChanges.debounceTime(200).subscribe(() => {
+           this.change.emit();
+        });
 
         this.tracked = this.form.controls["id"].valueChanges.debounceTime(1000).subscribe((value) => {
             try {

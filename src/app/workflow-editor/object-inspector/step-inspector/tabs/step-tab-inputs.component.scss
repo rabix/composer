@@ -10,15 +10,6 @@ $grid-gutter-width-half: $grid-gutter-width-base / 2;
         padding: 1rem $grid-gutter-width-half;
         border-bottom: 1px solid $toolbar-border;
 
-        ct-dropdown-button {
-            button {
-                border: none;
-                background: none;
-                &:hover, &:active, &:focus {
-                    background: none;
-                }
-            }
-        }
     }
 
     .input-title {
@@ -58,4 +49,30 @@ $grid-gutter-width-half: $grid-gutter-width-base / 2;
             display: block;
         }
     }
+
+    .dropdown-port-option {
+        border-bottom: 1px solid $black;
+        line-height: $line-height-base;
+        padding: .55rem 1rem;
+        cursor: pointer;
+        min-width: 150px;
+        color: $smoke;
+
+        .text-muted {
+            white-space: nowrap;
+        }
+
+        &:hover {
+            background: $gray;
+        }
+
+        .active-icon {
+            color: $gray;
+        }
+    }
+
+    .dropdown-item-single.active {
+        background-color: $gray;
+    }
+
 }
