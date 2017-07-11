@@ -6,13 +6,13 @@ $gradientDarken: 2%;
 .btn-primary,
 .btn-secondary,
 .btn:disabled {
-    border: 1px solid $btn-border-color;
+    border: 1px solid $black;
     border-radius: $btn-border-radius;
 }
 
 .btn:disabled {
-    color: $text-muted;
-    opacity: 1;
+    color: white;
+    opacity: 0.5;
 }
 
 .btn-loader {
@@ -28,7 +28,7 @@ $gradientDarken: 2%;
 }
 
 .btn-primary:active {
-    background: linear-gradient(darken($btn-primary-bg, $gradientDarken), darken(darken($btn-primary-bg, $gradientDarken), $gradientDarken));
+    background: $btn-primary-bg;
 }
 
 .btn:enabled:hover {
@@ -41,7 +41,7 @@ $gradientDarken: 2%;
 
     @if $btn-gradient-active {
         $gradientStop: darken($btn-primary-bg, $gradientDarken);
-        background: linear-gradient($btn-primary-bg, $gradientStop);
+        background: $btn-primary-bg;
 
     } @else {
         background: $btn-primary-bg;
@@ -54,20 +54,9 @@ $gradientDarken: 2%;
     @if $btn-gradient-active {
         $gradientStop: darken($btn-secondary-bg, $gradientDarken);
 
-        background: linear-gradient($btn-secondary-bg, $gradientStop);
+        background: $btn-secondary-bg;
 
     } @else {
         background: $btn-secondary-bg;
     }
-}
-
-.btn-primary:disabled,
-.btn-primary:disabled:hover {
-    background: darken($btn-primary-bg, $gradientDarken);
-    border-color: $btn-primary-border-color;
-}
-
-.btn-secondary:disabled,
-.btn-secondary:disabled:hover {
-    background: darken($btn-secondary-bg, $gradientDarken);
 }

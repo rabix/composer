@@ -4,7 +4,7 @@
     display: flex;
     flex-basis: $action-bar-height;
     background: $panel-bg;
-    border-bottom: 1px solid #292929;
+    border-bottom: 1px solid $input-border-color;
     justify-content: space-between;
 
     /deep/ .btn {

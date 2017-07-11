@@ -19,6 +19,8 @@ html, body {
     font-size: $font-size-base;
 }
 
+
+
 .loading-image {
     display: flex;
     justify-content: center;
@@ -31,16 +33,27 @@ html, body {
     display: none;
 }
 
+.editor-list {
+
+    .children {
+        padding-top: 10px;
+        border: 1px solid $black;
+        border-top: none;
+    }
+
+    .ct-inspected + .children {
+        border: 1px solid $brand-primary;
+        border-top: none;
+    }
+}
+
 .input-list-items {
-    //border-radius: $editor-list-item-border-radius;
+    border-radius: 3px;
     margin-bottom: 10px;
     list-style: none;
 
     &.record-input {
-        //border: 1px solid $editor-list-item-bg;
-
         > .editor-list-item {
-            margin-bottom: 10px;
             border-bottom-right-radius: 0;
             border-bottom-left-radius: 0;
         }

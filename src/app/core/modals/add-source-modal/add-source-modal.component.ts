@@ -25,7 +25,7 @@ const {app, dialog} = window["require"]("electron").remote;
             <div *ngIf="activeTab === 'local'" class="dialog-centered dialog-content">
                 <p>Add one or more folders from your computer to the workspace.</p>
                 <p>
-                    <button class="btn btn-secondary" (click)="selectLocalFolders()">Select a Folder...</button>
+                    <button class="btn btn-secondary" (click)="selectLocalFolders()">Select a Folder</button>
                 </p>
             </div>
 

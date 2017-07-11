@@ -28,7 +28,7 @@ type ViewMode = "auth" | "keyBindings" | "cache";
         <ct-form-panel class="m-2">
             <div class="tc-header">Authentication</div>
             <div class="tc-body">
-
+ 
                 <table class="table table-striped">
                     <thead>
                     <tr>

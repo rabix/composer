@@ -25,12 +25,11 @@
 
     ct-status-bar {
         flex-basis: $layout-stripe-width;
-        border-top: $layout-section-border-dark;
         background: $layout-section-background;
     }
 
     .title-bar-section {
-        background: $layout-title-bar-background;
+        background: $black;
         height: $layout-title-bar-height;
     }
 
@@ -41,11 +40,11 @@
 
     .layout-section {
         color: $layout-section-font-color;
-        background: $layout-section-background;
+        background: $sidebar-panel-bg;
     }
 
     .handle-vertical {
-        //background: $panel-resize-handle-color;
+        background: $sidebar-panel-bg;
         cursor: col-resize;
         display: inline-block;
         width: $panel-resize-handle-width;
@@ -55,7 +54,7 @@
             content: '';
             display: block;
             position: relative;
-            background-color: $layout-title-bar-background;
+            background-color: $black;
             width: $panel-resize-handle-width;
             height: $layout-title-bar-height;
         }

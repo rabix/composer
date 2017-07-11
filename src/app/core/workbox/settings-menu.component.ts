@@ -17,7 +17,7 @@ import {WorkboxService} from "./workbox.service";
     template: `
         <ct-generic-dropdown-menu [ct-menu]="menu" menuAlign="left" [menuState]="openStatus">
             <span *ngIf="active">{{ userLabel }}</span>
-            <i class="fa fa-sliders fa-fw settings-icon" *ngIf="!active"> </i>
+            <i class="fa fa-chevron-down fa-fw settings-icon"> </i>
         </ct-generic-dropdown-menu>
 
         <ng-template #menu class="mr-1">
@@ -31,7 +31,7 @@ import {WorkboxService} from "./workbox.service";
                     </span>
                     <span class="text-muted d-block small">{{ c.url }}</span>
                 </li>
-                <li (click)="openSettings()"><i class="fa fa-sliders fa-fw"></i> Settings</li>
+                <li (click)="openSettings()"><i class="fa fa-cog fa-fw"></i> Settings</li>
                 <li (click)="openFeedback()"><i class="fa fa-bullhorn fa-fw"></i> Send Feedback</li>
             </ul>
         </ng-template>

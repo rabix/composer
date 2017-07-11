@@ -3,11 +3,12 @@
 :host {
     position: relative;
     display: inline-block;
-    z-index: 3;
 
     .generic-menu {
+        z-index: 1000;
         position: absolute;
-        background: $panel-bg;
+        background: #333333;
+        border: 1px solid $black;
         border-radius: $border-radius;
         box-shadow: 0 0 6px 2px rgba(0, 0, 0, 0.2);
 
