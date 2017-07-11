@@ -3,6 +3,7 @@ import {Subject} from "rxjs/Subject";
 import {CodeEditorComponent} from "../../ui/code-editor-new/code-editor.component";
 import {TreeViewService} from "../../ui/tree-view/tree-view.service";
 import {SystemService} from "../../platform-providers/system.service";
+import {ModalService} from "../../ui/modal/modal.service";
 
 @Component({
     selector: "ct-error-report",
@@ -16,10 +17,7 @@ import {SystemService} from "../../platform-providers/system.service";
         </div>
         <div class="modal-footer pb-1 pt-1 pr-1">
             <button (click)="report()" class="btn ml-1 btn-primary" type="button mr-1">Report</button>
-            <button (click)="clearCacheAndRestart()" class="btn btn-secondary ml-1" type="button">Clear Cache and
-                Restart
-            </button>
-            <button (click)="restart()" class="btn btn-secondary ml-1" type="button">Restart</button>
+            <button (click)="close()" class="btn btn-secondary ml-1" type="button">Close</button>
         </div>
     `
 })
@@ -45,18 +43,16 @@ export class ErrorReportComponent {
     @ViewChild("editor", {read: CodeEditorComponent})
     private editor: CodeEditorComponent;
 
-    constructor(private system: SystemService) {
-        console.log("After construction");
+    constructor(private system: SystemService, private modal: ModalService) {
     }
 
-    restart() {
-        window["require"]("electron").remote.app.relaunch();
-        window["require"]("electron").remote.app.quit();
-    }
+    // restart() {
+    //     window["require"]("electron").remote.app.relaunch();
+    //     window["require"]("electron").remote.app.quit();
+    // }
 
-    clearCacheAndRestart() {
-        window.localStorage.clear();
-        this.restart();
+    close(){
+        this.modal.close();
     }
 
     report() {
