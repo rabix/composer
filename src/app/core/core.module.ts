@@ -39,6 +39,10 @@ import {WorkBoxTabComponent} from "./workbox/workbox-tab.component";
 import {WorkBoxComponent} from "./workbox/workbox.component";
 import {WorkboxService} from "./workbox/workbox.service";
 
+export function errorHandlerFactory(modal: ModalService) {
+    return environment.production ? new ModalErrorHandler(modal) : new ErrorHandler();
+}
+
 @NgModule({
     entryComponents: [
         AddSourceModalComponent,
@@ -88,9 +92,7 @@ import {WorkboxService} from "./workbox/workbox.service";
         PlatformAPI,
         {
             provide: ErrorHandler,
-            useFactory: (modal: ModalService) => {
-                return environment.production ? new ModalErrorHandler(modal) : new ErrorHandler();
-            },
+            useFactory: errorHandlerFactory,
             deps: [ModalService]
         }
     ],
