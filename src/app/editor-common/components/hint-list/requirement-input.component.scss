@@ -11,13 +11,6 @@
     width: 100%;
   }
 
-  input {
-    // magic (to level inputs with expression input)
-    height: 1.89rem;
-    position: relative;
-    top: 1px;
-  }
-
   input, ct-expression-input, ct-auto-complete {
     flex: 1;
   }

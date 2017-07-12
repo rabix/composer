@@ -21,19 +21,21 @@ import {ModalService} from "../ui/modal/modal.service";
 import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow-graph-editor.component";
 import {WorkflowEditorService} from "./workflow-editor.service";
 
+export function useFactory(comp: WorkflowEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
+
+    if (comp.tabData.dataSource === "local") {
+        return new LocalFileSavingService(ipc);
+    }
+
+    return new PlatformAppSavingService(platformRepository, modal);
+}
+
 @Component({
     selector: "ct-workflow-editor",
     providers: [EditorInspectorService, NotificationBarService, WorkflowEditorService, CodeSwapService, PlatformAppService,
         {
             provide: APP_SAVER_TOKEN,
-            useFactory(comp: WorkflowEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
-
-                if (comp.tabData.dataSource === "local") {
-                    return new LocalFileSavingService(ipc);
-                }
-
-                return new PlatformAppSavingService(platformRepository, modal);
-            },
+            useFactory: useFactory,
             deps: [WorkflowEditorComponent, IpcService, ModalService, PlatformRepositoryService]
         }
     ],

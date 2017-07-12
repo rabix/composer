@@ -250,7 +250,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
         this.tree.contextMenu.filter((data) => data.node.type === "project")
             .subscribe(data => {
                 const contextMenu = [
-                    new MenuItem("Create new Workflow", {
+                    new MenuItem("New Workflow", {
                         click: () => {
                             const modal = this.modal.fromComponent(CreateAppModalComponent, {
                                 closeOnOutsideClick: false,
@@ -264,7 +264,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
                             modal.defaultProject = data.node.id;
                         }
                     }),
-                    new MenuItem("Create new Command Line Tool", {
+                    new MenuItem("New Command Line Tool", {
                         click: () => {
                             const modal = this.modal.fromComponent(CreateAppModalComponent, {
                                 closeOnOutsideClick: false,
@@ -289,19 +289,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
         this.tree.contextMenu.filter((data) => data.node.type === "folder" && data.node.level === 2)
             .subscribe(data => {
                 const contextMenu = [
-                    new MenuItem("Create new Folder", {
-                        click: () => {
-                            const modal = this.modal.fromComponent(CreateLocalFolderModalComponent, {
-                                closeOnOutsideClick: false,
-                                backdrop: true,
-                                title: `Create a new Folder in "${data.node.label}"`,
-                                closeOnEscape: true
-                            });
-
-                            modal.folderPath = data.node.id;
-                        }
-                    }),
-                    new MenuItem("Create new Workflow", {
+                    new MenuItem("New Workflow", {
                         click: () => {
                             const modal = this.modal.fromComponent(CreateAppModalComponent, {
                                 closeOnOutsideClick: false,
@@ -314,7 +302,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
                             modal.defaultFolder = data.node.id + "/";
                         }
                     }),
-                    new MenuItem("Create new Command Line Tool", {
+                    new MenuItem("New Command Line Tool", {
                         click: () => {
                             const modal = this.modal.fromComponent(CreateAppModalComponent, {
                                 closeOnOutsideClick: false,
@@ -325,6 +313,18 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
 
                             modal.appType       = "tool";
                             modal.defaultFolder = data.node.id + "/";
+                        }
+                    }),
+                    new MenuItem("New Folder", {
+                        click: () => {
+                            const modal = this.modal.fromComponent(CreateLocalFolderModalComponent, {
+                                closeOnOutsideClick: false,
+                                backdrop: true,
+                                title: `Create a new Folder in "${data.node.label}"`,
+                                closeOnEscape: true
+                            });
+
+                            modal.folderPath = data.node.id;
                         }
                     }),
                     new MenuItem("Remove from Workspace", {

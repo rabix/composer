@@ -19,16 +19,16 @@
 
         <!--Edit-->
         <button *ngIf="isReadonly"
-                class="btn btn-edit-lock"
+                class="btn control-button"
                 type="button"
                 ct-tooltip="Unlock this app for editing"
                 tooltipPlacement="bottom"
                 (click)="unlockEditing()">
-            <i class="fa fa-fw fa-lock"></i> Unlock
+            <i class="fa fa-fw fa-lock"></i> Edit
         </button>
 
         <!--Resolve-->
-        <button class="btn"
+        <button class="btn control-button"
                 type="button"
                 [disabled]="!validationState?.isValid"
                 *ngIf="viewMode === 'code' && tabData.dataSource === 'local'"
@@ -39,7 +39,7 @@
         </button>
 
         <!--Go to app-->
-        <button class="btn"
+        <button class="btn control-button"
                 type="button"
                 [disabled]="dataModel === undefined"
                 (click)="openOnPlatform(dataModel.sbgId)"
@@ -56,12 +56,12 @@
                 (click)="save()"
                 ct-tooltip="Save"
                 [tooltipPlacement]="'bottom'"
-                class="btn" type="button">
+                class="btn control-button" type="button">
             <i class="fa fa-fw fa-save"></i>
         </button>
 
         <!--Publish to Platform-->
-        <button class="btn"
+        <button class="btn control-button"
                 [disabled]="!validationState?.isValid  || !dataModel"
                 *ngIf="tabData.dataSource === 'local'"
                 ct-tooltip="Publish to Platform"
@@ -71,7 +71,7 @@
         </button>
 
         <!--Revisions-->
-        <button *ngIf="tabData.dataSource !== 'local' && dataModel" class="btn"
+        <button *ngIf="tabData.dataSource !== 'local' && dataModel" class="btn control-button"
                 type="button"
                 ct-tooltip="See Revision History"
                 tooltipPlacement="bottom"
@@ -148,7 +148,12 @@
        class="fa fa-circle-o-notch fa-spin">
     </i>
 
-    <span class="tag tag-warning">{{ dataModel?.cwlVersion }}</span>
+    <div class="tag tag-warning"
+         [ct-tooltip]="'This app is a copy of ' +  dataModel.customProps['sbg:copyOf']"
+         *ngIf="isReadonly && tabData.isWritable">Copy</div>
+    <div class="tag tag-info"
+         [ct-tooltip]="'The app is described using the displayed version(s) of CWL'"
+         *ngIf="dataModel">{{ dataModel.cwlVersion }}</div>
     <span class="btn-group">
             <button [disabled]="!validationState"
                     [class.active]="reportPanel === 'validation'"
@@ -156,11 +161,11 @@
                     class="btn">
 
                 <span *ngIf="validationState?.errors?.length">
-                <i class="fa fa-times-circle text-danger"></i> {{validationState.errors.length}} Errors
+                <i class="fa fa-times-circle text-danger"></i> {{validationState.errors.length}} {{ validationState.errors.length === 1 ? "Error" : "Errors"}}
                 </span>
 
                 <span *ngIf="validationState?.warnings?.length" [class.pl-1]="validationState?.errors?.length">
-                <i class="fa fa-exclamation-triangle text-warning"></i> {{validationState.warnings.length}} Warnings
+                <i class="fa fa-exclamation-triangle text-warning"></i> {{validationState.warnings.length}} {{ validationState.warnings.length === 1 ? "Warning" : "Warnings"}}
                 </span>
 
                 <span *ngIf="!validationState?.errors?.length && !validationState?.warnings?.length">

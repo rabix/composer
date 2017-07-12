@@ -22,7 +22,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
             <ng-content></ng-content>
         </button>
 
-        <div class="generic-menu {{menuAlign}}-align" #dropdownContainer>
+        <div class="{{menuAlign}}-align" [class.generic-menu]="dropdown" #dropdownContainer>
             <div #hostView></div>
         </div>
     `,

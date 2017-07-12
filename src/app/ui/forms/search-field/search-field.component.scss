@@ -4,12 +4,8 @@
     position: relative;
     display: block;
 
-    .form-control {
-        background: $layout-title-bar-background;
-        border: 1px solid $layout-element-separator-color;
-        border-radius: $border-radius;
+    input {
         padding-left: 2rem;
-        color: $layout-text-color;
     }
 
     .icon {

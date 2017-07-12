@@ -7,6 +7,7 @@ import {WorkboxService} from "../../core/workbox/workbox.service";
 import {SettingsService} from "../../services/settings/settings.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {Observable} from "rxjs/Observable";
 
 type ViewMode = "auth" | "keyBindings" | "cache";
 
@@ -27,7 +28,7 @@ type ViewMode = "auth" | "keyBindings" | "cache";
         <ct-form-panel class="m-2">
             <div class="tc-header">Authentication</div>
             <div class="tc-body">
-
+ 
                 <table class="table table-striped">
                     <thead>
                     <tr>
@@ -58,7 +59,7 @@ type ViewMode = "auth" | "keyBindings" | "cache";
                     </tbody>
                 </table>
                 <div class="text-xs-right">
-                    <button class="btn btn-secondary" (click)="openCredentialsForm()">Add a Connection...</button>
+                    <button class="btn btn-primary" (click)="openCredentialsForm()">Add a Connection</button>
                 </div>
             </div>
         </ct-form-panel>
@@ -84,20 +85,47 @@ export class SettingsComponent extends DirectiveBase {
         });
 
         credentialsModal.submit = () => {
-            const credentials = credentialsModal.getValue();
-            this.auth.addCredentials(credentials);
+            const valuesFromModal = credentialsModal.getValue();
+            Observable.fromPromise(this.auth.addCredentials(valuesFromModal)).withLatestFrom(this.auth.getCredentials())
+                .take(1).subscribe((combined) => {
+                    const credentials = combined[1];
+
+                    // If added credential is the only one, set it to be the active one
+                    if (credentials.length === 1) {
+                        this.setActiveCredentials(credentials[0]);
+                    }
+                });
             this.modal.close();
-        }
+        };
 
     }
 
-    editCredentials(credentials: AuthCredentials) {
-        const editor = this.modal.fromComponent(PlatformCredentialsModalComponent, {title: "Edit Connection"});
+    editCredentials(edited: AuthCredentials) {
+        const valuesFromModal = this.modal.fromComponent(PlatformCredentialsModalComponent, {title: "Edit Connection"});
 
-        editor.user      = credentials.user;
-        editor.token     = credentials.token;
-        editor.platform  = credentials.url;
-        editor.tokenOnly = true;
+        valuesFromModal.user      = edited.user;
+        valuesFromModal.token     = edited.token;
+        valuesFromModal.platform  = edited.url;
+        valuesFromModal.tokenOnly = true;
+
+        valuesFromModal.submit = () => {
+            const credentialsFromModal = valuesFromModal.getValue();
+
+            Observable.from(this.auth.addCredentials(credentialsFromModal)).withLatestFrom(this.auth.getActive())
+                .take(1).subscribe((combined) => {
+
+                    const credentials = combined[1];
+
+                    // If edited credentials is the active one, update active credentials
+                    if (edited === credentials) {
+                        this.auth.setActiveCredentials(credentialsFromModal);
+                    }
+
+                    this.modal.close();
+
+                });
+
+        };
     }
 
     /**

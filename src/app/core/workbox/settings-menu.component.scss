@@ -9,13 +9,14 @@
         padding: .55rem 1rem;
         cursor: pointer;
         min-width: 150px;
+        color: $smoke;
 
         .text-muted {
             white-space: nowrap;
         }
 
         &:hover {
-            background: darken($panel-bg, 3);
+            background: $gray;
         }
     }
 

@@ -98,7 +98,7 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
 
     // If true, the items that are currently selected will not be shown in the drop-down list
     @Input()
-    public hideSelected = true;
+    public hideSelected = false;
 
     // If true, Selectize will treat any options with a "" value like normal
     @Input()
@@ -136,7 +136,7 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
 
     protected component = null;
 
-    constructor(private zone: NgZone) {
+    constructor(protected zone: NgZone) {
     }
 
     protected updateOptions(items?: any []) {
@@ -220,14 +220,11 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
         }
 
         setTimeout(() => {
-            if (!this.options.length) {
-                this.setOptions = !Array.isArray(this.items) ? [this.items] : this.items;
-            }
             this.updateOptions(this.items);
         });
     }
 
-    setDisabledState(disabled: boolean) {
+    setDisabled(disabled: boolean) {
 
         this.disabled = disabled;
 

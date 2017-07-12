@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, Input} from "@angular/core";
+import {ChangeDetectorRef, Component, Input, Output, EventEmitter} from "@angular/core";
 import {Workflow} from "cwl-svg";
 import {StepModel, WorkflowModel} from "cwlts/models";
 import {RawApp} from "../../../../../electron/src/sbg-api-client/interfaces/raw-app";
@@ -15,8 +15,9 @@ import {UpdateStepModalComponent} from "../../update-step-modal/update-step-moda
     template: `
 
         <!--Update warning-->
-        <div class="alert alert-warning form-control-label" *ngIf="step.hasUpdate">
-            Update available.<a href="" (click)="updateStep($event)"> Click here to update.</a>
+        <div class="alert alert-update form-control-label" *ngIf="step.hasUpdate && !readonly">
+            A new version of this app is available! 
+            <button class="btn-unstyled update-btn" (click)="updateStep($event)">Update</button> to get the latest changes.
         </div>
 
         <!--View Modes-->
@@ -40,17 +41,18 @@ import {UpdateStepModalComponent} from "../../update-step-modal/update-step-moda
             </ct-tab-selector>
         </ct-action-bar>
 
-        <!--Info-->
+        <!--Inputs-->        
         <ct-workflow-step-inspector-inputs *ngIf="viewMode === tabs.Inputs"
                                            [step]="step"
                                            [inputs]="step.in"
                                            [graph]="graph"
+                                           (change)="change.next()"
                                            [workflowModel]="workflowModel"
                                            [readonly]="readonly">
         </ct-workflow-step-inspector-inputs>
 
-        <!--Inputs-->
-        <ct-workflow-step-inspector-info *ngIf="viewMode === tabs.Info"
+        <!--Info-->
+        <ct-workflow-step-inspector-info *ngIf="viewMode === tabs.Info"                                         
                                          [step]="step">
         </ct-workflow-step-inspector-info>
 
@@ -59,6 +61,7 @@ import {UpdateStepModalComponent} from "../../update-step-modal/update-step-moda
                                          [step]="step"
                                          [graph]="graph"
                                          [workflowModel]="workflowModel"
+                                         (change)="change.next()"
                                          [readonly]="readonly">
         </ct-workflow-step-inspector-step>
     `
@@ -79,6 +82,9 @@ export class StepInspectorComponent extends DirectiveBase {
 
     @Input()
     fileID: string;
+
+    @Output()
+    change = new EventEmitter();
 
     tabs = {
         Inputs: "inputs",
@@ -116,7 +122,7 @@ export class StepInspectorComponent extends DirectiveBase {
                 this.cdr.markForCheck();
                 this.cdr.detectChanges();
                 modal.closeModal();
-            }
+            };
         }).catch(err => {
             modal.closeModal();
             this.statusBar.stopProcess(proc);

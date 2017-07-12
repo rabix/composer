@@ -15,6 +15,13 @@ export class PublicAppsPanelService {
         this.apps = platformRepository.getPublicApps();
     }
 
+    getAppsByNone(): Observable<TreeNode<any>[]> {
+        return this.apps.map((array) => {
+            return array.slice().sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
+                .map(app => this.makeAppTreeNode(app));
+        });
+    }
+
     getAppsGroupedByToolkit(): Observable<TreeNode<any>[]> {
         return this.apps.map(apps => {
 

@@ -27,9 +27,9 @@
     .ui-modal-header {
         border: 0 solid;
         line-height: 2.5em;
-        text-align: center;
+        text-align: left;
         border-radius: 2px 2px 0 0;
-        background: linear-gradient($modal-header-bg, darken($modal-header-bg, 2%));
+        background: $modal_header-bg;
         border-bottom: 1px solid $modal-footer-border-color;
     }
 

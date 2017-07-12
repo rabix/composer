@@ -5,10 +5,10 @@
     width: 100%;
     padding: 20px;
     display: block;
-    background: $panel-bg;
+    background: $body-bg;
 
     ct-inline-editor {
-        display: inline-block;
+        diplay: inline-block;
     }
 
     .app-info {
@@ -41,6 +41,10 @@
         }
     }
 
+    .text-title {
+        color: $light-gray;
+    }
+
     .app-info-meta-item ~ .app-info-meta-item{
 
         padding-right: 2rem;
@@ -48,6 +52,10 @@
 
     h5 {
         font-weight: bold;
+    }
+
+    ct-tab-selector {
+        border-bottom: 1px solid $black;
     }
 }
 

@@ -68,7 +68,7 @@
             border-radius: 0;
 
             &.active {
-                background: $layout-title-bar-background;
+                background: $black;
             }
 
             &:active, &:focus {
@@ -77,10 +77,19 @@
         }
 
         .tag {
+            color: white;
             font-size: 100%;
             font-weight: normal;
             margin-right: 2px;
 
+            &.tag-warning {
+                background-color: $brand-warning;
+            }
+
+            &.tag-info {
+                background-color: $sky;
+
+            }
         }
 
         i {

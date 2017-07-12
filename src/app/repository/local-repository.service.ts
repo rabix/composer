@@ -44,7 +44,7 @@ export class LocalRepositoryService {
         return this.publicAppsGrouping;
     }
 
-    setPublicAppsGrouping(publicAppsGrouping: "toolkit" | "category"): Promise<any> {
+    setPublicAppsGrouping(publicAppsGrouping: "toolkit" | "category" | "none"): Promise<any> {
         return this.patch({publicAppsGrouping}).toPromise();
     }
 
