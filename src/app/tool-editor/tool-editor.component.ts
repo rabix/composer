@@ -25,7 +25,7 @@ import "../util/rx-extensions/subscribe-tracked";
 import {PlatformRepositoryService} from "../repository/platform-repository.service";
 import {CommandLineToolModel} from "cwlts/models";
 
-export function useFactory(comp: ToolEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
+export function appSaverFactory(comp: ToolEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
     if (comp.tabData.dataSource === "local") {
         return new LocalFileSavingService(ipc);
@@ -44,7 +44,7 @@ export function useFactory(comp: ToolEditorComponent, ipc: IpcService, modal: Mo
         PlatformAppService,
         {
             provide: APP_SAVER_TOKEN,
-            useFactory: useFactory,
+            useFactory: appSaverFactory,
             deps: [ToolEditorComponent, IpcService, ModalService, PlatformRepositoryService]
         }
     ],
