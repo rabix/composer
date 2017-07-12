@@ -129,6 +129,9 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
                 }
             }
         } else if (category === "resources") {
+            const memValue = parseInt(data.mem.value, 10);
+            const cpuValue   = parseInt(data.cores.value, 10);
+
             if (this.model.cwlVersion === "v1.0") {
                 // extending the data object gotten to recapture any other requirement properties (ramMax, coresMax, etc)
                 const req = <ResourceRequirement>{
@@ -141,12 +144,12 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
 
                 let {ram, cores} = this.context.runtime;
 
-                if (!data.mem.isExpression && !isNaN(parseInt(data.mem.value, 10))) {
-                    ram = parseInt(data.mem.value, 10);
+                if (!isNaN(memValue)) {
+                    ram = memValue;
                 }
 
-                if (!data.cores.isExpression && !isNaN(parseInt(data.cores.value, 10))) {
-                    cores = parseInt(data.cores.value, 10);
+                if (!isNaN(cpuValue)) {
+                    cores = cpuValue;
                 }
 
                 this.model.setRuntime({cores, ram});
@@ -168,12 +171,12 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
 
                 let {mem, cpu} = this.context.$job.allocatedResources;
 
-                if (!data.mem.isExpression && !isNaN(parseInt(data.mem.value, 10))) {
-                    mem = parseInt(data.mem.value, 10);
+                if (!isNaN(memValue)) {
+                    mem = memValue;
                 }
 
-                if (!data.cores.isExpression && !isNaN(parseInt(data.cores.value, 10))) {
-                    cpu = parseInt(data.cores.value, 10);
+                if (!isNaN(cpuValue)) {
+                    cpu = cpuValue;
                 }
                 this.model.setRuntime({mem, cpu});
             }
