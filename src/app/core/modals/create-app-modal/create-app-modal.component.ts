@@ -11,6 +11,7 @@ import {PlatformRepositoryService} from "../../../repository/platform-repository
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
+import {AppHelper} from "../../helpers/AppHelper";
 import {WorkboxService} from "../../workbox/workbox.service";
 
 const {app, dialog} = window["require"]("electron").remote;
@@ -273,13 +274,15 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
         const newAppID = `${this.projectSelection.value}/${slug}`.split("/").slice(0, 3).concat("0").join("/");
 
         this.platformRepository.createApp(newAppID, JSON.stringify(app, null, 4)).then(app => {
+
             const tab = this.workbox.getOrCreateAppTab({
-                id: newAppID,
+                id: AppHelper.getRevisionlessID(newAppID),
                 type: this.appType === "workflow" ? "Workflow" : "CommandLineTool",
                 label: label,
                 isWritable: true,
                 language: "json"
             });
+
             this.workbox.openTab(tab);
             this.modal.close();
 
