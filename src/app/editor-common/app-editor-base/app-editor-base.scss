@@ -1,9 +1,5 @@
 @import "../../../assets/sass/_variables.scss";
 
-ct-app-info {
-    overflow: scroll !important;
-}
-
 :host {
     flex: 1;
     display: flex;
@@ -13,16 +9,8 @@ ct-app-info {
         margin-right: .5em;
     }
 
-    .btn-edit-lock {
-        background: $btn-primary-bg;
-        color: $btn-primary-color;
-        height: 65%;
-        padding-right: 10px;
-        &:hover {
-            background: $btn-primary-bg;
-            border-color: $btn-primary-border;
-            color: $btn-primary-color;
-        }
+    .control-button {
+        color: $layout-text-color;
     }
 
     .editor-layout {
