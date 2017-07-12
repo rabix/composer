@@ -81,45 +81,6 @@ export class DataRepository {
         });
     }
 
-    private flushUserData() {
-        this.user = new UserRepository();
-
-        const demoUser = new UserRepository();
-        Object.keys(demoUser).forEach(key => {
-            this.trigger(`update.user.${key}`, demoUser[key]);
-        });
-    }
-
-    private update<T extends RepositoryType>(profile: string, data: Partial<T>, callback?: (err?: Error, data?: T) => void) {
-
-        const profilePath = `profiles/${profile}`;
-        this.trigger("update", {user: this.user, local: this.local});
-
-        if (profile === "local") {
-            Object.assign(this.local, data);
-            this.trigger("update.local", this.local);
-            this.enqueueStorageWrite(profilePath, this.local, callback);
-        } else {
-            Object.assign(this.user, data);
-            this.trigger(`update.${profile}`, this.user);
-
-            // User to update might not be the active user, so we need to check that before emitting this event
-            if (profile === this.local.activeCredentials.id) {
-                this.trigger(`update.user`, this.user);
-            }
-
-            this.enqueueStorageWrite(profilePath, this.user, callback);
-        }
-
-        for (let key in data) {
-            this.trigger(["update", profile, key].join("."), data[key]);
-
-            if (profile !== "local" && profile === this.local.activeCredentials.id) {
-                this.trigger(["update", "user", key].join("."), data[key]);
-            }
-        }
-    }
-
     updateLocal(data: Partial<LocalRepository>, callback) {
         this.update("local", data, callback);
     }
@@ -158,6 +119,53 @@ export class DataRepository {
             const idx = evListeners.indexOf(callback);
             evListeners.splice(idx, 1);
         }
+    }
+
+    private flushUserData() {
+        this.user = new UserRepository();
+
+        const demoUser = new UserRepository();
+        Object.keys(demoUser).forEach(key => {
+            this.trigger(`update.user.${key}`, demoUser[key]);
+        });
+    }
+
+    private update<T extends RepositoryType>(profile: string, data: Partial<T>, callback?: (err?: Error, data?: T) => void) {
+
+        const profilePath = `profiles/${profile}`;
+        this.trigger("update", {user: this.user, local: this.local});
+
+        if (profile === "local") {
+            Object.assign(this.local, data);
+            this.trigger("update.local", this.local);
+            this.enqueueStorageWrite(profilePath, this.local, callback);
+        } else {
+            Object.assign(this.user, data);
+            this.trigger(`update.${profile}`, this.user);
+
+            // User to update might not be the active user, so we need to check that before emitting this event
+            // Also, there might be no active user anymore when fetch gets back, so we need to check that first
+            if (this.profileMatchesActiveUser(profile)) {
+                this.trigger(`update.user`, this.user);
+            }
+
+            this.enqueueStorageWrite(profilePath, this.user, callback);
+        }
+
+        for (let key in data) {
+            this.trigger(["update", profile, key].join("."), data[key]);
+
+            if (profile !== "local" && this.profileMatchesActiveUser(profile)) {
+                this.trigger(["update", "user", key].join("."), data[key]);
+            }
+        }
+    }
+
+    /**
+     * Tells whether given profile name represents the currently active credentials
+     */
+    private profileMatchesActiveUser(profile: string): boolean {
+        return this.local.activeCredentials && profile === this.local.activeCredentials.id;
     }
 
     /**

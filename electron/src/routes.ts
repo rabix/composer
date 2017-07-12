@@ -239,7 +239,7 @@ module.exports = {
 
             if (platformFetchingLocks[targetID]) {
                 const currentFetch = platformFetchingLocks[targetID];
-                currentFetch.then(data => callback(data)).catch(callback);
+                currentFetch.then(data => callback(null, data)).catch(callback);
                 return
             }
 
@@ -276,8 +276,7 @@ module.exports = {
                 delete platformFetchingLocks[targetID];
             }).catch(callback);
 
-
-        }, err => callback(err));
+        }, callback);
     },
 
     /**
