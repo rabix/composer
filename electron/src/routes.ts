@@ -265,7 +265,7 @@ module.exports = {
                         if (err) return reject(err);
 
                         resolve(data);
-                    }, targetCredentials.id);
+                    }, targetID);
                 });
 
             });

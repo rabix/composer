@@ -1,7 +1,10 @@
+import {app} from "electron";
 import * as storage from "electron-storage";
-import {LocalRepository} from "./types/local-repository";
+import {CredentialsCache, LocalRepository} from "./types/local-repository";
 import {RepositoryType} from "./types/repository-type";
 import {UserRepository} from "./types/user-repository";
+
+const fs = require("fs");
 
 export class DataRepository {
 
@@ -23,9 +26,16 @@ export class DataRepository {
             this.loadProfile(activeCredentials.id, new UserRepository(), (err, data) => {
                 this.user = data;
                 Object.keys(this.user).forEach(key => this.trigger(`update.user.${key}`, this.user[key]));
-                this.trigger("update.user", this.user);
+
+                if (this.profileMatchesActiveUser(activeCredentials.id)) {
+                    this.trigger("update.user", this.user);
+                }
             });
-        })
+        });
+
+        this.on("update.local.credentials", (credentials: CredentialsCache[]) => {
+            this.cleanProfiles();
+        });
     }
 
     /**
@@ -66,11 +76,15 @@ export class DataRepository {
         }
 
         this.updateLocal(patch, (err) => {
-            if (err) return callback(err);
+            if (err) {
+                callback(err);
+                return;
+            }
 
             if (patch.activeCredentials === null) {
                 this.user = new UserRepository();
-                return callback();
+                callback();
+                return;
             }
 
             this.loadProfile(patch.activeCredentials.id, new UserRepository(), (err) => {
@@ -130,6 +144,10 @@ export class DataRepository {
         });
     }
 
+    private profileExists(profile: string): boolean {
+        return this.local.credentials.find(c => c.id === profile) !== undefined;
+    }
+
     private update<T extends RepositoryType>(profile: string, data: Partial<T>, callback?: (err?: Error, data?: T) => void) {
 
         const profilePath = `profiles/${profile}`;
@@ -140,16 +158,39 @@ export class DataRepository {
             this.trigger("update.local", this.local);
             this.enqueueStorageWrite(profilePath, this.local, callback);
         } else {
-            Object.assign(this.user, data);
-            this.trigger(`update.${profile}`, this.user);
+
 
             // User to update might not be the active user, so we need to check that before emitting this event
             // Also, there might be no active user anymore when fetch gets back, so we need to check that first
             if (this.profileMatchesActiveUser(profile)) {
+                // This is the case where updated user is the current user. We can patch the this.user cache
+                Object.assign(this.user, data);
                 this.trigger(`update.user`, this.user);
+                this.enqueueStorageWrite(profilePath, this.user, callback);
+            } else {
+                // If update is for a non-active user, we need to load that user's data and patch that instead
+                // However, user might be deleted at the time, so we first need to check that
+
+                // Scenario that we need to cover
+                // 1) 2 users, 1st active
+                // 2) activate 2nd fast
+                // 3) activate 1st fast --> two updates pending
+                // 4) remove 1st
+                // incoming patch would create this deleted user again if we don't prevent it
+                if (!this.profileExists(profile)) {
+                    return callback();
+                }
+
+                this.loadProfile(profile, new UserRepository(), (err, loadedProfileData) => {
+                    if (err) return callback(err);
+
+                    this.trigger(`update.${profile}`, data);
+                    this.enqueueStorageWrite(profilePath, Object.assign(loadedProfileData, data), callback);
+                });
+
             }
 
-            this.enqueueStorageWrite(profilePath, this.user, callback);
+
         }
 
         for (let key in data) {
@@ -168,12 +209,19 @@ export class DataRepository {
         return this.local.activeCredentials && profile === this.local.activeCredentials.id;
     }
 
+    private getProfileFilePath(profile: string, prefix = app.getPath("userData")): string {
+        return [
+            prefix,
+            `profiles/${profile}.json`
+        ].filter(v => v).join("/");
+    }
+
     /**
      * Read data from a storage file
      */
     private loadProfile<T extends Object>(path = "local", defaultData: T, callback: (err: Error, data?: T) => any): void {
 
-        const filePath = `profiles/${path}.json`;
+        const filePath = this.getProfileFilePath(path, null);
 
         storage.isPathExists(filePath, (exists) => {
             if (!exists) {
@@ -249,5 +297,32 @@ export class DataRepository {
             pathQueue.push(executor);
             pathQueue[0]();
         }
+    }
+
+    private cleanProfiles(callback = (err?: Error, data?: any) => {
+    }) {
+        const profileIDs = this.local.credentials.map(c => c.id);
+
+        fs.readdir(app.getPath("userData") + "/profiles", (err, files) => {
+            if (err) {
+                return callback(err);
+            }
+
+            const deletables = files
+                .map(file => file.slice(0, -5)) // remove .json extension
+                .filter(profile => profileIDs.indexOf(profile) === -1) // take just the ones not present in profiles
+                .map(profile => new Promise((resolve, reject) => {
+
+                    fs.unlink(this.getProfileFilePath(profile), (err, data) => {
+                        if (err) {
+                            return reject(err);
+                        }
+
+                        resolve(data);
+                    });
+                }));
+
+            Promise.all(deletables).then(r => callback(null, r), callback);
+        });
     }
 }
