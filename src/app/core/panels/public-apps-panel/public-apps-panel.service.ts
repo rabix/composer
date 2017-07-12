@@ -11,7 +11,8 @@ export class PublicAppsPanelService {
 
     constructor(private platformRepository: PlatformRepositoryService) {
 
-        this.apps = platformRepository.getPublicApps();
+        this.apps = platformRepository.getPublicApps()
+            .map((apps) => apps.filter((app) => !app.raw["sbg:blackbox"]));
     }
 
     getAppsByNone(): Observable<TreeNode<any>[]> {
