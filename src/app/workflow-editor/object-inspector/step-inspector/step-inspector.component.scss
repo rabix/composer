@@ -23,10 +23,10 @@
         background-color: $brand-warning;
         color: white;
         border: none;
+    }
 
-        & > a {
-            color:white;
-            text-decoration: underline;
-        }
+    .update-btn {
+        color:white;
+        text-decoration: underline;
     }
 }

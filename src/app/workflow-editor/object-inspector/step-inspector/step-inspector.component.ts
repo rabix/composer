@@ -17,7 +17,7 @@ import {UpdateStepModalComponent} from "../../update-step-modal/update-step-moda
         <!--Update warning-->
         <div class="alert alert-update form-control-label" *ngIf="step.hasUpdate && !readonly">
             A new version of this app is available! 
-            <a href="" (click)="updateStep($event)">Update</a> to get the latest changes.
+            <button class="btn-unstyled update-btn" (click)="updateStep($event)">Update</button> to get the latest changes.
         </div>
 
         <!--View Modes-->
