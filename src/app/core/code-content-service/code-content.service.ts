@@ -7,6 +7,7 @@ import "rxjs/add/operator/map";
 import {Observable} from "rxjs/Observable";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {IpcService} from "../../services/ipc.service";
+import {AppHelper} from "../helpers/AppHelper";
 
 
 @Injectable()
@@ -34,7 +35,7 @@ export class CodeSwapService {
 
     private patchSwap(content): void {
         this.ipc.request("patchSwap", {
-            local: this.appID.startsWith("/"),
+            local: AppHelper.isLocal(this.appID),
             swapID: this.appID,
             swapContent: content
         });

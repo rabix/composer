@@ -4,6 +4,7 @@ import {Observable} from "rxjs/Observable";
 import {App} from "../../../../../electron/src/sbg-api-client/interfaces/app";
 
 import {LocalFileRepositoryService} from "../../../file-repository/local-file-repository.service";
+import {LocalRepositoryService} from "../../../repository/local-repository.service";
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {TreeNode} from "../../../ui/tree-view/tree-node";
 import {TreeViewComponent} from "../../../ui/tree-view/tree-view.component";
@@ -13,7 +14,7 @@ import {TabData} from "../../workbox/tab-data.interface";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.component";
 import {PublicAppsPanelService} from "./public-apps-panel.service";
-import {LocalRepositoryService} from "../../../repository/local-repository.service";
+import {AppHelper} from "../../helpers/AppHelper";
 
 @Component({
     selector: "ct-public-apps-panel",
@@ -114,7 +115,7 @@ export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, A
 
     ngOnInit() {
 
-        this.localRepository.getPublicAppsGrouping().take(1).subscribeTracked(this, (grouping) =>{
+        this.localRepository.getPublicAppsGrouping().take(1).subscribeTracked(this, (grouping) => {
             this.grouping = grouping;
         });
 
@@ -146,14 +147,14 @@ export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, A
             return apps.map(app => {
 
                 return {
-                    id: app.id,
+                    id: AppHelper.getRevisionlessID(app.id),
                     icon: app.raw["class"] === "Workflow" ? "fa-share-alt" : "fa-terminal",
                     title: app.name,
                     label: app.id.split("/").join(" → "),
                     relevance: 1.5,
 
                     tabData: {
-                        id: app.id,
+                        id: AppHelper.getRevisionlessID(app.id),
                         isWritable: false,
                         label: app.name,
                         language: "json",
@@ -201,13 +202,14 @@ export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, A
         const appOpening = this.tree.open.filter(n => n.type === "app");
 
         appOpening.subscribeTracked(this, (node: TreeNode<App>) => {
+
             const app = node.data;
             if (!app.raw || !app.raw.class) {
                 return;
             }
 
             const tab = this.workbox.getOrCreateAppTab({
-                id: app.id,
+                id: AppHelper.getRevisionlessID(app.id),
                 language: "json",
                 isWritable: false,
                 type: app.raw.class,
