@@ -14,7 +14,6 @@ import {TabData} from "../../workbox/tab-data.interface";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.component";
 import {PublicAppsPanelService} from "./public-apps-panel.service";
-import {LocalRepositoryService} from "../../../repository/local-repository.service";
 import {Subject} from "rxjs/Subject";
 import {AppHelper} from "../../helpers/AppHelper";
 
