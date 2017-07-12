@@ -176,7 +176,6 @@ module.exports = {
             }
 
         }, err => {
-            console.log("Watch user error");
             callback(err)
         });
     },
@@ -296,7 +295,10 @@ module.exports = {
 
             swapController.exists(data.id, (err, exists) => {
 
-                if (err) return callback(err);
+                if (err) {
+                    callback(err);
+                    return;
+                }
 
                 if (exists) {
                     swapController.read(data.id, callback);
@@ -402,7 +404,6 @@ module.exports = {
             const originalUser = repository.user;
 
             const off = repository.on("update.user", (user) => {
-                console.log("user comparison", typeof user, typeof originalUser);
                 if (user !== originalUser) {
                     off();
                     // @FIXME hack for event receiving order, have no idea why it forks for the moment, figure it out later
