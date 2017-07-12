@@ -69,11 +69,11 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                               [readonly]="readonly">
             </ct-file-def-list>
 
-            <ct-tool-other  [model]="model"
-                            [context]="context"
-                            (updateStream)="setStreams($event)"
-                            (updateCodes)="formGroup.markAsDirty()"
-                            [readonly]="readonly">
+            <ct-tool-other [model]="model"
+                           [context]="context"
+                           (updateStream)="setStreams($event)"
+                           (updateCodes)="formGroup.markAsDirty()"
+                           [readonly]="readonly">
             </ct-tool-other>
         </form>
 
@@ -139,6 +139,18 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
                     }
                 };
 
+                let {ram, cores} = this.context.runtime;
+
+                if (!data.mem.isExpression && !isNaN(parseInt(data.mem.value, 10))) {
+                    ram = parseInt(data.mem.value, 10);
+                }
+
+                if (!data.cores.isExpression && !isNaN(parseInt(data.cores.value, 10))) {
+                    cores = parseInt(data.cores.value, 10);
+                }
+
+                this.model.setRuntime({cores, ram});
+
                 // remove cottontail specific properties so they aren't serialized as customProps
                 delete (<any> req).cores;
                 delete (<any> req).mem;
@@ -153,6 +165,17 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
                     "class": "sbg:MemRequirement",
                     value: data.mem.serialize()
                 });
+
+                let {mem, cpu} = this.context.$job.allocatedResources;
+
+                if (!data.mem.isExpression && !isNaN(parseInt(data.mem.value, 10))) {
+                    mem = parseInt(data.mem.value, 10);
+                }
+
+                if (!data.cores.isExpression && !isNaN(parseInt(data.cores.value, 10))) {
+                    cpu = parseInt(data.cores.value, 10);
+                }
+                this.model.setRuntime({mem, cpu});
             }
         }
 

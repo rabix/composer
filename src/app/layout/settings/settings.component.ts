@@ -18,7 +18,7 @@ type ViewMode = "auth" | "keyBindings" | "cache";
                              (onSubmit)="submitCredentials($event)"
                              class="p-2"></ct-credentials-form>
 
-        <div class="pull-right col-sm-2">
+        <div class="ml-2">
             <!--Add Another-->
             <button (click)="creds.addEntry()"
                     class="btn btn-secondary"
