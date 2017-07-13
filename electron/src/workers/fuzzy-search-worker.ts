@@ -9,7 +9,7 @@ let folders: string[];
 let results: any[] = [];
 // let traversedFolders = [];
 
-process.on("message", (data: { term: string, threshold: number, limit: number, folders: string[] }) => {
+process.on("message" as any, (data: { term: string, threshold: number, limit: number, folders: string[] }) => {
 
     term      = data.term.split("").reverse().join("").toLowerCase();
     limit     = data.limit;
