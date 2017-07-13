@@ -1,18 +1,8 @@
 <ct-action-bar>
-    <ct-tab-selector [distribute]="'auto'" [active]="viewMode"
-                     (activeChange)="switchTab($event)">
-
-        <ct-tab-selector-entry [disabled]="!validationState?.isValid"
-                               [tabName]="'info'">App Info
-        </ct-tab-selector-entry>
-
-        <ct-tab-selector-entry [disabled]="!validationState?.isValid"
-                               [tabName]="'graph'">Graph View
-        </ct-tab-selector-entry>
-
-        <ct-tab-selector-entry [tabName]="'code'"
-                               [disabled]="!!unavailableError">Code
-        </ct-tab-selector-entry>
+    <ct-tab-selector [distribute]="'auto'" [active]="viewMode" (activeChange)="switchTab($event)">
+        <ct-tab-selector-entry [disabled]="!tabsUnlocked()" [tabName]="'info'">App Info</ct-tab-selector-entry>
+        <ct-tab-selector-entry [disabled]="!tabsUnlocked()" [tabName]="'graph'">Graph View</ct-tab-selector-entry>
+        <ct-tab-selector-entry [tabName]="'code'" [disabled]="!tabsUnlocked() || !!unavailableError">Code</ct-tab-selector-entry>
     </ct-tab-selector>
 
     <div class="document-controls">
@@ -23,6 +13,7 @@
                 type="button"
                 ct-tooltip="Unlock this app for editing"
                 tooltipPlacement="bottom"
+
                 (click)="unlockEditing()">
             <i class="fa fa-fw fa-lock"></i> Edit
         </button>
@@ -30,7 +21,7 @@
         <!--Resolve-->
         <button class="btn control-button"
                 type="button"
-                [disabled]="!validationState?.isValid"
+                [disabled]="!appIsResolvable()"
                 *ngIf="viewMode === 'code' && tabData.dataSource === 'local'"
                 ct-tooltip="Resolve"
                 tooltipPlacement="bottom"
@@ -42,27 +33,27 @@
         <button class="btn control-button"
                 type="button"
                 [disabled]="dataModel === undefined"
-                (click)="openOnPlatform(dataModel.sbgId)"
-                tooltipPlacement="bottom"
                 *ngIf="tabData.dataSource !== 'local'"
-                ct-tooltip="Open on Platform">
+                ct-tooltip="Open on Platform"
+                tooltipPlacement="bottom"
+                (click)="openOnPlatform(dataModel.sbgId)">
             <i class="fa fa-fw fa-external-link"></i>
         </button>
 
 
         <!--Save-->
         <button *ngIf="tabData.isWritable"
-                [disabled]="isValidatingCWL || !!unavailableError || !dataModel"
+                [disabled]="!appIsSavable()"
                 (click)="save()"
                 ct-tooltip="Save"
-                [tooltipPlacement]="'bottom'"
+                tooltipPlacement="bottom"
                 class="btn control-button" type="button">
             <i class="fa fa-fw fa-save"></i>
         </button>
 
         <!--Publish to Platform-->
         <button class="btn control-button"
-                [disabled]="!validationState?.isValid  || !dataModel"
+                [disabled]="!appIsPublishable()"
                 *ngIf="tabData.dataSource === 'local'"
                 ct-tooltip="Publish to Platform"
                 tooltipPlacement="bottom"
@@ -70,11 +61,13 @@
             <i class="fa fa-fw fa-cloud-upload"></i>
         </button>
 
+
         <!--Revisions-->
-        <button *ngIf="tabData.dataSource !== 'local' && dataModel" class="btn control-button"
-                type="button"
+        <button *ngIf="tabData.dataSource !== 'local' && dataModel && dataModel.customProps['sbg:revisionsInfo']"
+                class="btn control-button" type="button"
                 ct-tooltip="See Revision History"
                 tooltipPlacement="bottom"
+                [ct-editor-inspector-target]="'revisions'"
                 [ct-editor-inspector]="revisions">
 
             Revision: {{ dataModel.customProps['sbg:revision']}}
@@ -116,6 +109,7 @@
                               [data]="tabData"
                               [readonly]="isReadonly"
                               [(model)]="dataModel"
+                              (change)="syncModelAndCode(false)"
                               (draw)="onGraphDraw()"
                               class="editor-main">
     </ct-workflow-graph-editor>
@@ -150,10 +144,12 @@
 
     <div class="tag tag-warning"
          [ct-tooltip]="'This app is a copy of ' +  dataModel.customProps['sbg:copyOf']"
-         *ngIf="isReadonly && tabData.isWritable">Copy</div>
+         *ngIf="isReadonly && tabData.isWritable">Copy
+    </div>
     <div class="tag tag-info"
          [ct-tooltip]="'The app is described using the displayed version(s) of CWL'"
-         *ngIf="dataModel">{{ dataModel.cwlVersion }}</div>
+         *ngIf="dataModel">{{ dataModel.cwlVersion }}
+    </div>
     <span class="btn-group">
             <button [disabled]="!validationState"
                     [class.active]="reportPanel === 'validation'"

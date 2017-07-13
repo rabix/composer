@@ -163,7 +163,6 @@ export class PlatformCredentialsModalComponent implements OnInit {
 
                     return null;
                 }, rejection => {
-                    console.log("Token rejection", rejection);
                     return {tokenCheck: rejection.message};
                 });
 

@@ -37,17 +37,14 @@ import {WorkboxService} from "./workbox.service";
                         ></i>
                     </div>
                     
-                    <div class="title" [ct-tooltip]="ctt" [tooltipPlacement]="'bottom'">{{tab.label}}
-                    </div>
+                    <div class="title" [ct-tooltip]="ctt" [tooltipPlacement]="'bottom'">{{tab.label}}</div>
                     <div class="close-icon">
                         <i class="fa fa-times clickable" (click)="removeTab(tab)"></i>
                     </div>
 
                     <!--Tooltip content-->
                     <ct-tooltip-content [maxWidth]="500" #ctt>
-                        <div>
                             {{ tab.data?.id || tab.label}}
-                        </div>
                     </ct-tooltip-content>
                 </li>
 

@@ -1,4 +1,4 @@
-import {Component, Input, OnChanges, OnDestroy} from "@angular/core";
+import {Component, EventEmitter, Input, OnChanges, OnDestroy, Output} from "@angular/core";
 import {FormGroup} from "@angular/forms";
 import {ProcessRequirement} from "cwlts/mappings/d2sb/ProcessRequirement";
 import {SBGCPURequirement} from "cwlts/mappings/d2sb/SBGCPURequirement";
@@ -17,7 +17,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
         <form [formGroup]="formGroup">
 
             <ct-docker-requirement [docker]="model.docker"
-                                   (update)="formGroup.markAsDirty()"
+                                   (update)="change.emit()"
                                    [readonly]="readonly">
             </ct-docker-requirement>
 
@@ -31,7 +31,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 
             <ct-tool-input [location]="model.loc + '.inputs'"
                            [model]="model"
-                           (update)="formGroup.markAsDirty(); model.updateCommandLine()"
+                           (update)="change.emit(); model.updateCommandLine()"
                            [readonly]="readonly">
             </ct-tool-input>
 
@@ -39,7 +39,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                             [model]="model"
                             [context]="context"
                             [inputs]="model.inputs || []"
-                            (update)="formGroup.markAsDirty()"
+                            (update)="change.emit()"
                             [readonly]="readonly">
             </ct-tool-output>
 
@@ -51,13 +51,13 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 
             <ct-tool-hints [model]="model"
                            [context]="context"
-                           (update)="formGroup.markAsDirty()"
+                           (update)="change.emit()"
                            [readonly]="readonly">
             </ct-tool-hints>
 
             <ct-argument-list [location]="model.loc + '.arguments'"
                               [model]="model"
-                              (update)="formGroup.markAsDirty(); model.updateCommandLine()"
+                              (update)="change.emit(); model.updateCommandLine()"
                               [context]="context"
                               [readonly]="readonly">
             </ct-argument-list>
@@ -69,11 +69,11 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                               [readonly]="readonly">
             </ct-file-def-list>
 
-            <ct-tool-other  [model]="model"
-                            [context]="context"
-                            (updateStream)="setStreams($event)"
-                            (updateCodes)="formGroup.markAsDirty()"
-                            [readonly]="readonly">
+            <ct-tool-other [model]="model"
+                           [context]="context"
+                           (updateStream)="setStreams($event)"
+                           (updateCodes)="change.emit()"
+                           [readonly]="readonly">
             </ct-tool-other>
         </form>
 
@@ -90,6 +90,9 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
     /** ControlGroup that encapsulates the validation for all the nested forms */
     @Input()
     formGroup: FormGroup;
+
+    @Output()
+    change = new EventEmitter<any>();
 
     context: any;
 
@@ -156,7 +159,7 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
             }
         }
 
-        this.formGroup.markAsDirty();
+        this.change.emit();
     }
 
     setStreams(change) {
@@ -166,7 +169,7 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
             }
         });
         this.model.updateCommandLine();
-        this.formGroup.markAsDirty();
+        this.change.emit();
     }
 
     ngOnDestroy() {

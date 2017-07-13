@@ -2,19 +2,18 @@ import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
+    EventEmitter,
     Input,
-    ViewEncapsulation,
-    OnInit, SimpleChanges, OnChanges, ElementRef, ViewChild
+    OnChanges,
+    OnInit,
+    Output,
+    SimpleChanges,
+    ViewEncapsulation
 } from "@angular/core";
-import {
-    WorkflowInputParameterModel,
-    WorkflowModel,
-    WorkflowOutputParameterModel
-} from "cwlts/models";
 import {FormBuilder, FormGroup} from "@angular/forms";
-import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {Workflow} from "cwl-svg";
-import {Observable} from "rxjs/Observable";
+import {WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -138,11 +137,7 @@ import {Observable} from "rxjs/Observable";
 })
 export class WorkflowIOInspectorComponent extends DirectiveBase implements OnInit, OnChanges {
 
-    public propertyTypes = ["array", "enum", "File", "string", "int", "float", "boolean"];
-
-    public itemTypes = ["File", "string", "int", "float", "boolean"];
-
-    public batchByList: { label: string, value: string | string [] } [] =
+    batchByList: { label: string, value: string | string [] } [] =
         [
             {
                 label: "None",
@@ -183,16 +178,19 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
     private selectedBatchByOption;
 
     @Input()
-    public port: WorkflowInputParameterModel | WorkflowOutputParameterModel;
+    port: WorkflowInputParameterModel | WorkflowOutputParameterModel;
 
     @Input()
-    public workflowModel: WorkflowModel;
+    workflowModel: WorkflowModel;
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
     @Input()
-    public graph: Workflow;
+    graph: Workflow;
+
+    @Output()
+    change = new EventEmitter<any>();
 
     form: FormGroup;
 
@@ -281,11 +279,15 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
             batchType: [{value: this.selectedBatchByOption, disabled: this.readonly}]
         });
 
-        this.tracked = this.form.controls["isRequired"].valueChanges.subscribe((value) => {
+        this.form.valueChanges.debounceTime(500).subscribeTracked(this, () => {
+            this.change.emit();
+        });
+
+        this.form.controls["isRequired"].valueChanges.subscribeTracked(this, (value) => {
             this.port.type.isNullable = !value;
         });
 
-        this.tracked = this.form.controls["id"].valueChanges.debounceTime(1000).subscribe((value) => {
+        this.form.controls["id"].valueChanges.debounceTime(1000).subscribeTracked(this, (value) => {
             try {
                 // Change id on workflow model so canvas can interact with it
                 this.workflowModel.changeIONodeId(this.port, value);
@@ -301,21 +303,21 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
             }
         });
 
-        this.tracked = this.form.controls["symbols"].valueChanges.subscribe((value) => {
+        this.form.controls["symbols"].valueChanges.subscribeTracked(this, (value) => {
             if (value.length > 0 && this.isEnumType()) {
                 this.port.type.symbols = value;
             }
         });
 
-        this.tracked = this.form.controls["fileTypes"].valueChanges.subscribe((value) => {
+        this.form.controls["fileTypes"].valueChanges.subscribeTracked(this, (value) => {
             this.port.fileTypes = value || [];
         });
 
-        this.tracked = this.form.controls["description"].valueChanges.subscribe((description) => {
+        this.form.controls["description"].valueChanges.subscribeTracked(this, (description) => {
             this.port.description = description;
         });
 
-        this.tracked = this.form.controls["batchType"].valueChanges.subscribe((batchType) => {
+        this.form.controls["batchType"].valueChanges.subscribeTracked(this, (batchType) => {
             this.selectedBatchByOption = batchType;
             this.workflowModel.setBatch(this.port.id, batchType);
         });
