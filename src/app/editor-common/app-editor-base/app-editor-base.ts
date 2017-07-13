@@ -61,6 +61,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     savingDisabled = true;
 
+    isUnlockable = null;
+
     /** Template of the status controls that will be shown in the status bar */
     @ViewChild("statusControls")
     protected statusControls: TemplateRef<any>;
@@ -131,8 +133,10 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             return state;
         }).share();
 
+        const validationCompletion = schemaValidation.filter(state => !state.isPending);
+
         /** Get the end of first validation check */
-        const firstValidationEnd = schemaValidation.filter(state => !state.isPending).take(1);
+        const firstValidationEnd = validationCompletion.take(1);
 
         /**
          * For each code change from outside the ace editor, update the content of the editor form control.
@@ -164,9 +168,13 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
          * code change that might have been there in the meantime so we know what to use as the base for
          * the model creation.
          */
-        firstValidationEnd.withLatestFrom(externalCodeChanges, (_, inner) => inner)
-
-            .switchMap(inner => Observable.of(inner).merge(externalCodeChanges).distinctUntilChanged())
+        firstValidationEnd
+            .withLatestFrom(externalCodeChanges, (_, latestCode) => latestCode)
+            .switchMap(latestCode => {
+                const validation = validationCompletion.startWith(this.validationState);
+                const modelCode  = Observable.of(latestCode).merge(externalCodeChanges).distinctUntilChanged();
+                return modelCode.switchMap(code => validation, (code, validation) => code);
+            })
             .subscribeTracked(this, code => {
 
                 this.isLoading = false;
@@ -177,7 +185,15 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
                 this.resolveToModel(code).then(() => {
 
-                    if (this.tabData.isWritable && this.hasCopyOfProperty()) {
+                    const hasCopyOfProperty = this.dataModel.customProps["sbg:copyOf"] !== undefined;
+
+                    if (!this.tabData.isWritable) {
+                        this.isUnlockable = false;
+                    } else if (hasCopyOfProperty) {
+                        this.isUnlockable = true;
+                    }
+
+                    if (this.isUnlockable && hasCopyOfProperty) {
                         this.toggleLock(true);
                     }
                 }, err => console.warn);
@@ -232,10 +248,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     provideStatusControls(): TemplateRef<any> {
         return this.statusControls;
-    }
-
-    hasCopyOfProperty(): boolean {
-        return this.dataModel && this.dataModel.customProps["sbg:copyOf"] !== undefined;
     }
 
     ngAfterViewInit() {
@@ -316,6 +328,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     }
 
     protected syncModelAndCode(resolveRDF = true): Promise<any> {
+        console.log("Syncing model and code");
         if (this.viewMode === "code") {
             const codeVal = this.codeEditorContent.value;
 
@@ -333,12 +346,11 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             } catch (err) {
                 return Promise.reject(err);
             }
-
         }
 
         if (!resolveRDF) {
             this.codeEditorContent.setValue(this.getModelText());
-            return;
+            return Promise.resolve();
         }
 
         const modelText = JSON.stringify(this.dataModel.serialize());
@@ -346,6 +358,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         return this.resolveContent(modelText).then((data: Object) => {
             const serialized = JSON.stringify(data, null, 4);
             this.codeEditorContent.setValue(serialized);
+            return data;
         });
     }
 

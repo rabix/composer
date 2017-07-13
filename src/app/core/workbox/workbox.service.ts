@@ -115,7 +115,7 @@ export class WorkboxService {
             tab = this.extractValues().activeTab;
         }
 
-        if (tab.data && tab.data.id) {
+        if (tab && tab.data && tab.data.id) {
             this.dataGateway.updateSwap(tab.data.id, null);
         }
 

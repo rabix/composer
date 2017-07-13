@@ -62,15 +62,16 @@
     }
 
     .tab {
+        background: $body-bg;
+        border-left: 1px solid $black;
+        color: $text-muted;
+        cursor: pointer;
         flex: 1;
+        line-height: 36px;
         max-width: 275px;
         min-width: 40px;
         padding: 0 24px 10px 10px;
         position: relative;
-        color: $text-muted;
-        background: $body-bg;
-        border-left: 1px solid $black;
-        line-height: 36px;
 
         .tab-icon {
             flex-basis: 18px;
