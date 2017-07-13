@@ -65,7 +65,6 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
 
     protected recreateModel(json: Object): void {
         this.dataModel = WorkflowFactory.from(json as any, "document");
-        console.log("Data model is now", this.dataModel);
         this.dataModel.setValidationCallback(this.afterModelValidation.bind(this));
         this.dataModel.validate().then(this.afterModelValidation.bind(this));
     }
@@ -149,42 +148,6 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
             this.statusBar.stopProcess(updateStatusProcess);
         });
 
-
-        // Observable.of(1).switchMap(() => {
-        //     // Call service only if wf is in user projects
-        //     if (this.tabData.dataSource !== "local" && this.tabData.isWritable) {
-        //
-        //         const [appHash] = this.tabData.id.split("/");
-        //         const api       = this.apiGateway.forHash(appHash);
-        //
-        //         return api.getUpdates(this.workflowModel.steps
-        //             .map(step => step.run ? step.run.customProps["sbg:id"] : null)
-        //             .filter(s => !!s));
-        //
-        //         // return this.platform.getUpdates(this.workflowModel.steps
-        //         //     .map(step => step.run ? step.run.customProps["sbg:id"] : null)
-        //         //     .filter(s => !!s))
-        //     }
-        //
-        //     return Observable.of(undefined);
-        // }).subscribe((response) => {
-        //
-        //     if (response) {
-        //         Object.keys(response).forEach(key => {
-        //             if (response[key] === true) {
-        //                 this.workflowModel.steps
-        //                     .filter(step => step.run.customProps["sbg:id"] === key)
-        //                     .forEach(step => step.hasUpdate = true);
-        //             }
-        //         });
-        //     }
-        //
-        //     // load document in GUI and turn off loader, only if loader was active
-        //     if (this.isLoading) {
-        //         this.isLoading = false;
-        //     }
-        //
-        // });
     }
 
     /**
@@ -192,11 +155,10 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
      * the text has been formatted by the GUI editor
      */
     protected getModelText(embed = false): string {
-        const wf          = embed ? this.dataModel.serializeEmbedded() : this.dataModel.serialize();
-        const modelObject = Object.assign(wf, {"sbg:modified": true});
+        const wf = embed ? this.dataModel.serializeEmbedded() : this.dataModel.serialize();
 
         return this.tabData.language === "json" || this.tabData.dataSource === "app" ?
-            JSON.stringify(modelObject, null, 4) : Yaml.dump(modelObject);
+            JSON.stringify(wf, null, 4) : Yaml.dump(wf);
     }
 
     onTabActivation(): void {

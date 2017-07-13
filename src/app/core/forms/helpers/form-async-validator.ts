@@ -9,7 +9,6 @@ export class FormAsyncValidator {
             return new Promise((resolve, reject) => {
                 clearTimeout(timeout);
                 timeout = setTimeout(() => {
-                    console.log("Go go");
                     fn(control).then(resolve, reject);
                 }, time);
 
@@ -19,7 +18,6 @@ export class FormAsyncValidator {
     }
 
     public static debounceValidator(validator: (control: AbstractControl) => Promise<ValidationErrors | null>, time = 300) {
-        console.log("Debouncing");
         return FormAsyncValidator._debounce(validator, time);
     }
 

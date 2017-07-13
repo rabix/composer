@@ -61,13 +61,6 @@ export class WorkboxService {
     }
 
     forceReloadTabs() {
-        // this.localRepository.getOpenTabs().take(1).subscribe(data => {
-        //     console.log("local tabs", data);
-        // });
-        //
-        // this.platformRepository.getOpenTabs().take(1).subscribe(data => {
-        //     console.log("platform tabs", data);
-        // });
         this.priorityTabUpdate.next(1);
     }
 
@@ -123,7 +116,6 @@ export class WorkboxService {
         }
 
         if (tab.data && tab.data.id) {
-            console.log("Patching swap for", tab.data.id);
             this.dataGateway.updateSwap(tab.data.id, null);
         }
 
@@ -192,7 +184,6 @@ export class WorkboxService {
 
     }): TabData<T> {
 
-        console.log("Creating tab data", data);
         const currentTab = this.tabs.getValue().find(existingTab => existingTab.id === data.id);
 
         if (currentTab) {

@@ -1,12 +1,4 @@
-import {
-    AfterViewInit,
-    Injector,
-    Input,
-    OnInit,
-    TemplateRef,
-    ViewChild,
-    ViewContainerRef
-} from "@angular/core";
+import {AfterViewInit, Injector, Input, OnInit, TemplateRef, ViewChild, ViewContainerRef} from "@angular/core";
 import {FormControl} from "@angular/forms";
 import {CommandLineToolModel, WorkflowModel} from "cwlts/models";
 
@@ -67,6 +59,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     isReadonly = false;
 
+    savingDisabled = true;
 
     /** Template of the status controls that will be shown in the status bar */
     @ViewChild("statusControls")
@@ -129,10 +122,17 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         const firstDirtyCodeChange = codeEditorChanges.filter(() => this.codeEditorContent.dirty === true).take(1);
 
         /** Attach a CWL validator to code updates and observe the validation state changes. */
-        const validation = this.appValidator.createValidator(allCodeChanges).share();
+        const schemaValidation = this.appValidator.createValidator(allCodeChanges).map((state: AppValidityState) => {
+            if (state.isValidCWL && this.dataModel) {
+                state.errors   = state.errors.concat(this.dataModel.errors);
+                state.warnings = state.warnings.concat(this.dataModel.warnings);
+            }
+
+            return state;
+        }).share();
 
         /** Get the end of first validation check */
-        const firstValidationEnd = validation.filter(state => !state.isPending).take(1);
+        const firstValidationEnd = schemaValidation.filter(state => !state.isPending).take(1);
 
         /**
          * For each code change from outside the ace editor, update the content of the editor form control.
@@ -151,14 +151,14 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
          * We will store the validation state from the validator to avoid excessive template subscribers.
          * Also, we will at some times override the data from the state validity with model validation.
          */
-        validation.subscribe(state => {
+        schemaValidation.subscribe(state => {
             this.validationState = state;
         });
 
         /**
          * After the initial validation, external code changes should resolve and recreate the model.
          * The issue is that model creation registers a validation callback that overrides validation state
-         * provided by the {@link validation} stream. For the first input, however, the app might not be
+         * provided by the {@link schemaValidation} stream. For the first input, however, the app might not be
          * validated yet, so we should not create the model before the first validation ends.
          * We therefore skip the input until the first validation, but need to preserve the latest
          * code change that might have been there in the meantime so we know what to use as the base for
@@ -171,7 +171,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
                 this.isLoading = false;
 
-                if (this.validationState.isInvalid) {
+                if (!this.validationState.isValidCWL) {
                     return;
                 }
 
@@ -191,9 +191,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
         /** When the first validation ends, turn off the loader and determine which view we can show. Invalid app forces code view */
         firstValidationEnd.subscribe(state => {
-            console.log("First validation end", JSON.parse(JSON.stringify(state)));
-            this.viewMode    = state.isValid ? this.getPreferredTab() : "code";
-            this.reportPanel = state.isValid ? this.getPreferredReportPanel() : this.reportPanel;
+            this.viewMode    = state.isValidCWL ? this.getPreferredTab() : "code";
+            this.reportPanel = state.isValidCWL ? this.getPreferredReportPanel() : this.reportPanel;
         });
     }
 
@@ -220,7 +219,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     publish(): void {
 
-        if (!this.validationState.isValid) {
+        if (!this.validationState.isValidCWL) {
             this.errorBar.showError(`Cannot publish this app because because it's doesn't match the proper JSON schema`);
             return;
         }
@@ -258,6 +257,37 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         });
     }
 
+    /**
+     * Tells whether GUI tabs are enabled
+     */
+    tabsUnlocked(): boolean {
+        const codeCondition = this.validationState && this.validationState.isValidCWL && !this.isResolvingContent && !this.isValidatingCWL;
+        if (this.viewMode === "code") {
+            return codeCondition;
+        }
+
+        return codeCondition && this.dataModel !== undefined;
+    }
+
+    appIsSavable(): boolean {
+        if (this.tabData.dataSource === "local") {
+            return true;
+        }
+
+        /** Bound to lock state by accident, not intention */
+        return this.tabsUnlocked();
+    }
+
+    appIsResolvable(): boolean {
+        /** Bound to lock state by accident, not intention */
+        return this.tabsUnlocked();
+    }
+
+    appIsPublishable(): boolean {
+        /** Bound to lock state by accident, not intention */
+        return this.tabsUnlocked();
+    }
+
     openRevision(revisionNumber: number | string): Promise<any> {
 
         const fid = this.tabData.id.split("/").slice(0, 3).concat(revisionNumber.toString()).join("/");
@@ -276,7 +306,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
      */
     protected getModelText(): string {
 
-        const modelObject = Object.assign(this.dataModel.serialize(), {"sbg:modified": true});
+        const modelObject = this.dataModel.serialize();
 
         if (this.tabData.language === "json" || this.tabData.dataSource === "app") {
             return JSON.stringify(modelObject, null, 4);
@@ -306,22 +336,30 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
         }
 
-        this.codeEditorContent.setValue(this.getModelText());
+        if (!resolveRDF) {
+            this.codeEditorContent.setValue(this.getModelText());
+            return;
+        }
 
-        return Promise.resolve();
+        const modelText = JSON.stringify(this.dataModel.serialize());
+
+        return this.resolveContent(modelText).then((data: Object) => {
+            const serialized = JSON.stringify(data, null, 4);
+            this.codeEditorContent.setValue(serialized);
+        });
     }
 
     protected afterModelValidation(): void {
-
-        const hasErrorsOrWarnings = this.dataModel.errors.length || this.dataModel.warnings.length;
-
         this.validationState = {
+            ...this.validationState,
             errors: this.dataModel.errors || [],
             warnings: this.dataModel.warnings || [],
-            isValid: !hasErrorsOrWarnings,
-            isInvalid: !!hasErrorsOrWarnings,
             isPending: false
         };
+    }
+
+    protected applyModelValidity() {
+
     }
 
     /**
@@ -331,15 +369,13 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
      * @returns Promise of resolved code content
      */
     protected resolveToModel(content: string): Promise<Object> {
-        const appMightBeRDF     = this.tabData.dataSource === "local";
-        this.isResolvingContent = true;
+        const appMightBeRDF = this.tabData.dataSource === "local";
 
         return new Promise((resolve, reject) => {
             if (appMightBeRDF) {
                 const statusMessage = this.statusBar.startProcess("Resolving RDF Schema...");
 
-                this.tabData.resolve(content).subscribe((resolved: Object) => {
-
+                this.resolveContent(content).then(resolved => {
                     this.recreateModel(resolved);
                     this.afterModelCreated(!this.modelCreated);
                     this.modelCreated = true;
@@ -361,14 +397,12 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             resolve(json);
 
         }).then(result => {
-            this.isResolvingContent = false;
             return result;
         }, err => {
             this.errorBar.showError("RDF resolution error: " + err.message);
-            this.isResolvingContent = false;
 
-            this.validationState.isValid = false;
-            this.validationState.errors  = [{
+            this.validationState.isValidCWL = false;
+            this.validationState.errors     = [{
                 loc: "document",
                 type: "error",
                 message: err.message
@@ -413,7 +447,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
      * When click on Resolve button (visible only if app is a local file and you are in Code mode)
      */
     resolveButtonClick(): void {
-        this.resolveToModel(this.codeEditorContent.value).then(() => {}, err => console.warn);
+        this.resolveToModel(this.codeEditorContent.value).then(() => {
+        }, err => console.warn);
     }
 
     toggleReport(panel: string) {
@@ -449,5 +484,26 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     }
 
     protected afterModelCreated(isFirstCreation: boolean): void {
+    }
+
+    protected updateSavingAvailability() {
+
+        if (this.tabData.dataSource === "local") {
+            this.savingDisabled = false;
+            return;
+        }
+
+        this.savingDisabled = !(this.isValidatingCWL || !!this.unavailableError || !this.dataModel);
+    }
+
+    protected resolveContent(content: string): Promise<Object> {
+        this.isResolvingContent = true;
+        return this.tabData.resolve(content).toPromise().then(resolved => {
+            this.isResolvingContent = false;
+            return resolved;
+        }, err => {
+            this.isResolvingContent = false;
+            throw err;
+        });
     }
 }
