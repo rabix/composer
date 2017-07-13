@@ -107,7 +107,6 @@ export class PublishModalComponent extends DirectiveBase {
         });
 
         this.inputForm.statusChanges.filter(() => this.inputForm.valid).subscribe(() => {
-            console.log("Updating from", this.inputForm.getRawValue());
             const {name, project} = this.inputForm.getRawValue();
             this.outputForm.patchValue({
                 appID: project + "/" + this.slugify.transform(name.toLowerCase()) + "/" + this.revision

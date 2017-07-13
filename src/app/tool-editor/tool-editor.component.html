@@ -1,22 +1,10 @@
 <!--Control Header-->
 <ct-action-bar>
     <ct-tab-selector [distribute]="'auto'" [active]="viewMode" (activeChange)="switchTab($event)">
-
-        <ct-tab-selector-entry [disabled]="!validationState?.isValid"
-                               [tabName]="'info'">App Info
-        </ct-tab-selector-entry>
-
-        <ct-tab-selector-entry [disabled]="!validationState?.isValid"
-                               [tabName]="'gui'">Visual
-        </ct-tab-selector-entry>
-
-        <ct-tab-selector-entry [disabled]=" !validationState?.isValid"
-                               [tabName]="'test'">Test
-        </ct-tab-selector-entry>
-
-        <ct-tab-selector-entry [tabName]="'code'"
-                               [disabled]="!!unavailableError">Code
-        </ct-tab-selector-entry>
+        <ct-tab-selector-entry [disabled]="!tabsUnlocked()" [tabName]="'info'">App Info</ct-tab-selector-entry>
+        <ct-tab-selector-entry [disabled]="!tabsUnlocked()" [tabName]="'gui'">Visual</ct-tab-selector-entry>
+        <ct-tab-selector-entry [disabled]="!tabsUnlocked()" [tabName]="'test'">Test</ct-tab-selector-entry>
+        <ct-tab-selector-entry [tabName]="'code'" [disabled]="!tabsUnlocked() || !!unavailableError">Code</ct-tab-selector-entry>
     </ct-tab-selector>
 
     <div class="document-controls">
@@ -35,7 +23,7 @@
         <!--Resolve-->
         <button class="btn control-button"
                 type="button"
-                [disabled]="!validationState?.isValid"
+                [disabled]="!appIsResolvable()"
                 *ngIf="viewMode === 'code' && tabData.dataSource === 'local'"
                 ct-tooltip="Resolve"
                 tooltipPlacement="bottom"
@@ -55,10 +43,9 @@
         </button>
 
 
-
         <!--Save-->
         <button *ngIf="tabData.isWritable"
-                [disabled]="isValidatingCWL || !!unavailableError || !dataModel"
+                [disabled]="!appIsSavable()"
                 (click)="save()"
                 ct-tooltip="Save"
                 tooltipPlacement="bottom"
@@ -68,7 +55,7 @@
 
         <!--Publish to Platform-->
         <button class="btn control-button"
-                [disabled]="!validationState?.isValid || !dataModel"
+                [disabled]="!appIsPublishable()"
                 *ngIf="tabData.dataSource === 'local'"
                 ct-tooltip="Publish to Platform"
                 tooltipPlacement="bottom"
@@ -123,6 +110,7 @@
     <!--GUI Editor-->
     <ct-tool-visual-editor *ngIf="viewMode === 'gui' && !isLoading && dataModel"
                            class="flex-col"
+                           (change)="syncModelAndCode(false)"
                            [readonly]="!tabData.isWritable"
                            [formGroup]="toolGroup"
                            [model]="dataModel"></ct-tool-visual-editor>
@@ -130,12 +118,13 @@
     <ct-job-editor *ngIf="viewMode === 'test' && !isLoading && dataModel"
                    class="flex-col"
                    [model]="dataModel"
-                   (update)="onJobUpdate($event)"
+                   (update)="onJobUpdate($event); syncModelAndCode(false)"
                    (reset)="resetJob()"></ct-job-editor>
 
     <ct-app-info *ngIf="viewMode === 'info' && !isLoading && dataModel"
                  class="gui-editor-component p-2"
                  [readonly]="!tabData.isWritable"
+                 (change)="syncModelAndCode(false)"
                  [formGroup]="toolGroup"
                  [class.flex-col]="showInspector"
                  [model]="dataModel"></ct-app-info>
@@ -165,11 +154,13 @@
     </i>
 
     <div class="tag tag-warning"
-          [ct-tooltip]="'This app is a copy of ' +  dataModel.customProps['sbg:copyOf']"
-          *ngIf="isReadonly && tabData.isWritable">Copy</div>
+         [ct-tooltip]="'This app is a copy of ' +  dataModel.customProps['sbg:copyOf']"
+         *ngIf="isReadonly && tabData.isWritable">Copy
+    </div>
     <div class="tag tag-info"
          [ct-tooltip]="'The app is described using the displayed version(s) of CWL'"
-         *ngIf="dataModel">{{ dataModel.cwlVersion }}</div>
+         *ngIf="dataModel">{{ dataModel.cwlVersion }}
+    </div>
     <span class="btn-group">
                     <button [disabled]="!validationState"
                             [class.active]="reportPanel === 'validation'"
@@ -193,7 +184,7 @@
                     </button>
 
                     <button [class.active]="reportPanel == 'commandLinePreview'"
-                            [disabled]="!validationState?.isValid"
+                            [disabled]="!validationState?.isValidCWL"
                             (click)="toggleReport('commandLinePreview')"
                             class="btn">Command Line</button>
                 </span>

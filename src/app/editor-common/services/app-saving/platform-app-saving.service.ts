@@ -17,7 +17,6 @@ export class PlatformAppSavingService implements AppSaver {
             return this.saveWithNote(appID, content, revisionNote);
         }
 
-
         const revisionNoteControl = new FormControl("");
 
         return this.modal.prompt({

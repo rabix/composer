@@ -46,7 +46,7 @@ import {UpdateStepModalComponent} from "../../update-step-modal/update-step-moda
                                            [step]="step"
                                            [inputs]="step.in"
                                            [graph]="graph"
-                                           (change)="change.next()"
+                                           (change)="change.emit()"
                                            [workflowModel]="workflowModel"
                                            [readonly]="readonly">
         </ct-workflow-step-inspector-inputs>
@@ -61,7 +61,7 @@ import {UpdateStepModalComponent} from "../../update-step-modal/update-step-moda
                                          [step]="step"
                                          [graph]="graph"
                                          [workflowModel]="workflowModel"
-                                         (change)="change.next()"
+                                         (change)="change.emit()"
                                          [readonly]="readonly">
         </ct-workflow-step-inspector-step>
     `
