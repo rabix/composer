@@ -4,22 +4,21 @@ import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {noop} from "../../lib/utils.lib";
 import {IpcService} from "../../services/ipc.service";
+import {AppHelper} from "../helpers/AppHelper";
 
 @Injectable()
 export class DataGatewayService {
 
     cacheInvalidation = new Subject<string>();
 
-    static getFileSource(id): "local" | "public" | "app" {
-        if (id.startsWith("/")) {
-            return "local";
-        }
+    /**
+     * @depreceated Can check AppHelper.isLocal directly
+     * @param id
+     * @returns {"local" | "app"}
+     */
+    static getFileSource(id): "local" | "app" {
 
-        if (id.startsWith("https://") || id.startsWith("http://")) {
-            return "public";
-        }
-
-        return "app";
+        return AppHelper.isLocal(id) ? "local" : "app";
     }
 
 
@@ -90,12 +89,11 @@ export class DataGatewayService {
     }
 
     resolveContent(content, path): Observable<Object | any> {
-
-        if (!path.startsWith("/")) {
-            return Observable.of(content).map(txt => YAML.safeLoad(txt, {json: true} as any));
+        if (AppHelper.isLocal(path)) {
+            return this.ipc.request("resolveContent", ({content, path})).take(1);
         }
 
-        return this.ipc.request("resolveContent", ({content, path})).take(1);
+        return Observable.of(content).map(txt => YAML.safeLoad(txt, {json: true} as any));
     }
 
 
@@ -117,7 +115,7 @@ export class DataGatewayService {
     }
 
     updateSwap(fileID, content): Observable<any> {
-        const isLocal = fileID.startsWith("/");
+        const isLocal = AppHelper.isLocal(fileID);
 
         let swapID = fileID;
         if (!isLocal) {
