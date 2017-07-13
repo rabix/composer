@@ -3,6 +3,7 @@ import {ControlValueAccessor, FormControl, FormBuilder, FormGroup, NG_VALUE_ACCE
 import {CommandInputParameterModel} from "cwlts/models";
 import {noop} from "../../../../lib/utils.lib";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
+import {V1CommandInputParameterModel} from "cwlts/models/v1.0";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -17,7 +18,8 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
     ],
     template: `
         <ct-form-panel *ngIf="form" class="borderless" [collapsed]="true">
-            <div class="tc-header">Stage Input</div>
+            <div *ngIf="cwlVersion !== 'v1.0'" class="tc-header">Stage Input</div>
+            <div *ngIf="cwlVersion === 'v1.0'" class="tc-header">Load Content</div>
             <div class="tc-body" *ngIf="input && form">
 
                 <div class="form-group" *ngIf="form.controls['stageInput']">
@@ -26,6 +28,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                             [formControl]="form.controls['stageInput']">
 
                         <option *ngFor="let item of stageInputOptions"
+                                [disabled]="readonly"
                                 [value]="item.value">
                             {{item.text}}
                         </option>
@@ -39,7 +42,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <ct-toggle-slider [formControl]="form.controls['loadContent']"
                                       [off]="'No'"
                                       [on]="'Yes'"
-                                      [readonly]="readonly">
+                                      [disabled]="readonly">
                     </ct-toggle-slider>
                 </span>
                 </div>
@@ -55,6 +58,8 @@ export class StageInputSectionComponent extends DirectiveBase implements Control
     public readonly = false;
 
     input: CommandInputParameterModel;
+
+    cwlVersion: string;
 
     private onTouched = noop;
 
@@ -75,16 +80,14 @@ export class StageInputSectionComponent extends DirectiveBase implements Control
     writeValue(input: CommandInputParameterModel): void {
         this.input = input;
 
+        this.cwlVersion = input instanceof V1CommandInputParameterModel ? "v1.0" : "sbg:draft-2";
+
         this.form = this.formBuilder.group({
             loadContent: [!!this.input.inputBinding && this.input.inputBinding.loadContents ? this.input.inputBinding.loadContents : false]
         }, {onlySelf: true});
 
         if (this.input.hasStageInput) {
-            this.form.addControl("stageInput", new FormControl({
-                    value: this.input.customProps["sbg:stageInput"] || null,
-                    disabled: this.readonly
-                })
-            );
+            this.form.addControl("stageInput", new FormControl(this.input.customProps["sbg:stageInput"] || null));
         }
 
         this.tracked = this.form.valueChanges

@@ -24,7 +24,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                         <ct-toggle-slider [formControl]="form.controls['isRequired']"
                                           [on]="'Yes'"
                                           [off]="'No'"
-                                          [readonly]="readonly">
+                                          [disabled]="readonly">
                         </ct-toggle-slider>
                     </span>
             </div>
@@ -32,7 +32,9 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <!--ID-->
             <div class="form-group" [class.has-danger]="form.controls['id'].errors">
                 <label class="form-control-label">ID</label>
-                <input type="text" class="form-control"
+                <input type="text" 
+                       class="form-control"
+                       [readonly]="readonly"
                        [formControl]="form.controls['id']">
                 <div *ngIf="form.controls['id'].errors" class="form-control-feedback">
                     {{form.controls['id'].errors['error']}}
@@ -41,7 +43,8 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
             <!--Input Type -->
             <div class="form-group">
-                <ct-type-select [formControl]="form.controls['type']"></ct-type-select>
+                <ct-type-select [formControl]="form.controls['type']"
+                                [readonly]="readonly"></ct-type-select>
             </div>
 
             <!--Symbols-->
@@ -99,8 +102,8 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
         this.context = this.model.getContext(this.output);
 
         this.form = this.formBuilder.group({
-            id: [{value: this.output.id, disabled: this.readonly}],
-            type: [{value: this.output.type, disabled: this.readonly}, [Validators.required]],
+            id: [this.output.id],
+            type: [this.output.type, [Validators.required]],
             glob: [this.output.outputBinding.glob],
             isRequired: [!this.output.type.isNullable],
             itemType: [!!this.output.type.items ? this.output.type.items : "File"],

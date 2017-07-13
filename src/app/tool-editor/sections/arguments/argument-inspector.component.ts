@@ -12,8 +12,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             <div class="form-group">
                 <label>Use command line binding</label>
                 <span class="pull-right">
-                    <ct-toggle-slider [formControl]="form.controls['hasBinding']"
-                                      [readonly]="readonly">
+                    <ct-toggle-slider [disabled]="readonly"
+                                      [formControl]="form.controls['hasBinding']">
                     </ct-toggle-slider>
                 </span>
             </div>
@@ -22,7 +22,10 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                 <!--Prefix Field-->
                 <div class="form-group">
                     <label class="form-control-label">Prefix</label>
-                    <input type="text" class="form-control" [formControl]="form.controls['prefix']">
+                    <input type="text" 
+                           class="form-control" 
+                           [readonly]="readonly"
+                           [formControl]="form.controls['prefix']">
                 </div>
 
                 <!--Expression Field-->
@@ -38,8 +41,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                 <div class="form-group">
                     <label>Separate value and prefix</label>
                     <span class="pull-right">
-                        <ct-toggle-slider [formControl]="form.controls['separate']"
-                                          [readonly]="readonly">
+                        <ct-toggle-slider [disabled]="readonly"
+                                          [formControl]="form.controls['separate']">
                         </ct-toggle-slider>
                     </span>
                 </div>
@@ -47,13 +50,17 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                 <!--Position Field-->
                 <div class="form-group">
                     <label class="form-control-label">Position</label>
-                    <input type="number" class="form-control" [formControl]="form.controls['position']">
+                    <input type="number" 
+                           class="form-control" 
+                           [readonly]="readonly"
+                           [formControl]="form.controls['position']">
                 </div>
 
                 <div class="form-group" *ngIf="argument.hasShellQuote">
                     <label>shellQuote</label>
                     <span class="pull-right">
-                    <ct-toggle-slider [formControl]="form.controls['shellQuote']"></ct-toggle-slider>
+                    <ct-toggle-slider [disabled]="readonly" 
+                                      [formControl]="form.controls['shellQuote']"></ct-toggle-slider>
                 </span>
                 </div>
             </div>
@@ -64,6 +71,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                     <input type="text"
                            class="form-control"
                            *ngIf="!argument.hasExprPrimitive"
+                           [readonly]="readonly"
                            [formControl]="form.controls['primitive']">
 
                     <ct-expression-input type="string"
@@ -104,9 +112,9 @@ export class ArgumentInspectorComponent extends DirectiveBase implements OnInit 
             hasBinding: new FormControl(this.argument.hasBinding),
             valueFrom: new FormControl(this.argument.valueFrom),
             separate: new FormControl(this.argument.separate !== false),
-            position: new FormControl({value: this.argument.position || 0, disabled: this.readonly}),
-            prefix: new FormControl({value: this.argument.prefix || "", disabled: this.readonly}),
-            primitive: new FormControl({value: this.argument.primitive || "", disabled: this.readonly}),
+            position: new FormControl(this.argument.position || 0),
+            prefix: new FormControl(this.argument.prefix || ""),
+            primitive: new FormControl(this.argument.primitive || ""),
             shellQuote: new FormControl(this.argument.shellQuote)
         });
 

@@ -64,6 +64,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                         [ct-disabled]="isType('record')"
                         [formControl]="form.controls['itemSeparator']">
                     <option *ngFor="let itemSeparator of itemSeparators"
+                            [disabled]="readonly"
                             [value]="itemSeparator.value">
                         {{itemSeparator.text}}
                     </option>

@@ -33,7 +33,7 @@ import {noop} from "../../../../lib/utils.lib";
                         <ct-toggle-slider [formControl]="outputEvalFormGroup.controls['loadContents']"
                                           [on]="'Yes'"
                                           [off]="'No'"
-                                          [readonly]="readonly">
+                                          [disabled]="readonly">
                         </ct-toggle-slider>
                     </span>
                 </div>

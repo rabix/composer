@@ -14,7 +14,9 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             <label class="form-control-label">Type</label>
             <select class="form-control"
                     [formControl]="form.controls['type']">
-                <option *ngFor="let type of types" [value]="type">
+                <option *ngFor="let type of types" 
+                        [disabled]="readonly"
+                        [value]="type">
                     {{type}}
                 </option>
             </select>
@@ -23,7 +25,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         <div class="form-group" *ngIf="paramType.type !== 'array'">
             <label>Allow array as well as single item</label>
             <span class="pull-right">
-                    <ct-toggle-slider [formControl]="form.controls['isItemOrArray']"></ct-toggle-slider>
+                    <ct-toggle-slider [formControl]="form.controls['isItemOrArray']"
+                                      [disabled]="readonly"></ct-toggle-slider>
                 </span>
         </div>
 
@@ -33,6 +36,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                 <select class="form-control"
                         [formControl]="form.controls['items']">
                     <option *ngFor="let item of itemTypes"
+                            [disabled]="readonly"
                             [value]="item">
                         {{item}}
                     </option>
@@ -42,6 +46,9 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
     `
 })
 export class InputTypeSelectComponent extends DirectiveBase implements ControlValueAccessor {
+
+    @Input()
+    public readonly = false;
 
     public paramType: ParameterTypeModel;
 
