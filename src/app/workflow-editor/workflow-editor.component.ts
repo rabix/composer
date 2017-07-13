@@ -586,7 +586,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
      * the text has been formatted by the GUI editor
      */
     private getModelText(embed = false): string {
-        const wf = embed ? this.workflowModel.serializeEmbedded() : this.workflowModel.serialize();
+        const wf = embed || this.data.dataSource === "app" ? this.workflowModel.serializeEmbedded() : this.workflowModel.serialize();
         const modelObject = Object.assign(wf, {"sbg:modified": true});
 
         console.log("serialized workflow", modelObject);
