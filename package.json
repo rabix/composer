@@ -42,8 +42,8 @@
         "@angular/platform-browser-dynamic": "^4.2.6",
         "@angular/router": "^4.2.6",
         "@types/md5": "^2.1.32",
-        "ajv": "^5.2.0",
-        "angular2-moment": "^1.4.0",
+        "ajv": "^5.2.2",
+        "angular2-moment": "^1.5.0",
         "bootstrap": "4.0.0-alpha.5",
         "brace": "^0.10.0",
         "core-js": "^2.4.1",
@@ -57,10 +57,10 @@
         "ngx-pipes": "^1.6.1",
         "rxjs": "^5.4.2",
         "selectize": "^0.12.4",
-        "zone.js": "^0.8.12"
+        "zone.js": "^0.8.13"
     },
     "devDependencies": {
-        "@angular/cli": "^1.1.2",
+        "@angular/cli": "^1.2.1",
         "@angular/compiler-cli": "^4.2.6",
         "@types/jasmine": "^2.5.52",
         "@types/jquery": "^3.2.8",
