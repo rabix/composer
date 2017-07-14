@@ -21,7 +21,6 @@ import {AppValidatorService, AppValidityState} from "../app-validator/app-valida
 import {PlatformAppService} from "../components/platform-app-common/platform-app.service";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
 import {APP_SAVER_TOKEN, AppSaver} from "../services/app-saving/app-saver.interface";
-import "rxjs/add/operator/do";
 
 export abstract class AppEditorBase extends DirectiveBase implements StatusControlProvider, OnInit, AfterViewInit {
 
@@ -195,7 +194,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                         this.isUnlockable = true;
                     }
 
-                    if (this.isUnlockable && hasCopyOfProperty && !unlocked) {
+                    if (!this.tabData.isWritable || (this.isUnlockable && hasCopyOfProperty && !unlocked)) {
                         this.toggleLock(true);
                     }
                 }, err => console.warn);
