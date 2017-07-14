@@ -3,6 +3,7 @@ import * as YAML from "js-yaml";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {noop} from "../../lib/utils.lib";
+import {PlatformRepositoryService} from "../../repository/platform-repository.service";
 import {IpcService} from "../../services/ipc.service";
 import {AppHelper} from "../helpers/AppHelper";
 
@@ -22,7 +23,8 @@ export class DataGatewayService {
     }
 
 
-    constructor(private ipc: IpcService) {
+    constructor(private ipc: IpcService,
+                private platformRepository: PlatformRepositoryService) {
     }
 
     checkIfPathExists(path) {
@@ -114,19 +116,21 @@ export class DataGatewayService {
         return this.ipc.request("getUserByToken", {url, token});
     }
 
-    updateSwap(fileID, content): Observable<any> {
+    updateSwap(fileID, content): Promise<any> {
         const isLocal = AppHelper.isLocal(fileID);
+        const appID   = isLocal ? fileID : AppHelper.getRevisionlessID(fileID);
 
-        let swapID = fileID;
-        if (!isLocal) {
-            swapID = fileID.split("/").slice(0, 3).join("/");
-        }
+        return Promise.all([
+            this.ipc.request("patchSwap", {
+                local: isLocal,
+                swapID: appID,
+                swapContent: content
+            }).toPromise(),
 
-        return this.ipc.request("patchSwap", {
-            local: isLocal,
-            swapID: swapID,
-            swapContent: content
-        });
+            // If there is no content, swap should be deleted, so then we need to remove swapUnlocked meta
+            content ? Promise.resolve() : this.platformRepository.patchAppMeta(appID, "swapUnlocked", false)]
+        );
+
     }
 
     sendFeedbackToPlatform(type: string, text: string): Promise<any> {
