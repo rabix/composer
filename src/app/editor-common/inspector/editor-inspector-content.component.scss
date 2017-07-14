@@ -5,6 +5,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     flex: 1;
+    border-left: 1px solid $input-border-color;
 
     .header {
         border: 1px solid transparent;
@@ -37,7 +38,6 @@
         font-family: $font-family-title;
         font-size: $font-size-sm;
         font-weight: 400;
-        text-transform: uppercase;
     }
 
     .text-title {

@@ -9,11 +9,11 @@ import {NotificationBarService} from "./notification-bar.service";
         <div class="error-alert pl-1" [class.show]="show">
             <i class="fa fa-minus-circle"></i>
 
-            <div class="error-text pr-1">
+            <div class="error-text pl-2 pr-1">
                 {{error}}
             </div>
 
-            <i class="fa fa-times clickable" (click)="close()"></i>
+            <i class="fa fa-times pr-1 clickable" (click)="close()"></i>
         </div>
     `
 })

@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Input, OnChanges, Output, SimpleChanges} from "@angular/core";
+import {Component, Input, OnChanges, Output, SimpleChanges} from "@angular/core";
 import {Subject} from "rxjs/Subject";
 import {PlatformAppRevisionEntry} from "../../../services/api/platforms/platform-api.types";
 
@@ -38,17 +38,11 @@ import {PlatformAppRevisionEntry} from "../../../services/api/platforms/platform
 export class RevisionListComponent implements OnChanges {
 
 
-    @Input()
-    revisions: PlatformAppRevisionEntry[] = [];
+    @Input() revisions: PlatformAppRevisionEntry[] = [];
+    @Input() active: number;
 
-    @Input()
-    active: number;
-
-    @Output()
-    select = new Subject<number>();
-
-    @Input()
-    loadingRevision;
+    @Output() select = new Subject<number>();
+    @Input() loadingRevision;
 
     displayList: {
         date: number,
@@ -63,6 +57,7 @@ export class RevisionListComponent implements OnChanges {
         }
 
         this.loadingRevision = revision;
+        console.log("Loading revision", revision);
         this.select.next(revision.number);
 
     }

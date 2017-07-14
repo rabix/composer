@@ -61,7 +61,6 @@ export class CodeEditorComponent implements OnInit, ControlValueAccessor, OnDest
     }
 
     ngOnInit() {
-        console.log("Got options", this.options);
         // Instantiate an editor
 
         // To avoid unnecessary change detection cycle because of mouse and other events that occur on Ace editor

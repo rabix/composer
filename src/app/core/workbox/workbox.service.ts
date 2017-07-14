@@ -7,6 +7,7 @@ import {RecentAppTab} from "../../../../electron/src/storage/types/recent-app-ta
 import {LocalRepositoryService} from "../../repository/local-repository.service";
 import {PlatformRepositoryService} from "../../repository/platform-repository.service";
 import {DataGatewayService} from "../data-gateway/data-gateway.service";
+import {AppHelper} from "../helpers/AppHelper";
 import {AppTabData} from "./app-tab-data";
 import {TabData} from "./tab-data.interface";
 
@@ -40,7 +41,7 @@ export class WorkboxService {
                 const {id, label, type, isWritable, language} = tab;
 
                 const entry = {id, label, type, isWritable, language, position};
-                if (entry.id.startsWith("/")) {
+                if (AppHelper.isLocal(entry.id)) {
                     localTabs.push(entry);
                 } else {
                     platformTabs.push(entry);
@@ -60,13 +61,6 @@ export class WorkboxService {
     }
 
     forceReloadTabs() {
-        // this.localRepository.getOpenTabs().take(1).subscribe(data => {
-        //     console.log("local tabs", data);
-        // });
-        //
-        // this.platformRepository.getOpenTabs().take(1).subscribe(data => {
-        //     console.log("platform tabs", data);
-        // });
         this.priorityTabUpdate.next(1);
     }
 
@@ -101,7 +95,7 @@ export class WorkboxService {
             time: Date.now()
         } as RecentAppTab;
 
-        if (tab.id.startsWith("/")) {
+        if (AppHelper.isLocal(tab.id)) {
             this.localRepository.pushRecentApp(recentTabData);
         } else {
             this.platformRepository.pushRecentApp(recentTabData);
@@ -121,8 +115,7 @@ export class WorkboxService {
             tab = this.extractValues().activeTab;
         }
 
-        if (tab.data && tab.data.id) {
-            console.log("Patching swap for", tab.data.id);
+        if (tab && tab.data && tab.data.id) {
             this.dataGateway.updateSwap(tab.data.id, null);
         }
 
@@ -182,14 +175,6 @@ export class WorkboxService {
         this.activeTab.next(tab);
     }
 
-    /**
-     * @deprecated Do this same thing with {@link getOrCreateAppTab}
-     * @param fileID
-     */
-    getOrCreateFileTabAndOpenIt(fileID) {
-        this.getOrCreateFileTab(fileID).take(1).subscribe((tab) => this.openTab(tab));
-    }
-
     getOrCreateAppTab<T>(data: {
         id: string;
         type: string;
@@ -198,18 +183,18 @@ export class WorkboxService {
         language?: string;
 
     }): TabData<T> {
+
         const currentTab = this.tabs.getValue().find(existingTab => existingTab.id === data.id);
 
         if (currentTab) {
             return currentTab;
         }
 
-
         const dataSource = DataGatewayService.getFileSource(data.id);
 
         const id         = data.id;
         const label      = data.id.split("/").pop();
-        const isWritable = data.isWritable === undefined ? dataSource !== "public" : data.isWritable;
+        const isWritable = data.isWritable;
 
         const fileContent = Observable.empty().concat(this.dataGateway.fetchFileContent(id));
         const resolve     = (fcontent: string) => this.dataGateway.resolveContent(fcontent, id);
@@ -233,74 +218,6 @@ export class WorkboxService {
 
         return tab;
 
-    }
-
-    /**
-     * @deprecated Use {@link getOrCreateAppTab} for synchronous tab opening version
-     */
-    getOrCreateFileTab(fileID): Observable<TabData<AppTabData>> {
-
-        const currentTab = this.tabs.getValue().find(tab => tab.id === fileID);
-
-        if (currentTab) {
-            return Observable.of(currentTab);
-        }
-
-
-        return this.dataGateway.fetchFileContent(fileID).map(content => {
-
-            const dataSource = DataGatewayService.getFileSource(fileID);
-
-            const tab = {
-                id: fileID,
-                label: fileID,
-                type: "Code",
-                isWritable: dataSource !== "public",
-                data: {
-                    id: fileID,
-                    isWritable: dataSource !== "public",
-                    dataSource,
-                    language: "yaml",
-                    parsedContent: {},
-                    fileContent: content,
-                    resolve: (fcontent: string) => this.dataGateway.resolveContent(fcontent, fileID)
-                }
-            };
-
-            if (fileID.endsWith(".json")) {
-                tab.data.language = "json";
-            }
-
-            try {
-
-                const parsed = YAML.safeLoad(content, {json: true} as any);
-
-                tab.data.parsedContent = parsed;
-
-                if (dataSource === "public") {
-                    tab.id = parsed.id;
-                }
-
-                if (dataSource !== "local") {
-                    tab.data.fileContent = JSON.stringify(parsed, null, 4);
-                }
-
-                tab.label = parsed.label || fileID;
-
-                if (["CommandLineTool", "Workflow"].indexOf(parsed.class) !== -1) {
-                    tab.type = parsed.class;
-                }
-            } catch (ex) {
-                console.warn("Could not parse app", ex);
-            }
-
-            if (dataSource === "local") {
-                tab.label = fileID.split("/").pop();
-            }
-
-            return tab as any;
-
-        });
     }
 }
 

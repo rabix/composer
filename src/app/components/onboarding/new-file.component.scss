@@ -64,11 +64,15 @@
 
     /deep/ {
         .fa-share-alt {
-            color: #e29834;
+            color: $carrot;
+            -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=#{0}, mirror=1)";
+            -webkit-transform: scale(-1, 1);
+            -ms-transform: scale(-1, 1);
+            transform: scale(-1, 1);
         }
 
         .fa-terminal {
-            color: #a184dc;
+            color: $purple;
         }
     }
 }

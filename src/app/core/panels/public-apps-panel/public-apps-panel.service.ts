@@ -3,6 +3,7 @@ import {Observable} from "rxjs/Observable";
 import {App} from "../../../../../electron/src/sbg-api-client/interfaces/app";
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {TreeNode} from "../../../ui/tree-view/tree-node";
+import {AppHelper} from "../../helpers/AppHelper";
 
 @Injectable()
 export class PublicAppsPanelService {
@@ -12,6 +13,13 @@ export class PublicAppsPanelService {
     constructor(private platformRepository: PlatformRepositoryService) {
 
         this.apps = platformRepository.getPublicApps();
+    }
+
+    getAppsByNone(): Observable<TreeNode<any>[]> {
+        return this.apps.map((array) => {
+            return array.slice().sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
+                .map(app => this.makeAppTreeNode(app));
+        });
     }
 
     getAppsGroupedByToolkit(): Observable<TreeNode<any>[]> {
@@ -138,7 +146,7 @@ export class PublicAppsPanelService {
         }
 
         return {
-            id: app.id,
+            id: AppHelper.getRevisionlessID(app.id),
             data: app,
             type: "app",
             label: app.name,

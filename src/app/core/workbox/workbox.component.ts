@@ -33,22 +33,18 @@ import {WorkboxService} from "./workbox.service";
                            [class.fa-share-alt]="tab?.type === 'Workflow'"
                            [class.fa-terminal]="tab?.type === 'CommandLineTool'"
                            [class.fa-file-o]="tab?.type === 'NewFile'"
-                           [class.fa-sliders]="tab?.type === 'Settings'"
+                           [class.fa-cog]="tab?.type === 'Settings'"
                         ></i>
                     </div>
-
-                    <div class="title" [ct-tooltip]="ctt" [tooltipPlacement]="'bottom'">{{ tab.label
-                        }}
-                    </div>
+                    
+                    <div class="title" [ct-tooltip]="ctt" [tooltipPlacement]="'bottom'">{{tab.label}}</div>
                     <div class="close-icon">
                         <i class="fa fa-times clickable" (click)="removeTab(tab)"></i>
                     </div>
 
                     <!--Tooltip content-->
                     <ct-tooltip-content [maxWidth]="500" #ctt>
-                        <div>
-                            {{ tab.data?.id}}
-                        </div>
+                            {{ tab.data?.id || tab.label}}
                     </ct-tooltip-content>
                 </li>
 

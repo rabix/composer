@@ -17,6 +17,7 @@ import {TabData} from "../../workbox/tab-data.interface";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.component";
 import {MyAppsPanelService} from "./my-apps-panel.service";
+import {AppHelper} from "../../helpers/AppHelper";
 
 @Component({
     selector: "ct-my-apps-panel",
@@ -128,15 +129,17 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
         const projectSearch = (term) => this.platformRepository.searchAppsFromOpenProjects(term).take(1).toPromise().then(apps => {
             return apps.map(app => {
 
+                const revisionlessID = AppHelper.getRevisionlessID(app.id);
+
                 return {
-                    id: app.id,
+                    id: revisionlessID,
                     icon: app.raw["class"] === "Workflow" ? "fa-share-alt" : "fa-terminal",
                     title: app.name,
                     label: app.id.split("/").join(" → "),
                     relevance: 1.5,
 
                     tabData: {
-                        id: app.id,
+                        id: revisionlessID,
                         isWritable: true,
                         label: app.name,
                         language: "json",
@@ -162,7 +165,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
                 localFileSearch(term),
                 projectSearch(term)
             ))
-            .subscribe(datasets => {
+            .subscribeTracked(this, datasets => {
                 const combined     = [].concat(...datasets).sort((a, b) => b.relevance - a.relevance);
                 this.searchResults = combined;
 
@@ -196,12 +199,11 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
 
         appOpening.subscribe(node => {
 
-            const appID = node.data.id.split("/").slice(0, 3).join("/");
             const label = node.data.name;
             const type  = node.data.raw.class === "CommandLineTool" ? "CommandLineTool" : "Workflow";
 
             const tab = this.workbox.getOrCreateAppTab({
-                id: appID,
+                id: AppHelper.getRevisionlessID(node.data.id),
                 type: type,
                 label: label,
                 isWritable: true,
@@ -248,7 +250,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
         this.tree.contextMenu.filter((data) => data.node.type === "project")
             .subscribe(data => {
                 const contextMenu = [
-                    new MenuItem("Create new Workflow", {
+                    new MenuItem("New Workflow", {
                         click: () => {
                             const modal = this.modal.fromComponent(CreateAppModalComponent, {
                                 closeOnOutsideClick: false,
@@ -262,7 +264,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
                             modal.defaultProject = data.node.id;
                         }
                     }),
-                    new MenuItem("Create new Command Line Tool", {
+                    new MenuItem("New Command Line Tool", {
                         click: () => {
                             const modal = this.modal.fromComponent(CreateAppModalComponent, {
                                 closeOnOutsideClick: false,
@@ -287,19 +289,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
         this.tree.contextMenu.filter((data) => data.node.type === "folder" && data.node.level === 2)
             .subscribe(data => {
                 const contextMenu = [
-                    new MenuItem("Create new Folder", {
-                        click: () => {
-                            const modal = this.modal.fromComponent(CreateLocalFolderModalComponent, {
-                                closeOnOutsideClick: false,
-                                backdrop: true,
-                                title: `Create a new Folder in "${data.node.label}"`,
-                                closeOnEscape: true
-                            });
-
-                            modal.folderPath = data.node.id;
-                        }
-                    }),
-                    new MenuItem("Create new Workflow", {
+                    new MenuItem("New Workflow", {
                         click: () => {
                             const modal = this.modal.fromComponent(CreateAppModalComponent, {
                                 closeOnOutsideClick: false,
@@ -312,7 +302,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
                             modal.defaultFolder = data.node.id + "/";
                         }
                     }),
-                    new MenuItem("Create new Command Line Tool", {
+                    new MenuItem("New Command Line Tool", {
                         click: () => {
                             const modal = this.modal.fromComponent(CreateAppModalComponent, {
                                 closeOnOutsideClick: false,
@@ -323,6 +313,18 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
 
                             modal.appType       = "tool";
                             modal.defaultFolder = data.node.id + "/";
+                        }
+                    }),
+                    new MenuItem("New Folder", {
+                        click: () => {
+                            const modal = this.modal.fromComponent(CreateLocalFolderModalComponent, {
+                                closeOnOutsideClick: false,
+                                backdrop: true,
+                                title: `Create a new Folder in "${data.node.label}"`,
+                                closeOnEscape: true
+                            });
+
+                            modal.folderPath = data.node.id;
                         }
                     }),
                     new MenuItem("Remove from Workspace", {

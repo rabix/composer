@@ -4,11 +4,11 @@ import {Observable} from "rxjs/Observable";
 import {CwlSchemaValidationWorkerService} from "../cwl-schema-validation-worker/cwl-schema-validation-worker.service";
 
 export interface AppValidityState {
-    isValid: boolean,
+    isValidCWL: boolean,
     isInvalid: boolean,
     isPending: boolean,
     errors: Issue[],
-    warnings: Issue[]
+    warnings: Issue[],
 }
 
 @Injectable()
@@ -20,34 +20,32 @@ export class AppValidatorService {
     createValidator(contentStream: Observable<string>): Observable<AppValidityState> {
 
         const output = {
-            isValid: false,
-            isInvalid: false,
+            isValidCWL: false,
             isPending: true,
             errors: [],
             warnings: []
-        };
+        } as AppValidityState;
 
         const subs          = [];
         const preValidation = contentStream;
-        const validation    = preValidation.switchMap(content => {
+
+        const validation = preValidation.switchMap(content => {
             return Observable.fromPromise(this.cwlWorker.validate(content));
         });
 
         return new Observable(obs => {
             subs.push(
                 preValidation.subscribe(_ => obs.next(Object.assign({}, output, {
-                    isValid: false,
-                    isInvalid: false,
+                    isValidCWL: false,
                     isPending: true,
-                }))),
+                } as AppValidityState))),
 
                 validation.subscribe(val => obs.next(Object.assign(output, {
-                    isValid: val.isValidCWL,
-                    isInvalid: !val.isValidCWL,
+                    isValidCWL: val.isValidCWL,
                     isPending: false,
                     errors: val.errors,
                     warnings: val.warnings
-                }))));
+                } as AppValidityState))));
 
 
             return () => subs.forEach(sub => sub.unsubscribe());

@@ -5,6 +5,7 @@ import {
     OnChanges,
     OnInit,
     Output,
+    EventEmitter
 } from "@angular/core";
 import {Workflow} from "cwl-svg";
 import {StepModel, WorkflowModel, WorkflowStepInputModel} from "cwlts/models";
@@ -53,11 +54,26 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
                                 <!--Port options for all other types-->
                                 <div *ngIf="!isType(input, ['File', 'Directory'])" class="input-control">
-                                    <ct-dropdown-button [dropDownOptions]="dropDownPortOptions"
-                                                        (change)="onPortOptionChange(input, $event)"
-                                                        [value]="input.status"
-                                                        [readonly]="readonly">
-                                    </ct-dropdown-button>
+                                    
+                                    <ct-generic-dropdown-menu [ct-menu]="menu" menuAlign="left" [menuState]="openStatus">
+                                        <span>{{ input.status}}
+                                            <i class="fa fa-chevron-down fa-fw settings-icon"> </i>
+                                        </span>                                        
+                                    </ct-generic-dropdown-menu>
+
+                                    <ng-template #menu class="mr-1">
+                                        <ul class="list-unstyled">
+                                            <li *ngFor="let c of dropDownPortOptions" class="dropdown-port-option" 
+                                                [class.active]="input.status === c.value"
+                                                (click)="onPortOptionChange(input, c.value)">
+                                                <span>
+                                                    {{ c.caption }}
+                                                </span>
+                                                <span class="text-muted d-block small">{{ c.description }}</span>
+                                            </li>
+                                        </ul>
+                                    </ng-template>
+
                                 </div>
                             </div>
 
@@ -117,6 +133,8 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 })
 export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase implements OnInit, OnChanges {
 
+    openStatus = new Subject<boolean>();
+
     public dropDownPortOptions = [
         {
             value: "editable",
@@ -151,7 +169,7 @@ export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase imple
     public graph: Workflow;
 
     @Output()
-    public save = new Subject<WorkflowStepInputModel>();
+    public change = new EventEmitter();
 
     public group = [];
 
@@ -179,6 +197,8 @@ export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase imple
                 this.graph.redraw();
                 break;
         }
+
+        this.openStatus.next(false);
     }
 
     /**
@@ -239,6 +259,7 @@ export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase imple
 
         // Assign the given value to the step key
         OH.addProperty(this.step.inAsMap, prefix, value);
+        this.change.emit();
     }
 
     private handleConnectionChange = (src, dest) => {

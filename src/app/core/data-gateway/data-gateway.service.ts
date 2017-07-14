@@ -3,27 +3,28 @@ import * as YAML from "js-yaml";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {noop} from "../../lib/utils.lib";
+import {PlatformRepositoryService} from "../../repository/platform-repository.service";
 import {IpcService} from "../../services/ipc.service";
+import {AppHelper} from "../helpers/AppHelper";
 
 @Injectable()
 export class DataGatewayService {
 
     cacheInvalidation = new Subject<string>();
 
-    static getFileSource(id): "local" | "public" | "app" {
-        if (id.startsWith("/")) {
-            return "local";
-        }
+    /**
+     * @depreceated Can check AppHelper.isLocal directly
+     * @param id
+     * @returns {"local" | "app"}
+     */
+    static getFileSource(id): "local" | "app" {
 
-        if (id.startsWith("https://") || id.startsWith("http://")) {
-            return "public";
-        }
-
-        return "app";
+        return AppHelper.isLocal(id) ? "local" : "app";
     }
 
 
-    constructor(private ipc: IpcService) {
+    constructor(private ipc: IpcService,
+                private platformRepository: PlatformRepositoryService) {
     }
 
     checkIfPathExists(path) {
@@ -90,12 +91,11 @@ export class DataGatewayService {
     }
 
     resolveContent(content, path): Observable<Object | any> {
-
-        if (!path.startsWith("/")) {
-            return Observable.of(content).map(txt => YAML.safeLoad(txt, {json: true} as any));
+        if (AppHelper.isLocal(path)) {
+            return this.ipc.request("resolveContent", ({content, path})).take(1);
         }
 
-        return this.ipc.request("resolveContent", ({content, path})).take(1);
+        return Observable.of(content).map(txt => YAML.safeLoad(txt, {json: true} as any));
     }
 
 
@@ -116,19 +116,21 @@ export class DataGatewayService {
         return this.ipc.request("getUserByToken", {url, token});
     }
 
-    updateSwap(fileID, content): Observable<any> {
-        const isLocal = fileID.startsWith("/");
+    updateSwap(fileID, content): Promise<any> {
+        const isLocal = AppHelper.isLocal(fileID);
+        const appID   = isLocal ? fileID : AppHelper.getRevisionlessID(fileID);
 
-        let swapID = fileID;
-        if (!isLocal) {
-            swapID = fileID.split("/").slice(0, 3).join("/");
-        }
+        return Promise.all([
+            this.ipc.request("patchSwap", {
+                local: isLocal,
+                swapID: appID,
+                swapContent: content
+            }).toPromise(),
 
-        return this.ipc.request("patchSwap", {
-            local: isLocal,
-            swapID: swapID,
-            swapContent: content
-        });
+            // If there is no content, swap should be deleted, so then we need to remove swapUnlocked meta
+            content ? Promise.resolve() : this.platformRepository.patchAppMeta(appID, "swapUnlocked", false)]
+        );
+
     }
 
     sendFeedbackToPlatform(type: string, text: string): Promise<any> {

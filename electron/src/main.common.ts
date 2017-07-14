@@ -24,7 +24,7 @@ function start(config: { devTools: boolean, url: string }) {
         splash.show();
     });
 
-    splash.once("closed", () =>{
+    splash.once("closed", () => {
         splash = undefined;
     });
 
@@ -121,7 +121,7 @@ function start(config: { devTools: boolean, url: string }) {
                 {label: "Toggle DevTools", role: "toggledevtools"},
             ]
         }
-    ]));
+    ] as any[] /* types are not accurate for menu items */));
 }
 
 

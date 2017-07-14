@@ -55,7 +55,7 @@ import "rxjs/add/operator/toPromise";
 
             <div class="modal-footer">
                 <button class="btn btn-secondary" type="button" (click)="close()">Cancel</button>
-                <button class="btn btn-primary" type="submit" [class.btn-loader]="form.pending" [disabled]="!form.valid">
+                <button class="btn btn-primary" type="submit" [class.btn-loader]="form.pending" [disabled]="!form.valid || !form.dirty">
                     <ng-container *ngIf="!form.pending">Apply</ng-container>
                     <ct-circular-loader class="loader-25" *ngIf="form.pending"></ct-circular-loader>
                 </button>
@@ -163,7 +163,6 @@ export class PlatformCredentialsModalComponent implements OnInit {
 
                     return null;
                 }, rejection => {
-                    console.log("Token rejection", rejection);
                     return {tokenCheck: rejection.message};
                 });
 

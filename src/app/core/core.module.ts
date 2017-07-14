@@ -3,6 +3,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {BrowserModule} from "@angular/platform-browser";
 import {PublishModalComponent} from "app/core/modals/publish-modal/publish-modal.component";
 import {NgStringPipesModule} from "ngx-pipes";
+import {environment} from "../../environments/environment";
 import {AuthModule} from "../auth/auth.module";
 import {GettingStartedComponent} from "../components/onboarding/getting-started.component";
 import {NewFileTabComponent} from "../components/onboarding/new-file.component";
@@ -14,29 +15,33 @@ import {GuidService} from "../services/guid.service";
 import {ToolEditorModule} from "../tool-editor/tool-editor.module";
 import {ModalService} from "../ui/modal/modal.service";
 import {UIModule} from "../ui/ui.module";
-import {AddSourceModalComponent} from "./modals/add-source-modal/add-source-modal.component";
+import {WorkflowEditorModule} from "../workflow-editor/workflow-editor.module";
 import {ErrorReportComponent} from "./error-report/error-report.component";
-import {CreateLocalFolderModalComponent} from "./modals/create-local-folder-modal/create-local-folder-modal.component";
-import {PlatformCredentialsModalComponent} from "./modals/platform-credentials-modal/platform-credentials-modal.component";
+import {ModalErrorHandler} from "./error-report/modal-error-handler";
 import {LayoutComponent} from "./layout/layout.component";
+import {LayoutService} from "./layout/layout.service";
 import {LogoComponent} from "./logo/logo.component";
-import {SettingsMenuComponent} from "./workbox/settings-menu.component";
+import {AddSourceModalComponent} from "./modals/add-source-modal/add-source-modal.component";
+import {CreateAppModalComponent} from "./modals/create-app-modal/create-app-modal.component";
+import {CreateLocalFolderModalComponent} from "./modals/create-local-folder-modal/create-local-folder-modal.component";
+import {HintsModalComponent} from "./modals/hints-modal/hints-modal.component";
+import {PlatformCredentialsModalComponent} from "./modals/platform-credentials-modal/platform-credentials-modal.component";
+import {ProceedToEditingModalComponent} from "./modals/proceed-to-editing-modal/proceed-to-editing-modal.component";
+import {SendFeedbackModalComponent} from "./modals/send-feedback-modal/send-feedback.modal.component";
 import {AppsPanelComponent} from "./panels/apps-panel/apps-panel.component";
 import {MyAppsPanelComponent} from "./panels/my-apps-panel/my-apps-panel.component";
-import {PublicAppsPanelComponent} from "./panels/public-apps-panel/public-apps-panel.component";
 import {NavSearchResultComponent} from "./panels/nav-search-result/nav-search-result.component";
-import {WorkBoxComponent} from "./workbox/workbox.component";
-import {WorkBoxTabComponent} from "./workbox/workbox-tab.component";
 import {PanelContainerComponent} from "./panels/panel-container/panel-container.component";
-import {SendFeedbackModalComponent} from "./modals/send-feedback-modal/send-feedback.modal.component";
-import {CreateAppModalComponent} from "./modals/create-app-modal/create-app-modal.component";
+import {PublicAppsPanelComponent} from "./panels/public-apps-panel/public-apps-panel.component";
 import {WebWorkerBuilderService} from "./web-worker/web-worker-builder.service";
+import {SettingsMenuComponent} from "./workbox/settings-menu.component";
+import {WorkBoxTabComponent} from "./workbox/workbox-tab.component";
+import {WorkBoxComponent} from "./workbox/workbox.component";
 import {WorkboxService} from "./workbox/workbox.service";
-import {LayoutService} from "./layout/layout.service";
-import {ModalErrorHandler} from "./error-report/modal-error-handler";
-import {WorkflowEditorModule} from "../workflow-editor/workflow-editor.module";
-import {ProceedToEditingModalComponent} from "./modals/proceed-to-editing-modal/proceed-to-editing-modal.component";
-import {HintsModalComponent} from "./modals/hints-modal/hints-modal.component";
+
+export function errorHandlerFactory(modal: ModalService) {
+    return environment.production ? new ModalErrorHandler(modal) : new ErrorHandler();
+}
 
 @NgModule({
     entryComponents: [
@@ -85,7 +90,11 @@ import {HintsModalComponent} from "./modals/hints-modal/hints-modal.component";
         ModalService,
         LayoutService,
         PlatformAPI,
-        // {provide: ErrorHandler, useClass: ModalErrorHandler}
+        {
+            provide: ErrorHandler,
+            useFactory: errorHandlerFactory,
+            deps: [ModalService]
+        }
     ],
     imports: [
         BrowserModule,

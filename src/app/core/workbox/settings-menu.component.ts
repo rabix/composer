@@ -1,4 +1,5 @@
 import {Component} from "@angular/core";
+import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {AuthService} from "../../auth/auth.service";
 import {AuthCredentials} from "../../auth/model/auth-credentials";
@@ -17,12 +18,12 @@ import {WorkboxService} from "./workbox.service";
     template: `
         <ct-generic-dropdown-menu [ct-menu]="menu" menuAlign="left" [menuState]="openStatus">
             <span *ngIf="active">{{ userLabel }}</span>
-            <i class="fa fa-sliders fa-fw settings-icon" *ngIf="!active"> </i>
+            <i class="fa fa-chevron-down fa-fw settings-icon"> </i>
         </ct-generic-dropdown-menu>
 
         <ng-template #menu class="mr-1">
             <ul class="list-unstyled">
-                <li *ngFor="let c of auth.getCredentials() | async"
+                <li *ngFor="let c of credentials | async"
                     (click)="setActiveUser(c)">
                     <span>
                         {{ c.user.username }} 
@@ -31,7 +32,7 @@ import {WorkboxService} from "./workbox.service";
                     </span>
                     <span class="text-muted d-block small">{{ c.url }}</span>
                 </li>
-                <li (click)="openSettings()"><i class="fa fa-sliders fa-fw"></i> Settings</li>
+                <li (click)="openSettings()"><i class="fa fa-cog fa-fw"></i> Settings</li>
                 <li (click)="openFeedback()"><i class="fa fa-bullhorn fa-fw"></i> Send Feedback</li>
             </ul>
         </ng-template>
@@ -39,7 +40,7 @@ import {WorkboxService} from "./workbox.service";
 })
 export class SettingsMenuComponent extends DirectiveBase {
 
-    public hasWarning = false;
+    hasWarning = false;
 
     active: AuthCredentials;
 
@@ -47,14 +48,20 @@ export class SettingsMenuComponent extends DirectiveBase {
 
     openStatus = new Subject<boolean>();
 
+    credentials: Observable<AuthCredentials[]>;
+
     constructor(private workbox: WorkboxService,
                 private settings: SettingsService,
                 private modal: ModalService,
                 private system: SystemService,
                 private global: GlobalService,
-                public auth: AuthService) {
+                private auth: AuthService) {
         super();
+
         settings.validity.subscribeTracked(this, isValid => this.hasWarning = !isValid);
+
+        // Store the stream locally so we don't have a auth.getCredentials function call in the template
+        this.credentials = auth.getCredentials();
 
         auth.getActive().subscribeTracked(this, cred => {
             this.active = cred;
@@ -64,12 +71,12 @@ export class SettingsMenuComponent extends DirectiveBase {
         });
     }
 
-    openSettings() {
+    openSettings(): void {
         this.workbox.openSettingsTab();
         this.openStatus.next(false);
     }
 
-    openFeedback() {
+    openFeedback(): void {
         if (!this.active) {
             this.system.openLink("mailto:support@sbgenomics.com?subject=Rabix Composer Feedback");
             return;
@@ -80,7 +87,14 @@ export class SettingsMenuComponent extends DirectiveBase {
         this.openStatus.next(false);
     }
 
-    setActiveUser(c) {
+    setActiveUser(c): void {
+
+        // If we click on a user that is already active, nothing should be done.
+        if (this.active === c) {
+            this.openStatus.next(false);
+            return;
+        }
+
         this.auth.setActiveCredentials(c).then((user) => {
             if (c) {
                 this.global.reloadPlatformData();

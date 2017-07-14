@@ -18,7 +18,7 @@ import {ModalService} from "../../ui/modal/modal.service";
             <!--Item-->
             <div class="item">
                 <p class="subtitle">New to Rabix Composer?</p>
-                <p>Rabix Composer is a standalone editor Common Workflow Language tools and workflows.
+                <p>Rabix Composer is a standalone editor for Common Workflow Language tools and workflows.
                     <a data-test="new-to-link" href
                        (click)="openLink('https://github.com/rabix/cottontail-frontend/wiki/Introduction-to-Rabix-and-Rabix-Composer'); false;">
                         Learn more
@@ -43,7 +43,7 @@ import {ModalService} from "../../ui/modal/modal.service";
                 <p class="subtitle">Need help?</p>
                 <p>If you have any problem, idea or a thought let us know.</p>
                 <p>
-                    <button type="button" data-test="get-support-btn" class="btn btn-secondary"
+                    <button type="button" data-test="get-support-btn" class="btn btn-primary"
                             (click)="initiateFeedbackDialog()">
                         Get support
                     </button>

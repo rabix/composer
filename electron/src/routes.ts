@@ -176,7 +176,6 @@ module.exports = {
             }
 
         }, err => {
-            console.log("Watch user error");
             callback(err)
         });
     },
@@ -239,7 +238,7 @@ module.exports = {
 
             if (platformFetchingLocks[targetID]) {
                 const currentFetch = platformFetchingLocks[targetID];
-                currentFetch.then(data => callback(data)).catch(callback);
+                currentFetch.then(data => callback(null, data)).catch(callback);
                 return
             }
 
@@ -266,7 +265,7 @@ module.exports = {
                         if (err) return reject(err);
 
                         resolve(data);
-                    }, targetCredentials.id);
+                    }, targetID);
                 });
 
             });
@@ -276,8 +275,7 @@ module.exports = {
                 delete platformFetchingLocks[targetID];
             }).catch(callback);
 
-
-        }, err => callback(err));
+        }, callback);
     },
 
     /**
@@ -297,7 +295,10 @@ module.exports = {
 
             swapController.exists(data.id, (err, exists) => {
 
-                if (err) return callback(err);
+                if (err) {
+                    callback(err);
+                    return;
+                }
 
                 if (exists) {
                     swapController.read(data.id, callback);
@@ -403,7 +404,6 @@ module.exports = {
             const originalUser = repository.user;
 
             const off = repository.on("update.user", (user) => {
-                console.log("user comparison", typeof user, typeof originalUser);
                 if (user !== originalUser) {
                     off();
                     // @FIXME hack for event receiving order, have no idea why it forks for the moment, figure it out later
@@ -430,5 +430,34 @@ module.exports = {
                 callback(null, result);
             }, callback);
         }).catch(callback);
+    },
+
+    patchAppMeta: (data: {
+        profile: "local" | "user",
+        appID: string,
+        key: string,
+        value: any,
+    }, callback) => {
+        const {profile, appID, key, value} = data;
+
+        repositoryLoad.then(() => {
+
+
+            const allMeta = repository[profile].appMeta;
+
+            if (allMeta[appID]) {
+                allMeta[appID][key] = value;
+            } else {
+                allMeta[appID] = {[key]: value};
+            }
+
+            if (profile === "local") {
+                repository.updateLocal({appMeta: allMeta}, callback);
+                return;
+            }
+
+            repository.updateUser({appMeta: allMeta}, callback);
+
+        }, callback);
     }
 };

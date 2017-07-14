@@ -19,24 +19,21 @@
     .no-results {
         text-align: center;
         color: $layout-text-color-faded;
-        .icon {
-            color: #212121;
-        }
     }
 
     /deep/ {
 
         .fa-folder-open,
         .fa-folder {
-            color: #a8b2c1;
+            color: $light-gray;
         }
 
         .fa-file {
-            color: #e6e6e6;
+            color: $smoke;
         }
 
         .fa-share-alt {
-            color: #e29834;
+            color: $carrot;
             -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=#{0}, mirror=1)";
             -webkit-transform: scale(-1, 1);
             -ms-transform: scale(-1, 1);
@@ -44,7 +41,7 @@
         }
 
         .fa-terminal {
-            color: #a184dc;
+            color: $purple;
         }
     }
 

@@ -14,7 +14,7 @@
     }
 
     .head {
-        background: $layout-title-bar-background;
+        background: $black;
         flex-basis: $layout-title-bar-height;
         line-height: $layout-title-bar-height;
         width: 100%;
@@ -62,16 +62,16 @@
     }
 
     .tab {
+        background: $body-bg;
+        border-left: 1px solid $black;
+        color: $text-muted;
+        cursor: pointer;
         flex: 1;
+        line-height: 36px;
         max-width: 275px;
         min-width: 40px;
         padding: 0 24px 10px 10px;
         position: relative;
-        color: $text-muted;
-        background: $body-bg;
-        border-left: 1px solid #4d4d4d;
-        border-right: 1px solid #373a3c;
-        line-height: 36px;
 
         .tab-icon {
             flex-basis: 18px;

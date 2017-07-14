@@ -1,10 +1,10 @@
 import {
     Component,
     Input,
-    OnChanges,
-    SimpleChanges
+    OnChanges, Output,
+    SimpleChanges,
+    EventEmitter
 } from "@angular/core";
-import {FormGroup} from "@angular/forms";
 import {WorkflowModel} from "cwlts/models";
 import {SystemService} from "../../../platform-providers/system.service";
 import {
@@ -46,20 +46,10 @@ import {
             <div class="info-section">
                 <div class="app-info-meta">
 
-                    <!--Categories-->
-                    <div class="col-lg-4 col-sm-6 app-info-meta-item">
-                        <div class="text-title">Categories:</div>
-                        <ct-inline-editor [value]="model.customProps['sbg:categories']"
-                                          type="tags"
-                                          [disabled]="readonly"
-                                          [options]="categories"
-                                          (saveData)="updateCustomProp('sbg:categories', $event)">
-                            {{ (model.customProps['sbg:categories'] || []).join(", ")}}
-                        </ct-inline-editor>
-                    </div>
+
 
                     <!--Toolkit-->
-                    <div class="col-lg-4 col-sm-6 app-info-meta-item">
+                    <div class="col-lg-4 col-sm-6 app-info-meta-item" *ngIf="isToolkit()">
                         <div class="text-title">Toolkit:</div>
                         <div>
                             <ct-inline-editor [disabled]="readonly" class="toolkit"
@@ -78,9 +68,20 @@ import {
                         </div>
                     </div>
 
+                    <!--Author-->
+                    <div class="col-lg-4 col-sm-6 app-info-meta-item">
+                        <div class="text-title">{{isToolkit()? "Toolkit" : "Workflow"}} Author:</div>
+                        <ct-inline-editor [value]="model.customProps['sbg:toolAuthor']"
+                                          [disabled]="readonly"
+                                          type="text"
+                                          (saveData)="updateCustomProp('sbg:toolAuthor', $event)">
+                            {{model.customProps['sbg:toolAuthor']}}
+                        </ct-inline-editor>
+                    </div>
+
                     <!--License-->
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
-                        <div class="text-title">License:</div>
+                        <div class="text-title">{{isToolkit()? "Toolkit" : "Workflow"}} License:</div>
                         <ct-inline-editor [value]="model.customProps['sbg:license']"
                                           [disabled]="readonly"
                                           type="text"
@@ -88,6 +89,13 @@ import {
                             <div>{{model.customProps['sbg:license']}}</div>
                         </ct-inline-editor>
                     </div>
+
+                    <!--Contributors-->
+                    <div class="col-lg-4 col-sm-6 app-info-meta-item">
+                        <div class="text-title">Contributors:</div>
+                        {{(model.customProps['sbg:contributors'] || []).join(", ")}}
+                    </div>
+
 
                     <!--Wrapper Author-->
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
@@ -111,21 +119,16 @@ import {
                         </ct-inline-editor>
                     </div>
 
-                    <!--Author-->
+                    <!--Categories-->
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
-                        <div class="text-title">Author:</div>
-                        <ct-inline-editor [value]="model.customProps['sbg:toolAuthor']"
+                        <div class="text-title">Categories:</div>
+                        <ct-inline-editor [value]="model.customProps['sbg:categories']"
+                                          type="tags"
                                           [disabled]="readonly"
-                                          type="text"
-                                          (saveData)="updateCustomProp('sbg:toolAuthor', $event)">
-                            {{model.customProps['sbg:toolAuthor']}}
+                                          [options]="categories"
+                                          (saveData)="updateCustomProp('sbg:categories', $event)">
+                            {{ (model.customProps['sbg:categories'] || []).join(", ")}}
                         </ct-inline-editor>
-                    </div>
-
-                    <!--Contributors-->
-                    <div class="col-lg-4 col-sm-6 app-info-meta-item">
-                        <div class="text-title">Contributors:</div>
-                        {{(model.customProps['sbg:contributors'] || []).join(", ")}}
                     </div>
 
                     <!--CWL version-->
@@ -281,12 +284,11 @@ export class AppInfoComponent implements OnChanges {
     @Input()
     public readonly = false;
 
-    /** ControlGroup that encapsulates the validation for all the nested forms */
-    @Input()
-    formGroup: FormGroup;
-
     @Input()
     model: WorkflowModel | CommandLineToolModel;
+
+    @Output()
+    change = new EventEmitter();
 
     public createdBy: string;
     public createdOn: number;
@@ -319,17 +321,17 @@ export class AppInfoComponent implements OnChanges {
 
     updateLabel(value: string) {
         this.model.label = value;
-        this.formGroup.markAsDirty();
+        this.change.next();
     }
 
     updateDescription(value: string) {
         this.model.description = value;
-        this.formGroup.markAsDirty();
+        this.change.next();
     }
 
     updateCustomProp(key: string, value: any) {
         this.model.customProps[key] = value;
-        this.formGroup.markAsDirty();
+        this.change.next();
     }
 
     openWebPage(url: string) {
@@ -341,4 +343,9 @@ export class AppInfoComponent implements OnChanges {
             this.viewMode = tabName;
         });
     }
+
+    isToolkit() {
+        return this.model instanceof  CommandLineToolModel;
+    }
+
 }

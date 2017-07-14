@@ -4,6 +4,7 @@ import {Observable} from "rxjs/Observable";
 import {App} from "../../../../../electron/src/sbg-api-client/interfaces/app";
 
 import {LocalFileRepositoryService} from "../../../file-repository/local-file-repository.service";
+import {LocalRepositoryService} from "../../../repository/local-repository.service";
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {TreeNode} from "../../../ui/tree-view/tree-node";
 import {TreeViewComponent} from "../../../ui/tree-view/tree-view.component";
@@ -13,26 +14,39 @@ import {TabData} from "../../workbox/tab-data.interface";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.component";
 import {PublicAppsPanelService} from "./public-apps-panel.service";
-import {LocalRepositoryService} from "../../../repository/local-repository.service";
+import {Subject} from "rxjs/Subject";
+import {AppHelper} from "../../helpers/AppHelper";
 
 @Component({
     selector: "ct-public-apps-panel",
     template: `
         <ct-search-field class="m-1" [formControl]="searchContent"
-                         [placeholder]="'Search Public Apps...'"></ct-search-field>
+                         [placeholder]="'Search Public Apps'"></ct-search-field>
 
         <div class="btn-group grouping-toggle" *ngIf="!searchContent?.value">
-            <button type="button"
-                    [class.active]="grouping === 'toolkit'"
-                    (click)="switchGrouping('toolkit')"
-                    class="btn btn-secondary">By Toolkit
-            </button>
 
-            <button type="button"
-                    (click)="switchGrouping('category')"
-                    [class.active]="grouping === 'category'"
-                    class="btn btn-secondary">By Category
-            </button>
+                <label class="input-label" title="Group By:">
+                    Group by: 
+                </label>                
+     
+                <ct-generic-dropdown-menu [ct-menu]="menu" [menuState]="groupByOpenStatus">
+                    <span>{{ grouping }}
+                        <i class="fa fa-chevron-down fa-fw settings-icon"> </i>
+                    </span>
+                    
+                </ct-generic-dropdown-menu>
+
+                <ng-template #menu class="mr-1">
+                    <ul class="list-unstyled">
+                        <li *ngFor="let c of groupByOptions" class="group-by-item" [class.active]="grouping === c.value"
+                            (click)="switchGrouping(c.value)">
+                                            <span>
+                                                {{ c.caption }}
+                                            </span>
+                        </li>
+                    </ul>
+                </ng-template>      
+
         </div>
 
         <div class="scroll-container">
@@ -70,13 +84,31 @@ import {LocalRepositoryService} from "../../../repository/local-repository.servi
             <ct-tree-view #tree
                           [level]="1"
                           [class.hidden]="searchContent?.value"
-                          [nodes]="grouping === 'toolkit' ? (appsByToolkit | async) : (appsByCategory | async)"></ct-tree-view>
+                          [nodes]="grouping === 'none' ? (appsByNone | async) 
+                          : grouping === 'toolkit' ? (appsByToolkit|async) : (appsByCategory | async)"></ct-tree-view>
         </div>
     `,
     providers: [LocalFileRepositoryService, PublicAppsPanelService],
     styleUrls: ["./public-apps-panel.component.scss"]
 })
 export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, AfterViewInit {
+
+    groupByOptions = [
+        {
+            value: "none",
+            caption: "None"
+        },
+        {
+            value: "toolkit",
+            caption: "Toolkit"
+        },
+        {
+            value: "category",
+            caption: "Category"
+        }
+    ];
+
+    groupByOpenStatus = new Subject<boolean>();
 
     treeNodes: TreeNode<any>[] = [];
 
@@ -86,9 +118,11 @@ export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, A
 
     expandedNodes;
 
+    form: FormControl;
+
     groupedNodes: TreeNode<any>[];
 
-    grouping: "category" | "toolkit" | string = "toolkit";
+    grouping: "category" | "toolkit" | "none" | string = "none";
 
     @ViewChild(TreeViewComponent)
     treeComponent: TreeViewComponent;
@@ -100,6 +134,7 @@ export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, A
 
     appsByToolkit: Observable<TreeNode<any>[]>;
     appsByCategory: Observable<TreeNode<any>[]>;
+    appsByNone: Observable<TreeNode<any>[]>;
 
     constructor(private workbox: WorkboxService,
                 private localRepository: LocalRepositoryService,
@@ -110,11 +145,12 @@ export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, A
 
         this.appsByToolkit  = this.service.getAppsGroupedByToolkit();
         this.appsByCategory = this.service.getAppsGroupedByCategory();
+        this.appsByNone = this.service.getAppsByNone();
     }
 
     ngOnInit() {
 
-        this.localRepository.getPublicAppsGrouping().take(1).subscribeTracked(this, (grouping) =>{
+        this.localRepository.getPublicAppsGrouping().take(1).subscribeTracked(this, (grouping) => {
             this.grouping = grouping;
         });
 
@@ -135,8 +171,11 @@ export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, A
         });
     }
 
-    switchGrouping(type: "toolkit" | "category") {
+    switchGrouping(type: "toolkit" | "category" | "none") {
         this.grouping = type;
+
+        // Close dropdown
+        this.groupByOpenStatus.next(false);
 
         this.localRepository.setPublicAppsGrouping(type);
     }
@@ -146,14 +185,14 @@ export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, A
             return apps.map(app => {
 
                 return {
-                    id: app.id,
+                    id: AppHelper.getRevisionlessID(app.id),
                     icon: app.raw["class"] === "Workflow" ? "fa-share-alt" : "fa-terminal",
                     title: app.name,
                     label: app.id.split("/").join(" → "),
                     relevance: 1.5,
 
                     tabData: {
-                        id: app.id,
+                        id: AppHelper.getRevisionlessID(app.id),
                         isWritable: false,
                         label: app.name,
                         language: "json",
@@ -201,13 +240,14 @@ export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, A
         const appOpening = this.tree.open.filter(n => n.type === "app");
 
         appOpening.subscribeTracked(this, (node: TreeNode<App>) => {
+
             const app = node.data;
             if (!app.raw || !app.raw.class) {
                 return;
             }
 
             const tab = this.workbox.getOrCreateAppTab({
-                id: app.id,
+                id: AppHelper.getRevisionlessID(app.id),
                 language: "json",
                 isWritable: false,
                 type: app.raw.class,
