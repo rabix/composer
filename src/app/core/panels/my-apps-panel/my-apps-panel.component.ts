@@ -318,13 +318,10 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
                     new MenuItem("New Folder", {
                         click: () => {
                             const modal = this.modal.fromComponent(CreateLocalFolderModalComponent, {
-                                closeOnOutsideClick: false,
-                                backdrop: true,
                                 title: `Create a new Folder in "${data.node.label}"`,
-                                closeOnEscape: true
                             });
 
-                            modal.folderPath = data.node.id;
+                            modal.rootFolder = data.node.id;
                         }
                     }),
                     new MenuItem("Remove from Workspace", {

@@ -1,69 +1,110 @@
 import {Component, Input, OnInit} from "@angular/core";
-import {FormControl, Validators} from "@angular/forms";
+import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {LocalFileRepositoryService} from "../../../file-repository/local-file-repository.service";
+import {ModalService} from "../../../ui/modal/modal.service";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
-import {ModalService} from "../../../ui/modal/modal.service";
+import {FormAsyncValidator} from "../../forms/helpers/form-async-validator";
 
 @Component({
-    selector: 'ct-create-local-folder-modal',
-    template: `        
-        <div class="p-1">
+    selector: "ct-create-local-folder-modal",
+    styleUrls: ["./create-local-folder-modal.component.scss"],
+    template: `
+        <form [formGroup]="form" (submit)="onSubmit(form.getRawValue())">
 
-            <div class="form-group">
-                <label class="">Folder Name:</label>
-                <input class="form-control" type="text" [formControl]="folderName"/>
+            <div class="p-1">
+                <div class="form-group">
+                    <label>Folder Name:</label>
+                    <input autofocus="true" class="form-control" formControlName="folderName"/>
+                </div>
+
+                <div class="alert alert-warning" *ngIf="form.hasError('exists', 'folderName')">
+                    Folder with this name already exists. Please choose another name.
+                </div>
+
+                <div class="alert alert-warning" *ngIf="form.hasError('invalidName', 'folderName')">
+                    {{ form.getError('invalidName', 'folderName') }}
+                </div>
+
+                <div class="alert alert-danger" *ngIf="form.hasError('creationFailure')">
+                    {{ form.getError('creationFailure') }}
+                </div>
+
+
             </div>
 
-            <div class="alert alert-danger" *ngIf="folderName.errors && folderName.errors.exists">
-                This folder name already exists. Choose another name!
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="modal.close()">Cancel</button>
+                <button type="submit" class="btn btn-primary" [disabled]="!form.valid">
+                    <ct-loader-button-content [isLoading]="form.pending">Create</ct-loader-button-content>
+                </button>
             </div>
-        </div>
 
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" (click)="modal.close()"> Cancel</button>
-            <button type="button"
-                    class="btn btn-primary"
-                    (click)="createFolder()"
-                    [disabled]="folderName.invalid">
-                Create
-            </button>
-        </div>
+        </form>
     `
 })
-export class CreateLocalFolderModalComponent implements OnInit {
-    @Input() folderPath: string;
-             folderName: FormControl;
-             error: string;
-             checking = false;
+export class CreateLocalFolderModalComponent extends DirectiveBase implements OnInit {
+    @Input()
+    rootFolder: string;
+
+    error: string;
+    form: FormGroup;
 
     constructor(private dataGateway: DataGatewayService,
+                private localFileRepository: LocalFileRepositoryService,
                 public modal: ModalService) {
+        super();
     }
 
     hasFolderNameAsyncValidator(control: FormControl) {
         return new Promise(resolve => {
 
-            this.dataGateway.checkIfPathExists(this.folderPath + "/" + control.value)
-                .subscribe((val) => {
-                if (val.exists) {
-                    resolve({"exists": true});
-                } else {
-                    resolve(null);
-                }
-            });
+            this.dataGateway.checkIfPathExists(this.rootFolder + "/" + control.value).take(1)
+                .subscribeTracked(this, (val) => {
+                    if (val.exists) {
+                        resolve({exists: true});
+                    } else {
+                        resolve(null);
+                    }
+                });
         });
     }
 
-    createFolder() {
-        this.dataGateway.createLocalFolder(this.folderPath + "/" + this.folderName.value).subscribe(() => {
-            this.dataGateway.invalidateFolderListing(this.folderPath);
-            this.modal.close();
-        });
+    onSubmit() {
+        const fullPath = `${this.rootFolder}/${this.form.get("folderName").value}`;
+
+        this.dataGateway
+            .createLocalFolder(fullPath).take(1)
+            .subscribeTracked(this, () => {
+                this.localFileRepository.reloadPath(this.rootFolder);
+                this.modal.close();
+            }, err => {
+                this.form.setErrors({
+                    creationFailure: err.message
+                })
+            });
     }
 
     ngOnInit() {
-        this.folderName = new FormControl("",
-            [Validators.required, Validators.pattern('^[a-zA-Zа-яА-Я0-9_!]+$')],
-            [this.hasFolderNameAsyncValidator.bind(this)]);
+        this.form = new FormGroup({
+            folderName: new FormControl("",
+                [
+                    Validators.required,
+                    (control: FormControl) => {
+                        const hasIllegalChar = new RegExp("[‘“!#$%&+^<=>`]").exec(control.value);
+
+                        if (!hasIllegalChar) {
+                            return null;
+                        }
+
+                        const invalidName = `Invalid character “${hasIllegalChar[0]}” at index ${hasIllegalChar.index}.`;
+                        return {invalidName};
+
+                    }
+                ],
+                FormAsyncValidator.debounceValidator(this.hasFolderNameAsyncValidator.bind(this))
+            )
+        });
     }
 }
