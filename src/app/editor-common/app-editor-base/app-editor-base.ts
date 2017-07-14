@@ -14,12 +14,14 @@ import {AppTabData} from "../../core/workbox/app-tab-data";
 import {NotificationBarService} from "../../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {StatusControlProvider} from "../../layout/status-bar/status-control-provider.interface";
+import {PlatformRepositoryService} from "../../repository/platform-repository.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {AppValidatorService, AppValidityState} from "../app-validator/app-validator.service";
 import {PlatformAppService} from "../components/platform-app-common/platform-app.service";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
 import {APP_SAVER_TOKEN, AppSaver} from "../services/app-saving/app-saver.interface";
+import "rxjs/add/operator/do";
 
 export abstract class AppEditorBase extends DirectiveBase implements StatusControlProvider, OnInit, AfterViewInit {
 
@@ -84,7 +86,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 protected injector: Injector,
                 protected appValidator: AppValidatorService,
                 protected codeSwapService: CodeSwapService,
-                protected platformAppService: PlatformAppService) {
+                protected platformAppService: PlatformAppService,
+                protected platformRepository: PlatformRepositoryService) {
 
         super();
     }
@@ -172,10 +175,12 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             .withLatestFrom(externalCodeChanges, (_, latestCode) => latestCode)
             .switchMap(latestCode => {
                 const validation = validationCompletion.startWith(this.validationState);
-                const modelCode  = Observable.of(latestCode).merge(externalCodeChanges).distinctUntilChanged();
+                const modelCode  = externalCodeChanges.startWith(latestCode).distinctUntilChanged();
                 return modelCode.switchMap(code => validation, (code, validation) => code);
             })
-            .subscribeTracked(this, code => {
+            .withLatestFrom(this.platformRepository.getAppMeta(this.tabData.id, "swapUnlocked"))
+            .subscribeTracked(this, data => {
+                const [code, unlocked] = data;
 
                 this.isLoading = false;
 
@@ -189,11 +194,11 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
                     if (!this.tabData.isWritable) {
                         this.isUnlockable = false;
-                    } else if (hasCopyOfProperty) {
+                    } else if (hasCopyOfProperty && !unlocked) {
                         this.isUnlockable = true;
                     }
 
-                    if (this.isUnlockable && hasCopyOfProperty) {
+                    if (this.isUnlockable && hasCopyOfProperty && !unlocked) {
                         this.toggleLock(true);
                     }
                 }, err => console.warn);
@@ -478,6 +483,14 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     protected abstract recreateModel(json: Object): void;
 
     protected toggleLock(locked: boolean): void {
+
+        if (locked === false) {
+            this.platformRepository.patchAppMeta(this.tabData.id, "swapUnlocked", true).then(result => {
+                console.log("Swap unlocked");
+            });
+
+            this.isUnlockable = false;
+        }
 
         this.isReadonly = locked;
         if (locked) {

@@ -69,8 +69,9 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
                 injector: Injector,
                 appValidator: AppValidatorService,
                 codeSwapService: CodeSwapService,
+                platformRepository: PlatformRepositoryService,
                 platformAppService: PlatformAppService) {
-        super(statusBar, errorBar, modal, inspector, dataGateway, injector, appValidator, codeSwapService, platformAppService);
+        super(statusBar, errorBar, modal, inspector, dataGateway, injector, appValidator, codeSwapService, platformAppService, platformRepository);
     }
 
     ngOnInit(): any {

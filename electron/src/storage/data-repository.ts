@@ -95,11 +95,11 @@ export class DataRepository {
         });
     }
 
-    updateLocal(data: Partial<LocalRepository>, callback) {
+    updateLocal(data: Partial<LocalRepository>, callback?: (err?: Error, data?: any) => void) {
         this.update("local", data, callback);
     }
 
-    updateUser(data: Partial<UserRepository>, callback, profileID?) {
+    updateUser(data: Partial<UserRepository>, callback?: (err?: Error, data?: any) => void, profileID?) {
 
         if (profileID) {
 
@@ -119,7 +119,7 @@ export class DataRepository {
      * Sets a listener for an event name
      * @return off function
      */
-    on(eventType: string, callback: Function): () => void {
+    on(eventType: string, callback: (result: any) => void): () => void {
 
         if (!this.listeners[eventType]) {
             this.listeners[eventType] = [];
