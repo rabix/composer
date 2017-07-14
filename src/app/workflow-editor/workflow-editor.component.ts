@@ -127,6 +127,10 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
             }, {});
 
             this.dataModel.steps.forEach(step => {
+                // a non-sbg app might be embedded in an sbg workflow
+                if (!step.run.customProps || !step.run.customProps["sbg:id"]) {
+                    return;
+                }
 
                 const revisionless = step.run.customProps["sbg:id"].split("/").slice(0, 3).join("/");
                 const revision     = Number(step.run.customProps["sbg:id"].split("/").pop());
@@ -192,7 +196,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
      * the text has been formatted by the GUI editor
      */
     protected getModelText(embed = false): string {
-        const wf          = embed ? this.dataModel.serializeEmbedded() : this.dataModel.serialize();
+        const wf          = embed || this.tabData.dataSource === "app" ? this.dataModel.serializeEmbedded() : this.dataModel.serialize();
         const modelObject = Object.assign(wf, {"sbg:modified": true});
 
         return this.tabData.language === "json" || this.tabData.dataSource === "app" ?
