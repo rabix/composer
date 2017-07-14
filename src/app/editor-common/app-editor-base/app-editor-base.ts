@@ -12,7 +12,7 @@ import {ProceedToEditingModalComponent} from "../../core/modals/proceed-to-editi
 import {PublishModalComponent} from "../../core/modals/publish-modal/publish-modal.component";
 import {AppTabData} from "../../core/workbox/app-tab-data";
 import {
-    ErrorNotification,
+    ErrorNotification, InfoNotification,
     NotificationBarService
 } from "../../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
@@ -195,6 +195,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     if (!this.tabData.isWritable) {
                         this.isUnlockable = false;
                     } else if (hasCopyOfProperty && !unlocked) {
+                        this.notificationBar.showNotification(
+                            new InfoNotification("This app is a copy of " + this.dataModel.customProps["sbg:copyOf"]));
                         this.isUnlockable = true;
                     }
 

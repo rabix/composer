@@ -18,7 +18,7 @@ import {Notification, NotificationBarService} from "./notification-bar.service";
                     {{notification.message}}
                 </div>
 
-                <i class="fa fa-times pr-1 clickable" (click)="close(entry)"></i>
+                <i class="fa fa-times pr-1 clickable" (click)="close(notification)"></i>
             </div>   
 
     `

@@ -7,7 +7,7 @@ export class Notification {
     type: "error" | "warning" | "info" | string;
     duration: number;
 
-    constructor(message: string, type, duration: number = 3000) {
+    constructor(message: string, type, duration: number = Infinity) {
         this.message = message;
         this.type = type;
         this.duration = duration;
