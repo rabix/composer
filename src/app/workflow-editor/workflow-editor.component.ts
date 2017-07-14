@@ -4,6 +4,7 @@ import * as Yaml from "js-yaml";
 import "rxjs/add/operator/debounceTime";
 import "rxjs/add/operator/merge";
 import "rxjs/add/operator/switchMap";
+import {Observable} from "rxjs/Observable";
 import {CodeSwapService} from "../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
 import {AppEditorBase} from "../editor-common/app-editor-base/app-editor-base";
@@ -117,37 +118,38 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
             })
             .filter(v => v);
 
-        this.platformRepository.getUpdates(nestedAppRevisionlessIDs).then(result => {
+        // We are wrapping a promise as a tracked observable so we easily dispose of it when component gets destroyed
+        // If this gets destroyed while fetch is in progress, when it completes it will try to access the destroyed view
+        // which results in throwing an exception
+        Observable.fromPromise(this.platformRepository.getUpdates(nestedAppRevisionlessIDs))
+            .finally(() => this.statusBar.stopProcess(updateStatusProcess))
+            .subscribeTracked(this, result => {
 
-            const appRevisionMap = result.reduce((acc, item) => {
+                const appRevisionMap = result.reduce((acc, item) => {
 
-                const revisionlessID = item.id.split("/").slice(0, 3).join("/");
-                return {...acc, [revisionlessID]: item.revision};
-            }, {});
+                    const revisionlessID = item.id.split("/").slice(0, 3).join("/");
+                    return {...acc, [revisionlessID]: item.revision};
+                }, {});
 
-            this.dataModel.steps.forEach(step => {
+                this.dataModel.steps.forEach(step => {
 
-                const revisionless = step.run.customProps["sbg:id"].split("/").slice(0, 3).join("/");
-                const revision     = Number(step.run.customProps["sbg:id"].split("/").pop());
+                    const revisionless = step.run.customProps["sbg:id"].split("/").slice(0, 3).join("/");
+                    const revision     = Number(step.run.customProps["sbg:id"].split("/").pop());
 
-                if (appRevisionMap[revisionless] === undefined) {
-                    return;
-                }
+                    if (appRevisionMap[revisionless] === undefined) {
+                        return;
+                    }
 
-                step.hasUpdate = appRevisionMap[revisionless] > revision;
+                    step.hasUpdate = appRevisionMap[revisionless] > revision;
+                });
+
+                setTimeout(() => {
+                    this.cdr.markForCheck();
+                    this.cdr.detectChanges();
+                });
+            }, err => {
+                this.errorBar.showError("Cannot get app updates. " + (err.error ? err.error.message : err.message));
             });
-
-            setTimeout(() => {
-                this.cdr.markForCheck();
-                this.cdr.detectChanges();
-            });
-
-            this.statusBar.stopProcess(updateStatusProcess);
-        }).catch(err => {
-            this.errorBar.showError("Cannot get app updates. " + (err.error ? err.error.message : err.message));
-            this.statusBar.stopProcess(updateStatusProcess);
-        });
-
     }
 
     /**

@@ -123,9 +123,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         /** Observe all code changes */
         const allCodeChanges = Observable.merge(externalCodeChanges, codeEditorChanges).distinctUntilChanged().share();
 
-        /** First time that user types something in the code editor */
-        const firstDirtyCodeChange = codeEditorChanges.filter(() => this.codeEditorContent.dirty === true).take(1);
-
         /** Attach a CWL validator to code updates and observe the validation state changes. */
         const schemaValidation = this.appValidator.createValidator(allCodeChanges).map((state: AppValidityState) => {
             if (state.isValidCWL && this.dataModel) {
@@ -176,7 +173,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             .switchMap(latestCode => {
                 const validation = validationCompletion.startWith(this.validationState);
                 const modelCode  = externalCodeChanges.startWith(latestCode).distinctUntilChanged();
-                return modelCode.switchMap(code => validation, (code, validation) => code);
+                return modelCode.switchMap(code => validation.take(1), (code, validation) => code);
             })
             .withLatestFrom(this.platformRepository.getAppMeta(this.tabData.id, "swapUnlocked"))
             .subscribeTracked(this, data => {
@@ -333,7 +330,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     }
 
     protected syncModelAndCode(resolveRDF = true): Promise<any> {
-        console.log("Syncing model and code");
         if (this.viewMode === "code") {
             const codeVal = this.codeEditorContent.value;
 
@@ -485,9 +481,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     protected toggleLock(locked: boolean): void {
 
         if (locked === false) {
-            this.platformRepository.patchAppMeta(this.tabData.id, "swapUnlocked", true).then(result => {
-                console.log("Swap unlocked");
-            });
+            this.platformRepository.patchAppMeta(this.tabData.id, "swapUnlocked", true);
 
             this.isUnlockable = false;
         }
