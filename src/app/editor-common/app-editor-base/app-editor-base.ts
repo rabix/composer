@@ -4,6 +4,7 @@ import {CommandLineToolModel, WorkflowModel} from "cwlts/models";
 
 import * as Yaml from "js-yaml";
 import {LoadOptions} from "js-yaml";
+import "rxjs/add/operator/do";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {CodeSwapService} from "../../core/code-content-service/code-content.service";
