@@ -35,10 +35,6 @@ export class DataGatewayService {
         return this.ipc.request("createDirectory", folderPath);
     }
 
-    invalidateFolderListing(folder) {
-        this.cacheInvalidation.next(`readDirectory.${folder}`);
-    }
-
     searchLocalProjects(term, limit = 20): Promise<{
         type: "Workflow" | "CommandLineTool" | string;
         path: string;
