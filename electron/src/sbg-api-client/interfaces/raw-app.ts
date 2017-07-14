@@ -6,6 +6,7 @@ export interface RawApp {
     "class": string;
     "cwlVersion"?:string;
     "description": string;
+    "sbg:blackbox": boolean;
     "sbg:categories": string[];
     "sbg:contributors": string[];
     "sbg:copyOf": string;

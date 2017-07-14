@@ -11,7 +11,6 @@ export class ElectronSystemService extends SystemService {
     }
 
     public openLink(url: string) {
-        console.log("Opening link", url);
         shell.openExternal(url);
     }
 }

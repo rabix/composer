@@ -1,11 +1,8 @@
 import {Component, Injector, OnInit} from "@angular/core";
 import {FormGroup} from "@angular/forms";
+import {CommandLineToolModel} from "cwlts/models";
 import {CommandLineToolFactory} from "cwlts/models/generic/CommandLineToolFactory";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
-
-import "rxjs/add/observable/combineLatest";
-import "rxjs/add/operator/skip";
-import "rxjs/add/operator/take";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {Subject} from "rxjs/Subject";
 import {CodeSwapService} from "../core/code-content-service/code-content.service";
@@ -19,11 +16,9 @@ import {LocalFileSavingService} from "../editor-common/services/app-saving/local
 import {PlatformAppSavingService} from "../editor-common/services/app-saving/platform-app-saving.service";
 import {NotificationBarService} from "../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../layout/status-bar/status-bar.service";
+import {PlatformRepositoryService} from "../repository/platform-repository.service";
 import {IpcService} from "../services/ipc.service";
 import {ModalService} from "../ui/modal/modal.service";
-import "../util/rx-extensions/subscribe-tracked";
-import {PlatformRepositoryService} from "../repository/platform-repository.service";
-import {CommandLineToolModel} from "cwlts/models";
 
 export function appSaverFactory(comp: ToolEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -66,17 +61,17 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
 
     toolGroup: FormGroup;
 
-
     constructor(statusBar: StatusBarService,
-                errorBar: NotificationBarService,
+                notificationBarService: NotificationBarService,
                 modal: ModalService,
                 inspector: EditorInspectorService,
                 dataGateway: DataGatewayService,
                 injector: Injector,
                 appValidator: AppValidatorService,
                 codeSwapService: CodeSwapService,
+                platformRepository: PlatformRepositoryService,
                 platformAppService: PlatformAppService) {
-        super(statusBar, errorBar, modal, inspector, dataGateway, injector, appValidator, codeSwapService, platformAppService);
+        super(statusBar, notificationBarService, modal, inspector, dataGateway, injector, appValidator, codeSwapService, platformAppService, platformRepository);
     }
 
     ngOnInit(): any {
@@ -97,7 +92,6 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
     resetJob() {
         this.dataModel.resetJobDefaults();
     }
-
 
     protected getPreferredTab(): string {
         return "gui";

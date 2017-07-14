@@ -21,7 +21,10 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {WorkflowEditorService} from "../../workflow-editor.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
-import {NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
+import {
+    ErrorNotification,
+    NotificationBarService
+} from "../../../layout/notification-bar/notification-bar.service";
 
 
 @Component({
@@ -106,6 +109,7 @@ import {NotificationBarService} from "../../../layout/notification-bar/notificat
                                                 [step]="inspectedNode"
                                                 [graph]="graph"
                                                 [workflowModel]="model"
+                                                (change)="change.emit()"
                                                 [readonly]="readonly">
                     </ct-workflow-step-inspector>
 
@@ -143,6 +147,9 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
     @Output()
     draw = new EventEmitter<WorkflowGraphEditorComponent>();
+
+    @Output()
+    change = new EventEmitter<any>();
 
     @ViewChild("canvas")
     private canvas: ElementRef;
@@ -203,7 +210,6 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     drawGraphAndAttachListeners() {
 
         this.graph = new Workflow(this.canvas.nativeElement, this.model as any);
-        console.log("Drawing graph", this.model);
 
         if (this.readonly) {
             this.graph.disableGraphManipulations();
@@ -216,7 +222,6 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
                 console.warn("Workflow should be able to fit in by now...");
                 try {
                     this.graph.fitToViewport();
-                    console.log("Should be rendered");
                     this.draw.emit(this);
                     this.functionsWaitingForRender.forEach(fn => fn());
                     this.functionsWaitingForRender = undefined;
@@ -235,6 +240,10 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
                 this.workflowEditorService.putInHistory(this.model);
             }
 
+        });
+
+        this.graph.on("afterChange", () => {
+            this.change.emit();
         });
 
         this.graph.on("selectionChange", (ev) => {
@@ -400,7 +409,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             this.statusBar.stopProcess(statusProcess, `Added ${step.label}`);
         }, err => {
             this.statusBar.stopProcess(statusProcess);
-            this.notificationBar.showError("Failed to add an app to workflow: " + err.error ? err.error.message : err.message);
+            this.notificationBar.showNotification(new ErrorNotification("Failed to add an app to workflow: " + err.error ? err.error.message : err.message));
         });
     }
 
