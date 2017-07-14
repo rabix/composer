@@ -98,7 +98,7 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
 
     // If true, the items that are currently selected will not be shown in the drop-down list
     @Input()
-    public hideSelected = false;
+    public hideSelected = true;
 
     // If true, Selectize will treat any options with a "" value like normal
     @Input()

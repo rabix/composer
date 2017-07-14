@@ -21,7 +21,10 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {WorkflowEditorService} from "../../workflow-editor.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
-import {NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
+import {
+    ErrorNotification,
+    NotificationBarService
+} from "../../../layout/notification-bar/notification-bar.service";
 
 
 @Component({
@@ -406,7 +409,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             this.statusBar.stopProcess(statusProcess, `Added ${step.label}`);
         }, err => {
             this.statusBar.stopProcess(statusProcess);
-            this.notificationBar.showError("Failed to add an app to workflow: " + err.error ? err.error.message : err.message);
+            this.notificationBar.showNotification(new ErrorNotification("Failed to add an app to workflow: " + err.error ? err.error.message : err.message));
         });
     }
 

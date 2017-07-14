@@ -39,7 +39,7 @@ export class AutoCompleteComponent extends SelectComponent implements ControlVal
     ngOnInit() {
         if (this.mono) {
             this.maxItems = 1;
-            this.hideSelected = true;
+            this.hideSelected = false;
         }
 
         this.update.distinctUntilChanged().subscribe((value) => {

@@ -12,7 +12,10 @@ import {DataGatewayService} from "../../core/data-gateway/data-gateway.service";
 import {ProceedToEditingModalComponent} from "../../core/modals/proceed-to-editing-modal/proceed-to-editing-modal.component";
 import {PublishModalComponent} from "../../core/modals/publish-modal/publish-modal.component";
 import {AppTabData} from "../../core/workbox/app-tab-data";
-import {NotificationBarService} from "../../layout/notification-bar/notification-bar.service";
+import {
+    ErrorNotification, InfoNotification,
+    NotificationBarService
+} from "../../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {StatusControlProvider} from "../../layout/status-bar/status-control-provider.interface";
 import {PlatformRepositoryService} from "../../repository/platform-repository.service";
@@ -79,7 +82,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     private modelCreated = false;
 
     constructor(protected statusBar: StatusBarService,
-                protected errorBar: NotificationBarService,
+                protected notificationBar: NotificationBarService,
                 protected modal: ModalService,
                 protected inspector: EditorInspectorService,
                 protected dataGateway: DataGatewayService,
@@ -192,6 +195,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     if (!this.tabData.isWritable) {
                         this.isUnlockable = false;
                     } else if (hasCopyOfProperty && !unlocked) {
+                        this.notificationBar.showNotification(
+                            new InfoNotification("This app is a copy of " + this.dataModel.customProps["sbg:copyOf"]));
                         this.isUnlockable = true;
                     }
 
@@ -230,7 +235,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     return;
                 }
 
-                this.errorBar.showError(`Saving failed: ${err.message}`);
+                this.notificationBar.showNotification(new ErrorNotification(`Saving failed: ${err.message}`));
                 this.statusBar.stopProcess(proc, `Could not save ${this.originalTabLabel} (${err.message})`);
             });
     }
@@ -238,7 +243,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     publish(): void {
 
         if (!this.validationState.isValidCWL) {
-            this.errorBar.showError(`Cannot publish this app because because it's doesn't match the proper JSON schema`);
+            this.notificationBar.showNotification(new ErrorNotification(`Cannot publish this app because because it's doesn't match the proper JSON schema`));
             return;
         }
 
@@ -413,7 +418,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         }).then(result => {
             return result;
         }, err => {
-            this.errorBar.showError("RDF resolution error: " + err.message);
+            this.notificationBar.showNotification(new ErrorNotification("RDF resolution error: " + err.message));
 
             this.validationState.isValidCWL = false;
             this.validationState.errors     = [{

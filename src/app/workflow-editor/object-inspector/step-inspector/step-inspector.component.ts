@@ -2,7 +2,10 @@ import {ChangeDetectorRef, Component, Input, Output, EventEmitter} from "@angula
 import {Workflow} from "cwl-svg";
 import {StepModel, WorkflowModel} from "cwlts/models";
 import {RawApp} from "../../../../../electron/src/sbg-api-client/interfaces/raw-app";
-import {NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
+import {
+    ErrorNotification,
+    NotificationBarService
+} from "../../../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {ModalService} from "../../../ui/modal/modal.service";
@@ -126,7 +129,7 @@ export class StepInspectorComponent extends DirectiveBase {
         }).catch(err => {
             modal.closeModal();
             this.statusBar.stopProcess(proc);
-            this.notificationBar.showError(err.error ? err.error.message : err.message);
+            this.notificationBar.showNotification(new ErrorNotification(err.error ? err.error.message : err.message));
         });
     }
 

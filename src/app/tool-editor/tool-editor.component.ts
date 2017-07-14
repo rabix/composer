@@ -62,7 +62,7 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
     toolGroup: FormGroup;
 
     constructor(statusBar: StatusBarService,
-                errorBar: NotificationBarService,
+                notificationBarService: NotificationBarService,
                 modal: ModalService,
                 inspector: EditorInspectorService,
                 dataGateway: DataGatewayService,
@@ -71,7 +71,7 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
                 codeSwapService: CodeSwapService,
                 platformRepository: PlatformRepositoryService,
                 platformAppService: PlatformAppService) {
-        super(statusBar, errorBar, modal, inspector, dataGateway, injector, appValidator, codeSwapService, platformAppService, platformRepository);
+        super(statusBar, notificationBarService, modal, inspector, dataGateway, injector, appValidator, codeSwapService, platformAppService, platformRepository);
     }
 
     ngOnInit(): any {

@@ -73,6 +73,7 @@ export class SBGClient {
                     "project",
                     "revision",
                     "raw.class",
+                    "raw.sbg:blackbox",
                     "raw.sbg:categories",
                     "raw.sbg:toolkit",
                     "raw.sbg:toolkitVersion"
