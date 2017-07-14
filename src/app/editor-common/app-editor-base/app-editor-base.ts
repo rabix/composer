@@ -14,12 +14,14 @@ import {AppTabData} from "../../core/workbox/app-tab-data";
 import {NotificationBarService} from "../../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {StatusControlProvider} from "../../layout/status-bar/status-control-provider.interface";
+import {PlatformRepositoryService} from "../../repository/platform-repository.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {AppValidatorService, AppValidityState} from "../app-validator/app-validator.service";
 import {PlatformAppService} from "../components/platform-app-common/platform-app.service";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
 import {APP_SAVER_TOKEN, AppSaver} from "../services/app-saving/app-saver.interface";
+import "rxjs/add/operator/do";
 
 export abstract class AppEditorBase extends DirectiveBase implements StatusControlProvider, OnInit, AfterViewInit {
 
@@ -61,6 +63,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     savingDisabled = true;
 
+    isUnlockable = null;
+
     /** Template of the status controls that will be shown in the status bar */
     @ViewChild("statusControls")
     protected statusControls: TemplateRef<any>;
@@ -82,7 +86,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 protected injector: Injector,
                 protected appValidator: AppValidatorService,
                 protected codeSwapService: CodeSwapService,
-                protected platformAppService: PlatformAppService) {
+                protected platformAppService: PlatformAppService,
+                protected platformRepository: PlatformRepositoryService) {
 
         super();
     }
@@ -131,8 +136,10 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             return state;
         }).share();
 
+        const validationCompletion = schemaValidation.filter(state => !state.isPending);
+
         /** Get the end of first validation check */
-        const firstValidationEnd = schemaValidation.filter(state => !state.isPending).take(1);
+        const firstValidationEnd = validationCompletion.take(1);
 
         /**
          * For each code change from outside the ace editor, update the content of the editor form control.
@@ -164,10 +171,16 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
          * code change that might have been there in the meantime so we know what to use as the base for
          * the model creation.
          */
-        firstValidationEnd.withLatestFrom(externalCodeChanges, (_, inner) => inner)
-
-            .switchMap(inner => Observable.of(inner).merge(externalCodeChanges).distinctUntilChanged())
-            .subscribeTracked(this, code => {
+        firstValidationEnd
+            .withLatestFrom(externalCodeChanges, (_, latestCode) => latestCode)
+            .switchMap(latestCode => {
+                const validation = validationCompletion.startWith(this.validationState);
+                const modelCode  = externalCodeChanges.startWith(latestCode).distinctUntilChanged();
+                return modelCode.switchMap(code => validation, (code, validation) => code);
+            })
+            .withLatestFrom(this.platformRepository.getAppMeta(this.tabData.id, "swapUnlocked"))
+            .subscribeTracked(this, data => {
+                const [code, unlocked] = data;
 
                 this.isLoading = false;
 
@@ -177,7 +190,15 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
                 this.resolveToModel(code).then(() => {
 
-                    if (this.tabData.isWritable && this.hasCopyOfProperty()) {
+                    const hasCopyOfProperty = this.dataModel.customProps["sbg:copyOf"] !== undefined;
+
+                    if (!this.tabData.isWritable) {
+                        this.isUnlockable = false;
+                    } else if (hasCopyOfProperty && !unlocked) {
+                        this.isUnlockable = true;
+                    }
+
+                    if (this.isUnlockable && hasCopyOfProperty && !unlocked) {
                         this.toggleLock(true);
                     }
                 }, err => console.warn);
@@ -232,10 +253,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     provideStatusControls(): TemplateRef<any> {
         return this.statusControls;
-    }
-
-    hasCopyOfProperty(): boolean {
-        return this.dataModel && this.dataModel.customProps["sbg:copyOf"] !== undefined;
     }
 
     ngAfterViewInit() {
@@ -316,6 +333,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     }
 
     protected syncModelAndCode(resolveRDF = true): Promise<any> {
+        console.log("Syncing model and code");
         if (this.viewMode === "code") {
             const codeVal = this.codeEditorContent.value;
 
@@ -333,12 +351,11 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             } catch (err) {
                 return Promise.reject(err);
             }
-
         }
 
         if (!resolveRDF) {
             this.codeEditorContent.setValue(this.getModelText());
-            return;
+            return Promise.resolve();
         }
 
         const modelText = JSON.stringify(this.dataModel.serialize());
@@ -346,6 +363,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         return this.resolveContent(modelText).then((data: Object) => {
             const serialized = JSON.stringify(data, null, 4);
             this.codeEditorContent.setValue(serialized);
+            return data;
         });
     }
 
@@ -465,6 +483,14 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     protected abstract recreateModel(json: Object): void;
 
     protected toggleLock(locked: boolean): void {
+
+        if (locked === false) {
+            this.platformRepository.patchAppMeta(this.tabData.id, "swapUnlocked", true).then(result => {
+                console.log("Swap unlocked");
+            });
+
+            this.isUnlockable = false;
+        }
 
         this.isReadonly = locked;
         if (locked) {

@@ -430,5 +430,34 @@ module.exports = {
                 callback(null, result);
             }, callback);
         }).catch(callback);
+    },
+
+    patchAppMeta: (data: {
+        profile: "local" | "user",
+        appID: string,
+        key: string,
+        value: any,
+    }, callback) => {
+        const {profile, appID, key, value} = data;
+
+        repositoryLoad.then(() => {
+
+
+            const allMeta = repository[profile].appMeta;
+
+            if (allMeta[appID]) {
+                allMeta[appID][key] = value;
+            } else {
+                allMeta[appID] = {[key]: value};
+            }
+
+            if (profile === "local") {
+                repository.updateLocal({appMeta: allMeta}, callback);
+                return;
+            }
+
+            repository.updateUser({appMeta: allMeta}, callback);
+
+        }, callback);
     }
 };

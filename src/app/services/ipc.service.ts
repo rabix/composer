@@ -24,6 +24,8 @@ export type IPCRoute =
     | "getProjects"
     | "getSetting"
     | "getUserByToken"
+    | "patchAppMeta"
+    | "watchAppMeta"
     | "getUserRepository"
     | "getLocalFileContent"
     | "hasDataCache"

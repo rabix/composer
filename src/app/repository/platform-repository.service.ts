@@ -8,6 +8,7 @@ import {ReplaySubject} from "rxjs/ReplaySubject";
 import {App} from "../../../electron/src/sbg-api-client/interfaces/app";
 import {Project} from "../../../electron/src/sbg-api-client/interfaces/project";
 import {RawApp} from "../../../electron/src/sbg-api-client/interfaces/raw-app";
+import {AppMeta} from "../../../electron/src/storage/types/app-meta";
 import {RecentAppTab} from "../../../electron/src/storage/types/recent-app-tab";
 import {TabData} from "../core/workbox/tab-data.interface";
 import {IpcService} from "../services/ipc.service";
@@ -22,6 +23,7 @@ export class PlatformRepositoryService {
     private expandedNodes: ReplaySubject<string[]>    = new ReplaySubject(1);
     private openTabs: ReplaySubject<TabData<any>[]>   = new ReplaySubject(1);
     private recentApps: ReplaySubject<RecentAppTab[]> = new ReplaySubject(1);
+    private appMeta: ReplaySubject<AppMeta[]>         = new ReplaySubject(1);
 
     constructor(private ipc: IpcService) {
 
@@ -32,6 +34,7 @@ export class PlatformRepositoryService {
         this.listen("recentApps").subscribe(this.recentApps);
         this.listen("openProjects").subscribe(this.openProjects);
         this.listen("expandedNodes").subscribe(this.expandedNodes);
+        this.listen("appMeta").subscribe(this.appMeta);
     }
 
     getOpenTabs(): Observable<TabData<any>[]> {
@@ -241,6 +244,27 @@ export class PlatformRepositoryService {
 
                 return appID.indexOf(term) !== -1 || appName.indexOf(term) !== -1;
             });
+        });
+    }
+
+    patchAppMeta(appID: string, key: string, value: any): Promise<any> {
+        return this.ipc.request("patchAppMeta", {
+            profile: "user",
+            appID,
+            key,
+            value
+        }).toPromise();
+    }
+
+    getAppMeta<T>(appID: string, key?: any): Observable<T> {
+        return this.appMeta.map(meta => {
+
+            const data = meta[appID];
+            if (key && data) {
+                return data[key];
+            }
+
+            return data;
         });
     }
 }
