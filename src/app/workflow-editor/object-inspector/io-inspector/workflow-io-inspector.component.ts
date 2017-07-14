@@ -83,7 +83,7 @@ import {Observable} from "rxjs/Observable";
         </div>
 
         <!--File Types-->
-        <div *ngIf="isFileType() && isInputPort()">
+        <div *ngIf="isFileType()">
             <label class="form-control-label">File types</label>
             <ct-auto-complete [formControl]="form.controls['fileTypes']"
                               [create]="true"
