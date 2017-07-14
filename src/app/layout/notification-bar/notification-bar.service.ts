@@ -36,7 +36,7 @@ export class ErrorNotification extends Notification {
 @Injectable()
 export class NotificationBarService {
 
-    public static maxDisplay = 5;
+    public static maxDisplay = 3;
 
     private notifications = new Subject<any>();
 
