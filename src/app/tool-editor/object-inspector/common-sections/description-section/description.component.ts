@@ -47,7 +47,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <input class="form-control"
                            type="text"
                            [readonly]="readonly"
-                           [formControl]="form.controls['alternativePrefix']">
+                           [formControl]="form.controls['altPrefix']">
                 </div>
 
                 <!--Category-->
@@ -102,7 +102,7 @@ export class DescriptionComponent extends DirectiveBase implements ControlValueA
         this.form = this.formBuilder.group({
             label: [this.port.label],
             description: [this.port.description],
-            alternativePrefix: [this.port.customProps["sbg:alternativePrefix"]],
+            altPrefix: [this.port.customProps["sbg:altPrefix"]],
             category: [this.port.customProps["sbg:category"]],
             toolDefaults: [this.port.customProps["sbg:toolDefaultValue"]],
             fileTypes: [{value: this.port.fileTypes, disabled: this.readonly}]
@@ -114,7 +114,7 @@ export class DescriptionComponent extends DirectiveBase implements ControlValueA
             .subscribe(value => {
 
                 if (this.isInputPort()) {
-                    this.setTextProperty("sbg:alternativePrefix", value.alternativePrefix, true);
+                    this.setTextProperty("sbg:altPrefix", value.altPrefix, true);
                     this.setTextProperty("sbg:category", value.category, true);
                     if (!this.isFileType()) {
                         this.setTextProperty("sbg:toolDefaultValue", value.toolDefaults, true);
@@ -133,15 +133,14 @@ export class DescriptionComponent extends DirectiveBase implements ControlValueA
     }
 
     private setTextProperty(propertyName: string, newValue: string, custom?: boolean): void {
-        if (typeof newValue !== 'undefined') {
+        if (typeof newValue === "string") {
             if (custom) {
                 if (newValue.length > 0) {
                     this.port.customProps[propertyName] = newValue;
                 } else if (this.port.customProps[propertyName]) {
                     delete this.port.customProps[propertyName];
                 }
-            }
-            else {
+            } else {
                 this.port[propertyName] = newValue.length > 0 ? newValue : undefined;
             }
         }
