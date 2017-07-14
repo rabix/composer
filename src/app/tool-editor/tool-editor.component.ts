@@ -93,7 +93,6 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
         this.dataModel.resetJobDefaults();
     }
 
-
     protected getPreferredTab(): string {
         return "gui";
     }
