@@ -12,6 +12,10 @@
         border-radius: $border-radius;
         box-shadow: 0 0 6px 2px rgba(0, 0, 0, 0.2);
 
+        &.top {
+            top: -180%;
+        }
+
         &.right-align {
             left: 0;
         }

@@ -15,17 +15,15 @@ import {
 import {Workflow} from "cwl-svg";
 import {StepModel, WorkflowFactory, WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
 import {DataGatewayService} from "../../../core/data-gateway/data-gateway.service";
+import {AppTabData} from "../../../core/workbox/app-tab-data";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
+import {ErrorNotification, NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
+import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
 import {IpcService} from "../../../services/ipc.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {WorkflowEditorService} from "../../workflow-editor.service";
-import {ModalService} from "../../../ui/modal/modal.service";
-import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
-import {
-    ErrorNotification,
-    NotificationBarService
-} from "../../../layout/notification-bar/notification-bar.service";
 
+const {dialog} = window["require"]("electron").remote;
 
 @Component({
     selector: "ct-workflow-graph-editor",
@@ -33,12 +31,13 @@ import {
     styleUrls: ["./workflow-graph-editor.component.scss"],
     template: `
         <div *ngIf="model && model.steps.length === 0" class="svg-graph-empty-state"></div>
-        
-        <svg (dblclick)="openInspector($event)"
+
+        <svg #canvas class="cwl-workflow" tabindex="-1"
              ct-click
-             (onMouseClick)="setFocusOnCanvas()" #canvas class="cwl-workflow" tabindex="-1"
              [ct-drop-enabled]="true"
              [ct-drop-zones]="['zone1']"
+             (dblclick)="openInspector($event)"
+             (onMouseClick)="setFocusOnCanvas()"
              (onDropSuccess)="onDrop($event.detail.data.event, $event.detail.data.transfer_data)"></svg>
 
         <span class="svg-btns" (click)="setFocusOnCanvas()">
@@ -94,6 +93,16 @@ import {
                     <i class="fa fa-paint-brush"></i>
                 </button>
             </span>
+
+            <!--Export image-->
+            <span class="btn-group">
+                <button class="btn btn-sm btn-secondary"
+                        (click)="exportSVG()"
+                        ct-tooltip="Export SVG"
+                        tooltipPlacement="top">
+                    <i class="fa fa-file-image-o"></i>
+                </button>
+            </span>
             
         </span>
 
@@ -133,7 +142,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     model: WorkflowModel;
 
     @Input()
-    data;
+    data: AppTabData;
 
     modelEventListeners = [];
 
@@ -153,9 +162,6 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
     @ViewChild("canvas")
     private canvas: ElementRef;
-
-    @ViewChild("controls")
-    private controlsTemplate: TemplateRef<any>;
 
     @ViewChild("inspector", {read: TemplateRef})
     private inspectorTemplate: TemplateRef<any>;
@@ -184,8 +190,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
                 private inspector: EditorInspectorService,
                 private statusBar: StatusBarService,
                 private notificationBar: NotificationBarService,
-                private workflowEditorService: WorkflowEditorService,
-                private modal: ModalService) {
+                private workflowEditorService: WorkflowEditorService) {
         super();
     }
 
@@ -328,13 +333,6 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         if (this.graph && this.canvas && Workflow.canDrawIn(this.canvas.nativeElement)) {
             this.graph.redraw(this.model as any);
         }
-        // if (firstAnything && firstAnything.customProps["sbg:x"] === undefined) {
-        //     console.log("Should arrange");
-        //     // this.graph.command("workflow.arrange");
-        // }
-
-
-        // this.statusBar.setControls(this.controlsTemplate);
     }
 
     upscale() {
@@ -515,6 +513,33 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         this.tryToFitWorkflowOnNextTabActivation = false;
     }
 
+    exportSVG() {
+        const svg = this.canvas.nativeElement as SVGSVGElement;
+
+        const content = this.renderSVGBundle(svg);
+
+        dialog.showSaveDialog({
+            buttonLabel: "Save",
+            defaultPath: `${this.data.id}.svg`,
+            title: "Export Workflow SVG",
+
+        }, (path) => {
+
+            if (!path) {
+                return;
+            }
+            this.ipc.request("saveFileContent", {
+                path,
+                content
+            }).toPromise().then(() => {
+                this.statusBar.instant(`Exported SVG to ${path}`);
+            }, err => {
+                this.notificationBar.showNotification(new ErrorNotification("Could not save SVG: " + err, 5000));
+            });
+        });
+
+    }
+
     private scheduleAfterRender(fn: Function) {
 
         if (this.graph) {
@@ -523,5 +548,57 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         }
 
         this.functionsWaitingForRender.push(fn);
+    }
+
+
+    private renderSVGBundle(root: SVGSVGElement) {
+
+        const containerElements = ["svg", "g"];
+        const embeddableStyles  = {
+            "rect": ["fill", "stroke", "stroke-width"],
+            "path": ["fill", "stroke", "stroke-width"],
+            "circle": ["fill", "stroke", "stroke-width"],
+            "line": ["stroke", "stroke-width"],
+            "text": ["fill", "font-size", "text-anchor", "font-family"],
+            "polygon": ["stroke", "fill"]
+        };
+
+        function traverse(parentNode, originalData) {
+
+            const children             = parentNode.childNodes;
+            const originalChildrenData = originalData.childNodes;
+
+            for (let childIndex = 0; childIndex < children.length; childIndex++) {
+                const child   = children[childIndex];
+                const tagName = child.tagName;
+
+                if (containerElements.indexOf(tagName) != -1) {
+                    traverse(child, originalChildrenData[childIndex]);
+                } else if (tagName in embeddableStyles) {
+
+                    const styleDefinition = window.getComputedStyle(originalChildrenData[childIndex]);
+
+                    let styleString = "";
+                    for (let st = 0; st < embeddableStyles[tagName].length; st++) {
+                        styleString +=
+                            embeddableStyles[tagName][st]
+                            + ":"
+                            + styleDefinition.getPropertyValue(embeddableStyles[tagName][st])
+                            + "; ";
+                    }
+
+                    child.setAttribute("style", styleString);
+                }
+            }
+
+        }
+
+
+        const clone = root.cloneNode(true) as SVGSVGElement;
+        Array.from(clone.querySelectorAll(".port .label")).forEach(el => el.parentNode.removeChild(el));
+        traverse(clone, root);
+
+        return new XMLSerializer().serializeToString(clone);
+
     }
 }

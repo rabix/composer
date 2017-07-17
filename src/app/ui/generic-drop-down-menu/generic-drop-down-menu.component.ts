@@ -1,13 +1,4 @@
-import {
-    ChangeDetectionStrategy,
-    Component,
-    EmbeddedViewRef,
-    Input,
-    OnInit,
-    TemplateRef,
-    ViewChild,
-    ViewContainerRef
-} from "@angular/core";
+import {ChangeDetectionStrategy, Component, EmbeddedViewRef, Input, OnInit, TemplateRef, ViewChild, ViewContainerRef} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 
@@ -22,7 +13,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
             <ng-content></ng-content>
         </button>
 
-        <div class="{{menuAlign}}-align" [class.generic-menu]="dropdown" #dropdownContainer>
+        <div class="{{menuAlign}}-align" [class.top]="menuSide === 'top'" [class.generic-menu]="dropdown" #dropdownContainer>
             <div #hostView></div>
         </div>
     `,
@@ -44,11 +35,14 @@ export class GenericDropDownMenuComponent extends DirectiveBase implements OnIni
     @Input()
     menuAlign: "right" | "left" = "right";
 
+    @Input()
+    menuSide: "top" | "bottom" = "bottom";
+
     /**
      * Observable for externally triggering the state of
      */
     @Input()
-    menuState: Observable<boolean> = Observable.of(null);
+    menuState: Observable<boolean>;
 
     @ViewChild("hostView", {read: ViewContainerRef})
     hostView: ViewContainerRef;
@@ -65,6 +59,7 @@ export class GenericDropDownMenuComponent extends DirectiveBase implements OnIni
      * @param value
      */
     toggleMenu(value?: boolean) {
+        console.log("Toggling menu", value);
         typeof value === "boolean" ? this.shouldShow = value : this.shouldShow = !this.shouldShow;
 
         if (this.shouldShow) {
@@ -78,10 +73,18 @@ export class GenericDropDownMenuComponent extends DirectiveBase implements OnIni
         // Here we listen to external changes in the menu's state.
         // If the component using the dropdown menu sends a false value
         // down the menuState stream, the menu will close.
-        this.menuState.subscribeTracked(this, (val) => this.toggleMenu(val));
+        if (this.menuState) {
+            this.menuState.subscribeTracked(this, (val) => {
+                console.log("Toggling in subscription");
+                this.toggleMenu(val);
+            });
+        } else {
+            this.toggleMenu(false);
+        }
     }
 
     private createMenu() {
+
         if (this.dropdown) {
             return;
         }
