@@ -81,9 +81,11 @@ export class ToolOutputInspectorComponent extends DirectiveBase implements OnCha
     ngOnChanges(changes: SimpleChanges): void {
         const items = ["File", "record"];
 
-        this.inputList = changes["inputs"].currentValue.filter(entry =>
-            (items.indexOf(entry.type.type) > -1 ||
-            (entry.type.type === "array" && items.indexOf(entry.type.items) > -1)));
+        if (changes["inputs"]) {
+            this.inputList = changes["inputs"].currentValue.filter(entry =>
+                (items.indexOf(entry.type.type) > -1 ||
+                (entry.type.type === "array" && items.indexOf(entry.type.items) > -1)));
+        }
     }
 
     ngOnInit() {

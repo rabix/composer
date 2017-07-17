@@ -77,7 +77,7 @@ const {app, dialog} = window["require"]("electron").remote;
                 </p>
             </div>
 
-            <div class="form-group" *ngIf="destination === 'remote'">
+            <div class="form-group" *ngIf="destination === 'remote'" [class.hidden]="defaultProject">
                 <label>Destination Project:</label>
                 <ct-auto-complete [formControl]="projectSelection"
                                   [mono]="true"

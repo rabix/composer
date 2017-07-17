@@ -24,9 +24,10 @@ import {WorkflowStepInputModel} from "cwlts/models";
                 <ng-template ngSwitchCase="enum">
                     <select [value]="value" class="form-control"
                             [attr.prefix]="prefix"
-                            [attr.fieldType]="inputType"
-                            [disabled]="readonly">
-                        <option *ngFor="let val of input.type.symbols" [value]="val"> {{ val }}
+                            [attr.fieldType]="inputType">
+                        <option *ngFor="let val of input.type.symbols"
+                                [disabled]="readonly"
+                                [value]="val"> {{ val }}
                         </option>
                     </select>
                 </ng-template>
@@ -38,7 +39,7 @@ import {WorkflowStepInputModel} from "cwlts/models";
                            type="number"
                            class="form-control"
                            [value]="value"
-                           [disabled]="readonly"/>
+                           [readonly]="readonly"/>
                 </ng-template>
                 <ng-template ngSwitchCase="float">
                     <input [attr.prefix]="prefix"
@@ -46,7 +47,7 @@ import {WorkflowStepInputModel} from "cwlts/models";
                            type="number"
                            class="form-control"
                            [value]="value"
-                           [disabled]="readonly"/>
+                           [readonly]="readonly"/>
                 </ng-template>
 
                 <!--Strings-->
@@ -55,7 +56,7 @@ import {WorkflowStepInputModel} from "cwlts/models";
                            [attr.fieldType]="inputType"
                            class="form-control"
                            [value]="value"
-                           [disabled]="readonly"/>
+                           [readonly]="readonly"/>
                 </ng-template>
 
                 <!--Booleans-->
