@@ -12,10 +12,7 @@ import {DataGatewayService} from "../../core/data-gateway/data-gateway.service";
 import {ProceedToEditingModalComponent} from "../../core/modals/proceed-to-editing-modal/proceed-to-editing-modal.component";
 import {PublishModalComponent} from "../../core/modals/publish-modal/publish-modal.component";
 import {AppTabData} from "../../core/workbox/app-tab-data";
-import {
-    ErrorNotification, InfoNotification,
-    NotificationBarService
-} from "../../layout/notification-bar/notification-bar.service";
+import {ErrorNotification, InfoNotification, NotificationBarService} from "../../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {StatusControlProvider} from "../../layout/status-bar/status-control-provider.interface";
 import {PlatformRepositoryService} from "../../repository/platform-repository.service";
@@ -171,26 +168,29 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
          * code change that might have been there in the meantime so we know what to use as the base for
          * the model creation.
          */
-        firstValidationEnd
-            .withLatestFrom(externalCodeChanges, (_, latestCode) => latestCode)
-            .switchMap(latestCode => {
-                const validation = validationCompletion.startWith(this.validationState);
-                const modelCode  = externalCodeChanges.startWith(latestCode).distinctUntilChanged();
-                return modelCode.switchMap(code => validation.take(1), (code, validation) => code);
+        firstValidationEnd.withLatestFrom(externalCodeChanges)
+            .switchMap((data: [AppValidityState, string]) => {
+                const [validationState, code] = data;
+                return validationCompletion.startWith(validationState).map(state => [this.codeEditorContent.value, state])
             })
-            .withLatestFrom(this.platformRepository.getAppMeta(this.tabData.id, "swapUnlocked"))
-            .subscribeTracked(this, data => {
-                const [code, unlocked] = data;
+            .withLatestFrom(this.platformRepository.getAppMeta(this.tabData.id, "swapUnlocked"), (outer, inner) => [...outer, inner])
+            .subscribeTracked(this, (data: [string, AppValidityState, boolean]) => {
+
+                const [code, validation, unlocked] = data;
 
                 this.isLoading = false;
 
-                if (!this.validationState.isValidCWL) {
+                if (!validation.isValidCWL) {
                     return;
                 }
 
                 this.resolveToModel(code).then(() => {
 
-                    const hasCopyOfProperty = this.dataModel.customProps["sbg:copyOf"] !== undefined;
+                    // copyOf property really matters only if we are working with the latest revision
+                    // otherwise, apps detached from copy state at some revision will still show locked state
+                    // and notification when switched to an older revision
+                    const props = this.dataModel.customProps || {};
+                    const hasCopyOfProperty = props["sbg:copyOf"] && (~~props["sbg:revision"] === ~~props["sbg:latestRevision"]);
 
                     if (!this.tabData.isWritable) {
                         this.isUnlockable = false;

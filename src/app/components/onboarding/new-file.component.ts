@@ -29,7 +29,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                     <div class="text-title">Actions</div>
 
                     <div class="creation-entry p-1 mt-1 clickable deep-unselectable" data-test="create-workflow-btn"
-                         (click)="openAppCreation('workflow')">
+                         (click)="openAppCreation('Workflow')">
                         <i class="fa fa-fw fa-share-alt fa-3x float-sm-left pl-1"></i>
                         <div class="content float-sm-left">
                             <div class="title text-title">New Workflow</div>
@@ -38,7 +38,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                     </div>
 
                     <div class="creation-entry p-1 mt-1 clickable deep-unselectable" data-test="create-tool-btn"
-                         (click)="openAppCreation('tool')">
+                         (click)="openAppCreation('CommandLineTool')">
                         <i class="fa fa-fw fa-terminal fa-3x float-sm-left pr-1"></i>
                         <div class="content float-sm-left">
                             <div class="title text-title">New Command Line Tool</div>
@@ -100,9 +100,9 @@ export class NewFileTabComponent extends DirectiveBase implements OnInit {
         this.workbox.openTab(tab);
     }
 
-    openAppCreation(type: "workflow" | "tool") {
+    openAppCreation(type: "Workflow" | "CommandLineTool") {
         const modal = this.modal.fromComponent(CreateAppModalComponent, {
-            title: `Create a new ${type === "workflow" ? "Workflow" : "Command Line Tool"}`,
+            title: `Create a new ${type}`,
         });
 
         modal.appType = type;

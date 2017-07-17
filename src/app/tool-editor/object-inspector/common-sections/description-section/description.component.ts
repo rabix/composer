@@ -27,6 +27,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <label class="form-control-label">Label</label>
                     <input type="text"
                            class="form-control"
+                           [readonly]="readonly"
                            [formControl]="form.controls['label']">
                 </div>
 
@@ -35,6 +36,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <label class="form-control-label">Description</label>
                     <textarea class="form-control"
                               rows="4"
+                              [readonly]="readonly"
                               [formControl]="form.controls['description']"></textarea>
                 </div>
                 
@@ -44,7 +46,8 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <label class="form-control-label">Alternative Prefix</label>
                     <input class="form-control"
                            type="text"
-                           [formControl]="form.controls['alternativePrefix']">
+                           [readonly]="readonly"
+                           [formControl]="form.controls['altPrefix']">
                 </div>
 
                 <!--Category-->
@@ -52,6 +55,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <label class="form-control-label">Category</label>
                     <input class="form-control"
                            type="text"
+                           [readonly]="readonly"
                            [formControl]="form.controls['category']">
                 </div>
 
@@ -60,6 +64,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <label class="form-control-label">Tool Defaults</label>
                     <input class="form-control"
                            type="text"
+                           [readonly]="readonly"
                            [formControl]="form.controls['toolDefaults']">
                 </div>
 
@@ -95,11 +100,11 @@ export class DescriptionComponent extends DirectiveBase implements ControlValueA
         this.port = port;
 
         this.form = this.formBuilder.group({
-            label: [{value: this.port.label, disabled: this.readonly}],
-            description: [{value: this.port.description, disabled: this.readonly}],
-            alternativePrefix: [{value: this.port.customProps["sbg:alternativePrefix"], disabled: this.readonly}],
-            category: [{value: this.port.customProps["sbg:category"], disabled: this.readonly}],
-            toolDefaults: [{value: this.port.customProps["sbg:toolDefaultValue"], disabled: this.readonly}],
+            label: [this.port.label],
+            description: [this.port.description],
+            altPrefix: [this.port.customProps["sbg:altPrefix"]],
+            category: [this.port.customProps["sbg:category"]],
+            toolDefaults: [this.port.customProps["sbg:toolDefaultValue"]],
             fileTypes: [{value: this.port.fileTypes, disabled: this.readonly}]
         });
 
@@ -109,7 +114,7 @@ export class DescriptionComponent extends DirectiveBase implements ControlValueA
             .subscribe(value => {
 
                 if (this.isInputPort()) {
-                    this.setTextProperty("sbg:alternativePrefix", value.alternativePrefix, true);
+                    this.setTextProperty("sbg:altPrefix", value.altPrefix, true);
                     this.setTextProperty("sbg:category", value.category, true);
                     if (!this.isFileType()) {
                         this.setTextProperty("sbg:toolDefaultValue", value.toolDefaults, true);
@@ -128,15 +133,14 @@ export class DescriptionComponent extends DirectiveBase implements ControlValueA
     }
 
     private setTextProperty(propertyName: string, newValue: string, custom?: boolean): void {
-        if (typeof newValue !== 'undefined') {
+        if (typeof newValue === "string") {
             if (custom) {
                 if (newValue.length > 0) {
                     this.port.customProps[propertyName] = newValue;
                 } else if (this.port.customProps[propertyName]) {
                     delete this.port.customProps[propertyName];
                 }
-            }
-            else {
+            } else {
                 this.port[propertyName] = newValue.length > 0 ? newValue : undefined;
             }
         }

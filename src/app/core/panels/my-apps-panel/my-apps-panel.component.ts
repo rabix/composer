@@ -10,6 +10,7 @@ import {TreeViewComponent} from "../../../ui/tree-view/tree-view.component";
 import {TreeViewService} from "../../../ui/tree-view/tree-view.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
+import {AppHelper} from "../../helpers/AppHelper";
 import {AddSourceModalComponent} from "../../modals/add-source-modal/add-source-modal.component";
 import {CreateAppModalComponent} from "../../modals/create-app-modal/create-app-modal.component";
 import {CreateLocalFolderModalComponent} from "../../modals/create-local-folder-modal/create-local-folder-modal.component";
@@ -17,7 +18,6 @@ import {TabData} from "../../workbox/tab-data.interface";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.component";
 import {MyAppsPanelService} from "./my-apps-panel.service";
-import {AppHelper} from "../../helpers/AppHelper";
 
 @Component({
     selector: "ct-my-apps-panel",
@@ -234,102 +234,82 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
 
     private listenForContextMenu() {
 
+        // Context streams
+        const platformRoot        = this.tree.contextMenu.filter(data => data.node.type === "source" && data.node.id !== "local");
+        const userProject         = this.tree.contextMenu.filter((data) => data.node.type === "project");
+        const topLevelLocalFolder = this.tree.contextMenu.filter((data) => data.node.type === "folder" && data.node.level === 2);
+        const nestedLocalFolder   = this.tree.contextMenu.filter(data => data.node.type === "folder" && data.node.level > 2);
 
-        // Platform root
-        this.tree.contextMenu
-            .filter(data => data.node.type === "source" && data.node.id !== "local")
-            .subscribe((data) => {
-                this.context.showAt(data.node.getViewContainer(), [
-                    new MenuItem("Refresh data", {
-                        click: () => this.service.reloadPlatformData()
-                    })
-                ], data.coordinates);
+        // Menu Items and factories
+        const syncMenuItem = new MenuItem("Synchronize Data", {
+            click: () => this.service.reloadPlatformData()
+        });
+
+        const createAppMenuItem = (node: TreeNode<any>, destination: "local" | "remote", type: "Workflow" | "CommandLineTool") => {
+
+            return new MenuItem(`New ${type}`, {
+                click: () => {
+                    const modal = this.modal.fromComponent(CreateAppModalComponent, `Create a new ${type} in ${node.label}`);
+
+                    modal.appType     = type;
+                    modal.destination = destination;
+                    if (destination === "local") {
+                        modal.defaultFolder = node.id;
+
+                        // Wait for component to initialize, then open the dialog for choosing the file path
+                        setTimeout(() => {
+                            modal.chooseFilepath();
+                        });
+                    } else {
+                        modal.defaultProject = node.id;
+                    }
+
+                }
             });
+        };
 
-        // When click on user project
-        this.tree.contextMenu.filter((data) => data.node.type === "project")
-            .subscribe(data => {
-                const contextMenu = [
-                    new MenuItem("New Workflow", {
-                        click: () => {
-                            const modal = this.modal.fromComponent(CreateAppModalComponent, {
-                                closeOnOutsideClick: false,
-                                backdrop: true,
-                                title: `Create a new Workflow in "${data.node.label}"`,
-                                closeOnEscape: true
-                            });
+        const createFolderMenuItem = (node: TreeNode<any>) => new MenuItem("New Folder", {
+            click: () => {
+                const modal      = this.modal.fromComponent(CreateLocalFolderModalComponent, `Create a new Folder in ${node.label}`);
+                modal.rootFolder = node.id;
+            }
+        });
 
-                            modal.appType        = "workflow";
-                            modal.destination    = "remote";
-                            modal.defaultProject = data.node.id;
-                        }
-                    }),
-                    new MenuItem("New Command Line Tool", {
-                        click: () => {
-                            const modal = this.modal.fromComponent(CreateAppModalComponent, {
-                                closeOnOutsideClick: false,
-                                backdrop: true,
-                                title: `Create a new Command Line Tool in "${data.node.label}"`,
-                                closeOnEscape: true
-                            });
 
-                            modal.appType        = "tool";
-                            modal.destination    = "remote";
-                            modal.defaultProject = data.node.id;
-                        }
-                    }),
-                    new MenuItem("Remove from Workspace", {
-                        click: () => this.service.removeProjectFromWorkspace(data.node.id)
-                    })
-                ];
-                this.context.showAt(data.node.getViewContainer(), contextMenu, data.coordinates);
-            });
+        platformRoot.subscribe(data => this.context.showAt(data.node.getViewContainer(), [syncMenuItem], data.coordinates));
 
-        // When click on some root local folder
-        this.tree.contextMenu.filter((data) => data.node.type === "folder" && data.node.level === 2)
-            .subscribe(data => {
-                const contextMenu = [
-                    new MenuItem("New Workflow", {
-                        click: () => {
-                            const modal = this.modal.fromComponent(CreateAppModalComponent, {
-                                closeOnOutsideClick: false,
-                                backdrop: true,
-                                title: `Create a new Workflow in "${data.node.label}"`,
-                                closeOnEscape: true
-                            });
+        userProject.subscribe(data => {
+            const contextMenu = [
+                createAppMenuItem(data.node, "remote", "Workflow"),
+                createAppMenuItem(data.node, "remote", "CommandLineTool"),
+                new MenuItem("Remove from Workspace", {
+                    click: () => this.service.removeProjectFromWorkspace(data.node.id)
+                })
+            ];
+            this.context.showAt(data.node.getViewContainer(), contextMenu, data.coordinates);
+        });
 
-                            modal.appType       = "workflow";
-                            modal.defaultFolder = data.node.id + "/";
-                        }
-                    }),
-                    new MenuItem("New Command Line Tool", {
-                        click: () => {
-                            const modal = this.modal.fromComponent(CreateAppModalComponent, {
-                                closeOnOutsideClick: false,
-                                backdrop: true,
-                                title: `Create a new Command Line Tool in "${data.node.label}"`,
-                                closeOnEscape: true
-                            });
+        topLevelLocalFolder.subscribe(data => {
+            const contextMenu = [
+                createAppMenuItem(data.node, "local", "Workflow"),
+                createAppMenuItem(data.node, "local", "CommandLineTool"),
+                createFolderMenuItem(data.node),
+                new MenuItem("Remove from Workspace", {
+                    click: () => this.service.removeFolderFromWorkspace(data.node.id)
+                })
+            ];
 
-                            modal.appType       = "tool";
-                            modal.defaultFolder = data.node.id + "/";
-                        }
-                    }),
-                    new MenuItem("New Folder", {
-                        click: () => {
-                            const modal = this.modal.fromComponent(CreateLocalFolderModalComponent, {
-                                title: `Create a new Folder in "${data.node.label}"`,
-                            });
+            this.context.showAt(data.node.getViewContainer(), contextMenu, data.coordinates);
+        });
 
-                            modal.rootFolder = data.node.id;
-                        }
-                    }),
-                    new MenuItem("Remove from Workspace", {
-                        click: () => this.service.removeFolderFromWorkspace(data.node.id)
-                    })
-                ];
+        nestedLocalFolder.subscribe(data => {
+            const contextMenu = [
+                createAppMenuItem(data.node, "local", "Workflow"),
+                createAppMenuItem(data.node, "local", "CommandLineTool"),
+                createFolderMenuItem(data.node),
+            ];
 
-                this.context.showAt(data.node.getViewContainer(), contextMenu, data.coordinates);
-            });
+            this.context.showAt(data.node.getViewContainer(), contextMenu, data.coordinates);
+        });
     }
 }

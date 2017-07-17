@@ -32,7 +32,7 @@ import {noop} from "../../../../lib/utils.lib";
                 <label>Required</label>
                 <span class="align-right">
                         <ct-toggle-slider [formControl]="form.controls['isRequired']"
-                                          [readonly]="readonly">
+                                          [disabled]="readonly">
                         </ct-toggle-slider>
                     </span>
             </div>
@@ -42,6 +42,7 @@ import {noop} from "../../../../lib/utils.lib";
                 <label class="form-control-label">ID</label>
                 <input type="text"
                        class="form-control"
+                       [readonly]="readonly"
                        [formControl]="form.controls['id']">
                 <div *ngIf="form.controls['id'].errors" class="form-control-feedback">
                     {{form.controls['id'].errors['error']}}
@@ -49,7 +50,8 @@ import {noop} from "../../../../lib/utils.lib";
             </div>
 
             <!--Input Type -->
-            <ct-type-select [formControl]="form.controls['type']"></ct-type-select>
+            <ct-type-select [formControl]="form.controls['type']"
+                            [readonly]="readonly"></ct-type-select>
 
             <!--Symbols-->
             <div class="form-group"
@@ -66,7 +68,7 @@ import {noop} from "../../../../lib/utils.lib";
                 <label>Include in command line</label>
                 <span class="align-right">
                         <ct-toggle-slider [formControl]="form.controls['isBound']"
-                                          [readonly]="readonly">
+                                          [disabled]="readonly">
                         </ct-toggle-slider>
                     </span>
             </div>
@@ -118,8 +120,8 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
         this.input = input;
 
         this.form = this.formBuilder.group({
-            id: [{value: this.input.id, disabled: this.readonly}],
-            type: [{value: this.input.type, disabled: this.readonly}, [Validators.required]],
+            id: [this.input.id],
+            type: [this.input.type, [Validators.required]],
             isBound: [this.input.isBound],
             isRequired: [!this.input.type.isNullable],
             inputBinding: [this.input],

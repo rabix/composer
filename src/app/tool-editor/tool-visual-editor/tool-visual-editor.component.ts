@@ -132,6 +132,9 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
                 }
             }
         } else if (category === "resources") {
+            const memValue = parseInt(data.mem.value, 10);
+            const cpuValue   = parseInt(data.cores.value, 10);
+
             if (this.model.cwlVersion === "v1.0") {
                 // extending the data object gotten to recapture any other requirement properties (ramMax, coresMax, etc)
                 const req = <ResourceRequirement>{
@@ -141,6 +144,18 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
                         coresMin: data.cores.serialize()
                     }
                 };
+
+                let {ram, cores} = this.context.runtime;
+
+                if (!isNaN(memValue)) {
+                    ram = memValue;
+                }
+
+                if (!isNaN(cpuValue)) {
+                    cores = cpuValue;
+                }
+
+                this.model.setRuntime({cores, ram});
 
                 // remove cottontail specific properties so they aren't serialized as customProps
                 delete (<any> req).cores;
@@ -156,6 +171,17 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
                     "class": "sbg:MemRequirement",
                     value: data.mem.serialize()
                 });
+
+                let {mem, cpu} = this.context.$job.allocatedResources;
+
+                if (!isNaN(memValue)) {
+                    mem = memValue;
+                }
+
+                if (!isNaN(cpuValue)) {
+                    cpu = cpuValue;
+                }
+                this.model.setRuntime({mem, cpu});
             }
         }
 

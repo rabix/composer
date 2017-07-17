@@ -6,4 +6,9 @@ ct-job-editor-entry {
     top: -7px;
     right: 0;
   }
+
+  .input-group-btn button {
+    height: 28.38px; //@fixme (this works but PLEASE fix me)
+    width: 46px;
+  }
 }

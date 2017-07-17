@@ -11,7 +11,7 @@
         transition: opacity .25s, height 0.25s;
         overflow: hidden;
         color: white;
-        border-bottom: 1px solid white;
+        border-bottom: 1px solid $panel-bg;
 
         .error-text {
             flex: 1;
