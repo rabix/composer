@@ -1,11 +1,11 @@
 import {Component, Input, OnInit} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
-import {LocalFileRepositoryService} from "../../../file-repository/local-file-repository.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {FormAsyncValidator} from "../../forms/helpers/form-async-validator";
+import {FileRepositoryService} from "../../../file-repository/file-repository.service";
 
 @Component({
     selector: "ct-create-local-folder-modal",
@@ -52,7 +52,7 @@ export class CreateLocalFolderModalComponent extends DirectiveBase implements On
     form: FormGroup;
 
     constructor(private dataGateway: DataGatewayService,
-                private localFileRepository: LocalFileRepositoryService,
+                private localFileRepository: FileRepositoryService,
                 public modal: ModalService) {
         super();
     }

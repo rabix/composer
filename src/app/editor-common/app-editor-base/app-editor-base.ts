@@ -115,13 +115,13 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         this.codeEditorContent.valueChanges.subscribeTracked(this, content => this.codeSwapService.codeContent.next(content));
 
         /** Changes to the code that did not come from user's typing. */
-        const externalCodeChanges = Observable.merge(this.tabData.fileContent, this.priorityCodeUpdates).distinctUntilChanged().share();
+        const externalCodeChanges = Observable.merge(this.tabData.fileContent, this.priorityCodeUpdates).distinctUntilChanged();
 
         /** Changes to the code from user's typing, slightly debounced */
-        const codeEditorChanges = this.codeEditorContent.valueChanges.debounceTime(300).distinctUntilChanged().share();
+        const codeEditorChanges = this.codeEditorContent.valueChanges.debounceTime(300).distinctUntilChanged();
 
         /** Observe all code changes */
-        const allCodeChanges = Observable.merge(externalCodeChanges, codeEditorChanges).distinctUntilChanged().share();
+        const allCodeChanges = Observable.merge(externalCodeChanges, codeEditorChanges).distinctUntilChanged();
 
         /** Attach a CWL validator to code updates and observe the validation state changes. */
         const schemaValidation = this.appValidator.createValidator(allCodeChanges).map((state: AppValidityState) => {
@@ -171,11 +171,14 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         firstValidationEnd.withLatestFrom(externalCodeChanges)
             .switchMap((data: [AppValidityState, string]) => {
                 const [validationState, code] = data;
-                return validationCompletion.startWith(validationState).map(state => [this.codeEditorContent.value, state])
+                return validationCompletion
+                    .startWith(validationState)
+                    .map(state => [this.codeEditorContent.value, state])
             })
-            .withLatestFrom(this.platformRepository.getAppMeta(this.tabData.id, "swapUnlocked"), (outer, inner) => [...outer, inner])
+            .withLatestFrom(
+                this.platformRepository.getAppMeta(this.tabData.id, "swapUnlocked"),
+                (outer, inner) => [...outer, inner])
             .subscribeTracked(this, (data: [string, AppValidityState, boolean]) => {
-
                 const [code, validation, unlocked] = data;
 
                 this.isLoading = false;
@@ -189,14 +192,15 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     // copyOf property really matters only if we are working with the latest revision
                     // otherwise, apps detached from copy state at some revision will still show locked state
                     // and notification when switched to an older revision
-                    const props = this.dataModel.customProps || {};
+                    const props             = this.dataModel.customProps || {};
                     const hasCopyOfProperty = props["sbg:copyOf"] && (~~props["sbg:revision"] === ~~props["sbg:latestRevision"]);
 
-                    if (!this.tabData.isWritable) {
+                    if (!this.tabData.isWritable || this.tabData.dataSource === "local") {
                         this.isUnlockable = false;
                     } else if (hasCopyOfProperty && !unlocked) {
                         this.notificationBar.showNotification(
-                            new InfoNotification("This app is a copy of " + this.dataModel.customProps["sbg:copyOf"]));
+                            new InfoNotification("This app is a copy of " + this.dataModel.customProps["sbg:copyOf"])
+                        );
                         this.isUnlockable = true;
                     }
 

@@ -1,20 +1,24 @@
-import {Injectable} from "@angular/core";
+import {ChangeDetectorRef, Injectable} from "@angular/core";
 import "rxjs/add/operator/withLatestFrom";
 import {Observable} from "rxjs/Observable";
 import {App} from "../../../../../electron/src/sbg-api-client/interfaces/app";
 import {Project} from "../../../../../electron/src/sbg-api-client/interfaces/project";
 import {AuthService} from "../../../auth/auth.service";
 import {AuthCredentials} from "../../../auth/model/auth-credentials";
-import {LocalFileRepositoryService} from "../../../file-repository/local-file-repository.service";
+import {FileRepositoryService} from "../../../file-repository/file-repository.service";
 import {LocalRepositoryService} from "../../../repository/local-repository.service";
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {IpcService} from "../../../services/ipc.service";
 import {TreeNode} from "../../../ui/tree-view/tree-node";
 import {FilesystemEntry} from "../../data-gateway/data-types/local.types";
 import {GlobalService} from "../../global/global.service";
+import {AppsPanelService} from "../common/apps-panel.service";
+import {NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
+import {WorkboxService} from "../../workbox/workbox.service";
+import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
 
 @Injectable()
-export class MyAppsPanelService {
+export class MyAppsPanelService extends AppsPanelService {
 
     projects: Observable<Project[]>;
     expandedNodes: Observable<string[]>;
@@ -26,9 +30,14 @@ export class MyAppsPanelService {
                 private ipc: IpcService,
                 private global: GlobalService,
                 private localRepository: LocalRepositoryService,
-                private localFileRepository: LocalFileRepositoryService,
-                private platformRepository: PlatformRepositoryService) {
+                protected fileRepository: FileRepositoryService,
+                protected notificationBar: NotificationBarService,
+                protected workbox: WorkboxService,
+                protected statusBar: StatusBarService,
+                cdr: ChangeDetectorRef,
+                protected platformRepository: PlatformRepositoryService) {
 
+        super(fileRepository, platformRepository, notificationBar, workbox, statusBar, cdr);
 
         this.localFolders       = this.localRepository.getLocalFolders();
         this.projects           = this.platformRepository.getOpenProjects();
@@ -91,7 +100,7 @@ export class MyAppsPanelService {
                     label: path.split("/").pop(),
                     isExpanded: this.localExpandedNodes.map(list => list.indexOf(path) !== -1),
                     children: Observable.empty()
-                        .concat(this.localFileRepository.watch(path))
+                        .concat(this.fileRepository.watch(path))
                         .map(listing => this.createDirectoryListingTreeNodes(listing))
 
                 }));

@@ -239,6 +239,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
         const userProject         = this.tree.contextMenu.filter((data) => data.node.type === "project");
         const topLevelLocalFolder = this.tree.contextMenu.filter((data) => data.node.type === "folder" && data.node.level === 2);
         const nestedLocalFolder   = this.tree.contextMenu.filter(data => data.node.type === "folder" && data.node.level > 2);
+        const platformApp         = this.tree.contextMenu.filter(data => data.node.type === "app");
 
         // Menu Items and factories
         const syncMenuItem = new MenuItem("Synchronize Data", {
@@ -307,6 +308,14 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
                 createAppMenuItem(data.node, "local", "Workflow"),
                 createAppMenuItem(data.node, "local", "CommandLineTool"),
                 createFolderMenuItem(data.node),
+            ];
+
+            this.context.showAt(data.node.getViewContainer(), contextMenu, data.coordinates);
+        });
+
+        platformApp.subscribeTracked(this, (data) => {
+            const contextMenu = [
+                this.service.makeCopyAppToLocalMenuItem(data.node),
             ];
 
             this.context.showAt(data.node.getViewContainer(), contextMenu, data.coordinates);

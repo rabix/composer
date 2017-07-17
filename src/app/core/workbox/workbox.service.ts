@@ -187,6 +187,7 @@ export class WorkboxService {
         const currentTab = this.tabs.getValue().find(existingTab => existingTab.id === data.id);
 
         if (currentTab) {
+            console.log("Tab already active", currentTab);
             return currentTab;
         }
 

@@ -6,7 +6,6 @@ import {Observable} from "rxjs/Observable";
 import {Project} from "../../../../../electron/src/sbg-api-client/interfaces/project";
 import {AuthService} from "../../../auth/auth.service";
 import {AppGeneratorService} from "../../../cwl/app-generator/app-generator.service";
-import {LocalFileRepositoryService} from "../../../file-repository/local-file-repository.service";
 import {LocalRepositoryService} from "../../../repository/local-repository.service";
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {ModalService} from "../../../ui/modal/modal.service";
@@ -14,6 +13,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {AppHelper} from "../../helpers/AppHelper";
 import {WorkboxService} from "../../workbox/workbox.service";
+import {FileRepositoryService} from "../../../file-repository/file-repository.service";
 
 const {app, dialog} = window["require"]("electron").remote;
 
@@ -131,7 +131,7 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
                 private workbox: WorkboxService,
                 private platformRepository: PlatformRepositoryService,
                 private localRepository: LocalRepositoryService,
-                private localFileRepository: LocalFileRepositoryService) {
+                private fileRepository: FileRepositoryService) {
 
         super();
     }
@@ -235,7 +235,7 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
         const dump = YAML.dump(app);
 
         this.dataGateway.saveLocalFileContent(path, dump).subscribeTracked(this, () => {
-            this.localFileRepository.reloadPath(folder);
+            this.fileRepository.reloadPath(folder);
 
             const tabData = {
                 id: path,
