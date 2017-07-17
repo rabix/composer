@@ -22,6 +22,7 @@ import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
 import {IpcService} from "../../../services/ipc.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {WorkflowEditorService} from "../../workflow-editor.service";
+import {ErrorWrapper} from "../../../core/helpers/error-wrapper";
 
 const {dialog} = window["require"]("electron").remote;
 
@@ -407,7 +408,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             this.statusBar.stopProcess(statusProcess, `Added ${step.label}`);
         }, err => {
             this.statusBar.stopProcess(statusProcess);
-            this.notificationBar.showNotification(new ErrorNotification("Failed to add an app to workflow: " + err.error ? err.error.message : err.message));
+            this.notificationBar.showNotification(new ErrorNotification("Failed to add an app to workflow. " + new ErrorWrapper(err)));
         });
     }
 

@@ -24,6 +24,7 @@ import {IpcService} from "../services/ipc.service";
 import {ModalService} from "../ui/modal/modal.service";
 import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow-graph-editor.component";
 import {WorkflowEditorService} from "./workflow-editor.service";
+import {ErrorWrapper} from "../core/helpers/error-wrapper";
 
 export function appSaverFactory(comp: WorkflowEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -155,7 +156,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                     this.cdr.detectChanges();
                 });
             }, err => {
-                this.notificationBar.showNotification(new ErrorNotification("Cannot get app updates. " + (err.error ? err.error.message : err.message)));
+                this.notificationBar.showNotification(new ErrorNotification("Cannot get app updates. " + new ErrorWrapper(err)));
             });
     }
 

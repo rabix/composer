@@ -7,6 +7,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {FormAsyncValidator} from "../../forms/helpers/form-async-validator";
+import {ErrorWrapper} from "../../helpers/error-wrapper";
 
 const {app, dialog} = window["require"]("electron").remote;
 
@@ -134,8 +135,8 @@ export class PublishModalComponent extends DirectiveBase {
         saveCall.then(yay => {
             this.isPublishing = false;
             this.close();
-        }, (nay) => {
-            this.error        = nay.error ? nay.error.message : nay.message;
+        }, (err) => {
+            this.error        = "Failed to publish the app. " + new ErrorWrapper(err);
             this.isPublishing = false;
         });
     }

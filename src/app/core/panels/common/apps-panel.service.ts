@@ -10,6 +10,7 @@ import {MenuItem} from "../../../ui/menu/menu-item";
 import {TreeNode} from "../../../ui/tree-view/tree-node";
 import {TabData} from "../../workbox/tab-data.interface";
 import {WorkboxService} from "../../workbox/workbox.service";
+import {ErrorWrapper} from "../../helpers/error-wrapper";
 
 const {dialog} = window["require"]("electron").remote;
 
@@ -83,7 +84,7 @@ export class AppsPanelService {
                         }).catch((err) => {
                             savingUpdate.next("failed");
                             this.notificationBar.showNotification(
-                                new ErrorNotification("App saving failed. " + (err.error ? err.error.message : err.message))
+                                new ErrorNotification("App saving failed. " + new ErrorWrapper(err))
                             );
                         });
 

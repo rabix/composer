@@ -3,6 +3,7 @@ import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
+import {ErrorWrapper} from "../../helpers/error-wrapper";
 
 
 @Component({
@@ -169,7 +170,7 @@ export class SendFeedbackModalComponent extends DirectiveBase {
             this.closeModal();
         }, err => {
             this.isSending    = false;
-            this.errorMessage = err.error ? err.error.message : err.message;
+            this.errorMessage = "Failed to send feedback. " + new ErrorWrapper(err);
         });
     }
 

@@ -11,6 +11,7 @@ import {PlatformRepositoryService} from "../../../repository/platform-repository
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {UpdateStepModalComponent} from "../../update-step-modal/update-step-modal.component";
+import {ErrorWrapper} from "../../../core/helpers/error-wrapper";
 
 @Component({
     selector: "ct-workflow-step-inspector",
@@ -129,7 +130,7 @@ export class StepInspectorComponent extends DirectiveBase {
         }).catch(err => {
             modal.closeModal();
             this.statusBar.stopProcess(proc);
-            this.notificationBar.showNotification(new ErrorNotification(err.error ? err.error.message : err.message));
+            this.notificationBar.showNotification(new ErrorNotification(new ErrorWrapper(err).toString()));
         });
     }
 

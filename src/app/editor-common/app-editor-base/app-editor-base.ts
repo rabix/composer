@@ -22,6 +22,7 @@ import {AppValidatorService, AppValidityState} from "../app-validator/app-valida
 import {PlatformAppService} from "../components/platform-app-common/platform-app.service";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
 import {APP_SAVER_TOKEN, AppSaver} from "../services/app-saving/app-saver.interface";
+import {ErrorWrapper} from "../../core/helpers/error-wrapper";
 
 export abstract class AppEditorBase extends DirectiveBase implements StatusControlProvider, OnInit, AfterViewInit {
 
@@ -147,7 +148,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             this.codeEditorContent.setValue(code);
 
         }, (err) => {
-            this.unavailableError = (err.error ? err.error.message : err.message) || "Error occurred while fetching app";
+            this.unavailableError = new ErrorWrapper(err).toString() || "Error occurred while fetching app";
             this.isLoading        = false;
         });
 
@@ -319,6 +320,10 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             .toPromise().then(result => {
                 this.priorityCodeUpdates.next(result);
                 return result;
+            }).catch(err =>{
+                this.notificationBar.showNotification(
+                    new ErrorNotification("Cannot open revision. " + new ErrorWrapper(err))
+                )
             });
     }
 
