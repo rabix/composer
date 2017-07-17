@@ -25,11 +25,14 @@ const {app, dialog} = window["require"]("electron").remote;
         <form [formGroup]="destination === 'local' ? localForm : remoteForm" (ngSubmit)="submit()">
             <div class="p-1">
 
-                <div *ngIf="!defaultFolder && !defaultProject && (auth.getActive() | async)" class="destination-selection">
-                    <div class="platform clickable" [class.active]="destination === 'local'" (click)="destination = 'local'">
+                <div *ngIf="!defaultFolder && !defaultProject && (auth.getActive() | async)"
+                     class="destination-selection">
+                    <div class="platform clickable" [class.active]="destination === 'local'"
+                         (click)="destination = 'local'">
                         <span><i class="fa fa-desktop"></i> Local Files</span>
                     </div>
-                    <div class="platform clickable" [class.active]="destination === 'remote'" (click)="destination = 'remote'">
+                    <div class="platform clickable" [class.active]="destination === 'remote'"
+                         (click)="destination = 'remote'">
                         <span><i class="fa fa-globe"></i> Remote</span>
                     </div>
                 </div>
@@ -37,8 +40,9 @@ const {app, dialog} = window["require"]("electron").remote;
                 <div class="form-group">
                     <label>App Name:</label>
                     <input class="form-control" formControlName="name"/>
-                    <p *ngIf="destination === 'remote' && remoteForm.get('name').value" class="form-text text-muted">
-                        App ID: {{ remoteForm.get('name').value }}
+                    <p *ngIf="destination === 'remote' && remoteForm.get('name').value"
+                       class="form-text text-muted">
+                        App ID: {{ remoteForm.get('name').value | slugify}}
                     </p>
                 </div>
 
@@ -61,7 +65,8 @@ const {app, dialog} = window["require"]("electron").remote;
                 <div class="form-group" *ngIf="destination === 'local'">
                     <label>Destination Path:</label>
 
-                    <button class="btn btn-secondary block" type="button" (click)="chooseFilepath()">
+                    <button class="btn btn-secondary block" type="button"
+                            (click)="chooseFilepath()">
                         {{ defaultFolder ? "Choose a File Name" : "Choose a Local Folder" }}
                     </button>
 
@@ -79,15 +84,22 @@ const {app, dialog} = window["require"]("electron").remote;
                                       optgroupField="hash"></ct-auto-complete>
                 </div>
 
-                <div class="alert alert-danger" *ngIf="destination === 'remote' && remoteAppCreationError ">
+                <div class="alert alert-danger"
+                     *ngIf="destination === 'remote' && remoteAppCreationError ">
                     {{ remoteAppCreationError }}
+                </div>
+
+                <div class="alert alert-info"
+                     *ngIf="destination === 'local' && localAppCreationInfo">
+                    {{ localAppCreationInfo }}
                 </div>
 
             </div>
 
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" (click)="modal.close()"> Cancel</button>
+                <button type="button" class="btn btn-secondary" (click)="modal.close()"> Cancel
+                </button>
                 <button type="submit" class="btn btn-primary" *ngIf="destination=== 'remote'"
                         [disabled]="!remoteForm.valid || appCreationInProgress">
 
@@ -97,7 +109,8 @@ const {app, dialog} = window["require"]("electron").remote;
                     </ct-loader-button-content>
                 </button>
 
-                <button type="submit" class="btn btn-primary" *ngIf="destination=== 'local'" [disabled]="!localForm.valid">
+                <button type="submit" class="btn btn-primary" *ngIf="destination=== 'local'"
+                        [disabled]="!localForm.valid">
                     Create
                 </button>
             </div>
@@ -119,6 +132,7 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
     appTypeLocked         = false;
     appCreationInProgress = false;
     remoteAppCreationError;
+    localAppCreationInfo;
 
     localForm: FormGroup;
     remoteForm: FormGroup;
@@ -196,21 +210,34 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
             return app.getPath("home");
         }).take(1);
 
-        defaultFolder.subscribeTracked(this, path => {
+        defaultFolder.subscribeTracked(this, directoryPath => {
 
             const defaultFilename   = this.slugify.transform(`New ${this.appType}`) + ".cwl";
             const {name}            = this.localForm.getRawValue();
             const suggestedFilename = name ? (this.slugify.transform(name) + ".cwl") : defaultFilename;
+            let addExtension      = false;
 
             dialog.showSaveDialog({
                 title: "Choose a File Path",
-                defaultPath: `${path}/${suggestedFilename}`,
+                defaultPath: `${directoryPath}/${suggestedFilename}`,
                 buttonLabel: "Done",
                 properties: ["openDirectory"]
             }, (path) => {
 
+                if (!path) {
+                    return;
+                } else if (path.split("/").slice(-1)[0].split(".").length === 1) {
+                    // ensure the path still gets an extension even if "hide extension" was checked
+                    if (`${directoryPath}/${suggestedFilename}` !== path + ".cwl") {
+                        // but only show message if the user changed the file name, to inform them
+                        // that we've modified it
+                        this.localAppCreationInfo = "Extension .cwl was added to the file name.";
+                    }
+                    addExtension = true;
+                }
+
                 this.localForm.patchValue({
-                    path,
+                    path: addExtension ? path + ".cwl" : path,
                     name: name || path.split("/").pop()
                 });
 
@@ -224,7 +251,8 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
     }
 
     createLocal() {
-        this.error = undefined;
+        this.error                = undefined;
+        this.localAppCreationInfo = undefined;
 
         const {path, name, cwlVersion, type} = this.localForm.getRawValue();
         const filesplit                      = path.split("/");
