@@ -129,18 +129,19 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
     @Input() chosenLocalFilename             = "";
     @Input() defaultFolder: string;
     @Input() defaultProject: string;
-             platformGroup: FormGroup;
-             projectSelection: FormControl;
-             localNameControl: FormControl;
-             localFileControl: FormControl;
-             remoteNameControl: FormControl;
-             remoteSlugControl: FormControl;
-             error: string;
-             projectOptions                  = [];
-             checkingSlug                    = false;
-             appTypeLocked                   = false;
-             appCreationInProgress           = false;
-             remoteAppCreationError;
+
+    platformGroup: FormGroup;
+    projectSelection: FormControl;
+    localNameControl: FormControl;
+    localFileControl: FormControl;
+    remoteNameControl: FormControl;
+    remoteSlugControl: FormControl;
+    error: string;
+    projectOptions        = [];
+    checkingSlug          = false;
+    appTypeLocked         = false;
+    appCreationInProgress = false;
+    remoteAppCreationError;
 
     constructor(private dataGateway: DataGatewayService,
                 public modal: ModalService,

@@ -87,6 +87,8 @@ export class CreateLocalFolderModalComponent extends DirectiveBase implements On
     }
 
     ngOnInit() {
+
+        console.log("Got input", this);
         this.form = new FormGroup({
             folderName: new FormControl("",
                 [
