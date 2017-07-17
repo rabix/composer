@@ -271,9 +271,12 @@ module.exports = {
             });
 
             platformFetchingLocks[targetID] = call.then((data) => {
-                callback(null, data)
+                callback(null, data);
                 delete platformFetchingLocks[targetID];
-            }).catch(callback);
+            }).catch(err => {
+                delete platformFetchingLocks[targetID];
+                callback(err);
+            });
 
         }, callback);
     },

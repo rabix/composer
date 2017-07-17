@@ -3,13 +3,11 @@ import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {IpcService} from "../services/ipc.service";
 
-
 @Injectable()
 export class LocalFileRepositoryService {
 
-
+    private watchedPaths     = [];
     private directoryReloads = new Subject<string>();
-
 
     constructor(private ipc: IpcService) {
     }
@@ -17,6 +15,8 @@ export class LocalFileRepositoryService {
     watch(path: string): Observable<any> {
 
         return new Observable(observer => {
+
+            this.watchedPaths.push(path);
 
             const sub = Observable.merge(
                 Observable.of(path),
@@ -28,17 +28,25 @@ export class LocalFileRepositoryService {
             }, err => observer.error(err));
 
             return () => {
+
+                this.watchedPaths.splice(this.watchedPaths.indexOf(path), 1);
                 sub.unsubscribe();
             }
         });
     }
 
-    fetchDirectoryContent() {
-
-    }
-
     reloadPath(path: string): void {
-        this.directoryReloads.next(path);
+        let pathsToReload = [path];
+
+        // If path to reload is not a top-level folder, find the closest folder that is
+        if (this.watchedPaths.indexOf(path) === -1) {
+            pathsToReload = this.watchedPaths.filter(wp => path.indexOf(wp) === 0).filter((v, i, a) => a.indexOf(v) === i);
+        }
+
+        pathsToReload.forEach(path => {
+            this.directoryReloads.next(path);
+        });
+
     }
 
     readDirectory(path): Observable<{
