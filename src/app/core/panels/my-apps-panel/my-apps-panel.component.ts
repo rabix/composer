@@ -245,16 +245,25 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
             click: () => this.service.reloadPlatformData()
         });
 
-        const createAppMenuItem = (node: TreeNode<any>, destination: "local" | "remote", type: "workflow" | "tool") => {
+        const createAppMenuItem = (node: TreeNode<any>, destination: "local" | "remote", type: "Workflow" | "CommandLineTool") => {
 
-            const typename = type === "tool" ? "Command Line Tool" : "Workflow";
-            return new MenuItem(`New ${typename}`, {
+            return new MenuItem(`New ${type}`, {
                 click: () => {
-                    const modal = this.modal.fromComponent(CreateAppModalComponent, `Create a new ${typename} in ${node.label}`);
+                    const modal = this.modal.fromComponent(CreateAppModalComponent, `Create a new ${type} in ${node.label}`);
 
-                    modal.appType        = type;
-                    modal.destination    = destination;
-                    modal.defaultProject = node.id;
+                    modal.appType     = type;
+                    modal.destination = destination;
+                    if (destination === "local") {
+                        modal.defaultFolder = node.id;
+
+                        // Wait for component to initialize, then open the dialog for choosing the file path
+                        setTimeout(() => {
+                            modal.chooseFilepath();
+                        });
+                    } else {
+                        modal.defaultProject = node.id;
+                    }
+
                 }
             });
         };
@@ -271,8 +280,8 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
 
         userProject.subscribe(data => {
             const contextMenu = [
-                createAppMenuItem(data.node, "remote", "workflow"),
-                createAppMenuItem(data.node, "remote", "tool"),
+                createAppMenuItem(data.node, "remote", "Workflow"),
+                createAppMenuItem(data.node, "remote", "CommandLineTool"),
                 new MenuItem("Remove from Workspace", {
                     click: () => this.service.removeProjectFromWorkspace(data.node.id)
                 })
@@ -282,8 +291,8 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
 
         topLevelLocalFolder.subscribe(data => {
             const contextMenu = [
-                createAppMenuItem(data.node, "local", "workflow"),
-                createAppMenuItem(data.node, "local", "tool"),
+                createAppMenuItem(data.node, "local", "Workflow"),
+                createAppMenuItem(data.node, "local", "CommandLineTool"),
                 createFolderMenuItem(data.node),
                 new MenuItem("Remove from Workspace", {
                     click: () => this.service.removeFolderFromWorkspace(data.node.id)
@@ -295,8 +304,8 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
 
         nestedLocalFolder.subscribe(data => {
             const contextMenu = [
-                createAppMenuItem(data.node, "local", "workflow"),
-                createAppMenuItem(data.node, "local", "tool"),
+                createAppMenuItem(data.node, "local", "Workflow"),
+                createAppMenuItem(data.node, "local", "CommandLineTool"),
                 createFolderMenuItem(data.node),
             ];
 
