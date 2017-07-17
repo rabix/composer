@@ -9,6 +9,7 @@ import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {CodeSwapService} from "../../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../../core/data-gateway/data-gateway.service";
+import {ErrorWrapper} from "../../core/helpers/error-wrapper";
 import {ProceedToEditingModalComponent} from "../../core/modals/proceed-to-editing-modal/proceed-to-editing-modal.component";
 import {PublishModalComponent} from "../../core/modals/publish-modal/publish-modal.component";
 import {AppTabData} from "../../core/workbox/app-tab-data";
@@ -20,9 +21,9 @@ import {ModalService} from "../../ui/modal/modal.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {AppValidatorService, AppValidityState} from "../app-validator/app-validator.service";
 import {PlatformAppService} from "../components/platform-app-common/platform-app.service";
+import {RevisionListComponent} from "../components/revision-list/revision-list.component";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
 import {APP_SAVER_TOKEN, AppSaver} from "../services/app-saving/app-saver.interface";
-import {ErrorWrapper} from "../../core/helpers/error-wrapper";
 
 export abstract class AppEditorBase extends DirectiveBase implements StatusControlProvider, OnInit, AfterViewInit {
 
@@ -34,6 +35,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     @Input()
     viewMode: "code" | string;
+
+    @ViewChild(RevisionListComponent)
+    revisionList: RevisionListComponent;
 
     validationState: AppValidityState;
 
@@ -320,10 +324,11 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             .toPromise().then(result => {
                 this.priorityCodeUpdates.next(result);
                 return result;
-            }).catch(err =>{
+            }).catch(err => {
+                this.revisionList.loadingRevision = false;
                 this.notificationBar.showNotification(
                     new ErrorNotification("Cannot open revision. " + new ErrorWrapper(err))
-                )
+                );
             });
     }
 
