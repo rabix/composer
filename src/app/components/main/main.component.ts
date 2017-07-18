@@ -5,14 +5,16 @@ import "rxjs/add/operator/concat";
 import "rxjs/add/operator/concatAll";
 import "rxjs/add/operator/delay";
 import {Observable} from "rxjs/Observable";
+import {AuthService} from "../../auth/auth.service";
+import {GlobalService} from "../../core/global/global.service";
 import {SystemService} from "../../platform-providers/system.service";
 import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {GuidService} from "../../services/guid.service";
+import {JavascriptEvalService} from "../../services/javascript-eval/javascript-eval.service";
 import {ContextService} from "../../ui/context/context.service";
 import {MarkdownService} from "../../ui/markdown/markdown.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {UrlValidator} from "../../validators/url.validator";
-import {JavascriptEvalService} from "../../services/javascript-eval/javascript-eval.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -41,10 +43,15 @@ export class MainComponent {
     constructor(modal: ModalService,
                 system: SystemService,
                 vcRef: ViewContainerRef,
+                auth: AuthService,
+                global: GlobalService,
                 // DON'T REMOVE THIS PLEASE I KNOW IT DOESN'T HAVE ANY USAGES
-                js: JavascriptEvalService ) {
+                js: JavascriptEvalService) {
 
         system.boot();
+
+        // When we first get active credentials (might be undefined if no user is active), sync data with the platform
+        auth.getActive().take(1).toPromise().then(credentials => credentials && global.reloadPlatformData());
 
         /**
          * Hack for angular's inability to provide the vcRef to a service with DI.

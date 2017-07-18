@@ -30,6 +30,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                 <!--List of entries-->
                 <ct-tool-output-list [inputs]="inputs"
                                      [(entries)]="model.outputs"
+                                     (update)="update.emit($event)"
                                      (entriesChange)="update.emit($event)"
                                      [location]="location"
                                      [context]="context"

@@ -2,14 +2,17 @@ import {Injectable} from "@angular/core";
 
 import "rxjs/add/operator/take";
 import {AuthService} from "../../../auth/auth.service";
-import {NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
+import {
+    ErrorNotification,
+    NotificationBarService
+} from "../../../layout/notification-bar/notification-bar.service";
 import {SystemService} from "../../../platform-providers/system.service";
 
 @Injectable()
 export class PlatformAppService {
 
     constructor(private auth: AuthService,
-                private errorBar: NotificationBarService,
+                private notificationBar: NotificationBarService,
                 private system: SystemService) {
     }
 
@@ -17,7 +20,7 @@ export class PlatformAppService {
         this.auth.getActive().take(1).subscribe(credentials => {
 
             if (!credentials) {
-                this.errorBar.showError("Unable to open the app, it seems that you are not connected to any platform.");
+                this.notificationBar.showNotification(new ErrorNotification("Unable to open the app, it seems that you are not connected to any platform."));
 
                 return;
             }

@@ -2,12 +2,16 @@ import {ChangeDetectorRef, Component, Input, Output, EventEmitter} from "@angula
 import {Workflow} from "cwl-svg";
 import {StepModel, WorkflowModel} from "cwlts/models";
 import {RawApp} from "../../../../../electron/src/sbg-api-client/interfaces/raw-app";
-import {NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
+import {
+    ErrorNotification,
+    NotificationBarService
+} from "../../../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {UpdateStepModalComponent} from "../../update-step-modal/update-step-modal.component";
+import {ErrorWrapper} from "../../../core/helpers/error-wrapper";
 
 @Component({
     selector: "ct-workflow-step-inspector",
@@ -17,7 +21,7 @@ import {UpdateStepModalComponent} from "../../update-step-modal/update-step-moda
         <!--Update warning-->
         <div class="alert alert-update form-control-label" *ngIf="step.hasUpdate && !readonly">
             A new version of this app is available! 
-            <button class="btn-unstyled update-btn" (click)="updateStep($event)">Update</button> to get the latest changes.
+            <button class="btn-unstyled p-0 update-btn" (click)="updateStep($event)">Update</button> to get the latest changes.
         </div>
 
         <!--View Modes-->
@@ -126,7 +130,7 @@ export class StepInspectorComponent extends DirectiveBase {
         }).catch(err => {
             modal.closeModal();
             this.statusBar.stopProcess(proc);
-            this.notificationBar.showError(err.error ? err.error.message : err.message);
+            this.notificationBar.showNotification(new ErrorNotification(new ErrorWrapper(err).toString()));
         });
     }
 

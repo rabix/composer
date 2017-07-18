@@ -4,14 +4,16 @@ import {CommandLineToolModel, WorkflowModel} from "cwlts/models";
 
 import * as Yaml from "js-yaml";
 import {LoadOptions} from "js-yaml";
+import "rxjs/add/operator/do";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {CodeSwapService} from "../../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../../core/data-gateway/data-gateway.service";
+import {ErrorWrapper} from "../../core/helpers/error-wrapper";
 import {ProceedToEditingModalComponent} from "../../core/modals/proceed-to-editing-modal/proceed-to-editing-modal.component";
 import {PublishModalComponent} from "../../core/modals/publish-modal/publish-modal.component";
 import {AppTabData} from "../../core/workbox/app-tab-data";
-import {NotificationBarService} from "../../layout/notification-bar/notification-bar.service";
+import {ErrorNotification, InfoNotification, NotificationBarService} from "../../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {StatusControlProvider} from "../../layout/status-bar/status-control-provider.interface";
 import {PlatformRepositoryService} from "../../repository/platform-repository.service";
@@ -19,9 +21,9 @@ import {ModalService} from "../../ui/modal/modal.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {AppValidatorService, AppValidityState} from "../app-validator/app-validator.service";
 import {PlatformAppService} from "../components/platform-app-common/platform-app.service";
+import {RevisionListComponent} from "../components/revision-list/revision-list.component";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
 import {APP_SAVER_TOKEN, AppSaver} from "../services/app-saving/app-saver.interface";
-import "rxjs/add/operator/do";
 
 export abstract class AppEditorBase extends DirectiveBase implements StatusControlProvider, OnInit, AfterViewInit {
 
@@ -33,6 +35,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     @Input()
     viewMode: "code" | string;
+
+    @ViewChild(RevisionListComponent)
+    revisionList: RevisionListComponent;
 
     validationState: AppValidityState;
 
@@ -79,7 +84,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     private modelCreated = false;
 
     constructor(protected statusBar: StatusBarService,
-                protected errorBar: NotificationBarService,
+                protected notificationBar: NotificationBarService,
                 protected modal: ModalService,
                 protected inspector: EditorInspectorService,
                 protected dataGateway: DataGatewayService,
@@ -115,13 +120,13 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         this.codeEditorContent.valueChanges.subscribeTracked(this, content => this.codeSwapService.codeContent.next(content));
 
         /** Changes to the code that did not come from user's typing. */
-        const externalCodeChanges = Observable.merge(this.tabData.fileContent, this.priorityCodeUpdates).distinctUntilChanged().share();
+        const externalCodeChanges = Observable.merge(this.tabData.fileContent, this.priorityCodeUpdates).distinctUntilChanged();
 
         /** Changes to the code from user's typing, slightly debounced */
-        const codeEditorChanges = this.codeEditorContent.valueChanges.debounceTime(300).distinctUntilChanged().share();
+        const codeEditorChanges = this.codeEditorContent.valueChanges.debounceTime(300).distinctUntilChanged();
 
         /** Observe all code changes */
-        const allCodeChanges = Observable.merge(externalCodeChanges, codeEditorChanges).distinctUntilChanged().share();
+        const allCodeChanges = Observable.merge(externalCodeChanges, codeEditorChanges).distinctUntilChanged();
 
         /** Attach a CWL validator to code updates and observe the validation state changes. */
         const schemaValidation = this.appValidator.createValidator(allCodeChanges).map((state: AppValidityState) => {
@@ -147,7 +152,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             this.codeEditorContent.setValue(code);
 
         }, (err) => {
-            this.unavailableError = (err.error ? err.error.message : err.message) || "Error occurred while fetching app";
+            this.unavailableError = new ErrorWrapper(err).toString() || "Error occurred while fetching app";
             this.isLoading        = false;
         });
 
@@ -168,34 +173,43 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
          * code change that might have been there in the meantime so we know what to use as the base for
          * the model creation.
          */
-        firstValidationEnd
-            .withLatestFrom(externalCodeChanges, (_, latestCode) => latestCode)
-            .switchMap(latestCode => {
-                const validation = validationCompletion.startWith(this.validationState);
-                const modelCode  = externalCodeChanges.startWith(latestCode).distinctUntilChanged();
-                return modelCode.switchMap(code => validation.take(1), (code, validation) => code);
+        firstValidationEnd.withLatestFrom(externalCodeChanges)
+            .switchMap((data: [AppValidityState, string]) => {
+                const [validationState, code] = data;
+                return validationCompletion
+                    .startWith(validationState)
+                    .map(state => [this.codeEditorContent.value, state])
             })
-            .withLatestFrom(this.platformRepository.getAppMeta(this.tabData.id, "swapUnlocked"))
-            .subscribeTracked(this, data => {
-                const [code, unlocked] = data;
+            .withLatestFrom(
+                this.platformRepository.getAppMeta(this.tabData.id, "swapUnlocked"),
+                (outer, inner) => [...outer, inner])
+            .subscribeTracked(this, (data: [string, AppValidityState, boolean]) => {
+                const [code, validation, unlocked] = data;
 
                 this.isLoading = false;
 
-                if (!this.validationState.isValidCWL) {
+                if (!validation.isValidCWL) {
                     return;
                 }
 
                 this.resolveToModel(code).then(() => {
 
-                    const hasCopyOfProperty = this.dataModel.customProps["sbg:copyOf"] !== undefined;
+                    // copyOf property really matters only if we are working with the latest revision
+                    // otherwise, apps detached from copy state at some revision will still show locked state
+                    // and notification when switched to an older revision
+                    const props             = this.dataModel.customProps || {};
+                    const hasCopyOfProperty = props["sbg:copyOf"] && (~~props["sbg:revision"] === ~~props["sbg:latestRevision"]);
 
-                    if (!this.tabData.isWritable) {
+                    if (!this.tabData.isWritable || this.tabData.dataSource === "local") {
                         this.isUnlockable = false;
                     } else if (hasCopyOfProperty && !unlocked) {
+                        this.notificationBar.showNotification(
+                            new InfoNotification("This app is a copy of " + this.dataModel.customProps["sbg:copyOf"])
+                        );
                         this.isUnlockable = true;
                     }
 
-                    if (this.isUnlockable && hasCopyOfProperty && !unlocked) {
+                    if (!this.tabData.isWritable || (this.isUnlockable && hasCopyOfProperty && !unlocked)) {
                         this.toggleLock(true);
                     }
                 }, err => console.warn);
@@ -230,7 +244,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     return;
                 }
 
-                this.errorBar.showError(`Saving failed: ${err.message}`);
+                this.notificationBar.showNotification(new ErrorNotification(`Saving failed: ${err.message}`));
                 this.statusBar.stopProcess(proc, `Could not save ${this.originalTabLabel} (${err.message})`);
             });
     }
@@ -238,7 +252,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     publish(): void {
 
         if (!this.validationState.isValidCWL) {
-            this.errorBar.showError(`Cannot publish this app because because it's doesn't match the proper JSON schema`);
+            this.notificationBar.showNotification(new ErrorNotification(`Cannot publish this app because because it's doesn't match the proper JSON schema`));
             return;
         }
 
@@ -310,6 +324,11 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             .toPromise().then(result => {
                 this.priorityCodeUpdates.next(result);
                 return result;
+            }).catch(err => {
+                this.revisionList.loadingRevision = false;
+                this.notificationBar.showNotification(
+                    new ErrorNotification("Cannot open revision. " + new ErrorWrapper(err))
+                );
             });
     }
 
@@ -413,7 +432,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         }).then(result => {
             return result;
         }, err => {
-            this.errorBar.showError("RDF resolution error: " + err.message);
+            this.notificationBar.showNotification(new ErrorNotification("RDF resolution error: " + err.message));
 
             this.validationState.isValidCWL = false;
             this.validationState.errors     = [{

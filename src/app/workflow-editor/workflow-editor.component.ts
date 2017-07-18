@@ -14,13 +14,17 @@ import {EditorInspectorService} from "../editor-common/inspector/editor-inspecto
 import {APP_SAVER_TOKEN} from "../editor-common/services/app-saving/app-saver.interface";
 import {LocalFileSavingService} from "../editor-common/services/app-saving/local-file-saving.service";
 import {PlatformAppSavingService} from "../editor-common/services/app-saving/platform-app-saving.service";
-import {NotificationBarService} from "../layout/notification-bar/notification-bar.service";
+import {
+    ErrorNotification,
+    NotificationBarService
+} from "../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../layout/status-bar/status-bar.service";
 import {PlatformRepositoryService} from "../repository/platform-repository.service";
 import {IpcService} from "../services/ipc.service";
 import {ModalService} from "../ui/modal/modal.service";
 import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow-graph-editor.component";
 import {WorkflowEditorService} from "./workflow-editor.service";
+import {ErrorWrapper} from "../core/helpers/error-wrapper";
 
 export function appSaverFactory(comp: WorkflowEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -47,7 +51,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
 
 
     constructor(statusBar: StatusBarService,
-                errorBar: NotificationBarService,
+                notificationBar: NotificationBarService,
                 modal: ModalService,
                 inspector: EditorInspectorService,
                 dataGateway: DataGatewayService,
@@ -57,7 +61,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                 protected platformRepository: PlatformRepositoryService,
                 private cdr: ChangeDetectorRef,
                 platformAppService: PlatformAppService,) {
-        super(statusBar, errorBar, modal, inspector, dataGateway, injector, appValidator, codeSwapService, platformAppService, platformRepository);
+        super(statusBar, notificationBar, modal, inspector, dataGateway, injector, appValidator, codeSwapService, platformAppService, platformRepository);
     }
 
     protected getPreferredTab(): string {
@@ -131,8 +135,12 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                     return {...acc, [revisionlessID]: item.revision};
                 }, {});
 
-                this.dataModel.steps.forEach(step => {
+            this.dataModel.steps.forEach(step => {
 
+                // a non-sbg app might be embedded in an sbg workflow
+                if (!step.run.customProps || !step.run.customProps["sbg:id"]) {
+                    return;
+                }
                     const revisionless = step.run.customProps["sbg:id"].split("/").slice(0, 3).join("/");
                     const revision     = Number(step.run.customProps["sbg:id"].split("/").pop());
 
@@ -148,7 +156,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                     this.cdr.detectChanges();
                 });
             }, err => {
-                this.errorBar.showError("Cannot get app updates. " + (err.error ? err.error.message : err.message));
+                this.notificationBar.showNotification(new ErrorNotification("Cannot get app updates. " + new ErrorWrapper(err)));
             });
     }
 
@@ -157,7 +165,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
      * the text has been formatted by the GUI editor
      */
     protected getModelText(embed = false): string {
-        const wf = embed ? this.dataModel.serializeEmbedded() : this.dataModel.serialize();
+        const wf = embed || this.tabData.dataSource === "app" ? this.dataModel.serializeEmbedded() : this.dataModel.serialize();
 
         return this.tabData.language === "json" || this.tabData.dataSource === "app" ?
             JSON.stringify(wf, null, 4) : Yaml.dump(wf);

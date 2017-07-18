@@ -1,18 +1,31 @@
-import {Injectable} from "@angular/core";
+import {ChangeDetectorRef, Injectable} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {App} from "../../../../../electron/src/sbg-api-client/interfaces/app";
+import {FileRepositoryService} from "../../../file-repository/file-repository.service";
+import {NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
+import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {TreeNode} from "../../../ui/tree-view/tree-node";
 import {AppHelper} from "../../helpers/AppHelper";
+import {WorkboxService} from "../../workbox/workbox.service";
+import {AppsPanelService} from "../common/apps-panel.service";
 
 @Injectable()
-export class PublicAppsPanelService {
+export class PublicAppsPanelService extends AppsPanelService {
 
     private apps: Observable<App[]>;
 
-    constructor(private platformRepository: PlatformRepositoryService) {
+    constructor(protected platformRepository: PlatformRepositoryService,
+                fileRepository: FileRepositoryService,
+                notificationBar: NotificationBarService,
+                workbox: WorkboxService,
+                cdr: ChangeDetectorRef,
+                statusBar: StatusBarService) {
 
-        this.apps = platformRepository.getPublicApps();
+        super(fileRepository, platformRepository, notificationBar, workbox, statusBar, cdr);
+
+        this.apps = platformRepository.getPublicApps()
+            .map((apps) => apps.filter((app) => !app.raw["sbg:blackbox"]));
     }
 
     getAppsByNone(): Observable<TreeNode<any>[]> {

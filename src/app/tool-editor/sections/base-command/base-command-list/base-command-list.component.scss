@@ -6,6 +6,10 @@
 
         ct-expression-input {
             flex: 1;
+
+            /deep/ .input-group {
+                padding-bottom: 1px; //@fixme (this works but PLEASE fix me)
+            }
         }
 
         .remove-icon {

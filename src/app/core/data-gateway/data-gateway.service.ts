@@ -35,10 +35,6 @@ export class DataGatewayService {
         return this.ipc.request("createDirectory", folderPath);
     }
 
-    invalidateFolderListing(folder) {
-        this.cacheInvalidation.next(`readDirectory.${folder}`);
-    }
-
     searchLocalProjects(term, limit = 20): Promise<{
         type: "Workflow" | "CommandLineTool" | string;
         path: string;
@@ -99,10 +95,16 @@ export class DataGatewayService {
     }
 
 
+    /**
+     * @deprecated use FileRepository.saveFile
+     */
     saveLocalFileContent(path, content) {
         return this.ipc.request("saveFileContent", {path, content});
     }
 
+    /**
+     * @deprecated use FileRepository.saveFile
+     */
     saveFile(fileID, content): Observable<string> {
         return this.saveLocalFileContent(fileID, content).map(() => content);
     }

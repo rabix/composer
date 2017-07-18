@@ -1,13 +1,17 @@
 import {Injectable} from "@angular/core";
-import {NotificationBarService} from "../../layout/notification-bar/notification-bar.service";
+import {
+    ErrorNotification,
+    NotificationBarService
+} from "../../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {PlatformRepositoryService} from "../../repository/platform-repository.service";
+import {ErrorWrapper} from "../helpers/error-wrapper";
 
 @Injectable()
 export class GlobalService {
 
     constructor(private platformRepository: PlatformRepositoryService,
-                private notification: NotificationBarService,
+                private notificationBar: NotificationBarService,
                 private statusBar: StatusBarService) {
     }
 
@@ -17,7 +21,8 @@ export class GlobalService {
             this.statusBar.stopProcess(process, "Fetched platform data");
 
         }, err => {
-            this.notification.showError("Cannot sync platform data. " + (err.error ? err.error.message : err.message));
+            console.log("Error", err);
+            this.notificationBar.showNotification(new ErrorNotification("Cannot sync platform data. " + new ErrorWrapper(err)));
             this.statusBar.stopProcess(process, "Failed to fetch platform data.");
         });
     }

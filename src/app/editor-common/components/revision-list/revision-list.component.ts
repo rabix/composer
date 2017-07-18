@@ -6,7 +6,6 @@ import {PlatformAppRevisionEntry} from "../../../services/api/platforms/platform
 
     selector: "ct-revision-list",
     styleUrls: ["./revision-list.component.scss"],
-    // changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <ct-editor-inspector-content class="p-0">
             <div class="tc-header">Revisions</div>
@@ -57,7 +56,6 @@ export class RevisionListComponent implements OnChanges {
         }
 
         this.loadingRevision = revision;
-        console.log("Loading revision", revision);
         this.select.next(revision.number);
 
     }

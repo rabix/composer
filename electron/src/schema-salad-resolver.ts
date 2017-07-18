@@ -13,6 +13,8 @@ function traverse(data, source, root, graph = {}) {
 
         const future = [];
 
+        const isResolvableGraph = data["$graph"] !== undefined;
+
         for (let key in data) {
 
             const entry = data[key];
@@ -27,7 +29,7 @@ function traverse(data, source, root, graph = {}) {
             const isGraphReference    = isExternalResource && key === "run" && entry.startsWith("#");
             const isGraphSubreference = !isExternalResource && typeof entry === "string" && entry.startsWith("#") && entry.indexOf("/") !== -1;
 
-            if (isGraphSubreference) {
+            if (isGraphSubreference && isResolvableGraph) {
 
                 const [graphKey, ...rest] = entry.substr(1).split("/");
                 const remains             = rest.join("/");
@@ -36,7 +38,7 @@ function traverse(data, source, root, graph = {}) {
                     data[key] = remains;
                     future.push(Promise.resolve(1));
                 } else {
-                    future.push(Promise.reject(`Could not dereference a non-existing $graph path for “${entry}”`));
+                    future.push(Promise.reject(new Error(`Could not dereference a non-existing $graph path for “${entry}”`)));
                 }
 
 
@@ -53,7 +55,7 @@ function traverse(data, source, root, graph = {}) {
                         return;
                     }
 
-                    reject(`Graph id “${entry}” has no corresponding $graph entry`);
+                    reject(new Error(`Graph id “${entry}” has no corresponding $graph entry`));
                 });
 
                 future.push(embedding);

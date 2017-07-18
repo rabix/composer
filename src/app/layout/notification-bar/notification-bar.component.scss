@@ -3,15 +3,15 @@
 
 /** @name ErrorBarComponentStyle */
 :host {
-    .error-alert {
+    .notification {
         display: flex;
-        opacity: 0;
-        height: 0;
+        opacity: 1;
+        height: $notification-bar-height;
         line-height: $notification-bar-height;
-        color: $brand-danger-inverse-color;
-        background-color: $brand-danger;
         transition: opacity .25s, height 0.25s;
         overflow: hidden;
+        color: white;
+        border-bottom: 1px solid $panel-bg;
 
         .error-text {
             flex: 1;
@@ -25,9 +25,16 @@
         }
     }
 
-    .show {
-        opacity: 1;
-        height: $notification-bar-height;
+    .notification-error {
+        background-color: $brand-danger;
+    }
+
+    .notification-warning {
+        background-color: $brand-warning;
+    }
+
+    .notification-info {
+        background-color: $brand-info;
     }
 }
 

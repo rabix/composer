@@ -1,8 +1,8 @@
 import {Directive, ElementRef, Input} from "@angular/core";
-import {DomEventService} from "../../../services/dom/dom-event.service";
-import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import "rxjs/add/operator/last";
 import "rxjs/add/operator/skip";
+import {DomEventService} from "../../../services/dom/dom-event.service";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Directive({selector: "[ct-drag-enabled]"})
 export class DragDirective extends DirectiveBase {
@@ -47,27 +47,27 @@ export class DragDirective extends DirectiveBase {
                 // Skip first 6 mouse move events in order to distinguish mouse click and drag
                 const mid = drag.skip(6).subscribe((ev: any) => {
 
-                    const dragImage = ev.ctData.dragImage;
+                    const dragImage           = ev.ctData.dragImage;
                     const preEnteredDropZones = ev.ctData.preEnteredDropZones;
-                    const preHoveredElement = ev.ctData.preHoveredElement;
-                    const preDragEntered = ev.ctData.preDragEntered;
+                    const preHoveredElement   = ev.ctData.preHoveredElement;
+                    const preDragEntered      = ev.ctData.preDragEntered;
 
                     // Reposition of drag image
-                    dragImage.style.top =
+                    dragImage.style.top  =
                         ev.clientY - (1 / 2) * dragImage.offsetHeight + "px";
                     dragImage.style.left =
                         (ev.clientX - (1 / 2) * dragImage.offsetWidth) + "px";
 
                     // Get element behind drag image at following mouse coordinates
                     dragImage.style.visibility = "hidden";
-                    const curHoveredElement = document.elementFromPoint(ev.clientX, ev.clientY);
+                    const curHoveredElement    = document.elementFromPoint(ev.clientX, ev.clientY);
                     dragImage.style.visibility = "visible";
 
                     // If current hovered element is different than previous one
                     if (curHoveredElement !== preHoveredElement) {
 
                         const curEnteredDropZones = [];
-                        let parent = curHoveredElement;
+                        let parent                = curHoveredElement;
 
                         let curDragEntered = null;
 
@@ -95,7 +95,7 @@ export class DragDirective extends DirectiveBase {
 
                         // Find differences between previous and current matched drop zones (entered ones)
                         const enteredDropZones = this.diffArray(curEnteredDropZones, preEnteredDropZones);
-                        const leavedDropZones = this.diffArray(preEnteredDropZones, curEnteredDropZones);
+                        const leavedDropZones  = this.diffArray(preEnteredDropZones, curEnteredDropZones);
 
                         // Trigger Drag Enter event on elements
                         this.domEvents.triggerCustomEventOnElements(enteredDropZones, this.domEvents.ON_DRAG_ENTER_ZONE_EVENT);
@@ -104,7 +104,7 @@ export class DragDirective extends DirectiveBase {
                         this.domEvents.triggerCustomEventOnElements(leavedDropZones, this.domEvents.ON_DRAG_LEAVE_ZONE_EVENT);
 
 
-                        ev.ctData.preDragEntered = curDragEntered;
+                        ev.ctData.preDragEntered      = curDragEntered;
                         ev.ctData.preEnteredDropZones = curEnteredDropZones;
                     }
 
@@ -115,8 +115,12 @@ export class DragDirective extends DirectiveBase {
                 drag.last().subscribe((ev: any) => {
 
                     // Remove drag image from DOM
-                    if (ev.ctData.dragImage) {
-                        document.body.removeChild(ev.ctData.dragImage);
+                    try {
+                        if (ev.ctData.dragImage) {
+                            document.body.removeChild(ev.ctData.dragImage);
+                        }
+                    } catch (ex) {
+                        console.warn("Tried to remove drag image, but it's not a child of document");
                     }
 
                     // Trigger Drag Over Leave event on previously entered (onDragOverEnter) element
@@ -154,15 +158,15 @@ export class DragDirective extends DirectiveBase {
      * Create drag image with caption text under
      */
     private createDragImage(imageClass: string, caption: string): Element {
-        const container = document.createElement("div");
+        const container     = document.createElement("div");
         container.className = "drag-container";
 
-        const image = document.createElement("div");
+        const image     = document.createElement("div");
         image.className = "drag-image ";
         image.className += imageClass;
 
-        const text = document.createElement("div");
-        text.className = "drag-text";
+        const text       = document.createElement("div");
+        text.className   = "drag-text";
         text.textContent = caption;
 
         container.appendChild(image);

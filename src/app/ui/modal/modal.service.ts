@@ -20,23 +20,30 @@ export class ModalService {
         this.onClose.subscribe(() => this.cleanComponentRef());
     }
 
-    public setViewContainer(view: ViewContainerRef): void {
+    setViewContainer(view: ViewContainerRef): void {
         this.rootViewContainer = view;
     }
 
-    public close() {
+    close() {
         this.onClose.next();
     }
 
-    public fromComponent<T>(component: { new (...args: any[]): T; },
-                            config?: Partial<ModalOptions>): T {
+    fromComponent<T>(component: { new (...args: any[]): T; }, title?: string): T;
+    fromComponent<T>(component: { new (...args: any[]): T; }, options?: Partial<ModalOptions>);
+    fromComponent<T>(component: { new (...args: any[]): T; }, options?: Partial<ModalOptions> | string): T {
 
-        config = {
+        if (typeof options === "string"){
+            options = {
+                title: options
+            };
+        }
+
+        options = {
             backdrop: true,
             closeOnEscape: true,
             closeOnOutsideClick: false,
             title: "",
-            ...config
+            ...options
         };
 
         const modalFactory     = this.resolver.resolveComponentFactory(ModalComponent);
@@ -44,7 +51,7 @@ export class ModalService {
 
         const modalComponentRef = this.rootViewContainer.createComponent(modalFactory);
 
-        modalComponentRef.instance.configure(config as ModalOptions);
+        modalComponentRef.instance.configure(options as ModalOptions);
 
         const componentRef = modalComponentRef.instance.produce(componentFactory);
 
@@ -53,7 +60,7 @@ export class ModalService {
         return componentRef.instance;
     }
 
-    public fromTemplate<T>(template: TemplateRef<T>, config?: Partial<ModalOptions>): void {
+    fromTemplate<T>(template: TemplateRef<T>, config?: Partial<ModalOptions>): void {
 
         config = {
             backdrop: true,

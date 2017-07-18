@@ -76,6 +76,7 @@
 
             <ng-template #revisions>
                 <ct-revision-list *ngIf="dataModel" [active]="dataModel.customProps['sbg:revision']"
+                                  #revisionList
                                   [revisions]="dataModel.customProps['sbg:revisionsInfo']"
                                   (select)="openRevision($event)">
                 </ct-revision-list>
@@ -85,7 +86,7 @@
     </div>
 </ct-action-bar>
 
-<ct-notification-bar [autoClose]="true" [fadeOutTime]="5000"></ct-notification-bar>
+<ct-notification-bar></ct-notification-bar>
 
 <!--Header & Editor Column-->
 <div class="editor-layout">
