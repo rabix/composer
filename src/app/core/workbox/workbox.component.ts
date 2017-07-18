@@ -248,6 +248,11 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
 
                         // Restore open tabs
                         openTabs.forEach(tab => {
+                            //FIXME: Remove later
+                            if (tab.id.startsWith("http")) {
+                                return;
+                            }
+
                             if (tab.id.startsWith("?")) {
                                 this.workbox.openTab(tab, false);
                             } else {

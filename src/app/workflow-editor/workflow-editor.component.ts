@@ -146,6 +146,7 @@ import LoadOptions = jsyaml.LoadOptions;
 
             <ct-app-info *ngIf="viewMode === 'info' && !isLoading"
                          [readonly]="!data.isWritable"
+                         [formGroup]="toolGroup"
                          [class.flex-col]="showInspector"
                          [model]="workflowModel">
             </ct-app-info>
@@ -455,7 +456,9 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
             this.data.isWritable = val;
             if (val) {
                 this.codeEditorContent.enable();
-                this.graphEditor.enableGraphManipulations();
+                if (this.graphEditor) {
+                    this.graphEditor.enableGraphManipulations();
+                }
             }
         })
     }
@@ -583,7 +586,7 @@ export class WorkflowEditorComponent extends DirectiveBase implements OnDestroy,
      * the text has been formatted by the GUI editor
      */
     private getModelText(embed = false): string {
-        const wf = embed ? this.workflowModel.serializeEmbedded() : this.workflowModel.serialize();
+        const wf = embed || this.data.dataSource === "app" ? this.workflowModel.serializeEmbedded() : this.workflowModel.serialize();
         const modelObject = Object.assign(wf, {"sbg:modified": true});
 
         console.log("serialized workflow", modelObject);

@@ -82,7 +82,7 @@ export class NewFileTabComponent extends DirectiveBase implements OnInit {
 
     ngOnInit(): void {
         this.tracked = this.preferences.get("recentApps", []).subscribe((items) => {
-            this.recentApps = items.slice().reverse();
+            this.recentApps = items.slice().reverse().filter(item => !item.id.startsWith("http"));
         });
     }
 

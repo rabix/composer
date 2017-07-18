@@ -15,10 +15,10 @@ type ViewMode = "auth" | "keyBindings" | "cache";
         <ct-line-loader *ngIf="auth.authenticationProgress | async"></ct-line-loader>
 
         <ct-credentials-form #creds [credentials]="credentials"
-                             (onSubmit)="preferences.setCredentials($event)"
+                             (onSubmit)="submitCredentials($event)"
                              class="p-2"></ct-credentials-form>
 
-        <div class="pull-right col-sm-2">
+        <div class="ml-2">
             <!--Add Another-->
             <button (click)="creds.addEntry()"
                     class="btn btn-secondary"
@@ -52,4 +52,21 @@ export class SettingsComponent extends DirectiveBase implements OnInit {
         });
     }
 
+    submitCredentials(credentials) {
+        this.preferences.getCredentials().take(1).subscribe(creds => {
+            let credsChanged = true;
+            if (creds.length == credentials.length) {
+                credsChanged = false;
+                for (let i = 0; i < creds.length; i++) {
+                    if (!(creds[i].token === credentials[i].token &&
+                        creds[i].url === credentials[i].url)) {
+                        credsChanged = true;
+                    }
+                }
+            }
+            if (credsChanged) {
+                this.preferences.setCredentials(credentials);
+            }
+        });
+    }
 }
