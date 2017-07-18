@@ -13,6 +13,16 @@
             }
         }
 
+        .alert-update {
+            background-color: $brand-warning;
+            color: white;
+            border: none;
+        }
+
+        .update-btn {
+            color:white; text-decoration: underline;
+        }
+
         & > .active {
             //color: $editor-list-item-select-bg;
             //border-bottom: 3px solid $editor-list-item-select-bg;

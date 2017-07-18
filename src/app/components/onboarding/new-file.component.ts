@@ -25,18 +25,18 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 
                     <div class="creation-entry p-1 mt-1 clickable deep-unselectable" data-test="create-workflow-btn"
                          (click)="openAppCreation('workflow')">
-                        <i class="fa fa-fw fa-share-alt fa-4x float-sm-left "></i>
+                        <i class="fa fa-fw fa-share-alt fa-3x float-sm-left pl-1"></i>
                         <div class="content float-sm-left">
-                            <div class="title text-title">Create a Workflow</div>
+                            <div class="title text-title">New Workflow</div>
                             <div class="description">Workflows are chains of interconnected tools.</div>
                         </div>
                     </div>
 
                     <div class="creation-entry p-1 mt-1 clickable deep-unselectable" data-test="create-tool-btn"
                          (click)="openAppCreation('tool')">
-                        <i class="fa fa-fw fa-terminal fa-4x float-sm-left"></i>
+                        <i class="fa fa-fw fa-terminal fa-3x float-sm-left pr-1"></i>
                         <div class="content float-sm-left">
-                            <div class="title text-title">Create a Command Line Tool</div>
+                            <div class="title text-title">New Command Line Tool</div>
                             <div class="description">Tools are programs for processing data.</div>
                         </div>
                     </div>

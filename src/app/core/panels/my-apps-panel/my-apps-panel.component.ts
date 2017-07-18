@@ -400,7 +400,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
         this.tree.contextMenu.filter((data) => data.node.type === "project")
             .subscribe(data => {
                 const contextMenu = [
-                    new MenuItem("Create new Workflow", {
+                    new MenuItem("New Workflow", {
                         click: () => {
                             const modal = this.modal.fromComponent(CreateAppModalComponent, {
                                 closeOnOutsideClick: false,
@@ -414,7 +414,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                             modal.defaultProject = data.node.id;
                         }
                     }),
-                    new MenuItem("Create new Command Line Tool", {
+                    new MenuItem("New Command Line Tool", {
                         click: () => {
                             const modal = this.modal.fromComponent(CreateAppModalComponent, {
                                 closeOnOutsideClick: false,
@@ -444,7 +444,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
         this.tree.contextMenu.filter((data) => data.node.type === "folder" && data.node.level === 2)
             .subscribe(data => {
                 const contextMenu = [
-                    new MenuItem("Create new Folder", {
+                    new MenuItem("New Folder", {
                         click: () => {
                             const modal = this.modal.fromComponent(CreateLocalFolderModalComponent, {
                                 closeOnOutsideClick: false,
@@ -456,7 +456,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                             modal.folderPath = data.node.id;
                         }
                     }),
-                    new MenuItem("Create new Workflow", {
+                    new MenuItem("New Workflow", {
                         click: () => {
                             const modal = this.modal.fromComponent(CreateAppModalComponent, {
                                 closeOnOutsideClick: false,
@@ -469,7 +469,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements OnInit, After
                             modal.defaultFolder = data.node.id + "/";
                         }
                     }),
-                    new MenuItem("Create new Command Line Tool", {
+                    new MenuItem("New Command Line Tool", {
                         click: () => {
                             const modal = this.modal.fromComponent(CreateAppModalComponent, {
                                 closeOnOutsideClick: false,

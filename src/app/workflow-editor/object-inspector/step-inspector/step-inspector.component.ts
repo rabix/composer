@@ -15,10 +15,10 @@ import {UpdateStepModalComponent} from "../../update-step-modal/update-step-moda
     template: `
 
         <!--Update warning-->
-        <div class="alert alert-warning form-control-label" *ngIf="step.hasUpdate">
-            Update available.<a href="" (click)="updateStep($event)"> Click here to update.</a>
-        </div>
-
+        <div class="alert alert-update form-control-label" *ngIf="step.hasUpdate && !readonly">
+            A new version of this app is available!
+        <button class="btn-unstyled update-btn" (click)="updateStep($event)">Update</button> to get the latest changes.
+            
         <!--View Modes-->
         <ct-action-bar class="row workflow-step-inspector-tabs">
             <ct-tab-selector class="full-width"

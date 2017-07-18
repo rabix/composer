@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, EventEmitter, forwardRef, Output} from "@angular/core";
+import {AfterViewInit, Component, EventEmitter, forwardRef, Input, Output} from "@angular/core";
 import {ControlValueAccessor, FormArray, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {noop} from "../../../lib/utils.lib";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
@@ -12,30 +12,45 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             multi: true
         }
     ],
+    styleUrls: ["./map-list.component.scss"],
     template: `
         <div [formGroup]="formGroup" (change)="onInputsFormChange($event)">
             <div formArrayName="pairs">
-                <div *ngFor="let item of getPairControls(); let i = index" [formGroupName]="i" class="mb-1 input-group row">
 
-                    <input class="form-control  col-xs-5" formControlName="key" placeholder="key"/>
-                    <span class="input-group-addon col-xs-1">:</span>
-                    <input class="form-control col-xs-5" formControlName="value" placeholder="value"/>
-                    <span class="input-group-btn col-xs-1">
-                        <button (click)="remove(i)" type="button"
-                                class="input-group-addon btn btn-secondary ">
-                            <i class="fa fa-trash"></i></button>
-                    </span>
+                <ct-blank-tool-state *ngIf="!list.length && !readonly"
+                                     [buttonText]="'Add an Entry'"
+                                     (buttonClick)="add()">
+                    No entries defined.
+                </ct-blank-tool-state>
 
+                <div *ngFor="let item of getPairControls(); let i = index" [formGroupName]="i" class="list-item">
+                    <input class="form-control key-input" formControlName="key" placeholder="key" [readonly]="readonly"/>
+
+                    <span class="input-group-addon add-on">:</span>
+
+                    <input class="form-control value-input" formControlName="value" placeholder="value" [readonly]="readonly"/>
+
+                    <div *ngIf="!readonly" class="remove-icon clickable ml-1 text-hover-danger"
+                         [ct-tooltip]="'Delete'"
+                         (click)="remove(i)">
+                        <i class="fa fa-trash"></i>
+                    </div>
                 </div>
 
-                <div class="row">
-                    <button class="pull-right btn btn-secondary btn-sm" type="button" (click)="add()">Add an Entry</button>
-                </div>
             </div>
+            <button type="button" *ngIf="list.length && !readonly"
+                    class="btn pl-0 btn-link no-outline no-underline-hover"
+                    (click)="add()">
+                <i class="fa fa-plus"></i> Add an Entry
+            </button>
         </div>
     `
 })
 export class MapListComponent extends DirectiveBase implements ControlValueAccessor, AfterViewInit {
+
+    @Input()
+    readonly = false;
+
     public list: { key: string, value: string }[] = [];
 
     public formGroup = new FormGroup({

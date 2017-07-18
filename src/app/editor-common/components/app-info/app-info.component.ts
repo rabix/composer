@@ -18,19 +18,16 @@ import {
     styleUrls: ["./app-info.component.scss"],
     template: `
         <div class="app-info">
-
             <!--Header section-->
             <div class="info-section">
                 <ct-inline-editor [value]="model.label" type="text"
                                   [disabled]="readonly"
                                   (saveData)="updateLabel($event)">
-
                     <h1 class="h3">{{model.label}}</h1>
                 </ct-inline-editor>
                 <div>Created by {{createdBy}} on {{createdOn | date}}. Last edited by {{editedBy}} on {{editedOn | date}}</div>
                 <div *ngIf="revisionNote">Revision note: “<em>{{revisionNote}}</em>”</div>
             </div>
-
             <!--Description section-->
             <div class="info-section">
                 <div class="text-title">Description:</div>
@@ -41,25 +38,11 @@ import {
                     <div [ct-markdown]="model.description"></div>
                 </ct-inline-editor>
             </div>
-
             <!--Meta section-->
             <div class="info-section">
                 <div class="app-info-meta">
-
-                    <!--Categories-->
-                    <div class="col-lg-4 col-sm-6 app-info-meta-item">
-                        <div class="text-title">Categories:</div>
-                        <ct-inline-editor [value]="model.customProps['sbg:categories']"
-                                          type="tags"
-                                          [disabled]="readonly"
-                                          [options]="categories"
-                                          (saveData)="updateCustomProp('sbg:categories', $event)">
-                            {{ (model.customProps['sbg:categories'] || []).join(", ")}}
-                        </ct-inline-editor>
-                    </div>
-
                     <!--Toolkit-->
-                    <div class="col-lg-4 col-sm-6 app-info-meta-item">
+                    <div class="col-lg-4 col-sm-6 app-info-meta-item" *ngIf="isToolkit()">
                         <div class="text-title">Toolkit:</div>
                         <div>
                             <ct-inline-editor [disabled]="readonly" class="toolkit"
@@ -77,10 +60,19 @@ import {
                             </ct-inline-editor>
                         </div>
                     </div>
-
+                    <!--Author-->
+                    <div class="col-lg-4 col-sm-6 app-info-meta-item">
+                        <div class="text-title">{{isToolkit()? "Toolkit" : "Workflow"}} Author:</div>
+                        <ct-inline-editor [value]="model.customProps['sbg:toolAuthor']"
+                                          [disabled]="readonly"
+                                          type="text"
+                                          (saveData)="updateCustomProp('sbg:toolAuthor', $event)">
+                            {{model.customProps['sbg:toolAuthor']}}
+                        </ct-inline-editor>
+                    </div>
                     <!--License-->
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
-                        <div class="text-title">License:</div>
+                        <div class="text-title">{{isToolkit()? "Toolkit" : "Workflow"}} License:</div>
                         <ct-inline-editor [value]="model.customProps['sbg:license']"
                                           [disabled]="readonly"
                                           type="text"
@@ -88,7 +80,11 @@ import {
                             <div>{{model.customProps['sbg:license']}}</div>
                         </ct-inline-editor>
                     </div>
-
+                    <!--Contributors-->
+                    <div class="col-lg-4 col-sm-6 app-info-meta-item">
+                        <div class="text-title">Contributors:</div>
+                        {{(model.customProps['sbg:contributors'] || []).join(", ")}}
+                    </div>
                     <!--Wrapper Author-->
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
                         <div class="text-title">Wrapper Author:</div>
@@ -99,7 +95,6 @@ import {
                             <div>{{model.customProps['sbg:wrapperAuthor']}}</div>
                         </ct-inline-editor>
                     </div>
-
                     <!--Wrapper License-->
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
                         <div class="text-title">Wrapper License:</div>
@@ -110,30 +105,22 @@ import {
                             <div>{{model.customProps['sbg:wrapperLicense']}}</div>
                         </ct-inline-editor>
                     </div>
-
-                    <!--Author-->
+                    <!--Categories-->
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
-                        <div class="text-title">Author:</div>
-                        <ct-inline-editor [value]="model.customProps['sbg:toolAuthor']"
+                        <div class="text-title">Categories:</div>
+                        <ct-inline-editor [value]="model.customProps['sbg:categories']"
+                                          type="tags"
                                           [disabled]="readonly"
-                                          type="text"
-                                          (saveData)="updateCustomProp('sbg:toolAuthor', $event)">
-                            {{model.customProps['sbg:toolAuthor']}}
+                                          [options]="categories"
+                                          (saveData)="updateCustomProp('sbg:categories', $event)">
+                            {{ (model.customProps['sbg:categories'] || []).join(", ")}}
                         </ct-inline-editor>
                     </div>
-
-                    <!--Contributors-->
-                    <div class="col-lg-4 col-sm-6 app-info-meta-item">
-                        <div class="text-title">Contributors:</div>
-                        {{(model.customProps['sbg:contributors'] || []).join(", ")}}
-                    </div>
-
                     <!--CWL version-->
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
                         <div class="text-title">CWL Version:</div>
                         {{model['cwlVersion']}}
                     </div>
-
                     <!--Links-->
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
                         <div class="text-title">Links:</div>
@@ -141,36 +128,28 @@ import {
                                           [disabled]="readonly"
                                           type="keyvalue"
                                           (saveData)="updateCustomProp('sbg:links', $event)">
-
                             <span *ngFor="let link of model.customProps['sbg:links']" class="links">
                                     <a href=""
                                        (click)="$event.preventDefault();
                                        $event.stopPropagation();
                                        openWebPage(link.id)">{{link.label}}</a>
                             </span>
-
                         </ct-inline-editor>
                     </div>
-
                     <!--ID-->
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
                         <div class="text-title">ID</div>
                         {{model.customProps['sbg:id']}}
                     </div>
                 </div>
-
             </div>
-
             <!--Table section-->
             <div class="info-section">
-
                 <ct-tab-selector distribute="auto" [active]="viewMode" (activeChange)="switchTab($event)">
                     <ct-tab-selector-entry tabName="inputs">Inputs</ct-tab-selector-entry>
                     <ct-tab-selector-entry tabName="appSettings">App Settings</ct-tab-selector-entry>
                     <ct-tab-selector-entry tabName="outputs">Outputs</ct-tab-selector-entry>
                 </ct-tab-selector>
-
-
                 <!--Inputs-->
                 <div *ngIf="viewMode === 'inputs'">
                     <div *ngIf="inputs.length === 0">
@@ -195,8 +174,6 @@ import {
                         </tr>
                     </table>
                 </div>
-
-
                 <!--App settings-->
                 <div *ngIf="viewMode === 'appSettings'">
                     <div *ngIf="appSettings.length === 0">
@@ -221,8 +198,6 @@ import {
                         </tr>
                     </table>
                 </div>
-
-
                 <!--Outputs-->
                 <div *ngIf="viewMode === 'outputs'">
                     <div *ngIf="model.outputs.length === 0">
@@ -243,7 +218,6 @@ import {
                         </tr>
                     </table>
                 </div>
-
             </div>
         </div>
     `
@@ -341,4 +315,9 @@ export class AppInfoComponent implements OnChanges {
             this.viewMode = tabName;
         });
     }
+
+    isToolkit() {
+        return this.model instanceof  CommandLineToolModel;
+    }
+
 }

@@ -2,13 +2,38 @@
 
 //
 //
+// ----- Colors -----
+//
+
+$black: #232323;
+$dark-gray: #303030;
+$gray: #3c3c3c;
+$light-gray: #999;
+$smoke: #eee;
+$white: #fff;
+
+
+$blue: #337cb9;
+$sky: #6aaaf0;
+
+$orange: #f89406;
+$carrot: #e29834;
+
+$red: #dd4a38;
+
+$purple: #a184dc;
+
+$green: #7ac24d;
+
+//
+//
 // ----- Color Scheme -----
 //
 // # Brand Colors
 $brand-success: #3eb157;
-$brand-primary: #5d95d0;
-$brand-danger: #dd4a38;
-$brand-warning: #f89406;
+$brand-primary: $sky;
+$brand-danger: $red;
+$brand-warning: $orange;
 $brand-info: #f3f8fc;
 // # Other Colors
 
@@ -17,8 +42,8 @@ $border-radius: 2px;
 
 // ----- Typography ------
 $font-size-base: 13px;
-$text-color: #e7e7e7;
-$text-muted: darken($text-color, 30);
+$text-color: $smoke;
+$text-muted: $light-gray;
 
 // ----- Tag -----
 $tag-primary-bg: $brand-primary;
@@ -34,7 +59,7 @@ $input-border-radius: $border-radius;
 $input-line-height: 1rem;
 $input-padding-x: .55rem;
 $input-padding-y: .4rem;
-$input-border-color: #262626;
+$input-border-color: $black;
 $input-bg-disabled: #262626;
 $input-color-disabled: $text-muted;
 $input-bg-hover: $brand-primary;
@@ -49,8 +74,8 @@ $dropdown-active-bg: $input-border-color;
 // ----- Code -----
 $code-bg: $input-bg;
 $code-color: $brand-primary;
-$code-base-cmd: #a77ed7;
-$code-inputs: #7ac24d;
+$code-base-cmd: $purple;
+$code-inputs: $green;
 $code-args: #fda365;
 $code-warning: $brand-warning;
 $code-error: $brand-danger;
@@ -62,8 +87,8 @@ $btn-border-radius: 3px;
 $btn-line-height: 1rem;
 $btn-padding-x: 1.2rem;
 $btn-padding-y: .4rem;
-$btn-primary-bg: #337cb9;
-$btn-secondary-bg: #373a3c;
+$btn-primary-bg: $blue;
+$btn-secondary-bg: $dark-gray;
 $btn-secondary-color: $text-color;
 $btn-border-hover-color: $input-border-color;
 $btn-gradient-active: false;
@@ -76,10 +101,10 @@ $link-hover-color: lighten($brand-primary, 10%);
 $table-border-color: $input-border-color;
 
 // ----- Global Layout Elements -----
-$body-bg: #303030;
-$panel-bg: #434343;
+$body-bg: $dark-gray;
+$panel-bg: $gray;
 $toolbar-height: 2em;
-$toolbar-header-bg: #333;
+$toolbar-header-bg: $black;
 $toolbar-border: #333;
 
 // ----- Layout Uniques -----
@@ -108,9 +133,9 @@ $btn-warning-border: #bc7e20; // not according to style guide
 /** Layout */
 $layout-stripe-width: 28px;
 $layout-section-background: #333;
-$layout-section-terminal-background: #222;
+$layout-section-terminal-background: #1f1f1f;
 $layout-section-border-dark: 1px solid #1a1a1a;
-$layout-section-border-light: 1px solid #4d4d4d;
+$layout-section-border-light: 1px solid #232323;
 $layout-section-font-color: #f3f3f3;
 
 $layout-section-alt-border-color: #ccc;
@@ -121,7 +146,7 @@ $layout-section-alt-border-color: #ccc;
 $action-bar-border-color: $layout-section-alt-border-color;
 $action-bar-background: white; // @TODO Fix theme variable, bottom of tab value
 
-$layout-title-bar-background: #1e2124;
+//$layout-title-bar-background: #1e2124;
 $layout-title-bar-height: 36px;
 
 $layout-tab-height: 32px;
@@ -130,12 +155,12 @@ $layout-tab-background-active: white;
 
 $layout-element-alt-background: rgb(246, 246, 246);
 $layout-element-alt-foreground: white;
-$layout-element-separator-color: $layout-title-bar-background;
+$layout-element-separator-color: $black;
 
 $layout-status-bar-height: 32px;
 
-$layout-text-color: rgb(230, 230, 230);
-$layout-text-color-faded: rgb(153, 153, 153);
+$layout-text-color: $smoke;
+$layout-text-color-faded: $light-gray;
 
 // Typography
 $font-family-title: "Montserrat";
@@ -143,6 +168,7 @@ $font-family-title: "Montserrat";
 // Editors common
 $action-bar-height: 36px;
 $action-bar-color: $layout-element-alt-foreground;
+$sidebar-panel-bg: $gray;
 
 $brand-danger-inverse-color: white;
 
@@ -151,7 +177,7 @@ $error-bar-height: $main-header-height * .8;
 
 // Tree View
 $tree-node-selected-color: white;
-$tree-node-selected-background: #455c7d;
+$tree-node-selected-background: $dark-gray;
 
 // Editor Panel
 $editor-panel-selected-background: #455c7d;

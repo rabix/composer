@@ -32,7 +32,7 @@ import {UserPreferencesService} from "../../services/storage/user-preferences.se
                            [class.fa-share-alt]="tab?.type === 'Workflow'"
                            [class.fa-terminal]="tab?.type === 'CommandLineTool'"
                            [class.fa-file-o]="tab?.type === 'NewFile'"
-                           [class.fa-sliders]="tab?.type === 'Settings'"
+                           [class.fa-cog]="tab?.type === 'Settings'"
                         ></i>
                     </div>
 

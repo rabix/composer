@@ -180,17 +180,6 @@ import {HintsModalComponent} from "../../../core/modals/hints-modal/hints-modal.
                 </button>
             </span>
 
-            <!--Auto-arrange button-->
-            <span class="btn-group">
-                <button class="btn btn-sm btn-secondary"
-                        ct-tooltip="Auto-arrange"
-                        tooltipPlacement="top"
-                        (click)="arrange()"
-                        [disabled]="readonly">
-                    <i class="fa fa-paint-brush"></i>
-                </button>
-            </span>
-
             <!--Hints button-->
             <span class="btn-group">
                 <button ct-tooltip="Hints"
@@ -227,6 +216,17 @@ import {HintsModalComponent} from "../../../core/modals/hints-modal/hints-modal.
                         tooltipPlacement="top"
                         (click)="fitToViewport()">
                     <i class="fa fa-compress"></i>
+                </button>
+            </span>
+
+            <!--Auto-arrange button-->
+            <span class="btn-group">
+                <button class="btn btn-sm btn-secondary"
+                        ct-tooltip="Auto-arrange"
+                        tooltipPlacement="top"
+                        (click)="arrange()"
+                        [disabled]="readonly">
+                    <i class="fa fa-paint-brush"></i>
                 </button>
             </span>
             

@@ -23,7 +23,7 @@ const {app, dialog} = window["require"]("electron").remote;
                     Add one or more folders from your computer to the workspace
                 </p>
                 <div>
-                    <button class="btn btn-secondary" (click)="selectLocalFolders()">Select a Folder...</button>
+                    <button class="btn btn-secondary" (click)="selectLocalFolders()">Select a Folder</button>
                 </div>
             </div>
 

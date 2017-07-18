@@ -1,6 +1,4 @@
-ct-app-info {
-    overflow: scroll !important;
-}
+@import "../../assets/sass/variables";
 
 :host {
     flex: 1;
@@ -23,6 +21,7 @@ ct-app-info {
     }
 
     ct-editor-inspector {
+        background: $gray;
         flex-basis: 320px;
         flex-shrink: 0;
     }
