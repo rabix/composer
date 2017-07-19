@@ -178,7 +178,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 const [validationState, code] = data;
                 return validationCompletion
                     .startWith(validationState)
-                    .map(state => [this.codeEditorContent.value, state])
+                    .map(state => [this.codeEditorContent.value, state]);
             })
             .withLatestFrom(
                 this.platformRepository.getAppMeta(this.tabData.id, "swapUnlocked"),
@@ -258,7 +258,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
         this.syncModelAndCode(true).then(() => {
             const modal      = this.modal.fromComponent(PublishModalComponent, {title: "Publish an App"});
-            modal.appContent = this.codeEditorContent.value;
+            modal.appContent = this.getModelText(true);
         }, err => console.warn);
     }
 
@@ -337,7 +337,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
      * the text has been formatted by the GUI editor.
      *
      */
-    protected getModelText(): string {
+    protected getModelText(embed?: boolean): string {
 
         const modelObject = this.dataModel.serialize();
 
