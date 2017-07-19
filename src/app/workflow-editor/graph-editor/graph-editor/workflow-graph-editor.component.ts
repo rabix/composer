@@ -495,32 +495,37 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
         this.gateway.fetchFileContent(nodeID, true).subscribe((app: any) => {
             // if the app is local, give it an id that's the same as its filename (if doesn't exist)
-            const isLocal = DataGatewayService.getFileSource(nodeID) === "local";
-            if (isLocal) {
-                const split = nodeID.split("/");
-                const id    = split[split.length - 1].split(".")[0];
-                app.id      = app.id || id;
-            }
+            this.gateway.resolveContent(JSON.stringify(app), nodeID).subscribe(resolved => {
+                const isLocal = DataGatewayService.getFileSource(nodeID) === "local";
+                if (isLocal) {
+                    const split = nodeID.split("/");
+                    const id    = split[split.length - 1].split(".")[0];
+                    app.id      = app.id || id;
+                }
 
-            this.workflowEditorService.putInHistory(this.model);
+                this.workflowEditorService.putInHistory(this.model);
 
-            const step = this.model.addStepFromProcess(app);
+                const step = this.model.addStepFromProcess(app);
 
-            // add local source so step can be serialized without embedding
-            if (isLocal) {
-                step.customProps["sbg:rdfSource"] = nodeID;
-                step.customProps["sbg:rdfId"]     = nodeID;
-            }
+                // add local source so step can be serialized without embedding
+                if (isLocal) {
+                    step.customProps["sbg:rdfSource"] = nodeID;
+                    step.customProps["sbg:rdfId"]     = nodeID;
+                }
 
-            const coords = this.graph.transformScreenCTMtoCanvas(ev.clientX, ev.clientY);
-            Object.assign(step.customProps, {
-                "sbg:x": coords.x,
-                "sbg:y": coords.y
+                const coords = this.graph.transformScreenCTMtoCanvas(ev.clientX, ev.clientY);
+                Object.assign(step.customProps, {
+                    "sbg:x": coords.x,
+                    "sbg:y": coords.y
+                });
+
+                this.graph.command("app.create.step", step);
+
+                this.setFocusOnCanvas();
+            }, err => {
+                console.warn("Could not resolve app", err);
             });
 
-            this.graph.command("app.create.step", step);
-
-            this.setFocusOnCanvas();
         }, err => {
             console.warn("Could not add an app", err);
         });
