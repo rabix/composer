@@ -1,47 +1,46 @@
 import {Component, Input, OnInit} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
-import {LocalFileRepositoryService} from "../../../file-repository/local-file-repository.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {FormAsyncValidator} from "../../forms/helpers/form-async-validator";
+import {FileRepositoryService} from "../../../file-repository/file-repository.service";
 
 @Component({
     selector: "ct-create-local-folder-modal",
     styleUrls: ["./create-local-folder-modal.component.scss"],
-    template: `
-        <form [formGroup]="form" (submit)="onSubmit(form.getRawValue())">
+    template: `<form [formGroup]="form" (submit)="onSubmit()">
 
-            <div class="p-1">
-                <div class="form-group">
-                    <label>Folder Name:</label>
-                    <input autofocus="true" class="form-control" formControlName="folderName"/>
-                </div>
+    <div class="p-1">
+        <div class="form-group">
+            <label>Folder Name:</label>
+            <input autofocus class="form-control" formControlName="folderName"/>
+        </div>
 
-                <div class="alert alert-warning" *ngIf="form.hasError('exists', 'folderName')">
-                    Folder with this name already exists. Please choose another name.
-                </div>
+        <div class="alert alert-warning" *ngIf="form.hasError('exists', ['folderName'])">
+            Folder with this name already exists. Please choose another name.
+        </div>
 
-                <div class="alert alert-warning" *ngIf="form.hasError('invalidName', 'folderName')">
-                    {{ form.getError('invalidName', 'folderName') }}
-                </div>
+        <div class="alert alert-warning" *ngIf="form.hasError('invalidName', ['folderName'])">
+            {{ form.getError('invalidName', 'folderName') }}
+        </div>
 
-                <div class="alert alert-danger" *ngIf="form.hasError('creationFailure')">
-                    {{ form.getError('creationFailure') }}
-                </div>
+        <div class="alert alert-danger" *ngIf="form.hasError('creationFailure')">
+            {{ form.getError('creationFailure') }}
+        </div>
 
 
-            </div>
+    </div>
 
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" (click)="modal.close()">Cancel</button>
-                <button type="submit" class="btn btn-primary" [disabled]="!form.valid">
-                    <ct-loader-button-content [isLoading]="form.pending">Create</ct-loader-button-content>
-                </button>
-            </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.close()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="!form.valid">
+            <ct-loader-button-content [isLoading]="form.pending">Create</ct-loader-button-content>
+        </button>
+    </div>
 
-        </form>
+</form>
     `
 })
 export class CreateLocalFolderModalComponent extends DirectiveBase implements OnInit {
@@ -52,7 +51,7 @@ export class CreateLocalFolderModalComponent extends DirectiveBase implements On
     form: FormGroup;
 
     constructor(private dataGateway: DataGatewayService,
-                private localFileRepository: LocalFileRepositoryService,
+                private localFileRepository: FileRepositoryService,
                 public modal: ModalService) {
         super();
     }
@@ -80,7 +79,7 @@ export class CreateLocalFolderModalComponent extends DirectiveBase implements On
                 this.localFileRepository.reloadPath(this.rootFolder);
                 this.modal.close();
             }, err => {
-                this.form.setErrors({
+                    this.form.setErrors({
                     creationFailure: err.message
                 })
             });

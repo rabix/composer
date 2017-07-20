@@ -9,6 +9,7 @@ import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {CodeSwapService} from "../../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../../core/data-gateway/data-gateway.service";
+import {ErrorWrapper} from "../../core/helpers/error-wrapper";
 import {ProceedToEditingModalComponent} from "../../core/modals/proceed-to-editing-modal/proceed-to-editing-modal.component";
 import {PublishModalComponent} from "../../core/modals/publish-modal/publish-modal.component";
 import {AppTabData} from "../../core/workbox/app-tab-data";
@@ -20,6 +21,7 @@ import {ModalService} from "../../ui/modal/modal.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {AppValidatorService, AppValidityState} from "../app-validator/app-validator.service";
 import {PlatformAppService} from "../components/platform-app-common/platform-app.service";
+import {RevisionListComponent} from "../components/revision-list/revision-list.component";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
 import {APP_SAVER_TOKEN, AppSaver} from "../services/app-saving/app-saver.interface";
 
@@ -33,6 +35,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     @Input()
     viewMode: "code" | string;
+
+    @ViewChild(RevisionListComponent)
+    revisionList: RevisionListComponent;
 
     validationState: AppValidityState;
 
@@ -115,13 +120,13 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         this.codeEditorContent.valueChanges.subscribeTracked(this, content => this.codeSwapService.codeContent.next(content));
 
         /** Changes to the code that did not come from user's typing. */
-        const externalCodeChanges = Observable.merge(this.tabData.fileContent, this.priorityCodeUpdates).distinctUntilChanged().share();
+        const externalCodeChanges = Observable.merge(this.tabData.fileContent, this.priorityCodeUpdates).distinctUntilChanged();
 
         /** Changes to the code from user's typing, slightly debounced */
-        const codeEditorChanges = this.codeEditorContent.valueChanges.debounceTime(300).distinctUntilChanged().share();
+        const codeEditorChanges = this.codeEditorContent.valueChanges.debounceTime(300).distinctUntilChanged();
 
         /** Observe all code changes */
-        const allCodeChanges = Observable.merge(externalCodeChanges, codeEditorChanges).distinctUntilChanged().share();
+        const allCodeChanges = Observable.merge(externalCodeChanges, codeEditorChanges).distinctUntilChanged();
 
         /** Attach a CWL validator to code updates and observe the validation state changes. */
         const schemaValidation = this.appValidator.createValidator(allCodeChanges).map((state: AppValidityState) => {
@@ -147,7 +152,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             this.codeEditorContent.setValue(code);
 
         }, (err) => {
-            this.unavailableError = (err.error ? err.error.message : err.message) || "Error occurred while fetching app";
+            this.unavailableError = new ErrorWrapper(err).toString() || "Error occurred while fetching app";
             this.isLoading        = false;
         });
 
@@ -171,11 +176,14 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         firstValidationEnd.withLatestFrom(externalCodeChanges)
             .switchMap((data: [AppValidityState, string]) => {
                 const [validationState, code] = data;
-                return validationCompletion.startWith(validationState).map(state => [this.codeEditorContent.value, state])
+                return validationCompletion
+                    .startWith(validationState)
+                    .map(state => [this.codeEditorContent.value, state])
             })
-            .withLatestFrom(this.platformRepository.getAppMeta(this.tabData.id, "swapUnlocked"), (outer, inner) => [...outer, inner])
+            .withLatestFrom(
+                this.platformRepository.getAppMeta(this.tabData.id, "swapUnlocked"),
+                (outer, inner) => [...outer, inner])
             .subscribeTracked(this, (data: [string, AppValidityState, boolean]) => {
-
                 const [code, validation, unlocked] = data;
 
                 this.isLoading = false;
@@ -189,14 +197,15 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     // copyOf property really matters only if we are working with the latest revision
                     // otherwise, apps detached from copy state at some revision will still show locked state
                     // and notification when switched to an older revision
-                    const props = this.dataModel.customProps || {};
+                    const props             = this.dataModel.customProps || {};
                     const hasCopyOfProperty = props["sbg:copyOf"] && (~~props["sbg:revision"] === ~~props["sbg:latestRevision"]);
 
-                    if (!this.tabData.isWritable) {
+                    if (!this.tabData.isWritable || this.tabData.dataSource === "local") {
                         this.isUnlockable = false;
                     } else if (hasCopyOfProperty && !unlocked) {
                         this.notificationBar.showNotification(
-                            new InfoNotification("This app is a copy of " + this.dataModel.customProps["sbg:copyOf"]));
+                            new InfoNotification("This app is a copy of " + this.dataModel.customProps["sbg:copyOf"])
+                        );
                         this.isUnlockable = true;
                     }
 
@@ -315,6 +324,11 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             .toPromise().then(result => {
                 this.priorityCodeUpdates.next(result);
                 return result;
+            }).catch(err => {
+                this.revisionList.loadingRevision = false;
+                this.notificationBar.showNotification(
+                    new ErrorNotification("Cannot open revision. " + new ErrorWrapper(err))
+                );
             });
     }
 

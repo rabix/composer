@@ -95,10 +95,16 @@ export class DataGatewayService {
     }
 
 
+    /**
+     * @deprecated use FileRepository.saveFile
+     */
     saveLocalFileContent(path, content) {
         return this.ipc.request("saveFileContent", {path, content});
     }
 
+    /**
+     * @deprecated use FileRepository.saveFile
+     */
     saveFile(fileID, content): Observable<string> {
         return this.saveLocalFileContent(fileID, content).map(() => content);
     }

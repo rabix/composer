@@ -34,9 +34,7 @@ export class AppsPanelComponent extends DirectiveBase {
     }
 
     ngOnInit() {
-        this.localRepository.getSelectedAppsPanel().take(1).subscribeTracked(this, panel => {
-            this.activeTab = panel;
-        });
+        this.localRepository.getSelectedAppsPanel().take(1).subscribeTracked(this, panel => this.activeTab = panel);
     }
 
 

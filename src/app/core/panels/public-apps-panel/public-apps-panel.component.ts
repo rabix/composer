@@ -1,21 +1,22 @@
 import {AfterViewInit, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren} from "@angular/core";
 import {FormControl} from "@angular/forms";
 import {Observable} from "rxjs/Observable";
+import {Subject} from "rxjs/Subject";
 import {App} from "../../../../../electron/src/sbg-api-client/interfaces/app";
 
-import {LocalFileRepositoryService} from "../../../file-repository/local-file-repository.service";
+import {FileRepositoryService} from "../../../file-repository/file-repository.service";
 import {LocalRepositoryService} from "../../../repository/local-repository.service";
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
+import {ContextService} from "../../../ui/context/context.service";
 import {TreeNode} from "../../../ui/tree-view/tree-node";
 import {TreeViewComponent} from "../../../ui/tree-view/tree-view.component";
 import {TreeViewService} from "../../../ui/tree-view/tree-view.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {AppHelper} from "../../helpers/AppHelper";
 import {TabData} from "../../workbox/tab-data.interface";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.component";
 import {PublicAppsPanelService} from "./public-apps-panel.service";
-import {Subject} from "rxjs/Subject";
-import {AppHelper} from "../../helpers/AppHelper";
 
 @Component({
     selector: "ct-public-apps-panel",
@@ -25,27 +26,27 @@ import {AppHelper} from "../../helpers/AppHelper";
 
         <div class="btn-group grouping-toggle" *ngIf="!searchContent?.value">
 
-                <label class="input-label" title="Group By:">
-                    Group by: 
-                </label>                
-     
-                <ct-generic-dropdown-menu [ct-menu]="menu" [menuState]="groupByOpenStatus">
+            <label class="input-label" title="Group By:">
+                Group by:
+            </label>
+
+            <ct-generic-dropdown-menu [ct-menu]="menu" [menuState]="groupByOpenStatus">
                     <span>{{ grouping }}
                         <i class="fa fa-chevron-down fa-fw settings-icon"> </i>
                     </span>
-                    
-                </ct-generic-dropdown-menu>
 
-                <ng-template #menu class="mr-1">
-                    <ul class="list-unstyled">
-                        <li *ngFor="let c of groupByOptions" class="group-by-item" [class.active]="grouping === c.value"
-                            (click)="switchGrouping(c.value)">
+            </ct-generic-dropdown-menu>
+
+            <ng-template #menu class="mr-1">
+                <ul class="list-unstyled">
+                    <li *ngFor="let c of groupByOptions" class="group-by-item" [class.active]="grouping === c.value"
+                        (click)="switchGrouping(c.value)">
                                             <span>
                                                 {{ c.caption }}
                                             </span>
-                        </li>
-                    </ul>
-                </ng-template>      
+                    </li>
+                </ul>
+            </ng-template>
 
         </div>
 
@@ -88,7 +89,7 @@ import {AppHelper} from "../../helpers/AppHelper";
                           : grouping === 'toolkit' ? (appsByToolkit|async) : (appsByCategory | async)"></ct-tree-view>
         </div>
     `,
-    providers: [LocalFileRepositoryService, PublicAppsPanelService],
+    providers: [FileRepositoryService, PublicAppsPanelService],
     styleUrls: ["./public-apps-panel.component.scss"]
 })
 export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, AfterViewInit {
@@ -139,13 +140,14 @@ export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, A
     constructor(private workbox: WorkboxService,
                 private localRepository: LocalRepositoryService,
                 private platformRepository: PlatformRepositoryService,
+                private context: ContextService,
                 private service: PublicAppsPanelService) {
         super();
 
 
         this.appsByToolkit  = this.service.getAppsGroupedByToolkit();
         this.appsByCategory = this.service.getAppsGroupedByCategory();
-        this.appsByNone = this.service.getAppsByNone();
+        this.appsByNone     = this.service.getAppsByNone();
     }
 
     ngOnInit() {
@@ -168,6 +170,14 @@ export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, A
 
         this.searchResultComponents.changes.subscribeTracked(this, list => {
             list.forEach((el, idx) => setTimeout(() => el.nativeElement.classList.add("shown"), idx * 20));
+        });
+
+        this.tree.contextMenu.filter(data => data.node.type === "app").subscribeTracked(this, (data) => {
+            const contextMenu = [
+                this.service.makeCopyAppToLocalMenuItem(data.node),
+            ];
+
+            this.context.showAt(data.node.getViewContainer(), contextMenu, data.coordinates);
         });
     }
 

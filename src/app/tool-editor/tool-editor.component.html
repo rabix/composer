@@ -76,6 +76,7 @@
 
             <ng-template #revisions>
                 <ct-revision-list *ngIf="dataModel" [active]="dataModel.customProps['sbg:revision']"
+                                  #revisionList
                                   [revisions]="dataModel.customProps['sbg:revisionsInfo']"
                                   (select)="openRevision($event)">
                 </ct-revision-list>
