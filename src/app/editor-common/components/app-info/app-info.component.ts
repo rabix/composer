@@ -182,7 +182,7 @@ import {
                         </ct-tab-selector>
 
                         <!--Inputs-->
-                        <div *ngIf="viewMode === 'inputs'" [style.height.px]="height*38">
+                        <div *ngIf="viewMode === 'inputs'">
                             <div class="no-ports-defined" *ngIf="inputs.length === 0">
                                 No inputs defined.
                             </div>
@@ -208,7 +208,7 @@ import {
 
 
                         <!--App settings-->
-                        <div *ngIf="viewMode === 'appSettings'" [style.height.px]="height*38">
+                        <div *ngIf="viewMode === 'appSettings'">
                             <div class="no-ports-defined" *ngIf="appSettings.length === 0">
                                 No app settings defined.
                             </div>
@@ -234,7 +234,7 @@ import {
 
 
                         <!--Outputs-->
-                        <div *ngIf="viewMode === 'outputs'" [style.height.px]="height*38">
+                        <div *ngIf="viewMode === 'outputs'">
                             <div class="no-ports-defined" *ngIf="model.outputs.length === 0">
                                 No outputs defined.
                             </div>
@@ -309,8 +309,6 @@ export class AppInfoComponent implements OnChanges {
     public inputs: Array<CommandInputParameterModel | WorkflowInputParameterModel>;
     public appSettings: Array<CommandInputParameterModel | WorkflowInputParameterModel>;
 
-    public height = 0;
-
     constructor(private system: SystemService) {
 
     }
@@ -331,7 +329,6 @@ export class AppInfoComponent implements OnChanges {
             | WorkflowInputParameterModel>)
             .filter((input) => input.type.type !== "File" && input.type.items !== "File");
 
-        this.height = Math.max(this.inputs.length, this.model.outputs.length, this.appSettings.length);
     }
 
     updateLabel(value: string) {
