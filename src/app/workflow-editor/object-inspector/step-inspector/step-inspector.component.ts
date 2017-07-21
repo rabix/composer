@@ -1,4 +1,9 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, ViewEncapsulation} from "@angular/core";
+import {
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
+    Component,
+    Input
+} from "@angular/core";
 import {Workflow} from "cwl-svg";
 import {StepModel, WorkflowModel} from "cwlts/models";
 import {PlatformAPI} from "../../../services/api/platforms/platform-api.service";
@@ -79,7 +84,7 @@ export class StepInspectorComponent extends DirectiveBase {
     graph: Workflow;
 
     @Input()
-    fileID:string;
+    fileID: string;
 
     tabs = {
         Inputs: "inputs",
@@ -111,7 +116,7 @@ export class StepInspectorComponent extends DirectiveBase {
         console.log("Should update app", ev, this);
 
         const [appHash] = this.fileID.split("/");
-        const api = this.apiGateway.forHash(appHash);
+        const api       = this.apiGateway.forHash(appHash);
 
         api.getApp(appData).subscribe((app) => {
 
