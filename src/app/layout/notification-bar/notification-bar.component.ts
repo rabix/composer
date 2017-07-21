@@ -29,8 +29,8 @@ export class NotificationBarComponent extends DirectiveBase {
 
     constructor(public notificationBarService: NotificationBarService, public cdr: ChangeDetectorRef) {
         super();
-        this.notificationBarService.aggregate.subscribeTracked(this, (notifications) => {
-            this.notifications = notifications;
+        this.notificationBarService.displayedNotifications.subscribeTracked(this, (notifications) => {
+             this.notifications = notifications;
         });
     }
 

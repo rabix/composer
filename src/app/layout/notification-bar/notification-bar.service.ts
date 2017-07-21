@@ -1,11 +1,14 @@
 import {Injectable} from "@angular/core";
 import {Subject} from "rxjs/Subject";
 import {Observable} from "rxjs/Observable";
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
 
 export class Notification {
     message: string;
     type: "error" | "warning" | "info" | string;
     duration: number;
+
+    dismiss = new Subject<any>();
 
     constructor(message: string, type, duration: number = Infinity) {
         this.message = message;
@@ -36,19 +39,46 @@ export class ErrorNotification extends Notification {
 @Injectable()
 export class NotificationBarService {
 
-    public static maxDisplay = 3;
+    /** Max number of displayed notifications */
+    public static maxDisplay = 5;
 
-    private notifications = new Subject<any>();
+    /** Queue of notifications waiting to be displayed */
+    private pendingNotifications = [];
+
+    /**  Notifications that are currently displayed */
+    public displayedNotifications = new BehaviorSubject<any>([]);
+
+    private notificationsStream = new Subject<any>();
 
     private updates = new Subject<any>();
 
-    public aggregate = this.updates.scan((acc, patch) => patch(acc), []);
+    private aggregate = this.updates.scan((acc, patch) => patch(acc), []).do((agg) => {
+        this.displayedNotifications.next(agg);
+    });
 
-    private availability = Observable.of([]).merge(this.aggregate.map(agg => agg.length < NotificationBarService.maxDisplay).filter(v => v));
+    /**  Flag to limit number of values in queue (zip operator) for availability stream to 1  */
+    private available = false;
+
+    private availabilityStream = Observable.of(true).merge(this.aggregate.map(agg => agg.length < NotificationBarService.maxDisplay))
+        .filter((v) => {
+
+            // Limit number of values in queue (zip operator) for availability stream to 1
+            // In case for example when maxDisplay is 3 and you have 3 displayed and 0 pending notifications.
+            // Once one notification is dismissed you will have one value in zip operator queue (availability stream)
+            // When you dismiss them all you will have 3 values in the queue. Now add 1 notification, you will have
+            // 4 values in the queue and so on. Using this variable only one value can be in the queue
+            if (!v || this.available) {
+                return false;
+            }
+            return this.available = true;
+        });
 
     constructor() {
-        Observable.zip(this.notifications, this.availability, msg => msg).map((msg) => msg.notification)
+        Observable.zip(this.notificationsStream, this.availabilityStream, msg => msg)
             .flatMap(msg => {
+
+                this.available = false;
+                this.pendingNotifications.shift();
 
                 // Take the message and create an observable of 2 emits.
                 // They are update transformations for the list of shown messages
@@ -65,25 +95,29 @@ export class NotificationBarService {
                             }
 
                             return acc.slice(0, idx).concat(acc.slice(idx + 1));
-                        }).delay(msg.duration)
+                        }).delayWhen(() =>
+                            // Dismiss notification when delay time passed or when its manually dismissed
+                            Observable.merge(Observable.of(1).delay(msg.duration), msg.dismiss))
                     );
             })
             .subscribe(patches => {
                 this.updates.next(patches);
             });
-
     }
 
-
     public showNotification(notification: Notification) {
-        this.notifications.next({
-            notification
-        });
+        // If notification is not in queue of pending notifications or its already displayed
+        if (!this.pendingNotifications.concat(this.displayedNotifications.getValue())
+                .find((item) => notification.message === item.message)) {
+
+            this.pendingNotifications.push(notification);
+            this.notificationsStream.next(notification);
+        }
     }
 
     public dismissNotification(notification: Notification) {
-        this.updates.next((all: Notification[]) => {
-            return all.filter(n => n !== notification);
-        });
+        if (this.displayedNotifications.getValue().find((displayed) => displayed === notification)) {
+            notification.dismiss.next();
+        }
     }
 }
