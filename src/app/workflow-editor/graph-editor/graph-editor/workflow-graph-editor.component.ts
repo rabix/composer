@@ -500,12 +500,12 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
                 if (isLocal) {
                     const split = nodeID.split("/");
                     const id    = split[split.length - 1].split(".")[0];
-                    app.id      = app.id || id;
+                    resolved.id      = resolved.id || id;
                 }
 
                 this.workflowEditorService.putInHistory(this.model);
 
-                const step = this.model.addStepFromProcess(app);
+                const step = this.model.addStepFromProcess(resolved);
 
                 // add local source so step can be serialized without embedding
                 if (isLocal) {
