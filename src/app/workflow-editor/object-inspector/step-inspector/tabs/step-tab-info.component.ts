@@ -9,43 +9,43 @@ import {StepModel} from "cwlts/models";
         <div>
             <!--Type-->
             <p>
-                <strong>Type:</strong>
+                <span class="text-title">Type:</span>
                 <span> {{ step.run['class'] }} </span>
             </p>
 
             <!--Cwl Version-->
             <p>
-                <strong>Cwl Version:</strong>
+                <span class="text-title">Cwl Version:</span>
                 <span> {{ step.run['cwlVersion'] }} </span>
             </p>
 
             <!--Revision-->
             <p>
-                <strong>Revision:</strong>
+                <span class="text-title">Revision:</span>
                 <span>{{ step.run.customProps['sbg:revision'] }}</span>
             </p>
 
             <!--Toolkit Version-->
             <p>
-                <strong>Toolkit Version:</strong>
-                <span>{{ step.run.customProps['sbg:toolkitVersion'] }}</span>
+                <span class="text-title">Toolkit:</span>
+                <span>{{ step.run.customProps['sbg:toolkit'] }} {{step.run.customProps['sbg:toolkitVersion']}}</span>
             </p>
 
             <!--Author-->
             <p>
-                <strong>Author:</strong>
+                <span class="text-title">Author:</span>
                 <span> {{ step.run.customProps['sbg:createdBy'] }} </span>
             </p>
 
             <!--Author-->
             <p>
-                <strong>Source:</strong>
+                <span class="text-title">Source:</span>
                 <span> {{ getSource() }} </span>
             </p>
 
             <!--Description-->
             <div>
-                <strong>Description{{ getDescription() ? '' : ':'}}</strong>
+                <span class="text-title">Description{{ getDescription() ? '' : ':'}}</span>
                 <div class="form-group" [ngClass]="{'format': getDescription()}">
                     <div [ct-markdown]="getDescription()"></div>
                 </div>
