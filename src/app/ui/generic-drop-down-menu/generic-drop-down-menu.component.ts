@@ -69,6 +69,18 @@ export class GenericDropDownMenuComponent extends DirectiveBase implements OnIni
         }
     }
 
+    show() {
+        if (!this.dropdown) {
+            this.createMenu();
+        }
+    }
+
+    hide() {
+        if (this.dropdown) {
+            this.destroyMenu();
+        }
+    }
+
     ngOnInit() {
         // Here we listen to external changes in the menu's state.
         // If the component using the dropdown menu sends a false value

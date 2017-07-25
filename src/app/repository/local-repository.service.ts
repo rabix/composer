@@ -3,6 +3,8 @@ import "rxjs/add/operator/publishReplay"
 import "rxjs/add/operator/shareReplay"
 import {Observable} from "rxjs/Observable";
 import {ReplaySubject} from "rxjs/ReplaySubject";
+import {ExecutorConfig} from "../../../electron/src/storage/types/executor-config";
+import {AppMetadata} from "../../../electron/src/storage/types/local-repository";
 import {RecentAppTab} from "../../../electron/src/storage/types/recent-app-tab";
 import {AuthCredentials} from "../auth/model/auth-credentials";
 import {TabData} from "../core/workbox/tab-data.interface";
@@ -16,6 +18,7 @@ export class LocalRepositoryService {
     private expandedFolders: ReplaySubject<string[]>                  = new ReplaySubject(1);
     private recentApps: ReplaySubject<RecentAppTab[]>                 = new ReplaySubject(1);
     private credentials: ReplaySubject<AuthCredentials[]>             = new ReplaySubject(1);
+    private executorConfig: ReplaySubject<ExecutorConfig>             = new ReplaySubject(1);
     private activeCredentials: ReplaySubject<AuthCredentials>         = new ReplaySubject(1);
     private selectedAppsPanel: ReplaySubject<"myApps" | "publicApps"> = new ReplaySubject(1);
     private publicAppsGrouping: ReplaySubject<"toolkit" | "category"> = new ReplaySubject(1);
@@ -26,6 +29,7 @@ export class LocalRepositoryService {
         this.listen("recentApps").subscribe(this.recentApps);
         this.listen("localFolders").subscribe(this.localFolders);
         this.listen("expandedNodes").subscribe(this.expandedFolders);
+        this.listen("executorConfig").do(data => console.log("Passing executor config", data)).subscribe(this.executorConfig);
         this.listen("selectedAppsPanel").subscribe(this.selectedAppsPanel);
         this.listen("publicAppsGrouping").subscribe(this.publicAppsGrouping);
         this.listen("activeCredentials").map(cred => AuthCredentials.from(cred)).subscribe(this.activeCredentials);
@@ -143,6 +147,7 @@ export class LocalRepositoryService {
 
     removeLocalFolders(...folders): Promise<any> {
         return this.getLocalFolders().take(1).toPromise().then(existing => {
+
             const update = existing.filter(path => folders.indexOf(path) === -1);
 
             if (update.length === existing.length) {
@@ -169,5 +174,36 @@ export class LocalRepositoryService {
 
     setOpenTabs(openTabs: TabData<any>[]): Promise<any> {
         return this.patch({openTabs}).toPromise();
+    }
+
+    getExecutorConfig(): Observable<ExecutorConfig> {
+        return this.executorConfig;
+    }
+
+    setExecutorConfig(executorConfig: ExecutorConfig): Promise<any> {
+        return this.patch({executorConfig}).take(1).toPromise();
+    }
+
+    getAppMeta(appID: string, key?: string): Observable<AppMetadata> {
+        return this.listen("appMeta")
+            .map(meta => {
+                const data = meta[appID];
+
+                if (key && data) {
+                    return data[key];
+                }
+
+                return data;
+
+            });
+    }
+
+    patchAppMeta(appID: string, key: keyof AppMetadata, value: any): Promise<any> {
+        return this.ipc.request("patchAppMeta", {
+            profile: "local",
+            appID,
+            key,
+            value
+        }).toPromise();
     }
 }

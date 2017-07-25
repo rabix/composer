@@ -52,6 +52,8 @@ export abstract class DirectiveBase implements OnDestroy, AfterViewInit {
         this.__disposables.forEach(d => d.track[d.dispose]());
     }
 
+
+
     ngAfterViewInit() {
         this.viewReady.next(true);
         this.viewReady.complete();

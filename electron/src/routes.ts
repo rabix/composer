@@ -2,10 +2,12 @@ import {RequestCallback} from "request";
 import {PublicAPI} from "./controllers/public-api.controller";
 import * as SearchController from "./controllers/search.controller";
 import {SwapController} from "./controllers/swap.controller";
+import {RabixExecutor} from "./rabix-executor/rabix-executor";
 import {AppQueryParams} from "./sbg-api-client/interfaces/queries";
 import {SBGClient} from "./sbg-api-client/sbg-client";
 import {DataRepository} from "./storage/data-repository";
-import {CredentialsCache, LocalRepository} from "./storage/types/local-repository";
+import {Executor} from "./storage/hooks/executor-config-hook";
+import {AppMetadata, CredentialsCache, LocalRepository} from "./storage/types/local-repository";
 import {UserRepository} from "./storage/types/user-repository";
 
 const swapPath       = require("electron").app.getPath("userData") + "/swap";
@@ -16,10 +18,14 @@ const acceleratorController = require("./controllers/accelerator.controller");
 const resolver              = require("./schema-salad-resolver");
 const md5                   = require("md5");
 
-const repository     = new DataRepository();
+const repository = new DataRepository();
+repository.attachHook(new Executor());
+
 const repositoryLoad = new Promise((resolve, reject) => repository.load((err) => err ? reject(err) : resolve(1))).catch(err => {
     console.log("Caught promise rejection", err);
     // return err;
+}).then(() => {
+
 });
 
 const platformFetchingLocks: { [platformID: string]: Promise<any> } = {};
@@ -451,16 +457,50 @@ module.exports = {
             if (allMeta[appID]) {
                 allMeta[appID][key] = value;
             } else {
-                allMeta[appID] = {[key]: value};
+                allMeta[appID] = {[key]: value} as any;
             }
 
             if (profile === "local") {
-                repository.updateLocal({appMeta: allMeta}, callback);
+                repository.updateLocal({appMeta: allMeta as any}, callback);
                 return;
             }
 
             repository.updateUser({appMeta: allMeta}, callback);
 
         }, callback);
+    },
+
+    probeExecutorVersion: (data: { path: string }, callback) => {
+        repositoryLoad.then(() => {
+            const rabix = new RabixExecutor(repository.local.executorConfig);
+            rabix.getVersion((err: any, version) => {
+                if (err) {
+                    if (err.code === "ENOENT") {
+                        return callback(null, "");
+                    } else if (err.code === "EACCESS") {
+                        return callback(null, `No execution permissions on ${data.path}`)
+                    } else {
+                        return callback(null, err.message);
+                    }
+                }
+
+                callback(null, `Version: ${version}`);
+            });
+        });
+    },
+
+    executeApp: (data: {
+        appID: string,
+        content: string,
+        jobPath: string,
+        options: Object
+    }, callback) => {
+
+        repositoryLoad.then(() => {
+            const {appID, content, jobPath, options} = data;
+
+            const rabix = new RabixExecutor(repository.local.executorConfig);
+            rabix.execute(appID, content, jobPath, options, callback);
+        })
     }
 };

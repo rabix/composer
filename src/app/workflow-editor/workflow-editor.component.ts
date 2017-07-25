@@ -7,6 +7,7 @@ import "rxjs/add/operator/switchMap";
 import {Observable} from "rxjs/Observable";
 import {CodeSwapService} from "../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
+import {ErrorWrapper} from "../core/helpers/error-wrapper";
 import {AppEditorBase} from "../editor-common/app-editor-base/app-editor-base";
 import {AppValidatorService} from "../editor-common/app-validator/app-validator.service";
 import {PlatformAppService} from "../editor-common/components/platform-app-common/platform-app.service";
@@ -14,17 +15,14 @@ import {EditorInspectorService} from "../editor-common/inspector/editor-inspecto
 import {APP_SAVER_TOKEN} from "../editor-common/services/app-saving/app-saver.interface";
 import {LocalFileSavingService} from "../editor-common/services/app-saving/local-file-saving.service";
 import {PlatformAppSavingService} from "../editor-common/services/app-saving/platform-app-saving.service";
-import {
-    ErrorNotification,
-    NotificationBarService
-} from "../layout/notification-bar/notification-bar.service";
+import {ExecutorService} from "../executor/executor.service";
+import {ErrorNotification, NotificationBarService} from "../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../layout/status-bar/status-bar.service";
 import {PlatformRepositoryService} from "../repository/platform-repository.service";
 import {IpcService} from "../services/ipc.service";
 import {ModalService} from "../ui/modal/modal.service";
 import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow-graph-editor.component";
 import {WorkflowEditorService} from "./workflow-editor.service";
-import {ErrorWrapper} from "../core/helpers/error-wrapper";
 
 export function appSaverFactory(comp: WorkflowEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -60,8 +58,21 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                 codeSwapService: CodeSwapService,
                 protected platformRepository: PlatformRepositoryService,
                 private cdr: ChangeDetectorRef,
-                platformAppService: PlatformAppService,) {
-        super(statusBar, notificationBar, modal, inspector, dataGateway, injector, appValidator, codeSwapService, platformAppService, platformRepository);
+                platformAppService: PlatformAppService,
+                executorService: ExecutorService) {
+        super(
+            statusBar,
+            notificationBar,
+            modal,
+            inspector,
+            dataGateway,
+            injector,
+            appValidator,
+            codeSwapService,
+            platformAppService,
+            platformRepository,
+            executorService
+        );
     }
 
     protected getPreferredTab(): string {
@@ -135,12 +146,12 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                     return {...acc, [revisionlessID]: item.revision};
                 }, {});
 
-            this.dataModel.steps.forEach(step => {
+                this.dataModel.steps.forEach(step => {
 
-                // a non-sbg app might be embedded in an sbg workflow
-                if (!step.run.customProps || !step.run.customProps["sbg:id"]) {
-                    return;
-                }
+                    // a non-sbg app might be embedded in an sbg workflow
+                    if (!step.run.customProps || !step.run.customProps["sbg:id"]) {
+                        return;
+                    }
                     const revisionless = step.run.customProps["sbg:id"].split("/").slice(0, 3).join("/");
                     const revision     = Number(step.run.customProps["sbg:id"].split("/").pop());
 

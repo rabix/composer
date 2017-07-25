@@ -72,7 +72,8 @@ import { ToolCodesComponent } from "./sections/other/codes/tool-codes.component"
         ToolCodesComponent
     ],
     exports: [
-        ToolEditorComponent
+        ToolEditorComponent,
+        CommandLinePreviewComponent,
     ],
     imports: [
         BrowserModule,

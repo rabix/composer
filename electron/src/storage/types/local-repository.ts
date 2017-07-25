@@ -1,4 +1,5 @@
 import {User} from "../../sbg-api-client/interfaces/user";
+import {AppExecutionContext, ExecutorConfig} from "./executor-config";
 import {RepositoryType} from "./repository-type";
 
 export interface CredentialsCache {
@@ -6,6 +7,10 @@ export interface CredentialsCache {
     user: User;
     url: string;
     token: string;
+}
+
+export interface AppMetadata {
+    executionConfig: AppExecutionContext,
 }
 
 export class LocalRepository extends RepositoryType {
@@ -18,8 +23,12 @@ export class LocalRepository extends RepositoryType {
 
     publicAppsGrouping: "toolkit" | "category" = "toolkit";
 
-    selectedAppPanel: "myApps" | "publicApps" = "myApps";
+    selectedAppsPanel: "myApps" | "publicApps" = "myApps";
 
     sidebarHidden = false;
+
+    executorConfig: ExecutorConfig = {
+        path: ""
+    }
 
 }

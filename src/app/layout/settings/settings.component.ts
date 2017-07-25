@@ -1,4 +1,5 @@
 import {Component} from "@angular/core";
+import {Observable} from "rxjs/Observable";
 import {AuthService} from "../../auth/auth.service";
 import {AuthCredentials} from "../../auth/model/auth-credentials";
 import {GlobalService} from "../../core/global/global.service";
@@ -7,9 +8,8 @@ import {WorkboxService} from "../../core/workbox/workbox.service";
 import {SettingsService} from "../../services/settings/settings.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
-import {Observable} from "rxjs/Observable";
 
-type ViewMode = "auth" | "keyBindings" | "cache";
+type ViewMode = "auth" | "bunnyConfig";
 
 @Component({
     selector: "ct-settings",
@@ -19,16 +19,17 @@ type ViewMode = "auth" | "keyBindings" | "cache";
 
             <ct-tab-selector [distribute]="'auto'" [active]="viewMode" (activeChange)="switchTab($event)">
                 <ct-tab-selector-entry tabName="auth">Authentication</ct-tab-selector-entry>
+                <ct-tab-selector-entry tabName="bunnyConfig">Rabix Executor</ct-tab-selector-entry>
                 <!--<ct-tab-selector-entry tabName="keyBindings">Key Bindings</ct-tab-selector-entry>-->
                 <!--<ct-tab-selector-entry tabName="cache">Cache</ct-tab-selector-entry>-->
             </ct-tab-selector>
 
         </ct-action-bar>
 
-        <ct-form-panel class="m-2">
+        <ct-form-panel *ngIf="viewMode === 'auth'" class="m-2">
             <div class="tc-header">Authentication</div>
             <div class="tc-body">
- 
+
                 <table class="table table-striped">
                     <thead>
                     <tr>
@@ -63,6 +64,13 @@ type ViewMode = "auth" | "keyBindings" | "cache";
                 </div>
             </div>
         </ct-form-panel>
+
+        <ct-form-panel *ngIf="viewMode === 'bunnyConfig'" class="m-2">
+            <div class="tc-header">Rabix Executor Configuration</div>
+            <div class="tc-body p-1">
+                <ct-executor-config></ct-executor-config>
+            </div>
+        </ct-form-panel>
     `
 })
 export class SettingsComponent extends DirectiveBase {
@@ -88,13 +96,13 @@ export class SettingsComponent extends DirectiveBase {
             const valuesFromModal = credentialsModal.getValue();
             Observable.fromPromise(this.auth.addCredentials(valuesFromModal)).withLatestFrom(this.auth.getCredentials())
                 .take(1).subscribe((combined) => {
-                    const credentials = combined[1];
+                const credentials = combined[1];
 
-                    // If added credential is the only one, set it to be the active one
-                    if (credentials.length === 1) {
-                        this.setActiveCredentials(credentials[0]);
-                    }
-                });
+                // If added credential is the only one, set it to be the active one
+                if (credentials.length === 1) {
+                    this.setActiveCredentials(credentials[0]);
+                }
+            });
             this.modal.close();
         };
 
@@ -114,16 +122,16 @@ export class SettingsComponent extends DirectiveBase {
             Observable.from(this.auth.addCredentials(credentialsFromModal)).withLatestFrom(this.auth.getActive())
                 .take(1).subscribe((combined) => {
 
-                    const credentials = combined[1];
+                const credentials = combined[1];
 
-                    // If edited credentials is the active one, update active credentials
-                    if (edited === credentials) {
-                        this.auth.setActiveCredentials(credentialsFromModal);
-                    }
+                // If edited credentials is the active one, update active credentials
+                if (edited === credentials) {
+                    this.auth.setActiveCredentials(credentialsFromModal);
+                }
 
-                    this.modal.close();
+                this.modal.close();
 
-                });
+            });
 
         };
     }
@@ -139,7 +147,7 @@ export class SettingsComponent extends DirectiveBase {
     setActiveCredentials(credentials: AuthCredentials) {
 
         this.auth.setActiveCredentials(credentials).then(() => {
-            if(credentials){
+            if (credentials) {
                 this.global.reloadPlatformData();
             }
             this.workbox.forceReloadTabs();

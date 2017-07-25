@@ -12,7 +12,6 @@ $light-gray: #999;
 $smoke: #eee;
 $white: #fff;
 
-
 $blue: #337cb9;
 $sky: #6aaaf0;
 
@@ -25,7 +24,6 @@ $purple: #a184dc;
 
 $green: #7ac24d;
 
-
 //
 //
 // ----- Color Scheme -----
@@ -37,7 +35,6 @@ $brand-danger: $red;
 $brand-warning: $orange;
 $brand-info: $sky;
 // # Other Colors
-
 
 // ----- Global Layout Elements -----
 $body-bg: $dark-gray;
@@ -92,8 +89,8 @@ $code-error: $brand-danger;
 // ----- Buttons -----
 $btn-primary-border-color: #1a4365;
 $btn-border-color: #313030;
-$btn-border-radius: 3px;
-$btn-line-height: 1rem;
+$btn-border-radius: $border-radius;
+$btn-line-height: 1.3rem;
 $btn-padding-x: 1.2rem;
 $btn-padding-y: .4rem;
 $btn-primary-bg: $blue;

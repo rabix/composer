@@ -11,6 +11,7 @@ import {ActionBarComponent} from "./action-bar/action-bar.component";
 import {TabLoaderComponent} from "./tab-loader/tab-loader.component";
 import {NotificationBarComponent} from "./notification-bar/notification-bar.component";
 import {NotificationBarService} from "./notification-bar/notification-bar.service";
+import {ExecutorConfigComponent} from "./settings/executor-config/executor-config.component";
 
 @NgModule({
     imports: [
@@ -28,6 +29,7 @@ import {NotificationBarService} from "./notification-bar/notification-bar.servic
         StatusBarComponent,
         TabLoaderComponent,
         NotificationBarComponent,
+        ExecutorConfigComponent
     ],
     exports: [
         ActionBarComponent,
@@ -36,7 +38,7 @@ import {NotificationBarService} from "./notification-bar/notification-bar.servic
         SettingsComponent,
         StatusBarComponent,
         TabLoaderComponent,
-        NotificationBarComponent,
+        NotificationBarComponent
     ],
     providers: [
         NotificationBarService

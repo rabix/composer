@@ -1,5 +1,6 @@
 import {app} from "electron";
 import * as storage from "electron-storage";
+import {RepositoryHook} from "./hooks/repository-hook";
 import {CredentialsCache, LocalRepository} from "./types/local-repository";
 import {RepositoryType} from "./types/repository-type";
 import {UserRepository} from "./types/user-repository";
@@ -14,8 +15,10 @@ export class DataRepository {
     private storageWriteQueue: { [filePath: string]: Function[] } = {};
 
     private listeners = {};
+    private hooks     = new Set<RepositoryHook>();
 
     constructor() {
+
         this.on("update.local.activeCredentials", (activeCredentials: any) => {
 
             if (!activeCredentials) {
@@ -38,6 +41,10 @@ export class DataRepository {
         });
     }
 
+    attachHook(hook: RepositoryHook) {
+        this.hooks.add(hook);
+    }
+
     /**
      * Load local and user (if needed) storage files into memory.
      */
@@ -47,18 +54,42 @@ export class DataRepository {
             if (err) return callback(err);
 
             this.local = localData;
-            if (!localData.activeCredentials) {
-                return callback();
-            }
 
-            this.loadProfile(localData.activeCredentials.id, new UserRepository(), (err, userData) => {
-                if (err) return callback(err);
-
-                this.user = userData;
-
-                callback();
+            const hooksLoaded = new Promise((resolve, reject) => {
+                (async () => {
+                    try {
+                        for (const hook of this.hooks) {
+                            await hook.afterLoad(this);
+                        }
+                        resolve();
+                    } catch (err) {
+                        reject(err);
+                    }
+                })();
             });
+
+            hooksLoaded.then(() => {
+                if (!localData.activeCredentials) {
+                    return callback();
+                }
+
+                this.loadProfile(localData.activeCredentials.id, new UserRepository(), (err, userData) => {
+                    if (err) return callback(err);
+
+                    this.user = userData;
+
+                    callback();
+                });
+            }, callback)
+
+
         });
+    }
+
+    private hookAfterLoad() {
+        this.hooks.forEach(async (hook) => {
+            await hook.afterLoad(this);
+        })
     }
 
     activateUser(credentialsID?: string, callback?: (err?: Error) => void) {
@@ -148,7 +179,10 @@ export class DataRepository {
         return this.local.credentials.find(c => c.id === profile) !== undefined;
     }
 
-    private update<T extends RepositoryType>(profile: string, data: Partial<T>, callback?: (err?: Error, data?: T) => void) {
+    private update<T extends RepositoryType>(profile: string,
+                                             data: Partial<T>,
+                                             callback: (err?: Error, data?: T) => void = () => {
+                                             }) {
 
         const profilePath = `profiles/${profile}`;
         this.trigger("update", {user: this.user, local: this.local});

@@ -38,6 +38,7 @@ import {SettingsMenuComponent} from "./workbox/settings-menu.component";
 import {WorkBoxTabComponent} from "./workbox/workbox-tab.component";
 import {WorkBoxComponent} from "./workbox/workbox.component";
 import {WorkboxService} from "./workbox/workbox.service";
+import {ExecutorService} from "../executor/executor.service";
 
 export function errorHandlerFactory(modal: ModalService) {
     return environment.production ? new ModalErrorHandler(modal) : new ErrorHandler();
@@ -89,6 +90,7 @@ export function errorHandlerFactory(modal: ModalService) {
         WorkboxService,
         ModalService,
         LayoutService,
+        ExecutorService,
         PlatformAPI,
         {
             provide: ErrorHandler,

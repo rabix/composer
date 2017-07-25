@@ -16,39 +16,41 @@ export type IPCRoute =
     | "createPlatformApp"
     | "deletePath"
     | "fetchPlatformData"
-    | "patchSwap"
-    | "getPlatformApp"
     | "getApps"
     | "getAppUpdates"
+    | "getLocalFileContent"
     | "getLocalRepository"
+    | "getPlatformApp"
     | "getProjects"
     | "getSetting"
     | "getUserByToken"
-    | "patchAppMeta"
-    | "watchAppMeta"
     | "getUserRepository"
-    | "getLocalFileContent"
     | "hasDataCache"
-    | "saveAppRevision"
+    | "patchAppMeta"
     | "patchLocalRepository"
+    | "patchSwap"
     | "patchUserRepository"
-    | "sendFeedback"
     | "pathExists"
+    | "probeExecutorVersion"
     | "putSetting"
     | "readDirectory"
     | "readFileContent"
     | "resolve"
     | "resolveContent"
+    | "saveAppRevision"
+    | "saveFileContent"
     | "scanPlatforms"
     | "searchLocalProjects"
     | "searchPublicApps"
     | "searchUserProjects"
+    | "sendFeedback"
     | "switchActiveUser"
-    | "saveFileContent";
+    | "watchAppMeta";
 
 export type IPCListeners =
     "watchLocalRepository" |
     "watchUserRepository" |
+    "executeApp" |
     "accelerator";
 
 @Injectable()

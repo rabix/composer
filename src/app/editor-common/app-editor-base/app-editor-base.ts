@@ -4,21 +4,26 @@ import {CommandLineToolModel, WorkflowModel} from "cwlts/models";
 
 import * as Yaml from "js-yaml";
 import {LoadOptions} from "js-yaml";
+import "rxjs/add/observable/of";
 import "rxjs/add/operator/do";
+import "rxjs/add/operator/switchMap";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
+import {AppExecutionContext} from "../../../../electron/src/storage/types/executor-config";
 import {CodeSwapService} from "../../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../../core/data-gateway/data-gateway.service";
 import {ErrorWrapper} from "../../core/helpers/error-wrapper";
 import {ProceedToEditingModalComponent} from "../../core/modals/proceed-to-editing-modal/proceed-to-editing-modal.component";
 import {PublishModalComponent} from "../../core/modals/publish-modal/publish-modal.component";
 import {AppTabData} from "../../core/workbox/app-tab-data";
+import {ExecutorService} from "../../executor/executor.service";
 import {ErrorNotification, InfoNotification, NotificationBarService} from "../../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {StatusControlProvider} from "../../layout/status-bar/status-control-provider.interface";
 import {PlatformRepositoryService} from "../../repository/platform-repository.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {AppExecutionContextModalComponent} from "../app-execution-context-modal/app-execution-context-modal.component";
 import {AppValidatorService, AppValidityState} from "../app-validator/app-validator.service";
 import {PlatformAppService} from "../components/platform-app-common/platform-app.service";
 import {RevisionListComponent} from "../components/revision-list/revision-list.component";
@@ -70,6 +75,14 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     isUnlockable = null;
 
+    isExecuting = false;
+
+    appType: "Workflow" | "CommandLineTool";
+
+    executionOutput = "";
+
+    executionQueue = new Subject<any>();
+
     /** Template of the status controls that will be shown in the status bar */
     @ViewChild("statusControls")
     protected statusControls: TemplateRef<any>;
@@ -102,9 +115,11 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 protected appValidator: AppValidatorService,
                 protected codeSwapService: CodeSwapService,
                 protected platformAppService: PlatformAppService,
-                protected platformRepository: PlatformRepositoryService) {
+                protected platformRepository: PlatformRepositoryService,
+                protected executorService: ExecutorService) {
 
         super();
+
     }
 
     registerOnTabLabelChange(update: (label: string) => void, originalLabel: string): void {
@@ -247,6 +262,17 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             this.viewMode    = state.isValidCWL ? this.getPreferredTab() : "code";
             this.reportPanel = state.isValidCWL ? this.getPreferredReportPanel() : this.reportPanel;
         });
+
+        this.executionQueue.switchMap(() => {
+            return new Observable(obs => {
+                const process = this.runOnExecutor();
+                return () => {
+                    console.log("Should terminate process");
+                }
+            });
+        }).subscribeTracked(this, e => {
+
+        });
     }
 
     save(): void {
@@ -335,6 +361,10 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     appIsPublishable(): boolean {
         /** Bound to lock state by accident, not intention */
         return this.tabsUnlocked();
+    }
+
+    appIsRunnable() {
+        return this.dataModel !== undefined;
     }
 
     openRevision(revisionNumber: number | string): Promise<any> {
@@ -509,8 +539,13 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         }, err => console.warn);
     }
 
-    toggleReport(panel: string) {
-        this.reportPanel = this.reportPanel === panel ? undefined : panel;
+    toggleReport(panel: string, value?: boolean) {
+        if (value === true) {
+            this.reportPanel = panel;
+        } else {
+            this.reportPanel = this.reportPanel === panel ? undefined : panel;
+
+        }
 
         // Force browser reflow, heights and scroll bar size gets inconsistent otherwise
         setTimeout(() => window.dispatchEvent(new Event("resize")));
@@ -518,6 +553,128 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     openOnPlatform(appID: string) {
         this.platformAppService.openOnPlatform(appID);
+    }
+
+    editRunConfiguration() {
+        const appID     = this.tabData.id;
+        const appConfig = this.executorService.getAppConfig(appID).take(1);
+        appConfig.take(1).subscribeTracked(this, (context) => {
+
+            const modal = this.modal.fromComponent(AppExecutionContextModalComponent, {
+                title: "Set Execution Parameters"
+            });
+
+            modal.context = context;
+            modal.appID   = appID;
+
+            modal.onSubmit = (raw) => {
+                this.executorService.setAppConfig(appID, raw);
+                this.modal.close();
+            };
+
+            modal.onCancel = () => {
+                this.modal.close();
+            }
+        });
+    }
+
+    scheduleExecution() {
+        this.executionQueue.next(true);
+    }
+
+    runOnExecutor(): void {
+
+        const appID      = this.tabData.id;
+        const appConfig  = this.executorService.getAppConfig(appID).take(1);
+        this.isExecuting = true;
+
+        const executionContext = appConfig.switchMap((context: AppExecutionContext) => {
+
+            // If we have job path set, we can proceed with execution
+            if (context.jobPath) {
+                return Observable.of(context);
+            }
+
+            // Otherwise, we have to obtain job path
+            const modal = this.modal.fromComponent(AppExecutionContextModalComponent, {
+                title: "Set Execution Parameters"
+            });
+
+            modal.context = context;
+            modal.appID   = appID;
+
+            return new Observable(observer => {
+                modal.onSubmit = (raw) => {
+                    observer.next(raw);
+                    observer.complete();
+                    this.modal.close();
+                };
+
+                modal.onCancel = () => {
+                    observer.next(null);
+                    observer.complete();
+                    this.modal.close();
+                }
+            })
+        }).take(1) as Observable<AppExecutionContext>;
+
+        executionContext.subscribeTracked(this, (data: AppExecutionContext) => {
+            if (!data) {
+                return;
+            }
+
+            this.executorService.setAppConfig(appID, data);
+
+            const modelObject = this.dataModel.serialize();
+
+            // Bunny has a bug where it would recursively search for inputs, and dwelve into sbg:job
+            delete modelObject["sbg:job"];
+
+            const modelText = Yaml.dump(modelObject, {});
+
+            this.toggleReport("execution", true);
+
+            this.executionOutput = "";
+
+            const execution = this.executorService.run(this.tabData.id, modelText, data.jobPath, data.executionParams);
+
+            // const pid      = execution.take(1);
+            // const progress = execution.skip(1);
+
+            execution
+                .finally(() => this.isExecuting = false)
+                .subscribeTracked(this, (data) => {
+
+                    if (typeof data !== "string") {
+                        console.log("Data type", typeof data, data);
+                        return;
+                    }
+
+                    data = data.replace(/\n/g, "<br/>").replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
+                    console.log("Data is", data);
+
+
+                    /**
+                     * Relies on custom-added prefix to wrap up error messages
+                     * @name AppEditorBase.__errorDiscriminator
+                     * @see RabixExecutor.__errorPrefixing
+                     */
+                    if (data.startsWith("ERR: ")) {
+                        this.executionOutput += `<div class="text-error">${data.slice(5)}</div>`;
+                    } else {
+                        this.executionOutput += `<div>${data}</div>`;
+                    }
+                }, err => {
+                    this.executionOutput += `<div class="text-error">${ new ErrorWrapper(err) }</div>`
+                    console.warn("Execution error", err);
+                });
+
+
+        }, err => {
+            console.warn("Unexpected Execution Error", err);
+        });
+
+
     }
 
     protected abstract recreateModel(json: Object): void;
@@ -570,4 +727,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             throw err;
         });
     }
+
+
 }

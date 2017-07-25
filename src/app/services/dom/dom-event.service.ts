@@ -108,7 +108,7 @@ export class DomEventService {
         return down.flatMap(_ => move.takeUntil(up)).map((ev: MouseEvent) => Object.assign(ev, {ctData}, {ctName}));
     }
 
-    public onDrag(element: Element, ctName = "", ctData = {}) {
+    public onDrag(element: Element, ctName = "", ctData = {}): Observable<Observable<MouseEvent>> {
 
         const down = Observable.fromEvent(element, "mousedown").do((ev: MouseEvent) => {
             if (ev.stopPropagation) {
