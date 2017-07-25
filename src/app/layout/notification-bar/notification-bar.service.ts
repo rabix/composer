@@ -52,28 +52,36 @@ export class NotificationBarService {
 
     private updates = new Subject<any>();
 
-    private aggregate = this.updates.scan((acc, patch) => patch(acc), []).do((agg) => {
-        this.displayedNotifications.next(agg);
-    });
+    /** Stream of notifications that should be displayed */
+    private aggregateStream;
 
     /**  Flag to limit number of values in queue (zip operator) for availability stream to 1  */
     private available = false;
 
-    private availabilityStream = Observable.of(true).merge(this.aggregate.map(agg => agg.length < NotificationBarService.maxDisplay))
-        .filter((v) => {
-
-            // Limit number of values in queue (zip operator) for availability stream to 1
-            // In case for example when maxDisplay is 3 and you have 3 displayed and 0 pending notifications.
-            // Once one notification is dismissed you will have one value in zip operator queue (availability stream)
-            // When you dismiss them all you will have 3 values in the queue. Now add 1 notification, you will have
-            // 4 values in the queue and so on. Using this variable only one value can be in the queue
-            if (!v || this.available) {
-                return false;
-            }
-            return this.available = true;
-        });
+    /** Stream of availabilities */
+    private availabilityStream;
 
     constructor() {
+
+        this.aggregateStream = this.updates.scan((acc, patch) => patch(acc), []).do((agg) => {
+            this.displayedNotifications.next(agg);
+        });
+
+        this.availabilityStream = Observable.of(true).merge(this.aggregateStream.map(agg => agg.length < NotificationBarService.maxDisplay))
+            .filter((v) => {
+
+                // Limit number of values in queue (zip operator) for availability stream to 1
+                // In case for example when maxDisplay is 3 and you have 3 displayed and 0 pending notifications.
+                // Once one notification is dismissed you will have one value in zip operator queue (availability stream)
+                // When you dismiss them all you will have 3 values in the queue. Now add 1 notification, you will have
+                // 4 values in the queue and so on. Using this variable only one value can be in the queue
+                if (!v || this.available) {
+                    return false;
+                }
+                this.available = true;
+                return true;
+            });
+
         Observable.zip(this.notificationsStream, this.availabilityStream, msg => msg)
             .flatMap(msg => {
 
