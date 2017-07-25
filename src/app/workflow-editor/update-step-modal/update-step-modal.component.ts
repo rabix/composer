@@ -28,8 +28,12 @@ import {ModalService} from "../../ui/modal/modal.service";
                             on {{ updatedApp['sbg:modifiedOn'] * 1000 | date: 'MMM d, y hh:mm'}}</p>
                     </div>
 
-                    <div class="alert alert-danger" *ngIf="!updatedApp">
-                        Failed to retrieve the latest revision of this app.
+                    <div *ngIf="!updatedApp">
+                        <span class="text-danger">
+                            <i class="fa fa-times-circle fa-fw"></i>
+                                Failed to retrieve the latest revision of this app.                   
+                            
+                        </span>
                     </div>
 
                 </div>

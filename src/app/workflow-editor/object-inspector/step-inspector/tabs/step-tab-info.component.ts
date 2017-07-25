@@ -1,9 +1,8 @@
-import {Component, Input, ViewEncapsulation} from "@angular/core";
+import {Component, Input} from "@angular/core";
 import {StepModel} from "cwlts/models";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
+    styleUrls: ["step-tab-info.component.scss"],
     selector: "ct-workflow-step-inspector-info",
     template: `
         <div>
