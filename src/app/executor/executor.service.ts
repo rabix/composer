@@ -57,3 +57,20 @@ export class ExecutorService {
 
     }
 }
+
+export interface RabixExecutorResult {
+    output: RabixExecutorResultOutput[]
+}
+
+export interface RabixExecutorResultOutput {
+    basename: string,
+    checksum: string,
+    class: string,
+    dirname: string,
+    location: string,
+    nameext: string,
+    nameroot: string,
+    path: string,
+    secondaryFiles: string[],
+    size: number
+}

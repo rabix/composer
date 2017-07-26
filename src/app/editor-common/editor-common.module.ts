@@ -40,9 +40,8 @@ import {FileDefContentPipe} from "./pipes/file-def-content.pipe";
 import {FileDefNamePipe} from "./pipes/file-def-name.pipe";
 import {ValidationTextPipe} from "./pipes/validation-text.pipes";
 import {CommonDocumentControlsComponent} from "./template-common/common-document-controls/common-document-controls.component";
-import {CommonStatusControlsComponent} from "./template-common/common-status-controls/common-status-controls.component";
 import {CommonReportPanelComponent} from "./template-common/common-preview-panel/common-report-panel.component";
-import {ToolEditorModule} from "../tool-editor/tool-editor.module";
+import {CommonStatusControlsComponent} from "./template-common/common-status-controls/common-status-controls.component";
 
 @NgModule({
     declarations: [
@@ -82,7 +81,7 @@ import {ToolEditorModule} from "../tool-editor/tool-editor.module";
         AppExecutionContextModalComponent,
         CommonDocumentControlsComponent,
         CommonStatusControlsComponent,
-        CommonReportPanelComponent
+        CommonReportPanelComponent,
     ],
     exports: [
         MapListComponent,
