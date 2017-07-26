@@ -7,7 +7,7 @@ import {AppQueryParams} from "./sbg-api-client/interfaces/queries";
 import {SBGClient} from "./sbg-api-client/sbg-client";
 import {DataRepository} from "./storage/data-repository";
 import {Executor} from "./storage/hooks/executor-config-hook";
-import {AppMetadata, CredentialsCache, LocalRepository} from "./storage/types/local-repository";
+import {CredentialsCache, LocalRepository} from "./storage/types/local-repository";
 import {UserRepository} from "./storage/types/user-repository";
 
 const swapPath       = require("electron").app.getPath("userData") + "/swap";
@@ -473,6 +473,7 @@ module.exports = {
     probeExecutorVersion: (data: { path: string }, callback) => {
         repositoryLoad.then(() => {
             const rabix = new RabixExecutor(repository.local.executorConfig);
+
             rabix.getVersion((err: any, version) => {
                 if (err) {
                     if (err.code === "ENOENT") {
@@ -494,13 +495,14 @@ module.exports = {
         content: string,
         jobPath: string,
         options: Object
-    }, callback) => {
+    }, callback, emitter) => {
 
         repositoryLoad.then(() => {
             const {appID, content, jobPath, options} = data;
 
             const rabix = new RabixExecutor(repository.local.executorConfig);
-            rabix.execute(appID, content, jobPath, options, callback);
+
+            rabix.execute(appID, content, jobPath, options, callback, emitter);
         })
     }
 };

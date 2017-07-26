@@ -101,7 +101,7 @@ export class IpcService {
         });
     }
 
-    public request(message: IPCRoute, data = {}, zone?: NgZone): Observable<any> {
+    request(message: IPCRoute, data = {}, zone?: NgZone): Observable<any> {
         const messageID = this.guid.generate();
 
         this.pendingRequests[messageID] = {
@@ -121,9 +121,11 @@ export class IpcService {
         return this.pendingRequests[messageID].stream;
     }
 
-    public watch(message: IPCListeners, data = {}, zone?: NgZone): Observable<any> {
+    watch(message: IPCListeners, data = {}, zone?: NgZone): Observable<any> {
+        // Create a unique ID for the message
         const messageID = this.guid.generate();
 
+        // Store the request stream, so we know where to push incoming messages when they arrive
         this.pendingRequests[messageID] = {
             zone,
             type: RequestType.Watch,
@@ -137,10 +139,27 @@ export class IpcService {
             data
         });
 
-        return this.pendingRequests[messageID].stream;
-    }
+        const incomingMessages = this.pendingRequests[messageID].stream;
 
-    public notify(message: any): void {
-        this.ipcRenderer.send("notification", {message});
+        const clientObservable = new Observable(observer => {
+
+            // Proxy all messages from the IPC channel to this observable
+            const msgSubscription = incomingMessages
+            // Complete when the “$$EOS$$” message comes in
+                .takeUntil(incomingMessages.filter(v => v === "$$EOS$$"))
+                .subscribe(observer);
+
+
+            return () => {
+                this.ipcRenderer.send("data-request-terminate", {
+                    id: messageID,
+                    message: "stop"
+                });
+
+                msgSubscription.unsubscribe();
+            }
+        });
+
+        return clientObservable;
     }
 }

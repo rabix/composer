@@ -263,16 +263,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             this.reportPanel = state.isValidCWL ? this.getPreferredReportPanel() : this.reportPanel;
         });
 
-        this.executionQueue.switchMap(() => {
-            return new Observable(obs => {
-                const process = this.runOnExecutor();
-                return () => {
-                    console.log("Should terminate process");
-                }
-            });
-        }).subscribeTracked(this, e => {
 
-        });
+        this.bindExecutionQueue();
     }
 
     save(): void {
@@ -385,6 +377,87 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     new ErrorNotification("Cannot open revision. " + new ErrorWrapper(err))
                 );
             });
+    }
+
+    switchTab(tabName): void {
+
+        if (!tabName) {
+            return;
+        }
+
+        /** If switching to code mode, serialize the model first and update the editor text */
+        if (this.viewMode !== "code" && tabName === "code") {
+            this.priorityCodeUpdates.next(this.getModelText());
+            this.viewMode = tabName;
+            return;
+        }
+
+        /** If going from code mode to gui, resolve the content first */
+        if ((this.viewMode === "code" || !this.viewMode) && tabName !== "code") {
+
+            // Trick that will change reference for tabselector highlight line (to reset it to a Code mode if resolve fails)
+            this.viewMode = undefined;
+            this.resolveToModel(this.codeEditorContent.value).then(() => {
+                this.viewMode = tabName;
+            }, err => {
+                this.viewMode = "code";
+            });
+            return;
+        }
+
+        // If changing from|to mode that is not a Code mode, just switch
+        this.viewMode = tabName;
+    }
+
+    /**
+     * When click on Resolve button (visible only if app is a local file and you are in Code mode)
+     */
+    resolveButtonClick(): void {
+        this.resolveToModel(this.codeEditorContent.value).then(() => {
+        }, err => console.warn);
+    }
+
+    toggleReport(panel: string, value?: boolean) {
+        if (value === true) {
+            this.reportPanel = panel;
+        } else {
+            this.reportPanel = this.reportPanel === panel ? undefined : panel;
+
+        }
+
+        // Force browser reflow, heights and scroll bar size gets inconsistent otherwise
+        setTimeout(() => window.dispatchEvent(new Event("resize")));
+    }
+
+    openOnPlatform(appID: string) {
+        this.platformAppService.openOnPlatform(appID);
+    }
+
+    editRunConfiguration() {
+        const appID     = this.tabData.id;
+        const appConfig = this.executorService.getAppConfig(appID).take(1);
+        appConfig.take(1).subscribeTracked(this, (context) => {
+
+            const modal = this.modal.fromComponent(AppExecutionContextModalComponent, {
+                title: "Set Execution Parameters"
+            });
+
+            modal.context = context;
+            modal.appID   = appID;
+
+            modal.onSubmit = (raw) => {
+                this.executorService.setAppConfig(appID, raw);
+                this.modal.close();
+            };
+
+            modal.onCancel = () => {
+                this.modal.close();
+            }
+        });
+    }
+
+    scheduleExecution() {
+        this.executionQueue.next(true);
     }
 
     /**
@@ -501,187 +574,12 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         });
     }
 
-    switchTab(tabName): void {
-
-        if (!tabName) {
-            return;
-        }
-
-        /** If switching to code mode, serialize the model first and update the editor text */
-        if (this.viewMode !== "code" && tabName === "code") {
-            this.priorityCodeUpdates.next(this.getModelText());
-            this.viewMode = tabName;
-            return;
-        }
-
-        /** If going from code mode to gui, resolve the content first */
-        if ((this.viewMode === "code" || !this.viewMode) && tabName !== "code") {
-
-            // Trick that will change reference for tabselector highlight line (to reset it to a Code mode if resolve fails)
-            this.viewMode = undefined;
-            this.resolveToModel(this.codeEditorContent.value).then(() => {
-                this.viewMode = tabName;
-            }, err => {
-                this.viewMode = "code";
-            });
-            return;
-        }
-
-        // If changing from|to mode that is not a Code mode, just switch
-        this.viewMode = tabName;
-    }
-
-    /**
-     * When click on Resolve button (visible only if app is a local file and you are in Code mode)
-     */
-    resolveButtonClick(): void {
-        this.resolveToModel(this.codeEditorContent.value).then(() => {
-        }, err => console.warn);
-    }
-
-    toggleReport(panel: string, value?: boolean) {
-        if (value === true) {
-            this.reportPanel = panel;
-        } else {
-            this.reportPanel = this.reportPanel === panel ? undefined : panel;
-
-        }
-
-        // Force browser reflow, heights and scroll bar size gets inconsistent otherwise
-        setTimeout(() => window.dispatchEvent(new Event("resize")));
-    }
-
-    openOnPlatform(appID: string) {
-        this.platformAppService.openOnPlatform(appID);
-    }
-
-    editRunConfiguration() {
-        const appID     = this.tabData.id;
-        const appConfig = this.executorService.getAppConfig(appID).take(1);
-        appConfig.take(1).subscribeTracked(this, (context) => {
-
-            const modal = this.modal.fromComponent(AppExecutionContextModalComponent, {
-                title: "Set Execution Parameters"
-            });
-
-            modal.context = context;
-            modal.appID   = appID;
-
-            modal.onSubmit = (raw) => {
-                this.executorService.setAppConfig(appID, raw);
-                this.modal.close();
-            };
-
-            modal.onCancel = () => {
-                this.modal.close();
-            }
-        });
-    }
-
-    scheduleExecution() {
-        this.executionQueue.next(true);
-    }
-
-    runOnExecutor(): void {
-
-        const appID      = this.tabData.id;
-        const appConfig  = this.executorService.getAppConfig(appID).take(1);
-        this.isExecuting = true;
-
-        const executionContext = appConfig.switchMap((context: AppExecutionContext) => {
-
-            // If we have job path set, we can proceed with execution
-            if (context.jobPath) {
-                return Observable.of(context);
-            }
-
-            // Otherwise, we have to obtain job path
-            const modal = this.modal.fromComponent(AppExecutionContextModalComponent, {
-                title: "Set Execution Parameters"
-            });
-
-            modal.context = context;
-            modal.appID   = appID;
-
-            return new Observable(observer => {
-                modal.onSubmit = (raw) => {
-                    observer.next(raw);
-                    observer.complete();
-                    this.modal.close();
-                };
-
-                modal.onCancel = () => {
-                    observer.next(null);
-                    observer.complete();
-                    this.modal.close();
-                }
-            })
-        }).take(1) as Observable<AppExecutionContext>;
-
-        executionContext.subscribeTracked(this, (data: AppExecutionContext) => {
-            if (!data) {
-                return;
-            }
-
-            this.executorService.setAppConfig(appID, data);
-
-            const modelObject = this.dataModel.serialize();
-
-            // Bunny has a bug where it would recursively search for inputs, and dwelve into sbg:job
-            delete modelObject["sbg:job"];
-
-            const modelText = Yaml.dump(modelObject, {});
-
-            this.toggleReport("execution", true);
-
-            this.executionOutput = "";
-
-            const execution = this.executorService.run(this.tabData.id, modelText, data.jobPath, data.executionParams);
-
-            // const pid      = execution.take(1);
-            // const progress = execution.skip(1);
-
-            execution
-                .finally(() => this.isExecuting = false)
-                .subscribeTracked(this, (data) => {
-
-                    if (typeof data !== "string") {
-                        console.log("Data type", typeof data, data);
-                        return;
-                    }
-
-                    data = data.replace(/\n/g, "<br/>").replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
-                    console.log("Data is", data);
-
-
-                    /**
-                     * Relies on custom-added prefix to wrap up error messages
-                     * @name AppEditorBase.__errorDiscriminator
-                     * @see RabixExecutor.__errorPrefixing
-                     */
-                    if (data.startsWith("ERR: ")) {
-                        this.executionOutput += `<div class="text-error">${data.slice(5)}</div>`;
-                    } else {
-                        this.executionOutput += `<div>${data}</div>`;
-                    }
-                }, err => {
-                    this.executionOutput += `<div class="text-error">${ new ErrorWrapper(err) }</div>`
-                    console.warn("Execution error", err);
-                });
-
-
-        }, err => {
-            console.warn("Unexpected Execution Error", err);
-        });
-
-
-    }
-
     protected abstract recreateModel(json: Object): void;
 
     protected toggleLock(locked: boolean): void {
 
-        if (locked === false) {
+        if (locked === false
+        ) {
             this.platformRepository.patchAppMeta(this.tabData.id, "swapUnlocked", true);
 
             this.isUnlockable = false;
@@ -725,6 +623,106 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         }, err => {
             this.isResolvingContent = false;
             throw err;
+        });
+    }
+
+    private bindExecutionQueue() {
+
+        // Whenever a new app queues for execution, toggle the “isExecuting” GUI flag
+        this.executionQueue.subscribeTracked(this, () => {
+            this.isExecuting     = true;
+            this.executionOutput = "";
+            this.toggleReport("execution", true);
+        });
+
+        // When a new execution is in the line, run it
+        this.executionQueue
+            .switchMap(() => this.runOnExecutor().finally(() => this.isExecuting = false))
+            .subscribeTracked(this, (output: string) => {
+
+                if (typeof output === "object") {
+                    output = JSON.stringify(output, null, 4);
+                } else if (typeof output !== "string") {
+                    return;
+                }
+
+                // Replace newlines with html tags because we are colouring lines separately
+                output = output.replace(/\n/g, "<br/>");
+
+                /**
+                 * Relies on custom-added prefix to wrap up error messages
+                 * @name AppEditorBase.__errorDiscriminator
+                 * @see RabixExecutor.__errorPrefixing
+                 */
+                if (output.startsWith("ERR: ")) {
+                    this.executionOutput += `<div class="text-error">${output.slice(5)}</div>`;
+                } else {
+                    this.executionOutput += `<div>${output}</div>`;
+                }
+            });
+    }
+
+    private runOnExecutor(): Observable<string | Object> {
+
+        const appID     = this.tabData.id;
+        const appConfig = this.executorService.getAppConfig(appID).take(1);
+
+        const executionContext = appConfig.switchMap((context: AppExecutionContext) => {
+
+            // If we have job path set, we can proceed with execution
+            if (context.jobPath) {
+                return Observable.of(context);
+            }
+
+            // Otherwise, we have to obtain job path
+            const modal = this.modal.fromComponent(AppExecutionContextModalComponent, {
+                title: "Set Execution Parameters"
+            });
+
+            modal.context = context;
+            modal.appID   = appID;
+
+            return new Observable(observer => {
+                modal.onSubmit = (raw) => {
+                    observer.next(raw);
+                    observer.complete();
+                    this.modal.close();
+                };
+
+                modal.onCancel = () => {
+                    observer.next(null);
+                    observer.complete();
+                    this.modal.close();
+                }
+            })
+        }).take(1).filter(v => !!v) as Observable<AppExecutionContext>;
+
+
+        executionContext.subscribeTracked(this, (context) => {
+            this.executorService.setAppConfig(appID, context);
+        });
+
+
+        return new Observable(obs => {
+
+
+            const modelObject = this.dataModel.serialize();
+            delete modelObject["sbg:job"]; // Bunny traverses mistakenly into this to look for actual inputs
+            const modelText = Yaml.dump(modelObject, {});
+
+            const runner = executionContext.switchMap(context => {
+                return this.executorService
+                    .run(this.tabData.id, modelText, context.jobPath, context.executionParams)
+                    .finally(() => {
+                        console.log("Completing inner obs");
+                        obs.complete();
+                    });
+            }).subscribe(obs);
+
+            return () => {
+                runner.unsubscribe();
+            }
+
         });
     }
 

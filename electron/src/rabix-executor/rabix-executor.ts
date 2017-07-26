@@ -2,6 +2,7 @@ import {exec, spawn} from "child_process";
 import * as fs from "fs";
 import * as tmp from "tmp";
 import {ExecutorConfig, ExecutorParamsConfig} from "../storage/types/executor-config";
+import EventEmitter = NodeJS.EventEmitter;
 
 export type ProcessCallback = (err?: Error, stdout?: string, stderr?: string) => void;
 const noop = () => {
@@ -91,25 +92,26 @@ export class RabixExecutor {
      * @param {string} content CWL document that describes the app
      * @param {string} jobPath Path to the job json file
      * @param {Partial<ExecutorParamsConfig>} executionParams Rabix executor execution parameters
-     * @param callback
+     * @param dataCallback
+     * @param chat
      */
-    execute(path, content: string, jobPath: string, executionParams: Partial<ExecutorParamsConfig> = {}, callback) {
+    execute(path, content: string, jobPath: string, executionParams: Partial<ExecutorParamsConfig> = {}, dataCallback, chat?: EventEmitter) {
         this.probeBinary(this.config.path, err => {
             if (err) {
                 let message = "Rabix Executor path is not configured properly.";
-                return callback(new Error(message))
+                return dataCallback(new Error(message))
             }
 
             tmp.file((err, appTempFilePath, fd, cleanupCallback) => {
 
                 if (err) {
-                    return callback(err);
+                    return dataCallback(err);
                 }
 
                 fs.writeFile(appTempFilePath, content, (err) => {
 
                     if (err) {
-                        return callback(err);
+                        return dataCallback(err);
                     }
 
 
@@ -120,10 +122,19 @@ export class RabixExecutor {
                         ...this.parseExecutorParamsToArgs(executionParams)
                     ];
 
-                    const process            = spawn(rabixExecutorPath, executorArgs, {});
+                    const process = spawn(rabixExecutorPath, executorArgs, {});
+
+                    if (chat) {
+                        chat.on("stop", () => {
+                            console.log("Sending SIGKILL to", process.pid);
+                            process.kill("SIGKILL");
+                            cleanupCallback();
+                        });
+                    }
+
                     const processCommandLine = [rabixExecutorPath, ...executorArgs].join(" ");
 
-                    callback(null, `Running “${processCommandLine}”`);
+                    dataCallback(null, `Running “${processCommandLine}”`);
 
                     process.stdout.on("data", (data) => {
 
@@ -132,9 +143,9 @@ export class RabixExecutor {
 
                         try {
                             const json = JSON.parse(out);
-                            callback(null, json);
+                            dataCallback(null, json);
                         } catch (err) {
-                            callback(null, out);
+                            dataCallback(null, out);
                         }
 
                     });
@@ -146,21 +157,22 @@ export class RabixExecutor {
                          * @name RabixExecutor.__errorPrefixing
                          * @see AppEditorBase.__errorDiscriminator
                          */
-                        callback(null, "ERR: " + data);
+                        dataCallback(null, "ERR: " + data);
                     });
 
                     // when the spawn child process exits, check if there were any errors and close the writeable stream
                     process.on("exit", (code, a, b) => {
 
+                        console.log("Exiting process");
+
                         cleanupCallback();
 
                         if (code !== 0) {
-                            return callback(new Error("Execution failed with non-zero exit code."));
+                            return dataCallback(new Error("Execution failed with non-zero exit code."));
                         }
 
-                        console.log("Exit", code);
-                        callback(null, "Done.");
-                        callback(null, null);
+                        dataCallback(null, "Done.");
+                        dataCallback(null, "$$EOS$$");
 
 
                     });
