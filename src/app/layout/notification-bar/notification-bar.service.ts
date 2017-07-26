@@ -1,14 +1,11 @@
 import {Injectable} from "@angular/core";
 import {Subject} from "rxjs/Subject";
 import {Observable} from "rxjs/Observable";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
 
 export class Notification {
     message: string;
     type: "error" | "warning" | "info" | string;
     duration: number;
-
-    dismiss = new Subject<any>();
 
     constructor(message: string, type, duration: number = Infinity) {
         this.message = message;
@@ -35,97 +32,82 @@ export class ErrorNotification extends Notification {
     }
 }
 
-
 @Injectable()
 export class NotificationBarService {
 
-    /** Max number of displayed notifications */
-    public static maxDisplay = 5;
+    public static maxDisplay = 3;
 
-    /** Queue of notifications waiting to be displayed */
-    private pendingNotifications = [];
+    /** Array of notifications */
+    private notifications: Array<Notification> = [];
 
-    /**  Notifications that are currently displayed */
-    public displayedNotifications = new BehaviorSubject<any>([]);
+    private showNotificationStream = new Subject<Notification>();
 
-    private notificationsStream = new Subject<any>();
+    private dismissNotificationStream = new Subject<Notification>();
 
-    private updates = new Subject<any>();
-
-    /** Stream of notifications that should be displayed */
-    private aggregateStream;
-
-    /**  Flag to limit number of values in queue (zip operator) for availability stream to 1  */
-    private available = false;
-
-    /** Stream of availabilities */
-    private availabilityStream;
+    /** Stream of displayed notifications */
+    public displayedNotifications = new Subject<any>();
 
     constructor() {
+        this.showNotificationStream.flatMap((notification) => {
 
-        this.aggregateStream = this.updates.scan((acc, patch) => patch(acc), []).do((agg) => {
-            this.displayedNotifications.next(agg);
+            // Dismiss notification when delay time passed or when its manually dismissed
+            return Observable.race(Observable.of(notification).delay(notification.duration)
+                , this.dismissNotificationStream.filter((n) => n === notification).take(1));
+
+        }).subscribe((notification) => {
+            this.dismiss(notification);
         });
+    }
 
-        this.availabilityStream = Observable.of(true).merge(this.aggregateStream.map(agg => agg.length < NotificationBarService.maxDisplay))
-            .filter((v) => {
+    /** Dismiss notification passed as an argument */
+    private dismiss(notification: Notification) {
+        const index = this.notifications.findIndex((n) => n === notification);
 
-                // Limit number of values in queue (zip operator) for availability stream to 1
-                // In case for example when maxDisplay is 3 and you have 3 displayed and 0 pending notifications.
-                // Once one notification is dismissed you will have one value in zip operator queue (availability stream)
-                // When you dismiss them all you will have 3 values in the queue. Now add 1 notification, you will have
-                // 4 values in the queue and so on. Using this variable only one value can be in the queue
-                if (!v || this.available) {
-                    return false;
-                }
-                this.available = true;
-                return true;
-            });
+        if (index !== -1) {
+            // Remove notification from the list
+            this.notifications.splice(index, 1);
 
-        Observable.zip(this.notificationsStream, this.availabilityStream, msg => msg)
-            .flatMap(msg => {
+            if (index >= 0 && index <= NotificationBarService.maxDisplay) {
+                // Display updated list with next pending notification (if exists)
+                this.showNext();
+            }
+        }
+    }
 
-                this.available = false;
-                this.pendingNotifications.shift();
+    /** Show next pending notification
+     * @param {boolean} added - true/false if last operation was addition/deletion
+     */
+    private showNext(added: boolean = false) {
 
-                // Take the message and create an observable of 2 emits.
-                // They are update transformations for the list of shown messages
-                // First one appends the message to the list
-                // The second one is delayed for {notificationLifetime} time, and then emits a transformation that
-                // removes the message from the list
-                // Both of these emits will trigger reevaluation of the available space in the list
-                return Observable.of(acc => acc.concat(msg))
-                    .concat(
-                        Observable.of(acc => {
-                            const idx = acc.indexOf(msg);
-                            if (idx === -1) {
-                                return acc;
-                            }
+        const notificationsLength = this.notifications.length;
+        const maxDisplayLength = NotificationBarService.maxDisplay;
 
-                            return acc.slice(0, idx).concat(acc.slice(idx + 1));
-                        }).delayWhen(() =>
-                            // Dismiss notification when delay time passed or when its manually dismissed
-                            Observable.merge(Observable.of(1).delay(msg.duration), msg.dismiss))
-                    );
-            })
-            .subscribe(patches => {
-                this.updates.next(patches);
-            });
+        if (added && notificationsLength <= maxDisplayLength) {
+            // If last operation was addition we should display the added notification if length <= maxDisplay
+            this.showNotificationStream.next(this.notifications[notificationsLength - 1]);
+        } else if (!added && notificationsLength >= maxDisplayLength) {
+            // If last operation was deletion we should display the next pending notification if exists
+            this.showNotificationStream.next(this.notifications[maxDisplayLength - 1]);
+        }
+
+        // Updated list of displayed notifications
+        this.displayedNotifications.next(this.notifications.slice(0, maxDisplayLength));
     }
 
     public showNotification(notification: Notification) {
-        // If notification is not in queue of pending notifications or its already displayed
-        if (!this.pendingNotifications.concat(this.displayedNotifications.getValue())
-                .find((item) => notification.message === item.message)) {
+        const similarExists = this.notifications.find((n) => n.message === notification.message);
 
-            this.pendingNotifications.push(notification);
-            this.notificationsStream.next(notification);
+        if (!similarExists) {
+
+            this.notifications.push(notification);
+            if (this.notifications.length <= NotificationBarService.maxDisplay) {
+                // Display updated list with added notification
+                this.showNext(true);
+            }
         }
     }
 
     public dismissNotification(notification: Notification) {
-        if (this.displayedNotifications.getValue().find((displayed) => displayed === notification)) {
-            notification.dismiss.next();
-        }
+        this.dismissNotificationStream.next(notification);
     }
 }
