@@ -320,17 +320,17 @@ module.exports = {
 
     patchSwap: (data: { local: boolean, swapID: string, swapContent?: string }, callback) => {
         repositoryLoad.then(() => {
-            let credentials = "local";
+            let credentials;
             if (repository.local.activeCredentials) {
                 credentials = repository.local.activeCredentials.id;
             }
 
             if (data.swapContent === null) {
-                swapController.remove((credentials === "local" ? "" : credentials + "/") + data.swapID, callback);
+                swapController.remove(credentials && !data.local ? (credentials + "/") : "" + data.swapID, callback);
                 return;
             }
 
-            swapController.write((credentials === "local" ? "" : credentials + "/") + data.swapID, data.swapContent, callback);
+            swapController.write(credentials && !data.local ? (credentials + "/") : "" + data.swapID, data.swapContent, callback);
         });
     },
 
