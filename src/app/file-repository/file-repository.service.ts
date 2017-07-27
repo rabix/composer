@@ -31,7 +31,7 @@ export class FileRepositoryService {
 
                 this.watchedPaths.splice(this.watchedPaths.indexOf(path), 1);
                 sub.unsubscribe();
-            }
+            };
         });
     }
 
@@ -65,5 +65,9 @@ export class FileRepositoryService {
 
     saveFile(path: string, content: string): Promise<any> {
         return this.ipc.request("saveFileContent", {path, content}).toPromise();
+    }
+
+    fetchFile(path: string): Promise<string> {
+        return this.ipc.request("getLocalFileContent", path).toPromise();
     }
 }

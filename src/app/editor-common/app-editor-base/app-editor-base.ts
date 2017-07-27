@@ -83,6 +83,16 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     private modelCreated = false;
 
+    /**
+     * Used as a hack flag so we can recreate the model on changes from non-gui mode,
+     * or from any mode when switching revisions.
+     * Please don't use it elsewhere unless discussing the added complexity of flag switching.
+     *
+     * {@link revisionHackFlagSwitchOff}
+     * {@link revisionHackFlagSwitchOn}
+     */
+    private revisionChangingInProgress = false;
+
     constructor(protected statusBar: StatusBarService,
                 protected notificationBar: NotificationBarService,
                 protected modal: ModalService,
@@ -178,7 +188,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 const [validationState, code] = data;
                 return validationCompletion
                     .startWith(validationState)
-                    .map(state => [this.codeEditorContent.value, state])
+                    .map(state => [this.codeEditorContent.value, state]);
             })
             .withLatestFrom(
                 this.platformRepository.getAppMeta(this.tabData.id, "swapUnlocked"),
@@ -192,7 +202,18 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     return;
                 }
 
-                this.resolveToModel(code).then(() => {
+                const continuation: Promise<any> = (
+                    this.viewMode === "code"
+                    || !this.dataModel
+                    || this.revisionChangingInProgress
+                ) ? this.resolveToModel(code) : Promise.resolve();
+
+                continuation.then(() => {
+                    /**
+                     * @name revisionHackFlagSwitchOff
+                     * @see revisionChangingInProgress
+                     * */
+                    this.revisionChangingInProgress = false;
 
                     // copyOf property really matters only if we are working with the latest revision
                     // otherwise, apps detached from copy state at some revision will still show locked state
@@ -258,7 +279,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
         this.syncModelAndCode(true).then(() => {
             const modal      = this.modal.fromComponent(PublishModalComponent, {title: "Publish an App"});
-            modal.appContent = this.codeEditorContent.value;
+            modal.appContent = this.getModelText(true);
         }, err => console.warn);
     }
 
@@ -320,11 +341,15 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
         const fid = this.tabData.id.split("/").slice(0, 3).concat(revisionNumber.toString()).join("/");
 
+        /** @name revisionHackFlagSwitchOn */
+        this.revisionChangingInProgress = true;
+
         return this.dataGateway.fetchFileContent(fid).take(1)
             .toPromise().then(result => {
                 this.priorityCodeUpdates.next(result);
                 return result;
             }).catch(err => {
+                this.revisionChangingInProgress   = false;
                 this.revisionList.loadingRevision = false;
                 this.notificationBar.showNotification(
                     new ErrorNotification("Cannot open revision. " + new ErrorWrapper(err))
@@ -337,7 +362,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
      * the text has been formatted by the GUI editor.
      *
      */
-    protected getModelText(): string {
+    protected getModelText(embed?: boolean): string {
 
         const modelObject = this.dataModel.serialize();
 
