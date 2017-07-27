@@ -1,5 +1,5 @@
 export class AppHelper {
-    static DS: "/";
+    static DS = "/";
 
     static isLocal(appID: string): boolean {
 
