@@ -402,16 +402,17 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         fetch.then((result) => {
             return this.gateway.resolveContent(result, nodeID).toPromise();
         }).then(resolved => {
-            return new Promise((res, rej) => {
-                this.appValidator.createValidator(
-                    Observable.of(JSON.stringify(resolved)))
-                    .filter(val => !val.isPending)
-                    .subscribeTracked(this, (val) => {
-                        val.isValidCWL
-                            ? res(resolved)
-                            : rej(new Error("App did not pass JSON schema validation"));
-                    });
-            });
+            return this.appValidator.createValidator(Observable.of(JSON.stringify(resolved)))
+                .filter(val => !val.isPending)
+                .take(1)
+                .toPromise()
+                .then(val => {
+                    if (val.isValidCWL) {
+                        return resolved;
+                    }
+
+                    throw new Error("App did not pass JSON schema validation");
+                });
         }).then((resolved: Process) => {
             // if the app is local, give it an id that's the same as its filename (if doesn't exist)
             if (isLocal) {
@@ -441,7 +442,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             this.statusBar.stopProcess(statusProcess, `Added ${step.label}`);
         }, err => {
             this.statusBar.stopProcess(statusProcess);
-            this.notificationBar.showNotification(new ErrorNotification(`Failed to add an ${nodeID} to workflow. ${new ErrorWrapper(err)}`));
+            this.notificationBar.showNotification(new ErrorNotification(`Failed to add ${nodeID} to workflow. ${new ErrorWrapper(err)}`));
         });
     }
 
