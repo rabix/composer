@@ -23,6 +23,9 @@ import {IpcService} from "../../../services/ipc.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {WorkflowEditorService} from "../../workflow-editor.service";
 import {ErrorWrapper} from "../../../core/helpers/error-wrapper";
+import {AppHelper} from "../../../core/helpers/AppHelper";
+import {FileRepositoryService} from "../../../file-repository/file-repository.service";
+import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 
 const {dialog} = window["require"]("electron").remote;
 
@@ -191,6 +194,8 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
                 private inspector: EditorInspectorService,
                 private statusBar: StatusBarService,
                 private notificationBar: NotificationBarService,
+                private platformRepository: PlatformRepositoryService,
+                private fileRepository: FileRepositoryService,
                 private workflowEditorService: WorkflowEditorService) {
         super();
     }
@@ -376,18 +381,22 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
         const statusProcess = this.statusBar.startProcess(`Adding ${nodeID} to Workflow...`);
 
-        this.gateway.fetchFileContent(nodeID, true).subscribe((app: any) => {
+        const isLocal               = AppHelper.isLocal(nodeID);
+        const fetch: Promise<string> = isLocal
+            ? this.fileRepository.fetchFile(nodeID)
+            : this.platformRepository.getApp(nodeID).then(app => JSON.stringify(app));
+
+        fetch.then((result) => {
+            return this.gateway.resolveContent(result, nodeID).toPromise();
+        }).then(resolved => {
             // if the app is local, give it an id that's the same as its filename (if doesn't exist)
-            const isLocal = DataGatewayService.getFileSource(nodeID) === "local";
             if (isLocal) {
-                const split = nodeID.split("/");
-                const id    = split[split.length - 1].split(".")[0];
-                app.id      = app.id || id;
+                resolved.id = resolved.id || AppHelper.getBasename(nodeID);
             }
 
             this.workflowEditorService.putInHistory(this.model);
 
-            const step = this.model.addStepFromProcess(app);
+            const step = this.model.addStepFromProcess(resolved);
 
             // add local source so step can be serialized without embedding
             if (isLocal) {
@@ -573,7 +582,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
                 const child   = children[childIndex];
                 const tagName = child.tagName;
 
-                if (containerElements.indexOf(tagName) != -1) {
+                if (containerElements.indexOf(tagName) !== -1) {
                     traverse(child, originalChildrenData[childIndex]);
                 } else if (tagName in embeddableStyles) {
 
