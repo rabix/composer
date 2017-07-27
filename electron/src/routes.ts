@@ -296,7 +296,7 @@ module.exports = {
                 callback(new Error("Cannot fetch an app, you are not connected to any platform."));
             }
 
-            swapController.exists(data.id, (err, exists) => {
+            swapController.exists(credentials.id + "/" + data.id, (err, exists) => {
 
                 if (err) {
                     callback(err);
@@ -304,7 +304,7 @@ module.exports = {
                 }
 
                 if (exists) {
-                    swapController.read(data.id, callback);
+                    swapController.read(credentials.id + "/" + data.id, callback);
                     return;
                 }
 
@@ -319,12 +319,19 @@ module.exports = {
     },
 
     patchSwap: (data: { local: boolean, swapID: string, swapContent?: string }, callback) => {
-        if (data.swapContent === null) {
-            swapController.remove(data.swapID, callback);
-            return;
-        }
+        repositoryLoad.then(() => {
+            let credentials = "local";
+            if (repository.local.activeCredentials) {
+                credentials = repository.local.activeCredentials.id;
+            }
 
-        swapController.write(data.swapID, data.swapContent, callback);
+            if (data.swapContent === null) {
+                swapController.remove((credentials === "local" ? "" : credentials + "/") + data.swapID, callback);
+                return;
+            }
+
+            swapController.write((credentials === "local" ? "" : credentials + "/") + data.swapID, data.swapContent, callback);
+        });
     },
 
     getLocalFileContent: (path, callback) => {
