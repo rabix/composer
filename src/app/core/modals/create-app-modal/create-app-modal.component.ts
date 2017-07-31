@@ -82,16 +82,20 @@ const {app, dialog} = window["require"]("electron").remote;
                                       [options]="projectOptions"
                                       placeholder="Choose a destination project..."
                                       optgroupField="hash"></ct-auto-complete>
+                </div>               
+
+                <div *ngIf="destination === 'remote' && remoteAppCreationError ">
+                    <span class="text-danger">
+                        <i class="fa fa-times-circle fa-fw"></i>
+                            {{ remoteAppCreationError }}
+                    </span>
                 </div>
 
-                <div class="alert alert-danger"
-                     *ngIf="destination === 'remote' && remoteAppCreationError ">
-                    {{ remoteAppCreationError }}
-                </div>
-
-                <div class="alert alert-info"
-                     *ngIf="destination === 'local' && localAppCreationInfo">
-                    {{ localAppCreationInfo }}
+                <div *ngIf="destination === 'local' && localAppCreationInfo">
+                    <span class="text-info">
+                        <i class="fa fa-info-circle fa-fw"></i>
+                            {{ localAppCreationInfo }}
+                    </span>
                 </div>
 
             </div>

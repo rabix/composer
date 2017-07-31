@@ -15,6 +15,10 @@
         }
     }
 
+    .description {
+        color: $light-gray;
+    }
+
     ct-nav-search-result {
         border-radius: $border-radius;
         border-bottom: 1px solid $body-bg;

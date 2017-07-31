@@ -100,7 +100,12 @@ import {ErrorWrapper} from "../../helpers/error-wrapper";
                     </textarea>
                 </div>
 
-                <div class="alert alert-danger" *ngIf="errorMessage">{{ errorMessage }}</div>
+                <div *ngIf="errorMessage">
+                    <span class="text-danger">
+                        <i class="fa fa-times-circle fa-fw"></i>
+                            {{errorMessage}}
+                    </span>
+                </div>
             </div>
 
 

@@ -1,15 +1,14 @@
 @import "../../../assets/sass/variables";
 
 ct-menu-item {
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
     color: $gray-dark;
     cursor: pointer;
-    font-size: $font-size-sm;
-    font-weight: 500;
-    padding: 2px 10px 2px 12px;
     position: relative;
     white-space: nowrap;
+    border-bottom: 1px solid #232323;
+    padding: .55rem 1rem;
+    line-height: $line-height-base;
+    font-size: 1rem;
     line-height: 1.5em;
 
     &.disabled {
@@ -17,8 +16,7 @@ ct-menu-item {
     }
 
     &:not(.disabled):hover {
-        color: white;
-        background: $brand-primary;
+        background: $gray;
     }
 
     .expander {

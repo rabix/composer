@@ -5,6 +5,10 @@ import {PlatformRepositoryService} from "../../../repository/platform-repository
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {WorkboxService} from "../../workbox/workbox.service";
+import {PlatformCredentialsModalComponent} from "../platform-credentials-modal/platform-credentials-modal.component";
+import {Observable} from "rxjs/Observable";
+import {AuthCredentials} from "../../../auth/model/auth-credentials";
+import {GlobalService} from "../../global/global.service";
 
 const {app, dialog} = window["require"]("electron").remote;
 
@@ -42,7 +46,8 @@ const {app, dialog} = window["require"]("electron").remote;
                         <div *ngIf="closedProjectOptions.length > 0; else allProjectsAreAdded">
                             <p>Choose projects to add to the workspace:</p>
                             <div>
-                                <ct-auto-complete [(ngModel)]="selectedProjects" [options]="closedProjectOptions"></ct-auto-complete>
+                                <ct-auto-complete [(ngModel)]="selectedProjects"
+                                                  [options]="closedProjectOptions"></ct-auto-complete>
                             </div>
                         </div>
 
@@ -55,13 +60,22 @@ const {app, dialog} = window["require"]("electron").remote;
             <ng-template #noActiveConnection>
 
                 <div class="dialog-content dialog-centered">
-                    <p>You are not connected to any platform</p>
-                    <p>
-                        <button type="button" class="btn btn-primary" (click)="openSettingsTab()">Connect</button>
-                    </p>
-                </div>            
+                    <div *ngIf="(auth.getCredentials() | async ).length > 0; else noUsers">
+                        <p>Go to
+                            <a href="" (click)="openSettingsTab(); false;">settings page</a>
+                            and choose an active user in order to add projects to your workspace
+                        </p>
+                    </div>
+                </div>
 
+            </ng-template>
 
+            <ng-template #noUsers>
+                <p>You are not connected to any platform</p>
+                <p>
+                    <button type="button" class="btn btn-primary" (click)="openCredentialsForm()">Add a connection
+                    </button>
+                </p>
             </ng-template>
 
             <ng-template #projectsNotLoadedYet>
@@ -74,7 +88,9 @@ const {app, dialog} = window["require"]("electron").remote;
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" (click)="modal.close()">Cancel</button>
-                <button type="button" class="btn btn-primary" [disabled]="selectedProjects.length === 0" (click)="onDone()">Done</button>
+                <button type="button" class="btn btn-primary" [disabled]="selectedProjects.length === 0"
+                        (click)="onDone()">Done
+                </button>
             </div>
         </div>
     `,
@@ -90,6 +106,7 @@ export class AddSourceModalComponent extends DirectiveBase {
                 private localRepository: LocalRepositoryService,
                 private repository: PlatformRepositoryService,
                 private workbox: WorkboxService,
+                private global: GlobalService,
                 public auth: AuthService) {
 
         super();
@@ -128,6 +145,37 @@ export class AddSourceModalComponent extends DirectiveBase {
             this.localFoldersToAdd = paths || [];
             this.localRepository.addLocalFolders(...paths);
             this.modal.close();
+        });
+    }
+
+    openCredentialsForm() {
+        const credentialsModal = this.modal.fromComponent(PlatformCredentialsModalComponent, {
+            title: "Add Connection"
+        });
+
+        credentialsModal.submit = () => {
+            const valuesFromModal = credentialsModal.getValue();
+            Observable.fromPromise(this.auth.addCredentials(valuesFromModal)).withLatestFrom(this.auth.getCredentials())
+                .take(1).subscribe((combined) => {
+                const credentials = combined[1];
+
+                // If added credential is the only one, set it to be the active one
+                if (credentials.length === 1) {
+                    this.setActiveCredentials(credentials[0]);
+                }
+            });
+            this.modal.close();
+        };
+
+    }
+
+    setActiveCredentials(credentials: AuthCredentials) {
+
+        this.auth.setActiveCredentials(credentials).then(() => {
+            if (credentials) {
+                this.global.reloadPlatformData();
+            }
+            this.workbox.forceReloadTabs();
         });
     }
 
