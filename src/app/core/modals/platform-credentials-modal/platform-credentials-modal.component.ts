@@ -50,11 +50,16 @@ import "rxjs/add/operator/toPromise";
                         Token cannot be empty
                     </span>
 
-                    <span class="text-danger" *ngIf="form.get('url').hasError('name') || form.get('token').hasError('pattern')">
+                    <span class="text-danger" *ngIf="form.get('url').hasError('name')">
                         <i class="fa fa-times-circle fa-fw"></i>
-                            <span *ngIf="form.get('url').hasError('name')">Given platform does not exist.</span>
-                            <span *ngIf="form.get('token').hasError('pattern')">Invalid token</span>
+                            <span>Given platform does not exist.</span>
                     </span>
+                    
+                    <span class="text-danger" *ngIf="form.get('token').hasError('pattern')">
+                        <i class="fa fa-times-circle fa-fw"></i>
+                            <span>Invalid token</span>
+                    </span>                    
+                    
                 </div>
 
             </div>
