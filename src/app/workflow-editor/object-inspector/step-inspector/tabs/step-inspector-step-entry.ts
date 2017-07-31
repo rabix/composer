@@ -13,7 +13,7 @@ import {WorkflowStepInputModel} from "cwlts/models";
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <div class="form-control-label" *ngIf="warning">        
-            <span class="text-danger">
+            <span class="text-warning">
                 <i class="fa fa-times-circle fa-fw"></i>
                     {{ warning }}
             </span>

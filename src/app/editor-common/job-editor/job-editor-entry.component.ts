@@ -22,8 +22,8 @@ import {ObjectHelper} from "../../helpers/object.helper";
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <div class="form-control-label" *ngIf="warning">        
-            <span class="text-danger">
-                <i class="fa fa-times-circle fa-fw"></i>
+            <span class="text-warning">
+                <i class="fa fa-warning fa-fw"></i>
                     {{ warning }}
             </span>
         </div>
