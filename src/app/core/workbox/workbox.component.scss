@@ -100,7 +100,6 @@
         }
 
         &.active, &.active:before, &.active:after {
-            z-index: 1;
             color: $layout-text-color;
             background: $panel-bg;
         }
