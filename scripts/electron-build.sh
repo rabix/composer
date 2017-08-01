@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 BASEDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd )"
-VERSION=${1-"0.1.0"}
+VERSION=${1-"$(date +"%y%m%d")"}
 
 cd $BASEDIR
 
