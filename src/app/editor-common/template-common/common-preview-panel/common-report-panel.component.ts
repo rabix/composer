@@ -16,6 +16,8 @@ import {AppEditorBase} from "../../app-editor-base/app-editor-base";
 
         <!--Common Execution Preview-->
         <ct-app-execution-preview *ngIf="host.reportPanel === 'execution'"
+                                  (stopExecution)="host.stopExecution()"
+                                  [isRunning]="host.isExecuting"
                                   [content]="host.executionOutput">
         </ct-app-execution-preview>
 

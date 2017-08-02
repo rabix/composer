@@ -58,10 +58,8 @@ export class StatusBarComponent extends DirectiveBase implements OnInit {
                 public layoutService: LayoutService) {
         super();
 
-        this.statusBar.status.do(data => console.log("Got status", data)).subscribeTracked(this, s => this.status = s);
+        this.statusBar.status.subscribeTracked(this, s => this.status = s);
         this.statusBar.queueSize.subscribeTracked(this, s => this.queueSize = s);
-
-
     }
 
     ngOnInit() {

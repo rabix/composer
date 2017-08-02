@@ -5,9 +5,11 @@ import {Component, Input} from "@angular/core";
     template: `
         <div class="document-controls">
 
+
             <!--Run-->
             <button type="button" class="btn btn-secondary"
-                    [disabled]="!host.appIsRunnable()"
+                    *ngIf="(host.executor.getExecutorState() | async) !== 'UNSET'"
+                    [disabled]="!host.appIsRunnable() && (host.executor.getExecutorState() | async) === 'INVALID'"
                     ct-tooltip="Run with Rabix Executor"
                     tooltipPlacement="bottom"
                     (click)="host.scheduleExecution()">

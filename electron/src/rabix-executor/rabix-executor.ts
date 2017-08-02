@@ -93,9 +93,9 @@ export class RabixExecutor {
      * @param {string} jobPath Path to the job json file
      * @param {Partial<ExecutorParamsConfig>} executionParams Rabix executor execution parameters
      * @param dataCallback
-     * @param chat
+     * @param emitter
      */
-    execute(path, content: string, jobPath: string, executionParams: Partial<ExecutorParamsConfig> = {}, dataCallback, chat?: EventEmitter) {
+    execute(path, content: string, jobPath: string, executionParams: Partial<ExecutorParamsConfig> = {}, dataCallback, emitter?: EventEmitter) {
         this.probeBinary(this.config.path, err => {
             if (err) {
                 let message = "Rabix Executor path is not configured properly.";
@@ -122,12 +122,15 @@ export class RabixExecutor {
                         ...this.parseExecutorParamsToArgs(executionParams)
                     ];
 
-                    const process = spawn(rabixExecutorPath, executorArgs, {});
+                    const rabixProcess = spawn(rabixExecutorPath, executorArgs, {});
 
-                    if (chat) {
-                        chat.on("stop", () => {
-                            console.log("Sending SIGKILL to", process.pid);
-                            process.kill("SIGKILL");
+                    if (emitter) {
+                        emitter.on("stop", () => {
+
+                            rabixProcess.stdout.removeAllListeners();
+                            rabixProcess.stderr.removeAllListeners();
+
+                            rabixProcess.kill();
                             cleanupCallback();
                         });
                     }
@@ -136,7 +139,7 @@ export class RabixExecutor {
 
                     dataCallback(null, `Running “${processCommandLine}”`);
 
-                    process.stdout.on("data", (data) => {
+                    rabixProcess.stdout.on("data", (data) => {
 
                         const out = data.toString();
                         console.log("STDOUT", out);
@@ -150,7 +153,7 @@ export class RabixExecutor {
 
                     });
 
-                    process.stderr.on("data", data => {
+                    rabixProcess.stderr.on("data", data => {
                         console.log("STDERR", data.toString());
                         /**
                          * This “ERR: ” prefix is important because client listener uses it to determine how to treat incoming data
@@ -161,7 +164,7 @@ export class RabixExecutor {
                     });
 
                     // when the spawn child process exits, check if there were any errors and close the writeable stream
-                    process.on("exit", (code, a, b) => {
+                    rabixProcess.on("exit", (code, a, b) => {
 
                         console.log("Exiting process");
 

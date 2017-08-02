@@ -77,8 +77,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     isExecuting = false;
 
-    appType: "Workflow" | "CommandLineTool";
-
     executionOutput = "";
 
     executionQueue = new Subject<any>();
@@ -95,6 +93,12 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     protected appSavingService: AppSaver;
 
     private modelCreated = false;
+
+    /**
+     * Used to emit signals that should stop app execution, if it's running.
+     * It is used a breaking emit, so anything can be pushed through it.
+     */
+    private executionStop = new Subject<any>();
 
     /**
      * Used as a hack flag so we can recreate the model on changes from non-gui mode,
@@ -116,7 +120,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 protected codeSwapService: CodeSwapService,
                 protected platformAppService: PlatformAppService,
                 protected platformRepository: PlatformRepositoryService,
-                protected executorService: ExecutorService) {
+                protected executor: ExecutorService) {
 
         super();
 
@@ -200,7 +204,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
          */
         firstValidationEnd.withLatestFrom(externalCodeChanges)
             .switchMap((data: [AppValidityState, string]) => {
-                const [validationState, code] = data;
+                const [validationState] = data;
                 return validationCompletion
                     .startWith(validationState)
                     .map(state => [this.codeEditorContent.value, state])
@@ -239,13 +243,15 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     if (!this.tabData.isWritable || this.tabData.dataSource === "local") {
                         this.isUnlockable = false;
                     } else if (hasCopyOfProperty && !unlocked) {
-                        this.notificationBar.showNotification(
-                            new InfoNotification("This app is a copy of " + this.dataModel.customProps["sbg:copyOf"])
-                        );
+
+                        const originalApp = this.dataModel.customProps["sbg:copyOf"];
+                        this.notificationBar.showNotification(new InfoNotification(`This app is a copy of ${originalApp}`));
                         this.isUnlockable = true;
                     }
 
-                    if (!this.tabData.isWritable || (this.isUnlockable && hasCopyOfProperty && !unlocked)) {
+                    const isUnlockedAndUnlockableCopy = this.isUnlockable && hasCopyOfProperty && !unlocked;
+
+                    if (!this.tabData.isWritable || isUnlockedAndUnlockableCopy) {
                         this.toggleLock(true);
                     }
                 }, err => console.warn);
@@ -262,7 +268,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             this.viewMode    = state.isValidCWL ? this.getPreferredTab() : "code";
             this.reportPanel = state.isValidCWL ? this.getPreferredReportPanel() : this.reportPanel;
         });
-
 
         this.bindExecutionQueue();
     }
@@ -435,7 +440,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     editRunConfiguration() {
         const appID     = this.tabData.id;
-        const appConfig = this.executorService.getAppConfig(appID).take(1);
+        const appConfig = this.executor.getAppConfig(appID).take(1);
         appConfig.take(1).subscribeTracked(this, (context) => {
 
             const modal = this.modal.fromComponent(AppExecutionContextModalComponent, {
@@ -446,7 +451,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             modal.appID   = appID;
 
             modal.onSubmit = (raw) => {
-                this.executorService.setAppConfig(appID, raw);
+                this.executor.setAppConfig(appID, raw);
                 this.modal.close();
             };
 
@@ -637,35 +642,60 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
         // When a new execution is in the line, run it
         this.executionQueue
-            .switchMap(() => this.runOnExecutor().finally(() => this.isExecuting = false))
-            .subscribeTracked(this, (output: string) => {
+            .switchMap(() => {                               // Switch so the execution gets cancelled when new one is scheduled
+                return this.runOnExecutor()                  // Starts the execution process
+                    .takeUntil(this.executionStop.do(() => this.executionOutput += "Execution Stopped"))
+                    .finally(() => {
+                        console.log("Done with executor");
+                        // When it ends, turn off the UI flag
+                        this.isExecuting = false
+                    })
+                    .catch(err => {
+                        // We need to catch the error here, because if we catch it in the end, queue sub will be disposed
+                        const wrappedError   = new ErrorWrapper(err).toString();
+                        this.executionOutput = `<div class="text-error">${wrappedError}</div>`;
+                        this.notificationBar.showNotification(new ErrorNotification(wrappedError));
 
+                        return Observable.empty();
+                    });
+            })
+            .subscribeTracked(this, (output: string | Object) => {
+
+                // Output result comes as a JSON object with info about execution results
+                // Otherwise, it's a string, most likely an [INFO] log from stderr, which we should print out
+                let localOutput = "";
                 if (typeof output === "object") {
-                    output = JSON.stringify(output, null, 4);
-                } else if (typeof output !== "string") {
+                    localOutput = JSON.stringify(output, null, 4);
+                } else if (typeof output === "string") {
+                    localOutput = output;
+                } else {
                     return;
                 }
 
                 // Replace newlines with html tags because we are colouring lines separately
-                output = output.replace(/\n/g, "<br/>");
+                localOutput = localOutput.replace(/\n/g, "<br/>");
 
                 /**
                  * Relies on custom-added prefix to wrap up error messages
                  * @name AppEditorBase.__errorDiscriminator
                  * @see RabixExecutor.__errorPrefixing
                  */
-                if (output.startsWith("ERR: ")) {
-                    this.executionOutput += `<div class="text-error">${output.slice(5)}</div>`;
+                if (localOutput.startsWith("ERR: ")) {
+                    this.executionOutput += `<div class="text-error">${localOutput.slice(5)}</div>`;
                 } else {
-                    this.executionOutput += `<div>${output}</div>`;
+                    this.executionOutput += `<div>${localOutput}</div>`;
                 }
             });
+    }
+
+    stopExecution() {
+        this.executionStop.next(1);
     }
 
     private runOnExecutor(): Observable<string | Object> {
 
         const appID     = this.tabData.id;
-        const appConfig = this.executorService.getAppConfig(appID).take(1);
+        const appConfig = this.executor.getAppConfig(appID).take(1);
 
         const executionContext = appConfig.switchMap((context: AppExecutionContext) => {
 
@@ -697,21 +727,18 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             })
         }).take(1).filter(v => !!v) as Observable<AppExecutionContext>;
 
-
         executionContext.subscribeTracked(this, (context) => {
-            this.executorService.setAppConfig(appID, context);
+            this.executor.setAppConfig(appID, context);
         });
 
-
         return new Observable(obs => {
-
 
             const modelObject = this.dataModel.serialize();
             delete modelObject["sbg:job"]; // Bunny traverses mistakenly into this to look for actual inputs
             const modelText = Yaml.dump(modelObject, {});
 
             const runner = executionContext.switchMap(context => {
-                return this.executorService
+                return this.executor
                     .run(this.tabData.id, modelText, context.jobPath, context.executionParams)
                     .finally(() => {
                         console.log("Completing inner obs");
@@ -720,6 +747,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             }).subscribe(obs);
 
             return () => {
+                console.log("Unsibscribing runner");
                 runner.unsubscribe();
             }
 
