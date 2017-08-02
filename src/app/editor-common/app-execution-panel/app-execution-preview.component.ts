@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output} from "@angular/core";
+import {ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild} from "@angular/core";
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -14,11 +14,11 @@ import {ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnC
                 <i class="fa fa-times"></i>
             </button>
         </div>
-        <div class="output" [innerHTML]="content"></div>
+        <div #output class="output" [innerHTML]="content"></div>
     `
 })
 
-export class AppExecutionPreviewComponent implements OnInit, OnChanges {
+export class AppExecutionPreviewComponent implements OnChanges {
     @Input()
     content: string;
 
@@ -28,16 +28,13 @@ export class AppExecutionPreviewComponent implements OnInit, OnChanges {
     @Output()
     stopExecution = new EventEmitter<any>();
 
-    constructor(private el: ElementRef) {
-    }
-
-    ngOnInit() {
-    }
+    @ViewChild("output")
+    private output: ElementRef;
 
     ngOnChanges() {
 
         setTimeout(() => {
-            const nel     = this.el.nativeElement as Element;
+            const nel     = this.output.nativeElement as Element;
             nel.scrollTop = nel.scrollHeight;
         });
     }

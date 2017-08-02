@@ -646,7 +646,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 return this.runOnExecutor()                  // Starts the execution process
                     .takeUntil(this.executionStop.do(() => this.executionOutput += "Execution Stopped"))
                     .finally(() => {
-                        console.log("Done with executor");
                         // When it ends, turn off the UI flag
                         this.isExecuting = false
                     })
@@ -741,13 +740,11 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 return this.executor
                     .run(this.tabData.id, modelText, context.jobPath, context.executionParams)
                     .finally(() => {
-                        console.log("Completing inner obs");
                         obs.complete();
                     });
             }).subscribe(obs);
 
             return () => {
-                console.log("Unsibscribing runner");
                 runner.unsubscribe();
             }
 
