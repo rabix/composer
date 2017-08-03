@@ -324,7 +324,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         }
 
         /** Bound to lock state by accident, not intention */
-        return this.tabsUnlocked();
+        return this.tabsUnlocked() && !this.isReadonly;
     }
 
     appIsResolvable(): boolean {
