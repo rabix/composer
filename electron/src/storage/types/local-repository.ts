@@ -18,7 +18,7 @@ export class LocalRepository extends RepositoryType {
 
     publicAppsGrouping: "toolkit" | "category" = "toolkit";
 
-    selectedAppPanel: "myApps" | "publicApps" = "myApps";
+    selectedAppsPanel: "myApps" | "publicApps" = "myApps";
 
     sidebarHidden = false;
 
