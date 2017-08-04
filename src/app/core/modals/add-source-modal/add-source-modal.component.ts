@@ -111,10 +111,6 @@ export class AddSourceModalComponent extends DirectiveBase {
 
         super();
 
-        this.platformRepository.getProjects().subscribeTracked(this, (p) => {
-            console.log("All projects", p);
-        });
-
         this.platformRepository.getClosedProjects()
             .map(p => p || [])
             .subscribeTracked(this, projects => {
