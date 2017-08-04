@@ -217,6 +217,7 @@ module.exports = {
     fetchPlatformData: (data: {
         credentialsID?: string
     }, callback) => {
+
         const {credentialsID} = data;
 
         repositoryLoad.then(() => {
@@ -242,7 +243,7 @@ module.exports = {
             if (platformFetchingLocks[targetID]) {
                 const currentFetch = platformFetchingLocks[targetID];
                 currentFetch.then(data => callback(null, data)).catch(callback);
-                return
+                return;
             }
 
             const {url, token} = targetCredentials;
