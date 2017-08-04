@@ -71,10 +71,10 @@ import {WorkboxService} from "./workbox.service";
 export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterViewInit {
 
     /** List of tab data objects */
-    public tabs: TabData<any>[] = [];
+    tabs: TabData<any>[] = [];
 
     /** Reference to an active tab object */
-    public activeTab: TabData<any>;
+    activeTab: TabData<any>;
 
     private el: Element;
 
@@ -120,12 +120,6 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
         });
     }
 
-    getTabComponent(tab) {
-        const idx       = this.tabs.findIndex(t => t === tab);
-        const component = this.tabComponents.find((item, index) => index === idx);
-        return component;
-    }
-
     ngAfterViewInit() {
 
         this.workbox.tabCreation.delay(1).subscribeTracked(this, tab => {
@@ -165,6 +159,11 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
         });
     }
 
+    getTabComponent(tab) {
+        const idx = this.tabs.findIndex(t => t === tab);
+        return this.tabComponents.find((item, index) => index === idx);
+    }
+
     /**
      * When you click on tab
      */
@@ -180,22 +179,8 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
     /**
      * Removes a tab by index
      */
-    public removeTab(tab) {
+    removeTab(tab) {
         this.workbox.closeTab(tab);
-    }
-
-    /**
-     * Removes all tabs except one
-     */
-    private removeOtherTabs(tab) {
-        this.workbox.closeOtherTabs(tab);
-    }
-
-    /**
-     * Removes all tabs
-     */
-    private removeAllTabs() {
-        this.workbox.closeAllTabs();
     }
 
     /**
@@ -259,12 +244,12 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
             tabDataList.forEach(tabDataEntry => {
 
                 if (tabDataEntry.id.startsWith("?")) {
-                    this.workbox.openTab(tabDataEntry);
+                    this.workbox.openTab(tabDataEntry, false, false);
                     return;
                 }
 
                 const tab = this.workbox.getOrCreateAppTab(tabDataEntry);
-                this.workbox.openTab(tab);
+                this.workbox.openTab(tab, false, false);
             });
 
             // if (lastActiveTab && lastActiveTab.id === "?settings") {
@@ -272,5 +257,19 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
             // }
 
         });
+    }
+
+    /**
+     * Removes all tabs except one
+     */
+    private removeOtherTabs(tab) {
+        this.workbox.closeOtherTabs(tab);
+    }
+
+    /**
+     * Removes all tabs
+     */
+    private removeAllTabs() {
+        this.workbox.closeAllTabs();
     }
 }

@@ -1,6 +1,6 @@
 import {app} from "electron";
 import * as storage from "electron-storage";
-import {CredentialsCache, LocalRepository} from "./types/local-repository";
+import {LocalRepository} from "./types/local-repository";
 import {RepositoryType} from "./types/repository-type";
 import {UserRepository} from "./types/user-repository";
 
@@ -16,6 +16,7 @@ export class DataRepository {
     private listeners = {};
 
     constructor() {
+
         this.on("update.local.activeCredentials", (activeCredentials: any) => {
 
             if (!activeCredentials) {
@@ -24,7 +25,9 @@ export class DataRepository {
             }
 
             this.loadProfile(activeCredentials.id, new UserRepository(), (err, data) => {
+
                 this.user = data;
+
                 Object.keys(this.user).forEach(key => this.trigger(`update.user.${key}`, this.user[key]));
 
                 if (this.profileMatchesActiveUser(activeCredentials.id)) {
@@ -33,7 +36,7 @@ export class DataRepository {
             });
         });
 
-        this.on("update.local.credentials", (credentials: CredentialsCache[]) => {
+        this.on("update.local.credentials", () => {
             this.cleanProfiles();
         });
     }
@@ -44,11 +47,15 @@ export class DataRepository {
     load(callback: (err?: Error, data?: any) => void): void {
 
         this.loadProfile("local", new LocalRepository(), (err, localData) => {
-            if (err) return callback(err);
+            if (err) {
+                callback(err);
+                return;
+            }
 
             this.local = localData;
             if (!localData.activeCredentials) {
-                return callback();
+                callback();
+                return;
             }
 
             this.loadProfile(localData.activeCredentials.id, new UserRepository(), (err, userData) => {
@@ -159,7 +166,6 @@ export class DataRepository {
             this.enqueueStorageWrite(profilePath, this.local, callback);
         } else {
 
-
             // User to update might not be the active user, so we need to check that before emitting this event
             // Also, there might be no active user anymore when fetch gets back, so we need to check that first
             if (this.profileMatchesActiveUser(profile)) {
@@ -222,7 +228,6 @@ export class DataRepository {
     private loadProfile<T extends Object>(path = "local", defaultData: T, callback: (err: Error, data?: T) => any): void {
 
         const filePath = this.getProfileFilePath(path, null);
-
         storage.isPathExists(filePath, (exists) => {
             if (!exists) {
                 this.enqueueStorageWrite(filePath, defaultData, (err) => {
@@ -237,6 +242,7 @@ export class DataRepository {
                 if (err) {
                     return callback(err);
                 }
+
                 for (let prop in defaultData) {
                     if (!storageContent.hasOwnProperty(prop)) {
                         storageContent[prop] = defaultData[prop];
@@ -264,13 +270,17 @@ export class DataRepository {
 
     private enqueueStorageWrite(filePath, data, callback) {
 
+
         if (!this.storageWriteQueue[filePath]) {
             this.storageWriteQueue[filePath] = [];
         }
         const pathQueue = this.storageWriteQueue[filePath];
 
         const executor = () => {
-            storage.set(filePath, data, (err, data) => {
+
+            const dataClone = JSON.parse(JSON.stringify(data));
+
+            storage.set(filePath, dataClone, (err, data) => {
                 if (err) return callback(err);
 
                 callback(null, data);

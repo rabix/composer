@@ -1,5 +1,4 @@
 import {Injectable} from "@angular/core";
-import * as YAML from "js-yaml";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
@@ -8,7 +7,6 @@ import {LocalRepositoryService} from "../../repository/local-repository.service"
 import {PlatformRepositoryService} from "../../repository/platform-repository.service";
 import {DataGatewayService} from "../data-gateway/data-gateway.service";
 import {AppHelper} from "../helpers/AppHelper";
-import {AppTabData} from "./app-tab-data";
 import {TabData} from "./tab-data.interface";
 
 
@@ -29,30 +27,6 @@ export class WorkboxService {
                 private localRepository: LocalRepositoryService,
                 private platformRepository: PlatformRepositoryService) {
 
-        // First emit is an empty array (default), second emit is restoring tabs that were previously open
-        // after that, start listening for newly added tabs
-        this.tabs.skip(2).subscribe(tabs => {
-
-
-            const localTabs    = [];
-            const platformTabs = [];
-
-            tabs.forEach((tab, position) => {
-                const {id, label, type, isWritable, language} = tab;
-
-                const entry = {id, label, type, isWritable, language, position};
-                if (AppHelper.isLocal(entry.id)) {
-                    localTabs.push(entry);
-                } else {
-                    platformTabs.push(entry);
-                }
-            });
-
-            this.localRepository.setOpenTabs(localTabs);
-            this.platformRepository.setOpenTabs(platformTabs);
-
-        });
-
         this.startingTabs = this.priorityTabUpdate.startWith(1).withLatestFrom(
             this.localRepository.getOpenTabs(),
             this.platformRepository.getOpenTabs(),
@@ -60,11 +34,38 @@ export class WorkboxService {
         );
     }
 
+    syncTabs(): Promise<any> {
+        // First emit is an empty array (default), second emit is restoring tabs that were previously open
+        // after that, start listening for newly added tabs
+
+        const tabs = this.tabs.getValue();
+
+        const localTabs    = [];
+        const platformTabs = [];
+
+        tabs.forEach((tab, position) => {
+            const {id, label, type, isWritable, language} = tab;
+
+            const entry = {id, label, type, isWritable, language, position};
+            if (AppHelper.isLocal(entry.id)) {
+                localTabs.push(entry);
+            } else {
+                platformTabs.push(entry);
+            }
+        });
+
+        return Promise.all([
+            this.localRepository.setOpenTabs(localTabs),
+            this.platformRepository.setOpenTabs(platformTabs)
+        ]);
+
+    }
+
     forceReloadTabs() {
         this.priorityTabUpdate.next(1);
     }
 
-    openTab(tab, persistToRecentApps: boolean = true) {
+    openTab(tab, persistToRecentApps: boolean = true, syncState = true) {
 
         const {tabs} = this.extractValues();
 
@@ -81,25 +82,32 @@ export class WorkboxService {
         this.tabCreation.next(tab);
         this.activateTab(tab);
 
-        if (!persistToRecentApps || tab.id.startsWith("?")) {
-            return;
+        if (syncState) {
+            this.syncTabs();
         }
 
-        const recentTabData = {
-            id: tab.id,
-            label: tab.label,
-            type: tab.type,
-            isWritable: tab.isWritable,
-            language: tab.language,
-            description: tab.id,
-            time: Date.now()
-        } as RecentAppTab;
+        const isUtilityTab = tab.id.startsWith("?");
 
-        if (AppHelper.isLocal(tab.id)) {
-            this.localRepository.pushRecentApp(recentTabData);
-        } else {
-            this.platformRepository.pushRecentApp(recentTabData);
+        if (persistToRecentApps && !isUtilityTab) {
+            const recentTabData = {
+                id: tab.id,
+                label: tab.label,
+                type: tab.type,
+                isWritable: tab.isWritable,
+                language: tab.language,
+                description: tab.id,
+                time: Date.now()
+            } as RecentAppTab;
+
+
+            if (AppHelper.isLocal(tab.id)) {
+                this.localRepository.pushRecentApp(recentTabData);
+            } else {
+                this.platformRepository.pushRecentApp(recentTabData);
+            }
         }
+
+
     }
 
     openSettingsTab() {
