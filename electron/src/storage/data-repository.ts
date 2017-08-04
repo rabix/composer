@@ -19,8 +19,11 @@ export class DataRepository {
 
         this.on("update.local.activeCredentials", (activeCredentials: any) => {
 
+            // Every credentials change should flush user data until new data is loaded
+            this.flushUserData();
+
+            // Don't load if no user is active
             if (!activeCredentials) {
-                this.flushUserData();
                 return;
             }
 
