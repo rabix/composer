@@ -1,14 +1,14 @@
 import {Component} from "@angular/core";
+import {Observable} from "rxjs/Observable";
 import {AuthService} from "../../../auth/auth.service";
+import {AuthCredentials} from "../../../auth/model/auth-credentials";
 import {LocalRepositoryService} from "../../../repository/local-repository.service";
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {GlobalService} from "../../global/global.service";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {PlatformCredentialsModalComponent} from "../platform-credentials-modal/platform-credentials-modal.component";
-import {Observable} from "rxjs/Observable";
-import {AuthCredentials} from "../../../auth/model/auth-credentials";
-import {GlobalService} from "../../global/global.service";
 
 const {app, dialog} = window["require"]("electron").remote;
 
@@ -40,7 +40,7 @@ const {app, dialog} = window["require"]("electron").remote;
                 <div class="dialog-content dialog-connection" *ngIf="auth.active | async; else noActiveConnection">
 
                     <!--Projects are loaded-->
-                    <ng-container *ngIf="(repository.getProjects() | async).length > 0; else projectsNotLoadedYet">
+                    <ng-container *ngIf="(platformRepository.getProjects() | async) !== null; else projectsNotLoadedYet">
 
                         <!--Offer projects so users can choose which to add-->
                         <div *ngIf="closedProjectOptions.length > 0; else allProjectsAreAdded">
@@ -97,28 +97,34 @@ const {app, dialog} = window["require"]("electron").remote;
 })
 export class AddSourceModalComponent extends DirectiveBase {
 
-    activeTab         = "local";
-    selectedProjects  = [];
-    localFoldersToAdd = [];
+    activeTab                                               = "local";
+    selectedProjects                                        = [];
+    localFoldersToAdd                                       = [];
     closedProjectOptions: { value: string, text: string }[] = null;
 
     constructor(public modal: ModalService,
                 private localRepository: LocalRepositoryService,
-                private repository: PlatformRepositoryService,
+                private platformRepository: PlatformRepositoryService,
                 private workbox: WorkboxService,
                 private global: GlobalService,
                 public auth: AuthService) {
 
         super();
 
-        this.repository.getClosedProjects().subscribeTracked(this, (projects) => {
-            this.closedProjectOptions = projects.map(project => {
-                return {
-                    value: project.id,
-                    text: project.name
-                };
-            });
+        this.platformRepository.getProjects().subscribeTracked(this, (p) => {
+            console.log("All projects", p);
         });
+
+        this.platformRepository.getClosedProjects()
+            .map(p => p || [])
+            .subscribeTracked(this, projects => {
+                this.closedProjectOptions = projects.map(project => {
+                    return {
+                        value: project.id,
+                        text: project.name
+                    };
+                });
+            });
     }
 
     onDone() {
@@ -128,7 +134,7 @@ export class AddSourceModalComponent extends DirectiveBase {
                 throw new Error("Trying to open a project, but there is no active platform set.");
             }
 
-            this.repository.addOpenProjects(...this.selectedProjects).then(() => {
+            this.platformRepository.addOpenProjects(...this.selectedProjects).then(() => {
                 this.modal.close();
             });
 

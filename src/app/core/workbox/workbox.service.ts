@@ -29,7 +29,7 @@ export class WorkboxService {
 
         this.startingTabs = this.priorityTabUpdate.startWith(1).withLatestFrom(
             this.localRepository.getOpenTabs(),
-            this.platformRepository.getOpenTabs(),
+            this.platformRepository.getOpenTabs().map(data => data || []),
             (_, local, platform) => [...local, ...platform].sort((a, b) => a.position - b.position)
         );
     }

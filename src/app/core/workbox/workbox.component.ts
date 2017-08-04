@@ -36,7 +36,7 @@ import {WorkboxService} from "./workbox.service";
                            [class.fa-cog]="tab?.type === 'Settings'"
                         ></i>
                     </div>
-                    
+
                     <div class="title" [ct-tooltip]="ctt" [tooltipPlacement]="'bottom'">{{tab.label}}</div>
                     <div class="close-icon">
                         <i class="fa fa-times clickable" (click)="removeTab(tab)"></i>
@@ -44,7 +44,7 @@ import {WorkboxService} from "./workbox.service";
 
                     <!--Tooltip content-->
                     <ct-tooltip-content [maxWidth]="500" #ctt>
-                            {{ tab.data?.id || tab.label}}
+                        {{ tab.data?.id || tab.label}}
                     </ct-tooltip-content>
                 </li>
 
@@ -113,7 +113,6 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
             .subscribeTracked(this, () => {
                 this.workbox.activatePrevious();
             });
-
 
         this.workbox.tabs.subscribeTracked(this, tabs => {
             this.tabs = tabs;

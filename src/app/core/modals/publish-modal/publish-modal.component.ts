@@ -119,7 +119,9 @@ export class PublishModalComponent extends DirectiveBase {
             });
         });
 
-        this.platformRepository.getOpenProjects().take(1)
+        this.platformRepository.getOpenProjects()
+            .map(projects => projects || [])
+            .take(1)
             .subscribeTracked(this, (projects) => this.projectOptions = projects.map(project => ({
                 value: project.id,
                 text: project.name

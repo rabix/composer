@@ -8,7 +8,7 @@ const fs = require("fs");
 
 export class DataRepository {
 
-    user: UserRepository   = new UserRepository();
+    user: UserRepository   = null;
     local: LocalRepository = new LocalRepository();
 
     private storageWriteQueue: { [filePath: string]: Function[] } = {};
@@ -68,40 +68,6 @@ export class DataRepository {
         });
     }
 
-    activateUser(credentialsID?: string, callback?: (err?: Error) => void) {
-
-        // By default, set the update to be deactivation, then check if we need to activate a user
-        const patch = {activeCredentials: null} as Partial<LocalRepository>;
-
-        // If we received credentials ID, try to match it to a credentials entry and set that entry as the active one
-        if (credentialsID) {
-            const credentialsEntryWithGivenID = this.local.credentials.find(entry => entry.id === credentialsID);
-
-            if (credentialsEntryWithGivenID) {
-                patch.activeCredentials = credentialsEntryWithGivenID;
-            }
-        }
-
-        this.updateLocal(patch, (err) => {
-            if (err) {
-                callback(err);
-                return;
-            }
-
-            if (patch.activeCredentials === null) {
-                this.user = new UserRepository();
-                callback();
-                return;
-            }
-
-            this.loadProfile(patch.activeCredentials.id, new UserRepository(), (err) => {
-                if (err) return callback(err);
-
-                callback();
-            });
-        });
-    }
-
     updateLocal(data: Partial<LocalRepository>, callback?: (err?: Error, data?: any) => void) {
         this.update("local", data, callback);
     }
@@ -143,11 +109,11 @@ export class DataRepository {
     }
 
     private flushUserData() {
-        this.user = new UserRepository();
+        this.user = null;
 
         const demoUser = new UserRepository();
         Object.keys(demoUser).forEach(key => {
-            this.trigger(`update.user.${key}`, demoUser[key]);
+            this.trigger(`update.user.${key}`, null);
         });
     }
 
@@ -170,7 +136,12 @@ export class DataRepository {
             // Also, there might be no active user anymore when fetch gets back, so we need to check that first
             if (this.profileMatchesActiveUser(profile)) {
                 // This is the case where updated user is the current user. We can patch the this.user cache
-                Object.assign(this.user, data);
+
+                if (this.user) {
+                    Object.assign(this.user, data);
+                } else {
+                    this.user = Object.assign(new UserRepository(), data);
+                }
                 this.trigger(`update.user`, this.user);
                 this.enqueueStorageWrite(profilePath, this.user, callback);
             } else {

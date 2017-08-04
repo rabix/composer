@@ -1,15 +1,14 @@
 import {App} from "../../sbg-api-client/interfaces/app";
 import {Project} from "../../sbg-api-client/interfaces/project";
 import {RepositoryType} from "./repository-type";
-import {RecentAppTab} from "./recent-app-tab";
 
 export class UserRepository extends RepositoryType {
 
-    projects: Project[] = [];
+    projects: Project[] = null;
 
-    apps: App[] = [];
+    apps: App[] = null;
 
-    publicApps: App[] = [];
+    publicApps: App[] = null;
 
     openProjects: string[] = [];
 
