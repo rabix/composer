@@ -6,7 +6,6 @@
 // import "rxjs/add/observable/of";
 // import {ReplaySubject} from "rxjs/ReplaySubject";
 //
-// import {OldAuthService} from "../../auth/auth/auth.service";
 // import {ModalService} from "../../ui/modal/modal.service";
 // import {SystemService} from "../../platform-providers/system.service";
 //

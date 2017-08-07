@@ -24,8 +24,9 @@ export class PublicAppsPanelService extends AppsPanelService {
 
         super(fileRepository, platformRepository, notificationBar, workbox, statusBar, cdr);
 
-        this.apps = platformRepository.getPublicApps()
-            .map((apps) => apps.filter((app) => !app.raw["sbg:blackbox"]));
+        this.apps = platformRepository.getPublicApps().map(apps => {
+            return (apps || []).filter((app) => !app.raw["sbg:blackbox"]);
+        });
     }
 
     getAppsByNone(): Observable<TreeNode<any>[]> {
@@ -75,7 +76,7 @@ export class PublicAppsPanelService extends AppsPanelService {
                         id: nodeID,
                         type: "toolkit",
                         label: toolkit,
-                        isExpanded: this.platformRepository.getExpandedNodes().map(list => list.indexOf(nodeID) !== -1),
+                        isExpanded: this.platformRepository.getExpandedNodes().map(list => (list || []).indexOf(nodeID) !== -1),
                         isExpandable: true,
                         icon: "fa-folder",
                         children: Observable.of(appNodes)
@@ -126,7 +127,7 @@ export class PublicAppsPanelService extends AppsPanelService {
                         id: nodeID,
                         type: "category",
                         label: category,
-                        isExpanded: this.platformRepository.getExpandedNodes().map(list => list.indexOf(nodeID) !== -1),
+                        isExpanded: this.platformRepository.getExpandedNodes().map(list => (list || []).indexOf(nodeID) !== -1),
                         isExpandable: true,
                         children: Observable.of(appNodes),
                         icon: "fa-folder",

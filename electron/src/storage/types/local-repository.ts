@@ -22,4 +22,10 @@ export class LocalRepository extends RepositoryType {
 
     sidebarHidden = false;
 
+    openTabs = [{
+        id: "?welcome",
+        label: "Welcome",
+        type: "Welcome"
+    }]
+
 }

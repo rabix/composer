@@ -89,7 +89,7 @@ export class NewFileTabComponent extends DirectiveBase implements OnInit {
     ngOnInit(): void {
         this.recentApps = Observable.combineLatest(
             this.localRepository.getRecentApps().startWith([]),
-            this.platformRepository.getRecentApps().startWith([]),
+            this.platformRepository.getRecentApps().map(apps => apps || []).startWith([]),
             (localApps, platformApps) => [...localApps, ...platformApps].sort((a, b) => b.time - a.time).slice(0, 20)
         );
     }
