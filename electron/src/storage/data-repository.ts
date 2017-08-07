@@ -1,30 +1,41 @@
 import {app} from "electron";
 import * as storage from "electron-storage";
-import {CredentialsCache, LocalRepository} from "./types/local-repository";
+import * as ReadWriteLock from "rwlock";
+import {LocalRepository} from "./types/local-repository";
 import {RepositoryType} from "./types/repository-type";
 import {UserRepository} from "./types/user-repository";
 
 const fs = require("fs");
 
+
 export class DataRepository {
 
-    user: UserRepository   = new UserRepository();
+    user: UserRepository   = null;
     local: LocalRepository = new LocalRepository();
 
-    private storageWriteQueue: { [filePath: string]: Function[] } = {};
-
+    private lock      = new ReadWriteLock();
     private listeners = {};
 
     constructor() {
+
         this.on("update.local.activeCredentials", (activeCredentials: any) => {
 
+            // Every credentials change should flush user data until new data is loaded
+            this.flushUserData();
+
+            // Don't load if no user is active
             if (!activeCredentials) {
-                this.flushUserData();
                 return;
             }
 
             this.loadProfile(activeCredentials.id, new UserRepository(), (err, data) => {
+
+                if (err) {
+                    throw err;
+                }
+
                 this.user = data;
+
                 Object.keys(this.user).forEach(key => this.trigger(`update.user.${key}`, this.user[key]));
 
                 if (this.profileMatchesActiveUser(activeCredentials.id)) {
@@ -33,7 +44,7 @@ export class DataRepository {
             });
         });
 
-        this.on("update.local.credentials", (credentials: CredentialsCache[]) => {
+        this.on("update.local.credentials", () => {
             this.cleanProfiles();
         });
     }
@@ -44,51 +55,21 @@ export class DataRepository {
     load(callback: (err?: Error, data?: any) => void): void {
 
         this.loadProfile("local", new LocalRepository(), (err, localData) => {
-            if (err) return callback(err);
+            if (err) {
+                callback(err);
+                return;
+            }
 
             this.local = localData;
             if (!localData.activeCredentials) {
-                return callback();
+                callback();
+                return;
             }
 
             this.loadProfile(localData.activeCredentials.id, new UserRepository(), (err, userData) => {
                 if (err) return callback(err);
 
                 this.user = userData;
-
-                callback();
-            });
-        });
-    }
-
-    activateUser(credentialsID?: string, callback?: (err?: Error) => void) {
-
-        // By default, set the update to be deactivation, then check if we need to activate a user
-        const patch = {activeCredentials: null} as Partial<LocalRepository>;
-
-        // If we received credentials ID, try to match it to a credentials entry and set that entry as the active one
-        if (credentialsID) {
-            const credentialsEntryWithGivenID = this.local.credentials.find(entry => entry.id === credentialsID);
-
-            if (credentialsEntryWithGivenID) {
-                patch.activeCredentials = credentialsEntryWithGivenID;
-            }
-        }
-
-        this.updateLocal(patch, (err) => {
-            if (err) {
-                callback(err);
-                return;
-            }
-
-            if (patch.activeCredentials === null) {
-                this.user = new UserRepository();
-                callback();
-                return;
-            }
-
-            this.loadProfile(patch.activeCredentials.id, new UserRepository(), (err) => {
-                if (err) return callback(err);
 
                 callback();
             });
@@ -136,11 +117,12 @@ export class DataRepository {
     }
 
     private flushUserData() {
-        this.user = new UserRepository();
+        this.user = null;
 
+        this.trigger(`update.user`, null);
         const demoUser = new UserRepository();
         Object.keys(demoUser).forEach(key => {
-            this.trigger(`update.user.${key}`, demoUser[key]);
+            this.trigger(`update.user.${key}`, null);
         });
     }
 
@@ -156,17 +138,21 @@ export class DataRepository {
         if (profile === "local") {
             Object.assign(this.local, data);
             this.trigger("update.local", this.local);
-            this.enqueueStorageWrite(profilePath, this.local, callback);
+            this.storageWrite(profilePath, this.local, callback);
         } else {
-
 
             // User to update might not be the active user, so we need to check that before emitting this event
             // Also, there might be no active user anymore when fetch gets back, so we need to check that first
             if (this.profileMatchesActiveUser(profile)) {
                 // This is the case where updated user is the current user. We can patch the this.user cache
-                Object.assign(this.user, data);
+
+                if (this.user) {
+                    Object.assign(this.user, data);
+                } else {
+                    this.user = Object.assign(new UserRepository(), data);
+                }
                 this.trigger(`update.user`, this.user);
-                this.enqueueStorageWrite(profilePath, this.user, callback);
+                this.storageWrite(profilePath, this.user, callback);
             } else {
                 // If update is for a non-active user, we need to load that user's data and patch that instead
                 // However, user might be deleted at the time, so we first need to check that
@@ -185,7 +171,7 @@ export class DataRepository {
                     if (err) return callback(err);
 
                     this.trigger(`update.${profile}`, data);
-                    this.enqueueStorageWrite(profilePath, Object.assign(loadedProfileData, data), callback);
+                    this.storageWrite(profilePath, Object.assign(loadedProfileData, data), callback);
                 });
 
             }
@@ -224,20 +210,26 @@ export class DataRepository {
         const filePath = this.getProfileFilePath(path, null);
 
         storage.isPathExists(filePath, (exists) => {
+
             if (!exists) {
-                this.enqueueStorageWrite(filePath, defaultData, (err) => {
+
+                this.storageWrite(filePath, defaultData, err => {
                     if (err) return callback(err);
 
                     callback(null, defaultData);
+
                 });
+
                 return;
             }
 
-            storage.get(filePath, (err, storageContent: T) => {
+            this.storageRead(filePath, (err, storageContent: T) => {
                 if (err) {
                     return callback(err);
                 }
+
                 for (let prop in defaultData) {
+
                     if (!storageContent.hasOwnProperty(prop)) {
                         storageContent[prop] = defaultData[prop];
                     }
@@ -262,41 +254,24 @@ export class DataRepository {
         });
     }
 
-    private enqueueStorageWrite(filePath, data, callback) {
-
-        if (!this.storageWriteQueue[filePath]) {
-            this.storageWriteQueue[filePath] = [];
-        }
-        const pathQueue = this.storageWriteQueue[filePath];
-
-        const executor = () => {
-            storage.set(filePath, data, (err, data) => {
-                if (err) return callback(err);
-
-                callback(null, data);
-
-                pathQueue.shift();
-
-                if (pathQueue.length) {
-                    pathQueue[0]();
-                }
+    private storageRead(filePath, callback: (err?: Error, content?: any) => void) {
+        this.lock.readLock(filePath, (release) => {
+            storage.get(filePath, (err, content) => {
+                release();
+                callback(err, content);
             });
-        };
+        });
+    }
 
-        if (pathQueue.length === 2) {
-            pathQueue[1] = executor;
-            return;
-        }
+    private storageWrite(filePath, data, callback) {
+        this.lock.writeLock(filePath, (release) => {
 
-        if (pathQueue.length === 1) {
-            pathQueue.push(executor);
-            return;
-        }
-
-        if (pathQueue.length === 0) {
-            pathQueue.push(executor);
-            pathQueue[0]();
-        }
+            const frozen = JSON.stringify(data, null, 4);
+            storage.set(filePath, frozen, (err, data) => {
+                release();
+                callback(err, data);
+            });
+        });
     }
 
     private cleanProfiles(callback = (err?: Error, data?: any) => {

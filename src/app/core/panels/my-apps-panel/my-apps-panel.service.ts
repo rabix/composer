@@ -6,16 +6,16 @@ import {Project} from "../../../../../electron/src/sbg-api-client/interfaces/pro
 import {AuthService} from "../../../auth/auth.service";
 import {AuthCredentials} from "../../../auth/model/auth-credentials";
 import {FileRepositoryService} from "../../../file-repository/file-repository.service";
+import {NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
+import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
 import {LocalRepositoryService} from "../../../repository/local-repository.service";
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {IpcService} from "../../../services/ipc.service";
 import {TreeNode} from "../../../ui/tree-view/tree-node";
 import {FilesystemEntry} from "../../data-gateway/data-types/local.types";
 import {GlobalService} from "../../global/global.service";
-import {AppsPanelService} from "../common/apps-panel.service";
-import {NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
 import {WorkboxService} from "../../workbox/workbox.service";
-import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
+import {AppsPanelService} from "../common/apps-panel.service";
 
 @Injectable()
 export class MyAppsPanelService extends AppsPanelService {
@@ -24,7 +24,7 @@ export class MyAppsPanelService extends AppsPanelService {
     expandedNodes: Observable<string[]>;
     rootFolders: Observable<TreeNode<any>[]>;
     localExpandedNodes: Observable<string[]>;
-    localFolders: Observable<TreeNode<any>[]>;
+    localFolders: Observable<string[]>;
 
     constructor(private auth: AuthService,
                 private ipc: IpcService,
@@ -40,7 +40,7 @@ export class MyAppsPanelService extends AppsPanelService {
         super(fileRepository, platformRepository, notificationBar, workbox, statusBar, cdr);
 
         this.localFolders       = this.localRepository.getLocalFolders();
-        this.projects           = this.platformRepository.getOpenProjects();
+        this.projects           = this.platformRepository.getOpenProjects().map(projects => projects || []);
         this.localExpandedNodes = this.localRepository.getExpandedFolders();
         this.rootFolders        = this.getRootFolders();
     }
@@ -80,8 +80,8 @@ export class MyAppsPanelService extends AppsPanelService {
                 iconExpanded: "fa-folder-open",
                 label: AuthCredentials.getPlatformLabel(credentials.url),
                 isExpandable: true,
-                isExpanded: this.platformRepository.getExpandedNodes().map(list => list.indexOf(platformHash) !== -1),
-                children: this.platformRepository.getOpenProjects().map(projects => this.createPlatformListingTreeNodes(projects))
+                isExpanded: this.platformRepository.getExpandedNodes().map(list => (list || []).indexOf(platformHash) !== -1),
+                children: this.platformRepository.getOpenProjects().map(projects => this.createPlatformListingTreeNodes(projects || []))
             };
         });
 
@@ -175,7 +175,7 @@ export class MyAppsPanelService extends AppsPanelService {
                 type: "project",
                 icon: isWritable ? "fa-folder" : "fa-lock",
                 label: project.name,
-                isExpanded: this.platformRepository.getExpandedNodes().map(list => list.indexOf(project.id) !== -1),
+                isExpanded: this.platformRepository.getExpandedNodes().map(list => (list || []).indexOf(project.id) !== -1),
                 isExpandable: true,
                 iconExpanded: isWritable ? "fa-folder-open" : "fa-lock",
                 children: this.platformRepository.getAppsForProject(project.id).map(apps => this.createPlatformAppListingTreeNodes(apps, isWritable)),

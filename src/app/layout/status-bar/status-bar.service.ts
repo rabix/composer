@@ -15,13 +15,13 @@ export class StatusBarService {
 
     host: StatusBarComponent;
 
-    status = new ReplaySubject<{ message: string, time?: Date }>();
+    status = new ReplaySubject<{ message: string, time?: Date }>(1);
 
     queueSize = new BehaviorSubject(0);
 
     process: Observable<string>;
 
-    controls = new ReplaySubject<TemplateRef<any>>();
+    controls = new ReplaySubject<TemplateRef<any>>(1);
 
     private processMap = {};
 

@@ -1,13 +1,12 @@
 import {Component} from "@angular/core";
+import {Observable} from "rxjs/Observable";
 import {AuthService} from "../../auth/auth.service";
 import {AuthCredentials} from "../../auth/model/auth-credentials";
 import {GlobalService} from "../../core/global/global.service";
 import {PlatformCredentialsModalComponent} from "../../core/modals/platform-credentials-modal/platform-credentials-modal.component";
 import {WorkboxService} from "../../core/workbox/workbox.service";
-import {SettingsService} from "../../services/settings/settings.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
-import {Observable} from "rxjs/Observable";
 
 type ViewMode = "auth" | "keyBindings" | "cache";
 
@@ -70,8 +69,7 @@ export class SettingsComponent extends DirectiveBase {
     viewMode: ViewMode = "auth";
 
 
-    constructor(private settings: SettingsService,
-                public modal: ModalService,
+    constructor(public modal: ModalService,
                 private global: GlobalService,
                 private workbox: WorkboxService,
                 public auth: AuthService) {
@@ -136,7 +134,7 @@ export class SettingsComponent extends DirectiveBase {
         this.viewMode = tab;
     }
 
-    setActiveCredentials(credentials: AuthCredentials) {
+    setActiveCredentials(credentials?: AuthCredentials) {
 
         this.auth.setActiveCredentials(credentials).then(() => {
             if(credentials){

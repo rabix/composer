@@ -73,9 +73,7 @@ export class LocalRepositoryService {
     }
 
     setActiveCredentials(activeCredentials: AuthCredentials = null): Promise<any> {
-        // return this.ipc.request("patchLocalRepository", {activeCredentials}).toPromise();
-        return this.ipc.request("switchActiveUser", {credentials: activeCredentials})
-            .toPromise();
+        return this.ipc.request("switchActiveUser", {credentials: activeCredentials}).toPromise();
     }
 
     setCredentials(credentials: AuthCredentials[]): Promise<any> {

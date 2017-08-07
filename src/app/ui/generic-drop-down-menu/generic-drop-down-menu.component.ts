@@ -59,7 +59,6 @@ export class GenericDropDownMenuComponent extends DirectiveBase implements OnIni
      * @param value
      */
     toggleMenu(value?: boolean) {
-        console.log("Toggling menu", value);
         typeof value === "boolean" ? this.shouldShow = value : this.shouldShow = !this.shouldShow;
 
         if (this.shouldShow) {
@@ -75,7 +74,6 @@ export class GenericDropDownMenuComponent extends DirectiveBase implements OnIni
         // down the menuState stream, the menu will close.
         if (this.menuState) {
             this.menuState.subscribeTracked(this, (val) => {
-                console.log("Toggling in subscription");
                 this.toggleMenu(val);
             });
         } else {
