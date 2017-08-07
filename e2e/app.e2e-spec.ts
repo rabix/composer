@@ -1,14 +1,15 @@
 import {RabixComposerPage} from "./app.po";
 
 describe("rabix-composer App", () => {
-    let page: RabixComposerPage;
+    let app: RabixComposerPage;
 
     beforeEach(() => {
-        page = new RabixComposerPage();
+        app = new RabixComposerPage();
     });
 
-    it("should display message saying app works", () => {
-        page.navigateTo();
-        expect(true).toEqual(true);
+    it("should display the layout", () => {
+        app.isLayoutDisplayed().then(isDisplayed => {
+            expect(isDisplayed).toBeTruthy("Layout component is not displayed properly");
+        });
     });
 });

@@ -1,5 +1,4 @@
 import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren} from "@angular/core";
-import {Observable} from "rxjs/Observable";
 import {AuthService} from "../../auth/auth.service";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {LocalRepositoryService} from "../../repository/local-repository.service";
@@ -94,6 +93,8 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
 
     ngOnInit() {
 
+
+
         // FIXME: this needs to be handled in a system-specific way
         // Listen for a shortcut that should close the active tab
         this.ipc.watch("accelerator", "CmdOrCtrl+W").subscribeTracked(this, () => {
@@ -129,8 +130,8 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
                     this.cdr.markForCheck();
                 }, tab.label);
             }
-
         });
+
         this.workbox.activeTab.subscribeTracked(this, tab => {
             this.statusBar.removeControls();
 
@@ -151,10 +152,6 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
                     component.onTabActivation();
                 });
             }
-        });
-
-        setTimeout(() => {
-            this.restoreTabs();
         });
     }
 
@@ -214,48 +211,6 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
         });
 
         return [closeOthers, closeAll];
-    }
-
-    restoreTabs() {
-
-        this.workbox.startingTabs.subscribeTracked(this, tabDataList => {
-
-            // const lastActiveTab = this.activeTab;
-            this.workbox.tabs.next([]);
-            this.workbox.activeTab.next(undefined);
-
-            if (tabDataList.length === 0) {
-
-                Observable.combineLatest(this.local.getLocalFolders(), this.auth.getActive(), (folders, cred) => {
-                    return folders.length || cred;
-                }).subscribeTracked(this, (hasSettings) => {
-                    if (hasSettings) {
-                        this.openNewFileTab();
-                    } else {
-                        this.openWelcomeTab();
-                    }
-                });
-
-                return;
-            }
-
-
-            tabDataList.forEach(tabDataEntry => {
-
-                if (tabDataEntry.id.startsWith("?")) {
-                    this.workbox.openTab(tabDataEntry, false, false);
-                    return;
-                }
-
-                const tab = this.workbox.getOrCreateAppTab(tabDataEntry);
-                this.workbox.openTab(tab, false, false);
-            });
-
-            // if (lastActiveTab && lastActiveTab.id === "?settings") {
-            //     this.workbox.activeTab.next(lastActiveTab);
-            // }
-
-        });
     }
 
     /**

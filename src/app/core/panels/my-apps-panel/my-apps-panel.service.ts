@@ -24,7 +24,7 @@ export class MyAppsPanelService extends AppsPanelService {
     expandedNodes: Observable<string[]>;
     rootFolders: Observable<TreeNode<any>[]>;
     localExpandedNodes: Observable<string[]>;
-    localFolders: Observable<TreeNode<any>[]>;
+    localFolders: Observable<string[]>;
 
     constructor(private auth: AuthService,
                 private ipc: IpcService,

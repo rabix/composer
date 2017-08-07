@@ -3,6 +3,7 @@ import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {RecentAppTab} from "../../../../electron/src/storage/types/recent-app-tab";
+import {AuthService} from "../../auth/auth.service";
 import {LocalRepositoryService} from "../../repository/local-repository.service";
 import {PlatformRepositoryService} from "../../repository/platform-repository.service";
 import {DataGatewayService} from "../data-gateway/data-gateway.service";
@@ -19,18 +20,41 @@ export class WorkboxService {
 
     tabCreation = new Subject<TabData<any>>();
 
-    startingTabs: Observable<TabData<any>[]>;
-
     private priorityTabUpdate = new Subject();
 
-    constructor(private dataGateway: DataGatewayService,
+    constructor(private auth: AuthService,
+                private dataGateway: DataGatewayService,
                 private localRepository: LocalRepositoryService,
                 private platformRepository: PlatformRepositoryService) {
 
-        this.startingTabs = this.priorityTabUpdate.startWith(1).withLatestFrom(
-            this.localRepository.getOpenTabs(),
-            this.platformRepository.getOpenTabs().map(data => data || []),
-            (_, local, platform) => [...local, ...platform].sort((a, b) => a.position - b.position)
+        // Whenever a user gets changed, we should restore their tabs
+        this.auth.getActive()
+            .switchMap(() => this.getStoredTabs().take(1))
+            // If we have no active tabs, add a "new file"
+            .map(tabDataList => tabDataList.length ? tabDataList : [this.createNewFileTabData()])
+            .map(tabDataList => tabDataList.map(tabData => {
+                return this.isUtilityTab(tabData) ? tabData : this.getOrCreateAppTab(tabData, true);
+            }))
+            .subscribe(tabList => {
+                this.tabs.next(tabList);
+                this.ensureActiveTab();
+            });
+    }
+
+
+    getStoredTabs() {
+
+
+        const local    = this.localRepository.getOpenTabs();
+        const platform = this.auth.getActive().switchMap(user => {
+            if (!user) {
+                return Observable.of([]);
+            }
+            return this.platformRepository.getOpenTabs()
+        }).filter(v => v !== null);
+
+        return Observable.combineLatest(local, platform,
+            (local, platform) => [...local, ...platform].sort((a, b) => a.position - b.position)
         );
     }
 
@@ -59,6 +83,10 @@ export class WorkboxService {
             this.platformRepository.setOpenTabs(platformTabs)
         ]);
 
+    }
+
+    isUtilityTab(tabData: TabData<any>): boolean {
+        return tabData.id.startsWith("?");
     }
 
     forceReloadTabs() {
@@ -134,15 +162,21 @@ export class WorkboxService {
 
         this.tabs.next(newTabList);
         this.ensureActiveTab();
+
+        this.syncTabs();
     }
 
     closeOtherTabs(tab) {
         this.tabs.next([tab]);
         this.activateTab(tab);
+
+        this.syncTabs();
     }
 
     closeAllTabs() {
         this.tabs.next([]);
+
+        this.syncTabs();
     }
 
     activateNext() {
@@ -190,14 +224,16 @@ export class WorkboxService {
         isWritable?: boolean;
         language?: string;
 
-    }): TabData<T> {
+    }, forceCreate = false): TabData<T> {
 
-        const currentTab = this.tabs.getValue().find(existingTab => existingTab.id === data.id);
+        if (!forceCreate) {
+            const currentTab = this.tabs.getValue().find(existingTab => existingTab.id === data.id);
 
-        if (currentTab) {
-            console.log("Tab already active", currentTab);
-            return currentTab;
+            if (currentTab) {
+                return currentTab;
+            }
         }
+
 
         const dataSource = DataGatewayService.getFileSource(data.id);
 
@@ -227,6 +263,14 @@ export class WorkboxService {
 
         return tab;
 
+    }
+
+    private createNewFileTabData(): TabData<any> {
+        return {
+            id: "?newFile",
+            label: "New File",
+            type: "NewFile"
+        }
     }
 }
 
