@@ -1,5 +1,6 @@
 import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren} from "@angular/core";
 import {Observable} from "rxjs/Observable";
+import {ReplaySubject} from "rxjs/ReplaySubject";
 import {AuthService} from "../../auth/auth.service";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {LocalRepositoryService} from "../../repository/local-repository.service";
@@ -138,27 +139,33 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
             }
 
         });
-        this.workbox.activeTab.subscribeTracked(this, tab => {
+
+        const replayComponents = new ReplaySubject(1);
+        this.tabComponents.changes.subscribeTracked(this, replayComponents);
+
+        this.workbox.activeTab.subscribeTracked(this, () => {
             this.statusBar.removeControls();
-
-            this.activeTab = tab;
-            const idx      = this.tabs.findIndex(t => t === tab);
-
-            const component = this.tabComponents.find((item, index) => index === idx);
-
-            if (component) {
-
-                const statusControl = component.provideStatusControls();
-
-                if (statusControl) {
-                    this.statusBar.setControls(statusControl);
-                }
-
-                setTimeout(() => {
-                    component.onTabActivation();
-                });
-            }
         });
+
+        this.workbox.activeTab.delay(1).switchMap(tab => replayComponents.filter((list: QueryList<any>) => {
+            return list.find((item) => item.tab === tab);
+        }), (tab) => tab)
+            .subscribeTracked(this, (tab) => {
+
+                this.activeTab = tab;
+                const idx      = this.tabs.findIndex(t => t === tab);
+
+                const component = this.tabComponents.find((item, index) => index === idx);
+
+                if (component) {
+
+                    this.statusBar.setControls(component.provideStatusControls());
+
+                    setTimeout(() => {
+                        component.onTabActivation();
+                    });
+                }
+            });
 
         setTimeout(() => {
             this.restoreTabs();

@@ -118,9 +118,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             .map(obj => obj !== undefined)
             .subscribeTracked(this, show => this.showInspector = show);
 
-        // Push status controls to the status bar
-        this.statusBar.setControls(this.statusControls);
-
         // Get the app saver from the injector
         this.appSavingService = this.injector.get(APP_SAVER_TOKEN) as AppSaver;
 
