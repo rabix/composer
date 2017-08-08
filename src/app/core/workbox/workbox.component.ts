@@ -7,6 +7,7 @@ import {MenuItem} from "../../ui/menu/menu-item";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {TabData} from "./tab-data.interface";
 import {WorkboxService} from "./workbox.service";
+import {ReplaySubject} from "rxjs/ReplaySubject";
 
 @Component({
     selector: "ct-workbox",
@@ -130,29 +131,35 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
                     this.cdr.markForCheck();
                 }, tab.label);
             }
+
         });
 
-        this.workbox.activeTab.subscribeTracked(this, tab => {
+        const replayComponents = new ReplaySubject(1);
+        this.tabComponents.changes.subscribeTracked(this, replayComponents);
+
+        this.workbox.activeTab.subscribeTracked(this, () => {
             this.statusBar.removeControls();
-
-            this.activeTab = tab;
-            const idx      = this.tabs.findIndex(t => t === tab);
-
-            const component = this.tabComponents.find((item, index) => index === idx);
-
-            if (component) {
-
-                const statusControl = component.provideStatusControls();
-
-                if (statusControl) {
-                    this.statusBar.setControls(statusControl);
-                }
-
-                setTimeout(() => {
-                    component.onTabActivation();
-                });
-            }
         });
+
+        this.workbox.activeTab.delay(1).switchMap(tab => replayComponents.filter((list: QueryList<any>) => {
+            return list.find((item) => item.tab === tab);
+        }), (tab) => tab)
+            .subscribeTracked(this, (tab) => {
+
+                this.activeTab = tab;
+                const idx = this.tabs.findIndex(t => t === tab);
+
+                const component = this.tabComponents.find((item, index) => index === idx);
+
+                if (component) {
+
+                    this.statusBar.setControls(component.provideStatusControls());
+
+                    setTimeout(() => {
+                        component.onTabActivation();
+                    });
+                }
+            });
     }
 
     getTabComponent(tab) {

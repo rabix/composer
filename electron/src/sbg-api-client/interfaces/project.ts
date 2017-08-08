@@ -14,6 +14,15 @@ export interface Project {
 
     billing_group?: string;
 
+    /** Project Permissions */
+    permissions: {
+        admin: boolean,
+        copy: boolean,
+        execute: boolean,
+        read: boolean,
+        write: boolean
+    };
+
     settings: {
         locked: boolean;
     }
