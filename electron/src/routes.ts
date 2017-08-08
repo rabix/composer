@@ -13,7 +13,7 @@ const swapController = new SwapController(swapPath);
 
 const fsController          = require("./controllers/fs.controller");
 const acceleratorController = require("./controllers/accelerator.controller");
-const resolver              = require("./schema-salad-resolver");
+const resolver              = require("./schema-salad-resolver/schema-salad-resolver");
 const md5                   = require("md5");
 
 const repository     = new DataRepository();

@@ -1,9 +1,9 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output, ViewEncapsulation} from "@angular/core";
-import {CommandInputParameterModel, CommandOutputParameterModel, ExpressionModel} from "cwlts/models";
-import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output} from "@angular/core";
 import {FormArray, FormControl, FormGroup} from "@angular/forms";
+import {CommandInputParameterModel, CommandOutputParameterModel, ExpressionModel} from "cwlts/models";
 import {Subscription} from "rxjs/Subscription";
 import {ModalService} from "../../../ui/modal/modal.service";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
     styleUrls: ["./secondary-files.component.scss"],

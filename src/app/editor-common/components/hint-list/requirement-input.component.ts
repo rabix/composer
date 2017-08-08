@@ -1,6 +1,6 @@
-import {Component, OnInit, ChangeDetectionStrategy, Input, forwardRef} from "@angular/core";
-import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormControl, FormGroup} from "@angular/forms";
-import {RequirementBaseModel, ExpressionModel} from "cwlts/models";
+import {Component, forwardRef, Input} from "@angular/core";
+import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
+import {ExpressionModel, RequirementBaseModel} from "cwlts/models";
 import {noop} from "../../../lib/utils.lib";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 

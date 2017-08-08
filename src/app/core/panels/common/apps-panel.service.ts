@@ -8,9 +8,9 @@ import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {MenuItem} from "../../../ui/menu/menu-item";
 import {TreeNode} from "../../../ui/tree-view/tree-node";
+import {ErrorWrapper} from "../../helpers/error-wrapper";
 import {TabData} from "../../workbox/tab-data.interface";
 import {WorkboxService} from "../../workbox/workbox.service";
-import {ErrorWrapper} from "../../helpers/error-wrapper";
 
 const {dialog} = window["require"]("electron").remote;
 

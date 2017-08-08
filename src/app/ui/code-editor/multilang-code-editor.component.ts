@@ -1,7 +1,7 @@
 import {Component, Output} from "@angular/core";
-import {ACE_MODE_MAP} from "../code-editor-new/ace-mode-map";
-import {Subject} from "rxjs/Subject";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {Subject} from "rxjs/Subject";
+import {ACE_MODE_MAP} from "../code-editor-new/ace-mode-map";
 
 @Component({
     styleUrls: ["multilang-code-editor.component.scss"],

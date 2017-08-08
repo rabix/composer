@@ -1,5 +1,4 @@
 import {ChangeDetectorRef, Injectable} from "@angular/core";
-import "rxjs/add/operator/withLatestFrom";
 import {Observable} from "rxjs/Observable";
 import {App} from "../../../../../electron/src/sbg-api-client/interfaces/app";
 import {Project} from "../../../../../electron/src/sbg-api-client/interfaces/project";

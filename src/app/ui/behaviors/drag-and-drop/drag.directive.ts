@@ -1,6 +1,4 @@
 import {Directive, ElementRef, Input} from "@angular/core";
-import "rxjs/add/operator/last";
-import "rxjs/add/operator/skip";
 import {DomEventService} from "../../../services/dom/dom-event.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 

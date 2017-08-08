@@ -1,12 +1,4 @@
-import {
-    Component,
-    ElementRef,
-    forwardRef,
-    Input,
-    Renderer,
-    ViewChild,
-    ViewEncapsulation
-} from "@angular/core";
+import {Component, ElementRef, forwardRef, Input, Renderer, ViewChild, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormControl, NG_VALIDATORS, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {noop} from "../../../lib/utils.lib";
 import {ModalService} from "../../../ui/modal/modal.service";

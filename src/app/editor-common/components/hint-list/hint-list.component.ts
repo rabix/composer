@@ -1,12 +1,9 @@
-import {
-    Component, Input, OnChanges, Output, EventEmitter,
-    SimpleChanges
-} from "@angular/core";
-import {CommandLineToolModel, StepModel, WorkflowModel} from "cwlts/models";
+import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from "@angular/core";
 import {FormArray, FormControl, FormGroup} from "@angular/forms";
-import {ModalService} from "../../../ui/modal/modal.service";
+import {CommandLineToolModel, StepModel, WorkflowModel} from "cwlts/models";
 import {Subscription} from "rxjs/Subscription";
 import {SystemService} from "../../../platform-providers/system.service";
+import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
     selector: "ct-hint-list",

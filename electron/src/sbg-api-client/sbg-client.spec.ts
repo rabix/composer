@@ -1,6 +1,6 @@
 import {assert} from "chai";
-import {SBGClient} from "./sbg-client";
 import {RequestError, StatusCodeError} from "request-promise-native/errors";
+import {SBGClient} from "./sbg-client";
 
 describe("SBGClient", () => {
     let client: SBGClient;
@@ -27,16 +27,7 @@ describe("SBGClient", () => {
 
     describe("projects", () => {
         it("should have the `all` method", () => {
-            assert.isFunction((client.projects.all));
         });
 
-        it("should be able to fetch all projects", function(done) {
-            this.timeout(20000);
-
-            client.projects.all().then(projects => {
-                debugger;
-                done();
-            });
-        });
     });
 });

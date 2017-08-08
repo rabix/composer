@@ -1,9 +1,4 @@
 import {Component, ViewContainerRef, ViewEncapsulation} from "@angular/core";
-import "rxjs/add/observable/fromEvent";
-import "rxjs/add/operator/bufferCount";
-import "rxjs/add/operator/concat";
-import "rxjs/add/operator/concatAll";
-import "rxjs/add/operator/delay";
 import {Observable} from "rxjs/Observable";
 import {AuthService} from "../../auth/auth.service";
 import {GlobalService} from "../../core/global/global.service";
@@ -23,7 +18,6 @@ import {UrlValidator} from "../../validators/url.validator";
     template: `
         <ct-layout data-test="layout"></ct-layout>
         <div id="runnix" [class.active]="runnix | async"></div>
-
     `,
     styleUrls: ["./../../../assets/sass/main.scss", "./main.component.scss"],
     providers: [

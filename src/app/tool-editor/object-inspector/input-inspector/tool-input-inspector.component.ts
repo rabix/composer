@@ -1,6 +1,6 @@
-import {Component, Input, Output, ViewEncapsulation, OnInit} from "@angular/core";
-import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
+import {Component, Input, OnInit, Output, ViewEncapsulation} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
+import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
 import {Subject} from "rxjs/Subject";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 

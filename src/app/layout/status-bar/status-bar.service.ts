@@ -1,6 +1,5 @@
 import {Injectable, TemplateRef} from "@angular/core";
 
-import "rxjs/add/observable/concat";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {Observable} from "rxjs/Observable";
 import {ReplaySubject} from "rxjs/ReplaySubject";

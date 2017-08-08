@@ -1,12 +1,10 @@
 import {AfterViewInit, ChangeDetectorRef, Component, Injector, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {WorkflowFactory, WorkflowModel} from "cwlts/models";
 import * as Yaml from "js-yaml";
-import "rxjs/add/operator/debounceTime";
-import "rxjs/add/operator/merge";
-import "rxjs/add/operator/switchMap";
 import {Observable} from "rxjs/Observable";
 import {CodeSwapService} from "../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
+import {ErrorWrapper} from "../core/helpers/error-wrapper";
 import {AppEditorBase} from "../editor-common/app-editor-base/app-editor-base";
 import {AppValidatorService} from "../editor-common/app-validator/app-validator.service";
 import {PlatformAppService} from "../editor-common/components/platform-app-common/platform-app.service";
@@ -14,17 +12,13 @@ import {EditorInspectorService} from "../editor-common/inspector/editor-inspecto
 import {APP_SAVER_TOKEN} from "../editor-common/services/app-saving/app-saver.interface";
 import {LocalFileSavingService} from "../editor-common/services/app-saving/local-file-saving.service";
 import {PlatformAppSavingService} from "../editor-common/services/app-saving/platform-app-saving.service";
-import {
-    ErrorNotification,
-    NotificationBarService
-} from "../layout/notification-bar/notification-bar.service";
+import {ErrorNotification, NotificationBarService} from "../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../layout/status-bar/status-bar.service";
 import {PlatformRepositoryService} from "../repository/platform-repository.service";
 import {IpcService} from "../services/ipc.service";
 import {ModalService} from "../ui/modal/modal.service";
 import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow-graph-editor.component";
 import {WorkflowEditorService} from "./workflow-editor.service";
-import {ErrorWrapper} from "../core/helpers/error-wrapper";
 
 export function appSaverFactory(comp: WorkflowEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 

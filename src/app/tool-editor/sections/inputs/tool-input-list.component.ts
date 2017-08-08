@@ -1,17 +1,9 @@
-import {
-    Component,
-    EventEmitter,
-    Input,
-    Output,
-    QueryList,
-    TemplateRef,
-    ViewChildren
-} from "@angular/core";
+import {Component, EventEmitter, Input, Output, QueryList, TemplateRef, ViewChildren} from "@angular/core";
 import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
-import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
-import {DirectiveBase} from "../../../util/directive-base/directive-base";
-import {ModalService} from "../../../ui/modal/modal.service";
 import {noop} from "rxjs/util/noop";
+import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
+import {ModalService} from "../../../ui/modal/modal.service";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
     selector: "ct-tool-input-list",

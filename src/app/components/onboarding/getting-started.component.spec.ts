@@ -3,7 +3,6 @@
 // import {By} from "@angular/platform-browser";
 // import {DebugElement} from "@angular/core";
 // import {noop} from "rxjs/util/noop";
-// import "rxjs/add/observable/of";
 // import {ReplaySubject} from "rxjs/ReplaySubject";
 //
 // import {ModalService} from "../../ui/modal/modal.service";

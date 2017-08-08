@@ -1,6 +1,4 @@
 import {Component, OnInit} from "@angular/core";
-import "rxjs/add/observable/combineLatest";
-import "rxjs/add/operator/startWith";
 import {Observable} from "rxjs/Observable";
 import {RecentAppTab} from "../../../../electron/src/storage/types/recent-app-tab";
 import {CreateAppModalComponent} from "../../core/modals/create-app-modal/create-app-modal.component";
@@ -28,8 +26,10 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 
                     <div class="text-title">Actions</div>
 
-                    <div class="creation-entry p-1 mt-1 clickable deep-unselectable" data-test="create-workflow-btn"
+                    <div class="creation-entry p-1 mt-1 clickable deep-unselectable"
+                         data-test="create-workflow-btn"
                          (click)="openAppCreation('Workflow')">
+
                         <i class="fa fa-fw fa-share-alt fa-3x float-sm-left pl-1"></i>
                         <div class="content float-sm-left">
                             <div class="title text-title">New Workflow</div>
@@ -95,17 +95,14 @@ export class NewFileTabComponent extends DirectiveBase implements OnInit {
     }
 
     openRecentApp(appData: RecentAppTab) {
-
         const tab = this.workbox.getOrCreateAppTab(appData);
         this.workbox.openTab(tab);
     }
 
     openAppCreation(type: "Workflow" | "CommandLineTool") {
-        const modal = this.modal.fromComponent(CreateAppModalComponent, {
-            title: `Create a new ${type}`,
+        this.modal.fromComponent(CreateAppModalComponent, `Create a new ${type}`, {
+            appType: type
         });
-
-        modal.appType = type;
     }
 }
 

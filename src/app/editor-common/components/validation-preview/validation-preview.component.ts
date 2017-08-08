@@ -1,5 +1,5 @@
-import {Component, Input, OnChanges, ViewEncapsulation} from "@angular/core";
-import {Validation, ValidationBase} from "cwlts/models/helpers/validation";
+import {Component, Input, ViewEncapsulation} from "@angular/core";
+import {ValidationBase} from "cwlts/models/helpers/validation";
 
 @Component({
     encapsulation: ViewEncapsulation.None,

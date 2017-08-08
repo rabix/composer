@@ -1,7 +1,7 @@
 import {Component} from "@angular/core";
-import {ModalService} from "../../ui/modal/modal.service";
 import {AddSourceModalComponent} from "../../core/modals/add-source-modal/add-source-modal.component";
 import {SystemService} from "../../platform-providers/system.service";
+import {ModalService} from "../../ui/modal/modal.service";
 
 @Component({
     styleUrls: ["welcome.component.scss"],

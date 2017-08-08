@@ -9,6 +9,8 @@ import {BlankToolStateComponent} from "./components/blank-tool-state.component";
 import {CompactListComponent} from "./components/compact-list/compact-list.component";
 import {ExpressionInputComponent} from "./components/expression-input/expression-input.component";
 import {ExpressionModelListComponent} from "./components/expression-model-list/expression-model-list.component";
+import {HintsComponent} from "./components/hint-list/hint-list.component";
+import {RequirementInputComponent} from "./components/hint-list/requirement-input.component";
 import {KeyValueInputComponent} from "./components/key-value-component/key-value-input.component";
 import {KeyValueListComponent} from "./components/key-value-component/key-value-list.component";
 import {MapListComponent} from "./components/map-list/map-list.component";
@@ -35,8 +37,6 @@ import {EditorPanelComponent} from "./layout/editor-panel/editor-panel.component
 import {FileDefContentPipe} from "./pipes/file-def-content.pipe";
 import {FileDefNamePipe} from "./pipes/file-def-name.pipe";
 import {ValidationTextPipe} from "./pipes/validation-text.pipes";
-import {HintsComponent} from "./components/hint-list/hint-list.component";
-import {RequirementInputComponent} from "./components/hint-list/requirement-input.component";
 
 @NgModule({
     declarations: [

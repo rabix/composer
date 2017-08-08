@@ -1,6 +1,6 @@
 import {Component, Input} from "@angular/core";
-import {ModalService} from "../../../ui/modal/modal.service";
 import {CommandLineToolModel, StepModel, WorkflowModel} from "cwlts/models";
+import {ModalService} from "../../../ui/modal/modal.service";
 
 
 @Component({

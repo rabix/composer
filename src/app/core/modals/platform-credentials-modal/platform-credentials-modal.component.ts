@@ -5,7 +5,6 @@ import {AuthCredentials} from "../../../auth/model/auth-credentials";
 import {SystemService} from "../../../platform-providers/system.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
-import "rxjs/add/operator/toPromise";
 
 @Component({
     selector: "ct-platform-credentials-modal",

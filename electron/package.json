@@ -3,7 +3,7 @@
     "version": "1.0.0-rc.1",
     "main": "dist/main.js",
     "scripts": {
-        "test": "mocha dist/**/*.spec.js"
+        "test": "mocha -r ts-node/register ./src/**/*.spec.ts"
     },
     "dependencies": {
         "@types/chai": "^4.0.2",
@@ -33,6 +33,7 @@
         "chai": "^4.1.0",
         "mocha": "^3.5.0",
         "proxyquire": "^1.8.0",
-        "sinon": "^2.4.1"
+        "sinon": "^2.4.1",
+        "ts-node": "^3.3.0"
     }
 }

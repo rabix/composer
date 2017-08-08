@@ -1,5 +1,5 @@
-import { Component, ContentChildren, QueryList, AfterContentInit, ViewEncapsulation } from "@angular/core";
-import { TabComponent } from "./tab.component";
+import {AfterContentInit, Component, ContentChildren, QueryList, ViewEncapsulation} from "@angular/core";
+import {TabComponent} from "./tab.component";
 
 @Component({
   selector: "ct-tabs-component",

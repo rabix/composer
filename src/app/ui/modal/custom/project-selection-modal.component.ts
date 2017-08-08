@@ -1,7 +1,7 @@
 import {Component, Input, ViewEncapsulation} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
-import {ModalService} from "../modal.service";
 import {Observable} from "rxjs/Observable";
+import {ModalService} from "../modal.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
