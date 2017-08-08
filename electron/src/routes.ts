@@ -320,17 +320,21 @@ module.exports = {
 
     patchSwap: (data: { local: boolean, swapID: string, swapContent?: string }, callback) => {
         repositoryLoad.then(() => {
-            let credentials;
+            let credentialsID;
             if (repository.local.activeCredentials) {
-                credentials = repository.local.activeCredentials.id;
+                credentialsID = repository.local.activeCredentials.id;
+            } else if (!data.local) {
+                callback(new Error("You are not connected to any platform."));
             }
 
+            const swapFileName = data.local ? data.swapID : `${credentialsID}/${data.swapID}`;
+
             if (data.swapContent === null) {
-                swapController.remove(credentials && !data.local ? (credentials + "/") : "" + data.swapID, callback);
+                swapController.remove(swapFileName, callback);
                 return;
             }
 
-            swapController.write(credentials && !data.local ? (credentials + "/") : "" + data.swapID, data.swapContent, callback);
+            swapController.write(swapFileName, data.swapContent, callback);
         });
     },
 
