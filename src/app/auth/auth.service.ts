@@ -24,7 +24,7 @@ export class AuthService {
         ).subscribe(this.active);
     }
 
-    getActive(): ReplaySubject<AuthCredentials> {
+    getActive(): ReplaySubject<AuthCredentials | undefined> {
         return this.active;
     }
 
