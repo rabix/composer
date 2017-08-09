@@ -22,7 +22,7 @@
         "postinstall": "npm run update-webdriver && cd electron && npm install",
         "serve": "./node_modules/.bin/ng serve",
         "start:electron": "./node_modules/.bin/electron ./electron",
-        "test": "npm run test:electron && npm run test:angular && npm run e2e",
+        "test": "npm run test:electron && npm run test:angular && npm run test:e2e",
         "test:angular": "./node_modules/.bin/ng test --watch false",
         "test:angular:watch": "./node_modules/.bin/ng test",
         "test:e2e": "./node_modules/.bin/ng e2e",
