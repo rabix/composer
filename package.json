@@ -89,9 +89,5 @@
         "tslint": "^5.5.0",
         "typescript": "~2.3.3",
         "v8-profiler": "^5.7.0"
-    },
-    "engines": {
-        "node": ">= 7.4.0",
-        "npm": "^5.2.0"
     }
 }
