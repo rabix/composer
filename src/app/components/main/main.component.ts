@@ -3,7 +3,6 @@ import {Observable} from "rxjs/Observable";
 import {AuthService} from "../../auth/auth.service";
 import {GlobalService} from "../../core/global/global.service";
 import {SystemService} from "../../platform-providers/system.service";
-import {PlatformAPI} from "../../services/api/platforms/platform-api.service";
 import {GuidService} from "../../services/guid.service";
 import {JavascriptEvalService} from "../../services/javascript-eval/javascript-eval.service";
 import {ContextService} from "../../ui/context/context.service";
@@ -22,7 +21,6 @@ import {UrlValidator} from "../../validators/url.validator";
     styleUrls: ["./../../../assets/sass/main.scss", "./main.component.scss"],
     providers: [
         UrlValidator,
-        PlatformAPI,
         MarkdownService,
         ContextService,
         // FIXME: this needs to be handled in a system-specific way

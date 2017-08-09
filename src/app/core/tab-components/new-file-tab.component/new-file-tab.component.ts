@@ -1,16 +1,16 @@
-import {Component, OnInit} from "@angular/core";
+import {Component} from "@angular/core";
 import {Observable} from "rxjs/Observable";
-import {RecentAppTab} from "../../../../electron/src/storage/types/recent-app-tab";
-import {CreateAppModalComponent} from "../../core/modals/create-app-modal/create-app-modal.component";
-import {WorkboxService} from "../../core/workbox/workbox.service";
-import {LocalRepositoryService} from "../../repository/local-repository.service";
-import {PlatformRepositoryService} from "../../repository/platform-repository.service";
-import {ModalService} from "../../ui/modal/modal.service";
-import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {RecentAppTab} from "../../../../../electron/src/storage/types/recent-app-tab";
+import {ModalService} from "../../../ui/modal/modal.service";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {CreateAppModalComponent} from "../../modals/create-app-modal/create-app-modal.component";
+import {WorkboxService} from "../../workbox/workbox.service";
+import {NewFileTabService} from "./new-file-tab.service";
 
 @Component({
-    styleUrls: ["new-file.component.scss"],
+    styleUrls: ["new-file-tab.component.scss"],
     selector: "ct-new-file-tab",
+    providers: [NewFileTabService],
     template: `
         <ct-action-bar></ct-action-bar>
 
@@ -56,7 +56,8 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                     <div class="app-container">
                         <div class="app p-1">
                             <div class="revisions">
-                                <ct-nav-search-result *ngFor="let entry of recentApps | async"
+                                <ct-nav-search-result *ngFor="let entry of service.getRecentApps() | async"
+                                                      data-test="recent-apps-list"
                                                       class="pl-1 pr-1 deep-unselectable"
                                                       [id]="entry?.id"
                                                       [icon]="entry.type === 'Workflow' ? 'fa-share-alt': 'fa-terminal'"
@@ -75,23 +76,14 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
         <ct-getting-started></ct-getting-started>
     `
 })
-export class NewFileTabComponent extends DirectiveBase implements OnInit {
+export class NewFileTabComponent extends DirectiveBase {
 
     recentApps: Observable<RecentAppTab[]>;
 
-    constructor(private modal: ModalService,
-                private localRepository: LocalRepositoryService,
-                private platformRepository: PlatformRepositoryService,
+    constructor(public service: NewFileTabService,
+                private modal: ModalService,
                 private workbox: WorkboxService) {
         super();
-    }
-
-    ngOnInit(): void {
-        this.recentApps = Observable.combineLatest(
-            this.localRepository.getRecentApps().startWith([]),
-            this.platformRepository.getRecentApps().map(apps => apps || []).startWith([]),
-            (localApps, platformApps) => [...localApps, ...platformApps].sort((a, b) => b.time - a.time).slice(0, 20)
-        );
     }
 
     openRecentApp(appData: RecentAppTab) {

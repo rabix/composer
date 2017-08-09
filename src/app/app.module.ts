@@ -14,6 +14,7 @@ import {EditorCommonModule} from "./editor-common/editor-common.module";
 import {FileRepositoryService} from "./file-repository/file-repository.service";
 import {CtHttp} from "./http/ct-http.service";
 import {StatusBarService} from "./layout/status-bar/status-bar.service";
+import {NativeModule} from "./native/native.module";
 import {LocalRepositoryService} from "./repository/local-repository.service";
 import {PlatformRepositoryService} from "./repository/platform-repository.service";
 import {DomEventService} from "./services/dom/dom-event.service";
@@ -64,6 +65,7 @@ import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
         EditorCommonModule,
         ToolEditorModule,
         WorkflowEditorModule,
+        NativeModule,
     ],
     bootstrap: [MainComponent]
 })

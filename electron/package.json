@@ -3,7 +3,7 @@
     "version": "1.0.0-rc.1",
     "main": "dist/main.js",
     "scripts": {
-        "test": "mocha -r ts-node/register ./src/**/*.spec.ts"
+        "test": "./node_modules/.bin/_mocha -r ts-node/register ./src/**/*.spec.ts"
     },
     "dependencies": {
         "@types/chai": "^4.0.2",
