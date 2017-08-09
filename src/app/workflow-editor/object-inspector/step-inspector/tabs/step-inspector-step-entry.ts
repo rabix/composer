@@ -12,7 +12,13 @@ import {WorkflowStepInputModel} from "cwlts/models";
     selector: "ct-workflow-step-inspector-entry",
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-        <div class="alert alert-warning form-control-label" *ngIf="warning">{{ warning }}</div>
+        <div class="form-control-label" *ngIf="warning">        
+            <span class="text-warning">
+                <i class="fa fa-times-circle fa-fw"></i>
+                    {{ warning }}
+            </span>
+        </div>
+        
         <div [ngSwitch]="inputType" class="form-group">
 
             <!--Each leaf field will be wrapped as an input group-->

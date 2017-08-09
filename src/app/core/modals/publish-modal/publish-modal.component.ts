@@ -46,7 +46,12 @@ const {app, dialog} = window["require"]("electron").remote;
                     </div>
                 </div>
 
-                <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+                <div *ngIf="error">                
+                    <span class="text-danger">
+                        <i class="fa fa-times-circle fa-fw"></i>
+                            {{error}}
+                    </span>
+                </div>
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" (click)="close()">Cancel</button>
@@ -114,7 +119,9 @@ export class PublishModalComponent extends DirectiveBase {
             });
         });
 
-        this.platformRepository.getOpenProjects().take(1)
+        this.platformRepository.getOpenProjects()
+            .map(projects => projects || [])
+            .take(1)
             .subscribeTracked(this, (projects) => this.projectOptions = projects.map(project => ({
                 value: project.id,
                 text: project.name

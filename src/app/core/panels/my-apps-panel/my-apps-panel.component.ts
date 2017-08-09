@@ -126,8 +126,14 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
             });
         });
 
-        const projectSearch = (term) => this.platformRepository.searchAppsFromOpenProjects(term).take(1).toPromise().then(apps => {
+        const projectSearch = (term) =>
+        Observable.combineLatest(this.platformRepository.getOpenProjects(), this.platformRepository.searchAppsFromOpenProjects(term))
+            .take(1).toPromise().then(result => {
+            const [projects, apps] = result;
+
             return apps.map(app => {
+
+                const project = projects.find((project) => project.id === app.project);
 
                 const revisionlessID = AppHelper.getRevisionlessID(app.id);
 
@@ -140,7 +146,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
 
                     tabData: {
                         id: revisionlessID,
-                        isWritable: true,
+                        isWritable: project.permissions.write,
                         label: app.name,
                         language: "json",
                         type: app.raw["class"],
@@ -151,9 +157,8 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
                     dragLabel: app.name,
                     dragImageClass: app.raw["class"] === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
                     dragDropZones: ["zone1"]
-                }
-
-            })
+                };
+            });
         });
 
         this.searchContent.valueChanges
@@ -206,7 +211,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
                 id: AppHelper.getRevisionlessID(node.data.id),
                 type: type,
                 label: label,
-                isWritable: true,
+                isWritable: node.data.isWritable,
                 language: "json",
             });
 

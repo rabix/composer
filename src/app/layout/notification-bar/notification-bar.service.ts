@@ -32,58 +32,82 @@ export class ErrorNotification extends Notification {
     }
 }
 
-
 @Injectable()
 export class NotificationBarService {
 
     public static maxDisplay = 3;
 
-    private notifications = new Subject<any>();
+    /** Array of notifications */
+    private notifications: Array<Notification> = [];
 
-    private updates = new Subject<any>();
+    private showNotificationStream = new Subject<Notification>();
 
-    public aggregate = this.updates.scan((acc, patch) => patch(acc), []);
+    private dismissNotificationStream = new Subject<Notification>();
 
-    private availability = Observable.of([]).merge(this.aggregate.map(agg => agg.length < NotificationBarService.maxDisplay).filter(v => v));
+    /** Stream of displayed notifications */
+    public displayedNotifications = new Subject<any>();
 
     constructor() {
-        Observable.zip(this.notifications, this.availability, msg => msg).map((msg) => msg.notification)
-            .flatMap(msg => {
+        this.showNotificationStream.flatMap((notification) => {
 
-                // Take the message and create an observable of 2 emits.
-                // They are update transformations for the list of shown messages
-                // First one appends the message to the list
-                // The second one is delayed for {notificationLifetime} time, and then emits a transformation that
-                // removes the message from the list
-                // Both of these emits will trigger reevaluation of the available space in the list
-                return Observable.of(acc => acc.concat(msg))
-                    .concat(
-                        Observable.of(acc => {
-                            const idx = acc.indexOf(msg);
-                            if (idx === -1) {
-                                return acc;
-                            }
+            // Dismiss notification when delay time passed or when its manually dismissed
+            return Observable.race(Observable.of(notification).delay(notification.duration)
+                , this.dismissNotificationStream.filter((n) => n === notification).take(1));
 
-                            return acc.slice(0, idx).concat(acc.slice(idx + 1));
-                        }).delay(msg.duration)
-                    );
-            })
-            .subscribe(patches => {
-                this.updates.next(patches);
-            });
-
+        }).subscribe((notification) => {
+            this.dismiss(notification);
+        });
     }
 
+    /** Dismiss notification passed as an argument */
+    private dismiss(notification: Notification) {
+        const index = this.notifications.findIndex((n) => n === notification);
+
+        if (index !== -1) {
+            // Remove notification from the list
+            this.notifications.splice(index, 1);
+
+            if (index >= 0 && index <= NotificationBarService.maxDisplay) {
+                // Display updated list with next pending notification (if exists)
+                this.showNext();
+            }
+        }
+    }
+
+    /** Show next pending notification
+     * @param {boolean} added - true/false if last operation was addition/deletion
+     */
+    private showNext(added: boolean = false) {
+
+        const notificationsLength = this.notifications.length;
+        const maxDisplayLength = NotificationBarService.maxDisplay;
+
+        if (added && notificationsLength <= maxDisplayLength) {
+            // If last operation was addition we should display the added notification if length <= maxDisplay
+            this.showNotificationStream.next(this.notifications[notificationsLength - 1]);
+        } else if (!added && notificationsLength >= maxDisplayLength) {
+            // If last operation was deletion we should display the next pending notification if exists
+            this.showNotificationStream.next(this.notifications[maxDisplayLength - 1]);
+        }
+
+        // Updated list of displayed notifications
+        this.displayedNotifications.next(this.notifications.slice(0, maxDisplayLength));
+    }
 
     public showNotification(notification: Notification) {
-        this.notifications.next({
-            notification
-        });
+        const similarExists = this.notifications.find((n) => n.message === notification.message);
+
+        if (!similarExists) {
+
+            this.notifications.push(notification);
+            if (this.notifications.length <= NotificationBarService.maxDisplay) {
+                // Display updated list with added notification
+                this.showNext(true);
+            }
+        }
     }
 
     public dismissNotification(notification: Notification) {
-        this.updates.next((all: Notification[]) => {
-            return all.filter(n => n !== notification);
-        });
+        this.dismissNotificationStream.next(notification);
     }
 }

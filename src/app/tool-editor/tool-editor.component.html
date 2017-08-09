@@ -112,7 +112,7 @@
     <ct-tool-visual-editor *ngIf="viewMode === 'gui' && !isLoading && dataModel"
                            class="flex-col"
                            (change)="syncModelAndCode(false)"
-                           [readonly]="!tabData.isWritable"
+                           [readonly]="isReadonly"
                            [formGroup]="toolGroup"
                            [model]="dataModel"></ct-tool-visual-editor>
 
@@ -124,7 +124,7 @@
 
     <ct-app-info *ngIf="viewMode === 'info' && !isLoading && dataModel"
                  class="gui-editor-component p-2"
-                 [readonly]="!tabData.isWritable"
+                 [readonly]="isReadonly"
                  (change)="syncModelAndCode(false)"
                  [formGroup]="toolGroup"
                  [class.flex-col]="showInspector"

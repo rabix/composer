@@ -69,7 +69,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                                                 <span>
                                                     {{ c.caption }}
                                                 </span>
-                                                <span class="text-muted d-block small">{{ c.description }}</span>
+                                                <span class="text-muted d-block">{{ c.description }}</span>
                                             </li>
                                         </ul>
                                     </ng-template>
@@ -93,16 +93,16 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
                                 <!--No connections-->
                                 <div *ngIf="input.source.length === 0 && input.isVisible">
-                                    <span class="text-warning small" *ngIf="input.type.isNullable">
+                                    <span class="text-warning" *ngIf="input.type.isNullable">
                                         <i class="fa fa-warning fa-fw"></i> This port is not connected
                                     </span>
-                                    <span class="text-danger small" *ngIf="!input.type.isNullable">
+                                    <span class="text-danger" *ngIf="!input.type.isNullable">
                                         <i class="fa fa-times-circle fa-fw"></i> This required port is not connected
                                     </span>
                                 </div>
 
                                 <!--List of connections-->
-                                <div *ngIf="input.source.length > 0" class="text-muted small">
+                                <div *ngIf="input.source.length > 0" class="text-muted">
                                     Connections: {{ input.source.join(", ") }}
                                 </div>
                             </div>

@@ -45,7 +45,7 @@ export class ResourcesComponent extends DirectiveBase implements OnChanges, OnIn
     context: any = {};
 
     @Output()
-    update = new ReplaySubject<any>();
+    update = new ReplaySubject<any>(1);
 
     form = new FormGroup({
         mem: new FormControl(),

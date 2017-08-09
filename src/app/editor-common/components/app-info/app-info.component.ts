@@ -70,7 +70,7 @@ import {
 
                     <!--Author-->
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
-                        <div class="text-title">{{isToolkit()? "Toolkit" : "Workflow"}} Author:</div>
+                        <div class="text-title">{{isToolkit() ? "Toolkit" : "Workflow"}} Author:</div>
                         <ct-inline-editor [value]="model.customProps['sbg:toolAuthor']"
                                           [disabled]="readonly"
                                           type="text"
@@ -81,7 +81,7 @@ import {
 
                     <!--License-->
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
-                        <div class="text-title">{{isToolkit()? "Toolkit" : "Workflow"}} License:</div>
+                        <div class="text-title">{{isToolkit() ? "Toolkit" : "Workflow"}} License:</div>
                         <ct-inline-editor [value]="model.customProps['sbg:license']"
                                           [disabled]="readonly"
                                           type="text"
@@ -164,90 +164,101 @@ import {
 
             </div>
 
-            <!--Table section-->
-            <div class="info-section">
+            <ct-form-panel>
 
-                <ct-tab-selector distribute="auto" [active]="viewMode" (activeChange)="switchTab($event)">
-                    <ct-tab-selector-entry tabName="inputs">Inputs</ct-tab-selector-entry>
-                    <ct-tab-selector-entry tabName="appSettings">App Settings</ct-tab-selector-entry>
-                    <ct-tab-selector-entry tabName="outputs">Outputs</ct-tab-selector-entry>
-                </ct-tab-selector>
-
-
-                <!--Inputs-->
-                <div *ngIf="viewMode === 'inputs'">
-                    <div *ngIf="inputs.length === 0">
-                        No inputs.
-                    </div>
-                    <table class="table" *ngIf="inputs.length > 0">
-                        <tr>
-                            <th>ID</th>
-                            <th>Label</th>
-                            <th>Type</th>
-                            <th>Required</th>
-                            <th>Prefix</th>
-                            <th>Format</th>
-                        </tr>
-                        <tr *ngFor="let input of inputs">
-                            <td>{{input.id}}</td>
-                            <td>{{input.label}}</td>
-                            <td>{{input.type | commandParameterType}}</td>
-                            <td>{{input.type.isNullable ? 'False' : 'True'}}</td>
-                            <td>{{input.inputBinding?.prefix || "-" }}</td>
-                            <td>{{input.fileTypes ? input.fileTypes.join(', ') : '-'}}</td>
-                        </tr>
-                    </table>
+                <div class="tc-header">
+                    Ports
                 </div>
 
+                <div class="tc-body">
 
-                <!--App settings-->
-                <div *ngIf="viewMode === 'appSettings'">
-                    <div *ngIf="appSettings.length === 0">
-                        No settings.
+                    <!--Table section-->
+                    <div class="info-section">
+
+                        <ct-tab-selector distribute="auto" [active]="viewMode" (activeChange)="switchTab($event)">
+                            <ct-tab-selector-entry tabName="inputs">Inputs</ct-tab-selector-entry>
+                            <ct-tab-selector-entry tabName="appSettings">App Settings</ct-tab-selector-entry>
+                            <ct-tab-selector-entry tabName="outputs">Outputs</ct-tab-selector-entry>
+                        </ct-tab-selector>
+
+                        <!--Inputs-->
+                        <div *ngIf="viewMode === 'inputs'">
+                            <div class="no-ports-defined" *ngIf="inputs.length === 0">
+                                No inputs defined.
+                            </div>
+                            <table class="table table-striped" *ngIf="inputs.length > 0">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Label</th>
+                                    <th>Type</th>
+                                    <th>Required</th>
+                                    <th>Prefix</th>
+                                    <th>Format</th>
+                                </tr>
+                                <tr *ngFor="let input of inputs">
+                                    <td>{{input.id}}</td>
+                                    <td>{{input.label}}</td>
+                                    <td>{{input.type | commandParameterType}}</td>
+                                    <td>{{input.type.isNullable ? 'False' : 'True'}}</td>
+                                    <td>{{input.inputBinding?.prefix || "-" }}</td>
+                                    <td>{{input.fileTypes ? input.fileTypes.join(', ') : '-'}}</td>
+                                </tr>
+                            </table>
+                        </div>
+
+
+                        <!--App settings-->
+                        <div *ngIf="viewMode === 'appSettings'">
+                            <div class="no-ports-defined" *ngIf="appSettings.length === 0">
+                                No app settings defined.
+                            </div>
+                            <table class="table table-striped" *ngIf="appSettings.length > 0">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Label</th>
+                                    <th>Type</th>
+                                    <th>Required</th>
+                                    <th>Prefix</th>
+                                    <th>Format</th>
+                                </tr>
+                                <tr *ngFor="let input of appSettings">
+                                    <td>{{input.id}}</td>
+                                    <td>{{input.label}}</td>
+                                    <td>{{input.type | commandParameterType}}</td>
+                                    <td>{{input.type.isNullable ? 'False' : 'True'}}</td>
+                                    <td>{{input.inputBinding?.prefix || "-" }}</td>
+                                    <td>{{input.fileTypes ? input.fileTypes.join(', ') : '-'}}</td>
+                                </tr>
+                            </table>
+                        </div>
+
+
+                        <!--Outputs-->
+                        <div *ngIf="viewMode === 'outputs'">
+                            <div class="no-ports-defined" *ngIf="model.outputs.length === 0">
+                                No outputs defined.
+                            </div>
+                            <table class="table table-striped" *ngIf="model.outputs.length > 0">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Label</th>
+                                    <th>Type</th>
+                                    <th>Format</th>
+                                </tr>
+                                <tr *ngFor="let output of model.outputs">
+                                    <td>{{output.id}}</td>
+                                    <td>{{output.label}}</td>
+                                    <td>{{output.type | commandParameterType}}</td>
+                                    <td>{{output.fileTypes ? output.fileTypes.join(', ') : '-'}}</td>
+                                </tr>
+                            </table>
+                        </div>
+
+
                     </div>
-                    <table class="table" *ngIf="appSettings.length > 0">
-                        <tr>
-                            <th>ID</th>
-                            <th>Label</th>
-                            <th>Type</th>
-                            <th>Required</th>
-                            <th>Prefix</th>
-                            <th>Format</th>
-                        </tr>
-                        <tr *ngFor="let input of appSettings">
-                            <td>{{input.id}}</td>
-                            <td>{{input.label}}</td>
-                            <td>{{input.type | commandParameterType}}</td>
-                            <td>{{input.type.isNullable ? 'False' : 'True'}}</td>
-                            <td>{{input.inputBinding?.prefix || "-" }}</td>
-                            <td>{{input.fileTypes ? input.fileTypes.join(', ') : '-'}}</td>
-                        </tr>
-                    </table>
                 </div>
 
-
-                <!--Outputs-->
-                <div *ngIf="viewMode === 'outputs'">
-                    <div *ngIf="model.outputs.length === 0">
-                        No outputs.
-                    </div>
-                    <table class="table" *ngIf="model.outputs.length > 0">
-                        <tr>
-                            <th>ID</th>
-                            <th>Label</th>
-                            <th>Type</th>
-                            <th>Format</th>
-                        </tr>
-                        <tr *ngFor="let output of model.outputs">
-                            <td>{{output.id}}</td>
-                            <td>{{output.label}}</td>
-                            <td>{{output.type | commandParameterType}}</td>
-                            <td>{{output.fileTypes ? output.fileTypes.join(', ') : '-'}}</td>
-                        </tr>
-                    </table>
-                </div>
-
-            </div>
+            </ct-form-panel>
         </div>
     `
 })
@@ -304,19 +315,20 @@ export class AppInfoComponent implements OnChanges {
 
     ngOnChanges(changes: SimpleChanges) {
 
-        this.createdBy    = this.model.customProps["sbg:createdBy"];
-        this.createdOn    = this.model.customProps["sbg:createdOn"] * 1000;
-        this.editedBy     = this.model.customProps["sbg:modifiedBy"];
-        this.editedOn     = this.model.customProps["sbg:modifiedOn"] * 1000;
+        this.createdBy = this.model.customProps["sbg:createdBy"];
+        this.createdOn = this.model.customProps["sbg:createdOn"] * 1000;
+        this.editedBy = this.model.customProps["sbg:modifiedBy"];
+        this.editedOn = this.model.customProps["sbg:modifiedOn"] * 1000;
         this.revisionNote = this.model.customProps["sbg:revisionNotes"] || null;
 
 
-        this.inputs      = (this.model.inputs as Array<CommandInputParameterModel
+        this.inputs = (this.model.inputs as Array<CommandInputParameterModel
             | WorkflowInputParameterModel>)
             .filter((input) => input.type.type === "File" || input.type.items === "File");
         this.appSettings = (this.model.inputs as Array<CommandInputParameterModel
             | WorkflowInputParameterModel>)
             .filter((input) => input.type.type !== "File" && input.type.items !== "File");
+
     }
 
     updateLabel(value: string) {
@@ -345,7 +357,7 @@ export class AppInfoComponent implements OnChanges {
     }
 
     isToolkit() {
-        return this.model instanceof  CommandLineToolModel;
+        return this.model instanceof CommandLineToolModel;
     }
 
 }
