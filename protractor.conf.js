@@ -16,8 +16,7 @@ exports.config = {
         browserName: "chrome",
         chromeOptions: {
             binary: (() => {
-                const files = glob.sync("build/**/rabix-composer.app/Contents/**/rabix-composer");
-                console.log("Found files", files);
+                const files = glob.sync("./build/**/Contents/**/rabix-composer");
                 if (!files.length) {
                     throw new Error("You must build and package the app before running e2e tests");
                 }
