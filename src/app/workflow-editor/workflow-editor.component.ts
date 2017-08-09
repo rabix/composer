@@ -152,6 +152,10 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                 });
 
                 setTimeout(() => {
+                    if (this.graphEditor && this.graphEditor.graph) {
+                        this.graphEditor.graph.redraw();
+                    }
+
                     this.cdr.markForCheck();
                     this.cdr.detectChanges();
                 });

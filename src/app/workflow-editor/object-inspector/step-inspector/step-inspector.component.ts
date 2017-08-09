@@ -123,6 +123,7 @@ export class StepInspectorComponent extends DirectiveBase {
             modal.onSubmit   = () => {
                 this.step.setRunProcess(app as any);
                 this.step.hasUpdate = false;
+                this.graph.redraw();
                 this.cdr.markForCheck();
                 this.cdr.detectChanges();
                 modal.closeModal();
