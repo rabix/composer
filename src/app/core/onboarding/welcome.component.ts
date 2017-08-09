@@ -47,11 +47,9 @@ import {ModalService} from "../../ui/modal/modal.service";
 })
 export class WelcomeTabComponent {
 
-
-    constructor(private modal: ModalService, private system: SystemService) {
+    constructor(public system: SystemService,
+                private modal: ModalService) {
     }
-
-    open
 
     onOpenProjectButtonClick() {
         this.modal.fromComponent(AddSourceModalComponent, "Open a Project");
