@@ -2,7 +2,6 @@ import {ChangeDetectionStrategy, Component} from "@angular/core";
 import {AuthService} from "../../auth/auth.service";
 import {SendFeedbackModalComponent} from "../../core/modals/send-feedback-modal/send-feedback.modal.component";
 import {SystemService} from "../../platform-providers/system.service";
-import {CredentialsEntry} from "../../services/storage/user-preferences-types";
 import {ModalService} from "../../ui/modal/modal.service";
 
 @Component({

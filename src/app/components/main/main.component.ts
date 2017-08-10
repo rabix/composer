@@ -21,10 +21,9 @@ import {UrlValidator} from "../../validators/url.validator";
 
     selector: "ct-cottontail",
     template: `
-        <ct-layout></ct-layout>
+        <ct-layout data-test="layout"></ct-layout>
         <div id="runnix" [class.active]="runnix | async"></div>
 
-        <span data-marker="ready">ready</span>
     `,
     styleUrls: ["./../../../assets/sass/main.scss", "./main.component.scss"],
     providers: [

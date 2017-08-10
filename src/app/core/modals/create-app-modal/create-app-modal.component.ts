@@ -6,6 +6,7 @@ import {Observable} from "rxjs/Observable";
 import {Project} from "../../../../../electron/src/sbg-api-client/interfaces/project";
 import {AuthService} from "../../../auth/auth.service";
 import {AppGeneratorService} from "../../../cwl/app-generator/app-generator.service";
+import {FileRepositoryService} from "../../../file-repository/file-repository.service";
 import {LocalRepositoryService} from "../../../repository/local-repository.service";
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {ModalService} from "../../../ui/modal/modal.service";
@@ -13,7 +14,6 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {AppHelper} from "../../helpers/AppHelper";
 import {WorkboxService} from "../../workbox/workbox.service";
-import {FileRepositoryService} from "../../../file-repository/file-repository.service";
 
 const {app, dialog} = window["require"]("electron").remote;
 
@@ -84,14 +84,18 @@ const {app, dialog} = window["require"]("electron").remote;
                                       optgroupField="hash"></ct-auto-complete>
                 </div>
 
-                <div class="alert alert-danger"
-                     *ngIf="destination === 'remote' && remoteAppCreationError ">
-                    {{ remoteAppCreationError }}
+                <div *ngIf="destination === 'remote' && remoteAppCreationError ">
+                    <span class="text-danger">
+                        <i class="fa fa-times-circle fa-fw"></i>
+                            {{ remoteAppCreationError }}
+                    </span>
                 </div>
 
-                <div class="alert alert-info"
-                     *ngIf="destination === 'local' && localAppCreationInfo">
-                    {{ localAppCreationInfo }}
+                <div *ngIf="destination === 'local' && localAppCreationInfo">
+                    <span class="text-info">
+                        <i class="fa fa-info-circle fa-fw"></i>
+                            {{ localAppCreationInfo }}
+                    </span>
                 </div>
 
             </div>
@@ -175,12 +179,14 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
 
 
         // Check out open projects on platform and map them to select box options
-        this.platformRepository.getOpenProjects().subscribeTracked(this, projects => {
-            this.projectOptions = projects.map((project: Project) => ({
-                value: project.id,
-                text: project.name
-            }));
-        });
+        this.platformRepository.getOpenProjects()
+            .map(projects => projects || [])
+            .subscribeTracked(this, projects => {
+                this.projectOptions = projects.map((project: Project) => ({
+                    value: project.id,
+                    text: project.name
+                }));
+            });
     }
 
     submit() {
@@ -215,7 +221,7 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
             const defaultFilename   = this.slugify.transform(`New ${this.appType}`) + ".cwl";
             const {name}            = this.localForm.getRawValue();
             const suggestedFilename = name ? (this.slugify.transform(name) + ".cwl") : defaultFilename;
-            let addExtension      = false;
+            let addExtension        = false;
 
             dialog.showSaveDialog({
                 title: "Choose a File Path",

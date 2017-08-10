@@ -137,9 +137,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             .map(obj => obj !== undefined)
             .subscribeTracked(this, show => this.showInspector = show);
 
-        // Push status controls to the status bar
-        this.statusBar.setControls(this.statusControls);
-
         // Get the app saver from the injector
         this.appSavingService = this.injector.get(APP_SAVER_TOKEN) as AppSaver;
 
@@ -207,7 +204,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 const [validationState] = data;
                 return validationCompletion
                     .startWith(validationState)
-                    .map(state => [this.codeEditorContent.value, state])
+                    .map(state => [this.codeEditorContent.value, state]);
             })
             .withLatestFrom(
                 this.platformRepository.getAppMeta(this.tabData.id, "swapUnlocked"),
@@ -302,7 +299,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
         this.syncModelAndCode(true).then(() => {
             const modal      = this.modal.fromComponent(PublishModalComponent, {title: "Publish an App"});
-            modal.appContent = this.codeEditorContent.value;
+            modal.appContent = this.getModelText(true);
         }, err => console.warn);
     }
 
@@ -347,7 +344,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         }
 
         /** Bound to lock state by accident, not intention */
-        return this.tabsUnlocked();
+        return this.tabsUnlocked() && !this.isReadonly;
     }
 
     appIsResolvable(): boolean {
@@ -470,7 +467,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
      * the text has been formatted by the GUI editor.
      *
      */
-    protected getModelText(): string {
+    protected getModelText(embed?: boolean): string {
 
         const modelObject = this.dataModel.serialize();
 

@@ -169,8 +169,17 @@ module.exports = {
     watchUserRepository: (data: { key: string }, callback) => {
         repositoryLoad.then(() => {
 
-            if (repository.user && repository.user.hasOwnProperty(data.key)) {
-                callback(null, repository.user[data.key]);
+            const demoUser = new UserRepository();
+
+            // Actual user might be null, so we need to check the user shape, not the user itself
+            if (demoUser.hasOwnProperty(data.key)) {
+
+                // Return current value if the user is present, otherwise pass null
+                if (repository.user) {
+                    callback(null, repository.user[data.key]);
+                } else {
+                    callback(null, null);
+                }
 
                 repository.on(`update.user.${data.key}`, (value) => {
                     callback(null, value);
@@ -189,12 +198,6 @@ module.exports = {
     patchUserRepository: (patch: Partial<UserRepository>, callback) => {
         repositoryLoad.then(() => {
             repository.updateUser(patch, callback);
-        }, err => callback(err));
-    },
-
-    activateUser: (credentialsID: string, callback) => {
-        repositoryLoad.then(() => {
-            repository.activateUser(credentialsID, callback);
         }, err => callback(err));
     },
 
@@ -220,6 +223,7 @@ module.exports = {
     fetchPlatformData: (data: {
         credentialsID?: string
     }, callback) => {
+
         const {credentialsID} = data;
 
         repositoryLoad.then(() => {
@@ -245,7 +249,7 @@ module.exports = {
             if (platformFetchingLocks[targetID]) {
                 const currentFetch = platformFetchingLocks[targetID];
                 currentFetch.then(data => callback(null, data)).catch(callback);
-                return
+                return;
             }
 
             const {url, token} = targetCredentials;

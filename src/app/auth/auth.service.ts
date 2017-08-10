@@ -4,9 +4,7 @@ import "rxjs/add/operator/shareReplay";
 import "rxjs/add/operator/startWith";
 import {Observable} from "rxjs/Observable";
 import {ReplaySubject} from "rxjs/ReplaySubject";
-import {StatusBarService} from "../layout/status-bar/status-bar.service";
 import {LocalRepositoryService} from "../repository/local-repository.service";
-import {PlatformRepositoryService} from "../repository/platform-repository.service";
 import {AuthCredentials} from "./model/auth-credentials";
 
 @Injectable()
@@ -14,9 +12,7 @@ export class AuthService {
 
     private active = new ReplaySubject<AuthCredentials>(1);
 
-    constructor(private repository: LocalRepositoryService,
-                private platformRepository: PlatformRepositoryService,
-                private statusBar: StatusBarService) {
+    constructor(private repository: LocalRepositoryService) {
 
         Observable.combineLatest(
             this.repository.getCredentials(),

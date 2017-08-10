@@ -44,13 +44,24 @@ import "rxjs/add/operator/toPromise";
 
                 </div>
 
-                <div class="alert alert-warning pl-2" *ngIf="form.dirty && form.invalid">
-                    <span *ngIf="form.hasError('tokenCheck')">
-                        Token is not valid for the selected platform. ({{ form.getError("tokenCheck") }})
+                <div *ngIf="form.dirty && form.invalid">                    
+                    <span class="text-warning" *ngIf="form.get('token').hasError('required')">
+                        <i class="fa fa-warning fa-fw"></i>    
+                        Token cannot be empty
                     </span>
-                    <span *ngIf="form.get('url').hasError('name')">Given platform does not exist.</span>
-                    <span *ngIf="form.get('token').errors">Invalid Token</span>
+
+                    <span class="text-danger" *ngIf="form.get('url').hasError('name')">
+                        <i class="fa fa-times-circle fa-fw"></i>
+                            <span>Given platform does not exist.</span>
+                    </span>
+                    
+                    <span class="text-danger" *ngIf="form.get('token').hasError('pattern')">
+                        <i class="fa fa-times-circle fa-fw"></i>
+                            <span>Invalid token</span>
+                    </span>                    
+                    
                 </div>
+
             </div>
 
             <div class="modal-footer">

@@ -24,6 +24,8 @@
     }
 
     ct-editor-inspector {
+        background: $gray;
+        border-left: 1px solid $black;
         flex-basis: 320px;
         flex-shrink: 0;
     }

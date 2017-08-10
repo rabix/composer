@@ -38,19 +38,22 @@ export class PlatformRepositoryService {
         this.listen("appMeta").subscribe(this.appMeta);
     }
 
-    getOpenTabs(): Observable<TabData<any>[]> {
+    getOpenTabs(): Observable<TabData<any>[] | null> {
         return this.openTabs;
     }
 
     getAppsForProject(projectID): Observable<App[]> {
-        return this.apps.map(apps => apps.filter(app => app.project === projectID));
+        return this.apps.map(apps => {
+            // Apps may not be present, fallback to an empty array
+            return (apps || []).filter(app => app.project === projectID);
+        });
     }
 
     getProjects(): Observable<Project[]> {
         return this.projects;
     }
 
-    getPublicApps(): Observable<App[]> {
+    getPublicApps(): Observable<App[] | null> {
         return this.publicApps;
     }
 
@@ -70,6 +73,12 @@ export class PlatformRepositoryService {
         return Observable
             .combineLatest(this.projects, this.openProjects)
             .map(data => {
+
+                // If either of them is null, then we don't know which projects are open
+                if (~data.indexOf(null)) {
+                    return null;
+                }
+
                 const [all, open] = data;
                 if (open.length === 0) return [];
 
@@ -81,6 +90,12 @@ export class PlatformRepositoryService {
     getClosedProjects(): Observable<Project[]> {
         return Observable.combineLatest(this.projects, this.openProjects)
             .map(data => {
+
+                // If either of them is null, then we don't know which projects are closed
+                if (~data.indexOf(null)) {
+                    return null;
+                }
+
                 const [all, open] = data;
 
                 if (open.length === 0) return all;
@@ -173,7 +188,7 @@ export class PlatformRepositoryService {
     }
 
     pushRecentApp(recentTabData: RecentAppTab, limit = 20): Promise<any> {
-        return this.getRecentApps().take(1).toPromise().then((entries) => {
+        return this.getRecentApps().map(apps => apps || []).take(1).toPromise().then((entries) => {
             const update = [recentTabData].concat(entries).filter((val, idx, arr) => {
                 const duplicateIndex = arr.findIndex(el => el.id === val.id);
                 return duplicateIndex === idx;
@@ -205,36 +220,38 @@ export class PlatformRepositoryService {
 
         const term = substring.toLowerCase();
 
-        return this.getOpenProjects().flatMap(openProjects => {
+        return this.getOpenProjects()
+            .map(projects => projects || [])
+            .flatMap(openProjects => {
 
-            const openProjectIDs = openProjects.map(project => project.id);
+                const openProjectIDs = openProjects.map(project => project.id);
 
-            return this.getPrivateApps().map(apps => {
+                return this.getPrivateApps().map(apps => {
 
-                return apps.filter(app => {
+                    return (apps || []).filter(app => {
 
-                    if (openProjectIDs.indexOf(app.project) === -1) {
-                        return false;
-                    }
+                        if (openProjectIDs.indexOf(app.project) === -1) {
+                            return false;
+                        }
 
-                    if (!substring) {
-                        return true;
-                    }
+                        if (!substring) {
+                            return true;
+                        }
 
-                    const appID   = app.id.toLowerCase();
-                    const appName = app.name.toLowerCase();
+                        const appID   = app.id.toLowerCase();
+                        const appName = app.name.toLowerCase();
 
-                    return appID.indexOf(term) !== -1 || appName.indexOf(term) !== -1;
+                        return appID.indexOf(term) !== -1 || appName.indexOf(term) !== -1;
+                    });
                 });
             });
-        });
     }
 
     searchPublicApps(substring?: string): Observable<App[]> {
         const term = substring.toLowerCase();
 
         return this.getPublicApps().map(apps => {
-            return apps.filter(app => {
+            return (apps || []).filter(app => {
 
                 if (!substring) {
                     return true;
@@ -258,14 +275,14 @@ export class PlatformRepositoryService {
     }
 
     getAppMeta<T>(appID: string, key?: any): Observable<AppMetadata> {
-        return this.appMeta.map(meta => {
+        return this.appMeta
+            .map(meta => {
+                const data = (meta || {})[appID];
+                if (key && data) {
+                    return data[key];
+                }
 
-            const data = meta[appID];
-            if (key && data) {
-                return data[key];
-            }
-
-            return data;
-        });
+                return data;
+            });
     }
 }

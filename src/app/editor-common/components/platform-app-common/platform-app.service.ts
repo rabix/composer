@@ -1,11 +1,7 @@
 import {Injectable} from "@angular/core";
 
-import "rxjs/add/operator/take";
 import {AuthService} from "../../../auth/auth.service";
-import {
-    ErrorNotification,
-    NotificationBarService
-} from "../../../layout/notification-bar/notification-bar.service";
+import {ErrorNotification, NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
 import {SystemService} from "../../../platform-providers/system.service";
 
 @Injectable()

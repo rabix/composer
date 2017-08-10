@@ -16,20 +16,28 @@ import {FileRepositoryService} from "../../../file-repository/file-repository.se
         <div class="form-group">
             <label>Folder Name:</label>
             <input autofocus class="form-control" formControlName="folderName"/>
+        </div>       
+
+        <div *ngIf="form.hasError('exists', ['folderName'])">
+            <span class="text-warning">
+                <i class="fa fa-warning fa-fw"></i>    
+                    Folder with this name already exists. Please choose another name.
+            </span>
         </div>
 
-        <div class="alert alert-warning" *ngIf="form.hasError('exists', ['folderName'])">
-            Folder with this name already exists. Please choose another name.
+        <div *ngIf="form.hasError('invalidName', ['folderName'])">
+            <span class="text-warning">
+                <i class="fa fa-warning fa-fw"></i>    
+                    {{ form.getError('invalidName', 'folderName') }}
+            </span>
         </div>
 
-        <div class="alert alert-warning" *ngIf="form.hasError('invalidName', ['folderName'])">
-            {{ form.getError('invalidName', 'folderName') }}
+        <div *ngIf="form.hasError('creationFailure')">
+            <span class="text-danger">
+                <i class="fa fa-times-circle fa-fw"></i>
+                    {{ form.getError('creationFailure') }}
+            </span>            
         </div>
-
-        <div class="alert alert-danger" *ngIf="form.hasError('creationFailure')">
-            {{ form.getError('creationFailure') }}
-        </div>
-
 
     </div>
 

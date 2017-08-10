@@ -13,16 +13,31 @@ import {
     ViewEncapsulation
 } from "@angular/core";
 import {Workflow} from "cwl-svg";
-import {StepModel, WorkflowFactory, WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
+import {
+    StepModel,
+    WorkflowFactory,
+    WorkflowInputParameterModel,
+    WorkflowModel,
+    WorkflowOutputParameterModel
+} from "cwlts/models";
 import {DataGatewayService} from "../../../core/data-gateway/data-gateway.service";
 import {AppTabData} from "../../../core/workbox/app-tab-data";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
-import {ErrorNotification, NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
+import {
+    ErrorNotification,
+    NotificationBarService
+} from "../../../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
 import {IpcService} from "../../../services/ipc.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {WorkflowEditorService} from "../../workflow-editor.service";
 import {ErrorWrapper} from "../../../core/helpers/error-wrapper";
+import {AppHelper} from "../../../core/helpers/AppHelper";
+import {FileRepositoryService} from "../../../file-repository/file-repository.service";
+import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
+import {AppValidatorService} from "../../../editor-common/app-validator/app-validator.service";
+import {Observable} from "rxjs/Observable";
+import {Process} from "cwlts/models/generic/Process";
 
 const {dialog} = window["require"]("electron").remote;
 
@@ -124,11 +139,11 @@ const {dialog} = window["require"]("electron").remote;
                     </ct-workflow-step-inspector>
 
                     <ct-workflow-io-inspector
-                        *ngIf="typeOfInspectedNode() === 'Input' || typeOfInspectedNode() === 'Output'"
-                        [port]="inspectedNode"
-                        [graph]="graph"
-                        [workflowModel]="model"
-                        [readonly]="readonly">
+                            *ngIf="typeOfInspectedNode() === 'Input' || typeOfInspectedNode() === 'Output'"
+                            [port]="inspectedNode"
+                            [graph]="graph"
+                            [workflowModel]="model"
+                            [readonly]="readonly">
 
                     </ct-workflow-io-inspector>
 
@@ -191,6 +206,9 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
                 private inspector: EditorInspectorService,
                 private statusBar: StatusBarService,
                 private notificationBar: NotificationBarService,
+                private appValidator: AppValidatorService,
+                private platformRepository: PlatformRepositoryService,
+                private fileRepository: FileRepositoryService,
                 private workflowEditorService: WorkflowEditorService) {
         super();
     }
@@ -376,18 +394,34 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
         const statusProcess = this.statusBar.startProcess(`Adding ${nodeID} to Workflow...`);
 
-        this.gateway.fetchFileContent(nodeID, true).subscribe((app: any) => {
+        const isLocal                = AppHelper.isLocal(nodeID);
+        const fetch: Promise<string> = isLocal
+            ? this.fileRepository.fetchFile(nodeID)
+            : this.platformRepository.getApp(nodeID).then(app => JSON.stringify(app));
+
+        fetch.then((result) => {
+            return this.gateway.resolveContent(result, nodeID).toPromise();
+        }).then(resolved => {
+            return this.appValidator.createValidator(Observable.of(JSON.stringify(resolved)))
+                .filter(val => !val.isPending)
+                .take(1)
+                .toPromise()
+                .then(val => {
+                    if (val.isValidCWL) {
+                        return resolved;
+                    }
+
+                    throw new Error("App did not pass JSON schema validation");
+                });
+        }).then((resolved: Process) => {
             // if the app is local, give it an id that's the same as its filename (if doesn't exist)
-            const isLocal = DataGatewayService.getFileSource(nodeID) === "local";
             if (isLocal) {
-                const split = nodeID.split("/");
-                const id    = split[split.length - 1].split(".")[0];
-                app.id      = app.id || id;
+                resolved.id = resolved.id || AppHelper.getBasename(nodeID);
             }
 
             this.workflowEditorService.putInHistory(this.model);
 
-            const step = this.model.addStepFromProcess(app);
+            const step = this.model.addStepFromProcess(resolved);
 
             // add local source so step can be serialized without embedding
             if (isLocal) {
@@ -408,7 +442,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             this.statusBar.stopProcess(statusProcess, `Added ${step.label}`);
         }, err => {
             this.statusBar.stopProcess(statusProcess);
-            this.notificationBar.showNotification(new ErrorNotification("Failed to add an app to workflow. " + new ErrorWrapper(err)));
+            this.notificationBar.showNotification(new ErrorNotification(`Failed to add ${nodeID} to workflow. ${new ErrorWrapper(err)}`));
         });
     }
 
@@ -573,7 +607,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
                 const child   = children[childIndex];
                 const tagName = child.tagName;
 
-                if (containerElements.indexOf(tagName) != -1) {
+                if (containerElements.indexOf(tagName) !== -1) {
                     traverse(child, originalChildrenData[childIndex]);
                 } else if (tagName in embeddableStyles) {
 

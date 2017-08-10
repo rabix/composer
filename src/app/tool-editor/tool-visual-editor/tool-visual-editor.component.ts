@@ -29,6 +29,13 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                              [readonly]="readonly">
             </ct-base-command>
 
+            <ct-argument-list [location]="model.loc + '.arguments'"
+                              [model]="model"
+                              (update)="change.emit(); model.updateCommandLine()"
+                              [context]="context"
+                              [readonly]="readonly">
+            </ct-argument-list>
+
             <ct-tool-input [location]="model.loc + '.inputs'"
                            [model]="model"
                            (update)="change.emit(); model.updateCommandLine()"
@@ -54,13 +61,6 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                            (update)="change.emit()"
                            [readonly]="readonly">
             </ct-tool-hints>
-
-            <ct-argument-list [location]="model.loc + '.arguments'"
-                              [model]="model"
-                              (update)="change.emit(); model.updateCommandLine()"
-                              [context]="context"
-                              [readonly]="readonly">
-            </ct-argument-list>
 
             <ct-file-def-list [model]="model.fileRequirement || {}"
                               [location]="model.fileRequirement?.loc"

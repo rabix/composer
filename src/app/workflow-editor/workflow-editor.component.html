@@ -41,6 +41,7 @@
 
     <ct-app-info *ngIf="viewMode === 'info' && !isLoading && dataModel"
                  [readonly]="isReadonly"
+                 (change)="syncModelAndCode(false)"
                  [class.flex-col]="showInspector"
                  [model]="dataModel">
     </ct-app-info>

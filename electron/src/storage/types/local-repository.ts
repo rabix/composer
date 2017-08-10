@@ -29,6 +29,12 @@ export class LocalRepository extends RepositoryType {
 
     executorConfig: ExecutorConfig = {
         path: ""
-    }
+    };
+
+    openTabs = [{
+        id: "?welcome",
+        label: "Welcome",
+        type: "Welcome"
+    }];
 
 }

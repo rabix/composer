@@ -10,9 +10,15 @@
         border: 1px solid $brand-danger;
     }
 
-    /deep/ .selectize-input {
-        border-radius: $border-radius;
-        line-height: $input-line-height;
-        padding: $input-padding-y $input-padding-x;
+    /deep/ {
+        .selectize-input {
+            border-radius: $border-radius;
+            line-height: $input-line-height;
+            padding: $input-padding-y $input-padding-x;
+        }
+
+        .selectize-dropdown-content {
+            max-height: 140px;
+        }
     }
 }

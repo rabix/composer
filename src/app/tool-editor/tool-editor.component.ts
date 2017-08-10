@@ -58,7 +58,7 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
     dataModel: CommandLineToolModel;
 
     /** Sorted array of resulting command line parts */
-    commandLineParts: Subject<CommandLinePart[]> = new ReplaySubject();
+    commandLineParts: Subject<CommandLinePart[]> = new ReplaySubject(1);
 
     toolGroup: FormGroup;
 
