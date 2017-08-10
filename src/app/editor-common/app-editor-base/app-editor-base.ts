@@ -628,14 +628,45 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         });
     }
 
-    private bindExecutionQueue() {
+    private getExecutionContext(): Observable<AppExecutionContext | null> {
 
-        // Whenever a new app queues for execution, toggle the “isExecuting” GUI flag
-        this.executionQueue.subscribeTracked(this, () => {
-            this.isExecuting     = true;
-            this.executionOutput = "";
-            this.toggleReport("execution", true);
-        });
+        const appID = this.tabData.id;
+
+        return this.executor.getAppConfig(appID).take(1)
+            .switchMap((context: AppExecutionContext) => {
+
+                // If we have job path set, we can proceed with execution
+                if (context.jobPath) {
+                    return Observable.of(context);
+                }
+
+                // Otherwise, we have to obtain job path
+                const modal = this.modal.fromComponent(AppExecutionContextModalComponent, "Set Execution Parameters");
+
+                modal.confirmLabel = "Run";
+                modal.context = context;
+                modal.appID   = appID;
+
+                return new Observable(observer => {
+                    modal.onSubmit = (raw) => {
+                        observer.next(raw);
+                        observer.complete();
+                        this.modal.close();
+                        this.executor.setAppConfig(appID, raw);
+                    };
+
+                    modal.onCancel = () => {
+                        observer.next(null);
+                        observer.complete();
+                        this.modal.close();
+                        this.executor.setAppConfig(appID, null);
+                    }
+                });
+
+            }).take(1).filter(v => !!v) as Observable<AppExecutionContext>;
+    }
+
+    private bindExecutionQueue() {
 
         // When a new execution is in the line, run it
         this.executionQueue
@@ -648,10 +679,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     })
                     .catch(err => {
                         // We need to catch the error here, because if we catch it in the end, queue sub will be disposed
-                        const wrappedError   = new ErrorWrapper(err).toString();
-                        this.executionOutput = `<div class="text-error">${wrappedError}</div>`;
-                        this.notificationBar.showNotification(new ErrorNotification(wrappedError));
-
+                        const wrappedError = new ErrorWrapper(err).toString();
+                        this.executionOutput += `<div class="text-error">${wrappedError}</div>`;
                         return Observable.empty();
                     });
             })
@@ -682,6 +711,14 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     this.executionOutput += `<div>${localOutput}</div>`;
                 }
             });
+
+        // Whenever a new app queues for execution, toggle the “isExecuting” GUI flag
+        this.executionQueue.subscribeTracked(this, () => {
+            this.executionOutput = "";
+            this.toggleReport("execution", true);
+
+            this.isExecuting = true;
+        });
     }
 
     stopExecution() {
@@ -690,50 +727,13 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     private runOnExecutor(): Observable<string | Object> {
 
-        const appID     = this.tabData.id;
-        const appConfig = this.executor.getAppConfig(appID).take(1);
-
-        const executionContext = appConfig.switchMap((context: AppExecutionContext) => {
-
-            // If we have job path set, we can proceed with execution
-            if (context.jobPath) {
-                return Observable.of(context);
-            }
-
-            // Otherwise, we have to obtain job path
-            const modal = this.modal.fromComponent(AppExecutionContextModalComponent, {
-                title: "Set Execution Parameters"
-            });
-
-            modal.context = context;
-            modal.appID   = appID;
-
-            return new Observable(observer => {
-                modal.onSubmit = (raw) => {
-                    observer.next(raw);
-                    observer.complete();
-                    this.modal.close();
-                };
-
-                modal.onCancel = () => {
-                    observer.next(null);
-                    observer.complete();
-                    this.modal.close();
-                }
-            })
-        }).take(1).filter(v => !!v) as Observable<AppExecutionContext>;
-
-        executionContext.subscribeTracked(this, (context) => {
-            this.executor.setAppConfig(appID, context);
-        });
-
         return new Observable(obs => {
 
             const modelObject = this.dataModel.serialize();
             delete modelObject["sbg:job"]; // Bunny traverses mistakenly into this to look for actual inputs
             const modelText = Yaml.dump(modelObject, {});
 
-            const runner = executionContext.switchMap(context => {
+            const runner = this.getExecutionContext().switchMap(context => {
                 return this.executor
                     .run(this.tabData.id, modelText, context.jobPath, context.executionParams)
                     .finally(() => {

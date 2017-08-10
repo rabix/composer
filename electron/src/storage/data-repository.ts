@@ -95,48 +95,6 @@ export class DataRepository {
         });
     }
 
-    private hookAfterLoad() {
-        this.hooks.forEach(async (hook) => {
-            await hook.afterLoad(this);
-        })
-    }
-
-    activateUser(credentialsID?: string, callback?: (err?: Error) => void) {
-
-        // By default, set the update to be deactivation, then check if we need to activate a user
-        const patch = {activeCredentials: null} as Partial<LocalRepository>;
-
-        // If we received credentials ID, try to match it to a credentials entry and set that entry as the active one
-        if (credentialsID) {
-            const credentialsEntryWithGivenID = this.local.credentials.find(entry => entry.id === credentialsID);
-
-            if (credentialsEntryWithGivenID) {
-                patch.activeCredentials = credentialsEntryWithGivenID;
-            }
-        }
-
-        this.updateLocal(patch, (err) => {
-            if (err) {
-                callback(err);
-                return;
-            }
-
-            this.local = localData;
-            if (!localData.activeCredentials) {
-                callback();
-                return;
-            }
-
-            this.loadProfile(localData.activeCredentials.id, new UserRepository(), (err, userData) => {
-                if (err) return callback(err);
-
-                this.user = userData;
-
-                callback();
-            });
-        });
-    }
-
     updateLocal(data: Partial<LocalRepository>, callback?: (err?: Error, data?: any) => void) {
         this.update("local", data, callback);
     }

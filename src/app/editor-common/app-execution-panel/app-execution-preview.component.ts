@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild} from "@angular/core";
+import {ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnChanges, Output, ViewChild} from "@angular/core";
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -7,11 +7,11 @@ import {ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnC
 
     template: `
         <div class="controls">
-            <button class="btn btn-secondary" type="button"
-                    ct-tooltip="Stop Execution"
+            <button class="btn btn-secondary" type="button" ct-tooltip="Stop Execution"
                     (click)="stopExecution.emit()"
+                    [class.text-danger]="isRunning"
                     [disabled]="!isRunning">
-                <i class="fa fa-times"></i>
+                <i class="fa fa-square"></i>
             </button>
         </div>
         <div #output class="output" [innerHTML]="content"></div>

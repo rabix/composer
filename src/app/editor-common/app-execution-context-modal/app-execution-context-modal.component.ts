@@ -105,7 +105,7 @@ const {dialog} = window["require"]("electron").remote;
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
-                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="submit" class="btn btn-primary">{{ confirmLabel }}</button>
             </div>
 
         </form>
@@ -119,10 +119,14 @@ export class AppExecutionContextModalComponent implements OnInit {
     @Input()
     appID: string;
 
+    @Input()
+    confirmLabel = "Save";
+
     form: FormGroup;
 
     @ViewChild("jobPathInput", {read: ElementRef})
     jobPathInput: ElementRef;
+
 
     constructor(private fb: FormBuilder, private modal: ModalService) {
     }
@@ -155,7 +159,7 @@ export class AppExecutionContextModalComponent implements OnInit {
         }
     }
 
-    onSubmit(raw: Object) {
+    onSubmit(raw: AppExecutionContext) {
 
     }
 
