@@ -3,6 +3,7 @@ import {AsyncSubject} from "rxjs/AsyncSubject";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {GuidService} from "./guid.service";
+import {IPC_EOS_MARK} from "../../../electron/src/constants";
 
 enum RequestType {
     Once,
@@ -146,7 +147,7 @@ export class IpcService {
             // Proxy all messages from the IPC channel to this observable
             const msgSubscription = incomingMessages
             // Complete when the “$$EOS$$” message comes in
-                .takeUntil(incomingMessages.filter(v => v === "$$EOS$$"))
+                .takeUntil(incomingMessages.filter(v => v === IPC_EOS_MARK))
                 .subscribe(observer);
 
 

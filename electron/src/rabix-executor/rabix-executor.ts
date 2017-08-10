@@ -3,6 +3,7 @@ import * as fs from "fs";
 import * as tmp from "tmp";
 import {ExecutorConfig, ExecutorParamsConfig} from "../storage/types/executor-config";
 import EventEmitter = NodeJS.EventEmitter;
+import {IPC_EOS_MARK} from "../constants";
 
 export type ProcessCallback = (err?: Error, stdout?: string, stderr?: string) => void;
 const noop = () => {
@@ -175,7 +176,7 @@ export class RabixExecutor {
                         }
 
                         dataCallback(null, "Done.");
-                        dataCallback(null, "$$EOS$$");
+                        dataCallback(null, IPC_EOS_MARK);
 
 
                     });
