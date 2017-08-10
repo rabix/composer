@@ -35,14 +35,8 @@ export class ModalService {
 
         let [component, options, instanceProperties] = args;
 
-        if(typeof options === "string"){
-            options = {title: options};
-        }
-
         if (typeof options === "string") {
-            options = {
-                title: options
-            };
+            options = {title: options};
         }
 
         options = {

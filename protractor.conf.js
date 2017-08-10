@@ -2,9 +2,10 @@
 // https://github.com/angular/protractor/blob/master/lib/config.ts
 
 /*global jasmine */
+const rimraf = require("rimraf");
+
 const {SpecReporter} = require('jasmine-spec-reporter');
 const glob = require("glob");
-
 
 exports.config = {
     allScriptsTimeout: 11000,
@@ -24,26 +25,29 @@ exports.config = {
                     throw new Error("You must build and package the app before running e2e tests");
                 }
                 return files[0];
-            })()
+            })(),
+            args: ["--webdriver-e2e"]
         }
     },
     // baseUrl: "http://localhost:4200/",
     framework: "jasmine",
+    restartBrowserBetweenTests: true,
     jasmineNodeOpts: {
         showColors: true,
         defaultTimeoutInterval: 30000,
         print: function () {
         }
     },
-    beforeLaunch: function () {
-        require('ts-node').register({
-            project: 'e2e'
-        });
-    },
     onPrepare() {
         require('ts-node').register({
-            project: 'e2e/tsconfig.json'
+            project: 'e2e/tsconfig.e2e.json'
         });
         jasmine.getEnv().addReporter(new SpecReporter({spec: {displayStacktrace: true}}));
+
+        jasmine.getEnv().afterAll(() => {
+            browser.executeScript(`return window["require"]("electron").remote.app.getPath("userData")`).then(dataPath => {
+                rimraf.sync(dataPath);
+            });
+        });
     }
 };
