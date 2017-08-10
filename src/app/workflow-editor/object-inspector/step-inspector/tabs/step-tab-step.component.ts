@@ -48,6 +48,8 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <label class="form-control-label">Scatter Method</label>
             <select class="form-control"
                     [formControl]="form.controls['scatterMethod']">
+                <option value=""
+                        [disabled]="readonly">-- none --</option>
                 <option *ngFor="let method of scatterMethodOptions" 
                         [disabled]="readonly"
                         [value]="method.value">
@@ -148,7 +150,7 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
             this.form.controls["id"].setValue(newStep.id);
             this.form.controls["label"].setValue(newStep.label);
             this.form.controls["description"].setValue(newStep.description);
-            this.form.controls["scatterMethod"].setValue(newStep.scatterMethod);
+            this.form.controls["scatterMethod"].setValue(newStep.scatterMethod || "");
             this.form.controls["scatter"].setValue(newStep.scatter || "");
 
             this.disableScatter();
@@ -161,7 +163,7 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
             id: [this.step.id],
             label: [this.step.label],
             description: [this.step.description],
-            scatterMethod: [this.step.scatterMethod],
+            scatterMethod: [this.step.scatterMethod || ""],
             scatter: [this.step.scatter || ""]
         });
 

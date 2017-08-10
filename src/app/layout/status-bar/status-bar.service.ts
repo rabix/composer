@@ -83,7 +83,7 @@ export class StatusBarService {
         this.status.next({message, time: time ? new Date() : undefined});
     }
 
-    setControls(tpl: TemplateRef<any>) {
+    setControls(tpl?: TemplateRef<any>) {
         this.controls.next(tpl);
     }
 

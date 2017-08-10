@@ -166,27 +166,29 @@ export class MyAppsPanelService extends AppsPanelService {
     private createPlatformListingTreeNodes(projects: Project[]): TreeNode<Project>[] {
         return projects.map(project => {
 
+            const isWritable = project.permissions.write;
+
             return {
                 id: project.id,
                 data: project,
                 type: "project",
-                icon: "fa-folder",
+                icon: isWritable ? "fa-folder" : "fa-lock",
                 label: project.name,
                 isExpanded: this.platformRepository.getExpandedNodes().map(list => (list || []).indexOf(project.id) !== -1),
                 isExpandable: true,
-                iconExpanded: "fa-folder-open",
-                children: this.platformRepository.getAppsForProject(project.id).map(apps => this.createPlatformAppListingTreeNodes(apps)),
+                iconExpanded: isWritable ? "fa-folder-open" : "fa-lock",
+                children: this.platformRepository.getAppsForProject(project.id).map(apps => this.createPlatformAppListingTreeNodes(apps, isWritable)),
 
             };
         });
     }
 
-    private createPlatformAppListingTreeNodes(apps: App[]): TreeNode<App>[] {
+    private createPlatformAppListingTreeNodes(apps: App[], isWritable: boolean): TreeNode<App>[] {
         return apps.map(app => {
 
             return {
                 id: app.id,
-                data: app,
+                data: {...app, isWritable},
                 label: app.name,
                 type: "app",
                 icon: app.raw.class === "CommandLineTool" ? "fa-terminal" : "fa-share-alt",
