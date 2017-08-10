@@ -135,12 +135,12 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                     return {...acc, [revisionlessID]: item.revision};
                 }, {});
 
-            this.dataModel.steps.forEach(step => {
+                this.dataModel.steps.forEach(step => {
 
-                // a non-sbg app might be embedded in an sbg workflow
-                if (!step.run.customProps || !step.run.customProps["sbg:id"]) {
-                    return;
-                }
+                    // a non-sbg app might be embedded in an sbg workflow
+                    if (!step.run.customProps || !step.run.customProps["sbg:id"]) {
+                        return;
+                    }
                     const revisionless = step.run.customProps["sbg:id"].split("/").slice(0, 3).join("/");
                     const revision     = Number(step.run.customProps["sbg:id"].split("/").pop());
 
