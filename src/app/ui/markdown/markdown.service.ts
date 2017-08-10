@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
 
-import {MarkdownIt} from "markdown-it";
 import * as Markdown from "markdown-it";
+import {MarkdownIt} from "markdown-it";
 import * as LazyHeaders from "markdown-it-lazy-headers";
 
 

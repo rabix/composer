@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, EventEmitter, forwardRef, Input, Output, ViewEncapsulation} from "@angular/core";
+import {AfterViewInit, Component, EventEmitter, forwardRef, Input, Output} from "@angular/core";
 import {ControlValueAccessor, FormArray, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {noop} from "../../../lib/utils.lib";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";

@@ -30,12 +30,13 @@ export class ModalService {
 
     fromComponent<T>(component: { new (...args: any[]): T; }, title?: string): T;
     fromComponent<T>(component: { new (...args: any[]): T; }, options?: Partial<ModalOptions>);
-    fromComponent<T>(component: { new (...args: any[]): T; }, options?: Partial<ModalOptions> | string): T {
+    fromComponent<T>(component: { new (...args: any[]): T; }, options?: Partial<ModalOptions> | string, instanceProperties?: Partial<T>): T;
+    fromComponent<T>(...args: any[]): T {
 
-        if (typeof options === "string"){
-            options = {
-                title: options
-            };
+        let [component, options, instanceProperties] = args;
+
+        if (typeof options === "string") {
+            options = {title: options};
         }
 
         options = {
@@ -57,7 +58,11 @@ export class ModalService {
 
         this.modalComponentsRefStack.push(modalComponentRef);
 
-        return componentRef.instance;
+        if (typeof instanceProperties === "object") {
+            Object.assign(componentRef.instance, instanceProperties);
+        }
+
+        return componentRef.instance as T;
     }
 
     fromTemplate<T>(template: TemplateRef<T>, config?: Partial<ModalOptions>): void {
@@ -70,7 +75,7 @@ export class ModalService {
             ...config
         };
 
-        const modalFactory     = this.resolver.resolveComponentFactory(ModalComponent);
+        const modalFactory      = this.resolver.resolveComponentFactory(ModalComponent);
         const modalComponentRef = this.rootViewContainer.createComponent(modalFactory);
 
         modalComponentRef.instance.configure(config as ModalOptions);

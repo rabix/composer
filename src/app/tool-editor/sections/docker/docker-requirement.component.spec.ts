@@ -1,9 +1,9 @@
-import {DockerRequirementComponent} from "./docker-requirement.component";
-import {ComponentFixture, TestBed, async, fakeAsync, tick} from "@angular/core/testing";
+import {Component} from "@angular/core";
+import {async, ComponentFixture, fakeAsync, TestBed, tick} from "@angular/core/testing";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {By} from "@angular/platform-browser";
 import {DockerRequirementModel} from "cwlts/models";
-import {Component} from "@angular/core";
-import {ReactiveFormsModule, FormsModule} from "@angular/forms";
+import {DockerRequirementComponent} from "./docker-requirement.component";
 
 @Component({
     selector: "ct-form-panel",

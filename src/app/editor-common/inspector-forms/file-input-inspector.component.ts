@@ -1,12 +1,4 @@
-import {
-    Component,
-    EventEmitter,
-    Input,
-    Output,
-    ViewEncapsulation,
-    OnInit,
-    OnChanges
-} from "@angular/core";
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, ViewEncapsulation} from "@angular/core";
 import {FormControl, FormGroup} from "@angular/forms";
 import {Observable} from "rxjs/Observable";
 

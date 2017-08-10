@@ -2,6 +2,7 @@ import {Component} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {AuthService} from "../../../auth/auth.service";
 import {AuthCredentials} from "../../../auth/model/auth-credentials";
+import {NativeSystemService} from "../../../native/system/native-system.service";
 import {LocalRepositoryService} from "../../../repository/local-repository.service";
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {ModalService} from "../../../ui/modal/modal.service";
@@ -9,8 +10,6 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {GlobalService} from "../../global/global.service";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {PlatformCredentialsModalComponent} from "../platform-credentials-modal/platform-credentials-modal.component";
-
-const {app, dialog} = window["require"]("electron").remote;
 
 @Component({
     selector: "ct-add-source-modal",
@@ -107,6 +106,7 @@ export class AddSourceModalComponent extends DirectiveBase {
                 private platformRepository: PlatformRepositoryService,
                 private workbox: WorkboxService,
                 private global: GlobalService,
+                private native: NativeSystemService,
                 public auth: AuthService) {
 
         super();
@@ -138,16 +138,15 @@ export class AddSourceModalComponent extends DirectiveBase {
     }
 
     selectLocalFolders() {
-        dialog.showOpenDialog({
-            title: "Choose a Directory",
-            defaultPath: app.getPath("home"),
-            buttonLabel: "Add to Workspace",
-            properties: ["openDirectory", "multiSelections"]
-        }, (paths) => {
-            this.localFoldersToAdd = paths || [];
+        this.native.openFolder({
+            buttonLabel: "Add to Workspace"
+        }, true).then(paths => {
+            this.localFoldersToAdd = paths;
             this.localRepository.addLocalFolders(...paths);
             this.modal.close();
+        }, () => {
         });
+
     }
 
     openCredentialsForm() {

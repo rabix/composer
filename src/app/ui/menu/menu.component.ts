@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, ViewEncapsulation, AfterViewInit} from "@angular/core";
+import {AfterViewInit, Component, ElementRef, Input, ViewEncapsulation} from "@angular/core";
 import {MenuItem} from "./menu-item";
 
 @Component({

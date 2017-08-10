@@ -2,9 +2,9 @@ import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ExpressionModel} from "cwlts/models";
 import {noop} from "../../../lib/utils.lib";
-import {ModelExpressionEditorComponent} from "../../expression-editor/model-expression-editor.component";
-import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {ModalService} from "../../../ui/modal/modal.service";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {ModelExpressionEditorComponent} from "../../expression-editor/model-expression-editor.component";
 
 @Component({
     encapsulation: ViewEncapsulation.None,

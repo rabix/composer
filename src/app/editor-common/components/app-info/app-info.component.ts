@@ -1,17 +1,6 @@
-import {
-    Component,
-    Input,
-    OnChanges, Output,
-    SimpleChanges,
-    EventEmitter
-} from "@angular/core";
-import {WorkflowModel} from "cwlts/models";
+import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from "@angular/core";
+import {CommandInputParameterModel, CommandLineToolModel, WorkflowInputParameterModel, WorkflowModel} from "cwlts/models";
 import {SystemService} from "../../../platform-providers/system.service";
-import {
-    CommandInputParameterModel,
-    WorkflowInputParameterModel,
-    CommandLineToolModel
-} from "cwlts/models";
 
 @Component({
     selector: "ct-app-info",

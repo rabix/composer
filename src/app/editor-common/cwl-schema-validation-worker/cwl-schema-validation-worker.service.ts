@@ -34,7 +34,8 @@ export class CwlSchemaValidationWorkerService {
             "js-yaml.min.js"
         ], {
             cwlSchema: this.cwlSchema,
-            draft4: require("ajv/lib/refs/json-schema-draft-04.json")
+            // FIXME: will not work in browser, window.require call
+            draft4: window["require"]("ajv/lib/refs/json-schema-draft-04.json")
         });
     }
 

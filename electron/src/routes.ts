@@ -1,3 +1,4 @@
+import {app} from "electron";
 import {RequestCallback} from "request";
 import {PublicAPI} from "./controllers/public-api.controller";
 import * as SearchController from "./controllers/search.controller";
@@ -13,13 +14,12 @@ const swapController = new SwapController(swapPath);
 
 const fsController          = require("./controllers/fs.controller");
 const acceleratorController = require("./controllers/accelerator.controller");
-const resolver              = require("./schema-salad-resolver");
-const md5                   = require("md5");
+const resolver              = require("./schema-salad-resolver/schema-salad-resolver");
 
-const repository     = new DataRepository();
+const repository     = new DataRepository(app.getPath("userData") + "/profile");
+
 const repositoryLoad = new Promise((resolve, reject) => repository.load((err) => err ? reject(err) : resolve(1))).catch(err => {
     console.log("Caught promise rejection", err);
-    // return err;
 });
 
 const platformFetchingLocks: { [platformID: string]: Promise<any> } = {};

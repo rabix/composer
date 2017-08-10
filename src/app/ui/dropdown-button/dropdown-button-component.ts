@@ -14,9 +14,9 @@ import {
     ViewEncapsulation
 } from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {DropDownMenuComponent} from "./dropdown-menu.component";
-import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {noop} from "../../lib/utils.lib";
+import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {DropDownMenuComponent} from "./dropdown-menu.component";
 
 @Component({
     encapsulation: ViewEncapsulation.None,

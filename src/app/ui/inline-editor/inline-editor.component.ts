@@ -1,10 +1,4 @@
-import {
-    Component,
-    Input,
-    Output,
-    EventEmitter,
-    ViewEncapsulation
-} from "@angular/core";
+import {Component, EventEmitter, Input, Output, ViewEncapsulation} from "@angular/core";
 
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 

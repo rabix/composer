@@ -1,17 +1,14 @@
-import {ChangeDetectorRef, Component, Input, Output, EventEmitter} from "@angular/core";
+import {ChangeDetectorRef, Component, EventEmitter, Input, Output} from "@angular/core";
 import {Workflow} from "cwl-svg";
 import {StepModel, WorkflowModel} from "cwlts/models";
 import {RawApp} from "../../../../../electron/src/sbg-api-client/interfaces/raw-app";
-import {
-    ErrorNotification,
-    NotificationBarService
-} from "../../../layout/notification-bar/notification-bar.service";
+import {ErrorWrapper} from "../../../core/helpers/error-wrapper";
+import {ErrorNotification, NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {UpdateStepModalComponent} from "../../update-step-modal/update-step-modal.component";
-import {ErrorWrapper} from "../../../core/helpers/error-wrapper";
 
 @Component({
     selector: "ct-workflow-step-inspector",
