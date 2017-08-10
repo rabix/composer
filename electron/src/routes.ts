@@ -262,7 +262,7 @@ module.exports = {
                     repository.updateUser({
                         apps,
                         projects,
-                        ["publicApps"] : publicApps.filter((app) => !app.raw["sbg:blackbox"]),
+                        publicApps : publicApps.filter((app) => !app.raw["sbg:blackbox"]),
                         appFetchTimestamp: timestamp,
                         projectFetchTimestamp: timestamp
                     }, (err, data) => {
