@@ -3,6 +3,7 @@ import {DomEventService} from "../../../services/dom/dom-event.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {WorkflowEditorComponent} from "../../../workflow-editor/workflow-editor.component";
 import {AppEditorBase} from "../../app-editor-base/app-editor-base";
+import {Observable} from "rxjs/Observable";
 
 @Component({
     selector: "ct-common-report-panel",
@@ -64,7 +65,7 @@ export class CommonReportPanelComponent extends DirectiveBase implements AfterVi
         const resizeHandle = this.resizeHandle.nativeElement as HTMLDivElement;
         const container    = this.element.nativeElement.parentElement;
 
-        this.domEvents.onDrag(resizeHandle).subscribeTracked(this, movement => {
+        this.domEvents.onDrag(resizeHandle).subscribeTracked(this, (movement: Observable<MouseEvent>) => {
 
             const originalFlexBasis = this.flexBasis;
 
