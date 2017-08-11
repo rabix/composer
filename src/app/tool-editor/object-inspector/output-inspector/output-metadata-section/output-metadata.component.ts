@@ -1,7 +1,7 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {CommandInputParameterModel} from "cwlts/models";
-import {SBDraft2ExpressionModel, SBDraft2CommandOutputParameterModel} from "cwlts/models/d2sb";
+import {SBDraft2CommandOutputParameterModel, SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 import {noop} from "../../../../lib/utils.lib";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 

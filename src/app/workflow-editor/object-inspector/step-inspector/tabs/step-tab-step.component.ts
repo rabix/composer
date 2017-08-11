@@ -1,13 +1,21 @@
 import {
-    ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnInit, Output, SimpleChanges,
-    ViewEncapsulation, EventEmitter
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
+    Component,
+    EventEmitter,
+    Input,
+    OnChanges,
+    OnInit,
+    Output,
+    SimpleChanges,
+    ViewEncapsulation
 } from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {Workflow} from "cwl-svg";
 import {StepModel, WorkflowModel} from "cwlts/models";
-import {DirectiveBase} from "../../../../util/directive-base/directive-base";
-import {ModalService} from "../../../../ui/modal/modal.service";
 import {HintsModalComponent} from "../../../../core/modals/hints-modal/hints-modal.component";
+import {ModalService} from "../../../../ui/modal/modal.service";
+import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,

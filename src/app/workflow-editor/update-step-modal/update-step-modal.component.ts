@@ -1,6 +1,5 @@
 import {Component, Input} from "@angular/core";
 import {StepModel} from "cwlts/models";
-import "rxjs/add/operator/first";
 import {RawApp} from "../../../../electron/src/sbg-api-client/interfaces/raw-app";
 import {SystemService} from "../../platform-providers/system.service";
 import {ModalService} from "../../ui/modal/modal.service";

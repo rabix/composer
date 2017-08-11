@@ -1,11 +1,11 @@
-import {Component, forwardRef, Input, ViewEncapsulation, OnDestroy} from "@angular/core";
+import {Component, forwardRef, Input, OnDestroy, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
 import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
-import {GuidService} from "../../../services/guid.service";
-import {CustomValidators} from "../../../validators/custom.validator";
 import {noop} from "../../../lib/utils.lib";
-import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {GuidService} from "../../../services/guid.service";
 import {ModalService} from "../../../ui/modal/modal.service";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {CustomValidators} from "../../../validators/custom.validator";
 
 /** @deprecated */
 @Component({

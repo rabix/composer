@@ -1,14 +1,6 @@
-import {
-    Component,
-    EventEmitter,
-    Input,
-    OnChanges, OnInit,
-    Output,
-    SimpleChanges,
-    ViewEncapsulation
-} from "@angular/core";
-import {CommandInputParameterModel, CommandOutputParameterModel, CommandLineToolModel} from "cwlts/models";
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewEncapsulation} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
+import {CommandInputParameterModel, CommandLineToolModel, CommandOutputParameterModel} from "cwlts/models";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({

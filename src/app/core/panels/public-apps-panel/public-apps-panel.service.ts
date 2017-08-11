@@ -25,7 +25,7 @@ export class PublicAppsPanelService extends AppsPanelService {
         super(fileRepository, platformRepository, notificationBar, workbox, statusBar, cdr);
 
         this.apps = platformRepository.getPublicApps().map(apps => {
-            return (apps || []).filter((app) => !app.raw["sbg:blackbox"]);
+            return (apps || []);
         });
     }
 

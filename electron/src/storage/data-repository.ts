@@ -1,4 +1,3 @@
-import {app} from "electron";
 import * as storage from "electron-storage";
 import {RepositoryHook} from "./hooks/repository-hook";
 import * as ReadWriteLock from "rwlock";
@@ -16,8 +15,12 @@ export class DataRepository {
     private lock      = new ReadWriteLock();
     private listeners = {};
     private hooks     = new Set<RepositoryHook>();
+    private profileDirectory: string;
 
-    constructor() {
+    constructor(profileDirectory: string) {
+
+        this.profileDirectory = profileDirectory;
+
 
         this.on("update.local.activeCredentials", (activeCredentials: any) => {
 
@@ -217,11 +220,8 @@ export class DataRepository {
         return this.local.activeCredentials && profile === this.local.activeCredentials.id;
     }
 
-    private getProfileFilePath(profile: string, prefix = app.getPath("userData")): string {
-        return [
-            prefix,
-            `profiles/${profile}.json`
-        ].filter(v => v).join("/");
+    private getProfileFilePath(profile: string): string {
+        return `${this.profileDirectory}/${profile}.json`;
     }
 
     /**
@@ -229,7 +229,7 @@ export class DataRepository {
      */
     private loadProfile<T extends Object>(path = "local", defaultData: T, callback: (err: Error, data?: T) => any): void {
 
-        const filePath = this.getProfileFilePath(path, null);
+        const filePath = this.getProfileFilePath(path);
 
         storage.isPathExists(filePath, (exists) => {
 
@@ -300,7 +300,7 @@ export class DataRepository {
     }) {
         const profileIDs = this.local.credentials.map(c => c.id);
 
-        fs.readdir(app.getPath("userData") + "/profiles", (err, files) => {
+        fs.readdir(this.profileDirectory, (err, files) => {
             if (err) {
                 return callback(err);
             }

@@ -13,7 +13,7 @@ function traverse(data, source, root, graph = {}) {
 
         const future = [];
 
-        const isResolvableGraph = data["$graph"] !== undefined;
+        const isResolvableGraph = root.$graph !== undefined;
 
         for (let key in data) {
 
@@ -141,6 +141,10 @@ function parseJSON(content, source, root?, graph?) {
             },
             json: true
         } as LoadOptions) || {};
+
+        if(typeof root === "string"){
+            root = yaml.safeLoad(root,{json: true} as LoadOptions);
+        }
 
         if (!graph) {
             graph = {};

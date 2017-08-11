@@ -9,11 +9,10 @@ import {
     Output,
     SimpleChanges,
 } from "@angular/core";
+import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
 import {ObjectHelper as OH} from "../../helpers/object.helper";
-import {CommandInputParameterModel} from "cwlts/models";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
-import {CommandLineToolModel} from "cwlts/models";
 
 /**
  * Job Editor modifies the test values of the job json.

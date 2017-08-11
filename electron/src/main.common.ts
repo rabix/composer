@@ -1,8 +1,24 @@
+import * as mkdirp from "mkdirp";
+import * as rimraf from "rimraf";
 import * as acceleratorProxy from "./accelerator-proxy";
 
-const {app, Menu, BrowserWindow} = require("electron");
+const {app, Menu, BrowserWindow, dialog} = require("electron");
 
-app.setPath("userData", app.getPath("home") + "/.sevenbridges/rabix-composer");
+const isWebdriverRun        = ~process.argv.indexOf("--test-type=webdriver");
+const defaultUserDataPath   = app.getPath("home") + "/.sevenbridges/rabix-composer";
+const webdriverUserDataPath = defaultUserDataPath + "-e2e";
+
+
+if (isWebdriverRun) {
+    mkdirp.sync(webdriverUserDataPath);
+    app.setPath("userData", webdriverUserDataPath);
+    global["__endpoints"]        = require("./routes");
+    global["__webdriverCleanup"] = () => rimraf(webdriverUserDataPath, () => void 0);
+} else {
+    app.setPath("userData", defaultUserDataPath);
+}
+
+
 const router = require("./ipc-router");
 
 let win;
@@ -124,7 +140,6 @@ function start(config: { devTools: boolean, url: string }) {
     ] as any[] /* types are not accurate for menu items */));
 }
 
-
 export = {
     start: (config) => {
 
@@ -139,7 +154,10 @@ export = {
             // to stay active until the user quits explicitly with Cmd + Q
             if (process.platform !== "darwin") {
                 app.quit();
+
             }
+
+
         });
 
         app.on("activate", () => {

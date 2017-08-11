@@ -1,5 +1,6 @@
 import {Component, Input, Output} from "@angular/core";
 import {Subject} from "rxjs/Subject";
+
 @Component({
     styleUrls: ["confirm.component.scss"],
     selector: "ct-modal-confirm",

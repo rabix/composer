@@ -1,6 +1,5 @@
 import {Injectable} from "@angular/core";
 import {Observable} from "rxjs/Observable";
-import "rxjs/add/operator/share";
 
 type ExtendedMouseEvent = MouseEvent & {
     ctName?: string;

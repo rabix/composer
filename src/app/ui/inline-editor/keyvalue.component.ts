@@ -1,7 +1,7 @@
 import {Component, EventEmitter, forwardRef, NgZone, Output, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormArray, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {noop} from "../../lib/utils.lib";
+import {DirectiveBase} from "../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,

@@ -1,6 +1,6 @@
-import {Directive, ElementRef, EventEmitter, Input, OnInit, Output} from "@angular/core";
-import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {Directive, ElementRef, EventEmitter, OnInit, Output} from "@angular/core";
 import {DomEventService} from "../../services/dom/dom-event.service";
+import {DirectiveBase} from "../../util/directive-base/directive-base";
 
 @Directive({
     selector: "[ct-click]"

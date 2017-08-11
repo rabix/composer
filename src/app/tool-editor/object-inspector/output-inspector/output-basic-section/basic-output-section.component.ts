@@ -1,8 +1,7 @@
 import {AfterViewInit, Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
-import {CommandOutputParameterModel} from "cwlts/models";
+import {CommandLineToolModel, CommandOutputParameterModel, ParameterTypeModel} from "cwlts/models";
 import {noop} from "../../../../lib/utils.lib";
-import {ParameterTypeModel, CommandLineToolModel} from "cwlts/models";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
 @Component({

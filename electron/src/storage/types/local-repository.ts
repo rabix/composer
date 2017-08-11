@@ -4,7 +4,7 @@ import {RepositoryType} from "./repository-type";
 
 export interface CredentialsCache {
     id: string;
-    user: User;
+    user: Partial<User>;
     url: string;
     token: string;
 }

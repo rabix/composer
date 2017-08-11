@@ -1,6 +1,6 @@
 import {ChangeDetectorRef, Directive, HostBinding, HostListener, Input, TemplateRef} from "@angular/core";
-import {EditorInspectorService} from "./editor-inspector.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {EditorInspectorService} from "./editor-inspector.service";
 
 @Directive({
     selector: "[ct-editor-inspector]",

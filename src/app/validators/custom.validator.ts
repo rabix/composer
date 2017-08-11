@@ -1,5 +1,5 @@
-import {AbstractControl} from "@angular/forms";
 import {Injectable} from "@angular/core";
+import {AbstractControl} from "@angular/forms";
 
 @Injectable()
 export class CustomValidators {

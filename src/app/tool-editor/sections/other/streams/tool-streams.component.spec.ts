@@ -23,11 +23,14 @@ class ExpressionInputStubComponent implements ControlValueAccessor {
     @Input()
     readonly: boolean;
 
-    writeValue(obj: any): void {}
+    writeValue(obj: any): void {
+    }
 
-    registerOnChange(fn: any): void {}
+    registerOnChange(fn: any): void {
+    }
 
-    registerOnTouched(fn: any): void {}
+    registerOnTouched(fn: any): void {
+    }
 }
 
 describe("ToolStreamsComponent", () => {
@@ -55,7 +58,7 @@ describe("ToolStreamsComponent", () => {
         v1Expr = new V1ExpressionModel("expression");
         d2Expr = new SBDraft2ExpressionModel("expression");
 
-        v1Model = new V1CommandLineToolModel();
+        v1Model       = new V1CommandLineToolModel();
         sbDraft2Model = new SBDraft2CommandLineToolModel();
 
         tick();
@@ -68,11 +71,11 @@ describe("ToolStreamsComponent", () => {
     it("should load SBDraft2 stdin and stdout provided", () => {
         component.stdin  = d2Expr;
         component.stdout = d2Expr;
-        component.model = sbDraft2Model;
+        component.model  = sbDraft2Model;
 
         fixture.detectChanges();
 
-        const stdinSpy = spyOn(component.form.controls["stdin"], "setValue");
+        const stdinSpy  = spyOn(component.form.controls["stdin"], "setValue");
         const stdoutSpy = spyOn(component.form.controls["stdout"], "setValue");
 
         component.ngOnChanges();
@@ -88,11 +91,11 @@ describe("ToolStreamsComponent", () => {
         component.stdin  = v1Expr;
         component.stdout = v1Expr;
         component.stderr = v1Expr;
-        component.model = v1Model;
+        component.model  = v1Model;
 
         fixture.detectChanges();
 
-        const stdinSpy = spyOn(component.form.controls["stdin"], "setValue");
+        const stdinSpy  = spyOn(component.form.controls["stdin"], "setValue");
         const stdoutSpy = spyOn(component.form.controls["stdout"], "setValue");
         const stderrSpy = spyOn(component.form.controls["stderr"], "setValue");
 

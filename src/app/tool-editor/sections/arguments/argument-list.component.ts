@@ -1,16 +1,8 @@
-import {
-    Component,
-    EventEmitter,
-    Input,
-    Output,
-    QueryList,
-    TemplateRef,
-    ViewChildren
-} from "@angular/core";
-import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
+import {Component, EventEmitter, Input, Output, QueryList, TemplateRef, ViewChildren} from "@angular/core";
 import {CommandLineToolModel} from "cwlts/models";
-import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 import {ModalService} from "../../../ui/modal/modal.service";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
     selector: "ct-argument-list",

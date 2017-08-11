@@ -1,3 +1,4 @@
+import {app} from "electron";
 import {RequestCallback} from "request";
 import {PublicAPI} from "./controllers/public-api.controller";
 import * as SearchController from "./controllers/search.controller";
@@ -15,17 +16,13 @@ const swapController = new SwapController(swapPath);
 
 const fsController          = require("./controllers/fs.controller");
 const acceleratorController = require("./controllers/accelerator.controller");
-const resolver              = require("./schema-salad-resolver");
-const md5                   = require("md5");
+const resolver              = require("./schema-salad-resolver/schema-salad-resolver");
 
-const repository = new DataRepository();
+const repository = new DataRepository(app.getPath("userData") + "/profile");
 repository.attachHook(new Executor());
 
 const repositoryLoad = new Promise((resolve, reject) => repository.load((err) => err ? reject(err) : resolve(1))).catch(err => {
     console.log("Caught promise rejection", err);
-    // return err;
-}).then(() => {
-
 });
 
 const platformFetchingLocks: { [platformID: string]: Promise<any> } = {};
@@ -268,7 +265,7 @@ module.exports = {
                     repository.updateUser({
                         apps,
                         projects,
-                        publicApps,
+                        publicApps : publicApps.filter((app) => !app.raw["sbg:blackbox"]),
                         appFetchTimestamp: timestamp,
                         projectFetchTimestamp: timestamp
                     }, (err, data) => {
@@ -306,7 +303,7 @@ module.exports = {
                 callback(new Error("Cannot fetch an app, you are not connected to any platform."));
             }
 
-            swapController.exists(data.id, (err, exists) => {
+            swapController.exists(credentials.id + "/" + data.id, (err, exists) => {
 
                 if (err) {
                     callback(err);
@@ -314,7 +311,7 @@ module.exports = {
                 }
 
                 if (exists) {
-                    swapController.read(data.id, callback);
+                    swapController.read(credentials.id + "/" + data.id, callback);
                     return;
                 }
 
@@ -329,12 +326,23 @@ module.exports = {
     },
 
     patchSwap: (data: { local: boolean, swapID: string, swapContent?: string }, callback) => {
-        if (data.swapContent === null) {
-            swapController.remove(data.swapID, callback);
-            return;
-        }
+        repositoryLoad.then(() => {
+            let credentialsID;
+            if (repository.local.activeCredentials) {
+                credentialsID = repository.local.activeCredentials.id;
+            } else if (!data.local) {
+                callback(new Error("You are not connected to any platform."));
+            }
 
-        swapController.write(data.swapID, data.swapContent, callback);
+            const swapFileName = data.local ? data.swapID : `${credentialsID}/${data.swapID}`;
+
+            if (data.swapContent === null) {
+                swapController.remove(swapFileName, callback);
+                return;
+            }
+
+            swapController.write(swapFileName, data.swapContent, callback);
+        });
     },
 
     getLocalFileContent: (path, callback) => {

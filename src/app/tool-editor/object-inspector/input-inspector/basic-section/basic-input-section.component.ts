@@ -1,16 +1,9 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
-import {
-    ControlValueAccessor,
-    FormBuilder,
-    FormControl,
-    FormGroup,
-    NG_VALUE_ACCESSOR,
-    Validators
-} from "@angular/forms";
+import {ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
 import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
 import {SBDraft2CommandInputParameterModel} from "cwlts/models/d2sb";
-import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 import {noop} from "../../../../lib/utils.lib";
+import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,

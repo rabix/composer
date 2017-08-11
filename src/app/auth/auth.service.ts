@@ -1,7 +1,4 @@
 import {Injectable} from "@angular/core";
-import "rxjs/add/operator/shareReplay";
-
-import "rxjs/add/operator/startWith";
 import {Observable} from "rxjs/Observable";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {LocalRepositoryService} from "../repository/local-repository.service";
@@ -27,7 +24,7 @@ export class AuthService {
         ).subscribe(this.active);
     }
 
-    getActive(): ReplaySubject<AuthCredentials> {
+    getActive(): ReplaySubject<AuthCredentials | undefined> {
         return this.active;
     }
 

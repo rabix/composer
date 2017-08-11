@@ -1,11 +1,5 @@
 import {Component, forwardRef, Input} from "@angular/core";
-import {
-    ControlValueAccessor,
-    FormBuilder,
-    FormGroup,
-    NG_VALUE_ACCESSOR,
-    Validators
-} from "@angular/forms";
+import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
 import {CommandInputParameterModel} from "cwlts/models";
 import {noop} from "../../../../lib/utils.lib";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";

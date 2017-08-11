@@ -15,8 +15,6 @@ import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {AppHelper} from "../../helpers/AppHelper";
 import {WorkboxService} from "../../workbox/workbox.service";
 
-const {app, dialog} = window["require"]("electron").remote;
-
 @Component({
     selector: "ct-create-app-modal",
     providers: [SlugifyPipe],
@@ -199,6 +197,8 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
     }
 
     chooseFilepath() {
+
+        const {app, dialog} = window["require"]("electron").remote;
 
         const defaultFolder = Observable.combineLatest(
             this.localRepository.getExpandedFolders(),

@@ -1,5 +1,9 @@
 import {Component, ElementRef, Input, Output, ViewEncapsulation} from "@angular/core";
 import * as ace from "brace";
+import * as AceAjax from "brace";
+import "brace/ext/searchbox";
+import "brace/mode/c_cpp";
+import "brace/mode/html";
 
 
 import "brace/mode/java";
@@ -7,16 +11,13 @@ import "brace/mode/javascript";
 import "brace/mode/json";
 import "brace/mode/markdown";
 import "brace/mode/python";
+import "brace/mode/r";
+import "brace/mode/scss";
 import "brace/mode/sh";
 import "brace/mode/text";
 import "brace/mode/typescript";
-import "brace/mode/yaml";
-import "brace/mode/c_cpp";
-import "brace/mode/scss";
-import "brace/mode/html";
 import "brace/mode/xml";
-import "brace/mode/r";
-import "brace/ext/searchbox";
+import "brace/mode/yaml";
 import "brace/theme/chrome";
 import "brace/theme/monokai";
 import {Observable} from "rxjs/Observable";
@@ -24,7 +25,6 @@ import {Subject} from "rxjs/Subject";
 
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {ACE_MODE_MAP} from "../code-editor-new/ace-mode-map";
-import * as AceAjax from "brace";
 
 export interface AceEditorOptions {
 
