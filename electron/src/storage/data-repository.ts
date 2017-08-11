@@ -3,7 +3,7 @@ import {LocalRepository} from "./types/local-repository";
 import {RepositoryType} from "./types/repository-type";
 import {UserRepository} from "./types/user-repository";
 
-const fs = require("fs");
+const fs = require("fs-extra");
 
 export class DataRepository {
 
@@ -17,7 +17,6 @@ export class DataRepository {
     constructor(profileDirectory: string) {
 
         this.profileDirectory = profileDirectory;
-
 
         this.on("update.local.activeCredentials", (activeCredentials: any) => {
 
@@ -207,36 +206,27 @@ export class DataRepository {
 
         const filePath = this.getProfileFilePath(path);
 
-        fs.open(filePath, "wx", (err, fd) => {
-            if (err) {
-                if (err.code !== "EEXIST") {
-                    throw err;
+        if (fs.existsSync(filePath)) {
+            this.storageRead(filePath, (err, storageContent: T) => {
+                if (err) {
+                    return callback(err);
                 }
 
-                this.storageRead(filePath, (err, storageContent: T) => {
-                    if (err) {
-                        return callback(err);
+                for (let prop in defaultData) {
+
+                    if (!storageContent.hasOwnProperty(prop)) {
+                        storageContent[prop] = defaultData[prop];
                     }
-
-                    for (let prop in defaultData) {
-
-                        if (!storageContent.hasOwnProperty(prop)) {
-                            storageContent[prop] = defaultData[prop];
-                        }
-                    }
-                    callback(null, storageContent);
-                });
-                return;
-            }
-
+                }
+                callback(null, storageContent);
+            });
+        } else {
             this.storageWrite(filePath, defaultData, err => {
                 if (err) return callback(err);
 
                 callback(null, defaultData);
             });
-
-
-        });
+        }
     }
 
     private trigger(event, data) {
@@ -275,7 +265,8 @@ export class DataRepository {
         const frozen = JSON.stringify(input, null, 4);
 
         this.lock.writeLock(filePath, (release) => {
-            fs.writeFile(filePath, frozen, (err, data) => {
+
+            fs.outputFile(filePath, frozen, (err, data) => {
                 release();
                 callback(err, data);
             });
@@ -293,7 +284,7 @@ export class DataRepository {
 
             const deletables = files
                 .map(file => file.slice(0, -5)) // remove .json extension
-                .filter(profile => profileIDs.indexOf(profile) === -1) // take just the ones not present in profiles
+                .filter(profile => profile !== "local" && profileIDs.indexOf(profile) === -1) // take just the ones not present in profiles
                 .map(profile => new Promise((resolve, reject) => {
 
                     fs.unlink(this.getProfileFilePath(profile), (err, data) => {
