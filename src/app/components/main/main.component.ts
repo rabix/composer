@@ -6,9 +6,9 @@ import {SystemService} from "../../platform-providers/system.service";
 import {GuidService} from "../../services/guid.service";
 import {JavascriptEvalService} from "../../services/javascript-eval/javascript-eval.service";
 import {ContextService} from "../../ui/context/context.service";
-import {MarkdownService} from "../../ui/markdown/markdown.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {UrlValidator} from "../../validators/url.validator";
+import {IpcService} from "../../services/ipc.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -17,11 +17,11 @@ import {UrlValidator} from "../../validators/url.validator";
     template: `
         <ct-layout data-test="layout"></ct-layout>
         <div id="runnix" [class.active]="runnix | async"></div>
+
     `,
     styleUrls: ["./../../../assets/sass/main.scss", "./main.component.scss"],
     providers: [
         UrlValidator,
-        MarkdownService,
         ContextService,
         // FIXME: this needs to be handled in a system-specific way
         GuidService
@@ -35,6 +35,7 @@ export class MainComponent {
                 system: SystemService,
                 vcRef: ViewContainerRef,
                 auth: AuthService,
+                ipc: IpcService,
                 global: GlobalService,
                 // DON'T REMOVE THIS PLEASE I KNOW IT DOESN'T HAVE ANY USAGES
                 js: JavascriptEvalService) {
@@ -49,6 +50,15 @@ export class MainComponent {
          * {@link ModalService.rootViewRef}
          */
         modal.setViewContainer(vcRef);
+
+        /**
+         * This has to be after  modal.setViewContainer(vcRef) in order to show the modal.
+         */
+        global.checkForPlatformUpdates();
+
+        ipc.watch("accelerator", "checkForPlatformUpdates").subscribe(() => {
+            global.checkForPlatformUpdates();
+        });
 
         this.runnix = Observable.fromEvent(document, "keyup").map((e: KeyboardEvent) => e.keyCode).bufferCount(10, 1)
             .filter(seq => seq.toString() === [38, 38, 40, 40, 37, 39, 37, 39, 66, 65].toString())

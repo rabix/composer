@@ -8,6 +8,7 @@ import {SBGClient} from "./sbg-api-client/sbg-client";
 import {DataRepository} from "./storage/data-repository";
 import {CredentialsCache, LocalRepository} from "./storage/types/local-repository";
 import {UserRepository} from "./storage/types/user-repository";
+import {GitHubClient} from "./github-api-client/github-client";
 
 const swapPath       = require("electron").app.getPath("userData") + "/swap";
 const swapController = new SwapController(swapPath);
@@ -15,6 +16,8 @@ const swapController = new SwapController(swapPath);
 const fsController          = require("./controllers/fs.controller");
 const acceleratorController = require("./controllers/accelerator.controller");
 const resolver              = require("./schema-salad-resolver/schema-salad-resolver");
+const md5                   = require("md5");
+const semver                = require("semver");
 
 const repository = new DataRepository(app.getPath("userData") + "/profiles");
 
@@ -456,6 +459,29 @@ module.exports = {
                 callback(null, result);
             }, callback);
         }).catch(callback);
+    },
+
+    checkForPlatformUpdates: (data: {}, callback) => {
+
+        const api = new GitHubClient();
+
+        return api.releases().get().then((result: Array<any>) => {
+
+            let hasUpdate = null;
+
+            if (result && result.length) {
+                result.sort((a, b) => semver.gt(a, b));
+
+                const latestRelease = result[0];
+
+                if (semver.gt(latestRelease.tag_name, app.getVersion())) {
+                    hasUpdate = latestRelease;
+                }
+            }
+
+            callback(null, hasUpdate);
+
+        }, callback).catch(callback);
     },
 
     patchAppMeta: (data: {

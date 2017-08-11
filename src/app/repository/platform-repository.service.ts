@@ -68,6 +68,10 @@ export class PlatformRepositoryService {
         return this.ipc.request("fetchPlatformData");
     }
 
+    checkForPlatformUpdates(): Observable<any> {
+        return this.ipc.request("checkForPlatformUpdates");
+    }
+
     getOpenProjects(): Observable<Project[]> {
         return Observable
             .combineLatest(this.projects, this.openProjects)

@@ -10,15 +10,19 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {GlobalService} from "../global/global.service";
 import {SendFeedbackModalComponent} from "../modals/send-feedback-modal/send-feedback.modal.component";
 import {WorkboxService} from "./workbox.service";
+import {LocalRepositoryService} from "../../repository/local-repository.service";
 
 @Component({
 
     selector: "ct-settings-menu",
     styleUrls: ["./settings-menu.component.scss"],
     template: `
-        <ct-generic-dropdown-menu [ct-menu]="menu" menuAlign="left" [menuState]="openStatus">
+        <ct-generic-dropdown-menu [ct-menu]="menu" menuAlign="left" [menuState]="openStatus" 
+                                  [class.update-available]="updateAvailable | async">
+            
             <span *ngIf="active">{{ userLabel }}</span>
             <i class="fa fa-chevron-down fa-fw settings-icon"> </i>
+
         </ct-generic-dropdown-menu>
 
         <ng-template #menu class="mr-1">
@@ -34,6 +38,10 @@ import {WorkboxService} from "./workbox.service";
                 </li>
                 <li (click)="openSettings()"><i class="fa fa-cog fa-fw"></i> Settings</li>
                 <li (click)="openFeedback()"><i class="fa fa-bullhorn fa-fw"></i> Send Feedback</li>
+                <li class="check-for-update" (click)="checkForPlatformUpdates()">
+                    <i class="fa fa-refresh fa-fw "></i>
+                    Update Available
+                </li>
             </ul>
         </ng-template>
     `
@@ -50,11 +58,14 @@ export class SettingsMenuComponent extends DirectiveBase {
 
     credentials: Observable<AuthCredentials[]>;
 
+    updateAvailable: Observable<string>;
+
     constructor(private workbox: WorkboxService,
                 private settings: SettingsService,
                 private modal: ModalService,
                 private system: SystemService,
                 private global: GlobalService,
+                public localRepository: LocalRepositoryService,
                 private auth: AuthService) {
         super();
 
@@ -62,6 +73,8 @@ export class SettingsMenuComponent extends DirectiveBase {
 
         // Store the stream locally so we don't have a auth.getCredentials function call in the template
         this.credentials = auth.getCredentials();
+
+        this.updateAvailable = localRepository.getUpdateAvailable();
 
         auth.getActive().subscribeTracked(this, cred => {
             this.active = cred;
@@ -102,6 +115,11 @@ export class SettingsMenuComponent extends DirectiveBase {
             this.workbox.forceReloadTabs();
         });
 
+        this.openStatus.next(false);
+    }
+
+    checkForPlatformUpdates() {
+        this.global.checkForPlatformUpdates();
         this.openStatus.next(false);
     }
 }
