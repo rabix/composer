@@ -1,4 +1,3 @@
-import * as storage from "electron-storage";
 import * as ReadWriteLock from "rwlock";
 import {LocalRepository} from "./types/local-repository";
 import {RepositoryType} from "./types/repository-type";
@@ -134,7 +133,7 @@ export class DataRepository {
 
     private update<T extends RepositoryType>(profile: string, data: Partial<T>, callback?: (err?: Error, data?: T) => void) {
 
-        const profilePath = `profiles/${profile}`;
+        const profilePath = this.getProfileFilePath(profile);
         this.trigger("update", {user: this.user, local: this.local});
 
         if (profile === "local") {
@@ -208,33 +207,34 @@ export class DataRepository {
 
         const filePath = this.getProfileFilePath(path);
 
-        storage.isPathExists(filePath, (exists) => {
+        fs.open(filePath, "wx", (err, fd) => {
+            if (err) {
+                if (err.code !== "EEXIST") {
+                    throw err;
+                }
 
-            if (!exists) {
+                this.storageRead(filePath, (err, storageContent: T) => {
+                    if (err) {
+                        return callback(err);
+                    }
 
-                this.storageWrite(filePath, defaultData, err => {
-                    if (err) return callback(err);
+                    for (let prop in defaultData) {
 
-                    callback(null, defaultData);
-
+                        if (!storageContent.hasOwnProperty(prop)) {
+                            storageContent[prop] = defaultData[prop];
+                        }
+                    }
+                    callback(null, storageContent);
                 });
-
                 return;
             }
 
-            this.storageRead(filePath, (err, storageContent: T) => {
-                if (err) {
-                    return callback(err);
-                }
+            this.storageWrite(filePath, defaultData, err => {
+                if (err) return callback(err);
 
-                for (let prop in defaultData) {
-
-                    if (!storageContent.hasOwnProperty(prop)) {
-                        storageContent[prop] = defaultData[prop];
-                    }
-                }
-                callback(null, storageContent);
+                callback(null, defaultData);
             });
+
 
         });
     }
@@ -255,18 +255,27 @@ export class DataRepository {
 
     private storageRead(filePath, callback: (err?: Error, content?: any) => void) {
         this.lock.readLock(filePath, (release) => {
-            storage.get(filePath, (err, content) => {
+            fs.readFile(filePath, "utf8", (err, content) => {
                 release();
-                callback(err, content);
+                if (err) {
+                    return callback(err);
+                }
+
+                try {
+                    const parsed = JSON.parse(content);
+                    callback(null, parsed);
+                } catch (err) {
+                    callback(err);
+                }
             });
         });
     }
 
-    private storageWrite(filePath, data, callback) {
-        this.lock.writeLock(filePath, (release) => {
+    private storageWrite(filePath, input, callback) {
+        const frozen = JSON.stringify(input, null, 4);
 
-            const frozen = JSON.stringify(data, null, 4);
-            storage.set(filePath, frozen, (err, data) => {
+        this.lock.writeLock(filePath, (release) => {
+            fs.writeFile(filePath, frozen, (err, data) => {
                 release();
                 callback(err, data);
             });

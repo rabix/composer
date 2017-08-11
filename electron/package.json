@@ -7,7 +7,6 @@
     },
     "dependencies": {
         "async": "^2.4.1",
-        "electron-storage": "^1.0.7",
         "glob": "^7.1.2",
         "js-yaml": "^3.9.1",
         "md5": "^2.2.1",
