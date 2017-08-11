@@ -4,7 +4,9 @@ VERSION=${1-"$(date +"%y%m%d")"}
 
 cd $BASEDIR
 
-cp $BASEDIR/electron/package.prod.json $BASEDIR/dist/package.json
+# Generate package.json
+
+cat $BASEDIR/electron/package.json | sed s/dist.main.js/main.js/ > $BASEDIR/dist/package.json
 cp $BASEDIR/electron/dist/main.prod.js $BASEDIR/dist/main.js
 cp -r $BASEDIR/electron/dist/src $BASEDIR/dist/
 cp -r $BASEDIR/electron/node_modules $BASEDIR/dist/

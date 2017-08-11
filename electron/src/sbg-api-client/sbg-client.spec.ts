@@ -14,15 +14,6 @@ describe("SBGClient", () => {
             assert.isFunction(client.user.get);
         });
 
-        it("can be tested", (done) => {
-            const req = client.user.get();
-
-            req.then(result => {
-                done();
-            }, (fail: StatusCodeError | RequestError) => {
-                done()
-            })
-        });
     });
 
     describe("projects", () => {
