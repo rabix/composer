@@ -18,10 +18,18 @@ const fsController          = require("./controllers/fs.controller");
 const acceleratorController = require("./controllers/accelerator.controller");
 const resolver              = require("./schema-salad-resolver/schema-salad-resolver");
 
-const repository = new DataRepository(app.getPath("userData") + "/profile");
+const repository = new DataRepository(app.getPath("userData") + "/profiles");
 repository.attachHook(new Executor());
 
-const repositoryLoad = new Promise((resolve, reject) => repository.load((err) => err ? reject(err) : resolve(1))).catch(err => {
+const repositoryLoad = new Promise((resolve, reject) => {
+    repository.load(err => {
+        if (err) {
+            return reject(err);
+        }
+
+        return resolve(1);
+    });
+}).catch(err => {
     console.log("Caught promise rejection", err);
 });
 
@@ -265,7 +273,7 @@ module.exports = {
                     repository.updateUser({
                         apps,
                         projects,
-                        publicApps : publicApps.filter((app) => !app.raw["sbg:blackbox"]),
+                        publicApps: publicApps.filter((app) => !app.raw["sbg:blackbox"]),
                         appFetchTimestamp: timestamp,
                         projectFetchTimestamp: timestamp
                     }, (err, data) => {

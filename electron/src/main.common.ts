@@ -2,7 +2,7 @@ import * as mkdirp from "mkdirp";
 import * as rimraf from "rimraf";
 import * as acceleratorProxy from "./accelerator-proxy";
 
-const {app, Menu, BrowserWindow, dialog} = require("electron");
+const {app, Menu, BrowserWindow} = require("electron");
 
 const isWebdriverRun        = ~process.argv.indexOf("--test-type=webdriver");
 const defaultUserDataPath   = app.getPath("home") + "/.sevenbridges/rabix-composer";
@@ -17,7 +17,6 @@ if (isWebdriverRun) {
 } else {
     app.setPath("userData", defaultUserDataPath);
 }
-
 
 const router = require("./ipc-router");
 
