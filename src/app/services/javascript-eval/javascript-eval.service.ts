@@ -1,7 +1,7 @@
-import {Observable} from "rxjs/Observable";
 import {Injectable, NgZone} from "@angular/core";
-import {GuidService} from "../guid.service";
 import {ExpressionEvaluator} from "cwlts/models";
+import {Observable} from "rxjs/Observable";
+import {GuidService} from "../guid.service";
 
 @Injectable()
 export class JavascriptEvalService {

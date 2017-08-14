@@ -1,9 +1,8 @@
 import {async, ComponentFixture, fakeAsync, TestBed, tick} from "@angular/core/testing";
-
-import {BaseCommandStringComponent} from "./base-command-string.component";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {By} from "@angular/platform-browser";
-import Spy = jasmine.Spy;
+
+import {BaseCommandStringComponent} from "./base-command-string.component";
 
 describe("BaseCommandStringComponent", () => {
     let component: BaseCommandStringComponent;

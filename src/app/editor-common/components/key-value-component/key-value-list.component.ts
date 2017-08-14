@@ -1,10 +1,10 @@
-import {Component, forwardRef, Input, ViewEncapsulation, OnDestroy} from "@angular/core";
+import {Component, forwardRef, Input, OnDestroy} from "@angular/core";
 import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
-import {GuidService} from "../../../services/guid.service";
 import {noop} from "../../../lib/utils.lib";
-import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {GuidService} from "../../../services/guid.service";
 import {ModalService} from "../../../ui/modal/modal.service";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 /**
  * @deprecated

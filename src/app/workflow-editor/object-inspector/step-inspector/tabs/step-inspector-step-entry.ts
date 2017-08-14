@@ -1,10 +1,17 @@
 import {
-    ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges,
+    ChangeDetectionStrategy,
+    Component,
+    EventEmitter,
+    Input,
+    OnChanges,
+    OnInit,
+    Output,
+    SimpleChanges,
     ViewEncapsulation
 } from "@angular/core";
-import {ObjectHelper} from "../../../../helpers/object.helper";
-import {JobHelper} from "cwlts/models/helpers/JobHelper";
 import {WorkflowStepInputModel} from "cwlts/models";
+import {JobHelper} from "cwlts/models/helpers/JobHelper";
+import {ObjectHelper} from "../../../../helpers/object.helper";
 
 @Component({
     encapsulation: ViewEncapsulation.None,

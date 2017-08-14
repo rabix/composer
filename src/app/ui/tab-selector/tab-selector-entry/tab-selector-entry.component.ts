@@ -1,6 +1,6 @@
-import {AfterViewInit, Component, HostBinding, HostListener, Input, OnInit} from "@angular/core";
-import {TabSelectorService} from "../tab-selector.service";
+import {Component, HostBinding, HostListener, Input, OnInit} from "@angular/core";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {TabSelectorService} from "../tab-selector.service";
 
 @Component({
     selector: "ct-tab-selector-entry",

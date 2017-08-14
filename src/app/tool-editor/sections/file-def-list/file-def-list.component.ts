@@ -1,12 +1,4 @@
-import {
-    Component,
-    Input,
-    Output,
-    QueryList,
-    TemplateRef,
-    ViewChildren,
-    ChangeDetectorRef
-} from "@angular/core";
+import {ChangeDetectorRef, Component, Input, Output, QueryList, TemplateRef, ViewChildren} from "@angular/core";
 import {CreateFileRequirementModel, DirentModel} from "cwlts/models";
 import {Subject} from "rxjs/Subject";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";

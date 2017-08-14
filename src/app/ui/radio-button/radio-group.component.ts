@@ -1,8 +1,8 @@
 import {ChangeDetectionStrategy, Component, Input, ViewEncapsulation} from "@angular/core";
-import {RadioButtonComponent} from "./radio-button.component";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {Subject} from "rxjs/Subject";
 import {Observable} from "rxjs/Observable";
+import {Subject} from "rxjs/Subject";
+import {RadioButtonComponent} from "./radio-button.component";
 
 export interface GroupItem<T> {
     name: string,

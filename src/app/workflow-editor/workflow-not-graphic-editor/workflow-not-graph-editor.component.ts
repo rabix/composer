@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Input, OnDestroy, ViewEncapsulation} from "@angular/core";
+import {ChangeDetectionStrategy, Component, Input, OnDestroy} from "@angular/core";
 import {WorkflowModel} from "cwlts/models";
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
 import {noop} from "../../lib/utils.lib";

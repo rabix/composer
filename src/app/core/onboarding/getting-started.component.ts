@@ -1,8 +1,8 @@
 import {ChangeDetectionStrategy, Component} from "@angular/core";
 import {AuthService} from "../../auth/auth.service";
-import {SendFeedbackModalComponent} from "../../core/modals/send-feedback-modal/send-feedback.modal.component";
 import {SystemService} from "../../platform-providers/system.service";
 import {ModalService} from "../../ui/modal/modal.service";
+import {SendFeedbackModalComponent} from "../modals/send-feedback-modal/send-feedback.modal.component";
 
 @Component({
     styleUrls: ["getting-started.component.scss"],
@@ -18,8 +18,9 @@ import {ModalService} from "../../ui/modal/modal.service";
             <div class="item">
                 <p class="subtitle">New to Rabix Composer?</p>
                 <p>Rabix Composer is a standalone editor for Common Workflow Language tools and workflows.
-                    <a data-test="new-to-link" href
-                       (click)="openLink('https://github.com/rabix/cottontail-frontend/wiki/Introduction-to-Rabix-and-Rabix-Composer'); false;">
+                    <a #introLink data-test="new-to-link"
+                       href="https://github.com/rabix/cottontail-frontend/wiki/Introduction-to-Rabix-and-Rabix-Composer"
+                       (click)="system.openLink(introLink.href, $event);">
                         Learn more
                     </a>
                 </p>
@@ -30,8 +31,8 @@ import {ModalService} from "../../ui/modal/modal.service";
                 <p class="subtitle">Learn how to build a tool</p>
                 <p>Having uploaded a Docker image containing your tool to the image registry, you can specify its
                     behavior, including its inputs and outputs.
-                    <a href data-test="learn-how-to-link"
-                       (click)="openLink('https://github.com/rabix/cottontail-frontend/wiki/About-the-tool-editor'); false;">
+                    <a #docsLink href="https://github.com/rabix/composer/wiki/The-tool-editor" data-test="tool-docs-link"
+                       (click)="system.openLink(docsLink.href, $event)">
                         Learn more
                     </a>
                 </p>
@@ -42,9 +43,11 @@ import {ModalService} from "../../ui/modal/modal.service";
                 <p class="subtitle">Need help?</p>
                 <p>If you have any problem, idea or a thought let us know.</p>
                 <p>
-                    <button type="button" data-test="get-support-btn" class="btn btn-primary"
-                            (click)="initiateFeedbackDialog()">
-                        Get support
+                    <button type="button"
+                            data-test="get-support-btn"
+                            class="btn btn-primary"
+                            (click)="initiateFeedbackDialog();">
+                        Get Support
                     </button>
                 </p>
             </div>
@@ -53,31 +56,19 @@ import {ModalService} from "../../ui/modal/modal.service";
 })
 export class GettingStartedComponent {
 
-    constructor(private modal: ModalService,
-                private auth: AuthService,
-                private system: SystemService) {
-    }
-
-    openLink(link: string) {
-        this.system.openLink(link);
-    }
-
-    openMailClient(): void {
-        this.system.openLink("mailto:support@sbgenomics.com?subject=Rabix Composer Feedback");
+    constructor(public auth: AuthService,
+                public system: SystemService,
+                private modal: ModalService,) {
     }
 
     initiateFeedbackDialog() {
 
-        this.auth.getActive().take(1).toPromise().then((credentials) => {
-            if (!credentials) {
-                this.openMailClient();
+        this.auth.getActive().take(1).subscribe(credentials => {
+            if (credentials) {
+                this.modal.fromComponent(SendFeedbackModalComponent, "Send Feedback");
                 return;
             }
-
-            const modal = this.modal.fromComponent(SendFeedbackModalComponent, {title: "Send Feedback"});
-
-
-
+            this.system.openLink("mailto:support@sbgenomics.com?subject=Rabix Composer Feedback");
         });
     }
 }

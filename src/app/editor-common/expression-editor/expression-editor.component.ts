@@ -1,14 +1,13 @@
 import {AfterViewInit, ChangeDetectorRef, Component, HostBinding, Input, OnInit, Output, ViewChild} from "@angular/core";
 import {FormControl} from "@angular/forms";
+import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {CodeEditorComponent} from "../../ui/code-editor-new/code-editor.component";
 import {AceEditorOptions} from "../../ui/code-editor/code-editor.component";
 import {TreeNode} from "../../ui/tree-view/tree-node";
+import {TreeViewComponent} from "../../ui/tree-view/tree-view.component";
 import {TreeViewService} from "../../ui/tree-view/tree-view.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
-import {TreeViewComponent} from "../../ui/tree-view/tree-view.component";
-import {Observable} from "rxjs/Observable";
-import "rxjs/add/observable/of";
 
 @Component({
     selector: "ct-expression-editor",

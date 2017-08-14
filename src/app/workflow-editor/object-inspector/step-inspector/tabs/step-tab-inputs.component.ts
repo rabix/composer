@@ -1,12 +1,4 @@
-import {
-    ChangeDetectorRef,
-    Component,
-    Input,
-    OnChanges,
-    OnInit,
-    Output,
-    EventEmitter
-} from "@angular/core";
+import {ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output} from "@angular/core";
 import {Workflow} from "cwl-svg";
 import {StepModel, WorkflowModel, WorkflowStepInputModel} from "cwlts/models";
 import {Subject} from "rxjs/Subject";

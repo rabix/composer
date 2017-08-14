@@ -1,13 +1,12 @@
-import {Component, CUSTOM_ELEMENTS_SCHEMA, forwardRef, Input, NO_ERRORS_SCHEMA} from "@angular/core";
+import {Component, forwardRef, Input, NO_ERRORS_SCHEMA} from "@angular/core";
 import {async, ComponentFixture, fakeAsync, TestBed, tick} from "@angular/core/testing";
 import {ControlValueAccessor, FormArray, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule} from "@angular/forms";
+import {By} from "@angular/platform-browser";
+import {ExpressionModel} from "cwlts/models";
+import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
+import {ModalService} from "../../../../ui/modal/modal.service";
 
 import {BaseCommandListComponent} from "./base-command-list.component";
-import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
-import {ExpressionModel} from "cwlts/models";
-import {By} from "@angular/platform-browser";
-import {ModalService} from "../../../../ui/modal/modal.service";
-import {noop} from "../../../../lib/utils.lib";
 
 @Component({
     selector: "ct-expression-input",

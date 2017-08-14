@@ -4,7 +4,6 @@ import {CommandLineToolModel, WorkflowModel} from "cwlts/models";
 
 import * as Yaml from "js-yaml";
 import {LoadOptions} from "js-yaml";
-import "rxjs/add/operator/do";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {CodeSwapService} from "../../core/code-content-service/code-content.service";
@@ -248,14 +247,24 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     save(): void {
 
-        const proc = this.statusBar.startProcess(`Saving ${this.originalTabLabel}`);
+        const appName = this.tabData.id;
+
+        const proc = this.statusBar.startProcess(`Saving ${appName}`);
         const text = this.viewMode === "code" ? this.codeEditorContent.value : this.getModelText();
 
         this.appSavingService
             .save(this.tabData.id, text)
             .then(update => {
+                /**
+                 * FIXME: Reorganize how priority code updates should sync with the model, this is a quick fix
+                 * without this, when publishing a new revision from the graph view, priority code update would sync model->code,
+                 * but the code is actually up to date and the model isn't.
+
+                 */
+                this.revisionChangingInProgress = true;
+
                 this.priorityCodeUpdates.next(update);
-                this.statusBar.stopProcess(proc, `Saved: ${this.originalTabLabel}`);
+                this.statusBar.stopProcess(proc, `Saved: ${appName}`);
             }, err => {
                 if (!err || !err.message) {
                     this.statusBar.stopProcess(proc);
@@ -263,7 +272,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 }
 
                 this.notificationBar.showNotification(new ErrorNotification(`Saving failed: ${err.message}`));
-                this.statusBar.stopProcess(proc, `Could not save ${this.originalTabLabel} (${err.message})`);
+                this.statusBar.stopProcess(proc, `Could not save ${appName} (${err.message})`);
             });
     }
 

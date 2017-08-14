@@ -1,7 +1,7 @@
 import {ComponentFactoryResolver, ComponentRef, Injectable, ViewContainerRef} from "@angular/core";
-import {MenuComponent} from "../menu/menu.component";
-import {MenuItem} from "../menu/menu-item";
 import {Observable} from "rxjs/Observable";
+import {MenuItem} from "../menu/menu-item";
+import {MenuComponent} from "../menu/menu.component";
 
 @Injectable()
 export class ContextService {

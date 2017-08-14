@@ -1,4 +1,4 @@
-import {ElementRef, Input, Directive} from '@angular/core';
+import {Directive, ElementRef, Input} from "@angular/core";
 import {MarkdownService} from "./markdown.service";
 
 

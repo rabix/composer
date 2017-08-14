@@ -1,7 +1,7 @@
 import {Component} from "@angular/core";
-import {ModalService} from "../../ui/modal/modal.service";
 import {AddSourceModalComponent} from "../../core/modals/add-source-modal/add-source-modal.component";
 import {SystemService} from "../../platform-providers/system.service";
+import {ModalService} from "../../ui/modal/modal.service";
 
 @Component({
     styleUrls: ["welcome.component.scss"],
@@ -13,18 +13,18 @@ import {SystemService} from "../../platform-providers/system.service";
                 <ct-logo></ct-logo>
             </h1>
 
-            <div class="background-logo">
-            </div>
-            
+            <div class="background-logo"></div>
+
             <div class="content">
                 <p class="welcome-text">The Rabix Composer is a standalone integrated development environment for workflow
                     description languages that enables rapid workflow composition, testing, and
                     integration
                     with online services like DockerHub.
                     <br/>
-                    Visit <a href data-test="info-link"
-                             (click)="openLink('http://rabix.io/'); false;">
-                        rabix.io</a> for more info.
+                    Visit
+                    <a #infoLink href="http://rabix.io" data-test="info-link"
+                       (click)="system.openLink(infoLink.href, $event)">rabix.io</a>
+                    for more info.
                 </p>
 
                 <h2 class="h5 mt-1">
@@ -32,7 +32,8 @@ import {SystemService} from "../../platform-providers/system.service";
                 </h2>
 
                 <p>
-                    <button data-test="open-project-btn" type="button" (click)="onOpenProjectButtonClick()"
+                    <button data-test="open-project-btn" type="button"
+                            (click)="onOpenProjectButtonClick()"
                             class="btn btn-primary">
                         Open a Project
                     </button>
@@ -46,19 +47,11 @@ import {SystemService} from "../../platform-providers/system.service";
 })
 export class WelcomeTabComponent {
 
-
-    constructor(private modal: ModalService, private system: SystemService) {
-
-    }
-
-    openLink(link: string) {
-        this.system.openLink(link);
+    constructor(public system: SystemService,
+                private modal: ModalService) {
     }
 
     onOpenProjectButtonClick() {
-        this.modal.fromComponent(AddSourceModalComponent, {
-            title: "Open a Project",
-            backdrop: true
-        });
+        this.modal.fromComponent(AddSourceModalComponent, "Open a Project");
     }
 }

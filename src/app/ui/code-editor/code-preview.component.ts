@@ -1,18 +1,18 @@
 import {
+    AfterViewInit,
     ChangeDetectionStrategy,
     Component,
     ElementRef,
     HostBinding,
     Input,
+    OnInit,
     Output,
     Renderer,
-    ViewChild,
-    OnInit,
-    AfterViewInit
+    ViewChild
 } from "@angular/core";
 import {Observable} from "rxjs/Observable";
-import {CodeEditorXComponent} from "./code-editor.component";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {CodeEditorXComponent} from "./code-editor.component";
 
 @Component({
     selector: "ct-code-preview",

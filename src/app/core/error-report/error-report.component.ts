@@ -1,9 +1,9 @@
 import {Component, ElementRef, HostBinding, Input, Output, ViewChild} from "@angular/core";
 import {Subject} from "rxjs/Subject";
-import {CodeEditorComponent} from "../../ui/code-editor-new/code-editor.component";
-import {TreeViewService} from "../../ui/tree-view/tree-view.service";
 import {SystemService} from "../../platform-providers/system.service";
+import {CodeEditorComponent} from "../../ui/code-editor-new/code-editor.component";
 import {ModalService} from "../../ui/modal/modal.service";
+import {TreeViewService} from "../../ui/tree-view/tree-view.service";
 
 @Component({
     selector: "ct-error-report",

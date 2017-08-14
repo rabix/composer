@@ -1,12 +1,8 @@
 import {Component, EventEmitter, Input, Output, ViewChild} from "@angular/core";
-import {
-    CommandInputParameterModel,
-    CommandLineToolModel,
-    CommandOutputParameterModel
-} from "cwlts/models";
+import {CommandInputParameterModel, CommandLineToolModel, CommandOutputParameterModel} from "cwlts/models";
 import {ExternalLinks} from "../../../cwl/external-links";
-import {ToolOutputListComponent} from "./tool-output-list.component";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {ToolOutputListComponent} from "./tool-output-list.component";
 
 @Component({
     selector: "ct-tool-output",

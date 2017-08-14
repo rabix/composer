@@ -1,32 +1,39 @@
 import {
-    ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, NgZone, OnChanges, OnDestroy,
+    ChangeDetectionStrategy,
+    Component,
+    ElementRef,
+    forwardRef,
+    Input,
+    NgZone,
+    OnChanges,
+    OnDestroy,
     OnInit,
     SimpleChanges
 } from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 
 import * as ace from "brace";
+import "brace/ext/language_tools";
+import "brace/ext/searchbox";
+import "brace/mode/c_cpp";
+import "brace/mode/html";
 
 import "brace/mode/java";
 import "brace/mode/javascript";
 import "brace/mode/json";
 import "brace/mode/markdown";
 import "brace/mode/python";
+import "brace/mode/r";
+import "brace/mode/scss";
 import "brace/mode/sh";
 import "brace/mode/text";
 import "brace/mode/typescript";
-import "brace/mode/yaml";
-import "brace/mode/c_cpp";
-import "brace/mode/scss";
-import "brace/mode/html";
 import "brace/mode/xml";
-import "brace/mode/r";
+import "brace/mode/yaml";
 import "brace/theme/chrome";
 import "brace/theme/idle_fingers";
-import "brace/ext/searchbox";
-import "brace/ext/language_tools";
-import {getModeForPath} from "./modelist";
 import {AceEditorOptions} from "./ace-editor-options";
+import {getModeForPath} from "./modelist";
 
 @Component({
     selector: "ct-code-editor",

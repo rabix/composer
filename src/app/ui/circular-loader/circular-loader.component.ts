@@ -1,4 +1,4 @@
-import {Component, OnInit, ChangeDetectionStrategy} from "@angular/core";
+import {ChangeDetectionStrategy, Component, OnInit} from "@angular/core";
 
 @Component({
     selector: "ct-circular-loader",

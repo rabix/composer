@@ -1,6 +1,6 @@
-import {Component, OnInit, ChangeDetectionStrategy, Input, EventEmitter, Output, OnChanges, OnDestroy} from "@angular/core";
-import {CommandLineToolModel, ExpressionModel} from "cwlts/models";
+import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output} from "@angular/core";
 import {FormArray, FormControl, FormGroup} from "@angular/forms";
+import {CommandLineToolModel, ExpressionModel} from "cwlts/models";
 import {Subscription} from "rxjs/Subscription";
 import {ModalService} from "../../../../ui/modal/modal.service";
 
