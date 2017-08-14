@@ -26,9 +26,11 @@ export class PlatformAppSavingService implements AppSaver {
             confirmationLabel: "Publish",
             formControl: revisionNoteControl
         }).then(() => this.saveWithNote(appID, content, revisionNoteControl.value));
-    };
+    }
 
     private saveWithNote(appID: string, content: string, revisionNote: string): Promise<any> {
-        return this.platformRepository.saveAppRevision(appID, content, revisionNote);
+        return this.platformRepository.saveAppRevision(appID, content, revisionNote).then(result => {
+            return JSON.stringify(JSON.parse(result), null, 4);
+        });
     }
 }
