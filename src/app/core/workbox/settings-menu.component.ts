@@ -10,16 +10,15 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {GlobalService} from "../global/global.service";
 import {SendFeedbackModalComponent} from "../modals/send-feedback-modal/send-feedback.modal.component";
 import {WorkboxService} from "./workbox.service";
-import {LocalRepositoryService} from "../../repository/local-repository.service";
 
 @Component({
 
     selector: "ct-settings-menu",
     styleUrls: ["./settings-menu.component.scss"],
     template: `
-        <ct-generic-dropdown-menu [ct-menu]="menu" menuAlign="left" [menuState]="openStatus" 
-                                  [class.update-available]="updateAvailable | async">
-            
+        <ct-generic-dropdown-menu [ct-menu]="menu" menuAlign="left" [menuState]="openStatus"
+                                  [class.update-available]="isPlatformOutdated()">
+
             <span *ngIf="active">{{ userLabel }}</span>
             <i class="fa fa-chevron-down fa-fw settings-icon"> </i>
 
@@ -58,14 +57,11 @@ export class SettingsMenuComponent extends DirectiveBase {
 
     credentials: Observable<AuthCredentials[]>;
 
-    updateAvailable: Observable<string>;
-
     constructor(private workbox: WorkboxService,
                 private settings: SettingsService,
                 private modal: ModalService,
                 private system: SystemService,
                 private global: GlobalService,
-                public localRepository: LocalRepositoryService,
                 private auth: AuthService) {
         super();
 
@@ -74,14 +70,16 @@ export class SettingsMenuComponent extends DirectiveBase {
         // Store the stream locally so we don't have a auth.getCredentials function call in the template
         this.credentials = auth.getCredentials();
 
-        this.updateAvailable = localRepository.getUpdateAvailable();
-
         auth.getActive().subscribeTracked(this, cred => {
             this.active = cred;
             if (this.active) {
                 this.userLabel = `${this.active.user.username} (${AuthCredentials.getPlatformShortName(this.active.url)})`;
             }
         });
+    }
+
+    isPlatformOutdated() {
+        return this.global.platformIsOutdated;
     }
 
     openSettings(): void {
@@ -119,7 +117,7 @@ export class SettingsMenuComponent extends DirectiveBase {
     }
 
     checkForPlatformUpdates() {
-        this.global.checkForPlatformUpdates();
+        this.global.checkForPlatformUpdates().then();
         this.openStatus.next(false);
     }
 }

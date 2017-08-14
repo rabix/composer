@@ -10,28 +10,33 @@ import {SystemService} from "../../../platform-providers/system.service";
         <div class="body">
 
             <div class="dialog-content">
-                What's new:
-                
-                <div [ct-markdown]="description">
+                <div [ct-markdown]="description" *ngIf="platformIsOutdated; else upToDate">
                 </div>
             </div>
 
+            <ng-template #upToDate>
+                Your platform is up to date!
+            </ng-template>
+
             <!--Footer-->
             <div class="footer pr-1 pb-1">
-                
+
                 <button type="button" class="btn btn-secondary" data-test='cancel-button'
                         (click)="onCancel()">Cancel
                 </button>
-                
-                <button type="button" class="btn btn-primary" data-test='download-button'
+
+                <button *ngIf="platformIsOutdated" type="button" class="btn btn-primary" data-test='download-button'
                         (click)="onDownload()">Download
                 </button>
-            </div>            
+            </div>
 
         </div>
     `
 })
 export class UpdatePlatformModalComponent extends DirectiveBase {
+
+    @Input()
+    platformIsOutdated = false;
 
     @Input()
     description: string;

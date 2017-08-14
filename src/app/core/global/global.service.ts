@@ -6,15 +6,19 @@ import {ErrorWrapper} from "../helpers/error-wrapper";
 import {LocalRepositoryService} from "../../repository/local-repository.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {UpdatePlatformModalComponent} from "../modals/update-platform-modal/update-platform-modal.component";
+import {IpcService} from "../../services/ipc.service";
 
 @Injectable()
 export class GlobalService {
 
-    private checkingForPlatformUpdate = false;
+    private checkForPlatformUpdatePromise: Promise<any> = null;
+
+    public platformIsOutdated = false;
 
     constructor(private platformRepository: PlatformRepositoryService,
                 private localRepository: LocalRepositoryService,
                 private notificationBar: NotificationBarService,
+                private ipc: IpcService,
                 private modal: ModalService,
                 private statusBar: StatusBarService) {
     }
@@ -32,44 +36,65 @@ export class GlobalService {
         });
     }
 
-    checkForPlatformUpdates() {
+    checkForPlatformUpdates(showUpToDateModal: boolean = false) {
 
-        if (!this.checkingForPlatformUpdate) {
+        if (this.checkForPlatformUpdatePromise) {
+            return this.checkForPlatformUpdatePromise;
+        }
 
-            this.checkingForPlatformUpdate = true;
+        this.checkForPlatformUpdatePromise = new Promise((resolve, reject) => {
 
             const process = this.statusBar.startProcess("Checking for platform updates.");
 
-            this.platformRepository.checkForPlatformUpdates().withLatestFrom(this.localRepository.getUpdateAvailable())
+            this.ipc.request("checkForPlatformUpdates").withLatestFrom(this.localRepository.getIgnoredUpdateVersion())
                 .take(1).subscribe((result) => {
 
-                this.checkingForPlatformUpdate = false;
-                this.statusBar.stopProcess(process, "Checking for platform updates is finished.");
+                this.checkForPlatformUpdatePromise = null;
+                this.statusBar.stopProcess(process, "");
 
-                const [hasUpdate, lastAvailableUpdateStored] = result;
+                const [hasUpdate, ignoredUpdateVersion] = result;
 
                 if (!hasUpdate) {
-                    this.localRepository.setUpdateAvailable(null).then();
-                    return;
+
+                    this.localRepository.setIgnoredUpdateVersion(null).then();
+
+                    if (showUpToDateModal) {
+                        const modal = this.modal.fromComponent(UpdatePlatformModalComponent, {title: "Platform updates!"});
+
+                        modal.onCancel = () => {
+                            this.modal.close();
+                        };
+                    }
+
+                } else {
+
+                    this.platformIsOutdated = true;
+
+                    if (hasUpdate !== ignoredUpdateVersion) {
+                        const modal = this.modal.fromComponent(UpdatePlatformModalComponent, {title: "Platform updates!"});
+
+                        modal.platformIsOutdated = true;
+                        modal.description = hasUpdate.body;
+                        modal.downloadLink = hasUpdate.html_url;
+
+                        modal.onCancel = () => {
+                            this.modal.close();
+                            this.localRepository.setIgnoredUpdateVersion(hasUpdate).then();
+                        };
+                    }
                 }
 
-                if (hasUpdate !== lastAvailableUpdateStored) {
-                    const modal = this.modal.fromComponent(UpdatePlatformModalComponent, { title: "Update available!"});
-
-                    modal.description = hasUpdate.body;
-                    modal.downloadLink = hasUpdate.html_url;
-
-                    modal.onCancel = () => {
-                        this.modal.close();
-                        this.localRepository.setUpdateAvailable(hasUpdate).then();
-                    };
-                }
+                resolve(result);
 
             }, (err) => {
-                this.checkingForPlatformUpdate = false;
-                this.statusBar.stopProcess(process, "Failed to get platform updates.");
+                this.checkForPlatformUpdatePromise = null;
+                this.statusBar.stopProcess(process, "");
                 this.notificationBar.showNotification(new ErrorNotification("Cannot get platform updates. " + new ErrorWrapper(err)));
+
+                reject(new ErrorWrapper(err));
             });
-        }
+        });
+
+        return this.checkForPlatformUpdatePromise;
     }
 }
