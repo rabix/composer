@@ -4,16 +4,20 @@ import * as acceleratorProxy from "./accelerator-proxy";
 
 const {app, Menu, BrowserWindow} = require("electron");
 
-const isWebdriverRun        = ~process.argv.indexOf("--test-type=webdriver");
-const defaultUserDataPath   = app.getPath("home") + "/.sevenbridges/rabix-composer";
-const webdriverUserDataPath = defaultUserDataPath + "-e2e";
-
+const isWebdriverRun           = ~process.argv.indexOf("--test-type=webdriver");
+const defaultUserDataPath      = app.getPath("home") + "/.sevenbridges/rabix-composer";
+const webdriverUserDataPath    = defaultUserDataPath + "-e2e";
+const webdriverGlobalNamespace = "__webdriver";
 
 if (isWebdriverRun) {
     mkdirp.sync(webdriverUserDataPath);
     app.setPath("userData", webdriverUserDataPath);
-    global["__endpoints"]        = require("./routes");
-    global["__webdriverCleanup"] = () => rimraf(webdriverUserDataPath, () => void 0);
+
+    addGlobals(webdriverGlobalNamespace, {
+        endpoints: require("./routes"),
+        cleanup: () => rimraf(webdriverUserDataPath, () => void 0),
+    });
+
 } else {
     app.setPath("userData", defaultUserDataPath);
 }
@@ -142,18 +146,17 @@ function start(config: { devTools: boolean, url: string }) {
 export = {
     start: (config) => {
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
+        // This method will be called when Electron has finished
+        // initialization and is ready to create browser windows.
+        // Some APIs can only be used after this event occurs.
         app.on("ready", () => start(config));
 
-// Quit when all windows are closed.
+        // Quit when all windows are closed.
         app.on("window-all-closed", () => {
             // On macOS it is common for applications and their menu bar
             // to stay active until the user quits explicitly with Cmd + Q
             if (process.platform !== "darwin") {
                 app.quit();
-
             }
 
 
@@ -167,4 +170,13 @@ export = {
             }
         });
     }
-};
+}
+
+function addGlobals(namespace: string, valueMap: Object) {
+
+    if (!global[namespace]) {
+        global[namespace] = {};
+    }
+
+    Object.assign(global[namespace], valueMap);
+}

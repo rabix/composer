@@ -7,17 +7,9 @@ export class ProfileLoader {
 
     static patchLocal(profile: Partial<LocalRepository>) {
 
-        const serializedProfile = JSON.stringify(profile);
-
         return ProfileLoader.callRemoteEndpoint("patchLocalRepository", profile, () => {
             console.log("Done!");
         });
-
-        // return browser.executeAsyncScript(function (profile, callback) {
-        //     window["require"]("electron").remote.getGlobal("__endpoints").patchLocalRepository(JSON.parse(profile), () => {
-        //         callback("done");
-        //     });
-        // }, serializedProfile);
     }
 
     static getTestExecutionDirectory(): promise.Promise<string> {
@@ -41,13 +33,13 @@ export class ProfileLoader {
         return ProfileLoader.getTestExecutionDirectory()
             .then(executionDir => {
 
-            })
+            });
     }
 
     static callRemoteEndpoint(method: string, data: any, callback: Function) {
 
         return browser.executeAsyncScript(function (method, data, callback) {
-            window["require"]("electron").remote.getGlobal("__endpoints")[method](JSON.parse(data), function (err, result) {
+            window["require"]("electron").remote.getGlobal("__webdriver").endpoints[method](JSON.parse(data), function (err, result) {
                 callback(err, result);
             });
         }, method, JSON.stringify(data)).then((data) => {

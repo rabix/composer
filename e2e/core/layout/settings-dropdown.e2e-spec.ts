@@ -1,8 +1,15 @@
-import {by, element} from "protractor";
+import {browser, by, element} from "protractor";
 import {ProfileLoader} from "../../helpers/profile-loader";
 
 describe("Settings Dropdown", async () => {
 
+    beforeEach(() => {
+        browser.restartSync();
+    });
+
+    afterEach(() => {
+        browser.quit();
+    });
 
     it("should display an active user", async () => {
 
@@ -19,6 +26,8 @@ describe("Settings Dropdown", async () => {
             activeCredentials: user,
             credentials: [user]
         });
+
+        browser.sleep(2000);
 
         const settingsMenu = element(by.css("ct-settings-menu"));
         const text         = await settingsMenu.getText();

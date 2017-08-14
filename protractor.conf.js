@@ -31,7 +31,9 @@ exports.config = {
     },
     // baseUrl: "http://localhost:4200/",
     framework: "jasmine",
-    restartBrowserBetweenTests: true,
+    // This should ideally be true, but it would prevent testing flows
+    // in which we check if some state is preserved between restarts
+    restartBrowserBetweenTests: false,
     jasmineNodeOpts: {
         showColors: true,
         defaultTimeoutInterval: 30000,
