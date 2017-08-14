@@ -4,12 +4,21 @@ import * as acceleratorProxy from "./accelerator-proxy";
 
 const {app, Menu, BrowserWindow} = require("electron");
 
-const isWebdriverRun           = ~process.argv.indexOf("--test-type=webdriver");
-const defaultUserDataPath      = app.getPath("home") + "/.sevenbridges/rabix-composer";
-const webdriverUserDataPath    = defaultUserDataPath + "-e2e";
+const isWebdriverRun      = ~process.argv.indexOf("--test-type=webdriver");
+const defaultUserDataPath = app.getPath("home") + "/.sevenbridges/rabix-composer";
+
 const webdriverGlobalNamespace = "__webdriver";
 
 if (isWebdriverRun) {
+    let testRunID = Date.now().toString();
+    for (let entry of process.argv) {
+        if (entry.startsWith("--webdriver-run-id")) {
+            testRunID = entry.split("=")[1] + "/" + testRunID;
+        }
+    }
+
+    const webdriverUserDataPath = defaultUserDataPath + "-e2e-" + testRunID;
+
     mkdirp.sync(webdriverUserDataPath);
     app.setPath("userData", webdriverUserDataPath);
 

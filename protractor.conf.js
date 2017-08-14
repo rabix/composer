@@ -4,8 +4,13 @@
 /*global jasmine */
 const rimraf = require("rimraf");
 
+const path = require("path");
+const protractor = require("protractor");
+
 const {SpecReporter} = require('jasmine-spec-reporter');
 const glob = require("glob");
+
+const executionTime = Date.now();
 
 exports.config = {
     allScriptsTimeout: 11000,
@@ -26,7 +31,7 @@ exports.config = {
                 }
                 return files[0];
             })(),
-            args: ["--webdriver-e2e"]
+            args: ["--webdriver-e2e", "--webdriver-run-id=" + executionTime]
         }
     },
     // baseUrl: "http://localhost:4200/",
@@ -44,12 +49,26 @@ exports.config = {
         require('ts-node').register({
             project: 'e2e/tsconfig.json'
         });
-        jasmine.getEnv().addReporter(new SpecReporter({spec: {displayStacktrace: true}}));
 
-        jasmine.getEnv().afterAll(() => {
-            browser.executeScript(`return window["require"]("electron").remote.app.getPath("userData")`).then(dataPath => {
-                rimraf.sync(dataPath);
+        let testRoot;
+
+        jasmine.getEnv().beforeEach(() => {
+            if (testRoot) {
+                return;
+            }
+
+            browser.executeAsyncScript(function (callback) {
+                const dataPath = window["require"]("electron").remote.app.getPath("userData");
+                callback(dataPath);
+            }).then(dataPath => {
+                testRoot = path.dirname(dataPath);
             });
         });
+
+        jasmine.getEnv().afterAll(() => {
+            rimraf.sync(testRoot);
+        });
+
+        jasmine.getEnv().addReporter(new SpecReporter({spec: {displayStacktrace: true}}));
     }
 };

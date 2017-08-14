@@ -1,16 +1,18 @@
-import {browser} from "protractor";
+import {browser, protractor} from "protractor";
 import {RabixComposerPage} from "./app.po";
+import {boot, cleanQuit} from "./helpers/helpers";
 
 describe("rabix-composer App", () => {
     let app: RabixComposerPage;
 
     beforeEach(() => {
-        browser.restartSync();
+        boot();
+
         app = new RabixComposerPage();
     });
 
     afterEach(() => {
-        browser.close();
+        cleanQuit();
     });
 
     it("should display the layout", () => {
