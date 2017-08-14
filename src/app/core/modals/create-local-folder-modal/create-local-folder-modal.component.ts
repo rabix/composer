@@ -1,11 +1,11 @@
 import {Component, Input, OnInit} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {FileRepositoryService} from "../../../file-repository/file-repository.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {FormAsyncValidator} from "../../forms/helpers/form-async-validator";
-import {FileRepositoryService} from "../../../file-repository/file-repository.service";
 
 @Component({
     selector: "ct-create-local-folder-modal",

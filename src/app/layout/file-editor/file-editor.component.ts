@@ -1,10 +1,10 @@
 import {Component, Input, OnInit} from "@angular/core";
 import {FormControl} from "@angular/forms";
+import {CodeSwapService} from "../../core/code-content-service/code-content.service";
+import {DataGatewayService} from "../../core/data-gateway/data-gateway.service";
 import {AppTabData} from "../../core/workbox/app-tab-data";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
-import {DataGatewayService} from "../../core/data-gateway/data-gateway.service";
 import {StatusBarService} from "../status-bar/status-bar.service";
-import {CodeSwapService} from "../../core/code-content-service/code-content.service";
 
 @Component({
     selector: "ct-file-editor",

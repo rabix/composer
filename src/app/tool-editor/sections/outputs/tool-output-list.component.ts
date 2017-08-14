@@ -1,21 +1,9 @@
-import {noop} from "../../../lib/utils.lib";
-import {
-    Component,
-    EventEmitter,
-    Input,
-    Output,
-    QueryList,
-    TemplateRef,
-    ViewChildren
-} from "@angular/core";
+import {Component, EventEmitter, Input, Output, QueryList, TemplateRef, ViewChildren} from "@angular/core";
+import {CommandInputParameterModel, CommandLineToolModel, CommandOutputParameterModel} from "cwlts/models";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
-import {
-    CommandInputParameterModel,
-    CommandLineToolModel,
-    CommandOutputParameterModel
-} from "cwlts/models";
-import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {noop} from "../../../lib/utils.lib";
 import {ModalService} from "../../../ui/modal/modal.service";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
     selector: "ct-tool-output-list",
@@ -230,7 +218,7 @@ export class ToolOutputListComponent extends DirectiveBase {
     }
 
     updateOutput(output: CommandOutputParameterModel) {
-        output.validate(this.model.getContext(output.id)).then(noop, noop);
+        output.validate(this.model.getContext(output)).then(noop, noop);
         this.update.emit(this.model.outputs);
     }
 }

@@ -1,12 +1,9 @@
-import {app} from "electron";
-import * as storage from "electron-storage";
 import * as ReadWriteLock from "rwlock";
 import {LocalRepository} from "./types/local-repository";
 import {RepositoryType} from "./types/repository-type";
 import {UserRepository} from "./types/user-repository";
 
-const fs = require("fs");
-
+const fs = require("fs-extra");
 
 export class DataRepository {
 
@@ -15,8 +12,11 @@ export class DataRepository {
 
     private lock      = new ReadWriteLock();
     private listeners = {};
+    private profileDirectory: string;
 
-    constructor() {
+    constructor(profileDirectory: string) {
+
+        this.profileDirectory = profileDirectory;
 
         this.on("update.local.activeCredentials", (activeCredentials: any) => {
 
@@ -132,7 +132,7 @@ export class DataRepository {
 
     private update<T extends RepositoryType>(profile: string, data: Partial<T>, callback?: (err?: Error, data?: T) => void) {
 
-        const profilePath = `profiles/${profile}`;
+        const profilePath = this.getProfileFilePath(profile);
         this.trigger("update", {user: this.user, local: this.local});
 
         if (profile === "local") {
@@ -195,11 +195,8 @@ export class DataRepository {
         return this.local.activeCredentials && profile === this.local.activeCredentials.id;
     }
 
-    private getProfileFilePath(profile: string, prefix = app.getPath("userData")): string {
-        return [
-            prefix,
-            `profiles/${profile}.json`
-        ].filter(v => v).join("/");
+    private getProfileFilePath(profile: string): string {
+        return `${this.profileDirectory}/${profile}.json`;
     }
 
     /**
@@ -207,22 +204,9 @@ export class DataRepository {
      */
     private loadProfile<T extends Object>(path = "local", defaultData: T, callback: (err: Error, data?: T) => any): void {
 
-        const filePath = this.getProfileFilePath(path, null);
+        const filePath = this.getProfileFilePath(path);
 
-        storage.isPathExists(filePath, (exists) => {
-
-            if (!exists) {
-
-                this.storageWrite(filePath, defaultData, err => {
-                    if (err) return callback(err);
-
-                    callback(null, defaultData);
-
-                });
-
-                return;
-            }
-
+        if (fs.existsSync(filePath)) {
             this.storageRead(filePath, (err, storageContent: T) => {
                 if (err) {
                     return callback(err);
@@ -236,8 +220,13 @@ export class DataRepository {
                 }
                 callback(null, storageContent);
             });
+        } else {
+            this.storageWrite(filePath, defaultData, err => {
+                if (err) return callback(err);
 
-        });
+                callback(null, defaultData);
+            });
+        }
     }
 
     private trigger(event, data) {
@@ -256,18 +245,28 @@ export class DataRepository {
 
     private storageRead(filePath, callback: (err?: Error, content?: any) => void) {
         this.lock.readLock(filePath, (release) => {
-            storage.get(filePath, (err, content) => {
+            fs.readFile(filePath, "utf8", (err, content) => {
                 release();
-                callback(err, content);
+                if (err) {
+                    return callback(err);
+                }
+
+                try {
+                    const parsed = JSON.parse(content);
+                    callback(null, parsed);
+                } catch (err) {
+                    callback(err);
+                }
             });
         });
     }
 
-    private storageWrite(filePath, data, callback) {
+    private storageWrite(filePath, input, callback) {
+        const frozen = JSON.stringify(input, null, 4);
+
         this.lock.writeLock(filePath, (release) => {
 
-            const frozen = JSON.stringify(data, null, 4);
-            storage.set(filePath, frozen, (err, data) => {
+            fs.outputFile(filePath, frozen, (err, data) => {
                 release();
                 callback(err, data);
             });
@@ -278,14 +277,14 @@ export class DataRepository {
     }) {
         const profileIDs = this.local.credentials.map(c => c.id);
 
-        fs.readdir(app.getPath("userData") + "/profiles", (err, files) => {
+        fs.readdir(this.profileDirectory, (err, files) => {
             if (err) {
                 return callback(err);
             }
 
             const deletables = files
                 .map(file => file.slice(0, -5)) // remove .json extension
-                .filter(profile => profileIDs.indexOf(profile) === -1) // take just the ones not present in profiles
+                .filter(profile => profile !== "local" && profileIDs.indexOf(profile) === -1) // take just the ones not present in profiles
                 .map(profile => new Promise((resolve, reject) => {
 
                     fs.unlink(this.getProfileFilePath(profile), (err, data) => {

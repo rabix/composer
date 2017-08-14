@@ -1,12 +1,12 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {noop} from "../../../lib/utils.lib";
 import {ExpressionModel} from "cwlts/models";
 import {ModelExpressionEditorComponent} from "../../../editor-common/expression-editor/model-expression-editor.component";
-import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {noop} from "../../../lib/utils.lib";
 import {ACE_MODE_MAP} from "../../../ui/code-editor-new/ace-mode-map";
 import {MultilangCodeEditorComponent} from "../../../ui/code-editor/multilang-code-editor.component";
 import {ModalService} from "../../../ui/modal/modal.service";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
     encapsulation: ViewEncapsulation.None,

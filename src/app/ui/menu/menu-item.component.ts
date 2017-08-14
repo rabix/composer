@@ -1,4 +1,5 @@
 import {
+    AfterViewInit,
     ChangeDetectionStrategy,
     Component,
     ElementRef,
@@ -6,15 +7,14 @@ import {
     HostListener,
     Input,
     OnDestroy,
-    AfterViewInit,
     OnInit,
     ViewChild,
     ViewEncapsulation
 } from "@angular/core";
-import {MenuItem} from "./menu-item";
-import {Subscription} from "rxjs/Subscription";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
+import {Subscription} from "rxjs/Subscription";
+import {MenuItem} from "./menu-item";
 
 @Component({
     encapsulation: ViewEncapsulation.None,

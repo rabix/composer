@@ -1,6 +1,6 @@
-import {Component, Input, Output, ViewChild, EventEmitter} from "@angular/core";
-import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {Component, EventEmitter, Input, Output, ViewChild} from "@angular/core";
 import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {ToolInputListComponent} from "./tool-input-list.component";
 
 @Component({

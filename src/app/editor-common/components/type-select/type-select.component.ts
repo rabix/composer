@@ -1,4 +1,4 @@
-import {Component, forwardRef, Input, OnChanges} from "@angular/core";
+import {Component, forwardRef, Input} from "@angular/core";
 import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ParameterTypeModel} from "cwlts/models";
 import {noop} from "../../../lib/utils.lib";

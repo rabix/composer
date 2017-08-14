@@ -1,7 +1,7 @@
-import {Subject} from "rxjs/Subject";
-import {Component, Input, Output, ViewEncapsulation, OnInit} from "@angular/core";
+import {Component, Input, OnInit, Output, ViewEncapsulation} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {CommandArgumentModel} from "cwlts/models";
+import {Subject} from "rxjs/Subject";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({

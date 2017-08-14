@@ -2,7 +2,6 @@ import {async, ComponentFixture, fakeAsync, TestBed, tick} from "@angular/core/t
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {AutoCompleteComponent} from "./auto-complete.component";
 import {SelectComponent} from "./select/select.component";
-import {By} from "@angular/platform-browser";
 
 describe("UI", () => {
     describe("AutoCompleteComponent", () => {

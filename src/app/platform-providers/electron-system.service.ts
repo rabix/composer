@@ -10,7 +10,10 @@ export class ElectronSystemService extends SystemService {
         webFrame.setZoomLevelLimits(1, 1);
     }
 
-    public openLink(url: string) {
+    public openLink(url: string, event?: MouseEvent) {
+        if (event) {
+            event.preventDefault();
+        }
         shell.openExternal(url);
     }
 }

@@ -1,6 +1,4 @@
 import {Injectable} from "@angular/core";
-import "rxjs/add/operator/publishReplay"
-import "rxjs/add/operator/shareReplay"
 import {Observable} from "rxjs/Observable";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {RecentAppTab} from "../../../electron/src/storage/types/recent-app-tab";

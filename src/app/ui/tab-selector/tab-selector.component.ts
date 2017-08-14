@@ -1,16 +1,17 @@
 import {
     AfterViewInit,
-    ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
     ContentChildren,
     ElementRef,
     EventEmitter,
-    Input, OnChanges,
+    Input,
+    OnChanges,
     OnInit,
     Output,
     QueryList,
-    Renderer, SimpleChanges,
+    Renderer,
+    SimpleChanges,
     ViewChild
 } from "@angular/core";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
