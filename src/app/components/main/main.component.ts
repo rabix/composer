@@ -1,5 +1,6 @@
 import {Component, ViewContainerRef, ViewEncapsulation} from "@angular/core";
 import {Observable} from "rxjs/Observable";
+import {noop} from "../../lib/utils.lib";
 import {AuthService} from "../../auth/auth.service";
 import {GlobalService} from "../../core/global/global.service";
 import {SystemService} from "../../platform-providers/system.service";
@@ -54,10 +55,10 @@ export class MainComponent {
         /**
          * This has to be after  modal.setViewContainer(vcRef) in order to show the modal.
          */
-        global.checkForPlatformUpdates().then();
+        global.checkForPlatformUpdates().then(noop, noop);
 
         ipc.watch("accelerator", "checkForPlatformUpdates").subscribe(() => {
-            global.checkForPlatformUpdates(true).then();
+            global.checkForPlatformUpdates(true).then(noop, noop);
         });
 
         this.runnix = Observable.fromEvent(document, "keyup").map((e: KeyboardEvent) => e.keyCode).bufferCount(10, 1)
