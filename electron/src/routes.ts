@@ -16,7 +16,6 @@ const swapController = new SwapController(swapPath);
 const fsController          = require("./controllers/fs.controller");
 const acceleratorController = require("./controllers/accelerator.controller");
 const resolver              = require("./schema-salad-resolver/schema-salad-resolver");
-const md5                   = require("md5");
 const semver                = require("semver");
 
 const repository = new DataRepository(app.getPath("userData") + "/profiles");
@@ -481,7 +480,7 @@ module.exports = {
 
             callback(null, hasUpdate);
 
-        }, callback).catch(callback);
+        }, callback);
     },
 
     patchAppMeta: (data: {

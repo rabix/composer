@@ -1,7 +1,6 @@
 import {Component} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
-import {noop} from "../../lib/utils.lib";
 import {AuthService} from "../../auth/auth.service";
 import {AuthCredentials} from "../../auth/model/auth-credentials";
 import {SystemService} from "../../platform-providers/system.service";
@@ -118,7 +117,7 @@ export class SettingsMenuComponent extends DirectiveBase {
     }
 
     checkForPlatformUpdates() {
-        this.global.checkForPlatformUpdates().then(noop, noop);
+        this.global.checkForPlatformUpdates();
         this.openStatus.next(false);
     }
 }
