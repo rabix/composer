@@ -15,7 +15,7 @@ import {SystemService} from "../../../platform-providers/system.service";
             </div>
 
             <ng-template #upToDate>
-                Your platform is up to date!
+                Rabix Composer is up to date!
             </ng-template>
 
             <!--Footer-->

@@ -44,7 +44,7 @@ export class GlobalService {
 
         this.checkForPlatformUpdatePromise = new Promise((resolve, reject) => {
 
-            const process = this.statusBar.startProcess("Checking for platform updates.");
+            const process = this.statusBar.startProcess("Checking for platform updates...");
 
             this.ipc.request("checkForPlatformUpdates").withLatestFrom(this.localRepository.getIgnoredUpdateVersion())
                 .take(1).subscribe((result) => {
@@ -54,19 +54,7 @@ export class GlobalService {
 
                 const [hasUpdate, ignoredUpdateVersion] = result;
 
-                if (!hasUpdate) {
-
-                    this.localRepository.setIgnoredUpdateVersion(null).then();
-
-                    if (showUpToDateModal) {
-                        const modal = this.modal.fromComponent(UpdatePlatformModalComponent, {title: "Platform updates!"});
-
-                        modal.onCancel = () => {
-                            this.modal.close();
-                        };
-                    }
-
-                } else {
+                if (hasUpdate) {
 
                     this.platformIsOutdated = true;
 
@@ -79,7 +67,19 @@ export class GlobalService {
 
                         modal.onCancel = () => {
                             this.modal.close();
-                            this.localRepository.setIgnoredUpdateVersion(hasUpdate).then();
+                            this.localRepository.setIgnoredUpdateVersion(hasUpdate);
+                        };
+                    }
+
+                } else {
+
+                    this.localRepository.setIgnoredUpdateVersion(null).then();
+
+                    if (showUpToDateModal) {
+                        const modal = this.modal.fromComponent(UpdatePlatformModalComponent, {title: "Platform updates!"});
+
+                        modal.onCancel = () => {
+                            this.modal.close();
                         };
                     }
                 }
@@ -91,7 +91,7 @@ export class GlobalService {
                 this.statusBar.stopProcess(process, "");
                 this.notificationBar.showNotification(new ErrorNotification("Cannot get platform updates. " + new ErrorWrapper(err)));
 
-                reject(new ErrorWrapper(err));
+                reject(err);
             });
         });
 
