@@ -1,4 +1,4 @@
-import {Component, Injector, OnInit} from "@angular/core";
+import {ChangeDetectorRef, Component, Injector, NgZone, OnInit} from "@angular/core";
 import {FormGroup} from "@angular/forms";
 import {CommandLineToolModel} from "cwlts/models";
 import {CommandLineToolFactory} from "cwlts/models/generic/CommandLineToolFactory";
@@ -61,6 +61,9 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
 
     toolGroup: FormGroup;
 
+    /** Added to notify job editor to re-render job inputs when job values are reset to mock values */
+    resetMockValuesIndicator = {};
+
     constructor(statusBar: StatusBarService,
                 notificationBarService: NotificationBarService,
                 modal: ModalService,
@@ -91,6 +94,8 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
 
     resetJob() {
         this.dataModel.resetJobDefaults();
+        // Changing reference in order to call ngOnChanges in job editor and update job entry values
+        this.resetMockValuesIndicator = {};
     }
 
     protected getPreferredTab(): string {

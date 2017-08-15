@@ -119,6 +119,7 @@
     <ct-job-editor *ngIf="viewMode === 'test' && !isLoading && dataModel"
                    class="flex-col"
                    [model]="dataModel"
+                   [resetMockValuesIndicator]="resetMockValuesIndicator"
                    (update)="onJobUpdate($event); syncModelAndCode(false)"
                    (reset)="resetJob()"></ct-job-editor>
 

@@ -82,7 +82,7 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
 
         <div class="block mb-1">
             <button class="btn btn-secondary pull-right"
-                    (click)="reset.emit()">
+                    (click)="resetToMockValues()">
                 Reset to mock values
             </button>
         </div>
@@ -102,6 +102,12 @@ export class JobEditorComponent implements OnChanges, OnDestroy {
      * CWL app input definitions.
      */
     inputs: CommandInputParameterModel[] = [];
+
+    /**
+     * Added to call ngOnChanges, by changing reference manually, when values are reset to mock values
+     */
+    @Input()
+    resetMockValuesIndicator;
 
     @Output()
     update = new EventEmitter();
@@ -224,6 +230,14 @@ export class JobEditorComponent implements OnChanges, OnDestroy {
         // Send output for component
         this.update.emit(this.job);
         this.cdr.markForCheck();
+    }
+
+    resetToMockValues() {
+        if (this.inspector.inspectedObject.getValue() !== "revisions") {
+            this.inspector.hide();
+        }
+
+        this.reset.emit();
     }
 
     ngOnChanges(changes: SimpleChanges) {
