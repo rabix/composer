@@ -1,5 +1,4 @@
 import * as mkdirp from "mkdirp";
-import * as rimraf from "rimraf";
 import * as acceleratorProxy from "./accelerator-proxy";
 
 const {app, Menu, BrowserWindow} = require("electron");
@@ -24,7 +23,8 @@ if (isWebdriverRun) {
 
     addGlobals(webdriverGlobalNamespace, {
         endpoints: require("./routes"),
-        cleanup: () => rimraf(webdriverUserDataPath, () => void 0),
+        require: require,
+        mockRequire: require("mock-require")
     });
 
 } else {

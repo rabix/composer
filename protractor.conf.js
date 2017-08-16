@@ -16,7 +16,8 @@ exports.config = {
     allScriptsTimeout: 11000,
     directConnect: true,
     specs: [
-        "./e2e/**/*.e2e-spec.ts"
+        // "./e2e/**/*.e2e-spec.ts",
+        "./e2e/core/layout/settings-dropdown.e2e-spec.ts"
     ],
     capabilities: {
         browserName: "chrome",

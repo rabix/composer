@@ -1,18 +1,25 @@
-import {by, element} from "protractor";
-import {boot, cleanQuit} from "../../helpers/helpers";
+import {browser, by, element} from "protractor";
+import {boot, callRemoteEndpoint, cleanQuit} from "../../helpers/helpers";
+import {httpMock} from "../../helpers/http-proxy";
 import {ProfileLoader} from "../../helpers/profile-loader";
 
 describe("Settings Dropdown", async () => {
 
     beforeEach(() => {
         boot();
+
     });
 
     afterEach(() => {
         cleanQuit();
+
+        browser.manage().logs().get("browser").then((logs) => {
+            console.log("Got browser logs", logs);
+        });
     });
 
     it("should display an active user", async () => {
+
 
         const user = {
             "id": "api_demo",
@@ -32,6 +39,15 @@ describe("Settings Dropdown", async () => {
         const text         = await settingsMenu.getText();
 
         expect(text.trim()).toEqual("demon (CGC)");
+
+
+        httpMock();
+
+        callRemoteEndpoint("fetchPlatformData", {}, (err, data) => {
+
+            console.log("Fetched", err, data);
+        });
+        browser.sleep(40000);
 
     });
 });
