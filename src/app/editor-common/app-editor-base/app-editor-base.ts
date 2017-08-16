@@ -1,4 +1,12 @@
-import {AfterViewInit, Injector, Input, OnInit, TemplateRef, ViewChild, ViewContainerRef} from "@angular/core";
+import {
+    AfterViewInit,
+    Injector,
+    Input,
+    OnInit,
+    TemplateRef,
+    ViewChild,
+    ViewContainerRef
+} from "@angular/core";
 import {FormControl} from "@angular/forms";
 import {CommandLineToolModel, WorkflowModel} from "cwlts/models";
 
@@ -12,7 +20,11 @@ import {ErrorWrapper} from "../../core/helpers/error-wrapper";
 import {ProceedToEditingModalComponent} from "../../core/modals/proceed-to-editing-modal/proceed-to-editing-modal.component";
 import {PublishModalComponent} from "../../core/modals/publish-modal/publish-modal.component";
 import {AppTabData} from "../../core/workbox/app-tab-data";
-import {ErrorNotification, InfoNotification, NotificationBarService} from "../../layout/notification-bar/notification-bar.service";
+import {
+    ErrorNotification,
+    InfoNotification,
+    NotificationBarService
+} from "../../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {StatusControlProvider} from "../../layout/status-bar/status-control-provider.interface";
 import {PlatformRepositoryService} from "../../repository/platform-repository.service";
@@ -309,7 +321,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         return modal.response.take(1).toPromise().then(response => {
             this.toggleLock(false);
             return response;
-        });
+        }, err => console.warn);
     }
 
     /**
@@ -410,7 +422,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             const serialized = JSON.stringify(data, null, 4);
             this.codeEditorContent.setValue(serialized);
             return data;
-        });
+        }, err => console.warn);
     }
 
     protected afterModelValidation(): void {
@@ -435,35 +447,43 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     protected resolveToModel(content: string): Promise<Object> {
         const appMightBeRDF = this.tabData.dataSource === "local";
 
+        const tryModelCreation = (text, resolve, reject) => {
+            try {
+                this.recreateModel(text); // throws exception when generating graph
+                this.afterModelCreated(!this.modelCreated);
+                this.modelCreated = true;
+
+                resolve(text);
+            } catch (err) {
+                reject(new Error("Model error: " + err.message));
+            }
+        };
+
         return new Promise((resolve, reject) => {
             if (appMightBeRDF) {
                 const statusMessage = this.statusBar.startProcess("Resolving RDF Schema...");
 
                 this.resolveContent(content).then(resolved => {
-                    this.recreateModel(resolved);
-                    this.afterModelCreated(!this.modelCreated);
-                    this.modelCreated = true;
-
+                    tryModelCreation(resolved, resolve, reject);
                     this.statusBar.stopProcess(statusMessage, "");
-                    resolve(resolved);
+
                 }, err => {
                     this.statusBar.stopProcess(statusMessage, "Failed to resolve RDF schema.");
-                    reject(err);
+                    reject(new Error("RDF resolution error: " + err.message));
                 });
 
                 return;
             }
 
             const json = Yaml.safeLoad(content, {json: true} as LoadOptions);
-            this.recreateModel(json);
-            this.afterModelCreated(!this.modelCreated);
-            this.modelCreated = true;
-            resolve(json);
+
+            tryModelCreation(json, resolve, reject);
 
         }).then(result => {
             return result;
         }, err => {
-            this.notificationBar.showNotification(new ErrorNotification("RDF resolution error: " + err.message));
+
+            this.notificationBar.showNotification(new ErrorNotification(err.message || "Error occurred"));
 
             this.validationState.isValidCWL = false;
             this.validationState.errors     = [{
