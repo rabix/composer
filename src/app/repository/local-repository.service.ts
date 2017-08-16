@@ -17,6 +17,7 @@ export class LocalRepositoryService {
     private activeCredentials: ReplaySubject<AuthCredentials>         = new ReplaySubject(1);
     private selectedAppsPanel: ReplaySubject<"myApps" | "publicApps"> = new ReplaySubject(1);
     private publicAppsGrouping: ReplaySubject<"toolkit" | "category"> = new ReplaySubject(1);
+    private ignoredUpdateVersion: ReplaySubject<string>               = new ReplaySubject(1);
 
     constructor(private ipc: IpcService) {
 
@@ -28,6 +29,15 @@ export class LocalRepositoryService {
         this.listen("publicAppsGrouping").subscribe(this.publicAppsGrouping);
         this.listen("activeCredentials").map(cred => AuthCredentials.from(cred)).subscribe(this.activeCredentials);
         this.listen("credentials").map(creds => creds.map(c => AuthCredentials.from(c))).subscribe(this.credentials);
+        this.listen("ignoredUpdateVersion").subscribe(this.ignoredUpdateVersion);
+    }
+
+    getIgnoredUpdateVersion(): Observable<string> {
+        return this.ignoredUpdateVersion;
+    }
+
+    setIgnoredUpdateVersion(ignoredUpdateVersion: string): Promise<any> {
+        return this.patch({ignoredUpdateVersion}).toPromise();
     }
 
     getSelectedAppsPanel(): Observable<"myApps" | "publicApps"> {

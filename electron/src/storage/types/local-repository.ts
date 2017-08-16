@@ -26,6 +26,7 @@ export class LocalRepository extends RepositoryType {
         id: "?welcome",
         label: "Welcome",
         type: "Welcome"
-    }]
+    }];
 
+    ignoredUpdateVersion = null;
 }
