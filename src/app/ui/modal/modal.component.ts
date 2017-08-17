@@ -23,7 +23,16 @@ import {ModalService} from "./modal.service";
     selector: "ct-modal",
     template: `
         <div #container class="ui-modal-frame">
-            <div #header class="pl-1 ui-modal-header">{{ title }}</div>
+            <div #header class="pl-1 ui-modal-header">
+                <div class="ui-modal-title">
+                    {{ title }}
+                </div>  
+                
+                <div class="ui-modal-close-icon" *ngIf="closeIcon">
+                    <i class="fa fa-times pr-1 clickable" (click)="onClose()"></i>
+                </div>
+                
+            </div>
             <div #nestedComponent></div>
         </div>
     `,
@@ -42,6 +51,9 @@ export class ModalComponent extends DirectiveBase implements AfterViewInit {
 
     /** When you press the "ESC" key, should the modal be closed? */
     public closeOnEscape: true;
+
+    /** Show close icon */
+    public closeIcon: false;
 
     /** Holds the ComponentRef object of a component that is injected and rendered inside the modal */
     private nestedComponentRef: ComponentRef<any>;
@@ -68,6 +80,11 @@ export class ModalComponent extends DirectiveBase implements AfterViewInit {
             .map((ev: KeyboardEvent) => ev.which)
             .filter(key => key === 27)
             .subscribe(() => this.service.close());
+    }
+
+    /** When click on X icon */
+    public onClose() {
+        this.service.close();
     }
 
     @HostListener("click", ["$event.target"])
