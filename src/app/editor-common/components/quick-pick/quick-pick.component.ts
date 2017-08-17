@@ -134,7 +134,7 @@ available types: {[label: string]: string | number} | string[]`);
             console.warn(`ct-quick-pick expected value to be instanceof ExpressionModel`);
         }
 
-        this.showCustom = !this.list.filter(item => {
+        this.showCustom = this.showCustom || !this.list.filter(item => {
                 return this.computedVal !== undefined && item.value.toString() === this.computedVal.toString();
             }).length && this.computedVal !== undefined;
 
