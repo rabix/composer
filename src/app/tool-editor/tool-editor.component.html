@@ -121,7 +121,7 @@
                    [model]="dataModel"
                    [resetMockValuesIndicator]="resetMockValuesIndicator"
                    (update)="onJobUpdate($event); syncModelAndCode(false)"
-                   (reset)="resetJob()"></ct-job-editor>
+                   (reset)="syncModelAndCode(false)"></ct-job-editor>
 
     <ct-app-info *ngIf="viewMode === 'info' && !isLoading && dataModel"
                  class="gui-editor-component p-2"

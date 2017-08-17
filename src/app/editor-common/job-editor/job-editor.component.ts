@@ -237,10 +237,17 @@ export class JobEditorComponent implements OnChanges, OnDestroy {
             this.inspector.hide();
         }
 
+        this.model.resetJobDefaults();
+        this.recreateInputGroups();
+
         this.reset.emit();
     }
 
     ngOnChanges(changes: SimpleChanges) {
+        this.recreateInputGroups();
+    }
+
+    recreateInputGroups() {
         const context = this.model.getContext();
 
         this.job = context.$job || {

@@ -92,12 +92,6 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
         this.dataModel.updateCommandLine();
     }
 
-    resetJob() {
-        this.dataModel.resetJobDefaults();
-        // Changing reference in order to call ngOnChanges in job editor and update job entry values
-        this.resetMockValuesIndicator = {};
-    }
-
     protected getPreferredTab(): string {
         return "gui";
     }
