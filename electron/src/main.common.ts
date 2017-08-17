@@ -58,7 +58,7 @@ function start(config: { devTools: boolean, url: string }) {
         }, 300);
     });
 
-    if (config.devTools) {
+    if (config.devTools && !isSpectronRun) {
         win.webContents.openDevTools();
     }
 

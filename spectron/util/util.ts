@@ -10,12 +10,26 @@ import ITestCallbackContext = Mocha.ITestCallbackContext;
 
 interface FnTestConfig {
     localRepository: Partial<LocalRepository>,
-    platformRepository: Partial<UserRepository>
+    platformRepository: Partial<UserRepository>,
+    waitForMainWindow: boolean,
+    testTimeout: number
 
 }
 
+function isDevServer() {
+    return ~process.argv.indexOf("--dev-server");
+}
+
 function findAppBinary() {
-    const binaries = glob.sync("./build/**/rabix-composer");
+
+    let binaries: string[];
+
+    if (isDevServer()) {
+        binaries = glob.sync("./node_modules/.bin/electron");
+    } else {
+        binaries = glob.sync("./build/**/rabix-composer");
+    }
+
 
     if (!binaries.length) {
         throw new Error("You must build and package the app before running e2e tests");
@@ -23,7 +37,11 @@ function findAppBinary() {
     return binaries[0];
 }
 
-export function boot(context: ITestCallbackContext, appState?: Partial<FnTestConfig>): Promise<spectron.Application> {
+export function boot(context: ITestCallbackContext, testConfig: Partial<FnTestConfig> = {}): Promise<spectron.Application> {
+
+
+    context.timeout(testConfig.testTimeout || 5000);
+
     const testTitle      = context.test.fullTitle();
     const globalTestDir  = path.resolve(`${__dirname}/../../.testrun`);
     const currentTestDir = `${globalTestDir}/${testTitle}`.replace(/\s/g, "-");
@@ -33,23 +51,30 @@ export function boot(context: ITestCallbackContext, appState?: Partial<FnTestCon
 
     const swapDirPath = currentTestDir + "/swap";
 
-    appState.localRepository = Object.assign(new LocalRepository(), appState.localRepository || {});
+    testConfig.localRepository = Object.assign(new LocalRepository(), testConfig.localRepository || {});
 
-    fs.outputJSONSync(localProfilePath, appState.localRepository, {
+    fs.outputJSONSync(localProfilePath, testConfig.localRepository, {
         spaces: 4,
         replacer: null
     });
     const appCreation = new spectron.Application({
         path: findAppBinary(),
         args: [
+            isDevServer() && "./electron",
             "--spectron",
             "--user-data-dir=" + currentTestDir
-        ]
+        ].filter(v => v)
     });
 
-    return appCreation.start().then(app => {
+    return appCreation.start().then((app: any) => {
         Object.assign(app, {testdir: currentTestDir});
-        return app;
+
+        if (testConfig.waitForMainWindow === false) {
+            return app;
+        }
+
+        return app.client.waitForVisible("ct-layout").then(() => app);
+
     });
 }
 

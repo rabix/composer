@@ -6,12 +6,9 @@ const assert = require("assert");
 
 describe("app launch", function () {
 
-
     let app: spectron.Application;
 
     it("shows an initial window", async function () {
-
-        this.timeout(5000);
 
         const user = {
             "id": "api_demo",
@@ -26,11 +23,10 @@ describe("app launch", function () {
             localRepository: {
                 activeCredentials: user,
                 credentials: [user]
-            }
+            },
         });
 
         const client = app.client;
-        await client.waitForVisible("ct-layout");
 
         const text = await client.getText("ct-settings-menu");
         assert.equal(text.trim(), "demon (CGC)");
