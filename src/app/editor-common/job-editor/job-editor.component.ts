@@ -82,7 +82,7 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
 
         <div class="block mb-1">
             <button class="btn btn-secondary pull-right"
-                    (click)="reset.emit()">
+                    (click)="resetToMockValues()">
                 Reset to mock values
             </button>
         </div>
@@ -226,7 +226,22 @@ export class JobEditorComponent implements OnChanges, OnDestroy {
         this.cdr.markForCheck();
     }
 
+    resetToMockValues() {
+        if (this.inspector.inspectedObject.getValue() !== "revisions") {
+            this.inspector.hide();
+        }
+
+        this.model.resetJobDefaults();
+        this.recreateInputGroups();
+
+        this.reset.emit();
+    }
+
     ngOnChanges(changes: SimpleChanges) {
+        this.recreateInputGroups();
+    }
+
+    recreateInputGroups() {
         const context = this.model.getContext();
 
         this.job = context.$job || {
