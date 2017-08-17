@@ -61,9 +61,6 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
 
     toolGroup: FormGroup;
 
-    /** Added to notify job editor to re-render job inputs when job values are reset to mock values */
-    resetMockValuesIndicator = {};
-
     constructor(statusBar: StatusBarService,
                 notificationBarService: NotificationBarService,
                 modal: ModalService,

@@ -103,12 +103,6 @@ export class JobEditorComponent implements OnChanges, OnDestroy {
      */
     inputs: CommandInputParameterModel[] = [];
 
-    /**
-     * Added to call ngOnChanges, by changing reference manually, when values are reset to mock values
-     */
-    @Input()
-    resetMockValuesIndicator;
-
     @Output()
     update = new EventEmitter();
 
