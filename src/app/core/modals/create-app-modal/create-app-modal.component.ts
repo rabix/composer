@@ -233,6 +233,9 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
                 if (!path) {
                     return;
                 } else if (path.split("/").slice(-1)[0].split(".").length === 1) {
+                    // true if path = "/path/to/some/file" -> ["path", "to", "some", "file"] -> ["file"] -> ["file"]
+                    // false if path = "/path/to/some/file.ext" -> ["path", "to", "some", "file"] -> ["file.ext"] -> ["file", "ext"]
+
                     // ensure the path still gets an extension even if "hide extension" was checked
                     if (`${directoryPath}/${suggestedFilename}` !== path + ".cwl") {
                         // but only show message if the user changed the file name, to inform them
