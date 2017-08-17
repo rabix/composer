@@ -20,7 +20,8 @@
         "rwlock": "^5.0.0",
         "tmp": "^0.0.31",
         "winston": "^2.3.1",
-        "winston-electron": "0.0.3"
+        "winston-electron": "0.0.3",
+        "semver": "^5.4.1"
     },
     "devDependencies": {
         "@types/chai": "^4.0.2",

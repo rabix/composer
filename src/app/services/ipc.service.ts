@@ -11,6 +11,7 @@ enum RequestType {
 
 export type IPCRoute =
     "accelerator"
+    | "checkForPlatformUpdates"
     | "createDirectory"
     | "createFile"
     | "createPlatformApp"

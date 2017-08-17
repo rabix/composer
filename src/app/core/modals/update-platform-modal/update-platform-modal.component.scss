@@ -1,0 +1,26 @@
+@import "../../../../assets/sass/variables";
+
+:host {
+
+    width: 600px;
+    display: flex;
+    flex-direction: column;
+
+    .body {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .dialog-content {
+        max-height: 500px;
+        overflow: auto;
+        flex: 1;
+        padding: 1em;
+    }
+
+    .footer {
+        text-align: right;
+    }
+}

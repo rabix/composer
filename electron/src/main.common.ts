@@ -71,6 +71,14 @@ function start(config: { devTools: boolean, url: string }) {
         {
             label: "Application",
             submenu: [
+                {
+                    label: "Check For Updates...",
+                    accelerator: "checkForPlatformUpdates",
+                    click: (menu, browser) => {
+                        acceleratorProxy.pass(menu, browser, "checkForPlatformUpdates");
+                    }
+                },
+                {type: "separator"},
                 {label: "About", selector: "orderFrontStandardAboutPanel:"},
                 {type: "separator"},
                 {

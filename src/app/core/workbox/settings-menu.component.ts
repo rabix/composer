@@ -16,9 +16,12 @@ import {WorkboxService} from "./workbox.service";
     selector: "ct-settings-menu",
     styleUrls: ["./settings-menu.component.scss"],
     template: `
-        <ct-generic-dropdown-menu [ct-menu]="menu" menuAlign="left" [menuState]="openStatus">
+        <ct-generic-dropdown-menu [ct-menu]="menu" menuAlign="left" [menuState]="openStatus"
+                                  [class.update-available]="isPlatformOutdated()">
+
             <span *ngIf="active">{{ userLabel }}</span>
             <i class="fa fa-chevron-down fa-fw settings-icon"> </i>
+
         </ct-generic-dropdown-menu>
 
         <ng-template #menu class="mr-1">
@@ -34,6 +37,10 @@ import {WorkboxService} from "./workbox.service";
                 </li>
                 <li (click)="openSettings()"><i class="fa fa-cog fa-fw"></i> Settings</li>
                 <li (click)="openFeedback()"><i class="fa fa-bullhorn fa-fw"></i> Send Feedback</li>
+                <li class="check-for-update" (click)="checkForPlatformUpdates()">
+                    <i class="fa fa-refresh fa-fw "></i>
+                    Update Available
+                </li>
             </ul>
         </ng-template>
     `
@@ -71,6 +78,10 @@ export class SettingsMenuComponent extends DirectiveBase {
         });
     }
 
+    isPlatformOutdated() {
+        return this.global.platformIsOutdated;
+    }
+
     openSettings(): void {
         this.workbox.openSettingsTab();
         this.openStatus.next(false);
@@ -102,6 +113,11 @@ export class SettingsMenuComponent extends DirectiveBase {
             this.workbox.forceReloadTabs();
         });
 
+        this.openStatus.next(false);
+    }
+
+    checkForPlatformUpdates() {
+        this.global.checkForPlatformUpdates();
         this.openStatus.next(false);
     }
 }

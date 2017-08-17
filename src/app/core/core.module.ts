@@ -37,6 +37,8 @@ import {PublishModalComponent} from "./modals/publish-modal/publish-modal.compon
 import {WelcomeTabComponent} from "./onboarding/welcome.component";
 import {GettingStartedComponent} from "./onboarding/getting-started.component";
 import {NewFileTabComponent} from "./tab-components/new-file-tab.component/new-file-tab.component";
+import {UpdatePlatformModalComponent} from "./modals/update-platform-modal/update-platform-modal.component";
+import {MarkdownService} from "../ui/markdown/markdown.service";
 
 export function errorHandlerFactory(modal: ModalService) {
     return environment.production ? new ModalErrorHandler(modal) : new ErrorHandler();
@@ -53,6 +55,7 @@ export function errorHandlerFactory(modal: ModalService) {
         PublishModalComponent,
         HintsModalComponent,
         PlatformCredentialsModalComponent,
+        UpdatePlatformModalComponent
     ],
     declarations: [
         LayoutComponent,
@@ -76,7 +79,8 @@ export function errorHandlerFactory(modal: ModalService) {
         ProceedToEditingModalComponent,
         PublishModalComponent,
         HintsModalComponent,
-        PlatformCredentialsModalComponent
+        PlatformCredentialsModalComponent,
+        UpdatePlatformModalComponent
     ],
     exports: [
         LogoComponent,
@@ -88,6 +92,7 @@ export function errorHandlerFactory(modal: ModalService) {
         WorkboxService,
         ModalService,
         LayoutService,
+        MarkdownService,
         {
             provide: ErrorHandler,
             useFactory: errorHandlerFactory,
