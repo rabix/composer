@@ -1,4 +1,4 @@
-import {Component, Injector, OnInit} from "@angular/core";
+import {ChangeDetectorRef, Component, Injector, NgZone, OnInit} from "@angular/core";
 import {FormGroup} from "@angular/forms";
 import {CommandLineToolModel} from "cwlts/models";
 import {CommandLineToolFactory} from "cwlts/models/generic/CommandLineToolFactory";
@@ -87,10 +87,6 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
         this.dataModel.setJobInputs(job.inputs);
         this.dataModel.setRuntime(job.allocatedResources);
         this.dataModel.updateCommandLine();
-    }
-
-    resetJob() {
-        this.dataModel.resetJobDefaults();
     }
 
     protected getPreferredTab(): string {
