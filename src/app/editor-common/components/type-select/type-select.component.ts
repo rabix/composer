@@ -25,8 +25,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         <div class="form-group" *ngIf="paramType.type !== 'array'">
             <label>Allow array as well as single item</label>
             <span class="pull-right">
-                    <ct-toggle-slider [formControl]="form.controls['isItemOrArray']"
-                                      [disabled]="readonly"></ct-toggle-slider>
+                    <ct-toggle-slider [formControl]="form.controls['isItemOrArray']"></ct-toggle-slider>
                 </span>
         </div>
 
@@ -47,8 +46,19 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 })
 export class InputTypeSelectComponent extends DirectiveBase implements ControlValueAccessor {
 
-    @Input()
-    public readonly = false;
+    disabled = false;
+
+    get readonly(): boolean {
+        return this.disabled;
+    }
+
+    @Input("readonly")
+    set readonly(value: boolean) {
+        this.disabled = value;
+        if (this.form) {
+            this.setDisabledState(value);
+        }
+    }
 
     public paramType: ParameterTypeModel;
 
@@ -120,12 +130,11 @@ export class InputTypeSelectComponent extends DirectiveBase implements ControlVa
         this.onTouched = fn;
     }
 
-    setDisabledState(isDisabled: boolean) {
-        if (isDisabled) {
-            this.skipOnChange = true;
-            this.form.controls["type"].disable();
+    setDisabledState(disabled: boolean) {
+        if (disabled === true) {
             this.form.controls["isItemOrArray"].disable();
-            this.form.controls["items"].disable();
+        } else {
+            this.form.controls["isItemOrArray"].enable();
         }
     }
 }

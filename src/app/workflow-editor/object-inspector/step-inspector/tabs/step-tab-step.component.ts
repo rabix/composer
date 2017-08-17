@@ -27,8 +27,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <label class="form-control-label">ID</label>
             <input type="text"
                    class="form-control"
-                   [formControl]="form.controls['id']"
-                   [readonly]="readonly">
+                   [formControl]="form.controls['id']">
             <div *ngIf="form.controls['id'].errors" class="form-control-feedback">
                 {{form.controls['id'].errors['error']}}
             </div>
@@ -39,8 +38,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <label class="form-control-label">Label</label>
             <input type="text"
                    class="form-control"
-                   [formControl]="form.controls['label']"
-                   [readonly]="readonly">
+                   [formControl]="form.controls['label']">
         </div>
 
         <!--Scatter Method-->
@@ -95,8 +93,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <label class="form-control-label">Description</label>
             <textarea class="form-control"
                       rows="4"
-                      [formControl]="form.controls['description']"
-                      [readonly]="readonly"></textarea>
+                      [formControl]="form.controls['description']"></textarea>
         </div>
 
         <!--Set Hints-->
@@ -106,8 +103,19 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 })
 export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnInit, OnChanges {
 
-    @Input()
-    public readonly = false;
+    disabled = false;
+
+    get readonly(): boolean {
+        return this.disabled;
+    }
+
+    @Input("readonly")
+    set readonly(value: boolean) {
+        this.disabled = value;
+        if (this.form) {
+            this.setDisabledState(value);
+        }
+    }
 
     @Input()
     public step: StepModel;
@@ -160,9 +168,9 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
     ngOnInit() {
 
         this.form = this.formBuilder.group({
-            id: [this.step.id],
-            label: [this.step.label],
-            description: [this.step.description],
+            id: [{value: this.step.id, disabled: this.readonly}],
+            label: [{value: this.step.label, disabled: this.readonly}],
+            description: [{value: this.step.description, disabled: this.readonly}],
             scatterMethod: [this.step.scatterMethod || ""],
             scatter: [this.step.scatter || ""]
         });
@@ -224,5 +232,17 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
 
         hints.model = this.step;
         hints.readonly = this.readonly;
+    }
+
+    setDisabledState(disabled: boolean) {
+        if (disabled) {
+            this.form.controls["id"].disable();
+            this.form.controls["label"].disable();
+            this.form.controls["description"].disable();
+        } else {
+            this.form.controls["id"].enable();
+            this.form.controls["label"].enable();
+            this.form.controls["description"].enable();
+        }
     }
 }

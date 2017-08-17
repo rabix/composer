@@ -27,7 +27,6 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <label class="form-control-label">Label</label>
                     <input type="text"
                            class="form-control"
-                           [readonly]="readonly"
                            [formControl]="form.controls['label']">
                 </div>
 
@@ -36,7 +35,6 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <label class="form-control-label">Description</label>
                     <textarea class="form-control"
                               rows="4"
-                              [readonly]="readonly"
                               [formControl]="form.controls['description']"></textarea>
                 </div>
                 
@@ -46,7 +44,6 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <label class="form-control-label">Alternative Prefix</label>
                     <input class="form-control"
                            type="text"
-                           [readonly]="readonly"
                            [formControl]="form.controls['altPrefix']">
                 </div>
 
@@ -55,7 +52,6 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <label class="form-control-label">Category</label>
                     <input class="form-control"
                            type="text"
-                           [readonly]="readonly"
                            [formControl]="form.controls['category']">
                 </div>
 
@@ -64,7 +60,6 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <label class="form-control-label">Tool Defaults</label>
                     <input class="form-control"
                            type="text"
-                           [readonly]="readonly"
                            [formControl]="form.controls['toolDefaults']">
                 </div>
 
@@ -81,8 +76,19 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 })
 export class DescriptionComponent extends DirectiveBase implements ControlValueAccessor {
 
-    @Input()
-    public readonly = false;
+    disabled = false;
+
+    get readonly(): boolean {
+        return this.disabled;
+    }
+
+    @Input("readonly")
+    set readonly(value: boolean) {
+        this.disabled = value;
+        if (this.form) {
+            this.setDisabledState(value);
+        }
+    }
 
     public port: CommandOutputParameterModel | CommandInputParameterModel;
 
@@ -100,11 +106,11 @@ export class DescriptionComponent extends DirectiveBase implements ControlValueA
         this.port = port;
 
         this.form = this.formBuilder.group({
-            label: [this.port.label],
-            description: [this.port.description],
-            altPrefix: [this.port.customProps["sbg:altPrefix"]],
-            category: [this.port.customProps["sbg:category"]],
-            toolDefaults: [this.port.customProps["sbg:toolDefaultValue"]],
+            label: [{value: this.port.label, disabled: this.readonly}],
+            description: [{value: this.port.description, disabled: this.readonly}],
+            altPrefix: [{value: this.port.customProps["sbg:altPrefix"], disabled: this.readonly}],
+            category: [{value: this.port.customProps["sbg:category"], disabled: this.readonly}],
+            toolDefaults: [{value: this.port.customProps["sbg:toolDefaultValue"], disabled: this.readonly}],
             fileTypes: [{value: this.port.fileTypes, disabled: this.readonly}]
         });
 
@@ -164,5 +170,31 @@ export class DescriptionComponent extends DirectiveBase implements ControlValueA
 
     isFileType() {
         return this.port.type.type === "File" || this.port.type.items === "File";
+    }
+
+    setDisabledState(disabled: boolean) {
+        if (disabled) {
+            this.form.controls["label"].disable();
+            this.form.controls["description"].disable();
+            if (this.isInputPort()) {
+                this.form.controls["altPrefix"].disable();
+                this.form.controls["category"].disable();
+
+                if (!this.isFileType()) {
+                    this.form.controls["toolDefaults"].disable();
+                }
+            }
+        } else {
+            this.form.controls["label"].enable();
+            this.form.controls["description"].enable();
+            if (this.isInputPort()) {
+                this.form.controls["altPrefix"].enable();
+                this.form.controls["category"].enable();
+
+                if (!this.isFileType()) {
+                    this.form.controls["toolDefaults"].enable();
+                }
+            }
+        }
     }
 }
