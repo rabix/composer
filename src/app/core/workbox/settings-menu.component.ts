@@ -58,11 +58,11 @@ export class SettingsMenuComponent extends DirectiveBase {
 
     credentials: Observable<AuthCredentials[]>;
 
-    constructor(private workbox: WorkboxService,
+    constructor(public global: GlobalService,
+                private workbox: WorkboxService,
                 private settings: SettingsService,
                 private modal: ModalService,
                 private system: SystemService,
-                private global: GlobalService,
                 private auth: AuthService) {
         super();
 

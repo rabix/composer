@@ -3,13 +3,13 @@ import {RequestCallback} from "request";
 import {PublicAPI} from "./controllers/public-api.controller";
 import * as SearchController from "./controllers/search.controller";
 import {SwapController} from "./controllers/swap.controller";
+import * as GitHubClient from "./github-api-client/github-client";
 import {Log} from "./logger/logger";
 import {AppQueryParams} from "./sbg-api-client/interfaces/queries";
 import {SBGClient} from "./sbg-api-client/sbg-client";
 import {DataRepository} from "./storage/data-repository";
 import {CredentialsCache, LocalRepository} from "./storage/types/local-repository";
 import {UserRepository} from "./storage/types/user-repository";
-import {GitHubClient} from "./github-api-client/github-client";
 
 const swapPath       = require("electron").app.getPath("userData") + "/swap";
 const swapController = new SwapController(swapPath);
@@ -20,8 +20,6 @@ const resolver              = require("./schema-salad-resolver/schema-salad-reso
 const semver                = require("semver");
 
 const repository = new DataRepository(app.getPath("userData") + "/profiles");
-
-Log.info("Instantiated Routes");
 
 const repositoryLoad = new Promise((resolve, reject) => {
     repository.load(err => {
@@ -231,29 +229,21 @@ module.exports = {
         credentialsID?: string
     }, callback) => {
 
-        Log.info("fetchPlatformData", data);
-
         const {credentialsID} = data;
 
         repositoryLoad.then(() => {
-
-            Log.debug("repository loaded");
 
             let targetCredentials: CredentialsCache;
 
             if (credentialsID) {
 
-                Log.debug("fetching credentials id", credentialsID);
-
                 targetCredentials = repository.local.credentials.find(c => c.id === credentialsID);
 
                 if (!targetCredentials) {
-                    Log.error("trying to fetch data for an unknown user");
                     return callback(new Error("Cannot fetch platform data for unknown user."));
                 }
             } else {
 
-                Log.debug("credentials were not given");
                 if (!repository.local.activeCredentials) {
                     return callback(new Error("Cannot fetch platform data when there is no active user."));
                 }
@@ -264,13 +254,11 @@ module.exports = {
             const targetID = targetCredentials.id;
 
             if (platformFetchingLocks[targetID]) {
-                Log.debug("fetch already in progress, returning existing promise");
                 const currentFetch = platformFetchingLocks[targetID];
                 currentFetch.then(data => callback(null, data)).catch(callback);
                 return;
             }
 
-            Log.debug("prepared to fetch user data", targetCredentials);
             const {url, token} = targetCredentials;
 
             const client = SBGClient.create(url, token);
@@ -467,7 +455,7 @@ module.exports = {
         ensurePlatformUser().then(repo => {
             const {url, token} = repo.local.activeCredentials;
 
-            const api  = new SBGClient(url, token);
+            const api = new SBGClient(url, token);
 
             return api.apps.private({
                 id: data.appIDs,
@@ -480,18 +468,19 @@ module.exports = {
 
     checkForPlatformUpdates: (data: {}, callback) => {
 
-        const api = new GitHubClient();
-
-        return api.releases().get().then((result: Array<any>) => {
+        return GitHubClient.getReleases().then((result: Array<any>) => {
 
             let hasUpdate = null;
 
             if (result && result.length) {
-                result.sort((a, b) => semver.gt(a, b));
+                result.sort((a, b) => semver.gt(b.tag_name, a.tag_name));
 
                 const latestRelease = result[0];
 
-                if (semver.gt(latestRelease.tag_name, app.getVersion())) {
+                const appVersion = app.getVersion();
+                const latestTag = latestRelease.tag_name;
+
+                if (semver.gt(latestTag, appVersion)) {
                     hasUpdate = latestRelease;
                 }
             }

@@ -11,6 +11,7 @@ import ITestCallbackContext = Mocha.ITestCallbackContext;
 interface FnTestConfig {
     localRepository: Partial<LocalRepository>,
     platformRepository: Partial<UserRepository>,
+    overrideModules: Object,
     waitForMainWindow: boolean,
     testTimeout: number
 
@@ -57,13 +58,25 @@ export function boot(context: ITestCallbackContext, testConfig: Partial<FnTestCo
         spaces: 4,
         replacer: null
     });
+
+    const moduleOverrides = testConfig.overrideModules && JSON.stringify(testConfig.overrideModules, (key, val) => {
+        if (typeof val === "function") {
+            return val.toString();
+        }
+        return val;
+    });
+
+
+    const chromiumArgs = [
+        isDevServer() && "./electron",
+        "--spectron",
+        "--user-data-dir=" + currentTestDir,
+        moduleOverrides && `--override-modules=${moduleOverrides}`
+    ].filter(v => v);
+
     const appCreation = new spectron.Application({
         path: findAppBinary(),
-        args: [
-            isDevServer() && "./electron",
-            "--spectron",
-            "--user-data-dir=" + currentTestDir
-        ].filter(v => v)
+        args: chromiumArgs
     });
 
     return appCreation.start().then((app: any) => {
