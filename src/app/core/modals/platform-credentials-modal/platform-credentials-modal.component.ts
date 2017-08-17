@@ -57,7 +57,12 @@ import {DataGatewayService} from "../../data-gateway/data-gateway.service";
                     <span class="text-danger" *ngIf="form.get('token').hasError('pattern')">
                         <i class="fa fa-times-circle fa-fw"></i>
                             <span>Invalid token</span>
-                    </span>                    
+                    </span>
+
+                    <span class="text-danger" *ngIf="form.hasError('tokenCheck')">
+                        <i class="fa fa-times-circle fa-fw"></i>
+                            <span>Token is not valid for the selected platform. ({{ form.getError("tokenCheck") }})</span>
+                    </span>
                     
                 </div>
 
