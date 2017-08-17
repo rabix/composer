@@ -5,6 +5,7 @@ import * as SearchController from "./controllers/search.controller";
 import {SwapController} from "./controllers/swap.controller";
 import {Log} from "./logger/logger";
 import {AppQueryParams} from "./sbg-api-client/interfaces/queries";
+import {SBGClient} from "./sbg-api-client/sbg-client";
 import {DataRepository} from "./storage/data-repository";
 import {CredentialsCache, LocalRepository} from "./storage/types/local-repository";
 import {UserRepository} from "./storage/types/user-repository";
@@ -108,15 +109,13 @@ module.exports = {
 
 
     getProjects: (data: { url: string; token: string }, callback) => {
-        const sbgc = require("./sbg-api-client/sbg-client");
-        sbgc.SBGClient.create(data.url, data.token).projects.all().then(response => {
+        SBGClient.create(data.url, data.token).projects.all().then(response => {
             callback(null, response.filter(project => project.type === "v2"));
         }, rejection => callback(rejection));
     },
 
     getApps: (data: { url: string, token: string, query?: AppQueryParams }, callback) => {
-        const sbgc = require("./sbg-api-client/sbg-client");
-        sbgc.SBGClient.create(data.url, data.token).apps.private(data.query || {})
+        SBGClient.create(data.url, data.token).apps.private(data.query || {})
             .then(
                 response => callback(null, response),
                 reject => callback(reject)
@@ -272,15 +271,7 @@ module.exports = {
             Log.debug("prepared to fetch user data", targetCredentials);
             const {url, token} = targetCredentials;
 
-            let sbgc;
-            try {
-                const sbgc = require("./sbg-api-client/sbg-client");
-                Log.debug("Imported SBGClient", sbgc);
-            } catch (err) {
-
-                Log.error("failed to create sbg client", err);
-            }
-            const client = new sbgc.SBGClient.create(url, token);
+            const client = SBGClient.create(url, token);
 
             const projectsPromise   = client.projects.all();
             const appsPromise       = client.apps.private();
@@ -345,8 +336,7 @@ module.exports = {
                     return;
                 }
 
-                const sbgc = require("./sbg-api-client/sbg-client");
-                const api  = new sbgc.SBGClient(credentials.url, credentials.token);
+                const api = new SBGClient(credentials.url, credentials.token);
                 api.apps.get(data.id).then(response => {
                     callback(null, JSON.stringify(response.raw, null, 4));
                 }, err => callback(err));
@@ -399,8 +389,7 @@ module.exports = {
         ensurePlatformUser().then(repo => {
             const {url, token} = repo.local.activeCredentials;
 
-            const sbgc = require("./sbg-api-client/sbg-client");
-            const api  = new sbgc.SBGClient(url, token);
+            const api = new SBGClient(url, token);
 
             api.apps.save(data.id, data.content).then(response => {
                 callback(null, response);
@@ -414,8 +403,7 @@ module.exports = {
         ensurePlatformUser().then(repo => {
             const {url, token} = repo.local.activeCredentials;
 
-            const sbgc = require("./sbg-api-client/sbg-client");
-            const api  = new sbgc.SBGClient(url, token);
+            const api = new SBGClient(url, token);
 
             return api.apps.create(data.id, data.content).then((response) => {
                 callback(null, JSON.parse(response));
@@ -445,8 +433,7 @@ module.exports = {
         ensurePlatformUser().then(repo => {
             const {url, token} = repo.local.activeCredentials;
 
-            const sbgc = require("./sbg-api-client/sbg-client");
-            const api  = new sbgc.SBGClient(url, token);
+            const api = new SBGClient(url, token);
 
             return api.sendFeedback(data.type, data.text);
         }).then(resolve => {
@@ -478,8 +465,7 @@ module.exports = {
         ensurePlatformUser().then(repo => {
             const {url, token} = repo.local.activeCredentials;
 
-            const sbgc = require("./sbg-api-client/sbg-client");
-            const api  = new sbgc.SBGClient(url, token);
+            const api  = new SBGClient(url, token);
 
             return api.apps.private({
                 id: data.appIDs,

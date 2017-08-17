@@ -13,7 +13,8 @@ export function cleanQuit() {
  * Used to prepare the application for testing
  */
 export function boot() {
-    browser.restartSync();
+    const browserInstance = browser.restartSync();
+    browserInstance
 }
 
 /**

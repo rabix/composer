@@ -1,34 +1,22 @@
-import * as mkdirp from "mkdirp";
 import * as acceleratorProxy from "./accelerator-proxy";
+import {Log} from "./logger/logger";
 
 const {app, Menu, BrowserWindow} = require("electron");
 
-const isWebdriverRun      = ~process.argv.indexOf("--test-type=webdriver");
+const isSpectronRun = ~process.argv.indexOf("--spectron");
+
 const defaultUserDataPath = app.getPath("home") + "/.sevenbridges/rabix-composer";
 
-const webdriverGlobalNamespace = "__webdriver";
+app.setPath("userData", defaultUserDataPath);
 
-if (isWebdriverRun) {
-    let testRunID = Date.now().toString();
-    for (let entry of process.argv) {
-        if (entry.startsWith("--webdriver-run-id")) {
-            testRunID = entry.split("=")[1] + "/" + testRunID;
-        }
+if (isSpectronRun) {
+    const dirArgName     = "--user-data-dir=";
+    const userDataDirArg = process.argv.find(arg => arg.startsWith(dirArgName));
+
+    if (userDataDirArg) {
+        const userDir = userDataDirArg.slice(dirArgName.length);
+        app.setPath("userData", userDir);
     }
-
-    const webdriverUserDataPath = defaultUserDataPath + "-e2e-" + testRunID;
-
-    mkdirp.sync(webdriverUserDataPath);
-    app.setPath("userData", webdriverUserDataPath);
-
-    addGlobals(webdriverGlobalNamespace, {
-        endpoints: require("./routes"),
-        require: require,
-        mockRequire: require("mock-require")
-    });
-
-} else {
-    app.setPath("userData", defaultUserDataPath);
 }
 
 const router = require("./ipc-router");
@@ -162,12 +150,14 @@ export = {
 
         // Quit when all windows are closed.
         app.on("window-all-closed", () => {
+
+            Log.info("electron: window-all-closed event on " + process.platform);
+
             // On macOS it is common for applications and their menu bar
             // to stay active until the user quits explicitly with Cmd + Q
             if (process.platform !== "darwin") {
                 app.quit();
             }
-
 
         });
 
@@ -181,11 +171,3 @@ export = {
     }
 }
 
-function addGlobals(namespace: string, valueMap: Object) {
-
-    if (!global[namespace]) {
-        global[namespace] = {};
-    }
-
-    Object.assign(global[namespace], valueMap);
-}
