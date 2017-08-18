@@ -3,12 +3,12 @@ import {RequestCallback} from "request";
 import {PublicAPI} from "./controllers/public-api.controller";
 import * as SearchController from "./controllers/search.controller";
 import {SwapController} from "./controllers/swap.controller";
+import * as GitHubClient from "./github-api-client/github-client";
 import {AppQueryParams} from "./sbg-api-client/interfaces/queries";
 import {SBGClient} from "./sbg-api-client/sbg-client";
 import {DataRepository} from "./storage/data-repository";
 import {CredentialsCache, LocalRepository} from "./storage/types/local-repository";
 import {UserRepository} from "./storage/types/user-repository";
-import {GitHubClient} from "./github-api-client/github-client";
 
 const swapPath       = require("electron").app.getPath("userData") + "/swap";
 const swapController = new SwapController(swapPath);
@@ -29,7 +29,7 @@ const repositoryLoad = new Promise((resolve, reject) => {
         return resolve(1);
     });
 }).catch(err => {
-    console.log("Caught promise rejection", err);
+
 });
 
 const platformFetchingLocks: { [platformID: string]: Promise<any> } = {};
@@ -235,7 +235,9 @@ module.exports = {
             let targetCredentials: CredentialsCache;
 
             if (credentialsID) {
+
                 targetCredentials = repository.local.credentials.find(c => c.id === credentialsID);
+
                 if (!targetCredentials) {
                     return callback(new Error("Cannot fetch platform data for unknown user."));
                 }
@@ -258,7 +260,8 @@ module.exports = {
 
             const {url, token} = targetCredentials;
 
-            const client            = SBGClient.create(url, token);
+            const client = SBGClient.create(url, token);
+
             const projectsPromise   = client.projects.all();
             const appsPromise       = client.apps.private();
             const publicAppsPromise = client.apps.public();
@@ -418,7 +421,8 @@ module.exports = {
     sendFeedback: (data: { type: string, text: string }, callback) => {
         ensurePlatformUser().then(repo => {
             const {url, token} = repo.local.activeCredentials;
-            const api          = new SBGClient(url, token);
+
+            const api = new SBGClient(url, token);
 
             return api.sendFeedback(data.type, data.text);
         }).then(resolve => {
@@ -449,7 +453,8 @@ module.exports = {
     getAppUpdates: (data: { appIDs: string[] }, callback) => {
         ensurePlatformUser().then(repo => {
             const {url, token} = repo.local.activeCredentials;
-            const api          = new SBGClient(url, token);
+
+            const api = new SBGClient(url, token);
 
             return api.apps.private({
                 id: data.appIDs,
@@ -462,18 +467,19 @@ module.exports = {
 
     checkForPlatformUpdates: (data: {}, callback) => {
 
-        const api = new GitHubClient();
-
-        return api.releases().get().then((result: Array<any>) => {
+        return GitHubClient.getReleases().then((result: Array<any>) => {
 
             let hasUpdate = null;
 
             if (result && result.length) {
-                result.sort((a, b) => semver.gt(a, b));
+                result.sort((a, b) => semver.gt(b.tag_name, a.tag_name));
 
                 const latestRelease = result[0];
 
-                if (semver.gt(latestRelease.tag_name, app.getVersion())) {
+                const appVersion = app.getVersion();
+                const latestTag = latestRelease.tag_name;
+
+                if (semver.gt(latestTag, appVersion)) {
                     hasUpdate = latestRelease;
                 }
             }

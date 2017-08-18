@@ -17,7 +17,7 @@ import {WorkboxService} from "./workbox.service";
     styleUrls: ["./settings-menu.component.scss"],
     template: `
         <ct-generic-dropdown-menu [ct-menu]="menu" menuAlign="left" [menuState]="openStatus"
-                                  [class.update-available]="isPlatformOutdated()">
+                                  [class.update-available]="global.platformIsOutdated">
 
             <span *ngIf="active">{{ userLabel }}</span>
             <i class="fa fa-chevron-down fa-fw settings-icon"> </i>
@@ -26,20 +26,21 @@ import {WorkboxService} from "./workbox.service";
 
         <ng-template #menu class="mr-1">
             <ul class="list-unstyled">
-                <li *ngFor="let c of credentials | async"
-                    (click)="setActiveUser(c)">
+                <li *ngFor="let c of credentials | async" (click)="setActiveUser(c)">
                     <span>
                         {{ c.user.username }} 
-                        <i class="active-icon fa fa-check-circle"
-                           *ngIf="active === c"></i>
+                        <i *ngIf="active === c" class="active-icon fa fa-check-circle"></i>
                     </span>
                     <span class="text-muted d-block small">{{ c.url }}</span>
                 </li>
                 <li (click)="openSettings()"><i class="fa fa-cog fa-fw"></i> Settings</li>
                 <li (click)="openFeedback()"><i class="fa fa-bullhorn fa-fw"></i> Send Feedback</li>
-                <li class="check-for-update" (click)="checkForPlatformUpdates()">
+                <li (click)="checkForPlatformUpdates()" class="check-for-update" data-test="check-for-updates">
                     <i class="fa fa-refresh fa-fw "></i>
-                    Update Available
+                    <span *ngIf="platformIsOutdated; else checkForUpdates" class="outdated-update">
+                        Update Available
+                    </span>
+                    <ng-template #checkForUpdates>Check for Updates</ng-template>
                 </li>
             </ul>
         </ng-template>
@@ -57,11 +58,11 @@ export class SettingsMenuComponent extends DirectiveBase {
 
     credentials: Observable<AuthCredentials[]>;
 
-    constructor(private workbox: WorkboxService,
+    constructor(public global: GlobalService,
+                private workbox: WorkboxService,
                 private settings: SettingsService,
                 private modal: ModalService,
                 private system: SystemService,
-                private global: GlobalService,
                 private auth: AuthService) {
         super();
 
@@ -76,10 +77,6 @@ export class SettingsMenuComponent extends DirectiveBase {
                 this.userLabel = `${this.active.user.username} (${AuthCredentials.getPlatformShortName(this.active.url)})`;
             }
         });
-    }
-
-    isPlatformOutdated() {
-        return this.global.platformIsOutdated;
     }
 
     openSettings(): void {
@@ -117,7 +114,7 @@ export class SettingsMenuComponent extends DirectiveBase {
     }
 
     checkForPlatformUpdates() {
-        this.global.checkForPlatformUpdates();
+        this.global.checkForPlatformUpdates(true);
         this.openStatus.next(false);
     }
 }
