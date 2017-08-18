@@ -3,12 +3,11 @@ import {Observable} from "rxjs/Observable";
 import {AuthService} from "../../auth/auth.service";
 import {GlobalService} from "../../core/global/global.service";
 import {SystemService} from "../../platform-providers/system.service";
-import {GuidService} from "../../services/guid.service";
+import {IpcService} from "../../services/ipc.service";
 import {JavascriptEvalService} from "../../services/javascript-eval/javascript-eval.service";
 import {ContextService} from "../../ui/context/context.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {UrlValidator} from "../../validators/url.validator";
-import {IpcService} from "../../services/ipc.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -22,9 +21,7 @@ import {IpcService} from "../../services/ipc.service";
     styleUrls: ["./../../../assets/sass/main.scss", "./main.component.scss"],
     providers: [
         UrlValidator,
-        ContextService,
-        // FIXME: this needs to be handled in a system-specific way
-        GuidService
+        ContextService
     ],
 })
 export class MainComponent {
