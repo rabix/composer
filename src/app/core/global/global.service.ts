@@ -84,12 +84,11 @@ export class GlobalService {
                         const modal = this.modal.fromComponent(UpdatePlatformModalComponent,
                             {
                                 title: "Update",
-                                closeIcon: true
+                                closeIcon: true,
+                                onClose: () => {
+                                    this.modal.close();
+                                }
                             });
-
-                        modal.onCancel = () => {
-                            this.modal.close();
-                        };
                     }
                 }
 

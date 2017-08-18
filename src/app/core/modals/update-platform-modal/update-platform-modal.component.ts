@@ -65,7 +65,4 @@ export class UpdatePlatformModalComponent extends DirectiveBase {
     constructor(public modal: ModalService, public system: SystemService) {
         super();
     }
-
-    onCancel() {
-    }
 }
