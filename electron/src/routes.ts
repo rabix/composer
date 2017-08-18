@@ -9,6 +9,7 @@ import {SBGClient} from "./sbg-api-client/sbg-client";
 import {DataRepository} from "./storage/data-repository";
 import {CredentialsCache, LocalRepository} from "./storage/types/local-repository";
 import {UserRepository} from "./storage/types/user-repository";
+import {GitHubRelease} from "./github-api-client/interfaces/github-release";
 
 const swapPath       = require("electron").app.getPath("userData") + "/swap";
 const swapController = new SwapController(swapPath);
@@ -467,7 +468,7 @@ module.exports = {
 
     checkForPlatformUpdates: (data: {}, callback) => {
 
-        return GitHubClient.getReleases().then((result: Array<any>) => {
+        return GitHubClient.getReleases().then((result: Array<GitHubRelease>) => {
 
             let hasUpdate = null;
 

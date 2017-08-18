@@ -7,6 +7,7 @@ import {LocalRepositoryService} from "../../repository/local-repository.service"
 import {ModalService} from "../../ui/modal/modal.service";
 import {UpdatePlatformModalComponent} from "../modals/update-platform-modal/update-platform-modal.component";
 import {IpcService} from "../../services/ipc.service";
+import {GitHubRelease} from "../../../../electron/src/github-api-client/interfaces/github-release";
 
 @Injectable()
 export class GlobalService {
@@ -36,7 +37,7 @@ export class GlobalService {
         });
     }
 
-    checkForPlatformUpdates(showUpToDateModal: boolean = false) {
+    checkForPlatformUpdates(showUpToDateModal: boolean = false): Promise<GitHubRelease> {
 
         if (this.checkForPlatformUpdatePromise) {
             return this.checkForPlatformUpdatePromise;
@@ -47,7 +48,7 @@ export class GlobalService {
             const process = this.statusBar.startProcess("Checking for platform updates...");
 
             this.ipc.request("checkForPlatformUpdates").withLatestFrom(this.localRepository.getIgnoredUpdateVersion())
-                .take(1).subscribe((result) => {
+                .take(1).subscribe((result: [GitHubRelease, string]) => {
 
                 this.checkForPlatformUpdatePromise = null;
                 this.statusBar.stopProcess(process, "");
