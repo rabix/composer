@@ -58,17 +58,22 @@ export class GlobalService {
 
                     this.platformIsOutdated = true;
 
-                    if (hasUpdate !== ignoredUpdateVersion) {
-                        const modal = this.modal.fromComponent(UpdatePlatformModalComponent, {title: "Platform updates!"});
+                    if (hasUpdate.tag_name !== ignoredUpdateVersion) {
+                        const modal = this.modal.fromComponent(UpdatePlatformModalComponent,
+                            {
+                                title: "Update",
+                                closeIcon: true,
+                                onClose: () => {
+                                    this.modal.close();
+                                    this.localRepository.setIgnoredUpdateVersion(hasUpdate.tag_name);
+                                }
+                            });
 
                         modal.platformIsOutdated = true;
                         modal.description = hasUpdate.body;
-                        modal.downloadLink = hasUpdate.html_url;
-
-                        modal.onCancel = () => {
-                            this.modal.close();
-                            this.localRepository.setIgnoredUpdateVersion(hasUpdate);
-                        };
+                        modal.newVersion = hasUpdate.tag_name;
+                        modal.currentVersion = window["require"]("electron").remote.app.getVersion();
+                        modal.linkForDownload = hasUpdate.html_url;
                     }
 
                 } else {
@@ -76,7 +81,11 @@ export class GlobalService {
                     this.localRepository.setIgnoredUpdateVersion(null).then();
 
                     if (showUpToDateModal) {
-                        const modal = this.modal.fromComponent(UpdatePlatformModalComponent, {title: "Platform updates!"});
+                        const modal = this.modal.fromComponent(UpdatePlatformModalComponent,
+                            {
+                                title: "Update",
+                                closeIcon: true
+                            });
 
                         modal.onCancel = () => {
                             this.modal.close();

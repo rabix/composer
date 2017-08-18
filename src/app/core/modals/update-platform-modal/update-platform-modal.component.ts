@@ -9,27 +9,39 @@ import {SystemService} from "../../../platform-providers/system.service";
     template: `
         <div class="body">
 
-            <div class="dialog-content">
-                <div [ct-markdown]="description" *ngIf="platformIsOutdated; else upToDate">
+            <div class="header">
+                
+                <div class="logo mb-1">                    
+                </div>
+
+                <div class="header-text">                    
+                    <ng-container *ngIf="platformIsOutdated; else upToDate">
+                        A new version of Rabix Composer is available
+                    </ng-container>
+
+                    <ng-template #upToDate>
+                        Rabix Composer is up to date!
+                    </ng-template>
+                
                 </div>
             </div>
 
-            <ng-template #upToDate>
-                Rabix Composer is up to date!
-            </ng-template>
+            <div class="dialog-content" *ngIf="platformIsOutdated">
+                What's new:
+                <div [ct-markdown]="description">
+                </div>
+                
+                <div class="version-info">Current version: Rabix Composer ({{currentVersion}})</div>
+                <div class="version-info">New version: Rabix Composer ({{newVersion}})</div>
 
-            <!--Footer-->
-            <div class="footer pr-1 pb-1">
-
-                <button type="button" class="btn btn-secondary" data-test='cancel-button'
-                        (click)="onCancel()">Cancel
-                </button>
-
-                <button *ngIf="platformIsOutdated" type="button" class="btn btn-primary" data-test='download-button'
-                        (click)="onDownload()">Download
-                </button>
+                <div class="dialog-centered">
+                    <div class="mt-2">
+                        <a #downloadLink href="{{linkForDownload}}" 
+                           data-test="info-link" class="btn btn-primary btn-lg downloadLink"
+                           (click)="system.openLink(downloadLink.href); modal.close()">Download</a>
+                    </div>
+                </div>
             </div>
-
         </div>
     `
 })
@@ -42,15 +54,16 @@ export class UpdatePlatformModalComponent extends DirectiveBase {
     description: string;
 
     @Input()
-    downloadLink: string;
+    currentVersion: string;
 
-    constructor(private modal: ModalService, private system: SystemService) {
+    @Input()
+    newVersion: string;
+
+    @Input()
+    linkForDownload: string;
+
+    constructor(public modal: ModalService, public system: SystemService) {
         super();
-    }
-
-    onDownload() {
-        this.system.openLink(this.downloadLink);
-        this.modal.close();
     }
 
     onCancel() {
