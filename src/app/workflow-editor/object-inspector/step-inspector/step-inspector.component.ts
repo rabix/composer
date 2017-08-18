@@ -17,8 +17,9 @@ import {UpdateStepModalComponent} from "../../update-step-modal/update-step-moda
 
         <!--Update warning-->
         <div class="alert alert-update form-control-label" *ngIf="step.hasUpdate && !readonly">
-            A new version of this app is available! 
-            <button class="btn-unstyled p-0 update-btn" (click)="updateStep($event)">Update</button> to get the latest changes.
+            A new version of this app is available!
+            <button class="btn-unstyled p-0 update-entry" (click)="updateStep($event)">Update</button>
+            to get the latest changes.
         </div>
 
         <!--View Modes-->
@@ -42,7 +43,7 @@ import {UpdateStepModalComponent} from "../../update-step-modal/update-step-moda
             </ct-tab-selector>
         </ct-action-bar>
 
-        <!--Inputs-->        
+        <!--Inputs-->
         <ct-workflow-step-inspector-inputs *ngIf="viewMode === tabs.Inputs"
                                            [step]="step"
                                            [inputs]="step.in"
@@ -53,7 +54,7 @@ import {UpdateStepModalComponent} from "../../update-step-modal/update-step-moda
         </ct-workflow-step-inspector-inputs>
 
         <!--Info-->
-        <ct-workflow-step-inspector-info *ngIf="viewMode === tabs.Info"                                         
+        <ct-workflow-step-inspector-info *ngIf="viewMode === tabs.Info"
                                          [step]="step">
         </ct-workflow-step-inspector-info>
 

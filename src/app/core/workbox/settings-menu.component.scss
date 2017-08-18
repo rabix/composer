@@ -24,19 +24,14 @@
         color: $brand-primary;
     }
 
-    .check-for-update {
-        display: none;
-    }
-
     .update-available {
         .settings-icon {
             color: $brand-warning;
         }
 
-        .check-for-update {
-            display: list-item;
-            background-color: $brand-warning;
-        }
+    }
+    .outdated-update {
+        background-color: $brand-warning;
     }
 
     .settings-icon {
