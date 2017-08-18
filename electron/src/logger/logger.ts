@@ -9,11 +9,11 @@ fs.ensureFileSync(logFilePath);
 
 export const Log = new winston.Logger({
     transports: [
-        // new winston.transports.Console({
-        //     level: "debug",
-        //     colorize: true,
-        //     timestamp: true
-        // }),
+        new winston.transports.Console({
+            level: "debug",
+            colorize: true,
+            timestamp: true
+        }),
         new winston.transports.File({
             level: "debug",
             colorize: false,
