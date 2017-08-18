@@ -11,7 +11,7 @@ describe("settings menu", function () {
     it("displays name of the active user", async function () {
 
         const user = {
-            "id": "api_demo",
+            "id": "cgc-api_demo",
             "token": "3d15bcde2052476280f2bc6d0c56f69b",
             "url": "https://cgc-api.sbgenomics.com",
             "user": {
