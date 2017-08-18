@@ -19,7 +19,7 @@
         "compile:electron:watch": "./node_modules/.bin/tsc -p electron --watch",
         "lint": "./node_modules/.bin/ng lint",
         "package": "./scripts/electron-build.sh",
-        "postinstall": "npm run update-webdriver && cd electron && npm install",
+        "postinstall": "cd electron && npm install",
         "serve": "./node_modules/.bin/ng serve",
         "start:electron": "./node_modules/.bin/electron ./electron",
         "test": "npm run test:electron && npm run test:angular && npm run test:spectron",
