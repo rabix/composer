@@ -1,6 +1,5 @@
 import * as mock from "mock-require";
 import * as acceleratorProxy from "./accelerator-proxy";
-import {Log} from "./logger/logger";
 
 const {app, Menu, BrowserWindow} = require("electron");
 
@@ -202,8 +201,6 @@ export = {
 
         // Quit when all windows are closed.
         app.on("window-all-closed", () => {
-
-            Log.info("electron: window-all-closed event on " + process.platform);
 
             // On macOS it is common for applications and their menu bar
             // to stay active until the user quits explicitly with Cmd + Q

@@ -1,5 +1,4 @@
 import * as ReadWriteLock from "rwlock";
-import {Log} from "../logger/logger";
 import {LocalRepository} from "./types/local-repository";
 import {RepositoryType} from "./types/repository-type";
 import {UserRepository} from "./types/user-repository";
@@ -55,30 +54,20 @@ export class DataRepository {
      */
     load(callback: (err?: Error, data?: any) => void): void {
 
-        Log.debug("loading repositories");
-
         this.loadProfile("local", new LocalRepository(), (err, localData) => {
             if (err) {
-                Log.warn("failed to load local repository", err);
                 callback(err);
                 return;
             }
 
-            Log.debug("loaded local repository");
-
             this.local = localData;
             if (!localData.activeCredentials) {
-
-                Log.debug("no active credentials to load user repository for");
                 callback();
                 return;
             }
 
-            Log.debug("loading user repository", localData.activeCredentials);
-
             this.loadProfile(localData.activeCredentials.id, new UserRepository(), (err, userData) => {
                 if (err) {
-                    Log.warn("failed to load user repository");
                     callback(err);
                     return;
                 }

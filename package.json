@@ -43,7 +43,7 @@
         "@types/md5": "^2.1.32",
         "ajv": "^5.2.2",
         "angular2-moment": "^1.6.0",
-        "bootstrap": "^4.0.0-alpha.5",
+        "bootstrap": "4.0.0-alpha.5",
         "brace": "^0.10.0",
         "core-js": "^2.5.0",
         "cwl-svg": "0.0.39",

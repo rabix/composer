@@ -4,7 +4,6 @@ import {PublicAPI} from "./controllers/public-api.controller";
 import * as SearchController from "./controllers/search.controller";
 import {SwapController} from "./controllers/swap.controller";
 import * as GitHubClient from "./github-api-client/github-client";
-import {Log} from "./logger/logger";
 import {AppQueryParams} from "./sbg-api-client/interfaces/queries";
 import {SBGClient} from "./sbg-api-client/sbg-client";
 import {DataRepository} from "./storage/data-repository";
@@ -30,7 +29,7 @@ const repositoryLoad = new Promise((resolve, reject) => {
         return resolve(1);
     });
 }).catch(err => {
-    Log.error("Cannot load local repository. " + err.toString());
+
 });
 
 const platformFetchingLocks: { [platformID: string]: Promise<any> } = {};
