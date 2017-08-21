@@ -191,24 +191,21 @@ function applyCLIArgs() {
     const dirArgName             = "--user-data-dir=";
     const moduleOverridesArgName = "--override-modules=";
 
-// Find if arguments are present in the command line
+    // Find if arguments are present in the command line
     const userDataDirArg     = process.argv.find(arg => arg.startsWith(dirArgName));
     const moduleOverridesArg = process.argv.find(arg => arg.startsWith(moduleOverridesArgName))
 
-// If we're given an alternate userData directory, override the default one
+    // If we're given an alternate userData directory, override the default one
     if (userDataDirArg) {
         const userDir = userDataDirArg.slice(dirArgName.length);
         app.setPath("userData", userDir);
     }
 
-// If we're given module overrides, we're given a string through the command line
-// so we need to unpack it
+    // If we're given module overrides, we're given a string through the command line
+    // so we need to unpack it
     if (moduleOverridesArg) {
         // Take the argument value
         const serializedOverrides = moduleOverridesArg.slice(moduleOverridesArgName.length);
-
-        const Log = require("./logger/logger").Log;
-        Log.debug(serializedOverrides);
 
         // Deserialize it in such way that everything that is not an object goes through eval
         // We serialized function as strings beforehand, so we need to bring them back to life
@@ -224,7 +221,6 @@ function applyCLIArgs() {
         // before anybody else requires them.
         // That way, they will get mocks from cache.
         overrides.forEach(override => {
-
             mock(override.module, override.override);
         });
     }

@@ -38,7 +38,7 @@ describe("app publishing", () => {
                 {
                     module: "fs-extra",
                     override: partialProxy("fs-extra", {
-                        readFile: proxerialize(fileContent => {
+                        readFile: proxerialize((fileContent) => {
                             return (target, context, args) => {
                                 const filepath = args[0];
                                 const callback = args[args.length - 1];
