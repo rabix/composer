@@ -29,6 +29,7 @@ import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {StatusControlProvider} from "../../layout/status-bar/status-control-provider.interface";
 import {PlatformRepositoryService} from "../../repository/platform-repository.service";
 import {ModalService} from "../../ui/modal/modal.service";
+import {WorkboxService} from "../../core/workbox/workbox.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {AppValidatorService, AppValidityState} from "../app-validator/app-validator.service";
 import {PlatformAppService} from "../components/platform-app-common/platform-app.service";
@@ -109,6 +110,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 protected modal: ModalService,
                 protected inspector: EditorInspectorService,
                 protected dataGateway: DataGatewayService,
+                protected workbox: WorkboxService,
                 protected injector: Injector,
                 protected appValidator: AppValidatorService,
                 protected codeSwapService: CodeSwapService,
@@ -298,6 +300,18 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         this.syncModelAndCode(true).then(() => {
             const modal      = this.modal.fromComponent(PublishModalComponent, {title: "Publish an App"});
             modal.appContent = this.getModelText(true);
+
+            modal.publishedApp.then((app) => {
+                const newTab = this.workbox.getOrCreateAppTab({
+                    id: app["sbg:id"],
+                    type: app["class"],
+                    label: app["label"],
+                    isWritable: true
+                });
+
+                this.workbox.openTab(newTab);
+            });
+
         }, err => console.warn);
     }
 
