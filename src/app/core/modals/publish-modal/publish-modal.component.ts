@@ -1,3 +1,4 @@
+import {Subject} from "rxjs/Subject";
 import {Component, Input} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {SlugifyPipe} from "ngx-pipes";
@@ -79,13 +80,13 @@ export class PublishModalComponent extends DirectiveBase {
 
     outputForm: FormGroup;
 
-    publishedApp: Promise< {
+    publishedApp = new Subject< {
         id: string;
         type: string;
         label?: string;
         isWritable?: boolean;
         language?: string;
-    }>;
+    }>();
 
     constructor(private dataGateway: DataGatewayService,
                 public modal: ModalService,
@@ -149,7 +150,7 @@ export class PublishModalComponent extends DirectiveBase {
 
         saveCall.then(yay => {
             this.isPublishing = false;
-            this.publishedApp = new Promise(resolve => resolve(yay));
+            this.publishedApp.next(yay);
             this.close();
         }, (err) => {
             this.error        = "Failed to publish the app. " + new ErrorWrapper(err);

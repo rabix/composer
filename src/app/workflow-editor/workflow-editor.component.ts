@@ -4,6 +4,7 @@ import * as Yaml from "js-yaml";
 import {Observable} from "rxjs/Observable";
 import {CodeSwapService} from "../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
+import {WorkboxService} from "../core/workbox/workbox.service";
 import {ErrorWrapper} from "../core/helpers/error-wrapper";
 import {AppEditorBase} from "../editor-common/app-editor-base/app-editor-base";
 import {AppValidatorService} from "../editor-common/app-validator/app-validator.service";
@@ -49,13 +50,14 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                 modal: ModalService,
                 inspector: EditorInspectorService,
                 dataGateway: DataGatewayService,
+                workbox: WorkboxService,
                 injector: Injector,
                 appValidator: AppValidatorService,
                 codeSwapService: CodeSwapService,
                 protected platformRepository: PlatformRepositoryService,
                 private cdr: ChangeDetectorRef,
                 platformAppService: PlatformAppService,) {
-        super(statusBar, notificationBar, modal, inspector, dataGateway, injector, appValidator, codeSwapService, platformAppService, platformRepository);
+        super(statusBar, notificationBar, modal, inspector, dataGateway, workbox, injector, appValidator, codeSwapService, platformAppService, platformRepository);
     }
 
     protected getPreferredTab(): string {

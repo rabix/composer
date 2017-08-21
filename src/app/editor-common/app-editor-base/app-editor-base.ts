@@ -301,7 +301,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             const modal      = this.modal.fromComponent(PublishModalComponent, {title: "Publish an App"});
             modal.appContent = this.getModelText(true);
 
-            modal.publishedApp.then((app) => {
+            modal.publishedApp.subscribeTracked(this, (app) => {
                 const newTab = this.workbox.getOrCreateAppTab({
                     id: app["sbg:id"],
                     type: app["class"],

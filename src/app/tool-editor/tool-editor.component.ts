@@ -7,6 +7,7 @@ import {ReplaySubject} from "rxjs/ReplaySubject";
 import {Subject} from "rxjs/Subject";
 import {CodeSwapService} from "../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
+import {WorkboxService} from "../core/workbox/workbox.service";
 import {AppEditorBase} from "../editor-common/app-editor-base/app-editor-base";
 import {AppValidatorService} from "../editor-common/app-validator/app-validator.service";
 import {PlatformAppService} from "../editor-common/components/platform-app-common/platform-app.service";
@@ -66,12 +67,13 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
                 modal: ModalService,
                 inspector: EditorInspectorService,
                 dataGateway: DataGatewayService,
+                workbox: WorkboxService,
                 injector: Injector,
                 appValidator: AppValidatorService,
                 codeSwapService: CodeSwapService,
                 platformRepository: PlatformRepositoryService,
                 platformAppService: PlatformAppService) {
-        super(statusBar, notificationBarService, modal, inspector, dataGateway, injector, appValidator, codeSwapService, platformAppService, platformRepository);
+        super(statusBar, notificationBarService, modal, inspector, dataGateway, workbox, injector, appValidator, codeSwapService, platformAppService, platformRepository);
     }
 
     ngOnInit(): any {
