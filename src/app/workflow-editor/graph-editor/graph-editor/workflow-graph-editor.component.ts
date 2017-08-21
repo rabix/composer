@@ -564,7 +564,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
                 return;
             }
 
-            const addExtension = path.split("/").slice(-1)[0].split(".").length === 1;
+            const addExtension = !path.split("/").slice(-1)[0].endsWith(".svg");
             path = addExtension ? path + ".svg" : path;
 
             this.ipc.request("saveFileContent", {
