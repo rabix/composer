@@ -4,6 +4,7 @@ import {SlugifyPipe} from "ngx-pipes";
 import {PlatformAppSavingService} from "../../../editor-common/services/app-saving/platform-app-saving.service";
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {ModalService} from "../../../ui/modal/modal.service";
+import {WorkboxService} from "../../workbox/workbox.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {FormAsyncValidator} from "../../forms/helpers/form-async-validator";
@@ -81,6 +82,7 @@ export class PublishModalComponent extends DirectiveBase {
 
     constructor(private dataGateway: DataGatewayService,
                 public modal: ModalService,
+                private workbox: WorkboxService,
                 private platformRepository: PlatformRepositoryService,
                 private slugify: SlugifyPipe) {
 
@@ -141,6 +143,16 @@ export class PublishModalComponent extends DirectiveBase {
 
         saveCall.then(yay => {
             this.isPublishing = false;
+
+            const newTab = this.workbox.getOrCreateAppTab({
+                id: yay["sbg:id"],
+                type: yay["class"],
+                label: yay["label"],
+                isWritable: true
+            });
+
+            this.workbox.openTab(newTab);
+
             this.close();
         }, (err) => {
             this.error        = "Failed to publish the app. " + new ErrorWrapper(err);
