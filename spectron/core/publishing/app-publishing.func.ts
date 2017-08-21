@@ -82,7 +82,10 @@ describe("app publishing", () => {
         const projectControl = `${modal} [formControlName=project]`;
         const projectOption  = `${projectControl} .option[data-value='test-user/test-project']`;
 
-        await client.click("[data-test=publish-btn]");
+        const publishBtn = `[data-test=publish-btn]`;
+
+        await client.waitForEnabled(publishBtn, 2000);
+        await client.click(publishBtn);
         await client.waitForVisible(modal);
 
         await client.setValue(nameControl, "test-app-publish");
