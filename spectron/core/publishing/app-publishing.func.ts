@@ -88,7 +88,7 @@ describe("app publishing", () => {
         await client.click(publishBtn);
         await client.waitForVisible(modal);
 
-        await client.setValue(nameControl, "test-app-publish");
+        await client.setValue(nameControl, "Test App Publish");
 
         await client.click(`${projectControl} .selectize-input`);
         await client.waitForVisible(projectOption, 1000);
@@ -102,7 +102,7 @@ describe("app publishing", () => {
         await client.waitForVisible(newTabSelector, 2000);
         const tabTitle = await client.getText(`${newTabSelector} .title`);
 
-        assert.equal(tabTitle, "My Published App");
+        assert.equal(tabTitle, "Test App Publish");
     });
 });
 

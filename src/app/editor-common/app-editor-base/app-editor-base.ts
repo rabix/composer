@@ -8,6 +8,7 @@ import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {CodeSwapService} from "../../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../../core/data-gateway/data-gateway.service";
+import {AppHelper} from "../../core/helpers/AppHelper";
 import {ErrorWrapper} from "../../core/helpers/error-wrapper";
 import {ProceedToEditingModalComponent} from "../../core/modals/proceed-to-editing-modal/proceed-to-editing-modal.component";
 import {PublishModalComponent} from "../../core/modals/publish-modal/publish-modal.component";
@@ -280,6 +281,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     publish(): void {
 
+        debugger;
         if (!this.validationState.isValidCWL) {
             this.notificationBar.showNotification(new ErrorNotification(`Cannot publish this app because because it's doesn't match the proper JSON schema`));
             return;
@@ -294,9 +296,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 return originalSubmit.apply(modal, args).then(appID => {
 
                     const tab = this.workbox.getOrCreateAppTab({
-                        id: appID,
+                        id: AppHelper.getRevisionlessID(appID),
                         type: this.dataModel.class,
-                        label: this.dataModel.label || this.dataModel.id.split("/").pop(),
+                        label: modal.inputForm.get("name").value,
                         isWritable: true,
                         language: "json"
 
