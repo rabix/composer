@@ -40,7 +40,13 @@ export class MainComponent {
         system.boot();
 
         // When we first get active credentials (might be undefined if no user is active), sync data with the platform
-        auth.getActive().take(1).filter(c => !!c).subscribe(() => global.reloadPlatformData());
+        auth.getActive().take(1).filter(creds => {
+            // Stop if there are either no credentials, or we have the --no-fetch-on-start argument passed to the chromium cli
+            // The cli arg is a useful testing facility.
+            return creds && process.argv.indexOf("--no-fetch-on-start") === -1;
+        }).subscribe(() => {
+            global.reloadPlatformData();
+        });
 
         /**
          * Hack for angular's inability to provide the vcRef to a service with DI.
@@ -52,6 +58,7 @@ export class MainComponent {
          * This has to be after  modal.setViewContainer(vcRef) in order to show the modal.
          */
         global.checkForPlatformUpdates();
+
 
         ipc.watch("accelerator", "checkForPlatformUpdates").subscribe(() => {
             global.checkForPlatformUpdates(true);
