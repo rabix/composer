@@ -37,8 +37,12 @@ describe("new release check", function () {
         });
 
         await triggerUpdateCheck();
-        const noUpdates = await displaysThatAppIsUpToDate();
-        assert.equal(noUpdates, true);
+
+        const noUpdates = await displaysNewUpdateSection();
+        const upToDateText = await displaysThatAppIsUpToDateText();
+
+        assert.equal(noUpdates, false);
+        assert.equal(upToDateText, true);
     });
 
     it("shows that there is an update amongst multiple releases", async function () {
@@ -58,8 +62,12 @@ describe("new release check", function () {
         });
 
         await app.client.waitForVisible("ct-update-platform-modal", 5000);
-        const updateShown = await displaysNewUpdateNotification();
+
+        const updateShown = await displaysNewUpdateSection();
+        const outOfDateText = await displaysThatAppIsOutOfDateText();
+
         assert.equal(updateShown, true);
+        assert.equal(outOfDateText, true);
     });
 
     it("shows that the update is available when it is", async function () {
@@ -82,9 +90,11 @@ describe("new release check", function () {
         const client = app.client;
         await client.waitForVisible("ct-update-platform-modal", 5000);
 
-        const displaysUpdate = await displaysNewUpdateNotification();
+        const displaysUpdate = await displaysNewUpdateSection();
+        const outOfDateText = await displaysThatAppIsOutOfDateText();
 
         assert.equal(displaysUpdate, true);
+        assert.equal(outOfDateText, true);
     });
 
     afterEach(async () => {
@@ -92,14 +102,21 @@ describe("new release check", function () {
     });
 
 
-    function displaysNewUpdateNotification() {
-        return app.client.isVisible("[data-test=download-button]");
+    function displaysNewUpdateSection() {
+        return app.client.isVisible(".dialog-content");
     }
 
-    function displaysThatAppIsUpToDate() {
-        return app.client.getText("ct-update-platform-modal .dialog-content").then(text => {
+    function displaysThatAppIsUpToDateText() {
+        return app.client.getText("ct-update-platform-modal .header-text")
+            .then(text => {
             return text === "Rabix Composer is up to date!";
-        })
+        });
+    }
+
+    function displaysThatAppIsOutOfDateText() {
+        return app.client.getText("ct-update-platform-modal .header-text").then(text => {
+            return text === "A new version of Rabix Composer is available!";
+        });
     }
 
     function triggerUpdateCheck() {

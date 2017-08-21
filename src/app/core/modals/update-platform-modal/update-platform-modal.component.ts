@@ -16,7 +16,7 @@ import {SystemService} from "../../../platform-providers/system.service";
 
                 <div class="header-text">                    
                     <ng-container *ngIf="platformIsOutdated; else upToDate">
-                        A new version of Rabix Composer is available
+                        A new version of Rabix Composer is available!
                     </ng-container>
 
                     <ng-template #upToDate>
@@ -37,7 +37,7 @@ import {SystemService} from "../../../platform-providers/system.service";
                 <div class="dialog-centered">
                     <div class="mt-2">
                         <a #downloadLink href="{{linkForDownload}}" 
-                           data-test="info-link" class="btn btn-primary btn-lg downloadLink"
+                           data-test="download-link" class="btn btn-primary btn-lg downloadLink"
                            (click)="system.openLink(downloadLink.href); modal.close()">Download</a>
                     </div>
                 </div>
