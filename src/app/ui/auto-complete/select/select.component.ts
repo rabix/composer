@@ -157,7 +157,7 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
             }
 
             if (items && Array.isArray(items)) {
-                items.forEach((item) => {
+                items.map((item) => item.toString()).forEach((item) => {
                     const num = this.component.items.length;
 
                     // Add not user option
@@ -166,6 +166,7 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
                     if (this.component.items.length === num && this.create) {
                         // Add user option
                         this.component.addOption({[this.valueField]: item, [this.labelField]: item});
+                        // If item is not a string, selectize will not create that item
                         this.component.createItem(item, false);
                     }
                 });

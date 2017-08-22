@@ -31,7 +31,9 @@
         margin: 0 auto 2rem;
     }
 
-    /deep/ ct-logo {
-        font-size: 45px;
+    .logo {
+        height: 100px;
+        width: 390px;
+        margin: 0 auto;
     }
 }

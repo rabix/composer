@@ -43,7 +43,7 @@ export class MainComponent {
         system.boot();
 
         // When we first get active credentials (might be undefined if no user is active), sync data with the platform
-        auth.getActive().take(1).toPromise().then(credentials => credentials && global.reloadPlatformData());
+        auth.getActive().take(1).filter(c => !!c).subscribe(() => global.reloadPlatformData());
 
         /**
          * Hack for angular's inability to provide the vcRef to a service with DI.

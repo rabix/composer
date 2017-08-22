@@ -94,7 +94,7 @@ export class PublishModalComponent extends DirectiveBase {
         }, null, FormAsyncValidator.debounceValidator((group: FormGroup) => {
             const {name, project} = group.getRawValue();
 
-            const appID = `${project}/${name}`;
+            const appID = `${project}/${this.slugify.transform(name.toLowerCase())}/${this.revision}`;
 
             return this.dataGateway.fetchFileContent(appID, true).toPromise().then((app: any) => {
                 this.revision = app["sbg:latestRevision"] + 1;

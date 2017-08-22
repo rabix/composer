@@ -33,9 +33,9 @@ interface CWLFile {
 
             <!--Secondary Files-->
             <div class="form-group">
-                <label>Secondary Files</label>
-                <ct-compact-list [addKeyCode]="13"
-                                 formControlName="secondaryFiles"></ct-compact-list>
+                <label>Secondary Files</label>                
+                <ct-auto-complete formControlName="secondaryFiles" create="true">
+                </ct-auto-complete>                
             </div>
 
             <!--Metadata-->
@@ -75,6 +75,9 @@ export class FileInputInspectorComponent implements OnInit, OnChanges {
     /** Input data for the component */
     @Input()
     public input: CWLFile = {};
+
+    @Input()
+    public path: string;
 
     /** Emits when the form data changed */
     @Output()
@@ -146,7 +149,8 @@ export class FileInputInspectorComponent implements OnInit, OnChanges {
 
         // Form group is not present on first call
         if (this.formGroup) {
-            this.formGroup.get("secondaryFiles").setValue(this.secondaryFilePaths);
+            this.formGroup.get("path").setValue(this.path, {onlySelf: true});
+            this.formGroup.get("secondaryFiles").setValue(this.secondaryFilePaths, {onlySelf: true});
         }
     }
 }
