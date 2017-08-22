@@ -281,7 +281,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     publish(): void {
 
-        debugger;
         if (!this.validationState.isValidCWL) {
             this.notificationBar.showNotification(new ErrorNotification(`Cannot publish this app because because it's doesn't match the proper JSON schema`));
             return;
