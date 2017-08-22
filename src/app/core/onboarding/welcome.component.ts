@@ -1,5 +1,5 @@
 import {Component} from "@angular/core";
-import {AddSourceModalComponent} from "../../core/modals/add-source-modal/add-source-modal.component";
+import {AddSourceModalComponent} from "../modals/add-source-modal/add-source-modal.component";
 import {SystemService} from "../../platform-providers/system.service";
 import {ModalService} from "../../ui/modal/modal.service";
 
@@ -9,9 +9,7 @@ import {ModalService} from "../../ui/modal/modal.service";
     template: `
         <ct-action-bar></ct-action-bar>
         <div class="content-container p-3">
-            <h1 class="h3">
-                <ct-logo></ct-logo>
-            </h1>
+            <ct-logo class="logo"></ct-logo>
 
             <div class="background-logo"></div>
 
