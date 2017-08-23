@@ -131,10 +131,7 @@ export class InputTypeSelectComponent extends DirectiveBase implements ControlVa
     }
 
     setDisabledState(disabled: boolean) {
-        if (disabled === true) {
-            this.form.controls["isItemOrArray"].disable();
-        } else {
-            this.form.controls["isItemOrArray"].enable();
-        }
+        const control = this.form.controls["isItemOrArray"];
+        disabled ? control.disable() : control.enable();
     }
 }

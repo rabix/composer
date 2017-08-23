@@ -173,28 +173,9 @@ export class DescriptionComponent extends DirectiveBase implements ControlValueA
     }
 
     setDisabledState(disabled: boolean) {
-        if (disabled) {
-            this.form.controls["label"].disable();
-            this.form.controls["description"].disable();
-            if (this.isInputPort()) {
-                this.form.controls["altPrefix"].disable();
-                this.form.controls["category"].disable();
-
-                if (!this.isFileType()) {
-                    this.form.controls["toolDefaults"].disable();
-                }
-            }
-        } else {
-            this.form.controls["label"].enable();
-            this.form.controls["description"].enable();
-            if (this.isInputPort()) {
-                this.form.controls["altPrefix"].enable();
-                this.form.controls["category"].enable();
-
-                if (!this.isFileType()) {
-                    this.form.controls["toolDefaults"].enable();
-                }
-            }
-        }
+        Object.keys(this.form.controls).forEach((item) => {
+            const control = this.form.controls[item];
+            disabled ? control.disable() : control.enable();
+        });
     }
 }
