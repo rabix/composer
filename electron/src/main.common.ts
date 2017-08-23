@@ -1,22 +1,18 @@
-import * as mkdirp from "mkdirp";
-import * as rimraf from "rimraf";
+import * as mock from "mock-require";
 import * as acceleratorProxy from "./accelerator-proxy";
 
 const {app, Menu, BrowserWindow} = require("electron");
 
-const isWebdriverRun        = ~process.argv.indexOf("--test-type=webdriver");
-const defaultUserDataPath   = app.getPath("home") + "/.sevenbridges/rabix-composer";
-const webdriverUserDataPath = defaultUserDataPath + "-e2e";
+const isSpectronRun       = ~process.argv.indexOf("--spectron");
+const defaultUserDataPath = app.getPath("home") + "/.sevenbridges/rabix-composer";
 
+app.setPath("userData", defaultUserDataPath);
 
-if (isWebdriverRun) {
-    mkdirp.sync(webdriverUserDataPath);
-    app.setPath("userData", webdriverUserDataPath);
-    global["__endpoints"]        = require("./routes");
-    global["__webdriverCleanup"] = () => rimraf(webdriverUserDataPath, () => void 0);
-} else {
-    app.setPath("userData", defaultUserDataPath);
-}
+process.on("unhandledRejection", (reason, p) => {
+    console.log("Unhandled Rejection at: Promise", p, "reason:", reason);
+});
+
+applyCLIArgs();
 
 const router = require("./ipc-router");
 
@@ -57,7 +53,7 @@ function start(config: { devTools: boolean, url: string }) {
         }, 300);
     });
 
-    if (config.devTools) {
+    if (config.devTools && !isSpectronRun) {
         win.webContents.openDevTools();
     }
 
@@ -150,20 +146,19 @@ function start(config: { devTools: boolean, url: string }) {
 export = {
     start: (config) => {
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
+        // This method will be called when Electron has finished
+        // initialization and is ready to create browser windows.
+        // Some APIs can only be used after this event occurs.
         app.on("ready", () => start(config));
 
-// Quit when all windows are closed.
+        // Quit when all windows are closed.
         app.on("window-all-closed", () => {
+
             // On macOS it is common for applications and their menu bar
             // to stay active until the user quits explicitly with Cmd + Q
             if (process.platform !== "darwin") {
                 app.quit();
-
             }
-
 
         });
 
@@ -175,4 +170,58 @@ export = {
             }
         });
     }
-};
+}
+
+
+/**
+ * If we are running functional tests with spectron, we need to expose more of the app to
+ * outside control.
+ *
+ * First, we need to be able to override the directory in Chromium will be storing data.
+ * This is “--user-data-dir”. We need it so tests will not store data in the same folder where the
+ * regular apps stores it, and tests should not share data amongst themselves, so each test case
+ * will provide a different directory, and clean it up afterwards.
+ *
+ * We also need a possibility to override some modules in the app.
+ * For example, we don't want to do actual HTTP requests. We instead need a way to mock
+ * modules on per-test basis.
+ *
+ */
+function applyCLIArgs() {
+    const dirArgName             = "--user-data-dir=";
+    const moduleOverridesArgName = "--override-modules=";
+
+    // Find if arguments are present in the command line
+    const userDataDirArg     = process.argv.find(arg => arg.startsWith(dirArgName));
+    const moduleOverridesArg = process.argv.find(arg => arg.startsWith(moduleOverridesArgName))
+
+    // If we're given an alternate userData directory, override the default one
+    if (userDataDirArg) {
+        const userDir = userDataDirArg.slice(dirArgName.length);
+        app.setPath("userData", userDir);
+    }
+
+    // If we're given module overrides, we're given a string through the command line
+    // so we need to unpack it
+    if (moduleOverridesArg) {
+        // Take the argument value
+        const serializedOverrides = moduleOverridesArg.slice(moduleOverridesArgName.length);
+
+        // Deserialize it in such way that everything that is not an object goes through eval
+        // We serialized function as strings beforehand, so we need to bring them back to life
+        const overrides: { module: string, override: Object }[] = JSON.parse(serializedOverrides, (key, val) => {
+            if (typeof val === "string" && (val.startsWith("(") || val.startsWith("function"))) {
+                return eval(`(${val})`);
+            }
+
+            return val;
+        }) || [];
+
+        // For all modules that should be mocked, provide given mocks to the module loader now,
+        // before anybody else requires them.
+        // That way, they will get mocks from cache.
+        overrides.forEach(override => {
+            mock(override.module, override.override);
+        });
+    }
+}
