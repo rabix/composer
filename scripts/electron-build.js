@@ -8,6 +8,7 @@ const projectRoot = path.resolve(__dirname + "/../");
 const ngDistDir = projectRoot + "/ng-dist";
 const electronDir = projectRoot + "/electron";
 const appDistDir = projectRoot + "/dist";
+const buildResourceDir = projectRoot + "/build-resources";
 
 
 // Copy ng-dist to dist
@@ -21,10 +22,7 @@ const mainPackage = JSON.parse(fs.readFileSync(projectRoot + "/package.json", "u
 const merged = Object.assign(mainPackage, {
     dependencies: electronPackage.dependencies,
     devDependencies: electronPackage.devDependencies,
-    main: "main.js",
-    mac: {
-        icon: electronDir + "/rabix-icon.icns"
-    }
+    main: "main.js"
 });
 fs.writeFileSync(appDistDir + "/package.json", JSON.stringify(merged, null, 4));
 
@@ -34,12 +32,14 @@ fs.copySync(electronDir + "/dist/main.prod.js", appDistDir + "/main.js", {
     overwrite: true
 });
 
+
 // Copy compiled electron code to dist
-console.log("Copying electron src...");
-fs.copySync(electronDir + "/src", appDistDir + "/src", {
+console.log("Copying electron dist...");
+fs.copySync(electronDir + "/dist/src", appDistDir + "/src", {
     overwrite: true,
     dereference: true
 });
+fs.copySync(electronDir + "/src/splash", appDistDir + "/src/splash");
 
 // Copy electron node modules
 console.log("Copying electron node_modules...");
@@ -49,16 +49,36 @@ fs.copySync(electronDir + "/node_modules", appDistDir + "/node_modules", {
 });
 
 console.log("Starting build process...");
+
+const targets = new Map();
+// const macTarget = platform.MAC.createTarget();
+targets.set(platform.MAC, new Map());
+// targets.set(platform.LINUX, platform.LINUX.createTarget("ia32", "x64"));
+targets.set(platform.WINDOWS, new Map());
+
 builder.build({
-    targets: platform.current().createTarget(),
+    targets,
     config: {
         appId: "io.rabix.composer",
-        productName: "Rabix Composer",
-        asar: false,
+        productName: "rabix-composer",
+        asar: true,
         directories: {
             output: "build",
-            app: "dist"
-        }
+            app: "dist",
+            buildResources: "build-resources"
+        },
+        mac: {
+            target: ["dmg", "zip"],
+            icon: buildResourceDir + "/icons/rc-icon.icns"
+        },
+        win: {
+            target: ["zip", "portable"],
+            icon: buildResourceDir + "/icons/rc-icon.ico"
+        },
+        linux: {
+            target: ["AppImage", "zip"]
+        },
+
     }
 
 });

@@ -1,5 +1,6 @@
 import {Component, Input} from "@angular/core";
 import {StepModel} from "cwlts/models";
+import {AppHelper} from "../../../../core/helpers/AppHelper";
 
 @Component({
     styleUrls: ["step-tab-info.component.scss"],
@@ -57,11 +58,13 @@ export class WorkflowStepInspectorTabInfo {
     public step: StepModel;
 
     getSource() {
-        return this.step.customProps["sbg:rdfId"] ? (() => {
-            const idSplit = this.step.customProps["sbg:rdfId"].split("/");
-            idSplit.pop();
-            return idSplit.join("/");
-        })() : this.step.run.customProps["sbg:project"] || "Embedded";
+
+        const rdfID = this.step.customProps["sbg:rdfId"];
+        if(rdfID){
+            return AppHelper.getDirname(rdfID);
+        }
+
+        return this.step.run.customProps["sbg:project"] || "Embedded";
     }
 
     getDescription() {

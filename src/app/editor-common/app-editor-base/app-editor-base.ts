@@ -35,6 +35,7 @@ import {PlatformAppService} from "../components/platform-app-common/platform-app
 import {RevisionListComponent} from "../components/revision-list/revision-list.component";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
 import {APP_SAVER_TOKEN, AppSaver} from "../services/app-saving/app-saver.interface";
+import {AppHelper} from "../../core/helpers/AppHelper";
 
 export abstract class AppEditorBase extends DirectiveBase implements StatusControlProvider, OnInit, AfterViewInit {
 
@@ -355,9 +356,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         return this.tabsUnlocked();
     }
 
-    openRevision(revisionNumber: number | string): Promise<any> {
+    openRevision(revisionNumber: number | string | any): Promise<any> {
 
-        const fid = this.tabData.id.split("/").slice(0, 3).concat(revisionNumber.toString()).join("/");
+        const fid = AppHelper.getAppIDWithRevision(this.tabData.id, revisionNumber);
 
         /** @name revisionHackFlagSwitchOn */
         this.revisionChangingInProgress = true;

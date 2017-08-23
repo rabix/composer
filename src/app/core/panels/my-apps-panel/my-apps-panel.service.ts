@@ -15,6 +15,7 @@ import {FilesystemEntry} from "../../data-gateway/data-types/local.types";
 import {GlobalService} from "../../global/global.service";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {AppsPanelService} from "../common/apps-panel.service";
+import {AppHelper} from "../../helpers/AppHelper";
 
 @Injectable()
 export class MyAppsPanelService extends AppsPanelService {
@@ -96,7 +97,7 @@ export class MyAppsPanelService extends AppsPanelService {
                     id: path,
                     data: path,
                     type: "folder",
-                    label: path.split("/").pop(),
+                    label: AppHelper.getBasename(path),
                     isExpanded: this.localExpandedNodes.map(list => list.indexOf(path) !== -1),
                     children: Observable.empty()
                         .concat(this.fileRepository.watch(path))
@@ -121,8 +122,9 @@ export class MyAppsPanelService extends AppsPanelService {
     private createDirectoryListingTreeNodes(listing: FilesystemEntry[]) {
         return listing.map(fsEntry => {
 
+            console.log("Listing");
             const id    = fsEntry.path;
-            const label = fsEntry.path.split("/").pop();
+            const label = AppHelper.getBasename(fsEntry.path);
 
             let icon           = "fa-folder";
             const iconExpanded = "fa-folder-open";

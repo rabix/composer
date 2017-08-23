@@ -416,7 +416,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         }).then((resolved: Process) => {
             // if the app is local, give it an id that's the same as its filename (if doesn't exist)
             if (isLocal) {
-                resolved.id = resolved.id || AppHelper.getBasename(nodeID);
+                resolved.id = resolved.id || AppHelper.getBasename(nodeID, true);
             }
 
             this.workflowEditorService.putInHistory(this.model);
@@ -564,8 +564,9 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
                 return;
             }
 
-            const addExtension = !path.split("/").slice(-1)[0].endsWith(".svg");
-            path = addExtension ? path + ".svg" : path;
+            if(!path.endsWith(".svg")){
+                path += ".svg";
+            }
 
             this.ipc.request("saveFileContent", {
                 path,
