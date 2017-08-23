@@ -1,10 +1,11 @@
 import * as mock from "mock-require";
 import * as acceleratorProxy from "./accelerator-proxy";
+import * as path from "path";
 
 const {app, Menu, BrowserWindow} = require("electron");
 
 const isSpectronRun       = ~process.argv.indexOf("--spectron");
-const defaultUserDataPath = app.getPath("home") + "/.sevenbridges/rabix-composer";
+const defaultUserDataPath = app.getPath("home") + path.sep + ".sevenbridges/rabix-composer";
 
 app.setPath("userData", defaultUserDataPath);
 

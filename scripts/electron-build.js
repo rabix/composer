@@ -51,9 +51,8 @@ fs.copySync(electronDir + "/node_modules", appDistDir + "/node_modules", {
 console.log("Starting build process...");
 
 const targets = new Map();
-// const macTarget = platform.MAC.createTarget();
 targets.set(platform.MAC, new Map());
-// targets.set(platform.LINUX, platform.LINUX.createTarget("ia32", "x64"));
+targets.set(platform.LINUX, new Map());
 targets.set(platform.WINDOWS, new Map());
 
 builder.build({
@@ -68,15 +67,16 @@ builder.build({
             buildResources: "build-resources"
         },
         mac: {
-            target: ["dmg", "zip"],
-            icon: buildResourceDir + "/icons/rc-icon.icns"
+            target: ["dmg", "zip", "dir"],
+            icon: buildResourceDir + "/icons/rc-icon.icns",
         },
         win: {
             target: ["zip", "portable"],
             icon: buildResourceDir + "/icons/rc-icon.ico"
         },
         linux: {
-            target: ["AppImage", "zip"]
+            target: ["AppImage", "zip", "dir"],
+            icon: buildResourceDir + "/icons/rc-icon.iconset"
         },
 
     }

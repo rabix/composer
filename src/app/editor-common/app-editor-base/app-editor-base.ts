@@ -25,7 +25,6 @@ import {PlatformAppService} from "../components/platform-app-common/platform-app
 import {RevisionListComponent} from "../components/revision-list/revision-list.component";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
 import {APP_SAVER_TOKEN, AppSaver} from "../services/app-saving/app-saver.interface";
-import {AppHelper} from "../../core/helpers/AppHelper";
 
 export abstract class AppEditorBase extends DirectiveBase implements StatusControlProvider, OnInit, AfterViewInit {
 

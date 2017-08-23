@@ -14,15 +14,13 @@
         "url": "git+https://github.com/rabix/composer.git"
     },
     "scripts": {
-        "pack": "electron-builder --dir",
-        "dist": "electron-builder",
         "build": "npm run compile:electron && npm run compile:angular && npm run package",
         "changelog": "./node_modules/.bin/git-changelog",
         "compile:angular": "./node_modules/.bin/ng build -prod -aot",
         "compile:electron": "./node_modules/.bin/tsc -p electron && cp -R electron/src/splash electron/dist/src",
         "compile:electron:watch": "./node_modules/.bin/tsc -p electron --watch",
         "lint": "./node_modules/.bin/ng lint",
-        "package": "./scripts/electron-build.sh",
+        "package": "node ./scripts/electron-build.js",
         "postinstall": "cd electron && npm install",
         "serve": "./node_modules/.bin/ng serve",
         "start:electron": "./node_modules/.bin/electron ./electron",
@@ -31,7 +29,7 @@
         "test:angular:watch": "./node_modules/.bin/ng test",
         "test:spectron": "node ./node_modules/.bin/_mocha -r ts-node/register --bail --ui bdd ./spectron/**/*.func.ts",
         "test:electron": "./node_modules/electron/cli.js ./electron/node_modules/.bin/_mocha -r ts-node/register --recursive --ui bdd 'electron/**/*.spec.ts'",
-        "travis": "npm run build && npm run test:spectron && npm run test:electron && npm run test:angular",
+        "ci": "npm run build && npm run test:spectron && npm run test:electron && npm run test:angular",
         "i18n": "ng-xi18n"
     },
     "private": true,

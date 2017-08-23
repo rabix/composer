@@ -9,8 +9,9 @@ import {SBGClient} from "./sbg-api-client/sbg-client";
 import {DataRepository} from "./storage/data-repository";
 import {CredentialsCache, LocalRepository} from "./storage/types/local-repository";
 import {UserRepository} from "./storage/types/user-repository";
+import * as path from "path";
 
-const swapPath       = require("electron").app.getPath("userData") + "/swap";
+const swapPath       = require("electron").app.getPath("userData") + path.sep + "swap";
 const swapController = new SwapController(swapPath);
 
 const fsController          = require("./controllers/fs.controller");
@@ -39,7 +40,7 @@ const ensurePlatformUser = () => {
 
 
 export function loadDataRepository() {
-    repository     = new DataRepository(app.getPath("userData") + "/profiles");
+    repository     = new DataRepository(app.getPath("userData") + path.sep + "profiles");
     repositoryLoad = new Promise((resolve, reject) => {
         repository.load(err => {
             if (err) {

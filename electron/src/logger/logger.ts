@@ -1,10 +1,11 @@
 import {app} from "electron";
 import * as fs from "fs-extra";
 import * as winston from "winston";
+import * as path from "path";
 
-const logDir = app.getPath("userData") + "/logs";
+const logDir = app.getPath("userData") + path.sep + "logs";
 
-const logFilePath = logDir + "/composer.log";
+const logFilePath = logDir + path.sep + "composer.log";
 fs.ensureFileSync(logFilePath);
 
 export const Log = new winston.Logger({
