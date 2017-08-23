@@ -52,7 +52,15 @@
         color: $light-gray;
     }
 
-    .downloadLink {
+    .btn-lg {
         font-size: 1em;
+    }
+
+    .dismissButton {
+        padding-top: 0.5em;
+    }
+
+    .modal-footer {
+        text-align: right;
     }
 }

@@ -57,11 +57,11 @@ export class MainComponent {
         /**
          * This has to be after  modal.setViewContainer(vcRef) in order to show the modal.
          */
-        global.checkForPlatformUpdates();
+        global.checkForPlatformUpdates().catch(console.warn);
 
 
         ipc.watch("accelerator", "checkForPlatformUpdates").subscribe(() => {
-            global.checkForPlatformUpdates(true);
+            global.checkForPlatformUpdates(true).catch(console.warn);
         });
 
         this.runnix = Observable.fromEvent(document, "keyup").map((e: KeyboardEvent) => e.keyCode).bufferCount(10, 1)

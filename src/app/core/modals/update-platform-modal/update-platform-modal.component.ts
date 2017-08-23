@@ -22,25 +22,46 @@ import {SystemService} from "../../../platform-providers/system.service";
                     <ng-template #upToDate>
                         Rabix Composer is up to date!
                     </ng-template>
-                
+                    
                 </div>
             </div>
 
-            <div class="dialog-content" *ngIf="platformIsOutdated">
-                What's new:
-                <div [ct-markdown]="description">
-                </div>
-                
-                <div class="version-info">Current version: Rabix Composer ({{currentVersion}})</div>
-                <div class="version-info">New version: Rabix Composer ({{newVersion}})</div>
+            <div class="dialog-content">
 
-                <div class="dialog-centered">
-                    <div class="mt-2">
-                        <a #downloadLink href="{{linkForDownload}}" 
-                           data-test="download-link" class="btn btn-primary btn-lg downloadLink"
-                           (click)="system.openLink(downloadLink.href); modal.close()">Download</a>
+                <ng-container *ngIf="platformIsOutdated; else upToDateSection">
+                    What's new:
+                    <div [ct-markdown]="description">
                     </div>
-                </div>
+
+                    <div class="version-info">Current version: Rabix Composer ({{currentVersion}})</div>
+                    <div class="version-info">New version: Rabix Composer ({{newVersion}})</div>
+
+                    <div class="dialog-centered">
+                        <div class="mt-2">
+                            <div>
+                                <a #downloadLink href="{{linkForDownload}}"
+                                   data-test="download-link" class="btn btn-primary btn-lg"
+                                   (click)="system.openLink(downloadLink.href); modal.close()">Download</a>
+                            </div>
+
+                            <div>
+                                <button data-test="dismiss-button" class="btn-link clickable dismissButton"
+                                        (click)="skipUpdateVersion()">Skip this version</button>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+
+                <ng-template #upToDateSection>
+                    <div class="dialog-centered">
+                        <div>
+                            <div>
+                                <button data-test="close-button" class="btn btn-primary btn-lg"
+                                        (click)="modal.close()">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
             </div>
         </div>
     `
@@ -64,5 +85,9 @@ export class UpdatePlatformModalComponent extends DirectiveBase {
 
     constructor(public modal: ModalService, public system: SystemService) {
         super();
+    }
+
+    skipUpdateVersion() {
+
     }
 }

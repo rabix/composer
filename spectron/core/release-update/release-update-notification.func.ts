@@ -8,16 +8,26 @@ describe("new release check", function () {
 
     let app: spectron.Application;
 
-    it.skip("shows that it cannot fetch update data without the internet connection", async function () {
+    it("shows that it cannot fetch update data if github api fails", async function () {
 
-        app = await boot(this);
+        app = await boot(this, {
+            overrideModules: [{
+                module: "./github-api-client/github-client",
+                override: {
+                    getReleases: () => {
+                        return Promise.reject("Error");
+                    }
+                }
+            }]
+        });
 
         const client = app.client;
-        client.setNetworkConnection(0);
+        await client.pause(500);
         await triggerUpdateCheck();
 
-        const modalText = await client.getText("ct-update-platform-modal .dialog-content");
-        assert.equal(modalText, "Failed to check for updates.");
+        await client.waitForVisible("ct-modal-error", 1000);
+        const modalText = await client.getText("ct-modal-error .body");
+        assert.equal(modalText, "An error occurred while checking for update information.");
     });
 
     it("shows that there are no updates if latest version is older than the current one", async function () {
@@ -40,10 +50,8 @@ describe("new release check", function () {
 
         await triggerUpdateCheck();
 
-        const noUpdates = await displaysNewUpdateSection();
         const upToDateText = await displaysThatAppIsUpToDateText();
 
-        assert.equal(noUpdates, false);
         assert.equal(upToDateText, true);
     });
 
@@ -68,10 +76,8 @@ describe("new release check", function () {
 
         await app.client.waitForVisible("ct-update-platform-modal", 5000);
 
-        const updateShown = await displaysNewUpdateSection();
         const outOfDateText = await displaysThatAppIsOutOfDateText();
 
-        assert.equal(updateShown, true);
         assert.equal(outOfDateText, true);
     });
 
@@ -98,10 +104,8 @@ describe("new release check", function () {
         const client = app.client;
         await client.waitForVisible("ct-update-platform-modal", 5000);
 
-        const displaysUpdate = await displaysNewUpdateSection();
         const outOfDateText = await displaysThatAppIsOutOfDateText();
 
-        assert.equal(displaysUpdate, true);
         assert.equal(outOfDateText, true);
     });
 
@@ -109,16 +113,11 @@ describe("new release check", function () {
         await shutdown(app);
     });
 
-
-    function displaysNewUpdateSection() {
-        return app.client.isVisible(".dialog-content");
-    }
-
     function displaysThatAppIsUpToDateText() {
         return app.client.getText("ct-update-platform-modal .header-text")
             .then(text => {
-            return text === "Rabix Composer is up to date!";
-        });
+                return text === "Rabix Composer is up to date!";
+            });
     }
 
     function displaysThatAppIsOutOfDateText() {
@@ -129,8 +128,7 @@ describe("new release check", function () {
 
     function triggerUpdateCheck() {
         return app.client.click("ct-settings-menu")
-            .then(() => app.client.click("[data-test=check-for-updates]"))
-            .then(() => app.client.waitForVisible("ct-update-platform-modal", 5000));
+            .then(() => app.client.click("[data-test=check-for-updates]"));
     }
 });
 
