@@ -55,6 +55,7 @@
     .app {
         flex: 1;
         display: flex;
+        width: 0; //to ensure the two sides don't expand with their content
         flex-direction: column;
         border: 1px solid $input-border-color;
         background: $panel-bg;

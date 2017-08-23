@@ -190,7 +190,7 @@ function fetch(filename, options) {
         call.then((body) => {
             if (options.type === "json") {
                 try {
-                    parseJSON(body, filename).then(resolve, reject);
+                    parseJSON(body, filename, body).then(resolve, reject);
                 } catch (ex) {
                     reject(ex);
                 }
