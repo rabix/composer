@@ -73,9 +73,9 @@ export class AppsPanelService {
                                 isWritable: true,
                                 label: path.split("/").pop(),
                                 type: appType,
-                            } as TabData<any>);
+                            } as TabData<any>, true);
 
-                            this.workbox.openTab(tab);
+                            this.workbox.openTab(tab, true, true, true);
                             this.fileRepository.reloadPath(path);
 
                             this.cdr.markForCheck();
