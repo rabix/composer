@@ -53,6 +53,7 @@
 
         <!--Publish to Platform-->
         <button class="btn control-button"
+                data-test="publish-btn"
                 [disabled]="!appIsPublishable()"
                 *ngIf="tabData.dataSource === 'local'"
                 ct-tooltip="Publish to Platform"

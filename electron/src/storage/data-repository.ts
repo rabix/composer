@@ -67,7 +67,10 @@ export class DataRepository {
             }
 
             this.loadProfile(localData.activeCredentials.id, new UserRepository(), (err, userData) => {
-                if (err) return callback(err);
+                if (err) {
+                    callback(err);
+                    return;
+                }
 
                 this.user = userData;
 

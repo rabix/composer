@@ -13,7 +13,13 @@ import {
     ViewEncapsulation
 } from "@angular/core";
 import {Workflow} from "cwl-svg";
-import {StepModel, WorkflowFactory, WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
+import {
+    StepModel,
+    WorkflowFactory,
+    WorkflowInputParameterModel,
+    WorkflowModel,
+    WorkflowOutputParameterModel
+} from "cwlts/models";
 import {Process} from "cwlts/models/generic/Process";
 import {Observable} from "rxjs/Observable";
 import {DataGatewayService} from "../../../core/data-gateway/data-gateway.service";
@@ -23,7 +29,10 @@ import {AppTabData} from "../../../core/workbox/app-tab-data";
 import {AppValidatorService} from "../../../editor-common/app-validator/app-validator.service";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 import {FileRepositoryService} from "../../../file-repository/file-repository.service";
-import {ErrorNotification, NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
+import {
+    ErrorNotification,
+    NotificationBarService
+} from "../../../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {IpcService} from "../../../services/ipc.service";
@@ -554,6 +563,10 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             if (!path) {
                 return;
             }
+
+            const addExtension = !path.split("/").slice(-1)[0].endsWith(".svg");
+            path = addExtension ? path + ".svg" : path;
+
             this.ipc.request("saveFileContent", {
                 path,
                 content
