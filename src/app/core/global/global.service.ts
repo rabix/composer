@@ -7,6 +7,8 @@ import {LocalRepositoryService} from "../../repository/local-repository.service"
 import {ModalService} from "../../ui/modal/modal.service";
 import {UpdatePlatformModalComponent} from "../modals/update-platform-modal/update-platform-modal.component";
 import {IpcService} from "../../services/ipc.service";
+import {GitHubRelease} from "../../../../electron/src/github-api-client/interfaces/github-release";
+import {noop} from "../../lib/utils.lib";
 
 @Injectable()
 export class GlobalService {
@@ -14,6 +16,8 @@ export class GlobalService {
     private checkForPlatformUpdatePromise: Promise<any> = null;
 
     public platformIsOutdated = false;
+
+    private showModal = false;
 
     constructor(private platformRepository: PlatformRepositoryService,
                 private localRepository: LocalRepositoryService,
@@ -36,7 +40,11 @@ export class GlobalService {
         });
     }
 
-    checkForPlatformUpdates(showUpToDateModal: boolean = false) {
+    checkForPlatformUpdates(showModal: boolean = false): Promise<GitHubRelease> {
+
+        // In the case when first checkForPlatformUpdates is called (main component) and while this is not resolved yet
+        // user clicks to manually trigger checkForPlatformUpdates
+        this.showModal = showModal;
 
         if (this.checkForPlatformUpdatePromise) {
             return this.checkForPlatformUpdatePromise;
@@ -47,7 +55,7 @@ export class GlobalService {
             const process = this.statusBar.startProcess("Checking for platform updates...");
 
             this.ipc.request("checkForPlatformUpdates").withLatestFrom(this.localRepository.getIgnoredUpdateVersion())
-                .take(1).subscribe((result) => {
+                .take(1).subscribe((result: [GitHubRelease, string]) => {
 
                 this.checkForPlatformUpdatePromise = null;
                 this.statusBar.stopProcess(process, "");
@@ -58,16 +66,18 @@ export class GlobalService {
 
                     this.platformIsOutdated = true;
 
-                    if (hasUpdate !== ignoredUpdateVersion) {
-                        const modal = this.modal.fromComponent(UpdatePlatformModalComponent, {title: "Platform updates!"});
+                    if (hasUpdate.tag_name !== ignoredUpdateVersion) {
+                        const modal = this.modal.fromComponent(UpdatePlatformModalComponent, "Update");
 
                         modal.platformIsOutdated = true;
                         modal.description = hasUpdate.body;
-                        modal.downloadLink = hasUpdate.html_url;
+                        modal.newVersion = hasUpdate.tag_name;
+                        modal.currentVersion = window["require"]("electron").remote.app.getVersion();
+                        modal.linkForDownload = hasUpdate.html_url;
 
-                        modal.onCancel = () => {
+                        modal.skipUpdateVersion = () => {
                             this.modal.close();
-                            this.localRepository.setIgnoredUpdateVersion(hasUpdate);
+                            this.localRepository.setIgnoredUpdateVersion(hasUpdate.tag_name);
                         };
                     }
 
@@ -75,12 +85,8 @@ export class GlobalService {
 
                     this.localRepository.setIgnoredUpdateVersion(null).then();
 
-                    if (showUpToDateModal) {
-                        const modal = this.modal.fromComponent(UpdatePlatformModalComponent, {title: "Platform updates!"});
-
-                        modal.onCancel = () => {
-                            this.modal.close();
-                        };
+                    if (this.showModal) {
+                        this.modal.fromComponent(UpdatePlatformModalComponent, "Update");
                     }
                 }
 
@@ -89,7 +95,11 @@ export class GlobalService {
             }, (err) => {
                 this.checkForPlatformUpdatePromise = null;
                 this.statusBar.stopProcess(process, "");
-                this.notificationBar.showNotification(new ErrorNotification("Cannot get platform updates. " + new ErrorWrapper(err)));
+
+                if (this.showModal) {
+                    this.modal.error({title: "Update",
+                        content: "An error occurred while checking for update information."}).catch(noop);
+                }
 
                 reject(err);
             });

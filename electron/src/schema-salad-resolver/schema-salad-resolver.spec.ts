@@ -38,11 +38,11 @@ describe("Schema salad resolver", () => {
             const resolvedSerialized = JSON.stringify(resolved, null, 4);
             assert.equal(resolvedSerialized, expectedSerialized);
             done();
-        });
+        }).catch(done);
     });
 
     it("should adapt ins and outs keys to remove $graph roots", (done) => {
-        const original = {
+        const original           = {
             "$graph": [{
                 "id": "main",
                 "steps": {
@@ -53,7 +53,7 @@ describe("Schema salad resolver", () => {
         };
         const originalSerialized = JSON.stringify(original, null, 4);
 
-        const expected = JSON.parse(originalSerialized);
+        const expected           = JSON.parse(originalSerialized);
         expected.$graph[0].steps = {
             "index": {"in": {"file": "infile"}},
             "search": {"in": {"file": "index/result", "term": "term"}}
@@ -65,6 +65,42 @@ describe("Schema salad resolver", () => {
 
             assert.equal(resolvedSerialized, expectedSerialized);
             done();
-        });
+        }).catch(done);
     });
+
+    it("should resolve regular workflow without $graph", (done) => {
+        const original = {
+            "class": "Workflow",
+            "inputs": [],
+            "outputs": [],
+            "steps": [
+                {
+                    "id": "step",
+                    "run": "test/tool-stub.json"
+                }
+            ]
+        };
+
+        const originalSerialized = JSON.stringify(original, null, 4);
+
+        const expected = JSON.parse(originalSerialized);
+
+        expected.steps[0].run = {
+            "class": "CommandLineTool",
+            "inputs": [],
+            "outputs": [],
+        };
+
+        expected.steps[0]["sbg:rdfId"]     = "test/tool-stub.json";
+        expected.steps[0]["sbg:rdfSource"] = __dirname.replace("schema-salad-resolver", "") + "test/tool-stub.json";
+
+        const expectedSerialized = JSON.stringify(expected, null, 4);
+
+        resolver.resolveContent(originalSerialized, __dirname).then(resolved => {
+            const resolvedSerialized = JSON.stringify(resolved, null, 4);
+
+            assert.equal(resolvedSerialized, expectedSerialized);
+            done();
+        }).catch(done);
+    })
 });

@@ -18,7 +18,6 @@ import {NativeModule} from "./native/native.module";
 import {LocalRepositoryService} from "./repository/local-repository.service";
 import {PlatformRepositoryService} from "./repository/platform-repository.service";
 import {DomEventService} from "./services/dom/dom-event.service";
-import {GuidService} from "./services/guid.service";
 import {IpcService} from "./services/ipc.service";
 import {JavascriptEvalService} from "./services/javascript-eval/javascript-eval.service";
 import {SettingsService} from "./services/settings/settings.service";
@@ -33,7 +32,6 @@ import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
         DataGatewayService,
         DomEventService,
         FormBuilder,
-        GuidService,
         IpcService,
         LocalRepositoryService,
         ModalService,

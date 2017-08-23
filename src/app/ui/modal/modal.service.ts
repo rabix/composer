@@ -5,6 +5,7 @@ import {ConfirmComponent} from "./common/confirm.component";
 import {PromptComponent} from "./common/prompt.component";
 import {ModalOptions} from "./modal-options";
 import {ModalComponent} from "./modal.component";
+import {ErrorComponent} from "./common/error.component";
 
 @Injectable()
 export class ModalService {
@@ -136,6 +137,28 @@ export class ModalService {
             content: `Are you sure you want to delete this ${objectName}?`,
             confirmationLabel: "Delete",
             cancellationLabel: "Cancel"
+        });
+    }
+
+    error(params: {
+        title?: string,
+        content?: string,
+        confirmationLabel?: string
+    }) {
+        return this.wrapPromise((resolve) => {
+            const component = this.fromComponent(ErrorComponent, {
+                title: params.title || "Error"
+            });
+
+            Object.assign(component, {
+                content: "An error has occurred",
+                confirmationLabel: "Ok"
+            }, params);
+
+            component.onConfirm = () => {
+                resolve(true);
+                this.close();
+            };
         });
     }
 
