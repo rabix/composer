@@ -28,8 +28,8 @@ import {ModalService} from "./modal.service";
                     {{ title }}
                 </div>  
                 
-                <div class="ui-modal-close-icon" *ngIf="closeIcon">
-                    <i class="fa fa-times pr-1 clickable" (click)="onClose()"></i>
+                <div class="ui-modal-close-icon">
+                    <i class="fa fa-times pr-1 clickable" (click)="close()"></i>
                 </div>
                 
             </div>
@@ -51,9 +51,6 @@ export class ModalComponent extends DirectiveBase implements AfterViewInit {
 
     /** When you press the "ESC" key, should the modal be closed? */
     public closeOnEscape: true;
-
-    /** Show close icon */
-    public closeIcon: false;
 
     /** Holds the ComponentRef object of a component that is injected and rendered inside the modal */
     private nestedComponentRef: ComponentRef<any>;
@@ -83,7 +80,7 @@ export class ModalComponent extends DirectiveBase implements AfterViewInit {
     }
 
     /** When click on X icon */
-    public onClose() {
+    public close() {
         this.service.close();
     }
 
