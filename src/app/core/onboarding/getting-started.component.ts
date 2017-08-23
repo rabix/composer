@@ -17,11 +17,14 @@ import {SendFeedbackModalComponent} from "../modals/send-feedback-modal/send-fee
             <!--Item-->
             <div class="item">
                 <p class="subtitle">New to Rabix Composer?</p>
-                <p>Rabix Composer is a standalone editor for Common Workflow Language tools and workflows.
-                    <a #introLink data-test="new-to-link"
-                       href="https://github.com/rabix/cottontail-frontend/wiki/Introduction-to-Rabix-and-Rabix-Composer"
-                       (click)="system.openLink(introLink.href, $event);">
-                        Learn more
+
+                <p>
+                    If you want to use Rabix composer to edit workflows on the Seven Bridges Platform, read our 
+                    <a #quickstartLink 
+                       href="https://github.com/rabix/composer/wiki/Quickstart-for-editing-Platform-workflows"
+                       (click)="system.openLink(quickstartLink.href, $event)"
+                       data-test="platform-quickstart-link">
+                        quickstart for editing Platform workflows.
                     </a>
                 </p>
             </div>
@@ -29,8 +32,7 @@ import {SendFeedbackModalComponent} from "../modals/send-feedback-modal/send-fee
             <!--Item-->
             <div class="item">
                 <p class="subtitle">Learn how to build a tool</p>
-                <p>Having uploaded a Docker image containing your tool to the image registry, you can specify its
-                    behavior, including its inputs and outputs.
+                <p>You can upload a Docker image containing your tool to the image registry, then specify its behavior, including inputs and outputs.
                     <a #docsLink href="https://github.com/rabix/composer/wiki/The-tool-editor" data-test="tool-docs-link"
                        (click)="system.openLink(docsLink.href, $event)">
                         Learn more
@@ -41,7 +43,7 @@ import {SendFeedbackModalComponent} from "../modals/send-feedback-modal/send-fee
             <!--Item-->
             <div class="item">
                 <p class="subtitle">Need help?</p>
-                <p>If you have any problem, idea or a thought let us know.</p>
+                <p>If you have problems, ideas, or other comments, let us know.</p>
                 <p>
                     <button type="button"
                             data-test="get-support-btn"
@@ -58,7 +60,7 @@ export class GettingStartedComponent {
 
     constructor(public auth: AuthService,
                 public system: SystemService,
-                private modal: ModalService,) {
+                private modal: ModalService) {
     }
 
     initiateFeedbackDialog() {
