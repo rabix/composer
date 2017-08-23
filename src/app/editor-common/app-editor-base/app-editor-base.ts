@@ -1,12 +1,4 @@
-import {
-    AfterViewInit,
-    Injector,
-    Input,
-    OnInit,
-    TemplateRef,
-    ViewChild,
-    ViewContainerRef
-} from "@angular/core";
+import {AfterViewInit, Injector, Input, OnInit, TemplateRef, ViewChild, ViewContainerRef} from "@angular/core";
 import {FormControl} from "@angular/forms";
 import {CommandLineToolModel, WorkflowModel} from "cwlts/models";
 
@@ -16,15 +8,13 @@ import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {CodeSwapService} from "../../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../../core/data-gateway/data-gateway.service";
+import {AppHelper} from "../../core/helpers/AppHelper";
 import {ErrorWrapper} from "../../core/helpers/error-wrapper";
 import {ProceedToEditingModalComponent} from "../../core/modals/proceed-to-editing-modal/proceed-to-editing-modal.component";
 import {PublishModalComponent} from "../../core/modals/publish-modal/publish-modal.component";
 import {AppTabData} from "../../core/workbox/app-tab-data";
-import {
-    ErrorNotification,
-    InfoNotification,
-    NotificationBarService
-} from "../../layout/notification-bar/notification-bar.service";
+import {WorkboxService} from "../../core/workbox/workbox.service";
+import {ErrorNotification, InfoNotification, NotificationBarService} from "../../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {StatusControlProvider} from "../../layout/status-bar/status-control-provider.interface";
 import {PlatformRepositoryService} from "../../repository/platform-repository.service";
@@ -114,7 +104,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 protected appValidator: AppValidatorService,
                 protected codeSwapService: CodeSwapService,
                 protected platformAppService: PlatformAppService,
-                protected platformRepository: PlatformRepositoryService) {
+                protected platformRepository: PlatformRepositoryService,
+                protected workbox: WorkboxService) {
 
         super();
     }
@@ -297,8 +288,25 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         }
 
         this.syncModelAndCode(true).then(() => {
-            const modal      = this.modal.fromComponent(PublishModalComponent, {title: "Publish an App"});
-            modal.appContent = this.getModelText(true);
+            const modal          = this.modal.fromComponent(PublishModalComponent, "Publish an App");
+            modal.appContent     = this.getModelText(true);
+            const originalSubmit = modal.onSubmit;
+
+            modal.onSubmit = (...args: any[]) => {
+                return originalSubmit.apply(modal, args).then(appID => {
+
+                    const tab = this.workbox.getOrCreateAppTab({
+                        id: AppHelper.getRevisionlessID(appID),
+                        type: this.dataModel.class,
+                        label: modal.inputForm.get("name").value,
+                        isWritable: true,
+                        language: "json"
+
+                    });
+                    this.workbox.openTab(tab);
+                });
+            }
+
         }, err => console.warn);
     }
 
@@ -597,4 +605,5 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             throw err;
         });
     }
+
 }

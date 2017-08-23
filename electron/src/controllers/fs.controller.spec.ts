@@ -1,7 +1,7 @@
 import ctrl = require("./fs.controller");
 import chai = require("chai");
 import tmp = require("tmp");
-import fs = require("fs");
+import fs = require("fs-extra");
 import path = require("path");
 import rimraf = require("rimraf");
 

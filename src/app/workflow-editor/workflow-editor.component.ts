@@ -20,6 +20,7 @@ import {IpcService} from "../services/ipc.service";
 import {ModalService} from "../ui/modal/modal.service";
 import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow-graph-editor.component";
 import {WorkflowEditorService} from "./workflow-editor.service";
+import {WorkboxService} from "../core/workbox/workbox.service";
 
 export function appSaverFactory(comp: WorkflowEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -55,8 +56,9 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                 codeSwapService: CodeSwapService,
                 protected platformRepository: PlatformRepositoryService,
                 private cdr: ChangeDetectorRef,
-                platformAppService: PlatformAppService,) {
-        super(statusBar, notificationBar, modal, inspector, dataGateway, injector, appValidator, codeSwapService, platformAppService, platformRepository);
+                platformAppService: PlatformAppService,
+                workbox: WorkboxService) {
+        super(statusBar, notificationBar, modal, inspector, dataGateway, injector, appValidator, codeSwapService, platformAppService, platformRepository, workbox);
     }
 
     protected getPreferredTab(): string {
