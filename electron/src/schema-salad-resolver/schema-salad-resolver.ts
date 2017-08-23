@@ -1,4 +1,4 @@
-import fs = require("fs");
+import fs = require("fs-extra");
 import yaml = require("js-yaml");
 import request = require("request");
 import {LoadOptions} from "js-yaml";

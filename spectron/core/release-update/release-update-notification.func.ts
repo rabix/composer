@@ -23,8 +23,9 @@ describe("new release check", function () {
     it("shows that there are no updates if latest version is older than the current one", async function () {
 
         app = await boot(this, {
-            overrideModules: {
-                "./github-api-client/github-client": {
+            overrideModules: [{
+                module: "./github-api-client/github-client",
+                override: {
                     getReleases: () => {
                         return Promise.resolve([
                             {"tag_name": "v0.0.2", "html_url": "", "body": ""},
@@ -33,7 +34,8 @@ describe("new release check", function () {
                         ]);
                     }
                 }
-            }
+            }]
+
         });
 
         await triggerUpdateCheck();
@@ -48,17 +50,20 @@ describe("new release check", function () {
     it("shows that there is an update amongst multiple releases", async function () {
 
         app = await boot(this, {
-            overrideModules: {
-                "./github-api-client/github-client": {
-                    getReleases: () => {
-                        return Promise.resolve([
-                            {"tag_name": "v0.0.1", "html_url": "", "body": ""},
-                            {"tag_name": "v100.0.1", "html_url": "", "body": ""},
-                            {"tag_name": "v0.0.2", "html_url": "", "body": ""},
-                        ]);
+            overrideModules: [
+                {
+                    module: "./github-api-client/github-client",
+                    override: {
+                        getReleases: () => {
+                            return Promise.resolve([
+                                {"tag_name": "v0.0.1", "html_url": "", "body": ""},
+                                {"tag_name": "v100.0.1", "html_url": "", "body": ""},
+                                {"tag_name": "v0.0.2", "html_url": "", "body": ""},
+                            ]);
+                        }
                     }
                 }
-            }
+            ]
         });
 
         await app.client.waitForVisible("ct-update-platform-modal", 5000);
@@ -72,19 +77,22 @@ describe("new release check", function () {
 
     it("shows that the update is available when it is", async function () {
         app = await boot(this, {
-            overrideModules: {
-                "./github-api-client/github-client": {
-                    getReleases: () => {
-                        return Promise.resolve([
-                            {
-                                "html_url": "https://github.com/rabix/composer/releases/tag/v1.0.0-beta.3",
-                                "tag_name": "v100.0.0",
-                                "body": ""
-                            }
-                        ]);
+            overrideModules: [
+                {
+                    module: "./github-api-client/github-client",
+                    override: {
+                        getReleases: () => {
+                            return Promise.resolve([
+                                {
+                                    "html_url": "https://github.com/rabix/composer/releases/tag/v1.0.0-beta.3",
+                                    "tag_name": "v100.0.0",
+                                    "body": ""
+                                }
+                            ]);
+                        }
                     }
                 }
-            }
+            ]
         });
 
         const client = app.client;
