@@ -4,12 +4,10 @@ const builder = require("electron-builder");
 const fs = require("fs-extra");
 const platform = builder.Platform;
 
-const projectRoot = path.resolve(__dirname + "/../");
+const projectRoot = path.resolve(__dirname + "/");
 const ngDistDir = projectRoot + "/ng-dist";
 const electronDir = projectRoot + "/electron";
 const appDistDir = projectRoot + "/dist";
-const buildResourceDir = projectRoot + "/build-resources";
-
 
 // Copy ng-dist to dist
 console.log("Copying compiled frontend code...");
@@ -68,15 +66,12 @@ builder.build({
         },
         mac: {
             target: ["zip", "dir"],
-            icon: buildResourceDir + "/icons/rc-icon.icns",
         },
         win: {
             target: ["zip", "portable"],
-            icon: buildResourceDir + "/icons/rc-icon.ico"
         },
         linux: {
             target: ["zip", "dir"],
-            icon: buildResourceDir + "/icons/rc-icon.iconset"
         },
 
     }

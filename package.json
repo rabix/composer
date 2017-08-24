@@ -20,7 +20,7 @@
         "compile:electron": "./node_modules/.bin/tsc -p electron && cp -R electron/src/splash electron/dist/src",
         "compile:electron:watch": "./node_modules/.bin/tsc -p electron --watch",
         "lint": "./node_modules/.bin/ng lint",
-        "package": "node ./scripts/electron-build.js",
+        "package": "node ./electron-build.js",
         "postinstall": "cd electron && yarn install",
         "serve": "./node_modules/.bin/ng serve",
         "start:electron": "./node_modules/.bin/electron ./electron",
