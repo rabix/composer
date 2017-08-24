@@ -539,6 +539,14 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         });
     }
 
+    redrawIfCanDrawInWorkflow(): boolean {
+        if (Workflow.canDrawIn(this.canvas.nativeElement)) {
+            this.graph.redraw();
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     checkOutstandingGraphFitting() {
         if (this.tryToFitWorkflowOnNextTabActivation === false) {
