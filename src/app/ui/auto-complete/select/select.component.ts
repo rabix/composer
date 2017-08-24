@@ -215,14 +215,12 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
             })[0].selectize;
         });
 
-        // Set initial disable/enable state for the component
-        if (this.disabled) {
-            this.component.disable();
-        }
 
         setTimeout(() => {
             this.updateOptions(this.items);
+            // Set initial disable/enable state for the component
             if (this.disabled) {
+                this.component.disable();
                 this.component.lock();
             }
         });
