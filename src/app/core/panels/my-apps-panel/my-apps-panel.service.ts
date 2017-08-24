@@ -122,7 +122,6 @@ export class MyAppsPanelService extends AppsPanelService {
     private createDirectoryListingTreeNodes(listing: FilesystemEntry[]) {
         return listing.map(fsEntry => {
 
-            console.log("Listing");
             const id    = fsEntry.path;
             const label = AppHelper.getBasename(fsEntry.path);
 
