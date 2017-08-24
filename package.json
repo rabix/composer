@@ -26,7 +26,7 @@
         "test:angular": "./node_modules/.bin/ng test --watch false",
         "test:angular:watch": "./node_modules/.bin/ng test",
         "test:spectron": "node ./node_modules/.bin/_mocha -r ts-node/register --bail --ui bdd ./spectron/**/*.func.ts",
-        "test:electron": "./node_modules/electron/cli.js ./electron/node_modules/.bin/_mocha --recursive --ui bdd 'electron/dist/**/*.spec.js'",
+        "test:electron": "./node_modules/electron/cli.js ./electron/node_modules/.bin/_mocha -r ts-node/register --recursive --ui bdd 'electron/**/*.spec.ts'",
         "travis": "npm run build && npm run test:spectron && npm run test:electron && npm run test:angular",
         "i18n": "ng-xi18n"
     },
@@ -46,7 +46,7 @@
         "bootstrap": "4.0.0-alpha.5",
         "brace": "^0.10.0",
         "core-js": "^2.5.0",
-        "cwl-svg": "^0.0.40",
+        "cwl-svg": "^0.0.41",
         "cwlts": "^1.13.36",
         "font-awesome": "^4.7.0",
         "jquery": "^3.2.1",

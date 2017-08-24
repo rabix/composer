@@ -5,7 +5,7 @@ import {Observable} from "rxjs/Observable";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {Subject} from "rxjs/Subject";
 import {noop} from "../../lib/utils.lib";
-import {GuidService} from "../../services/guid.service";
+import {Guid} from "../../services/guid.service";
 import {StatusBarComponent} from "./status-bar.component";
 
 
@@ -23,9 +23,6 @@ export class StatusBarService {
     controls = new ReplaySubject<TemplateRef<any>>(1);
 
     private processMap = {};
-
-    constructor(private guid: GuidService) {
-    }
 
     enqueue(process: Observable<string>, completionMessage = "") {
 
@@ -46,7 +43,7 @@ export class StatusBarService {
     }
 
     startProcess(firstMessage = "", completionMessage = "") {
-        const id = this.guid.generate();
+        const id = Guid.generate();
 
         const p = new BehaviorSubject(firstMessage);
 

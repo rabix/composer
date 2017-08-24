@@ -23,12 +23,14 @@ function bindDataRequestListener() {
         controllerFn(request.data, reply(request.id));
     });
 }
+
 module.exports = {
     /**
      * Starts the router event listeners
      * @return {void}
      */
     start: () => {
+        routes.loadDataRepository();
         bindDataRequestListener();
     },
 };

@@ -2,7 +2,7 @@ import {Component, forwardRef, Input, OnDestroy} from "@angular/core";
 import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 import {noop} from "../../../lib/utils.lib";
-import {GuidService} from "../../../services/guid.service";
+import {Guid} from "../../../services/guid.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
@@ -119,7 +119,7 @@ export class KeyValueListComponent extends DirectiveBase implements ControlValue
 
     duplicateKeys = new Set();
 
-    constructor(private guidService: GuidService, private modal: ModalService) {
+    constructor(private modal: ModalService) {
         super();
     }
 
@@ -131,7 +131,7 @@ export class KeyValueListComponent extends DirectiveBase implements ControlValue
 
         this.keyValueFormList = keyValueList.map(entry => {
             return {
-                id: this.guidService.generate(),
+                id: Guid.generate(),
                 model: entry
             };
         });
@@ -190,7 +190,7 @@ export class KeyValueListComponent extends DirectiveBase implements ControlValue
 
     addEntry(): void {
         const newEntry = {
-            id: this.guidService.generate(),
+            id: Guid.generate(),
             model: {
                 key: "",
                 value: new SBDraft2ExpressionModel(null, ""),
