@@ -220,8 +220,11 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
 
             const defaultFilename   = this.slugify.transform(`New ${this.appType}`) + ".cwl";
             const {name}            = this.localForm.getRawValue();
-            const suggestedFilename = name ? (this.slugify.transform(name) + ".cwl") : defaultFilename;
+            const suggestedFilename = name ? // if the name exists, create filename from it
+                (/.cwl$|.yaml$|.json$|.yml$/.test(name) ? name : (this.slugify.transform(name) + ".cwl")) :
+                defaultFilename; // otherwise just use defaultFilename
             let addExtension        = false;
+            this.localAppCreationInfo = null;
 
             dialog.showSaveDialog({
                 title: "Choose a File Path",
@@ -232,10 +235,8 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
 
                 if (!path) {
                     return;
-                } else if (!path.split("/").slice(-1)[0].endsWith(".cwl")) {
-                    // true if path = "/path/to/some/file" -> ["path", "to", "some", "file"] -> ["file"] -> !false
-                    // false if path = "/path/to/some/file.cwl" -> ["path", "to", "some", "file"] -> ["file.cwl"] -> !true
-
+                } else if (!/.cwl$|.yaml$|.json$|.yml$/.test(path)) {
+                    // if path doesn't end with one of the extensions we recognize as a tool or workflow
                     // ensure the path still gets an extension even if "hide extension" was checked
                     if (`${directoryPath}/${suggestedFilename}` !== path + ".cwl") {
                         // but only show message if the user changed the file name, to inform them
