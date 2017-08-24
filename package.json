@@ -14,22 +14,22 @@
         "url": "git+https://github.com/rabix/composer.git"
     },
     "scripts": {
-        "build": "yar run compile:electron && yar run compile:angular && yar run package",
+        "build": "yarn run compile:electron && yarn run compile:angular && yarn run package",
         "changelog": "./node_modules/.bin/git-changelog",
         "compile:angular": "./node_modules/.bin/ng build -prod -aot",
         "compile:electron": "./node_modules/.bin/tsc -p electron && cp -R electron/src/splash electron/dist/src",
         "compile:electron:watch": "./node_modules/.bin/tsc -p electron --watch",
         "lint": "./node_modules/.bin/ng lint",
         "package": "node ./scripts/electron-build.js",
-        "postinstall": "cd electron && yar install",
+        "postinstall": "cd electron && yarn install",
         "serve": "./node_modules/.bin/ng serve",
         "start:electron": "./node_modules/.bin/electron ./electron",
-        "test": "yar run test:electron && yar run test:angular && yar run test:spectron",
+        "test": "yarn run test:electron && yarn run test:angular && yarn run test:spectron",
         "test:angular": "./node_modules/.bin/ng test --watch false",
         "test:angular:watch": "./node_modules/.bin/ng test",
         "test:spectron": "node ./node_modules/.bin/_mocha -r ts-node/register --bail --ui bdd ./spectron/**/*.func.ts",
         "test:electron": "./node_modules/electron/cli.js ./electron/node_modules/.bin/_mocha -r ts-node/register --recursive --ui bdd 'electron/**/*.spec.ts'",
-        "ci": "yar run build && yar run test:spectron && yar run test:electron && npm run test:angular",
+        "ci": "yarn run build && yarn run test:spectron && yarn run test:electron && yarn run test:angular",
         "i18n": "ng-xi18n"
     },
     "private": true,
@@ -95,9 +95,5 @@
         "ts-node": "~2.0.0",
         "tslint": "^5.6.0",
         "typescript": "~2.3.4"
-    },
-    "engines": {
-        "node": ">= 7.4.0",
-        "npm": "^5.0.4"
     }
 }
