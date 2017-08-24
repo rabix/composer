@@ -1,17 +1,13 @@
-import {GuidService} from "./guid.service";
+import {Guid} from "./guid.service";
 
 describe("GUID Generator Service", () => {
-    let guid: GuidService;
-    beforeEach(() => {
-        guid = new GuidService();
-    });
 
     it("Should have a generator function to generate IDs", () => {
-        expect(typeof guid.generate).toBe("function");
+        expect(typeof Guid.generate).toBe("function");
     });
 
     it("Should be able to generate a proper v4 guid", () => {
-        const id = guid.generate();
+        const id = Guid.generate();
 
         expect(typeof id).toBe("string");
         expect(id.length).toBe(36);
@@ -30,7 +26,7 @@ describe("GUID Generator Service", () => {
         const ids   = [];
 
         for (let i = 0; i < limit; i++) {
-            ids.push(guid.generate());
+            ids.push(Guid.generate());
         }
 
         const unique = ids.filter((id, index, arr) => arr.indexOf(id) === index);

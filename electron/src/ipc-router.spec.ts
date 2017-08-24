@@ -10,7 +10,7 @@ describe("IPC Router", () => {
     it("should register the data-request event callback", (done) => {
 
         const electron = {ipcMain: {on: sinon.spy()}};
-        const router   = proxy("./ipc-router", {electron});
+        const router = proxy("./ipc-router", {electron});
         router.start();
 
         assert.isTrue(electron.ipcMain.on.calledOnce);
@@ -20,7 +20,7 @@ describe("IPC Router", () => {
         assert.isFunction(callArgs[1]);
 
         done();
-    });
+    }).timeout(4000);
 
     it("should call the appropriate controller function when required and return the response", (done) => {
         const send = sinon.spy();

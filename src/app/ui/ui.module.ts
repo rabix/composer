@@ -48,6 +48,7 @@ import {TooltipContentComponent} from "./tooltip/tooltip-content.component";
 import {TooltipDirective} from "./tooltip/tooltip.directive";
 import {TreeNodeComponent} from "./tree-view/tree-node/tree-node.component";
 import {TreeViewComponent} from "./tree-view/tree-view.component";
+import {ErrorComponent} from "./modal/common/error.component";
 
 @NgModule({
     imports: [
@@ -95,6 +96,7 @@ import {TreeViewComponent} from "./tree-view/tree-view.component";
     entryComponents: [
         DropDownButtonComponent,
         DropDownMenuComponent,
+        ErrorComponent,
         ModalComponent,
         TooltipContentComponent,
         ConfirmComponent,
@@ -112,6 +114,7 @@ import {TreeViewComponent} from "./tree-view/tree-view.component";
         CodeEditorComponent,
         CodePreviewComponent,
         CodeEditorXComponent,
+        ErrorComponent,
         ModalComponent,
         ContextDirective,
         ConfirmComponent,

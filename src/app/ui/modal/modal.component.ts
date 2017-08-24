@@ -23,7 +23,16 @@ import {ModalService} from "./modal.service";
     selector: "ct-modal",
     template: `
         <div #container class="ui-modal-frame">
-            <div #header class="pl-1 ui-modal-header">{{ title }}</div>
+            <div #header class="pl-1 ui-modal-header">
+                <div class="ui-modal-title">
+                    {{ title }}
+                </div>  
+                
+                <div class="ui-modal-close-icon">
+                    <i class="fa fa-times pr-1 clickable" (click)="close()"></i>
+                </div>
+                
+            </div>
             <div #nestedComponent></div>
         </div>
     `,
@@ -68,6 +77,11 @@ export class ModalComponent extends DirectiveBase implements AfterViewInit {
             .map((ev: KeyboardEvent) => ev.which)
             .filter(key => key === 27)
             .subscribe(() => this.service.close());
+    }
+
+    /** When click on X icon */
+    public close() {
+        this.service.close();
     }
 
     @HostListener("click", ["$event.target"])

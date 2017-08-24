@@ -1,11 +1,8 @@
-import {Injectable} from "@angular/core";
-
 /**
  * GUID v4 Generator
  */
-@Injectable()
-export class GuidService {
-    public generate() {
+export class Guid {
+    static generate() {
         const mask = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
         return mask.replace(/[xy]/g, (replacer) => {
             const x = Math.random() * 16 | 0,
