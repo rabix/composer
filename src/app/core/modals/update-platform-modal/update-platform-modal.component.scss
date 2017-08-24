@@ -13,14 +13,54 @@
         justify-content: space-between;
     }
 
+    .header {
+        display: flex;
+        padding: 2em;
+        flex-direction: column;
+        align-items: center;
+        flex-basis: 190px;
+        background: linear-gradient(45deg, #0d7a90, #11aead);
+    }
+
+    .header-text {
+        font-size: 1.5em;
+    }
+
+    .logo {
+        height: 100px;
+        width: 100px;
+        background: url("../../../../assets/img/rc_icon_256x256.png") no-repeat center;
+        background-size: contain;
+    }
+
     .dialog-content {
         max-height: 500px;
         overflow: auto;
         flex: 1;
-        padding: 1em;
+        padding: 2em;
     }
 
-    .footer {
+    .dialog-centered {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .version-info {
+        color: $light-gray;
+    }
+
+    .btn-lg {
+        font-size: 1em;
+    }
+
+    .dismissButton {
+        padding-top: 0.5em;
+    }
+
+    .modal-footer {
         text-align: right;
     }
 }
