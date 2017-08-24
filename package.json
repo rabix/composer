@@ -3,7 +3,9 @@
     "version": "1.0.0-rc.1",
     "license": "Apache-2.0",
     "homepage": "https://github.com/rabix/composer#readme",
+    "description": "Rabix Composer is a desktop IDE for working with Common Workflow Language workflows",
     "angular-cli": {},
+    "author": "Seven Bridges",
     "bugs": {
         "url": "https://github.com/rabix/composer/issues"
     },
@@ -12,22 +14,22 @@
         "url": "git+https://github.com/rabix/composer.git"
     },
     "scripts": {
-        "build": "npm run compile:electron && npm run compile:angular && npm run package",
+        "build": "yarn run compile:electron && yarn run compile:angular && yarn run package",
         "changelog": "./node_modules/.bin/git-changelog",
         "compile:angular": "./node_modules/.bin/ng build -prod -aot",
         "compile:electron": "./node_modules/.bin/tsc -p electron && cp -R electron/src/splash electron/dist/src",
         "compile:electron:watch": "./node_modules/.bin/tsc -p electron --watch",
         "lint": "./node_modules/.bin/ng lint",
-        "package": "./scripts/electron-build.sh",
-        "postinstall": "cd electron && npm install",
+        "package": "node ./electron-build.js",
+        "postinstall": "cd electron && yarn install",
         "serve": "./node_modules/.bin/ng serve",
         "start:electron": "./node_modules/.bin/electron ./electron",
-        "test": "npm run test:electron && npm run test:angular && npm run test:spectron",
+        "test": "yarn run test:electron && yarn run test:angular && yarn run test:spectron",
         "test:angular": "./node_modules/.bin/ng test --watch false",
         "test:angular:watch": "./node_modules/.bin/ng test",
         "test:spectron": "node ./node_modules/.bin/_mocha -r ts-node/register --bail --ui bdd ./spectron/**/*.func.ts",
         "test:electron": "./node_modules/electron/cli.js ./electron/node_modules/.bin/_mocha -r ts-node/register --recursive --ui bdd 'electron/**/*.spec.ts'",
-        "travis": "npm run build && npm run test:spectron && npm run test:electron && npm run test:angular",
+        "ci": "yarn run build && yarn run test:spectron && yarn run test:electron && yarn run test:angular",
         "i18n": "ng-xi18n"
     },
     "private": true,
@@ -74,7 +76,7 @@
         "@types/webdriverio": "^4.8.4",
         "codelyzer": "^3.1.2",
         "electron": "^1.7.6",
-        "electron-packager": "8.7.2",
+        "electron-builder": "^19.24.1",
         "fs-extra": "^4.0.1",
         "git-changelog": "^1.1.2",
         "glob": "^7.1.1",
@@ -93,9 +95,5 @@
         "ts-node": "~2.0.0",
         "tslint": "^5.6.0",
         "typescript": "~2.3.4"
-    },
-    "engines": {
-        "node": ">= 7.4.0",
-        "npm": "^5.0.4"
     }
 }

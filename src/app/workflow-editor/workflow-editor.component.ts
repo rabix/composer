@@ -4,6 +4,7 @@ import * as Yaml from "js-yaml";
 import {Observable} from "rxjs/Observable";
 import {CodeSwapService} from "../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
+import {AppHelper} from "../core/helpers/AppHelper";
 import {ErrorWrapper} from "../core/helpers/error-wrapper";
 import {AppEditorBase} from "../editor-common/app-editor-base/app-editor-base";
 import {AppValidatorService} from "../editor-common/app-validator/app-validator.service";
@@ -116,7 +117,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                     return;
                 }
 
-                return step.run.customProps["sbg:id"].split("/").slice(0, 3).join("/");
+                return AppHelper.getAppIDWithRevision(step.run.customProps["sbg:id"], null);
             })
             .filter(v => v);
 
@@ -129,7 +130,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
 
                 const appRevisionMap = result.reduce((acc, item) => {
 
-                    const revisionlessID = item.id.split("/").slice(0, 3).join("/");
+                    const revisionlessID = AppHelper.getRevisionlessID(item.id);
                     return {...acc, [revisionlessID]: item.revision};
                 }, {});
 
@@ -139,8 +140,8 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                     if (!step.run.customProps || !step.run.customProps["sbg:id"]) {
                         return;
                     }
-                    const revisionless = step.run.customProps["sbg:id"].split("/").slice(0, 3).join("/");
-                    const revision     = Number(step.run.customProps["sbg:id"].split("/").pop());
+                    const revisionless = AppHelper.getAppIDWithRevision(step.run.customProps["sbg:id"], null);
+                    const revision     = AppHelper.getRevision(step.run.customProps["sbg:id"]);
 
                     if (appRevisionMap[revisionless] === undefined) {
                         return;

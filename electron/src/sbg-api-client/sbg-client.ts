@@ -34,7 +34,7 @@ export class SBGClient {
         this.apiRequest = requestPromise.defaults({
 
             baseUrl: url + "/v2/",
-            timeout: 60000,
+            timeout: 300000,
             json: true,
             headers: {
                 "X-SBG-Auth-Token": token,
@@ -44,7 +44,9 @@ export class SBGClient {
     }
 
     getUser(): SBGClientResponse<User> {
-        return this.apiRequest("user");
+        return this.apiRequest("user", {
+            timeout: 30000
+        });
     }
 
     getAllProjects(): Promise<Project[]> {
