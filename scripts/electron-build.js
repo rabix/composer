@@ -75,7 +75,7 @@ builder.build({
             icon: buildResourceDir + "/icons/rc-icon.ico"
         },
         linux: {
-            target: ["AppImage", "zip", "dir"],
+            target: ["zip", "dir"],
             icon: buildResourceDir + "/icons/rc-icon.iconset"
         },
 
