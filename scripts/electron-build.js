@@ -82,3 +82,11 @@ builder.build({
     }
 
 });
+
+function getCurrentGitBranchSlug() {
+
+    const gitHeadPath = path.join(process.cwd(), '.git/HEAD');
+    const ref = fs.readFileSync(gitHeadPath, "utf8");
+    const branchName = /ref: refs\/heads\/([^\n]+)/.exec(ref)[1];
+    return branchName.replace(/\//g, "-");
+}

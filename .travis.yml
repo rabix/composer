@@ -12,7 +12,7 @@ cache:
   directories:
     - node_modules
     - electron/node_modules
-install:
+install: 2
   - yarn install
 before_script:
   - export DISPLAY=:99.0
@@ -26,5 +26,5 @@ notifications:
 
 branches:
   only:
-  - gh-pages
-  - /.*/
+  - master
+  - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
