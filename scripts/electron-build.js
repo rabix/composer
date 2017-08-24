@@ -67,7 +67,7 @@ builder.build({
             buildResources: "build-resources"
         },
         mac: {
-            target: ["dmg", "zip", "dir"],
+            target: ["zip", "dir"],
             icon: buildResourceDir + "/icons/rc-icon.icns",
         },
         win: {
