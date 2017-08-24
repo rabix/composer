@@ -80,7 +80,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
     @ViewChild(WorkflowGraphEditorComponent)
     graphEditor: WorkflowGraphEditorComponent;
 
-    private redrawWorkflow = false;
+    private hasPendingRedraw = false;
 
     private graphDrawQueue: Function[] = [];
 
@@ -151,7 +151,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
 
                 setTimeout(() => {
                     if (this.graphEditor && this.graphEditor.graph) {
-                        this.redrawWorkflow = !this.graphEditor.redrawIfCanDrawInWorkflow();
+                        this.hasPendingRedraw = !this.graphEditor.redrawIfCanDrawInWorkflow();
                     }
 
                     this.cdr.markForCheck();
@@ -176,8 +176,9 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
     onTabActivation(): void {
         if (this.graphEditor) {
             this.graphEditor.checkOutstandingGraphFitting();
-            if (this.redrawWorkflow) {
-                this.redrawWorkflow = !this.graphEditor.redrawIfCanDrawInWorkflow();
+
+            if (this.hasPendingRedraw) {
+                this.hasPendingRedraw = !this.graphEditor.redrawIfCanDrawInWorkflow();
             }
         }
     }
