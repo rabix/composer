@@ -1,13 +1,10 @@
 osx_image: xcode8.3
 sudo: required
-dist: trusty
+#dist: trusty
 os:
-  - linux
+  - osx
 addons:
   chrome: stable
-  apt:
-    packages:
-            - libsecret-1-0
   artifacts:
     paths:
       - $(ls build/*.zip | tr "\n" ":")
@@ -22,9 +19,9 @@ cache:
 install:
   - yarn install
 before_script:
-  - sudo add-apt-repository ppa:ubuntu-wine/ppa -y
-  - sudo apt-get update
-  - sudo apt-get install --no-install-recommends -y wine1.8 gcc-multilib g++-multilib icnsutils graphicsmagick xz-utils
+#  - sudo add-apt-repository ppa:ubuntu-wine/ppa -y
+#  - sudo apt-get update
+#  - sudo apt-get install --no-install-recommends -y wine1.8 gcc-multilib g++-multilib icnsutils graphicsmagick xz-utils
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
   - sleep 3
@@ -34,8 +31,8 @@ script:
 notifications:
   email: false
 
-before_cache:
-  - rm -rf $HOME/.cache/electron-builder/wine
+#before_cache:
+#  - rm -rf $HOME/.cache/electron-builder/wine
 
 branches:
   only:
