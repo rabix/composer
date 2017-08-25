@@ -1,13 +1,19 @@
+osx_image: xcode8.3
 sudo: required
 dist: trusty
+os:
+  - osx
+  - linux
 addons:
   chrome: stable
+  apt:
+    packages:
+            - libsecret-1-0
   artifacts:
     paths:
       - $(ls build/*.zip | tr "\n" ":")
 language: node_js
-node_js:
-  - "8"
+node_js: "8"
 
 cache:
   yarn: true
@@ -28,6 +34,9 @@ script:
 
 notifications:
   email: false
+
+before_cache:
+  - rm -rf $HOME/.cache/electron-builder/wine
 
 branches:
   only:
