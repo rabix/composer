@@ -58,7 +58,7 @@ export class AppsPanelService {
                         this.statusBar.enqueue(savingProcess);
                         let appType;
 
-                        this.platformRepository.getApp(node.id).then(app => {
+                        this.platformRepository.getApp(node.id, true).then(app => {
                             savingUpdate.next("loaded");
                             appType = app.class;
                             return YAML.dump(app);

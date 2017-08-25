@@ -15,6 +15,7 @@ import {FilesystemEntry} from "../../data-gateway/data-types/local.types";
 import {GlobalService} from "../../global/global.service";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {AppsPanelService} from "../common/apps-panel.service";
+import {AppHelper} from "../../helpers/AppHelper";
 
 @Injectable()
 export class MyAppsPanelService extends AppsPanelService {
@@ -187,7 +188,7 @@ export class MyAppsPanelService extends AppsPanelService {
         return apps.map(app => {
 
             return {
-                id: app.id,
+                id: AppHelper.getRevisionlessID(app.id),
                 data: {...app, isWritable},
                 label: app.name,
                 type: "app",

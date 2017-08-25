@@ -312,7 +312,7 @@ export function fetchPlatformData(data: {
  * Retrive platform app content.
  * Checks for a swap data first, then falls back to fetching it from the API.
  */
-export function getPlatformApp(data: { id: string }, callback) {
+export function getPlatformApp(data: { id: string, forceFetch?: boolean }, callback) {
 
     repositoryLoad.then(() => {
 
@@ -323,25 +323,32 @@ export function getPlatformApp(data: { id: string }, callback) {
             callback(new Error("Cannot fetch an app, you are not connected to any platform."));
         }
 
-        swapController.exists(credentials.id + "/" + data.id, (err, exists) => {
+        if (!data.forceFetch) {
+            swapController.exists(credentials.id + "/" + data.id, (err, exists) => {
 
-            if (err) {
-                callback(err);
-                return;
-            }
+                if (err) {
+                    callback(err);
+                    return;
+                }
 
-            if (exists) {
-                swapController.read(credentials.id + "/" + data.id, callback);
-                return;
-            }
+                if (exists) {
+                    swapController.read(credentials.id + "/" + data.id, callback);
+                    return;
+                }
 
+                const api = new SBGClient(credentials.url, credentials.token);
+                api.apps.get(data.id).then(response => {
+                    callback(null, JSON.stringify(response.raw, null, 4));
+                }, err => callback(err));
+
+
+            });
+        } else {
             const api = new SBGClient(credentials.url, credentials.token);
-            api.apps.get(data.id).then(response => {
+            api.getApp(data.id).then(response => {
                 callback(null, JSON.stringify(response.raw, null, 4));
             }, err => callback(err));
-
-
-        });
+        }
     }, err => callback(err));
 }
 

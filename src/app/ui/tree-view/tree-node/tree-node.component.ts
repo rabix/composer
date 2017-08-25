@@ -171,10 +171,6 @@ export class TreeNodeComponent<T> implements OnInit, OnChanges {
 
     modify(update: (treeNode?: TreeNodeComponent<T>) => void, forceDetection = false): void {
 
-        if (true) {
-            console.log("gotta set da breakpoint")
-        }
-
         update(this);
 
         this.cdr.markForCheck();
