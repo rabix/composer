@@ -2,6 +2,9 @@ sudo: required
 dist: trusty
 addons:
   chrome: stable
+  artifacts:
+    paths:
+      - $(ls build/*.zip | tr "\n" ":")
 language: node_js
 node_js:
   - "8"
