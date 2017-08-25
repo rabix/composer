@@ -28,19 +28,15 @@ function isDevServer() {
 
 function findAppBinary() {
 
-    let binaries: string[];
-
     if (isDevServer()) {
-        binaries = glob.sync("./node_modules/.bin/electron");
+        return glob.sync("./node_modules/.bin/electron")[0];
+    } else if (process.platform.startsWith("win")) {
+        return path.resolve("./build/win-unpacked/rabix-composer.exe");
+    } else if (process.platform.startsWith("darwin")) {
+        return path.resolve("./build/mac/rabix-composer.app/Contents/MacOS/rabix-composer");
     } else {
-        binaries = glob.sync("./build/**/rabix-composer");
+        return path.resolve("./build/linux-unpacked/rabix-composer");
     }
-
-
-    if (!binaries.length) {
-        throw new Error("You must build and package the app before running e2e tests");
-    }
-    return binaries[0];
 }
 
 export function boot(context: ITestCallbackContext, testConfig: Partial<FnTestConfig> = {}): Promise<spectron.Application> {
@@ -54,8 +50,6 @@ export function boot(context: ITestCallbackContext, testConfig: Partial<FnTestCo
 
     const profilesDirPath  = currentTestDir + "/profiles";
     const localProfilePath = profilesDirPath + "/local.json";
-
-    const swapDirPath = currentTestDir + "/swap";
 
     testConfig.localRepository = Object.assign(new LocalRepository(), testConfig.localRepository || {});
 

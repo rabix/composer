@@ -246,7 +246,7 @@ export class WorkboxService {
         const dataSource = DataGatewayService.getFileSource(data.id);
 
         const id         = data.id;
-        const label      = data.id.split("/").pop();
+        const label      = AppHelper.getBasename(data.id);
         const isWritable = data.isWritable;
 
         const fileContent = Observable.empty().concat(this.dataGateway.fetchFileContent(id, false, false));

@@ -97,7 +97,7 @@ export class MyAppsPanelService extends AppsPanelService {
                     id: path,
                     data: path,
                     type: "folder",
-                    label: path.split("/").pop(),
+                    label: AppHelper.getBasename(path),
                     isExpanded: this.localExpandedNodes.map(list => list.indexOf(path) !== -1),
                     children: Observable.empty()
                         .concat(this.fileRepository.watch(path))
@@ -123,7 +123,7 @@ export class MyAppsPanelService extends AppsPanelService {
         return listing.map(fsEntry => {
 
             const id    = fsEntry.path;
-            const label = fsEntry.path.split("/").pop();
+            const label = AppHelper.getBasename(fsEntry.path);
 
             let icon           = "fa-folder";
             const iconExpanded = "fa-folder-open";
