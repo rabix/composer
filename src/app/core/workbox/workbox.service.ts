@@ -113,9 +113,11 @@ export class WorkboxService {
             tabs.splice(foundTabIndex, 1)
             tabs.splice(foundTabIndex, 0, tab);
             this.tabs.next(tabs);
+        } else {
+            this.tabCreation.next(tab);
+            this.tabs.next(tabs.concat(tab));
         }
 
-        this.tabCreation.next(tab);
         this.activateTab(tab);
 
         if (syncState) {
