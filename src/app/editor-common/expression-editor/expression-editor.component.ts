@@ -174,11 +174,11 @@ export class ExpressionEditorComponent extends DirectiveBase implements OnInit, 
             if (type === "object" || type === "array") {
                 node.isExpandable = true;
                 node.children     = Observable.of(wrap(contextItem, trace));
-            } else {
-                node.id = trace.split(".").map(p => (parseInt(p, 10).toString() === p) ? `[${p}]` : p).join(".")
-                    .replace(/\]\.\[/g, "][")
-                    .replace(/\.\[/g, "[");
             }
+
+            node.id = trace.split(".").map(p => (parseInt(p, 10).toString() === p) ? `[${p}]` : p).join(".")
+                .replace(/\]\.\[/g, "][")
+                .replace(/\.\[/g, "[");
 
             return node;
         });
