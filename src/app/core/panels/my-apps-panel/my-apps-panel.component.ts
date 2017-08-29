@@ -116,7 +116,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
                         isWritable: result.isWritable,
                         label: result.name,
                         language: ["cwl", "yml", "yaml"].indexOf(result.language) === -1 ? "json" : "yaml",
-                        type: result.type,
+                        type: result.type || "Code",
                     } as TabData<any>,
                     type: "file",
                     dragEnabled: ["Workflow", "CommandLineTool"].indexOf(result.type) !== -1,
