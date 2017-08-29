@@ -4,10 +4,8 @@ import {
     Component,
     HostListener,
     Input,
-    OnChanges,
     OnInit,
     QueryList,
-    SimpleChanges,
     ViewChildren,
     ViewContainerRef
 } from "@angular/core";
@@ -17,7 +15,7 @@ import {TreeViewService} from "../tree-view.service";
 @Component({
     selector: "ct-tree-node",
     template: `
-        <div (dblclick)="toggle()"
+        <div (dblclick)="toggle($event)"
              (click)="select()"
 
              [ct-drop-zones]="dragDropZones"
@@ -34,11 +32,12 @@ import {TreeViewService} from "../tree-view.service";
             <i *ngIf="loading" class="fa fa-fw fa-circle-o-notch fa-spin"></i>
 
             <!--Standard icon if the node is contracted or there is no expansion icon-->
-            <i *ngIf="!loading && (!_isExpanded || (_isExpanded && !iconExpanded))" class="fa fa-fw"
+            <i *ngIf="!loading && (!_isExpanded || (_isExpanded && !iconExpanded))" class="fa fa-fw" data-toggle-icon
                [ngClass]="icon"></i>
 
             <!--Expansion icon if the node is expanded and there is an expansion icon-->
-            <i *ngIf="!loading && _isExpanded && !!iconExpanded" class="fa fa-fw" [ngClass]="iconExpanded"></i>
+            <i *ngIf="!loading && _isExpanded && !!iconExpanded" class="fa fa-fw expand" data-toggle-icon 
+               [ngClass]="iconExpanded"></i>
 
             <span [innerHTML]="label"></span>
         </div>
@@ -67,7 +66,7 @@ import {TreeViewService} from "../tree-view.service";
     styleUrls: ["./tree-node.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TreeNodeComponent<T> implements OnInit, OnChanges {
+export class TreeNodeComponent<T> implements OnInit {
 
     @Input() id: string;
     @Input() type: string;
@@ -119,19 +118,19 @@ export class TreeNodeComponent<T> implements OnInit, OnChanges {
         }
     }
 
-    ngOnChanges(changes: SimpleChanges): void {
+    toggle(event: MouseEvent) {
 
-    }
+        // Only clicking on data-toggle-icon can toggle
+       if (event.srcElement.getAttribute("data-toggle-icon") !== null ) {
 
-    toggle() {
+           if (this._isExpanded) {
+               return this.contract();
+           }
 
-        if (this._isExpanded) {
-            return this.contract();
-        }
-
-        if (this.isExpandable) {
-            return this.expand();
-        }
+           if (this.isExpandable) {
+               return this.expand();
+           }
+       }
 
         this.open();
     }
