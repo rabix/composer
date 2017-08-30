@@ -57,8 +57,8 @@ export class DataGatewayService {
 
         if (source === "local") {
 
-            const fetch = useSwap ? Observable.empty().concat(this.ipc.request("getLocalFileContent", almostID)) as Observable<string> :
-                Observable.empty().concat(this.updateSwap(almostID, null), this.ipc.request("getLocalFileContent", almostID)) as Observable<string>;
+            const fetch = Observable.empty().concat(useSwap ? Observable.empty() : this.updateSwap(almostID, null),
+                this.ipc.request("getLocalFileContent", almostID)).takeLast(1) as Observable<string>;
 
             if (parse) {
                 return fetch
