@@ -37,7 +37,7 @@ const {dialog} = window["require"]("electron").remote;
     encapsulation: ViewEncapsulation.None,
     styleUrls: ["./workflow-graph-editor.component.scss"],
     template: `
-        <div *ngIf="model && model.steps.length === 0" class="svg-graph-empty-state"></div>
+        <div *ngIf="isGraphEmpty()" class="svg-graph-empty-state"></div>
 
         <svg #canvas class="cwl-workflow" tabindex="-1"
              ct-click
@@ -646,6 +646,12 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         return new XMLSerializer().serializeToString(clone);
     }
 
+    /**
+     * Tells whether graph is empty (nothing to render on SVG)
+     */
+    isGraphEmpty() {
+        return this.model && !(this.model.steps.length || this.model.inputs.length || this.model.outputs.length);
+    }
 
     /**
      * Tells whether there is a canvas in which workflow can be drawn
