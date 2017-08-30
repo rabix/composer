@@ -289,6 +289,10 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
 
         this.form.controls["id"].valueChanges.debounceTime(1000).subscribeTracked(this, (value) => {
             try {
+                if (this.port.id === value) {
+                    return;
+                }
+
                 // Change id on workflow model so canvas can interact with it
                 this.workflowModel.changeIONodeId(this.port, value);
                 this.graph.redraw();
@@ -324,16 +328,15 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
     }
 
     labelUpdate(ev: FocusEvent) {
-        let val = (<HTMLInputElement>ev.srcElement).value;
+        const el = <HTMLInputElement>ev.srcElement;
+        let val = el.value;
 
         if (!val) {
-            val = (<HTMLInputElement>ev.srcElement).value = this.port.label;
-        }
-
-        if (this.port.label !== val) {
+            this.port.label = undefined;
+        } else if (this.port.label !== val) {
             this.port.label = val;
-            this.graph.redraw();
         }
+        this.graph.redraw();
     }
 
     /**
