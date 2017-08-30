@@ -39,7 +39,14 @@ import {TreeViewService} from "../tree-view.service";
             <i *ngIf="!loading && _isExpanded && !!iconExpanded" class="fa fa-fw expand" data-toggle-icon 
                [ngClass]="iconExpanded"></i>
 
-            <span [innerHTML]="label"></span>
+            <ng-container *ngIf="labelIsHTML; else showTextContent">
+                <span [innerHTML]="label"></span>                
+            </ng-container>
+            
+            <ng-template #showTextContent>
+                <span>{{label}}</span>
+            </ng-template>            
+            
         </div>
 
         <div *ngIf="_isExpanded" class="children">
@@ -48,6 +55,7 @@ import {TreeViewService} from "../tree-view.service";
                           [type]="child?.type"
                           [icon]="child?.icon"
                           [label]="child?.label"
+                          [labelIsHTML]="child?.labelIsHTML"
                           [data]="child?.data || {}"
                           [children]="child?.children"
                           [isExpanded]="child?.isExpanded"
@@ -75,6 +83,7 @@ export class TreeNodeComponent<T> implements OnInit {
     @Input() isExpanded: Observable<boolean>;
     @Input() iconExpanded: string;
     @Input() isExpandable: boolean;
+    @Input() labelIsHTML: boolean;
 
     @Input() children: Observable<any[]>;
     @Input() data: T;
