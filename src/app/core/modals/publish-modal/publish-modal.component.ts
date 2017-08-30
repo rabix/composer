@@ -30,7 +30,7 @@ const {app, dialog} = window["require"]("electron").remote;
 
                 <div class="form-group">
                     <label>Destination Project:</label>
-                    <ct-auto-complete formControlName="project"
+                    <ct-auto-complete formControlName="project" data-test="app-project"
                                       [mono]="true"
                                       [options]="projectOptions"
                                       placeholder="Choose a destination project...">
@@ -68,7 +68,9 @@ export class PublishModalComponent extends DirectiveBase {
 
     @Input()
     appContent: string;
+
     error: string;
+
     projectOptions = [];
 
     isPublishing = false;
@@ -94,7 +96,7 @@ export class PublishModalComponent extends DirectiveBase {
         }, null, FormAsyncValidator.debounceValidator((group: FormGroup) => {
             const {name, project} = group.getRawValue();
 
-            const appID = `${project}/${name}`;
+            const appID = `${project}/${this.slugify.transform(name.toLowerCase())}/${this.revision}`;
 
             return this.dataGateway.fetchFileContent(appID, true).toPromise().then((app: any) => {
                 this.revision = app["sbg:latestRevision"] + 1;
@@ -128,20 +130,22 @@ export class PublishModalComponent extends DirectiveBase {
             })));
     }
 
-    onSubmit() {
+    onSubmit(): Promise<string> {
         const {revisionNote, appID, content} = this.outputForm.getRawValue();
-        this.isPublishing                    = true;
+
+        this.isPublishing = true;
         let saveCall: Promise<any>;
 
-        if (this.revision !== 0) {
-            saveCall = this.platformRepository.saveAppRevision(appID, content, revisionNote);
-        } else {
+        if (this.revision === 0) {
             saveCall = this.platformRepository.createApp(appID, content);
+        } else {
+            saveCall = this.platformRepository.saveAppRevision(appID, content, revisionNote);
         }
 
-        saveCall.then(yay => {
+        return saveCall.then(str => {
             this.isPublishing = false;
             this.close();
+            return appID;
         }, (err) => {
             this.error        = "Failed to publish the app. " + new ErrorWrapper(err);
             this.isPublishing = false;

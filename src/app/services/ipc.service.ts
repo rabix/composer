@@ -2,7 +2,7 @@ import {Injectable, NgZone, Optional} from "@angular/core";
 import {AsyncSubject} from "rxjs/AsyncSubject";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
-import {GuidService} from "./guid.service";
+import {Guid} from "./guid.service";
 
 enum RequestType {
     Once,
@@ -64,7 +64,7 @@ export class IpcService {
         }
     }                   = {};
 
-    constructor(private guid: GuidService, @Optional() private zone: NgZone) {
+    constructor(@Optional() private zone: NgZone) {
         this.ipcRenderer.on("data-reply", (sender, response) => {
 
             // console.debug("Data reply received", response.id, response);
@@ -101,7 +101,7 @@ export class IpcService {
     }
 
     public request(message: IPCRoute, data = {}, zone?: NgZone): Observable<any> {
-        const messageID = this.guid.generate();
+        const messageID = Guid.generate();
 
         this.pendingRequests[messageID] = {
             zone,
@@ -121,7 +121,7 @@ export class IpcService {
     }
 
     public watch(message: IPCListeners, data = {}, zone?: NgZone): Observable<any> {
-        const messageID = this.guid.generate();
+        const messageID = Guid.generate();
 
         this.pendingRequests[messageID] = {
             zone,

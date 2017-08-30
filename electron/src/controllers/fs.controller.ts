@@ -1,4 +1,4 @@
-const fs     = require("fs");
+const fs     = require("fs-extra");
 const path   = require("path");
 const rimraf = require("rimraf");
 const yaml   = require("js-yaml");
@@ -141,7 +141,7 @@ export = {
                 // Map them onto promises that will return the output info for each entry
                 .map(name => new Promise((resolve, reject) => {
 
-                    getFileOutputInfo(dir + "/" + name, (err, info) => {
+                    getFileOutputInfo(dir + path.sep + name, (err, info) => {
                         if (err) return reject(err);
 
                         return resolve(info)

@@ -4,6 +4,7 @@ import * as Yaml from "js-yaml";
 import {Observable} from "rxjs/Observable";
 import {CodeSwapService} from "../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
+import {AppHelper} from "../core/helpers/AppHelper";
 import {ErrorWrapper} from "../core/helpers/error-wrapper";
 import {AppEditorBase} from "../editor-common/app-editor-base/app-editor-base";
 import {AppValidatorService} from "../editor-common/app-validator/app-validator.service";
@@ -19,6 +20,7 @@ import {IpcService} from "../services/ipc.service";
 import {ModalService} from "../ui/modal/modal.service";
 import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow-graph-editor.component";
 import {WorkflowEditorService} from "./workflow-editor.service";
+import {WorkboxService} from "../core/workbox/workbox.service";
 
 export function appSaverFactory(comp: WorkflowEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -54,8 +56,9 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                 codeSwapService: CodeSwapService,
                 protected platformRepository: PlatformRepositoryService,
                 private cdr: ChangeDetectorRef,
-                platformAppService: PlatformAppService,) {
-        super(statusBar, notificationBar, modal, inspector, dataGateway, injector, appValidator, codeSwapService, platformAppService, platformRepository);
+                platformAppService: PlatformAppService,
+                workbox: WorkboxService) {
+        super(statusBar, notificationBar, modal, inspector, dataGateway, injector, appValidator, codeSwapService, platformAppService, platformRepository, workbox);
     }
 
     protected getPreferredTab(): string {
@@ -77,6 +80,8 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
 
     @ViewChild(WorkflowGraphEditorComponent)
     graphEditor: WorkflowGraphEditorComponent;
+
+    private hasPendingRedraw = false;
 
     private graphDrawQueue: Function[] = [];
 
@@ -112,7 +117,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                     return;
                 }
 
-                return step.run.customProps["sbg:id"].split("/").slice(0, 3).join("/");
+                return AppHelper.getAppIDWithRevision(step.run.customProps["sbg:id"], null);
             })
             .filter(v => v);
 
@@ -125,7 +130,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
 
                 const appRevisionMap = result.reduce((acc, item) => {
 
-                    const revisionlessID = item.id.split("/").slice(0, 3).join("/");
+                    const revisionlessID = AppHelper.getRevisionlessID(item.id);
                     return {...acc, [revisionlessID]: item.revision};
                 }, {});
 
@@ -135,8 +140,8 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                     if (!step.run.customProps || !step.run.customProps["sbg:id"]) {
                         return;
                     }
-                    const revisionless = step.run.customProps["sbg:id"].split("/").slice(0, 3).join("/");
-                    const revision     = Number(step.run.customProps["sbg:id"].split("/").pop());
+                    const revisionless = AppHelper.getAppIDWithRevision(step.run.customProps["sbg:id"], null);
+                    const revision     = AppHelper.getRevision(step.run.customProps["sbg:id"]);
 
                     if (appRevisionMap[revisionless] === undefined) {
                         return;
@@ -147,7 +152,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
 
                 setTimeout(() => {
                     if (this.graphEditor && this.graphEditor.graph) {
-                        this.graphEditor.graph.redraw();
+                        this.hasPendingRedraw = !this.graphEditor.redrawIfCanDrawInWorkflow();
                     }
 
                     this.cdr.markForCheck();
@@ -172,6 +177,10 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
     onTabActivation(): void {
         if (this.graphEditor) {
             this.graphEditor.checkOutstandingGraphFitting();
+
+            if (this.hasPendingRedraw) {
+                this.hasPendingRedraw = !this.graphEditor.redrawIfCanDrawInWorkflow();
+            }
         }
     }
 

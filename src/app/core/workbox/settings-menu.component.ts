@@ -31,16 +31,21 @@ import {WorkboxService} from "./workbox.service";
                         {{ c.user.username }} 
                         <i *ngIf="active === c" class="active-icon fa fa-check-circle"></i>
                     </span>
-                    <span class="text-muted d-block small">{{ c.url }}</span>
+                    <span class="text-muted d-block small">{{ getPlatformLabel(c.url) }}</span>
                 </li>
                 <li (click)="openSettings()"><i class="fa fa-cog fa-fw"></i> Settings</li>
                 <li (click)="openFeedback()"><i class="fa fa-bullhorn fa-fw"></i> Send Feedback</li>
-                <li (click)="checkForPlatformUpdates()" class="check-for-update" data-test="check-for-updates">
+                <li (click)="checkForPlatformUpdates()" [class.outdated-update]="global.platformIsOutdated"
+                        data-test="check-for-updates">
+                    
                     <i class="fa fa-refresh fa-fw "></i>
-                    <span *ngIf="platformIsOutdated; else checkForUpdates" class="outdated-update">
+                    
+                    <span *ngIf="platformIsOutdated; else checkForUpdates">
                         Update Available
                     </span>
+                    
                     <ng-template #checkForUpdates>Check for Updates</ng-template>
+                    
                 </li>
             </ul>
         </ng-template>
@@ -114,7 +119,11 @@ export class SettingsMenuComponent extends DirectiveBase {
     }
 
     checkForPlatformUpdates() {
-        this.global.checkForPlatformUpdates(true);
+        this.global.checkForPlatformUpdates(true).catch(console.warn);
         this.openStatus.next(false);
+    }
+
+    getPlatformLabel(url: string): string {
+        return AuthCredentials.getPlatformLabel(url);
     }
 }

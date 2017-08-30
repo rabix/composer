@@ -1,7 +1,7 @@
 import ctrl = require("./fs.controller");
 import chai = require("chai");
 import tmp = require("tmp");
-import fs = require("fs");
+import fs = require("fs-extra");
 import path = require("path");
 import rimraf = require("rimraf");
 
@@ -439,7 +439,7 @@ describe("FS Controller", () => {
                 tmp.dir((err, childDir, cleanChild) => {
                     if (err) throw err;
 
-                    tmp.file({template: childDir + "/tmp-XXXXXX"}, (err, path, fd, cleanFile) => {
+                    tmp.file({template: childDir + path.sep + "tmp-XXXXXX"}, (err, path, fd, cleanFile) => {
                         if (err) throw err;
 
 

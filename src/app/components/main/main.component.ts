@@ -3,12 +3,11 @@ import {Observable} from "rxjs/Observable";
 import {AuthService} from "../../auth/auth.service";
 import {GlobalService} from "../../core/global/global.service";
 import {SystemService} from "../../platform-providers/system.service";
-import {GuidService} from "../../services/guid.service";
+import {IpcService} from "../../services/ipc.service";
 import {JavascriptEvalService} from "../../services/javascript-eval/javascript-eval.service";
 import {ContextService} from "../../ui/context/context.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {UrlValidator} from "../../validators/url.validator";
-import {IpcService} from "../../services/ipc.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -22,9 +21,7 @@ import {IpcService} from "../../services/ipc.service";
     styleUrls: ["./../../../assets/sass/main.scss", "./main.component.scss"],
     providers: [
         UrlValidator,
-        ContextService,
-        // FIXME: this needs to be handled in a system-specific way
-        GuidService
+        ContextService
     ],
 })
 export class MainComponent {
@@ -43,7 +40,13 @@ export class MainComponent {
         system.boot();
 
         // When we first get active credentials (might be undefined if no user is active), sync data with the platform
-        auth.getActive().take(1).filter(c => !!c).subscribe(() => global.reloadPlatformData());
+        auth.getActive().take(1).filter(creds => {
+            // Stop if there are either no credentials, or we have the --no-fetch-on-start argument passed to the chromium cli
+            // The cli arg is a useful testing facility.
+            return creds && process.argv.indexOf("--no-fetch-on-start") === -1;
+        }).subscribe(() => {
+            global.reloadPlatformData();
+        });
 
         /**
          * Hack for angular's inability to provide the vcRef to a service with DI.
@@ -54,10 +57,11 @@ export class MainComponent {
         /**
          * This has to be after  modal.setViewContainer(vcRef) in order to show the modal.
          */
-        global.checkForPlatformUpdates();
+        global.checkForPlatformUpdates().catch(console.warn);
+
 
         ipc.watch("accelerator", "checkForPlatformUpdates").subscribe(() => {
-            global.checkForPlatformUpdates(true);
+            global.checkForPlatformUpdates(true).catch(console.warn);
         });
 
         this.runnix = Observable.fromEvent(document, "keyup").map((e: KeyboardEvent) => e.keyCode).bufferCount(10, 1)

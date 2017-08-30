@@ -27,7 +27,7 @@ type ViewMode = "auth" | "keyBindings" | "cache";
         <ct-form-panel class="m-2">
             <div class="tc-header">Authentication</div>
             <div class="tc-body">
- 
+
                 <table class="table table-striped">
                     <thead>
                     <tr>
@@ -38,7 +38,7 @@ type ViewMode = "auth" | "keyBindings" | "cache";
                     <tbody>
 
                     <tr *ngFor="let entry of (auth.getCredentials() | async)" class="align-middle">
-                        <td class="align-middle">{{ entry.url }}</td>
+                        <td class="align-middle">{{ getPlatformLabel(entry.url) }}</td>
                         <td class="align-middle">
                             {{ entry.user.username }}
                             <span *ngIf="(auth.getActive() | async) === entry" class="tag tag-primary">active</span>
@@ -86,13 +86,13 @@ export class SettingsComponent extends DirectiveBase {
             const valuesFromModal = credentialsModal.getValue();
             Observable.fromPromise(this.auth.addCredentials(valuesFromModal)).withLatestFrom(this.auth.getCredentials())
                 .take(1).subscribe((combined) => {
-                    const credentials = combined[1];
+                const credentials = combined[1];
 
-                    // If added credential is the only one, set it to be the active one
-                    if (credentials.length === 1) {
-                        this.setActiveCredentials(credentials[0]);
-                    }
-                });
+                // If added credential is the only one, set it to be the active one
+                if (credentials.length === 1) {
+                    this.setActiveCredentials(credentials[0]);
+                }
+            });
             this.modal.close();
         };
 
@@ -112,16 +112,16 @@ export class SettingsComponent extends DirectiveBase {
             Observable.from(this.auth.addCredentials(credentialsFromModal)).withLatestFrom(this.auth.getActive())
                 .take(1).subscribe((combined) => {
 
-                    const credentials = combined[1];
+                const credentials = combined[1];
 
-                    // If edited credentials is the active one, update active credentials
-                    if (edited === credentials) {
-                        this.auth.setActiveCredentials(credentialsFromModal);
-                    }
+                // If edited credentials is the active one, update active credentials
+                if (edited === credentials) {
+                    this.auth.setActiveCredentials(credentialsFromModal);
+                }
 
-                    this.modal.close();
+                this.modal.close();
 
-                });
+            });
 
         };
     }
@@ -137,10 +137,14 @@ export class SettingsComponent extends DirectiveBase {
     setActiveCredentials(credentials?: AuthCredentials) {
 
         this.auth.setActiveCredentials(credentials).then(() => {
-            if(credentials){
+            if (credentials) {
                 this.global.reloadPlatformData();
             }
             this.workbox.forceReloadTabs();
         });
+    }
+
+    getPlatformLabel(url: string): string {
+        return AuthCredentials.getPlatformLabel(url);
     }
 }

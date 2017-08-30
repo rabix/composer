@@ -2,7 +2,9 @@ import {Component, Input, OnInit} from "@angular/core";
 import {FormControl} from "@angular/forms";
 import {CodeSwapService} from "../../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../../core/data-gateway/data-gateway.service";
+import {AppHelper} from "../../core/helpers/AppHelper";
 import {AppTabData} from "../../core/workbox/app-tab-data";
+import {FileRepositoryService} from "../../file-repository/file-repository.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {StatusBarService} from "../status-bar/status-bar.service";
 
@@ -34,6 +36,7 @@ export class FileEditorComponent extends DirectiveBase implements OnInit {
 
     constructor(private dataGateway: DataGatewayService,
                 private codeSwapService: CodeSwapService,
+                private fileRepository: FileRepositoryService,
                 private status: StatusBarService) {
         super();
     }
@@ -50,10 +53,10 @@ export class FileEditorComponent extends DirectiveBase implements OnInit {
     }
 
     save() {
-        const filename = this.tabData.id.split("/").pop();
+        const filename = AppHelper.getBasename(this.tabData.id);
         const proc     = this.status.startProcess(`Saving: ${filename}`);
 
-        this.dataGateway.saveFile(this.tabData.id, this.fileContent.value).subscribe(() => {
+        this.fileRepository.saveFile(this.tabData.id, this.fileContent.value).then(() => {
             this.status.stopProcess(proc, `Saved: ${filename}`);
         }, err => {
             this.status.stopProcess(proc, `Could not save ${filename} (${err})`);
