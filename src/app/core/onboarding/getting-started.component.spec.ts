@@ -48,11 +48,11 @@ describe("GettingStartedComponent", () => {
         expect(component).toBeTruthy("Component could not be instantiated");
     });
 
-    it("should open 'New to Rabix Composer' link in browser", () => {
+    it("should open 'quickstart for editing Platform workflows' link in browser", () => {
 
-        const wikiLink = "https://github.com/rabix/cottontail-frontend/wiki/Introduction-to-Rabix-and-Rabix-Composer";
+        const wikiLink = "https://github.com/rabix/composer/wiki/Quickstart-for-editing-Platform-workflows";
 
-        const toolDocsLink = fixture.debugElement.query(By.css("[data-test=new-to-link]"));
+        const toolDocsLink = fixture.debugElement.query(By.css("[data-test=platform-quickstart-link]"));
         const system       = fixture.debugElement.injector.get(SystemService);
         const linkSpy      = spyOn(system, "openLink");
 
