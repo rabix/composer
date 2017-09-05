@@ -14,14 +14,11 @@ type ViewMode = "auth" | "keyBindings" | "cache";
     selector: "ct-settings",
     styleUrls: ["./settings.component.scss"],
     template: `
+        
         <ct-action-bar>
-
-            <ct-tab-selector [distribute]="'auto'" [active]="viewMode" (activeChange)="switchTab($event)">
+            <ct-tab-selector distribute="auto" active="auth">
                 <ct-tab-selector-entry tabName="auth">Authentication</ct-tab-selector-entry>
-                <!--<ct-tab-selector-entry tabName="keyBindings">Key Bindings</ct-tab-selector-entry>-->
-                <!--<ct-tab-selector-entry tabName="cache">Cache</ct-tab-selector-entry>-->
             </ct-tab-selector>
-
         </ct-action-bar>
 
         <ct-form-panel class="m-2">
@@ -66,21 +63,16 @@ type ViewMode = "auth" | "keyBindings" | "cache";
 })
 export class SettingsComponent extends DirectiveBase {
 
-    viewMode: ViewMode = "auth";
-
-
-    constructor(public modal: ModalService,
+    constructor(public auth: AuthService,
+                public modal: ModalService,
                 private global: GlobalService,
-                private workbox: WorkboxService,
-                public auth: AuthService) {
+                private workbox: WorkboxService) {
 
         super();
     }
 
     openCredentialsForm() {
-        const credentialsModal = this.modal.fromComponent(PlatformCredentialsModalComponent, {
-            title: "Add Connection"
-        });
+        const credentialsModal = this.modal.fromComponent(PlatformCredentialsModalComponent, "Add Connection");
 
         credentialsModal.submit = () => {
             const valuesFromModal = credentialsModal.getValue();
@@ -99,7 +91,7 @@ export class SettingsComponent extends DirectiveBase {
     }
 
     editCredentials(edited: AuthCredentials) {
-        const valuesFromModal = this.modal.fromComponent(PlatformCredentialsModalComponent, {title: "Edit Connection"});
+        const valuesFromModal = this.modal.fromComponent(PlatformCredentialsModalComponent, "Edit Connection");
 
         valuesFromModal.user      = edited.user;
         valuesFromModal.token     = edited.token;
@@ -124,14 +116,6 @@ export class SettingsComponent extends DirectiveBase {
             });
 
         };
-    }
-
-    /**
-     * Changes the view mode
-     * @param tab Name of the tab to switch to
-     */
-    switchTab(tab: ViewMode): void {
-        this.viewMode = tab;
     }
 
     setActiveCredentials(credentials?: AuthCredentials) {

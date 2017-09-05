@@ -204,6 +204,10 @@
   version "3.9.1"
   resolved "https://registry.yarnpkg.com/@types/js-yaml/-/js-yaml-3.9.1.tgz#2f3c142771bb345829ce690c5838760b6b9ba553"
 
+"@types/keytar@^4.0.1":
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/@types/keytar/-/keytar-4.0.1.tgz#e2cf6405dc33861424e59b67516c66d2cf7bc21b"
+
 "@types/markdown-it@0.0.2":
   version "0.0.2"
   resolved "https://registry.yarnpkg.com/@types/markdown-it/-/markdown-it-0.0.2.tgz#5d9ad19e6e6508cdd2f2596df86fd0aade598660"
@@ -3564,6 +3568,13 @@ karma@~1.7.0:
     tmp "0.0.31"
     useragent "^2.1.12"
 
+keytar-prebuild@^4.0.3:
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/keytar-prebuild/-/keytar-prebuild-4.0.3.tgz#1bcbe37c55b5b079e962e0546e528c13ea923295"
+  dependencies:
+    nan "2.6.2"
+    prebuild-install "^2.1.2"
+
 kind-of@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-2.0.1.tgz#018ec7a4ce7e3a86cb9141be519d24c8faa981b5"
@@ -4086,7 +4097,7 @@ mute-stream@0.0.7:
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.7.tgz#3075ce93bc21b8fab43e1bc4da7e8115ed1e7bab"
 
-nan@2.6.x, nan@^2.3.0, nan@^2.3.2:
+nan@2.6.2, nan@2.6.x, nan@^2.3.0, nan@^2.3.2:
   version "2.6.2"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.6.2.tgz#e4ff34e6c95fdfb5aecc08de6596f43605a7db45"
 
@@ -4911,7 +4922,7 @@ postcss@^6.0.1:
     source-map "^0.5.6"
     supports-color "^4.2.1"
 
-prebuild-install@^2.1.0:
+prebuild-install@^2.1.0, prebuild-install@^2.1.2:
   version "2.2.2"
   resolved "https://registry.yarnpkg.com/prebuild-install/-/prebuild-install-2.2.2.tgz#dd47c4d61f3754fb17bbf601759e5922e16e0671"
   dependencies:

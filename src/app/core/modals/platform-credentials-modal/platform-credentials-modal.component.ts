@@ -53,7 +53,7 @@ import {DataGatewayService} from "../../data-gateway/data-gateway.service";
                         <i class="fa fa-times-circle fa-fw"></i>
                             <span>Given platform does not exist.</span>
                     </span>
-                    
+
                     <span class="text-danger" *ngIf="form.get('token').hasError('pattern')">
                         <i class="fa fa-times-circle fa-fw"></i>
                             <span>Invalid token</span>
@@ -63,7 +63,7 @@ import {DataGatewayService} from "../../data-gateway/data-gateway.service";
                         <i class="fa fa-times-circle fa-fw"></i>
                             <span>Token is not valid for the selected platform. ({{ form.getError("tokenCheck") }})</span>
                     </span>
-                    
+
                 </div>
 
             </div>
@@ -81,21 +81,19 @@ import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 })
 export class PlatformCredentialsModalComponent implements OnInit {
 
-    /**
-     * Allow only token update. If this is true, platform will be disabled and username of the new token must match the old one.
-     */
+    /** Allow only token update. If this is true, platform will be disabled and username of the new token must match the old one. */
     @Input() tokenOnly = false;
 
-    @Input() token: string;
-
+    /** Public API url */
     @Input() platform = "https://api.sbgenomics.com";
 
-    /**
-     * Combined with the “tokenOnly” parameter, checks whether the modified token for a given platform belongs to this user.
-     */
+    /** Combined with the “tokenOnly” parameter, checks whether the modified token for a given platform belongs to this user. */
     @Input() user: User;
 
+    /** Modal can be given preset with a token */
+    @Input() token: string;
 
+    /** FormGroup for modal inputs */
     form: FormGroup;
 
     platformList = [
@@ -113,6 +111,7 @@ export class PlatformCredentialsModalComponent implements OnInit {
     }
 
     submit(): void {
+
         // Should be overridden from the modal creator
     }
 
@@ -197,7 +196,7 @@ export class PlatformCredentialsModalComponent implements OnInit {
         this.system.openLink(url);
     }
 
-    close(){
+    close() {
         this.modal.close();
     }
 }

@@ -137,13 +137,13 @@ export class AuthCredentials implements UserPlatformIdentifier {
 
     private ensureValidToken(token: string): void {
         if (AuthCredentials.isValidToken(token) === false) {
-            throw `Invalid token: ${token}`;
+            throw new Error("Given token is not valid: " + token);
         }
     }
 
     private ensureValidURL(url: string): void {
         if (AuthCredentials.isValidURL(url) === false) {
-            throw `Invalid URL: ${url}`;
+            throw new Error("Invalid platform URL: " + url);
         }
     }
 }
