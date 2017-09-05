@@ -47,7 +47,8 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                                 <!--Port options for all other types-->
                                 <div *ngIf="!isType(input, ['File', 'Directory'])" class="input-control">
                                     
-                                    <ct-generic-dropdown-menu [ct-menu]="menu" menuAlign="left" [menuState]="openStatus">
+                                    <ct-generic-dropdown-menu [ct-menu]="menu" menuAlign="left" 
+                                                              [menuState]="openStatus" [readonly]="readonly">
                                         <span>{{ input.status}}
                                             <i class="fa fa-chevron-down fa-fw settings-icon"> </i>
                                         </span>                                        
@@ -55,7 +56,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
                                     <ng-template #menu class="mr-1">
                                         <ul class="list-unstyled">
-                                            <li *ngFor="let c of dropDownPortOptions" class="dropdown-port-option" 
+                                            <li *ngFor="let c of dropDownPortOptions"
                                                 [class.active]="input.status === c.value"
                                                 (click)="onPortOptionChange(input, c.value)">
                                                 <span>
