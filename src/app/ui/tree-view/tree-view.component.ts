@@ -12,6 +12,7 @@ import {TreeViewService} from "./tree-view.service";
                       [type]="node?.type"
                       [icon]="node?.icon"
                       [label]="node?.label"
+                      [labelIsHTML]="node?.labelIsHTML"
                       [data]="node?.data || {}"
                       [children]="node?.children"
                       [dragLabel]="node?.dragLabel"

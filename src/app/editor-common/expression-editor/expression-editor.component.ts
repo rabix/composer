@@ -8,6 +8,7 @@ import {TreeNode} from "../../ui/tree-view/tree-node";
 import {TreeViewComponent} from "../../ui/tree-view/tree-view.component";
 import {TreeViewService} from "../../ui/tree-view/tree-view.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {HtmlHelper} from "../../helpers/html.helper";
 
 @Component({
     selector: "ct-expression-editor",
@@ -167,18 +168,19 @@ export class ExpressionEditorComponent extends DirectiveBase implements OnInit, 
                 node.iconExpanded = "fa-angle-down";
             }
 
-            node.label = `<span class="varname">${key}: <span class="vartype">${typeDisplay}</span></span>`;
+            node.label = `<span class="varname">${HtmlHelper.escapeHTML(key)}: <span class="vartype">${typeDisplay}</span></span>`;
+            node.labelIsHTML = true;
 
             const trace = [path, key].filter(e => e).join(".");
 
             if (type === "object" || type === "array") {
                 node.isExpandable = true;
                 node.children     = Observable.of(wrap(contextItem, trace));
-            } else {
-                node.id = trace.split(".").map(p => (parseInt(p, 10).toString() === p) ? `[${p}]` : p).join(".")
-                    .replace(/\]\.\[/g, "][")
-                    .replace(/\.\[/g, "[");
             }
+
+            node.id = trace.split(".").map(p => (parseInt(p, 10).toString() === p) ? `[${p}]` : p).join(".")
+                .replace(/\]\.\[/g, "][")
+                .replace(/\.\[/g, "[");
 
             return node;
         });

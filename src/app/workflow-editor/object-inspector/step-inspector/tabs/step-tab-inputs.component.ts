@@ -47,7 +47,8 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                                 <!--Port options for all other types-->
                                 <div *ngIf="!isType(input, ['File', 'Directory'])" class="input-control">
                                     
-                                    <ct-generic-dropdown-menu [ct-menu]="menu" menuAlign="left" [menuState]="openStatus">
+                                    <ct-generic-dropdown-menu [ct-menu]="menu" menuAlign="left" [menuState]="openStatus"
+                                                              [readonly]="readonly">
                                         <span>{{ input.status}}
                                             <i class="fa fa-chevron-down fa-fw settings-icon"> </i>
                                         </span>                                        

@@ -5,6 +5,7 @@ export interface TreeNode<T> {
     type?: string;
     icon?: string;
     label?: string;
+    labelIsHTML?: boolean;
     iconExpanded?: string;
     isExpandable?: boolean;
     isExpanded?: Observable<boolean>;
