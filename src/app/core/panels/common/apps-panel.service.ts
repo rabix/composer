@@ -59,7 +59,7 @@ export class AppsPanelService {
                         this.statusBar.enqueue(savingProcess);
                         let appType;
 
-                        this.platformRepository.getApp(node.id).then(app => {
+                        this.platformRepository.getApp(node.id, true).then(app => {
                             savingUpdate.next("loaded");
                             appType = app.class;
                             return YAML.dump(app);
@@ -74,9 +74,9 @@ export class AppsPanelService {
                                 isWritable: true,
                                 label: AppHelper.getBasename(path),
                                 type: appType,
-                            } as TabData<any>);
+                            } as TabData<any>, true);
 
-                            this.workbox.openTab(tab);
+                            this.workbox.openTab(tab, true, true, true);
                             this.fileRepository.reloadPath(path);
 
                             this.cdr.markForCheck();

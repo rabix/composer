@@ -93,20 +93,28 @@ export class WorkboxService {
         this.priorityTabUpdate.next(1);
     }
 
-    openTab(tab, persistToRecentApps: boolean = true, syncState = true) {
+    openTab(tab, persistToRecentApps: boolean = true, syncState = true, replaceExistingIfExists = false) {
 
         const {tabs} = this.extractValues();
 
         // When opening an app, we use id with revision number because we can have cases when we can open the same app
         // different revisions (when we publish a local file with existing id, new tab is open ...)
-        const foundTab = tabs.find(existingTab => existingTab.id === tab.id);
+        const foundTabIndex = tabs.findIndex(existingTab => existingTab.id === tab.id);
+        const foundTab = tabs[foundTabIndex];
 
-        if (foundTab) {
-            this.activateTab(foundTab);
-            return;
+        if (!replaceExistingIfExists) {
+            if (foundTab) {
+                this.activateTab(foundTab);
+                return;
+            }
+
+            this.tabs.next(tabs.concat(tab));
+        } else if (foundTab) {
+            tabs.splice(foundTabIndex, 1)
+            tabs.splice(foundTabIndex, 0, tab);
+            this.tabs.next(tabs);
         }
 
-        this.tabs.next(tabs.concat(tab));
         this.tabCreation.next(tab);
         this.activateTab(tab);
 
@@ -241,7 +249,7 @@ export class WorkboxService {
         const label      = AppHelper.getBasename(data.id);
         const isWritable = data.isWritable;
 
-        const fileContent = Observable.empty().concat(this.dataGateway.fetchFileContent(id));
+        const fileContent = Observable.empty().concat(this.dataGateway.fetchFileContent(id, false, false));
         const resolve     = (fcontent: string) => this.dataGateway.resolveContent(fcontent, id);
 
         const tab = Object.assign({

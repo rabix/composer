@@ -51,13 +51,14 @@ export class DataGatewayService {
         return this.ipc.request("searchLocalProjects", {term, limit,}).toPromise();
     }
 
-    fetchFileContent(almostID: string, parse = false): Observable<string> {
+    fetchFileContent(almostID: string, parse = false, useSwap = true): Observable<string> {
 
         const source = DataGatewayService.getFileSource(almostID);
 
         if (source === "local") {
 
-            const fetch = Observable.empty().concat(this.ipc.request("getLocalFileContent", almostID)) as Observable<string>;
+            const fetch = Observable.empty().concat(useSwap ? Observable.empty() : this.updateSwap(almostID, null),
+                this.ipc.request("getLocalFileContent", almostID)).takeLast(1) as Observable<string>;
 
             if (parse) {
                 return fetch
