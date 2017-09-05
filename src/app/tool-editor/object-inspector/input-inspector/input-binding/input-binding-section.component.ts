@@ -21,7 +21,6 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                 <label class="form-control-label">Value</label>
                 <ct-expression-input
                         [context]="context"
-                        [readonly]="readonly"
                         [formControl]="form.controls['valueFrom']"
                         [disableLiteralTextInput]="true">
                 </ct-expression-input>
@@ -31,7 +30,6 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                 <label class="form-control-label">Position</label>
                 <input class="form-control"
                        type="number"
-                       [ct-disabled]="readonly"
                        [formControl]="form.controls['position']"/>
             </div>
 
@@ -130,15 +128,15 @@ export class InputBindingSectionComponent extends DirectiveBase implements Contr
     createInputBindingForm(input: CommandInputParameterModel): void {
         this.form = this.formBuilder.group({
             stageInput: [input],
-            valueFrom: [input.inputBinding.valueFrom, [Validators.required]],
-            position: [input.inputBinding.position, [Validators.pattern(/^\d+$/)]],
+            valueFrom: [{value: input.inputBinding.valueFrom, disabled: this.readonly}, [Validators.required]],
+            position: [{value: input.inputBinding.position, disabled: this.readonly}, [Validators.pattern(/^\d+$/)]],
             prefix: [input.inputBinding.prefix],
             separate: [input.inputBinding.separate !== false],
             itemSeparator: [!!input.inputBinding.itemSeparator ? input.inputBinding.itemSeparator : null],
             shellQuote: [input.inputBinding.shellQuote]
         }, {onlySelf: true});
 
-        if (!this.readonly) {
+        if (!this.readonly) {``
             this.listenToInputBindingFormChanges();
         }
     }
@@ -182,5 +180,14 @@ export class InputBindingSectionComponent extends DirectiveBase implements Contr
 
     isType(type) {
         return this.propertyType === type || this.input.type.items === type;
+    }
+
+    setDisabledState(isDisabled: boolean): void {
+        this.readonly = isDisabled;
+        const excludeControls = [];
+        Object.keys(this.form.controls).filter(c => !excludeControls.includes(c)).forEach((item) => {
+            const control = this.form.controls[item];
+            isDisabled ? control.disable() : control.enable();
+        });
     }
 }

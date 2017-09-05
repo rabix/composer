@@ -56,9 +56,6 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 export class OutputMetaDataSectionComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
-    public readonly = false;
-
-    @Input()
     public inputs: CommandInputParameterModel[] = [];
 
     /** The currently displayed property */
@@ -69,6 +66,8 @@ export class OutputMetaDataSectionComponent extends DirectiveBase implements Con
     private propagateChange = noop;
 
     public metadataForm: FormGroup;
+
+    private readonly = false;
 
     private keyValueFormList: { key: string, value: string | SBDraft2ExpressionModel }[] = [];
 
@@ -117,5 +116,9 @@ export class OutputMetaDataSectionComponent extends DirectiveBase implements Con
                 this.output.outputBinding.inheritMetadataFrom = change.inheritMetadata;
                 this.propagateChange(change);
             });
+    }
+
+    setDisabledState(isDisabled: boolean): void {
+        this.readonly = isDisabled;
     }
 }
