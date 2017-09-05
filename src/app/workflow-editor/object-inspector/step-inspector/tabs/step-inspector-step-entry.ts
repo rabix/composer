@@ -52,7 +52,7 @@ import {ObjectHelper} from "../../../../helpers/object.helper";
                            type="number"
                            class="form-control"
                            [value]="value"
-                           [readonly]="readonly"/>
+                           [disabled]="readonly"/>
                 </ng-template>
                 <ng-template ngSwitchCase="float">
                     <input [attr.prefix]="prefix"
@@ -60,7 +60,7 @@ import {ObjectHelper} from "../../../../helpers/object.helper";
                            type="number"
                            class="form-control"
                            [value]="value"
-                           [readonly]="readonly"/>
+                           [disabled]="readonly"/>
                 </ng-template>
 
                 <!--Strings-->
@@ -69,7 +69,7 @@ import {ObjectHelper} from "../../../../helpers/object.helper";
                            [attr.fieldType]="inputType"
                            class="form-control"
                            [value]="value"
-                           [readonly]="readonly"/>
+                           [disabled]="readonly"/>
                 </ng-template>
 
                 <!--Booleans-->

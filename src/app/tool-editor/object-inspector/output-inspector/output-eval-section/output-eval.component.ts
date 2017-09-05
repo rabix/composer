@@ -32,8 +32,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <span class="align-right">
                         <ct-toggle-slider [formControl]="outputEvalFormGroup.controls['loadContents']"
                                           [on]="'Yes'"
-                                          [off]="'No'"
-                                          [disabled]="readonly">
+                                          [off]="'No'">
                         </ct-toggle-slider>
                     </span>
                 </div>
@@ -54,8 +53,19 @@ export class OutputEvalSectionComponent extends DirectiveBase implements Control
     @Input()
     public model: CommandLineToolModel;
 
-    @Input()
-    public readonly = false;
+    disabled = false;
+
+    get readonly(): boolean {
+        return this.disabled;
+    }
+
+    @Input("readonly")
+    set readonly(value: boolean) {
+        this.disabled = value;
+        if (this.outputEvalFormGroup) {
+            this.setDisabledState(value);
+        }
+    }
 
     /** Context in which expression should be evaluated */
     public context: any = {};
@@ -78,7 +88,7 @@ export class OutputEvalSectionComponent extends DirectiveBase implements Control
         this.context = this.model.getContext(this.output);
 
         this.outputEvalFormGroup = this.formBuilder.group({
-            loadContents: [this.output.outputBinding.loadContents],
+            loadContents: [{value: this.output.outputBinding.loadContents, disabled: this.readonly}],
             outputEval: [this.output.outputBinding.outputEval]
         });
 
@@ -98,5 +108,13 @@ export class OutputEvalSectionComponent extends DirectiveBase implements Control
 
     registerOnTouched(fn: any): void {
         this.onTouched = fn;
+    }
+
+    setDisabledState(disabled: boolean) {
+        if (disabled) {
+            this.outputEvalFormGroup.controls["loadContents"].disable();
+        } else {
+            this.outputEvalFormGroup.controls["loadContents"].enable();
+        }
     }
 }

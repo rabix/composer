@@ -41,8 +41,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <span class="align-right">
                     <ct-toggle-slider [formControl]="form.controls['loadContent']"
                                       [off]="'No'"
-                                      [on]="'Yes'"
-                                      [disabled]="readonly">
+                                      [on]="'Yes'">
                     </ct-toggle-slider>
                 </span>
                 </div>
@@ -54,8 +53,19 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
 export class StageInputSectionComponent extends DirectiveBase implements ControlValueAccessor {
 
-    @Input()
-    public readonly = false;
+    disabled = false;
+
+    get readonly(): boolean {
+        return this.disabled;
+    }
+
+    @Input("readonly")
+    set readonly(value: boolean) {
+        this.disabled = value;
+        if (this.form) {
+            this.setDisabledState(value);
+        }
+    }
 
     input: CommandInputParameterModel;
 
@@ -83,7 +93,11 @@ export class StageInputSectionComponent extends DirectiveBase implements Control
         this.cwlVersion = input instanceof V1CommandInputParameterModel ? "v1.0" : "sbg:draft-2";
 
         this.form = this.formBuilder.group({
-            loadContent: [!!this.input.inputBinding && this.input.inputBinding.loadContents ? this.input.inputBinding.loadContents : false]
+            loadContent: [{
+                value: !!this.input.inputBinding && this.input.inputBinding.loadContents ?
+                    this.input.inputBinding.loadContents : false,
+                disabled: this.readonly
+            }]
         }, {onlySelf: true});
 
         if (this.input.hasStageInput) {
@@ -114,5 +128,13 @@ export class StageInputSectionComponent extends DirectiveBase implements Control
 
     registerOnTouched(fn: any): void {
         this.onTouched = fn;
+    }
+
+    setDisabledState(disabled: boolean) {
+        if (disabled === true) {
+            this.form.controls["loadContent"].disable();
+        } else {
+            this.form.controls["loadContent"].enable();
+        }
     }
 }

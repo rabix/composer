@@ -22,8 +22,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                 <span class="align-right">
                         <ct-toggle-slider [formControl]="form.controls['isRequired']"
                                           [on]="'Yes'"
-                                          [off]="'No'"
-                                          [disabled]="readonly">
+                                          [off]="'No'">
                         </ct-toggle-slider>
                     </span>
             </div>
@@ -33,7 +32,6 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                 <label class="form-control-label">ID</label>
                 <input type="text" 
                        class="form-control"
-                       [readonly]="readonly"
                        [formControl]="form.controls['id']">
                 <div *ngIf="form.controls['id'].errors" class="form-control-feedback">
                     {{form.controls['id'].errors['error']}}
@@ -70,8 +68,19 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 })
 export class BasicOutputSectionComponent extends DirectiveBase implements ControlValueAccessor, AfterViewInit {
 
-    @Input()
-    public readonly = false;
+    disabled = false;
+
+    get readonly(): boolean {
+        return this.disabled;
+    }
+
+    @Input("readonly")
+    set readonly(value: boolean) {
+        this.disabled = value;
+        if (this.form) {
+            this.setDisabledState(value);
+        }
+    }
 
     /** Context in which expression should be evaluated */
     public context: { $job?: any, $self?: any } = {};
@@ -101,10 +110,10 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
         this.context = this.model.getContext(this.output);
 
         this.form = this.formBuilder.group({
-            id: [this.output.id],
+            id: [{value: this.output.id, disabled: this.readonly}],
             type: [this.output.type, [Validators.required]],
             glob: [this.output.outputBinding.glob],
-            isRequired: [!this.output.type.isNullable],
+            isRequired: [{value: !this.output.type.isNullable, disabled: this.readonly}],
             itemType: [!!this.output.type.items ? this.output.type.items : "File"],
             symbols: [!!this.output.type.symbols ? this.output.type.symbols : this.initSymbolsList]
         });
@@ -188,5 +197,15 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
         setTimeout(() => {
             this.checkGlob();
         });
+    }
+
+    setDisabledState(disabled: boolean) {
+        if (disabled === true) {
+            this.form.controls["id"].disable();
+            this.form.controls["isRequired"].disable();
+        } else {
+            this.form.controls["id"].enable();
+            this.form.controls["isRequired"].enable();
+        }
     }
 }

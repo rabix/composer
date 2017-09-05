@@ -27,8 +27,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             <span class="align-right">
                         <ct-toggle-slider [formControl]="form.controls['isRequired']"
                                           [off]="'No'"
-                                          [on]="'Yes'"
-                                          [disabled]="readonly">
+                                          [on]="'Yes'">
                         </ct-toggle-slider>
                     </span>
         </div>
@@ -70,7 +69,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         </div>
 
         <!--Input Type -->
-        <ct-type-select [formControl]="form.controls['typeForm']"></ct-type-select>
+        <ct-type-select [formControl]="form.controls['typeForm']" [readonly]="readonly"></ct-type-select>
 
         <!--Symbols-->
         <div class="form-group"
@@ -183,8 +182,19 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
     @Input()
     workflowModel: WorkflowModel;
 
-    @Input()
-    readonly = false;
+    disabled = false;
+
+    get readonly(): boolean {
+        return this.disabled;
+    }
+
+    @Input("readonly")
+    set readonly(value: boolean) {
+        this.disabled = value;
+        if (this.form) {
+            this.setDisabledState(value);
+        }
+    }
 
     @Input()
     graph: Workflow;
@@ -269,7 +279,7 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
         this.selectedBatchByOption = this.findBatchValueInTheList(this.workflowModel["batchByValue"]);
 
         this.form = this.formBuilder.group({
-            isRequired: [!this.port.type.isNullable],
+            isRequired: [{value: !this.port.type.isNullable, disabled: this.readonly}],
             id: [{value: this.port.id, disabled: this.readonly}],
             label: [{value: this.port.label, disabled: this.readonly}],
             typeForm: [{value: this.port.type, disabled: this.readonly}],
@@ -354,5 +364,25 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
 
     isFileType() {
         return this.port.type.type === "File" || (this.port.type.type === "array" && this.port.type.items === "File");
+    }
+
+    setDisabledState(disabled: boolean) {
+        if (disabled) {
+            this.form.controls["id"].disable();
+            this.form.controls["isRequired"].disable();
+            this.form.controls["label"].disable();
+            this.form.controls["typeForm"].disable();
+            this.form.controls["description"].disable();
+            this.form.controls["fileTypes"].disable();
+            this.form.controls["batchType"].disable();
+        } else {
+            this.form.controls["id"].enable();
+            this.form.controls["isRequired"].enable();
+            this.form.controls["label"].enable();
+            this.form.controls["typeForm"].enable();
+            this.form.controls["description"].enable();
+            this.form.controls["fileTypes"].enable();
+            this.form.controls["batchType"].enable();
+        }
     }
 }

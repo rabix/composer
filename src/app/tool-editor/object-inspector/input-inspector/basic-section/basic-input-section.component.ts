@@ -24,8 +24,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <div class="form-group flex-container">
                 <label>Required</label>
                 <span class="align-right">
-                        <ct-toggle-slider [formControl]="form.controls['isRequired']"
-                                          [disabled]="readonly">
+                        <ct-toggle-slider [formControl]="form.controls['isRequired']">
                         </ct-toggle-slider>
                     </span>
             </div>
@@ -33,9 +32,8 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <!--ID-->
             <div class="form-group" [class.has-danger]="form.controls['id'].errors">
                 <label class="form-control-label">ID</label>
-                <input type="text"
+                <input type="text"  
                        class="form-control"
-                       [readonly]="readonly"
                        [formControl]="form.controls['id']">
                 <div *ngIf="form.controls['id'].errors" class="form-control-feedback">
                     {{form.controls['id'].errors['error']}}
@@ -60,8 +58,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                  *ngIf="!isType('map') && !!form.controls['isBound']">
                 <label>Include in command line</label>
                 <span class="align-right">
-                        <ct-toggle-slider [formControl]="form.controls['isBound']"
-                                          [disabled]="readonly">
+                        <ct-toggle-slider [formControl]="form.controls['isBound']">
                         </ct-toggle-slider>
                     </span>
             </div>
@@ -90,8 +87,19 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
     @Input()
     context: { $job?: any, $self?: any } = {};
 
-    @Input()
-    readonly = false;
+    disabled = false;
+
+    get readonly(): boolean {
+        return this.disabled;
+    }
+
+    @Input("readonly")
+    set readonly(value: boolean) {
+        this.disabled = value;
+        if (this.form) {
+            this.setDisabledState(value);
+        }
+    }
 
     @Input()
     model: CommandLineToolModel;
@@ -113,10 +121,10 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
         this.input = input;
 
         this.form = this.formBuilder.group({
-            id: [this.input.id],
+            id: [{value: this.input.id, disabled: this.readonly}],
             type: [this.input.type, [Validators.required]],
-            isBound: [this.input.isBound],
-            isRequired: [!this.input.type.isNullable],
+            isBound: [{value: this.input.isBound, disabled: this.readonly}],
+            isRequired: [{value: !this.input.type.isNullable, disabled: this.readonly}],
             inputBinding: [this.input],
             symbols: [this.input.type.symbols ? this.input.type.symbols : []]
         });
@@ -209,5 +217,17 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
 
     isType(type: string): boolean {
         return this.input.type.type === type || this.input.type.items === type;
+    }
+
+    setDisabledState(disabled: boolean) {
+        if (disabled === true) {
+            this.form.controls["id"].disable();
+            this.form.controls["isRequired"].disable();
+            this.form.controls["isBound"].disable();
+        } else {
+            this.form.controls["id"].enable();
+            this.form.controls["isRequired"].enable();
+            this.form.controls["isBound"].enable();
+        }
     }
 }
