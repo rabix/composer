@@ -48,7 +48,7 @@
         "bootstrap": "4.0.0-alpha.5",
         "brace": "^0.10.0",
         "core-js": "^2.5.0",
-        "cwl-svg": "^0.0.41",
+        "cwl-svg": "^0.0.42",
         "cwlts": "^1.13.36",
         "font-awesome": "^4.7.0",
         "jquery": "^3.2.1",
