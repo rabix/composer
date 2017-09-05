@@ -3,6 +3,7 @@ import {Observable} from "rxjs/Observable";
 export interface TreeNode<T> {
     id?: string;
     type?: string;
+    typeDisplay?: string;
     icon?: string;
     label?: string;
     iconExpanded?: string;

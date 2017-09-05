@@ -1,7 +1,11 @@
-import {ChangeDetectionStrategy, Component, Input, QueryList, ViewChildren} from "@angular/core";
+import {
+    AfterContentInit, ChangeDetectionStrategy, Component, ContentChildren, Input, QueryList, TemplateRef,
+    ViewChildren
+} from "@angular/core";
 import {TreeNode} from "./tree-node";
 import {TreeNodeComponent} from "./tree-node/tree-node.component";
 import {TreeViewService} from "./tree-view.service";
+import {TreeNodeLabelDirective} from "./tree-node-label-directive";
 
 @Component({
     selector: "ct-tree-view",
@@ -10,8 +14,10 @@ import {TreeViewService} from "./tree-view.service";
                       [level]="level"
                       [id]="node?.id"
                       [type]="node?.type"
+                      [typeDisplay]="node?.typeDisplay"
                       [icon]="node?.icon"
                       [label]="node?.label"
+                      [labelTemplate]="labelTemplate"
                       [data]="node?.data || {}"
                       [children]="node?.children"
                       [dragLabel]="node?.dragLabel"
@@ -21,22 +27,25 @@ import {TreeViewService} from "./tree-view.service";
                       [isExpandable]="node?.isExpandable"
                       [iconExpanded]="node?.iconExpanded"
                       [dragImageClass]="node?.dragImageClass"
-                      [dragTransferData]="node?.dragTransferData"
-        >
+                      [dragTransferData]="node?.dragTransferData">          
         </ct-tree-node>
     `,
     providers: [TreeViewService],
     styleUrls: ["./tree-view.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TreeViewComponent {
-
+export class TreeViewComponent implements AfterContentInit {
 
     @Input()
     nodes: TreeNode<any>[];
 
     @Input()
     level = 0;
+
+    @ContentChildren(TreeNodeLabelDirective)
+    labelChildren: QueryList<TreeNodeLabelDirective>;
+
+    labelTemplate: {[key: string]: TemplateRef<any>};
 
     @ViewChildren(TreeNodeComponent)
     private treeNodes: QueryList<TreeNodeComponent<any>>;
@@ -51,5 +60,11 @@ export class TreeViewComponent {
 
     getService() {
         return this.tree;
+    }
+
+    ngAfterContentInit () {
+        this.labelTemplate = this.labelChildren.reduce((acc, item) => {
+            return Object.assign(acc, {[item.type]: item.templateRef});
+        }, {});
     }
 }

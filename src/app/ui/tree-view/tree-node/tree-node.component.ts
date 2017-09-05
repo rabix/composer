@@ -4,20 +4,18 @@ import {
     Component,
     HostListener,
     Input,
-    OnChanges,
     OnInit,
     QueryList,
-    SimpleChanges,
+    TemplateRef,
     ViewChildren,
     ViewContainerRef
 } from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {TreeViewService} from "../tree-view.service";
-
 @Component({
     selector: "ct-tree-node",
     template: `
-        <div (dblclick)="toggle()"
+        <div (dblclick)="toggle($event)"
              (click)="select()"
 
              [ct-drop-zones]="dragDropZones"
@@ -34,21 +32,32 @@ import {TreeViewService} from "../tree-view.service";
             <i *ngIf="loading" class="fa fa-fw fa-circle-o-notch fa-spin"></i>
 
             <!--Standard icon if the node is contracted or there is no expansion icon-->
-            <i *ngIf="!loading && (!_isExpanded || (_isExpanded && !iconExpanded))" class="fa fa-fw"
+            <i *ngIf="!loading && (!_isExpanded || (_isExpanded && !iconExpanded))" class="fa fa-fw" data-toggle-icon
                [ngClass]="icon"></i>
 
             <!--Expansion icon if the node is expanded and there is an expansion icon-->
-            <i *ngIf="!loading && _isExpanded && !!iconExpanded" class="fa fa-fw" [ngClass]="iconExpanded"></i>
+            <i *ngIf="!loading && _isExpanded && !!iconExpanded" class="fa fa-fw expand" data-toggle-icon
+               [ngClass]="iconExpanded"></i>
 
-            <span [innerHTML]="label"></span>
+            <ng-container *ngIf="labelTemplate[type]; else plain">
+                <ng-container *ngTemplateOutlet="labelTemplate[type]; context: {$implicit: this}">
+                </ng-container>
+            </ng-container>
+
+            <ng-template #plain>
+                <span>{{label}}</span>
+            </ng-template>
+
         </div>
 
         <div *ngIf="_isExpanded" class="children">
             <ct-tree-node *ngFor="let child of (children | async)"
                           [id]="child?.id"
                           [type]="child?.type"
+                          [typeDisplay]="child?.typeDisplay"
                           [icon]="child?.icon"
                           [label]="child?.label"
+                          [labelTemplate]="labelTemplate"
                           [data]="child?.data || {}"
                           [children]="child?.children"
                           [isExpanded]="child?.isExpanded"
@@ -60,19 +69,22 @@ import {TreeViewService} from "../tree-view.service";
                           [dragDropZones]="child.dragDropZones"
                           [dragImageClass]="child.dragImageClass"
                           [dragTransferData]="child.dragTransferData"
+                          [level]="level + 1">
 
-                          [level]="level + 1"></ct-tree-node>
+            </ct-tree-node>
         </div>
     `,
     styleUrls: ["./tree-node.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TreeNodeComponent<T> implements OnInit, OnChanges {
+export class TreeNodeComponent<T> implements OnInit {
 
     @Input() id: string;
     @Input() type: string;
+    @Input() typeDisplay: string;
     @Input() icon: string;
     @Input() label: string;
+    @Input() labelTemplate: {[key: string]: TemplateRef<any>};
     @Input() isExpanded: Observable<boolean>;
     @Input() iconExpanded: string;
     @Input() isExpandable: boolean;
@@ -119,19 +131,19 @@ export class TreeNodeComponent<T> implements OnInit, OnChanges {
         }
     }
 
-    ngOnChanges(changes: SimpleChanges): void {
+    toggle(event: MouseEvent) {
 
-    }
+        // Only clicking on data-toggle-icon can toggle
+       if (event.srcElement.getAttribute("data-toggle-icon") !== null ) {
 
-    toggle() {
+           if (this._isExpanded) {
+               return this.contract();
+           }
 
-        if (this._isExpanded) {
-            return this.contract();
-        }
-
-        if (this.isExpandable) {
-            return this.expand();
-        }
+           if (this.isExpandable) {
+               return this.expand();
+           }
+       }
 
         this.open();
     }
