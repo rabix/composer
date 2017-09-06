@@ -7,7 +7,7 @@ const assert = chai.assert;
 
 describe("IPC Router", function () {
 
-    it("should register the data-request event callback", function (done) {
+    it("should register the data-request event callback", function () {
         this.timeout(2000);
 
         const electron = {ipcMain: {on: sinon.spy()}};
@@ -31,10 +31,7 @@ describe("IPC Router", function () {
         console.log("Checking if is function ", typeof callArgs[1]);
         assert.isFunction(callArgs[1]);
 
-        console.log("Calling done");
-        done();
-
-        console.log("Ended test");
+        return Promise.resolve();
     });
 
     it("should call the appropriate controller function when required and return the response", function (done) {
