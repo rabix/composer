@@ -44,8 +44,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <ct-key-value-list
                             [addEntryText]="'Add Metadata'"
                             [emptyListText]="'No metadata defined.'"
-                            [formControl]="metadataForm.controls['metadataList']"
-                            [readonly]="readonly">
+                            [formControl]="metadataForm.controls['metadataList']">
                     </ct-key-value-list>
                 </div>
             </div>
@@ -120,5 +119,6 @@ export class OutputMetaDataSectionComponent extends DirectiveBase implements Con
 
     setDisabledState(isDisabled: boolean): void {
         this.readonly = isDisabled;
+        isDisabled ? this.metadataForm.controls["metadataList"].disable() : this.metadataForm.controls["metadataList"].enable();
     }
 }

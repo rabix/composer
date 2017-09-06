@@ -20,13 +20,13 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             </ct-output-metadata-section>
 
             <ct-output-eval [formControl]="form.controls['outputEval']"
-                            [model]="model"
-                            [readonly]="readonly">
+                            [model]="model">
             </ct-output-eval>
 
             <ct-secondary-file *ngIf="showSecondaryFiles()"
                                [context]="context"
                                [port]="output"
+                               [readonly]="readonly"
                                [bindingName]="'outputBinding'"
                                (update)="save.next(output)">
             </ct-secondary-file>
@@ -49,25 +49,10 @@ export class ToolOutputInspectorComponent extends DirectiveBase implements OnCha
     set readonly(value: boolean) {
         this.disabled = value;
         if (this.form) {
-            if (this.disabled) {
-                this.form.controls["basicOutputSection"].disable();
-                this.form.controls["description"].disable();
-                if (this.form.controls["metaData"]) {
-                    this.form.controls["metaData"].disable();
-                }
-                if (this.showSecondaryFiles()) {
-                    this.form.controls["outputBinding"].disable();
-                }
-            } else {
-                this.form.controls["basicInputSection"].enable();
-                this.form.controls["description"].enable();
-                if (this.form.controls["metaData"]) {
-                    this.form.controls["metaData"].enable();
-                }
-                if (this.showSecondaryFiles()) {
-                    this.form.controls["outputBinding"].enable();
-                }
-            }
+            Object.keys(this.form.controls).forEach((item) => {
+                const control = this.form.controls[item];
+                this.disabled ? control.disable() : control.enable();
+            });
         }
     }
 
@@ -109,7 +94,7 @@ export class ToolOutputInspectorComponent extends DirectiveBase implements OnCha
         this.form = this.formBuilder.group({
             basicOutputSection: [{value: this.output, disabled: this.readonly}],
             description: [{value: this.output, disabled: this.readonly}],
-            outputEval: [this.output]
+            outputEval: [{value: this.output, disabled: this.readonly}]
         });
 
         if (this.output.outputBinding.hasMetadata && this.output.outputBinding.hasInheritMetadata) {

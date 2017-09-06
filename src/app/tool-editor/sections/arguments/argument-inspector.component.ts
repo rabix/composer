@@ -12,9 +12,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             <div class="form-group">
                 <label>Use command line binding</label>
                 <span class="pull-right">
-                    <ct-toggle-slider [disabled]="readonly"
-                                      [formControl]="form.controls['hasBinding']">
-                    </ct-toggle-slider>
+                    <ct-toggle-slider [formControl]="form.controls['hasBinding']"></ct-toggle-slider>
                 </span>
             </div>
 
@@ -22,9 +20,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                 <!--Prefix Field-->
                 <div class="form-group">
                     <label class="form-control-label">Prefix</label>
-                    <input type="text" 
-                           class="form-control" 
-                           [readonly]="readonly"
+                    <input type="text"
+                           class="form-control"
                            [formControl]="form.controls['prefix']">
                 </div>
 
@@ -32,35 +29,31 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                 <div class="form-group">
                     <label class="form-control-label">Expression</label>
                     <ct-expression-input
-                            [context]="context"
-                            [readonly]="readonly"
-                            [formControl]="form.controls['valueFrom']">
+                        [context]="context"
+                        [readonly]="readonly"
+                        [formControl]="form.controls['valueFrom']">
                     </ct-expression-input>
                 </div>
 
                 <div class="form-group">
                     <label>Separate value and prefix</label>
                     <span class="pull-right">
-                        <ct-toggle-slider [disabled]="readonly"
-                                          [formControl]="form.controls['separate']">
-                        </ct-toggle-slider>
+                        <ct-toggle-slider [formControl]="form.controls['separate']"></ct-toggle-slider>
                     </span>
                 </div>
 
                 <!--Position Field-->
                 <div class="form-group">
                     <label class="form-control-label">Position</label>
-                    <input type="number" 
-                           class="form-control" 
-                           [readonly]="readonly"
+                    <input type="number"
+                           class="form-control"
                            [formControl]="form.controls['position']">
                 </div>
 
                 <div class="form-group" *ngIf="argument.hasShellQuote">
                     <label>shellQuote</label>
                     <span class="pull-right">
-                    <ct-toggle-slider [disabled]="readonly" 
-                                      [formControl]="form.controls['shellQuote']"></ct-toggle-slider>
+                    <ct-toggle-slider [formControl]="form.controls['shellQuote']"></ct-toggle-slider>
                 </span>
                 </div>
             </div>
@@ -88,8 +81,19 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 })
 export class ArgumentInspectorComponent extends DirectiveBase implements OnInit {
 
-    @Input()
-    public readonly = false;
+    disabled = false;
+
+    get readonly(): boolean {
+        return this.disabled;
+    }
+
+    @Input("readonly")
+    set readonly(value: boolean) {
+        this.disabled = value;
+        if (this.form) {
+            this.setDisabledState(value);
+        }
+    }
 
     @Input()
     public argument: CommandArgumentModel;
@@ -109,13 +113,13 @@ export class ArgumentInspectorComponent extends DirectiveBase implements OnInit 
 
     ngOnInit() {
         this.form = this.formBuilder.group({
-            hasBinding: new FormControl(this.argument.hasBinding),
+            hasBinding: new FormControl({value: this.argument.hasBinding, disabled: this.readonly}),
             valueFrom: new FormControl(this.argument.valueFrom),
-            separate: new FormControl(this.argument.separate !== false),
-            position: new FormControl(this.argument.position || 0),
-            prefix: new FormControl(this.argument.prefix || ""),
+            separate: new FormControl({value: this.argument.separate !== false, disabled: this.readonly}),
+            position: new FormControl({value: this.argument.position || 0, disabled: this.readonly}),
+            prefix: new FormControl({value: this.argument.prefix || "", disabled: this.readonly}),
             primitive: new FormControl(this.argument.primitive || ""),
-            shellQuote: new FormControl(this.argument.shellQuote)
+            shellQuote: new FormControl({value: this.argument.shellQuote, disabled: this.readonly})
         });
 
         this.tracked = this.form.controls["hasBinding"].valueChanges.subscribe(val => {
@@ -143,6 +147,13 @@ export class ArgumentInspectorComponent extends DirectiveBase implements OnInit 
             }
 
             this.save.next(form);
+        });
+    }
+
+    setDisabledState(isDisabled: boolean) {
+        Object.keys(this.form.controls).forEach((item) => {
+            const control = this.form.controls[item];
+            isDisabled ? control.disable({emitEvent: false}) : control.enable({emitEvent: false});
         });
     }
 }

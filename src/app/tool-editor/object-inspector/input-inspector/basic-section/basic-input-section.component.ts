@@ -98,8 +98,6 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
 
     private propagateChange = noop;
 
-    private skipIsBoundChange = false;
-
     constructor(private formBuilder: FormBuilder) {
         super();
     }
@@ -110,7 +108,7 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
         this.form = this.formBuilder.group({
             id: [{value: this.input.id, disabled: this.readonly}],
             type: [{value: this.input.type, disabled: this.readonly}, [Validators.required]],
-            isBound: [this.input.isBound],
+            isBound: [{value: this.input.isBound, disabled: this.readonly}],
             isRequired: [{value: !this.input.type.isNullable,  disabled: this.readonly}],
             inputBinding: [{value: this.input, disabled: this.readonly}],
             symbols: [{value: this.input.type.symbols ? this.input.type.symbols : [], disabled: this.readonly}]
@@ -183,11 +181,9 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
 
     private listenToIsBoundChanges(): void {
         this.tracked = this.form.controls["isBound"].valueChanges.subscribe((isBound: boolean) => {
-            if (isBound && !this.skipIsBoundChange) {
+            if (isBound) {
                 this.input.createInputBinding();
                 this.form.setControl("inputBinding", new FormControl(this.input));
-            } else if (this.skipIsBoundChange) {
-                this.skipIsBoundChange = false;
             } else {
 
                 if (this.input instanceof SBDraft2CommandInputParameterModel) {
@@ -210,10 +206,9 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
 
     setDisabledState(isDisabled: boolean): void {
         this.readonly = isDisabled;
-        this.skipIsBoundChange = true;
         Object.keys(this.form.controls).forEach((item) => {
             const control = this.form.controls[item];
-            isDisabled ? control.disable() : control.enable();
+            isDisabled ? control.disable({emitEvent: false}) : control.enable({emitEvent: false});
         });
     }
 }

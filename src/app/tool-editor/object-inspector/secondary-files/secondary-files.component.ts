@@ -56,6 +56,9 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 export class SecondaryFilesComponent extends DirectiveBase implements OnChanges, OnInit {
 
+    @Input()
+    public readonly = false;
+
     /** Context in which expression should be evaluated */
     @Input()
     public context: { $job: any } = {$job: {}};
@@ -72,8 +75,6 @@ export class SecondaryFilesComponent extends DirectiveBase implements OnChanges,
     update = new EventEmitter<ExpressionModel[]>();
 
     form = new FormGroup({list: new FormArray([])});
-
-    private readonly = false;
 
     private subscription: Subscription;
 
@@ -139,9 +140,5 @@ export class SecondaryFilesComponent extends DirectiveBase implements OnChanges,
                 this.update.emit(list);
             }
         });
-    }
-
-    setDisabledState(isDisabled: boolean): void {
-        this.readonly = isDisabled;
     }
 }
