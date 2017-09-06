@@ -215,13 +215,14 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
             })[0].selectize;
         });
 
-        // Set initial disable/enable state for the component
-        if (this.disabled) {
-            this.component.disable();
-        }
 
         setTimeout(() => {
             this.updateOptions(this.items);
+            // Set initial disable/enable state for the component
+            if (this.disabled) {
+                this.component.disable();
+                this.component.lock();
+            }
         });
     }
 
@@ -229,10 +230,17 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
 
         this.disabled = disabled;
 
-        // If component is null, disable/enable state will be set after component is initialized
+        // If component is null, disable/enable and lock/unlock state will be set after component is initialized
+
         if (this.component) {
 
-            this.disabled ? this.component.disable() : this.component.enable();
+            if (this.disabled) {
+                this.component.disable();
+                this.component.lock();
+            } else {
+                this.component.enable();
+                this.component.unlock();
+            }
         }
     }
 
