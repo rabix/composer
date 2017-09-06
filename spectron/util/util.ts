@@ -34,7 +34,7 @@ function findAppBinary() {
     if (isDevServer()) {
         return glob.sync("./node_modules/.bin/electron")[0];
     } else if (process.platform.startsWith("win")) {
-        return path.resolve("./build/win-unpacked/rabix-composer.exe");
+        return glob.sync("./build/**/rabix-composer.exe")[0];
     } else if (process.platform.startsWith("darwin")) {
         return path.resolve("./build/mac/rabix-composer.app/Contents/MacOS/rabix-composer");
     } else {
