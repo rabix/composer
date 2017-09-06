@@ -45,7 +45,7 @@ function findAppBinary() {
 export function boot(context: ITestCallbackContext, testConfig: Partial<FnTestConfig> = {}): Promise<spectron.Application> {
 
     context.retries(testConfig.retries || 0);
-    context.timeout(testConfig.testTimeout || 5000);
+    context.timeout(testConfig.testTimeout || 30000);
 
     const testTitle      = context.test.fullTitle();
     const globalTestDir  = path.resolve(`${__dirname}/../../.testrun`);

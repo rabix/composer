@@ -18,7 +18,6 @@ describe("app publishing", () => {
         const demoApp = fs.readFileSync(__dirname + "/stub/demo-app.json", "utf-8");
 
         app = await boot(this, {
-            testTimeout: 10000,
             localRepository: {
                 credentials: [user],
                 activeCredentials: user,
