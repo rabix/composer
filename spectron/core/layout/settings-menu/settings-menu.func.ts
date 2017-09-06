@@ -24,10 +24,12 @@ describe("settings menu", function () {
                 activeCredentials: user,
                 credentials: [user]
             },
+            testTimeout: 10000
         });
 
         const client = app.client;
 
+        await client.waitForVisible("ct-settings-menu", 5000);
         const text = await client.getText("ct-settings-menu");
         assert.equal(text.trim(), "demon (CGC)");
     });
