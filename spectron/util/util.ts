@@ -107,6 +107,9 @@ export function boot(context: ITestCallbackContext, testConfig: Partial<FnTestCo
 
 export function shutdown(app: spectron.Application) {
 
+    if(!app){
+        return;
+    }
 
     if (app.hasOwnProperty("testdir")) {
         rimraf.sync(app["testdir"]);

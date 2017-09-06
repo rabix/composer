@@ -84,14 +84,14 @@ describe("app publishing", () => {
 
         const publishBtn = `[data-test=publish-btn]`;
 
-        await client.waitForEnabled(publishBtn, 2000);
+        await client.waitForEnabled(publishBtn, 10000);
         await client.click(publishBtn);
         await client.waitForVisible(modal);
 
         await client.setValue(nameControl, "Test App Publish");
 
         await client.click(`${projectControl} .selectize-input`);
-        await client.waitForVisible(projectOption, 1000);
+        await client.waitForVisible(projectOption, 5000);
         await client.click(projectOption);
 
 
@@ -99,7 +99,7 @@ describe("app publishing", () => {
         await client.click(submitBtn);
 
         const newTabSelector = `ct-workbox .tab-bar .tab:nth-child(2)`;
-        await client.waitForVisible(newTabSelector, 2000);
+        await client.waitForVisible(newTabSelector, 10000);
         const tabTitle = await client.getText(`${newTabSelector} .title`);
 
         assert.equal(tabTitle, "Test App Publish");

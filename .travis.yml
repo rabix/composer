@@ -1,5 +1,8 @@
 dist: trusty
-os: linux
+osx_image: xcode8.3
+os:
+  - linux
+  - osx
 addons:
   chrome: stable
   apt:
