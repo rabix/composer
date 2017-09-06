@@ -7,7 +7,7 @@ import sinon = require("sinon");
 
 describe("IPC Router", () => {
 
-    it("should register the data-request event callback", () => {
+    it("should register the data-request event callback", (done) => {
 
         const electron = {ipcMain: {on: sinon.spy()}};
         console.log("Mocked electron");
@@ -24,11 +24,17 @@ describe("IPC Router", () => {
         const callArgs = electron.ipcMain.on.args[0];
         console.log("Call args", electron.ipcMain.on.args);
 
+        console.log("Checking if", callArgs[0], " is data-request");
         assert.equal(callArgs[0], "data-request");
+
+        console.log("Checking if is function ", typeof callArgs[1]);
         assert.isFunction(callArgs[1]);
+
+        console.log("Calling done");
+        done();
     }).timeout(1000);
 
-    it("should call the appropriate controller function when required and return the response", () => {
+    it("should call the appropriate controller function when required and return the response", (done) => {
         const send = sinon.spy();
 
         const testRouteEndpoint = sinon.spy((data, callback) => {
@@ -63,5 +69,6 @@ describe("IPC Router", () => {
         assert.property(replyData, "id");
         assert.property(replyData, "data");
         assert.equal(replyData.data.name, "Zoro");
+        done();
     });
 });
