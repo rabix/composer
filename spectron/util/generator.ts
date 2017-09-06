@@ -53,7 +53,7 @@ export function generatePlatformProject(data: Partial<Project> = {}): Project {
 }
 
 
-export function generateKeychain(token = Guid.generate()) {
+export function generateKeychain() {
     return {
         module: "./keychain",
         override: {
