@@ -10,12 +10,20 @@ describe("IPC Router", () => {
     it("should register the data-request event callback", () => {
 
         const electron = {ipcMain: {on: sinon.spy()}};
+        console.log("Mocked electron");
+
         const router = proxy("./ipc-router", {electron});
+        console.log("Proxied router");
+
         router.start();
+        console.log("Started router");
 
         assert.isTrue(electron.ipcMain.on.calledOnce);
+        console.log("Asserting that called once is true, call count:", electron.ipcMain.on.callCount);
 
         const callArgs = electron.ipcMain.on.args[0];
+        console.log("Call args", electron.ipcMain.on.args);
+
         assert.equal(callArgs[0], "data-request");
         assert.isFunction(callArgs[1]);
     }).timeout(1000);
