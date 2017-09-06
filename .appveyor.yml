@@ -25,3 +25,11 @@ cache:
   - electron\node_modules
   - '%APPDATA%\npm-cache'
   - '%USERPROFILE%\.electron'
+
+branches:
+  only:
+  - /^release\/v\d+\.\d+(\.\d+)?(-\S*)?$/
+  - /^master$/
+
+artifacts:
+  - path: build
