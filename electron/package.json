@@ -3,8 +3,8 @@
     "version": "1.0.0-rc.1",
     "main": "dist/main.js",
     "scripts": {
-        "test": "./node_modules/.bin/_mocha -r ts-node/register ./src/**/*.spec.ts",
-        "rebuild": "./node_modules/.bin/electron-rebuild"
+        "test": "./node_modules/mocha/bin/_mocha -r ts-node/register ./src/**/*.spec.ts",
+        "postinstall": "./../node_modules/.bin/electron-builder install-app-deps"
     },
     "dependencies": {
         "async": "^2.4.1",
@@ -43,7 +43,6 @@
         "@types/tmp": "0.0.33",
         "@types/winston": "^2.3.5",
         "chai": "^4.1.0",
-        "electron-rebuild": "^1.6.0",
         "mocha": "^3.5.0",
         "sinon": "^2.4.1",
         "ts-node": "^3.3.0"
