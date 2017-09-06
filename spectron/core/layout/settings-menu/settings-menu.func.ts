@@ -36,8 +36,6 @@ describe("settings menu", function () {
         assert.equal(text.trim(), "demon (CGC)");
     });
 
-    afterEach(async () => {
-        await shutdown(app);
-    });
+    afterEach(() => shutdown(app));
 
 });

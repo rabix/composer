@@ -109,9 +109,7 @@ describe("new release check", function () {
         assert.equal(outOfDateText, true);
     });
 
-    afterEach(async () => {
-        await shutdown(app);
-    });
+    afterEach(() => shutdown(app));
 
     function whenModalIsReady() {
         return app.client.waitForVisible("ct-update-platform-modal", 1000);
