@@ -5,7 +5,7 @@ import sinon = require("sinon");
 const assert = chai.assert;
 
 
-describe("IPC Router", function () {
+describe.skip("IPC Router", function () {
 
 
     it.skip("should register the data-request event cb", function (done) {
