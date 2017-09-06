@@ -19,8 +19,8 @@ export class AuthCredentials implements UserPlatformIdentifier {
     token: string;
 
     constructor(url: string, token: string, user: User) {
-        this.ensureValidURL(url);
-        this.ensureValidToken(token);
+        // this.ensureValidURL(url);
+        // this.ensureValidToken(token);
 
         this.url   = url;
         this.token = token;
