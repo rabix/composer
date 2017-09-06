@@ -1,0 +1,27 @@
+image: Visual Studio 2017
+
+environment:
+  nodejs_version: "6"
+
+platform:
+  - x64
+
+install:
+  - ps: Install-Product node $env:nodejs_version
+  - yarn install --no-progress
+
+test_script:
+  - yarn run build
+
+test_script:
+  - yarn run test:electron
+  - yarn run test:angular
+  - yarn run test:spectron
+
+cache:
+  - node_modules -> yarn.lock
+  - "%LOCALAPPDATA%/Yarn"
+  - node_modules
+  - electron\node_modules
+  - '%APPDATA%\npm-cache'
+  - '%USERPROFILE%\.electron'
