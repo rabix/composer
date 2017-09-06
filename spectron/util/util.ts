@@ -27,6 +27,9 @@ function isDevServer() {
 }
 
 function findAppBinary() {
+    console.log("Searching for app binary.");
+    const scan = glob.sync("./build/**/rabix-composer*");
+    console.log("Scan results: \n" + scan.join("\n\t"));
 
     if (isDevServer()) {
         return glob.sync("./node_modules/.bin/electron")[0];
