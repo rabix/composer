@@ -31,7 +31,7 @@ before_script:
   - sh -e /etc/init.d/xvfb start
   - sleep 3
 script:
-  - yarn run ci
+  - yarn run ci:concurrently
 
 notifications:
   email: false

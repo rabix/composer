@@ -32,8 +32,7 @@
         "test:electron": "./node_modules/electron/cli.js ./electron/node_modules/.bin/_mocha -r ts-node/register --recursive --ui bdd 'electron/**/*.spec.ts'",
         "ci": "yarn run build && yarn run test:spectron && yarn run test:electron && yarn run test:angular",
         "i18n": "ng-xi18n",
-        "testcn": "./node_modules/.bin/concurrently \"echo 'hello'\" \"ddsecho 'double'\" --kill-others-on-fail",
-        "ci:concurrent": "yarn run concurrently \"yarn run build && yarn run test:spectron\" \"yarn run test:electron\" \"yarn run test:angular\""
+        "ci:concurrently": "yarn run concurrently -- --kill-others-on-fail \"yarn run build && yarn run test:spectron\" \"yarn run test:electron\" \"yarn run test:angular\""
     },
     "private": true,
     "dependencies": {

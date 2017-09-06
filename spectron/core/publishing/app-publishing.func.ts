@@ -10,7 +10,7 @@ describe("app publishing", () => {
 
     afterEach(() => shutdown(app));
 
-    it.only("opens newly published app in a new tab", async function () {
+    it("opens newly published app in a new tab", async function () {
 
         const user    = generateAuthCredentials("test-user", "https://api.sbgenomics.com");
         const project = generatePlatformProject({id: "test-user/test-project"});
