@@ -31,5 +31,12 @@ branches:
   - /^release\/v\d+\.\d+(\.\d+)?(-\S*)?$/
   - /^master$/
 
+deploy:
+    provider: S3
+    access_key_id: $(amazon_key_id)
+    secret_access_key: $(amazon_key_secret)
+    bucket: $(amazon_bucket)
+    folder: build
+
 artifacts:
   - path: build
