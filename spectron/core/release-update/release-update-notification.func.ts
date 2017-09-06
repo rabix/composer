@@ -131,7 +131,8 @@ describe("new release check", function () {
     }
 
     function triggerUpdateCheck() {
-        return app.client.click("ct-settings-menu").then(() => app.client.click("[data-test=check-for-updates]"));
+        return app.client.click("ct-settings-menu")
+            .then(() => app.client.click("[data-test=check-for-updates]"));
     }
 });
 
