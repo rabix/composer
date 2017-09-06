@@ -4,7 +4,7 @@
     "main": "dist/main.js",
     "scripts": {
         "test": "./node_modules/.bin/_mocha -r ts-node/register ./src/**/*.spec.ts",
-        "rebuild": "./electron/node_modules/.bin/electron-rebuild"
+        "rebuild": "./node_modules/.bin/electron-rebuild"
     },
     "dependencies": {
         "async": "^2.4.1",

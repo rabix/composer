@@ -1,7 +1,7 @@
 import * as assert from "assert";
 import * as fs from "fs-extra";
 import * as spectron from "spectron";
-import {generateAuthCredentials, generatePlatformProject} from "../../util/generator";
+import {generateAuthCredentials, generateKeychain, generatePlatformProject} from "../../util/generator";
 import {mockSBGClient} from "../../util/sbg-client-proxy";
 import {boot, partialProxy, proxerialize, shutdown} from "../../util/util";
 
@@ -10,7 +10,7 @@ describe("app publishing", () => {
 
     afterEach(() => shutdown(app));
 
-    it("opens newly published app in a new tab", async function () {
+    it.only("opens newly published app in a new tab", async function () {
 
         const user    = generateAuthCredentials("test-user", "https://api.sbgenomics.com");
         const project = generatePlatformProject({id: "test-user/test-project"});
@@ -35,6 +35,7 @@ describe("app publishing", () => {
                 }
             },
             overrideModules: [
+                generateKeychain(),
                 {
                     module: "fs-extra",
                     override: partialProxy("fs-extra", {

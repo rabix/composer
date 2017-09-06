@@ -1,4 +1,5 @@
 import * as spectron from "spectron";
+import {generateKeychain} from "../../../util/generator";
 import {boot, shutdown} from "../../../util/util";
 
 const assert = require("assert");
@@ -12,7 +13,7 @@ describe("settings menu", function () {
 
         const user = {
             "id": "cgc-api_demo",
-            "token": "3d15bcde2052476280f2bc6d0c56f69b",
+            "token": null,
             "url": "https://cgc-api.sbgenomics.com",
             "user": {
                 "username": "demon",
@@ -24,6 +25,9 @@ describe("settings menu", function () {
                 activeCredentials: user,
                 credentials: [user]
             },
+            overrideModules: [
+                generateKeychain()
+            ]
         });
 
         const client = app.client;
