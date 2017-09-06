@@ -1,18 +1,13 @@
-sudo: required
 dist: trusty
-os:
-  - linux
+os: linux
 addons:
   chrome: stable
   apt:
-    sources:
-      - ppa:ubuntu-wine/ppa
     packages:
       - libsecret-1-0
       - icnsutils
       - graphicsmagick
       - xz-utils
-      - wine1.8
   artifacts:
     paths:
       - $(ls build/*.zip | tr "\n" ":")
