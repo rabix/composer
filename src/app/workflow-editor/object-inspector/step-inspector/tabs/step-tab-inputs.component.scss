@@ -49,30 +49,4 @@ $grid-gutter-width-half: $grid-gutter-width-base / 2;
             display: block;
         }
     }
-
-    .dropdown-port-option {
-        border-bottom: 1px solid $black;
-        line-height: $line-height-base;
-        padding: .55rem 1rem;
-        cursor: pointer;
-        min-width: 150px;
-        color: $smoke;
-
-        .text-muted {
-            white-space: nowrap;
-        }
-
-        &:hover {
-            background: $gray;
-        }
-
-        .active-icon {
-            color: $gray;
-        }
-    }
-
-    .dropdown-port-option.active {
-        background-color: $gray;
-    }
-
 }
