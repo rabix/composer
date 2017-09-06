@@ -9,6 +9,7 @@ import {PlatformRepositoryService} from "../../repository/platform-repository.se
 import {DataGatewayService} from "../data-gateway/data-gateway.service";
 import {AppHelper} from "../helpers/AppHelper";
 import {TabData} from "./tab-data.interface";
+import {FileRepositoryService} from "../../file-repository/file-repository.service";
 
 
 @Injectable()
@@ -24,6 +25,7 @@ export class WorkboxService {
 
     constructor(private auth: AuthService,
                 private dataGateway: DataGatewayService,
+                private fileRepository: FileRepositoryService,
                 private localRepository: LocalRepositoryService,
                 private platformRepository: PlatformRepositoryService) {
 
@@ -110,7 +112,7 @@ export class WorkboxService {
 
             this.tabs.next(tabs.concat(tab));
         } else if (foundTab) {
-            tabs.splice(foundTabIndex, 1)
+            this.closeTab(foundTab);
             tabs.splice(foundTabIndex, 0, tab);
             this.tabs.next(tabs);
         }
@@ -249,7 +251,7 @@ export class WorkboxService {
         const label      = AppHelper.getBasename(data.id);
         const isWritable = data.isWritable;
 
-        const fileContent = Observable.empty().concat(this.dataGateway.fetchFileContent(id, false, false));
+        const fileContent = Observable.empty().concat(this.fileRepository.fetchFile(id, true));
         const resolve     = (fcontent: string) => this.dataGateway.resolveContent(fcontent, id);
 
         const tab = Object.assign({
