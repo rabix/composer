@@ -10,7 +10,7 @@ install:
   - ps: Install-Product node $env:nodejs_version
   - yarn install --no-progress
 
-test_script:
+build_script:
   - yarn run build
 
 test_script:
