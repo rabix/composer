@@ -4,7 +4,7 @@ os:
   - linux
   - osx
 addons:
-  chrome: stable
+  chrome: beta
   apt:
     packages:
       - libsecret-1-dev
