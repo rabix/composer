@@ -15,8 +15,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                 <form [formGroup]="form">
                     <ct-blank-tool-state *ngIf="!readonly && !secondaryFiles.length"
                                          [buttonText]="'Add secondary file'"
-                                         (buttonClick)="addFile()">
-                        No Secondary Files defined.
+                                         [description]="'No Secondary Files defined.'"
+                                         (buttonClick)="addFile()">                        
                     </ct-blank-tool-state>
 
                     <div *ngIf="readonly && !secondaryFiles.length" class="text-xs-center">
@@ -34,10 +34,10 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                     [readonly]="readonly">
                             </ct-expression-input>
 
-                            <div *ngIf="!readonly" class="remove-icon clickable ml-1 text-hover-danger"
+                            <div *ngIf="!readonly" class="remove-icon"
                                  [ct-tooltip]="'Delete'"
                                  (click)="removeFile(i)">
-                                <i class="fa fa-trash"></i>
+                                <i class="fa fa-trash clickable"></i>
                             </div>
                         </li>
                     </ol>

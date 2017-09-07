@@ -18,9 +18,9 @@ import {ToolOutputListComponent} from "./tool-output-list.component";
                 <ct-blank-tool-state *ngIf="!readonly && !model?.outputs.length"
                                      [buttonText]="'Add an Output'"
                                      [learnMoreURL]="helpLink"
+                                     [description]="blankStateDescription"
                                      (buttonClick)="addEntry()">
-                    The connections to tool outputs. Create an output port for each output file and data item, and also intermediate files
-                    if they need to be saved for later. Add secondary files to file ports for related index files.
+
                 </ct-blank-tool-state>
 
                 <!--List of entries-->
@@ -67,6 +67,9 @@ export class ToolOutputsComponent extends DirectiveBase {
     @ViewChild(ToolOutputListComponent) outputList: ToolOutputListComponent;
 
     helpLink = ExternalLinks.toolOutput;
+
+    blankStateDescription = `The connections to tool outputs. Create an output port for each output file and data item,
+     and also intermediate files if they need to be saved for later. Add secondary files to file ports for related index files.`;
 
     addEntry() {
         this.outputList.addEntry();
