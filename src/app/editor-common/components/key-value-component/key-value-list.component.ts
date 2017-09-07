@@ -76,6 +76,9 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 export class KeyValueListComponent extends DirectiveBase implements ControlValueAccessor, OnDestroy {
 
     @Input()
+    readonly = false;
+
+    @Input()
     context: { $job: any } = {$job: {}};
 
     @Input()
@@ -111,8 +114,6 @@ export class KeyValueListComponent extends DirectiveBase implements ControlValue
     private onTouched = noop;
 
     private propagateChange = noop;
-
-    private readonly = false;
 
     form = new FormGroup({}, this.duplicateKeyValidator.bind(this));
 
