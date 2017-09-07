@@ -1595,9 +1595,9 @@ custom-event@~1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/custom-event/-/custom-event-1.0.1.tgz#5d02a46850adf1b4a317946a3928fccb5bfd0425"
 
-cwl-svg@0.0.42:
-  version "0.0.42"
-  resolved "https://registry.yarnpkg.com/cwl-svg/-/cwl-svg-0.0.42.tgz#78f43f3669ecb4af98099422a147b2254eac8f1f"
+cwl-svg@0.0.41:
+  version "0.0.41"
+  resolved "https://registry.yarnpkg.com/cwl-svg/-/cwl-svg-0.0.41.tgz#d0c147fdbead47e505008ae762b479229c176d88"
   dependencies:
     core-js "^2.4.1"
 

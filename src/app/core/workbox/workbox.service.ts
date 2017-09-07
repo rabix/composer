@@ -113,7 +113,7 @@ export class WorkboxService {
             this.tabs.next(tabs.concat(tab));
         } else if (foundTab) {
             this.closeTab(foundTab);
-            tabs.splice(foundTabIndex, 0, tab);
+            tabs.splice(foundTabIndex, 1, tab);
             this.tabs.next(tabs);
         }
 
@@ -251,7 +251,8 @@ export class WorkboxService {
         const label      = AppHelper.getBasename(data.id);
         const isWritable = data.isWritable;
 
-        const fileContent = Observable.empty().concat(this.fileRepository.fetchFile(id, true));
+        const fileContent = Observable.empty().concat(dataSource === "local" ?
+            this.fileRepository.fetchFile(id, true) : this.platformRepository.getAppContent(id, true));
         const resolve     = (fcontent: string) => this.dataGateway.resolveContent(fcontent, id);
 
         const tab = Object.assign({

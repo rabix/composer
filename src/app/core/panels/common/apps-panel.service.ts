@@ -36,6 +36,7 @@ export class AppsPanelService {
                     title: "Choose a File Path",
                     buttonLabel: "Save",
                     defaultPath: `${nodeID}.cwl`,
+                    filters: [{name: "Common Workflow Language App", extensions: ["cwl"]}],
                     properties: ["openDirectory"]
                 }, (path) => {
 
