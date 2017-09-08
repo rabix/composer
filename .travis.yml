@@ -14,12 +14,14 @@ language: node_js
 node_js: "8"
 
 cache:
+  yarn: true
   directories:
     - node_modules
     - electron/node_modules
 install:
   - yarn install
 before_script:
+  - npm rebuild node-sass
   - sudo add-apt-repository ppa:ubuntu-wine/ppa -y
   - sudo apt-get update
   - sudo apt-get install --no-install-recommends -y icnsutils graphicsmagick xz-utils
