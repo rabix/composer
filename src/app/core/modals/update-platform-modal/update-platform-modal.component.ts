@@ -44,7 +44,7 @@ import {SystemService} from "../../../platform-providers/system.service";
                                    (click)="system.openLink(downloadLink.href); modal.close()">Download</a>
                             </div>
 
-                            <div>
+                            <div *ngIf="!isIgnoredVersion">
                                 <button data-test="dismiss-button" class="btn-link clickable dismissButton"
                                         (click)="skipUpdateVersion()">Skip this version</button>
                             </div>
@@ -79,6 +79,9 @@ export class UpdatePlatformModalComponent extends DirectiveBase {
 
     @Input()
     newVersion: string;
+
+    @Input()
+    isIgnoredVersion = false;
 
     @Input()
     linkForDownload: string;
