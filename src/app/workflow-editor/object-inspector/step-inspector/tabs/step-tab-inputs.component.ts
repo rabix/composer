@@ -258,7 +258,7 @@ export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase imple
         if (dest && dest.parentStep && dest.parentStep.id === this.step.id) {
             this.cdr.markForCheck();
         }
-    }
+    };
 
     ngOnInit() {
         this.tracked = this.workflowModel.on("connection.create", this.handleConnectionChange.bind(this));

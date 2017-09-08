@@ -53,15 +53,21 @@ export class DataRepository {
         });
 
         this.on("update.local", (_, changes) => {
+            /**
+             * When credentials in local profile get updated, we might have to remove some tokens from the keychain.
+             */
             if (changes && changes.has("credentials")) {
                 const {oldValue, newValue} = changes.get("credentials");
-                const oldIDs               = oldValue.map(c => c.id);
-                const newIDs               = newValue.map(c => c.id);
 
+                const oldIDs = oldValue.map(c => c.id);
+                const newIDs = newValue.map(c => c.id);
+
+                // Get all ids that existed earlier, but not anymore.
                 const prune = oldIDs.filter(id => newIDs.indexOf(id) === -1);
-                prune.forEach(cid => keychain.remove(cid)).catch(err => {
+
+                prune.forEach(cid => keychain.remove(cid).catch(err => {
                     logger.error("Failed to remove token from keychain.", err);
-                });
+                }));
             }
         });
 
