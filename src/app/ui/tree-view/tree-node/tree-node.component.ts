@@ -63,6 +63,7 @@ import {TreeViewService} from "../tree-view.service";
                           [isExpanded]="child?.isExpanded"
                           [isExpandable]="child.isExpandable"
                           [iconExpanded]="child?.iconExpanded"
+                          expandOnIconOnly="child?.toggleOnIconOnly"
 
                           [dragLabel]="child.dragLabel"
                           [dragEnabled]="child.dragEnabled"
@@ -88,6 +89,7 @@ export class TreeNodeComponent<T> implements OnInit {
     @Input() isExpanded: Observable<boolean>;
     @Input() iconExpanded: string;
     @Input() isExpandable: boolean;
+    @Input() toggleOnIconOnly = false;
 
     @Input() children: Observable<any[]>;
     @Input() data: T;
@@ -134,7 +136,7 @@ export class TreeNodeComponent<T> implements OnInit {
     toggle(event: MouseEvent) {
 
         // Only clicking on data-toggle-icon can toggle
-       if (event.srcElement.getAttribute("data-toggle-icon") !== null ) {
+       if (!this.toggleOnIconOnly || event.srcElement.getAttribute("data-toggle-icon") !== null) {
 
            if (this._isExpanded) {
                return this.contract();

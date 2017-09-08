@@ -9,6 +9,7 @@ export interface TreeNode<T> {
     iconExpanded?: string;
     isExpandable?: boolean;
     isExpanded?: Observable<boolean>;
+    toggleOnIconOnly?: boolean;
     children?: Observable<TreeNode<any>[]>;
     data?: T;
 

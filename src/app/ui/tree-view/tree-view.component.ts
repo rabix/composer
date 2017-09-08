@@ -21,13 +21,14 @@ import {TreeNodeLabelDirective} from "./tree-node-label-directive";
                       [data]="node?.data || {}"
                       [children]="node?.children"
                       [dragLabel]="node?.dragLabel"
+                      [isExpandable]="node?.isExpandable"
                       [isExpanded]="node?.isExpanded"
+                      [toggleOnIconOnly]="node?.toggleOnIconOnly"
                       [dragEnabled]="node?.dragEnabled"
                       [dragDropZones]="node?.dragDropZones"
-                      [isExpandable]="node?.isExpandable"
                       [iconExpanded]="node?.iconExpanded"
                       [dragImageClass]="node?.dragImageClass"
-                      [dragTransferData]="node?.dragTransferData">          
+                      [dragTransferData]="node?.dragTransferData">
         </ct-tree-node>
     `,
     providers: [TreeViewService],

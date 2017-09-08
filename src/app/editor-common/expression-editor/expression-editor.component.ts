@@ -174,6 +174,7 @@ export class ExpressionEditorComponent extends DirectiveBase implements OnInit, 
             node.label = key;
             node.type = "entry";
             node.typeDisplay = typeDisplay;
+            node.toggleOnIconOnly = true;
 
             const trace = [path, key].filter(e => e).join(".");
 
