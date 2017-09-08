@@ -41,7 +41,7 @@ import {SystemService} from "../../../platform-providers/system.service";
                             <div>
                                 <a #downloadLink href="{{linkForDownload}}"
                                    data-test="download-link" class="btn btn-primary btn-lg"
-                                   (click)="system.openLink(downloadLink.href); modal.close()">Download</a>
+                                   (click)="system.openLink(downloadLink.href); modal.close(); false;">Download</a>
                             </div>
 
                             <div *ngIf="!isIgnoredVersion">
