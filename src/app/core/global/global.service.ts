@@ -9,6 +9,7 @@ import {UpdatePlatformModalComponent} from "../modals/update-platform-modal/upda
 import {IpcService} from "../../services/ipc.service";
 import {GitHubRelease} from "../../../../electron/src/github-api-client/interfaces/github-release";
 import {noop} from "../../lib/utils.lib";
+import {AboutPageModalComponent} from "../modals/about-page-modal/about-page-modal.component";
 
 @Injectable()
 export class GlobalService {
@@ -106,5 +107,9 @@ export class GlobalService {
         });
 
         return this.checkForPlatformUpdatePromise;
+    }
+
+    showAboutPageModal() {
+        this.modal.fromComponent(AboutPageModalComponent, "About");
     }
 }
