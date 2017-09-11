@@ -9,6 +9,7 @@ import {PlatformRepositoryService} from "../../../repository/platform-repository
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {UpdateStepModalComponent} from "../../update-step-modal/update-step-modal.component";
+import {AppHelper} from "../../../core/helpers/AppHelper";
 
 @Component({
     selector: "ct-workflow-step-inspector",
@@ -108,13 +109,13 @@ export class StepInspectorComponent extends DirectiveBase {
     updateStep(ev: Event) {
         ev.preventDefault();
 
-        const appID = this.step.run.customProps["sbg:id"].split("/").slice(0, 3).join("/");
+        const appID = AppHelper.getAppIDWithRevision(this.step.run.customProps["sbg:id"], null);
         const proc  = this.statusBar.startProcess("Updating " + appID);
 
         const modal = this.modal.fromComponent(UpdateStepModalComponent, {title: `Update ${appID}?`});
         modal.step  = this.step;
 
-        this.platformRepository.getApp(appID).then((app: RawApp) => {
+        this.platformRepository.getApp(appID, true).then((app: RawApp) => {
             this.statusBar.stopProcess(proc);
             modal.updatedApp = app;
             modal.isLoading  = false;

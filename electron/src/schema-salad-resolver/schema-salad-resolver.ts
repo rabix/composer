@@ -8,6 +8,15 @@ function isUrl(s) {
     return regexp.test(s);
 }
 
+function isLocalFile(filepath: string) {
+    const isWin = /^win/.test(process.platform);
+    if (isWin) {
+        return (/^[a-z]:\\.+$/i).test(filepath);
+    }
+
+    return filepath.startsWith("/");
+}
+
 function traverse(data, source, root, graph = {}) {
     return new Promise((resolve, reject) => {
 
@@ -63,7 +72,8 @@ function traverse(data, source, root, graph = {}) {
                 future.push(new Promise((resolve, reject) => {
 
                     let externalPath = source.split("/").slice(0, -1).concat(entry).join("/");
-                    if (isUrl(entry) || (!isUrl(source) && entry.startsWith("/"))) {
+
+                    if (isUrl(entry) || (!isUrl(source) && isLocalFile(entry))) {
                         externalPath = entry;
                     }
 
@@ -142,8 +152,8 @@ function parseJSON(content, source, root?, graph?) {
             json: true
         } as LoadOptions) || {};
 
-        if(typeof root === "string"){
-            root = yaml.safeLoad(root,{json: true} as LoadOptions);
+        if (typeof root === "string") {
+            root = yaml.safeLoad(root, {json: true} as LoadOptions);
         }
 
         if (!graph) {

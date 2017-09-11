@@ -92,9 +92,11 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
 
         const localFileSearch = (term) => this.dataGateway.searchLocalProjects(term).then(results => {
             return results.map(result => {
+                const ds = AppHelper.DS;
+
                 const id    = result.path;
-                const label = result.path.split("/").slice(-3, -1).join("/");
-                const title = result.path.split("/").pop();
+                const label = result.path.split(ds).slice(-3, -1).join(ds);
+                const title = result.path.split(ds).pop();
 
                 let icon      = "fa-file";
                 let relevance = result.relevance;
@@ -114,7 +116,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
                         isWritable: result.isWritable,
                         label: result.name,
                         language: ["cwl", "yml", "yaml"].indexOf(result.language) === -1 ? "json" : "yaml",
-                        type: result.type,
+                        type: result.type || "Code",
                     } as TabData<any>,
                     type: "file",
                     dragEnabled: ["Workflow", "CommandLineTool"].indexOf(result.type) !== -1,

@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as md5 from "md5";
 import * as mkdirp from "mkdirp";
+import * as path from "path";
 
 export class SwapController {
 
@@ -57,7 +58,7 @@ export class SwapController {
     }
 
     private makeHashedPath(fp: string): string {
-        return this.rootDir + "/" + this.hash(fp);
+        return this.rootDir + path.sep + this.hash(fp);
     }
 
     private hash(path: string): string {

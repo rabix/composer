@@ -363,9 +363,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         return this.tabsUnlocked();
     }
 
-    openRevision(revisionNumber: number | string): Promise<any> {
+    openRevision(revisionNumber: number | string | any): Promise<any> {
 
-        const fid = this.tabData.id.split("/").slice(0, 3).concat(revisionNumber.toString()).join("/");
+        const fid = AppHelper.getAppIDWithRevision(this.tabData.id, revisionNumber);
 
         /** @name revisionHackFlagSwitchOn */
         this.revisionChangingInProgress = true;

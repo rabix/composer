@@ -128,13 +128,14 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
     @Input() defaultFolder: string;
     @Input() defaultProject: string;
 
-    error: string;
     projectOptions        = [];
     checkingSlug          = false;
     appTypeLocked         = false;
     appCreationInProgress = false;
-    remoteAppCreationError;
-    localAppCreationInfo;
+
+    error: string;
+    localAppCreationInfo: string;
+    remoteAppCreationError: string;
 
     localForm: FormGroup;
     remoteForm: FormGroup;
@@ -221,7 +222,6 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
             const defaultFilename   = this.slugify.transform(`New ${this.appType}`) + ".cwl";
             const {name}            = this.localForm.getRawValue();
             const suggestedFilename = name ? (this.slugify.transform(name) + ".cwl") : defaultFilename;
-            let addExtension        = false;
 
             dialog.showSaveDialog({
                 title: "Choose a File Path",
@@ -230,24 +230,22 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
                 properties: ["openDirectory"]
             }, (path) => {
 
+                // Indication of whether we need to add .cwl extension to the file name
+                this.localAppCreationInfo = undefined;
+
+                // If user did not choose anything, do nothing
                 if (!path) {
                     return;
-                } else if (!path.split("/").slice(-1)[0].endsWith(".cwl")) {
-                    // true if path = "/path/to/some/file" -> ["path", "to", "some", "file"] -> ["file"] -> !false
-                    // false if path = "/path/to/some/file.cwl" -> ["path", "to", "some", "file"] -> ["file.cwl"] -> !true
+                }
 
-                    // ensure the path still gets an extension even if "hide extension" was checked
-                    if (`${directoryPath}/${suggestedFilename}` !== path + ".cwl") {
-                        // but only show message if the user changed the file name, to inform them
-                        // that we've modified it
-                        this.localAppCreationInfo = "Extension .cwl was added to the file name.";
-                    }
-                    addExtension = true;
+                if (!AppHelper.endsWithAppExtension(path)) {
+                    path += ".cwl";
+                    this.localAppCreationInfo = "Extension .cwl was added to the file name.";
                 }
 
                 this.localForm.patchValue({
-                    path: addExtension ? path + ".cwl" : path,
-                    name: name || path.split("/").pop()
+                    path: path,
+                    name: name || AppHelper.getBasename(path, true)
                 });
 
                 setTimeout(() => {
@@ -264,14 +262,15 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
         this.localAppCreationInfo = undefined;
 
         const {path, name, cwlVersion, type} = this.localForm.getRawValue();
-        const filesplit                      = path.split("/");
-        const fileBasename                   = filesplit.pop();
-        const folder                         = filesplit.join("/");
+
+        const fileBasename = AppHelper.getBasename(path, true);
+        const folder       = AppHelper.getDirname(path);
 
         const app  = AppGeneratorService.generate(cwlVersion, type, fileBasename, name);
         const dump = YAML.dump(app);
 
-        this.dataGateway.saveLocalFileContent(path, dump).subscribeTracked(this, () => {
+        this.fileRepository.saveFile(path, dump).then(() => {
+
             this.fileRepository.reloadPath(folder);
 
             const tabData = {
@@ -297,7 +296,7 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
 
         const app = AppGeneratorService.generate(cwlVersion, type, slug, name);
 
-        const newAppID = `${project}/${slug}`.split("/").slice(0, 3).concat("0").join("/");
+        const newAppID = AppHelper.getAppIDWithRevision(`${project}/${slug}`, 0);
 
         this.platformRepository.createApp(newAppID, JSON.stringify(app, null, 4)).then(() => {
 
