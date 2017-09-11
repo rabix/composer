@@ -15,7 +15,7 @@ addons:
     paths:
       - $(ls build/*.zip | tr "\n" ":")
 language: node_js
-node_js: "7"
+node_js: "8"
 
 install:
   - yarn install
