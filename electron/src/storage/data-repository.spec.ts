@@ -6,6 +6,7 @@ import * as sinon from "sinon";
 
 import * as tmp from "tmp";
 import {SynchrounousResult} from "tmp";
+import {encodeBase64} from "../security/encoder";
 import {DataRepository} from "./data-repository";
 import {UserRepository} from "./types/user-repository";
 
@@ -125,10 +126,12 @@ describe("Data repository", function () {
         const localPath = dir.name + "/local.json";
 
         // Write basic user data to that profile file, so we don't start with a blank state
-        fs.outputJSONSync(localPath, {
+        const profileData = {
             credentials: [userData],
             activeCredentials: userData
-        } as Partial<UserRepository>);
+        } as Partial<UserRepository>;
+
+        fs.outputFileSync(localPath, encodeBase64(JSON.stringify(profileData)));
 
         return userData;
     }

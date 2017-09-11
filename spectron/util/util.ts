@@ -7,6 +7,7 @@ import {LocalRepository} from "../../electron/src/storage/types/local-repository
 import {UserRepository} from "../../electron/src/storage/types/user-repository";
 import rimraf = require("rimraf");
 import ITestCallbackContext = Mocha.ITestCallbackContext;
+import {encodeBase64} from "../../electron/src/security/encoder";
 
 interface FnTestConfig {
     localRepository: Partial<LocalRepository>,
@@ -17,9 +18,7 @@ interface FnTestConfig {
     }[],
     waitForMainWindow: boolean,
     testTimeout: number,
-    retries: number,
-    swapFiles: { userID: string, content: string }[]
-
+    retries: number
 }
 
 function isDevServer() {
@@ -27,9 +26,6 @@ function isDevServer() {
 }
 
 function findAppBinary() {
-    console.log("Searching for app binary.");
-    const scan = glob.sync("./build/**/rabix-composer*");
-    console.log("Scan results: \n" + scan.join("\n\t"));
 
     if (isDevServer()) {
         return glob.sync("./node_modules/.bin/electron")[0];
@@ -56,19 +52,14 @@ export function boot(context: ITestCallbackContext, testConfig: Partial<FnTestCo
 
     testConfig.localRepository = Object.assign(new LocalRepository(), testConfig.localRepository || {});
 
-    fs.outputJSONSync(localProfilePath, testConfig.localRepository, {
-        spaces: 4,
-        replacer: null
-    });
+    fs.outputFileSync(localProfilePath, encodeBase64(JSON.stringify(testConfig.localRepository)));
 
     if (testConfig.platformRepositories) {
         for (let userID in testConfig.platformRepositories) {
             const profilePath = profilesDirPath + `/${userID}.json`;
             const profileData = Object.assign(new UserRepository(), testConfig.platformRepositories[userID] || {});
-            fs.outputJSONSync(profilePath, profileData, {
-                spaces: 4,
-                replacer: null
-            })
+
+            fs.outputFileSync(profilePath, encodeBase64(JSON.stringify(profileData)));
         }
     }
 

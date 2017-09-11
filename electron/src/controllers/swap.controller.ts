@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as md5 from "md5";
 import * as mkdirp from "mkdirp";
 import * as path from "path";
+import {decodeBase64, encodeBase64} from "../security/encoder";
 
 export class SwapController {
 
@@ -57,7 +58,7 @@ export class SwapController {
         fs.readFile(fullPath, "utf8", (err, content) => {
             if (err) return callback(err);
 
-            const decoded = Buffer.from(content, "base64").toString("utf8");
+            const decoded = decodeBase64(content);
             callback(null, decoded);
 
         });
@@ -79,7 +80,7 @@ export class SwapController {
 
         const executor = () => {
 
-            const encoded = new Buffer(content).toString("base64");
+            const encoded = encodeBase64(content);
 
             fs.writeFile(fp, encoded, "utf8", (err?, data?) => {
                 if (err) return callback(err);

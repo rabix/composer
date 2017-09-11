@@ -1,4 +1,5 @@
 import * as ReadWriteLock from "rwlock";
+import {decodeBase64, encodeBase64} from "../security/encoder";
 import {LocalRepository} from "./types/local-repository";
 import {RepositoryType} from "./types/repository-type";
 import {UserRepository} from "./types/user-repository";
@@ -334,8 +335,9 @@ export class DataRepository {
                 }
 
                 try {
-                    const b64Buffer = Buffer.from(content, "base64").toString("utf8");
-                    const parsed    = JSON.parse(b64Buffer);
+
+                    const text   = decodeBase64(content);
+                    const parsed = JSON.parse(text);
                     callback(null, parsed);
                 } catch (err) {
 
@@ -368,7 +370,7 @@ export class DataRepository {
         const frozen = JSON.stringify(copy, null, 4);
 
         this.lock.writeLock(filePath, (release) => {
-            const b64 = new Buffer(frozen).toString("base64");
+            const b64 = encodeBase64(frozen);
 
             fs.outputFile(filePath, b64, "utf8", (err, data) => {
                 release();
