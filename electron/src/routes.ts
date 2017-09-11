@@ -324,7 +324,12 @@ export function getPlatformApp(data: { id: string, forceFetch?: boolean }, callb
             callback(new Error("Cannot fetch an app, you are not connected to any platform."));
         }
 
-        if (!data.forceFetch) {
+        if (data.forceFetch) {
+            const api = new SBGClient(credentials.url, credentials.token);
+            api.getApp(data.id).then(response => {
+                callback(null, JSON.stringify(response.raw, null, 4));
+            }, err => callback(err));
+        } else {
             swapController.exists(credentials.id + "/" + data.id, (err, exists) => {
 
                 if (err) {
@@ -338,17 +343,10 @@ export function getPlatformApp(data: { id: string, forceFetch?: boolean }, callb
                 }
 
                 const api = new SBGClient(credentials.url, credentials.token);
-                api.apps.get(data.id).then(response => {
+                api.getApp(data.id).then(response => {
                     callback(null, JSON.stringify(response.raw, null, 4));
                 }, err => callback(err));
-
-
             });
-        } else {
-            const api = new SBGClient(credentials.url, credentials.token);
-            api.getApp(data.id).then(response => {
-                callback(null, JSON.stringify(response.raw, null, 4));
-            }, err => callback(err));
         }
     }, err => callback(err));
 }
