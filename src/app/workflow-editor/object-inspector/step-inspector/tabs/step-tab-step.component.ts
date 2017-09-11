@@ -160,8 +160,6 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
             this.form.controls["description"].setValue(newStep.description);
             this.form.controls["scatterMethod"].setValue(newStep.scatterMethod || "");
             this.form.controls["scatter"].setValue(newStep.scatter || "");
-
-            this.disableScatter();
         }
     }
 
@@ -208,19 +206,6 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
             this.step.scatterMethod = scatterMethod;
         });
 
-    }
-
-    disableScatter() {
-        // using [disabled] doesn't work for whatever reason
-        // binding readonly to [attr.disabled] makes the select ALWAYS disabled
-        // because it has the disabled attribute, regardless if it's true or false
-        if (this.readonly) {
-            this.form.controls["scatter"].disable();
-            this.form.controls["scatterMethod"].disable();
-        } else {
-            this.form.controls["scatter"].enable();
-            this.form.controls["scatterMethod"].enable();
-        }
     }
 
     setHints() {

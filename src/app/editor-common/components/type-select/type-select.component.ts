@@ -64,8 +64,6 @@ export class InputTypeSelectComponent extends DirectiveBase implements ControlVa
 
     private onChange = noop;
 
-    private skipOnChange = false;
-
     writeValue(paramType: ParameterTypeModel): void {
         this.paramType = paramType;
 
@@ -100,13 +98,6 @@ export class InputTypeSelectComponent extends DirectiveBase implements ControlVa
                 this.paramType.items = "File";
                 this.form.controls["items"].setValue("File", {onlySelf: true});
             }
-
-            // This method gets triggered if we set disabled state
-            // and there is no way to distinguish it from other events.
-            if (!this.skipOnChange) {
-                this.skipOnChange = false;
-                this.onChange(this.paramType);
-            }
         });
     }
 
@@ -120,7 +111,6 @@ export class InputTypeSelectComponent extends DirectiveBase implements ControlVa
 
     setDisabledState(isDisabled: boolean): void {
         this.readonly = isDisabled;
-        this.skipOnChange = true;
-        isDisabled ? this.form.controls["isItemOrArray"].disable() : this.form.controls["isItemOrArray"].enable();
+        isDisabled ? this.form.controls["isItemOrArray"].disable({emitEvent: false}) : this.form.controls["isItemOrArray"].enable({emitEvent: false});
     }
 }

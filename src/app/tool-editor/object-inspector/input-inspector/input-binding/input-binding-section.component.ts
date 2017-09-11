@@ -184,8 +184,7 @@ export class InputBindingSectionComponent extends DirectiveBase implements Contr
 
     setDisabledState(isDisabled: boolean): void {
         this.readonly = isDisabled;
-        const excludeControls = [];
-        Object.keys(this.form.controls).filter(c => !excludeControls.includes(c)).forEach((item) => {
+        Object.keys(this.form.controls).forEach((item) => {
             const control = this.form.controls[item];
             isDisabled ? control.disable() : control.enable();
         });
