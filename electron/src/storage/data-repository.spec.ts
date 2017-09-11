@@ -26,7 +26,7 @@ describe("Data repository", function () {
             remove: () => Promise.resolve(),
         };
 
-        dataRepositoryClass = proxyquire.load("./data-repository", {
+        dataRepositoryClass = proxyquire.noCallThru().load("./data-repository", {
             "../keychain": keychain
         }).DataRepository;
 
