@@ -194,7 +194,7 @@ function applyCLIArgs() {
 
     // Find if arguments are present in the command line
     const userDataDirArg     = process.argv.find(arg => arg.startsWith(dirArgName));
-    const moduleOverridesArg = process.argv.find(arg => arg.startsWith(moduleOverridesArgName))
+    const moduleOverridesArg = process.argv.find(arg => arg.startsWith(moduleOverridesArgName));
 
     // If we're given an alternate userData directory, override the default one
     if (userDataDirArg) {

@@ -1,0 +1,42 @@
+image: Visual Studio 2017
+
+environment:
+  nodejs_version: "6"
+
+platform:
+  - x64
+
+install:
+  - ps: Install-Product node $env:nodejs_version
+  - yarn install --no-progress
+
+build_script:
+  - yarn run build
+
+test_script:
+  - yarn run test:electron
+  - yarn run test:angular
+  - yarn run test:spectron
+
+cache:
+  - node_modules -> yarn.lock
+  - "%LOCALAPPDATA%/Yarn"
+  - node_modules
+  - electron\node_modules
+  - '%APPDATA%\npm-cache'
+  - '%USERPROFILE%\.electron'
+
+branches:
+  only:
+  - /^release\/v\d+\.\d+(\.\d+)?(-\S*)?$/
+  - /^master$/
+
+deploy:
+    provider: S3
+    access_key_id: $(amazon_key_id)
+    secret_access_key: $(amazon_key_secret)
+    bucket: $(amazon_bucket)
+    folder: build
+
+artifacts:
+  - path: build
