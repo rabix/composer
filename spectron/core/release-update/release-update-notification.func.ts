@@ -30,7 +30,7 @@ describe("new release check", function () {
         assert.equal(modalText, "An error occurred while checking for update information.");
     });
 
-    it.only("shows that there are no updates if latest version is older than the current one", async function () {
+    it("shows that there are no updates if latest version is older than the current one", async function () {
 
         app = await boot(this, {
             overrideModules: [{
