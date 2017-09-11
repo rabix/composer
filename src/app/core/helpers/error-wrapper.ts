@@ -14,9 +14,12 @@ export class ErrorWrapper {
 
         const isHttpRequest = this.err.statusCode && this.err.options;
         if (this.err.error && isHttpRequest) {
-            const uri     = this.err.options.uri;
-            const timeout = this.err.options.timeout;
-            let msg       = uri.charAt(0).toUpperCase() + uri.slice(1) + " service";
+            const uri         = this.err.options.uri;
+            const timeout     = this.err.options.timeout;
+            const justService = uri.split("?")[0];
+            const serviceName = justService.charAt(0).toUpperCase() + justService.slice(1);
+
+            let msg = serviceName + " service";
 
             if (this.err.statusCode === 401) {
                 return msg + " says that you are unauthorized to view this resource. Did your token expire?"

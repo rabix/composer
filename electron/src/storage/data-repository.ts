@@ -74,6 +74,7 @@ export class DataRepository {
         this.on("update.local.credentials", () => {
 
             this.local.credentials.forEach(c => {
+
                 keychain.set(c.id, c.token).catch(ex => {
                     logger.error("Keychain error", ex);
                 });

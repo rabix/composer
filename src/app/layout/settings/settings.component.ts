@@ -1,5 +1,4 @@
 import {Component} from "@angular/core";
-import {Observable} from "rxjs/Observable";
 import {AuthService} from "../../auth/auth.service";
 import {AuthCredentials} from "../../auth/model/auth-credentials";
 import {GlobalService} from "../../core/global/global.service";
@@ -14,7 +13,7 @@ type ViewMode = "auth" | "keyBindings" | "cache";
     selector: "ct-settings",
     styleUrls: ["./settings.component.scss"],
     template: `
-        
+
         <ct-action-bar>
             <ct-tab-selector distribute="auto" active="auth">
                 <ct-tab-selector-entry tabName="auth">Authentication</ct-tab-selector-entry>
@@ -72,50 +71,12 @@ export class SettingsComponent extends DirectiveBase {
     }
 
     openCredentialsForm() {
-        const credentialsModal = this.modal.fromComponent(PlatformCredentialsModalComponent, "Add Connection");
-
-        credentialsModal.submit = () => {
-            const valuesFromModal = credentialsModal.getValue();
-            Observable.fromPromise(this.auth.addCredentials(valuesFromModal)).withLatestFrom(this.auth.getCredentials())
-                .take(1).subscribe((combined) => {
-                const credentials = combined[1];
-
-                // If added credential is the only one, set it to be the active one
-                if (credentials.length === 1) {
-                    this.setActiveCredentials(credentials[0]);
-                }
-            });
-            this.modal.close();
-        };
-
+        this.modal.fromComponent(PlatformCredentialsModalComponent, "Add Connection");
     }
 
     editCredentials(edited: AuthCredentials) {
-        const valuesFromModal = this.modal.fromComponent(PlatformCredentialsModalComponent, "Edit Connection");
-
-        valuesFromModal.user      = edited.user;
-        valuesFromModal.token     = edited.token;
-        valuesFromModal.platform  = edited.url;
-        valuesFromModal.tokenOnly = true;
-
-        valuesFromModal.submit = () => {
-            const credentialsFromModal = valuesFromModal.getValue();
-
-            Observable.from(this.auth.addCredentials(credentialsFromModal)).withLatestFrom(this.auth.getActive())
-                .take(1).subscribe((combined) => {
-
-                const credentials = combined[1];
-
-                // If edited credentials is the active one, update active credentials
-                if (edited === credentials) {
-                    this.auth.setActiveCredentials(credentialsFromModal);
-                }
-
-                this.modal.close();
-
-            });
-
-        };
+        const modal = this.modal.fromComponent(PlatformCredentialsModalComponent, "Edit Connection");
+        modal.prepareEdit(edited);
     }
 
     setActiveCredentials(credentials?: AuthCredentials) {

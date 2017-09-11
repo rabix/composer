@@ -9,9 +9,9 @@ import {SynchrounousResult} from "tmp";
 import {DataRepository} from "./data-repository";
 import {UserRepository} from "./types/user-repository";
 
-describe.only("Data repository", function () {
+describe("Data repository", function () {
 
-    let DataRepository: { new(...args: any[]): DataRepository };
+    let dataRepositoryClass: { new(...args: any[]): DataRepository };
     let dir: SynchrounousResult;
     let keychain;
 
@@ -25,7 +25,7 @@ describe.only("Data repository", function () {
             remove: () => Promise.resolve(),
         };
 
-        DataRepository = proxyquire("./data-repository", {
+        dataRepositoryClass = proxyquire("./data-repository", {
             "../keychain": keychain
         }).DataRepository;
 
@@ -41,7 +41,7 @@ describe.only("Data repository", function () {
 
         const token = "test-token";
         sinon.stub(keychain, "get").callsFake(() => Promise.resolve(token));
-        const repository = new DataRepository(dir.name);
+        const repository = new dataRepositoryClass(dir.name);
 
         repository.load(err => {
             if (err) throw err;
@@ -55,7 +55,7 @@ describe.only("Data repository", function () {
         const user = prepareTestUser();
 
         const keychainRemoval = sinon.stub(keychain, "remove").callsFake(() => Promise.resolve(true));
-        const repository      = new DataRepository(dir.name);
+        const repository      = new dataRepositoryClass(dir.name);
 
         repository.load(err => {
 
@@ -81,8 +81,12 @@ describe.only("Data repository", function () {
         const user = prepareTestUser();
 
         const token = "altered-token";
+
         sinon.stub(keychain, "get").callsFake(() => Promise.resolve(token));
-        const repository = new DataRepository(dir.name);
+
+        const tokenSetting = sinon.stub(keychain, "set").callsFake(() => Promise.resolve());
+
+        const repository = new dataRepositoryClass(dir.name);
 
         repository.load(err => {
 
@@ -95,6 +99,10 @@ describe.only("Data repository", function () {
                 if (err) throw err;
 
                 assert.equal(repository.local.activeCredentials.token, token);
+                assert.equal(tokenSetting.callCount, 1);
+                assert.equal(tokenSetting.firstCall.args[0], user.id);
+                assert.equal(tokenSetting.firstCall.args[1], token);
+
                 done();
 
             });

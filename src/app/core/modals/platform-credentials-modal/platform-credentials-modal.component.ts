@@ -1,10 +1,13 @@
 import {Component, Input, OnInit} from "@angular/core";
 import {AbstractControl, FormControl, FormGroup, Validators} from "@angular/forms";
+import {Observable} from "rxjs/Observable";
 import {User} from "../../../../../electron/src/sbg-api-client/interfaces/user";
+import {AuthService} from "../../../auth/auth.service";
 import {AuthCredentials} from "../../../auth/model/auth-credentials";
 import {SystemService} from "../../../platform-providers/system.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
+import {GlobalService} from "../../global/global.service";
 
 @Component({
     selector: "ct-platform-credentials-modal",
@@ -106,13 +109,51 @@ export class PlatformCredentialsModalComponent implements OnInit {
     ];
 
     constructor(private system: SystemService,
+                private auth: AuthService,
+                private global: GlobalService,
                 private data: DataGatewayService,
                 private modal: ModalService) {
     }
 
     submit(): void {
 
-        // Should be overridden from the modal creator
+        const {url, token, user} = this.form.getRawValue();
+        const credentials        = new AuthCredentials(url, token, user);
+
+        const activeCredentials = this.auth.getActive();
+        const allCredentials    = this.auth.getCredentials();
+        const credentialsUpdate = Observable.fromPromise(this.auth.addCredentials(credentials));
+
+        credentialsUpdate
+            .withLatestFrom(activeCredentials, allCredentials, (_, active, all) => [active, all])
+            .take(1)
+            .subscribe((results: [AuthCredentials | undefined, AuthCredentials[]]) => {
+
+                const [active, all] = results;
+
+                // Determine whether we are adding new creds or updating old ones
+                const isEditing = this.tokenOnly;
+
+                const editedCredentials = new AuthCredentials(url, token, user);
+
+                let maybeUserUpdate = Promise.resolve();
+
+                if (isEditing && editedCredentials.equals(active)) {
+                    // If we are editing credentials that appear to be active, update it
+                    maybeUserUpdate = this.auth.setActiveCredentials(editedCredentials);
+
+                } else if (all.length === 1) {
+                    // Otherwise, if we added new credentials, and it turns out that it's the first one,
+                    // activate that user
+                    maybeUserUpdate = this.auth.setActiveCredentials(all[0]);
+                }
+
+                maybeUserUpdate.then(() => this.global.reloadPlatformData());
+
+                this.modal.close();
+
+            });
+
     }
 
     getValue(): AuthCredentials {
@@ -120,19 +161,17 @@ export class PlatformCredentialsModalComponent implements OnInit {
         return new AuthCredentials(url, token, user);
     }
 
-    private debounce(fn: (control: AbstractControl) => Promise<any>, time = 300): (control: AbstractControl) => Promise<any> {
-        let timeout;
-
-        return (control: AbstractControl) => {
-            return new Promise((resolve, reject) => {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => {
-                    fn(control).then(resolve, reject);
-                }, time);
-
-            });
-
-        };
+    /**
+     * Prepare a form for editing an existing {@link AuthCredentials} object.
+     * This will populate form fields with credentials properties and lock everything except token editing.
+     *
+     * @param {AuthCredentials} credentials
+     */
+    prepareEdit(credentials: AuthCredentials): void {
+        this.user      = credentials.user;
+        this.token     = credentials.token;
+        this.platform  = credentials.url;
+        this.tokenOnly = true;
     }
 
     ngOnInit() {
@@ -198,6 +237,21 @@ export class PlatformCredentialsModalComponent implements OnInit {
 
     close() {
         this.modal.close();
+    }
+
+    private debounce(fn: (control: AbstractControl) => Promise<any>, time = 300): (control: AbstractControl) => Promise<any> {
+        let timeout;
+
+        return (control: AbstractControl) => {
+            return new Promise((resolve, reject) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => {
+                    fn(control).then(resolve, reject);
+                }, time);
+
+            });
+
+        };
     }
 }
 
