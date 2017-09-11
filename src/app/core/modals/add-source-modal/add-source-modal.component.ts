@@ -1,13 +1,10 @@
 import {Component} from "@angular/core";
-import {Observable} from "rxjs/Observable";
 import {AuthService} from "../../../auth/auth.service";
-import {AuthCredentials} from "../../../auth/model/auth-credentials";
 import {NativeSystemService} from "../../../native/system/native-system.service";
 import {LocalRepositoryService} from "../../../repository/local-repository.service";
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
-import {GlobalService} from "../../global/global.service";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {PlatformCredentialsModalComponent} from "../platform-credentials-modal/platform-credentials-modal.component";
 
@@ -105,7 +102,6 @@ export class AddSourceModalComponent extends DirectiveBase {
                 private localRepository: LocalRepositoryService,
                 private platformRepository: PlatformRepositoryService,
                 private workbox: WorkboxService,
-                private global: GlobalService,
                 private native: NativeSystemService,
                 public auth: AuthService) {
 
@@ -144,40 +140,13 @@ export class AddSourceModalComponent extends DirectiveBase {
             this.localFoldersToAdd = paths;
             this.localRepository.addLocalFolders(...paths);
             this.modal.close();
-        }, () => {
+        }).catch(() => {
         });
 
     }
 
     openCredentialsForm() {
-        const credentialsModal = this.modal.fromComponent(PlatformCredentialsModalComponent, {
-            title: "Add Connection"
-        });
-
-        credentialsModal.submit = () => {
-            const valuesFromModal = credentialsModal.getValue();
-            Observable.fromPromise(this.auth.addCredentials(valuesFromModal)).withLatestFrom(this.auth.getCredentials())
-                .take(1).subscribe((combined) => {
-                const credentials = combined[1];
-
-                // If added credential is the only one, set it to be the active one
-                if (credentials.length === 1) {
-                    this.setActiveCredentials(credentials[0]);
-                }
-            });
-            this.modal.close();
-        };
-
-    }
-
-    setActiveCredentials(credentials: AuthCredentials) {
-
-        this.auth.setActiveCredentials(credentials).then(() => {
-            if (credentials) {
-                this.global.reloadPlatformData();
-            }
-            this.workbox.forceReloadTabs();
-        });
+        this.modal.fromComponent(PlatformCredentialsModalComponent, "Add Connection");
     }
 
     openSettingsTab() {

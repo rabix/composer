@@ -49,6 +49,7 @@ import {TooltipDirective} from "./tooltip/tooltip.directive";
 import {TreeNodeComponent} from "./tree-view/tree-node/tree-node.component";
 import {TreeViewComponent} from "./tree-view/tree-view.component";
 import {ErrorComponent} from "./modal/common/error.component";
+import {TreeNodeLabelDirective} from "./tree-view/tree-node-label-directive";
 
 @NgModule({
     imports: [
@@ -87,6 +88,7 @@ import {ErrorComponent} from "./modal/common/error.component";
         TooltipContentComponent,
         TooltipDirective,
         TreeNodeComponent,
+        TreeNodeLabelDirective,
         TreeViewComponent,
         MouseClickDirective,
         TrimValueAccessor,
@@ -153,6 +155,7 @@ import {ErrorComponent} from "./modal/common/error.component";
         TooltipContentComponent,
         TooltipDirective,
         TreeNodeComponent,
+        TreeNodeLabelDirective,
         TreeViewComponent,
         CircularLoaderComponent,
         MouseClickDirective,
