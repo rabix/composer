@@ -325,16 +325,20 @@ export class DataRepository {
 
     private storageRead(filePath, callback: (err?: Error, content?: any) => void) {
         this.lock.readLock(filePath, (release) => {
+
             fs.readFile(filePath, "utf8", (err, content) => {
                 release();
+
                 if (err) {
                     return callback(err);
                 }
 
                 try {
-                    const parsed = JSON.parse(content);
+                    const b64Buffer = Buffer.from(content, "base64").toString("utf8");
+                    const parsed    = JSON.parse(b64Buffer);
                     callback(null, parsed);
                 } catch (err) {
+
                     callback(err);
                 }
             });
@@ -364,8 +368,9 @@ export class DataRepository {
         const frozen = JSON.stringify(copy, null, 4);
 
         this.lock.writeLock(filePath, (release) => {
+            const b64 = new Buffer(frozen).toString("base64");
 
-            fs.outputFile(filePath, frozen, (err, data) => {
+            fs.outputFile(filePath, b64, "utf8", (err, data) => {
                 release();
                 callback(err, data);
             });
