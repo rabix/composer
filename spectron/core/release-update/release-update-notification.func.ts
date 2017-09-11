@@ -30,7 +30,7 @@ describe("new release check", function () {
         assert.equal(modalText, "An error occurred while checking for update information.");
     });
 
-    it("shows that there are no updates if latest version is older than the current one", async function () {
+    it.only("shows that there are no updates if latest version is older than the current one", async function () {
 
         app = await boot(this, {
             overrideModules: [{
@@ -129,8 +129,10 @@ describe("new release check", function () {
     }
 
     function triggerUpdateCheck() {
+        const updateBtnSelector = "[data-test=check-for-updates]";
         return app.client.click("ct-settings-menu")
-            .then(() => app.client.click("[data-test=check-for-updates]"));
+            .then(() => app.client.waitForVisible(updateBtnSelector, 5000))
+            .then(() => app.client.click(updateBtnSelector));
     }
 });
 
