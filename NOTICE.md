@@ -332,4 +332,3 @@
       <td valign="top"><a href="https://github.com/sinonjs/sinon/blob/master/LICENSE">BSD 3-clause</a>
    </tr>
 </table>
-<
