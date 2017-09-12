@@ -48,13 +48,7 @@ fs.copySync(electronDir + "/node_modules", appDistDir + "/node_modules", {
 
 console.log("Starting build process...");
 
-const targets = new Map();
-targets.set(platform.MAC, new Map());
-targets.set(platform.LINUX, new Map());
-targets.set(platform.WINDOWS, new Map());
-
 builder.build({
-    targets,
     config: {
         appId: "io.rabix.composer",
         productName: "rabix-composer",
@@ -65,10 +59,10 @@ builder.build({
             buildResources: "build-resources"
         },
         mac: {
-            target: ["zip", "dir"],
+            target: ["zip", "dir", "dmg"],
         },
         win: {
-            target: ["zip", "portable"],
+            target: ["zip", "portable", "dir"],
         },
         linux: {
             target: ["zip", "dir"],
