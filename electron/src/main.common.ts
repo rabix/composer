@@ -75,7 +75,13 @@ function start(config: { devTools: boolean, url: string }) {
                     }
                 },
                 {type: "separator"},
-                {label: "About", selector: "orderFrontStandardAboutPanel:"},
+                {
+                    label: "About",
+                    accelerator: "showAboutPageModal",
+                    click: (menu, browser) => {
+                        acceleratorProxy.pass(menu, browser, "showAboutPageModal");
+                    }
+                },
                 {type: "separator"},
                 {
                     label: "Quit",
