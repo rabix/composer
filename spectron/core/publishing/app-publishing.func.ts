@@ -1,7 +1,7 @@
 import * as assert from "assert";
 import * as fs from "fs-extra";
 import * as spectron from "spectron";
-import {generateAuthCredentials, generatePlatformProject} from "../../util/generator";
+import {generateAuthCredentials, generateKeychain, generatePlatformProject} from "../../util/generator";
 import {mockSBGClient} from "../../util/sbg-client-proxy";
 import {boot, partialProxy, proxerialize, shutdown} from "../../util/util";
 
@@ -18,7 +18,6 @@ describe("app publishing", () => {
         const demoApp = fs.readFileSync(__dirname + "/stub/demo-app.json", "utf-8");
 
         app = await boot(this, {
-            testTimeout: 10000,
             localRepository: {
                 credentials: [user],
                 activeCredentials: user,
@@ -35,6 +34,7 @@ describe("app publishing", () => {
                 }
             },
             overrideModules: [
+                generateKeychain(),
                 {
                     module: "fs-extra",
                     override: partialProxy("fs-extra", {
@@ -84,14 +84,14 @@ describe("app publishing", () => {
 
         const publishBtn = `[data-test=publish-btn]`;
 
-        await client.waitForEnabled(publishBtn, 2000);
+        await client.waitForEnabled(publishBtn, 10000);
         await client.click(publishBtn);
         await client.waitForVisible(modal);
 
         await client.setValue(nameControl, "Test App Publish");
 
         await client.click(`${projectControl} .selectize-input`);
-        await client.waitForVisible(projectOption, 1000);
+        await client.waitForVisible(projectOption, 5000);
         await client.click(projectOption);
 
 
@@ -99,7 +99,7 @@ describe("app publishing", () => {
         await client.click(submitBtn);
 
         const newTabSelector = `ct-workbox .tab-bar .tab:nth-child(2)`;
-        await client.waitForVisible(newTabSelector, 2000);
+        await client.waitForVisible(newTabSelector, 10000);
         const tabTitle = await client.getText(`${newTabSelector} .title`);
 
         assert.equal(tabTitle, "Test App Publish");
