@@ -16,27 +16,42 @@ import {SendFeedbackModalComponent} from "../modals/send-feedback-modal/send-fee
         <div class="items">
             <!--Item-->
             <div class="item">
-                <p class="subtitle">New to Rabix Composer?</p>
+                <p class="subtitle">Before you start building</p>
 
                 <p>
-                    If you want to use Rabix composer to edit workflows on the Seven Bridges Platform, read our 
-                    <a #quickstartLink 
-                       href="https://github.com/rabix/composer/wiki/Quickstart-for-editing-Platform-workflows"
-                       (click)="system.openLink(quickstartLink.href, $event)"
-                       data-test="platform-quickstart-link">
-                        quickstart for editing Platform workflows.
+                    Learn how to set up your workspace by
+                    <a #localWorkspaceLink
+                       href="https://github.com/rabix/composer/wiki/Configuration#adding-a-local-workspace"
+                       (click)="system.openLink(localWorkspaceLink.href, $event)"
+                       data-test="local-workspace-link">
+                        adding a local workspace
+                    </a>
+                    and
+                    <a #connectingPlatformLink
+                       href="https://github.com/rabix/composer/wiki/Configuration#connecting-a-platform-account"
+                       (click)="system.openLink(connectingPlatformLink.href, $event)"
+                       data-test="connecting-platform-link">
+                        connecting your Platform account.
                     </a>
                 </p>
             </div>
 
             <!--Item-->
             <div class="item">
-                <p class="subtitle">Learn how to build a tool</p>
-                <p>You can upload a Docker image containing your tool to the image registry, then specify its behavior, including inputs and outputs.
-                    <a #docsLink href="https://github.com/rabix/composer/wiki/The-tool-editor" data-test="tool-docs-link"
-                       (click)="system.openLink(docsLink.href, $event)">
-                        Learn more
+                <p class="subtitle">Build tools and workflows</p>
+                <p>
+                    <a #toolLink href="https://github.com/rabix/composer/wiki/Tool-editor-tutorial-1"
+                       data-test="tool-docs-link"
+                       (click)="system.openLink(toolLink.href, $event)">
+                         Wrap your command line tool
                     </a>
+                    using the Common Workflow Language.
+                    <a #platformWorkflowLink href="https://github.com/rabix/composer/wiki/Workflow-editor-tutorial-1"
+                       data-test="platform-workflow-link"
+                       (click)="system.openLink(platformWorkflowLink.href, $event)">
+                         Edit a Platform workflow
+                    </a>
+                     in Rabix Composer.
                 </p>
             </div>
 
@@ -49,7 +64,7 @@ import {SendFeedbackModalComponent} from "../modals/send-feedback-modal/send-fee
                             data-test="get-support-btn"
                             class="btn btn-primary"
                             (click)="initiateFeedbackDialog();">
-                        Get Support
+                        Get in Touch
                     </button>
                 </p>
             </div>

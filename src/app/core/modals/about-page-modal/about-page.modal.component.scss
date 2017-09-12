@@ -1,0 +1,51 @@
+@import "../../../../assets/sass/variables";
+
+:host {
+
+    width: 600px;
+    display: flex;
+    flex-direction: column;
+
+    .body {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .header {
+        display: flex;
+        padding: 2em 2em 2em 2em;
+        flex-direction: column;
+        align-items: center;
+        flex-basis: 190px;
+        background: linear-gradient(45deg, #0d7a90, #11aead);
+    }
+
+    .header-text {
+        font-size: 1.5em;
+    }
+
+    .logo {
+        height: 100px;
+        width: 100px;
+        background: url("../../../../assets/img/rc_icon_256x256.png") no-repeat center;
+        background-size: contain;
+
+    }
+
+    .content {
+        padding: 1rem 2rem 2rem 2rem;
+    }
+
+    hr {
+        background: $black;
+    }
+
+    .description {
+        height: 13em;
+        margin-left: 1rem;
+        margin-right: 1rem;
+        overflow-y: scroll;
+    }
+}
