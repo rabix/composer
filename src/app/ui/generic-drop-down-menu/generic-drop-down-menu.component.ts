@@ -8,7 +8,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 @Component({
     selector: "ct-generic-dropdown-menu",
     template: `
-        <button class="btn-unstyled" (click)="toggleMenu()">
+        <button class="btn btn-unstyled generic-dropdown-button" [disabled]="readonly" (click)="toggleMenu()">
             <!--Transcluded content serves as the button for toggling the dropdown-->
             <ng-content></ng-content>
         </button>
@@ -27,6 +27,12 @@ export class GenericDropDownMenuComponent extends DirectiveBase implements OnIni
      */
     @Input("ct-menu")
     content: TemplateRef<any>;
+
+    /**
+     +     * Sets readonly property on component
+     +     */
+    @Input("readonly")
+    readonly: boolean;
 
     /**
      * Alignment of the dropdown.
