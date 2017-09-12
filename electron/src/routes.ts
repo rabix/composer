@@ -273,7 +273,7 @@ export function fetchPlatformData(data: {
 
         const client = new SBGClient(url, token);
 
-        const projectsPromise   = client.getAllProjects();;
+        const projectsPromise = client.getAllProjects();
         const appsPromise       = client.getAllUserApps();
         const publicAppsPromise = client.getAllPublicApps();
 
