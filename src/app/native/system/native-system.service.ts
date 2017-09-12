@@ -5,12 +5,12 @@ import {ElectronProxyService} from "../proxy/electron-proxy.service";
 @Injectable()
 export class NativeSystemService {
 
-    constructor(private proxy: ElectronProxyService) {
+    constructor(private electron: ElectronProxyService) {
     }
 
     openFolder(options: Electron.OpenDialogOptions = {}, multi = false): Promise<string[]> {
 
-        const {app, dialog} = this.proxy.getRemote();
+        const {app, dialog} = this.electron.getRemote();
 
         const config = Object.assign({
             title: "Choose a Directory",
