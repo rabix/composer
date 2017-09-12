@@ -38,6 +38,7 @@ import {SettingsMenuComponent} from "./workbox/settings-menu.component";
 import {WorkBoxTabComponent} from "./workbox/workbox-tab.component";
 import {WorkBoxComponent} from "./workbox/workbox.component";
 import {WorkboxService} from "./workbox/workbox.service";
+import {AboutPageModalComponent} from "./modals/about-page-modal/about-page-modal.component";
 
 export function errorHandlerFactory(modal: ModalService) {
     return environment.production ? new ModalErrorHandler(modal) : new ErrorHandler();
@@ -45,6 +46,7 @@ export function errorHandlerFactory(modal: ModalService) {
 
 @NgModule({
     entryComponents: [
+        AboutPageModalComponent,
         AddSourceModalComponent,
         SendFeedbackModalComponent,
         ErrorReportComponent,
@@ -57,6 +59,7 @@ export function errorHandlerFactory(modal: ModalService) {
         UpdatePlatformModalComponent
     ],
     declarations: [
+        AboutPageModalComponent,
         LayoutComponent,
         LogoComponent,
         WorkBoxComponent,
