@@ -115,7 +115,7 @@ export class StepInspectorComponent extends DirectiveBase {
         const modal = this.modal.fromComponent(UpdateStepModalComponent, {title: `Update ${appID}?`});
         modal.step  = this.step;
 
-        this.platformRepository.getApp(appID).then((app: RawApp) => {
+        this.platformRepository.getApp(appID, true).then((app: RawApp) => {
             this.statusBar.stopProcess(proc);
             modal.updatedApp = app;
             modal.isLoading  = false;
