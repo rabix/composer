@@ -109,26 +109,30 @@ describe("new release check", function () {
         assert.equal(outOfDateText, true);
     });
 
-    afterEach(async () => {
-        await shutdown(app);
-    });
+    afterEach(() => shutdown(app));
+
+    function whenModalIsReady() {
+        return app.client.waitForVisible("ct-update-platform-modal", 1000);
+    }
 
     function displaysThatAppIsUpToDateText() {
-        return app.client.getText("ct-update-platform-modal .header-text")
-            .then(text => {
-                return text === "Rabix Composer is up to date!";
-            });
+        return whenModalIsReady()
+            .then(() => app.client.getText("ct-update-platform-modal .header-text"))
+            .then(txt => txt === "Rabix Composer is up to date!");
+
     }
 
     function displaysThatAppIsOutOfDateText() {
-        return app.client.getText("ct-update-platform-modal .header-text").then(text => {
-            return text === "A new version of Rabix Composer is available!";
-        });
+        return whenModalIsReady()
+            .then(() => app.client.getText("ct-update-platform-modal .header-text"))
+            .then(text => text === "A new version of Rabix Composer is available!");
     }
 
     function triggerUpdateCheck() {
+        const updateBtnSelector = "[data-test=check-for-updates]";
         return app.client.click("ct-settings-menu")
-            .then(() => app.client.click("[data-test=check-for-updates]"));
+            .then(() => app.client.waitForVisible(updateBtnSelector, 5000))
+            .then(() => app.client.click(updateBtnSelector));
     }
 });
 
