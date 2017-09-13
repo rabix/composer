@@ -61,7 +61,7 @@ import {Component, Input} from "@angular/core";
             </button>
 
             <!--Publish to Platform-->
-            <button class="btn control-button"
+            <button class="btn control-button" data-test="publish-btn"
                     [disabled]="!host.appIsPublishable()"
                     *ngIf="host.tabData.dataSource === 'local'"
                     ct-tooltip="Publish to Platform"
