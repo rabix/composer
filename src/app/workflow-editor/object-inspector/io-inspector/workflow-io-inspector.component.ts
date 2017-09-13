@@ -330,11 +330,11 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
     labelUpdate(ev: FocusEvent) {
         const val = (<HTMLInputElement>ev.srcElement).value;
 
-        if (!val) {
-            this.port.label = undefined;
-        } else if (this.port.label !== val) {
-            this.port.label = val;
+        if (val === this.port.label) {
+            return;
         }
+
+        this.port.label = val ? val : undefined;
         this.graph.redraw();
     }
 
