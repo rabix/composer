@@ -3,10 +3,9 @@ import {Observable} from "rxjs/Observable";
 import {AuthService} from "../../auth/auth.service";
 import {GlobalService} from "../../core/global/global.service";
 import {SystemService} from "../../platform-providers/system.service";
-import {GuidService} from "../../services/guid.service";
+import {IpcService} from "../../services/ipc.service";
 import {JavascriptEvalService} from "../../services/javascript-eval/javascript-eval.service";
 import {ContextService} from "../../ui/context/context.service";
-import {MarkdownService} from "../../ui/markdown/markdown.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {UrlValidator} from "../../validators/url.validator";
 
@@ -17,14 +16,12 @@ import {UrlValidator} from "../../validators/url.validator";
     template: `
         <ct-layout data-test="layout"></ct-layout>
         <div id="runnix" [class.active]="runnix | async"></div>
+
     `,
     styleUrls: ["./../../../assets/sass/main.scss", "./main.component.scss"],
     providers: [
         UrlValidator,
-        MarkdownService,
-        ContextService,
-        // FIXME: this needs to be handled in a system-specific way
-        GuidService
+        ContextService
     ],
 })
 export class MainComponent {
@@ -35,6 +32,7 @@ export class MainComponent {
                 system: SystemService,
                 vcRef: ViewContainerRef,
                 auth: AuthService,
+                ipc: IpcService,
                 global: GlobalService,
                 // DON'T REMOVE THIS PLEASE I KNOW IT DOESN'T HAVE ANY USAGES
                 js: JavascriptEvalService) {
@@ -42,13 +40,33 @@ export class MainComponent {
         system.boot();
 
         // When we first get active credentials (might be undefined if no user is active), sync data with the platform
-        auth.getActive().take(1).toPromise().then(credentials => credentials && global.reloadPlatformData());
+        auth.getActive().take(1).filter(creds => {
+            // Stop if there are either no credentials, or we have the --no-fetch-on-start argument passed to the chromium cli
+            // The cli arg is a useful testing facility.
+            return creds && process.argv.indexOf("--no-fetch-on-start") === -1;
+        }).subscribe(() => {
+            global.reloadPlatformData();
+        });
 
         /**
          * Hack for angular's inability to provide the vcRef to a service with DI.
          * {@link ModalService.rootViewRef}
          */
         modal.setViewContainer(vcRef);
+
+        /**
+         * This has to be after  modal.setViewContainer(vcRef) in order to show the modal.
+         */
+        global.checkForPlatformUpdates().catch(console.warn);
+
+
+        ipc.watch("accelerator", "checkForPlatformUpdates").subscribe(() => {
+            global.checkForPlatformUpdates(true).catch(console.warn);
+        });
+
+        ipc.watch("accelerator", "showAboutPageModal").subscribe(() => {
+            global.showAboutPageModal();
+        });
 
         this.runnix = Observable.fromEvent(document, "keyup").map((e: KeyboardEvent) => e.keyCode).bufferCount(10, 1)
             .filter(seq => seq.toString() === [38, 38, 40, 40, 37, 39, 37, 39, 66, 65].toString())

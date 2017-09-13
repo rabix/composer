@@ -20,6 +20,7 @@ $grid-gutter-width-half: $grid-gutter-width-base / 2;
         .input-label {
             @include ellipsis();
             display: block;
+            padding-right: 10px;
         }
     }
 

@@ -157,7 +157,7 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
             }
 
             if (items && Array.isArray(items)) {
-                items.forEach((item) => {
+                items.map((item) => item.toString()).forEach((item) => {
                     const num = this.component.items.length;
 
                     // Add not user option
@@ -166,6 +166,7 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
                     if (this.component.items.length === num && this.create) {
                         // Add user option
                         this.component.addOption({[this.valueField]: item, [this.labelField]: item});
+                        // If item is not a string, selectize will not create that item
                         this.component.createItem(item, false);
                     }
                 });
@@ -214,13 +215,14 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
             })[0].selectize;
         });
 
-        // Set initial disable/enable state for the component
-        if (this.disabled) {
-            this.component.disable();
-        }
 
         setTimeout(() => {
             this.updateOptions(this.items);
+            // Set initial disable/enable state for the component
+            if (this.disabled) {
+                this.component.disable();
+                this.component.lock();
+            }
         });
     }
 
@@ -228,10 +230,17 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
 
         this.disabled = disabled;
 
-        // If component is null, disable/enable state will be set after component is initialized
+        // If component is null, disable/enable and lock/unlock state will be set after component is initialized
+
         if (this.component) {
 
-            this.disabled ? this.component.disable() : this.component.enable();
+            if (this.disabled) {
+                this.component.disable();
+                this.component.lock();
+            } else {
+                this.component.enable();
+                this.component.unlock();
+            }
         }
     }
 

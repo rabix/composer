@@ -1,4 +1,5 @@
 @import "../../../assets/sass/_variables.scss";
+@import "./../../../assets/sass/mixins";
 
 :host {
 
@@ -25,12 +26,22 @@
     }
 
     .ui-modal-header {
+        display: flex;
         border: 0 solid;
         line-height: 2.5em;
         text-align: left;
         border-radius: 2px 2px 0 0;
         background: $modal_header-bg;
         border-bottom: 1px solid $modal-footer-border-color;
+    }
+
+    .ui-modal-title {
+        flex: 1;
+        @include ellipsis();
+    }
+
+    .ui-modal-close-icon {
+        line-height: 2.5em;
     }
 
     .modal-title {

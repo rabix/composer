@@ -19,8 +19,8 @@ export class AuthCredentials implements UserPlatformIdentifier {
     token: string;
 
     constructor(url: string, token: string, user: User) {
-        this.ensureValidURL(url);
-        this.ensureValidToken(token);
+        // this.ensureValidURL(url);
+        // this.ensureValidToken(token);
 
         this.url   = url;
         this.token = token;
@@ -137,13 +137,13 @@ export class AuthCredentials implements UserPlatformIdentifier {
 
     private ensureValidToken(token: string): void {
         if (AuthCredentials.isValidToken(token) === false) {
-            throw `Invalid token: ${token}`;
+            throw new Error("Given token is not valid: " + token);
         }
     }
 
     private ensureValidURL(url: string): void {
         if (AuthCredentials.isValidURL(url) === false) {
-            throw `Invalid URL: ${url}`;
+            throw new Error("Invalid platform URL: " + url);
         }
     }
 }

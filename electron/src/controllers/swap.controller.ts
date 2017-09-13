@@ -1,6 +1,8 @@
 import * as fs from "fs";
 import * as md5 from "md5";
 import * as mkdirp from "mkdirp";
+import * as path from "path";
+import {decodeBase64, encodeBase64} from "../security/encoder";
 
 export class SwapController {
 
@@ -27,7 +29,7 @@ export class SwapController {
     remove(fp: string, callback: (err?: Error, data?: any) => void) {
         const hash = this.makeHashedPath(fp);
 
-        fs.unlink(hash, (err?, done?) =>{
+        fs.unlink(hash, (err?, done?) => {
             // Ignore failures, just return when it's done.
             // It might not be there in the first place, so the error is fine.
             callback(null, done);
@@ -53,11 +55,17 @@ export class SwapController {
     read(fp: string, callback: (err?: Error, data?: string) => void) {
         const fullPath = this.makeHashedPath(fp);
 
-        fs.readFile(fullPath, "utf8", callback);
+        fs.readFile(fullPath, "utf8", (err, content) => {
+            if (err) return callback(err);
+
+            const decoded = decodeBase64(content);
+            callback(null, decoded);
+
+        });
     }
 
     private makeHashedPath(fp: string): string {
-        return this.rootDir + "/" + this.hash(fp);
+        return this.rootDir + path.sep + this.hash(fp);
     }
 
     private hash(path: string): string {
@@ -71,7 +79,10 @@ export class SwapController {
         const pathQueue = this.writeQueue[fp];
 
         const executor = () => {
-            fs.writeFile(fp, content, "utf8", (err?, data?) => {
+
+            const encoded = encodeBase64(content);
+
+            fs.writeFile(fp, encoded, "utf8", (err?, data?) => {
                 if (err) return callback(err);
 
                 callback(null, data);

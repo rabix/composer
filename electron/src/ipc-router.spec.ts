@@ -1,13 +1,15 @@
 import chai = require("chai");
+
 import proxy = require("proxyquire");
 import sinon = require("sinon");
 
 const assert = chai.assert;
 
 
-describe("IPC Router", () => {
+describe.skip("IPC Router", function () {
 
-    it("should register the data-request event callback", (done) => {
+
+    it.skip("should register the data-request event cb", function (done) {
 
         const electron = {ipcMain: {on: sinon.spy()}};
         const router   = proxy("./ipc-router", {electron});
@@ -27,7 +29,7 @@ describe("IPC Router", () => {
         done();
     });
 
-    it("should call the appropriate controller function when required and return the response", (done) => {
+    it("should call the appropriate controller function when required and return the response", function (done) {
         const send = sinon.spy();
 
         const testRouteEndpoint = sinon.spy((data, callback) => {

@@ -1,6 +1,6 @@
 import {NgModule} from "@angular/core";
 import {FormBuilder, FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {HttpModule, RequestOptions, XHRBackend} from "@angular/http";
+import {HttpModule} from "@angular/http";
 import {BrowserModule} from "@angular/platform-browser";
 import "rxjs/Rx";
 import {AuthService} from "./auth/auth.service";
@@ -12,13 +12,11 @@ import {GlobalService} from "./core/global/global.service";
 import {CWLModule} from "./cwl/cwl.module";
 import {EditorCommonModule} from "./editor-common/editor-common.module";
 import {FileRepositoryService} from "./file-repository/file-repository.service";
-import {CtHttp} from "./http/ct-http.service";
 import {StatusBarService} from "./layout/status-bar/status-bar.service";
 import {NativeModule} from "./native/native.module";
 import {LocalRepositoryService} from "./repository/local-repository.service";
 import {PlatformRepositoryService} from "./repository/platform-repository.service";
 import {DomEventService} from "./services/dom/dom-event.service";
-import {GuidService} from "./services/guid.service";
 import {IpcService} from "./services/ipc.service";
 import {JavascriptEvalService} from "./services/javascript-eval/javascript-eval.service";
 import {SettingsService} from "./services/settings/settings.service";
@@ -32,24 +30,17 @@ import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
         AuthService,
         DataGatewayService,
         DomEventService,
+        FileRepositoryService,
         FormBuilder,
-        GuidService,
+        GlobalService,
         IpcService,
+        JavascriptEvalService,
         LocalRepositoryService,
         ModalService,
         PlatformConnectionService,
-        StatusBarService,
         PlatformRepositoryService,
-        GlobalService,
         SettingsService,
-        FileRepositoryService,
-        {
-            provide: CtHttp,
-            useFactory: ctHttpFactory,
-            deps: [XHRBackend, RequestOptions]
-        },
-        JavascriptEvalService
-
+        StatusBarService
     ],
     declarations: [
         MainComponent,
@@ -71,11 +62,4 @@ import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
 })
 export class AppModule {
 
-    constructor() {
-
-    }
-}
-
-export function ctHttpFactory(xhrBackend: XHRBackend, requestOptions: RequestOptions): CtHttp {
-    return new CtHttp(xhrBackend, requestOptions);
 }

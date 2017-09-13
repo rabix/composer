@@ -2,7 +2,7 @@ import {Component, forwardRef, Input, OnDestroy, ViewEncapsulation} from "@angul
 import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
 import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 import {noop} from "../../../lib/utils.lib";
-import {GuidService} from "../../../services/guid.service";
+import {Guid} from "../../../services/guid.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {CustomValidators} from "../../../validators/custom.validator";
@@ -71,11 +71,12 @@ export class ExpressionModelListComponent extends DirectiveBase implements Contr
 
     private propagateChange = noop;
 
+
     input: SBDraft2ExpressionModel[];
 
     form: FormGroup = new FormGroup({});
 
-    constructor(private guidService: GuidService, private modal: ModalService) {
+    constructor(private modal: ModalService) {
         super();
     }
 
@@ -84,7 +85,7 @@ export class ExpressionModelListComponent extends DirectiveBase implements Contr
 
         this.formList = this.input.map(model => {
             return {
-                id: this.guidService.generate(), model
+                id: Guid.generate(), model
             };
         });
 
@@ -119,7 +120,7 @@ export class ExpressionModelListComponent extends DirectiveBase implements Contr
 
     addExpressionModel(): void {
         const newCmd = {
-            id: this.guidService.generate(),
+            id: Guid.generate(),
             model: new SBDraft2ExpressionModel("")
         };
 

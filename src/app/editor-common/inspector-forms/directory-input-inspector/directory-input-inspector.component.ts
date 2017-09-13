@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, OnChanges} from "@angular/core";
 import {FormControl, FormGroup} from "@angular/forms";
 
 @Component({
@@ -20,7 +20,7 @@ import {FormControl, FormGroup} from "@angular/forms";
     `,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DirectoryInputInspectorComponent implements OnInit {
+export class DirectoryInputInspectorComponent implements OnInit, OnChanges {
     /** Input data for the component */
     @Input()
     public input: any = {};
@@ -28,6 +28,9 @@ export class DirectoryInputInspectorComponent implements OnInit {
     /** Emits when the form data changed */
     @Output()
     public update = new EventEmitter();
+
+    @Input()
+    public path: string;
 
     formGroup: FormGroup;
 
@@ -41,5 +44,17 @@ export class DirectoryInputInspectorComponent implements OnInit {
         this.formGroup.valueChanges.subscribe(data => {
             this.update.emit(data);
         });
+    }
+
+    ngOnChanges() {
+
+        if (!this.input) {
+            return;
+        }
+
+        // Form group is not present on first call
+        if (this.formGroup) {
+            this.formGroup.get("path").setValue(this.path, {onlySelf: true});
+        }
     }
 }

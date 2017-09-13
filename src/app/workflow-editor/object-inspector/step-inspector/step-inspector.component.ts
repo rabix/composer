@@ -9,6 +9,7 @@ import {PlatformRepositoryService} from "../../../repository/platform-repository
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {UpdateStepModalComponent} from "../../update-step-modal/update-step-modal.component";
+import {AppHelper} from "../../../core/helpers/AppHelper";
 
 @Component({
     selector: "ct-workflow-step-inspector",
@@ -17,8 +18,9 @@ import {UpdateStepModalComponent} from "../../update-step-modal/update-step-moda
 
         <!--Update warning-->
         <div class="alert alert-update form-control-label" *ngIf="step.hasUpdate && !readonly">
-            A new version of this app is available! 
-            <button class="btn-unstyled p-0 update-btn" (click)="updateStep($event)">Update</button> to get the latest changes.
+            A new version of this app is available!
+            <button class="btn-unstyled p-0 update-entry" (click)="updateStep($event)">Update</button>
+            to get the latest changes.
         </div>
 
         <!--View Modes-->
@@ -42,7 +44,7 @@ import {UpdateStepModalComponent} from "../../update-step-modal/update-step-moda
             </ct-tab-selector>
         </ct-action-bar>
 
-        <!--Inputs-->        
+        <!--Inputs-->
         <ct-workflow-step-inspector-inputs *ngIf="viewMode === tabs.Inputs"
                                            [step]="step"
                                            [inputs]="step.in"
@@ -53,7 +55,7 @@ import {UpdateStepModalComponent} from "../../update-step-modal/update-step-moda
         </ct-workflow-step-inspector-inputs>
 
         <!--Info-->
-        <ct-workflow-step-inspector-info *ngIf="viewMode === tabs.Info"                                         
+        <ct-workflow-step-inspector-info *ngIf="viewMode === tabs.Info"
                                          [step]="step">
         </ct-workflow-step-inspector-info>
 
@@ -107,13 +109,13 @@ export class StepInspectorComponent extends DirectiveBase {
     updateStep(ev: Event) {
         ev.preventDefault();
 
-        const appID = this.step.run.customProps["sbg:id"].split("/").slice(0, 3).join("/");
+        const appID = AppHelper.getAppIDWithRevision(this.step.run.customProps["sbg:id"], null);
         const proc  = this.statusBar.startProcess("Updating " + appID);
 
         const modal = this.modal.fromComponent(UpdateStepModalComponent, {title: `Update ${appID}?`});
         modal.step  = this.step;
 
-        this.platformRepository.getApp(appID).then((app: RawApp) => {
+        this.platformRepository.getApp(appID, true).then((app: RawApp) => {
             this.statusBar.stopProcess(proc);
             modal.updatedApp = app;
             modal.isLoading  = false;

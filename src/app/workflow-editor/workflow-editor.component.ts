@@ -4,7 +4,9 @@ import * as Yaml from "js-yaml";
 import {Observable} from "rxjs/Observable";
 import {CodeSwapService} from "../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
+import {AppHelper} from "../core/helpers/AppHelper";
 import {ErrorWrapper} from "../core/helpers/error-wrapper";
+import {WorkboxService} from "../core/workbox/workbox.service";
 import {AppEditorBase} from "../editor-common/app-editor-base/app-editor-base";
 import {AppValidatorService} from "../editor-common/app-validator/app-validator.service";
 import {PlatformAppService} from "../editor-common/components/platform-app-common/platform-app.service";
@@ -12,11 +14,8 @@ import {EditorInspectorService} from "../editor-common/inspector/editor-inspecto
 import {APP_SAVER_TOKEN} from "../editor-common/services/app-saving/app-saver.interface";
 import {LocalFileSavingService} from "../editor-common/services/app-saving/local-file-saving.service";
 import {PlatformAppSavingService} from "../editor-common/services/app-saving/platform-app-saving.service";
-import {
-    ExecutorService} from "../executor/executor.service";
-import {ErrorNotification,
-    NotificationBarService
-} from "../layout/notification-bar/notification-bar.service";
+import {ExecutorService} from "../executor/executor.service";
+import {ErrorNotification, NotificationBarService} from "../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../layout/status-bar/status-bar.service";
 import {PlatformRepositoryService} from "../repository/platform-repository.service";
 import {IpcService} from "../services/ipc.service";
@@ -59,6 +58,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                 protected platformRepository: PlatformRepositoryService,
                 private cdr: ChangeDetectorRef,
                 platformAppService: PlatformAppService,
+                workbox: WorkboxService,
                 executorService: ExecutorService) {
         super(
             statusBar,
@@ -71,6 +71,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
             codeSwapService,
             platformAppService,
             platformRepository,
+            workbox,
             executorService
         );
     }
@@ -94,6 +95,8 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
 
     @ViewChild(WorkflowGraphEditorComponent)
     graphEditor: WorkflowGraphEditorComponent;
+
+    private hasPendingRedraw = false;
 
     private graphDrawQueue: Function[] = [];
 
@@ -129,7 +132,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                     return;
                 }
 
-                return step.run.customProps["sbg:id"].split("/").slice(0, 3).join("/");
+                return AppHelper.getAppIDWithRevision(step.run.customProps["sbg:id"], null);
             })
             .filter(v => v);
 
@@ -142,7 +145,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
 
                 const appRevisionMap = result.reduce((acc, item) => {
 
-                    const revisionlessID = item.id.split("/").slice(0, 3).join("/");
+                    const revisionlessID = AppHelper.getRevisionlessID(item.id);
                     return {...acc, [revisionlessID]: item.revision};
                 }, {});
 
@@ -152,8 +155,8 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                     if (!step.run.customProps || !step.run.customProps["sbg:id"]) {
                         return;
                     }
-                    const revisionless = step.run.customProps["sbg:id"].split("/").slice(0, 3).join("/");
-                    const revision     = Number(step.run.customProps["sbg:id"].split("/").pop());
+                    const revisionless = AppHelper.getAppIDWithRevision(step.run.customProps["sbg:id"], null);
+                    const revision     = AppHelper.getRevision(step.run.customProps["sbg:id"]);
 
                     if (appRevisionMap[revisionless] === undefined) {
                         return;
@@ -164,7 +167,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
 
                 setTimeout(() => {
                     if (this.graphEditor && this.graphEditor.graph) {
-                        this.graphEditor.graph.redraw();
+                        this.hasPendingRedraw = !this.graphEditor.redrawIfCanDrawInWorkflow();
                     }
 
                     this.cdr.markForCheck();
@@ -189,6 +192,10 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
     onTabActivation(): void {
         if (this.graphEditor) {
             this.graphEditor.checkOutstandingGraphFitting();
+
+            if (this.hasPendingRedraw) {
+                this.hasPendingRedraw = !this.graphEditor.redrawIfCanDrawInWorkflow();
+            }
         }
     }
 

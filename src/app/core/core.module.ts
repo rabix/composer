@@ -7,8 +7,8 @@ import {AuthModule} from "../auth/auth.module";
 import {EditorCommonModule} from "../editor-common/editor-common.module";
 import {ExecutorService} from "../executor/executor.service";
 import {LayoutModule} from "../layout/layout.module";
-import {GuidService} from "../services/guid.service";
 import {ToolEditorModule} from "../tool-editor/tool-editor.module";
+import {MarkdownService} from "../ui/markdown/markdown.service";
 import {ModalService} from "../ui/modal/modal.service";
 import {UIModule} from "../ui/ui.module";
 import {WorkflowEditorModule} from "../workflow-editor/workflow-editor.module";
@@ -17,6 +17,7 @@ import {ModalErrorHandler} from "./error-report/modal-error-handler";
 import {LayoutComponent} from "./layout/layout.component";
 import {LayoutService} from "./layout/layout.service";
 import {LogoComponent} from "./logo/logo.component";
+import {AboutPageModalComponent} from "./modals/about-page-modal/about-page-modal.component";
 import {AddSourceModalComponent} from "./modals/add-source-modal/add-source-modal.component";
 import {CreateAppModalComponent} from "./modals/create-app-modal/create-app-modal.component";
 import {CreateLocalFolderModalComponent} from "./modals/create-local-folder-modal/create-local-folder-modal.component";
@@ -25,6 +26,7 @@ import {PlatformCredentialsModalComponent} from "./modals/platform-credentials-m
 import {ProceedToEditingModalComponent} from "./modals/proceed-to-editing-modal/proceed-to-editing-modal.component";
 import {PublishModalComponent} from "./modals/publish-modal/publish-modal.component";
 import {SendFeedbackModalComponent} from "./modals/send-feedback-modal/send-feedback.modal.component";
+import {UpdatePlatformModalComponent} from "./modals/update-platform-modal/update-platform-modal.component";
 import {GettingStartedComponent} from "./onboarding/getting-started.component";
 import {WelcomeTabComponent} from "./onboarding/welcome.component";
 import {AppsPanelComponent} from "./panels/apps-panel/apps-panel.component";
@@ -45,6 +47,7 @@ export function errorHandlerFactory(modal: ModalService) {
 
 @NgModule({
     entryComponents: [
+        AboutPageModalComponent,
         AddSourceModalComponent,
         SendFeedbackModalComponent,
         ErrorReportComponent,
@@ -54,8 +57,10 @@ export function errorHandlerFactory(modal: ModalService) {
         PublishModalComponent,
         HintsModalComponent,
         PlatformCredentialsModalComponent,
+        UpdatePlatformModalComponent
     ],
     declarations: [
+        AboutPageModalComponent,
         LayoutComponent,
         LogoComponent,
         WorkBoxComponent,
@@ -77,19 +82,20 @@ export function errorHandlerFactory(modal: ModalService) {
         ProceedToEditingModalComponent,
         PublishModalComponent,
         HintsModalComponent,
-        PlatformCredentialsModalComponent
+        PlatformCredentialsModalComponent,
+        UpdatePlatformModalComponent
     ],
     exports: [
         LogoComponent,
         LayoutComponent,
     ],
     providers: [
-        GuidService,
         WebWorkerBuilderService,
         WorkboxService,
         ModalService,
         LayoutService,
         ExecutorService,
+        MarkdownService,
         {
             provide: ErrorHandler,
             useFactory: errorHandlerFactory,

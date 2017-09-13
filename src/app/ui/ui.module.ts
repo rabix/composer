@@ -48,6 +48,8 @@ import {TooltipContentComponent} from "./tooltip/tooltip-content.component";
 import {TooltipDirective} from "./tooltip/tooltip.directive";
 import {TreeNodeComponent} from "./tree-view/tree-node/tree-node.component";
 import {TreeViewComponent} from "./tree-view/tree-view.component";
+import {ErrorComponent} from "./modal/common/error.component";
+import {TreeNodeLabelDirective} from "./tree-view/tree-node-label-directive";
 
 @NgModule({
     imports: [
@@ -86,6 +88,7 @@ import {TreeViewComponent} from "./tree-view/tree-view.component";
         TooltipContentComponent,
         TooltipDirective,
         TreeNodeComponent,
+        TreeNodeLabelDirective,
         TreeViewComponent,
         MouseClickDirective,
         TrimValueAccessor,
@@ -95,6 +98,7 @@ import {TreeViewComponent} from "./tree-view/tree-view.component";
     entryComponents: [
         DropDownButtonComponent,
         DropDownMenuComponent,
+        ErrorComponent,
         ModalComponent,
         TooltipContentComponent,
         ConfirmComponent,
@@ -112,6 +116,7 @@ import {TreeViewComponent} from "./tree-view/tree-view.component";
         CodeEditorComponent,
         CodePreviewComponent,
         CodeEditorXComponent,
+        ErrorComponent,
         ModalComponent,
         ContextDirective,
         ConfirmComponent,
@@ -150,6 +155,7 @@ import {TreeViewComponent} from "./tree-view/tree-view.component";
         TooltipContentComponent,
         TooltipDirective,
         TreeNodeComponent,
+        TreeNodeLabelDirective,
         TreeViewComponent,
         CircularLoaderComponent,
         MouseClickDirective,

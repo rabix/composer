@@ -37,7 +37,7 @@ const {dialog} = window["require"]("electron").remote;
     encapsulation: ViewEncapsulation.None,
     styleUrls: ["./workflow-graph-editor.component.scss"],
     template: `
-        <div *ngIf="model && model.steps.length === 0" class="svg-graph-empty-state"></div>
+        <div *ngIf="model && isGraphEmpty()" class="svg-graph-empty-state"></div>
 
         <svg #canvas class="cwl-workflow" tabindex="-1"
              ct-click
@@ -130,11 +130,11 @@ const {dialog} = window["require"]("electron").remote;
                     </ct-workflow-step-inspector>
 
                     <ct-workflow-io-inspector
-                            *ngIf="typeOfInspectedNode() === 'Input' || typeOfInspectedNode() === 'Output'"
-                            [port]="inspectedNode"
-                            [graph]="graph"
-                            [workflowModel]="model"
-                            [readonly]="readonly">
+                        *ngIf="typeOfInspectedNode() === 'Input' || typeOfInspectedNode() === 'Output'"
+                        [port]="inspectedNode"
+                        [graph]="graph"
+                        [workflowModel]="model"
+                        [readonly]="readonly">
 
                     </ct-workflow-io-inspector>
 
@@ -181,6 +181,8 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
     private historyHandler: (ev: KeyboardEvent) => void;
 
+    private scaleStep = .1;
+
     /**
      * If we're trying to trigger operations on graph that require viewport calculations (like fitting to viewport)
      * it might break because the viewport might not be available. This can happen if n tabs are being opened at the same time
@@ -189,7 +191,6 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
      */
     private tryToFitWorkflowOnNextTabActivation = false;
 
-    private emptyState                            = false;
     private functionsWaitingForRender: Function[] = [];
 
     constructor(private gateway: DataGatewayService,
@@ -214,7 +215,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         // Apparently this is the desired and documented solution?
         // https://angular.io/docs/ts/latest/cookbook/component-communication.html#!#parent-to-view-child
         setTimeout(() => {
-            if (Workflow.canDrawIn(this.canvas.nativeElement)) {
+            if (this.canDraw()) {
                 this.drawGraphAndAttachListeners();
             } else {
                 this.tryToFitWorkflowOnNextTabActivation = true;
@@ -340,14 +341,14 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             this.resetInspectedNodeReference();
         }
 
-        if (this.graph && this.canvas && Workflow.canDrawIn(this.canvas.nativeElement)) {
+        if (this.graph && this.canvas && this.canDraw()) {
             this.graph.redraw(this.model as any);
         }
     }
 
     upscale() {
         if (this.graph.getScale() <= Workflow.maxScale) {
-            const newScale = this.graph.getScale() + .1;
+            const newScale = this.graph.getScale() + this.scaleStep;
             this.graph.scaleWorkflowCenter(newScale > Workflow.maxScale ?
                 Workflow.maxScale : newScale);
         }
@@ -355,7 +356,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
     downscale() {
         if (this.graph.getScale() >= Workflow.minScale) {
-            const newScale = this.graph.getScale() - .1;
+            const newScale = this.graph.getScale() - this.scaleStep;
             this.graph.scaleWorkflowCenter(newScale < Workflow.minScale ?
                 Workflow.minScale : newScale);
         }
@@ -407,7 +408,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         }).then((resolved: Process) => {
             // if the app is local, give it an id that's the same as its filename (if doesn't exist)
             if (isLocal) {
-                resolved.id = resolved.id || AppHelper.getBasename(nodeID);
+                resolved.id = resolved.id || AppHelper.getBasename(nodeID, true);
             }
 
             this.workflowEditorService.putInHistory(this.model);
@@ -530,7 +531,20 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         });
     }
 
+    redrawIfCanDrawInWorkflow(): boolean {
 
+        if (this.canDraw()) {
+            this.graph.redraw();
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if we still have to draw the graph for the first time
+     * Do that if necessary
+     */
     checkOutstandingGraphFitting() {
         if (this.tryToFitWorkflowOnNextTabActivation === false) {
             return;
@@ -554,6 +568,11 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             if (!path) {
                 return;
             }
+
+            if( !path.endsWith(".svg")){
+            path +=  ".svg" ;
+            }
+
             this.ipc.request("saveFileContent", {
                 path,
                 content
@@ -625,6 +644,19 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         traverse(clone, root);
 
         return new XMLSerializer().serializeToString(clone);
+    }
 
+    /**
+     +     * Tells whether graph is empty (nothing to render on SVG)
+     +     */
+    isGraphEmpty() {
+        return this.model && !(this.model.steps.length || this.model.inputs.length || this.model.outputs.length);
+    }
+
+    /**
+     * Tells whether there is a canvas in which workflow can be drawn
+     */
+    private canDraw(): boolean {
+        return Workflow.canDrawIn(this.canvas.nativeElement);
     }
 }

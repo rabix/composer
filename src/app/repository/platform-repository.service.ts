@@ -210,8 +210,8 @@ export class PlatformRepositoryService {
         return this.ipc.request("getAppUpdates", {appIDs}).toPromise();
     }
 
-    getApp(id: string): Promise<RawApp> {
-        return this.ipc.request("getPlatformApp", {id}).toPromise().then((appText: string) => {
+    getApp(id: string, forceFetch = false): Promise<RawApp> {
+        return this.ipc.request("getPlatformApp", {id, forceFetch}).toPromise().then((appText: string) => {
             return JSON.parse(appText);
         });
     }

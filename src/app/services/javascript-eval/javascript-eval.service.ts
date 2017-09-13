@@ -1,7 +1,7 @@
 import {Injectable, NgZone} from "@angular/core";
 import {ExpressionEvaluator} from "cwlts/models";
 import {Observable} from "rxjs/Observable";
-import {GuidService} from "../guid.service";
+import {Guid} from "../guid.service";
 
 @Injectable()
 export class JavascriptEvalService {
@@ -10,7 +10,7 @@ export class JavascriptEvalService {
 
     private pendingRequestsForEvaluation = {};
 
-    constructor(private guid: GuidService, private zone: NgZone) {
+    constructor(private zone: NgZone) {
 
         this.zone.runOutsideAngular(() => {
 
@@ -213,7 +213,7 @@ export class JavascriptEvalService {
 
     public evaluateCode(expression?: string, context?: any, timeout: Number = 300) {
 
-        const generatedId = this.guid.generate();
+        const generatedId = Guid.generate();
 
         this.zone.runOutsideAngular(() => {
             this.iFrame.contentWindow.postMessage({

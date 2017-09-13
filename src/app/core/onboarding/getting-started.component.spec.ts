@@ -48,11 +48,11 @@ describe("GettingStartedComponent", () => {
         expect(component).toBeTruthy("Component could not be instantiated");
     });
 
-    it("should open 'New to Rabix Composer' link in browser", () => {
+    it("should open 'adding a local workspace' link in browser", () => {
 
-        const wikiLink = "https://github.com/rabix/cottontail-frontend/wiki/Introduction-to-Rabix-and-Rabix-Composer";
+        const wikiLink = "https://github.com/rabix/composer/wiki/Configuration#adding-a-local-workspace";
 
-        const toolDocsLink = fixture.debugElement.query(By.css("[data-test=new-to-link]"));
+        const toolDocsLink = fixture.debugElement.query(By.css("[data-test=local-workspace-link]"));
         const system       = fixture.debugElement.injector.get(SystemService);
         const linkSpy      = spyOn(system, "openLink");
 
@@ -61,10 +61,35 @@ describe("GettingStartedComponent", () => {
         expect(linkSpy).toHaveBeenCalledWith(wikiLink, jasmine.anything());
     });
 
-    it("should open 'Learn how to build a tool' link in browser", () => {
-        const wikiLink = "https://github.com/rabix/composer/wiki/The-tool-editor";
+    it("should open 'connecting your Platform account.' link in browser", () => {
+
+        const wikiLink = "https://github.com/rabix/composer/wiki/Configuration#connecting-a-platform-account";
+
+        const toolDocsLink = fixture.debugElement.query(By.css("[data-test=connecting-platform-link]"));
+        const system       = fixture.debugElement.injector.get(SystemService);
+        const linkSpy      = spyOn(system, "openLink");
+
+        toolDocsLink.triggerEventHandler("click", {});
+
+        expect(linkSpy).toHaveBeenCalledWith(wikiLink, jasmine.anything());
+    });
+
+    it("should open 'Wrap your command line tool' link in browser", () => {
+        const wikiLink = "https://github.com/rabix/composer/wiki/Tool-editor-tutorial-1";
 
         const toolDocsLink = fixture.debugElement.query(By.css("[data-test=tool-docs-link]"));
+        const system       = fixture.debugElement.injector.get(SystemService);
+        const linkSpy      = spyOn(system, "openLink");
+
+        toolDocsLink.triggerEventHandler("click", {});
+
+        expect(linkSpy).toHaveBeenCalledWith(wikiLink, jasmine.anything());
+    });
+
+    it("should open 'Edit a Platform workflow' link in browser", () => {
+        const wikiLink = "https://github.com/rabix/composer/wiki/Workflow-editor-tutorial-1";
+
+        const toolDocsLink = fixture.debugElement.query(By.css("[data-test=platform-workflow-link]"));
         const system       = fixture.debugElement.injector.get(SystemService);
         const linkSpy      = spyOn(system, "openLink");
 

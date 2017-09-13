@@ -1,10 +1,18 @@
-import {RepositoryHook} from "./hooks/repository-hook";
 import * as ReadWriteLock from "rwlock";
+import {decodeBase64, encodeBase64} from "../security/encoder";
+import {RepositoryHook} from "./hooks/repository-hook";
 import {LocalRepository} from "./types/local-repository";
 import {RepositoryType} from "./types/repository-type";
 import {UserRepository} from "./types/user-repository";
 
-const fs = require("fs-extra");
+const fs       = require("fs-extra");
+const keychain = require("../keychain");
+const logger   = require("../logger").Log;
+type UpdateChange = {
+    newValue: any;
+    oldValue: any;
+}
+type UpdateChanges = Map<string, UpdateChange>;
 
 export class DataRepository {
 
@@ -15,6 +23,7 @@ export class DataRepository {
     private listeners = {};
     private hooks     = new Set<RepositoryHook>();
     private profileDirectory: string;
+
 
     constructor(profileDirectory: string) {
 
@@ -46,7 +55,34 @@ export class DataRepository {
             });
         });
 
+        this.on("update.local", (_, changes) => {
+            /**
+             * When credentials in local profile get updated, we might have to remove some tokens from the keychain.
+             */
+            if (changes && changes.has("credentials")) {
+                const {oldValue, newValue} = changes.get("credentials");
+
+                const oldIDs = oldValue.map(c => c.id);
+                const newIDs = newValue.map(c => c.id);
+
+                // Get all ids that existed earlier, but not anymore.
+                const prune = oldIDs.filter(id => newIDs.indexOf(id) === -1);
+
+                prune.forEach(cid => keychain.remove(cid).catch(err => {
+                    logger.error("Failed to remove token from keychain.", err);
+                }));
+            }
+        });
+
         this.on("update.local.credentials", () => {
+
+            this.local.credentials.forEach(c => {
+
+                keychain.set(c.id, c.token).catch(ex => {
+                    logger.error("Keychain error", ex);
+                });
+            });
+
             this.cleanProfiles();
         });
     }
@@ -78,20 +114,35 @@ export class DataRepository {
                 })();
             });
 
-            hooksLoaded.then(() => {
-                if (!localData.activeCredentials) {
-                    return callback();
-                }
+            // Load tokens
+            const keychainTokens = Promise.all(this.local.credentials.map(c => keychain.get(c.id)));
 
-                this.loadProfile(localData.activeCredentials.id, new UserRepository(), (err, userData) => {
-                    if (err) return callback(err);
+            hooksLoaded
+                .then(() => keychainTokens)
+                .then(tokens => {
+                    this.local.credentials.forEach((c, idx) => {
+                        c.token = tokens[idx];
+                    });
 
-                    this.user = userData;
+                    // If there are no active credentials, there are no other profiles to load, so break here
+                    if (!localData.activeCredentials) {
+                        callback();
+                        return;
+                    }
 
-                    callback();
-                });
-            }, callback)
+                    // If there are active credentials, patch it's token from keychain as well
+                    this.local.activeCredentials.token = this.local.credentials.find(cred => cred.id === this.local.activeCredentials.id).token;
+                    this.loadProfile(localData.activeCredentials.id, new UserRepository(), (err, userData) => {
+                        if (err) {
+                            callback(err);
+                            return;
+                        }
 
+                        this.user = userData;
+
+                        callback();
+                    });
+                }, callback);
 
         });
     }
@@ -120,7 +171,7 @@ export class DataRepository {
      * Sets a listener for an event name
      * @return off function
      */
-    on(eventType: string, callback: (result: any) => void): () => void {
+    on(eventType: string, callback: (result: any, changes?: UpdateChanges) => void): () => void {
 
         if (!this.listeners[eventType]) {
             this.listeners[eventType] = [];
@@ -150,17 +201,30 @@ export class DataRepository {
         return this.local.credentials.find(c => c.id === profile) !== undefined;
     }
 
+    private getUpdateDiff(main, patch): UpdateChanges {
+        const patchMap = new Map();
+        Object.keys(patch).forEach((key) => {
+            patchMap.set(key, {
+                newValue: patch[key],
+                oldValue: main[key]
+            });
+        });
+
+        return patchMap;
+    }
+
     private update<T extends RepositoryType>(profile: string,
                                              data: Partial<T>,
                                              callback: (err?: Error, data?: T) => void = () => {
                                              }) {
 
         const profilePath = this.getProfileFilePath(profile);
-        this.trigger("update", {user: this.user, local: this.local});
 
         if (profile === "local") {
+
+            const changes = this.getUpdateDiff(this.local, data);
             Object.assign(this.local, data);
-            this.trigger("update.local", this.local);
+            this.trigger("update.local", this.local, changes);
             this.storageWrite(profilePath, this.local, callback);
         } else {
 
@@ -169,12 +233,18 @@ export class DataRepository {
             if (this.profileMatchesActiveUser(profile)) {
                 // This is the case where updated user is the current user. We can patch the this.user cache
 
+                let diff: UpdateChanges;
+
                 if (this.user) {
+                    diff = this.getUpdateDiff(this.user, data);
                     Object.assign(this.user, data);
                 } else {
-                    this.user = Object.assign(new UserRepository(), data);
+                    const blankUser = new UserRepository();
+                    diff            = this.getUpdateDiff(blankUser, data);
+                    this.user       = Object.assign(blankUser, data);
                 }
-                this.trigger(`update.user`, this.user);
+
+                this.trigger(`update.user`, this.user, diff);
                 this.storageWrite(profilePath, this.user, callback);
             } else {
                 // If update is for a non-active user, we need to load that user's data and patch that instead
@@ -193,8 +263,11 @@ export class DataRepository {
                 this.loadProfile(profile, new UserRepository(), (err, loadedProfileData) => {
                     if (err) return callback(err);
 
-                    this.trigger(`update.${profile}`, data);
-                    this.storageWrite(profilePath, Object.assign(loadedProfileData, data), callback);
+                    const diff = this.getUpdateDiff(loadedProfileData, data);
+                    this.trigger(`update.${profile}`, data, diff);
+
+                    const patched = Object.assign(loadedProfileData, data);
+                    this.storageWrite(profilePath, patched, callback);
                 });
 
             }
@@ -252,7 +325,7 @@ export class DataRepository {
         }
     }
 
-    private trigger(event, data) {
+    private trigger(event, data, changes?: UpdateChanges) {
         const eventParts = event.split(".");
 
         eventParts.forEach((val, index) => {
@@ -260,7 +333,7 @@ export class DataRepository {
 
             if (this.listeners[evName]) {
                 this.listeners[evName].forEach(listener => {
-                    listener(data);
+                    listener(data, changes);
                 });
             }
         });
@@ -268,16 +341,21 @@ export class DataRepository {
 
     private storageRead(filePath, callback: (err?: Error, content?: any) => void) {
         this.lock.readLock(filePath, (release) => {
+
             fs.readFile(filePath, "utf8", (err, content) => {
                 release();
+
                 if (err) {
                     return callback(err);
                 }
 
                 try {
-                    const parsed = JSON.parse(content);
+
+                    const text   = decodeBase64(content);
+                    const parsed = JSON.parse(text);
                     callback(null, parsed);
                 } catch (err) {
+
                     callback(err);
                 }
             });
@@ -285,11 +363,31 @@ export class DataRepository {
     }
 
     private storageWrite(filePath, input, callback) {
-        const frozen = JSON.stringify(input, null, 4);
+
+        const copy = Object.assign({}, input);
+
+        if (copy.credentials) {
+            Object.assign(copy, {
+                credentials: copy.credentials.map(c => Object.assign({}, c, {
+                    token: null
+                }))
+            });
+        }
+
+        if (copy.activeCredentials) {
+            Object.assign(copy, {
+                activeCredentials: Object.assign({}, copy.activeCredentials, {
+                    token: null
+                })
+            });
+        }
+
+        const frozen = JSON.stringify(copy, null, 4);
 
         this.lock.writeLock(filePath, (release) => {
+            const b64 = encodeBase64(frozen);
 
-            fs.outputFile(filePath, frozen, (err, data) => {
+            fs.outputFile(filePath, b64, "utf8", (err, data) => {
                 release();
                 callback(err, data);
             });

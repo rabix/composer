@@ -26,7 +26,11 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                 </div>
             </div>
             <div class="tree">
-                <ct-tree-view [nodes]="contextNodes"></ct-tree-view>
+                <ct-tree-view [nodes]="contextNodes">
+                    <ng-template ct-tree-node-label-directive="entry" let-node>
+                        <span class="varname">{{node.label}} <span class="vartype">{{node.typeDisplay}}</span></span>
+                    </ng-template>                   
+                </ct-tree-view>
             </div>
         </div>
         <div class="modal-footer pb-1 pt-1 pr-1">
@@ -167,18 +171,21 @@ export class ExpressionEditorComponent extends DirectiveBase implements OnInit, 
                 node.iconExpanded = "fa-angle-down";
             }
 
-            node.label = `<span class="varname">${key}: <span class="vartype">${typeDisplay}</span></span>`;
+            node.label = key;
+            node.type = "entry";
+            node.typeDisplay = typeDisplay;
+            node.toggleOnIconOnly = true;
 
             const trace = [path, key].filter(e => e).join(".");
 
             if (type === "object" || type === "array") {
                 node.isExpandable = true;
                 node.children     = Observable.of(wrap(contextItem, trace));
-            } else {
-                node.id = trace.split(".").map(p => (parseInt(p, 10).toString() === p) ? `[${p}]` : p).join(".")
-                    .replace(/\]\.\[/g, "][")
-                    .replace(/\.\[/g, "[");
             }
+
+            node.id = trace.split(".").map(p => (parseInt(p, 10).toString() === p) ? `[${p}]` : p).join(".")
+                .replace(/\]\.\[/g, "][")
+                .replace(/\.\[/g, "[");
 
             return node;
         });

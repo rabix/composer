@@ -12,10 +12,12 @@ import {Subject} from "rxjs/Subject";
 import {AppExecutionContext} from "../../../../electron/src/storage/types/executor-config";
 import {CodeSwapService} from "../../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../../core/data-gateway/data-gateway.service";
+import {AppHelper} from "../../core/helpers/AppHelper";
 import {ErrorWrapper} from "../../core/helpers/error-wrapper";
 import {ProceedToEditingModalComponent} from "../../core/modals/proceed-to-editing-modal/proceed-to-editing-modal.component";
 import {PublishModalComponent} from "../../core/modals/publish-modal/publish-modal.component";
 import {AppTabData} from "../../core/workbox/app-tab-data";
+import {WorkboxService} from "../../core/workbox/workbox.service";
 import {ExecutorService} from "../../executor/executor.service";
 import {ErrorNotification, InfoNotification, NotificationBarService} from "../../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
@@ -120,6 +122,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 protected codeSwapService: CodeSwapService,
                 protected platformAppService: PlatformAppService,
                 protected platformRepository: PlatformRepositoryService,
+                protected workbox: WorkboxService,
                 protected executor: ExecutorService) {
 
         super();
@@ -271,14 +274,24 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     save(): void {
 
-        const proc = this.statusBar.startProcess(`Saving ${this.originalTabLabel}`);
+        const appName = this.tabData.id;
+
+        const proc = this.statusBar.startProcess(`Saving ${appName}`);
         const text = this.viewMode === "code" ? this.codeEditorContent.value : this.getModelText();
 
         this.appSavingService
             .save(this.tabData.id, text)
             .then(update => {
+                /**
+                 * FIXME: Reorganize how priority code updates should sync with the model, this is a quick fix
+                 * without this, when publishing a new revision from the graph view, priority code update would sync model->code,
+                 * but the code is actually up to date and the model isn't.
+
+                 */
+                this.revisionChangingInProgress = true;
+
                 this.priorityCodeUpdates.next(update);
-                this.statusBar.stopProcess(proc, `Saved: ${this.originalTabLabel}`);
+                this.statusBar.stopProcess(proc, `Saved: ${appName}`);
             }, err => {
                 if (!err || !err.message) {
                     this.statusBar.stopProcess(proc);
@@ -286,7 +299,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 }
 
                 this.notificationBar.showNotification(new ErrorNotification(`Saving failed: ${err.message}`));
-                this.statusBar.stopProcess(proc, `Could not save ${this.originalTabLabel} (${err.message})`);
+                this.statusBar.stopProcess(proc, `Could not save ${appName} (${err.message})`);
             });
     }
 
@@ -298,8 +311,25 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         }
 
         this.syncModelAndCode(true).then(() => {
-            const modal      = this.modal.fromComponent(PublishModalComponent, {title: "Publish an App"});
-            modal.appContent = this.getModelText(true);
+            const modal          = this.modal.fromComponent(PublishModalComponent, "Publish an App");
+            modal.appContent     = this.getModelText(true);
+            const originalSubmit = modal.onSubmit;
+
+            modal.onSubmit = (...args: any[]) => {
+                return originalSubmit.apply(modal, args).then(appID => {
+
+                    const tab = this.workbox.getOrCreateAppTab({
+                        id: AppHelper.getRevisionlessID(appID),
+                        type: this.dataModel.class,
+                        label: modal.inputForm.get("name").value,
+                        isWritable: true,
+                        language: "json"
+
+                    });
+                    this.workbox.openTab(tab);
+                });
+            }
+
         }, err => console.warn);
     }
 
@@ -323,7 +353,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         return modal.response.take(1).toPromise().then(response => {
             this.toggleLock(false);
             return response;
-        });
+        }, err => console.warn);
     }
 
     /**
@@ -361,9 +391,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         return this.dataModel !== undefined;
     }
 
-    openRevision(revisionNumber: number | string): Promise<any> {
+    openRevision(revisionNumber: number | string | any): Promise<any> {
 
-        const fid = this.tabData.id.split("/").slice(0, 3).concat(revisionNumber.toString()).join("/");
+        const fid = AppHelper.getAppIDWithRevision(this.tabData.id, revisionNumber);
 
         /** @name revisionHackFlagSwitchOn */
         this.revisionChangingInProgress = true;
@@ -509,7 +539,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             const serialized = JSON.stringify(data, null, 4);
             this.codeEditorContent.setValue(serialized);
             return data;
-        });
+        }, err => console.warn);
     }
 
     protected afterModelValidation(): void {
@@ -534,35 +564,43 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     protected resolveToModel(content: string): Promise<Object> {
         const appMightBeRDF = this.tabData.dataSource === "local";
 
+        const tryModelCreation = (text, resolve, reject) => {
+            try {
+                this.recreateModel(text); // throws exception when generating graph
+                this.afterModelCreated(!this.modelCreated);
+                this.modelCreated = true;
+
+                resolve(text);
+            } catch (err) {
+                reject(new Error("Model error: " + err.message));
+            }
+        };
+
         return new Promise((resolve, reject) => {
             if (appMightBeRDF) {
                 const statusMessage = this.statusBar.startProcess("Resolving RDF Schema...");
 
                 this.resolveContent(content).then(resolved => {
-                    this.recreateModel(resolved);
-                    this.afterModelCreated(!this.modelCreated);
-                    this.modelCreated = true;
-
+                    tryModelCreation(resolved, resolve, reject);
                     this.statusBar.stopProcess(statusMessage, "");
-                    resolve(resolved);
+
                 }, err => {
                     this.statusBar.stopProcess(statusMessage, "Failed to resolve RDF schema.");
-                    reject(err);
+                    reject(new Error("RDF resolution error: " + err.message));
                 });
 
                 return;
             }
 
             const json = Yaml.safeLoad(content, {json: true} as LoadOptions);
-            this.recreateModel(json);
-            this.afterModelCreated(!this.modelCreated);
-            this.modelCreated = true;
-            resolve(json);
+
+            tryModelCreation(json, resolve, reject);
 
         }).then(result => {
             return result;
         }, err => {
-            this.notificationBar.showNotification(new ErrorNotification("RDF resolution error: " + err.message));
+
+            this.notificationBar.showNotification(new ErrorNotification(err.message || "Error occurred"));
 
             this.validationState.isValidCWL = false;
             this.validationState.errors     = [{

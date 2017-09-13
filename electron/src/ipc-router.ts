@@ -78,6 +78,7 @@ module.exports = {
      * @return {void}
      */
     start: () => {
+        routes.loadDataRepository();
         bindDataRequestListener();
     },
 };

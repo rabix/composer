@@ -12,6 +12,7 @@ import {
 import {CommandInputParameterModel} from "cwlts/models";
 import {JobHelper} from "cwlts/models/helpers/JobHelper";
 import {ObjectHelper} from "../../helpers/object.helper";
+import {EditorInspectorService} from "../inspector/editor-inspector.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -97,7 +98,8 @@ import {ObjectHelper} from "../../helpers/object.helper";
                     <span class="input-group-btn">
                         
                         <button type="button" class="btn btn-secondary"
-                                [ct-editor-inspector]="fileInspector">
+                                [ct-editor-inspector]="fileInspector"
+                                [ct-editor-inspector-target]="value">
                             <i class="fa fa-ellipsis-h"></i>
                         </button>
                     </span>
@@ -106,7 +108,9 @@ import {ObjectHelper} from "../../helpers/object.helper";
                         <ct-editor-inspector-content>
                             <div class="tc-header">{{ input?.id }}</div>
                             <div class="tc-body">
-                                <ct-file-input-inspector [input]="value || {}"
+                                <ct-file-input-inspector
+                                                         [path]="value?.path"   
+                                                         [input]="value || {}"
                                                          (update)="updateFile($event)">
                                 </ct-file-input-inspector>
                             </div>
@@ -119,7 +123,9 @@ import {ObjectHelper} from "../../helpers/object.helper";
                     <input [attr.jobPropPath]="'path'"
                            [attr.prefix]="prefix" class="form-control" [value]="value?.path"/>
                     <span class="input-group-btn">
-                        <button class="btn btn-secondary" [ct-editor-inspector]="directoryInspector">
+                        <button class="btn btn-secondary"
+                                [ct-editor-inspector-target]="value"
+                                [ct-editor-inspector]="directoryInspector">
                                                         <i class="fa fa-ellipsis-h"></i>
 
                         </button>
@@ -128,7 +134,9 @@ import {ObjectHelper} from "../../helpers/object.helper";
                         <ct-editor-inspector-content>
                             <div class="tc-header">{{ input?.id }}</div>
                             <div class="tc-body">
-                                <ct-directory-input-inspector [input]="value || {}"
+                                <ct-directory-input-inspector
+                                                        [path]="value?.path"
+                                                        [input]="value || {}"
                                                          (update)="updateDirectory($event)">
                                 </ct-directory-input-inspector>
                             </div>
@@ -218,6 +226,11 @@ export class JobEditorEntryComponent implements OnChanges, OnInit {
 
     arrayModifiedInput;
 
+
+    constructor(private inspector: EditorInspectorService) {
+
+    }
+
     updateJob(data) {
         this.update.emit(data);
     }
@@ -272,6 +285,10 @@ export class JobEditorEntryComponent implements OnChanges, OnInit {
     }
 
     deleteFromArray() {
+        if (this.inspector.inspectedObject.getValue() === this.value) {
+            this.inspector.hide();
+        }
+
         this.updateJob(undefined);
     }
 

@@ -218,7 +218,7 @@ export class ToolOutputListComponent extends DirectiveBase {
     }
 
     updateOutput(output: CommandOutputParameterModel) {
-        output.validate(this.model.getContext(output.id)).then(noop, noop);
+        output.validate(this.model.getContext(output)).then(noop, noop);
         this.update.emit(this.model.outputs);
     }
 }

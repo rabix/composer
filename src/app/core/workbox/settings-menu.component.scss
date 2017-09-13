@@ -8,7 +8,7 @@
         line-height: $line-height-base;
         padding: .55rem 1rem;
         cursor: pointer;
-        min-width: 150px;
+        min-width: 165px;
         color: $smoke;
 
         .text-muted {
@@ -22,6 +22,20 @@
 
     .active-icon {
         color: $brand-primary;
+    }
+
+    .update-available {
+        .settings-icon {
+            color: $brand-warning;
+        }
+
+    }
+    .outdated-update {
+        background-color: $brand-warning;
+
+        &:hover {
+            background: lighten($brand-warning, 10%);
+        }
     }
 
     .settings-icon {

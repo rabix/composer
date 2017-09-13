@@ -34,7 +34,7 @@ export class SBGClient {
         this.apiRequest = requestPromise.defaults({
 
             baseUrl: url + "/v2/",
-            timeout: 60000,
+            timeout: 300000,
             json: true,
             headers: {
                 "X-SBG-Auth-Token": token,
@@ -43,28 +43,108 @@ export class SBGClient {
         });
     }
 
+    getUser(): SBGClientResponse<User> {
+        return this.apiRequest("user", {
+            timeout: 30000
+        });
+    }
+
+    getAllProjects(): Promise<Project[]> {
+        return this.fetchAll<Project>("projects?fields=_all")
+            .then((projects: Project[]) => {
+                return projects.filter(project => project.type === "v2")
+            });
+    }
+
+    /**
+     * @deprecated use {@link getUser}
+     */
     get user() {
         return {
-            get: (): SBGClientResponse<User> => this.apiRequest("user")
+            get: (): SBGClientResponse<User> => this.getUser()
         };
     }
 
+
+    /**
+     * @deprecated use {@link getAllProjects}
+     */
     get projects() {
         return {
-            all: (): Promise<Project[]> => {
-                return this.fetchAll<Project>("projects?fields=_all").then(projects => projects.filter(project => project.type === "v2"))
-            }
+            all: () => this.getAllProjects()
         }
+    }
+
+    getAllUserApps(query: AppQueryParams = {fields: "id,name,project,raw.class,revision"}) {
+        return this.fetchAll<App>("apps", query);
+    }
+
+    getApp(appID: string) {
+        return this.apiRequest(`apps/${appID}`.toLowerCase());
+    }
+
+    getAllPublicApps(query: AppQueryParams = {
+        visibility: "public",
+        fields: [
+            "id",
+            "name",
+            "project",
+            "revision",
+            "raw.class",
+            "raw.sbg:blackbox",
+            "raw.sbg:categories",
+            "raw.sbg:toolkit",
+            "raw.sbg:toolkitVersion"
+        ].join(",")
+    }) {
+        return this.fetchAll<App>("apps", query);
+    }
+
+    saveAppRevision(appID: string, content: string) {
+        const revisionlessID = appID.split("/").slice(0, 3).join("/").toLowerCase();
+
+        return this.apiRequest(`apps/${revisionlessID}`, {
+            fields: "revision"
+        }).then(app => {
+
+            const nextRevision = app.revision + 1;
+            const url          = `apps/${revisionlessID}/${nextRevision}/raw`;
+
+            return this.apiRequest.post(url, {
+                body: content,
+                json: false
+            });
+
+        });
+    }
+
+    createApp(appID: string, content: string): Promise<string> {
+        const revisionlessID = appID.split("/").slice(0, 3).join("/").toLowerCase();
+
+        return this.apiRequest(`apps/${revisionlessID}`).then((app) => {
+            throw new Error("App already exists.");
+        }, err => {
+            if (err.error && err.error.status == 404) {
+                return Promise.resolve();
+            }
+            throw err;
+        }).then(() => {
+            const url = `apps/${revisionlessID}/0/raw`;
+
+            return this.apiRequest.post(url, {
+                body: content,
+                json: false
+            });
+        });
     }
 
     get apps() {
         return {
-            private: (query: AppQueryParams = {fields: "id,name,project,raw.class,revision"}) => {
-                return this.fetchAll<App>("apps", query);
-            },
-            get: (appID: string) => {
-                return this.apiRequest(`apps/${appID}`.toLowerCase());
-            },
+            /** @deprecated use {@link getAllUserApps} */
+            private: (query: AppQueryParams = {fields: "id,name,project,raw.class,revision"}) => this.getAllUserApps(query),
+            /** @deprecated use {@link getApp} */
+            get: (appID: string) => this.getApp(appID),
+            /** @deprecated use {@link getAllPublicApps} */
             public: (query: AppQueryParams = {
                 visibility: "public",
                 fields: [
@@ -78,47 +158,13 @@ export class SBGClient {
                     "raw.sbg:toolkit",
                     "raw.sbg:toolkitVersion"
                 ].join(",")
-            }) => {
-                return this.fetchAll<App>("apps", query);
-            },
+            }) => this.getAllPublicApps(),
 
-            save: (appID, content) => {
-                const revisionlessID = appID.split("/").slice(0, 3).join("/").toLowerCase();
+            /** @deprecated {@link use saveAppRevision} */
+            save: (appID, content) => this.saveAppRevision(appID, content),
 
-                return this.apiRequest(`apps/${revisionlessID}`, {
-                    fields: "revision"
-                }).then(app => {
-
-                    const nextRevision = app.revision + 1;
-                    const url          = `apps/${revisionlessID}/${nextRevision}/raw`;
-
-                    return this.apiRequest.post(url, {
-                        body: content,
-                        json: false
-                    });
-
-                });
-            },
-
-            create: (appID, content) => {
-                const revisionlessID = appID.split("/").slice(0, 3).join("/").toLowerCase();
-
-                return this.apiRequest(`apps/${revisionlessID}`).then((app) => {
-                    throw new Error("App already exists.");
-                }, err => {
-                    if (err.error && err.error.status == 404) {
-                        return Promise.resolve();
-                    }
-                    throw err;
-                }).then(() => {
-                    const url = `apps/${revisionlessID}/0/raw`;
-
-                    return this.apiRequest.post(url, {
-                        body: content,
-                        json: false
-                    });
-                });
-            }
+            /** @deprecated {@link use createApp} */
+            create: (appID, content) => this.createApp(appID, content)
         }
     }
 
