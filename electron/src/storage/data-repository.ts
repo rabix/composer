@@ -104,7 +104,8 @@ export class DataRepository {
             const hooksLoaded = new Promise((resolve, reject) => {
                 (async () => {
                     try {
-                        for (const hook of this.hooks) {
+
+                        for (const hook of <any>this.hooks) {
                             await hook.afterLoad(this);
                         }
                         resolve();

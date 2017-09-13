@@ -23,8 +23,6 @@ const semver                = require("semver");
 
 let repository: DataRepository;
 let repositoryLoad: Promise<any>;
-repository.attachHook(new Executor());
-
 
 const platformFetchingLocks: { [platformID: string]: Promise<any> } = {};
 
@@ -43,7 +41,10 @@ const ensurePlatformUser = () => {
 
 
 export function loadDataRepository() {
-    repository     = new DataRepository(app.getPath("userData") + path.sep + "profiles");
+    repository = new DataRepository(app.getPath("userData") + path.sep + "profiles");
+
+    repository.attachHook(new Executor());
+
     repositoryLoad = new Promise((resolve, reject) => {
         repository.load(err => {
             if (err) {
@@ -52,9 +53,7 @@ export function loadDataRepository() {
 
             return resolve(1);
         });
-    }).catch(err => {
-
-    });
+    }).catch(err => void 0);
 }
 
 // File System Routes

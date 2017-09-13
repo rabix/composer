@@ -92,7 +92,7 @@ import {Component, Input} from "@angular/core";
             </button>
 
             <ct-generic-dropdown-menu [ct-menu]="moreActionsMenu" menuAlign="left" #moreActionsDropdown>
-                <button class="btn control-button"
+                <button class="btn btn-unstyled control-button"
                         *ngIf="host.appIsRunnable()"
                         ct-tooltip="See More Actions"
                         tooltipPlacement="bottom"
