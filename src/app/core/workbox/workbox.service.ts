@@ -104,17 +104,18 @@ export class WorkboxService {
         const foundTabIndex = tabs.findIndex(existingTab => existingTab.id === tab.id);
         const foundTab = tabs[foundTabIndex];
 
-        if (!replaceExistingIfExists) {
-            if (foundTab) {
+        if (foundTab) {
+            if (replaceExistingIfExists) {
+                this.closeTab(foundTab);
+                tabs.splice(foundTabIndex, 1, tab);
+                this.tabs.next(tabs);
+            } else {
                 this.activateTab(foundTab);
                 return;
             }
 
+        } else {
             this.tabs.next(tabs.concat(tab));
-        } else if (foundTab) {
-            this.closeTab(foundTab);
-            tabs.splice(foundTabIndex, 1, tab);
-            this.tabs.next(tabs);
         }
 
         this.tabCreation.next(tab);
