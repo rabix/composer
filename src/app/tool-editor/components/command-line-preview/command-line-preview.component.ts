@@ -29,7 +29,7 @@ export class CommandLinePreviewComponent implements OnChanges {
     list: { type: string, value: string }[] = [];
 
     @Input()
-    public commandLineParts: { type: string, value: string }[] = [];
+    commandLineParts: { type: string, value: string }[] = [];
 
     ngOnChanges() {
         if (this.commandLineParts) {

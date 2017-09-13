@@ -1,4 +1,5 @@
 import chai = require("chai");
+
 import proxy = require("proxyquire");
 import sinon = require("sinon");
 
@@ -14,15 +15,18 @@ describe.skip("IPC Router", function () {
         const router   = proxy("./ipc-router", {electron});
         router.start();
 
-        setTimeout(() => {
-            assert.isTrue(electron.ipcMain.on.calledOnce);
+        const onSpy = electron.ipcMain.on;
+        assert.equal(onSpy.callCount, 2, `IPC “on” handler was called ${onSpy.callCount} times instead of 1 time.`);
 
-            const callArgs = electron.ipcMain.on.args[0];
-            assert.equal(callArgs[0], "data-request");
+        const [firstArgs, secondArgs] = onSpy.getCalls().map(call => call.args);
 
-            assert.isFunction(callArgs[1]);
-            done();
-        });
+        assert.equal(firstArgs[0], "data-request");
+        assert.equal(secondArgs[0], "data-request-terminate");
+
+        assert.isFunction(firstArgs[1]);
+        assert.isFunction(secondArgs[1]);
+
+        done();
     });
 
     it("should call the appropriate controller function when required and return the response", function (done) {
@@ -60,6 +64,7 @@ describe.skip("IPC Router", function () {
         assert.property(replyData, "id");
         assert.property(replyData, "data");
         assert.equal(replyData.data.name, "Zoro");
+
         done();
     });
 });

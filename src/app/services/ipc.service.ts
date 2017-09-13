@@ -3,6 +3,7 @@ import {AsyncSubject} from "rxjs/AsyncSubject";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {Guid} from "./guid.service";
+import {IPC_EOS_MARK} from "../../../electron/src/constants";
 
 enum RequestType {
     Once,
@@ -17,39 +18,41 @@ export type IPCRoute =
     | "createPlatformApp"
     | "deletePath"
     | "fetchPlatformData"
-    | "patchSwap"
-    | "getPlatformApp"
     | "getApps"
     | "getAppUpdates"
+    | "getLocalFileContent"
     | "getLocalRepository"
+    | "getPlatformApp"
     | "getProjects"
     | "getSetting"
     | "getUserByToken"
-    | "patchAppMeta"
-    | "watchAppMeta"
     | "getUserRepository"
-    | "getLocalFileContent"
     | "hasDataCache"
-    | "saveAppRevision"
+    | "patchAppMeta"
     | "patchLocalRepository"
+    | "patchSwap"
     | "patchUserRepository"
-    | "sendFeedback"
     | "pathExists"
+    | "probeExecutorVersion"
     | "putSetting"
     | "readDirectory"
     | "readFileContent"
     | "resolve"
     | "resolveContent"
+    | "saveAppRevision"
+    | "saveFileContent"
     | "scanPlatforms"
     | "searchLocalProjects"
     | "searchPublicApps"
     | "searchUserProjects"
+    | "sendFeedback"
     | "switchActiveUser"
-    | "saveFileContent";
+    | "watchAppMeta";
 
 export type IPCListeners =
     "watchLocalRepository" |
     "watchUserRepository" |
+    "executeApp" |
     "accelerator";
 
 @Injectable()
@@ -100,7 +103,7 @@ export class IpcService {
         });
     }
 
-    public request(message: IPCRoute, data = {}, zone?: NgZone): Observable<any> {
+    request(message: IPCRoute, data = {}, zone?: NgZone): Observable<any> {
         const messageID = Guid.generate();
 
         this.pendingRequests[messageID] = {
@@ -120,9 +123,11 @@ export class IpcService {
         return this.pendingRequests[messageID].stream;
     }
 
-    public watch(message: IPCListeners, data = {}, zone?: NgZone): Observable<any> {
+    watch(message: IPCListeners, data = {}, zone?: NgZone): Observable<any> {
+        // Create a unique ID for the message
         const messageID = Guid.generate();
 
+        // Store the request stream, so we know where to push incoming messages when they arrive
         this.pendingRequests[messageID] = {
             zone,
             type: RequestType.Watch,
@@ -136,10 +141,27 @@ export class IpcService {
             data
         });
 
-        return this.pendingRequests[messageID].stream;
-    }
+        const incomingMessages = this.pendingRequests[messageID].stream;
 
-    public notify(message: any): void {
-        this.ipcRenderer.send("notification", {message});
+        const clientObservable = new Observable(observer => {
+
+            // Proxy all messages from the IPC channel to this observable
+            const msgSubscription = incomingMessages
+            // Complete when the “$$EOS$$” message comes in
+                .takeUntil(incomingMessages.filter(v => v === IPC_EOS_MARK))
+                .subscribe(observer);
+
+
+            return () => {
+                this.ipcRenderer.send("data-request-terminate", {
+                    id: messageID,
+                    message: "stop"
+                });
+
+                msgSubscription.unsubscribe();
+            }
+        });
+
+        return clientObservable;
     }
 }

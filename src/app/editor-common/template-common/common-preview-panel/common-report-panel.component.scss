@@ -1,0 +1,28 @@
+@import "../../../../assets/sass/variables";
+
+:host {
+
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    color: $layout-section-font-color;
+    background: $sidebar-panel-bg;
+
+    .panel-header {
+        width: 100%;
+        padding: 0 .4em;
+        cursor: row-resize;
+        line-height: 1.4em;
+        background: $panel-bg;
+        border: 1px solid #494949;
+        border-left-color: transparent;
+        border-right-color: transparent;
+    }
+
+    .panel-close {
+        cursor: pointer;
+    }
+    .panel-title {
+
+    }
+}

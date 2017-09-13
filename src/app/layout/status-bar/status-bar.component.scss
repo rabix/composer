@@ -9,8 +9,13 @@
     height: 2em;
     line-height: $layout-stripe-width - 6;
 
+    .sidebar-toggle-btn-group {
+        height:100%;
+    }
+
     .sidebar-toggle {
         font-size: 1.3rem;
+        height:100%;
     }
 
     @keyframes spin {
@@ -36,8 +41,13 @@
         animation: spin .65s linear infinite;
     }
 
+    .status-element,
+    /deep/ .tag {
+        vertical-align: middle;
+    }
+
     .status-item {
-        flex: 1 1 0;
+        //flex: 1 1 0;
         text-align: center;
         text-overflow: ellipsis;
         overflow: hidden;

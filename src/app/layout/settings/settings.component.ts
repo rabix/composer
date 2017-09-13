@@ -7,8 +7,6 @@ import {WorkboxService} from "../../core/workbox/workbox.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 
-type ViewMode = "auth" | "keyBindings" | "cache";
-
 @Component({
     selector: "ct-settings",
     styleUrls: ["./settings.component.scss"],
@@ -17,10 +15,11 @@ type ViewMode = "auth" | "keyBindings" | "cache";
         <ct-action-bar>
             <ct-tab-selector distribute="auto" active="auth">
                 <ct-tab-selector-entry tabName="auth">Authentication</ct-tab-selector-entry>
+                <ct-tab-selector-entry tabName="bunnyConfig">Rabix Executor</ct-tab-selector-entry>
             </ct-tab-selector>
         </ct-action-bar>
 
-        <ct-form-panel class="m-2">
+        <ct-form-panel *ngIf="viewMode === 'auth'" class="m-2">
             <div class="tc-header">Authentication</div>
             <div class="tc-body">
 
@@ -58,9 +57,18 @@ type ViewMode = "auth" | "keyBindings" | "cache";
                 </div>
             </div>
         </ct-form-panel>
+
+        <ct-form-panel *ngIf="viewMode === 'bunnyConfig'" class="m-2">
+            <div class="tc-header">Rabix Executor Configuration</div>
+            <div class="tc-body p-1">
+                <ct-executor-config></ct-executor-config>
+            </div>
+        </ct-form-panel>
     `
 })
 export class SettingsComponent extends DirectiveBase {
+
+    viewMode: "bunnyConfig" | "auth" = "auth";
 
     constructor(public auth: AuthService,
                 public modal: ModalService,
@@ -71,12 +79,14 @@ export class SettingsComponent extends DirectiveBase {
     }
 
     openCredentialsForm() {
-        this.modal.fromComponent(PlatformCredentialsModalComponent, "Add Connection");
+         this.modal.fromComponent(PlatformCredentialsModalComponent,  "Add Connection"
+        );
     }
 
     editCredentials(edited: AuthCredentials) {
-        const modal = this.modal.fromComponent(PlatformCredentialsModalComponent, "Edit Connection");
-        modal.prepareEdit(edited);
+        const modal = this.modal.fromComponent(PlatformCredentialsModalComponent,  "Edit Connection");
+
+        modal.prepareEdit( edited );
     }
 
     setActiveCredentials(credentials?: AuthCredentials) {

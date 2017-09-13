@@ -1,4 +1,5 @@
 import {Component, OnInit, ViewChild, ViewContainerRef} from "@angular/core";
+import {Observable} from "rxjs/Observable";
 import {LayoutService} from "../../core/layout/layout.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {StatusBarService} from "./status-bar.service";
@@ -8,9 +9,10 @@ import {StatusBarService} from "./status-bar.service";
     styleUrls: ["./status-bar.component.scss"],
     template: `
 
-        <!--Status & panel toggle button-->
-        <span class="status-item status-buttons">
-            <span class="btn-group">
+        <span class="status-item pull-left">
+            
+            <!--Sidebar toggle button-->
+            <span class="btn-group status-buttons sidebar-toggle-btn-group" >
                 <button class="sidebar-toggle btn btn-sm" data-test="sidebar-toggle"
                         [class.active]="layoutService.sidebarHidden"
                         (click)="layoutService.toggleSidebar()">
@@ -19,25 +21,26 @@ import {StatusBarService} from "./status-bar.service";
                        [class.fa-angle-double-right]="layoutService.sidebarHidden"></i>
                 </button>
             </span>
-            <span *ngIf="status">
-                {{ status.message }}
-                <span *ngIf="status.time">({{ status.time | amTimeAgo }})</span>
-            </span>
-        </span>
-
-        <!--Process-->
-        <span class="status-item">
-            <span *ngIf="queueSize" [ct-tooltip]="statusBar.process | async">
-                <span class="loader"></span>
-                {{ statusBar.process | async }}
-                <span *ngIf="queueSize > 1">
-                    and {{ queueSize - 1 }} more
+            
+            <span class="status-element">
+                <span *ngIf="queueSize > 0; else statusMsg" [ct-tooltip]="statusBar.process | async">
+                    <span class="loader"></span>
+                    {{ statusBar.process | async }}
+                    <span *ngIf="queueSize > 1">
+                        and {{ queueSize - 1 }} more
+                    </span>
                 </span>
+                
+                <ng-template #statusMsg>
+                    {{ status?.message }}
+                    <span *ngIf="status?.time">({{ status?.time | amTimeAgo }})</span>
+                </ng-template>
             </span>
+            
         </span>
 
         <!--Buttons and switches-->
-        <span class="status-item status-buttons">
+        <span class="status-item pull-right status-buttons">
             <span #controlHost></span>
         </span>
     `
@@ -55,8 +58,8 @@ export class StatusBarComponent extends DirectiveBase implements OnInit {
                 public layoutService: LayoutService) {
         super();
 
-        this.tracked = this.statusBar.status.subscribe(s => this.status = s);
-        this.tracked = this.statusBar.queueSize.subscribe(s => this.queueSize = s);
+        this.statusBar.status.subscribeTracked(this, s => this.status = s);
+        this.statusBar.queueSize.subscribeTracked(this, s => this.queueSize = s);
     }
 
     ngOnInit() {

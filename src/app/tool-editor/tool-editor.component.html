@@ -4,87 +4,11 @@
         <ct-tab-selector-entry [disabled]="!tabsUnlocked()" [tabName]="'info'">App Info</ct-tab-selector-entry>
         <ct-tab-selector-entry [disabled]="!tabsUnlocked()" [tabName]="'gui'">Visual</ct-tab-selector-entry>
         <ct-tab-selector-entry [disabled]="!tabsUnlocked()" [tabName]="'test'">Test</ct-tab-selector-entry>
-        <ct-tab-selector-entry [tabName]="'code'" [disabled]="!tabsUnlocked() || !!unavailableError">Code</ct-tab-selector-entry>
+        <ct-tab-selector-entry [tabName]="'code'" [disabled]="!tabsUnlocked() || !!unavailableError">Code
+        </ct-tab-selector-entry>
     </ct-tab-selector>
 
-    <div class="document-controls">
-
-        <!--Edit-->
-        <button *ngIf="isUnlockable"
-                class="btn control-button"
-                type="button"
-                ct-tooltip="Unlock this app for editing"
-                tooltipPlacement="bottom"
-
-                (click)="unlockEditing()">
-            <i class="fa fa-fw fa-lock"></i> Edit
-        </button>
-
-        <!--Resolve-->
-        <button class="btn control-button"
-                type="button"
-                [disabled]="!appIsResolvable()"
-                *ngIf="viewMode === 'code' && tabData.dataSource === 'local'"
-                ct-tooltip="Resolve"
-                tooltipPlacement="bottom"
-                (click)="resolveButtonClick()">
-            <i class="fa fa-fw fa-refresh"></i>
-        </button>
-
-        <!--Go to app-->
-        <button class="btn control-button"
-                type="button"
-                [disabled]="dataModel === undefined"
-                *ngIf="tabData.dataSource !== 'local'"
-                ct-tooltip="Open on Platform"
-                tooltipPlacement="bottom"
-                (click)="openOnPlatform(dataModel.sbgId)">
-            <i class="fa fa-fw fa-external-link"></i>
-        </button>
-
-
-        <!--Save-->
-        <button *ngIf="tabData.isWritable"
-                [disabled]="!appIsSavable()"
-                (click)="save()"
-                ct-tooltip="Save"
-                tooltipPlacement="bottom"
-                class="btn control-button" type="button">
-            <i class="fa fa-fw fa-save"></i>
-        </button>
-
-        <!--Publish to Platform-->
-        <button class="btn control-button"
-                data-test="publish-btn"
-                [disabled]="!appIsPublishable()"
-                *ngIf="tabData.dataSource === 'local'"
-                ct-tooltip="Publish to Platform"
-                tooltipPlacement="bottom"
-                (click)="publish()">
-            <i class="fa fa-fw fa-cloud-upload"></i>
-        </button>
-
-
-        <!--Revisions-->
-        <button *ngIf="tabData.dataSource !== 'local' && dataModel && dataModel.customProps['sbg:revisionsInfo']"
-                class="btn control-button" type="button"
-                ct-tooltip="See Revision History"
-                tooltipPlacement="bottom"
-                [ct-editor-inspector-target]="'revisions'"
-                [ct-editor-inspector]="revisions">
-
-            Revision: {{ dataModel.customProps['sbg:revision']}}
-
-            <ng-template #revisions>
-                <ct-revision-list *ngIf="dataModel" [active]="dataModel.customProps['sbg:revision']"
-                                  #revisionList
-                                  [revisions]="dataModel.customProps['sbg:revisionsInfo']"
-                                  (select)="openRevision($event)">
-                </ct-revision-list>
-            </ng-template>
-        </button>
-
-    </div>
+    <ct-common-document-controls [host]="this"></ct-common-document-controls>
 </ct-action-bar>
 
 <ct-notification-bar></ct-notification-bar>
@@ -139,55 +63,11 @@
     </ct-editor-inspector>
 </div>
 
-<div *ngIf="reportPanel" class="app-report-panel layout-section">
-
-    <ct-validation-report *ngIf="reportPanel === 'validation'"
-                          [errors]="validationState.errors"
-                          [warnings]="validationState.warnings"></ct-validation-report>
-
-    <ct-command-line-preview *ngIf="reportPanel === 'commandLinePreview'"
-                             [commandLineParts]="commandLineParts | async"></ct-command-line-preview>
-</div>
+<ct-common-report-panel *ngIf="reportPanel" [host]="this">
+    <ct-command-line-preview *ngIf="reportPanel === 'commandLinePreview'" [commandLineParts]="commandLineParts | async">
+    </ct-command-line-preview>
+</ct-common-report-panel>
 
 <ng-template #statusControls>
-    <!--Perpetual spinner that indicates if CWL validation is in progress-->
-    <i *ngIf="isValidatingCWL"
-       class="fa fa-circle-o-notch fa-spin">
-    </i>
-
-    <div class="tag tag-warning"
-         [ct-tooltip]="'This app is a copy of ' +  dataModel.customProps['sbg:copyOf']"
-         *ngIf="isReadonly && tabData.isWritable">Copy
-    </div>
-    <div class="tag tag-info"
-         [ct-tooltip]="'The app is described using the displayed version(s) of CWL'"
-         *ngIf="dataModel">{{ dataModel.cwlVersion }}
-    </div>
-    <span class="btn-group">
-                    <button [disabled]="!validationState"
-                            [class.active]="reportPanel === 'validation'"
-                            (click)="toggleReport('validation')"
-                            class="btn">
-
-                        <span *ngIf="validationState?.errors?.length">
-                            <i class="fa fa-times-circle text-danger"></i> {{validationState.errors.length}} {{ validationState.errors.length === 1 ? "Error" : "Errors"}}
-                        </span>
-
-                        <span *ngIf="validationState?.warnings?.length"
-                              [class.pl-1]="validationState?.errors?.length">
-                            <i class="fa fa-exclamation-triangle text-warning"></i> {{validationState.warnings.length}} {{ validationState.warnings.length === 1 ? "Warning" : "Warnings"}}
-                        </span>
-
-                        <span *ngIf="!validationState?.errors?.length && !validationState?.warnings?.length">
-                            No Issues
-                        </span>
-
-
-                    </button>
-
-                    <button [class.active]="reportPanel == 'commandLinePreview'"
-                            [disabled]="!validationState?.isValidCWL"
-                            (click)="toggleReport('commandLinePreview')"
-                            class="btn">Command Line</button>
-                </span>
+    <ct-common-status-controls [host]="this"></ct-common-status-controls>
 </ng-template>

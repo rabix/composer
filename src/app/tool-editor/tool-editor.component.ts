@@ -15,6 +15,7 @@ import {EditorInspectorService} from "../editor-common/inspector/editor-inspecto
 import {APP_SAVER_TOKEN} from "../editor-common/services/app-saving/app-saver.interface";
 import {LocalFileSavingService} from "../editor-common/services/app-saving/local-file-saving.service";
 import {PlatformAppSavingService} from "../editor-common/services/app-saving/platform-app-saving.service";
+import {ExecutorService} from "../executor/executor.service";
 import {NotificationBarService} from "../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../layout/status-bar/status-bar.service";
 import {PlatformRepositoryService} from "../repository/platform-repository.service";
@@ -72,8 +73,23 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
                 codeSwapService: CodeSwapService,
                 platformRepository: PlatformRepositoryService,
                 platformAppService: PlatformAppService,
-                workbox: WorkboxService) {
-        super(statusBar, notificationBarService, modal, inspector, dataGateway, injector, appValidator, codeSwapService, platformAppService, platformRepository, workbox);
+                workbox: WorkboxService,
+                executor: ExecutorService) {
+
+        super(
+            statusBar,
+            notificationBarService,
+            modal,
+            inspector,
+            dataGateway,
+            injector,
+            appValidator,
+            codeSwapService,
+            platformAppService,
+            platformRepository,
+            workbox,
+            executor
+        );
     }
 
     ngOnInit(): any {

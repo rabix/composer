@@ -31,9 +31,10 @@ import {PublicAppsPanelService} from "./public-apps-panel.service";
             </label>
 
             <ct-generic-dropdown-menu [ct-menu]="menu" [menuState]="groupByOpenStatus">
-                    <span>{{ grouping }}
-                        <i class="fa fa-chevron-down fa-fw settings-icon"> </i>
-                    </span>
+                <button type="button" class="btn btn-unstyled">
+                    {{ grouping }}
+                    <i class="fa fa-chevron-down fa-fw settings-icon"> </i>
+                </button>
 
             </ct-generic-dropdown-menu>
 

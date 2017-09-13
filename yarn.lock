@@ -1680,15 +1680,15 @@ custom-event@~1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/custom-event/-/custom-event-1.0.1.tgz#5d02a46850adf1b4a317946a3928fccb5bfd0425"
 
-cwl-svg@^0.0.42:
+cwl-svg@0.0.42:
   version "0.0.42"
   resolved "https://registry.yarnpkg.com/cwl-svg/-/cwl-svg-0.0.42.tgz#78f43f3669ecb4af98099422a147b2254eac8f1f"
   dependencies:
     core-js "^2.4.1"
 
-cwlts@^1.13.36:
-  version "1.13.36"
-  resolved "https://registry.yarnpkg.com/cwlts/-/cwlts-1.13.36.tgz#bb8bf7c7af97fe303b5b92424fe99a948912f0ba"
+cwlts@1.13.37:
+  version "1.13.37"
+  resolved "https://registry.yarnpkg.com/cwlts/-/cwlts-1.13.37.tgz#10a0874803be3f4c4fbe78cf763259c24b641417"
 
 d@1:
   version "1.0.0"
@@ -1963,7 +1963,7 @@ ejs@^2.5.7, ejs@~2.5.6:
   version "2.5.7"
   resolved "https://registry.yarnpkg.com/ejs/-/ejs-2.5.7.tgz#cc872c168880ae3c7189762fd5ffc00896c9518a"
 
-electron-builder@^19.24.1:
+electron-builder@^19.27.7:
   version "19.28.4"
   resolved "https://registry.yarnpkg.com/electron-builder/-/electron-builder-19.28.4.tgz#a6069db31a0d94b5f0593826f2d87391675f190d"
   dependencies:
@@ -6287,7 +6287,7 @@ tslib@^1.7.1:
   version "1.7.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.7.1.tgz#bc8004164691923a79fe8378bbeb3da2017538ec"
 
-tslint@^5.6.0:
+tslint@^5.7.0:
   version "5.7.0"
   resolved "https://registry.yarnpkg.com/tslint/-/tslint-5.7.0.tgz#c25e0d0c92fa1201c2bc30e844e08e682b4f3552"
   dependencies:
