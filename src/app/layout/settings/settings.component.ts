@@ -68,6 +68,8 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 })
 export class SettingsComponent extends DirectiveBase {
 
+    viewMode: "bunnyConfig" | "auth" = "auth";
+
     constructor(public auth: AuthService,
                 public modal: ModalService,
                 private global: GlobalService,
