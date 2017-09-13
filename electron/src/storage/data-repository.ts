@@ -350,14 +350,15 @@ export class DataRepository {
                     return callback(err);
                 }
 
+                const text = decodeBase64(content);
                 try {
 
-                    const text   = decodeBase64(content);
                     const parsed = JSON.parse(text);
                     callback(null, parsed);
-                } catch (err) {
 
-                    callback(err);
+                } catch (err) {
+                    // Try to gracefully fallback if we got something that is not json
+                    callback(null, {});
                 }
             });
         });
