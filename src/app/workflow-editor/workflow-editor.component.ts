@@ -137,7 +137,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                 this.dataModel.steps.forEach(step => {
 
                     // a non-sbg app might be embedded in an sbg workflow
-                    if (!step.run.customProps || !step.run.customProps["sbg:id"]) {
+                    if (!step.run || !step.run.customProps || !step.run.customProps["sbg:id"]) {
                         return;
                     }
                     const revisionless = AppHelper.getAppIDWithRevision(step.run.customProps["sbg:id"], null);
