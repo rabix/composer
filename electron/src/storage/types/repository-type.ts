@@ -1,4 +1,5 @@
 import {RecentAppTab} from "./recent-app-tab";
+import {AppMetadata} from "./local-repository";
 
 export class RepositoryType {
     activeTab: { tabID: string; activationTime: number; };
@@ -9,11 +10,6 @@ export class RepositoryType {
 
     recentApps: RecentAppTab[] = [];
 
-    appMeta: {
-        [path: string]: {
-            workingDirectory?: string,
-            jobFilePath?: string
-        }
-    } = {};
+    appMeta: { [path: string]: AppMetadata } = {};
 
 }

@@ -8,10 +8,10 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 @Component({
     selector: "ct-generic-dropdown-menu",
     template: `
-        <button class="btn btn-unstyled generic-dropdown-button" [disabled]="readonly" (click)="toggleMenu()">
+        <span class="generic-dropdown-button clickable" (click)="toggleMenu()">
             <!--Transcluded content serves as the button for toggling the dropdown-->
             <ng-content></ng-content>
-        </button>
+        </span>
 
         <div class="{{menuAlign}}-align" [class.top]="menuSide === 'top'" [class.generic-menu]="dropdown" #dropdownContainer>
             <div #hostView></div>
@@ -70,6 +70,18 @@ export class GenericDropDownMenuComponent extends DirectiveBase implements OnIni
         if (this.shouldShow) {
             this.createMenu();
         } else {
+            this.destroyMenu();
+        }
+    }
+
+    show() {
+        if (!this.dropdown) {
+            this.createMenu();
+        }
+    }
+
+    hide() {
+        if (this.dropdown) {
             this.destroyMenu();
         }
     }

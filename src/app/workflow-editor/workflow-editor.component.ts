@@ -6,6 +6,7 @@ import {CodeSwapService} from "../core/code-content-service/code-content.service
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
 import {AppHelper} from "../core/helpers/AppHelper";
 import {ErrorWrapper} from "../core/helpers/error-wrapper";
+import {WorkboxService} from "../core/workbox/workbox.service";
 import {AppEditorBase} from "../editor-common/app-editor-base/app-editor-base";
 import {AppValidatorService} from "../editor-common/app-validator/app-validator.service";
 import {PlatformAppService} from "../editor-common/components/platform-app-common/platform-app.service";
@@ -13,6 +14,7 @@ import {EditorInspectorService} from "../editor-common/inspector/editor-inspecto
 import {APP_SAVER_TOKEN} from "../editor-common/services/app-saving/app-saver.interface";
 import {LocalFileSavingService} from "../editor-common/services/app-saving/local-file-saving.service";
 import {PlatformAppSavingService} from "../editor-common/services/app-saving/platform-app-saving.service";
+import {ExecutorService} from "../executor/executor.service";
 import {ErrorNotification, NotificationBarService} from "../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../layout/status-bar/status-bar.service";
 import {PlatformRepositoryService} from "../repository/platform-repository.service";
@@ -20,7 +22,6 @@ import {IpcService} from "../services/ipc.service";
 import {ModalService} from "../ui/modal/modal.service";
 import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow-graph-editor.component";
 import {WorkflowEditorService} from "./workflow-editor.service";
-import {WorkboxService} from "../core/workbox/workbox.service";
 
 export function appSaverFactory(comp: WorkflowEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -57,8 +58,22 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                 protected platformRepository: PlatformRepositoryService,
                 private cdr: ChangeDetectorRef,
                 platformAppService: PlatformAppService,
-                workbox: WorkboxService) {
-        super(statusBar, notificationBar, modal, inspector, dataGateway, injector, appValidator, codeSwapService, platformAppService, platformRepository, workbox);
+                workbox: WorkboxService,
+                executorService: ExecutorService) {
+        super(
+            statusBar,
+            notificationBar,
+            modal,
+            inspector,
+            dataGateway,
+            injector,
+            appValidator,
+            codeSwapService,
+            platformAppService,
+            platformRepository,
+            workbox,
+            executorService
+        );
     }
 
     protected getPreferredTab(): string {

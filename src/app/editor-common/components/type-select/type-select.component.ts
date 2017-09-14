@@ -25,8 +25,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         <div class="form-group" *ngIf="paramType.type !== 'array'">
             <label>Allow array as well as single item</label>
             <span class="pull-right">
-                    <ct-toggle-slider [formControl]="form.controls['isItemOrArray']"
-                                      [disabled]="readonly"></ct-toggle-slider>
+                    <ct-toggle-slider [formControl]="form.controls['isItemOrArray']"></ct-toggle-slider>
                 </span>
         </div>
 
@@ -47,9 +46,6 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 })
 export class InputTypeSelectComponent extends DirectiveBase implements ControlValueAccessor {
 
-    @Input()
-    public readonly = false;
-
     public paramType: ParameterTypeModel;
 
     public types = ["array", "enum", "record", "File", "string", "int", "float", "boolean", "map"];
@@ -62,11 +58,11 @@ export class InputTypeSelectComponent extends DirectiveBase implements ControlVa
         isItemOrArray: new FormControl(null)
     });
 
+    private readonly = false;
+
     private onTouched = noop;
 
     private onChange = noop;
-
-    private skipOnChange = false;
 
     writeValue(paramType: ParameterTypeModel): void {
         this.paramType = paramType;
@@ -102,13 +98,6 @@ export class InputTypeSelectComponent extends DirectiveBase implements ControlVa
                 this.paramType.items = "File";
                 this.form.controls["items"].setValue("File", {onlySelf: true});
             }
-
-            // This method gets triggered if we set disabled state
-            // and there is no way to distinguish it from other events.
-            if (!this.skipOnChange) {
-                this.skipOnChange = false;
-                this.onChange(this.paramType);
-            }
         });
     }
 
@@ -120,12 +109,8 @@ export class InputTypeSelectComponent extends DirectiveBase implements ControlVa
         this.onTouched = fn;
     }
 
-    setDisabledState(isDisabled: boolean) {
-        if (isDisabled) {
-            this.skipOnChange = true;
-            this.form.controls["type"].disable();
-            this.form.controls["isItemOrArray"].disable();
-            this.form.controls["items"].disable();
-        }
+    setDisabledState(isDisabled: boolean): void {
+        this.readonly = isDisabled;
+        isDisabled ? this.form.controls["isItemOrArray"].disable({emitEvent: false}) : this.form.controls["isItemOrArray"].enable({emitEvent: false});
     }
 }

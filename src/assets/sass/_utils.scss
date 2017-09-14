@@ -71,15 +71,18 @@
     align-items: baseline;
 }
 
-.btn-unstyled,
-.btn-unstyled:active,
-.btn-unstyled:hover,
-.btn-unstyled:focus {
+.btn.btn-unstyled,
+.btn.btn-unstyled:active,
+.btn.btn-unstyled:hover,
+.btn.btn-unstyled:focus {
     background: none;
+    border: inherit;
     color: inherit;
-    border: 0;
-    padding: inherit;
-    margin: inherit;
     cursor: pointer;
+    line-height: inherit;
+    margin: inherit;
     outline: none;
+    padding: inherit;
 }
+
+
