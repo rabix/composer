@@ -4,8 +4,12 @@ import {CommandLineToolModel, WorkflowModel} from "cwlts/models";
 
 import * as Yaml from "js-yaml";
 import {LoadOptions} from "js-yaml";
+import "rxjs/add/observable/of";
+import "rxjs/add/operator/do";
+import "rxjs/add/operator/switchMap";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
+import {AppExecutionContext} from "../../../../electron/src/storage/types/executor-config";
 import {CodeSwapService} from "../../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../../core/data-gateway/data-gateway.service";
 import {AppHelper} from "../../core/helpers/AppHelper";
@@ -14,12 +18,14 @@ import {ProceedToEditingModalComponent} from "../../core/modals/proceed-to-editi
 import {PublishModalComponent} from "../../core/modals/publish-modal/publish-modal.component";
 import {AppTabData} from "../../core/workbox/app-tab-data";
 import {WorkboxService} from "../../core/workbox/workbox.service";
+import {ExecutorService} from "../../executor/executor.service";
 import {ErrorNotification, InfoNotification, NotificationBarService} from "../../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {StatusControlProvider} from "../../layout/status-bar/status-control-provider.interface";
 import {PlatformRepositoryService} from "../../repository/platform-repository.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {AppExecutionContextModalComponent} from "../app-execution-context-modal/app-execution-context-modal.component";
 import {AppValidatorService, AppValidityState} from "../app-validator/app-validator.service";
 import {PlatformAppService} from "../components/platform-app-common/platform-app.service";
 import {RevisionListComponent} from "../components/revision-list/revision-list.component";
@@ -71,6 +77,12 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     isUnlockable = null;
 
+    isExecuting = false;
+
+    executionOutput = "";
+
+    executionQueue = new Subject<any>();
+
     /** Template of the status controls that will be shown in the status bar */
     @ViewChild("statusControls")
     protected statusControls: TemplateRef<any>;
@@ -83,6 +95,12 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     protected appSavingService: AppSaver;
 
     private modelCreated = false;
+
+    /**
+     * Used to emit signals that should stop app execution, if it's running.
+     * It is used a breaking emit, so anything can be pushed through it.
+     */
+    private executionStop = new Subject<any>();
 
     /**
      * Used as a hack flag so we can recreate the model on changes from non-gui mode,
@@ -104,9 +122,11 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 protected codeSwapService: CodeSwapService,
                 protected platformAppService: PlatformAppService,
                 protected platformRepository: PlatformRepositoryService,
-                protected workbox: WorkboxService) {
+                protected workbox: WorkboxService,
+                protected executor: ExecutorService) {
 
         super();
+
     }
 
     registerOnTabLabelChange(update: (label: string) => void, originalLabel: string): void {
@@ -184,7 +204,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
          */
         firstValidationEnd.withLatestFrom(externalCodeChanges)
             .switchMap((data: [AppValidityState, string]) => {
-                const [validationState, code] = data;
+                const [validationState] = data;
                 return validationCompletion
                     .startWith(validationState)
                     .map(state => [this.codeEditorContent.value, state]);
@@ -223,13 +243,15 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     if (!this.tabData.isWritable || this.tabData.dataSource === "local") {
                         this.isUnlockable = false;
                     } else if (hasCopyOfProperty && !unlocked) {
-                        this.notificationBar.showNotification(
-                            new InfoNotification("This app is a copy of " + this.dataModel.customProps["sbg:copyOf"])
-                        );
+
+                        const originalApp = this.dataModel.customProps["sbg:copyOf"];
+                        this.notificationBar.showNotification(new InfoNotification(`This app is a copy of ${originalApp}`));
                         this.isUnlockable = true;
                     }
 
-                    if (!this.tabData.isWritable || (this.isUnlockable && hasCopyOfProperty && !unlocked)) {
+                    const isUnlockedAndUnlockableCopy = this.isUnlockable && hasCopyOfProperty && !unlocked;
+
+                    if (!this.tabData.isWritable || isUnlockedAndUnlockableCopy) {
                         this.toggleLock(true);
                     }
                 }, err => console.warn);
@@ -246,6 +268,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             this.viewMode    = state.isValidCWL ? this.getPreferredTab() : "code";
             this.reportPanel = state.isValidCWL ? this.getPreferredReportPanel() : this.reportPanel;
         });
+
+        this.bindExecutionQueue();
     }
 
     save(): void {
@@ -363,6 +387,10 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         return this.tabsUnlocked();
     }
 
+    appIsRunnable() {
+        return this.dataModel !== undefined;
+    }
+
     openRevision(revisionNumber: number | string | any): Promise<any> {
 
         const fid = AppHelper.getAppIDWithRevision(this.tabData.id, revisionNumber);
@@ -381,6 +409,87 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     new ErrorNotification("Cannot open revision. " + new ErrorWrapper(err))
                 );
             });
+    }
+
+    switchTab(tabName): void {
+
+        if (!tabName) {
+            return;
+        }
+
+        /** If switching to code mode, serialize the model first and update the editor text */
+        if (this.viewMode !== "code" && tabName === "code") {
+            this.priorityCodeUpdates.next(this.getModelText());
+            this.viewMode = tabName;
+            return;
+        }
+
+        /** If going from code mode to gui, resolve the content first */
+        if ((this.viewMode === "code" || !this.viewMode) && tabName !== "code") {
+
+            // Trick that will change reference for tabselector highlight line (to reset it to a Code mode if resolve fails)
+            this.viewMode = undefined;
+            this.resolveToModel(this.codeEditorContent.value).then(() => {
+                this.viewMode = tabName;
+            }, err => {
+                this.viewMode = "code";
+            });
+            return;
+        }
+
+        // If changing from|to mode that is not a Code mode, just switch
+        this.viewMode = tabName;
+    }
+
+    /**
+     * When click on Resolve button (visible only if app is a local file and you are in Code mode)
+     */
+    resolveButtonClick(): void {
+        this.resolveToModel(this.codeEditorContent.value).then(() => {
+        }, err => console.warn);
+    }
+
+    toggleReport(panel: string, value?: boolean) {
+        if (value === true) {
+            this.reportPanel = panel;
+        } else {
+            this.reportPanel = this.reportPanel === panel ? undefined : panel;
+
+        }
+
+        // Force browser reflow, heights and scroll bar size gets inconsistent otherwise
+        setTimeout(() => window.dispatchEvent(new Event("resize")));
+    }
+
+    openOnPlatform(appID: string) {
+        this.platformAppService.openOnPlatform(appID);
+    }
+
+    editRunConfiguration() {
+        const appID     = this.tabData.id;
+        const appConfig = this.executor.getAppConfig(appID).take(1);
+        appConfig.take(1).subscribeTracked(this, (context) => {
+
+            const modal = this.modal.fromComponent(AppExecutionContextModalComponent, {
+                title: "Set Execution Parameters"
+            });
+
+            modal.context = context;
+            modal.appID   = appID;
+
+            modal.onSubmit = (raw) => {
+                this.executor.setAppConfig(appID, raw);
+                this.modal.close();
+            };
+
+            modal.onCancel = () => {
+                this.modal.close();
+            }
+        });
+    }
+
+    scheduleExecution() {
+        this.executionQueue.next(true);
     }
 
     /**
@@ -505,60 +614,12 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         });
     }
 
-    switchTab(tabName): void {
-
-        if (!tabName) {
-            return;
-        }
-
-        /** If switching to code mode, serialize the model first and update the editor text */
-        if (this.viewMode !== "code" && tabName === "code") {
-            this.priorityCodeUpdates.next(this.getModelText());
-            this.viewMode = tabName;
-            return;
-        }
-
-        /** If going from code mode to gui, resolve the content first */
-        if ((this.viewMode === "code" || !this.viewMode) && tabName !== "code") {
-
-            // Trick that will change reference for tabselector highlight line (to reset it to a Code mode if resolve fails)
-            this.viewMode = undefined;
-            this.resolveToModel(this.codeEditorContent.value).then(() => {
-                this.viewMode = tabName;
-            }, err => {
-                this.viewMode = "code";
-            });
-            return;
-        }
-
-        // If changing from|to mode that is not a Code mode, just switch
-        this.viewMode = tabName;
-    }
-
-    /**
-     * When click on Resolve button (visible only if app is a local file and you are in Code mode)
-     */
-    resolveButtonClick(): void {
-        this.resolveToModel(this.codeEditorContent.value).then(() => {
-        }, err => console.warn);
-    }
-
-    toggleReport(panel: string) {
-        this.reportPanel = this.reportPanel === panel ? undefined : panel;
-
-        // Force browser reflow, heights and scroll bar size gets inconsistent otherwise
-        setTimeout(() => window.dispatchEvent(new Event("resize")));
-    }
-
-    openOnPlatform(appID: string) {
-        this.platformAppService.openOnPlatform(appID);
-    }
-
     protected abstract recreateModel(json: Object): void;
 
     protected toggleLock(locked: boolean): void {
 
-        if (locked === false) {
+        if (locked === false
+        ) {
             this.platformRepository.patchAppMeta(this.tabData.id, "swapUnlocked", true);
 
             this.isUnlockable = false;
@@ -604,5 +665,126 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             throw err;
         });
     }
+
+    private getExecutionContext(): Observable<AppExecutionContext | null> {
+
+        const appID = this.tabData.id;
+
+        return this.executor.getAppConfig(appID).take(1)
+            .switchMap((context: AppExecutionContext) => {
+
+                // If we have job path set, we can proceed with execution
+                if (context.jobPath) {
+                    return Observable.of(context);
+                }
+
+                // Otherwise, we have to obtain job path
+                const modal = this.modal.fromComponent(AppExecutionContextModalComponent, "Set Execution Parameters");
+
+                modal.confirmLabel = "Run";
+                modal.context = context;
+                modal.appID   = appID;
+
+                return new Observable(observer => {
+                    modal.onSubmit = (raw) => {
+                        observer.next(raw);
+                        observer.complete();
+                        this.modal.close();
+                        this.executor.setAppConfig(appID, raw);
+                    };
+
+                    modal.onCancel = () => {
+                        observer.next(null);
+                        observer.complete();
+                        this.modal.close();
+                        this.executor.setAppConfig(appID, null);
+                    }
+                });
+
+            }).take(1).filter(v => !!v) as Observable<AppExecutionContext>;
+    }
+
+    private bindExecutionQueue() {
+
+        // When a new execution is in the line, run it
+        this.executionQueue
+            .switchMap(() => {                               // Switch so the execution gets cancelled when new one is scheduled
+                return this.runOnExecutor()                  // Starts the execution process
+                    .takeUntil(this.executionStop.do(() => this.executionOutput += "Execution Stopped"))
+                    .finally(() => {
+                        // When it ends, turn off the UI flag
+                        this.isExecuting = false
+                    })
+                    .catch(err => {
+                        // We need to catch the error here, because if we catch it in the end, queue sub will be disposed
+                        const wrappedError = new ErrorWrapper(err).toString();
+                        this.executionOutput += `<div class="text-error">${wrappedError}</div>`;
+                        return Observable.empty();
+                    });
+            })
+            .subscribeTracked(this, (output: string | Object) => {
+
+                // Output result comes as a JSON object with info about execution results
+                // Otherwise, it's a string, most likely an [INFO] log from stderr, which we should print out
+                let localOutput = "";
+                if (typeof output === "object") {
+                    localOutput = JSON.stringify(output, null, 4);
+                } else if (typeof output === "string") {
+                    localOutput = output;
+                } else {
+                    return;
+                }
+
+                // Replace newlines with html tags because we are colouring lines separately
+                localOutput = localOutput.replace(/\n/g, "<br/>");
+
+                /**
+                 * Relies on custom-added prefix to wrap up error messages
+                 * @name AppEditorBase.__errorDiscriminator
+                 * @see RabixExecutor.__errorPrefixing
+                 */
+                if (localOutput.startsWith("ERR: ")) {
+                    this.executionOutput += `<div class="text-error">${localOutput.slice(5)}</div>`;
+                } else {
+                    this.executionOutput += `<div>${localOutput}</div>`;
+                }
+            });
+
+        // Whenever a new app queues for execution, toggle the “isExecuting” GUI flag
+        this.executionQueue.subscribeTracked(this, () => {
+            this.executionOutput = "";
+            this.toggleReport("execution", true);
+
+            this.isExecuting = true;
+        });
+    }
+
+    stopExecution() {
+        this.executionStop.next(1);
+    }
+
+    private runOnExecutor(): Observable<string | Object> {
+
+        return new Observable(obs => {
+
+            const modelObject = this.dataModel.serialize();
+            delete modelObject["sbg:job"]; // Bunny traverses mistakenly into this to look for actual inputs
+            const modelText = Yaml.dump(modelObject, {});
+
+            const runner = this.getExecutionContext().switchMap(context => {
+                return this.executor
+                    .run(this.tabData.id, modelText, context.jobPath, context.executionParams)
+                    .finally(() => {
+                        obs.complete();
+                    });
+            }).subscribe(obs);
+
+            return () => {
+                runner.unsubscribe();
+            }
+
+        });
+    }
+
 
 }

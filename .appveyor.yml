@@ -42,7 +42,7 @@ deploy:
     access_key_id: "%AMAZON_ID%"
     secret_access_key: "%AMAZON_SECRET%"
     bucket: "%AMAZON_BUCKET%"
-    folder: build
+    folder: 'appveyor-build'
 
 artifacts:
-  - path: build
+  - path: 'build\*.exe'

@@ -27,8 +27,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <label class="form-control-label">ID</label>
             <input type="text"
                    class="form-control"
-                   [formControl]="form.controls['id']"
-                   [readonly]="readonly">
+                   [formControl]="form.controls['id']">
             <div *ngIf="form.controls['id'].errors" class="form-control-feedback">
                 {{form.controls['id'].errors['error']}}
             </div>
@@ -39,8 +38,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <label class="form-control-label">Label</label>
             <input type="text"
                    class="form-control"
-                   [formControl]="form.controls['label']"
-                   [readonly]="readonly">
+                   [formControl]="form.controls['label']">
         </div>
 
         <!--Scatter Method-->
@@ -95,19 +93,29 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <label class="form-control-label">Description</label>
             <textarea class="form-control"
                       rows="4"
-                      [formControl]="form.controls['description']"
-                      [readonly]="readonly"></textarea>
+                      [formControl]="form.controls['description']"></textarea>
         </div>
 
         <!--Set Hints-->
-        <button type="button" class="btn btn-secondary" (click)="setHints()">Set Hints</button>
+        <button type="button" class="btn btn-secondary" (click)="setHints()">{{ this.readonly ? "View" : "Set" }} Hints</button>
 
     `
 })
 export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnInit, OnChanges {
 
-    @Input()
-    public readonly = false;
+    disabled = false;
+
+    get readonly(): boolean {
+        return this.disabled;
+    }
+
+    @Input("readonly")
+    set readonly(value: boolean) {
+        this.disabled = value;
+        if (this.form) {
+            this.setDisabledState(value);
+        }
+    }
 
     @Input()
     public step: StepModel;
@@ -152,17 +160,15 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
             this.form.controls["description"].setValue(newStep.description);
             this.form.controls["scatterMethod"].setValue(newStep.scatterMethod || "");
             this.form.controls["scatter"].setValue(newStep.scatter || "");
-
-            this.disableScatter();
         }
     }
 
     ngOnInit() {
 
         this.form = this.formBuilder.group({
-            id: [this.step.id],
-            label: [this.step.label],
-            description: [this.step.description],
+            id: [{value: this.step.id, disabled: this.readonly}],
+            label: [{value: this.step.label, disabled: this.readonly}],
+            description: [{value: this.step.description, disabled: this.readonly}],
             scatterMethod: [this.step.scatterMethod || ""],
             scatter: [this.step.scatter || ""]
         });
@@ -202,19 +208,6 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
 
     }
 
-    disableScatter() {
-        // using [disabled] doesn't work for whatever reason
-        // binding readonly to [attr.disabled] makes the select ALWAYS disabled
-        // because it has the disabled attribute, regardless if it's true or false
-        if (this.readonly) {
-            this.form.controls["scatter"].disable();
-            this.form.controls["scatterMethod"].disable();
-        } else {
-            this.form.controls["scatter"].enable();
-            this.form.controls["scatterMethod"].enable();
-        }
-    }
-
     setHints() {
         const hints = this.modal.fromComponent(HintsModalComponent, {
             title: "Set Hints",
@@ -224,5 +217,13 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
 
         hints.model = this.step;
         hints.readonly = this.readonly;
+    }
+
+    setDisabledState(isDisabled: boolean) {
+        const excludedControls = ["scatter", "scatterMethod"];
+        Object.keys(this.form.controls).filter(c => excludedControls.indexOf(c) === -1).forEach((item) => {
+            const control = this.form.controls[item];
+            isDisabled ? control.disable({emitEvent: false}) : control.enable({emitEvent: false});
+        });
     }
 }

@@ -1,5 +1,6 @@
 import * as ReadWriteLock from "rwlock";
 import {decodeBase64, encodeBase64} from "../security/encoder";
+import {RepositoryHook} from "./hooks/repository-hook";
 import {LocalRepository} from "./types/local-repository";
 import {RepositoryType} from "./types/repository-type";
 import {UserRepository} from "./types/user-repository";
@@ -20,6 +21,7 @@ export class DataRepository {
 
     private lock      = new ReadWriteLock();
     private listeners = {};
+    private hooks     = new Set<RepositoryHook>();
     private profileDirectory: string;
 
 
@@ -85,52 +87,63 @@ export class DataRepository {
         });
     }
 
+    attachHook(hook: RepositoryHook) {
+        this.hooks.add(hook);
+    }
+
     /**
      * Load local and user (if needed) storage files into memory.
      */
     load(callback: (err?: Error, data?: any) => void): void {
 
         this.loadProfile("local", new LocalRepository(), (err, localData) => {
-            if (err) {
-                callback(err);
-                return;
-            }
+            if (err) return callback(err);
 
             this.local = localData;
+
+            const hooksLoaded = new Promise((resolve, reject) => {
+                (async () => {
+                    try {
+
+                        for (const hook of <any>this.hooks) {
+                            await hook.afterLoad(this);
+                        }
+                        resolve();
+                    } catch (err) {
+                        reject(err);
+                    }
+                })();
+            });
 
             // Load tokens
             const keychainTokens = Promise.all(this.local.credentials.map(c => keychain.get(c.id)));
 
-            keychainTokens.then((tokens) => {
+            hooksLoaded
+                .then(() => keychainTokens)
+                .then(tokens => {
+                    this.local.credentials.forEach((c, idx) => {
+                        c.token = tokens[idx];
+                    });
 
-                this.local.credentials.forEach((c, idx) => {
-                    c.token = tokens[idx];
-                });
-
-                // If there are no active credentials, there are no other profiles to load, so break here
-                if (!localData.activeCredentials) {
-                    callback();
-                    return;
-                }
-
-                // If there are active credentials, patch it's token from keychain as well
-                this.local.activeCredentials.token = this.local.credentials.find(cred => cred.id === this.local.activeCredentials.id).token;
-
-                this.loadProfile(localData.activeCredentials.id, new UserRepository(), (err, userData) => {
-                    if (err) {
-                        callback(err);
+                    // If there are no active credentials, there are no other profiles to load, so break here
+                    if (!localData.activeCredentials) {
+                        callback();
                         return;
                     }
 
-                    this.user = userData;
+                    // If there are active credentials, patch it's token from keychain as well
+                    this.local.activeCredentials.token = this.local.credentials.find(cred => cred.id === this.local.activeCredentials.id).token;
+                    this.loadProfile(localData.activeCredentials.id, new UserRepository(), (err, userData) => {
+                        if (err) {
+                            callback(err);
+                            return;
+                        }
 
-                    callback();
-                });
+                        this.user = userData;
 
-            }, err => {
-                callback(err);
-            });
-
+                        callback();
+                    });
+                }, callback);
 
         });
     }
@@ -201,7 +214,10 @@ export class DataRepository {
         return patchMap;
     }
 
-    private update<T extends RepositoryType>(profile: string, data: Partial<T>, callback?: (err?: Error, data?: T) => void) {
+    private update<T extends RepositoryType>(profile: string,
+                                             data: Partial<T>,
+                                             callback: (err?: Error, data?: T) => void = () => {
+                                             }) {
 
         const profilePath = this.getProfileFilePath(profile);
 
@@ -334,14 +350,15 @@ export class DataRepository {
                     return callback(err);
                 }
 
+                const text = decodeBase64(content);
                 try {
 
-                    const text   = decodeBase64(content);
                     const parsed = JSON.parse(text);
                     callback(null, parsed);
-                } catch (err) {
 
-                    callback(err);
+                } catch (err) {
+                    // Try to gracefully fallback if we got something that is not json
+                    callback(null, {});
                 }
             });
         });

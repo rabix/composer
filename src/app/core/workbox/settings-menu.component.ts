@@ -19,8 +19,10 @@ import {WorkboxService} from "./workbox.service";
         <ct-generic-dropdown-menu [ct-menu]="menu" menuAlign="left" [menuState]="openStatus"
                                   [class.update-available]="global.platformIsOutdated">
 
-            <span *ngIf="active">{{ userLabel }}</span>
-            <i class="fa fa-chevron-down fa-fw settings-icon"> </i>
+            <button type="button" class="btn btn-unstyled">
+                <span *ngIf="active">{{ userLabel }}</span>
+                <i class="fa fa-chevron-down fa-fw settings-icon"> </i>
+            </button>
 
         </ct-generic-dropdown-menu>
 
