@@ -1,6 +1,7 @@
 import {User} from "../../sbg-api-client/interfaces/user";
 import {AppExecutionContext, ExecutorConfig} from "./executor-config";
 import {RepositoryType} from "./repository-type";
+import * as path from "path";
 
 export interface CredentialsCache {
     id: string;
@@ -28,7 +29,7 @@ export class LocalRepository extends RepositoryType {
     sidebarHidden = false;
 
     executorConfig: ExecutorConfig = {
-        path: ""
+        path: path.resolve(__dirname + "/../../../executor/rabix")
     };
 
     openTabs = [{

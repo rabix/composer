@@ -194,7 +194,7 @@ export class RabixExecutor {
         return `${this.config.path} ${cmd}`;
     }
 
-    private probeBinary(path: string, callback) {
+    private probeBinary(path = "", callback = (err?: Error) => void 0) {
         fs.access(path, fs.constants.X_OK, callback);
     }
 

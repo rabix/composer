@@ -6,8 +6,6 @@ import {LocalRepositoryService} from "../../../repository/local-repository.servi
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {ErrorNotification, NotificationBarService} from "../../notification-bar/notification-bar.service";
 
-const {dialog} = window["require"]("electron").remote;
-
 @Component({
     selector: "ct-executor-config",
     styles: [`
@@ -21,13 +19,10 @@ const {dialog} = window["require"]("electron").remote;
                 <label>Rabix Executor Path</label>
             </div>
 
-            <div class="input-group">
-                <input #path formControlName="path" class="form-control"/>
-                <span class="input-group-btn">
-                    <button class="btn btn-secondary" type="button" (click)="findExec()">Browse</button>
-                </span>
-            </div>
+            <ct-native-file-browser-form-field class="input-group" formControlName="path"></ct-native-file-browser-form-field>
+
             <p class=" form-text text-muted">{{ versionMessage }}</p>
+
         </form>
     `,
 })
@@ -35,31 +30,12 @@ export class ExecutorConfigComponent extends DirectiveBase implements OnInit {
 
     form: FormGroup;
 
-    isTesting = false;
-
     versionMessage = "Version: checking...";
 
     constructor(private localRepository: LocalRepositoryService,
                 private notificationBar: NotificationBarService,
                 public executorService: ExecutorService) {
         super();
-    }
-
-    private findExec() {
-        dialog.showOpenDialog({
-
-            title: "Select a Rabix binary ",
-            buttonLabel: "Done",
-
-        }, (path) => {
-            if (!path || path.length === 0) {
-                return;
-            }
-
-            this.form.patchValue({
-                path: path[0]
-            });
-        });
     }
 
     ngOnInit() {
@@ -72,6 +48,7 @@ export class ExecutorConfigComponent extends DirectiveBase implements OnInit {
                 path: new FormControl(config.path, [Validators.required])
             });
             const changes = this.form.valueChanges;
+
 
             changes.subscribeTracked(this, () => this.versionMessage = "checking...");
 

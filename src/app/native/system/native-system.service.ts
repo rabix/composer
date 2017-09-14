@@ -24,4 +24,20 @@ export class NativeSystemService {
             });
         });
     }
+
+    openFile(options: Electron.OpenDialogOptions = {}, multi = false): Promise<string[]> {
+
+        const {app, dialog} = this.electron.getRemote();
+
+        const config = Object.assign({
+            title: "Choose a File",
+            defaultPath: app.getPath("home"),
+        }, options);
+
+        return new Promise((resolve, reject) => {
+            dialog.showOpenDialog(config, paths => {
+                paths ? resolve(paths) : reject();
+            });
+        })
+    }
 }

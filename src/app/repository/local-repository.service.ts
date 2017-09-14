@@ -28,7 +28,7 @@ export class LocalRepositoryService {
         this.listen("recentApps").subscribe(this.recentApps);
         this.listen("localFolders").subscribe(this.localFolders);
         this.listen("expandedNodes").subscribe(this.expandedFolders);
-        this.listen("executorConfig").do(data => console.log("Passing executor config", data)).subscribe(this.executorConfig);
+        this.listen("executorConfig").subscribe(this.executorConfig);
         this.listen("selectedAppsPanel").subscribe(this.selectedAppsPanel);
         this.listen("publicAppsGrouping").subscribe(this.publicAppsGrouping);
         this.listen("activeCredentials").map(cred => AuthCredentials.from(cred)).subscribe(this.activeCredentials);
