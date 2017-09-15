@@ -8,6 +8,7 @@ import {JavascriptEvalService} from "../../services/javascript-eval/javascript-e
 import {ContextService} from "../../ui/context/context.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {UrlValidator} from "../../validators/url.validator";
+import {ElectronProxyService} from "../../native/proxy/electron-proxy.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -34,6 +35,7 @@ export class MainComponent {
                 auth: AuthService,
                 ipc: IpcService,
                 global: GlobalService,
+                electron: ElectronProxyService,
                 // DON'T REMOVE THIS PLEASE I KNOW IT DOESN'T HAVE ANY USAGES
                 js: JavascriptEvalService) {
 
@@ -43,7 +45,7 @@ export class MainComponent {
         auth.getActive().take(1).filter(creds => {
             // Stop if there are either no credentials, or we have the --no-fetch-on-start argument passed to the chromium cli
             // The cli arg is a useful testing facility.
-            return creds && process.argv.indexOf("--no-fetch-on-start") === -1;
+            return creds && electron.getRemote().process.argv.indexOf("--no-fetch-on-start") === -1;
         }).subscribe(() => {
             global.reloadPlatformData();
         });
@@ -57,8 +59,9 @@ export class MainComponent {
         /**
          * This has to be after  modal.setViewContainer(vcRef) in order to show the modal.
          */
-        global.checkForPlatformUpdates().catch(console.warn);
-
+        if (electron.getRemote().process.argv.indexOf("--no-update-check") === -1) {
+            global.checkForPlatformUpdates().catch(console.warn);
+        }
 
         ipc.watch("accelerator", "checkForPlatformUpdates").subscribe(() => {
             global.checkForPlatformUpdates(true).catch(console.warn);
