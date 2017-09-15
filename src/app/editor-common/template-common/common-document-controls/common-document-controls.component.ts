@@ -85,6 +85,7 @@ import {Component, Input} from "@angular/core";
                 <ng-template #revisions>
                     <ct-revision-list *ngIf="host.dataModel" [active]="host.dataModel.customProps['sbg:revision']"
                                       #revisionList
+                                      [showModalIfAppIsDirty]="host.showModalIfAppIsDirtyBound"
                                       [revisions]="host.dataModel.customProps['sbg:revisionsInfo']"
                                       (select)="host.openRevision($event)">
                     </ct-revision-list>

@@ -109,8 +109,10 @@ export class ModalService {
     confirm(params: {
         title?: string,
         content?: string,
+        showDiscardButton?: boolean,
         confirmationLabel?: string,
-        cancellationLabel ?: string
+        cancellationLabel ?: string,
+        discardLabel?: string,
     }) {
 
         return this.wrapPromise((resolve, reject) => {
@@ -118,14 +120,15 @@ export class ModalService {
                 title: params.title || "Are you sure?"
             });
 
-            Object.assign(component, {
-                content: "Are you sure?",
-                confirmationLabel: "Yes",
-                cancellationLabel: "Cancel"
-            }, params);
+            Object.assign(component,  params);
 
-            component.decision.subscribe(accepted => {
-                accepted ? resolve(true) : reject();
+            component.decision.subscribe(result => {
+                result ? resolve(true) : reject(true);
+                this.close();
+            });
+
+            component.cancel.subscribe(result => {
+                reject(false);
                 this.close();
             });
         });

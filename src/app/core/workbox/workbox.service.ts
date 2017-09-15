@@ -50,7 +50,7 @@ export class WorkboxService {
             if (!user) {
                 return Observable.of([]);
             }
-            return this.platformRepository.getOpenTabs()
+            return this.platformRepository.getOpenTabs();
         }).filter(v => v !== null);
 
         return Observable.combineLatest(local, platform,
@@ -166,17 +166,14 @@ export class WorkboxService {
         this.syncTabs();
     }
 
-    closeOtherTabs(tab) {
-        this.tabs.next([tab]);
-        this.activateTab(tab);
+    closeAllTabs(tab?: TabData<any>) {
 
-        this.syncTabs();
-    }
+        this.tabs.getValue().forEach((item) => {
+            if (item !== tab) {
+                this.closeTab(item);
+            }
+        });
 
-    closeAllTabs() {
-        this.tabs.next([]);
-
-        this.syncTabs();
     }
 
     activateNext() {
@@ -261,6 +258,8 @@ export class WorkboxService {
             tab.data.language = "json";
         }
 
+        this.tabCreation.next(tab);
+
         return tab;
 
     }
@@ -270,7 +269,7 @@ export class WorkboxService {
             id: "?newFile",
             label: "New File",
             type: "NewFile"
-        }
+        };
     }
 }
 

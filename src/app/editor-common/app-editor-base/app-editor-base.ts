@@ -31,6 +31,7 @@ import {PlatformAppService} from "../components/platform-app-common/platform-app
 import {RevisionListComponent} from "../components/revision-list/revision-list.component";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
 import {APP_SAVER_TOKEN, AppSaver} from "../services/app-saving/app-saver.interface";
+import {LocalRepositoryService} from "../../repository/local-repository.service";
 
 export abstract class AppEditorBase extends DirectiveBase implements StatusControlProvider, OnInit, AfterViewInit {
 
@@ -49,6 +50,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     validationState: AppValidityState;
 
     dataModel: CommandLineToolModel | WorkflowModel;
+
+    /** Flag to indicate if document is in Dirty state (when user interacts/modifies) */
+    private appIsDirty = false;
 
     /** Flag to indicate the document is loading */
     isLoading = true;
@@ -90,8 +94,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     @ViewChild("inspector", {read: ViewContainerRef})
     protected inspectorHostView: ViewContainerRef;
 
-    protected changeTabLabel: (title: string) => void;
-    protected originalTabLabel: string;
     protected appSavingService: AppSaver;
 
     private modelCreated = false;
@@ -112,6 +114,11 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
      */
     private revisionChangingInProgress = false;
 
+    /**
+     * Show modal when app is dirty when changing revisions to prevent loosing changes
+     */
+    showModalIfAppIsDirtyBound = this.showModalIfAppIsDirty.bind(this);
+
     constructor(protected statusBar: StatusBarService,
                 protected notificationBar: NotificationBarService,
                 protected modal: ModalService,
@@ -122,16 +129,12 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 protected codeSwapService: CodeSwapService,
                 protected platformAppService: PlatformAppService,
                 protected platformRepository: PlatformRepositoryService,
+                protected localRepository: LocalRepositoryService,
                 protected workbox: WorkboxService,
                 protected executor: ExecutorService) {
 
         super();
 
-    }
-
-    registerOnTabLabelChange(update: (label: string) => void, originalLabel: string): void {
-        this.changeTabLabel   = update;
-        this.originalTabLabel = originalLabel;
     }
 
     ngOnInit() {
@@ -202,7 +205,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
          * code change that might have been there in the meantime so we know what to use as the base for
          * the model creation.
          */
-        firstValidationEnd.withLatestFrom(externalCodeChanges)
+
+        const validationStateChanges = firstValidationEnd.withLatestFrom(externalCodeChanges)
             .switchMap((data: [AppValidityState, string]) => {
                 const [validationState] = data;
                 return validationCompletion
@@ -210,10 +214,20 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     .map(state => [this.codeEditorContent.value, state]);
             })
             .withLatestFrom(
-                this.platformRepository.getAppMeta(this.tabData.id, "swapUnlocked"),
-                (outer, inner) => [...outer, inner])
-            .subscribeTracked(this, (data: [string, AppValidityState, boolean]) => {
-                const [code, validation, unlocked] = data;
+                AppHelper.isLocal(this.tabData.id) ? Observable.of(true)
+                    : this.platformRepository.getAppMeta(this.tabData.id, "swapUnlocked"),
+                (outer, inner) => [...outer, inner]).share();
+
+
+        // On user interactions (changes) set app state to Dirty
+        validationStateChanges.skip(1).filter(() => this.revisionChangingInProgress === false)
+            .subscribeTracked(this, () => {
+                this.setAppDirtyState(true);
+            });
+
+
+        validationStateChanges.subscribeTracked(this, (data: [string, AppValidityState, boolean]) => {
+            const [code, validation, unlocked] = data;
 
                 this.isLoading = false;
 
@@ -257,19 +271,26 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 }, err => console.warn);
             });
 
-
-        /** When types something in the code editor for the first time, add a star to the tab label */
-        /** This does not work very well, so disable it for now */
-        // firstDirtyCodeChange.subscribeTracked(this, isDirty => this.changeTabLabel(this.originalTabLabel + (isDirty ? " (modified)" : "")));
-
-
         /** When the first validation ends, turn off the loader and determine which view we can show. Invalid app forces code view */
         firstValidationEnd.subscribe(state => {
             this.viewMode    = state.isValidCWL ? this.getPreferredTab() : "code";
             this.reportPanel = state.isValidCWL ? this.getPreferredReportPanel() : this.reportPanel;
         });
 
+        this.getRepository().getAppMeta(this.tabData.id, "appIsDirty").subscribeTracked(this, (isModified) => {
+            this.appIsDirty = !!isModified;
+        });
+
+
         this.bindExecutionQueue();
+    }
+
+    getRepository() {
+        return AppHelper.isLocal(this.tabData.id) ? this.localRepository : this.platformRepository;
+    }
+
+    setAppDirtyState(isModified: boolean) {
+        this.getRepository().patchAppMeta(this.tabData.id, "appIsDirty", isModified);
     }
 
     save(): void {
@@ -291,6 +312,10 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 this.revisionChangingInProgress = true;
 
                 this.priorityCodeUpdates.next(update);
+
+                // After app is saved, app state is not Dirty any more
+                this.setAppDirtyState(false);
+
                 this.statusBar.stopProcess(proc, `Saved: ${appName}`);
             }, err => {
                 if (!err || !err.message) {
@@ -318,6 +343,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             modal.onSubmit = (...args: any[]) => {
                 return originalSubmit.apply(modal, args).then(appID => {
 
+                    // After new revision is load, app state is not Dirty any more
+                    this.setAppDirtyState(false);
+
                     const tab = this.workbox.getOrCreateAppTab({
                         id: AppHelper.getRevisionlessID(appID),
                         type: this.dataModel.class,
@@ -328,7 +356,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     });
                     this.workbox.openTab(tab);
                 });
-            }
+            };
 
         }, err => console.warn);
     }
@@ -401,6 +429,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         return this.dataGateway.fetchFileContent(fid).take(1)
             .toPromise().then(result => {
                 this.priorityCodeUpdates.next(result);
+                this.setAppDirtyState(false);
                 return result;
             }).catch(err => {
                 this.revisionChangingInProgress   = false;
@@ -419,7 +448,12 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
         /** If switching to code mode, serialize the model first and update the editor text */
         if (this.viewMode !== "code" && tabName === "code") {
-            this.priorityCodeUpdates.next(this.getModelText());
+
+            if (this.appIsDirty) {
+                /** If switching to code mode, serialize only if there are changes made (dirty state) */
+                this.priorityCodeUpdates.next(this.getModelText());
+            }
+
             this.viewMode = tabName;
             return;
         }
@@ -484,7 +518,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
             modal.onCancel = () => {
                 this.modal.close();
-            }
+            };
         });
     }
 
@@ -618,8 +652,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     protected toggleLock(locked: boolean): void {
 
-        if (locked === false
-        ) {
+        if (locked === false) {
             this.platformRepository.patchAppMeta(this.tabData.id, "swapUnlocked", true);
 
             this.isUnlockable = false;
@@ -698,7 +731,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                         observer.complete();
                         this.modal.close();
                         this.executor.setAppConfig(appID, null);
-                    }
+                    };
                 });
 
             }).take(1).filter(v => !!v) as Observable<AppExecutionContext>;
@@ -713,7 +746,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     .takeUntil(this.executionStop.do(() => this.executionOutput += "Execution Stopped"))
                     .finally(() => {
                         // When it ends, turn off the UI flag
-                        this.isExecuting = false
+                        this.isExecuting = false;
                     })
                     .catch(err => {
                         // We need to catch the error here, because if we catch it in the end, queue sub will be disposed
@@ -781,10 +814,42 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
             return () => {
                 runner.unsubscribe();
-            }
+            };
 
         });
     }
 
+    showModalIfAppIsDirty(): Promise<boolean> {
 
+        return new Promise((resolve, reject) => {
+
+            if (this.appIsDirty) {
+
+                const modal = this.modal.confirm({
+                    title: "Change revision",
+                    showDiscardButton: true,
+                    content:
+                        `Do you want to save the changes made to the document?<br/>
+                    Your changes will be lost if you don't save them.`,
+                    confirmationLabel: "Save",
+                    discardLabel: "Change without saving"
+                });
+
+                modal.then(() => {
+                    // If click on Save button
+                    this.save();
+                    reject();
+                }, (result) => {
+                    if (result === true) {
+                        // If click on Discard button
+                        resolve(true);
+                    }
+                });
+
+            } else {
+                resolve(true);
+            }
+        });
+
+    }
 }

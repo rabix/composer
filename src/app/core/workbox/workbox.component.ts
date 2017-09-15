@@ -8,6 +8,9 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {TabData} from "./tab-data.interface";
 import {WorkboxService} from "./workbox.service";
 import {ReplaySubject} from "rxjs/ReplaySubject";
+import {ModalService} from "../../ui/modal/modal.service";
+import {noop} from "../../lib/utils.lib";
+
 
 @Component({
     selector: "ct-workbox",
@@ -17,29 +20,81 @@ import {ReplaySubject} from "rxjs/ReplaySubject";
 
             <ul class="tab-bar inset-panel" tabindex="-1">
 
-                <li *ngFor="let tab of tabs"
+                <li *ngFor="let tab of tabs; let i = index"
                     [ct-drag-over]="true"
                     (onDragOver)="workbox.openTab(tab)"
                     ct-click
-                    (onMouseClick)="onTabClick($event, tab)"
+                    (onMouseClick)="onTabClick($event, tab, tabComponents[i])"
                     [class.active]="tab === (workbox.activeTab | async)"
+                    [class.isDirty]="tabComponents[i]?.appIsDirty"
                     [ct-context]="createContextMenu(tab)"
                     class="tab">
 
-                    <div class="tab-icon">
-                        <i class="fa"
-                           [class.fa-home]="tab?.type === 'Welcome'"
-                           [class.fa-file-text-o]="tab?.type === 'Code'"
-                           [class.fa-share-alt]="tab?.type === 'Workflow'"
-                           [class.fa-terminal]="tab?.type === 'CommandLineTool'"
-                           [class.fa-file-o]="tab?.type === 'NewFile'"
-                           [class.fa-cog]="tab?.type === 'Settings'"
-                        ></i>
-                    </div>
+                    <!-- Tab label and title -->
+                    <ng-container [ngSwitch]="tab?.type">
 
-                    <div class="title" [ct-tooltip]="ctt" [tooltipPlacement]="'bottom'">{{tab.label}}</div>
+                        <!-- Welcome tab-->
+                        <ng-template ngSwitchCase="Welcome">
+                            <div class="tab-icon">
+                                <i class="fa fa-home"></i>
+                            </div>
+
+                            <div class="title" [ct-tooltip]="ctt" [tooltipPlacement]="'bottom'">{{tab.label}}</div>
+                        </ng-template>
+
+                        <!-- Code tab-->
+                        <ng-template ngSwitchCase="Code">
+                            <div class="tab-icon">
+                                <i class="fa fa-file-text-o"></i>
+                            </div>
+
+                            <div class="title" [ct-tooltip]="ctt" [tooltipPlacement]="'bottom'">{{tab.label}}</div>
+                        </ng-template>
+
+                        <!-- Workflow tab-->
+                        <ng-template ngSwitchCase="Workflow">
+                            <div class="tab-icon">
+                                <i class="fa fa-share-alt"></i>
+                            </div>
+
+                            <div class="title" [ct-tooltip]="ctt" [tooltipPlacement]="'bottom'">
+                                {{tabComponents[i]?.dataModel?.label || tab.label}}
+                            </div>
+                        </ng-template>
+
+                        <!-- Command Line Tool tab-->
+                        <ng-template ngSwitchCase="CommandLineTool">
+                            <div class="tab-icon">
+                                <i class="fa fa-terminal"></i>
+                            </div>
+
+                            <div class="title" [ct-tooltip]="ctt" [tooltipPlacement]="'bottom'">
+                                {{tabComponents[i]?.dataModel?.label || tab.label}}
+                            </div>
+                        </ng-template>
+
+                        <!-- New File tab-->
+                        <ng-template ngSwitchCase="NewFile">
+                            <div class="tab-icon">
+                                <i class="fa fa-file-o"></i>
+                            </div>
+
+                            <div class="title" [ct-tooltip]="ctt" [tooltipPlacement]="'bottom'">{{tab.label}}</div>
+                        </ng-template>
+
+                        <!-- Settings tab-->
+                        <ng-template ngSwitchCase="Settings">
+                            <div class="tab-icon">
+                                <i class="fa fa-cog"></i>
+                            </div>
+
+                            <div class="title" [ct-tooltip]="ctt" [tooltipPlacement]="'bottom'">{{tab.label}}</div>
+                        </ng-template>
+
+                    </ng-container>
+
                     <div class="close-icon">
-                        <i class="fa fa-times clickable" (click)="removeTab(tab)"></i>
+                        <i class="fa fa-times clickable" (click)="removeTab(tab, tabComponents[i])"></i>
                     </div>
 
                     <!--Tooltip content-->
@@ -61,7 +116,10 @@ import {ReplaySubject} from "rxjs/ReplaySubject";
 
             <div class="component-container" *ngFor="let tab of tabs" [class.hidden]="tab !== activeTab">
 
-                <ct-workbox-tab #workBoxTabComponent [tab]="tab" [isActive]="activeTab === tab"></ct-workbox-tab>
+                <ct-workbox-tab #tabComponentContainer
+                                [tab]="tab"
+                                [isActive]="activeTab === tab">
+                </ct-workbox-tab>
 
             </div>
 
@@ -78,8 +136,11 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
 
     private el: Element;
 
-    @ViewChildren("workBoxTabComponent")
-    private tabComponents: QueryList<any>;
+    @ViewChildren("tabComponentContainer")
+    private tabComponentContainers: QueryList<any>;
+
+    /**  Components that are shown in tab */
+    tabComponents = [];
 
     constructor(private ipc: IpcService,
                 public workbox: WorkboxService,
@@ -87,6 +148,7 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
                 private local: LocalRepositoryService,
                 private statusBar: StatusBarService,
                 private cdr: ChangeDetectorRef,
+                private modal: ModalService,
                 el: ElementRef) {
         super();
         this.el = el.nativeElement;
@@ -123,19 +185,8 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
 
     ngAfterViewInit() {
 
-        this.workbox.tabCreation.delay(1).subscribeTracked(this, tab => {
-            const component = this.getTabComponent(tab);
-            if (component && typeof component.registerOnTabLabelChange === "function") {
-                component.registerOnTabLabelChange((title) => {
-                    tab.label = title;
-                    this.cdr.markForCheck();
-                }, tab.label);
-            }
-
-        });
-
         const replayComponents = new ReplaySubject(1);
-        this.tabComponents.changes.subscribeTracked(this, replayComponents);
+        this.tabComponentContainers.changes.subscribeTracked(this, replayComponents);
 
         this.workbox.activeTab.subscribeTracked(this, () => {
             this.statusBar.removeControls();
@@ -149,7 +200,7 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
                 this.activeTab = tab;
                 const idx = this.tabs.findIndex(t => t === tab);
 
-                const component = this.tabComponents.find((item, index) => index === idx);
+                const component = this.tabComponentContainers.find((item, index) => index === idx);
 
                 if (component) {
 
@@ -160,30 +211,61 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
                     });
                 }
             });
+
+        this.tabComponentContainers.changes.startWith(this.tabComponentContainers).delay(1)
+            .subscribeTracked(this , (components) => {
+                this.tabComponents = components.toArray().map((c) => c.tabComponent);
+            });
     }
 
     getTabComponent(tab) {
         const idx = this.tabs.findIndex(t => t === tab);
-        return this.tabComponents.find((item, index) => index === idx);
+        return this.tabComponentContainers.find((item, index) => index === idx);
     }
 
     /**
      * When you click on tab
      */
-    onTabClick(event: MouseEvent, tab) {
+    onTabClick(event: MouseEvent, tab, component) {
         // Middle click
         if (event.button === 0) {
             this.workbox.openTab(tab);
         } else if (event.button === 1) {
-            this.removeTab(tab);
+            this.removeTab(tab, component);
         }
     }
 
     /**
      * Removes a tab by index
      */
-    removeTab(tab) {
-        this.workbox.closeTab(tab);
+    removeTab(tab, component) {
+
+        if (component.appIsDirty) {
+
+            // If app is Dirty show modal
+            const modal = this.modal.confirm({
+                title: "Remove tab",
+                showDiscardButton: true,
+                content: `
+                Do you want to save the changes made to the document?<br/>
+                Your changes will be lost if you don't save them.`,
+                confirmationLabel: "Save",
+                discardLabel: "Close without saving"
+            });
+
+            modal.then(() => {
+                // If click on Save button
+                component.save();
+            }, (result) => {
+                if (result === true) {
+                    // If click on Discard button
+                    this.workbox.closeTab(tab);
+                }
+            });
+
+        } else {
+            this.workbox.closeTab(tab);
+        }
     }
 
     /**
@@ -210,7 +292,7 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
 
     createContextMenu(tab): MenuItem[] {
         const closeOthers = new MenuItem("Close Others", {
-            click: () => this.removeOtherTabs(tab)
+            click: () => this.removeAllTabs(tab)
         });
 
         const closeAll = new MenuItem("Close All", {
@@ -221,16 +303,35 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
     }
 
     /**
-     * Removes all tabs except one
+     * Removes all tabs or all other tabs (if tab is passed as an argument)
      */
-    private removeOtherTabs(tab) {
-        this.workbox.closeOtherTabs(tab);
-    }
+    private removeAllTabs(tab?: TabData<any>) {
 
-    /**
-     * Removes all tabs
-     */
-    private removeAllTabs() {
-        this.workbox.closeAllTabs();
+        const component = tab ? this.getTabComponent(tab).tabComponent : null;
+
+        const hasDirtyTabs = this.tabComponents.find((tabComponent) => {
+            return tabComponent.appIsDirty && (tabComponent !== component);
+        });
+
+        const modalTitle = `Close ${tab ? "other" : "all"} tabs`;
+
+        if (hasDirtyTabs) {
+
+            // If there are apps that are Dirty show modal
+            const modal = this.modal.confirm({
+                title: modalTitle,
+                content: `Some documents are modified.<br>
+                          Your changes will be lost if you don't save them.`,
+                confirmationLabel: modalTitle,
+            });
+
+            modal.then(() => {
+                this.workbox.closeAllTabs(tab);
+            }, noop);
+
+        } else {
+            this.workbox.closeAllTabs(tab);
+        }
+
     }
 }
