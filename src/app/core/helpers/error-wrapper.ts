@@ -22,7 +22,7 @@ export class ErrorWrapper {
             let msg = serviceName + " service";
 
             if (this.err.statusCode === 401) {
-                return msg + " says that you are unauthorized to view this resource. Did your token expire?"
+                return msg + " says that you are unauthorized to view this resource. Please check your token.";
             }
 
             if (this.err.statusCode === 504) {

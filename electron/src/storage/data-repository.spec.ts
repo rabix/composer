@@ -6,7 +6,7 @@ import * as sinon from "sinon";
 
 import * as tmp from "tmp";
 import {SynchrounousResult} from "tmp";
-import {encodeBase64} from "../security/encoder";
+import {encrypt} from "../security/encoder";
 import {DataRepository} from "./data-repository";
 import {UserRepository} from "./types/user-repository";
 
@@ -131,7 +131,7 @@ describe("Data repository", function () {
             activeCredentials: userData
         } as Partial<UserRepository>;
 
-        fs.outputFileSync(localPath, encodeBase64(JSON.stringify(profileData)));
+        fs.outputFileSync(localPath, encrypt(JSON.stringify(profileData)));
 
         return userData;
     }
