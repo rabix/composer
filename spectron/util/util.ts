@@ -10,15 +10,17 @@ import ITestCallbackContext = Mocha.ITestCallbackContext;
 import {encodeBase64} from "../../electron/src/security/encoder";
 
 interface FnTestConfig {
-    localRepository: Partial<LocalRepository>,
-    platformRepositories: { [userID: string]: Partial<UserRepository> } ,
+    localRepository: Partial<LocalRepository>;
+    platformRepositories: { [userID: string]: Partial<UserRepository> };
     overrideModules: {
         module: string,
         override: Object
-    }[],
-    waitForMainWindow: boolean,
-    testTimeout: number,
-    retries: number
+    }[];
+    waitForMainWindow: boolean;
+    testTimeout: number;
+    retries: number;
+    skipFetch: boolean;
+    skipUpdateCheck: boolean;
 }
 
 function isDevServer() {
@@ -43,6 +45,9 @@ export function boot(context: ITestCallbackContext, testConfig: Partial<FnTestCo
     context.retries(testConfig.retries || 0);
     context.timeout(testConfig.testTimeout || 30000);
 
+    const skipFetch       = testConfig.skipFetch !== false;
+    const skipUpdateCheck = testConfig.skipUpdateCheck !== false;
+
     const testTitle      = context.test.fullTitle();
     const globalTestDir  = path.resolve(`${__dirname}/../../.testrun`);
     const currentTestDir = `${globalTestDir}/${testTitle}`.replace(/\s/g, "-");
@@ -55,7 +60,7 @@ export function boot(context: ITestCallbackContext, testConfig: Partial<FnTestCo
     fs.outputFileSync(localProfilePath, encodeBase64(JSON.stringify(testConfig.localRepository)));
 
     if (testConfig.platformRepositories) {
-        for (let userID in testConfig.platformRepositories) {
+        for (const userID in testConfig.platformRepositories) {
             const profilePath = profilesDirPath + `/${userID}.json`;
             const profileData = Object.assign(new UserRepository(), testConfig.platformRepositories[userID] || {});
 
@@ -74,7 +79,8 @@ export function boot(context: ITestCallbackContext, testConfig: Partial<FnTestCo
     const chromiumArgs = [
         isDevServer() && "./electron",
         "--spectron",
-        "--no-fetch-on-start",
+        skipFetch && "--no-fetch-on-start",
+        skipUpdateCheck && "--no-update-check",
         "--user-data-dir=" + currentTestDir,
         moduleOverrides && `--override-modules=${moduleOverrides}`
     ].filter(v => v);
@@ -98,7 +104,7 @@ export function boot(context: ITestCallbackContext, testConfig: Partial<FnTestCo
 
 export function shutdown(app: spectron.Application) {
 
-    if(!app){
+    if (!app) {
         return;
     }
 
@@ -148,11 +154,11 @@ export function partialProxy(module: string, overrides: Object = {}) {
     };
 
     let stringified = fn.toString();
-    for (let arg in interpolate) {
+    for (const arg in interpolate) {
         stringified = stringified.replace(new RegExp(arg, "g"), interpolate[arg]);
     }
 
-    return `(${stringified})()`
+    return `(${stringified})()`;
 
 }
 
@@ -185,7 +191,7 @@ export function proxerialize(fn: (...args: any[]) => any, ...inputs: any[]): any
             }
         });
 
-        outputStr = outputStr.replace(new RegExp(argName, "g"), argValue)
+        outputStr = outputStr.replace(new RegExp(argName, "g"), argValue);
 
     });
 
