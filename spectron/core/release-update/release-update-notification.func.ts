@@ -35,6 +35,7 @@ describe("new release check", function () {
     it("shows that there is an update amongst multiple releases", async function () {
 
         app = await boot(this, {
+            skipUpdateCheck: false,
             overrideModules: [
                 {
                     module: "./github-api-client/github-client",
@@ -59,6 +60,7 @@ describe("new release check", function () {
 
     it("shows that the update is available when it is", async function () {
         app = await boot(this, {
+            skipUpdateCheck: false,
             overrideModules: [
                 {
                     module: "./github-api-client/github-client",
