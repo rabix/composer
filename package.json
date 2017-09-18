@@ -1,7 +1,7 @@
 {
     "name": "rabix-composer",
     "version": "1.0.0-rc.2",
-    "executorVersion": "v1.0.0",
+    "executorVersion": "1.0.0",
     "license": "Apache-2.0",
     "homepage": "https://github.com/rabix/composer#readme",
     "description": "Rabix Composer is a desktop IDE for working with Common Workflow Language workflows",
@@ -22,7 +22,7 @@
         "compile:electron:watch": "./node_modules/.bin/tsc -p electron --watch",
         "lint": "./node_modules/.bin/ng lint",
         "package": "node ./electron-build.js",
-        "postinstall": "./node_modules/.bin/concurrently 'node build-scripts/executor-bundle.js' 'cd electron && yarn install'",
+        "postinstall": "./node_modules/.bin/concurrently 'node build-scripts/bundle-executor.js' 'cd electron && yarn install'",
         "serve": "./node_modules/.bin/ng serve",
         "start:electron": "./node_modules/.bin/electron ./electron",
         "test": "yarn run test:electron && yarn run test:angular && yarn run test:spectron",

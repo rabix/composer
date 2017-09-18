@@ -538,7 +538,7 @@ export function patchAppMeta(data: {
 
 export function probeExecutorVersion(data: { path: string }, callback) {
     repositoryLoad.then(() => {
-        const rabix = new RabixExecutor(repository.local.executorConfig);
+        const rabix = new RabixExecutor(repository.local.executorConfig.path);
 
         rabix.getVersion((err: any, version) => {
             if (err) {
@@ -566,8 +566,8 @@ export function executeApp(data: {
     repositoryLoad.then(() => {
         const {appID, content, jobPath, options} = data;
 
-        const rabix = new RabixExecutor(repository.local.executorConfig);
+        const rabix = new RabixExecutor(repository.local.executorConfig.path);
 
-        rabix.execute(appID, content, jobPath, options, callback, emitter);
+        rabix.execute(content, jobPath, options, callback, emitter);
     })
 }

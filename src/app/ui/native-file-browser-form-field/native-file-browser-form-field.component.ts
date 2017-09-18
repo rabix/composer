@@ -55,9 +55,12 @@ export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor
     }
 
     onBrowse() {
-        this.dialog.openFile({title: "Find the Rabix Executor"})
-            .then(files => files[0])
-            .then(file => this.value = file)
+        this.dialog
+            .openFile({
+                title: "Find the Rabix Executor",
+                defaultPath: this.value
+            })
+            .then(files => this.value = files[0])
             .catch(() => void 0);
     }
 

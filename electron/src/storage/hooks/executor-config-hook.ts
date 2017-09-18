@@ -11,7 +11,7 @@ export class Executor implements RepositoryHook {
             return;
         }
 
-        const rabix = new RabixExecutor(executorConfig);
+        const rabix = new RabixExecutor(executorConfig.path);
         // If there is no executor path set, see if you can run just “rabix” as a process, then set that path
 
         rabix.getVersion((err, stdout) => {

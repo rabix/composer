@@ -54,7 +54,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
         </ct-form-panel>
 
         <ct-form-panel class="m-2">
-            <div class="tc-header">Rabix Executor Configuration</div>
+            <div class="tc-header">Rabix Executor</div>
             <div class="tc-body p-1">
                 <ct-executor-config></ct-executor-config>
             </div>
@@ -74,8 +74,7 @@ export class SettingsComponent extends DirectiveBase {
     }
 
     openCredentialsForm() {
-        this.modal.fromComponent(PlatformCredentialsModalComponent, "Add Connection"
-        );
+        this.modal.fromComponent(PlatformCredentialsModalComponent, "Add Connection");
     }
 
     editCredentials(edited: AuthCredentials) {
