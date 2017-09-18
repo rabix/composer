@@ -21,6 +21,7 @@ import {StatusBarService} from "../layout/status-bar/status-bar.service";
 import {PlatformRepositoryService} from "../repository/platform-repository.service";
 import {IpcService} from "../services/ipc.service";
 import {ModalService} from "../ui/modal/modal.service";
+import {AppUpdateService} from "../editor-common/services/app-update/app-updating.service";
 
 export function appSaverFactory(comp: ToolEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -74,7 +75,8 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
                 platformRepository: PlatformRepositoryService,
                 platformAppService: PlatformAppService,
                 workbox: WorkboxService,
-                executor: ExecutorService) {
+                executor: ExecutorService,
+                updateService: AppUpdateService) {
 
         super(
             statusBar,
@@ -88,7 +90,8 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
             platformAppService,
             platformRepository,
             workbox,
-            executor
+            executor,
+            updateService
         );
     }
 

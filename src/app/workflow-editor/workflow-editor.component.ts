@@ -22,6 +22,7 @@ import {IpcService} from "../services/ipc.service";
 import {ModalService} from "../ui/modal/modal.service";
 import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow-graph-editor.component";
 import {WorkflowEditorService} from "./workflow-editor.service";
+import {AppUpdateService} from "../editor-common/services/app-update/app-updating.service";
 
 export function appSaverFactory(comp: WorkflowEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -59,7 +60,8 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                 private cdr: ChangeDetectorRef,
                 platformAppService: PlatformAppService,
                 workbox: WorkboxService,
-                executorService: ExecutorService) {
+                executorService: ExecutorService,
+                updateService: AppUpdateService) {
         super(
             statusBar,
             notificationBar,
@@ -72,7 +74,8 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
             platformAppService,
             platformRepository,
             workbox,
-            executorService
+            executorService,
+            updateService
         );
     }
 
@@ -116,6 +119,28 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
     protected afterModelCreated(isFirstCreation: boolean): void {
         if (this.tabData.isWritable && this.tabData.dataSource !== "local") {
             this.getStepUpdates();
+        }
+
+        if (isFirstCreation) {
+            this.updateService.update
+                .filter(data => {
+                    return this.dataModel.steps.filter(step => {
+                        if (this.tabData.dataSource === "local") {
+                            return this.codeEditorContent.value.indexOf("run: " + data["id"]) > -1;
+                        } else {
+                            return AppHelper.getRevisionlessID(step.run.customProps["sbg:id"] || "") === AppHelper.getRevisionlessID(data["sbg:id"]);
+                        }
+                    }).length > 0;
+                })
+                .subscribeTracked(this, (data) => {
+                    if (this.tabData.dataSource === "local") {
+                        this.syncModelAndCode(false).then(() => {
+                            this.resolveToModel(this.codeEditorContent.value);
+                        }, err => console.warn);
+                    } else {
+                        this.getStepUpdates();
+                    }
+                });
         }
     }
 

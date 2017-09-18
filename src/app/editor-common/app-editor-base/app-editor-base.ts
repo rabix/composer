@@ -30,6 +30,7 @@ import {AppValidatorService, AppValidityState} from "../app-validator/app-valida
 import {PlatformAppService} from "../components/platform-app-common/platform-app.service";
 import {RevisionListComponent} from "../components/revision-list/revision-list.component";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
+import {AppUpdateService} from "../services/app-update/app-updating.service";
 import {APP_SAVER_TOKEN, AppSaver} from "../services/app-saving/app-saver.interface";
 
 export abstract class AppEditorBase extends DirectiveBase implements StatusControlProvider, OnInit, AfterViewInit {
@@ -123,7 +124,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 protected platformAppService: PlatformAppService,
                 protected platformRepository: PlatformRepositoryService,
                 protected workbox: WorkboxService,
-                protected executor: ExecutorService) {
+                protected executor: ExecutorService,
+                protected updateService: AppUpdateService) {
 
         super();
 
@@ -269,6 +271,12 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             this.reportPanel = state.isValidCWL ? this.getPreferredReportPanel() : this.reportPanel;
         });
 
+        if (this.tabData.dataSource !== "local") {
+            this.updateService.update
+                .filter(data => AppHelper.getRevisionlessID(data["sbg:id"] || "") === this.tabData.id)
+                .subscribeTracked(this, data => this.dataModel.customProps["sbg:revisionsInfo"] = data["sbg:revisionsInfo"]);
+        }
+
         this.bindExecutionQueue();
     }
 
@@ -292,6 +300,10 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
                 this.priorityCodeUpdates.next(update);
                 this.statusBar.stopProcess(proc, `Saved: ${appName}`);
+
+                if (this.tabData.dataSource === "local") {
+                    this.updateService.notifySubscribers({id: this.tabData.id});
+                }
             }, err => {
                 if (!err || !err.message) {
                     this.statusBar.stopProcess(proc);

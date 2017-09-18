@@ -60,7 +60,7 @@ describe("app publishing", () => {
 
                                 return (appID: string) => {
 
-                                    if (appID.startsWith("test-user/test-project/test-app-publish") && $callCount > 1) {
+                                    if (appID.startsWith("test-user/test-project/test-app-update") && $callCount > 1) {
                                         return Promise.resolve({raw: JSON.parse(appContent)});
                                     }
 

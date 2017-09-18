@@ -8,6 +8,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {FormAsyncValidator} from "../../forms/helpers/form-async-validator";
 import {ErrorWrapper} from "../../helpers/error-wrapper";
+import {AppUpdateService} from "../../../editor-common/services/app-update/app-updating.service";
 
 const {app, dialog} = window["require"]("electron").remote;
 
@@ -84,6 +85,7 @@ export class PublishModalComponent extends DirectiveBase {
     constructor(private dataGateway: DataGatewayService,
                 public modal: ModalService,
                 private platformRepository: PlatformRepositoryService,
+                private updateService: AppUpdateService,
                 private slugify: SlugifyPipe) {
 
         super();
@@ -144,10 +146,11 @@ export class PublishModalComponent extends DirectiveBase {
 
         return saveCall.then(str => {
             this.isPublishing = false;
+            this.updateService.notifySubscribers(JSON.parse(str));
             this.close();
             return appID;
         }, (err) => {
-            this.error        = "Failed to publish the app. " + new ErrorWrapper(err);
+            this.error        = "Failed to update the app. " + new ErrorWrapper(err);
             this.isPublishing = false;
         });
     }
