@@ -335,8 +335,8 @@ export class DataRepository {
                     return callback(err);
                 }
 
-                const text = decrypt(content);
                 try {
+                    const text = decrypt(content);
 
                     const parsed = JSON.parse(text);
                     callback(null, parsed);
