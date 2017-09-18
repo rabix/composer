@@ -328,7 +328,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     });
                     this.workbox.openTab(tab);
                 });
-            }
+            };
 
         }, err => console.warn);
     }
