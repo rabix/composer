@@ -302,7 +302,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 this.statusBar.stopProcess(proc, `Saved: ${appName}`);
 
                 if (this.tabData.dataSource === "local") {
-                    this.updateService.notifySubscribers({id: this.tabData.id});
+                    this.updateService.updateApps({id: this.tabData.id});
                 }
             }, err => {
                 if (!err || !err.message) {
@@ -328,10 +328,11 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             const originalSubmit = modal.onSubmit;
 
             modal.onSubmit = (...args: any[]) => {
-                return originalSubmit.apply(modal, args).then(appID => {
+                return originalSubmit.apply(modal, args).then(json => {
+                    this.updateService.updateApps(json);
 
                     const tab = this.workbox.getOrCreateAppTab({
-                        id: AppHelper.getRevisionlessID(appID),
+                        id: AppHelper.getRevisionlessID(json["sbg:id"]),
                         type: this.dataModel.class,
                         label: modal.inputForm.get("name").value,
                         isWritable: true,

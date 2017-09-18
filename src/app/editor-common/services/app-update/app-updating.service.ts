@@ -8,7 +8,7 @@ export class AppUpdateService {
     constructor() {
     }
 
-    notifySubscribers(data: any) {
+    updateApps(data: any) {
         this.update.next(data);
     }
 }
