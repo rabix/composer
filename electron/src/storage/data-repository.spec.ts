@@ -6,7 +6,7 @@ import * as sinon from "sinon";
 
 import * as tmp from "tmp";
 import {SynchrounousResult} from "tmp";
-import {encodeBase64} from "../security/encoder";
+import {encrypt} from "../security/encoder";
 import {DataRepository} from "./data-repository";
 import {UserRepository} from "./types/user-repository";
 
@@ -47,9 +47,16 @@ describe("Data repository", function () {
         repository.load(err => {
             if (err) throw err;
 
-            assert.equal(repository.local.activeCredentials.token, token);
-            done();
+            try {
+                assert.equal(repository.local.activeCredentials.token, token);
+                done()
+
+            } catch (ex) {
+                done(ex);
+            }
+
         });
+
     });
 
     it("should delete token from keychain when user gets removed", function (done) {
@@ -68,10 +75,15 @@ describe("Data repository", function () {
 
                 if (err) throw err;
 
-                assert.equal(keychainRemoval.callCount, 1);
-                const [callArg] = keychainRemoval.firstCall.args;
-                assert.equal(callArg, user.id);
-                done();
+                try {
+                    assert.equal(keychainRemoval.callCount, 1);
+                    const [callArg] = keychainRemoval.firstCall.args;
+                    assert.equal(callArg, user.id);
+                    done();
+
+                } catch (ex) {
+                    done(ex);
+                }
 
             });
 
@@ -99,13 +111,15 @@ describe("Data repository", function () {
 
                 if (err) throw err;
 
-                assert.equal(repository.local.activeCredentials.token, token);
-                assert.equal(tokenSetting.callCount, 1);
-                assert.equal(tokenSetting.firstCall.args[0], user.id);
-                assert.equal(tokenSetting.firstCall.args[1], token);
-
-                done();
-
+                try {
+                    assert.equal(repository.local.activeCredentials.token, token);
+                    assert.equal(tokenSetting.callCount, 1);
+                    assert.equal(tokenSetting.firstCall.args[0], user.id);
+                    assert.equal(tokenSetting.firstCall.args[1], token);
+                    done();
+                } catch (ex) {
+                    done(ex);
+                }
             });
 
         });
@@ -123,7 +137,7 @@ describe("Data repository", function () {
         };
 
         // This is the full path of the local profile file
-        const localPath = dir.name + "/local.json";
+        const localPath = dir.name + "/local";
 
         // Write basic user data to that profile file, so we don't start with a blank state
         const profileData = {
@@ -131,7 +145,10 @@ describe("Data repository", function () {
             activeCredentials: userData
         } as Partial<UserRepository>;
 
-        fs.outputFileSync(localPath, encodeBase64(JSON.stringify(profileData)));
+        const stringified = JSON.stringify(profileData);
+        const encrypted   = encrypt(stringified);
+
+        fs.outputFileSync(localPath, encrypted);
 
         return userData;
     }
