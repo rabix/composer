@@ -35,17 +35,14 @@ import {WorkboxService} from "./workbox.service";
                 </li>
                 <li (click)="openSettings()"><i class="fa fa-cog fa-fw"></i> Settings</li>
                 <li (click)="openFeedback()"><i class="fa fa-bullhorn fa-fw"></i> Send Feedback</li>
-                <li (click)="checkForPlatformUpdates()" [class.outdated-update]="global.platformIsOutdated"
-                        data-test="check-for-updates">
-                    
+                <li (click)="checkForPlatformUpdates()" *ngIf="global.platformIsOutdated" class="outdated-update"
+                    data-test="updates-available">
+
                     <i class="fa fa-refresh fa-fw "></i>
-                    
-                    <span *ngIf="platformIsOutdated; else checkForUpdates">
-                        Update Available
+                    <span>
+                        Update available
                     </span>
-                    
-                    <ng-template #checkForUpdates>Check for Updates</ng-template>
-                    
+
                 </li>
             </ul>
         </ng-template>
