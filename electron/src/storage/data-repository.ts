@@ -1,12 +1,14 @@
 import * as ReadWriteLock from "rwlock";
-import {decodeBase64, encodeBase64} from "../security/encoder";
+import {decrypt, encrypt} from "../security/encoder";
 import {LocalRepository} from "./types/local-repository";
 import {RepositoryType} from "./types/repository-type";
 import {UserRepository} from "./types/user-repository";
 
+const crypto   = require("crypto");
 const fs       = require("fs-extra");
 const keychain = require("../keychain");
 const logger   = require("../logger").Log;
+
 type UpdateChange = {
     newValue: any;
     oldValue: any;
@@ -21,7 +23,6 @@ export class DataRepository {
     private lock      = new ReadWriteLock();
     private listeners = {};
     private profileDirectory: string;
-
 
     constructor(profileDirectory: string) {
 
@@ -277,7 +278,7 @@ export class DataRepository {
     }
 
     private getProfileFilePath(profile: string): string {
-        return `${this.profileDirectory}/${profile}.json`;
+        return `${this.profileDirectory}/${profile}`;
     }
 
     /**
@@ -334,8 +335,8 @@ export class DataRepository {
                     return callback(err);
                 }
 
-                const text = decodeBase64(content);
                 try {
+                    const text = decrypt(content);
 
                     const parsed = JSON.parse(text);
                     callback(null, parsed);
@@ -371,9 +372,8 @@ export class DataRepository {
         const frozen = JSON.stringify(copy, null, 4);
 
         this.lock.writeLock(filePath, (release) => {
-            const b64 = encodeBase64(frozen);
 
-            fs.outputFile(filePath, b64, "utf8", (err, data) => {
+            fs.outputFile(filePath, encrypt(frozen), "utf8", (err, data) => {
                 release();
                 callback(err, data);
             });
