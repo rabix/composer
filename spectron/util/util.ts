@@ -7,7 +7,6 @@ import {LocalRepository} from "../../electron/src/storage/types/local-repository
 import {UserRepository} from "../../electron/src/storage/types/user-repository";
 import rimraf = require("rimraf");
 import ITestCallbackContext = Mocha.ITestCallbackContext;
-import {encrypt} from "../../electron/src/security/encoder";
 
 interface FnTestConfig {
     localRepository: Partial<LocalRepository>;
@@ -57,14 +56,14 @@ export function boot(context: ITestCallbackContext, testConfig: Partial<FnTestCo
 
     testConfig.localRepository = Object.assign(new LocalRepository(), testConfig.localRepository || {});
 
-    fs.outputFileSync(localProfilePath, encrypt(JSON.stringify(testConfig.localRepository)));
+    fs.outputFileSync(localProfilePath, JSON.stringify(testConfig.localRepository));
 
     if (testConfig.platformRepositories) {
         for (const userID in testConfig.platformRepositories) {
             const profilePath = profilesDirPath + `/${userID}`;
             const profileData = Object.assign(new UserRepository(), testConfig.platformRepositories[userID] || {});
 
-            fs.outputFileSync(profilePath, encrypt(JSON.stringify(profileData)));
+            fs.outputFileSync(profilePath, JSON.stringify(profileData));
         }
     }
 

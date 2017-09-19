@@ -1,13 +1,10 @@
 import * as ReadWriteLock from "rwlock";
-import {decrypt, encrypt} from "../security/encoder";
 import {LocalRepository} from "./types/local-repository";
 import {RepositoryType} from "./types/repository-type";
 import {UserRepository} from "./types/user-repository";
 
-const crypto   = require("crypto");
-const fs       = require("fs-extra");
-const keychain = require("../keychain");
-const logger   = require("../logger").Log;
+const fs     = require("fs-extra");
+const logger = require("../logger").Log;
 
 type UpdateChange = {
     newValue: any;
@@ -54,34 +51,7 @@ export class DataRepository {
             });
         });
 
-        this.on("update.local", (_, changes) => {
-            /**
-             * When credentials in local profile get updated, we might have to remove some tokens from the keychain.
-             */
-            if (changes && changes.has("credentials")) {
-                const {oldValue, newValue} = changes.get("credentials");
-
-                const oldIDs = oldValue.map(c => c.id);
-                const newIDs = newValue.map(c => c.id);
-
-                // Get all ids that existed earlier, but not anymore.
-                const prune = oldIDs.filter(id => newIDs.indexOf(id) === -1);
-
-                prune.forEach(cid => keychain.remove(cid).catch(err => {
-                    logger.error("Failed to remove token from keychain.", err);
-                }));
-            }
-        });
-
         this.on("update.local.credentials", () => {
-
-            this.local.credentials.forEach(c => {
-
-                keychain.set(c.id, c.token).catch(ex => {
-                    logger.error("Keychain error", ex);
-                });
-            });
-
             this.cleanProfiles();
         });
     }
@@ -99,39 +69,22 @@ export class DataRepository {
 
             this.local = localData;
 
-            // Load tokens
-            const keychainTokens = Promise.all(this.local.credentials.map(c => keychain.get(c.id)));
+            // If there are no active credentials, there are no other profiles to load, so break here
+            if (!localData.activeCredentials) {
+                callback();
+                return;
+            }
 
-            keychainTokens.then((tokens) => {
-
-                this.local.credentials.forEach((c, idx) => {
-                    c.token = tokens[idx];
-                });
-
-                // If there are no active credentials, there are no other profiles to load, so break here
-                if (!localData.activeCredentials) {
-                    callback();
+            this.loadProfile(localData.activeCredentials.id, new UserRepository(), (err, userData) => {
+                if (err) {
+                    callback(err);
                     return;
                 }
 
-                // If there are active credentials, patch it's token from keychain as well
-                this.local.activeCredentials.token = this.local.credentials.find(cred => cred.id === this.local.activeCredentials.id).token;
+                this.user = userData;
 
-                this.loadProfile(localData.activeCredentials.id, new UserRepository(), (err, userData) => {
-                    if (err) {
-                        callback(err);
-                        return;
-                    }
-
-                    this.user = userData;
-
-                    callback();
-                });
-
-            }, err => {
-                callback(err);
+                callback();
             });
-
 
         });
     }
@@ -336,9 +289,7 @@ export class DataRepository {
                 }
 
                 try {
-                    const text = decrypt(content);
-
-                    const parsed = JSON.parse(text);
+                    const parsed = JSON.parse(content);
                     callback(null, parsed);
 
                 } catch (err) {
@@ -373,7 +324,7 @@ export class DataRepository {
 
         this.lock.writeLock(filePath, (release) => {
 
-            fs.outputFile(filePath, encrypt(frozen), "utf8", (err, data) => {
+            fs.outputFile(filePath, frozen, "utf8", (err, data) => {
                 release();
                 callback(err, data);
             });
