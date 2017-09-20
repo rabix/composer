@@ -328,11 +328,11 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             const originalSubmit = modal.onSubmit;
 
             modal.onSubmit = (...args: any[]) => {
-                return originalSubmit.apply(modal, args).then(json => {
-                    this.updateService.updateApps(json);
+                return originalSubmit.apply(modal, args).then(obj => {
+                    this.updateService.updateApps(obj.app);
 
                     const tab = this.workbox.getOrCreateAppTab({
-                        id: AppHelper.getRevisionlessID(json["sbg:id"]),
+                        id: AppHelper.getRevisionlessID(obj.id),
                         type: this.dataModel.class,
                         label: modal.inputForm.get("name").value,
                         isWritable: true,

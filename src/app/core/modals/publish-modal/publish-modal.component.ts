@@ -130,7 +130,7 @@ export class PublishModalComponent extends DirectiveBase {
             })));
     }
 
-    onSubmit(): Promise<string> {
+    onSubmit(): Promise<{ app: object, id: string}> {
         const {revisionNote, appID, content} = this.outputForm.getRawValue();
 
         this.isPublishing = true;
@@ -145,7 +145,7 @@ export class PublishModalComponent extends DirectiveBase {
         return saveCall.then(str => {
             this.isPublishing = false;
             this.close();
-            return JSON.parse(str);
+            return { app: JSON.parse(str), id: appID };
         }, (err) => {
             this.error        = "Failed to update the app. " + new ErrorWrapper(err);
             this.isPublishing = false;
