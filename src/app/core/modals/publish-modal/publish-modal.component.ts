@@ -134,7 +134,7 @@ export class PublishModalComponent extends DirectiveBase {
         const {revisionNote, appID, content} = this.outputForm.getRawValue();
 
         this.isPublishing = true;
-        let saveCall: Promise<any>;
+        let saveCall: Promise<string>;
 
         if (this.revision === 0) {
             saveCall = this.platformRepository.createApp(appID, content);

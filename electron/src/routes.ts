@@ -412,14 +412,14 @@ export function createPlatformApp(data: { id: string, content: string }, callbac
 
         const api = new SBGClient(url, token);
 
-        return api.apps.create(data.id, data.content).then((response) => {
-            callback(null, JSON.parse(response));
+        return api.createApp(data.id, data.content).then((response) => {
+            callback(null, response);
 
             const idParts = data.id.split("/");
 
             const project = idParts.slice(0, 2).join("/");
 
-            api.apps.private({
+            api.getAllUserApps({
                 project,
                 fields: "id,name,project,raw.class,revision"
             }).then((projectApps) => {

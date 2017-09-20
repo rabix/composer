@@ -20,6 +20,7 @@
         "compile:angular": "./node_modules/.bin/ng build -prod -aot --no-progress",
         "compile:electron": "./node_modules/.bin/tsc -p electron && cp -R electron/src/splash electron/dist/src",
         "compile:electron:watch": "./node_modules/.bin/tsc -p electron --watch",
+        "debug:electron": "./node_modules/.bin/electron ./electron --inspect-brk",
         "lint": "./node_modules/.bin/ng lint",
         "package": "node ./electron-build.js",
         "postinstall": "cd electron && yarn install",
