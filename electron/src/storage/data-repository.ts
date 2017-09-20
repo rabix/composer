@@ -52,6 +52,7 @@ export class DataRepository {
         });
 
         this.on("update.local.credentials", () => {
+
             this.cleanProfiles();
         });
     }
@@ -230,7 +231,7 @@ export class DataRepository {
         return this.local.activeCredentials && profile === this.local.activeCredentials.id;
     }
 
-    private getProfileFilePath(profile: string): string {
+    getProfileFilePath(profile: string): string {
         return `${this.profileDirectory}/${profile}`;
     }
 
@@ -304,22 +305,6 @@ export class DataRepository {
 
         const copy = Object.assign({}, input);
 
-        if (copy.credentials) {
-            Object.assign(copy, {
-                credentials: copy.credentials.map(c => Object.assign({}, c, {
-                    token: null
-                }))
-            });
-        }
-
-        if (copy.activeCredentials) {
-            Object.assign(copy, {
-                activeCredentials: Object.assign({}, copy.activeCredentials, {
-                    token: null
-                })
-            });
-        }
-
         const frozen = JSON.stringify(copy, null, 4);
 
         this.lock.writeLock(filePath, (release) => {
@@ -357,4 +342,6 @@ export class DataRepository {
             Promise.all(deletables).then(r => callback(null, r), callback);
         });
     }
+
+
 }

@@ -3,7 +3,6 @@ import * as fs from "fs-extra";
 import * as spectron from "spectron";
 import {
     generateAuthCredentials,
-    generateKeychain,
     generatePlatformProject
 } from "../../util/generator";
 import {mockSBGClient} from "../../util/sbg-client-proxy";
@@ -38,7 +37,6 @@ describe("app publishing", () => {
                 }
             },
             overrideModules: [
-                generateKeychain(),
                 {
                     module: "fs-extra",
                     override: partialProxy("fs-extra", {

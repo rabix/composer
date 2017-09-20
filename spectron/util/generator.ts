@@ -51,21 +51,3 @@ export function generatePlatformProject(data: Partial<Project> = {}): Project {
         settings: null
     } as Project, data);
 }
-
-
-export function generateKeychain() {
-    return {
-        module: "./keychain",
-        override: {
-            get() {
-                return Promise.resolve("3d15bcde2052476280f2bc6d0c56f69b");
-            },
-            set() {
-                return Promise.resolve();
-            },
-            remove() {
-                return Promise.resolve();
-            }
-        }
-    };
-}
