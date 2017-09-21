@@ -306,12 +306,12 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     publish(): void {
 
         if (!this.validationState.isValidCWL) {
-            this.notificationBar.showNotification(new ErrorNotification(`Cannot publish this app because because it's doesn't match the proper JSON schema`));
+            this.notificationBar.showNotification(new ErrorNotification(`Cannot push this app because because it's doesn't match the proper JSON schema`));
             return;
         }
 
         this.syncModelAndCode(true).then(() => {
-            const modal          = this.modal.fromComponent(PublishModalComponent, "Publish an App");
+            const modal          = this.modal.fromComponent(PublishModalComponent, "Push an App");
             modal.appContent     = this.getModelText(true);
             const originalSubmit = modal.onSubmit;
 
@@ -328,7 +328,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     });
                     this.workbox.openTab(tab);
                 });
-            }
+            };
 
         }, err => console.warn);
     }
@@ -431,7 +431,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             this.viewMode = undefined;
             this.resolveToModel(this.codeEditorContent.value).then(() => {
                 this.viewMode = tabName;
-            }, err => {
+            }, () => {
                 this.viewMode = "code";
             });
             return;
@@ -484,7 +484,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
             modal.onCancel = () => {
                 this.modal.close();
-            }
+            };
         });
     }
 
@@ -698,7 +698,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                         observer.complete();
                         this.modal.close();
                         this.executor.setAppConfig(appID, null);
-                    }
+                    };
                 });
 
             }).take(1).filter(v => !!v) as Observable<AppExecutionContext>;
@@ -713,7 +713,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     .takeUntil(this.executionStop.do(() => this.executionOutput += "Execution Stopped"))
                     .finally(() => {
                         // When it ends, turn off the UI flag
-                        this.isExecuting = false
+                        this.isExecuting = false;
                     })
                     .catch(err => {
                         // We need to catch the error here, because if we catch it in the end, queue sub will be disposed
@@ -781,7 +781,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
             return () => {
                 runner.unsubscribe();
-            }
+            };
 
         });
     }
