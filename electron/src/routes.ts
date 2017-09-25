@@ -1,15 +1,17 @@
 import {app} from "electron";
+import * as path from "path";
 import {RequestCallback} from "request";
 import {PublicAPI} from "./controllers/public-api.controller";
 import * as SearchController from "./controllers/search.controller";
 import {SwapController} from "./controllers/swap.controller";
 import * as GitHubClient from "./github-api-client/github-client";
+import {RabixExecutor} from "./rabix-executor/rabix-executor";
 import {AppQueryParams} from "./sbg-api-client/interfaces/queries";
 import {SBGClient} from "./sbg-api-client/sbg-client";
 import {DataRepository} from "./storage/data-repository";
+import {Executor} from "./storage/hooks/executor-config-hook";
 import {CredentialsCache, LocalRepository} from "./storage/types/local-repository";
 import {UserRepository} from "./storage/types/user-repository";
-import * as path from "path";
 
 const swapPath       = require("electron").app.getPath("userData") + path.sep + "swap";
 const swapController = new SwapController(swapPath);
@@ -21,7 +23,6 @@ const semver                = require("semver");
 
 let repository: DataRepository;
 let repositoryLoad: Promise<any>;
-
 
 const platformFetchingLocks: { [platformID: string]: Promise<any> } = {};
 
@@ -40,7 +41,10 @@ const ensurePlatformUser = () => {
 
 
 export function loadDataRepository() {
-    repository     = new DataRepository(app.getPath("userData") + path.sep + "profiles");
+    repository = new DataRepository(app.getPath("userData") + path.sep + "profiles");
+
+    repository.attachHook(new Executor());
+
     repositoryLoad = new Promise((resolve, reject) => {
         repository.load(err => {
             if (err) {
@@ -49,9 +53,7 @@ export function loadDataRepository() {
 
             return resolve(1);
         });
-    }).catch(err => {
-
-    });
+    }).catch(err => void 0);
 }
 
 // File System Routes
@@ -273,7 +275,7 @@ export function fetchPlatformData(data: {
 
         const client = new SBGClient(url, token);
 
-        const projectsPromise = client.getAllProjects();
+        const projectsPromise   = client.getAllProjects();
         const appsPromise       = client.getAllUserApps();
         const publicAppsPromise = client.getAllPublicApps();
 
@@ -525,11 +527,11 @@ export function patchAppMeta(data: {
         if (allMeta[appID]) {
             allMeta[appID][key] = value;
         } else {
-            allMeta[appID] = {[key]: value};
+            allMeta[appID] = {[key]: value} as any;
         }
 
         if (profile === "local") {
-            repository.updateLocal({appMeta: allMeta}, callback);
+            repository.updateLocal({appMeta: allMeta as any}, callback);
             return;
         }
 
@@ -538,3 +540,38 @@ export function patchAppMeta(data: {
     }, callback);
 }
 
+export function probeExecutorVersion(data: { path: string }, callback) {
+    repositoryLoad.then(() => {
+        const rabix = new RabixExecutor(repository.local.executorConfig);
+
+        rabix.getVersion((err: any, version) => {
+            if (err) {
+                if (err.code === "ENOENT") {
+                    return callback(null, "");
+                } else if (err.code === "EACCESS") {
+                    return callback(null, `No execution permissions on ${data.path}`)
+                } else {
+                    return callback(null, err.message);
+                }
+            }
+
+            callback(null, `Version: ${version}`);
+        });
+    });
+}
+
+export function executeApp(data: {
+    appID: string,
+    content: string,
+    jobPath: string,
+    options: Object
+}, callback, emitter) {
+
+    repositoryLoad.then(() => {
+        const {appID, content, jobPath, options} = data;
+
+        const rabix = new RabixExecutor(repository.local.executorConfig);
+
+        rabix.execute(appID, content, jobPath, options, callback, emitter);
+    })
+}

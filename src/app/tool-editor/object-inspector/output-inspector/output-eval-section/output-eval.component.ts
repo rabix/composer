@@ -32,8 +32,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <span class="align-right">
                         <ct-toggle-slider [formControl]="outputEvalFormGroup.controls['loadContents']"
                                           [on]="'Yes'"
-                                          [off]="'No'"
-                                          [disabled]="readonly">
+                                          [off]="'No'">
                         </ct-toggle-slider>
                     </span>
                 </div>
@@ -54,9 +53,6 @@ export class OutputEvalSectionComponent extends DirectiveBase implements Control
     @Input()
     public model: CommandLineToolModel;
 
-    @Input()
-    public readonly = false;
-
     /** Context in which expression should be evaluated */
     public context: any = {};
 
@@ -65,6 +61,8 @@ export class OutputEvalSectionComponent extends DirectiveBase implements Control
     private onTouched = noop;
 
     private propagateChange = noop;
+
+    private readonly = false;
 
     outputEvalFormGroup: FormGroup;
 
@@ -98,5 +96,10 @@ export class OutputEvalSectionComponent extends DirectiveBase implements Control
 
     registerOnTouched(fn: any): void {
         this.onTouched = fn;
+    }
+
+    setDisabledState(isDisabled: boolean): void {
+        this.readonly = isDisabled;
+        isDisabled ? this.outputEvalFormGroup.controls["loadContents"].disable() : this.outputEvalFormGroup.controls["loadContents"].enable();
     }
 }

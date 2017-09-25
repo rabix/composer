@@ -5,7 +5,8 @@
     display: inline-block;
 
     .generic-dropdown-button {
-        border: none;
+
+        border: inherit;
         outline: 0;
 
         &:disabled {

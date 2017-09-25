@@ -1,0 +1,39 @@
+@import "../../../assets/sass/variables";
+
+:host {
+    $barWidth: 26px;
+
+    display: flex;
+    height: 100%;
+    font-family: monospace;
+    background: $layout-section-terminal-background;
+    overflow: auto;
+
+    flex-direction: row;
+
+    .controls {
+        flex-basis: $barWidth;
+        background: $layout-section-background;
+
+        .btn {
+            width: $barWidth;
+            height: $barWidth;
+            padding: 0 0.5rem;
+            background: transparent;
+            border-radius: 2px;
+            border-color: transparent;
+            color: #999;
+        }
+    }
+    .output {
+        overflow: auto;
+        flex: 1;
+        padding: .2em .5em;
+        word-wrap: break-word;
+        white-space: pre-wrap;
+    }
+
+    /deep/ .text-error {
+        color: $brand-danger;
+    }
+}

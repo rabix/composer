@@ -22,8 +22,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                 <span class="align-right">
                         <ct-toggle-slider [formControl]="form.controls['isRequired']"
                                           [on]="'Yes'"
-                                          [off]="'No'"
-                                          [disabled]="readonly">
+                                          [off]="'No'">
                         </ct-toggle-slider>
                     </span>
             </div>
@@ -42,8 +41,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
             <!--Input Type -->
             <div class="form-group">
-                <ct-type-select [formControl]="form.controls['type']"
-                                [readonly]="readonly"></ct-type-select>
+                <ct-type-select [formControl]="form.controls['type']"></ct-type-select>
             </div>
 
             <!--Symbols-->
@@ -187,6 +185,14 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
         // @fixme
         setTimeout(() => {
             this.checkGlob();
+        });
+    }
+
+    setDisabledState(isDisabled: boolean): void {
+        this.readonly = isDisabled;
+        Object.keys(this.form.controls).forEach((item) => {
+            const control = this.form.controls[item];
+            isDisabled ? control.disable() : control.enable();
         });
     }
 }
