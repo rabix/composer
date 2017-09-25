@@ -19,10 +19,15 @@ export class ErrorWrapper {
             const justService = uri.split("?")[0];
             const serviceName = justService.charAt(0).toUpperCase() + justService.slice(1);
 
-            let msg = serviceName + " service";
+            const msg = serviceName + " service";
 
             if (this.err.statusCode === 401) {
                 return msg + " says that you are unauthorized to view this resource. Please check your token.";
+            }
+
+            // in case app couldn't be found
+            if (this.err.statusCode === 404 && this.err.error && this.err.error.code === 6002) {
+                return "Either this app doesn't exist or you don't have permission to open it.";
             }
 
             if (this.err.statusCode === 504) {
