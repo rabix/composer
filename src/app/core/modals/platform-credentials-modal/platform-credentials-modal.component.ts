@@ -101,11 +101,9 @@ export class PlatformCredentialsModalComponent implements OnInit {
 
     platformList = [
         {text: "Seven Bridges (Default)", value: "https://api.sbgenomics.com"},
-        {text: "Seven Bridges (Google Cloud Platform)", value: "https://gcp-api.sbgenomics.com"},
         {text: "Seven Bridges (EU)", value: "https://eu-api.sbgenomics.com"},
         {text: "Cancer Genomics Cloud", value: "https://cgc-api.sbgenomics.com"},
         {text: "Cavatica", value: "https://pgc-api.sbgenomics.com"},
-        {text: "Blood Profiling Atlas", value: "https://bpa-api.sbgenomics.com"},
     ];
 
     constructor(private system: SystemService,
