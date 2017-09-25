@@ -137,7 +137,7 @@ export class LocalRepositoryService {
         return this.ipc.request("patchLocalRepository", data);
     }
 
-    addLocalFolders(...folders): Promise<any> {
+    addLocalFolders(folders, expandFolders: boolean = false): Promise<any> {
         return this.getLocalFolders().take(1).toPromise().then(existingFolders => {
             const missing = folders.filter(folder => existingFolders.indexOf(folder) === -1);
 
@@ -145,8 +145,10 @@ export class LocalRepositoryService {
                 return Promise.resolve();
             }
 
-            // Expand added folders
-            this.setFolderExpansion(missing.concat("local"), true);
+            if (expandFolders) {
+                // Expand added folders
+                this.setFolderExpansion(missing.concat("local"), true);
+            }
 
             return this.patch({
                 localFolders: existingFolders.concat(missing)

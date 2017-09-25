@@ -142,7 +142,7 @@ export class PlatformRepositoryService {
         });
     }
 
-    addOpenProjects(...projectIDs: string[]) {
+    addOpenProjects(projectIDs: string[], expandNodes: boolean = false) {
         return this.openProjects.take(1).toPromise().then(openProjects => {
 
             const missing = projectIDs.filter(id => openProjects.indexOf(id) === -1);
@@ -151,10 +151,12 @@ export class PlatformRepositoryService {
                 return Promise.resolve();
             }
 
-            this.auth.getActive().take(1).subscribe((active) => {
-                // Expand added projects
-                this.setNodeExpansion(missing.concat(active.getHash()), true);
-            });
+            if (expandNodes) {
+                this.auth.getActive().take(1).subscribe((active) => {
+                    // Expand added projects
+                    this.setNodeExpansion(missing.concat(active.getHash()), true);
+                });
+            }
 
             return this.patch({openProjects: openProjects.concat(missing)}).toPromise();
 
