@@ -25,6 +25,10 @@ export class NotificationBarService {
 
     public static maxDisplay = 3;
 
+    public static defaultNotificationType: NotificationType = "warning";
+
+    public static defaultNotificationTimeout = Infinity;
+
     /** Array of notifications */
     private notifications: Array<Notification> = [];
 
@@ -87,8 +91,8 @@ export class NotificationBarService {
         options = options || ({} as NotificationOptions);
 
         const notification: Notification = {
-            type: options.type || "error",
-            timeout: options.timeout || Infinity
+            type: options.type || NotificationBarService.defaultNotificationType,
+            timeout: options.timeout || NotificationBarService.defaultNotificationTimeout
         };
 
         if (typeof notificationContent === "string") {
