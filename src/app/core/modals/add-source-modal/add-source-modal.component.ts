@@ -1,4 +1,4 @@
-import {Component} from "@angular/core";
+import {Component, Input} from "@angular/core";
 import {AuthService} from "../../../auth/auth.service";
 import {NativeSystemService} from "../../../native/system/native-system.service";
 import {LocalRepositoryService} from "../../../repository/local-repository.service";
@@ -93,7 +93,9 @@ import {PlatformCredentialsModalComponent} from "../platform-credentials-modal/p
 })
 export class AddSourceModalComponent extends DirectiveBase {
 
-    activeTab                                               = "local";
+    @Input()
+    activeTab: "local" | "platform" = "local";
+
     selectedProjects                                        = [];
     localFoldersToAdd                                       = [];
     closedProjectOptions: { value: string, text: string }[] = null;

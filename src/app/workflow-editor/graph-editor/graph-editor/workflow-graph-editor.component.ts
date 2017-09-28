@@ -13,7 +13,13 @@ import {
     ViewEncapsulation
 } from "@angular/core";
 import {Workflow} from "cwl-svg";
-import {StepModel, WorkflowFactory, WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
+import {
+    StepModel,
+    WorkflowFactory,
+    WorkflowInputParameterModel,
+    WorkflowModel,
+    WorkflowOutputParameterModel
+} from "cwlts/models";
 import {Process} from "cwlts/models/generic/Process";
 import {Observable} from "rxjs/Observable";
 import {DataGatewayService} from "../../../core/data-gateway/data-gateway.service";
@@ -23,7 +29,7 @@ import {AppTabData} from "../../../core/workbox/app-tab-data";
 import {AppValidatorService} from "../../../editor-common/app-validator/app-validator.service";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 import {FileRepositoryService} from "../../../file-repository/file-repository.service";
-import {ErrorNotification, NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
+import {NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {IpcService} from "../../../services/ipc.service";
@@ -434,7 +440,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             this.statusBar.stopProcess(statusProcess, `Added ${step.label}`);
         }, err => {
             this.statusBar.stopProcess(statusProcess);
-            this.notificationBar.showNotification(new ErrorNotification(`Failed to add ${nodeID} to workflow. ${new ErrorWrapper(err)}`));
+            this.notificationBar.showNotification(`Failed to add ${nodeID} to workflow. ${new ErrorWrapper(err)}`);
         });
     }
 
@@ -569,8 +575,8 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
                 return;
             }
 
-            if( !path.endsWith(".svg")){
-            path +=  ".svg" ;
+            if (!path.endsWith(".svg")) {
+                path += ".svg";
             }
 
             this.ipc.request("saveFileContent", {
@@ -579,7 +585,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             }).toPromise().then(() => {
                 this.statusBar.instant(`Exported SVG to ${path}`);
             }, err => {
-                this.notificationBar.showNotification(new ErrorNotification("Could not save SVG: " + err, 5000));
+                this.notificationBar.showNotification("Could not save SVG: " + err, {timeout: 50000});
             });
         });
 

@@ -3,7 +3,7 @@ import {Workflow} from "cwl-svg";
 import {StepModel, WorkflowModel} from "cwlts/models";
 import {RawApp} from "../../../../../electron/src/sbg-api-client/interfaces/raw-app";
 import {ErrorWrapper} from "../../../core/helpers/error-wrapper";
-import {ErrorNotification, NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
+import {NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {ModalService} from "../../../ui/modal/modal.service";
@@ -130,7 +130,7 @@ export class StepInspectorComponent extends DirectiveBase {
         }).catch(err => {
             modal.closeModal();
             this.statusBar.stopProcess(proc);
-            this.notificationBar.showNotification(new ErrorNotification(new ErrorWrapper(err).toString()));
+            this.notificationBar.showNotification(new ErrorWrapper(err).toString());
         });
     }
 

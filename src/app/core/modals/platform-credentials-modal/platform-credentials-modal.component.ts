@@ -8,6 +8,8 @@ import {SystemService} from "../../../platform-providers/system.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {GlobalService} from "../../global/global.service";
+import {NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
+import {GetStartedNotificationComponent} from "../../../layout/notification-bar/dynamic-notifications/get-started-notification/get-started-notification.component";
 
 @Component({
     selector: "ct-platform-credentials-modal",
@@ -110,6 +112,7 @@ export class PlatformCredentialsModalComponent implements OnInit {
                 private auth: AuthService,
                 private global: GlobalService,
                 private data: DataGatewayService,
+                private notificationBarService: NotificationBarService,
                 private modal: ModalService) {
     }
 
@@ -136,14 +139,23 @@ export class PlatformCredentialsModalComponent implements OnInit {
 
                 let maybeUserUpdate = Promise.resolve();
 
-                if (isEditing && editedCredentials.equals(active)) {
-                    // If we are editing credentials that appear to be active, update it
-                    maybeUserUpdate = this.auth.setActiveCredentials(editedCredentials);
+                if (isEditing) {
+                    if (editedCredentials.equals(active)) {
+                        // If we are editing credentials that appear to be active, update it
+                        maybeUserUpdate = this.auth.setActiveCredentials(editedCredentials);
+                    }
 
-                } else if (all.length === 1) {
-                    // Otherwise, if we added new credentials, and it turns out that it's the first one,
-                    // activate that user
-                    maybeUserUpdate = this.auth.setActiveCredentials(all[0]);
+                } else {
+                    // Activate added credentials
+                    maybeUserUpdate = this.auth.setActiveCredentials(credentials);
+                    this.notificationBarService.showNotification(GetStartedNotificationComponent, {
+                        type: "info",
+                        componentInputs: {
+                            environment: AuthCredentials.getPlatformLabel(url),
+                            account: user.username
+                        },
+                        timeout: 8000
+                    });
                 }
 
                 maybeUserUpdate.then(() => this.global.reloadPlatformData());

@@ -19,7 +19,7 @@ import {PublishModalComponent} from "../../core/modals/publish-modal/publish-mod
 import {AppTabData} from "../../core/workbox/app-tab-data";
 import {WorkboxService} from "../../core/workbox/workbox.service";
 import {ExecutorService} from "../../executor/executor.service";
-import {ErrorNotification, InfoNotification, NotificationBarService} from "../../layout/notification-bar/notification-bar.service";
+import {NotificationBarService} from "../../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {StatusControlProvider} from "../../layout/status-bar/status-control-provider.interface";
 import {PlatformRepositoryService} from "../../repository/platform-repository.service";
@@ -245,7 +245,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     } else if (hasCopyOfProperty && !unlocked) {
 
                         const originalApp = this.dataModel.customProps["sbg:copyOf"];
-                        this.notificationBar.showNotification(new InfoNotification(`This app is a copy of ${originalApp}`));
+                        this.notificationBar.showNotification(`This app is a copy of ${originalApp}`
+                            , {type: "info"});
                         this.isUnlockable = true;
                     }
 
@@ -298,7 +299,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     return;
                 }
 
-                this.notificationBar.showNotification(new ErrorNotification(`Saving failed: ${err.message}`));
+                this.notificationBar.showNotification(`Saving failed: ${err.message}`);
                 this.statusBar.stopProcess(proc, `Could not save ${appName} (${err.message})`);
             });
     }
@@ -306,7 +307,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     publish(): void {
 
         if (!this.validationState.isValidCWL) {
-            this.notificationBar.showNotification(new ErrorNotification(`Cannot push this app because because it's doesn't match the proper JSON schema`));
+            this.notificationBar.showNotification(`Cannot push this app because because it's doesn't match the proper JSON schema`);
             return;
         }
 
@@ -405,9 +406,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             }).catch(err => {
                 this.revisionChangingInProgress   = false;
                 this.revisionList.loadingRevision = false;
-                this.notificationBar.showNotification(
-                    new ErrorNotification("Cannot open revision. " + new ErrorWrapper(err))
-                );
+                this.notificationBar.showNotification("Cannot open revision. " + new ErrorWrapper(err));
             });
     }
 
@@ -600,7 +599,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             return result;
         }, err => {
 
-            this.notificationBar.showNotification(new ErrorNotification(err.message || "Error occurred"));
+            this.notificationBar.showNotification(err.message || "Error occurred");
 
             this.validationState.isValidCWL = false;
             this.validationState.errors     = [{

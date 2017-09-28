@@ -1,35 +1,23 @@
-import {Injectable} from "@angular/core";
+import {Component, ComponentRef, Injectable, ComponentFactoryResolver, Type, ReflectiveInjector} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
+import {DynamicNotification} from "./dynamic-notifications/dynamic-notification.interface";
 
-export class Notification {
-    message: string;
-    type: "error" | "warning" | "info" | string;
-    duration: number;
+export type NotificationContent = string | Type<DynamicNotification>;
+export type NotificationType = "info" | "error" | "warning";
 
-    constructor(message: string, type, duration: number = Infinity) {
-        this.message = message;
-        this.type = type;
-        this.duration = duration;
-    }
+export interface NotificationOptions {
+    type?: NotificationType;
+    timeout?: number;
+    componentInputs?: { [key: string]: any };
 }
 
-export class InfoNotification extends Notification {
-    constructor(message: string, duration?: number) {
-        super(message, "info", duration);
-    }
-}
-
-export class WarningNotification extends Notification {
-    constructor(message: string, duration?: number) {
-        super(message, "warning", duration);
-    }
-}
-
-export class ErrorNotification extends Notification {
-    constructor(message: string, duration?: number) {
-        super(message, "error", duration);
-    }
+export interface Notification {
+    type: NotificationType;
+    timeout: number;
+    message?: string;
+    component?: ComponentRef<Component>;
+    componentInputs?: { [key: string]: any };
 }
 
 @Injectable()
@@ -47,11 +35,11 @@ export class NotificationBarService {
     /** Stream of displayed notifications */
     public displayedNotifications = new Subject<any>();
 
-    constructor() {
+    constructor(private resolver: ComponentFactoryResolver) {
         this.showNotificationStream.flatMap((notification) => {
 
             // Dismiss notification when delay time passed or when its manually dismissed
-            return Observable.race(Observable.of(notification).delay(notification.duration)
+            return Observable.race(Observable.of(notification).delay(notification.timeout)
                 , this.dismissNotificationStream.filter((n) => n === notification).take(1));
 
         }).subscribe((notification) => {
@@ -94,7 +82,32 @@ export class NotificationBarService {
         this.displayedNotifications.next(this.notifications.slice(0, maxDisplayLength));
     }
 
-    public showNotification(notification: Notification) {
+    private createNotification(notificationContent: NotificationContent, options?: NotificationOptions) {
+
+        options = options || ({} as NotificationOptions);
+
+        const notification: Notification = {
+            type: options.type || "error",
+            timeout: options.timeout || Infinity
+        };
+
+        if (typeof notificationContent === "string") {
+            notification.message = notificationContent;
+            return notification;
+        }
+
+        const factory = this.resolver.resolveComponentFactory(notificationContent);
+
+        notification.component = factory.create(ReflectiveInjector.fromResolvedProviders(ReflectiveInjector.resolve([])));
+        notification.componentInputs = options.componentInputs;
+
+        return notification;
+    }
+
+    public showNotification(notificationContent: NotificationContent, options?: NotificationOptions) {
+
+        const notification = this.createNotification(notificationContent, options);
+
         const similarExists = this.notifications.find((n) => n.message === notification.message);
 
         if (!similarExists) {
