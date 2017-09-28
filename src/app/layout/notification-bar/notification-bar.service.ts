@@ -16,7 +16,7 @@ export interface Notification {
     type: NotificationType;
     timeout: number;
     message?: string;
-    component?: ComponentRef<Component>;
+    component?: ComponentRef<DynamicNotification>;
     componentInputs?: { [key: string]: any };
 }
 
