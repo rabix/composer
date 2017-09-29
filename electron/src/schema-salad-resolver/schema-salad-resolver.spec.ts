@@ -113,7 +113,7 @@ describe("Schema salad resolver", () => {
             "steps": [
                 {
                     "id": "step",
-                    "run": "test/recursive-tool-stub.json"
+                    "run": "test/recursive-workflow-stub.json"
                 }
             ]
         };
