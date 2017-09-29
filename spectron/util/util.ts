@@ -174,10 +174,8 @@ export function proxerialize(fn: (...args: any[]) => any, ...inputs: any[]): any
 
         if (argName === "$callCount") {
             closureContext += `
-                module.exports.__$callCount = (module.exports.__$callCount || 0) + 1;
+                var $callCount = 0;
             `;
-
-            outputStr = outputStr.replace(new RegExp("\\$callCount", "g"), "module.exports.__$callCount");
 
             return true;
         }

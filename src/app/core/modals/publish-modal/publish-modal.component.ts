@@ -140,7 +140,7 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
             saveCall = this.platformRepository.saveAppRevision(appID, content, revisionNote);
         }
 
-        return saveCall.then(() => {
+        return saveCall.then((str) => {
             this.isPublishing = false;
             this.close();
             return { app: JSON.parse(str), id: appID };
