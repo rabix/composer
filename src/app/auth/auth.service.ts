@@ -53,14 +53,30 @@ export class AuthService {
         });
     }
 
+    /**
+     * Add {@link AuthCredentials}. If credentials for the same username and platform exist, it will be updated.
+     * Otherwise, new one will be added.
+     *
+     * @param {AuthCredentials} credentials Credentials for inserting or matching a similar one for patching
+     * @returns {Promise<any>} Promise of credentials update call
+     */
     addCredentials(credentials: AuthCredentials): Promise<any> {
-        return this.getCredentials().take(1).toPromise().then(current => {
+
+        // Take up-to-date credentials array as a promise
+        const currentCredentials = this.getCredentials().take(1).toPromise();
+
+        return currentCredentials.then(current => {
+
+            // Try to find an existing credentials entry that is similar to the one added
             const similar = current.find(c => c.equals(credentials));
+
+            // If there is a similar entry, update that one
             if (similar) {
                 similar.updateToMatch(credentials);
                 return Promise.resolve(null);
             }
 
+            // Otherwise, append given credentials
             const updatedCredentials = current.concat(credentials);
 
             return this.repository.setCredentials(updatedCredentials);

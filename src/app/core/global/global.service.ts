@@ -9,6 +9,7 @@ import {UpdatePlatformModalComponent} from "../modals/update-platform-modal/upda
 import {IpcService} from "../../services/ipc.service";
 import {GitHubRelease} from "../../../../electron/src/github-api-client/interfaces/github-release";
 import {noop} from "../../lib/utils.lib";
+import {AboutPageModalComponent} from "../modals/about-page-modal/about-page-modal.component";
 
 @Injectable()
 export class GlobalService {
@@ -65,14 +66,16 @@ export class GlobalService {
                 if (hasUpdate) {
 
                     this.platformIsOutdated = true;
+                    const isIgnoredVersion = hasUpdate.tag_name === ignoredUpdateVersion;
 
-                    if (hasUpdate.tag_name !== ignoredUpdateVersion) {
+                    if (!isIgnoredVersion || showModal) {
                         const modal = this.modal.fromComponent(UpdatePlatformModalComponent, "Update");
 
                         modal.platformIsOutdated = true;
                         modal.description = hasUpdate.body;
                         modal.newVersion = hasUpdate.tag_name;
                         modal.currentVersion = window["require"]("electron").remote.app.getVersion();
+                        modal.isIgnoredVersion = isIgnoredVersion;
                         modal.linkForDownload = hasUpdate.html_url;
 
                         modal.skipUpdateVersion = () => {
@@ -106,5 +109,9 @@ export class GlobalService {
         });
 
         return this.checkForPlatformUpdatePromise;
+    }
+
+    showAboutPageModal() {
+        this.modal.fromComponent(AboutPageModalComponent, "About");
     }
 }

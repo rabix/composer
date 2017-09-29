@@ -24,8 +24,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <div class="form-group flex-container">
                 <label>Required</label>
                 <span class="align-right">
-                        <ct-toggle-slider [formControl]="form.controls['isRequired']"
-                                          [disabled]="readonly">
+                        <ct-toggle-slider [formControl]="form.controls['isRequired']">
                         </ct-toggle-slider>
                     </span>
             </div>
@@ -35,7 +34,6 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                 <label class="form-control-label">ID</label>
                 <input type="text"
                        class="form-control"
-                       [readonly]="readonly"
                        [formControl]="form.controls['id']">
                 <div *ngIf="form.controls['id'].errors" class="form-control-feedback">
                     {{form.controls['id'].errors['error']}}
@@ -43,16 +41,14 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             </div>
 
             <!--Input Type -->
-            <ct-type-select [formControl]="form.controls['type']"
-                            [readonly]="readonly"></ct-type-select>
+            <ct-type-select [formControl]="form.controls['type']"></ct-type-select>
 
             <!--Symbols-->
             <div class="form-group"
                  *ngIf="isType('enum')">
                 <label>Symbols</label>
                 <ct-auto-complete [create]="true"
-                                  [formControl]="form.controls['symbols']"
-                                  [readonly]="readonly"></ct-auto-complete>
+                                  [formControl]="form.controls['symbols']"></ct-auto-complete>
             </div>
 
             <!--Include in command line -->
@@ -60,8 +56,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                  *ngIf="!isType('map') && !!form.controls['isBound']">
                 <label>Include in command line</label>
                 <span class="align-right">
-                        <ct-toggle-slider [formControl]="form.controls['isBound']"
-                                          [disabled]="readonly">
+                        <ct-toggle-slider [formControl]="form.controls['isBound']">
                         </ct-toggle-slider>
                     </span>
             </div>
@@ -70,7 +65,6 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <ct-input-binding-section *ngIf="input.isBound"
                                       [context]="context"
                                       [propertyType]="input.type.type"
-                                      [readonly]="readonly"
                                       [formControl]="form.controls['inputBinding']">
             </ct-input-binding-section>
 
@@ -79,8 +73,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                                [context]="context"
                                [port]="input"
                                [bindingName]="'inputBinding'"
-                               (update)="propagateChange(input)"
-                               [readonly]="readonly">
+                               (update)="propagateChange(input)">
             </ct-secondary-file>
         </form>
     `
@@ -113,12 +106,12 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
         this.input = input;
 
         this.form = this.formBuilder.group({
-            id: [this.input.id],
-            type: [this.input.type, [Validators.required]],
-            isBound: [this.input.isBound],
-            isRequired: [!this.input.type.isNullable],
-            inputBinding: [this.input],
-            symbols: [this.input.type.symbols ? this.input.type.symbols : []]
+            id: [{value: this.input.id, disabled: this.readonly}],
+            type: [{value: this.input.type, disabled: this.readonly}, [Validators.required]],
+            isBound: [{value: this.input.isBound, disabled: this.readonly}],
+            isRequired: [{value: !this.input.type.isNullable,  disabled: this.readonly}],
+            inputBinding: [{value: this.input, disabled: this.readonly}],
+            symbols: [{value: this.input.type.symbols ? this.input.type.symbols : [], disabled: this.readonly}]
         });
 
         // track separately because it causes changes to the rest of the form
@@ -209,5 +202,13 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
 
     isType(type: string): boolean {
         return this.input.type.type === type || this.input.type.items === type;
+    }
+
+    setDisabledState(isDisabled: boolean): void {
+        this.readonly = isDisabled;
+        Object.keys(this.form.controls).forEach((item) => {
+            const control = this.form.controls[item];
+            isDisabled ? control.disable({emitEvent: false}) : control.enable({emitEvent: false});
+        });
     }
 }

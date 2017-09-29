@@ -3,10 +3,15 @@ export class AppHelper {
 
     static isLocal(appID: string): boolean {
 
-        const isUnixPath    = appID.startsWith("/");
-        const isWindowsPath = (/^[a-z]:\\.+$/i).test(appID);
+        return AppHelper.isUnixPath(appID) || AppHelper.isWindowsPath(appID);
+    }
 
-        return isUnixPath || isWindowsPath;
+    static isWindowsPath(appID: string) {
+        return (/^[a-z]:\\.+$/i).test(appID);
+    }
+
+    static isUnixPath(appID: string) {
+        return appID.startsWith("/");
     }
 
     static getRevisionlessID(appID: string): string {
@@ -41,7 +46,6 @@ export class AppHelper {
         }
 
         return lastPathPart;
-
     }
 
     static endsWithAppExtension(path: string): string | false {
@@ -77,5 +81,4 @@ export class AppHelper {
 
         return numeric;
     }
-
 }

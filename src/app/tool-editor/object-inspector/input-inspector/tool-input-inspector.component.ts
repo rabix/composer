@@ -13,12 +13,10 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
             <ct-basic-input-section [formControl]="form.controls['basicInputSection']"
                                     [context]="context"
-                                    [model]="model"
-                                    [readonly]="readonly">
+                                    [model]="model">
             </ct-basic-input-section>
 
-            <ct-description-section [formControl]="form.controls['description']"
-                                    [readonly]="readonly">
+            <ct-description-section [formControl]="form.controls['description']">
             </ct-description-section>
 
         </form>
@@ -33,8 +31,25 @@ export class ToolInputInspectorComponent extends DirectiveBase implements OnInit
     @Input()
     model: CommandLineToolModel;
 
-    @Input()
-    readonly = false;
+    disabled = false;
+
+    get readonly(): boolean {
+        return this.disabled;
+    }
+
+    @Input("readonly")
+    set readonly(value: boolean) {
+        this.disabled = value;
+        if (this.form) {
+            if (this.disabled) {
+                this.form.controls["basicInputSection"].disable();
+                this.form.controls["description"].disable();
+            } else {
+                this.form.controls["basicInputSection"].enable();
+                this.form.controls["description"].enable();
+            }
+        }
+    }
 
     form: FormGroup;
 
@@ -51,8 +66,8 @@ export class ToolInputInspectorComponent extends DirectiveBase implements OnInit
         this.context = this.model.getContext(this.input);
 
         this.form    = this.formBuilder.group({
-            basicInputSection: this.input,
-            description: this.input,
+            basicInputSection: {value: this.input, disabled: this.readonly},
+            description: {value: this.input, disabled: this.readonly},
             stageInputSection: this.input
         });
 

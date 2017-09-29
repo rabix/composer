@@ -27,8 +27,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             <span class="align-right">
                         <ct-toggle-slider [formControl]="form.controls['isRequired']"
                                           [off]="'No'"
-                                          [on]="'Yes'"
-                                          [disabled]="readonly">
+                                          [on]="'Yes'">
                         </ct-toggle-slider>
                     </span>
         </div>
@@ -77,16 +76,14 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
              *ngIf="isEnumType()">
             <label>Symbols</label>
             <ct-auto-complete [create]="true"
-                              [formControl]="form.controls['symbols']"
-                              [readonly]="readonly"></ct-auto-complete>
+                              [formControl]="form.controls['symbols']"></ct-auto-complete>
         </div>
 
         <!--File Types-->
         <div *ngIf="isFileType()">
             <label class="form-control-label">File types</label>
             <ct-auto-complete [formControl]="form.controls['fileTypes']"
-                              [create]="true"
-                              [readonly]="readonly"></ct-auto-complete>
+                              [create]="true"></ct-auto-complete>
         </div>
 
         <!--Batch group-->
@@ -110,7 +107,9 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             <!--Batch select-->
             <select class="form-control" *ngIf="!workflowModel.batchInput || workflowModel.batchInput === port.id"
                     [formControl]="form.controls['batchType']">
-                <option *ngFor="let propertyType of batchByList" [ngValue]="propertyType.value">
+                <option *ngFor="let propertyType of batchByList"
+                        [disabled]="readonly"
+                        [ngValue]="propertyType.value">
                     {{propertyType.label}}
                 </option>
             </select>
@@ -183,8 +182,19 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
     @Input()
     workflowModel: WorkflowModel;
 
-    @Input()
-    readonly = false;
+    disabled = false;
+
+    get readonly(): boolean {
+        return this.disabled;
+    }
+
+    @Input("readonly")
+    set readonly(value: boolean) {
+        this.disabled = value;
+        if (this.form) {
+            this.setDisabledState(value);
+        }
+    }
 
     @Input()
     graph: Workflow;
@@ -269,14 +279,14 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
         this.selectedBatchByOption = this.findBatchValueInTheList(this.workflowModel["batchByValue"]);
 
         this.form = this.formBuilder.group({
-            isRequired: [!this.port.type.isNullable],
+            isRequired: [{value: !this.port.type.isNullable, disabled: this.readonly}],
             id: [{value: this.port.id, disabled: this.readonly}],
             label: [{value: this.port.label, disabled: this.readonly}],
             typeForm: [{value: this.port.type, disabled: this.readonly}],
-            symbols: [this.port.type.symbols || this.initSymbolsList],
+            symbols: [{value: this.port.type.symbols || this.initSymbolsList, disabled: this.readonly}],
             description: [{value: this.port.description, disabled: this.readonly}],
             fileTypes: [{value: this.port.fileTypes, disabled: this.readonly}],
-            batchType: [{value: this.selectedBatchByOption, disabled: this.readonly}]
+            batchType: [this.selectedBatchByOption]
         });
 
         this.form.valueChanges.debounceTime(500).subscribeTracked(this, () => {
@@ -289,6 +299,10 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
 
         this.form.controls["id"].valueChanges.debounceTime(1000).subscribeTracked(this, (value) => {
             try {
+                if (this.port.id === value) {
+                    return;
+                }
+
                 // Change id on workflow model so canvas can interact with it
                 this.workflowModel.changeIONodeId(this.port, value);
                 this.graph.redraw();
@@ -329,16 +343,14 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
     }
 
     labelUpdate(ev: FocusEvent) {
-        let val = (<HTMLInputElement>ev.srcElement).value;
+        const val = (<HTMLInputElement>ev.srcElement).value;
 
-        if (!val) {
-            val = (<HTMLInputElement>ev.srcElement).value = this.port.label;
+        if (val === this.port.label) {
+            return;
         }
 
-        if (this.port.label !== val) {
-            this.port.label = val;
-            this.graph.redraw();
-        }
+        this.port.label = val ? val : undefined;
+        this.graph.redraw();
     }
 
     /**
@@ -359,5 +371,13 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
 
     isFileType() {
         return this.port.type.type === "File" || (this.port.type.type === "array" && this.port.type.items === "File");
+    }
+
+    setDisabledState(isDisabled: boolean) {
+        const excludedControls = ["batchType"];
+        Object.keys(this.form.controls).filter(c => excludedControls.indexOf(c) === -1).forEach((item) => {
+            const control = this.form.controls[item];
+            isDisabled ? control.disable({emitEvent: false}) : control.enable({emitEvent: false});
+        });
     }
 }

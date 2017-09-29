@@ -8,28 +8,6 @@ describe("new release check", function () {
 
     let app: spectron.Application;
 
-    it("shows that it cannot fetch update data if github api fails", async function () {
-
-        app = await boot(this, {
-            overrideModules: [{
-                module: "./github-api-client/github-client",
-                override: {
-                    getReleases: () => {
-                        return Promise.reject("Error");
-                    }
-                }
-            }]
-        });
-
-        const client = app.client;
-        await client.pause(500);
-        await triggerUpdateCheck();
-
-        await client.waitForVisible("ct-modal-error", 1000);
-        const modalText = await client.getText("ct-modal-error .body");
-        assert.equal(modalText, "An error occurred while checking for update information.");
-    });
-
     it("shows that there are no updates if latest version is older than the current one", async function () {
 
         app = await boot(this, {
@@ -48,16 +26,16 @@ describe("new release check", function () {
 
         });
 
-        await triggerUpdateCheck();
-
-        const upToDateText = await displaysThatAppIsUpToDateText();
-
-        assert.equal(upToDateText, true);
+        try {
+            await clickOnSettingsAndWaitForUpdatesAvailableButton();
+            assert.fail("Update Available button should not be visible");
+        } catch (e) {}
     });
 
     it("shows that there is an update amongst multiple releases", async function () {
 
         app = await boot(this, {
+            skipUpdateCheck: false,
             overrideModules: [
                 {
                     module: "./github-api-client/github-client",
@@ -75,7 +53,6 @@ describe("new release check", function () {
         });
 
         await app.client.waitForVisible("ct-update-platform-modal", 5000);
-
         const outOfDateText = await displaysThatAppIsOutOfDateText();
 
         assert.equal(outOfDateText, true);
@@ -83,6 +60,7 @@ describe("new release check", function () {
 
     it("shows that the update is available when it is", async function () {
         app = await boot(this, {
+            skipUpdateCheck: false,
             overrideModules: [
                 {
                     module: "./github-api-client/github-client",
@@ -102,33 +80,52 @@ describe("new release check", function () {
         });
 
         const client = app.client;
-        await client.waitForVisible("ct-update-platform-modal", 5000);
 
-        const outOfDateText = await displaysThatAppIsOutOfDateText();
+        // Waiting for modal on initialization to be visible
+        await client.waitForVisible("ct-update-platform-modal", 5000);
+        let outOfDateText = await displaysThatAppIsOutOfDateText();
+        assert.equal(outOfDateText, true);
+
+        // Close modal
+        await clickOnDiscardVersionButton();
+
+        await clickOnSettingsAndWaitForUpdatesAvailableButton();
+        await client.click("[data-test=updates-available]");
+
+        // Waiting for modal after clicking on "Updates Available"
+        await client.waitForVisible("ct-update-platform-modal", 5000);
+        outOfDateText = await displaysThatAppIsOutOfDateText();
 
         assert.equal(outOfDateText, true);
     });
 
-    afterEach(async () => {
-        await shutdown(app);
-    });
+    afterEach(() => shutdown(app));
+
+    function whenModalIsReady() {
+        return app.client.waitForVisible("ct-update-platform-modal", 1000);
+    }
 
     function displaysThatAppIsUpToDateText() {
-        return app.client.getText("ct-update-platform-modal .header-text")
-            .then(text => {
-                return text === "Rabix Composer is up to date!";
-            });
+        return whenModalIsReady()
+            .then(() => app.client.getText("ct-update-platform-modal .header-text"))
+            .then(txt => txt === "Rabix Composer is up to date!");
+
     }
 
     function displaysThatAppIsOutOfDateText() {
-        return app.client.getText("ct-update-platform-modal .header-text").then(text => {
-            return text === "A new version of Rabix Composer is available!";
-        });
+        return whenModalIsReady()
+            .then(() => app.client.getText("ct-update-platform-modal .header-text"))
+            .then(text => text === "A new version of Rabix Composer is available!");
     }
 
-    function triggerUpdateCheck() {
+    function clickOnSettingsAndWaitForUpdatesAvailableButton() {
+        const updateBtnSelector = "[data-test=updates-available]";
         return app.client.click("ct-settings-menu")
-            .then(() => app.client.click("[data-test=check-for-updates]"));
+            .then(() => app.client.waitForVisible(updateBtnSelector, 5000));
+    }
+
+    function clickOnDiscardVersionButton() {
+        const discardVersionButton = "[data-test=dismiss-button]";
+        return app.client.click(discardVersionButton);
     }
 });
-

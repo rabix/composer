@@ -35,29 +35,34 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                                 <!--Port options for File and array of Files-->
                                 <div *ngIf="isType(input, ['File', 'Directory'])" class="port-controls">
                                     <ct-toggle-slider
-                                            (valueChange)="onPortOptionChange(input, $event ? 'port' : 'editable')"
-                                            *ngIf="input.type.isNullable"
-                                            [disabled]="readonly"
-                                            [on]="'Show'"
-                                            [off]="'Hide'"
-                                            [value]="input.isVisible">
+                                        (valueChange)="onPortOptionChange(input, $event ? 'port' : 'editable')"
+                                        *ngIf="input.type.isNullable"
+                                        [disabled]="readonly"
+                                        [on]="'Show'"
+                                        [off]="'Hide'"
+                                        [value]="input.isVisible">
                                     </ct-toggle-slider>
                                 </div>
 
                                 <!--Port options for all other types-->
                                 <div *ngIf="!isType(input, ['File', 'Directory'])" class="input-control">
-                                    
-                                    <ct-generic-dropdown-menu [ct-menu]="menu" menuAlign="left" [menuState]="openStatus">
-                                        <span>{{ input.status}}
-                                            <i class="fa fa-chevron-down fa-fw settings-icon"> </i>
-                                        </span>                                        
+
+                                    <ct-generic-dropdown-menu [ct-menu]="menu" menuAlign="left"
+                                                              [menuState]="openStatus" [readonly]="readonly">
+                                        <button type="button" class="btn btn-unstyled">
+                                            <span>
+                                                {{ input.status }} <i class="fa fa-chevron-down fa-fw settings-icon"></i>
+                                            </span>
+                                        </button>
+
                                     </ct-generic-dropdown-menu>
 
                                     <ng-template #menu class="mr-1">
                                         <ul class="list-unstyled">
-                                            <li *ngFor="let c of dropDownPortOptions" class="dropdown-port-option" 
+                                            <li *ngFor="let c of dropDownPortOptions"
                                                 [class.active]="input.status === c.value"
-                                                (click)="onPortOptionChange(input, c.value)">
+                                                (click)="onPortOptionChange(input, c.value)"
+                                                class="dropdown-port-option">
                                                 <span>
                                                     {{ c.caption }}
                                                 </span>
@@ -258,7 +263,7 @@ export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase imple
         if (dest && dest.parentStep && dest.parentStep.id === this.step.id) {
             this.cdr.markForCheck();
         }
-    }
+    };
 
     ngOnInit() {
         this.tracked = this.workflowModel.on("connection.create", this.handleConnectionChange.bind(this));

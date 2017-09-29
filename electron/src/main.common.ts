@@ -75,7 +75,13 @@ function start(config: { devTools: boolean, url: string }) {
                     }
                 },
                 {type: "separator"},
-                {label: "About", selector: "orderFrontStandardAboutPanel:"},
+                {
+                    label: "About",
+                    accelerator: "showAboutPageModal",
+                    click: (menu, browser) => {
+                        acceleratorProxy.pass(menu, browser, "showAboutPageModal");
+                    }
+                },
                 {type: "separator"},
                 {
                     label: "Quit",
@@ -194,7 +200,7 @@ function applyCLIArgs() {
 
     // Find if arguments are present in the command line
     const userDataDirArg     = process.argv.find(arg => arg.startsWith(dirArgName));
-    const moduleOverridesArg = process.argv.find(arg => arg.startsWith(moduleOverridesArgName))
+    const moduleOverridesArg = process.argv.find(arg => arg.startsWith(moduleOverridesArgName));
 
     // If we're given an alternate userData directory, override the default one
     if (userDataDirArg) {

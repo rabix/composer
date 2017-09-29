@@ -19,8 +19,8 @@ export class AuthCredentials implements UserPlatformIdentifier {
     token: string;
 
     constructor(url: string, token: string, user: User) {
-        this.ensureValidURL(url);
-        this.ensureValidToken(token);
+        // this.ensureValidURL(url);
+        // this.ensureValidToken(token);
 
         this.url   = url;
         this.token = token;
@@ -46,16 +46,12 @@ export class AuthCredentials implements UserPlatformIdentifier {
         switch (subdomain) {
             case "api":
                 return "SBG";
-            case "gcp-api":
-                return "GCP";
             case "eu-api":
                 return "EU";
             case "cgc-api":
                 return "CGC";
             case "pgc-api":
                 return "CHOP";
-            case "bpa-api":
-                return "BPA";
             default:
                 return subdomain;
         }
@@ -66,16 +62,12 @@ export class AuthCredentials implements UserPlatformIdentifier {
         switch (subdomain) {
             case "api":
                 return "Seven Bridges";
-            case "gcp-api":
-                return "Seven Bridges (Google Cloud Platform)";
             case "eu-api":
                 return "Seven Bridges (EU)";
             case "cgc-api":
                 return "Cancer Genomics Cloud";
             case "pgc-api":
                 return "Cavatica";
-            case "bpa-api":
-                return "Blood Profiling Atlas";
             default:
                 return subdomain;
         }
@@ -137,13 +129,13 @@ export class AuthCredentials implements UserPlatformIdentifier {
 
     private ensureValidToken(token: string): void {
         if (AuthCredentials.isValidToken(token) === false) {
-            throw `Invalid token: ${token}`;
+            throw new Error("Given token is not valid: " + token);
         }
     }
 
     private ensureValidURL(url: string): void {
         if (AuthCredentials.isValidURL(url) === false) {
-            throw `Invalid URL: ${url}`;
+            throw new Error("Invalid platform URL: " + url);
         }
     }
 }

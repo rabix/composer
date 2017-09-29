@@ -72,7 +72,8 @@ import {ToolVisualEditorComponent} from "./tool-visual-editor/tool-visual-editor
         ToolCodesComponent
     ],
     exports: [
-        ToolEditorComponent
+        ToolEditorComponent,
+        CommandLinePreviewComponent,
     ],
     imports: [
         BrowserModule,

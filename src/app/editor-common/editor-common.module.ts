@@ -3,6 +3,8 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {BrowserModule} from "@angular/platform-browser";
 import {CWLModule} from "../cwl/cwl.module";
 import {UIModule} from "../ui/ui.module";
+import {AppExecutionContextModalComponent} from "./app-execution-context-modal/app-execution-context-modal.component";
+import {AppExecutionPreviewComponent} from "./app-execution-panel/app-execution-preview.component";
 import {AppValidatorService} from "./app-validator/app-validator.service";
 import {AppInfoComponent} from "./components/app-info/app-info.component";
 import {BlankToolStateComponent} from "./components/blank-tool-state.component";
@@ -37,6 +39,9 @@ import {EditorPanelComponent} from "./layout/editor-panel/editor-panel.component
 import {FileDefContentPipe} from "./pipes/file-def-content.pipe";
 import {FileDefNamePipe} from "./pipes/file-def-name.pipe";
 import {ValidationTextPipe} from "./pipes/validation-text.pipes";
+import {CommonDocumentControlsComponent} from "./template-common/common-document-controls/common-document-controls.component";
+import {CommonReportPanelComponent} from "./template-common/common-preview-panel/common-report-panel.component";
+import {CommonStatusControlsComponent} from "./template-common/common-status-controls/common-status-controls.component";
 
 @NgModule({
     declarations: [
@@ -71,7 +76,12 @@ import {ValidationTextPipe} from "./pipes/validation-text.pipes";
         EditorPanelComponent,
         HintsComponent,
         DirectoryInputInspectorComponent,
-        RequirementInputComponent
+        RequirementInputComponent,
+        AppExecutionPreviewComponent,
+        AppExecutionContextModalComponent,
+        CommonDocumentControlsComponent,
+        CommonStatusControlsComponent,
+        CommonReportPanelComponent,
     ],
     exports: [
         MapListComponent,
@@ -101,13 +111,18 @@ import {ValidationTextPipe} from "./pipes/validation-text.pipes";
         AppInfoComponent,
         EditorLayoutComponent,
         HintsComponent,
-        RequirementInputComponent
+        RequirementInputComponent,
+        AppExecutionPreviewComponent,
+        CommonDocumentControlsComponent,
+        CommonStatusControlsComponent,
+        CommonReportPanelComponent
     ],
     entryComponents: [
         EditorInspectorComponent,
         EditorInspectorContentComponent,
         ExpressionEditorComponent,
         ModelExpressionEditorComponent,
+        AppExecutionContextModalComponent
     ],
     providers: [
         CwlSchemaValidationWorkerService,

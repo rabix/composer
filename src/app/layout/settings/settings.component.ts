@@ -1,5 +1,4 @@
 import {Component} from "@angular/core";
-import {Observable} from "rxjs/Observable";
 import {AuthService} from "../../auth/auth.service";
 import {AuthCredentials} from "../../auth/model/auth-credentials";
 import {GlobalService} from "../../core/global/global.service";
@@ -8,23 +7,19 @@ import {WorkboxService} from "../../core/workbox/workbox.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 
-type ViewMode = "auth" | "keyBindings" | "cache";
-
 @Component({
     selector: "ct-settings",
     styleUrls: ["./settings.component.scss"],
     template: `
+
         <ct-action-bar>
-
-            <ct-tab-selector [distribute]="'auto'" [active]="viewMode" (activeChange)="switchTab($event)">
+            <ct-tab-selector distribute="auto" active="auth">
                 <ct-tab-selector-entry tabName="auth">Authentication</ct-tab-selector-entry>
-                <!--<ct-tab-selector-entry tabName="keyBindings">Key Bindings</ct-tab-selector-entry>-->
-                <!--<ct-tab-selector-entry tabName="cache">Cache</ct-tab-selector-entry>-->
+                <ct-tab-selector-entry tabName="bunnyConfig">Rabix Executor</ct-tab-selector-entry>
             </ct-tab-selector>
-
         </ct-action-bar>
 
-        <ct-form-panel class="m-2">
+        <ct-form-panel *ngIf="viewMode === 'auth'" class="m-2">
             <div class="tc-header">Authentication</div>
             <div class="tc-body">
 
@@ -62,76 +57,36 @@ type ViewMode = "auth" | "keyBindings" | "cache";
                 </div>
             </div>
         </ct-form-panel>
+
+        <ct-form-panel *ngIf="viewMode === 'bunnyConfig'" class="m-2">
+            <div class="tc-header">Rabix Executor Configuration</div>
+            <div class="tc-body p-1">
+                <ct-executor-config></ct-executor-config>
+            </div>
+        </ct-form-panel>
     `
 })
 export class SettingsComponent extends DirectiveBase {
 
-    viewMode: ViewMode = "auth";
+    viewMode: "bunnyConfig" | "auth" = "auth";
 
-
-    constructor(public modal: ModalService,
+    constructor(public auth: AuthService,
+                public modal: ModalService,
                 private global: GlobalService,
-                private workbox: WorkboxService,
-                public auth: AuthService) {
+                private workbox: WorkboxService) {
 
         super();
     }
 
     openCredentialsForm() {
-        const credentialsModal = this.modal.fromComponent(PlatformCredentialsModalComponent, {
-            title: "Add Connection"
-        });
-
-        credentialsModal.submit = () => {
-            const valuesFromModal = credentialsModal.getValue();
-            Observable.fromPromise(this.auth.addCredentials(valuesFromModal)).withLatestFrom(this.auth.getCredentials())
-                .take(1).subscribe((combined) => {
-                const credentials = combined[1];
-
-                // If added credential is the only one, set it to be the active one
-                if (credentials.length === 1) {
-                    this.setActiveCredentials(credentials[0]);
-                }
-            });
-            this.modal.close();
-        };
-
+         this.modal.fromComponent(PlatformCredentialsModalComponent,  "Add Connection"
+        );
     }
 
     editCredentials(edited: AuthCredentials) {
-        const valuesFromModal = this.modal.fromComponent(PlatformCredentialsModalComponent, {title: "Edit Connection"});
+        const modal = this.modal.fromComponent(PlatformCredentialsModalComponent,  "Edit Connection");
 
-        valuesFromModal.user      = edited.user;
-        valuesFromModal.token     = edited.token;
-        valuesFromModal.platform  = edited.url;
-        valuesFromModal.tokenOnly = true;
-
-        valuesFromModal.submit = () => {
-            const credentialsFromModal = valuesFromModal.getValue();
-
-            Observable.from(this.auth.addCredentials(credentialsFromModal)).withLatestFrom(this.auth.getActive())
-                .take(1).subscribe((combined) => {
-
-                const credentials = combined[1];
-
-                // If edited credentials is the active one, update active credentials
-                if (edited === credentials) {
-                    this.auth.setActiveCredentials(credentialsFromModal);
-                }
-
-                this.modal.close();
-
-            });
-
-        };
-    }
-
-    /**
-     * Changes the view mode
-     * @param tab Name of the tab to switch to
-     */
-    switchTab(tab: ViewMode): void {
-        this.viewMode = tab;
+        modal.prepareEdit( edited );
     }
 
     setActiveCredentials(credentials?: AuthCredentials) {

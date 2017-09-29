@@ -7,19 +7,20 @@ import {LocalRepository} from "../../electron/src/storage/types/local-repository
 import {UserRepository} from "../../electron/src/storage/types/user-repository";
 import rimraf = require("rimraf");
 import ITestCallbackContext = Mocha.ITestCallbackContext;
+import {encodeBase64} from "../../electron/src/security/encoder";
 
 interface FnTestConfig {
-    localRepository: Partial<LocalRepository>,
-    platformRepositories: { [userID: string]: Partial<UserRepository> } ,
+    localRepository: Partial<LocalRepository>;
+    platformRepositories: { [userID: string]: Partial<UserRepository> };
     overrideModules: {
         module: string,
         override: Object
-    }[],
-    waitForMainWindow: boolean,
-    testTimeout: number,
-    retries: number,
-    swapFiles: { userID: string, content: string }[]
-
+    }[];
+    waitForMainWindow: boolean;
+    testTimeout: number;
+    retries: number;
+    skipFetch: boolean;
+    skipUpdateCheck: boolean;
 }
 
 function isDevServer() {
@@ -31,7 +32,7 @@ function findAppBinary() {
     if (isDevServer()) {
         return glob.sync("./node_modules/.bin/electron")[0];
     } else if (process.platform.startsWith("win")) {
-        return path.resolve("./build/win-unpacked/rabix-composer.exe");
+        return glob.sync("./build/**/rabix-composer.exe")[0];
     } else if (process.platform.startsWith("darwin")) {
         return path.resolve("./build/mac/rabix-composer.app/Contents/MacOS/rabix-composer");
     } else {
@@ -42,7 +43,10 @@ function findAppBinary() {
 export function boot(context: ITestCallbackContext, testConfig: Partial<FnTestConfig> = {}): Promise<spectron.Application> {
 
     context.retries(testConfig.retries || 0);
-    context.timeout(testConfig.testTimeout || 5000);
+    context.timeout(testConfig.testTimeout || 30000);
+
+    const skipFetch       = testConfig.skipFetch !== false;
+    const skipUpdateCheck = testConfig.skipUpdateCheck !== false;
 
     const testTitle      = context.test.fullTitle();
     const globalTestDir  = path.resolve(`${__dirname}/../../.testrun`);
@@ -53,19 +57,14 @@ export function boot(context: ITestCallbackContext, testConfig: Partial<FnTestCo
 
     testConfig.localRepository = Object.assign(new LocalRepository(), testConfig.localRepository || {});
 
-    fs.outputJSONSync(localProfilePath, testConfig.localRepository, {
-        spaces: 4,
-        replacer: null
-    });
+    fs.outputFileSync(localProfilePath, encodeBase64(JSON.stringify(testConfig.localRepository)));
 
     if (testConfig.platformRepositories) {
-        for (let userID in testConfig.platformRepositories) {
+        for (const userID in testConfig.platformRepositories) {
             const profilePath = profilesDirPath + `/${userID}.json`;
             const profileData = Object.assign(new UserRepository(), testConfig.platformRepositories[userID] || {});
-            fs.outputJSONSync(profilePath, profileData, {
-                spaces: 4,
-                replacer: null
-            })
+
+            fs.outputFileSync(profilePath, encodeBase64(JSON.stringify(profileData)));
         }
     }
 
@@ -80,7 +79,8 @@ export function boot(context: ITestCallbackContext, testConfig: Partial<FnTestCo
     const chromiumArgs = [
         isDevServer() && "./electron",
         "--spectron",
-        "--no-fetch-on-start",
+        skipFetch && "--no-fetch-on-start",
+        skipUpdateCheck && "--no-update-check",
         "--user-data-dir=" + currentTestDir,
         moduleOverrides && `--override-modules=${moduleOverrides}`
     ].filter(v => v);
@@ -104,6 +104,9 @@ export function boot(context: ITestCallbackContext, testConfig: Partial<FnTestCo
 
 export function shutdown(app: spectron.Application) {
 
+    if (!app) {
+        return;
+    }
 
     if (app.hasOwnProperty("testdir")) {
         rimraf.sync(app["testdir"]);
@@ -151,11 +154,11 @@ export function partialProxy(module: string, overrides: Object = {}) {
     };
 
     let stringified = fn.toString();
-    for (let arg in interpolate) {
+    for (const arg in interpolate) {
         stringified = stringified.replace(new RegExp(arg, "g"), interpolate[arg]);
     }
 
-    return `(${stringified})()`
+    return `(${stringified})()`;
 
 }
 
@@ -188,7 +191,7 @@ export function proxerialize(fn: (...args: any[]) => any, ...inputs: any[]): any
             }
         });
 
-        outputStr = outputStr.replace(new RegExp(argName, "g"), argValue)
+        outputStr = outputStr.replace(new RegExp(argName, "g"), argValue);
 
     });
 
