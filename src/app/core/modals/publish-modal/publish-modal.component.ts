@@ -1,4 +1,4 @@
-import {Component, Input} from "@angular/core";
+import {Component, Input, OnInit} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {SlugifyPipe} from "ngx-pipes";
 import {PlatformAppSavingService} from "../../../editor-common/services/app-saving/platform-app-saving.service";
@@ -8,8 +8,6 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {FormAsyncValidator} from "../../forms/helpers/form-async-validator";
 import {ErrorWrapper} from "../../helpers/error-wrapper";
-
-const {app, dialog} = window["require"]("electron").remote;
 
 @Component({
     selector: "ct-publish-modal",
@@ -42,7 +40,7 @@ const {app, dialog} = window["require"]("electron").remote;
                     <input class="form-control" [formControl]="outputForm.controls.revisionNote"/>
                     <div class="form-text text-muted">
                         An app with this ID already exists.<br/>
-                        Publishing will create a revision <strong>{{ revision }}</strong>.
+                        Pushing will create a revision <strong>{{ revision }}</strong>.
                     </div>
                 </div>
 
@@ -56,7 +54,7 @@ const {app, dialog} = window["require"]("electron").remote;
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" (click)="close()">Cancel</button>
                     <button type="submit" class="btn btn-primary" [disabled]="!inputForm.valid || isPublishing">
-                        <ct-loader-button-content [isLoading]="inputForm.pending || isPublishing">Publish</ct-loader-button-content>
+                        <ct-loader-button-content [isLoading]="inputForm.pending || isPublishing">Push</ct-loader-button-content>
                     </button>
                 </div>
             </div>
@@ -64,7 +62,7 @@ const {app, dialog} = window["require"]("electron").remote;
     `,
     styleUrls: ["./publish-modal.component.scss"],
 })
-export class PublishModalComponent extends DirectiveBase {
+export class PublishModalComponent extends DirectiveBase implements OnInit {
 
     @Input()
     appContent: string;
@@ -142,12 +140,12 @@ export class PublishModalComponent extends DirectiveBase {
             saveCall = this.platformRepository.saveAppRevision(appID, content, revisionNote);
         }
 
-        return saveCall.then(str => {
+        return saveCall.then(() => {
             this.isPublishing = false;
             this.close();
             return { app: JSON.parse(str), id: appID };
         }, (err) => {
-            this.error        = "Failed to update the app. " + new ErrorWrapper(err);
+            this.error        = "Failed to push the app. " + new ErrorWrapper(err);
             this.isPublishing = false;
         });
     }
