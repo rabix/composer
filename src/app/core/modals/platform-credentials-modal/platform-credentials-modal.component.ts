@@ -36,7 +36,7 @@ import {GetStartedNotificationComponent} from "../../../layout/notification-bar/
                     <label class="col-xs-4 col-form-label">Developer Token:</label>
                     <div class="col-xs-8  form-inline token-form">
                         <input data-test="token-field"
-                               [formControl]="form.get('token')"
+                               formControlName="token"
                                class="form-control token-control"
                                type="password"/>
 

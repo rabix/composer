@@ -9,15 +9,22 @@ import {SystemService} from "../../platform-providers/system.service";
             <div class="row text-xs-center mb-1">
                 <div class="offset-xs-1 col-xs-10">
                     <span *ngIf="title">{{ title }}</span>
-                    <ng-content></ng-content>
+                        {{description}}
                 </div>
             </div>
 
             <div class="row text-xs-center mb-1" *ngIf="buttonText && !readonly">
                 <div class="col-xs-12">
-                    <button class="btn btn-primary" type="button" (click)="buttonClick.emit(true)">
+
+                    <div #contentWrapper>
+                        <ng-content></ng-content>
+                    </div>
+
+                    <button *ngIf="contentWrapper.children.length == 0"
+                            class="btn btn-primary" type="button" (click)="buttonClick.emit(true)">
                         {{ buttonText }}
                     </button>
+
                 </div>
             </div>
 
@@ -40,6 +47,9 @@ export class BlankToolStateComponent {
 
     @Input()
     title = "";
+
+    @Input()
+    description = "";
 
     @Input()
     buttonText;
