@@ -121,7 +121,8 @@ describe("Schema salad resolver", () => {
         const originalSerialized = JSON.stringify(original, null, 4);
 
         resolver.resolveContent(originalSerialized, __dirname).then(() => {
-            throw new Error("Workflow with recursive nesting should be invalid");
+            const error = new Error("Workflow with recursive nesting should be invalid");
+            done(error);
 
         }).catch((err) => {
             assert.equal(err instanceof RecursiveNestingError, true);
