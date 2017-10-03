@@ -8,6 +8,13 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {FormAsyncValidator} from "../../forms/helpers/form-async-validator";
 import {ErrorWrapper} from "../../helpers/error-wrapper";
+import {environment} from "../../../../environments/environment";
+
+declare var dialog:any;
+declare var app:any;
+if ( ! environment.browser ) {
+    const {app, dialog} = window["require"]("electron").remote;
+}
 
 @Component({
     selector: "ct-publish-modal",

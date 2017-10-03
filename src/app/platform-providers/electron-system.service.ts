@@ -1,7 +1,12 @@
 import {Injectable} from "@angular/core";
 import {SystemService} from "./system.service";
+import {environment} from './../../environments/environment';
 
-const {shell, webFrame} = window["require"]("electron");
+declare var shell:any;
+declare var webFrame:any;
+if ( ! environment.browser ) {
+	const {shell, webFrame} = window["require"]("electron");
+}
 
 @Injectable()
 export class ElectronSystemService extends SystemService {
@@ -15,5 +20,15 @@ export class ElectronSystemService extends SystemService {
             event.preventDefault();
         }
         shell.openExternal(url);
+    }
+}
+
+@Injectable()
+export class BrowserSystemService extends SystemService {
+
+    public boot() {
+    }
+
+    public openLink(url: string, event?: MouseEvent) {
     }
 }

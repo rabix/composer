@@ -3,8 +3,12 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {AppExecutionContext, ExecutorParamsConfig} from "../../../../electron/src/storage/types/executor-config";
 import {AppHelper} from "../../core/helpers/AppHelper";
 import {ModalService} from "../../ui/modal/modal.service";
+import {environment} from "../../../environments/environment";
 
-const {dialog} = window["require"]("electron").remote;
+declare var dialog:any;
+if ( ! environment.browser ) {
+    const {dialog} = window["require"]("electron").remote;
+}
 
 @Component({
     selector: "ct-app-execution-context-modal",

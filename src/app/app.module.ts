@@ -1,3 +1,4 @@
+import {IpcWebService} from './services/ipc.web.service';
 import {NgModule} from "@angular/core";
 import {FormBuilder, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {HttpModule} from "@angular/http";
@@ -33,6 +34,7 @@ import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
         FileRepositoryService,
         FormBuilder,
         GlobalService,
+        IpcWebService,
         IpcService,
         JavascriptEvalService,
         LocalRepositoryService,
