@@ -161,7 +161,7 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
     private checkGlob() {
         // add warning about empty glob if glob is empty
         if (this.output.outputBinding.glob && this.output.outputBinding.glob.serialize() === undefined) {
-            this.output.outputBinding.glob.updateValidity({
+            this.output.outputBinding.glob.setIssue({
                 [this.output.outputBinding.glob.loc]: {
                     message: "Glob should be specified",
                     type: "warning"

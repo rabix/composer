@@ -10,12 +10,12 @@ export class ValidationClassDirective {
 
     @HostBinding("class.error")
     get error() {
-        return this.entry ? this.entry.hasErrors : false;
+        return this.entry ? this.entry.errors.length : false;
     }
 
     @HostBinding("class.warning")
     get warning() {
-        return this.entry ? this.entry.hasWarnings && !this.error : false;
+        return this.entry ? this.entry.warnings.length && !this.error : false;
     }
 
     @HostBinding("class.validatable")

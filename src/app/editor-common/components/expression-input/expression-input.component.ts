@@ -8,7 +8,6 @@ import {ModelExpressionEditorComponent} from "../../expression-editor/model-expr
 
 @Component({
     encapsulation: ViewEncapsulation.None,
-
     selector: "ct-expression-input",
     styleUrls: ["./expression-input.component.scss"],
     providers: [
@@ -25,7 +24,7 @@ import {ModelExpressionEditorComponent} from "../../expression-editor/model-expr
 
             <ct-validation-preview [entry]="model"></ct-validation-preview>
             <b class="validation-icon result"
-               *ngIf="isExpr && !(model?.hasErrors || model?.hasWarnings)"
+               *ngIf="isExpr && !(model?.errors.length || model?.warnings.length)"
                [title]="result">E:</b>
 
             <div class="input-group">
