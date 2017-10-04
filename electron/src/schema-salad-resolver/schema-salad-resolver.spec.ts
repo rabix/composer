@@ -122,8 +122,10 @@ describe("Schema salad resolver", () => {
         const originalSerialized = JSON.stringify(original, null, 4);
 
         try {
-            resolver.resolveContent(originalSerialized, __dirname);
-            done(new Error("Should detect recursive nesting as invalid cwl"));
+            resolver.resolveContent(originalSerialized, __dirname).then(() => {
+                done(new Error("Should detect recursive nesting as invalid cwl"));
+            });
+
         } catch (e) {
             // assert.equal(e.message, "smthing");
             try {
