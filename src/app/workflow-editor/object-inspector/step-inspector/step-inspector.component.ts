@@ -20,7 +20,7 @@ import {AppHelper} from "../../../core/helpers/AppHelper";
         <div class="alert alert-update form-control-label" *ngIf="step.hasUpdate">
             A new version of this app is available!
             <ng-container *ngIf="!readonly">
-                <button class="btn-unstyled p-0 update-entry" (click)="updateStep($event)">Update</button>
+                <button class="btn-inline-link" (click)="updateStep($event)">Update</button>
                 to get the latest changes.
             </ng-container>
         </div>

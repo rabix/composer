@@ -27,6 +27,19 @@ $gradientDarken: 2%;
     background: none;
 }
 
+.btn-inline-link,
+.btn-inline-link:disabled {
+    border: none;
+    padding: 0;
+    background: none;
+    margin: 0;
+    color: inherit;
+    cursor: pointer;
+    line-height: inherit;
+    outline: none;
+    text-decoration: underline;
+}
+
 .btn-primary:active {
     background: $btn-primary-bg;
 }

@@ -16,7 +16,7 @@ export class PlatformAppService {
         this.auth.getActive().take(1).subscribe(credentials => {
 
             if (!credentials) {
-                this.notificationBar.showNotification("Unable to open the app, it seems that you are not connected to any platform.");
+                this.notificationBar.showNotification(`Unable to open ${appID}, it seems that you are not connected to any platform.`);
 
                 return;
             }

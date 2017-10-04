@@ -245,8 +245,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     } else if (hasCopyOfProperty && !unlocked) {
 
                         const originalApp = this.dataModel.customProps["sbg:copyOf"];
-                        this.notificationBar.showNotification(`This app is a copy of ${originalApp}`
-                            , {type: "info"});
+                        this.notificationBar.showNotification(`This app is a copy of ${originalApp}`, {
+                            type: "info"
+                        });
                         this.isUnlockable = true;
                     }
 
@@ -599,7 +600,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             return result;
         }, err => {
 
-            this.notificationBar.showNotification(err.message || "Error occurred");
+            this.notificationBar.showNotification(err.message || "An error has occurred");
 
             this.validationState.isValidCWL = false;
             this.validationState.errors     = [{
