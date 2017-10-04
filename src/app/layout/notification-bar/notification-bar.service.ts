@@ -83,9 +83,7 @@ export class NotificationBarService {
         this.displayedNotifications.next(this.notifications.slice(0, maxDisplayLength));
     }
 
-    private createNotification(notificationContent: NotificationContent, options?: NotificationOptions) {
-
-        options = options || ({} as NotificationOptions);
+    private createNotification(notificationContent: NotificationContent, options: NotificationOptions = {} as NotificationOptions) {
 
         const notification: Notification = {
             type: options.type || NotificationBarService.defaultNotificationType,
