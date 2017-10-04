@@ -105,7 +105,7 @@ describe("Schema salad resolver", () => {
         }).catch(done);
     });
 
-    it("should detect recursive nesting as invalid cwl", (done) => {
+    it("should detect recursive nesting as invalid cwl", async () => {
         const original = {
             "class": "Workflow",
             "inputs": [],
@@ -120,14 +120,13 @@ describe("Schema salad resolver", () => {
 
         const originalSerialized = JSON.stringify(original, null, 4);
 
-        resolver.resolveContent(originalSerialized, __dirname).then(() => {
-            const error = new Error("Workflow with recursive nesting should be invalid");
-            done(error);
+        try {
+            await resolver.resolveContent(originalSerialized, __dirname);
+            throw new Error("Should detect recursive nesting as invalid cwl");
+        } catch (e) {
+            assert.equal(e instanceof RecursiveNestingError, true, "Should throw RecursiveNestingError")
+        }
 
-        }).catch((err) => {
-            assert.equal(err instanceof RecursiveNestingError, true);
-            done();
-        });
     });
 
 });
