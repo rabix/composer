@@ -3,7 +3,6 @@ import {
 } from "@angular/core";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {Observable} from "rxjs/Observable";
-import {DynamicNotification} from "./dynamic-notifications/dynamic-notification.interface";
 
 @Component({
     selector: "ct-notification",
@@ -22,10 +21,7 @@ export class NotificationComponent extends DirectiveBase implements AfterViewIni
     message: string;
 
     @Input()
-    component: ComponentRef<DynamicNotification>;
-
-    @Input()
-    componentInputs: { [key: string]: any } = {};
+    component: ComponentRef<Component>;
 
     @ViewChild("componentView", {read: ViewContainerRef})
     componentView: ViewContainerRef;
@@ -35,8 +31,6 @@ export class NotificationComponent extends DirectiveBase implements AfterViewIni
         if (!this.component) {
             return;
         }
-
-        this.component.instance.componentInputs = this.componentInputs;
 
         Observable.of(1).delay(1).subscribe(() => {
             this.componentView.insert(this.component.hostView);

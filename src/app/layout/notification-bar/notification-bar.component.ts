@@ -17,8 +17,7 @@ import {Notification, NotificationBarService} from "./notification-bar.service";
                 <div class="error-text pl-2 pr-1">
                     <ct-notification 
                         [message]="notification.message" 
-                        [component]="notification.component"
-                        [componentInputs]="notification.componentInputs">                        
+                        [component]="notification.component">                        
                     </ct-notification>
                 </div>
 
