@@ -86,8 +86,7 @@ function traverse(data, source, root, graph = {}, traversedExternalPaths?) {
 
                     // Avoid recursive nesting
                     if (traversed.has(externalPath)) {
-                        reject(new RecursiveNestingError(`"${externalPath}"`));
-                        return;
+                        throw new RecursiveNestingError(`${externalPath}`);
                     }
 
                     traversed.add(externalPath);

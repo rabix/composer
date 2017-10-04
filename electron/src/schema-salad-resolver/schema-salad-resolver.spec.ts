@@ -124,7 +124,6 @@ describe("Schema salad resolver", () => {
             await resolver.resolveContent(originalSerialized, __dirname);
             throw new Error("Should detect recursive nesting as invalid cwl");
         } catch (e) {
-            assert.equal(e.message, "smthing");
             assert.equal(e instanceof RecursiveNestingError, true, "Should throw RecursiveNestingError")
         }
 
