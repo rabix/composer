@@ -121,20 +121,13 @@ describe("Schema salad resolver", () => {
 
         const originalSerialized = JSON.stringify(original, null, 4);
 
-        try {
-            resolver.resolveContent(originalSerialized, __dirname).then(() => {
-                done(new Error("Should detect recursive nesting as invalid cwl"));
-            });
+        resolver.resolveContent(originalSerialized, __dirname).then(() => {
+            done(new Error("Should detect recursive nesting as invalid cwl"));
+        }, (err) => {
+            assert.instanceOf(err, RecursiveNestingError, "Should be instance of RecursiveNestingError, but instead got " + err.__proto__.constructor.toString());
+            done();
+        });
 
-        } catch (e) {
-            // assert.equal(e.message, "smthing");
-            try {
-                assert.instanceOf(e, RecursiveNestingError, "Should throw RecursiveNestingError, but instead got " + e.message);
-                done();
-            } catch (ex) {
-                done(ex);
-            }
-        }
 
     });
 
