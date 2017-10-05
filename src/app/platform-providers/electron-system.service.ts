@@ -22,13 +22,3 @@ export class ElectronSystemService extends SystemService {
         shell.openExternal(url);
     }
 }
-
-@Injectable()
-export class BrowserSystemService extends SystemService {
-
-    public boot() {
-    }
-
-    public openLink(url: string, event?: MouseEvent) {
-    }
-}

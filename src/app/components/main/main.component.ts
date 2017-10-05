@@ -18,7 +18,6 @@ import {ElectronProxyService} from "../../native/proxy/electron-proxy.service";
     template: `
         <ct-layout data-test="layout"></ct-layout>
         <div id="runnix" [class.active]="runnix | async"></div>
-
     `,
     styleUrls: ["./../../../assets/sass/main.scss", "./main.component.scss"],
     providers: [

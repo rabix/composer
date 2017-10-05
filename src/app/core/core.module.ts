@@ -40,6 +40,7 @@ import {SettingsMenuComponent} from "./workbox/settings-menu.component";
 import {WorkBoxTabComponent} from "./workbox/workbox-tab.component";
 import {WorkBoxComponent} from "./workbox/workbox.component";
 import {WorkboxService} from "./workbox/workbox.service";
+import {LoginComponent} from "../login/login.component";
 
 export function errorHandlerFactory(modal: ModalService) {
     return environment.production ? new ModalErrorHandler(modal) : new ErrorHandler();
@@ -57,7 +58,7 @@ export function errorHandlerFactory(modal: ModalService) {
         PublishModalComponent,
         HintsModalComponent,
         PlatformCredentialsModalComponent,
-        UpdatePlatformModalComponent
+        UpdatePlatformModalComponent,
     ],
     declarations: [
         AboutPageModalComponent,
@@ -83,7 +84,7 @@ export function errorHandlerFactory(modal: ModalService) {
         PublishModalComponent,
         HintsModalComponent,
         PlatformCredentialsModalComponent,
-        UpdatePlatformModalComponent
+        UpdatePlatformModalComponent,
     ],
     exports: [
         LogoComponent,

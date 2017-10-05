@@ -18,10 +18,11 @@ import {PANEL_LOCAL_FILES, PANEL_PUBLIC_APPS, PANEL_STRUCTURE, PANEL_USER_PROJEC
 
             <!--Panels Column-->
             <div class="panel-column" [style.flexGrow]="treeSize"
-                 [class.hidden]="layoutService.sidebarHidden">
+                [class.hidden]="layoutService.sidebarHidden">
 
                 <ct-logo class="pl-1 logo title-bar-section"></ct-logo>
                 <ct-panel-container class="layout-section">
+
                     <ct-apps-panel class="panel"></ct-apps-panel>
                 </ct-panel-container>
             </div>

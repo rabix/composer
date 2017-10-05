@@ -25,6 +25,7 @@ import {ToolEditorModule} from "./tool-editor/tool-editor.module";
 import {ModalService} from "./ui/modal/modal.service";
 import {UIModule} from "./ui/ui.module";
 import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
+import {LoginComponent} from "./login/login.component";
 
 @NgModule({
     providers: [
@@ -46,6 +47,7 @@ import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
     ],
     declarations: [
         MainComponent,
+        LoginComponent,
     ],
     imports: [
         BrowserModule,
