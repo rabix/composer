@@ -98,7 +98,7 @@ export class WorkboxService {
         const {tabs} = this.extractValues();
 
         // When opening an app, we use id with revision number because we can have cases when we can open the same app
-        // different revisions (when we publish a local file with existing id, new tab is open ...)
+        // different revisions (when we push a local file with existing id, new tab is open ...)
         const foundTab = tabs.find(existingTab => existingTab.id === tab.id);
 
         if (foundTab) {

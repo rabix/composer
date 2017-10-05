@@ -19,8 +19,6 @@ html, body {
     font-size: $font-size-base;
 }
 
-
-
 .loading-image {
     display: flex;
     justify-content: center;
@@ -33,8 +31,14 @@ html, body {
     display: none;
 }
 
-.editor-list {
+.editor-list-title {
+    &.editable {
+        margin-right: 1rem;
+        padding-right: 10px;
+    }
+}
 
+.editor-list {
     .children {
         padding-top: 10px;
         border: 1px solid $black;
@@ -47,19 +51,43 @@ html, body {
     }
 }
 
+.editor-list-item > div:first-child {
+    height: 1em;
+}
+
+.editor-list-item-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+}
+
+.editor-list-item {
+    flex: 1;
+    display: flex;
+}
+
 .input-list-items {
+    display: flex;
     border-radius: 3px;
     margin-bottom: 10px;
     list-style: none;
 
     &.record-input {
-        > .editor-list-item {
+        .editor-list-item {
             border-bottom-right-radius: 0;
             border-bottom-left-radius: 0;
         }
     }
+}
 
-    .editor-list-item {
-        margin-bottom: 0;
+.remove-icon {
+    display: flex;
+    width: 10px;
+    margin-left: 1em;
+    margin-top: 0.5em;
+
+    i:hover {
+        color: $light-gray;
     }
 }

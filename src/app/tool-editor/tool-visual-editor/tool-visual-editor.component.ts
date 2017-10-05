@@ -62,7 +62,8 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                            [readonly]="readonly">
             </ct-tool-hints>
 
-            <ct-file-def-list [model]="model.fileRequirement || {}"
+            <ct-file-def-list [model]="model"  
+                              [fileRequirement]="model.fileRequirement || {}"
                               [location]="model.fileRequirement?.loc"
                               (update)="updateModel('fileRequirement', $event)"
                               [context]="context"

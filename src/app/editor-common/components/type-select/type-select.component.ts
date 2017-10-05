@@ -98,6 +98,8 @@ export class InputTypeSelectComponent extends DirectiveBase implements ControlVa
                 this.paramType.items = "File";
                 this.form.controls["items"].setValue("File", {onlySelf: true});
             }
+
+            this.onChange(this.paramType);
         });
     }
 

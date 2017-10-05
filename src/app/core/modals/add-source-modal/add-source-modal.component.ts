@@ -126,7 +126,7 @@ export class AddSourceModalComponent extends DirectiveBase {
                 throw new Error("Trying to open a project, but there is no active platform set.");
             }
 
-            this.platformRepository.addOpenProjects(...this.selectedProjects).then(() => {
+            this.platformRepository.addOpenProjects(this.selectedProjects, true).then(() => {
                 this.modal.close();
             });
 
@@ -138,8 +138,9 @@ export class AddSourceModalComponent extends DirectiveBase {
             buttonLabel: "Add to Workspace"
         }, true).then(paths => {
             this.localFoldersToAdd = paths;
-            this.localRepository.addLocalFolders(...paths);
-            this.modal.close();
+            this.localRepository.addLocalFolders(paths, true).then(() => {
+                this.modal.close();
+            });
         }).catch(() => {
         });
 

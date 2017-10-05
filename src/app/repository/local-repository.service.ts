@@ -105,30 +105,30 @@ export class LocalRepositoryService {
         }).toPromise();
     }
 
-    setFolderExpansion(nodeID: string, expanded: boolean): void {
+    setFolderExpansion(foldersToExpand: string | string [], isExpanded: boolean): void {
         this.expandedFolders.take(1)
             .subscribe(expandedFolders => {
-                const index = expandedFolders.indexOf(nodeID);
 
-                const shouldBeAdded   = expanded && index === -1;
-                const shouldBeRemoved = !expanded && index !== -1;
+                const patch = new Set(expandedFolders);
+                let modified = false;
 
-                const patch = expandedFolders.slice();
+                [].concat(foldersToExpand).forEach((item) => {
+                    const oldSize = patch.size;
 
-                if (shouldBeAdded) {
-                    patch.push(nodeID);
-                } else if (shouldBeRemoved) {
-                    patch.splice(index, 1);
-                }
+                    isExpanded ? patch.add(item) : patch.delete(item);
 
-                if (shouldBeAdded || shouldBeRemoved) {
+                    if (oldSize !== patch.size) {
+                        modified = true;
+                    }
+                });
+
+                if (modified) {
                     this.patch({
-                        expandedNodes: patch
+                        expandedNodes: Array.from(patch)
                     });
                 }
+
             });
-
-
     }
 
     private listen(key: string) {
@@ -139,12 +139,17 @@ export class LocalRepositoryService {
         return this.ipc.request("patchLocalRepository", data);
     }
 
-    addLocalFolders(...folders): Promise<any> {
+    addLocalFolders(folders, expandFolders: boolean = false): Promise<any> {
         return this.getLocalFolders().take(1).toPromise().then(existingFolders => {
             const missing = folders.filter(folder => existingFolders.indexOf(folder) === -1);
 
             if (missing.length === 0) {
                 return Promise.resolve();
+            }
+
+            if (expandFolders) {
+                // Expand added folders
+                this.setFolderExpansion(missing.concat("local"), true);
             }
 
             return this.patch({

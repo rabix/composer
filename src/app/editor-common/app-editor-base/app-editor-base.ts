@@ -331,12 +331,12 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     publish(): void {
 
         if (!this.validationState.isValidCWL) {
-            this.notificationBar.showNotification(new ErrorNotification(`Cannot publish this app because because it's doesn't match the proper JSON schema`));
+            this.notificationBar.showNotification(new ErrorNotification(`Cannot push this app because because it's doesn't match the proper JSON schema`));
             return;
         }
 
         this.syncModelAndCode(true).then(() => {
-            const modal          = this.modal.fromComponent(PublishModalComponent, "Publish an App");
+            const modal          = this.modal.fromComponent(PublishModalComponent, "Push an App");
             modal.appContent     = this.getModelText(true);
             const originalSubmit = modal.onSubmit;
 
@@ -465,7 +465,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             this.viewMode = undefined;
             this.resolveToModel(this.codeEditorContent.value).then(() => {
                 this.viewMode = tabName;
-            }, err => {
+            }, () => {
                 this.viewMode = "code";
             });
             return;

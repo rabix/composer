@@ -1686,9 +1686,9 @@ cwl-svg@0.0.42:
   dependencies:
     core-js "^2.4.1"
 
-cwlts@1.13.37:
-  version "1.13.37"
-  resolved "https://registry.yarnpkg.com/cwlts/-/cwlts-1.13.37.tgz#10a0874803be3f4c4fbe78cf763259c24b641417"
+cwlts@1.13.38:
+  version "1.13.38"
+  resolved "https://registry.yarnpkg.com/cwlts/-/cwlts-1.13.38.tgz#6520adbd59073a736e26ddadfb0b74d12b854f76"
 
 d@1:
   version "1.0.0"
@@ -6287,7 +6287,7 @@ tslib@^1.7.1:
   version "1.7.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.7.1.tgz#bc8004164691923a79fe8378bbeb3da2017538ec"
 
-tslint@^5.7.0:
+tslint@^5.6.0:
   version "5.7.0"
   resolved "https://registry.yarnpkg.com/tslint/-/tslint-5.7.0.tgz#c25e0d0c92fa1201c2bc30e844e08e682b4f3552"
   dependencies:
