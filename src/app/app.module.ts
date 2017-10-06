@@ -25,7 +25,10 @@ import {ToolEditorModule} from "./tool-editor/tool-editor.module";
 import {ModalService} from "./ui/modal/modal.service";
 import {UIModule} from "./ui/ui.module";
 import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
+import {LoginService} from "./services/login/login.service";
 import {LoginComponent} from "./login/login.component";
+import {environment} from './../environments/environment';
+import {CookieModule} from 'ngx-cookie';
 
 @NgModule({
     providers: [
@@ -43,9 +46,14 @@ import {LoginComponent} from "./login/login.component";
         PlatformConnectionService,
         PlatformRepositoryService,
         SettingsService,
-        StatusBarService
+        StatusBarService,
+        LoginService,
     ],
     declarations: [
+        MainComponent,
+        LoginComponent,
+    ],
+    entryComponents: [
         MainComponent,
         LoginComponent,
     ],
@@ -61,9 +69,27 @@ import {LoginComponent} from "./login/login.component";
         ToolEditorModule,
         WorkflowEditorModule,
         NativeModule,
+        CookieModule.forRoot(),
     ],
-    bootstrap: [MainComponent]
 })
 export class AppModule {
+
+    constructor(private _loginService: LoginService) {}
+
+    ngDoBootstrap(app) {
+        this._loginService.storeToken();
+
+        if (!environment.browser || this._loginService.getToken()) {
+            let cottonTailComponent = document.createElement("ct-cottontail");
+            document.body.appendChild(cottonTailComponent);
+
+            app.bootstrap(MainComponent);
+        } else {
+            let loginComponent = document.createElement("login");
+            document.body.appendChild(loginComponent);
+
+            app.bootstrap(LoginComponent);
+        }
+    }
 
 }

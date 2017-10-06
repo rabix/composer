@@ -1,8 +1,9 @@
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, Input, OnInit, ViewContainerRef, ViewEncapsulation} from "@angular/core";
 import {AbstractControl, FormControl, FormGroup, Validators} from "@angular/forms";
-import {Observable} from "rxjs/Observable";
 
 @Component({
+    encapsulation: ViewEncapsulation.None,
+    
     selector: "login",
     template: `
         <form class="web-login" (ngSubmit)="form.valid && submit()" [formGroup]="form">
@@ -33,7 +34,8 @@ import {Observable} from "rxjs/Observable";
         </form>
     `,
     styleUrls: [
-        "./login.component.css"
+        "./../../assets/sass/main.scss",
+        "./login.component.scss"
     ]
 })
 export class LoginComponent implements OnInit {
@@ -61,32 +63,5 @@ export class LoginComponent implements OnInit {
             ])
         });
 
-    }
-
-    tokenReturnCallback(): boolean {
-        // If there's a token and baseURL in the location bar (i.e.,
-        // we just landed here after a successful login), save it and
-        // scrub the location bar.
-        if (document.location.search[0] != '?') {
-            return false;
-        }
-
-        var params = {};
-        document.location.search.slice(1).split('&').map(function(kv) {
-            var e = kv.indexOf('=');
-            if (e < 0) {
-                return false;
-            }
-
-            params[decodeURIComponent(kv.slice(0, e))] = decodeURIComponent(kv.slice(e+1));
-        })
-
-        if (params.hasOwnProperty("baseURL") || !params.hasOwnProperty("api_token")) {
-            // Have a query string, but it's not a login callback.
-            return false;
-        }
-
-        localStorage.setItem("apiToken", params["api_token"]);
-        history.replaceState({}, '', document.location.origin + document.location.pathname);        
     }  
 }
