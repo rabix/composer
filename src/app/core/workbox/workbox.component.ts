@@ -8,6 +8,8 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {TabData} from "./tab-data.interface";
 import {WorkboxService} from "./workbox.service";
 import {ReplaySubject} from "rxjs/ReplaySubject";
+import {LogoutComponent} from "../../logout/logout.component";
+import {environment} from '../../../environments/environment';
 
 @Component({
     selector: "ct-workbox",
@@ -54,6 +56,7 @@ import {ReplaySubject} from "rxjs/ReplaySubject";
 
             </ul>
 
+            <logout *ngIf="isBrowser"></logout>
             <ct-settings-menu></ct-settings-menu>
         </div>
 
@@ -77,6 +80,7 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
     activeTab: TabData<any>;
 
     private el: Element;
+    private isBrowser: Boolean = false;
 
     @ViewChildren("workBoxTabComponent")
     private tabComponents: QueryList<any>;
@@ -94,7 +98,9 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
 
     ngOnInit() {
 
-
+        if (environment.browser) {
+            this.isBrowser = true;
+        }
 
         // FIXME: this needs to be handled in a system-specific way
         // Listen for a shortcut that should close the active tab

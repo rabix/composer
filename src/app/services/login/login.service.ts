@@ -37,4 +37,9 @@ export class LoginService {
         return this._cookieService.get("api_token")
     }
 
+    logout(): void {
+        this._cookieService.remove("api_token")
+        document.location.href = document.location.href
+    }
+
 }
