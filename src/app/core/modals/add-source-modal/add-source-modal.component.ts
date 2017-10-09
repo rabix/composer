@@ -1,4 +1,4 @@
-import {Component} from "@angular/core";
+import {Component, Input} from "@angular/core";
 import {AuthService} from "../../../auth/auth.service";
 import {NativeSystemService} from "../../../native/system/native-system.service";
 import {LocalRepositoryService} from "../../../repository/local-repository.service";
@@ -14,8 +14,8 @@ import {PlatformCredentialsModalComponent} from "../platform-credentials-modal/p
     template: `
         <div class="header">
             <ct-tab-selector [distribute]="'auto'" [(active)]="activeTab">
-                <ct-tab-selector-entry tabName="local">Local</ct-tab-selector-entry>
-                <ct-tab-selector-entry tabName="platform">Platform</ct-tab-selector-entry>
+                <ct-tab-selector-entry tabName="local" data-test="local-tab">Local</ct-tab-selector-entry>
+                <ct-tab-selector-entry tabName="platform" data-test="platform-tab">Platform</ct-tab-selector-entry>
             </ct-tab-selector>
         </div>
 
@@ -69,7 +69,11 @@ import {PlatformCredentialsModalComponent} from "../platform-credentials-modal/p
             <ng-template #noUsers>
                 <p>You are not connected to any platform</p>
                 <p>
-                    <button type="button" class="btn btn-primary" (click)="openCredentialsForm()">Add a connection
+                    <button type="button" 
+                            data-test="add-connection-btn" 
+                            class="btn btn-primary" 
+                            (click)="openCredentialsForm()">
+                        Add a connection
                     </button>
                 </p>
             </ng-template>
@@ -83,8 +87,8 @@ import {PlatformCredentialsModalComponent} from "../platform-credentials-modal/p
             </ng-template>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" (click)="modal.close()">Cancel</button>
-                <button type="button" class="btn btn-primary" [disabled]="selectedProjects.length === 0"
+                <button type="button" class="btn btn-secondary" data-test="cancel-btn" (click)="modal.close()">Cancel</button>
+                <button type="button" class="btn btn-primary" data-test="apply-btn" [disabled]="selectedProjects.length === 0"
                         (click)="onDone()">Done
                 </button>
             </div>
@@ -93,7 +97,9 @@ import {PlatformCredentialsModalComponent} from "../platform-credentials-modal/p
 })
 export class AddSourceModalComponent extends DirectiveBase {
 
-    activeTab                                               = "local";
+    @Input()
+    activeTab: "local" | "platform" = "local";
+
     selectedProjects                                        = [];
     localFoldersToAdd                                       = [];
     closedProjectOptions: { value: string, text: string }[] = null;

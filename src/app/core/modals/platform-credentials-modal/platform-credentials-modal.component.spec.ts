@@ -9,6 +9,7 @@ import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {GlobalService} from "../../global/global.service";
 
 import {PlatformCredentialsModalComponent} from "./platform-credentials-modal.component";
+import {NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
 
 describe("PlatformCredentialsModalComponent", () => {
     let component: PlatformCredentialsModalComponent;
@@ -35,6 +36,10 @@ describe("PlatformCredentialsModalComponent", () => {
                     useValue: {}
                 }, {
                     provide: ModalService,
+                    useValue: {}
+                },
+                {
+                    provide: NotificationBarService,
                     useValue: {}
                 }]
         }).compileComponents();
