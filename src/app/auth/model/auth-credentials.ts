@@ -45,7 +45,7 @@ export class AuthCredentials implements UserPlatformIdentifier {
             case "cgc-api":
                 return "CGC";
             case "pgc-api":
-                return "CHOP";
+                return "CAVATICA";
             default:
                 return subdomain;
         }
