@@ -5,7 +5,7 @@ export interface AppMeta {
         workingDirectory?: string,
         jobFilePath?: string,
         swapUnlocked?: boolean,
-        appIsDirty?: boolean
+        isDirty?: boolean
         executionConfig?: AppExecutionContext
     }
 }
