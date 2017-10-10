@@ -10,13 +10,8 @@ import {ModalService} from "../../../../ui/modal/modal.service";
         <form [formGroup]="form">
             <ct-blank-tool-state *ngIf="!readonly && !baseCommand.length"
                                  [buttonText]="'Add base command'"
+                                 [description]="blankStateDescription"
                                  (buttonClick)="addBaseCommand()">
-
-                The part of the command that comes before any tool parameters or options. You can also
-                include parameters or options
-                that you want to be fixed for every execution of the tool (provided they can be placed
-                before any variable
-                parameters and options in the command line), or these can be set as arguments below.
             </ct-blank-tool-state>
 
             <div *ngIf="readonly && !baseCommand.length" class="text-xs-center">
@@ -34,10 +29,10 @@ import {ModalService} from "../../../../ui/modal/modal.service";
                             [readonly]="readonly">
                     </ct-expression-input>
 
-                    <div *ngIf="!readonly" class="remove-icon clickable ml-1 text-hover-danger"
-                         [ct-tooltip]="'Delete'"
-                         (click)="removeBaseCommand(i)">
-                        <i class="fa fa-trash"></i>
+                    <div *ngIf="!readonly" class="remove-icon">
+                        <i [ct-tooltip]="'Delete'"
+                           class="fa fa-trash clickable"
+                           (click)="removeBaseCommand(i)"></i>
                     </div>
                 </li>
             </ol>
@@ -69,6 +64,12 @@ export class BaseCommandListComponent implements OnInit, OnChanges, OnDestroy {
 
     @Output()
     update = new EventEmitter<ExpressionModel[]>();
+
+    blankStateDescription = `The part of the command that comes before any tool parameters or options. You can also
+                include parameters or options
+                that you want to be fixed for every execution of the tool (provided they can be placed
+                before any variable
+                parameters and options in the command line), or these can be set as arguments below.`;
 
     private subscription: Subscription;
 

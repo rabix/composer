@@ -5,7 +5,7 @@ import {SystemService} from "../../platform-providers/system.service";
 import {ModalService} from "../../ui/modal/modal.service";
 
 @Component({
-    selector: "ct-project-selection-modal",
+    selector: "ct-update-step-modal",
     styleUrls: ["./update-step-modal.component.scss"],
     template: `
         <div class="p-1 content">

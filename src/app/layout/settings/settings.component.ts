@@ -33,11 +33,14 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                     <tbody>
 
                     <tr *ngFor="let entry of (auth.getCredentials() | async)" class="align-middle">
+                        
                         <td class="align-middle">{{ getPlatformLabel(entry.url) }}</td>
+                        
                         <td class="align-middle">
                             {{ entry.user.username }}
                             <span *ngIf="(auth.getActive() | async) === entry" class="tag tag-primary">active</span>
                         </td>
+                        
                         <td class="text-xs-right">
                             <button *ngIf="(auth.getActive() | async) === entry; else deactivate;"
                                     (click)="setActiveCredentials(undefined)"
@@ -49,6 +52,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                             <button class="btn btn-secondary" (click)="editCredentials(entry)">Edit</button>
                             <button class="btn btn-secondary" (click)="auth.removeCredentials(entry)">Remove</button>
                         </td>
+                        
                     </tr>
                     </tbody>
                 </table>

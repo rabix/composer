@@ -63,7 +63,7 @@ import {TreeViewService} from "../tree-view.service";
                           [isExpanded]="child?.isExpanded"
                           [isExpandable]="child.isExpandable"
                           [iconExpanded]="child?.iconExpanded"
-                          expandOnIconOnly="child?.toggleOnIconOnly"
+                          [toggleOnIconOnly]="child?.toggleOnIconOnly"
 
                           [dragLabel]="child.dragLabel"
                           [dragEnabled]="child.dragEnabled"
