@@ -323,8 +323,13 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
             }
         });
 
+        this.form.controls["typeForm"].valueChanges.subscribeTracked(this, (value) => {
+            this.workflowModel.validateConnectionsForIOPort(this.port);
+        });
+
         this.form.controls["fileTypes"].valueChanges.subscribeTracked(this, (value) => {
             this.port.fileTypes = value || [];
+            this.workflowModel.validateConnectionsForIOPort(this.port);
         });
 
         this.form.controls["description"].valueChanges.subscribeTracked(this, (description) => {

@@ -3,23 +3,6 @@
 :host {
     margin-right: 1rem;
 
-    li {
-        border-bottom: 1px solid $toolbar-border;
-        line-height: $line-height-base;
-        padding: .55rem 1rem;
-        cursor: pointer;
-        min-width: 165px;
-        color: $smoke;
-
-        .text-muted {
-            white-space: nowrap;
-        }
-
-        &:hover {
-            background: $gray;
-        }
-    }
-
     .active-icon {
         color: $brand-primary;
     }

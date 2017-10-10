@@ -20,9 +20,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                     <!--Blank Tool Screen-->
                     <ct-blank-tool-state *ngIf="!readonly && !model.arguments.length"
                                          [buttonText]="'Add an Argument'"
+                                         [description]="blankStateDescription"
                                          (buttonClick)="addEntry()">
-                        Parameters or options that are hard-coded for every execution of the tool. For example, you may 
-                        want to use a fixed name for an output file, so the output file name would be an argument not an input port.
                     </ct-blank-tool-state>
 
                     <div *ngIf="readonly && !model.arguments.length" class="text-xs-center">
@@ -30,7 +29,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                     </div>
 
                     <!--List Header Row-->
-                    <div class="editor-list-title" *ngIf="!!model.arguments.length">
+                    <div class="editor-list-title" [class.editable]="!readonly" *ngIf="!!model.arguments.length">
                         <div class="col-sm-4">Value</div>
                         <div class="col-sm-3">Prefix</div>
                         <div class="col-sm-3">Separate</div>
@@ -44,7 +43,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                         <li *ngFor="let entry of model.arguments; let i = index"
                             class="input-list-items">
 
-                            <div class="editor-list-item clickable"
+                            <!--List item-->
+                            <div class="form-control editor-list-item clickable"
                                  [ct-validation-class]="entry"
                                  [ct-editor-inspector]="inspector"
                                  [ct-editor-inspector-target]="entry.loc">
@@ -87,14 +87,13 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                 'col-sm-2': readonly
                             }">{{ entry.position || 0 }}
                                 </div>
+                            </div>
 
-                                <!--Actions Column-->
-                                <div *ngIf="!readonly" class="col-sm-1 align-right">
-                                    <i [ct-tooltip]="'Delete'"
-                                       class="fa fa-trash text-hover-danger"
-                                       (click)="removeEntry(i)"></i>
-                                </div>
-
+                            <!--Actions Column-->
+                            <div *ngIf="!readonly" class="remove-icon">
+                                <i [ct-tooltip]="'Delete'"
+                                   class="fa fa-trash clickable"
+                                   (click)="removeEntry(i)"></i>
                             </div>
 
                             <!--Object Inspector Template -->
@@ -148,6 +147,9 @@ export class ArgumentListComponent extends DirectiveBase {
 
     @ViewChildren("inspector", {read: TemplateRef})
     inspectorTemplate: QueryList<TemplateRef<any>>;
+
+    blankStateDescription = `Parameters or options that are hard-coded for every execution of the tool. For example, you may 
+    want to use a fixed name for an output file, so the output file name would be an argument not an input port.`;
 
     constructor(public inspector: EditorInspectorService, private modal: ModalService) {
         super();

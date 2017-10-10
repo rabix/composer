@@ -9,13 +9,16 @@ import {Notification, NotificationBarService} from "./notification-bar.service";
             <div *ngFor="let notification of notifications;"
                  class="notification pl-1 notification-{{notification.type}}">
                 <i class="fa"
-                   [class.fa-info-circle]="notification.type === 'info'"
+                   [class.fa-check]="notification.type === 'info'"
                    [class.fa-minus-circle]="notification.type === 'error'"
                    [class.fa-exclamation-triangle]="notification.type === 'warning'">
                 </i>
 
                 <div class="error-text pl-2 pr-1">
-                    {{notification.message}}
+                    <ct-notification 
+                        [message]="notification.message" 
+                        [component]="notification.component">                        
+                    </ct-notification>
                 </div>
 
                 <i class="fa fa-times pr-1 clickable" (click)="close(notification)"></i>

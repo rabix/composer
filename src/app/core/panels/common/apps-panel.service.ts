@@ -3,7 +3,7 @@ import * as YAML from "js-yaml";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {FileRepositoryService} from "../../../file-repository/file-repository.service";
-import {ErrorNotification, NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
+import {NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {MenuItem} from "../../../ui/menu/menu-item";
@@ -85,9 +85,8 @@ export class AppsPanelService {
 
                         }).catch((err) => {
                             savingUpdate.next("failed");
-                            this.notificationBar.showNotification(
-                                new ErrorNotification("App saving failed. " + new ErrorWrapper(err))
-                            );
+                            this.notificationBar.showNotification("App saving failed. " + new ErrorWrapper(err));
+
                         });
 
                     }

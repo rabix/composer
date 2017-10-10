@@ -87,7 +87,7 @@ export function errorHandlerFactory(modal: ModalService) {
     ],
     exports: [
         LogoComponent,
-        LayoutComponent,
+        LayoutComponent
     ],
     providers: [
         WebWorkerBuilderService,
