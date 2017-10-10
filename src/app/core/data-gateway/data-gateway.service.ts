@@ -122,7 +122,6 @@ export class DataGatewayService {
 
     updateSwap(fileID, content): Promise<any> {
         const isLocal = AppHelper.isLocal(fileID);
-        const repository = isLocal ? this.localRepository : this.platformRepository;
         const appID = isLocal ? fileID : AppHelper.getRevisionlessID(fileID);
 
         const promises = [];
@@ -136,11 +135,17 @@ export class DataGatewayService {
         // If there is no content swap should be deleted, so we need to remove AppMeta data
         if (!content) {
 
-            // Remove swapUnlocked meta (only for platform apps, for local this operation does nothing)
-            promises.push(repository.patchAppMeta(appID, "swapUnlocked", false));
+            // Remove swapUnlocked meta (only for platform apps)
+            if (!isLocal) {
+                promises.push(this.platformRepository.patchAppMeta(appID, "swapUnlocked", false));
+            }
 
-            // Remove appIsDirty meta
-            promises.push(repository.patchAppMeta(appID, "appIsDirty", false));
+            // Remove isDirty meta
+            if (!isLocal) {
+                promises.push(this.platformRepository.patchAppMeta(appID, "isDirty", false));
+            } else {
+                promises.push(this.localRepository.patchAppMeta(appID, "isDirty", false));
+            }
 
         }
 

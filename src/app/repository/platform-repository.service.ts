@@ -12,7 +12,6 @@ import {AppMeta} from "../../../electron/src/storage/types/app-meta";
 import {RecentAppTab} from "../../../electron/src/storage/types/recent-app-tab";
 import {TabData} from "../core/workbox/tab-data.interface";
 import {IpcService} from "../services/ipc.service";
-import {AppMetadata} from "../../../electron/src/storage/types/local-repository";
 import {AuthService} from "../auth/auth.service";
 
 @Injectable()

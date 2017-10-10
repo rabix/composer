@@ -10,6 +10,7 @@ import {WorkboxService} from "./workbox.service";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {ModalService} from "../../ui/modal/modal.service";
 import {noop} from "../../lib/utils.lib";
+import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closing-dirty-apps-modal.component";
 
 
 @Component({
@@ -26,7 +27,7 @@ import {noop} from "../../lib/utils.lib";
                     ct-click
                     (onMouseClick)="onTabClick($event, tab, tabComponents[i])"
                     [class.active]="tab === (workbox.activeTab | async)"
-                    [class.isDirty]="tabComponents[i]?.appIsDirty"
+                    [class.isDirty]="tabComponents[i]?.isDirty"
                     [ct-context]="createContextMenu(tab)"
                     class="tab">
 
@@ -240,27 +241,18 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
      */
     removeTab(tab, component) {
 
-        if (component.appIsDirty) {
+        if (component.isDirty) {
 
-            // If app is Dirty show modal
-            const modal = this.modal.confirm({
-                title: "Remove tab",
-                showDiscardButton: true,
-                content: `
-                Do you want to save the changes made to the document?<br/>
-                Your changes will be lost if you don't save them.`,
-                confirmationLabel: "Save",
-                discardLabel: "Close without saving"
+            const modal = this.modal.fromComponent(ClosingDirtyAppsModalComponent, {
+                title: "Remove tab"
             });
 
-            modal.then(() => {
-                // If click on Save button
-                component.save();
-            }, (result) => {
-                if (result === true) {
-                    // If click on Discard button
-                    this.workbox.closeTab(tab);
-                }
+            modal.confirmationLabel = "Save";
+            modal.discardLabel = "Close without saving";
+
+            modal.decision.take(1).subscribe((result) => {
+                this.modal.close();
+                result ? component.save() : this.workbox.closeTab(tab);
             });
 
         } else {
@@ -292,7 +284,7 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
 
     createContextMenu(tab): MenuItem[] {
         const closeOthers = new MenuItem("Close Others", {
-            click: () => this.removeAllTabs(tab)
+            click: () => this.removeAllTabs([tab])
         });
 
         const closeAll = new MenuItem("Close All", {
@@ -305,32 +297,31 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
     /**
      * Removes all tabs or all other tabs (if tab is passed as an argument)
      */
-    private removeAllTabs(tab?: TabData<any>) {
+    private removeAllTabs(preserve: TabData<any>[] = []) {
 
-        const component = tab ? this.getTabComponent(tab).tabComponent : null;
+        const components = preserve.map((tab) => this.getTabComponent(tab).tabComponent);
 
         const hasDirtyTabs = this.tabComponents.find((tabComponent) => {
-            return tabComponent.appIsDirty && (tabComponent !== component);
+            return tabComponent.isDirty && !components.includes(tabComponent);
         });
 
-        const modalTitle = `Close ${tab ? "other" : "all"} tabs`;
+        const modalTitle = `Close ${components.length ? "other" : "all"} tabs`;
 
         if (hasDirtyTabs) {
-
+            //
             // If there are apps that are Dirty show modal
             const modal = this.modal.confirm({
                 title: modalTitle,
-                content: `Some documents are modified.<br>
-                          Your changes will be lost if you don't save them.`,
+                content: "Some documents are modified\nYour changes will be lost if you don't save them.",
                 confirmationLabel: modalTitle,
             });
 
             modal.then(() => {
-                this.workbox.closeAllTabs(tab);
+                this.workbox.closeAllTabs(preserve);
             }, noop);
 
         } else {
-            this.workbox.closeAllTabs(tab);
+            this.workbox.closeAllTabs(preserve);
         }
 
     }

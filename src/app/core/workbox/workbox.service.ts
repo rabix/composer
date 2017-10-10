@@ -166,10 +166,9 @@ export class WorkboxService {
         this.syncTabs();
     }
 
-    closeAllTabs(tab?: TabData<any>) {
-
+    closeAllTabs(preserve: TabData<any>[] = []) {
         this.tabs.getValue().forEach((item) => {
-            if (item !== tab) {
+            if (!preserve.includes(item)) {
                 this.closeTab(item);
             }
         });

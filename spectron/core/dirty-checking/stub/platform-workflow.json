@@ -1,0 +1,79 @@
+{
+    "sbg:project": "marijanlekic89/div-nesto-input",
+    "sbg:revisionNotes": "",
+    "sbg:batchBy": {
+        "criteria": [
+            "metadata.sample_id"
+        ],
+        "type": "criteria"
+    },
+    "outputs": [],
+    "sbg:validationErrors": [
+        "batchInput #sample_files not present in app inputs"
+    ],
+    "sbg:modifiedOn": 1507639806,
+    "sbg:id": "marijanlekic89/div-nesto-input/publish/3",
+    "steps": [],
+    "inputs": [],
+    "class": "Workflow",
+    "requirements": [],
+    "sbg:canvas_y": 100,
+    "sbg:sbgMaintained": false,
+    "sbg:createdBy": "marijanlekic89",
+    "sbg:batchInput": "#sample_files",
+    "sbg:revision": 3,
+    "sbg:toolAuthor": "Milos Jordanski, Seven Bridges",
+    "sbg:revisionsInfo": [
+        {
+            "sbg:modifiedOn": 1505483440,
+            "sbg:modifiedBy": "marijanlekic89",
+            "sbg:revisionNotes": "added toolkit version to the Label",
+            "sbg:revision": 0
+        },
+        {
+            "sbg:modifiedOn": 1505483456,
+            "sbg:modifiedBy": "marijanlekic89",
+            "sbg:revisionNotes": "REvision note",
+            "sbg:revision": 1
+        },
+        {
+            "sbg:modifiedOn": 1505483470,
+            "sbg:modifiedBy": "marijanlekic89",
+            "sbg:revisionNotes": "asd",
+            "sbg:revision": 2
+        },
+        {
+            "sbg:modifiedOn": 1507639806,
+            "sbg:modifiedBy": "marijanlekic89",
+            "sbg:revisionNotes": "",
+            "sbg:revision": 3
+        }
+    ],
+    "sbg:categories": [
+        "chip-seq"
+    ],
+    "sbg:projectName": "<div>Nesto <input>",
+    "sbg:latestRevision": 3,
+    "hints": [
+        {
+            "class": "sbg:AWSInstanceType",
+            "value": "c4.4xlarge;ebs-gp2;700"
+        }
+    ],
+    "label": "ChIP-seq BWA Alignment and Peak Calling MACS2 2.1.1",
+    "sbg:canvas_zoom": 0.5999999999999996,
+    "sbg:appVersion": [
+        "sbg:draft-2"
+    ],
+    "sbg:modifiedBy": "marijanlekic89",
+    "id": "https://api.sbgenomics.com/v2/apps/marijanlekic89/div-nesto-input/publish/3/raw/",
+    "sbg:canvas_x": -521,
+    "cwlVersion": "sbg:draft-2",
+    "sbg:contributors": [
+        "marijanlekic89"
+    ],
+    "sbg:createdOn": 1505483440,
+    "sbg:publisher": "sbg",
+    "sbg:image_url": null,
+    "description": "**Description:**\n\nChIP-seq (Chromatin immunoprecipitation followed by high-throughput sequencing technology) allows researchers to study the landscape of chromatin modifications or the binding patterns of transcription factors or other chromatin-associated proteins like RNA-polymerases or chromatin modulators.\n\nThis pipeline takes you all the way from unaligned raw sequencing reads (FASTQ) to ChIP-seq peaks detection.\n\nSequenced reads are aligned with the BWA-backtrack tool (specific for read size < 100bp). After alignment, BAM files are filtered (to remove low quality and unpaired reads) and de-duplicated. A number of QC metrics that evaluate the library complexity and signal enrichment are calculated. Peak calling is performed on the processed BAM files using MACS2 which is suggested peak caller for analysing histone marks.\n\n**Blacklisting**\n\nPrior to further ChIP-seq analysis, genomic regions that are associated with artifact signal may be removed. The exclusion of these regions, called blacklist regions, aims to remove sources of artifact signal caused by biases from chromatin accessibility and ambiguous alignment in order to increase the accuracy of both peak calling and comparative ChIP analysis. BEDTools intersect tool within this pipeline, when provided with adequate blacklist file, will remove blacklisted regions from peak MACS2 output file. \n\n**Required inputs:**\n\n* Input FASTQ reads (ID: Sample FASTQ) - one fastq file per sample for single-end data, or two files per sample for paired-end data. NOTE: For paired-end reads, it is crucial to set the metadata 'paired-end' field as 1 for one input file, as 2 for the other input file.\n\n* Reference/Index files (ID: Reference index) - TAR bundle of already generated index files.\n\n**Optional input:**\n\n* Control FASTQ reads (ID: Control FASTQ) - one fastq file per sample for single-end data, or two files per sample for paired-end data. NOTE: For paired-end reads, it is crucial to set the metadata 'paired-end' field as 1 for one input file, as 2 for the other input file.\n\n* Blacklist file (ID: Blacklist file) - BED file containing genomic regions that have anomalous, unstructured, high signal/ read counts in next-generation sequencing experiments. It could be used by BEDTools intersect in order to increase the accuracy of peak calling and comparative ChIP analysis.\n\n**Outputs:**\n\n* Sample_FASTQ.qc.b64html: B64HTML file with a table of all QC metrics.\n\n* Sample_FASTQ_deduped.filter.srt.bam: BAM files that are filtered (to remove low quality and unpaired reads) and de-duplicated. Could be used independently in other analyses for peak calling with different peak-callers.\n\n* Control_FASTQ_deduped.filter.srt.bam: BAM files that are filtered (to remove low quality and unpaired reads) and de-duplicated. Could be used independently in other analyses for peak calling with different peak-callers.\n\n* Sample_FASTQ_deduped.filter.srt.bam.bai: BAI index files for processed BAM files. Could be used independently in other analyses for peak calling with different peak-callers.\n\n* Control_FASTQ_deduped.filter.srt.bam.bai: BAI index files for processed BAM files. Could be used independently in other analyses for peak calling with different peak-callers.\n\n* Sample_FASTQ_peaks.xls: A tabular file which contains information about called peaks: their length, and height, absolute peak summit position, as well as their fold change, p- and q-value.\n\n* Sample_FASTQ_summits.bed: a BED format, which contains the peak summits locations for every peak. If you want to find the motifs at the binding sites, this file is recommended.\n\n* Sample_FASTQ_peaks.narrowPeak: a BED6+4 format file which contains the peak locations together with peak summit, pvalue and qvalue. \n\n* Sample_FASTQ_peaks.broadPeak: a BED6+3 format which contains the peak locations together with peak summit, p-value and q-value, missing the column for annotating peak summits.\n\n* Sample_FASTQ_model.r: An R script which you can use to produce a PDF image about the model based on the ChIP-seq data. The shape of the modeled peaks allows assessment of the model quality.\n\n* Sample_FASTQ_peaks.blacklisted.(narrowPeak/broadPeak): Sample_FASTQ_peaks.broadPeak or Sample_FASTQ_peaks.narrowPeak file without blacklist regions.(This file is not created if Blacklist file is not provided on input).\n\n**Important notes:**\n\n* **When providing sample and control files to the input, a \"Case ID\" and \"Sample ID\" metadata should be properly set for each file. PE files should have the same \"Sample ID\" and \"Case ID\". Sample files (PE or SE) should have the same \"Case ID\" as corresponding control files.**\n\n* In some situations read trimming is necessary, for instance, if read ends display poor quality values (most generally the right end) or if control and ChIP-seq samples have inconsistent read lengths. In these cases, read-trimming should be applied.\n\n* Preferred values for library complexity are: NRF > 0.9, PBC1 ≥ 0.9, and PBC2 ≥ 10.\n\n* Preferred values for NSC and RSC metric when analysing sharp histone marks are: NSC > 1.05 and RSC > 0.8 (Even if ChIP-seq data does not meet these guidelines, there could still be significant biological information. The users should evaluate the profiles of the cross-correlation plot to further assess the quality of their data).\n\n* Input and negative control samples should have low NSC and RSC scores.\n\n* SBG ChIP-seq Set Metadata tool adds values 'control' and 'sample' to the metadata field 'chip-seq' of the input files.\n\n**Important notes about MACS2 options:**\n\n**NO_MODEL:** MACS2 uses the estimated fragment length to extend reads in 5'->3' direction to fix-sized fragments. By default, the fragment length is estimated by MACS2 during the model building step. However, for this specific workflow (following ENCODE pipeline), the predominant fragment length is estimated in a previous step (*json output; from 'SBG ChIP-seq filter and QC') and used as an input via the parameter --extsize*. The parameter --nomodel is also set to force MACS2 to bypass the building of the shifting model.\n\n**QVALUE:** The q-value is set to 0.05 to allow for peak calling. Recommended q-values are 0.01 for narrow peaks and 0.05 for broad peaks.Please use the p-value option (leaving the q-value option blank) if a less stringent analysis is needed. Peak sets thresholded in this way (p < 0.01) are not meant to be interpreted as definitive binding events but are rather intended to be used as input for subsequent statistical comparison of replicates which could be done by using IDR public app. \n\n**KEEP_DUPS:** This is set to 'all' to prevent MACS2 from searching for duplicated reads because we expect the input BAM files to be de-duplicated. If this is not the case, this parameter should be set to the default option '1' which is to keep one tag at the same location.\n\n**Common issues and limitations of the workflow:**\n\n* If the total size of the input files in a single task exceeds 20GB perhaps a larger instance should be allocated due to memory requirements.\n\n* In cases when analysing two biological replicates, outputs between replicates should be compared using IDR app. IDR is publicly available app which could be used to combine outputs of chip-seq pipeline in order to perform the comparative analysis between biological replicates in the separate task."
+}

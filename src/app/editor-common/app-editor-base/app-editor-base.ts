@@ -32,6 +32,7 @@ import {RevisionListComponent} from "../components/revision-list/revision-list.c
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
 import {APP_SAVER_TOKEN, AppSaver} from "../services/app-saving/app-saver.interface";
 import {LocalRepositoryService} from "../../repository/local-repository.service";
+import {ClosingDirtyAppsModalComponent} from "../../core/modals/closing-dirty-apps/closing-dirty-apps-modal.component";
 
 export abstract class AppEditorBase extends DirectiveBase implements StatusControlProvider, OnInit, AfterViewInit {
 
@@ -52,7 +53,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     dataModel: CommandLineToolModel | WorkflowModel;
 
     /** Flag to indicate if document is in Dirty state (when user interacts/modifies) */
-    private appIsDirty = false;
+    isDirty = false;
 
     /** Flag to indicate the document is loading */
     isLoading = true;
@@ -279,20 +280,26 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             this.reportPanel = state.isValidCWL ? this.getPreferredReportPanel() : this.reportPanel;
         });
 
-        this.getRepository().getAppMeta(this.tabData.id, "appIsDirty").subscribeTracked(this, (isModified) => {
-            this.appIsDirty = !!isModified;
-        });
-
+        if (AppHelper.isLocal(this.tabData.id)) {
+            this.localRepository.getAppMeta(this.tabData.id, "isDirty").subscribeTracked(this, (isModified) => {
+                this.isDirty = !!isModified;
+            });
+        } else {
+            this.platformRepository.getAppMeta(this.tabData.id, "isDirty").subscribeTracked(this, (isModified) => {
+                this.isDirty = !!isModified;
+            });
+        }
 
         this.bindExecutionQueue();
     }
 
-    getRepository() {
-        return AppHelper.isLocal(this.tabData.id) ? this.localRepository : this.platformRepository;
-    }
-
     setAppDirtyState(isModified: boolean) {
-        this.getRepository().patchAppMeta(this.tabData.id, "appIsDirty", isModified);
+
+        if (AppHelper.isLocal(this.tabData.id)) {
+            this.localRepository.patchAppMeta(this.tabData.id, "isDirty", isModified);
+        } else {
+            this.platformRepository.patchAppMeta(this.tabData.id, "isDirty", isModified);
+        }
     }
 
     save(): void {
@@ -311,12 +318,16 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                  * but the code is actually up to date and the model isn't.
 
                  */
-                this.revisionChangingInProgress = true;
 
-                this.priorityCodeUpdates.next(update);
+                if (this.tabData.dataSource !== "local") {
+                    this.revisionChangingInProgress = true;
+                }
 
                 // After app is saved, app state is not Dirty any more
                 this.setAppDirtyState(false);
+
+                this.priorityCodeUpdates.next(update);
+
 
                 this.statusBar.stopProcess(proc, `Saved: ${appName}`);
             }, err => {
@@ -449,7 +460,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         /** If switching to code mode, serialize the model first and update the editor text */
         if (this.viewMode !== "code" && tabName === "code") {
 
-            if (this.appIsDirty) {
+            if (this.isDirty) {
                 /** If switching to code mode, serialize only if there are changes made (dirty state) */
                 this.priorityCodeUpdates.next(this.getModelText());
             }
@@ -823,32 +834,29 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
         return new Promise((resolve, reject) => {
 
-            if (this.appIsDirty) {
+            if (!this.isDirty) {
+                return resolve(true);
+            }
 
-                const modal = this.modal.confirm({
-                    title: "Change revision",
-                    showDiscardButton: true,
-                    content:
-                        `Do you want to save the changes made to the document?<br/>
-                    Your changes will be lost if you don't save them.`,
-                    confirmationLabel: "Save",
-                    discardLabel: "Change without saving"
-                });
+            const modal = this.modal.fromComponent(ClosingDirtyAppsModalComponent, {
+                title: "Change revision"
+            });
 
-                modal.then(() => {
-                    // If click on Save button
+            modal.confirmationLabel = "Save";
+            modal.discardLabel = "Change without saving";
+
+            modal.decision.take(1).subscribe((result) => {
+
+                if (result) {
+                    this.modal.close();
                     this.save();
                     reject();
-                }, (result) => {
-                    if (result === true) {
-                        // If click on Discard button
-                        resolve(true);
-                    }
-                });
+                } else {
+                    resolve(true);
+                    this.modal.close();
+                }
+            });
 
-            } else {
-                resolve(true);
-            }
         });
 
     }

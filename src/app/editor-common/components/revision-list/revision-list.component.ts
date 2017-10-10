@@ -37,14 +37,6 @@ import {noop} from "../../../lib/utils.lib";
 })
 export class RevisionListComponent implements OnChanges {
 
-
-    @Input() revisions: PlatformAppRevisionEntry[] = [];
-    @Input() active: number;
-    @Input() loadingRevision;
-    @Input() showModalIfAppIsDirty: () => Promise<boolean>;
-
-    @Output() select = new Subject<number>();
-
     displayList: {
         date: number,
         note: string,
@@ -52,12 +44,19 @@ export class RevisionListComponent implements OnChanges {
         number: number
     }[] = [];
 
+    @Input() revisions: PlatformAppRevisionEntry[] = [];
+    @Input() active: number;
+    @Input() loadingRevision;
+
+    @Output() select = new Subject<number>();
+    @Input() beforeChange: () => Promise<boolean> = () => new Promise<boolean>((res) => res(true));
+
     selectRevision(revision) {
         if (revision.number === this.active) {
             return;
         }
 
-        this.showModalIfAppIsDirty().then(() => {
+        this.beforeChange().then(() => {
             this.loadingRevision = revision;
             this.select.next(revision.number);
         }, noop);
