@@ -1,7 +1,5 @@
 import {app} from "electron";
 import * as path from "path";
-import {RequestCallback} from "request";
-import {PublicAPI} from "./controllers/public-api.controller";
 import * as SearchController from "./controllers/search.controller";
 import {SwapController} from "./controllers/swap.controller";
 import * as GitHubClient from "./github-api-client/github-client";
@@ -94,9 +92,11 @@ export function resolve(path, callback: (err?: Error, result?: Object) => void) 
     });
 }
 
-export function getUserByToken(data: { url, token }, callback: RequestCallback) {
-    const api = new PublicAPI(data.url, data.token);
-    api.getUser(callback);
+export function getUserByToken(data: { url, token }, callback) {
+    const api = new SBGClient(data.url, data.token);
+    api.getUser().then( result => {
+        callback(null, result);
+    }, err => callback(err));
 }
 
 export function resolveContent(data, callback) {
