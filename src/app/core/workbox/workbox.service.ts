@@ -106,7 +106,7 @@ export class WorkboxService {
 
         if (foundTab) {
             if (replaceExistingIfExists) {
-                this.closeTab(foundTab);
+                this.dataGateway.updateSwap(foundTab.data.id, null);
                 tabs.splice(foundTabIndex, 1, tab);
                 this.tabs.next(tabs);
             } else {
@@ -145,8 +145,6 @@ export class WorkboxService {
                 this.platformRepository.pushRecentApp(recentTabData);
             }
         }
-
-
     }
 
     openSettingsTab() {
@@ -235,7 +233,7 @@ export class WorkboxService {
         isWritable?: boolean;
         language?: string;
 
-    }, forceCreate = false): TabData<T> {
+    }, forceCreate = false, forceFetch = false): TabData<T> {
 
         if (!forceCreate) {
             const currentTab = this.tabs.getValue().find(existingTab => existingTab.id === data.id);
@@ -253,7 +251,7 @@ export class WorkboxService {
         const isWritable = data.isWritable;
 
         const fileContent = Observable.empty().concat(dataSource === "local" ?
-            this.fileRepository.fetchFile(id, true) : this.platformRepository.getAppContent(id, true));
+            this.fileRepository.fetchFile(id, forceFetch) : this.platformRepository.getAppContent(id, forceFetch));
         const resolve     = (fcontent: string) => this.dataGateway.resolveContent(fcontent, id);
 
         const tab = Object.assign({

@@ -75,7 +75,7 @@ export class AppsPanelService {
                                 isWritable: true,
                                 label: AppHelper.getBasename(path),
                                 type: appType,
-                            } as TabData<any>, true);
+                            } as TabData<any>, true, true);
 
                             this.workbox.openTab(tab, true, true, true);
                             this.fileRepository.reloadPath(path);
