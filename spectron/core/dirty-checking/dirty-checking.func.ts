@@ -874,8 +874,8 @@ describe("dirty checking", async () => {
             const revisionComponent = `ct-revision-list`;
             const closingDirtyAppsModal = `ct-modal-closing-dirty-apps`;
 
-            await client.waitForVisible(visualEditor);
-            await client.waitForVisible(arrange);
+            await client.waitForVisible(visualEditor, 5000);
+            await client.waitForVisible(arrange, 5000);
 
             await client.click(arrange);
 
@@ -886,13 +886,13 @@ describe("dirty checking", async () => {
             await client.click(revisionBtn);
 
             // Revision component should appear
-            await client.waitForVisible(revisionComponent);
+            await client.waitForVisible(revisionComponent, 5000);
 
             // Click on revision entry
             await client.click(`${revisionComponent} .revision-entry:nth-of-type(2)`);
 
             // Modal should prevent changing revision
-            await client.waitForVisible(closingDirtyAppsModal);
+            await client.waitForVisible(closingDirtyAppsModal, 5000);
 
             // Click on cancel button
             await client.click(`${closingDirtyAppsModal} [data-test="cancel-btn"]`);
