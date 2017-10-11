@@ -8,7 +8,7 @@ import {LocalRepositoryService} from "../../repository/local-repository.service"
 import {PlatformRepositoryService} from "../../repository/platform-repository.service";
 import {DataGatewayService} from "../data-gateway/data-gateway.service";
 import {AppHelper} from "../helpers/AppHelper";
-import {TabData} from "./tab-data.interface";
+import {TabData} from "../../../../electron/src/storage/types/tab-data-interface";
 
 
 @Injectable()

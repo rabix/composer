@@ -4,7 +4,7 @@ import {ReplaySubject} from "rxjs/ReplaySubject";
 import {ExecutorConfig} from "../../../electron/src/storage/types/executor-config";
 import {RecentAppTab} from "../../../electron/src/storage/types/recent-app-tab";
 import {AuthCredentials} from "../auth/model/auth-credentials";
-import {TabData} from "../core/workbox/tab-data.interface";
+import {TabData} from "../../../electron/src/storage/types/tab-data-interface";
 import {IpcService} from "../services/ipc.service";
 import {AppMeta} from "../../../electron/src/storage/types/app-meta";
 

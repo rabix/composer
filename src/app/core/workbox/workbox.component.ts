@@ -5,7 +5,7 @@ import {LocalRepositoryService} from "../../repository/local-repository.service"
 import {IpcService} from "../../services/ipc.service";
 import {MenuItem} from "../../ui/menu/menu-item";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
-import {TabData} from "./tab-data.interface";
+import {TabData} from "../../../../electron/src/storage/types/tab-data-interface";
 import {WorkboxService} from "./workbox.service";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {ModalService} from "../../ui/modal/modal.service";
