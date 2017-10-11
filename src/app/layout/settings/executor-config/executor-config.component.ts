@@ -4,7 +4,7 @@ import {ErrorWrapper} from "../../../core/helpers/error-wrapper";
 import {ExecutorService} from "../../../executor/executor.service";
 import {LocalRepositoryService} from "../../../repository/local-repository.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
-import {ErrorNotification, NotificationBarService} from "../../notification-bar/notification-bar.service";
+import {NotificationBarService} from "../../notification-bar/notification-bar.service";
 
 const {dialog} = window["require"]("electron").remote;
 
@@ -64,7 +64,7 @@ export class ExecutorConfigComponent extends DirectiveBase implements OnInit {
 
     ngOnInit() {
 
-        const showErr = (err) => this.notificationBar.showNotification(new ErrorNotification(new ErrorWrapper(err).toString()));
+        const showErr = (err) => this.notificationBar.showNotification(new ErrorWrapper(err).toString());
 
         this.localRepository.getExecutorConfig().take(1).subscribeTracked(this, config => {
 

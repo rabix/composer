@@ -1,11 +1,5 @@
 import {User} from "../../../../electron/src/sbg-api-client/interfaces/user";
-
-export interface UserPlatformIdentifier {
-    user: User;
-    id: string;
-    url: string;
-    token: string;
-}
+import {UserPlatformIdentifier} from "./user-platform-identifier";
 
 export class AuthCredentials implements UserPlatformIdentifier {
 
@@ -51,7 +45,7 @@ export class AuthCredentials implements UserPlatformIdentifier {
             case "cgc-api":
                 return "CGC";
             case "pgc-api":
-                return "CHOP";
+                return "CAVATICA";
             default:
                 return subdomain;
         }

@@ -1,5 +1,4 @@
 import * as spectron from "spectron";
-import {generateKeychain} from "../../../util/generator";
 import {boot, shutdown} from "../../../util/util";
 
 const assert = require("assert");
@@ -24,10 +23,7 @@ describe("settings menu", function () {
             localRepository: {
                 activeCredentials: user,
                 credentials: [user]
-            },
-            overrideModules: [
-                generateKeychain()
-            ]
+            }
         });
 
         const client = app.client;

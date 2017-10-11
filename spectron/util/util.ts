@@ -7,7 +7,6 @@ import {LocalRepository} from "../../electron/src/storage/types/local-repository
 import {UserRepository} from "../../electron/src/storage/types/user-repository";
 import rimraf = require("rimraf");
 import ITestCallbackContext = Mocha.ITestCallbackContext;
-import {encodeBase64} from "../../electron/src/security/encoder";
 
 interface FnTestConfig {
     localRepository: Partial<LocalRepository>;
@@ -53,18 +52,18 @@ export function boot(context: ITestCallbackContext, testConfig: Partial<FnTestCo
     const currentTestDir = `${globalTestDir}/${testTitle}`.replace(/\s/g, "-");
 
     const profilesDirPath  = currentTestDir + "/profiles";
-    const localProfilePath = profilesDirPath + "/local.json";
+    const localProfilePath = profilesDirPath + "/local";
 
     testConfig.localRepository = Object.assign(new LocalRepository(), testConfig.localRepository || {});
 
-    fs.outputFileSync(localProfilePath, encodeBase64(JSON.stringify(testConfig.localRepository)));
+    fs.outputFileSync(localProfilePath, JSON.stringify(testConfig.localRepository));
 
     if (testConfig.platformRepositories) {
         for (const userID in testConfig.platformRepositories) {
-            const profilePath = profilesDirPath + `/${userID}.json`;
+            const profilePath = profilesDirPath + `/${userID}`;
             const profileData = Object.assign(new UserRepository(), testConfig.platformRepositories[userID] || {});
 
-            fs.outputFileSync(profilePath, encodeBase64(JSON.stringify(profileData)));
+            fs.outputFileSync(profilePath, JSON.stringify(profileData));
         }
     }
 

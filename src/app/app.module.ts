@@ -3,7 +3,7 @@ import {FormBuilder, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {HttpModule} from "@angular/http";
 import {BrowserModule} from "@angular/platform-browser";
 import "rxjs/Rx";
-import {AuthService} from "./auth/auth.service";
+import {AuthService, CREDENTIALS_REGISTRY} from "./auth/auth.service";
 import {MainComponent} from "./components/main/main.component";
 import {PlatformConnectionService} from "./core/auth/platform-connection.service";
 import {CoreModule} from "./core/core.module";
@@ -28,6 +28,10 @@ import {AppUpdateService} from "./editor-common/services/app-update/app-updating
 
 @NgModule({
     providers: [
+        {
+            provide: CREDENTIALS_REGISTRY,
+            useClass: LocalRepositoryService
+        },
         AuthService,
         DataGatewayService,
         DomEventService,
