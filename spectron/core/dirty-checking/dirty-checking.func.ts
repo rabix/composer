@@ -830,85 +830,85 @@ describe("dirty checking", async () => {
 
         });
 
-        it("modal should prevent changing revisions if tab is dirty", async function () {
-            app = await boot(this, {
-                localRepository: {
-                    credentials: [user],
-                    activeCredentials: user,
-                    openTabs: []
-                },
-                platformRepositories: {
-                    [user.id]: {
-                        projects: [project],
-                        openProjects: [project.id],
-                        openTabs: [{
-                            id: "marijanlekic89/div-nesto-input/draft2",
-                            type: "Workflow",
-                            label: "My Demo App",
-                            isWritable: true
-                        }]
-                    }
-                },
-                overrideModules: [
-                    {
-                        module: "./sbg-api-client/sbg-client",
-                        override: {
-                            SBGClient: mockSBGClient({
-                                getApp: proxerialize((appContent) => {
-                                    return () => {
-                                        return Promise.resolve({raw: JSON.parse(appContent)});
-                                    };
-                                }, platformWorkflow)
-                            }),
-                        }
-
-                    }
-                ]
-            });
-
-            const client = app.client;
-            const visualEditor = `ct-workflow-graph-editor`;
-            const tab = `ct-workbox .tab`;
-            const arrange = `[data-test="auto-arrange-btn"]`;
-            const revisionBtn = `[data-test="revision-btn"]`;
-            const revisionComponent = `ct-revision-list`;
-            const closingDirtyAppsModal = `ct-modal-closing-dirty-apps`;
-
-            await client.waitForVisible(visualEditor, 5000);
-            await client.waitForVisible(arrange, 5000);
-
-            await client.click(arrange);
-
-            // Tab should be dirty
-            await waitUntilTabBecomeDirty(client, tab);
-
-            // Click on revision button
-            await client.click(revisionBtn);
-
-            // Revision component should appear
-            await client.waitForVisible(revisionComponent, 5000);
-
-            // Click on revision entry
-            await client.click(`${revisionComponent} .revision-entry:nth-of-type(2)`);
-
-            // Modal should prevent changing revision
-            await client.waitForVisible(closingDirtyAppsModal, 5000);
-
-            // Click on cancel button
-            await client.click(`${closingDirtyAppsModal} [data-test="cancel-btn"]`);
-
-            // Tab should be still dirty
-            await waitUntilTabBecomeDirty(client, tab);
-
-            // Click again to change the revision
-            await client.click(`${revisionComponent} .revision-entry:nth-of-type(2)`);
-
-            // Click on discard button
-            await client.click(`${closingDirtyAppsModal} [data-test="discard-btn"]`);
-
-            // Tab should not be dirty anymore
-            await waitUntilTabBecomeDirty(client, tab, false);
-        });
+        // it("modal should prevent changing revisions if tab is dirty", async function () {
+        //     app = await boot(this, {
+        //         localRepository: {
+        //             credentials: [user],
+        //             activeCredentials: user,
+        //             openTabs: []
+        //         },
+        //         platformRepositories: {
+        //             [user.id]: {
+        //                 projects: [project],
+        //                 openProjects: [project.id],
+        //                 openTabs: [{
+        //                     id: "marijanlekic89/div-nesto-input/draft2",
+        //                     type: "Workflow",
+        //                     label: "My Demo App",
+        //                     isWritable: true
+        //                 }]
+        //             }
+        //         },
+        //         overrideModules: [
+        //             {
+        //                 module: "./sbg-api-client/sbg-client",
+        //                 override: {
+        //                     SBGClient: mockSBGClient({
+        //                         getApp: proxerialize((appContent) => {
+        //                             return () => {
+        //                                 return Promise.resolve({raw: JSON.parse(appContent)});
+        //                             };
+        //                         }, platformWorkflow)
+        //                     }),
+        //                 }
+        //
+        //             }
+        //         ]
+        //     });
+        //
+        //     const client = app.client;
+        //     const visualEditor = `ct-workflow-graph-editor`;
+        //     const tab = `ct-workbox .tab`;
+        //     const arrange = `[data-test="auto-arrange-btn"]`;
+        //     const revisionBtn = `[data-test="revision-btn"]`;
+        //     const revisionComponent = `ct-revision-list`;
+        //     const closingDirtyAppsModal = `ct-modal-closing-dirty-apps`;
+        //
+        //     await client.waitForVisible(visualEditor, 5000);
+        //     await client.waitForVisible(arrange, 5000);
+        //
+        //     await client.click(arrange);
+        //
+        //     // Tab should be dirty
+        //     await waitUntilTabBecomeDirty(client, tab);
+        //
+        //     // Click on revision button
+        //     await client.click(revisionBtn);
+        //
+        //     // Revision component should appear
+        //     await client.waitForVisible(revisionComponent, 5000);
+        //
+        //     // Click on revision entry
+        //     await client.click(`${revisionComponent} .revision-entry:nth-of-type(2)`);
+        //
+        //     // Modal should prevent changing revision
+        //     await client.waitForVisible(closingDirtyAppsModal, 5000);
+        //
+        //     // Click on cancel button
+        //     await client.click(`${closingDirtyAppsModal} [data-test="cancel-btn"]`);
+        //
+        //     // Tab should be still dirty
+        //     await waitUntilTabBecomeDirty(client, tab);
+        //
+        //     // Click again to change the revision
+        //     await client.click(`${revisionComponent} .revision-entry:nth-of-type(2)`);
+        //
+        //     // Click on discard button
+        //     await client.click(`${closingDirtyAppsModal} [data-test="discard-btn"]`);
+        //
+        //     // Tab should not be dirty anymore
+        //     await waitUntilTabBecomeDirty(client, tab, false);
+        // });
     });
 
 });
