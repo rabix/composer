@@ -12,14 +12,8 @@ import {
     ViewChild,
     ViewEncapsulation
 } from "@angular/core";
-import {Workflow} from "cwl-svg";
-import {
-    StepModel,
-    WorkflowFactory,
-    WorkflowInputParameterModel,
-    WorkflowModel,
-    WorkflowOutputParameterModel
-} from "cwlts/models";
+import {SVGArrangePlugin, SVGEdgeHoverPlugin, SVGNodeMovePlugin, SVGPortDragPlugin, Workflow} from "cwl-svg";
+import {StepModel, WorkflowFactory, WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
 import {Process} from "cwlts/models/generic/Process";
 import {Observable} from "rxjs/Observable";
 import {DataGatewayService} from "../../../core/data-gateway/data-gateway.service";
@@ -35,6 +29,7 @@ import {PlatformRepositoryService} from "../../../repository/platform-repository
 import {IpcService} from "../../../services/ipc.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {WorkflowEditorService} from "../../workflow-editor.service";
+
 
 const {dialog} = window["require"]("electron").remote;
 
@@ -74,7 +69,7 @@ const {dialog} = window["require"]("electron").remote;
                         (click)="upscale()"
                         ct-tooltip="Zoom In"
                         tooltipPlacement="top"
-                        [disabled]="graph !== undefined && graph.getScale() >= 2">
+                        [disabled]="graph !== undefined && graph.scale >= 2">
                     <i class="fa fa-plus"></i>
                 </button>
 
@@ -83,7 +78,7 @@ const {dialog} = window["require"]("electron").remote;
                         (click)="downscale()"
                         ct-tooltip="Zoom Out"
                         tooltipPlacement="top"
-                        [disabled]="graph !== undefined && graph.getScale() <= 0.2">
+                        [disabled]="graph !== undefined && graph.scale <= 0.2">
                     <i class="fa fa-minus"></i>
                 </button>
 
@@ -231,10 +226,20 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
     drawGraphAndAttachListeners() {
 
-        this.graph = new Workflow(this.canvas.nativeElement, this.model as any);
+        this.graph = new Workflow({
+            svgRoot: this.canvas.nativeElement as SVGSVGElement,
+            model: this.model as any,
+            plugins: [
+                new SVGArrangePlugin(),
+                new SVGPortDragPlugin(),
+                new SVGNodeMovePlugin(),
+                new SVGEdgeHoverPlugin()
+            ]
+        });
+
 
         if (this.readonly) {
-            this.graph.disableGraphManipulations();
+            this.graph.enableEditing(false);
         }
 
         try {
@@ -353,18 +358,18 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     }
 
     upscale() {
-        if (this.graph.getScale() <= Workflow.maxScale) {
-            const newScale = this.graph.getScale() + this.scaleStep;
-            this.graph.scaleWorkflowCenter(newScale > Workflow.maxScale ?
-                Workflow.maxScale : newScale);
+        const scale = this.graph.scale;
+
+        if (scale < this.graph.maxScale) {
+            this.graph.scale = Math.min(scale + this.scaleStep, this.graph.maxScale);
         }
     }
 
     downscale() {
-        if (this.graph.getScale() >= Workflow.minScale) {
-            const newScale = this.graph.getScale() - this.scaleStep;
-            this.graph.scaleWorkflowCenter(newScale < Workflow.minScale ?
-                Workflow.minScale : newScale);
+        const scale = this.graph.scale;
+
+        if (scale > this.graph.minScale) {
+            this.graph.scale = Math.max(scale - this.scaleStep, this.graph.minScale);
         }
     }
 
@@ -373,7 +378,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     }
 
     arrange() {
-        this.graph.arrange();
+        this.graph.getPlugin(SVGArrangePlugin).arrange();
     }
 
     deleteSelectedElement() {
@@ -528,11 +533,11 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
         this.scheduleAfterRender(() => {
             if (isLocked) {
-                this.graph.disableGraphManipulations();
+                this.graph.enableEditing(false);
                 return;
             }
 
-            this.graph.enableGraphManipulations();
+            this.graph.enableEditing(true);
 
         });
     }
