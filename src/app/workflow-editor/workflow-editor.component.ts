@@ -15,7 +15,7 @@ import {APP_SAVER_TOKEN} from "../editor-common/services/app-saving/app-saver.in
 import {LocalFileSavingService} from "../editor-common/services/app-saving/local-file-saving.service";
 import {PlatformAppSavingService} from "../editor-common/services/app-saving/platform-app-saving.service";
 import {ExecutorService} from "../executor/executor.service";
-import {ErrorNotification, NotificationBarService} from "../layout/notification-bar/notification-bar.service";
+import {NotificationBarService} from "../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../layout/status-bar/status-bar.service";
 import {PlatformRepositoryService} from "../repository/platform-repository.service";
 import {IpcService} from "../services/ipc.service";
@@ -152,7 +152,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                 this.dataModel.steps.forEach(step => {
 
                     // a non-sbg app might be embedded in an sbg workflow
-                    if (!step.run.customProps || !step.run.customProps["sbg:id"]) {
+                    if (!step.run || !step.run.customProps || !step.run.customProps["sbg:id"]) {
                         return;
                     }
                     const revisionless = AppHelper.getAppIDWithRevision(step.run.customProps["sbg:id"], null);
@@ -174,7 +174,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                     this.cdr.detectChanges();
                 });
             }, err => {
-                this.notificationBar.showNotification(new ErrorNotification("Cannot get app updates. " + new ErrorWrapper(err)));
+                this.notificationBar.showNotification("Cannot get app updates. " + new ErrorWrapper(err));
             });
     }
 

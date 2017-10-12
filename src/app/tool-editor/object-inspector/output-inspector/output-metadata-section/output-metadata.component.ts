@@ -44,8 +44,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <ct-key-value-list
                             [addEntryText]="'Add Metadata'"
                             [emptyListText]="'No metadata defined.'"
-                            [formControl]="metadataForm.controls['metadataList']"
-                            [readonly]="readonly">
+                            [formControl]="metadataForm.controls['metadataList']">
                     </ct-key-value-list>
                 </div>
             </div>
@@ -54,9 +53,6 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
     `
 })
 export class OutputMetaDataSectionComponent extends DirectiveBase implements ControlValueAccessor {
-
-    @Input()
-    public readonly = false;
 
     @Input()
     public inputs: CommandInputParameterModel[] = [];
@@ -69,6 +65,8 @@ export class OutputMetaDataSectionComponent extends DirectiveBase implements Con
     private propagateChange = noop;
 
     public metadataForm: FormGroup;
+
+    private readonly = false;
 
     private keyValueFormList: { key: string, value: string | SBDraft2ExpressionModel }[] = [];
 
@@ -117,5 +115,10 @@ export class OutputMetaDataSectionComponent extends DirectiveBase implements Con
                 this.output.outputBinding.inheritMetadataFrom = change.inheritMetadata;
                 this.propagateChange(change);
             });
+    }
+
+    setDisabledState(isDisabled: boolean): void {
+        this.readonly = isDisabled;
+        isDisabled ? this.metadataForm.controls["metadataList"].disable() : this.metadataForm.controls["metadataList"].enable();
     }
 }

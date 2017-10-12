@@ -1,19 +1,21 @@
-import {Injectable} from "@angular/core";
+import {Inject, Injectable, InjectionToken} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {ReplaySubject} from "rxjs/ReplaySubject";
-import {LocalRepositoryService} from "../repository/local-repository.service";
+import {CredentialsRegistry} from "./credentials-registry";
 import {AuthCredentials} from "./model/auth-credentials";
+
+export const CREDENTIALS_REGISTRY = new InjectionToken<CredentialsRegistry>("auth.credentials-registry");
 
 @Injectable()
 export class AuthService {
 
     private active = new ReplaySubject<AuthCredentials>(1);
 
-    constructor(private repository: LocalRepositoryService) {
+    constructor(@Inject(CREDENTIALS_REGISTRY) private registry: CredentialsRegistry) {
 
         Observable.combineLatest(
-            this.repository.getCredentials(),
-            this.repository.getActiveCredentials(),
+            this.registry.getCredentials(),
+            this.registry.getActiveCredentials(),
             (all, active) => {
                 if (!active) {
                     return undefined;
@@ -21,7 +23,12 @@ export class AuthService {
 
                 return all.find(c => c.equals(active));
             }
-        ).subscribe(this.active);
+        ).distinctUntilChanged((a, b) => {
+            if (a) {
+                return a.equals(b);
+            }
+            return a === b;
+        }).subscribe(this.active);
     }
 
     getActive(): ReplaySubject<AuthCredentials | undefined> {
@@ -29,7 +36,7 @@ export class AuthService {
     }
 
     getCredentials() {
-        return this.repository.getCredentials();
+        return this.registry.getCredentials();
     }
 
     /**
@@ -39,7 +46,7 @@ export class AuthService {
     setActiveCredentials(credentials?: AuthCredentials): Promise<any> {
 
         if (!credentials) {
-            return this.repository.setActiveCredentials(undefined);
+            return this.registry.setActiveCredentials(undefined);
         }
 
         return this.getCredentials().take(1).toPromise().then(all => {
@@ -49,7 +56,7 @@ export class AuthService {
                 throw new Error("Could not activate an unregistered credentials set");
             }
 
-            return this.repository.setActiveCredentials(val);
+            return this.registry.setActiveCredentials(val);
         });
     }
 
@@ -57,10 +64,10 @@ export class AuthService {
      * Add {@link AuthCredentials}. If credentials for the same username and platform exist, it will be updated.
      * Otherwise, new one will be added.
      *
-     * @param {AuthCredentials} credentials Credentials for inserting or matching a similar one for patching
+     * @param {AuthCredentials} addedCredentials Credentials for inserting or matching a similar one for patching
      * @returns {Promise<any>} Promise of credentials update call
      */
-    addCredentials(credentials: AuthCredentials): Promise<any> {
+    addCredentials(addedCredentials: AuthCredentials): Promise<any> {
 
         // Take up-to-date credentials array as a promise
         const currentCredentials = this.getCredentials().take(1).toPromise();
@@ -68,18 +75,18 @@ export class AuthService {
         return currentCredentials.then(current => {
 
             // Try to find an existing credentials entry that is similar to the one added
-            const similar = current.find(c => c.equals(credentials));
+            const similar = current.find(c => c.equals(addedCredentials));
 
             // If there is a similar entry, update that one
             if (similar) {
-                similar.updateToMatch(credentials);
-                return Promise.resolve(null);
+                similar.updateToMatch(addedCredentials);
+                return this.registry.setCredentials(current);
             }
 
             // Otherwise, append given credentials
-            const updatedCredentials = current.concat(credentials);
+            const updatedCredentials = current.concat(addedCredentials);
 
-            return this.repository.setCredentials(updatedCredentials);
+            return this.registry.setCredentials(updatedCredentials);
         });
     }
 
@@ -90,7 +97,7 @@ export class AuthService {
 
             if (index !== -1) {
                 const updated = current.slice(0, index).concat(current.slice(index + 1));
-                return this.repository.setCredentials(updated);
+                return this.registry.setCredentials(updated);
             }
 
             return Promise.resolve();

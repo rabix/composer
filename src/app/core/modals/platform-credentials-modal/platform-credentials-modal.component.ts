@@ -8,6 +8,8 @@ import {SystemService} from "../../../platform-providers/system.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {GlobalService} from "../../global/global.service";
+import {NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
+import {GetStartedNotificationComponent} from "../../../layout/notification-bar/dynamic-notifications/get-started-notification/get-started-notification.component";
 
 @Component({
     selector: "ct-platform-credentials-modal",
@@ -34,7 +36,7 @@ import {GlobalService} from "../../global/global.service";
                     <label class="col-xs-4 col-form-label">Developer Token:</label>
                     <div class="col-xs-8  form-inline token-form">
                         <input data-test="token-field"
-                               [formControl]="form.get('token')"
+                               formControlName="token"
                                class="form-control token-control"
                                type="password"/>
 
@@ -101,17 +103,16 @@ export class PlatformCredentialsModalComponent implements OnInit {
 
     platformList = [
         {text: "Seven Bridges (Default)", value: "https://api.sbgenomics.com"},
-        {text: "Seven Bridges (Google Cloud Platform)", value: "https://gcp-api.sbgenomics.com"},
         {text: "Seven Bridges (EU)", value: "https://eu-api.sbgenomics.com"},
         {text: "Cancer Genomics Cloud", value: "https://cgc-api.sbgenomics.com"},
         {text: "Cavatica", value: "https://pgc-api.sbgenomics.com"},
-        {text: "Blood Profiling Atlas", value: "https://bpa-api.sbgenomics.com"},
     ];
 
     constructor(private system: SystemService,
                 private auth: AuthService,
                 private global: GlobalService,
                 private data: DataGatewayService,
+                private notificationBarService: NotificationBarService,
                 private modal: ModalService) {
     }
 
@@ -138,14 +139,25 @@ export class PlatformCredentialsModalComponent implements OnInit {
 
                 let maybeUserUpdate = Promise.resolve();
 
-                if (isEditing && editedCredentials.equals(active)) {
-                    // If we are editing credentials that appear to be active, update it
-                    maybeUserUpdate = this.auth.setActiveCredentials(editedCredentials);
+                if (isEditing) {
+                    if (editedCredentials.equals(active)) {
+                        // If we are editing credentials that appear to be active, update it
+                        maybeUserUpdate = this.auth.setActiveCredentials(editedCredentials);
+                    }
 
-                } else if (all.length === 1) {
-                    // Otherwise, if we added new credentials, and it turns out that it's the first one,
-                    // activate that user
-                    maybeUserUpdate = this.auth.setActiveCredentials(all[0]);
+                } else {
+                    // Activate added credentials
+                    maybeUserUpdate = this.auth.setActiveCredentials(credentials);
+                    const component = this.notificationBarService.showDynamicNotification(GetStartedNotificationComponent, {
+                        type: "info"
+                    });
+
+                    component.environment = AuthCredentials.getPlatformLabel(url);
+                    component.username = user.username;
+
+                    component.dismiss.take(1).subscribe(() => {
+                        this.notificationBarService.dismissDynamicNotification(component);
+                    });
                 }
 
                 maybeUserUpdate.then(() => this.global.reloadPlatformData());

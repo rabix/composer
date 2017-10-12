@@ -214,4 +214,8 @@ export class KeyValueListComponent extends DirectiveBase implements ControlValue
         super.ngOnDestroy();
         this.keyValueFormList.forEach(item => this.form.removeControl(item.id));
     }
+
+    setDisabledState(isDisabled: boolean): void {
+        this.readonly = isDisabled;
+    }
 }

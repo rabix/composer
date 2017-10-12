@@ -19,7 +19,7 @@ import {ModelExpressionEditorComponent} from "../../expression-editor/model-expr
         }
     ],
     template: `
-        <div class="expression-input-group clickable"
+        <div *ngIf="model" class="expression-input-group clickable"
              [ct-validation-class]="model"
              [class.expr]="isExpr || disableLiteralTextInput">
 

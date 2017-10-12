@@ -20,10 +20,10 @@ export class PlatformAppSavingService implements AppSaver {
         const revisionNoteControl = new FormControl("");
 
         return this.modal.prompt({
-            title: "Publish New App Revision",
+            title: "Push New App Revision",
             content: "Revision Note:",
             cancellationLabel: "Cancel",
-            confirmationLabel: "Publish",
+            confirmationLabel: "Push",
             formControl: revisionNoteControl
         }).then(() => this.saveWithNote(appID, content, revisionNoteControl.value));
     }

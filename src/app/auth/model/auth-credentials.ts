@@ -1,11 +1,5 @@
 import {User} from "../../../../electron/src/sbg-api-client/interfaces/user";
-
-export interface UserPlatformIdentifier {
-    user: User;
-    id: string;
-    url: string;
-    token: string;
-}
+import {UserPlatformIdentifier} from "./user-platform-identifier";
 
 export class AuthCredentials implements UserPlatformIdentifier {
 
@@ -46,16 +40,12 @@ export class AuthCredentials implements UserPlatformIdentifier {
         switch (subdomain) {
             case "api":
                 return "SBG";
-            case "gcp-api":
-                return "GCP";
             case "eu-api":
                 return "EU";
             case "cgc-api":
                 return "CGC";
             case "pgc-api":
-                return "CHOP";
-            case "bpa-api":
-                return "BPA";
+                return "CAVATICA";
             default:
                 return subdomain;
         }
@@ -66,16 +56,12 @@ export class AuthCredentials implements UserPlatformIdentifier {
         switch (subdomain) {
             case "api":
                 return "Seven Bridges";
-            case "gcp-api":
-                return "Seven Bridges (Google Cloud Platform)";
             case "eu-api":
                 return "Seven Bridges (EU)";
             case "cgc-api":
                 return "Cancer Genomics Cloud";
             case "pgc-api":
                 return "Cavatica";
-            case "bpa-api":
-                return "Blood Profiling Atlas";
             default:
                 return subdomain;
         }

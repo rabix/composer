@@ -60,11 +60,11 @@ import {Component, Input} from "@angular/core";
                 <i class="fa fa-fw fa-save"></i>
             </button>
 
-            <!--Publish to Platform-->
+            <!--Push to Platform-->
             <button class="btn control-button" data-test="publish-btn"
                     [disabled]="!host.appIsPublishable()"
                     *ngIf="host.tabData.dataSource === 'local'"
-                    ct-tooltip="Publish to Platform"
+                    ct-tooltip="Push to Platform"
                     tooltipPlacement="bottom"
                     (click)="host.publish()">
                 <i class="fa fa-fw fa-cloud-upload"></i>

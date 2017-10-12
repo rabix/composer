@@ -31,23 +31,20 @@ import {WorkboxService} from "./workbox.service";
                 <li *ngFor="let c of credentials | async" (click)="setActiveUser(c)">
                     <span>
                         {{ c.user.username }} 
-                        <i *ngIf="active === c" class="active-icon fa fa-check-circle"></i>
+                        <i *ngIf="active?.equals(c)" class="active-icon fa fa-check-circle"></i>
                     </span>
                     <span class="text-muted d-block small">{{ getPlatformLabel(c.url) }}</span>
                 </li>
                 <li (click)="openSettings()"><i class="fa fa-cog fa-fw"></i> Settings</li>
                 <li (click)="openFeedback()"><i class="fa fa-bullhorn fa-fw"></i> Send Feedback</li>
-                <li (click)="checkForPlatformUpdates()" [class.outdated-update]="global.platformIsOutdated"
-                        data-test="check-for-updates">
-                    
+                <li (click)="checkForPlatformUpdates()" *ngIf="global.platformIsOutdated" class="outdated-update"
+                    data-test="updates-available">
+
                     <i class="fa fa-refresh fa-fw "></i>
-                    
-                    <span *ngIf="platformIsOutdated; else checkForUpdates">
-                        Update Available
+                    <span>
+                        Update available
                     </span>
-                    
-                    <ng-template #checkForUpdates>Check for Updates</ng-template>
-                    
+
                 </li>
             </ul>
         </ng-template>
@@ -110,7 +107,7 @@ export class SettingsMenuComponent extends DirectiveBase {
             return;
         }
 
-        this.auth.setActiveCredentials(c).then((user) => {
+        this.auth.setActiveCredentials(c).then(() => {
             if (c) {
                 this.global.reloadPlatformData();
             }

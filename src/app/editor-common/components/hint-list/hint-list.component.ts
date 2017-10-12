@@ -11,11 +11,9 @@ import {ModalService} from "../../../ui/modal/modal.service";
             <!--Blank Tool Screen-->
             <ct-blank-tool-state *ngIf="!readonly && !model.hints.length" 
                                  [buttonText]="'Add a Hint'"
+                                 [description]=[blankStateDescription]
                                  [learnMoreURL]="'http://docs.sevenbridges.com/docs/list-of-execution-hints'"
                                  (buttonClick)="addEntry()">
-                
-                Execution hints and their values, which specify execution requirements and suggestions, for example, the AWS instance
-                type to use.
             </ct-blank-tool-state>
     
             <div *ngIf="readonly && !model.hints.length" class="text-xs-center">
@@ -38,16 +36,15 @@ import {ModalService} from "../../../ui/modal/modal.service";
                         <div class="flex-row">
                             <ct-requirement-input [formControl]="control"
                                                   [context]="context"
-                                                  class="mr-1"
                                                   [formControlName]="i"
                                                   [classSuggest]="classSuggest"
                                                   [readonly]="readonly">
                             </ct-requirement-input>
-    
+
                             <!--Actions Column-->
-                            <div *ngIf="!readonly" class="mr-1 mb-1">
+                            <div *ngIf="!readonly" class="remove-icon">
                                 <i [ct-tooltip]="'Delete'"
-                                   class="fa fa-trash text-hover-danger clickable"
+                                   class="fa fa-trash clickable"
                                    (click)="removeEntry(i)"></i>
                             </div>
                         </div>
@@ -87,6 +84,9 @@ export class HintsComponent implements OnChanges {
 
     @Output()
     update = new EventEmitter();
+
+    blankStateDescription = `Execution hints and their values, which specify
+     execution requirements and suggestions, for example, the AWS instancetype to use.`;
 
     private sub: Subscription;
 
