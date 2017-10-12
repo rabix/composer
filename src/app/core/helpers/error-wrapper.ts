@@ -12,6 +12,10 @@ export class ErrorWrapper {
             return "You are offline.";
         }
 
+        if (this.err.code && this.err.code === "ENOENT") {
+            return "No such file or directory.";
+        }
+
         const isHttpRequest = this.err.statusCode && this.err.options;
         if (this.err.error && isHttpRequest) {
             const uri         = this.err.options.uri;
@@ -28,6 +32,10 @@ export class ErrorWrapper {
             // in case app couldn't be found
             if (this.err.statusCode === 404 && this.err.error && this.err.error.code === 6002) {
                 return "Either this app doesn't exist or you don't have permission to open it.";
+            }
+
+            if (this.err.statusCode === 503 && this.err.error && this.err.error.code === 6000) {
+                return "App service is currently unavailable.";
             }
 
             if (this.err.statusCode === 504) {
