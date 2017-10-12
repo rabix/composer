@@ -34,16 +34,16 @@ export class ErrorWrapper {
                 return "Either this app doesn't exist or you don't have permission to open it.";
             }
 
-            if (this.err.statusCode === 503 && this.err.error && this.err.error.message) {
-                return this.err.error.message;
-            }
-
             if (this.err.statusCode === 504) {
                 const seconds = timeout / 1000;
                 const minutes = seconds / 60;
                 const time    = minutes > 1 ? `${minutes} minutes.` : `${seconds} seconds.`;
 
                 return msg + " timed out after " + time;
+            }
+
+            if (this.err.error && this.err.error.message) {
+                return this.err.error.message;
             }
 
             return msg + " failed with " + this.err.message;
