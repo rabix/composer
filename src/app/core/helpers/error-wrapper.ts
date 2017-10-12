@@ -34,8 +34,8 @@ export class ErrorWrapper {
                 return "Either this app doesn't exist or you don't have permission to open it.";
             }
 
-            if (this.err.statusCode === 503 && this.err.error && this.err.error.code === 6000) {
-                return "App service is currently unavailable.";
+            if (this.err.statusCode === 503 && this.err.error && this.err.error.message) {
+                return this.err.error.message;
             }
 
             if (this.err.statusCode === 504) {
