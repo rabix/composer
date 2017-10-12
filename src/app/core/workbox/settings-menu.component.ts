@@ -31,7 +31,7 @@ import {WorkboxService} from "./workbox.service";
                 <li *ngFor="let c of credentials | async" (click)="setActiveUser(c)">
                     <span>
                         {{ c.user.username }} 
-                        <i *ngIf="active === c" class="active-icon fa fa-check-circle"></i>
+                        <i *ngIf="active?.equals(c)" class="active-icon fa fa-check-circle"></i>
                     </span>
                     <span class="text-muted d-block small">{{ getPlatformLabel(c.url) }}</span>
                 </li>
@@ -107,7 +107,7 @@ export class SettingsMenuComponent extends DirectiveBase {
             return;
         }
 
-        this.auth.setActiveCredentials(c).then((user) => {
+        this.auth.setActiveCredentials(c).then(() => {
             if (c) {
                 this.global.reloadPlatformData();
             }

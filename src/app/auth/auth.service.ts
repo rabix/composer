@@ -23,7 +23,12 @@ export class AuthService {
 
                 return all.find(c => c.equals(active));
             }
-        ).subscribe(this.active);
+        ).distinctUntilChanged((a, b) => {
+            if (a) {
+                return a.equals(b);
+            }
+            return a === b;
+        }).subscribe(this.active);
     }
 
     getActive(): ReplaySubject<AuthCredentials | undefined> {
