@@ -441,10 +441,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         this.viewMode = tabName;
     }
 
-    /**
-     * When click on Resolve button (visible only if app is a local file and you are in Code mode)
-     */
-    resolveButtonClick(): void {
+    resolveCurrentContent(): void {
         this.resolveToModel(this.codeEditorContent.value).then(() => {
         }, err => console.warn);
     }
