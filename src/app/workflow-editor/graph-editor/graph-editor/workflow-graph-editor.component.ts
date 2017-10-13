@@ -99,6 +99,7 @@ const {dialog} = window["require"]("electron").remote;
             <!--Auto-arrange button-->
             <span class="btn-group">
                 <button class="btn btn-sm btn-secondary"
+                        data-test="auto-arrange-btn"
                         ct-tooltip="Auto-arrange"
                         tooltipPlacement="top"
                         (click)="arrange()"

@@ -14,7 +14,7 @@ import {AppHelper} from "../../helpers/AppHelper";
 import {AddSourceModalComponent} from "../../modals/add-source-modal/add-source-modal.component";
 import {CreateAppModalComponent} from "../../modals/create-app-modal/create-app-modal.component";
 import {CreateLocalFolderModalComponent} from "../../modals/create-local-folder-modal/create-local-folder-modal.component";
-import {TabData} from "../../workbox/tab-data.interface";
+import {TabData} from "../../../../../electron/src/storage/types/tab-data-interface";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.component";
 import {MyAppsPanelService} from "./my-apps-panel.service";

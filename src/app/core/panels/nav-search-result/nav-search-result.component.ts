@@ -1,5 +1,5 @@
 import {Component, EventEmitter, HostListener, Input, Output} from "@angular/core";
-import {TabData} from "../../workbox/tab-data.interface";
+import {TabData} from "../../../../../electron/src/storage/types/tab-data-interface";
 
 @Component({
     selector: "ct-nav-search-result",
