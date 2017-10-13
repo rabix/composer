@@ -64,7 +64,7 @@ export class ObjectHelper {
 
             }
 
-            if (!target[key]) {
+            if (!target[key] && target[key] !== 0 && target[key] !== false) {
                 return defaultReturn;
             }
 
