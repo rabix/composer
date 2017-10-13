@@ -220,9 +220,14 @@ export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase imple
         const fieldValue = formField.value;
 
         // Get the new value that we should set the job to
-        const val = type === "number" ?
-            (fieldType === "int" ? parseInt(fieldValue, 10) : parseFloat(fieldValue))
-            : fieldValue;
+        let val: any = fieldValue;
+
+        if (type === "number" && !isNaN(parseInt(fieldValue, 10))) {
+            val = fieldType === "int" ? parseInt(fieldValue, 10) : parseFloat(fieldValue);
+        }
+
+        // Nullify values that shouldn't be serialized
+        val = (val !== "" && val !== undefined) ? val : null;
 
         // Form field might not have prefix, so if we missed it,
         // it's better to do nothing than break the app.
