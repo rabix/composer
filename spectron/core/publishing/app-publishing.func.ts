@@ -230,7 +230,7 @@ describe("app publishing", () => {
         assert.equal(newestRevision, "2");
     });
 
-    it.only("publishing app causes platform workflows that contain the published app to check for updates", async function () {
+    it("publishing app causes platform workflows that contain the published app to check for updates", async function () {
         const user    = generateAuthCredentials("test-user", "https://api.sbgenomics.com");
         const project = generatePlatformProject({id: "test-user/test-project"});
 
