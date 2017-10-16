@@ -52,7 +52,7 @@ import {Component, Input} from "@angular/core";
 
             <!--Save-->
             <button *ngIf="host.tabData.isWritable"
-                    [disabled]="!host.appIsSavable() || !host.isDirty"
+                    [disabled]="!host.appIsSavable()"
                     (click)="host.save()"
                     ct-tooltip="Save"
                     tooltipPlacement="bottom"
