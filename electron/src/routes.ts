@@ -398,7 +398,7 @@ export function saveAppRevision(data: {
 
         const api = new SBGClient(url, token);
 
-        api.apps.save(data.id, data.content).then(response => {
+        api.saveAppRevision(data.id, data.content).then(response => {
             callback(null, response);
         }, err => callback(err));
 
@@ -474,7 +474,7 @@ export function getAppUpdates(data: { appIDs: string[] }, callback) {
 
         const api = new SBGClient(url, token);
 
-        return api.apps.private({
+        return api.getAllUserApps({
             id: data.appIDs,
             fields: "id,revision,name"
         }).then(result => {

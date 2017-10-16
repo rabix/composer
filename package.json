@@ -21,6 +21,7 @@
         "compile:electron": "./node_modules/.bin/tsc -p electron && cp -R electron/src/splash electron/dist/src",
         "compile:electron:watch": "./node_modules/.bin/tsc -p electron --watch",
         "debug:electron": "./node_modules/.bin/electron ./electron --inspect-brk",
+        "debug:electron:mocks": "./node_modules/.bin/electron ./electron --inspect-brk --use-mocks",
         "lint": "./node_modules/.bin/ng lint",
         "package": "node ./electron-build.js",
         "postinstall": "cd electron && yarn install",
