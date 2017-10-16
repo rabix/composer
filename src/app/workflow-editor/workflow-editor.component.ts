@@ -22,6 +22,7 @@ import {IpcService} from "../services/ipc.service";
 import {ModalService} from "../ui/modal/modal.service";
 import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow-graph-editor.component";
 import {WorkflowEditorService} from "./workflow-editor.service";
+import {LocalRepositoryService} from "../repository/local-repository.service";
 
 export function appSaverFactory(comp: WorkflowEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -58,6 +59,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                 protected platformRepository: PlatformRepositoryService,
                 private cdr: ChangeDetectorRef,
                 platformAppService: PlatformAppService,
+                localRepository: LocalRepositoryService,
                 workbox: WorkboxService,
                 executorService: ExecutorService) {
         super(
@@ -71,6 +73,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
             codeSwapService,
             platformAppService,
             platformRepository,
+            localRepository,
             workbox,
             executorService
         );

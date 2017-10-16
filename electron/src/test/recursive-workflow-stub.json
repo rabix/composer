@@ -1,0 +1,25 @@
+{
+    "class": "Workflow",
+    "cwlVersion": "v1.0",
+    "id": "workflow",
+    "label": "workflow",
+    "inputs": [
+
+    ],
+    "outputs": [
+
+    ],
+    "steps": [
+        {
+            "id": "workflow",
+            "in": [
+
+            ],
+            "out": [
+
+            ],
+            "run": "recursive-workflow-stub.json",
+            "label": "workflow"
+        }
+    ]
+}

@@ -10,7 +10,7 @@ import {MenuItem} from "../../../ui/menu/menu-item";
 import {TreeNode} from "../../../ui/tree-view/tree-node";
 import {AppHelper} from "../../helpers/AppHelper";
 import {ErrorWrapper} from "../../helpers/error-wrapper";
-import {TabData} from "../../workbox/tab-data.interface";
+import {TabData} from "../../../../../electron/src/storage/types/tab-data-interface";
 import {WorkboxService} from "../../workbox/workbox.service";
 
 const {dialog} = window["require"]("electron").remote;
@@ -54,7 +54,7 @@ export class AppsPanelService {
                             savingUpdate.filter(v => v === "failed").take(1).subscribe(() => {
                                 subscriber.next("Saving failed");
                                 subscriber.complete();
-                            })
+                            });
                         }) as Observable<string>;
 
                         this.statusBar.enqueue(savingProcess);
@@ -66,7 +66,7 @@ export class AppsPanelService {
                             return YAML.dump(app);
                         }).then(text => {
                             return this.fileRepository.saveFile(path, text);
-                        }).then(saved => {
+                        }).then(() => {
                             savingUpdate.next("saved");
 
                             const tab = this.workbox.getOrCreateAppTab({
@@ -92,7 +92,7 @@ export class AppsPanelService {
                     }
                 });
             }
-        })
+        });
     }
 
 }

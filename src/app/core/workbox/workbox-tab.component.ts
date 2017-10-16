@@ -67,12 +67,6 @@ export class WorkBoxTabComponent implements OnChanges, WorkboxTab, AfterViewInit
         }
     }
 
-    registerOnTabLabelChange(update: (label: string) => void, originalLabel: string) {
-        if (this.tabComponent.registerOnTabLabelChange) {
-            this.tabComponent.registerOnTabLabelChange(update, originalLabel);
-        }
-    }
-
     ngAfterViewInit(): void {
         this.isTabViewInitialized = true;
 

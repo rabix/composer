@@ -8,8 +8,8 @@ import {LocalRepositoryService} from "../../repository/local-repository.service"
 import {PlatformRepositoryService} from "../../repository/platform-repository.service";
 import {DataGatewayService} from "../data-gateway/data-gateway.service";
 import {AppHelper} from "../helpers/AppHelper";
-import {TabData} from "./tab-data.interface";
 import {FileRepositoryService} from "../../file-repository/file-repository.service";
+import {TabData} from "../../../../electron/src/storage/types/tab-data-interface";
 
 
 @Injectable()
@@ -175,17 +175,13 @@ export class WorkboxService {
         this.syncTabs();
     }
 
-    closeOtherTabs(tab) {
-        this.tabs.next([tab]);
-        this.activateTab(tab);
+    closeAllTabs(preserve: TabData<any>[] = []) {
+        this.tabs.getValue().forEach((item) => {
+            if (!preserve.includes(item)) {
+                this.closeTab(item);
+            }
+        });
 
-        this.syncTabs();
-    }
-
-    closeAllTabs() {
-        this.tabs.next([]);
-
-        this.syncTabs();
     }
 
     activateNext() {
@@ -270,6 +266,8 @@ export class WorkboxService {
         if (id.endsWith(".json")) {
             tab.data.language = "json";
         }
+
+        this.tabCreation.next(tab);
 
         return tab;
 

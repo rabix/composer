@@ -1,6 +1,7 @@
 import {Component, Input, OnChanges, Output, SimpleChanges} from "@angular/core";
 import {Subject} from "rxjs/Subject";
 import {PlatformAppRevisionEntry} from "../../../services/api/platforms/platform-api.types";
+import {noop} from "../../../lib/utils.lib";
 
 @Component({
 
@@ -36,13 +37,6 @@ import {PlatformAppRevisionEntry} from "../../../services/api/platforms/platform
 })
 export class RevisionListComponent implements OnChanges {
 
-
-    @Input() revisions: PlatformAppRevisionEntry[] = [];
-    @Input() active: number;
-
-    @Output() select = new Subject<number>();
-    @Input() loadingRevision;
-
     displayList: {
         date: number,
         note: string,
@@ -50,14 +44,22 @@ export class RevisionListComponent implements OnChanges {
         number: number
     }[] = [];
 
+    @Input() revisions: PlatformAppRevisionEntry[] = [];
+    @Input() active: number;
+    @Input() loadingRevision;
+
+    @Output() select = new Subject<number>();
+    @Input() beforeChange: () => Promise<boolean> = () => new Promise<boolean>((res) => res(true));
+
     selectRevision(revision) {
         if (revision.number === this.active) {
             return;
         }
 
-        this.loadingRevision = revision;
-        this.select.next(revision.number);
-
+        this.beforeChange().then(() => {
+            this.loadingRevision = revision;
+            this.select.next(revision.number);
+        }, noop);
     }
 
     ngOnChanges(changes: SimpleChanges): void {

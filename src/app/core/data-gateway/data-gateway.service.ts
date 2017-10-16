@@ -4,6 +4,7 @@ import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {noop} from "../../lib/utils.lib";
 import {PlatformRepositoryService} from "../../repository/platform-repository.service";
+import {LocalRepositoryService} from "../../repository/local-repository.service";
 import {IpcService} from "../../services/ipc.service";
 import {AppHelper} from "../helpers/AppHelper";
 
@@ -24,7 +25,8 @@ export class DataGatewayService {
 
 
     constructor(private ipc: IpcService,
-                private platformRepository: PlatformRepositoryService) {
+                private platformRepository: PlatformRepositoryService,
+                private localRepository: LocalRepositoryService) {
     }
 
     checkIfPathExists(path) {
@@ -120,19 +122,34 @@ export class DataGatewayService {
 
     updateSwap(fileID, content): Promise<any> {
         const isLocal = AppHelper.isLocal(fileID);
-        const appID   = isLocal ? fileID : AppHelper.getRevisionlessID(fileID);
+        const appID = isLocal ? fileID : AppHelper.getRevisionlessID(fileID);
 
-        return Promise.all([
-            this.ipc.request("patchSwap", {
-                local: isLocal,
-                swapID: appID,
-                swapContent: content
-            }).toPromise(),
+        const promises = [];
 
-            // If there is no content, swap should be deleted, so then we need to remove swapUnlocked meta
-            content ? Promise.resolve() : this.platformRepository.patchAppMeta(appID, "swapUnlocked", false)]
-        );
+        promises.push(this.ipc.request("patchSwap", {
+            local: isLocal,
+            swapID: appID,
+            swapContent: content
+        }).toPromise());
 
+        // If there is no content swap should be deleted, so we need to remove AppMeta data
+        if (!content) {
+
+            // Remove swapUnlocked meta (only for platform apps)
+            if (!isLocal) {
+                promises.push(this.platformRepository.patchAppMeta(appID, "swapUnlocked", false));
+            }
+
+            // Remove isDirty meta
+            if (!isLocal) {
+                promises.push(this.platformRepository.patchAppMeta(appID, "isDirty", false));
+            } else {
+                promises.push(this.localRepository.patchAppMeta(appID, "isDirty", false));
+            }
+
+        }
+
+        return Promise.all(promises);
     }
 
     sendFeedbackToPlatform(type: string, text: string): Promise<any> {
