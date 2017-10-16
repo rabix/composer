@@ -128,7 +128,7 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
             })));
     }
 
-    onSubmit(): Promise<{ app: object, id: string}> {
+    onSubmit(): Promise<void | { app: object, id: string}> {
         const {revisionNote, appID, content} = this.outputForm.getRawValue();
 
         this.isPublishing = true;
@@ -143,7 +143,7 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
         return saveCall.then((str) => {
             this.isPublishing = false;
             this.close();
-            return { app: JSON.parse(str), id: appID };
+            return { app: JSON.parse(str), id: appID};
         }, (err) => {
             this.error        = "Failed to push the app. " + new ErrorWrapper(err);
             this.isPublishing = false;
