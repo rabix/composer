@@ -2,11 +2,11 @@ import {Injectable} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {ExecutorConfig} from "../../../electron/src/storage/types/executor-config";
-import {AppMetadata} from "../../../electron/src/storage/types/local-repository";
 import {RecentAppTab} from "../../../electron/src/storage/types/recent-app-tab";
 import {AuthCredentials} from "../auth/model/auth-credentials";
-import {TabData} from "../core/workbox/tab-data.interface";
+import {TabData} from "../../../electron/src/storage/types/tab-data-interface";
 import {IpcService} from "../services/ipc.service";
+import {AppMeta} from "../../../electron/src/storage/types/app-meta";
 
 @Injectable()
 export class LocalRepositoryService {
@@ -21,6 +21,7 @@ export class LocalRepositoryService {
     private selectedAppsPanel: ReplaySubject<"myApps" | "publicApps"> = new ReplaySubject(1);
     private publicAppsGrouping: ReplaySubject<"toolkit" | "category"> = new ReplaySubject(1);
     private ignoredUpdateVersion: ReplaySubject<string>               = new ReplaySubject(1);
+    private appMeta: ReplaySubject<AppMeta[]>                         = new ReplaySubject(1);
 
     constructor(private ipc: IpcService) {
 
@@ -34,6 +35,7 @@ export class LocalRepositoryService {
         this.listen("activeCredentials").map(cred => AuthCredentials.from(cred)).subscribe(this.activeCredentials);
         this.listen("credentials").map(creds => creds.map(c => AuthCredentials.from(c))).subscribe(this.credentials);
         this.listen("ignoredUpdateVersion").subscribe(this.ignoredUpdateVersion);
+        this.listen("appMeta").subscribe(this.appMeta);
     }
 
     getIgnoredUpdateVersion(): Observable<string> {
@@ -158,7 +160,6 @@ export class LocalRepositoryService {
 
     removeLocalFolders(...folders): Promise<any> {
         return this.getLocalFolders().take(1).toPromise().then(existing => {
-
             const update = existing.filter(path => folders.indexOf(path) === -1);
 
             if (update.length === existing.length) {
@@ -195,9 +196,8 @@ export class LocalRepositoryService {
         return this.patch({executorConfig}).take(1).toPromise();
     }
 
-    getAppMeta(appID: string, key?: string): Observable<AppMetadata> {
-        return this.listen("appMeta")
-            .map(meta => {
+    getAppMeta<T>(appID: string, key?: string): Observable<AppMeta> {
+        return this.appMeta.map(meta => {
                 const data = meta[appID];
 
                 if (key && data) {
@@ -209,7 +209,7 @@ export class LocalRepositoryService {
             });
     }
 
-    patchAppMeta(appID: string, key: keyof AppMetadata, value: any): Promise<any> {
+    patchAppMeta(appID: string, key: keyof AppMeta, value: any): Promise<any> {
         return this.ipc.request("patchAppMeta", {
             profile: "local",
             appID,

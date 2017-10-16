@@ -174,7 +174,7 @@ export class JobEditorComponent implements OnChanges, OnDestroy {
         // Get the new value of this input's job.
         // On the previous step, we might have set some nested property of it,
         // so here we take the top-level structure anyway.
-        const jobRef = OH.getProperty(job.inputs, fieldPath);
+        const jobRef = OH.getProperty(job.inputs, fieldPath, null);
 
 
         // Dispatch it as an update to the job
