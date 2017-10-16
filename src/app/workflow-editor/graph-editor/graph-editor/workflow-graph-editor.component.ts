@@ -12,7 +12,7 @@ import {
     ViewChild,
     ViewEncapsulation
 } from "@angular/core";
-import {SVGArrangePlugin, SVGEdgeHoverPlugin, SVGNodeMovePlugin, SVGPortDragPlugin, Workflow} from "cwl-svg";
+import {SVGArrangePlugin, SVGEdgeHoverPlugin, SVGNodeMovePlugin, SVGPortDragPlugin, SVGValidatePlugin, Workflow} from "cwl-svg";
 import {StepModel, WorkflowFactory, WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
 import {Process} from "cwlts/models/generic/Process";
 import {Observable} from "rxjs/Observable";
@@ -29,7 +29,6 @@ import {PlatformRepositoryService} from "../../../repository/platform-repository
 import {IpcService} from "../../../services/ipc.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {WorkflowEditorService} from "../../workflow-editor.service";
-
 
 const {dialog} = window["require"]("electron").remote;
 
@@ -233,7 +232,8 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
                 new SVGArrangePlugin(),
                 new SVGPortDragPlugin(),
                 new SVGNodeMovePlugin(),
-                new SVGEdgeHoverPlugin()
+                new SVGEdgeHoverPlugin(),
+                new SVGValidatePlugin()
             ]
         });
 
