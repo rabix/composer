@@ -292,12 +292,10 @@ describe("app publishing", () => {
                                 return (appID: string) => {
 
                                     $callCount++;
-                                    //if (appID.startsWith("test-user/test-project/demo-workflow-with-embedded-demo-app") && $callCount == 1) {
-                                    if ($callCount == 1) {
+                                    if (appID.startsWith("test-user/test-project/demo-workflow-with-embedded-demo-app") && $callCount == 1) {
                                         return Promise.resolve({raw: JSON.parse(workflowContent)});
                                     }
-                                    //if ((appID.startsWith("test-user/test-project/test-app-update") || appID.indexOf("some") > -1) && $callCount > 2) {
-                                    if ($callCount > 2) {
+                                    if (appID.startsWith("test-user/test-project/test-app-update") && $callCount > 2) {
                                         return Promise.resolve({raw: JSON.parse(appContent)});
                                     }
 
@@ -331,6 +329,9 @@ describe("app publishing", () => {
         await client.waitForVisible(localAppTab, 5000);
         await client.click(localAppTab);
 
+        await client.waitForVisible(publishBtn, 5000);
+        await client.waitForEnabled(publishBtn, 10000);
+
         await client.click(publishBtn);
         await client.waitForVisible(modal);
 
@@ -351,9 +352,9 @@ describe("app publishing", () => {
         const updatedNode = `ct-workflow-graph-editor .node.hasUpdate`;
         await client.waitForVisible(updatedNode, 10000);
 
-        const hero = client.isExisting(updatedNode);
+        const updatedNodeExists =  await client.isExisting(updatedNode);
 
-        assert.equal(client.isExisting(updatedNode), true);
+        assert.equal(updatedNodeExists, true);
     })
 });
 
