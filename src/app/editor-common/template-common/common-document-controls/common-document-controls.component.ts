@@ -34,7 +34,7 @@ import {Component, Input} from "@angular/core";
                     *ngIf="host.viewMode === 'code' && host.tabData.dataSource === 'local'"
                     ct-tooltip="Resolve"
                     tooltipPlacement="bottom"
-                    (click)="host.resolveButtonClick()">
+                    (click)="host.resolveCurrentContent()">
                 <i class="fa fa-fw fa-refresh"></i>
             </button>
 
