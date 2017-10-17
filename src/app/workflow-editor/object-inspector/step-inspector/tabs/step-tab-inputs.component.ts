@@ -181,17 +181,17 @@ export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase imple
      */
     onPortOptionChange(input, value) {
         switch (value) {
-            case"editable":
+            case "editable":
                 this.workflowModel.clearPort(input);
-                this.graph.redraw();
+                this.graph.draw();
                 break;
-            case"exposed":
+            case "exposed":
                 this.workflowModel.exposePort(input);
-                this.graph.redraw();
+                this.graph.draw();
                 break;
-            case"port":
+            case "port":
                 this.workflowModel.includePort(input);
-                this.graph.redraw();
+                this.graph.draw();
                 break;
         }
 

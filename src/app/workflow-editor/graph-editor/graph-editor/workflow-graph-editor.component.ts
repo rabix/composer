@@ -12,7 +12,9 @@ import {
     ViewChild,
     ViewEncapsulation
 } from "@angular/core";
-import {SVGArrangePlugin, SVGEdgeHoverPlugin, SVGNodeMovePlugin, SVGPortDragPlugin, Workflow} from "cwl-svg";
+import {SelectionPlugin, SVGArrangePlugin, SVGEdgeHoverPlugin, SVGNodeMovePlugin, SVGPortDragPlugin, Workflow} from "cwl-svg";
+import {ZoomPlugin} from "cwl-svg/src/plugins/zoom";
+
 import {StepModel, WorkflowFactory, WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
 import {Process} from "cwlts/models/generic/Process";
 import {Observable} from "rxjs/Observable";
@@ -146,27 +148,27 @@ const {dialog} = window["require"]("electron").remote;
 })
 export class WorkflowGraphEditorComponent extends DirectiveBase implements OnChanges, OnDestroy, AfterViewInit {
 
-    @Input()
-    model: WorkflowModel;
+    @Input() model: WorkflowModel;
 
-    @Input()
-    data: AppTabData;
+    @Input() data: AppTabData;
 
-    modelEventListeners = [];
+    @Input() readonly = false;
+
+    @Output() modelChange = new EventEmitter();
+
+    @Output() draw = new EventEmitter<WorkflowGraphEditorComponent>();
+
+    @Output() change = new EventEmitter<any>();
+
+    graph: Workflow;
+
+    inspectedNode: StepModel | WorkflowOutputParameterModel | WorkflowInputParameterModel = null;
 
     modelChangedFromHistory: WorkflowModel;
 
-    @Input()
-    readonly = false;
+    modelEventListeners = [];
 
-    @Output()
-    modelChange = new EventEmitter();
-
-    @Output()
-    draw = new EventEmitter<WorkflowGraphEditorComponent>();
-
-    @Output()
-    change = new EventEmitter<any>();
+    selectedElement: SVGElement;
 
     @ViewChild("canvas")
     private canvas: ElementRef;
@@ -174,11 +176,6 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     @ViewChild("inspector", {read: TemplateRef})
     private inspectorTemplate: TemplateRef<any>;
 
-    inspectedNode: StepModel | WorkflowOutputParameterModel | WorkflowInputParameterModel = null;
-
-    graph: Workflow;
-
-    selectedElement: SVGElement;
 
     private historyHandler: (ev: KeyboardEvent) => void;
 
@@ -233,7 +230,9 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
                 new SVGArrangePlugin(),
                 new SVGPortDragPlugin(),
                 new SVGNodeMovePlugin(),
-                new SVGEdgeHoverPlugin()
+                new SVGEdgeHoverPlugin(),
+                new SelectionPlugin(),
+                new ZoomPlugin()
             ]
         });
 
@@ -353,7 +352,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         }
 
         if (this.graph && this.canvas && this.canDraw()) {
-            this.graph.redraw(this.model as any);
+            this.graph.draw(this.model as any);
         }
     }
 
@@ -397,56 +396,58 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
         const statusProcess = this.statusBar.startProcess(`Adding ${nodeID} to Workflow...`);
 
-        const isLocal                = AppHelper.isLocal(nodeID);
+        const isLocal = AppHelper.isLocal(nodeID);
+
         const fetch: Promise<string> = isLocal
             ? this.fileRepository.fetchFile(nodeID)
             : this.platformRepository.getApp(nodeID).then(app => JSON.stringify(app));
 
-        fetch.then((result) => {
-            return this.gateway.resolveContent(result, nodeID).toPromise();
-        }).then(resolved => {
-            return this.appValidator.createValidator(Observable.of(JSON.stringify(resolved)))
-                .filter(val => !val.isPending)
-                .take(1)
-                .toPromise()
-                .then(val => {
-                    if (val.isValidCWL) {
-                        return resolved;
-                    }
+        fetch.then(result => this.gateway.resolveContent(result, nodeID).toPromise())
+            .then(resolved => {
+                return this.appValidator.createValidator(Observable.of(JSON.stringify(resolved)))
+                    .filter(val => !val.isPending)
+                    .take(1)
+                    .toPromise()
+                    .then(val => {
+                        if (val.isValidCWL) {
+                            return resolved;
+                        }
 
-                    throw new Error("App did not pass JSON schema validation");
+                        throw new Error("App did not pass JSON schema validation");
+                    });
+            })
+            .then((resolved: Process) => {
+                // if the app is local, give it an id that's the same as its filename (if doesn't exist)
+                if (isLocal) {
+                    resolved.id = resolved.id || AppHelper.getBasename(nodeID, true);
+                }
+
+                this.workflowEditorService.putInHistory(this.model);
+
+                const coords = this.graph.transformScreenCTMtoCanvas(ev.clientX, ev.clientY);
+                const patched = Object.assign(resolved, {
+                    "sbg:x": coords.x,
+                    "sbg:y": coords.y
                 });
-        }).then((resolved: Process) => {
-            // if the app is local, give it an id that's the same as its filename (if doesn't exist)
-            if (isLocal) {
-                resolved.id = resolved.id || AppHelper.getBasename(nodeID, true);
-            }
+                // add local source so step can be serialized without embedding
+                if (isLocal) {
+                    patched["sbg:rdfSource"] = nodeID;
+                    patched["sbg:rdfId"]     = nodeID;
+                }
+                patched["customProps"] = {
+                    foo: "bar"
+                };
+                patched["sbg:pleasePreserve"] = 3423;
+                const step = this.model.addStepFromProcess(patched);
+                console.log("Made step", step);
 
-            this.workflowEditorService.putInHistory(this.model);
+                this.setFocusOnCanvas();
 
-            const step = this.model.addStepFromProcess(resolved);
-
-            // add local source so step can be serialized without embedding
-            if (isLocal) {
-                step.customProps["sbg:rdfSource"] = nodeID;
-                step.customProps["sbg:rdfId"]     = nodeID;
-            }
-
-            const coords = this.graph.transformScreenCTMtoCanvas(ev.clientX, ev.clientY);
-            Object.assign(step.customProps, {
-                "sbg:x": coords.x,
-                "sbg:y": coords.y
+                this.statusBar.stopProcess(statusProcess, `Added ${step.label}`);
+            }, err => {
+                this.statusBar.stopProcess(statusProcess);
+                this.notificationBar.showNotification(`Failed to add ${nodeID} to workflow. ${new ErrorWrapper(err)}`);
             });
-
-            this.graph.command("app.create.step", step);
-
-            this.setFocusOnCanvas();
-
-            this.statusBar.stopProcess(statusProcess, `Added ${step.label}`);
-        }, err => {
-            this.statusBar.stopProcess(statusProcess);
-            this.notificationBar.showNotification(`Failed to add ${nodeID} to workflow. ${new ErrorWrapper(err)}`);
-        });
     }
 
     /**
@@ -545,7 +546,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     redrawIfCanDrawInWorkflow(): boolean {
 
         if (this.canDraw()) {
-            this.graph.redraw();
+            this.graph.draw();
             return true;
         }
 
