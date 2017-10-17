@@ -31,6 +31,7 @@ import {PlatformRepositoryService} from "../../../repository/platform-repository
 import {IpcService} from "../../../services/ipc.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {WorkflowEditorService} from "../../workflow-editor.service";
+import {SvgDumper} from "../svg-dumper/svg-dumper";
 
 
 const {dialog} = window["require"]("electron").remote;
@@ -39,112 +40,7 @@ const {dialog} = window["require"]("electron").remote;
     selector: "ct-workflow-graph-editor",
     encapsulation: ViewEncapsulation.None,
     styleUrls: ["./workflow-graph-editor.component.scss"],
-    template: `
-        <div *ngIf="model && isGraphEmpty()" class="svg-graph-empty-state"></div>
-
-        <svg #canvas class="cwl-workflow" tabindex="-1"
-             ct-click
-             [ct-drop-enabled]="true"
-             [ct-drop-zones]="['zone1']"
-             (dblclick)="openInspector($event)"
-             (onMouseClick)="setFocusOnCanvas()"
-             (onDropSuccess)="onDrop($event.detail.data.event, $event.detail.data.transfer_data)"></svg>
-
-        <span class="svg-btns" (click)="setFocusOnCanvas()">
-            
-            <!--Delete button-->
-            <span class="btn-group">
-                <button *ngIf="selectedElement"
-                        ct-tooltip="Delete"
-                        tooltipPlacement="top"
-                        class="btn btn-sm btn-secondary"
-                        (click)="deleteSelectedElement()"
-                        [disabled]="readonly">
-                    <i class="fa fa-trash"></i>
-                </button>
-            </span>
-
-            <span class="btn-group">
-                
-                <!--Zoom in button-->
-                <button class="btn btn-sm btn-secondary"
-                        (click)="upscale()"
-                        ct-tooltip="Zoom In"
-                        tooltipPlacement="top"
-                        [disabled]="graph !== undefined && graph.scale >= 2">
-                    <i class="fa fa-plus"></i>
-                </button>
-
-                <!--Zoom out button-->
-                <button class="btn btn-sm btn-secondary"
-                        (click)="downscale()"
-                        ct-tooltip="Zoom Out"
-                        tooltipPlacement="top"
-                        [disabled]="graph !== undefined && graph.scale <= 0.2">
-                    <i class="fa fa-minus"></i>
-                </button>
-
-                <!--Fit to Viewport button-->
-                <button class="btn btn-sm btn-secondary"
-                        ct-tooltip="Fit to Viewport"
-                        tooltipPlacement="top"
-                        (click)="fitToViewport()">
-                    <i class="fa fa-compress"></i>
-                </button>
-            </span>
-
-            <!--Auto-arrange button-->
-            <span class="btn-group">
-                <button class="btn btn-sm btn-secondary"
-                        ct-tooltip="Auto-arrange"
-                        tooltipPlacement="top"
-                        (click)="arrange()"
-                        [disabled]="readonly">
-                    <i class="fa fa-paint-brush"></i>
-                </button>
-            </span>
-
-            <!--Export image-->
-            <span class="btn-group">
-                <button class="btn btn-sm btn-secondary"
-                        (click)="exportSVG()"
-                        ct-tooltip="Export SVG"
-                        tooltipPlacement="top">
-                    <i class="fa fa-file-image-o"></i>
-                </button>
-            </span>
-            
-        </span>
-
-        <!--Inspector Template -->
-        <ng-template #inspector>
-            <ct-editor-inspector-content>
-                <div class="tc-header">
-                    {{ inspectedNode.label || inspectedNode.id || inspectedNode.loc || typeOfInspectedNode()}}
-                </div>
-                <div class="tc-body">
-                    <ct-workflow-step-inspector *ngIf="typeOfInspectedNode() === 'Step'"
-                                                [fileID]="data.id"
-                                                [step]="inspectedNode"
-                                                [graph]="graph"
-                                                [workflowModel]="model"
-                                                (change)="change.emit()"
-                                                [readonly]="readonly">
-                    </ct-workflow-step-inspector>
-
-                    <ct-workflow-io-inspector
-                        *ngIf="typeOfInspectedNode() === 'Input' || typeOfInspectedNode() === 'Output'"
-                        [port]="inspectedNode"
-                        [graph]="graph"
-                        [workflowModel]="model"
-                        [readonly]="readonly">
-
-                    </ct-workflow-io-inspector>
-
-                </div>
-            </ct-editor-inspector-content>
-        </ng-template>
-    `
+    templateUrl: "./workflow-graph-editor.component.html"
 })
 export class WorkflowGraphEditorComponent extends DirectiveBase implements OnChanges, OnDestroy, AfterViewInit {
 
@@ -424,7 +320,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
                 this.workflowEditorService.putInHistory(this.model);
 
-                const coords = this.graph.transformScreenCTMtoCanvas(ev.clientX, ev.clientY);
+                const coords  = this.graph.transformScreenCTMtoCanvas(ev.clientX, ev.clientY);
                 const patched = Object.assign(resolved, {
                     "sbg:x": coords.x,
                     "sbg:y": coords.y
@@ -434,11 +330,11 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
                     patched["sbg:rdfSource"] = nodeID;
                     patched["sbg:rdfId"]     = nodeID;
                 }
-                patched["customProps"] = {
+                patched["customProps"]        = {
                     foo: "bar"
                 };
                 patched["sbg:pleasePreserve"] = 3423;
-                const step = this.model.addStepFromProcess(patched);
+                const step                    = this.model.addStepFromProcess(patched);
                 console.log("Made step", step);
 
                 this.setFocusOnCanvas();
@@ -566,9 +462,8 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     }
 
     exportSVG() {
-        const svg = this.canvas.nativeElement as SVGSVGElement;
 
-        const content = this.renderSVGBundle(svg);
+        const content = new SvgDumper(this.canvas.nativeElement).dump();
 
         dialog.showSaveDialog({
             buttonLabel: "Save",
@@ -585,10 +480,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
                 path += ".svg";
             }
 
-            this.ipc.request("saveFileContent", {
-                path,
-                content
-            }).toPromise().then(() => {
+            this.ipc.request("saveFileContent", {path, content}).toPromise().then(() => {
                 this.statusBar.instant(`Exported SVG to ${path}`);
             }, err => {
                 this.notificationBar.showNotification("Could not save SVG: " + err, {timeout: 50000});
@@ -605,57 +497,6 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         }
 
         this.functionsWaitingForRender.push(fn);
-    }
-
-
-    private renderSVGBundle(root: SVGSVGElement) {
-
-        const containerElements = ["svg", "g"];
-        const embeddableStyles  = {
-            "rect": ["fill", "stroke", "stroke-width"],
-            "path": ["fill", "stroke", "stroke-width"],
-            "circle": ["fill", "stroke", "stroke-width"],
-            "line": ["stroke", "stroke-width"],
-            "text": ["fill", "font-size", "text-anchor", "font-family"],
-            "polygon": ["stroke", "fill"]
-        };
-
-        function traverse(parentNode, originalData) {
-
-            const children             = parentNode.childNodes;
-            const originalChildrenData = originalData.childNodes;
-
-            for (let childIndex = 0; childIndex < children.length; childIndex++) {
-                const child   = children[childIndex];
-                const tagName = child.tagName;
-
-                if (containerElements.indexOf(tagName) !== -1) {
-                    traverse(child, originalChildrenData[childIndex]);
-                } else if (tagName in embeddableStyles) {
-
-                    const styleDefinition = window.getComputedStyle(originalChildrenData[childIndex]);
-
-                    let styleString = "";
-                    for (let st = 0; st < embeddableStyles[tagName].length; st++) {
-                        styleString +=
-                            embeddableStyles[tagName][st]
-                            + ":"
-                            + styleDefinition.getPropertyValue(embeddableStyles[tagName][st])
-                            + "; ";
-                    }
-
-                    child.setAttribute("style", styleString);
-                }
-            }
-
-        }
-
-
-        const clone = root.cloneNode(true) as SVGSVGElement;
-        Array.from(clone.querySelectorAll(".port .label")).forEach(el => el.parentNode.removeChild(el));
-        traverse(clone, root);
-
-        return new XMLSerializer().serializeToString(clone);
     }
 
     /**
