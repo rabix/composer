@@ -12,8 +12,22 @@ import {
     ViewChild,
     ViewEncapsulation
 } from "@angular/core";
-import {SVGArrangePlugin, SVGEdgeHoverPlugin, SVGNodeMovePlugin, SVGPortDragPlugin, SVGValidatePlugin, Workflow} from "cwl-svg";
-import {StepModel, WorkflowFactory, WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
+import {
+    SVGArrangePlugin,
+    SVGEdgeHoverPlugin,
+    SVGNodeMovePlugin,
+    SVGPortDragPlugin,
+    SVGValidatePlugin,
+    SelectionPlugin,
+    Workflow
+} from "cwl-svg";
+import {
+    StepModel,
+    WorkflowFactory,
+    WorkflowInputParameterModel,
+    WorkflowModel,
+    WorkflowOutputParameterModel
+} from "cwlts/models";
 import {Process} from "cwlts/models/generic/Process";
 import {Observable} from "rxjs/Observable";
 import {DataGatewayService} from "../../../core/data-gateway/data-gateway.service";
@@ -233,7 +247,8 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
                 new SVGPortDragPlugin(),
                 new SVGNodeMovePlugin(),
                 new SVGEdgeHoverPlugin(),
-                new SVGValidatePlugin()
+                new SVGValidatePlugin(),
+                new SelectionPlugin()
             ]
         });
 
