@@ -12,10 +12,18 @@ import {
     ViewChild,
     ViewEncapsulation
 } from "@angular/core";
-import {SelectionPlugin,SVGArrangePlugin, SVGEdgeHoverPlugin, SVGNodeMovePlugin, SVGPortDragPlugin,SVGValidatePlugin,
-    SelectionPlugin, Workflow} from "cwl-svg";
+import {
+    SVGArrangePlugin, SVGEdgeHoverPlugin, SVGNodeMovePlugin, SVGPortDragPlugin, SVGValidatePlugin,
+    SelectionPlugin, Workflow
+} from "cwl-svg";
 import {ZoomPlugin} from "cwl-svg/src/plugins/zoom";
-import {StepModel, WorkflowFactory, WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
+import {
+    StepModel,
+    WorkflowFactory,
+    WorkflowInputParameterModel,
+    WorkflowModel,
+    WorkflowOutputParameterModel
+} from "cwlts/models";
 import {Process} from "cwlts/models/generic/Process";
 import {Observable} from "rxjs/Observable";
 import {DataGatewayService} from "../../../core/data-gateway/data-gateway.service";
