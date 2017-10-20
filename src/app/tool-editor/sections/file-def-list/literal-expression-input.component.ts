@@ -22,22 +22,22 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
     ],
     template: `
         <div class="expression-input-group clickable"
-             [class.expr]="isExpr"
+             [class.expr]="model?.isExpression"
              [ct-validation-class]="model">
 
             <ct-validation-preview [entry]="model"></ct-validation-preview>
             <b class="validation-icon result"
-               *ngIf="isExpr && !(model?.hasErrors || model?.hasWarnings)"
+               *ngIf="model?.isExpression && !(model?.hasErrors || model?.hasWarnings)"
                [title]="model.result">E:</b>
 
             <div class="textarea-btn-group">
 
                     <textarea class="form-control"
                               #input
-                              [readonly]="isExpr"
+                              [readonly]="model?.isExpression"
                               (blur)="onTouch()"
                               [value]="model?.toString() || ''"
-                              (click)="editExpr(isExpr ? 'edit' : null, $event)"
+                              (click)="editExpr(model?.isExpression ? 'edit' : null, $event)"
                               (change)="editLiteral(input.value)"></textarea>
 
                 <span class="btn-group">
@@ -50,10 +50,10 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                         <button type="button"
                                 class="btn btn-secondary"
                                 [disabled]="readonly"
-                                (click)="editExpr(isExpr ? 'clear' : 'edit', $event)">
+                                (click)="editExpr(model?.isExpression ? 'clear' : 'edit', $event)">
                             <i class="fa"
-                               [ngClass]="{'fa-times': isExpr,
-                                            'fa-code': !isExpr}"></i>
+                               [ngClass]="{'fa-times': model?.isExpression,
+                                            'fa-code': !model?.isExpression}"></i>
                         </button>
                     </span>
             </div>
@@ -81,9 +81,6 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
      */
     onTouch = noop;
 
-    /** Flag if model is expression or primitive */
-    isExpr = false;
-
     /**
      * Internal ExpressionModel on which changes are made
      */
@@ -100,8 +97,6 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
 
         if (obj) {
             this.model  = obj;
-            this.isExpr = obj.isExpression;
-            this.model.validate(this.context).then(noop, noop);
         } else {
             console.warn("supposed to get a value, but didn't... :(");
         }
@@ -185,11 +180,6 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
                     }
 
                     this.model.cloneStatus(editor.model);
-
-                    this.isExpr = this.model.isExpression;
-                    this.model.validate(this.context).then(() => {
-                        this.onChange(this.model);
-                    },  err => console.warn);
                 }
                 this.modal.close();
             });
@@ -198,12 +188,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
         if (action === "clear") {
             this.modal.delete("expression").then(() => {
                 this.model.setValue("", "string");
-                this.model.result = null;
-                this.isExpr       = false;
                 event.stopPropagation();
-                this.model.validate(this.context).then(() => {
-                    this.onChange(this.model);
-                }, console.warn);
             }, err => console.warn);
         }
     }

@@ -3,6 +3,7 @@ import {FormArray, FormControl, FormGroup} from "@angular/forms";
 import {CommandLineToolModel, ExpressionModel} from "cwlts/models";
 import {Subscription} from "rxjs/Subscription";
 import {ModalService} from "../../../../ui/modal/modal.service";
+import {ErrorCode} from "cwlts/models/helpers/validation/ErrorCode";
 
 @Component({
     selector: "ct-base-command-list",
@@ -89,7 +90,7 @@ export class BaseCommandListComponent implements OnInit, OnChanges, OnDestroy {
     public removeBaseCommand(i: number) {
         this.modal.delete("base command").then(() => {
             // reset the expression's validity
-            this.baseCommand[i].cleanValidity();
+            this.baseCommand[i].clearIssue(ErrorCode.EXPR_ALL);
             (this.form.get("list") as FormArray).removeAt(i);
         }, err => {
             console.warn(err);
