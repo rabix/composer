@@ -58,16 +58,20 @@ builder.build({
             app: "dist",
             buildResources: "build-resources"
         },
+        protocols: [{
+            "name": "cottontail",
+            "role": "Viewer",
+            "schemes": ["cottontail"]
+        }],
         mac: {
-            target: ["zip", "dir", "dmg"],
+            target: ["zip", "dir", "dmg"]
         },
         win: {
-            target: ["zip", "portable", "dir"],
+            target: ["zip", "portable", "dir"]
         },
         linux: {
-            target: ["zip", "dir"],
-        },
-
+            target: ["zip", "dir"]
+        }
     }
 
 });

@@ -230,6 +230,10 @@ export class PlatformRepositoryService {
         });
     }
 
+    getProject(projectSlug: string): Promise<Project> {
+        return this.ipc.request("getProject", projectSlug).toPromise();
+    }
+
     searchAppsFromOpenProjects(substring?: string): Observable<App[]> {
 
         const term = substring.toLowerCase();

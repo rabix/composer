@@ -23,6 +23,7 @@ export type IPCRoute =
     | "getLocalFileContent"
     | "getLocalRepository"
     | "getPlatformApp"
+    | "getProject"
     | "getProjects"
     | "getSetting"
     | "getUserByToken"
@@ -53,7 +54,8 @@ export type IPCListeners =
     "watchLocalRepository" |
     "watchUserRepository" |
     "executeApp" |
-    "accelerator";
+    "accelerator" |
+    "magnetLink";
 
 @Injectable()
 export class IpcService {
