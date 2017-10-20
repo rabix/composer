@@ -188,7 +188,7 @@ export class MyAppsPanelService extends AppsPanelService {
         return apps.map(app => {
 
             return {
-                id: app.id,
+                id: AppHelper.getRevisionlessID(app.id),
                 data: {...app, isWritable},
                 label: app.name,
                 type: "app",

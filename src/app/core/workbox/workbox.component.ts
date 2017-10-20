@@ -198,7 +198,11 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
         }), (tab) => tab)
             .subscribeTracked(this, (tab) => {
 
-                this.activeTab = tab;
+                // activeTab has to be set in the next tick, otherwise we will have ExpressionChangedAfterItHadBeenCheckedError in some cases
+                setTimeout(() => {
+                    this.activeTab = tab;
+                });
+
                 const idx = this.tabs.findIndex(t => t === tab);
 
                 const component = this.tabComponentContainers.find((item, index) => index === idx);

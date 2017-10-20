@@ -230,6 +230,10 @@ export class PlatformRepositoryService {
         });
     }
 
+    getAppContent(id: string, forceFetch = false): Promise<string> {
+        return this.ipc.request("getPlatformApp", {id, forceFetch}).toPromise();
+    }
+
     searchAppsFromOpenProjects(substring?: string): Observable<App[]> {
 
         const term = substring.toLowerCase();
