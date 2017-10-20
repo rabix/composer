@@ -1,0 +1,106 @@
+{
+    "sbg:project": "marijanlekic89/div-nesto-input",
+    "sbg:revisionNotes": "",
+    "outputs": [],
+    "sbg:validationErrors": [],
+    "sbg:modifiedOn": 1507295949,
+    "sbg:id": "marijanlekic89/div-nesto-input/draft2/3",
+    "sbg:job": {
+        "runtime": {
+            "ram": 1000,
+            "cores": 1
+        },
+        "inputs": {
+            "input_1": {
+                "class": "File",
+                "nameroot": "input_1",
+                "size": 0,
+                "contents": "file contents",
+                "basename": "input_1.ext",
+                "nameext": ".ext",
+                "path": "/path/to/input_1.ext",
+                "secondaryFiles": []
+            },
+            "input": {
+                "class": "File",
+                "nameroot": "input",
+                "size": 0,
+                "contents": "file contents",
+                "basename": "input.ext",
+                "nameext": ".ext",
+                "path": "/path/to/input.ext",
+                "secondaryFiles": []
+            }
+        }
+    },
+    "inputs": [
+        {
+            "id": "input",
+            "inputBinding": {
+                "position": 0
+            },
+            "type": "File?"
+        },
+        {
+            "id": "input_1",
+            "inputBinding": {
+                "position": 0
+            },
+            "type": "File?"
+        }
+    ],
+    "class": "CommandLineTool",
+    "requirements": [
+        {
+            "class": "DockerRequirement",
+            "dockerPull": "234123"
+        }
+    ],
+    "sbg:sbgMaintained": false,
+    "sbg:revision": 3,
+    "baseCommand": [
+        "123"
+    ],
+    "sbg:revisionsInfo": [
+        {
+            "sbg:modifiedOn": 1507202402,
+            "sbg:modifiedBy": "marijanlekic89",
+            "sbg:revisionNotes": null,
+            "sbg:revision": 0
+        },
+        {
+            "sbg:modifiedOn": 1507202454,
+            "sbg:modifiedBy": "marijanlekic89",
+            "sbg:revisionNotes": "",
+            "sbg:revision": 1
+        },
+        {
+            "sbg:modifiedOn": 1507295944,
+            "sbg:modifiedBy": "marijanlekic89",
+            "sbg:revisionNotes": "",
+            "sbg:revision": 2
+        },
+        {
+            "sbg:modifiedOn": 1507295949,
+            "sbg:modifiedBy": "marijanlekic89",
+            "sbg:revisionNotes": "",
+            "sbg:revision": 3
+        }
+    ],
+    "sbg:projectName": "<div>Nesto <input>",
+    "sbg:latestRevision": 3,
+    "label": "Draft2",
+    "sbg:appVersion": [
+        "v1.0"
+    ],
+    "sbg:modifiedBy": "marijanlekic89",
+    "id": "https://api.sbgenomics.com/v2/apps/marijanlekic89/div-nesto-input/draft2/3/raw/",
+    "sbg:createdBy": "marijanlekic89",
+    "cwlVersion": "v1.0",
+    "sbg:contributors": [
+        "marijanlekic89"
+    ],
+    "sbg:createdOn": 1507202402,
+    "sbg:publisher": "sbg",
+    "sbg:image_url": null
+}

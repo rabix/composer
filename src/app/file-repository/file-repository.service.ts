@@ -67,7 +67,7 @@ export class FileRepositoryService {
         return this.ipc.request("saveFileContent", {path, content}).toPromise();
     }
 
-    fetchFile(path: string): Promise<string> {
-        return this.ipc.request("getLocalFileContent", path).toPromise();
+    fetchFile(path: string, forceFetch = false): Promise<string> {
+        return this.ipc.request("getLocalFileContent", {path, forceFetch}).toPromise();
     }
 }

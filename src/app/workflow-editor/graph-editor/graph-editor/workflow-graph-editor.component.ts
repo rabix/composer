@@ -35,6 +35,7 @@ import {PlatformRepositoryService} from "../../../repository/platform-repository
 import {IpcService} from "../../../services/ipc.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {WorkflowEditorService} from "../../workflow-editor.service";
+import {WorkflowEditorComponent} from "../../workflow-editor.component";
 
 const {dialog} = window["require"]("electron").remote;
 
@@ -99,6 +100,7 @@ const {dialog} = window["require"]("electron").remote;
             <!--Auto-arrange button-->
             <span class="btn-group">
                 <button class="btn btn-sm btn-secondary"
+                        data-test="auto-arrange-btn"
                         ct-tooltip="Auto-arrange"
                         tooltipPlacement="top"
                         (click)="arrange()"
@@ -153,6 +155,9 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
     @Input()
     model: WorkflowModel;
+
+    @Input()
+    host: WorkflowEditorComponent;
 
     @Input()
     data: AppTabData;
@@ -438,9 +443,14 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             this.setFocusOnCanvas();
 
             this.statusBar.stopProcess(statusProcess, `Added ${step.label}`);
-        }, err => {
-            this.statusBar.stopProcess(statusProcess);
-            this.notificationBar.showNotification(`Failed to add ${nodeID} to workflow. ${new ErrorWrapper(err)}`);
+
+        }).then(() => {
+            // Resolve model current content in order to prevent nesting recursion
+            this.host.resolveCurrentContent();
+        }).catch(err => {
+                this.statusBar.stopProcess(statusProcess);
+                this.notificationBar.showNotification(`Failed to add ${nodeID} to workflow. ${new ErrorWrapper(err)}`);
+
         });
     }
 

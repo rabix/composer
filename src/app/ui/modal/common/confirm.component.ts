@@ -7,7 +7,7 @@ import {Subject} from "rxjs/Subject";
     template: `
         <form (ngSubmit)="decision.next(true)">
             <div class="body p-1">
-                <span [innerHTML]="content"></span>
+                <span class="content">{{content}}</span>
             </div>
             <div class="footer pr-1 pb-1">
                 <button class="btn btn-secondary" (click)="decision.next(false)" type="button">{{ cancellationLabel }}</button>

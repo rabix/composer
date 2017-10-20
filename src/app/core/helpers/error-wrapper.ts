@@ -12,6 +12,10 @@ export class ErrorWrapper {
             return "You are offline.";
         }
 
+        if (this.err.code && this.err.code === "ENOENT") {
+            return "No such file or directory.";
+        }
+
         const isHttpRequest = this.err.statusCode && this.err.options;
         if (this.err.error && isHttpRequest) {
             const uri         = this.err.options.uri;
@@ -36,6 +40,10 @@ export class ErrorWrapper {
                 const time    = minutes > 1 ? `${minutes} minutes.` : `${seconds} seconds.`;
 
                 return msg + " timed out after " + time;
+            }
+
+            if (this.err.error && this.err.error.message) {
+                return this.err.error.message;
             }
 
             return msg + " failed with " + this.err.message;

@@ -13,7 +13,7 @@ import {TreeViewComponent} from "../../../ui/tree-view/tree-view.component";
 import {TreeViewService} from "../../../ui/tree-view/tree-view.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {AppHelper} from "../../helpers/AppHelper";
-import {TabData} from "../../workbox/tab-data.interface";
+import {TabData} from "../../../../../electron/src/storage/types/tab-data-interface";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.component";
 import {PublicAppsPanelService} from "./public-apps-panel.service";
@@ -215,7 +215,7 @@ export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, A
                     dragLabel: app.name,
                     dragImageClass: app.raw["class"] === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
                     dragDropZones: ["zone1"]
-                }
+                };
             });
         });
     }

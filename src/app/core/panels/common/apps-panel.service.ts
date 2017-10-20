@@ -10,7 +10,7 @@ import {MenuItem} from "../../../ui/menu/menu-item";
 import {TreeNode} from "../../../ui/tree-view/tree-node";
 import {AppHelper} from "../../helpers/AppHelper";
 import {ErrorWrapper} from "../../helpers/error-wrapper";
-import {TabData} from "../../workbox/tab-data.interface";
+import {TabData} from "../../../../../electron/src/storage/types/tab-data-interface";
 import {WorkboxService} from "../../workbox/workbox.service";
 
 const {dialog} = window["require"]("electron").remote;
@@ -36,6 +36,7 @@ export class AppsPanelService {
                     title: "Choose a File Path",
                     buttonLabel: "Save",
                     defaultPath: `${nodeID}.cwl`,
+                    filters: [{name: "Common Workflow Language App", extensions: ["cwl"]}],
                     properties: ["openDirectory"]
                 }, (path) => {
 
@@ -53,19 +54,19 @@ export class AppsPanelService {
                             savingUpdate.filter(v => v === "failed").take(1).subscribe(() => {
                                 subscriber.next("Saving failed");
                                 subscriber.complete();
-                            })
+                            });
                         }) as Observable<string>;
 
                         this.statusBar.enqueue(savingProcess);
                         let appType;
 
-                        this.platformRepository.getApp(node.id).then(app => {
+                        this.platformRepository.getApp(node.id, true).then(app => {
                             savingUpdate.next("loaded");
                             appType = app.class;
                             return YAML.dump(app);
                         }).then(text => {
                             return this.fileRepository.saveFile(path, text);
-                        }).then(saved => {
+                        }).then(() => {
                             savingUpdate.next("saved");
 
                             const tab = this.workbox.getOrCreateAppTab({
@@ -74,9 +75,9 @@ export class AppsPanelService {
                                 isWritable: true,
                                 label: AppHelper.getBasename(path),
                                 type: appType,
-                            } as TabData<any>);
+                            } as TabData<any>, true, true);
 
-                            this.workbox.openTab(tab);
+                            this.workbox.openTab(tab, true, true, true);
                             this.fileRepository.reloadPath(path);
 
                             this.cdr.markForCheck();
@@ -91,7 +92,7 @@ export class AppsPanelService {
                     }
                 });
             }
-        })
+        });
     }
 
 }
