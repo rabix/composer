@@ -1,10 +1,16 @@
 import * as mock from "mock-require";
 import * as acceleratorProxy from "./accelerator-proxy";
+import * as magnetLinkProxy from "./open-external-file-proxy";
 import * as path from "path";
+import * as fs from "fs";
 
 const {app, Menu, BrowserWindow} = require("electron");
+const deepLinkingController = require("./controllers/open-external-file/deep-linking-protocol-controller");
+const localFileController = require("./controllers/open-external-file/open-file-handler-controller");
 
-const isSpectronRun       = ~process.argv.indexOf("--spectron");
+const proxy = require("./open-external-file-proxy");
+
+const isSpectronRun = ~process.argv.indexOf("--spectron");
 const defaultUserDataPath = app.getPath("home") + path.sep + ".sevenbridges/rabix-composer";
 
 app.setPath("userData", defaultUserDataPath);
@@ -17,7 +23,7 @@ applyCLIArgs();
 
 const router = require("./ipc-router");
 
-let win;
+let win = null;
 let splash;
 
 function start(config: { devTools: boolean, url: string }) {
@@ -59,7 +65,7 @@ function start(config: { devTools: boolean, url: string }) {
     }
 
     win.on("closed", () => {
-        win = undefined;
+        win = null;
     });
 
 
@@ -150,8 +156,46 @@ function start(config: { devTools: boolean, url: string }) {
     ] as any[] /* types are not accurate for menu items */));
 }
 
+
 export = {
     start: (config) => {
+
+        // Protocol handler for darwin
+        app.setAsDefaultProtocolClient("cottontail2");
+        app.on("open-url", function (event, url) {
+            openExternalFiles(url);
+            focusMainWindow();
+        });
+
+        // File handler for darwin
+        app.on("open-file", function (event, filePath) {
+            openExternalFiles(filePath);
+            focusMainWindow();
+        });
+
+        // Initial File handler for win32
+        if (process.platform === "win32") {
+            openExternalFiles(...getFilePaths(process.argv.slice(1)));
+        }
+
+        // File/Protocol handler for win32
+        const shouldQuit = app.makeSingleInstance((argv) => {
+            // Someone tried to run a second instance, we should focus our window.
+
+            // Protocol handler for win32
+            // argv: An array of the second instance’s (command line / deep linked) arguments
+            if (process.platform === "win32") {
+                // Keep only command line / deep linked arguments
+                openExternalFiles(...getFilePaths(process.argv.slice(1)));
+            }
+
+            focusMainWindow();
+        });
+
+        if (shouldQuit) {
+            app.quit();
+            return
+        }
 
         // This method will be called when Electron has finished
         // initialization and is ready to create browser windows.
@@ -163,9 +207,11 @@ export = {
 
             // On macOS it is common for applications and their menu bar
             // to stay active until the user quits explicitly with Cmd + Q
-            if (process.platform !== "darwin") {
-                app.quit();
-            }
+            // if (process.platform !== "darwin") {
+            //     app.quit();
+            // }
+
+            app.quit();
 
         });
 
@@ -176,9 +222,48 @@ export = {
                 start(config);
             }
         });
+
     }
 }
 
+/**
+ * Open external files (using deep linking or file protocol)
+ */
+function openExternalFiles(...items: string[]) {
+    items.forEach((item) => {
+        if (item.startsWith("rabix-composer://")) {
+            const encoded = item.replace("rabix-composer://", "");
+            const data = deepLinkingController.setMagnetLinkData(encoded);
+            proxy.passMagnetLink(data);
+        } else {
+            const filePath = localFileController.setLocalFilePath(item);
+            proxy.passFilePath(filePath);
+        }
+    });
+}
+
+/**
+ * Filter command line arguments to get file paths
+ */
+function getFilePaths(args: string []) {
+    // If dev mode do not use first argument as a file path
+    const devMode = process.argv.find(arg => arg.startsWith("--dev-mode"));
+
+    return args.filter((arg, index) => !(arg.startsWith("-") || (devMode && index === 0)));
+}
+
+
+/**
+ * Focus main window
+ */
+function focusMainWindow() {
+    if (win) {
+        if (win.isMinimized()) {
+            win.restore()
+        }
+        win.focus()
+    }
+}
 
 /**
  * If we are running functional tests with spectron, we need to expose more of the app to

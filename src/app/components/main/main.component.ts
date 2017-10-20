@@ -9,6 +9,7 @@ import {ContextService} from "../../ui/context/context.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {UrlValidator} from "../../validators/url.validator";
 import {ElectronProxyService} from "../../native/proxy/electron-proxy.service";
+import {OpenExternalFileService} from "../../core/magnet-link/magnet-link.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -37,6 +38,7 @@ export class MainComponent {
                 global: GlobalService,
                 electron: ElectronProxyService,
                 // DON'T REMOVE THIS PLEASE I KNOW IT DOESN'T HAVE ANY USAGES
+                openExternalFileService: OpenExternalFileService,
                 js: JavascriptEvalService) {
 
         system.boot();

@@ -86,7 +86,7 @@ export class ModalService {
         this.modalComponentsRefStack.push(modalComponentRef);
     }
 
-    private wrapPromise<T>(handler: (resolve, reject) => void): Promise<T> {
+    public wrapPromise<T>(handler: (resolve, reject) => void): Promise<T> {
         const insideClosing = new Promise((resolve, reject) => {
             handler(resolve, reject);
         }) as Promise<T>;
