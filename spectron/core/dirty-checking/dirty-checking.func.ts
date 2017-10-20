@@ -874,36 +874,29 @@ describe("dirty checking", async () => {
             const revisionComponent = `ct-revision-list`;
             const closingDirtyAppsModal = `ct-modal-closing-dirty-apps`;
 
-
-            console.log("Visual Editor");
             await client.waitForVisible(visualEditor, 5000);
             await client.waitForVisible(arrange, 5000);
 
             await client.click(arrange);
 
-
-            console.log("Dirty1");
             // Tab should be dirty
             await waitUntilTabBecomeDirty(client, tab);
 
             // Click on revision button
             await client.click(revisionBtn);
 
-            console.log("Revision");
             // Revision component should appear
             await client.waitForVisible(revisionComponent, 5000);
 
             // Click on revision entry
             await client.click(`${revisionComponent} .revision-entry:nth-of-type(2)`);
 
-            console.log("Revision2");
             // Modal should prevent changing revision
             await client.waitForVisible(closingDirtyAppsModal, 5000);
 
             // Click on cancel button
             await client.click(`${closingDirtyAppsModal} [data-test="cancel-btn"]`);
 
-            console.log("Dirty2");
             // Tab should be still dirty
             await waitUntilTabBecomeDirty(client, tab);
 
@@ -913,10 +906,8 @@ describe("dirty checking", async () => {
             // Click on discard button
             await client.click(`${closingDirtyAppsModal} [data-test="discard-btn"]`);
 
-            console.log("Discard");
             // Tab should not be dirty anymore
             await waitUntilTabBecomeDirty(client, tab, false);
-            console.log("Dirty3");
         });
     });
 

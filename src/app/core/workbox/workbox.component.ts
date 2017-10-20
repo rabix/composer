@@ -25,7 +25,7 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                     [ct-drag-over]="true"
                     (onDragOver)="workbox.openTab(tab)"
                     ct-click
-                    (onMouseClick)="onTabClick($event, tab, tabComponents[i])"
+                    (onMouseClick)="onTabClick($event, tab)"
                     [class.active]="tab === (workbox.activeTab | async)"
                     [class.isDirty]="tabComponents[i]?.isDirty"
                     [ct-context]="createContextMenu(tab)"
@@ -95,7 +95,7 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                     </ng-container>
 
                     <div class="close-icon">
-                        <i class="fa fa-times clickable" (click)="removeTab(tab, tabComponents[i])"></i>
+                        <i class="fa fa-times clickable" (click)="closeTab(tab)"></i>
                     </div>
 
                     <!--Tooltip content-->
@@ -182,6 +182,15 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
         this.workbox.tabs.subscribeTracked(this, tabs => {
             this.tabs = tabs;
         });
+
+        this.workbox.closeTabStream.subscribeTracked(this, tab => {
+           this.closeTab(tab);
+        });
+
+        this.workbox.closeAllTabsStream.subscribeTracked(this, tabs => {
+            this.closeAllTabs(tabs);
+        });
+
     }
 
     ngAfterViewInit() {
@@ -229,21 +238,29 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
     }
 
     /**
-     * When you click on tab
+     * When you click on a tab
      */
     onTabClick(event: MouseEvent, tab, component) {
         // Middle click
         if (event.button === 0) {
             this.workbox.openTab(tab);
         } else if (event.button === 1) {
-            this.removeTab(tab, component);
+            this.workbox.closeTab(tab);
         }
     }
 
     /**
-     * Removes a tab by index
+     * Closes a tab
      */
-    removeTab(tab, component) {
+    closeTab(tab: TabData<any>) {
+
+        const index = this.tabs.findIndex((t) => t === tab);
+
+        if (index === -1) {
+            return;
+        }
+
+        const component = this.tabComponents[index];
 
         if (component.isDirty) {
 
@@ -256,11 +273,11 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
 
             modal.decision.take(1).subscribe((result) => {
                 this.modal.close();
-                result ? component.save() : this.workbox.closeTab(tab);
+                result ? component.save() : this.workbox.closeTab(tab, true);
             });
 
         } else {
-            this.workbox.closeTab(tab);
+            this.workbox.closeTab(tab, true);
         }
     }
 
@@ -288,20 +305,20 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
 
     createContextMenu(tab): MenuItem[] {
         const closeOthers = new MenuItem("Close Others", {
-            click: () => this.removeAllTabs([tab])
+            click: () => this.closeAllTabs([tab])
         });
 
         const closeAll = new MenuItem("Close All", {
-            click: () => this.removeAllTabs()
+            click: () => this.closeAllTabs()
         });
 
         return [closeOthers, closeAll];
     }
 
     /**
-     * Removes all tabs or all other tabs (if tab is passed as an argument)
+     * Closes all tabs except ones that should be preserved
      */
-    private removeAllTabs(preserve: TabData<any>[] = []) {
+    private closeAllTabs(preserve: TabData<any>[] = []) {
 
         const components = preserve.map((tab) => this.getTabComponent(tab).tabComponent);
 
@@ -321,11 +338,11 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
             });
 
             modal.then(() => {
-                this.workbox.closeAllTabs(preserve);
+                this.workbox.closeAllTabs(preserve, true);
             }, noop);
 
         } else {
-            this.workbox.closeAllTabs(preserve);
+            this.workbox.closeAllTabs(preserve, true);
         }
 
     }

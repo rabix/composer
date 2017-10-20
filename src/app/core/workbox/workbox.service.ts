@@ -21,6 +21,10 @@ export class WorkboxService {
 
     tabCreation = new Subject<TabData<any>>();
 
+    closeTabStream = new Subject<TabData<any>>();
+
+    closeAllTabsStream = new Subject<TabData<any> []>();
+
     private priorityTabUpdate = new Subject();
 
     constructor(private auth: AuthService,
@@ -155,9 +159,18 @@ export class WorkboxService {
         }, false);
     }
 
-    closeTab(tab?) {
+    /**
+     * Closes a tab
+     */
+    closeTab(tab?: TabData<any>, force: boolean = false) {
+
         if (!tab) {
             tab = this.extractValues().activeTab;
+        }
+
+        if (!force) {
+            this.closeTabStream.next(tab);
+            return;
         }
 
         if (tab && tab.data && tab.data.id) {
@@ -175,10 +188,19 @@ export class WorkboxService {
         this.syncTabs();
     }
 
-    closeAllTabs(preserve: TabData<any>[] = []) {
+    /**
+     * Closes all tabs except one that should be preserved
+     */
+    closeAllTabs(preserve: TabData<any>[] = [], force: boolean = false) {
+
+        if (!force) {
+            this.closeAllTabsStream.next(preserve);
+            return;
+        }
+
         this.tabs.getValue().forEach((item) => {
             if (!preserve.includes(item)) {
-                this.closeTab(item);
+                this.closeTab(item, true);
             }
         });
 
