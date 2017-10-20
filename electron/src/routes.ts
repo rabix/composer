@@ -20,6 +20,10 @@ const swapController = new SwapController(swapPath);
 const fsController          = require("./controllers/fs.controller");
 const executionResultsCtrl  = require("./controllers/execution-results.controller");
 const acceleratorController = require("./controllers/accelerator.controller");
+
+const deepLinkingProtocolController  = require("./controllers/open-external-file/deep-linking-protocol-controller");
+const openFileHandlerController = require("./controllers/open-external-file/open-file-handler-controller");
+
 const resolver              = require("./schema-salad-resolver/schema-salad-resolver");
 const semver                = require("semver");
 
@@ -76,6 +80,10 @@ export function readFileContent(path, callback) {
     fsController.readFileContent(path, callback);
 }
 
+export function getFileOutputInfo(path, callback) {
+    fsController.getFileOutputInfo(path, callback);
+}
+
 export function deletePath(path, callback) {
     fsController.deletePath(path, callback);
 }
@@ -123,6 +131,26 @@ export function searchLocalProjects(data: { term: string, limit: number, folders
     }).catch(callback);
 }
 
+export function deepLinkingHandler(data, callback) {
+    deepLinkingProtocolController.register(callback);
+}
+
+export function openFileHandler(data, callback) {
+    openFileHandlerController.register(callback);
+}
+
+export function getProject(projectSlug: string, callback) {
+    ensurePlatformUser().then(repo => {
+        const {url, token} = repo.local.activeCredentials;
+
+        const api = new SBGClient(url, token);
+
+        return api.getProject(projectSlug).then(result => {
+            callback(null, result);
+        }, callback);
+
+    }).catch(callback);
+}
 
 export function getProjects(data: { url: string; token: string }, callback) {
     new SBGClient(data.url, data.token).projects.all().then(response => {

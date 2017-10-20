@@ -24,6 +24,8 @@ import {ToolEditorModule} from "./tool-editor/tool-editor.module";
 import {ModalService} from "./ui/modal/modal.service";
 import {UIModule} from "./ui/ui.module";
 import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
+import {OpenExternalFileService} from "./core/magnet-link/magnet-link.service";
+
 
 @NgModule({
     providers: [
@@ -40,6 +42,7 @@ import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
         IpcService,
         JavascriptEvalService,
         LocalRepositoryService,
+        OpenExternalFileService,
         ModalService,
         PlatformConnectionService,
         PlatformRepositoryService,

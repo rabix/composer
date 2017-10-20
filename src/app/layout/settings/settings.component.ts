@@ -85,13 +85,20 @@ export class SettingsComponent extends DirectiveBase {
     }
 
     openCredentialsForm() {
-        this.modal.fromComponent(PlatformCredentialsModalComponent, "Add Connection");
+         const modal = this.modal.fromComponent(PlatformCredentialsModalComponent,  "Add Connection");
+
+         modal.submit.take(1).subscribe(() => {
+             modal.close();
+         });
     }
 
     editCredentials(edited: AuthCredentials) {
-        const modal = this.modal.fromComponent(PlatformCredentialsModalComponent, "Edit Connection");
+        const modal = this.modal.fromComponent(PlatformCredentialsModalComponent,  "Edit Connection");
+        modal.prepareEdit( edited );
 
-        modal.prepareEdit(edited);
+        modal.submit.take(1).subscribe(() => {
+            this.modal.close();
+        });
     }
 
     setActiveCredentials(credentials?: AuthCredentials) {

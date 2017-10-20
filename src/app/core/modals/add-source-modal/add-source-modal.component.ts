@@ -154,7 +154,11 @@ export class AddSourceModalComponent extends DirectiveBase {
     }
 
     openCredentialsForm() {
-        this.modal.fromComponent(PlatformCredentialsModalComponent, "Add Connection");
+        const modal = this.modal.fromComponent(PlatformCredentialsModalComponent, "Add Connection");
+
+        modal.submit.take(1).subscribe(() => {
+            this.modal.close();
+        });
     }
 
     openSettingsTab() {

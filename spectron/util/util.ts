@@ -7,6 +7,7 @@ import {LocalRepository} from "../../electron/src/storage/types/local-repository
 import {UserRepository} from "../../electron/src/storage/types/user-repository";
 import rimraf = require("rimraf");
 import ITestCallbackContext = Mocha.ITestCallbackContext;
+import {tryCatch} from "rxjs/util/tryCatch";
 
 interface FnTestConfig {
     localRepository: Partial<LocalRepository>;
@@ -126,7 +127,12 @@ export function shutdown(app: spectron.Application) {
     }
 
     if (app.hasOwnProperty("testdir")) {
-        rimraf.sync(app["testdir"]);
+        try {
+            rimraf.sync(app["testdir"]);
+        } catch (e) {
+            console.log("error rimraf", e);
+        }
+
     }
 
     return app.stop();

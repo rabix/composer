@@ -60,15 +60,27 @@ builder.build({
             app: "dist",
             buildResources: "build-resources"
         },
+        protocols: [{
+            "name": "rabix-composer",
+            "role": "Editor",
+            "schemes": ["rabix-composer"]
+        }],
         mac: {
-            target: ["zip", "dir", "dmg"],
+            target: ["dmg"],
         },
         win: {
-            target: ["zip", "portable", "dir"],
+            target: ["nsis"],
         },
         linux: {
             target: ["zip", "dir"],
         },
+        nsis: {
+            perMachine: true
+        },
+        fileAssociations: [{
+            ext: "cwl",
+            name: "CWL"
+        }]
 
     }
 
