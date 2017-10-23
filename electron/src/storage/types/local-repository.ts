@@ -1,16 +1,13 @@
 import {User} from "../../sbg-api-client/interfaces/user";
-import {AppExecutionContext, ExecutorConfig} from "./executor-config";
+import {ExecutorConfig} from "./executor-config";
 import {RepositoryType} from "./repository-type";
+import {TabData} from "./tab-data-interface";
 
 export interface CredentialsCache {
     id: string;
     user: Partial<User>;
     url: string;
     token: string;
-}
-
-export interface AppMetadata {
-    executionConfig: AppExecutionContext,
 }
 
 export class LocalRepository extends RepositoryType {
@@ -31,7 +28,7 @@ export class LocalRepository extends RepositoryType {
         path: ""
     };
 
-    openTabs = [{
+    openTabs: TabData<any> [] = [{
         id: "?welcome",
         label: "Welcome",
         type: "Welcome"

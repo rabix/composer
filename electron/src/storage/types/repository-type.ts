@@ -1,15 +1,16 @@
 import {RecentAppTab} from "./recent-app-tab";
-import {AppMetadata} from "./local-repository";
+import {AppMeta} from "./app-meta";
+import {TabData} from "./tab-data-interface";
 
 export class RepositoryType {
     activeTab: { tabID: string; activationTime: number; };
 
     expandedNodes: string[] = [];
 
-    openTabs: Object[] = [];
+    openTabs: TabData<any>[] = [];
 
     recentApps: RecentAppTab[] = [];
 
-    appMeta: { [path: string]: AppMetadata } = {};
+    appMeta: AppMeta = {};
 
 }

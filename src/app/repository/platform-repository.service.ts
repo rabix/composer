@@ -10,9 +10,8 @@ import {Project} from "../../../electron/src/sbg-api-client/interfaces/project";
 import {RawApp} from "../../../electron/src/sbg-api-client/interfaces/raw-app";
 import {AppMeta} from "../../../electron/src/storage/types/app-meta";
 import {RecentAppTab} from "../../../electron/src/storage/types/recent-app-tab";
-import {TabData} from "../core/workbox/tab-data.interface";
+import {TabData} from "../../../electron/src/storage/types/tab-data-interface";
 import {IpcService} from "../services/ipc.service";
-import {AppMetadata} from "../../../electron/src/storage/types/local-repository";
 import {AuthService} from "../auth/auth.service";
 
 @Injectable()
@@ -231,6 +230,10 @@ export class PlatformRepositoryService {
         });
     }
 
+    getAppContent(id: string, forceFetch = false): Promise<string> {
+        return this.ipc.request("getPlatformApp", {id, forceFetch}).toPromise();
+    }
+
     searchAppsFromOpenProjects(substring?: string): Observable<App[]> {
 
         const term = substring.toLowerCase();
@@ -280,24 +283,30 @@ export class PlatformRepositoryService {
         });
     }
 
-    patchAppMeta(appID: string, key: string, value: any): Promise<any> {
+    getAppMeta<T>(appID: string, key?: string): Observable<AppMeta> {
+        return this.appMeta.map(meta => {
+
+                if (meta === null) {
+                    return meta;
+                }
+
+                const data = meta[appID];
+
+                if (key && data) {
+                    return data[key];
+                }
+
+                return data;
+
+            });
+    }
+
+    patchAppMeta(appID: string, key: keyof AppMeta, value: any): Promise<any> {
         return this.ipc.request("patchAppMeta", {
             profile: "user",
             appID,
             key,
             value
         }).toPromise();
-    }
-
-    getAppMeta<T>(appID: string, key?: any): Observable<AppMetadata> {
-        return this.appMeta
-            .map(meta => {
-                const data = (meta || {})[appID];
-                if (key && data) {
-                    return data[key];
-                }
-
-                return data;
-            });
     }
 }

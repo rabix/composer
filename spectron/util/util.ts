@@ -20,6 +20,10 @@ interface FnTestConfig {
     retries: number;
     skipFetch: boolean;
     skipUpdateCheck: boolean;
+    prepareTestData: [{
+        name: string,
+        content: string
+    }];
 }
 
 function isDevServer() {
@@ -51,10 +55,24 @@ export function boot(context: ITestCallbackContext, testConfig: Partial<FnTestCo
     const globalTestDir  = path.resolve(`${__dirname}/../../.testrun`);
     const currentTestDir = `${globalTestDir}/${testTitle}`.replace(/\s/g, "-");
 
+    if (testConfig.prepareTestData) {
+        testConfig.prepareTestData.forEach((data) => {
+            fs.outputFileSync(currentTestDir + data.name, data.content);
+        });
+    }
+
     const profilesDirPath  = currentTestDir + "/profiles";
     const localProfilePath = profilesDirPath + "/local";
 
     testConfig.localRepository = Object.assign(new LocalRepository(), testConfig.localRepository || {});
+
+    testConfig.localRepository.openTabs = testConfig.localRepository.openTabs.map((tab) => {
+        if (tab.id.startsWith("test:")) {
+            tab.id = tab.id.replace("test:", currentTestDir);
+        }
+        return tab;
+    });
+
 
     fs.outputFileSync(localProfilePath, JSON.stringify(testConfig.localRepository));
 

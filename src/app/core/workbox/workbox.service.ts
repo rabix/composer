@@ -8,7 +8,8 @@ import {LocalRepositoryService} from "../../repository/local-repository.service"
 import {PlatformRepositoryService} from "../../repository/platform-repository.service";
 import {DataGatewayService} from "../data-gateway/data-gateway.service";
 import {AppHelper} from "../helpers/AppHelper";
-import {TabData} from "./tab-data.interface";
+import {FileRepositoryService} from "../../file-repository/file-repository.service";
+import {TabData} from "../../../../electron/src/storage/types/tab-data-interface";
 
 
 @Injectable()
@@ -20,10 +21,15 @@ export class WorkboxService {
 
     tabCreation = new Subject<TabData<any>>();
 
+    closeTabStream = new Subject<TabData<any>>();
+
+    closeAllTabsStream = new Subject<TabData<any> []>();
+
     private priorityTabUpdate = new Subject();
 
     constructor(private auth: AuthService,
                 private dataGateway: DataGatewayService,
+                private fileRepository: FileRepositoryService,
                 private localRepository: LocalRepositoryService,
                 private platformRepository: PlatformRepositoryService) {
 
@@ -93,20 +99,29 @@ export class WorkboxService {
         this.priorityTabUpdate.next(1);
     }
 
-    openTab(tab, persistToRecentApps: boolean = true, syncState = true) {
+    openTab(tab, persistToRecentApps: boolean = true, syncState = true, replaceExistingIfExists = false) {
 
         const {tabs} = this.extractValues();
 
         // When opening an app, we use id with revision number because we can have cases when we can open the same app
         // different revisions (when we push a local file with existing id, new tab is open ...)
-        const foundTab = tabs.find(existingTab => existingTab.id === tab.id);
+        const foundTabIndex = tabs.findIndex(existingTab => existingTab.id === tab.id);
+        const foundTab = tabs[foundTabIndex];
 
         if (foundTab) {
-            this.activateTab(foundTab);
-            return;
+            if (replaceExistingIfExists) {
+                this.dataGateway.updateSwap(foundTab.data.id, null);
+                tabs.splice(foundTabIndex, 1, tab);
+                this.tabs.next(tabs);
+            } else {
+                this.activateTab(foundTab);
+                return;
+            }
+
+        } else {
+            this.tabs.next(tabs.concat(tab));
         }
 
-        this.tabs.next(tabs.concat(tab));
         this.tabCreation.next(tab);
         this.activateTab(tab);
 
@@ -134,8 +149,6 @@ export class WorkboxService {
                 this.platformRepository.pushRecentApp(recentTabData);
             }
         }
-
-
     }
 
     openSettingsTab() {
@@ -146,9 +159,18 @@ export class WorkboxService {
         }, false);
     }
 
-    closeTab(tab?) {
+    /**
+     * Closes a tab
+     */
+    closeTab(tab?: TabData<any>, force: boolean = false) {
+
         if (!tab) {
             tab = this.extractValues().activeTab;
+        }
+
+        if (!force) {
+            this.closeTabStream.next(tab);
+            return;
         }
 
         if (tab && tab.data && tab.data.id) {
@@ -166,17 +188,22 @@ export class WorkboxService {
         this.syncTabs();
     }
 
-    closeOtherTabs(tab) {
-        this.tabs.next([tab]);
-        this.activateTab(tab);
+    /**
+     * Closes all tabs except one that should be preserved
+     */
+    closeAllTabs(preserve: TabData<any>[] = [], force: boolean = false) {
 
-        this.syncTabs();
-    }
+        if (!force) {
+            this.closeAllTabsStream.next(preserve);
+            return;
+        }
 
-    closeAllTabs() {
-        this.tabs.next([]);
+        this.tabs.getValue().forEach((item) => {
+            if (!preserve.includes(item)) {
+                this.closeTab(item, true);
+            }
+        });
 
-        this.syncTabs();
     }
 
     activateNext() {
@@ -224,7 +251,7 @@ export class WorkboxService {
         isWritable?: boolean;
         language?: string;
 
-    }, forceCreate = false): TabData<T> {
+    }, forceCreate = false, forceFetch = false): TabData<T> {
 
         if (!forceCreate) {
             const currentTab = this.tabs.getValue().find(existingTab => existingTab.id === data.id);
@@ -241,7 +268,8 @@ export class WorkboxService {
         const label      = AppHelper.getBasename(data.id);
         const isWritable = data.isWritable;
 
-        const fileContent = Observable.empty().concat(this.dataGateway.fetchFileContent(id));
+        const fileContent = Observable.empty().concat(dataSource === "local" ?
+            this.fileRepository.fetchFile(id, forceFetch) : this.platformRepository.getAppContent(id, forceFetch));
         const resolve     = (fcontent: string) => this.dataGateway.resolveContent(fcontent, id);
 
         const tab = Object.assign({
@@ -260,6 +288,8 @@ export class WorkboxService {
         if (id.endsWith(".json")) {
             tab.data.language = "json";
         }
+
+        this.tabCreation.next(tab);
 
         return tab;
 

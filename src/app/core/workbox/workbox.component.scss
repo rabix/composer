@@ -73,6 +73,18 @@
         padding: 0 24px 10px 10px;
         position: relative;
 
+        &.isDirty {
+            .fa-share-alt {
+                color: $carrot;
+            }
+
+            .fa-terminal {
+                color: $purple;
+            }
+
+            font-style: italic;
+        }
+
         .tab-icon {
             flex-basis: 18px;
         }
@@ -82,7 +94,6 @@
             overflow: hidden;
             padding-right: 5px;
             text-overflow: ellipsis;
-            white-space: pre;
             z-index: 1;
         }
 
@@ -103,5 +114,12 @@
             color: $layout-text-color;
             background: $panel-bg;
         }
+    }
+
+    .fa-share-alt {
+        -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=#{0}, mirror=1)";
+        -webkit-transform: scale(-1, 1);
+        -ms-transform: scale(-1, 1);
+        transform: scale(-1, 1);
     }
 }

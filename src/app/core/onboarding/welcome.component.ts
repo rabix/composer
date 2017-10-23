@@ -2,6 +2,7 @@ import {Component} from "@angular/core";
 import {AddSourceModalComponent} from "../modals/add-source-modal/add-source-modal.component";
 import {SystemService} from "../../platform-providers/system.service";
 import {ModalService} from "../../ui/modal/modal.service";
+import {PlatformCredentialsModalComponent} from "../modals/platform-credentials-modal/platform-credentials-modal.component";
 
 @Component({
     styleUrls: ["welcome.component.scss"],
@@ -14,7 +15,8 @@ import {ModalService} from "../../ui/modal/modal.service";
             <div class="background-logo"></div>
 
             <div class="content">
-                <p class="welcome-text">The Rabix Composer is a standalone integrated development environment for workflow
+                <p class="welcome-text">The Rabix Composer is a standalone integrated development
+                    environment for workflow
                     description languages that enables rapid workflow composition, testing, and
                     integration
                     with online services like DockerHub.
@@ -30,10 +32,10 @@ import {ModalService} from "../../ui/modal/modal.service";
                 </h2>
 
                 <p>
-                    <button data-test="open-project-btn" type="button"
-                            (click)="onOpenProjectButtonClick()"
+                    <button data-test="connect-to-platform-btn" type="button"
+                            (click)="onConnectButtonClick()"
                             class="btn btn-primary">
-                        Open a Project
+                        Connect to Platform
                     </button>
                 </p>
             </div>
@@ -49,7 +51,7 @@ export class WelcomeTabComponent {
                 private modal: ModalService) {
     }
 
-    onOpenProjectButtonClick() {
-        this.modal.fromComponent(AddSourceModalComponent, "Open a Project");
+    onConnectButtonClick() {
+        this.modal.fromComponent(PlatformCredentialsModalComponent, "Add Connection");
     }
 }
