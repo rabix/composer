@@ -27,7 +27,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
             <ct-validation-preview [entry]="model"></ct-validation-preview>
             <b class="validation-icon result"
-               *ngIf="model?.isExpression && !(model?.hasErrors || model?.hasWarnings)"
+               *ngIf="model?.isExpression && !model?.errors.length && !model?.warnings.length"
                [title]="model.result">E:</b>
 
             <div class="textarea-btn-group">
@@ -131,7 +131,6 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
         editor.action.first().subscribe(action => {
             if (action === "save") {
                 // save string
-                // this.model = this.model.clone();
                 this.model.setValue(editor.content.value, "string");
                 this.onChange(this.model);
             }
@@ -144,7 +143,6 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
      * @param str
      */
     editLiteral(str: number | string) {
-        this.model = this.model.clone();
         this.model.setValue(str, "string");
         this.onChange(this.model);
     }

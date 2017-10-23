@@ -171,6 +171,7 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
                     }
 
                     this.model.cloneStatus(editor.model);
+                    this.onChange(this.model);
                 }
 
                 this.modal.close();
@@ -180,6 +181,7 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
         if (action === "clear") {
             this.modal.delete("expression").then(() => {
                 this.model.setValue("", this.type);
+                this.onChange(this.model);
                 event.stopPropagation();
             }, err => console.warn);
         }
