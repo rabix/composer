@@ -230,6 +230,10 @@ export class PlatformRepositoryService {
         });
     }
 
+    getAppContent(id: string, forceFetch = false): Promise<string> {
+        return this.ipc.request("getPlatformApp", {id, forceFetch}).toPromise();
+    }
+
     getProject(projectSlug: string): Promise<Project> {
         return this.ipc.request("getProject", projectSlug).toPromise();
     }

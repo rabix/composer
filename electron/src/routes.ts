@@ -390,19 +390,23 @@ export function patchSwap(data: { local: boolean, swapID: string, swapContent?: 
     });
 }
 
-export function getLocalFileContent(path, callback) {
+export function getLocalFileContent(data: { path: string, forceFetch?: boolean }, callback) {
 
-    swapController.exists(path, (err, exists) => {
+    if (data.forceFetch) {
+        fsController.readFileContent(data.path, callback);
+    } else {
+        swapController.exists(data.path, (err, exists) => {
 
-        if (err) return callback(err);
+            if (err) return callback(err);
 
-        if (exists) {
-            return swapController.read(path, callback);
-        }
+            if (exists) {
+                return swapController.read(data.path, callback);
+            }
 
-        fsController.readFileContent(path, callback);
+            fsController.readFileContent(data.path, callback);
 
-    });
+        });
+    }
 }
 
 export function saveAppRevision(data: {
