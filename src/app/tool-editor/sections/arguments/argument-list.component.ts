@@ -19,6 +19,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
                     <!--Blank Tool Screen-->
                     <ct-blank-tool-state *ngIf="!readonly && !model.arguments.length"
+                                         data-test="tool-add-argument-button"
                                          [buttonText]="'Add an Argument'"
                                          [description]="blankStateDescription"
                                          (buttonClick)="addEntry()">
@@ -119,7 +120,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                 <button *ngIf="!readonly && !!model.arguments.length"
                         (click)="addEntry()"
                         type="button"
-                        class="btn pl-0 btn-link no-outline no-underline-hover">
+                        class="btn pl-0 btn-link no-outline no-underline-hover"
+                        data-test="tool-add-argument-button-small">
                     <i class="fa fa-plus"></i> Add an Argument
                 </button>
             </div>
