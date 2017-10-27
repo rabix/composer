@@ -7,7 +7,7 @@ import {AuthService} from "../../../../auth/auth.service";
     selector: "ct-get-started-notification",
     template: `
         You’ve connected your {{environment}} account ({{username}}) to the Rabix Composer.
-        Get started by <button class="btn-inline-link" (click)="openProject()">opening a project.</button>
+        Get started by <button class="btn-inline-link" (click)="openProject()" data-test="get-started-notification-open-project">opening a project.</button>
     `
 })
 export class GetStartedNotificationComponent implements OnInit {

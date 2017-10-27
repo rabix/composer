@@ -28,6 +28,7 @@ import {GetStartedNotificationComponent} from "../../../layout/notification-bar/
                                           formControlName="url"
                                           [options]="platformList"
                                           [readonly]="tokenOnly"
+                                          [renderOptions]="renderOptions"
                                           data-test="platform-field"></ct-auto-complete>
                     </div>
                 </div>
@@ -40,7 +41,9 @@ import {GetStartedNotificationComponent} from "../../../layout/notification-bar/
                                class="form-control token-control"
                                type="password"/>
 
-                        <button class="ml-1 btn btn-secondary" type="button"
+                        <button class="ml-1 btn btn-secondary" 
+                                type="button"
+                                data-test="get-token-button"
                                 [disabled]="form.get('url').invalid"
                                 (click)="openTokenPage()">Get Token
                         </button>
@@ -74,8 +77,12 @@ import {GetStartedNotificationComponent} from "../../../layout/notification-bar/
             </div>
 
             <div class="modal-footer">
-                <button class="btn btn-secondary" type="button" (click)="close()">Cancel</button>
-                <button class="btn btn-primary" type="submit" [class.btn-loader]="form.pending" [disabled]="!form.valid || !form.dirty">
+                <button class="btn btn-secondary" type="button" (click)="close()" data-test="connection-cancel-button">Cancel</button>
+                <button class="btn btn-primary" 
+                        type="submit"
+                        data-test="connection-apply-button"
+                        [class.btn-loader]="form.pending" 
+                        [disabled]="!form.valid || !form.dirty">
                     <ng-container *ngIf="!form.pending">Apply</ng-container>
                     <ct-circular-loader class="loader-25" *ngIf="form.pending"></ct-circular-loader>
                 </button>
@@ -101,11 +108,18 @@ export class PlatformCredentialsModalComponent implements OnInit {
     /** FormGroup for modal inputs */
     form: FormGroup;
 
+    /** Object to render platform select options **/
+    renderOptions = {
+        option: function (data) {
+            return "<div data-value='" + data.value + "' data-test='" + data.dataTest + "' class='option'>" + data.text + " </div>";
+        }
+    };
+
     platformList = [
-        {text: "Seven Bridges (Default)", value: "https://api.sbgenomics.com"},
-        {text: "Seven Bridges (EU)", value: "https://eu-api.sbgenomics.com"},
-        {text: "Cancer Genomics Cloud", value: "https://cgc-api.sbgenomics.com"},
-        {text: "Cavatica", value: "https://pgc-api.sbgenomics.com"},
+        {text: "Seven Bridges (Default)", value: "https://api.sbgenomics.com", dataTest: "igor-platform" },
+        {text: "Seven Bridges (EU)", value: "https://eu-api.sbgenomics.com", dataTest: "eu-platform" },
+        {text: "Cancer Genomics Cloud", value: "https://cgc-api.sbgenomics.com", dataTest: "cgc-platform" },
+        {text: "Cavatica", value: "https://pgc-api.sbgenomics.com", dataTest: "pgc-platform" },
     ];
 
     constructor(private system: SystemService,
@@ -149,7 +163,8 @@ export class PlatformCredentialsModalComponent implements OnInit {
                     // Activate added credentials
                     maybeUserUpdate = this.auth.setActiveCredentials(credentials);
                     const component = this.notificationBarService.showDynamicNotification(GetStartedNotificationComponent, {
-                        type: "info"
+                        type: "info",
+                        dataTest: "get-started-notification"
                     });
 
                     component.environment = AuthCredentials.getPlatformLabel(url);

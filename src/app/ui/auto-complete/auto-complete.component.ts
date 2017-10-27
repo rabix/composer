@@ -31,6 +31,8 @@ export class AutoCompleteComponent extends SelectComponent implements ControlVal
     @Input()
     public type: "string" | "number" = "string";
 
+    @Input() renderOptions;
+
     private update          = new Subject();
     private onTouched       = noop;
     private propagateChange = noop;

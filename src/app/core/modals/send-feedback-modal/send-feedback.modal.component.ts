@@ -10,7 +10,7 @@ import {ErrorWrapper} from "../../helpers/error-wrapper";
     selector: "ct-send-feedback-modal",
     styleUrls: ["./send-feedback.modal.component.scss"],
     template: `
-        <div class="body">
+        <div class="body" data-test="send-feedback-modal">
 
             <div class="dialog-content">
 

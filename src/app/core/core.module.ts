@@ -43,7 +43,8 @@ import {WorkboxService} from "./workbox/workbox.service";
 import {ClosingDirtyAppsModalComponent} from "./modals/closing-dirty-apps/closing-dirty-apps-modal.component";
 
 export function errorHandlerFactory(modal: ModalService) {
-    return environment.production ? new ModalErrorHandler(modal) : new ErrorHandler();
+    return new ModalErrorHandler(modal);
+    // return environment.production ? new ModalErrorHandler(modal) : new ErrorHandler();
 }
 
 @NgModule({

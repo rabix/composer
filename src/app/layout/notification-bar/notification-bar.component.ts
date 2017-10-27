@@ -7,7 +7,8 @@ import {Notification, NotificationBarService} from "./notification-bar.service";
     styleUrls: ["./notification-bar.component.scss"],
     template: `        
             <div *ngFor="let notification of notifications;"
-                 class="notification pl-1 notification-{{notification.type}}">
+                 class="notification pl-1 notification-{{notification.type}}"
+                 [attr.data-test]="notification.dataTest">
                 <i class="fa"
                    [class.fa-check]="notification.type === 'info'"
                    [class.fa-minus-circle]="notification.type === 'error'"

@@ -21,8 +21,10 @@ import {PublicAppsPanelService} from "./public-apps-panel.service";
 @Component({
     selector: "ct-public-apps-panel",
     template: `
-        <ct-search-field class="m-1" [formControl]="searchContent"
-                         [placeholder]="'Search Public Apps'"></ct-search-field>
+        <ct-search-field class="m-1" 
+                         [formControl]="searchContent"
+                         [placeholder]="'Search Public Apps'"
+                         [dataTest]="'search-public-apps-field'"></ct-search-field>
 
         <div class="btn-group grouping-toggle" *ngIf="!searchContent?.value">
 
@@ -31,7 +33,7 @@ import {PublicAppsPanelService} from "./public-apps-panel.service";
             </label>
 
             <ct-generic-dropdown-menu [ct-menu]="menu" [menuState]="groupByOpenStatus">
-                <button type="button" class="btn btn-unstyled">
+                <button type="button" class="btn btn-unstyled" data-test="group-by-dropdown-button">
                     {{ grouping }}
                     <i class="fa fa-chevron-down fa-fw settings-icon"> </i>
                 </button>
@@ -40,11 +42,14 @@ import {PublicAppsPanelService} from "./public-apps-panel.service";
 
             <ng-template #menu class="mr-1">
                 <ul class="list-unstyled">
-                    <li *ngFor="let c of groupByOptions" class="group-by-item" [class.active]="grouping === c.value"
+                    <li *ngFor="let c of groupByOptions" 
+                        class="group-by-item"
+                        [attr.data-test]="'group-by-' + c.value"
+                        [class.active]="grouping === c.value"
                         (click)="switchGrouping(c.value)">
-                                            <span>
-                                                {{ c.caption }}
-                                            </span>
+                        <span>
+                            {{ c.caption }}
+                        </span>
                     </li>
                 </ul>
             </ng-template>
@@ -77,7 +82,7 @@ import {PublicAppsPanelService} from "./public-apps-panel.service";
             <div *ngIf="searchContent.value 
                         && (searchResults && searchResults?.length === 0)"
                  class="no-results m-1">
-                <p class="explanation">
+                <p class="explanation" data-test="no-search-results-my-apps">
                     No search results for “{{ searchContent.value }}.”
                 </p>
                 <i class="icon fa-4x fa fa-search"></i>
