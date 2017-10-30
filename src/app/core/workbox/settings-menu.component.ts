@@ -36,6 +36,7 @@ import {WorkboxService} from "./workbox.service";
                     <span class="text-muted d-block small">{{ getPlatformLabel(c.url) }}</span>
                 </li>
                 <li (click)="openSettings()"><i class="fa fa-cog fa-fw"></i> Settings</li>
+                <li (click)="openDocumentation()"><i class="fa fa-question-circle fa-fw"></i> Documentation</li>
                 <li (click)="openFeedback()"><i class="fa fa-bullhorn fa-fw"></i> Send Feedback</li>
                 <li (click)="checkForPlatformUpdates()" *ngIf="global.platformIsOutdated" class="outdated-update"
                     data-test="updates-available">
@@ -86,6 +87,10 @@ export class SettingsMenuComponent extends DirectiveBase {
     openSettings(): void {
         this.workbox.openSettingsTab();
         this.openStatus.next(false);
+    }
+
+    openDocumentation(): void {
+        this.system.openLink("http://docs.rabix.io/rabix-composer-home");
     }
 
     openFeedback(): void {
