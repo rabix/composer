@@ -44,19 +44,19 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                         <td class="text-xs-right">
                             <button *ngIf="(auth.getActive() | async) === entry; else deactivate;"
                                     class="btn btn-secondary"
-                                    data-test="deactivate-button-authentication"
+                                    data-test="authentication-deactivate-button"
                                     (click)="setActiveCredentials(undefined)">Deactivate
                             </button>
                             <ng-template #deactivate>
                                 <button class="btn btn-secondary"
-                                        data-test="activate-button-authentication"
+                                        data-test="authentication-activate-button"
                                         (click)="setActiveCredentials(entry)" >Activate</button>
                             </ng-template>
                             <button class="btn btn-secondary"
-                                    data-test="edit-button-authentication"
+                                    data-test="authentication-edit-button"
                                     (click)="editCredentials(entry)">Edit</button>
                             <button class="btn btn-secondary"
-                                    data-test="remove-button-authentication"
+                                    data-test="authentication-remove-button"
                                     (click)="auth.removeCredentials(entry)">Remove</button>
                         </td>
                         

@@ -56,13 +56,13 @@ import {Component, Input} from "@angular/core";
                     (click)="host.save()"
                     ct-tooltip="Save"
                     tooltipPlacement="bottom"
-                    data-test="save-btn"
+                    data-test="save-button"
                     class="btn control-button" type="button">
                 <i class="fa fa-fw fa-save"></i>
             </button>
 
             <!--Push to Platform-->
-            <button class="btn control-button" data-test="publish-btn"
+            <button class="btn control-button" data-test="publish-button"
                     [disabled]="!host.appIsPublishable()"
                     *ngIf="host.tabData.dataSource === 'local'"
                     ct-tooltip="Push to Platform"
@@ -75,7 +75,7 @@ import {Component, Input} from "@angular/core";
             <!--Revisions-->
             <button
                 *ngIf="host.tabData.dataSource !== 'local' && host.dataModel && host.dataModel.customProps['sbg:revisionsInfo']"
-                data-test="revision-btn"
+                data-test="revision-button"
                 class="btn control-button" type="button"
                 ct-tooltip="See Revision History"
                 tooltipPlacement="bottom"

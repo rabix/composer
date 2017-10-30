@@ -15,7 +15,7 @@ import {GetStartedNotificationComponent} from "../../../layout/notification-bar/
     selector: "ct-platform-credentials-modal",
     template: `
 
-        <form class="auth-form" data-test="form" (ngSubmit)="form.valid && submit()" [formGroup]="form">
+        <form class="auth-form" data-test="credentials-modal-form" (ngSubmit)="form.valid && submit()" [formGroup]="form">
             <div class="m-2">
                 <input type="hidden" formControlName="user"/>
 
@@ -29,21 +29,21 @@ import {GetStartedNotificationComponent} from "../../../layout/notification-bar/
                                           [options]="platformList"
                                           [readonly]="tokenOnly"
                                           [renderOptions]="renderOptions"
-                                          data-test="platform-field"></ct-auto-complete>
+                                          data-test="credentials-modal-platform-field"></ct-auto-complete>
                     </div>
                 </div>
 
                 <div class="row form-group" [class.has-warning]="form.get('token').invalid">
                     <label class="col-xs-4 col-form-label">Developer Token:</label>
                     <div class="col-xs-8  form-inline token-form">
-                        <input data-test="token-field"
+                        <input data-test="credentials-modal-token-field"
                                formControlName="token"
                                class="form-control token-control"
                                type="password"/>
 
                         <button class="ml-1 btn btn-secondary" 
                                 type="button"
-                                data-test="get-token-button"
+                                data-test="credentials-modal-get-token-button"
                                 [disabled]="form.get('url').invalid"
                                 (click)="openTokenPage()">Get Token
                         </button>
@@ -77,10 +77,10 @@ import {GetStartedNotificationComponent} from "../../../layout/notification-bar/
             </div>
 
             <div class="modal-footer">
-                <button class="btn btn-secondary" type="button" (click)="close()" data-test="connection-cancel-button">Cancel</button>
+                <button class="btn btn-secondary" type="button" (click)="close()" data-test="credentials-modal-cancel-button">Cancel</button>
                 <button class="btn btn-primary" 
                         type="submit"
-                        data-test="connection-apply-button"
+                        data-test="credentials-modal-apply-button"
                         [class.btn-loader]="form.pending" 
                         [disabled]="!form.valid || !form.dirty">
                     <ng-container *ngIf="!form.pending">Apply</ng-container>
