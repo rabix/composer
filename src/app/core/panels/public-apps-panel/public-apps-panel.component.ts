@@ -30,8 +30,8 @@ import {PublicAppsPanelService} from "./public-apps-panel.service";
                 Group by:
             </label>
 
-            <ct-generic-dropdown-menu [ct-menu]="menu" [menuState]="groupByOpenStatus">
-                <button type="button" class="btn btn-unstyled">
+            <ct-generic-dropdown-menu [ct-menu]="menu" #groupByDropdown>
+                <button type="button" class="btn btn-unstyled" (click)="groupByDropdown.toggleMenu()">
                     {{ grouping }}
                     <i class="fa fa-chevron-down fa-fw settings-icon"> </i>
                 </button>
@@ -39,7 +39,7 @@ import {PublicAppsPanelService} from "./public-apps-panel.service";
             </ct-generic-dropdown-menu>
 
             <ng-template #menu class="mr-1">
-                <ul class="list-unstyled">
+                <ul class="list-unstyled" (click)="groupByDropdown.hide()">
                     <li *ngFor="let c of groupByOptions" class="group-by-item" [class.active]="grouping === c.value"
                         (click)="switchGrouping(c.value)">
                                             <span>
@@ -109,8 +109,6 @@ export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, A
             caption: "Category"
         }
     ];
-
-    groupByOpenStatus = new Subject<boolean>();
 
     treeNodes: TreeNode<any>[] = [];
 
@@ -184,10 +182,6 @@ export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, A
 
     switchGrouping(type: "toolkit" | "category" | "none") {
         this.grouping = type;
-
-        // Close dropdown
-        this.groupByOpenStatus.next(false);
-
         this.localRepository.setPublicAppsGrouping(type);
     }
 

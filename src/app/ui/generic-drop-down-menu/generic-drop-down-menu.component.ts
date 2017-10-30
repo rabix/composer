@@ -1,4 +1,7 @@
-import {ChangeDetectionStrategy, Component, EmbeddedViewRef, Input, OnInit, TemplateRef, ViewChild, ViewContainerRef} from "@angular/core";
+import {
+    ChangeDetectionStrategy, ChangeDetectorRef, Component, EmbeddedViewRef, Input, OnInit, TemplateRef, ViewChild,
+    ViewContainerRef
+} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 
@@ -8,7 +11,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 @Component({
     selector: "ct-generic-dropdown-menu",
     template: `
-        <span class="generic-dropdown-button clickable" (click)="toggleMenu()">
+        <span class="generic-dropdown-button">
             <!--Transcluded content serves as the button for toggling the dropdown-->
             <ng-content></ng-content>
         </span>
@@ -60,6 +63,10 @@ export class GenericDropDownMenuComponent extends DirectiveBase implements OnIni
 
     shouldShow = false;
 
+    constructor(private cdr: ChangeDetectorRef) {
+        super();
+    }
+
     /**
      * Toggles the menu or sets the visibility to the provided value
      * @param value
@@ -106,6 +113,8 @@ export class GenericDropDownMenuComponent extends DirectiveBase implements OnIni
         }
 
         this.dropdown = this.hostView.createEmbeddedView(this.content, null, 0);
+
+        this.cdr.markForCheck();
 
         const sub = Observable.fromEvent(document, "click").filter((ev: MouseEvent) => {
             return !this.dropdownContainer.element.nativeElement.contains(ev.target as Node);
