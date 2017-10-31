@@ -446,7 +446,9 @@ export function sendFeedback(data: { type: string, text: string }, callback) {
 
         const api = new SBGClient(url, token);
 
-        return api.sendFeedback(data.type, data.text);
+        const referrer = `Cottontail ${process.platform}`;
+
+        return api.sendFeedback(data.type, data.text, referrer);
     }).then(resolve => {
         callback(null, resolve);
     }, callback);
