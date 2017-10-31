@@ -1,6 +1,6 @@
 {
-    "id": "my-app-id",
-    "label": "My Published App",
+    "id": "test-app-publish",
+    "label": "Test App Publish",
     "cwlVersion": "v1.0",
     "class": "CommandLineTool",
     "baseCommand": "cat",

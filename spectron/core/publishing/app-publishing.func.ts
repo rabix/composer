@@ -8,14 +8,17 @@ import {boot, partialProxy, proxerialize, shutdown} from "../../util/util";
 describe("app publishing", () => {
     let app: spectron.Application;
 
+    const user    = generateAuthCredentials("test-user", "https://api.sbgenomics.com");
+    const project = generatePlatformProject({id: "test-user/test-project"});
+
+    const demoApp = fs.readFileSync(__dirname + "/stub/demo-app.json", "utf-8");
+    const demoAppWithRevision1 = fs.readFileSync(__dirname + "/stub/demo-app-with-revision-1.json", 'utf-8');
+    const demoAppWithRevision2 = fs.readFileSync(__dirname + "/stub/demo-app-with-revision-2.json", 'utf-8');
+    const demoWorkflowWithEmbeddedApp = fs.readFileSync(__dirname + "/stub/demo-workflow-with-embedded-demo-app.json", 'utf-8');
+
     afterEach(() => shutdown(app));
 
     it("opens newly published app in a new tab", async function () {
-
-        const user    = generateAuthCredentials("test-user", "https://api.sbgenomics.com");
-        const project = generatePlatformProject({id: "test-user/test-project"});
-
-        const demoApp = fs.readFileSync(__dirname + "/stub/demo-app.json", "utf-8");
 
         app = await boot(this, {
             localRepository: {
@@ -60,7 +63,7 @@ describe("app publishing", () => {
                                 return (appID: string) => {
 
                                     $callCount++;
-                                    if (appID.startsWith("test-user/test-project/test-app-update") && $callCount > 1) {
+                                    if (appID.startsWith("test-user/test-project/test-app-publish") && $callCount > 1) {
                                         return Promise.resolve({raw: JSON.parse(appContent)});
                                     }
 
@@ -106,12 +109,6 @@ describe("app publishing", () => {
     });
 
     it("adds new revision to published app if app is already open", async function() {
-        const user    = generateAuthCredentials("test-user", "https://api.sbgenomics.com");
-        const project = generatePlatformProject({id: "test-user/test-project"});
-
-        const demoApp = fs.readFileSync(__dirname + "/stub/demo-app.json", "utf-8");
-        const demoAppWithRevision1 = fs.readFileSync(__dirname + "/stub/demo-app-with-revision-1.json", 'utf-8');
-        const demoAppWithRevision2 = fs.readFileSync(__dirname + "/stub/demo-app-with-revision-2.json", 'utf-8');
 
         app = await boot(this, {
             localRepository: {
@@ -231,13 +228,6 @@ describe("app publishing", () => {
     });
 
     it("publishing app causes platform workflows that contain the published app to check for updates", async function () {
-        const user    = generateAuthCredentials("test-user", "https://api.sbgenomics.com");
-        const project = generatePlatformProject({id: "test-user/test-project"});
-
-        const demoApp = fs.readFileSync(__dirname + "/stub/demo-app.json", "utf-8");
-        const demoAppWithRevision1 = fs.readFileSync(__dirname + "/stub/demo-app-with-revision-1.json", 'utf-8');
-        const demoAppWithRevision2 = fs.readFileSync(__dirname + "/stub/demo-app-with-revision-2.json", 'utf-8');
-        const demoWorkflowWithEmbeddedApp = fs.readFileSync(__dirname + "/stub/demo-workflow-with-embedded-demo-app.json", 'utf-8');
 
         app = await boot(this, {
             localRepository: {
