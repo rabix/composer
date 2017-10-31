@@ -26,13 +26,13 @@ import {WorkboxService} from "../../workbox/workbox.service";
                 <div *ngIf="!defaultFolder && !defaultProject && (auth.getActive() | async)"
                      class="destination-selection">
                     <div class="platform clickable"
-                         data-test="'new-app-local-files-tab'"
+                         data-test="new-app-local-files-tab"
                          [class.active]="destination === 'local'"
                          (click)="destination = 'local'">
                         <span><i class="fa fa-desktop"></i> Local Files</span>
                     </div>
                     <div class="platform clickable"
-                         data-test="'new-app-remote-tab'"
+                         data-test="new-app-remote-tab"
                          [class.active]="destination === 'remote'"
                          (click)="destination = 'remote'">
                         <span><i class="fa fa-globe"></i> Remote</span>
@@ -44,7 +44,7 @@ import {WorkboxService} from "../../workbox/workbox.service";
                     <input class="form-control" formControlName="name" data-test="new-app-name"/>
                     <p *ngIf="destination === 'remote' && remoteForm.get('name').value"
                        class="form-text text-muted"
-                        >
+                    >
                         App ID: {{ remoteForm.get('name').value | slugify}}
                     </p>
                 </div>
@@ -85,8 +85,11 @@ import {WorkboxService} from "../../workbox/workbox.service";
                     <ct-auto-complete formControlName="project"
                                       [mono]="true"
                                       [options]="projectOptions"
+                                      [inputFieldDataTest]="'new-app-destination-project-field'"
+                                      [renderOptions]="projectDropdownRenderOptions"
                                       placeholder="Choose a destination project..."
-                                      optgroupField="hash"></ct-auto-complete>
+                                      optgroupField="hash"
+                                      data-test="new-app-destination-project"></ct-auto-complete>
                 </div>
 
                 <div *ngIf="destination === 'remote' && remoteAppCreationError ">
@@ -107,10 +110,11 @@ import {WorkboxService} from "../../workbox/workbox.service";
 
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-test="new-app-cancel-button" (click)="modal.close()"> Cancel
+                <button type="button" class="btn btn-secondary" data-test="new-app-cancel-button"
+                        (click)="modal.close()"> Cancel
                 </button>
-                <button type="submit" 
-                        class="btn btn-primary" 
+                <button type="submit"
+                        class="btn btn-primary"
                         data-test="new-app-create-button"
                         *ngIf="destination=== 'remote'"
                         [disabled]="!remoteForm.valid || appCreationInProgress">
@@ -138,10 +142,15 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
     @Input() defaultFolder: string;
     @Input() defaultProject: string;
 
-    projectOptions        = [];
-    checkingSlug          = false;
-    appTypeLocked         = false;
-    appCreationInProgress = false;
+    projectOptions               = [];
+    checkingSlug                 = false;
+    appTypeLocked                = false;
+    appCreationInProgress        = false;
+    projectDropdownRenderOptions = {
+        option: function (data) {
+            return "<div data-value='" + data.value + "' data-test='" + data.dataTest + "' class='option'>" + data.text + " </div>";
+        }
+    };
 
     error: string;
     localAppCreationInfo: string;
@@ -193,7 +202,8 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
             .subscribeTracked(this, projects => {
                 this.projectOptions = projects.map((project: Project) => ({
                     value: project.id,
-                    text: project.name
+                    text: project.name,
+                    dataTest: `${project.id.split("/")[1]}-destination-project-option`
                 }));
             });
     }

@@ -131,9 +131,13 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
     @Input()
     sortDirection = "asc";
 
-    // The render options function, used to change the select options' template
+    // The render options function, used to change the select options' and items' templates
     @Input()
     renderOptions = null;
+
+    // The data-test attribute for the main input field
+    @Input()
+    inputFieldDataTest = "";
 
     @ViewChild("el", {read: ElementRef})
     private el;
@@ -222,6 +226,11 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
 
         this.zone.runOutsideAngular(() => {
             this.component = jQuery(this.el.nativeElement).selectize(selectizeOptions)[0].selectize;
+
+            if (this.inputFieldDataTest) {
+                jQuery(".selectize-input").find("input:text")
+                    .attr('data-test',this.inputFieldDataTest);
+            }
         });
 
 

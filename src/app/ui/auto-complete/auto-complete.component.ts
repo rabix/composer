@@ -27,6 +27,8 @@ export class AutoCompleteComponent extends SelectComponent implements ControlVal
 
     @Input() placeholder = "";
 
+    @Input() inputFieldDataTest    = "";
+
     // Specify the return type of a value that will be propagated
     @Input()
     public type: "string" | "number" = "string";

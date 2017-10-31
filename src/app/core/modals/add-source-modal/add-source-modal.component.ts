@@ -42,8 +42,11 @@ import {PlatformCredentialsModalComponent} from "../platform-credentials-modal/p
                         <div *ngIf="closedProjectOptions.length > 0; else allProjectsAreAdded">
                             <p>Choose projects to add to the workspace:</p>
                             <div>
-                                <ct-auto-complete [(ngModel)]="selectedProjects"
-                                                  [options]="closedProjectOptions"></ct-auto-complete>
+                                <ct-auto-complete data-test="add-source-modal-add-project"
+                                                  [(ngModel)]="selectedProjects"
+                                                  [options]="closedProjectOptions"
+                                                  [inputFieldDataTest]="'add-source-modal-add-project-field'"
+                                                  [renderOptions]="projectDropdownRenderOptions"></ct-auto-complete>
                             </div>
                         </div>
 
@@ -104,6 +107,12 @@ export class AddSourceModalComponent extends DirectiveBase {
     localFoldersToAdd                                       = [];
     closedProjectOptions: { value: string, text: string }[] = null;
 
+    projectDropdownRenderOptions                            = {
+        option: function (data) {
+            return "<div data-value='" + data.value + "' data-test='" + data.dataTest + "' class='option'>" + data.text + " </div>";
+        }
+    };
+
     constructor(public modal: ModalService,
                 private localRepository: LocalRepositoryService,
                 private platformRepository: PlatformRepositoryService,
@@ -119,7 +128,8 @@ export class AddSourceModalComponent extends DirectiveBase {
                 this.closedProjectOptions = projects.map(project => {
                     return {
                         value: project.id,
-                        text: project.name
+                        text: project.name,
+                        dataTest: `${project.id.split("/")[1]}-add-project-option`
                     };
                 });
             });
