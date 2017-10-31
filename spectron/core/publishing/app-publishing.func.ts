@@ -16,7 +16,10 @@ describe("app publishing", () => {
     const demoAppWithRevision2 = fs.readFileSync(__dirname + "/stub/demo-app-with-revision-2.json", 'utf-8');
     const demoWorkflowWithEmbeddedApp = fs.readFileSync(__dirname + "/stub/demo-workflow-with-embedded-demo-app.json", 'utf-8');
 
-    afterEach(() => shutdown(app));
+    afterEach((done) =>  {
+        done();
+        shutdown(app)
+    });
 
     it("opens newly published app in a new tab", async function () {
 
