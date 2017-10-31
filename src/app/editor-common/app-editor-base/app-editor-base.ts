@@ -195,6 +195,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
          */
         schemaValidation.subscribe(state => {
             this.validationState = state;
+        }, (err) => {
+            console.warn("Error on schema validation", err);
         });
 
         /**
@@ -224,6 +226,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         validationStateChanges.skip(1).filter(() => this.revisionChangingInProgress === false)
             .subscribeTracked(this, () => {
                 this.setAppDirtyState(true);
+            }, (err) => {
+                console.warn("Error on dirty checking stream", err);
             });
 
 
@@ -272,12 +276,16 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                         this.toggleLock(true);
                     }
                 }, err => console.warn);
-            });
+        }, (err) => {
+            console.warn("Error on validation state changes", err);
+        });
 
         /** When the first validation ends, turn off the loader and determine which view we can show. Invalid app forces code view */
         firstValidationEnd.subscribe(state => {
             this.viewMode    = state.isValidCWL ? this.getPreferredTab() : "code";
             this.reportPanel = state.isValidCWL ? this.getPreferredReportPanel() : this.reportPanel;
+        }, (err) => {
+            console.warn("Error on first validation end", err);
         });
 
         if (AppHelper.isLocal(this.tabData.id)) {

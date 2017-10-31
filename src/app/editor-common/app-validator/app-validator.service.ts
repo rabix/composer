@@ -38,15 +38,18 @@ export class AppValidatorService {
                 preValidation.subscribe(_ => obs.next(Object.assign({}, output, {
                     isValidCWL: false,
                     isPending: true,
-                } as AppValidityState))),
+                } as AppValidityState)), (err) => {
+                    obs.error(err);
+                }),
 
                 validation.subscribe(val => obs.next(Object.assign(output, {
                     isValidCWL: val.isValidCWL,
                     isPending: false,
                     errors: val.errors,
                     warnings: val.warnings
-                } as AppValidityState))));
-
+                } as AppValidityState)), (err) => {
+                    obs.error(err);
+                }));
 
             return () => subs.forEach(sub => sub.unsubscribe());
 
