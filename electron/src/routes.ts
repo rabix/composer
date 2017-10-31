@@ -16,6 +16,7 @@ const swapController = new SwapController(swapPath);
 
 const fsController          = require("./controllers/fs.controller");
 const acceleratorController = require("./controllers/accelerator.controller");
+const magnetLinkController  = require("./controllers/magnet-link.controller");
 const resolver              = require("./schema-salad-resolver/schema-salad-resolver");
 const semver                = require("semver");
 
@@ -119,6 +120,22 @@ export function searchLocalProjects(data: { term: string, limit: number, folders
     }).catch(callback);
 }
 
+export function magnetLink(data, callback) {
+    magnetLinkController.register(callback);
+}
+
+export function getProject(projectSlug: string, callback) {
+    ensurePlatformUser().then(repo => {
+        const {url, token} = repo.local.activeCredentials;
+
+        const api = new SBGClient(url, token);
+
+        return api.getProject(projectSlug).then(result => {
+            callback(null, result);
+        }, callback);
+
+    }).catch(callback);
+}
 
 export function getProjects(data: { url: string; token: string }, callback) {
     new SBGClient(data.url, data.token).projects.all().then(response => {

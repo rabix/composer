@@ -1,5 +1,4 @@
 import {Component} from "@angular/core";
-import {AddSourceModalComponent} from "../modals/add-source-modal/add-source-modal.component";
 import {SystemService} from "../../platform-providers/system.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {PlatformCredentialsModalComponent} from "../modals/platform-credentials-modal/platform-credentials-modal.component";
@@ -52,6 +51,10 @@ export class WelcomeTabComponent {
     }
 
     onConnectButtonClick() {
-        this.modal.fromComponent(PlatformCredentialsModalComponent, "Add Connection");
+        const modal = this.modal.fromComponent(PlatformCredentialsModalComponent, "Add Connection");
+
+        modal.submit.take(1).subscribe(() => {
+            modal.close();
+        });
     }
 }

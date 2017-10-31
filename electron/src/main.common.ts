@@ -1,8 +1,10 @@
 import * as mock from "mock-require";
 import * as acceleratorProxy from "./accelerator-proxy";
+import * as magnetLinkProxy from "./magnet-link-proxy";
 import * as path from "path";
 
 const {app, Menu, BrowserWindow} = require("electron");
+const magnetLinkController       = require("./controllers/magnet-link.controller");
 
 const isSpectronRun       = ~process.argv.indexOf("--spectron");
 const defaultUserDataPath = app.getPath("home") + path.sep + ".sevenbridges/rabix-composer";
@@ -175,6 +177,14 @@ export = {
             if (win === null) {
                 start(config);
             }
+        });
+
+        // Register protocol on app
+        app.setAsDefaultProtocolClient("cottontail");
+        app.on("open-url", function (event, url) {
+            const encoded = url.replace("cottontail://", "");
+            const data = magnetLinkController.setMagnetLinkData(encoded);
+            magnetLinkProxy.pass(data);
         });
     }
 }
