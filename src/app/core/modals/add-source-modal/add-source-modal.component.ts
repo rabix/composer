@@ -109,7 +109,8 @@ export class AddSourceModalComponent extends DirectiveBase {
 
     projectDropdownRenderOptions                            = {
         option: function (data) {
-            return "<div data-value='" + data.value + "' data-test='" + data.dataTest + "' class='option'>" + data.text + " </div>";
+            return "<div data-value='" + data.value + "' data-test='add-source-modal-add-project-option' data-project-id='" +
+                data.testAttr + "' class='option'>" + data.text + " </div>";
         }
     };
 
@@ -129,7 +130,7 @@ export class AddSourceModalComponent extends DirectiveBase {
                     return {
                         value: project.id,
                         text: project.name,
-                        dataTest: `${project.id.split("/")[1]}-add-project-option`
+                        testAttr: `${project.id.split("/")[1]}`
                     };
                 });
             });

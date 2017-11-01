@@ -148,7 +148,8 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
     appCreationInProgress        = false;
     projectDropdownRenderOptions = {
         option: function (data) {
-            return "<div data-value='" + data.value + "' data-test='" + data.dataTest + "' class='option'>" + data.text + " </div>";
+            return "<div data-value='" + data.value + "' data-test='new-app-destination-project-option' data-project-id='" +
+                data.testAttr + "' class='option'>" + data.text + " </div>";
         }
     };
 
@@ -203,7 +204,7 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
                 this.projectOptions = projects.map((project: Project) => ({
                     value: project.id,
                     text: project.name,
-                    dataTest: `${project.id.split("/")[1]}-destination-project-option`
+                    testAttr: `${project.id.split("/")[1]}`
                 }));
             });
     }

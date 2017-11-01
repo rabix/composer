@@ -164,7 +164,7 @@ export class PlatformCredentialsModalComponent implements OnInit {
                     maybeUserUpdate = this.auth.setActiveCredentials(credentials);
                     const component = this.notificationBarService.showDynamicNotification(GetStartedNotificationComponent, {
                         type: "info",
-                        dataTest: "get-started-notification"
+                        testAttr: "get-started-notification"
                     });
 
                     component.environment = AuthCredentials.getPlatformLabel(url);

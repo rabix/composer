@@ -5,25 +5,26 @@ import {Notification, NotificationBarService} from "./notification-bar.service";
 @Component({
     selector: "ct-notification-bar",
     styleUrls: ["./notification-bar.component.scss"],
-    template: `        
-            <div *ngFor="let notification of notifications;"
-                 class="notification pl-1 notification-{{notification.type}}"
-                 [attr.data-test]="notification.dataTest">
-                <i class="fa"
-                   [class.fa-check]="notification.type === 'info'"
-                   [class.fa-minus-circle]="notification.type === 'error'"
-                   [class.fa-exclamation-triangle]="notification.type === 'warning'">
-                </i>
+    template: `
+        <div *ngFor="let notification of notifications;"
+             class="notification pl-1 notification-{{notification.type}}"
+             data-test="notification-bar"
+             [attr.data-notification-type]="notification.testAttr">
+            <i class="fa"
+               [class.fa-check]="notification.type === 'info'"
+               [class.fa-minus-circle]="notification.type === 'error'"
+               [class.fa-exclamation-triangle]="notification.type === 'warning'">
+            </i>
 
-                <div class="error-text pl-2 pr-1">
-                    <ct-notification 
-                        [message]="notification.message" 
-                        [component]="notification.component">                        
-                    </ct-notification>
-                </div>
+            <div class="error-text pl-2 pr-1">
+                <ct-notification
+                    [message]="notification.message"
+                    [component]="notification.component">
+                </ct-notification>
+            </div>
 
-                <i class="fa fa-times pr-1 clickable" (click)="close(notification)"></i>
-            </div>   
+            <i class="fa fa-times pr-1 clickable" (click)="close(notification)"></i>
+        </div>
 
     `
 })
