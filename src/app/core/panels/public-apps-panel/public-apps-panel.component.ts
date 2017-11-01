@@ -47,7 +47,8 @@ import {PublicAppsPanelService} from "./public-apps-panel.service";
                 <ul class="list-unstyled" (click)="groupByDropdown.hide()">
                     <li *ngFor="let c of groupByOptions" 
                         class="group-by-item"
-                        [attr.data-test]="'group-by-' + c.value"
+                        data-test="group-by-option"
+                        [attr.data-option]="c.value"
                         [class.active]="grouping === c.value"
                         (click)="switchGrouping(c.value)">
                         <span>
