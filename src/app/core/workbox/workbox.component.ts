@@ -95,7 +95,7 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                     </ng-container>
 
                     <div class="close-icon">
-                        <i class="fa fa-times clickable" (click)="closeTab(tab)"></i>
+                        <i class="fa fa-times clickable" (click)="workbox.closeTab(tab)"></i>
                     </div>
 
                     <!--Tooltip content-->
