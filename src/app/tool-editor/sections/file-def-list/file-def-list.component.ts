@@ -20,13 +20,26 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                      [buttonText]="'Create a file'"
                                      [description]="blankStateDescription"
                                      (buttonClick)="addDirent()">
-
+                    
                     <!--In case that tool is not draft2 then show dropdown for adding items-->
-                    <ct-generic-dropdown-menu *ngIf="!isSBDraft2" [ct-menu]="menu" [menuState]="dropDownOpenStatus">
-                        <button class="btn btn-primary" type="button">
+                    <ct-generic-dropdown-menu *ngIf="!isSBDraft2" [ct-menu]="menu" #addItemDropDown>
+                        <button class="btn btn-primary" type="button" (click)="addItemDropDown.toggleMenu()">
                             Add
                         </button>
                     </ct-generic-dropdown-menu>
+
+                    <!--Template for add item dropdown -->
+                    <ng-template #menu class="mr-1">
+                        <ul class="list-unstyled" (click)="addItemDropDown.hide()">
+                            <li (click)="addDirent()">
+                                File
+                            </li>
+
+                            <li (click)="addExpression()">
+                                Expression
+                            </li>
+                        </ul>
+                    </ng-template>
 
                 </ct-blank-tool-state>
 
@@ -109,28 +122,28 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
                     <!--If not draft2 show dropdown for adding items-->
                     <ng-template #v1Template>
-                        <ct-generic-dropdown-menu [ct-menu]="menu" [menuState]="dropDownOpenStatus">
-                            <button type="button"
+                        <ct-generic-dropdown-menu [ct-menu]="menu" #addItemDropDown>
+                            <button type="button" (click)="addItemDropDown.toggleMenu()"
                                     class="btn pl-0 btn-link no-outline no-underline-hover">
                                 <i class="fa fa-plus"></i> Add
                             </button>
                         </ct-generic-dropdown-menu>
+
+                        <!--Template for add item dropdown -->
+                        <ng-template #menu class="mr-1">
+                            <ul class="list-unstyled" (click)="addItemDropDown.hide()">
+                                <li (click)="addDirent()">
+                                    File
+                                </li>
+
+                                <li (click)="addExpression()">
+                                    Expression
+                                </li>
+                            </ul>
+                        </ng-template>
                     </ng-template>
-                    
+
                 </ng-container>
-
-                <!--Template for add item dropdown -->
-                <ng-template #menu class="mr-1">
-                    <ul class="list-unstyled">
-                        <li (click)="addDirent()">
-                            File
-                        </li>
-
-                        <li (click)="addExpression()">
-                            Expression
-                        </li>
-                    </ul>
-                </ng-template>
                 
             </div>
         </ct-form-panel>
@@ -159,8 +172,6 @@ export class FileDefListComponent extends DirectiveBase implements OnInit {
     @ViewChildren("inspector", {read: TemplateRef})
     inspectorTemplate: QueryList<TemplateRef<any>>;
 
-    dropDownOpenStatus = new Subject<boolean>();
-
     isSBDraft2;
 
     blankStateDescription = `Any config or temporary files the tool expects to be present when it executes,
@@ -176,7 +187,6 @@ export class FileDefListComponent extends DirectiveBase implements OnInit {
     }
 
     addDirent() {
-        this.dropDownOpenStatus.next(false);
 
         const newEntry = this.fileRequirement.addDirent({});
         this.update.next(this.fileRequirement.listing);
@@ -191,7 +201,6 @@ export class FileDefListComponent extends DirectiveBase implements OnInit {
     }
 
     addExpression() {
-        this.dropDownOpenStatus.next(false);
 
         this.fileRequirement.addExpression("");
         this.update.next(this.fileRequirement.listing);

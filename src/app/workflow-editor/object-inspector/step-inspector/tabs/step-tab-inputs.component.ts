@@ -56,8 +56,9 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                                 <div *ngIf="!isType(input, ['File', 'Directory'])" class="input-control">
 
                                     <ct-generic-dropdown-menu [ct-menu]="menu" menuAlign="left"
-                                                              [menuState]="openStatus" [readonly]="readonly">
-                                        <button type="button" class="btn btn-unstyled">
+                                                              #portChangeDropDown>
+                                        <button type="button" [disabled]="readonly" class="btn btn-unstyled" 
+                                                (click)="portChangeDropDown.toggleMenu()">
                                             <span>
                                                 {{ input.status }} <i class="fa fa-chevron-down fa-fw settings-icon"></i>
                                             </span>
@@ -66,7 +67,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                                     </ct-generic-dropdown-menu>
 
                                     <ng-template #menu class="mr-1">
-                                        <ul class="list-unstyled">
+                                        <ul class="list-unstyled" (click)="portChangeDropDown.hide()">
                                             <li *ngFor="let c of dropDownPortOptions"
                                                 [class.active]="input.status === c.value"
                                                 (click)="onPortOptionChange(input, c.value)"
@@ -163,7 +164,6 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 })
 export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase implements OnInit, OnChanges {
 
-    openStatus = new Subject<boolean>();
 
     public dropDownPortOptions = [
         {
@@ -227,8 +227,6 @@ export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase imple
                 this.graph.redraw();
                 break;
         }
-
-        this.openStatus.next(false);
     }
 
     /**
