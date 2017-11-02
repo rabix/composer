@@ -8,7 +8,7 @@ import {boot, partialProxy, proxerialize, shutdown} from "../../util/util";
 describe("app publishing", () => {
     let app: spectron.Application;
 
-    afterEach((done) => done());
+    // afterEach((done) => done());
     afterEach(() => shutdown(app));
 
     it.skip("opens newly published app in a new tab", async function () {
@@ -231,7 +231,7 @@ describe("app publishing", () => {
         assert.equal(newestRevision, "2");
     });
 
-    it("publishing app causes platform workflows that contain the published app to check for updates", async function () {
+    it("publishing app causes platform workflows that contain the published app to check for updates", async function (done) {
         const user    = generateAuthCredentials("test-user", "https://api.sbgenomics.com");
         const project = generatePlatformProject({id: "test-user/test-project"});
 
@@ -356,6 +356,8 @@ describe("app publishing", () => {
         const updatedNodeExists =  await client.isExisting(updatedNode);
 
         assert.equal(updatedNodeExists, true);
+
+        done();
     })
 });
 
