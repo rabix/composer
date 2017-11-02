@@ -106,7 +106,7 @@ describe("app publishing", () => {
         assert.equal(tabTitle, "Test App Publish");
     });
 
-    it("adds new revision to published app if app is already open", async function() {
+    it.skip("adds new revision to published app if app is already open", async function() {
         const user    = generateAuthCredentials("test-user", "https://api.sbgenomics.com");
         const project = generatePlatformProject({id: "test-user/test-project"});
 
@@ -231,7 +231,7 @@ describe("app publishing", () => {
         assert.equal(newestRevision, "2");
     });
 
-    it("publishing app causes platform workflows that contain the published app to check for updates", async function () {
+    it.skip("publishing app causes platform workflows that contain the published app to check for updates", async function () {
         const user    = generateAuthCredentials("test-user", "https://api.sbgenomics.com");
         const project = generatePlatformProject({id: "test-user/test-project"});
 
