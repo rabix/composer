@@ -199,6 +199,7 @@ describe("app publishing", () => {
         const tabTitle = await client.getText(`${newTabSelector} .title`);
 
         assert.equal(tabTitle, "Test App Publish");
+
         // const user    = generateAuthCredentials("test-user", "https://api.sbgenomics.com");
         // const project = generatePlatformProject({id: "test-user/test-project"});
         //
