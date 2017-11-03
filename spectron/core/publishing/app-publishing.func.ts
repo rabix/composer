@@ -112,8 +112,8 @@ describe("app publishing", () => {
         const project = generatePlatformProject({id: "test-user/test-project"});
 
         const demoApp = fs.readFileSync(__dirname + "/stub/demo-app.json", "utf-8");
-        // const demoAppWithRevision1 = fs.readFileSync(__dirname + "/stub/demo-app-with-revision-1.json", 'utf-8');
-        // const demoAppWithRevision2 = fs.readFileSync(__dirname + "/stub/demo-app-with-revision-2.json", 'utf-8');
+        const demoAppWithRevision1 = fs.readFileSync(__dirname + "/stub/demo-app-with-revision-1.json", 'utf-8');
+        const demoAppWithRevision2 = fs.readFileSync(__dirname + "/stub/demo-app-with-revision-2.json", 'utf-8');
 
         app = await boot(this, {
             localRepository: {
