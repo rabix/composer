@@ -268,8 +268,14 @@ export class WorkboxService {
         const label      = AppHelper.getBasename(data.id);
         const isWritable = data.isWritable;
 
-        const fileContent = Observable.empty().concat(dataSource === "local" ?
-            this.fileRepository.fetchFile(id, forceFetch) : this.platformRepository.getAppContent(id, forceFetch));
+
+        const fileContent = Observable.of(1).switchMap(() => {
+            if (dataSource === "local") {
+                return this.fileRepository.fetchFile(id, forceFetch);
+            }
+            return this.platformRepository.getAppContent(id, forceFetch);
+        });
+
         const resolve     = (fcontent: string) => this.dataGateway.resolveContent(fcontent, id);
 
         const tab = Object.assign({

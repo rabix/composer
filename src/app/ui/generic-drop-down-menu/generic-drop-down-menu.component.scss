@@ -5,13 +5,6 @@
     display: inline-block;
 
     .generic-dropdown-button {
-
-        border: inherit;
-        outline: 0;
-
-        &:disabled {
-            cursor: not-allowed;
-        }
     }
 
     .generic-menu {

@@ -24,13 +24,11 @@ $grid-gutter-width-half: $grid-gutter-width-base / 2;
         }
     }
 
-    .tooltip-inner {
-        padding: 1.5rem;
+    /deep/.tooltip-inner {
+        padding: 1rem;
         text-align: left;
 
         h4 {
-            margin-bottom: 1.57143rem;
-            line-height: 1.57143rem;
             font-weight: bold;
         }
 
@@ -46,8 +44,11 @@ $grid-gutter-width-half: $grid-gutter-width-base / 2;
 
         .value {
             margin-bottom: 1.57143rem;
-            padding-left: 1.57143rem;
             display: block;
+        }
+
+        .indent {
+            padding-left: 1.57143rem;
         }
     }
 }
