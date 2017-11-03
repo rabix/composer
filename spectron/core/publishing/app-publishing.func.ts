@@ -162,7 +162,7 @@ describe("app publishing", () => {
                                 return (appID: string, content: string) => {
                                     return Promise.resolve(appContent);
                                 };
-                            }, demoAppWithRevision2),
+                            }, demoApp),
                             getApp: proxerialize((appRev1Content, appRev2Content, $callCount) => {
 
                                 return (appID: string) => {
@@ -177,43 +177,13 @@ describe("app publishing", () => {
 
                                     return Promise.resolve({raw: JSON.parse(appRev1Content)});
                                 };
-                            }, demoAppWithRevision1, demoAppWithRevision2)
+                            }, demoApp, demoApp)
                         }),
                     }
 
                 }
             ]
         });
-
-        const client = app.client;
-
-        const modal           = `ct-publish-modal`;
-        const submitBtn       = `${modal} button[type=submit]`;
-        const nameControl     = `${modal} [formControlName=name]`;
-        const projectControl  = `${modal} [formControlName=project]`;
-        const projectOption   = `${projectControl} .option[data-value='test-user/test-project']`;
-
-        const publishBtn = `[data-test=publish-btn]`;
-
-        const revisionsButton = `ct-common-document-controls div button:nth-child(2)`;
-
-        const localAppTab = `ct-workbox .tab-bar .tab:first-child`;
-        await client.waitForVisible(localAppTab, 5000);
-        await client.click(localAppTab);
-
-        await client.waitForVisible(publishBtn, 5000);
-        await client.waitForEnabled(publishBtn, 10000);
-
-        await client.click(publishBtn);
-        await client.waitForVisible(modal);
-
-        await client.setValue(nameControl, "Test App Update");
-
-        await client.click(`${projectControl} .selectize-input`);
-        await client.waitForVisible(projectOption, 5000);
-        await client.click(projectOption);
-
-        assert.equal("2", "2");
 
         // const user    = generateAuthCredentials("test-user", "https://api.sbgenomics.com");
         // const project = generatePlatformProject({id: "test-user/test-project"});
@@ -292,51 +262,51 @@ describe("app publishing", () => {
         //     ]
         // });
         //
-        // const client = app.client;
-        //
-        // const modal           = `ct-publish-modal`;
-        // const submitBtn       = `${modal} button[type=submit]`;
-        // const nameControl     = `${modal} [formControlName=name]`;
-        // const projectControl  = `${modal} [formControlName=project]`;
-        // const projectOption   = `${projectControl} .option[data-value='test-user/test-project']`;
-        //
-        // const publishBtn = `[data-test=publish-btn]`;
-        //
-        // const revisionsButton = `ct-common-document-controls div button:nth-child(2)`;
-        //
-        // const localAppTab = `ct-workbox .tab-bar .tab:first-child`;
-        // await client.waitForVisible(localAppTab, 5000);
-        // await client.click(localAppTab);
-        //
-        // await client.waitForVisible(publishBtn, 5000);
-        // await client.waitForEnabled(publishBtn, 10000);
-        //
-        // await client.click(publishBtn);
-        // await client.waitForVisible(modal);
-        //
-        // await client.setValue(nameControl, "Test App Update");
-        //
-        // await client.click(`${projectControl} .selectize-input`);
-        // await client.waitForVisible(projectOption, 5000);
-        // await client.click(projectOption);
-        //
-        //
-        // await client.waitForEnabled(submitBtn, 3000);
-        // await client.click(submitBtn);
-        //
-        // const tabSelector = `ct-workbox .tab-bar .tab:nth-child(2)`;
-        // await client.waitForVisible(tabSelector, 10000);
-        // await client.click(tabSelector);
-        //
-        // await client.waitForVisible(revisionsButton, 5000);
-        // await client.click(revisionsButton);
-        //
-        // const revisionList = `ct-revision-list`;
-        // await client.waitForVisible(revisionList, 5000);
-        //
-        // const newestRevision = await client.getText(`${revisionList} .revision-entry:first-of-type .revision-number`);
-        //
-        // assert.equal(newestRevision, "2");
+        const client = app.client;
+
+        const modal           = `ct-publish-modal`;
+        const submitBtn       = `${modal} button[type=submit]`;
+        const nameControl     = `${modal} [formControlName=name]`;
+        const projectControl  = `${modal} [formControlName=project]`;
+        const projectOption   = `${projectControl} .option[data-value='test-user/test-project']`;
+
+        const publishBtn = `[data-test=publish-btn]`;
+
+        const revisionsButton = `ct-common-document-controls div button:nth-child(2)`;
+
+        const localAppTab = `ct-workbox .tab-bar .tab:first-child`;
+        await client.waitForVisible(localAppTab, 5000);
+        await client.click(localAppTab);
+
+        await client.waitForVisible(publishBtn, 5000);
+        await client.waitForEnabled(publishBtn, 10000);
+
+        await client.click(publishBtn);
+        await client.waitForVisible(modal);
+
+        await client.setValue(nameControl, "Test App Update");
+
+        await client.click(`${projectControl} .selectize-input`);
+        await client.waitForVisible(projectOption, 5000);
+        await client.click(projectOption);
+
+
+        await client.waitForEnabled(submitBtn, 3000);
+        await client.click(submitBtn);
+
+        const tabSelector = `ct-workbox .tab-bar .tab:nth-child(2)`;
+        await client.waitForVisible(tabSelector, 10000);
+        await client.click(tabSelector);
+
+        await client.waitForVisible(revisionsButton, 5000);
+        await client.click(revisionsButton);
+
+        const revisionList = `ct-revision-list`;
+        await client.waitForVisible(revisionList, 5000);
+
+        const newestRevision = await client.getText(`${revisionList} .revision-entry:first-of-type .revision-number`);
+
+        assert.equal(newestRevision, "2");
     });
 
     it("publishing app causes platform workflows that contain the published app to check for updates", async function () {
