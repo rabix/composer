@@ -197,6 +197,22 @@ describe("app publishing", () => {
 
         const revisionsButton = `ct-common-document-controls div button:nth-child(2)`;
 
+        const localAppTab = `ct-workbox .tab-bar .tab:first-child`;
+        await client.waitForVisible(localAppTab, 5000);
+        await client.click(localAppTab);
+
+        await client.waitForVisible(publishBtn, 5000);
+        await client.waitForEnabled(publishBtn, 10000);
+
+        await client.click(publishBtn);
+        await client.waitForVisible(modal);
+
+        await client.setValue(nameControl, "Test App Update");
+
+        await client.click(`${projectControl} .selectize-input`);
+        await client.waitForVisible(projectOption, 5000);
+        await client.click(projectOption);
+
         assert.equal("2", "2");
 
         // const user    = generateAuthCredentials("test-user", "https://api.sbgenomics.com");
