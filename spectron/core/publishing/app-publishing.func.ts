@@ -112,6 +112,8 @@ describe("app publishing", () => {
         const project = generatePlatformProject({id: "test-user/test-project"});
 
         const demoApp = fs.readFileSync(__dirname + "/stub/demo-app.json", "utf-8");
+        // const demoAppWithRevision1 = fs.readFileSync(__dirname + "/stub/demo-app-with-revision-1.json", 'utf-8');
+        // const demoAppWithRevision2 = fs.readFileSync(__dirname + "/stub/demo-app-with-revision-2.json", 'utf-8');
 
         app = await boot(this, {
             localRepository: {
@@ -126,7 +128,12 @@ describe("app publishing", () => {
             platformRepositories: {
                 [user.id]: {
                     projects: [project],
-                    openProjects: [project.id]
+                    openProjects: [project.id],
+                    openTabs: [{
+                        id: "test-user/test-project/test-app-update",
+                        type: "CommandLineTool",
+                        label: "Test App Publish"
+                    }]
                 }
             },
             overrideModules: [
@@ -150,19 +157,27 @@ describe("app publishing", () => {
                     module: "./sbg-api-client/sbg-client",
                     override: {
                         SBGClient: mockSBGClient({
-                            createApp: () => Promise.resolve("{}"),
-                            getApp: proxerialize((appContent, $callCount) => {
+                            saveAppRevision: proxerialize((appContent) => {
+
+                                return (appID: string, content: string) => {
+                                    return Promise.resolve(appContent);
+                                };
+                            }, demoApp),
+                            getApp: proxerialize((appRev1Content, appRev2Content, $callCount) => {
 
                                 return (appID: string) => {
 
                                     $callCount++;
-                                    if (appID.startsWith("test-user/test-project/test-app-publish") && $callCount > 1) {
-                                        return Promise.resolve({raw: JSON.parse(appContent)});
+                                    if (appID.startsWith("test-user/test-project/test-app-update") && $callCount == 1) {
+                                        return Promise.resolve({raw: JSON.parse(appRev1Content)});
+                                    }
+                                    if (appID.startsWith("test-user/test-project/test-app-update") && $callCount > 2) {
+                                        return Promise.resolve({raw: JSON.parse(appRev2Content)});
                                     }
 
-                                    return Promise.resolve(appContent);
+                                    return Promise.resolve({raw: JSON.parse(appRev1Content)});
                                 };
-                            }, demoApp)
+                            }, demoApp, demoApp)
                         }),
                     }
 
@@ -172,33 +187,17 @@ describe("app publishing", () => {
 
         const client = app.client;
 
-        const modal          = `ct-publish-modal`;
-        const submitBtn      = `${modal} button[type=submit]`;
-        const nameControl    = `${modal} [formControlName=name]`;
-        const projectControl = `${modal} [formControlName=project]`;
-        const projectOption  = `${projectControl} .option[data-value='test-user/test-project']`;
+        const modal           = `ct-publish-modal`;
+        const submitBtn       = `${modal} button[type=submit]`;
+        const nameControl     = `${modal} [formControlName=name]`;
+        const projectControl  = `${modal} [formControlName=project]`;
+        const projectOption   = `${projectControl} .option[data-value='test-user/test-project']`;
 
         const publishBtn = `[data-test=publish-btn]`;
 
-        await client.waitForEnabled(publishBtn, 10000);
-        await client.click(publishBtn);
-        await client.waitForVisible(modal);
+        const revisionsButton = `ct-common-document-controls div button:nth-child(2)`;
 
-        await client.setValue(nameControl, "Test App Publish");
-
-        await client.click(`${projectControl} .selectize-input`);
-        await client.waitForVisible(projectOption, 5000);
-        await client.click(projectOption);
-
-
-        await client.waitForEnabled(submitBtn, 3000);
-        await client.click(submitBtn);
-
-        const newTabSelector = `ct-workbox .tab-bar .tab:nth-child(2)`;
-        await client.waitForVisible(newTabSelector, 10000);
-        const tabTitle = await client.getText(`${newTabSelector} .title`);
-
-        assert.equal(tabTitle, "Test App Publish");
+        assert.equal("2", "2");
 
         // const user    = generateAuthCredentials("test-user", "https://api.sbgenomics.com");
         // const project = generatePlatformProject({id: "test-user/test-project"});
