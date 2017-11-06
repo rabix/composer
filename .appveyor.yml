@@ -17,7 +17,7 @@ install:
   - yarn install --no-progress
 
 build_script:
-  - yarn run build
+  - npm run build
 
 test_script:
   - yarn run test:electron

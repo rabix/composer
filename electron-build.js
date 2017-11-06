@@ -67,10 +67,13 @@ builder.build({
             target: ["zip", "dir", "dmg"]
         },
         win: {
-            target: ["zip", "portable", "dir"]
+            target: "nsis"
         },
         linux: {
             target: ["zip", "dir"]
+        },
+        nsis: {
+            perMachine: true
         },
         fileAssociations: [{
             ext: "cwl",
