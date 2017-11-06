@@ -137,7 +137,7 @@ export class SecondaryFilesComponent extends DirectiveBase implements OnChanges,
             if (list) {
                 this.port.updateSecondaryFiles(list);
                 this.updateFileList();
-                this.secondaryFiles.forEach(file => file.validate(this.context));
+                this.updateFormArray();
                 this.update.emit(list);
             }
         });
