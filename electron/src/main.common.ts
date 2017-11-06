@@ -1,14 +1,11 @@
 import * as mock from "mock-require";
 import * as acceleratorProxy from "./accelerator-proxy";
-import * as magnetLinkProxy from "./open-external-file-proxy";
+import * as openExternalFileProxy from "./open-external-file-proxy";
 import * as path from "path";
-import * as fs from "fs";
 
 const {app, Menu, BrowserWindow} = require("electron");
 const deepLinkingController = require("./controllers/open-external-file/deep-linking-protocol-controller");
 const localFileController = require("./controllers/open-external-file/open-file-handler-controller");
-
-const proxy = require("./open-external-file-proxy");
 
 const isSpectronRun = ~process.argv.indexOf("--spectron");
 const defaultUserDataPath = app.getPath("home") + path.sep + ".sevenbridges/rabix-composer";
@@ -161,7 +158,7 @@ export = {
     start: (config) => {
 
         // Protocol handler for darwin
-        app.setAsDefaultProtocolClient("cottontail2");
+        app.setAsDefaultProtocolClient("rabix-composer");
         app.on("open-url", function (event, url) {
             openExternalFiles(url);
             focusMainWindow();
@@ -175,7 +172,7 @@ export = {
 
         // Initial File handler for win32
         if (process.platform === "win32") {
-            openExternalFiles(...getFilePaths(process.argv.slice(1)));
+            openExternalFiles(...getFilePathsFromArgs(process.argv.slice(1)));
         }
 
         // File/Protocol handler for win32
@@ -186,7 +183,7 @@ export = {
             // argv: An array of the second instance’s (command line / deep linked) arguments
             if (process.platform === "win32") {
                 // Keep only command line / deep linked arguments
-                openExternalFiles(...getFilePaths(process.argv.slice(1)));
+                openExternalFiles(...getFilePathsFromArgs(argv.slice(1)));
             }
 
             focusMainWindow();
@@ -234,10 +231,10 @@ function openExternalFiles(...items: string[]) {
         if (item.startsWith("rabix-composer://")) {
             const encoded = item.replace("rabix-composer://", "");
             const data = deepLinkingController.setMagnetLinkData(encoded);
-            proxy.passMagnetLink(data);
+            openExternalFileProxy.passMagnetLink(data);
         } else {
             const filePath = localFileController.setLocalFilePath(item);
-            proxy.passFilePath(filePath);
+            openExternalFileProxy.passFilePath(filePath);
         }
     });
 }
@@ -245,7 +242,7 @@ function openExternalFiles(...items: string[]) {
 /**
  * Filter command line arguments to get file paths
  */
-function getFilePaths(args: string []) {
+function getFilePathsFromArgs(args: string []) {
     // If dev mode do not use first argument as a file path
     const devMode = process.argv.find(arg => arg.startsWith("--dev-mode"));
 
