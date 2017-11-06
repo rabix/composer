@@ -67,7 +67,7 @@ builder.build({
             target: ["zip", "dir", "dmg"]
         },
         win: {
-            target: "nsis"
+            target: ["zip", "portable", "dir"]
         },
         linux: {
             target: ["zip", "dir"]
