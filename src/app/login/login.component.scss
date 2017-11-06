@@ -1,6 +1,4 @@
 .web-login {
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    background: #3c3c3c;
     display: block;
     border-radius: 2px;
     position: fixed;
@@ -9,8 +7,4 @@
     transform: translate(-50%, -50%);
     width: 100%;
     max-width: 400px;
-}
-
-.apiHost-control {
-    max-width: 100%;
 }

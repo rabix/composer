@@ -6,10 +6,7 @@ export class LoginService {
 
     constructor(private _cookieService: CookieService){}
 
-    storeToken(): boolean {
-        // If there's a token and baseURL in the location bar (i.e.,
-        // we just landed here after a successful login), save it and
-        // scrub the location bar.
+    storeToken(token: string): boolean {
         if (document.location.search[0] != '?') {
             return false;
         }
@@ -24,21 +21,20 @@ export class LoginService {
             params[decodeURIComponent(kv.slice(0, e))] = decodeURIComponent(kv.slice(e+1));
         })
 
-        if (!params.hasOwnProperty("api_token")) {
-            // Have a query string, but it's not a login callback.
+        if (!params.hasOwnProperty(token)) {
             return false;
         }
 
-        this._cookieService.put("api_token", params["api_token"]);
+        this._cookieService.put(token, params[token]);
         history.replaceState({}, '', document.location.origin + document.location.pathname);
     }
 
-    getToken(): string {
-        return this._cookieService.get("api_token")
+    getToken(token: string): string {
+        return this._cookieService.get(token)
     }
 
-    logout(): void {
-        this._cookieService.remove("api_token")
+    logout(token: string): void {
+        this._cookieService.remove(token)
         document.location.href = document.location.href
     }
 

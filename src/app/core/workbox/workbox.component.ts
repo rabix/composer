@@ -80,7 +80,7 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
     activeTab: TabData<any>;
 
     private el: Element;
-    private isBrowser: Boolean = false;
+    public isBrowser: Boolean = false;
 
     @ViewChildren("workBoxTabComponent")
     private tabComponents: QueryList<any>;
