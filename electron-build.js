@@ -72,9 +72,6 @@ builder.build({
         linux: {
             target: ["zip", "dir"]
         },
-        nsis: {
-            perMachine: true
-        },
         fileAssociations: [{
             ext: "cwl",
             name: "CWL"
