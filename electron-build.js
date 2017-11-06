@@ -70,7 +70,7 @@ builder.build({
             target: ["nsis", "zip", "portable", "dir"]
         },
         linux: {
-            target: ["zip", "portable", "dir"]
+            target: ["zip", "dir"]
         },
         nsis: {
             perMachine: true
