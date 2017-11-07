@@ -167,7 +167,7 @@ export class InputBindingSectionComponent extends DirectiveBase implements Contr
                     this.input.inputBinding.itemSeparator = form.itemSeparator;
                 }
 
-                if (form.valueFrom !== undefined && form.valueFrom.serialize() === undefined) {
+                if (form.valueFrom !== undefined && form.valueFrom.serialize() === undefined || this.isType("record")) {
                     this.input.inputBinding.valueFrom.setValue("", "string");
                 }
 
