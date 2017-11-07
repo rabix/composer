@@ -4,6 +4,7 @@ import {CommandLineToolModel, ExpressionModel} from "cwlts/models";
 import {Subscription} from "rxjs/Subscription";
 import {ModalService} from "../../../../ui/modal/modal.service";
 import {ErrorCode} from "cwlts/models/helpers/validation/ErrorCode";
+import {SBDraft2CommandLineToolModel, SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 
 @Component({
     selector: "ct-base-command-list",
@@ -52,10 +53,10 @@ export class BaseCommandListComponent implements OnInit, OnChanges, OnDestroy {
     form = new FormGroup({list: new FormArray([])});
 
     @Input()
-    baseCommand: ExpressionModel[] = [];
+    baseCommand: SBDraft2ExpressionModel[] = [];
 
     @Input()
-    model: CommandLineToolModel;
+    model: SBDraft2CommandLineToolModel;
 
     @Input()
     readonly = false;
@@ -120,6 +121,7 @@ export class BaseCommandListComponent implements OnInit, OnChanges, OnDestroy {
 
         // re-subscribe update output to form changes
         this.subscription = this.form.valueChanges.map(form => (form.list || [])).subscribe((list) => {
+            this.model.updateBaseCommand(list);
             this.update.emit(list);
         });
     }
