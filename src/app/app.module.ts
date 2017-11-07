@@ -34,7 +34,7 @@ import {CookieModule} from 'ngx-cookie';
 export function initConfiguration(_configurationService: ConfigurationService) {
     if (!environment.browser) { return; }
 
-    let _url = 'http://localhost:4200/configuration.yml';
+    let _url = '/configuration.yml';
     return () => _configurationService.load(_url);
 }
 
