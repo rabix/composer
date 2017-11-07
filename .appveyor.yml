@@ -1,4 +1,4 @@
-image: Previous Visual Studio 2017
+image: Previous Visual Studio 2015
 
 environment:
   nodejs_version: "8"
