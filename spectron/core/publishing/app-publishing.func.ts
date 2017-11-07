@@ -161,7 +161,7 @@ describe("app publishing", () => {
                                 return (appID: string, content: string) => {
                                     return Promise.resolve(appContent);
                                 };
-                            }, demoApp),
+                            }, demoAppWithRevision2),
                             getApp: proxerialize((appRev1Content, appRev2Content, $callCount) => {
 
                                 return (appID: string) => {
@@ -176,7 +176,7 @@ describe("app publishing", () => {
 
                                     return Promise.resolve({raw: JSON.parse(appRev1Content)});
                                 };
-                            }, demoApp, demoApp)
+                            }, demoAppWithRevision1, demoAppWithRevision2)
                         }),
                     }
 
@@ -289,7 +289,7 @@ describe("app publishing", () => {
                                 return (appID: string, content: string) => {
                                     return Promise.resolve(appContent);
                                 };
-                            }, demoApp),
+                            }, demoAppWithRevision2),
                             getApp: proxerialize((workflowContent, appContent, $callCount) => {
 
                                 return (appID: string) => {
@@ -304,7 +304,7 @@ describe("app publishing", () => {
 
                                     return Promise.resolve({raw: JSON.parse(appContent)});
                                 };
-                            }, demoApp, demoApp),
+                            }, demoWorkflowWithEmbeddedApp, demoAppWithRevision1),
                             getAllUserApps: proxerialize((content) => {
 
                                 return (appIDs: string[]) =>  {
