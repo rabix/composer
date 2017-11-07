@@ -38,7 +38,7 @@ export class MainComponent {
                 global: GlobalService,
                 electron: ElectronProxyService,
                 // DON'T REMOVE THIS PLEASE I KNOW IT DOESN'T HAVE ANY USAGES
-                // openExternalFileService: OpenExternalFileService,
+                openExternalFileService: OpenExternalFileService,
                 js: JavascriptEvalService) {
 
         system.boot();
