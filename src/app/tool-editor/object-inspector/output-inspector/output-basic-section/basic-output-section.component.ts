@@ -119,8 +119,7 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
                 this.output.type.symbols = value.symbols;
             }
 
-            if (value.glob && value.glob !== this.output.outputBinding.glob) {
-                // don't reassign unnecessarily
+            if (value.glob) {
                 this.output.outputBinding.glob = value.glob;
             }
 
