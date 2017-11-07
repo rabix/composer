@@ -80,7 +80,7 @@
         "codelyzer": "^3.1.2",
         "concurrently": "^3.5.0",
         "electron": "~1.7.6",
-        "electron-builder": "^19.45.4",
+        "electron-builder": "^19.27.7",
         "fs-extra": "^4.0.1",
         "git-changelog": "^1.1.2",
         "glob": "^7.1.1",
