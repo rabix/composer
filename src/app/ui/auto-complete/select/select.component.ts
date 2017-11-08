@@ -183,41 +183,40 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
     }
 
     ngAfterViewInit() {
-
-        let selectizeOptions = {
-            // Add remove button only if its not a mono-selection (suggested input)
-            plugins: this.maxItems !== 1 ? ["remove_button"] : [],
-            delimiter: this.delimiter,
-            create: this.create,
-            createOnBlur: this.createOnBlur,
-            createFilter: this.createFilter,
-            optgroups: this.optgroups,
-            optgroupValueField: this.optgroupValueField,
-            optgroupLabelField: this.optgroupLabelField,
-            optgroupField: this.optgroupField,
-            highlight: this.highlight,
-            persist: this.persist,
-            openOnFocus: this.openOnFocus,
-            maxItems: this.maxItems,
-            hideSelected: this.hideSelected,
-            allowEmptyOption: this.allowEmptyOptions,
-            addPrecedence: this.addPrecedence,
-            selectOnTab: this.selectOnTab,
-            valueField: this.valueField,
-            labelField: this.labelField,
-            sortField: this.sortField ? {
-                field: this.sortField,
-                direction: this.sortDirection || "asc"
-            } : undefined,
-            onChange: this.onChange.bind(this),
-            render: {
-                option: function (data) {
-                    return `<div class="option" data-selectable data-value="${data.value}" data-test="dropdown-option">${data.text}</div>`;
-                }
-            }
-        };
-
         this.zone.runOutsideAngular(() => {
+            let selectizeOptions = {
+                // Add remove button only if its not a mono-selection (suggested input)
+                plugins: this.maxItems !== 1 ? ["remove_button"] : [],
+                delimiter: this.delimiter,
+                create: this.create,
+                createOnBlur: this.createOnBlur,
+                createFilter: this.createFilter,
+                optgroups: this.optgroups,
+                optgroupValueField: this.optgroupValueField,
+                optgroupLabelField: this.optgroupLabelField,
+                optgroupField: this.optgroupField,
+                highlight: this.highlight,
+                persist: this.persist,
+                openOnFocus: this.openOnFocus,
+                maxItems: this.maxItems,
+                hideSelected: this.hideSelected,
+                allowEmptyOption: this.allowEmptyOptions,
+                addPrecedence: this.addPrecedence,
+                selectOnTab: this.selectOnTab,
+                valueField: this.valueField,
+                labelField: this.labelField,
+                sortField: this.sortField ? {
+                    field: this.sortField,
+                    direction: this.sortDirection || "asc"
+                } : undefined,
+                onChange: this.onChange.bind(this),
+                render: {
+                    option: function (data) {
+                        return `<div class="option" data-selectable data-value="${data.value}" data-test="dropdown-option">${data.text}</div>`;
+                    }
+                }
+            };
+
             this.component = jQuery(this.el.nativeElement).selectize(selectizeOptions)[0].selectize;
 
             jQuery(".selectize-input").find("input:text").attr("data-test", "dropdown-input-field");
