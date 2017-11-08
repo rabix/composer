@@ -85,8 +85,6 @@ import {WorkboxService} from "../../workbox/workbox.service";
                     <ct-auto-complete formControlName="project"
                                       [mono]="true"
                                       [options]="projectOptions"
-                                      [inputFieldDataTest]="'new-app-destination-project-field'"
-                                      [renderOptions]="projectDropdownRenderOptions"
                                       placeholder="Choose a destination project..."
                                       optgroupField="hash"
                                       data-test="new-app-destination-project"></ct-auto-complete>
@@ -146,12 +144,6 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
     checkingSlug                 = false;
     appTypeLocked                = false;
     appCreationInProgress        = false;
-    projectDropdownRenderOptions = {
-        option: function (data) {
-            return "<div data-value='" + data.value + "' data-test='new-app-destination-project-option' data-project-id='" +
-                data.testAttr + "' class='option'>" + data.text + " </div>";
-        }
-    };
 
     error: string;
     localAppCreationInfo: string;
@@ -203,8 +195,7 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
             .subscribeTracked(this, projects => {
                 this.projectOptions = projects.map((project: Project) => ({
                     value: project.id,
-                    text: project.name,
-                    testAttr: `${project.id.split("/")[1]}`
+                    text: project.name
                 }));
             });
     }

@@ -8,8 +8,7 @@ import {Notification, NotificationBarService} from "./notification-bar.service";
     template: `
         <div *ngFor="let notification of notifications;"
              class="notification pl-1 notification-{{notification.type}}"
-             data-test="notification-bar"
-             [attr.data-notification-type]="notification.testAttr">
+             data-test="notification-bar">
             <i class="fa"
                [class.fa-check]="notification.type === 'info'"
                [class.fa-minus-circle]="notification.type === 'error'"

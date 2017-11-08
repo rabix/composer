@@ -44,9 +44,7 @@ import {PlatformCredentialsModalComponent} from "../platform-credentials-modal/p
                             <div>
                                 <ct-auto-complete data-test="add-source-modal-add-project"
                                                   [(ngModel)]="selectedProjects"
-                                                  [options]="closedProjectOptions"
-                                                  [inputFieldDataTest]="'add-source-modal-add-project-field'"
-                                                  [renderOptions]="projectDropdownRenderOptions"></ct-auto-complete>
+                                                  [options]="closedProjectOptions"></ct-auto-complete>
                             </div>
                         </div>
 
@@ -107,13 +105,6 @@ export class AddSourceModalComponent extends DirectiveBase {
     localFoldersToAdd                                       = [];
     closedProjectOptions: { value: string, text: string }[] = null;
 
-    projectDropdownRenderOptions                            = {
-        option: function (data) {
-            return "<div data-value='" + data.value + "' data-test='add-source-modal-add-project-option' data-project-id='" +
-                data.testAttr + "' class='option'>" + data.text + " </div>";
-        }
-    };
-
     constructor(public modal: ModalService,
                 private localRepository: LocalRepositoryService,
                 private platformRepository: PlatformRepositoryService,
@@ -129,8 +120,7 @@ export class AddSourceModalComponent extends DirectiveBase {
                 this.closedProjectOptions = projects.map(project => {
                     return {
                         value: project.id,
-                        text: project.name,
-                        testAttr: `${project.id.split("/")[1]}`
+                        text: project.name
                     };
                 });
             });

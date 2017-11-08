@@ -8,7 +8,6 @@ export type NotificationType = "info" | "error" | "warning";
 export interface NotificationOptions {
     type?: NotificationType;
     timeout?: number;
-    testAttr?: string;
 }
 
 export interface Notification {
@@ -16,7 +15,6 @@ export interface Notification {
     timeout: number;
     message?: string;
     component?: ComponentRef<Component>;
-    testAttr?: string;
 }
 
 @Injectable()
@@ -89,8 +87,7 @@ export class NotificationBarService {
 
         const notification: Notification = {
             type: options.type || NotificationBarService.defaultNotificationType,
-            timeout: options.timeout || NotificationBarService.defaultNotificationTimeout,
-            testAttr: options.testAttr || ""
+            timeout: options.timeout || NotificationBarService.defaultNotificationTimeout
         };
 
         if (typeof notificationContent === "string") {

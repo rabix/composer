@@ -54,10 +54,11 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                                 <i class="fa fa-file-text-o"></i>
                             </div>
 
-                            <div class="title" 
+                            <div class="title"
                                  [ct-tooltip]="ctt" 
                                  [tooltipPlacement]="'bottom'" 
-                                 [attr.data-test]="formatDataTestAttribute(tab.label) + '-tab-title'" >
+                                 data-test="file-tab-title"
+                                 [attr.data-label]="tab.label">
                                 {{tab.label}}
                             </div>
                         </ng-template>
@@ -71,7 +72,8 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                             <div class="title" 
                                  [ct-tooltip]="ctt" 
                                  [tooltipPlacement]="'bottom'"
-                                 [attr.data-test]="formatDataTestAttribute(tabComponents[i]?.dataModel?.label || tab.label) + '-tab-title'">
+                                 data-test="workflow-tab-title"
+                                 [attr.data-label]="tabComponents[i]?.dataModel?.label || tab.label">
                                 {{tabComponents[i]?.dataModel?.label || tab.label}}
                             </div>
                         </ng-template>
@@ -85,7 +87,8 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                             <div class="title" 
                                  [ct-tooltip]="ctt" 
                                  [tooltipPlacement]="'bottom'"
-                                 [attr.data-test]="formatDataTestAttribute(tabComponents[i]?.dataModel?.label || tab.label) + '-tab-title'">
+                                 data-test="tool-tab-title"
+                                 [attr.data-label]="tabComponents[i]?.dataModel?.label || tab.label">
                                 {{tabComponents[i]?.dataModel?.label || tab.label}}
                             </div>
                         </ng-template>
@@ -122,7 +125,8 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
 
                     <div class="close-icon">
                         <i class="fa fa-times clickable" 
-                           [attr.data-test]="formatDataTestAttribute(tab.label) + '-tab-close-button'" 
+                           data-test="tab-close-button"
+                           [attr.data-label]="tab.label"
                            (click)="closeTab(tab)"></i>
                     </div>
 
@@ -372,9 +376,5 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
         } else {
             this.workbox.closeAllTabs(preserve, true);
         }
-    }
-
-    formatDataTestAttribute(str: string) {
-        return str.toLowerCase().replace(new RegExp(' ', 'g'), '-');
     }
 }

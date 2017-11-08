@@ -28,7 +28,6 @@ import {GetStartedNotificationComponent} from "../../../layout/notification-bar/
                                           formControlName="url"
                                           [options]="platformList"
                                           [readonly]="tokenOnly"
-                                          [renderOptions]="renderOptions"
                                           data-test="credentials-modal-platform-field"></ct-auto-complete>
                     </div>
                 </div>
@@ -108,13 +107,6 @@ export class PlatformCredentialsModalComponent implements OnInit {
     /** FormGroup for modal inputs */
     form: FormGroup;
 
-    /** Object to render platform select options **/
-    renderOptions = {
-        option: function (data) {
-            return "<div data-value='" + data.value + "' data-test='" + data.dataTest + "' class='option'>" + data.text + " </div>";
-        }
-    };
-
     platformList = [
         {text: "Seven Bridges (Default)", value: "https://api.sbgenomics.com", dataTest: "igor-platform" },
         {text: "Seven Bridges (EU)", value: "https://eu-api.sbgenomics.com", dataTest: "eu-platform" },
@@ -163,8 +155,7 @@ export class PlatformCredentialsModalComponent implements OnInit {
                     // Activate added credentials
                     maybeUserUpdate = this.auth.setActiveCredentials(credentials);
                     const component = this.notificationBarService.showDynamicNotification(GetStartedNotificationComponent, {
-                        type: "info",
-                        testAttr: "get-started-notification"
+                        type: "info"
                     });
 
                     component.environment = AuthCredentials.getPlatformLabel(url);
