@@ -1423,11 +1423,11 @@ copy-webpack-plugin@^4.0.1:
     minimatch "^3.0.0"
     node-dir "^0.1.10"
 
-core-js@^2.2.0, core-js@^2.4.0, core-js@^2.4.1:
+core-js@^2.2.0, core-js@^2.4.0:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.0.tgz#569c050918be6486b3837552028ae0466b717086"
 
-core-js@^2.5.0:
+core-js@^2.5.0, core-js@^2.5.1:
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.1.tgz#ae6874dc66937789b80754ff5428df66819ca50b"
 
@@ -1680,11 +1680,11 @@ custom-event@~1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/custom-event/-/custom-event-1.0.1.tgz#5d02a46850adf1b4a317946a3928fccb5bfd0425"
 
-cwl-svg@^0.0.45:
-  version "0.0.45"
-  resolved "https://registry.yarnpkg.com/cwl-svg/-/cwl-svg-0.0.45.tgz#acf1cb31d3042df28c4ba93ed992d2d50ea920dc"
+cwl-svg@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/cwl-svg/-/cwl-svg-1.0.0.tgz#052f1111033d4001ad028dffd321ef6e0c5ed81e"
   dependencies:
-    core-js "^2.4.1"
+    core-js "^2.5.1"
 
 cwlts@^1.13.40:
   version "1.13.40"
