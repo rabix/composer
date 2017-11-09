@@ -23,6 +23,7 @@ import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow
 import {JOB_SERVICE_TOKEN, jobServiceFactory} from "./services/job/job.service.factory";
 import {WorkflowEditorService} from "./workflow-editor.service";
 import {AppUpdateService} from "../editor-common/services/app-update/app-updating.service";
+import {AppHelper} from "../core/helpers/AppHelper";
 
 export function appSaverFactory(comp: WorkflowEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -147,7 +148,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                             this.resolveToModel(this.codeEditorContent.value);
                         }, err => console.warn);
                     } else {
-                        this.getStepUpdates();
+                        this.graphEditor.getStepUpdates();
                     }
                 });
         }
