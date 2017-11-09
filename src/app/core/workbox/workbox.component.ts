@@ -57,8 +57,7 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                             <div class="title"
                                  [ct-tooltip]="ctt" 
                                  [tooltipPlacement]="'bottom'" 
-                                 data-test="file-tab-title"
-                                 [attr.data-label]="tab.label">
+                                 data-test="file-tab-title">
                                 {{tab.label}}
                             </div>
                         </ng-template>
@@ -72,8 +71,7 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                             <div class="title" 
                                  [ct-tooltip]="ctt" 
                                  [tooltipPlacement]="'bottom'"
-                                 data-test="workflow-tab-title"
-                                 [attr.data-label]="tabComponents[i]?.dataModel?.label || tab.label">
+                                 data-test="workflow-tab-title">
                                 {{tabComponents[i]?.dataModel?.label || tab.label}}
                             </div>
                         </ng-template>
@@ -87,8 +85,7 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                             <div class="title" 
                                  [ct-tooltip]="ctt" 
                                  [tooltipPlacement]="'bottom'"
-                                 data-test="tool-tab-title"
-                                 [attr.data-label]="tabComponents[i]?.dataModel?.label || tab.label">
+                                 data-test="tool-tab-title">
                                 {{tabComponents[i]?.dataModel?.label || tab.label}}
                             </div>
                         </ng-template>
