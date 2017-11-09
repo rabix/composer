@@ -125,7 +125,7 @@ describe("new release check", function () {
     }
 
     function clickOnDiscardVersionButton() {
-        const discardVersionButton = "[data-test=dismiss-button]";
+        const discardVersionButton = "[data-test=update-platform-modal-dismiss-button]";
         return app.client.click(discardVersionButton);
     }
 });

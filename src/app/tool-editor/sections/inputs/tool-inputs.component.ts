@@ -16,6 +16,7 @@ import {ToolInputListComponent} from "./tool-input-list.component";
 
                 <!--Blank Tool Screen-->
                 <ct-blank-tool-state *ngIf="!readonly && !model?.inputs.length"
+                                     data-test="tool-add-input-button"
                                      [buttonText]="'Add an Input'"
                                      [description]="blankStateDescription"
                                      (buttonClick)="addEntry()">

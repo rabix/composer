@@ -13,7 +13,7 @@ import {StatusBarService} from "./status-bar.service";
             
             <!--Sidebar toggle button-->
             <span class="btn-group status-buttons sidebar-toggle-btn-group" >
-                <button class="sidebar-toggle btn btn-sm" data-test="sidebar-toggle"
+                <button class="sidebar-toggle btn btn-sm" data-test="sidebar-toggle-button"
                         [class.active]="layoutService.sidebarHidden"
                         (click)="layoutService.toggleSidebar()">
                     <i class="fa"

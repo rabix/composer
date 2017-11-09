@@ -40,7 +40,12 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                                 <i class="fa fa-home"></i>
                             </div>
 
-                            <div class="title" [ct-tooltip]="ctt" [tooltipPlacement]="'bottom'">{{tab.label}}</div>
+                            <div class="title" 
+                                 data-test="welcome-tab-title" 
+                                 [ct-tooltip]="ctt" 
+                                 [tooltipPlacement]="'bottom'">
+                                {{tab.label}}
+                            </div>
                         </ng-template>
 
                         <!-- Code tab-->
@@ -49,7 +54,12 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                                 <i class="fa fa-file-text-o"></i>
                             </div>
 
-                            <div class="title" [ct-tooltip]="ctt" [tooltipPlacement]="'bottom'">{{tab.label}}</div>
+                            <div class="title"
+                                 [ct-tooltip]="ctt" 
+                                 [tooltipPlacement]="'bottom'" 
+                                 data-test="file-tab-title">
+                                {{tab.label}}
+                            </div>
                         </ng-template>
 
                         <!-- Workflow tab-->
@@ -58,7 +68,10 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                                 <i class="fa fa-share-alt"></i>
                             </div>
 
-                            <div class="title" [ct-tooltip]="ctt" [tooltipPlacement]="'bottom'">
+                            <div class="title" 
+                                 [ct-tooltip]="ctt" 
+                                 [tooltipPlacement]="'bottom'"
+                                 data-test="workflow-tab-title">
                                 {{tabComponents[i]?.dataModel?.label || tab.label}}
                             </div>
                         </ng-template>
@@ -69,7 +82,10 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                                 <i class="fa fa-terminal"></i>
                             </div>
 
-                            <div class="title" [ct-tooltip]="ctt" [tooltipPlacement]="'bottom'">
+                            <div class="title" 
+                                 [ct-tooltip]="ctt" 
+                                 [tooltipPlacement]="'bottom'"
+                                 data-test="tool-tab-title">
                                 {{tabComponents[i]?.dataModel?.label || tab.label}}
                             </div>
                         </ng-template>
@@ -80,7 +96,12 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                                 <i class="fa fa-file-o"></i>
                             </div>
 
-                            <div class="title" [ct-tooltip]="ctt" [tooltipPlacement]="'bottom'">{{tab.label}}</div>
+                            <div class="title" 
+                                 data-test="new-file-tab-title" 
+                                 [ct-tooltip]="ctt" 
+                                 [tooltipPlacement]="'bottom'">
+                                {{tab.label}}
+                            </div>
                         </ng-template>
 
                         <!-- Settings tab-->
@@ -89,13 +110,21 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                                 <i class="fa fa-cog"></i>
                             </div>
 
-                            <div class="title" [ct-tooltip]="ctt" [tooltipPlacement]="'bottom'">{{tab.label}}</div>
+                            <div class="title" 
+                                 data-test="settings-tab-title"
+                                 [ct-tooltip]="ctt" 
+                                 [tooltipPlacement]="'bottom'">
+                                {{tab.label}}
+                            </div>
                         </ng-template>
 
                     </ng-container>
 
                     <div class="close-icon">
-                        <i class="fa fa-times clickable" (click)="workbox.closeTab(tab)"></i>
+                        <i class="fa fa-times clickable" 
+                           data-test="tab-close-button"
+                           [attr.data-label]="tab.label"
+                           (click)="workbox.closeTab(tab)"></i>
                     </div>
 
                     <!--Tooltip content-->
@@ -344,6 +373,5 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
         } else {
             this.workbox.closeAllTabs(preserve, true);
         }
-
     }
 }
