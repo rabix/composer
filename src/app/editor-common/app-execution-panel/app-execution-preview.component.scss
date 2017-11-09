@@ -11,6 +11,8 @@
 
     flex-direction: row;
 
+
+
     .controls {
         flex-basis: $barWidth;
         background: $layout-section-background;
@@ -35,5 +37,9 @@
 
     /deep/ .text-error {
         color: $brand-danger;
+    }
+
+    /deep/ .outdir-link, .outdir-link:hover {
+        background: $btn-primary-bg !important;
     }
 }

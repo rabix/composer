@@ -141,7 +141,7 @@ export class AddSourceModalComponent extends DirectiveBase {
     }
 
     selectLocalFolders() {
-        this.native.openFolder({
+        this.native.openFolderChoiceDialog({
             buttonLabel: "Add to Workspace"
         }, true).then(paths => {
             this.localFoldersToAdd = paths;

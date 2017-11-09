@@ -2,6 +2,7 @@
     <ct-tab-selector [distribute]="'auto'" [active]="viewMode" (activeChange)="switchTab($event)">
         <ct-tab-selector-entry [disabled]="!tabsUnlocked()" data-test="workflow-info-tab" [tabName]="'info'">App Info</ct-tab-selector-entry>
         <ct-tab-selector-entry [disabled]="!tabsUnlocked()" data-test="workflow-visual-tab" [tabName]="'graph'">Graph View</ct-tab-selector-entry>
+        <ct-tab-selector-entry [disabled]="!tabsUnlocked()" data-test="workflow-test-tab"   [tabName]="'test'">Test</ct-tab-selector-entry>
         <ct-tab-selector-entry data-test="workflow-code-tab" [tabName]="'code'" [disabled]="!tabsUnlocked() || !!unavailableError">Code
         </ct-tab-selector-entry>
     </ct-tab-selector>
@@ -40,6 +41,12 @@
                               class="editor-main">
     </ct-workflow-graph-editor>
 
+    <ct-workflow-job-editor *ngIf="viewMode === 'test' && !isLoading && dataModel"
+                            [appID]="this.tabData.id"
+                            [model]="dataModel"
+                            (draw)="onGraphDraw()">
+    </ct-workflow-job-editor>
+
     <ct-app-info *ngIf="viewMode === 'info' && !isLoading && dataModel"
                  [readonly]="isReadonly"
                  (change)="syncModelAndCode(false)"
@@ -55,7 +62,7 @@
 
 <!--Header & Editor Column-->
 
-<ct-common-report-panel *ngIf="reportPanel" [host]="this"></ct-common-report-panel>
+<ct-common-report-panel [hidden]="!reportPanel" [host]="this" #reportPanelComponent></ct-common-report-panel>
 
 <ng-template #statusControls>
     <ct-common-status-controls [host]="this"></ct-common-status-controls>

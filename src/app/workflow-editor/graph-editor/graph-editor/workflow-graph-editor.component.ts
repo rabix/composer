@@ -12,7 +12,11 @@ import {
     ViewChild,
     ViewEncapsulation
 } from "@angular/core";
-import {Workflow} from "cwl-svg";
+import {
+    SVGArrangePlugin, SVGEdgeHoverPlugin, SVGNodeMovePlugin, SVGPortDragPlugin, SVGValidatePlugin,
+    SelectionPlugin, Workflow, DeletionPlugin
+} from "cwl-svg";
+import {ZoomPlugin} from "cwl-svg/src/plugins/zoom";
 import {
     StepModel,
     WorkflowFactory,
@@ -36,6 +40,8 @@ import {IpcService} from "../../../services/ipc.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {WorkflowEditorService} from "../../workflow-editor.service";
 import {WorkflowEditorComponent} from "../../workflow-editor.component";
+import {SvgDumper} from "../svg-dumper/svg-dumper";
+import {UpdatePlugin} from "../update-plugin/update-plugin";
 
 const {dialog} = window["require"]("electron").remote;
 
@@ -43,140 +49,34 @@ const {dialog} = window["require"]("electron").remote;
     selector: "ct-workflow-graph-editor",
     encapsulation: ViewEncapsulation.None,
     styleUrls: ["./workflow-graph-editor.component.scss"],
-    template: `
-        <div *ngIf="model && isGraphEmpty()" class="svg-graph-empty-state"></div>
-
-        <svg #canvas class="cwl-workflow" tabindex="-1"
-             ct-click
-             [ct-drop-enabled]="true"
-             [ct-drop-zones]="['zone1']"
-             (dblclick)="openInspector($event)"
-             (onMouseClick)="setFocusOnCanvas()"
-             (onDropSuccess)="onDrop($event.detail.data.event, $event.detail.data.transfer_data)"></svg>
-
-        <span class="svg-btns" (click)="setFocusOnCanvas()">
-            
-            <!--Delete button-->
-            <span class="btn-group">
-                <button *ngIf="selectedElement"
-                        ct-tooltip="Delete"
-                        tooltipPlacement="top"
-                        class="btn btn-sm btn-secondary"
-                        (click)="deleteSelectedElement()"
-                        [disabled]="readonly">
-                    <i class="fa fa-trash"></i>
-                </button>
-            </span>
-
-            <span class="btn-group">
-                
-                <!--Zoom in button-->
-                <button class="btn btn-sm btn-secondary"
-                        (click)="upscale()"
-                        ct-tooltip="Zoom In"
-                        tooltipPlacement="top"
-                        [disabled]="graph !== undefined && graph.getScale() >= 2">
-                    <i class="fa fa-plus"></i>
-                </button>
-
-                <!--Zoom out button-->
-                <button class="btn btn-sm btn-secondary"
-                        (click)="downscale()"
-                        ct-tooltip="Zoom Out"
-                        tooltipPlacement="top"
-                        [disabled]="graph !== undefined && graph.getScale() <= 0.2">
-                    <i class="fa fa-minus"></i>
-                </button>
-
-                <!--Fit to Viewport button-->
-                <button class="btn btn-sm btn-secondary"
-                        ct-tooltip="Fit to Viewport"
-                        tooltipPlacement="top"
-                        (click)="fitToViewport()">
-                    <i class="fa fa-compress"></i>
-                </button>
-            </span>
-
-            <!--Auto-arrange button-->
-            <span class="btn-group">
-                <button class="btn btn-sm btn-secondary"
-                        data-test="workflow-graph-arrange-button"
-                        ct-tooltip="Auto-arrange"
-                        tooltipPlacement="top"
-                        (click)="arrange()"
-                        [disabled]="readonly">
-                    <i class="fa fa-paint-brush"></i>
-                </button>
-            </span>
-
-            <!--Export image-->
-            <span class="btn-group">
-                <button class="btn btn-sm btn-secondary"
-                        (click)="exportSVG()"
-                        ct-tooltip="Export SVG"
-                        tooltipPlacement="top">
-                    <i class="fa fa-file-image-o"></i>
-                </button>
-            </span>
-            
-        </span>
-
-        <!--Inspector Template -->
-        <ng-template #inspector>
-            <ct-editor-inspector-content>
-                <div class="tc-header">
-                    {{ inspectedNode.label || inspectedNode.id || inspectedNode.loc || typeOfInspectedNode()}}
-                </div>
-                <div class="tc-body">
-                    <ct-workflow-step-inspector *ngIf="typeOfInspectedNode() === 'Step'"
-                                                [fileID]="data.id"
-                                                [step]="inspectedNode"
-                                                [graph]="graph"
-                                                [workflowModel]="model"
-                                                (change)="change.emit()"
-                                                [readonly]="readonly">
-                    </ct-workflow-step-inspector>
-
-                    <ct-workflow-io-inspector
-                        *ngIf="typeOfInspectedNode() === 'Input' || typeOfInspectedNode() === 'Output'"
-                        [port]="inspectedNode"
-                        [graph]="graph"
-                        [workflowModel]="model"
-                        [readonly]="readonly">
-
-                    </ct-workflow-io-inspector>
-
-                </div>
-            </ct-editor-inspector-content>
-        </ng-template>
-    `
+    templateUrl: "./workflow-graph-editor.component.html"
 })
 export class WorkflowGraphEditorComponent extends DirectiveBase implements OnChanges, OnDestroy, AfterViewInit {
 
-    @Input()
-    model: WorkflowModel;
+    @Input() model: WorkflowModel;
 
     @Input()
     host: WorkflowEditorComponent;
 
-    @Input()
-    data: AppTabData;
+    @Input() data: AppTabData;
 
-    modelEventListeners = [];
+    @Input() readonly = false;
+
+    @Output() modelChange = new EventEmitter();
+
+    @Output() draw = new EventEmitter<WorkflowGraphEditorComponent>();
+
+    @Output() change = new EventEmitter<any>();
+
+    graph: Workflow;
+
+    inspectedNode: StepModel | WorkflowOutputParameterModel | WorkflowInputParameterModel = null;
 
     modelChangedFromHistory: WorkflowModel;
 
-    @Input()
-    readonly = false;
+    modelEventListeners = [];
 
-    @Output()
-    modelChange = new EventEmitter();
-
-    @Output()
-    draw = new EventEmitter<WorkflowGraphEditorComponent>();
-
-    @Output()
-    change = new EventEmitter<any>();
+    selectedElement: SVGElement;
 
     @ViewChild("canvas")
     private canvas: ElementRef;
@@ -184,15 +84,10 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     @ViewChild("inspector", {read: TemplateRef})
     private inspectorTemplate: TemplateRef<any>;
 
-    inspectedNode: StepModel | WorkflowOutputParameterModel | WorkflowInputParameterModel = null;
-
-    graph: Workflow;
-
-    selectedElement: SVGElement;
 
     private historyHandler: (ev: KeyboardEvent) => void;
 
-    private scaleStep = .1;
+    private scaleStep = 0.1;
 
     /**
      * If we're trying to trigger operations on graph that require viewport calculations (like fitting to viewport)
@@ -236,11 +131,22 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
     drawGraphAndAttachListeners() {
 
-        this.graph = new Workflow(this.canvas.nativeElement, this.model as any);
-
-        if (this.readonly) {
-            this.graph.disableGraphManipulations();
-        }
+        this.graph = new Workflow({
+            svgRoot: this.canvas.nativeElement as SVGSVGElement,
+            model: this.model as any,
+            plugins: [
+                new SVGArrangePlugin(),
+                new SVGPortDragPlugin(),
+                new SVGNodeMovePlugin(),
+                new SVGEdgeHoverPlugin(),
+                new SVGValidatePlugin(),
+                new SelectionPlugin(),
+                new ZoomPlugin(),
+                new DeletionPlugin(),
+                new UpdatePlugin(this.statusBar, this.platformRepository, this.notificationBar)
+            ],
+            editingEnabled: !this.readonly
+        });
 
         try {
             this.graph.fitToViewport();
@@ -273,7 +179,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             this.change.emit();
         });
 
-        this.graph.on("selectionChange", (ev) => {
+        this.graph.getPlugin(SelectionPlugin).registerOnSelectionChange((ev) => {
             this.selectedElement = ev;
         });
 
@@ -326,6 +232,8 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
      * Register event listeners on a current model
      */
     registerModelEventListeners() {
+        this.detachModelEventListeners();
+
         // Close object inspector if step/input/output is removed
         const removeHandler = (node) => {
             if (this.inspectedNode && this.inspectedNode.id === node.id) {
@@ -334,11 +242,35 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             }
         };
 
+        const changeHandler = (...args: any[]) => {
+            this.change.emit();
+        };
+
         this.modelEventListeners = [
             this.model.on("output.remove", removeHandler),
             this.model.on("input.remove", removeHandler),
-            this.model.on("step.remove", removeHandler)
+            this.model.on("step.remove", removeHandler),
+            this.model.on("connection.create", changeHandler),
+            this.model.on("connection.remove", changeHandler),
+            this.model.on("output.remove", changeHandler),
+            this.model.on("output.create", changeHandler),
+            this.model.on("input.remove", changeHandler),
+            this.model.on("input.create", changeHandler),
+            this.model.on("step.remove", changeHandler),
+            this.model.on("step.update", changeHandler)
+            /**
+             * because the workflow editor directly causes "step.create" to be emitted
+             * and it has to do some work afterward, this.change.emit() is triggered manually
+             * see {@link WorkflowGraphEditorComponent.onDrop}
+             */
+
         ];
+    }
+
+    detachModelEventListeners() {
+        this.modelEventListeners.forEach(handler => {
+            handler.dispose();
+        })
     }
 
     ngOnChanges(changes: SimpleChanges) {
@@ -353,23 +285,23 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         }
 
         if (this.graph && this.canvas && this.canDraw()) {
-            this.graph.redraw(this.model as any);
+            this.graph.draw(this.model as any);
         }
     }
 
     upscale() {
-        if (this.graph.getScale() <= Workflow.maxScale) {
-            const newScale = this.graph.getScale() + this.scaleStep;
-            this.graph.scaleWorkflowCenter(newScale > Workflow.maxScale ?
-                Workflow.maxScale : newScale);
+        const scale = this.graph.scale;
+
+        if (scale < this.graph.maxScale) {
+            this.graph.scale = Math.min(scale + this.scaleStep, this.graph.maxScale);
         }
     }
 
     downscale() {
-        if (this.graph.getScale() >= Workflow.minScale) {
-            const newScale = this.graph.getScale() - this.scaleStep;
-            this.graph.scaleWorkflowCenter(newScale < Workflow.minScale ?
-                Workflow.minScale : newScale);
+        const scale = this.graph.scale;
+
+        if (scale > this.graph.minScale) {
+            this.graph.scale = Math.max(scale - this.scaleStep, this.graph.minScale);
         }
     }
 
@@ -378,12 +310,11 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     }
 
     arrange() {
-        this.graph.arrange();
+        this.graph.getPlugin(SVGArrangePlugin).arrange();
     }
 
     deleteSelectedElement() {
-        this.graph.deleteSelection();
-        this.selectedElement = null;
+        this.graph.getPlugin(DeletionPlugin).deleteSelection();
     }
 
 
@@ -397,60 +328,58 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
         const statusProcess = this.statusBar.startProcess(`Adding ${nodeID} to Workflow...`);
 
-        const isLocal                = AppHelper.isLocal(nodeID);
+        const isLocal = AppHelper.isLocal(nodeID);
+
         const fetch: Promise<string> = isLocal
             ? this.fileRepository.fetchFile(nodeID)
             : this.platformRepository.getApp(nodeID).then(app => JSON.stringify(app));
 
-        fetch.then((result) => {
-            return this.gateway.resolveContent(result, nodeID).toPromise();
-        }).then(resolved => {
-            return this.appValidator.createValidator(Observable.of(JSON.stringify(resolved)))
-                .filter(val => !val.isPending)
-                .take(1)
-                .toPromise()
-                .then(val => {
-                    if (val.isValidCWL) {
-                        return resolved;
-                    }
+        fetch.then(result => this.gateway.resolveContent(result, nodeID).toPromise())
+            .then(resolved => {
+                return this.appValidator.createValidator(Observable.of(JSON.stringify(resolved)))
+                    .filter(val => !val.isPending)
+                    .take(1)
+                    .toPromise()
+                    .then(val => {
+                        if (val.isValidCWL) {
+                            return resolved;
+                        }
 
-                    throw new Error("App did not pass JSON schema validation");
+                        throw new Error("App did not pass JSON schema validation");
+                    });
+            })
+            .then((resolved: Process) => {
+                // if the app is local, give it an id that's the same as its filename (if doesn't exist)
+                if (isLocal) {
+                    resolved.id = resolved.id || AppHelper.getBasename(nodeID, true);
+                }
+
+                this.workflowEditorService.putInHistory(this.model);
+
+                const coords  = this.graph.transformScreenCTMtoCanvas(ev.clientX, ev.clientY);
+                const patched = Object.assign(resolved, {
+                    "sbg:x": coords.x,
+                    "sbg:y": coords.y
                 });
-        }).then((resolved: Process) => {
-            // if the app is local, give it an id that's the same as its filename (if doesn't exist)
-            if (isLocal) {
-                resolved.id = resolved.id || AppHelper.getBasename(nodeID, true);
-            }
 
-            this.workflowEditorService.putInHistory(this.model);
+                const step = this.model.addStepFromProcess(patched);
 
-            const step = this.model.addStepFromProcess(resolved);
+                // add local source so step can be serialized without embedding
+                if (isLocal) {
+                    step.customProps["sbg:rdfSource"] = nodeID;
+                    step.customProps["sbg:rdfId"]     = nodeID;
+                }
 
-            // add local source so step can be serialized without embedding
-            if (isLocal) {
-                step.customProps["sbg:rdfSource"] = nodeID;
-                step.customProps["sbg:rdfId"]     = nodeID;
-            }
-
-            const coords = this.graph.transformScreenCTMtoCanvas(ev.clientX, ev.clientY);
-            Object.assign(step.customProps, {
-                "sbg:x": coords.x,
-                "sbg:y": coords.y
-            });
-
-            this.graph.command("app.create.step", step);
-
-            this.setFocusOnCanvas();
+                this.change.emit();
+                this.setFocusOnCanvas();
 
             this.statusBar.stopProcess(statusProcess, `Added ${step.label}`);
-
         }).then(() => {
             // Resolve model current content in order to prevent nesting recursion
             this.host.resolveCurrentContent();
-        }).catch(err => {
-                this.statusBar.stopProcess(statusProcess);
-                this.notificationBar.showNotification(`Failed to add ${nodeID} to workflow. ${new ErrorWrapper(err)}`);
-
+        }).catch( err => {
+            this.statusBar.stopProcess(statusProcess);
+            this.notificationBar.showNotification(`Failed to add ${nodeID} to workflow. ${new ErrorWrapper(err)}`);
         });
     }
 
@@ -520,9 +449,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         super.ngOnDestroy();
 
         // Dispose model event listeners (remove step/input/output ...)
-        this.modelEventListeners.forEach((item) => {
-            item.dispose();
-        });
+        this.detachModelEventListeners();
 
         // When you click on remove tab (X) on non active tab which has no graph rendered yet
         if (this.graph) {
@@ -538,11 +465,11 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
         this.scheduleAfterRender(() => {
             if (isLocked) {
-                this.graph.disableGraphManipulations();
+                this.graph.enableEditing(false);
                 return;
             }
 
-            this.graph.enableGraphManipulations();
+            this.graph.enableEditing(true);
 
         });
     }
@@ -550,7 +477,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     redrawIfCanDrawInWorkflow(): boolean {
 
         if (this.canDraw()) {
-            this.graph.redraw();
+            this.graph.draw();
             return true;
         }
 
@@ -570,9 +497,8 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     }
 
     exportSVG() {
-        const svg = this.canvas.nativeElement as SVGSVGElement;
 
-        const content = this.renderSVGBundle(svg);
+        const content = new SvgDumper(this.canvas.nativeElement).dump();
 
         dialog.showSaveDialog({
             buttonLabel: "Save",
@@ -589,10 +515,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
                 path += ".svg";
             }
 
-            this.ipc.request("saveFileContent", {
-                path,
-                content
-            }).toPromise().then(() => {
+            this.ipc.request("saveFileContent", {path, content}).toPromise().then(() => {
                 this.statusBar.instant(`Exported SVG to ${path}`);
             }, err => {
                 this.notificationBar.showNotification("Could not save SVG: " + err, {timeout: 50000});
@@ -611,62 +534,13 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         this.functionsWaitingForRender.push(fn);
     }
 
-
-    private renderSVGBundle(root: SVGSVGElement) {
-
-        const containerElements = ["svg", "g"];
-        const embeddableStyles  = {
-            "rect": ["fill", "stroke", "stroke-width"],
-            "path": ["fill", "stroke", "stroke-width"],
-            "circle": ["fill", "stroke", "stroke-width"],
-            "line": ["stroke", "stroke-width"],
-            "text": ["fill", "font-size", "text-anchor", "font-family"],
-            "polygon": ["stroke", "fill"]
-        };
-
-        function traverse(parentNode, originalData) {
-
-            const children             = parentNode.childNodes;
-            const originalChildrenData = originalData.childNodes;
-
-            for (let childIndex = 0; childIndex < children.length; childIndex++) {
-                const child   = children[childIndex];
-                const tagName = child.tagName;
-
-                if (containerElements.indexOf(tagName) !== -1) {
-                    traverse(child, originalChildrenData[childIndex]);
-                } else if (tagName in embeddableStyles) {
-
-                    const styleDefinition = window.getComputedStyle(originalChildrenData[childIndex]);
-
-                    let styleString = "";
-                    for (let st = 0; st < embeddableStyles[tagName].length; st++) {
-                        styleString +=
-                            embeddableStyles[tagName][st]
-                            + ":"
-                            + styleDefinition.getPropertyValue(embeddableStyles[tagName][st])
-                            + "; ";
-                    }
-
-                    child.setAttribute("style", styleString);
-                }
-            }
-
-        }
-
-
-        const clone = root.cloneNode(true) as SVGSVGElement;
-        Array.from(clone.querySelectorAll(".port .label")).forEach(el => el.parentNode.removeChild(el));
-        traverse(clone, root);
-
-        return new XMLSerializer().serializeToString(clone);
-    }
-
     /**
      +     * Tells whether graph is empty (nothing to render on SVG)
      +     */
     isGraphEmpty() {
-        return this.model && !(this.model.steps.length || this.model.inputs.length || this.model.outputs.length);
+
+        const hasNoStepsOrIO = !this.model.steps.length && !this.model.inputs.length && !this.model.outputs.length;
+        return this.model && hasNoStepsOrIO;
     }
 
     /**

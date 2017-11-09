@@ -8,7 +8,7 @@ import {Component, Input} from "@angular/core";
 
             <!--Run-->
             <button type="button" class="btn btn-secondary"
-                    *ngIf="(host.executor.getExecutorState() | async) !== 'UNSET'"
+                    *ngIf="(host.executor.getExecutorState() | async) !== 'UNSET' && host.viewMode === 'test'"
                     [disabled]="!host.appIsRunnable() && (host.executor.getExecutorState() | async) === 'INVALID'"
                     ct-tooltip="Run with Rabix Executor"
                     tooltipPlacement="bottom"
@@ -95,7 +95,7 @@ import {Component, Input} from "@angular/core";
             </button>
 
             <ct-generic-dropdown-menu [ct-menu]="moreActionsMenu" menuAlign="left" #moreActionsDropdown>
-                <button class="btn btn-unstyled control-button"
+                <button class="btn control-button"
                         *ngIf="host.appIsRunnable()"
                         ct-tooltip="See More Actions"
                         tooltipPlacement="bottom"
