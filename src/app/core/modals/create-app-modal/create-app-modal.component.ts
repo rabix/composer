@@ -25,11 +25,15 @@ import {WorkboxService} from "../../workbox/workbox.service";
 
                 <div *ngIf="!defaultFolder && !defaultProject && (auth.getActive() | async)"
                      class="destination-selection">
-                    <div class="platform clickable" [class.active]="destination === 'local'"
+                    <div class="platform clickable"
+                         data-test="new-app-local-files-tab"
+                         [class.active]="destination === 'local'"
                          (click)="destination = 'local'">
                         <span><i class="fa fa-desktop"></i> Local Files</span>
                     </div>
-                    <div class="platform clickable" [class.active]="destination === 'remote'"
+                    <div class="platform clickable"
+                         data-test="new-app-remote-tab"
+                         [class.active]="destination === 'remote'"
                          (click)="destination = 'remote'">
                         <span><i class="fa fa-globe"></i> Remote</span>
                     </div>
@@ -37,33 +41,36 @@ import {WorkboxService} from "../../workbox/workbox.service";
 
                 <div class="form-group">
                     <label>App Name:</label>
-                    <input class="form-control" formControlName="name"/>
+                    <input class="form-control" formControlName="name" data-test="new-app-name"/>
                     <p *ngIf="destination === 'remote' && remoteForm.get('name').value"
-                       class="form-text text-muted">
+                       class="form-text text-muted"
+                    >
                         App ID: {{ remoteForm.get('name').value | slugify}}
                     </p>
                 </div>
 
                 <div class="form-group">
                     <label class="">CWL Version:</label>
-                    <select class="form-control" formControlName="cwlVersion">
-                        <option value="v1.0">v1.0</option>
-                        <option value="d2sb">sbg:draft-2</option>
+                    <select class="form-control" formControlName="cwlVersion" data-test="new-app-cwl-version">
+                        <option value="v1.0" data-test="new-app-cwl-v1-option">v1.0</option>
+                        <option value="d2sb" data-test="new-app-cwl-draft2-option">sbg:draft-2</option>
                     </select>
                 </div>
 
                 <div class="form-group col-sm-6" *ngIf="!appTypeLocked">
                     <label>App Type:</label>
-                    <select class="form-control" formControlName="type">
-                        <option value="Workflow">Workflow</option>
-                        <option value="CommandLineTool">Command Line tool</option>
+                    <select class="form-control" formControlName="type" data-test="new-app-type">
+                        <option value="Workflow" data-test="new-app-type-workflow">Workflow</option>
+                        <option value="CommandLineTool" data-test="new-app-type-tool">Command Line tool</option>
                     </select>
                 </div>
 
                 <div class="form-group" *ngIf="destination === 'local'">
                     <label>Destination Path:</label>
 
-                    <button class="btn btn-secondary block" type="button"
+                    <button class="btn btn-secondary block"
+                            type="button"
+                            data-test="new-app-choose-filepath-button"
                             (click)="chooseFilepath()">
                         {{ defaultFolder ? "Choose a File Name" : "Choose a Local Folder" }}
                     </button>
@@ -79,7 +86,8 @@ import {WorkboxService} from "../../workbox/workbox.service";
                                       [mono]="true"
                                       [options]="projectOptions"
                                       placeholder="Choose a destination project..."
-                                      optgroupField="hash"></ct-auto-complete>
+                                      optgroupField="hash"
+                                      data-test="new-app-destination-project"></ct-auto-complete>
                 </div>
 
                 <div *ngIf="destination === 'remote' && remoteAppCreationError ">
@@ -100,9 +108,13 @@ import {WorkboxService} from "../../workbox/workbox.service";
 
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" (click)="modal.close()"> Cancel
+                <button type="button" class="btn btn-secondary" data-test="new-app-cancel-button"
+                        (click)="modal.close()"> Cancel
                 </button>
-                <button type="submit" class="btn btn-primary" *ngIf="destination=== 'remote'"
+                <button type="submit"
+                        class="btn btn-primary"
+                        data-test="new-app-create-button"
+                        *ngIf="destination=== 'remote'"
                         [disabled]="!remoteForm.valid || appCreationInProgress">
 
                     <ct-loader-button-content [isLoading]="appCreationInProgress">
@@ -128,10 +140,10 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
     @Input() defaultFolder: string;
     @Input() defaultProject: string;
 
-    projectOptions        = [];
-    checkingSlug          = false;
-    appTypeLocked         = false;
-    appCreationInProgress = false;
+    projectOptions               = [];
+    checkingSlug                 = false;
+    appTypeLocked                = false;
+    appCreationInProgress        = false;
 
     error: string;
     localAppCreationInfo: string;

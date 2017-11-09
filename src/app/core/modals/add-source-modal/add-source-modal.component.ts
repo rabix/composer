@@ -42,7 +42,8 @@ import {PlatformCredentialsModalComponent} from "../platform-credentials-modal/p
                         <div *ngIf="closedProjectOptions.length > 0; else allProjectsAreAdded">
                             <p>Choose projects to add to the workspace:</p>
                             <div>
-                                <ct-auto-complete [(ngModel)]="selectedProjects"
+                                <ct-auto-complete data-test="add-source-modal-add-project"
+                                                  [(ngModel)]="selectedProjects"
                                                   [options]="closedProjectOptions"></ct-auto-complete>
                             </div>
                         </div>
@@ -70,7 +71,7 @@ import {PlatformCredentialsModalComponent} from "../platform-credentials-modal/p
                 <p>You are not connected to any platform</p>
                 <p>
                     <button type="button" 
-                            data-test="add-connection-btn" 
+                            data-test="add-source-modal-connection-button" 
                             class="btn btn-primary" 
                             (click)="openCredentialsForm()">
                         Add a connection
@@ -87,8 +88,8 @@ import {PlatformCredentialsModalComponent} from "../platform-credentials-modal/p
             </ng-template>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-test="cancel-btn" (click)="modal.close()">Cancel</button>
-                <button type="button" class="btn btn-primary" data-test="apply-btn" [disabled]="selectedProjects.length === 0"
+                <button type="button" class="btn btn-secondary" data-test="add-source-modal-cancel-button" (click)="modal.close()">Cancel</button>
+                <button type="button" class="btn btn-primary" data-test="add-source-modal-apply-button" [disabled]="selectedProjects.length === 0"
                         (click)="onDone()">Done
                 </button>
             </div>

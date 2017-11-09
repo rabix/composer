@@ -33,19 +33,26 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                         
                         <td class="align-middle">
                             {{ entry.user.username }}
-                            <span *ngIf="(auth.getActive() | async) === entry" class="tag tag-primary">active</span>
+                            <span *ngIf="(auth.getActive() | async) === entry" class="tag tag-primary" data-test="activa-user-tag">active</span>
                         </td>
                         
                         <td class="text-xs-right">
                             <button *ngIf="(auth.getActive() | async) === entry; else deactivate;"
-                                    (click)="setActiveCredentials(undefined)"
-                                    class="btn btn-secondary">Deactivate
+                                    class="btn btn-secondary"
+                                    data-test="authentication-deactivate-button"
+                                    (click)="setActiveCredentials(undefined)">Deactivate
                             </button>
                             <ng-template #deactivate>
-                                <button class="btn btn-secondary" (click)="setActiveCredentials(entry)">Activate</button>
+                                <button class="btn btn-secondary"
+                                        data-test="authentication-activate-button"
+                                        (click)="setActiveCredentials(entry)" >Activate</button>
                             </ng-template>
-                            <button class="btn btn-secondary" (click)="editCredentials(entry)">Edit</button>
-                            <button class="btn btn-secondary" (click)="auth.removeCredentials(entry)">Remove</button>
+                            <button class="btn btn-secondary"
+                                    data-test="authentication-edit-button"
+                                    (click)="editCredentials(entry)">Edit</button>
+                            <button class="btn btn-secondary"
+                                    data-test="authentication-remove-button"
+                                    (click)="auth.removeCredentials(entry)">Remove</button>
                         </td>
                         
                     </tr>
