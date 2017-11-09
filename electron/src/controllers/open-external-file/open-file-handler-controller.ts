@@ -14,7 +14,7 @@ module.exports = {
                 callback(null, path);
             });
 
-            filePaths = null;
+            filePaths = [];
         }
 
         callbackRegistered = true;
