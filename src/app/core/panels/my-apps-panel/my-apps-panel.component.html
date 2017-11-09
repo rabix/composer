@@ -1,7 +1,10 @@
-<ct-search-field class="m-1" [formControl]="searchContent" [placeholder]="'Search Apps'"></ct-search-field>
+<ct-search-field class="m-1"
+                 [formControl]="searchContent"
+                 [placeholder]="'Search Apps'"
+                 [dataTest]="'search-my-apps-field'"></ct-search-field>
 
 <div>
-    <button class="btn btn-link app-sources-btn" data-test="add-sources-btn"
+    <button class="btn btn-link app-sources-btn" data-test="add-sources-button"
             (click)="openAddAppSourcesDialog()">
         <i class="fa fa-fw fa-plus"></i> Open a Project
     </button>
@@ -32,7 +35,7 @@
 
     <div *ngIf="searchContent.value && (searchResults && searchResults.length === 0)"
          class="no-results m-1">
-        <p class="explanation">
+        <p class="explanation" data-test="no-search-results-public-apps">
             No search results for “{{ searchContent.value }}.”
         </p>
         <i class="icon fa-4x fa fa-search"></i>

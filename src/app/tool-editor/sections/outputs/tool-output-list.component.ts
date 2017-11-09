@@ -127,7 +127,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         <button *ngIf="!readonly && !!entries.length"
                 (click)="addEntry()"
                 type="button"
-                class="btn pl-0 btn-link no-outline no-underline-hover">
+                class="btn pl-0 btn-link no-outline no-underline-hover"
+                data-test="tool-add-output-button-small">
             <i class="fa fa-plus"></i> Add {{ isField ? "a Field" : "an Output" }}
         </button>
 
