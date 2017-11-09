@@ -12,7 +12,7 @@ import {
     SimpleChanges
 } from "@angular/core";
 import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {WorkflowModel, WorkflowStepInputModel} from "../../../../../../../IdeaProjects/cwl-ts/lib/models/index";
+import {WorkflowModel, WorkflowStepInputModel} from "cwlts/models";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {JobService} from "../../services/job/job.service";
 import {JOB_SERVICE_TOKEN} from "../../services/job/job.service.factory";
