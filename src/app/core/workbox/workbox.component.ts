@@ -124,7 +124,7 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                         <i class="fa fa-times clickable" 
                            data-test="tab-close-button"
                            [attr.data-label]="tab.label"
-                           (click)="closeTab(tab)"></i>
+                           (click)="workbox.closeTab(tab)"></i>
                     </div>
 
                     <!--Tooltip content-->
