@@ -1,6 +1,5 @@
 import chai = require("chai");
 import {RecursiveNestingError} from "./errors/recursive-nesting.error";
-import {_catch} from "rxjs/operator/catch";
 
 const assert   = chai.assert;
 const resolver = require("./schema-salad-resolver");

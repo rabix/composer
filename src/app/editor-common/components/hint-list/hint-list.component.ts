@@ -10,7 +10,8 @@ import {ErrorCode} from "../../../../../../cwl-ts/lib/models/helpers/validation/
     selector: "ct-hint-list",
     template: `
             <!--Blank Tool Screen-->
-            <ct-blank-tool-state *ngIf="!readonly && !model.hints.length" 
+            <ct-blank-tool-state *ngIf="!readonly && !model.hints.length"
+                                 data-test="tool-add-hint-button"
                                  [buttonText]="'Add a Hint'"
                                  [description]=[blankStateDescription]
                                  [learnMoreURL]="'http://docs.sevenbridges.com/docs/list-of-execution-hints'"
@@ -57,7 +58,8 @@ import {ErrorCode} from "../../../../../../cwl-ts/lib/models/helpers/validation/
             <button *ngIf="!readonly && !!model.hints.length"
                     (click)="addEntry()"
                     type="button"
-                    class="btn pl-0 btn-link no-outline no-underline-hover">
+                    class="btn pl-0 btn-link no-outline no-underline-hover"
+                    data-test="tool-add-hint-button-small">
                 <i class="fa fa-plus"></i> Add a Hint
             </button>
 

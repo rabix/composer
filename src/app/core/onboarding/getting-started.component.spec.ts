@@ -106,7 +106,7 @@ describe("GettingStartedComponent", () => {
         const system   = fixture.debugElement.injector.get(SystemService);
         const mailLink = spyOn(system, "openLink");
 
-        const getSupportBtn = fixture.debugElement.query(By.css("[data-test=get-support-btn]"));
+        const getSupportBtn = fixture.debugElement.query(By.css("[data-test=get-support-button]"));
         getSupportBtn.triggerEventHandler("click", {});
 
         expect(mailLink).toHaveBeenCalledTimes(1);
@@ -124,7 +124,7 @@ describe("GettingStartedComponent", () => {
         const modal    = fixture.debugElement.injector.get(ModalService);
         const modalSpy = spyOn(modal, "fromComponent");
 
-        const getSupportBtn = fixture.debugElement.query(By.css("[data-test=get-support-btn]"));
+        const getSupportBtn = fixture.debugElement.query(By.css("[data-test=get-support-button]"));
         getSupportBtn.triggerEventHandler("click", {});
 
         expect(modalSpy).toHaveBeenCalledWith(SendFeedbackModalComponent, jasmine.anything());

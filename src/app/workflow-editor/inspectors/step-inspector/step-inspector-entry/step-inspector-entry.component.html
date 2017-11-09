@@ -1,0 +1,128 @@
+<div class="form-control-label" *ngIf="warning">
+    <span class="text-warning">
+        <i class="fa fa-times-circle fa-fw"></i>
+        {{ warning }}
+    </span>
+</div>
+
+<div [ngSwitch]="inputType" class="form-group">
+
+    <!--Each leaf field will be wrapped as an input group-->
+    <!--Nested fields below should not be wrapped into other container elements-->
+    <!--because it will break size and positioning-->
+    <div class="input-group">
+
+        <!--Enums-->
+        <ng-template ngSwitchCase="enum">
+            <select class="form-control" [formControl]="control" #input>
+                <option *ngFor="let val of inputEnumSymbols" [value]="val">
+                    {{ val }}
+                </option>
+            </select>
+        </ng-template>
+
+        <!--Numbers-->
+        <ng-template ngSwitchCase="int">
+            <input type="number" class="form-control" [formControl]="control" [readonly]="readonly" #input/>
+        </ng-template>
+        <ng-template ngSwitchCase="float">
+            <input type="number" class="form-control" [formControl]="control" [readonly]="readonly" #input/>
+        </ng-template>
+
+        <!--Strings-->
+        <ng-template ngSwitchCase="string">
+            <input class="form-control" [formControl]="control" [readonly]="readonly" #input/>
+        </ng-template>
+
+        <!--Booleans-->
+        <ng-template ngSwitchCase="boolean">
+            <ct-toggle-slider [formControl]="control" [disabled]="readonly"></ct-toggle-slider>
+        </ng-template>
+
+        <!--Maps-->
+        <ng-template ngSwitchCase="map">
+            <ct-map-list class="form-group" [formControl]="control"></ct-map-list>
+        </ng-template>
+
+        <!--Files and array of Files-->
+        <ng-template ngSwitchCase="File">
+            <ct-native-file-browser-form-field class="input-group"
+                                               [formControl]="control.get('path')"
+                                               selectionType="file">
+            </ct-native-file-browser-form-field>
+        </ng-template>
+
+        <!--Directories and array of Directories-->
+        <ng-template ngSwitchCase="Directory">
+            <ct-native-file-browser-form-field class="input-group"
+                                               [formControl]="control.get('path')"
+                                               selectionType="directory">
+            </ct-native-file-browser-form-field>
+        </ng-template>
+
+
+    </div>
+
+    <!--Records-->
+    <ng-template ngSwitchCase="record">
+
+        <div *ngFor="let entry of inputRecordFields" class="ml-1">
+
+            <label>
+
+                {{entry?.label || entry.id}}
+
+                <i *ngIf="entry.description"
+                   class="fa fa-info-circle text-muted"
+                   [ct-tooltip]="ctt"
+                   tooltipPlacement="top"></i>
+
+            </label>
+
+            <ct-step-inspector-entry-2
+                [formControl]="control.get(entry.id)"
+                [readonly]="readonly"
+                [inputType]="entry.type.type"
+                [inputArrayItemsType]="entry.type.items"
+                [inputEnumSymbols]="entry.type.symbols"
+                [inputRecordFields]="entry.type.fields">
+            </ct-step-inspector-entry-2>
+
+            <ct-tooltip-content #ctt>
+                <div class="tooltip-info">{{ entry.description }}</div>
+            </ct-tooltip-content>
+        </div>
+    </ng-template>
+
+    <!--Arrays-->
+    <ng-template ngSwitchCase="array">
+
+        <div *ngFor="let ctrl of control.controls; let idx = index;" class="array-row">
+
+            <ct-step-inspector-entry-2 #arrayItem
+                                       [inputType]="inputArrayItemsType"
+                                       [inputEnumSymbols]="inputEnumSymbols"
+                                       [readonly]="readonly"
+                                       [formControl]="ctrl">
+            </ct-step-inspector-entry-2>
+
+            <!--Every element that's a part of the array can be deleted, so we add a deletion button to it-->
+            <span class="input-group-btn delete-btn-group">
+                <button type="button" class="btn btn-secondary" (click)="deleteFromArray(idx)" [disabled]="readonly">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </span>
+        </div>
+
+
+        <button (click)="addArrayEntry()" type="button" class="btn pl-0 btn-link no-outline no-underline-hover"
+                [disabled]="readonly">
+            <i class="fa fa-plus"></i> New {{ inputArrayItemsType }}
+        </button>
+    </ng-template>
+
+    <!--Unknown-->
+    <ng-template ngSwitchDefault>
+        <div class="alert alert-info">Unknown input type: {{ inputType || "null" }}</div>
+    </ng-template>
+</div>

@@ -2,7 +2,6 @@
 const path = require("path");
 const builder = require("electron-builder");
 const fs = require("fs-extra");
-const platform = builder.Platform;
 
 const projectRoot = path.resolve(__dirname + "/");
 const ngDistDir = projectRoot + "/ng-dist";
@@ -32,8 +31,12 @@ fs.copySync(electronDir + "/dist/main.prod.js", appDistDir + "/main.js", {
 
 
 // Copy compiled electron code to dist
-console.log("Copying electron dist...");
+console.log("Copying electron code...");
 fs.copySync(electronDir + "/dist/src", appDistDir + "/src", {
+    overwrite: true,
+    dereference: true
+});
+fs.copySync(electronDir + "/dist/executor", appDistDir + "/executor", {
     overwrite: true,
     dereference: true
 });
@@ -47,7 +50,6 @@ fs.copySync(electronDir + "/node_modules", appDistDir + "/node_modules", {
 });
 
 console.log("Starting build process...");
-
 builder.build({
     config: {
         appId: "io.rabix.composer",
@@ -71,11 +73,3 @@ builder.build({
     }
 
 });
-
-function getCurrentGitBranchSlug() {
-
-    const gitHeadPath = path.join(process.cwd(), '.git/HEAD');
-    const ref = fs.readFileSync(gitHeadPath, "utf8");
-    const branchName = /ref: refs\/heads\/([^\n]+)/.exec(ref)[1];
-    return branchName.replace(/\//g, "-");
-}

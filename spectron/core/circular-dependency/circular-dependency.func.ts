@@ -50,12 +50,12 @@ describe("circular dependency", () => {
         const addSourcesModal = `ct-add-source-modal`;
         const getStartedNotification = `ct-get-started-notification`;
 
-        await client.click(`${myAppsPanel} [data-test=add-sources-btn]`);
+        await client.click(`${myAppsPanel} [data-test=add-sources-button]`);
 
         await client.element(addSourcesModal);
 
         await client.click(`${addSourcesModal} [data-test=platform-tab]`);
-        await client.click(`${addSourcesModal} [data-test=add-connection-btn]`);
+        await client.click(`${addSourcesModal} [data-test=add-source-modal-connection-button]`);
 
         await client.element(platformCredentialsModal);
         await client.setValue(`${platformCredentialsModal} [formControlName=token]`, "1111111111111111111111111daa345f");
@@ -63,7 +63,7 @@ describe("circular dependency", () => {
 
         await client.click(`${platformCredentialsModal} button[type=submit]`);
 
-        await client.click(`${addSourcesModal} [data-test=cancel-btn]`);
+        await client.click(`${addSourcesModal} [data-test=add-source-modal-cancel-button]`);
 
         await client.click(`${getStartedNotification} button`);
 

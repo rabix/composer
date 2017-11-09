@@ -145,7 +145,7 @@ export class DomEventService {
      */
     public onMouseClick(element: Element) {
 
-        const down = Observable.fromEvent(element, "mousedown").do((e: MouseEvent) => e.preventDefault());
+        const down = Observable.fromEvent(element, "mousedown");
         const up = Observable.fromEvent(document, "mouseup");
 
         return down.flatMap(() => up.first().filter((e: MouseEvent) => element.contains(e.target as Node)));

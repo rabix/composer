@@ -1,0 +1,18 @@
+:host {
+    display: inline-block;
+    width: 100%;
+
+    .array-row {
+        display: flex;
+
+        .delete-btn-group {
+            flex-basis: 44px
+        }
+
+        ct-step-inspector-entry-2 {
+            flex: 1;
+        }
+    }
+
+
+}

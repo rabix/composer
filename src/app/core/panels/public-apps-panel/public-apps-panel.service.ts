@@ -166,8 +166,8 @@ export class PublicAppsPanelService extends AppsPanelService {
             label: app.name,
             dragEnabled: true,
             dragLabel: app.name,
-            dragDropZones: ["zone1"],
-            dragTransferData: app.id,
+            dragDropZones: ["graph-editor"],
+            dragTransferData: {name: app.id, type: "cwl"},
             icon: icon,
             dragImageClass: imageClass,
         }

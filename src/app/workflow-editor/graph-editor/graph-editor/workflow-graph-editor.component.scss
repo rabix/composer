@@ -1,4 +1,9 @@
-@import "~cwl-svg/assets/styles/style";
+@import "~cwl-svg/src/assets/styles/variables";
+@import "~cwl-svg/src/assets/styles/style";
+@import "~cwl-svg/src/plugins/port-drag/port-drag";
+@import "~cwl-svg/src/plugins/validate/validate";
+@import "~cwl-svg/src/plugins/selection/selection";
+@import "../update-plugin/update-plugin";
 
 svg.cwl-workflow {
 

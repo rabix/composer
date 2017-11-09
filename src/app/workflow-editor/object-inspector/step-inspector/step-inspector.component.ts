@@ -1,15 +1,16 @@
-import {ChangeDetectorRef, Component, EventEmitter, Input, Output} from "@angular/core";
+import {Component, EventEmitter, Input, Output} from "@angular/core";
 import {Workflow} from "cwl-svg";
 import {StepModel, WorkflowModel} from "cwlts/models";
 import {RawApp} from "../../../../../electron/src/sbg-api-client/interfaces/raw-app";
+import {AppHelper} from "../../../core/helpers/AppHelper";
 import {ErrorWrapper} from "../../../core/helpers/error-wrapper";
 import {NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {UpdatePlugin} from "../../graph-editor/update-plugin/update-plugin";
 import {UpdateStepModalComponent} from "../../update-step-modal/update-step-modal.component";
-import {AppHelper} from "../../../core/helpers/AppHelper";
 
 @Component({
     selector: "ct-workflow-step-inspector",
@@ -17,7 +18,7 @@ import {AppHelper} from "../../../core/helpers/AppHelper";
     template: `
 
         <!--Update warning-->
-        <div class="alert alert-update form-control-label" *ngIf="step.hasUpdate">
+        <div class="alert alert-update form-control-label" *ngIf="hasUpdate()">
             A new version of this app is available!
             <ng-container *ngIf="!readonly">
                 <button class="btn-inline-link" (click)="updateStep($event)">Update</button>
@@ -47,14 +48,12 @@ import {AppHelper} from "../../../core/helpers/AppHelper";
         </ct-action-bar>
 
         <!--Inputs-->
-        <ct-workflow-step-inspector-inputs *ngIf="viewMode === tabs.Inputs"
-                                           [step]="step"
-                                           [inputs]="step.in"
-                                           [graph]="graph"
-                                           (change)="change.emit()"
-                                           [workflowModel]="workflowModel"
-                                           [readonly]="readonly">
-        </ct-workflow-step-inspector-inputs>
+        <ct-step-inputs-inspector *ngIf="viewMode === tabs.Inputs"
+                                  [step]="step"
+                                  (change)="change.emit()"
+                                  [workflowModel]="workflowModel"
+                                  [readonly]="readonly">
+        </ct-step-inputs-inspector>
 
         <!--Info-->
         <ct-workflow-step-inspector-info *ngIf="viewMode === tabs.Info"
@@ -101,7 +100,6 @@ export class StepInspectorComponent extends DirectiveBase {
 
     constructor(private modal: ModalService,
                 private platformRepository: PlatformRepositoryService,
-                private cdr: ChangeDetectorRef,
                 private notificationBar: NotificationBarService,
                 private statusBar: StatusBarService) {
         super();
@@ -123,10 +121,7 @@ export class StepInspectorComponent extends DirectiveBase {
             modal.isLoading  = false;
             modal.onSubmit   = () => {
                 this.step.setRunProcess(app as any);
-                this.step.hasUpdate = false;
-                this.graph.redraw();
-                this.cdr.markForCheck();
-                this.cdr.detectChanges();
+                this.graph.getPlugin(UpdatePlugin).updateStep(this.step);
                 modal.closeModal();
             };
         }).catch(err => {
@@ -138,5 +133,9 @@ export class StepInspectorComponent extends DirectiveBase {
 
     changeTab(tab: string) {
         this.viewMode = tab;
+    }
+
+    hasUpdate(): boolean {
+        return this.graph.getPlugin(UpdatePlugin).hasUpdate(this.step);
     }
 }

@@ -18,7 +18,10 @@ import {WorkboxService} from "./workbox.service";
         <ct-generic-dropdown-menu [ct-menu]="menu" menuAlign="left"
                                   [class.update-available]="global.platformIsOutdated" #settingsDropDown>
 
-            <button type="button" class="btn btn-unstyled" (click)="settingsDropDown.toggleMenu()">
+            <button type="button" 
+                    class="btn btn-unstyled" 
+                    data-test="settings-menu-button" 
+                    (click)="settingsDropDown.toggleMenu()">
                 <span *ngIf="active">{{ userLabel }}</span>
                 <i class="fa fa-chevron-down fa-fw settings-icon"> </i>
             </button>
@@ -34,9 +37,9 @@ import {WorkboxService} from "./workbox.service";
                     </span>
                     <span class="text-muted d-block small">{{ getPlatformLabel(c.url) }}</span>
                 </li>
-                <li (click)="openSettings()"><i class="fa fa-cog fa-fw"></i> Settings</li>
-                <li (click)="openDocumentation()"><i class="fa fa-question-circle fa-fw"></i> Documentation</li>
-                <li (click)="openFeedback()"><i class="fa fa-bullhorn fa-fw"></i> Send Feedback</li>
+                <li (click)="openSettings()" data-test="settings-button"><i class="fa fa-cog fa-fw"></i> Settings</li>
+                <li (click)="openDocumentation()" data-test="documentation-button"><i class="fa fa-question-circle fa-fw"></i> Documentation</li>
+                <li (click)="openFeedback()" data-test="send-feedback-button"><i class="fa fa-bullhorn fa-fw"></i> Send Feedback</li>
                 <li (click)="checkForPlatformUpdates()" *ngIf="global.platformIsOutdated" class="outdated-update"
                     data-test="updates-available">
 

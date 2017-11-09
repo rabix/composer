@@ -40,12 +40,14 @@ import {SystemService} from "../../../platform-providers/system.service";
                         <div class="mt-2">
                             <div>
                                 <a #downloadLink href="{{linkForDownload}}"
-                                   data-test="download-link" class="btn btn-primary btn-lg"
+                                   data-test="update-platform-modal-download-link" 
+                                   class="btn btn-primary btn-lg"
                                    (click)="system.openLink(downloadLink.href); modal.close(); false;">Download</a>
                             </div>
 
                             <div *ngIf="!isIgnoredVersion">
-                                <button data-test="dismiss-button" class="btn-link clickable dismissButton"
+                                <button class="btn-link clickable dismissButton"
+                                        data-test="update-platform-modal-dismiss-button"
                                         (click)="skipUpdateVersion()">Skip this version</button>
                             </div>
                         </div>
@@ -56,7 +58,8 @@ import {SystemService} from "../../../platform-providers/system.service";
                     <div class="dialog-centered">
                         <div>
                             <div>
-                                <button data-test="close-button" class="btn btn-primary btn-lg"
+                                <button class="btn btn-primary btn-lg"
+                                        data-test="update-platform-modal-close-button" 
                                         (click)="modal.close()">Close</button>
                             </div>
                         </div>

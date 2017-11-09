@@ -3,6 +3,7 @@
 :host {
     display: flex;
     flex-basis: $action-bar-height;
+    min-height: $action-bar-height;
     background: $panel-bg;
     border-bottom: 1px solid $input-border-color;
     justify-content: space-between;

@@ -16,6 +16,7 @@ import {ToolOutputListComponent} from "./tool-output-list.component";
 
                 <!--Blank Tool Screen-->
                 <ct-blank-tool-state *ngIf="!readonly && !model?.outputs.length"
+                                     data-test="tool-add-output-button"
                                      [buttonText]="'Add an Output'"
                                      [learnMoreURL]="helpLink"
                                      [description]="blankStateDescription"
