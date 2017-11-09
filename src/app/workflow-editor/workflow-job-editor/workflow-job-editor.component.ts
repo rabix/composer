@@ -48,23 +48,25 @@ export class WorkflowJobEditorComponent extends DirectiveBase implements OnInit,
         super();
     }
 
-    onDrop(event, appID) {
+    onDrop(event, data: {name: string, type: "cwl" | "file" | "directory"}) {
 
-        if (!AppHelper.isLocal(appID)) {
+        if (!AppHelper.isLocal(data.name)) {
             return;
         }
 
-        const dropElement = event.ctData.preHoveredElement;
-        const input       = this.findParentFileInput(dropElement);
+        const dropElement    = event.ctData.preHoveredElement;
+        const directoryInput = this.findParentInputOfType(dropElement, "Directory");
+        const fileInput      = this.findParentInputOfType(dropElement, "File");
 
+        let type = directoryInput ? "Directory" : (fileInput ? "File" : null);
 
-        if (input) {
+        if (type) {
 
-            const inputID   = input.getAttribute("data-id");
+            const inputID   = (fileInput || directoryInput).getAttribute("data-id");
             const jobValue  = this.jobControl.value;
             const fileValue = jobValue[inputID];
             const isArray   = Array.isArray(fileValue);
-            const newEntry  = {class: "File", path: appID};
+            const newEntry  = {class: type, path: data.name};
 
             const patch = {[inputID]: newEntry} as any;
             if (isArray) {
@@ -113,14 +115,14 @@ export class WorkflowJobEditorComponent extends DirectiveBase implements OnInit,
         });
     }
 
-    findParentFileInput(el: Element) {
+    findParentInputOfType(el: Element, type: string) {
         while (el) {
 
-            const isInput         = el.classList.contains("input");
-            const isFileType      = el.classList.contains("type-File");
-            const isFileArrayType = el.classList.contains("type-array") && el.classList.contains("items-File");
+            const isInput     = el.classList.contains("input");
+            const isType      = el.classList.contains(`type-${type}`);
+            const isArrayType = el.classList.contains(`type-array`) && el.classList.contains(`items-${type}`);
 
-            if (isInput && (isFileType || isFileArrayType)) {
+            if (isInput && (isType || isArrayType)) {
                 return el;
             }
 

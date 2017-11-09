@@ -18,6 +18,7 @@ import {TabData} from "../../../../../electron/src/storage/types/tab-data-interf
 import {WorkboxService} from "../../workbox/workbox.service";
 import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.component";
 import {MyAppsPanelService} from "./my-apps-panel.service";
+import {getDragImageClass, getDragTransferDataType} from "../../../ui/tree-view/tree-view-utils";
 
 @Component({
     selector: "ct-my-apps-panel",
@@ -119,11 +120,11 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
                         type: result.type || "Code",
                     } as TabData<any>,
                     type: "file",
-                    dragEnabled: ["Workflow", "CommandLineTool"].indexOf(result.type) !== -1,
-                    dragTransferData: id,
+                    dragEnabled: true,
+                    dragTransferData: {name: id, type: getDragTransferDataType(result)},
                     dragLabel: title,
-                    dragImageClass: result.type === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
-                    dragDropZones: ["zone1"]
+                    dragImageClass: getDragImageClass(result),
+                    dragDropZones: ["graph-editor", "job-editor"]
                 };
             });
         });
@@ -155,10 +156,10 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
                     } as TabData<any>,
 
                     dragEnabled: true,
-                    dragTransferData: app.id,
+                    dragTransferData: {name: app.id, type: "cwl"},
                     dragLabel: app.name,
                     dragImageClass: app.raw["class"] === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
-                    dragDropZones: ["zone1"]
+                    dragDropZones: ["graph-editor"]
                 };
             });
         });

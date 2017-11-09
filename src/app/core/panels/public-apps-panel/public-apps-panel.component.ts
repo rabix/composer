@@ -214,10 +214,10 @@ export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, A
                     } as TabData<any>,
 
                     dragEnabled: true,
-                    dragTransferData: app.id,
+                    dragTransferData: {name: app.id, type: "cwl"},
                     dragLabel: app.name,
                     dragImageClass: app.raw["class"] === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
-                    dragDropZones: ["zone1"]
+                    dragDropZones: ["graph-editor"]
                 };
             });
         });
