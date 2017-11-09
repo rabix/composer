@@ -1,6 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { NativeFileBrowserFormFieldComponent } from './native-file-browser.component';
+import {NativeFileBrowserFormFieldComponent} from "./native-file-browser-form-field.component";
 
 describe('NativeFileBrowserFormFieldComponent', () => {
   let component: NativeFileBrowserFormFieldComponent;
