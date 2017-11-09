@@ -5,32 +5,32 @@ import {BehaviorSubject} from "rxjs/BehaviorSubject";
 export class EditorInspectorService {
 
     /** Holds the reference to the currently inspected object source, can be anything comparable */
-    public readonly inspectedObject = new BehaviorSubject<any>(undefined);
+    readonly inspectedObject = new BehaviorSubject<any>(undefined);
 
     private hostView: ViewContainerRef;
 
     private embeddedView: EmbeddedViewRef<any>;
 
 
-    public hide() {
+    hide() {
         this.clearView();
         this.inspectedObject.next(undefined);
 
     }
 
-    public setHostView(view: ViewContainerRef) {
+    setHostView(view: ViewContainerRef) {
         this.hostView = view;
     }
 
-    public isInspecting(obj: any) {
+    isInspecting(obj: any) {
         return obj === this.inspectedObject.getValue();
     }
 
-    public inspect(obj: any) {
+    inspect(obj: any) {
         this.inspectedObject.next(obj);
     }
 
-    public show(template: TemplateRef<any>, inspectedObject?) {
+    show(template: TemplateRef<any>, inspectedObject?) {
 
         if (inspectedObject === this.inspectedObject.getValue()) {
             return;

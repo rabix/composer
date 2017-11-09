@@ -13,7 +13,7 @@ export class ErrorWrapper {
         }
 
         if (this.err.code && this.err.code === "ENOENT") {
-            return "No such file or directory.";
+            return `No such file or directory: ${this.err.path}`;
         }
 
         const isHttpRequest = this.err.statusCode && this.err.options;

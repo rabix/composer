@@ -8,7 +8,7 @@ export class NativeSystemService {
     constructor(private electron: ElectronProxyService) {
     }
 
-    openFolder(options: Electron.OpenDialogOptions = {}, multi = false): Promise<string[]> {
+    openFolderChoiceDialog(options: Electron.OpenDialogOptions = {}, multi = false): Promise<string[]> {
 
         const {app, dialog} = this.electron.getRemote();
 
@@ -24,4 +24,26 @@ export class NativeSystemService {
             });
         });
     }
+
+    openFileChoiceDialog(options: Electron.OpenDialogOptions = {}, multi = false): Promise<string[]> {
+
+        const {app, dialog} = this.electron.getRemote();
+
+        const config = Object.assign({
+            title: "Choose a File",
+            defaultPath: app.getPath("home"),
+        }, options);
+
+        return new Promise((resolve, reject) => {
+            dialog.showOpenDialog(config, paths => {
+                paths ? resolve(paths) : reject();
+            });
+        })
+    }
+
+    exploreFolder(path: string): void {
+        const remote = this.electron.getRemote();
+        remote.require("open")(path);
+    }
+
 }

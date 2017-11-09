@@ -9,11 +9,13 @@ import "rxjs/add/operator/do";
 import "rxjs/add/operator/switchMap";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
+import {EXECUTOR_OUTDIR_PREFIX} from "../../../../electron/src/constants";
 import {AppExecutionContext} from "../../../../electron/src/storage/types/executor-config";
 import {CodeSwapService} from "../../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../../core/data-gateway/data-gateway.service";
 import {AppHelper} from "../../core/helpers/AppHelper";
 import {ErrorWrapper} from "../../core/helpers/error-wrapper";
+import {ClosingDirtyAppsModalComponent} from "../../core/modals/closing-dirty-apps/closing-dirty-apps-modal.component";
 import {ProceedToEditingModalComponent} from "../../core/modals/proceed-to-editing-modal/proceed-to-editing-modal.component";
 import {PublishModalComponent} from "../../core/modals/publish-modal/publish-modal.component";
 import {AppTabData} from "../../core/workbox/app-tab-data";
@@ -22,17 +24,18 @@ import {ExecutorService} from "../../executor/executor.service";
 import {NotificationBarService} from "../../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {StatusControlProvider} from "../../layout/status-bar/status-control-provider.interface";
+import {LocalRepositoryService} from "../../repository/local-repository.service";
 import {PlatformRepositoryService} from "../../repository/platform-repository.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {AppExecutionContextModalComponent} from "../app-execution-context-modal/app-execution-context-modal.component";
+import {AppExecutionPreviewComponent} from "../app-execution-panel/app-execution-preview.component";
 import {AppValidatorService, AppValidityState} from "../app-validator/app-validator.service";
 import {PlatformAppService} from "../components/platform-app-common/platform-app.service";
 import {RevisionListComponent} from "../components/revision-list/revision-list.component";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
 import {APP_SAVER_TOKEN, AppSaver} from "../services/app-saving/app-saver.interface";
-import {LocalRepositoryService} from "../../repository/local-repository.service";
-import {ClosingDirtyAppsModalComponent} from "../../core/modals/closing-dirty-apps/closing-dirty-apps-modal.component";
+import {CommonReportPanelComponent} from "../template-common/common-preview-panel/common-report-panel.component";
 
 export abstract class AppEditorBase extends DirectiveBase implements StatusControlProvider, OnInit, AfterViewInit {
 
@@ -84,9 +87,13 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     isExecuting = false;
 
-    executionOutput = "";
-
     executionQueue = new Subject<any>();
+
+
+    @ViewChild("reportPanelComponent", {read: CommonReportPanelComponent})
+    private reportPanelComponent: CommonReportPanelComponent;
+
+    private executionPreview: AppExecutionPreviewComponent;
 
     /** Template of the status controls that will be shown in the status bar */
     @ViewChild("statusControls")
@@ -234,48 +241,48 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         validationStateChanges.subscribeTracked(this, (data: [string, AppValidityState, boolean]) => {
             const [code, validation, unlocked] = data;
 
-                this.isLoading = false;
+            this.isLoading = false;
 
-                if (!validation.isValidCWL) {
-                    return;
+            if (!validation.isValidCWL) {
+                return;
+            }
+
+            const continuation: Promise<any> = (
+                this.viewMode === "code"
+                || !this.dataModel
+                || this.revisionChangingInProgress
+            ) ? this.resolveToModel(code) : Promise.resolve();
+
+            continuation.then(() => {
+                /**
+                 * @name revisionHackFlagSwitchOff
+                 * @see revisionChangingInProgress
+                 * */
+                this.revisionChangingInProgress = false;
+
+                // copyOf property really matters only if we are working with the latest revision
+                // otherwise, apps detached from copy state at some revision will still show locked state
+                // and notification when switched to an older revision
+                const props             = this.dataModel.customProps || {};
+                const hasCopyOfProperty = props["sbg:copyOf"] && (~~props["sbg:revision"] === ~~props["sbg:latestRevision"]);
+
+                if (!this.tabData.isWritable || this.tabData.dataSource === "local") {
+                    this.isUnlockable = false;
+                } else if (hasCopyOfProperty && !unlocked) {
+
+                    const originalApp = this.dataModel.customProps["sbg:copyOf"];
+                    this.notificationBar.showNotification(`This app is a copy of ${originalApp}`, {
+                        type: "info"
+                    });
+                    this.isUnlockable = true;
                 }
 
-                const continuation: Promise<any> = (
-                    this.viewMode === "code"
-                    || !this.dataModel
-                    || this.revisionChangingInProgress
-                ) ? this.resolveToModel(code) : Promise.resolve();
+                const isUnlockedAndUnlockableCopy = this.isUnlockable && hasCopyOfProperty && !unlocked;
 
-                continuation.then(() => {
-                    /**
-                     * @name revisionHackFlagSwitchOff
-                     * @see revisionChangingInProgress
-                     * */
-                    this.revisionChangingInProgress = false;
-
-                    // copyOf property really matters only if we are working with the latest revision
-                    // otherwise, apps detached from copy state at some revision will still show locked state
-                    // and notification when switched to an older revision
-                    const props             = this.dataModel.customProps || {};
-                    const hasCopyOfProperty = props["sbg:copyOf"] && (~~props["sbg:revision"] === ~~props["sbg:latestRevision"]);
-
-                    if (!this.tabData.isWritable || this.tabData.dataSource === "local") {
-                        this.isUnlockable = false;
-                    } else if (hasCopyOfProperty && !unlocked) {
-
-                        const originalApp = this.dataModel.customProps["sbg:copyOf"];
-                        this.notificationBar.showNotification(`This app is a copy of ${originalApp}`, {
-                            type: "info"
-                        });
-                        this.isUnlockable = true;
-                    }
-
-                    const isUnlockedAndUnlockableCopy = this.isUnlockable && hasCopyOfProperty && !unlocked;
-
-                    if (!this.tabData.isWritable || isUnlockedAndUnlockableCopy) {
-                        this.toggleLock(true);
-                    }
-                }, err => console.warn);
+                if (!this.tabData.isWritable || isUnlockedAndUnlockableCopy) {
+                    this.toggleLock(true);
+                }
+            }, err => console.warn);
         }, (err) => {
             console.warn("Error on validation state changes", err);
         });
@@ -297,8 +304,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 this.isDirty = !!isModified;
             });
         }
-
-        this.bindExecutionQueue();
     }
 
     setAppDirtyState(isModified: boolean) {
@@ -389,6 +394,10 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     ngAfterViewInit() {
         this.inspector.setHostView(this.inspectorHostView);
         super.ngAfterViewInit();
+        console.log("After init, report panel", this.reportPanelComponent);
+        this.executionPreview = this.reportPanelComponent.getAppExecutionPreview();
+
+        this.bindExecutionQueue();
     }
 
     unlockEditing(): Promise<boolean> {
@@ -506,6 +515,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             this.reportPanel = this.reportPanel === panel ? undefined : panel;
 
         }
+
+        console.log("Toggled report panel", this.reportPanel);
+
 
         // Force browser reflow, heights and scroll bar size gets inconsistent otherwise
         setTimeout(() => window.dispatchEvent(new Event("resize")));
@@ -723,7 +735,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             .switchMap((context: AppExecutionContext) => {
 
                 // If we have job path set, we can proceed with execution
-                if (context.jobPath) {
+                if (context) {
                     return Observable.of(context);
                 }
 
@@ -731,8 +743,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 const modal = this.modal.fromComponent(AppExecutionContextModalComponent, "Set Execution Parameters");
 
                 modal.confirmLabel = "Run";
-                modal.context = context;
-                modal.appID   = appID;
+                modal.context      = context;
+                modal.appID        = appID;
 
                 return new Observable(observer => {
                     modal.onSubmit = (raw) => {
@@ -757,17 +769,23 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
         // When a new execution is in the line, run it
         this.executionQueue
-            .switchMap(() => {                               // Switch so the execution gets cancelled when new one is scheduled
-                return this.runOnExecutor()                  // Starts the execution process
-                    .takeUntil(this.executionStop.do(() => this.executionOutput += "Execution Stopped"))
-                    .finally(() => {
-                        // When it ends, turn off the UI flag
-                        this.isExecuting = false;
-                    })
+
+        // Switch so the execution gets cancelled when new one is scheduled
+            .switchMap(() => {
+
+                // Starts the execution process
+                return this.runOnExecutor()
+
+                // Messages will be coming in but we need to unsubscribe at some point, so wait for the execution stream to emit
+                    .takeUntil(this.executionStop.do(() => this.executionPreview.addMessage("Execution Stopped")))
+
+                    // When done, turn off the UI flag
+                    .finally(() => this.isExecuting = false)
+
+                    // We need to catch the error here, because if we catch it in the end, this whole queue will terminate
                     .catch(err => {
-                        // We need to catch the error here, because if we catch it in the end, queue sub will be disposed
                         const wrappedError = new ErrorWrapper(err).toString();
-                        this.executionOutput += `<div class="text-error">${wrappedError}</div>`;
+                        this.executionPreview.addMessage(wrappedError, "error");
                         return Observable.empty();
                     });
             })
@@ -784,24 +802,25 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     return;
                 }
 
-                // Replace newlines with html tags because we are colouring lines separately
-                localOutput = localOutput.replace(/\n/g, "<br/>");
-
                 /**
                  * Relies on custom-added prefix to wrap up error messages
                  * @name AppEditorBase.__errorDiscriminator
                  * @see RabixExecutor.__errorPrefixing
                  */
                 if (localOutput.startsWith("ERR: ")) {
-                    this.executionOutput += `<div class="text-error">${localOutput.slice(5)}</div>`;
+                    this.executionPreview.addMessage(localOutput.slice(5), "error");
+                } else if (localOutput.startsWith(EXECUTOR_OUTDIR_PREFIX)) {
+                    this.executionPreview.addMessage(localOutput.slice(EXECUTOR_OUTDIR_PREFIX.length), "outdir");
                 } else {
-                    this.executionOutput += `<div>${localOutput}</div>`;
+                    this.executionPreview.addMessage(localOutput);
                 }
+
+
             });
 
         // Whenever a new app queues for execution, toggle the “isExecuting” GUI flag
         this.executionQueue.subscribeTracked(this, () => {
-            this.executionOutput = "";
+            this.executionPreview.clear();
             this.toggleReport("execution", true);
 
             this.isExecuting = true;
@@ -817,15 +836,18 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         return new Observable(obs => {
 
             const modelObject = this.dataModel.serialize();
-            delete modelObject["sbg:job"]; // Bunny traverses mistakenly into this to look for actual inputs
+
+            /** FIXME: Bunny traverses mistakenly into this to look for actual inputs, check if it's resolved */
+            delete modelObject["sbg:job"];
+
             const modelText = Yaml.dump(modelObject, {});
 
             const runner = this.getExecutionContext().switchMap(context => {
+
                 return this.executor
-                    .run(this.tabData.id, modelText, context.jobPath, context.executionParams)
-                    .finally(() => {
-                        obs.complete();
-                    });
+                    .run(this.tabData.id, modelText, context.executionParams)
+                    .finally(() => obs.complete());
+
             }).subscribe(obs);
 
             return () => {
@@ -848,7 +870,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             });
 
             modal.confirmationLabel = "Save";
-            modal.discardLabel = "Change without saving";
+            modal.discardLabel      = "Change without saving";
 
             modal.decision.take(1).subscribe((result) => {
 

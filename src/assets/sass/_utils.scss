@@ -76,12 +76,12 @@
 .btn.btn-unstyled:hover,
 .btn.btn-unstyled:focus {
     background: none;
-    border: none;
+    border: 1px solid transparent !important;
     color: inherit;
     line-height: inherit;
     margin: inherit;
     outline: none;
-    padding: inherit;
+    padding: inherit !important;
 }
 
 

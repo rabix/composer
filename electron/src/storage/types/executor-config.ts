@@ -1,5 +1,6 @@
 export interface ExecutorConfig {
     path: string;
+    choice: string | "bundled" | "custom";
 }
 
 export interface AppExecutionContext {

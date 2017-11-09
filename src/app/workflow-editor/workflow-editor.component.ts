@@ -1,11 +1,9 @@
 import {AfterViewInit, ChangeDetectorRef, Component, Injector, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {WorkflowFactory, WorkflowModel} from "cwlts/models";
 import * as Yaml from "js-yaml";
-import {Observable} from "rxjs/Observable";
+import {APP_META_MANAGER, appMetaManagerFactory} from "../core/app-meta/app-meta-manager-factory";
 import {CodeSwapService} from "../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
-import {AppHelper} from "../core/helpers/AppHelper";
-import {ErrorWrapper} from "../core/helpers/error-wrapper";
 import {WorkboxService} from "../core/workbox/workbox.service";
 import {AppEditorBase} from "../editor-common/app-editor-base/app-editor-base";
 import {AppValidatorService} from "../editor-common/app-validator/app-validator.service";
@@ -17,12 +15,13 @@ import {PlatformAppSavingService} from "../editor-common/services/app-saving/pla
 import {ExecutorService} from "../executor/executor.service";
 import {NotificationBarService} from "../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../layout/status-bar/status-bar.service";
+import {LocalRepositoryService} from "../repository/local-repository.service";
 import {PlatformRepositoryService} from "../repository/platform-repository.service";
 import {IpcService} from "../services/ipc.service";
 import {ModalService} from "../ui/modal/modal.service";
 import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow-graph-editor.component";
+import {JOB_SERVICE_TOKEN, jobServiceFactory} from "./services/job/job.service.factory";
 import {WorkflowEditorService} from "./workflow-editor.service";
-import {LocalRepositoryService} from "../repository/local-repository.service";
 
 export function appSaverFactory(comp: WorkflowEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -40,13 +39,23 @@ export function appSaverFactory(comp: WorkflowEditorComponent, ipc: IpcService, 
             provide: APP_SAVER_TOKEN,
             useFactory: appSaverFactory,
             deps: [WorkflowEditorComponent, IpcService, ModalService, PlatformRepositoryService]
+        }, {
+            provide: JOB_SERVICE_TOKEN,
+            useFactory: jobServiceFactory,
+            deps: [WorkflowEditorComponent, LocalRepositoryService, PlatformRepositoryService]
+        }, {
+            provide: APP_META_MANAGER,
+            useFactory: appMetaManagerFactory,
+            deps: [WorkflowEditorComponent, LocalRepositoryService, PlatformRepositoryService]
         }
+
     ],
     styleUrls: ["../editor-common/app-editor-base/app-editor-base.scss"],
     templateUrl: "./workflow-editor.component.html"
 })
 export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy, OnInit, AfterViewInit {
 
+    inspectorService: EditorInspectorService;
 
     constructor(statusBar: StatusBarService,
                 notificationBar: NotificationBarService,
@@ -77,6 +86,8 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
             workbox,
             executorService
         );
+
+        this.inspectorService = inspector;
     }
 
     protected getPreferredTab(): string {
@@ -91,7 +102,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
 
 
     /** Default view mode. */
-    viewMode: "info" | "graph" | "code" | string;
+    viewMode: "info" | "graph" | "code" | "test" | string;
 
     /** Model that's recreated on document change */
     dataModel: WorkflowModel;
@@ -113,72 +124,6 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                 this.graphEditor.setGraphManipulationsLock(locked);
             });
         }
-    }
-
-
-    protected afterModelCreated(isFirstCreation: boolean): void {
-        if (this.tabData.isWritable && this.tabData.dataSource !== "local") {
-            this.getStepUpdates();
-        }
-    }
-
-    /**
-     * Call updates service to get information about steps if they have updates and mark ones that can be updated
-     */
-    private getStepUpdates() {
-
-
-        const updateStatusProcess      = this.statusBar.startProcess("Checking for app updates…");
-        const nestedAppRevisionlessIDs = this.dataModel.steps
-            .map(step => {
-                if (!step.run || !step.run.customProps || !step.run.customProps["sbg:id"]) {
-                    return;
-                }
-
-                return AppHelper.getAppIDWithRevision(step.run.customProps["sbg:id"], null);
-            })
-            .filter(v => v);
-
-        // We are wrapping a promise as a tracked observable so we easily dispose of it when component gets destroyed
-        // If this gets destroyed while fetch is in progress, when it completes it will try to access the destroyed view
-        // which results in throwing an exception
-        Observable.fromPromise(this.platformRepository.getUpdates(nestedAppRevisionlessIDs))
-            .finally(() => this.statusBar.stopProcess(updateStatusProcess))
-            .subscribeTracked(this, result => {
-
-                const appRevisionMap = result.reduce((acc, item) => {
-
-                    const revisionlessID = AppHelper.getRevisionlessID(item.id);
-                    return {...acc, [revisionlessID]: item.revision};
-                }, {});
-
-                this.dataModel.steps.forEach(step => {
-
-                    // a non-sbg app might be embedded in an sbg workflow
-                    if (!step.run || !step.run.customProps || !step.run.customProps["sbg:id"]) {
-                        return;
-                    }
-                    const revisionless = AppHelper.getAppIDWithRevision(step.run.customProps["sbg:id"], null);
-                    const revision     = AppHelper.getRevision(step.run.customProps["sbg:id"]);
-
-                    if (appRevisionMap[revisionless] === undefined) {
-                        return;
-                    }
-
-                    step.hasUpdate = appRevisionMap[revisionless] > revision;
-                });
-
-                setTimeout(() => {
-                    if (this.graphEditor && this.graphEditor.graph) {
-                        this.hasPendingRedraw = !this.graphEditor.redrawIfCanDrawInWorkflow();
-                    }
-
-                    this.cdr.markForCheck();
-                    this.cdr.detectChanges();
-                });
-            }, err => {
-                this.notificationBar.showNotification("Cannot get app updates. " + new ErrorWrapper(err));
-            });
     }
 
     /**

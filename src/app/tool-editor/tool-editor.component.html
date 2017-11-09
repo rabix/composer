@@ -63,7 +63,7 @@
     </ct-editor-inspector>
 </div>
 
-<ct-common-report-panel *ngIf="reportPanel" [host]="this">
+<ct-common-report-panel [hidden]="!reportPanel" [host]="this" #reportPanelComponent>
     <ct-command-line-preview *ngIf="reportPanel === 'commandLinePreview'" [commandLineParts]="commandLineParts | async">
     </ct-command-line-preview>
 </ct-common-report-panel>

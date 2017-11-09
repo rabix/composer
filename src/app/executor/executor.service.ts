@@ -6,6 +6,7 @@ import {AppHelper} from "../core/helpers/AppHelper";
 import {LocalRepositoryService} from "../repository/local-repository.service";
 import {PlatformRepositoryService} from "../repository/platform-repository.service";
 import {IpcService} from "../services/ipc.service";
+import {takeWhile} from "rxjs/operator/takeWhile";
 
 @Injectable()
 export class ExecutorService {
@@ -54,11 +55,15 @@ export class ExecutorService {
         return this.executorState.asObservable();
     }
 
-    run(appID: string, content: string, jobPath: string, options = {}): Observable<string> {
+    run(appID: string, content: string, options = {}): Observable<string> {
+
+        const isLocal = AppHelper.isLocal(appID);
+        const appSource = isLocal ? "local" : "user";
+
         return this.ipc.watch("executeApp", {
             appID,
             content,
-            jobPath,
+            appSource,
             options
         }).takeWhile(val => val !== null);
     }

@@ -1,9 +1,10 @@
 import {AfterViewInit, Component, ElementRef, HostBinding, Input, ViewChild} from "@angular/core";
+import {Observable} from "rxjs/Observable";
 import {DomEventService} from "../../../services/dom/dom-event.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {WorkflowEditorComponent} from "../../../workflow-editor/workflow-editor.component";
 import {AppEditorBase} from "../../app-editor-base/app-editor-base";
-import {Observable} from "rxjs/Observable";
+import {AppExecutionPreviewComponent} from "../../app-execution-panel/app-execution-preview.component";
 
 @Component({
     selector: "ct-common-report-panel",
@@ -16,10 +17,9 @@ import {Observable} from "rxjs/Observable";
         </div>
 
         <!--Common Execution Preview-->
-        <ct-app-execution-preview *ngIf="host.reportPanel === 'execution'"
+        <ct-app-execution-preview [hidden]="host.reportPanel !== 'execution'" #executionPreview
                                   (stopExecution)="host.stopExecution()"
-                                  [isRunning]="host.isExecuting"
-                                  [content]="host.executionOutput">
+                                  [isRunning]="host.isExecuting">
         </ct-app-execution-preview>
 
         <!--Common Validation Report-->
@@ -46,6 +46,9 @@ export class CommonReportPanelComponent extends DirectiveBase implements AfterVi
 
     appType: string;
 
+    @ViewChild("executionPreview", {read: AppExecutionPreviewComponent})
+    private appExecutionPreview: AppExecutionPreviewComponent;
+
     constructor(private domEvents: DomEventService, private element: ElementRef) {
         super();
     }
@@ -55,6 +58,10 @@ export class CommonReportPanelComponent extends DirectiveBase implements AfterVi
             ? "Workflow"
             : "CommandLineTool";
 
+    }
+
+    getAppExecutionPreview(): AppExecutionPreviewComponent {
+        return this.appExecutionPreview;
     }
 
     ngAfterViewInit() {
