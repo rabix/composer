@@ -220,17 +220,15 @@ describe("app publishing", () => {
         await client.waitForVisible(tabSelector, 10000);
         await client.click(tabSelector);
 
-        assert.equal("2", "2");
+        await client.waitForVisible(revisionsButton, 5000);
+        await client.click(revisionsButton);
 
-        // await client.waitForVisible(revisionsButton, 5000);
-        // await client.click(revisionsButton);
-        //
-        // const revisionList = `ct-revision-list`;
-        // await client.waitForVisible(revisionList, 5000);
-        //
-        // const newestRevision = await client.getText(`${revisionList} .revision-entry:first-of-type .revision-number`);
-        //
-        // assert.equal(newestRevision, "2");
+        const revisionList = `ct-revision-list`;
+        await client.waitForVisible(revisionList, 5000);
+
+        const newestRevision = await client.getText(`${revisionList} .revision-entry:first-of-type .revision-number`);
+
+        assert.equal(newestRevision, "2");
     });
 
     it("publishing app causes platform workflows that contain the published app to check for updates", async function () {
@@ -348,18 +346,16 @@ describe("app publishing", () => {
         await client.waitForEnabled(submitBtn, 3000);
         await client.click(submitBtn);
 
-        assert.equal(true, true);
+        const tabSelector = `ct-workbox .tab-bar .tab:nth-child(2)`;
+        await client.waitForVisible(tabSelector, 10000);
+        await client.click(tabSelector);
 
-        // const tabSelector = `ct-workbox .tab-bar .tab:nth-child(2)`;
-        // await client.waitForVisible(tabSelector, 10000);
-        // await client.click(tabSelector);
-        //
-        // const updatedNode = `ct-workflow-graph-editor .node.hasUpdate`;
-        // await client.waitForVisible(updatedNode, 10000);
-        //
-        // const updatedNodeExists =  await client.isExisting(updatedNode);
-        //
-        // assert.equal(updatedNodeExists, true);
+        const updatedNode = `ct-workflow-graph-editor .node.hasUpdate`;
+        await client.waitForVisible(updatedNode, 10000);
+
+        const updatedNodeExists =  await client.isExisting(updatedNode);
+
+        assert.equal(updatedNodeExists, true);
     })
 });
 
