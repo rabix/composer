@@ -36,7 +36,7 @@ fs.copySync(electronDir + "/dist/src", appDistDir + "/src", {
     overwrite: true,
     dereference: true
 });
-fs.copySync(electronDir + "/dist/executor", appDistDir + "/executor", {
+fs.copySync(electronDir + "/executor", appDistDir + "/executor", {
     overwrite: true,
     dereference: true
 });
@@ -55,6 +55,7 @@ builder.build({
         appId: "io.rabix.composer",
         productName: "rabix-composer",
         asar: true,
+        asarUnpack: ["executor/**"],
         directories: {
             output: "build",
             app: "dist",

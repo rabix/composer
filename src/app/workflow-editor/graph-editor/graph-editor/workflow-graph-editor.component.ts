@@ -12,18 +12,20 @@ import {
     ViewChild,
     ViewEncapsulation
 } from "@angular/core";
+
 import {
-    SVGArrangePlugin, SVGEdgeHoverPlugin, SVGNodeMovePlugin, SVGPortDragPlugin, SVGValidatePlugin,
-    SelectionPlugin, Workflow, DeletionPlugin
+    DeletionPlugin,
+    SelectionPlugin,
+    SVGArrangePlugin,
+    SVGEdgeHoverPlugin,
+    SVGNodeMovePlugin,
+    SVGPortDragPlugin,
+    SVGValidatePlugin,
+    ZoomPlugin,
+    Workflow
 } from "cwl-svg";
-import {ZoomPlugin} from "cwl-svg/src/plugins/zoom";
-import {
-    StepModel,
-    WorkflowFactory,
-    WorkflowInputParameterModel,
-    WorkflowModel,
-    WorkflowOutputParameterModel
-} from "cwlts/models";
+
+import {StepModel, WorkflowFactory, WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
 import {Process} from "cwlts/models/generic/Process";
 import {Observable} from "rxjs/Observable";
 import {DataGatewayService} from "../../../core/data-gateway/data-gateway.service";
@@ -38,8 +40,8 @@ import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {IpcService} from "../../../services/ipc.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
-import {WorkflowEditorService} from "../../workflow-editor.service";
 import {WorkflowEditorComponent} from "../../workflow-editor.component";
+import {WorkflowEditorService} from "../../workflow-editor.service";
 import {SvgDumper} from "../svg-dumper/svg-dumper";
 import {UpdatePlugin} from "../update-plugin/update-plugin";
 
@@ -373,11 +375,11 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
                 this.change.emit();
                 this.setFocusOnCanvas();
 
-            this.statusBar.stopProcess(statusProcess, `Added ${step.label}`);
-        }).then(() => {
+                this.statusBar.stopProcess(statusProcess, `Added ${step.label}`);
+            }).then(() => {
             // Resolve model current content in order to prevent nesting recursion
             this.host.resolveCurrentContent();
-        }).catch( err => {
+        }).catch(err => {
             this.statusBar.stopProcess(statusProcess);
             this.notificationBar.showNotification(`Failed to add ${nodeID} to workflow. ${new ErrorWrapper(err)}`);
         });

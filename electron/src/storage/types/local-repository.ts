@@ -26,7 +26,7 @@ export class LocalRepository extends RepositoryType {
     sidebarHidden = false;
 
     executorConfig: ExecutorConfig = {
-        path: path.resolve(__dirname + "/../../../../executor/lib/rabix-cli.jar"),
+        path: "",
         choice: "bundled"
     };
 
