@@ -1,0 +1,103 @@
+<div *ngIf="model && isGraphEmpty()" class="svg-graph-empty-state"></div>
+
+<svg #canvas class="cwl-workflow" tabindex="-1"
+     ct-click
+     [ct-drop-enabled]="true"
+     [ct-drop-zones]="['zone1']"
+     (dblclick)="openInspector($event)"
+     (onMouseClick)="setFocusOnCanvas()"
+     (onDropSuccess)="onDrop($event.detail.data.event, $event.detail.data.transfer_data)"></svg>
+
+<span class="svg-btns" (click)="setFocusOnCanvas()">
+
+            <!--Delete button-->
+            <span class="btn-group">
+                <button *ngIf="selectedElement"
+                        ct-tooltip="Delete"
+                        tooltipPlacement="top"
+                        class="btn btn-sm btn-secondary"
+                        (click)="deleteSelectedElement()"
+                        [disabled]="readonly">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </span>
+
+            <span class="btn-group">
+
+                <!--Zoom in button-->
+                <button class="btn btn-sm btn-secondary"
+                        (click)="upscale()"
+                        ct-tooltip="Zoom In"
+                        tooltipPlacement="top"
+                        [disabled]="graph !== undefined && graph.scale >= 2">
+                    <i class="fa fa-plus"></i>
+                </button>
+
+                <!--Zoom out button-->
+                <button class="btn btn-sm btn-secondary"
+                        (click)="downscale()"
+                        ct-tooltip="Zoom Out"
+                        tooltipPlacement="top"
+                        [disabled]="graph !== undefined && graph.scale <= 0.2">
+                    <i class="fa fa-minus"></i>
+                </button>
+
+                <!--Fit to Viewport button-->
+                <button class="btn btn-sm btn-secondary"
+                        ct-tooltip="Fit to Viewport"
+                        tooltipPlacement="top"
+                        (click)="fitToViewport()">
+                    <i class="fa fa-compress"></i>
+                </button>
+            </span>
+
+    <!--Auto-arrange button-->
+            <span class="btn-group">
+                <button class="btn btn-sm btn-secondary"
+                        ct-tooltip="Auto-arrange"
+                        tooltipPlacement="top"
+                        (click)="arrange()"
+                        [disabled]="readonly">
+                    <i class="fa fa-paint-brush"></i>
+                </button>
+            </span>
+
+    <!--Export image-->
+            <span class="btn-group">
+                <button class="btn btn-sm btn-secondary"
+                        (click)="exportSVG()"
+                        ct-tooltip="Export SVG"
+                        tooltipPlacement="top">
+                    <i class="fa fa-file-image-o"></i>
+                </button>
+            </span>
+
+        </span>
+
+<!--Inspector Template -->
+<ng-template #inspector>
+    <ct-editor-inspector-content>
+        <div class="tc-header">
+            {{ inspectedNode.label || inspectedNode.id || inspectedNode.loc || typeOfInspectedNode()}}
+        </div>
+        <div class="tc-body">
+            <ct-workflow-step-inspector *ngIf="typeOfInspectedNode() === 'Step'"
+                                        [step]="inspectedNode"
+                                        [graph]="graph"
+                                        [workflowModel]="model"
+                                        (change)="change.emit()"
+                                        [readonly]="readonly">
+            </ct-workflow-step-inspector>
+
+            <ct-workflow-io-inspector
+                *ngIf="typeOfInspectedNode() === 'Input' || typeOfInspectedNode() === 'Output'"
+                [port]="inspectedNode"
+                [graph]="graph"
+                [workflowModel]="model"
+                [readonly]="readonly">
+
+            </ct-workflow-io-inspector>
+
+        </div>
+    </ct-editor-inspector-content>
+</ng-template>

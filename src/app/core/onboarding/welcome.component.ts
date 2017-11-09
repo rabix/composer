@@ -1,5 +1,4 @@
 import {Component} from "@angular/core";
-import {AddSourceModalComponent} from "../modals/add-source-modal/add-source-modal.component";
 import {SystemService} from "../../platform-providers/system.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {PlatformCredentialsModalComponent} from "../modals/platform-credentials-modal/platform-credentials-modal.component";

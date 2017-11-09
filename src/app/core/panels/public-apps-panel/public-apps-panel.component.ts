@@ -3,6 +3,7 @@ import {FormControl} from "@angular/forms";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {App} from "../../../../../electron/src/sbg-api-client/interfaces/app";
+import {TabData} from "../../../../../electron/src/storage/types/tab-data-interface";
 
 import {FileRepositoryService} from "../../../file-repository/file-repository.service";
 import {LocalRepositoryService} from "../../../repository/local-repository.service";
@@ -13,7 +14,6 @@ import {TreeViewComponent} from "../../../ui/tree-view/tree-view.component";
 import {TreeViewService} from "../../../ui/tree-view/tree-view.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {AppHelper} from "../../helpers/AppHelper";
-import {TabData} from "../../../../../electron/src/storage/types/tab-data-interface";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.component";
 import {PublicAppsPanelService} from "./public-apps-panel.service";

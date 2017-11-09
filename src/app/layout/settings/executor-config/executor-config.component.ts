@@ -6,8 +6,6 @@ import {LocalRepositoryService} from "../../../repository/local-repository.servi
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {NotificationBarService} from "../../notification-bar/notification-bar.service";
 
-const {dialog} = window["require"]("electron").remote;
-
 @Component({
     selector: "ct-executor-config",
     styles: [`
@@ -17,25 +15,40 @@ const {dialog} = window["require"]("electron").remote;
     ],
     template: `
         <form [formGroup]="form" *ngIf="form">
-            <div>
-                <label>Rabix Executor Path</label>
+
+            <div class="form-check">
+
+                <div class="form-group">
+                    <label class="form-check-label">
+                        <input type="radio" class="form-check-input" value="bundled" formControlName="choice" name="choice"/>
+                        Bundled (v1.0.2)
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-check-label">
+                        <input type="radio" class="form-check-input" value="custom" formControlName="choice" name="choice" #radio/>
+                        Custom
+
+                        <ng-container *ngIf="form.get('choice').value === 'custom'">
+                            <ct-native-file-browser-form-field class="input-group mt-1"
+                                                               [hidden]=""
+                                                               formControlName="path"></ct-native-file-browser-form-field>
+
+                            <p class="form-text text-muted">{{ versionMessage }}</p>
+                        </ng-container>
+                    </label>
+                </div>
+
             </div>
 
-            <div class="input-group">
-                <input #path formControlName="path" class="form-control"/>
-                <span class="input-group-btn">
-                    <button class="btn btn-secondary" type="button" (click)="findExec()">Browse</button>
-                </span>
-            </div>
-            <p class=" form-text text-muted">{{ versionMessage }}</p>
+
         </form>
     `,
 })
 export class ExecutorConfigComponent extends DirectiveBase implements OnInit {
 
     form: FormGroup;
-
-    isTesting = false;
 
     versionMessage = "Version: checking...";
 
@@ -45,32 +58,17 @@ export class ExecutorConfigComponent extends DirectiveBase implements OnInit {
         super();
     }
 
-    private findExec() {
-        dialog.showOpenDialog({
-
-            title: "Select a Rabix binary ",
-            buttonLabel: "Done",
-
-        }, (path) => {
-            if (!path || path.length === 0) {
-                return;
-            }
-
-            this.form.patchValue({
-                path: path[0]
-            });
-        });
-    }
-
     ngOnInit() {
 
         const showErr = (err) => this.notificationBar.showNotification(new ErrorWrapper(err).toString());
 
         this.localRepository.getExecutorConfig().take(1).subscribeTracked(this, config => {
 
-            this.form     = new FormGroup({
-                path: new FormControl(config.path, [Validators.required])
+            this.form = new FormGroup({
+                path: new FormControl(config.path, [Validators.required]),
+                choice: new FormControl(config.choice, [Validators.required])
             });
+
             const changes = this.form.valueChanges;
 
             changes.subscribeTracked(this, () => this.versionMessage = "checking...");
@@ -81,19 +79,18 @@ export class ExecutorConfigComponent extends DirectiveBase implements OnInit {
 
         }, showErr);
 
-        this.executorService.getVersion()
-            .subscribeTracked(this, (version) => {
-                this.versionMessage = version || "Version: not available";
-                if (version.startsWith("Version")) {
-                    this.form.get("path").setErrors(null);
-                } else {
-                    this.form.get("path").setErrors({
-                        probe: version
-                    });
-                }
+        this.executorService.getVersion().subscribeTracked(this, version => {
 
-            }, err => {
-                console.warn("Probe unhandled error", err);
-            });
+            this.versionMessage = version || "Version: not available";
+
+            if (version.startsWith("Version")) {
+                this.form.get("path").setErrors(null);
+            } else {
+                this.form.get("path").setErrors({probe: version});
+            }
+
+        }, err => {
+            console.warn("Probe unhandled error", err);
+        });
     }
 }

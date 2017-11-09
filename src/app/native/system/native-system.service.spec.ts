@@ -30,7 +30,7 @@ describe("NativeSystemService", () => {
          proxy: ElectronProxyService) => {
 
             const dialogSpy = spyOn(proxy.getRemote().dialog, "showOpenDialog");
-            service.openFolder();
+            service.openFolderChoiceDialog();
 
             expect(dialogSpy).toHaveBeenCalled();
         }));
