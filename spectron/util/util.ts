@@ -126,7 +126,7 @@ export function shutdown(app: spectron.Application) {
     }
 
     if (app.hasOwnProperty("testdir")) {
-        // rimraf.sync(app["testdir"]);
+        rimraf.sync(app["testdir"]);
     }
 
     return app.stop();

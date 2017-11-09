@@ -8,8 +8,8 @@ import {boot, partialProxy, proxerialize, shutdown} from "../../util/util";
 describe("app publishing", () => {
     let app: spectron.Application;
 
-    // afterEach((done) => done());
-    // afterEach(() => shutdown(app));
+    afterEach((done) => done());
+    afterEach(() => shutdown(app));
 
     it("opens newly published app in a new tab", async function () {
 
