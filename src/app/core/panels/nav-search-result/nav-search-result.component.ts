@@ -26,7 +26,7 @@ export class NavSearchResultComponent {
     @Input() dragLabel        = "";
     @Input() dragImageClass   = "";
     @Input() dragTransferData = {};
-    @Input() dragDropZones    = ["zone1"];
+    @Input() dragDropZones    = ["graph-editor"];
 
     @Input() tabData?: TabData<any>;
 
