@@ -25,7 +25,7 @@ before_script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sleep 3; fi
 script:
-  - yarn run ci:concurrently
+  - yarn run ci
 
 notifications:
   email: false
