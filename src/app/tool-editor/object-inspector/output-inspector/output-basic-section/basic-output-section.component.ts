@@ -1,4 +1,7 @@
-import {AfterViewInit, Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
+import {
+    ChangeDetectorRef, Component, forwardRef, Input,
+    ViewEncapsulation
+} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
 import {CommandLineToolModel, CommandOutputParameterModel, ParameterTypeModel} from "cwlts/models";
 import {noop} from "../../../../lib/utils.lib";
@@ -66,7 +69,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
     `
 })
-export class BasicOutputSectionComponent extends DirectiveBase implements ControlValueAccessor, AfterViewInit {
+export class BasicOutputSectionComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
     public readonly = false;
@@ -88,7 +91,7 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
 
     private initSymbolsList: string[] = [];
 
-    constructor(private formBuilder: FormBuilder) {
+    constructor(private formBuilder: FormBuilder, private cdr: ChangeDetectorRef) {
         super();
     }
 
@@ -117,8 +120,7 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
             }
 
             if (value.glob) {
-                this.output.outputBinding.glob.setValue(value.glob.serialize(), value.glob.type);
-                this.checkGlob();
+                this.output.outputBinding.glob = value.glob;
             }
 
             if (value.id !== undefined && this.output.id !== value.id) {
@@ -158,34 +160,8 @@ export class BasicOutputSectionComponent extends DirectiveBase implements Contro
         });
     }
 
-    private checkGlob() {
-        // add warning about empty glob if glob is empty
-        if (this.output.outputBinding.glob && this.output.outputBinding.glob.serialize() === undefined) {
-            this.output.outputBinding.glob.updateValidity({
-                [this.output.outputBinding.glob.loc]: {
-                    message: "Glob should be specified",
-                    type: "warning"
-                }
-            }, true);
-        } else if (this.output.outputBinding.glob &&
-            // remove warning about empty glob if glob isn't empty and that warning exists
-            this.output.outputBinding.warnings.length === 1 &&
-            this.output.outputBinding.warnings[0].message === "Glob should be specified") {
-            this.output.outputBinding.glob.cleanValidity();
-        }
-    }
-
     isType(type: string): boolean {
         return this.output.type.type === type || this.output.type.items === type;
-    }
-
-    ngAfterViewInit() {
-        // checking after view init because loading expression model will clear its validity based on the provided context
-        // wrapping it in a set timeout to avoid ExpressionChangedAfterItWasChecked
-        // @fixme
-        setTimeout(() => {
-            this.checkGlob();
-        });
     }
 
     setDisabledState(isDisabled: boolean): void {
