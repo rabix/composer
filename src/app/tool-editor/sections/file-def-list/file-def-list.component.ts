@@ -4,6 +4,7 @@ import {Subject} from "rxjs/Subject";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {ErrorCode} from "cwlts/models/helpers/validation/ErrorCode";
 
 @Component({
     selector: "ct-file-def-list",
@@ -218,12 +219,12 @@ export class FileDefListComponent extends DirectiveBase implements OnInit {
             }
 
             if (entryFromList instanceof ExpressionModel) {
-                entryFromList.cleanValidity();
+                entryFromList.clearIssue(ErrorCode.ALL);
             } else if (entryFromList instanceof DirentModel) {
 
                 const {entry, entryName} = entryFromList;
-                entry.cleanValidity();
-                entryName.cleanValidity();
+                entry.clearIssue(ErrorCode.ALL);
+                entryName.clearIssue(ErrorCode.ALL);
 
             }
 
