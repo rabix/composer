@@ -36,6 +36,9 @@ request.get({
         throw err;
     }
 
+    console.log("Response", response);
+    console.log("Releases", releases);
+
     const release = releases.find(r => r.tag_name === "v" + requiredExecutorVersion);
 
     if (!release) {
