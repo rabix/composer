@@ -2,10 +2,13 @@ const fs = require("fs-extra");
 const path = require("path");
 const tar = require("tar");
 const glob = require("glob");
-const requiredExecutorVersion = require("../package").executorVersion;
+const pkg = require("../package");
 const request = require("request");
 const rimraf = require("rimraf");
 const child = require("child_process");
+
+const requiredExecutorVersion = pkg.executorVersion;
+const executorDownloadURL = pkg.executorDownloadURL;
 
 console.log("Bundling Rabix Executor", requiredExecutorVersion);
 const targetDir = path.resolve(__dirname + "/../electron/executor");
@@ -18,57 +21,32 @@ try {
         process.exit(0);
     }
 } catch (ex) {
-    console.log("Preparing to download " + requiredExecutorVersion);
+    console.log("Preparing to download...");
 }
 
 rimraf.sync(targetDir);
 fs.ensureDirSync(targetDir);
 
-console.log("Checking releases");
-request.get({
-    url: "https://api.github.com/repos/rabix/bunny/releases",
-    json: true,
-    headers: {
-        "User-Agent": "Rabix Composer"
-    }
-}, (err, response, releases) => {
-    if (err) {
-        throw err;
-    }
+const tmpDir = targetDir + "/tmp";
+fs.ensureDir(tmpDir);
 
-    console.log("Response", response);
-    console.log("Releases", releases);
+console.log("Downloading", executorDownloadURL);
 
-    const release = releases.find(r => r.tag_name === "v" + requiredExecutorVersion);
+const write = request.get({
+    uri: executorDownloadURL,
+    gzip: true,
+    encoding: null,
+}).pipe(tar.x({
+    C: tmpDir
+}));
 
-    if (!release) {
-        throw new Error("No matching Rabix Executor Release");
-    }
-
-    const releaseURL = release.assets.find(asset => {
-        return asset.name.endsWith(".tar.gz")
-            && !asset.name.endsWith("-tes.tar.gz");
-    }).browser_download_url;
-
-
-    const tmpDir = targetDir + "/tmp";
-    fs.ensureDir(tmpDir);
-
-    console.log("Downloading", releaseURL);
-
-    const write = request.get(releaseURL).pipe(tar.x({
-        gzip: true,
-        C: tmpDir
-    }));
-
-    write.on("close", () => {
-        console.log("Copying ...");
-        const versionedDir = glob.sync(`${tmpDir}/*`)[0];
-        fs.copySync(versionedDir + "/", targetDir);
-        rimraf.sync(tmpDir);
-    });
-
+write.on("close", () => {
+    console.log("Copying ...");
+    const versionedDir = glob.sync(`${tmpDir}/*`)[0];
+    fs.copySync(versionedDir + "/", targetDir);
+    rimraf.sync(tmpDir);
 });
+
 
 
 
