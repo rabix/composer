@@ -28,7 +28,7 @@
         "serve": "node --max-old-space-size=4096 ./node_modules/.bin/ng serve",
         "start:electron": "./node_modules/.bin/electron ./electron",
         "test": "yarn run test:electron && yarn run test:angular && yarn run test:spectron",
-        "test:angular": "./node_modules/.bin/ng test --watch false --no-progress",
+        "test:angular": "./node_modules/.bin/ng test --watch false",
         "test:angular:watch": "./node_modules/.bin/ng test",
         "test:spectron": "node ./node_modules/mocha/bin/_mocha --timeout 20000 -r ts-node/register --bail --ui bdd ./spectron/**/*.func.ts",
         "test:electron": "./node_modules/electron/cli.js ./electron/node_modules/mocha/bin/_mocha --timeout 15000 -r ts-node/register --recursive --ui bdd 'electron/**/*.spec.ts'",
