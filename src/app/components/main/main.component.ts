@@ -9,7 +9,7 @@ import {ContextService} from "../../ui/context/context.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {UrlValidator} from "../../validators/url.validator";
 import {ElectronProxyService} from "../../native/proxy/electron-proxy.service";
-import {OpenExternalFileService} from "../../core/magnet-link/magnet-link.service";
+import {OpenExternalFileService} from "../../core/open-external-file/open-external-file.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
