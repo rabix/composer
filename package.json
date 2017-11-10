@@ -30,7 +30,7 @@
         "test": "yarn run test:electron && yarn run test:angular && yarn run test:spectron",
         "test:angular": "./node_modules/.bin/ng test --watch false",
         "test:angular:watch": "./node_modules/.bin/ng test",
-        "test:spectron": "node ./node_modules/mocha/bin/_mocha --timeout 20000 -r ts-node/register --bail --ui bdd ./spectron/**/*.func.ts",
+        "test:spectron": "node ./node_modules/mocha/bin/_mocha --timeout 30000 -r ts-node/register --bail --ui bdd ./spectron/**/*.func.ts",
         "test:electron": "./node_modules/electron/cli.js ./electron/node_modules/mocha/bin/_mocha --timeout 15000 -r ts-node/register --recursive --ui bdd 'electron/**/*.spec.ts'",
         "ci": "yarn run build && yarn run test:spectron && yarn run test:electron && yarn run test:angular",
         "i18n": "ng-xi18n",
