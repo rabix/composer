@@ -6,10 +6,6 @@
         "module": "es2015",
         "types": []
     },
-    "include": [
-        "**/*",
-        "../node_modules/cwl-svg/index.ts"
-    ],
     "exclude": [
         "test.ts",
         "**/*.spec.ts"
