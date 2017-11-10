@@ -3,6 +3,7 @@ import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR} from "@
 import {CommandLineToolModel, CommandOutputParameterModel} from "cwlts/models";
 import {noop} from "../../../../lib/utils.lib";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
+import {ErrorCode} from "cwlts/models/helpers/validation";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -83,7 +84,7 @@ export class OutputEvalSectionComponent extends DirectiveBase implements Control
         this.tracked = this.outputEvalFormGroup.valueChanges
             .distinctUntilChanged()
             .subscribe(value => {
-
+                this.output.outputBinding.outputEval.clearIssue(ErrorCode.OUTPUT_EVAL_INHERIT);
                 this.output.outputBinding.loadContents = value.loadContents;
                 this.propagateChange(this.output);
 
