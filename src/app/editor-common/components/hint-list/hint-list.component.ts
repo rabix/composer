@@ -4,7 +4,7 @@ import {CommandLineToolModel, StepModel, WorkflowModel} from "cwlts/models";
 import {Subscription} from "rxjs/Subscription";
 import {SystemService} from "../../../platform-providers/system.service";
 import {ModalService} from "../../../ui/modal/modal.service";
-import {ErrorCode} from "../../../../../../cwl-ts/lib/models/helpers/validation/index";
+import {ErrorCode} from "cwlts/models/helpers/validation";
 
 @Component({
     selector: "ct-hint-list",
