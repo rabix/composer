@@ -131,11 +131,14 @@ export function shutdown(app: spectron.Application) {
         return;
     }
 
-    if (app.hasOwnProperty("testdir")) {
-        rimraf.sync(app["testdir"]);
-    }
-
-    return app.stop();
+    return app.stop().then(() => {
+        return new Promise((resolve, reject) => {
+            rimraf(app["testdir"], {maxBusyTries: 5}, (err) => {
+                if (err) return reject(err);
+                resolve();
+            });
+        });
+    });
 }
 
 export function partialProxy(module: string, overrides: Object = {}) {
