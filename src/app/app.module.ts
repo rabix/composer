@@ -33,9 +33,7 @@ import {CookieModule} from 'ngx-cookie';
 
 export function initConfiguration(_configurationService: ConfigurationService) {
     if (!environment.browser) { return; }
-
-    let _url = '/configuration.yml';
-    return () => _configurationService.load(_url);
+    return () => _configurationService.load(environment.arvadosConfig);
 }
 
 @NgModule({

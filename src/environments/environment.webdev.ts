@@ -1,4 +1,5 @@
 export const environment = {
     production: false,
-    browser: true
+    browser: true,
+    arvadosConfig: 'arvados-configuration.yml'
 };

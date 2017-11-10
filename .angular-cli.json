@@ -12,6 +12,7 @@
             "assets": [
                 "assets",
                 "favicon.ico",
+                "arvados-configuration.yml",
                 {
                     "glob": "font-awesome.min.css",
                     "input": "../node_modules/font-awesome/css",
