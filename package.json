@@ -1,6 +1,7 @@
 {
     "name": "rabix-composer",
     "version": "1.0.0-rc.2",
+    "executorVersion": "1.0.3",
     "license": "Apache-2.0",
     "homepage": "https://github.com/rabix/composer#readme",
     "description": "Rabix Composer is a desktop IDE for working with Common Workflow Language workflows",
@@ -14,15 +15,15 @@
         "url": "git+https://github.com/rabix/composer.git"
     },
     "scripts": {
-        "concurrently": "./node_modules/.bin/concurrently",
         "build": "yarn run compile:electron && yarn run compile:angular && yarn run package",
         "changelog": "./node_modules/.bin/git-changelog",
         "compile:angular": "./node_modules/.bin/ng build -prod -aot --no-progress",
         "compile:electron": "./node_modules/.bin/tsc -p electron && cp -R electron/src/splash electron/dist/src",
         "compile:electron:watch": "./node_modules/.bin/tsc -p electron --watch",
+        "debug:electron": "./node_modules/.bin/electron ./electron --inspect-brk",
         "lint": "./node_modules/.bin/ng lint",
         "package": "node ./electron-build.js",
-        "postinstall": "cd electron && yarn install",
+        "postinstall": "./node_modules/.bin/concurrently 'node build-scripts/bundle-executor.js' 'cd electron && yarn install'",
         "serve": "./node_modules/.bin/ng serve",
         "start:electron": "./node_modules/.bin/electron ./electron",
         "test": "yarn run test:electron && yarn run test:angular && yarn run test:spectron",
@@ -50,8 +51,7 @@
         "bootstrap": "4.0.0-alpha.5",
         "brace": "^0.10.0",
         "core-js": "^2.5.0",
-        "cwl-svg": "0.0.42",
-        "cwlts": "1.13.39",
+        "cwl-svg": "^1.0.0",
         "font-awesome": "^4.7.0",
         "jquery": "^3.2.1",
         "js-yaml": "^3.9.1",
@@ -60,7 +60,8 @@
         "ngx-pipes": "^1.6.3",
         "rxjs": "^5.4.3",
         "selectize": "^0.12.4",
-        "zone.js": "^0.8.17"
+        "zone.js": "^0.8.17",
+        "cwlts":"^1.14.1"
     },
     "devDependencies": {
         "@angular/cli": "^1.3.2",
@@ -93,8 +94,10 @@
         "karma-jasmine-html-reporter": "^0.2.2",
         "markdown-it": "^8.3.2",
         "mocha": "^3.5.0",
+        "request": "^2.81.0",
         "rimraf": "^2.6.1",
         "spectron": "^3.7.2",
+        "tar": "^4.0.1",
         "ts-node": "^3.3.0",
         "tslint": "^5.7.0",
         "typescript": "~2.3.4"

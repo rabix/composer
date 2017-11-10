@@ -1,0 +1,24 @@
+@import "./../../../../assets/sass/variables";
+
+.__plugin-job-file-drop {
+
+    .node.input {
+
+        &.type-File,
+        &.items-File {
+
+            &.__plugin-job-file-drop-added .core .inner {
+                fill: #83a986;
+            }
+
+            .core .inner {
+                fill: #bf9d76;
+            }
+        }
+
+    }
+
+    .node.step .core .inner {
+        //fill: #aabac3;
+    }
+}

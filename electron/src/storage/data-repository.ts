@@ -1,3 +1,4 @@
+import * as path from "path";
 import * as ReadWriteLock from "rwlock";
 import {RepositoryHook} from "./hooks/repository-hook";
 import {LocalRepository} from "./types/local-repository";
@@ -51,6 +52,15 @@ export class DataRepository {
                     this.trigger("update.user", this.user);
                 }
             });
+        });
+
+        this.on("update.local.executorConfig", () => {
+
+            if (this.local.executorConfig.choice === "bundled") {
+                const executorPath             = path.resolve(__dirname + "/../../../executor/lib/rabix-cli.jar");
+                this.local.executorConfig.path = executorPath;
+            }
+
         });
 
         this.on("update.local.credentials", () => {

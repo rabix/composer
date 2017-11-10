@@ -3,6 +3,7 @@ import {FormControl} from "@angular/forms";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {App} from "../../../../../electron/src/sbg-api-client/interfaces/app";
+import {TabData} from "../../../../../electron/src/storage/types/tab-data-interface";
 
 import {FileRepositoryService} from "../../../file-repository/file-repository.service";
 import {LocalRepositoryService} from "../../../repository/local-repository.service";
@@ -13,7 +14,6 @@ import {TreeViewComponent} from "../../../ui/tree-view/tree-view.component";
 import {TreeViewService} from "../../../ui/tree-view/tree-view.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {AppHelper} from "../../helpers/AppHelper";
-import {TabData} from "../../../../../electron/src/storage/types/tab-data-interface";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.component";
 import {PublicAppsPanelService} from "./public-apps-panel.service";
@@ -21,8 +21,10 @@ import {PublicAppsPanelService} from "./public-apps-panel.service";
 @Component({
     selector: "ct-public-apps-panel",
     template: `
-        <ct-search-field class="m-1" [formControl]="searchContent"
-                         [placeholder]="'Search Public Apps'"></ct-search-field>
+        <ct-search-field class="m-1" 
+                         [formControl]="searchContent"
+                         [placeholder]="'Search Public Apps'"
+                         [dataTest]="'search-public-apps-field'"></ct-search-field>
 
         <div class="btn-group grouping-toggle" *ngIf="!searchContent?.value">
 
@@ -30,8 +32,11 @@ import {PublicAppsPanelService} from "./public-apps-panel.service";
                 Group by:
             </label>
 
-            <ct-generic-dropdown-menu [ct-menu]="menu" [menuState]="groupByOpenStatus">
-                <button type="button" class="btn btn-unstyled">
+            <ct-generic-dropdown-menu [ct-menu]="menu" #groupByDropdown>
+                <button type="button" 
+                        class="btn btn-unstyled" 
+                        data-test="group-by-dropdown-button" 
+                        (click)="groupByDropdown.toggleMenu()">
                     {{ grouping }}
                     <i class="fa fa-chevron-down fa-fw settings-icon"> </i>
                 </button>
@@ -39,12 +44,16 @@ import {PublicAppsPanelService} from "./public-apps-panel.service";
             </ct-generic-dropdown-menu>
 
             <ng-template #menu class="mr-1">
-                <ul class="list-unstyled">
-                    <li *ngFor="let c of groupByOptions" class="group-by-item" [class.active]="grouping === c.value"
+                <ul class="list-unstyled" (click)="groupByDropdown.hide()">
+                    <li *ngFor="let c of groupByOptions" 
+                        class="group-by-item"
+                        data-test="group-by-option"
+                        [attr.data-option]="c.value"
+                        [class.active]="grouping === c.value"
                         (click)="switchGrouping(c.value)">
-                                            <span>
-                                                {{ c.caption }}
-                                            </span>
+                        <span>
+                            {{ c.caption }}
+                        </span>
                     </li>
                 </ul>
             </ng-template>
@@ -77,7 +86,7 @@ import {PublicAppsPanelService} from "./public-apps-panel.service";
             <div *ngIf="searchContent.value 
                         && (searchResults && searchResults?.length === 0)"
                  class="no-results m-1">
-                <p class="explanation">
+                <p class="explanation" data-test="no-search-results-my-apps">
                     No search results for “{{ searchContent.value }}.”
                 </p>
                 <i class="icon fa-4x fa fa-search"></i>
@@ -109,8 +118,6 @@ export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, A
             caption: "Category"
         }
     ];
-
-    groupByOpenStatus = new Subject<boolean>();
 
     treeNodes: TreeNode<any>[] = [];
 
@@ -184,10 +191,6 @@ export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, A
 
     switchGrouping(type: "toolkit" | "category" | "none") {
         this.grouping = type;
-
-        // Close dropdown
-        this.groupByOpenStatus.next(false);
-
         this.localRepository.setPublicAppsGrouping(type);
     }
 
@@ -211,10 +214,10 @@ export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, A
                     } as TabData<any>,
 
                     dragEnabled: true,
-                    dragTransferData: app.id,
+                    dragTransferData: {name: app.id, type: "cwl"},
                     dragLabel: app.name,
                     dragImageClass: app.raw["class"] === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
-                    dragDropZones: ["zone1"]
+                    dragDropZones: ["graph-editor"]
                 };
             });
         });

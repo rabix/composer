@@ -185,6 +185,8 @@ function parseJSON(content, source, rootPath, root?, graph?, traversedExternalPa
 /**
  * @param filename
  * @param options
+ * @param rootPath
+ * @param traversedExternalPaths
  * @returns {Promise<Object>|Promise}
  */
 function fetch(filename, options, rootPath, traversedExternalPaths) {

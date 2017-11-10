@@ -69,11 +69,11 @@ describe("dirty checking", async () => {
             await client.waitForVisible(closingDirtyAppsModal);
 
             // If you click on Cancel button, tab should be still Dirty
-            await client.click(`${closingDirtyAppsModal} [data-test="cancel-btn"]`);
+            await client.click(`${closingDirtyAppsModal} [data-test="dirty-app-modal-cancel-button"]`);
             await waitUntilTabBecomeDirty(client, tab);
 
             // When you click on Save button, tab should not be Dirty anymore
-            await client.click(`${commonDocumentControls} [data-test="save-btn"]`);
+            await client.click(`${commonDocumentControls} [data-test="save-button"]`);
             await waitUntilTabBecomeDirty(client, tab, false);
 
             // When you change something again tab should be Dirty
@@ -85,7 +85,7 @@ describe("dirty checking", async () => {
             await client.waitForVisible(closingDirtyAppsModal);
 
             // If you click on Save button app should be saved and Dirty state should be false
-            await client.click(`${closingDirtyAppsModal} [data-test="save-btn"]`);
+            await client.click(`${closingDirtyAppsModal} [data-test="dirty-app-modal-save-button"]`);
             await waitUntilTabBecomeDirty(client, tab, false);
 
             // If you click on close button now, tab should be closed
@@ -144,7 +144,7 @@ describe("dirty checking", async () => {
             await client.waitForVisible(closingDirtyAppsModal);
 
             // If you click on Discard button app tab should be closed
-            await client.click(`${closingDirtyAppsModal} [data-test="discard-btn"]`);
+            await client.click(`${closingDirtyAppsModal} [data-test="dirty-app-modal-discard-button"]`);
 
             await client.waitUntil(async () => {
                 const isVisible = await client.isVisible(tab);
@@ -530,7 +530,7 @@ describe("dirty checking", async () => {
 
             const visualEditor = `ct-tool-visual-editor`;
             const tab = `ct-workbox .tab`;
-            const codeTab = `[data-test="code-tab"]`;
+            const codeTab = `[data-test="tool-code-tab"]`;
             const codeTabContent = `ct-code-editor`;
             const aceEditorContent = `.ace_content`;
 
@@ -580,7 +580,7 @@ describe("dirty checking", async () => {
 
             const visualEditor = `ct-tool-visual-editor`;
             const tab = `ct-workbox .tab`;
-            const infoTab = `[data-test="info-tab"]`;
+            const infoTab = `[data-test="tool-info-tab"]`;
             const infoTabSection = `ct-app-info`;
             const inlineEditor = `ct-inline-editor`;
 
@@ -643,7 +643,7 @@ describe("dirty checking", async () => {
             const visualEditor = `ct-tool-visual-editor`;
             const tab = `ct-workbox .tab`;
             const docker = `[data-test="docker-pull-input"]`;
-            const revisionBtn = `[data-test="revision-btn"]`;
+            const revisionBtn = `[data-test="revision-button"]`;
             const revisionComponent = `ct-revision-list`;
             const closingDirtyAppsModal = `ct-modal-closing-dirty-apps`;
 
@@ -668,7 +668,7 @@ describe("dirty checking", async () => {
             await client.waitForVisible(closingDirtyAppsModal);
 
             // Click on cancel button
-            await client.click(`${closingDirtyAppsModal} [data-test="cancel-btn"]`);
+            await client.click(`${closingDirtyAppsModal} [data-test="dirty-app-modal-cancel-button"]`);
 
             // Tab should be still dirty
             await waitUntilTabBecomeDirty(client, tab);
@@ -677,7 +677,7 @@ describe("dirty checking", async () => {
             await client.click(`${revisionComponent} .revision-entry:nth-of-type(2)`);
 
             // Click on discard button
-            await client.click(`${closingDirtyAppsModal} [data-test="discard-btn"]`);
+            await client.click(`${closingDirtyAppsModal} [data-test="dirty-app-modal-discard-button"]`);
 
             // Tab should not be dirty anymore
             await waitUntilTabBecomeDirty(client, tab, false);
@@ -716,7 +716,7 @@ describe("dirty checking", async () => {
 
             const visualEditor = `ct-workflow-graph-editor`;
             const tab = `ct-workbox .tab`;
-            const infoTab = `[data-test="info-tab"]`;
+            const infoTab = `[data-test="workflow-info-tab"]`;
             const infoTabSection = `ct-app-info`;
             const inlineEditor = `ct-inline-editor`;
 
@@ -768,7 +768,7 @@ describe("dirty checking", async () => {
 
             const visualEditor = `ct-workflow-graph-editor`;
             const tab = `ct-workbox .tab`;
-            const arrange = `[data-test="auto-arrange-btn"]`;
+            const arrange = `[data-test="workflow-graph-arrange-button"]`;
 
             await client.waitForVisible(visualEditor);
 
@@ -808,7 +808,7 @@ describe("dirty checking", async () => {
 
             const visualEditor = `ct-workflow-graph-editor`;
             const tab = `ct-workbox .tab`;
-            const codeTab = `[data-test="code-tab"]`;
+            const codeTab = `[data-test="workflow-code-tab"]`;
             const codeTabContent = `ct-code-editor`;
             const aceEditorContent = `.ace_content`;
 
@@ -869,41 +869,34 @@ describe("dirty checking", async () => {
             const client = app.client;
             const visualEditor = `ct-workflow-graph-editor`;
             const tab = `ct-workbox .tab`;
-            const arrange = `[data-test="auto-arrange-btn"]`;
-            const revisionBtn = `[data-test="revision-btn"]`;
+            const arrange = `[data-test="workflow-graph-arrange-button"]`;
+            const revisionBtn = `[data-test="revision-button"]`;
             const revisionComponent = `ct-revision-list`;
             const closingDirtyAppsModal = `ct-modal-closing-dirty-apps`;
 
-
-            console.log("Visual Editor");
             await client.waitForVisible(visualEditor, 5000);
             await client.waitForVisible(arrange, 5000);
 
             await client.click(arrange);
 
-
-            console.log("Dirty1");
             // Tab should be dirty
             await waitUntilTabBecomeDirty(client, tab);
 
             // Click on revision button
             await client.click(revisionBtn);
 
-            console.log("Revision");
             // Revision component should appear
             await client.waitForVisible(revisionComponent, 5000);
 
             // Click on revision entry
             await client.click(`${revisionComponent} .revision-entry:nth-of-type(2)`);
 
-            console.log("Revision2");
             // Modal should prevent changing revision
             await client.waitForVisible(closingDirtyAppsModal, 5000);
 
             // Click on cancel button
-            await client.click(`${closingDirtyAppsModal} [data-test="cancel-btn"]`);
+            await client.click(`${closingDirtyAppsModal} [data-test="dirty-app-modal-cancel-button"]`);
 
-            console.log("Dirty2");
             // Tab should be still dirty
             await waitUntilTabBecomeDirty(client, tab);
 
@@ -911,12 +904,10 @@ describe("dirty checking", async () => {
             await client.click(`${revisionComponent} .revision-entry:nth-of-type(2)`);
 
             // Click on discard button
-            await client.click(`${closingDirtyAppsModal} [data-test="discard-btn"]`);
+            await client.click(`${closingDirtyAppsModal} [data-test="dirty-app-modal-discard-button"]`);
 
-            console.log("Discard");
             // Tab should not be dirty anymore
             await waitUntilTabBecomeDirty(client, tab, false);
-            console.log("Dirty3");
         });
     });
 

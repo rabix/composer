@@ -181,7 +181,7 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
             try {
                 // Change id on workflow model so canvas can interact with it
                 this.workflowModel.changeStepId(this.step, value);
-                this.graph.redraw();
+                this.graph.draw();
             } catch (e) {
                 this.form.controls["id"].setErrors({error: e.message});
                 // Because this comes outside of Angular (workflow model)
@@ -195,7 +195,7 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
 
         this.tracked = this.form.controls["label"].valueChanges.debounceTime(1000).subscribe((label) => {
             this.step.label = label;
-            this.graph.redraw();
+            this.graph.draw();
         });
 
         this.tracked = this.form.controls["scatter"].valueChanges.subscribe((scatter) => {

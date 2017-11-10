@@ -14,12 +14,12 @@ import {ModalService} from "../../../ui/modal/modal.service";
             
             <div class="modal-footer">
                 <button class="btn btn-secondary discard-button"
-                        (click)="decision.next(false)" data-test="discard-btn" type="button">{{ discardLabel }}
+                        (click)="decision.next(false)" data-test="dirty-app-modal-discard-button" type="button">{{ discardLabel }}
                 </button>
 
-                <button class="btn btn-secondary" data-test="cancel-btn" (click)="onCancel()" type="button">{{ cancellationLabel }}
+                <button class="btn btn-secondary" data-test="dirty-app-modal-cancel-button" (click)="onCancel()" type="button">{{ cancellationLabel }}
                 </button>
-                <button class="btn btn-primary" data-test="save-btn" type="submit">{{ confirmationLabel }}</button>
+                <button class="btn btn-primary" data-test="dirty-app-modal-save-button" type="submit">{{ confirmationLabel }}</button>
             </div>
         </form>
     `

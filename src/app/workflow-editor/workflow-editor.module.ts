@@ -6,31 +6,39 @@ import {EditorCommonModule} from "../editor-common/editor-common.module";
 import {LayoutModule} from "../layout/layout.module";
 import {UIModule} from "../ui/ui.module";
 import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow-graph-editor.component";
+import {StepInspectorEntry2Component} from "./inspectors/step-inspector/step-inspector-entry/step-inspector-entry.component";
+import {InputJobInspectorComponent} from "./object-inspector/input-job-inspector/input-job-inspector.component";
 import {WorkflowIOInspectorComponent} from "./object-inspector/io-inspector/workflow-io-inspector.component";
+import {StepInputsInspectorComponent} from "./object-inspector/step-inspector/step-inputs-inspector/step-inputs-inspector.component";
 import {StepInspectorComponent} from "./object-inspector/step-inspector/step-inspector.component";
 import {WorkflowStepInspectorInputEntryComponent} from "./object-inspector/step-inspector/tabs/step-inspector-step-entry";
 import {WorkflowStepInspectorTabInfo} from "./object-inspector/step-inspector/tabs/step-tab-info.component";
-import {WorkflowStepInspectorTabInputsComponent} from "./object-inspector/step-inspector/tabs/step-tab-inputs.component";
 import {WorkflowStepInspectorTabStep} from "./object-inspector/step-inspector/tabs/step-tab-step.component";
+import {WorkflowJobStepInspector} from "./object-inspector/workflow-job-step-inspector/workflow-job-step-inspector.component";
 import {UpdateStepModalComponent} from "./update-step-modal/update-step-modal.component";
 import {WorkflowEditorComponent} from "./workflow-editor.component";
+import {WorkflowJobEditorComponent} from "./workflow-job-editor/workflow-job-editor.component";
 import {WorkflowNotGraphEditorComponent} from "./workflow-not-graphic-editor/workflow-not-graph-editor.component";
 
 @NgModule({
     declarations: [
+        InputJobInspectorComponent,
+        StepInputsInspectorComponent,
+        WorkflowJobStepInspector,
+        StepInspectorComponent,
+        StepInspectorEntry2Component,
+        UpdateStepModalComponent,
         WorkflowEditorComponent,
         WorkflowGraphEditorComponent,
-        WorkflowNotGraphEditorComponent,
         WorkflowIOInspectorComponent,
-        StepInspectorComponent,
+        WorkflowJobEditorComponent,
+        WorkflowNotGraphEditorComponent,
         WorkflowStepInspectorInputEntryComponent,
-        WorkflowStepInspectorTabInputsComponent,
         WorkflowStepInspectorTabInfo,
         WorkflowStepInspectorTabStep,
-        UpdateStepModalComponent
     ],
     entryComponents: [
-      UpdateStepModalComponent,
+        UpdateStepModalComponent,
     ],
     exports: [
         WorkflowEditorComponent

@@ -25,7 +25,7 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                     [ct-drag-over]="true"
                     (onDragOver)="workbox.openTab(tab)"
                     ct-click
-                    (onMouseClick)="onTabClick($event, tab, tabComponents[i])"
+                    (onMouseClick)="onTabClick($event, tab)"
                     [class.active]="tab === (workbox.activeTab | async)"
                     [class.isDirty]="tabComponents[i]?.isDirty"
                     [ct-context]="createContextMenu(tab)"
@@ -40,7 +40,12 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                                 <i class="fa fa-home"></i>
                             </div>
 
-                            <div class="title" [ct-tooltip]="ctt" [tooltipPlacement]="'bottom'">{{tab.label}}</div>
+                            <div class="title" 
+                                 data-test="welcome-tab-title" 
+                                 [ct-tooltip]="ctt" 
+                                 [tooltipPlacement]="'bottom'">
+                                {{tab.label}}
+                            </div>
                         </ng-template>
 
                         <!-- Code tab-->
@@ -49,7 +54,12 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                                 <i class="fa fa-file-text-o"></i>
                             </div>
 
-                            <div class="title" [ct-tooltip]="ctt" [tooltipPlacement]="'bottom'">{{tab.label}}</div>
+                            <div class="title"
+                                 [ct-tooltip]="ctt" 
+                                 [tooltipPlacement]="'bottom'" 
+                                 data-test="file-tab-title">
+                                {{tab.label}}
+                            </div>
                         </ng-template>
 
                         <!-- Workflow tab-->
@@ -58,7 +68,10 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                                 <i class="fa fa-share-alt"></i>
                             </div>
 
-                            <div class="title" [ct-tooltip]="ctt" [tooltipPlacement]="'bottom'">
+                            <div class="title" 
+                                 [ct-tooltip]="ctt" 
+                                 [tooltipPlacement]="'bottom'"
+                                 data-test="workflow-tab-title">
                                 {{tabComponents[i]?.dataModel?.label || tab.label}}
                             </div>
                         </ng-template>
@@ -69,7 +82,10 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                                 <i class="fa fa-terminal"></i>
                             </div>
 
-                            <div class="title" [ct-tooltip]="ctt" [tooltipPlacement]="'bottom'">
+                            <div class="title" 
+                                 [ct-tooltip]="ctt" 
+                                 [tooltipPlacement]="'bottom'"
+                                 data-test="tool-tab-title">
                                 {{tabComponents[i]?.dataModel?.label || tab.label}}
                             </div>
                         </ng-template>
@@ -80,7 +96,12 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                                 <i class="fa fa-file-o"></i>
                             </div>
 
-                            <div class="title" [ct-tooltip]="ctt" [tooltipPlacement]="'bottom'">{{tab.label}}</div>
+                            <div class="title" 
+                                 data-test="new-file-tab-title" 
+                                 [ct-tooltip]="ctt" 
+                                 [tooltipPlacement]="'bottom'">
+                                {{tab.label}}
+                            </div>
                         </ng-template>
 
                         <!-- Settings tab-->
@@ -89,13 +110,21 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                                 <i class="fa fa-cog"></i>
                             </div>
 
-                            <div class="title" [ct-tooltip]="ctt" [tooltipPlacement]="'bottom'">{{tab.label}}</div>
+                            <div class="title" 
+                                 data-test="settings-tab-title"
+                                 [ct-tooltip]="ctt" 
+                                 [tooltipPlacement]="'bottom'">
+                                {{tab.label}}
+                            </div>
                         </ng-template>
 
                     </ng-container>
 
                     <div class="close-icon">
-                        <i class="fa fa-times clickable" (click)="removeTab(tab, tabComponents[i])"></i>
+                        <i class="fa fa-times clickable" 
+                           data-test="tab-close-button"
+                           [attr.data-label]="tab.label"
+                           (click)="workbox.closeTab(tab)"></i>
                     </div>
 
                     <!--Tooltip content-->
@@ -182,6 +211,15 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
         this.workbox.tabs.subscribeTracked(this, tabs => {
             this.tabs = tabs;
         });
+
+        this.workbox.closeTabStream.subscribeTracked(this, tab => {
+           this.closeTab(tab);
+        });
+
+        this.workbox.closeAllTabsStream.subscribeTracked(this, tabs => {
+            this.closeAllTabs(tabs);
+        });
+
     }
 
     ngAfterViewInit() {
@@ -198,7 +236,11 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
         }), (tab) => tab)
             .subscribeTracked(this, (tab) => {
 
-                this.activeTab = tab;
+                // activeTab has to be set in the next tick, otherwise we will have ExpressionChangedAfterItHadBeenCheckedError in some cases
+                setTimeout(() => {
+                    this.activeTab = tab;
+                });
+
                 const idx = this.tabs.findIndex(t => t === tab);
 
                 const component = this.tabComponentContainers.find((item, index) => index === idx);
@@ -225,21 +267,29 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
     }
 
     /**
-     * When you click on tab
+     * When you click on a tab
      */
     onTabClick(event: MouseEvent, tab, component) {
         // Middle click
         if (event.button === 0) {
             this.workbox.openTab(tab);
         } else if (event.button === 1) {
-            this.removeTab(tab, component);
+            this.workbox.closeTab(tab);
         }
     }
 
     /**
-     * Removes a tab by index
+     * Closes a tab
      */
-    removeTab(tab, component) {
+    closeTab(tab: TabData<any>) {
+
+        const index = this.tabs.findIndex((t) => t === tab);
+
+        if (index === -1) {
+            return;
+        }
+
+        const component = this.tabComponents[index];
 
         if (component.isDirty) {
 
@@ -252,11 +302,11 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
 
             modal.decision.take(1).subscribe((result) => {
                 this.modal.close();
-                result ? component.save() : this.workbox.closeTab(tab);
+                result ? component.save() : this.workbox.closeTab(tab, true);
             });
 
         } else {
-            this.workbox.closeTab(tab);
+            this.workbox.closeTab(tab, true);
         }
     }
 
@@ -284,20 +334,20 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
 
     createContextMenu(tab): MenuItem[] {
         const closeOthers = new MenuItem("Close Others", {
-            click: () => this.removeAllTabs([tab])
+            click: () => this.closeAllTabs([tab])
         });
 
         const closeAll = new MenuItem("Close All", {
-            click: () => this.removeAllTabs()
+            click: () => this.closeAllTabs()
         });
 
         return [closeOthers, closeAll];
     }
 
     /**
-     * Removes all tabs or all other tabs (if tab is passed as an argument)
+     * Closes all tabs except ones that should be preserved
      */
-    private removeAllTabs(preserve: TabData<any>[] = []) {
+    private closeAllTabs(preserve: TabData<any>[] = []) {
 
         const components = preserve.map((tab) => this.getTabComponent(tab).tabComponent);
 
@@ -317,12 +367,11 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
             });
 
             modal.then(() => {
-                this.workbox.closeAllTabs(preserve);
+                this.workbox.closeAllTabs(preserve, true);
             }, noop);
 
         } else {
-            this.workbox.closeAllTabs(preserve);
+            this.workbox.closeAllTabs(preserve, true);
         }
-
     }
 }

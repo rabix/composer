@@ -13,7 +13,9 @@
         ],
         "lib": [
             "es2016",
-            "dom"
-        ]
+            "dom",
+            "dom.iterable"
+        ],
+        "downlevelIteration": true
     }
 }

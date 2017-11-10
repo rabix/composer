@@ -27,7 +27,7 @@ import {NewFileTabService} from "./new-file-tab.service";
                     <div class="text-title">Actions</div>
 
                     <div class="creation-entry p-1 mt-1 clickable deep-unselectable"
-                         data-test="create-workflow-btn"
+                         data-test="create-workflow-button"
                          (click)="openAppCreation('Workflow')">
 
                         <i class="fa fa-fw fa-share-alt fa-3x float-sm-left pl-1"></i>
@@ -37,7 +37,7 @@ import {NewFileTabService} from "./new-file-tab.service";
                         </div>
                     </div>
 
-                    <div class="creation-entry p-1 mt-1 clickable deep-unselectable" data-test="create-tool-btn"
+                    <div class="creation-entry p-1 mt-1 clickable deep-unselectable" data-test="create-tool-button"
                          (click)="openAppCreation('CommandLineTool')">
                         <i class="fa fa-fw fa-terminal fa-3x float-sm-left pr-1"></i>
                         <div class="content float-sm-left">
