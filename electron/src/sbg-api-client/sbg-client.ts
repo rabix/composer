@@ -204,7 +204,7 @@ export class SBGClient {
         });
     }
 
-    sendFeedback(type: string, text: string) {
-        return this.apiRequest.post("action/notifications/feedback", {body: {type, text}, json: true});
+    sendFeedback(type: string, text: string, referrer: string) {
+        return this.apiRequest.post("action/notifications/feedback", {body: {type, text, referrer}, json: true});
     }
 }

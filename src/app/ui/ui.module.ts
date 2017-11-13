@@ -33,6 +33,7 @@ import {MenuItemComponent} from "./menu/menu-item.component";
 import {MenuComponent} from "./menu/menu.component";
 import {CheckboxPromptComponent} from "./modal/common/checkbox-prompt.component";
 import {ConfirmComponent} from "./modal/common/confirm.component";
+import {ErrorComponent} from "./modal/common/error.component";
 import {PromptComponent} from "./modal/common/prompt.component";
 import {ProjectSelectionModal} from "./modal/custom/project-selection-modal.component";
 import {ModalComponent} from "./modal/modal.component";
@@ -46,10 +47,10 @@ import {TabsComponent} from "./tabs/tabs.component";
 import {ToggleSliderComponent} from "./toggle-slider/toggle-slider.component";
 import {TooltipContentComponent} from "./tooltip/tooltip-content.component";
 import {TooltipDirective} from "./tooltip/tooltip.directive";
+import {TreeNodeLabelDirective} from "./tree-view/tree-node-label-directive";
 import {TreeNodeComponent} from "./tree-view/tree-node/tree-node.component";
 import {TreeViewComponent} from "./tree-view/tree-view.component";
-import {ErrorComponent} from "./modal/common/error.component";
-import {TreeNodeLabelDirective} from "./tree-view/tree-node-label-directive";
+import {NativeFileBrowserFormFieldComponent} from "./native-file-browser-form-field/native-file-browser-form-field.component";
 
 @NgModule({
     imports: [
@@ -92,7 +93,8 @@ import {TreeNodeLabelDirective} from "./tree-view/tree-node-label-directive";
         TreeViewComponent,
         MouseClickDirective,
         TrimValueAccessor,
-        LoaderButtonContentComponent
+        LoaderButtonContentComponent,
+        NativeFileBrowserFormFieldComponent
     ],
 
     entryComponents: [
@@ -111,16 +113,14 @@ import {TreeNodeLabelDirective} from "./tree-view/tree-node-label-directive";
 
     declarations: [
         AutoCompleteComponent,
-        LineLoaderComponent,
         BlockLoaderComponent,
-        CodeEditorComponent,
-        CodePreviewComponent,
-        CodeEditorXComponent,
-        ErrorComponent,
-        ModalComponent,
-        ContextDirective,
-        ConfirmComponent,
         CheckboxPromptComponent,
+        CircularLoaderComponent,
+        CodeEditorComponent,
+        CodeEditorXComponent,
+        CodePreviewComponent,
+        ConfirmComponent,
+        ContextDirective,
         DisableFormControlDirective,
         DragDirective,
         DragOverDirective,
@@ -128,16 +128,23 @@ import {TreeNodeLabelDirective} from "./tree-view/tree-node-label-directive";
         DropDownButtonComponent,
         DropDownMenuComponent,
         DropZones,
+        ErrorComponent,
         FormPanelComponent,
+        GenericDropDownMenuComponent,
         InlineEditorComponent,
-        InputFieldComponent, // @fixme remove this component?
         InputComponent,
+        InputFieldComponent, // @fixme remove this component?
         KeyvalueComponent,
+        LineLoaderComponent,
+        LoaderButtonContentComponent,
         MarkdownDirective,
         MenuComponent,
         MenuItemComponent,
         ModalComponent,
+        ModalComponent,
+        MouseClickDirective,
         MultilangCodeEditorComponent,
+        NativeFileBrowserFormFieldComponent,
         ProgressComponent,
         ProjectSelectionModal,
         PromptComponent,
@@ -146,7 +153,6 @@ import {TreeNodeLabelDirective} from "./tree-view/tree-node-label-directive";
         SearchFieldComponent,
         SelectComponent,
         TabComponent,
-        TrimValueAccessor,
         TabsComponent,
         TabSelectorComponent,
         TabSelectorComponent,
@@ -157,10 +163,7 @@ import {TreeNodeLabelDirective} from "./tree-view/tree-node-label-directive";
         TreeNodeComponent,
         TreeNodeLabelDirective,
         TreeViewComponent,
-        CircularLoaderComponent,
-        MouseClickDirective,
-        LoaderButtonContentComponent,
-        GenericDropDownMenuComponent
+        TrimValueAccessor,
     ]
 })
 export class UIModule {

@@ -2,18 +2,18 @@ import * as assert from "assert";
 import * as fs from "fs-extra";
 import * as spectron from "spectron";
 import {generateAuthCredentials, generatePlatformProject} from "../../util/generator";
-import {boot, proxerialize, shutdown} from "../../util/util";
 import {mockSBGClient} from "../../util/sbg-client-proxy";
+import {boot, proxerialize, shutdown} from "../../util/util";
 
 describe("dirty checking", async () => {
     let app: spectron.Application;
-    const user =  generateAuthCredentials("test-user", "https://api.sbgenomics.com");
-    const project = generatePlatformProject({id: "test-user/test-project"});
-    const localTool = fs.readFileSync(__dirname + "/stub/local-tool.json", "utf-8");
-    const localWorkflow = fs.readFileSync(__dirname + "/stub/local-workflow.json", "utf-8");
-    const platformTool = fs.readFileSync(__dirname + "/stub/platform-tool.json", "utf-8");
+    const user             = generateAuthCredentials("test-user", "https://api.sbgenomics.com");
+    const project          = generatePlatformProject({id: "test-user/test-project"});
+    const localTool        = fs.readFileSync(__dirname + "/stub/local-tool.json", "utf-8");
+    const localWorkflow    = fs.readFileSync(__dirname + "/stub/local-workflow.json", "utf-8");
+    const platformTool     = fs.readFileSync(__dirname + "/stub/platform-tool.json", "utf-8");
     const platformWorkflow = fs.readFileSync(__dirname + "/stub/platform-workflow.json", "utf-8");
-    const localFile = fs.readFileSync(__dirname + "/stub/local-file.json", "utf-8");
+    const localFile        = fs.readFileSync(__dirname + "/stub/local-file.json", "utf-8");
 
     afterEach(() => shutdown(app));
 
@@ -23,7 +23,7 @@ describe("dirty checking", async () => {
 
             app = await boot(this, {
                 prepareTestData: [{
-                    name: "/demo-app-tool.json",
+                    name: "demo-app-tool.json",
                     content: localTool
                 }],
                 localRepository: {
@@ -46,11 +46,11 @@ describe("dirty checking", async () => {
 
             const client = app.client;
 
-            const visualEditor = `ct-tool-visual-editor`;
-            const tab = `ct-workbox .tab`;
-            const closingDirtyAppsModal = `ct-modal-closing-dirty-apps`;
+            const visualEditor           = `ct-tool-visual-editor`;
+            const tab                    = `ct-workbox .tab`;
+            const closingDirtyAppsModal  = `ct-modal-closing-dirty-apps`;
             const commonDocumentControls = `ct-common-document-controls`;
-            const docker = `[data-test="docker-pull-input"]`;
+            const docker                 = `[data-test="docker-pull-input"]`;
 
             await client.waitForVisible(visualEditor);
             await client.waitForVisible(docker);
@@ -69,11 +69,11 @@ describe("dirty checking", async () => {
             await client.waitForVisible(closingDirtyAppsModal);
 
             // If you click on Cancel button, tab should be still Dirty
-            await client.click(`${closingDirtyAppsModal} [data-test="cancel-btn"]`);
+            await client.click(`${closingDirtyAppsModal} [data-test="dirty-app-modal-cancel-button"]`);
             await waitUntilTabBecomeDirty(client, tab);
 
             // When you click on Save button, tab should not be Dirty anymore
-            await client.click(`${commonDocumentControls} [data-test="save-btn"]`);
+            await client.click(`${commonDocumentControls} [data-test="save-button"]`);
             await waitUntilTabBecomeDirty(client, tab, false);
 
             // When you change something again tab should be Dirty
@@ -85,7 +85,7 @@ describe("dirty checking", async () => {
             await client.waitForVisible(closingDirtyAppsModal);
 
             // If you click on Save button app should be saved and Dirty state should be false
-            await client.click(`${closingDirtyAppsModal} [data-test="save-btn"]`);
+            await client.click(`${closingDirtyAppsModal} [data-test="dirty-app-modal-save-button"]`);
             await waitUntilTabBecomeDirty(client, tab, false);
 
             // If you click on close button now, tab should be closed
@@ -102,7 +102,7 @@ describe("dirty checking", async () => {
 
             app = await boot(this, {
                 prepareTestData: [{
-                    name: "/demo-app-tool.json",
+                    name: "demo-app-tool.json",
                     content: localTool
                 }],
                 localRepository: {
@@ -125,10 +125,10 @@ describe("dirty checking", async () => {
 
             const client = app.client;
 
-            const visualEditor = `ct-tool-visual-editor`;
-            const tab = `ct-workbox .tab`;
+            const visualEditor          = `ct-tool-visual-editor`;
+            const tab                   = `ct-workbox .tab`;
             const closingDirtyAppsModal = `ct-modal-closing-dirty-apps`;
-            const docker = `[data-test="docker-pull-input"]`;
+            const docker                = `[data-test="docker-pull-input"]`;
 
             await client.waitForVisible(visualEditor);
             await client.waitForVisible(docker);
@@ -144,7 +144,7 @@ describe("dirty checking", async () => {
             await client.waitForVisible(closingDirtyAppsModal);
 
             // If you click on Discard button app tab should be closed
-            await client.click(`${closingDirtyAppsModal} [data-test="discard-btn"]`);
+            await client.click(`${closingDirtyAppsModal} [data-test="dirty-app-modal-discard-button"]`);
 
             await client.waitUntil(async () => {
                 const isVisible = await client.isVisible(tab);
@@ -156,11 +156,11 @@ describe("dirty checking", async () => {
         it("Close all tabs context menu item should work as expected", async function () {
             app = await boot(this, {
                 prepareTestData: [{
-                    name: "/demo-app-tool1.json",
+                    name: "demo-app-tool1.json",
                     content: localTool
                 },
                     {
-                        name: "/demo-app-tool2.json",
+                        name: "demo-app-tool2.json",
                         content: localTool
                     }],
                 localRepository: {
@@ -189,13 +189,13 @@ describe("dirty checking", async () => {
 
             const client = app.client;
 
-            const visualEditor = `ct-tool-visual-editor`;
-            const tab = `ct-workbox .tab`;
-            const activeTab = `ct-workbox .tab.active`;
-            const docker = `[data-test="docker-pull-input"]`;
-            const contextMenu = `ct-menu`;
+            const visualEditor    = `ct-tool-visual-editor`;
+            const tab             = `ct-workbox .tab`;
+            const activeTab       = `ct-workbox .tab.active`;
+            const docker          = `[data-test="docker-pull-input"]`;
+            const contextMenu     = `ct-menu`;
             const contextMenuItem = `ct-menu-item`;
-            const modalConfirm = `ct-modal-confirm`;
+            const modalConfirm    = `ct-modal-confirm`;
 
             await client.waitForVisible(visualEditor);
             await client.waitForVisible(docker);
@@ -247,75 +247,13 @@ describe("dirty checking", async () => {
         });
 
         it("Close others context menu item should close items if they are not dirty", async function () {
-                app = await boot(this, {
-                    prepareTestData: [{
-                        name: "/demo-app-tool1.json",
-                        content: localTool
-                    },
-                        {
-                            name: "/demo-app-tool2.json",
-                            content: localTool
-                        }],
-                    localRepository: {
-                        credentials: [user],
-                        activeCredentials: user,
-                        openTabs: [{
-                            id: "test:/demo-app-tool1.json",
-                            type: "CommandLineTool",
-                            label: "My Demo App",
-                            isWritable: true
-                        },
-                            {
-                                id: "test:/demo-app-tool2.json",
-                                type: "CommandLineTool",
-                                label: "My Demo App",
-                                isWritable: true
-                            }]
-                    },
-                    platformRepositories: {
-                        [user.id]: {
-                            projects: [project],
-                            openProjects: [project.id]
-                        }
-                    }
-                });
-
-                const client = app.client;
-
-                const visualEditor = `ct-tool-visual-editor`;
-                const tab = `ct-workbox .tab`;
-                const activeTab = `ct-workbox .tab.active`;
-                const docker = `[data-test="docker-pull-input"]`;
-                const contextMenu = `ct-menu`;
-                const contextMenuItem = `ct-menu-item`;
-
-                await client.waitForVisible(visualEditor);
-                await client.waitForVisible(docker);
-
-                await client.setValue(docker, "someText");
-
-                // Wait until tab is dirty
-                await waitUntilTabBecomeDirty(client, activeTab);
-
-                // Right click on active tab (second one is active) to open the context menu
-                await client.rightClick(activeTab);
-                await client.waitForVisible(contextMenu);
-
-                // Click on Close others menu item
-                await client.click(`${contextMenuItem}:nth-of-type(1)`);
-
-                const tabs = await client.elements(tab);
-                assert.equal(tabs.value.length, 1, "One tab should be open.");
-        });
-
-        it("Close others tab menu item should show modal if there are dirty tabs", async function () {
             app = await boot(this, {
                 prepareTestData: [{
-                    name: "/demo-app-tool1.json",
+                    name: "demo-app-tool1.json",
                     content: localTool
                 },
                     {
-                        name: "/demo-app-tool2.json",
+                        name: "demo-app-tool2.json",
                         content: localTool
                     }],
                 localRepository: {
@@ -344,13 +282,75 @@ describe("dirty checking", async () => {
 
             const client = app.client;
 
-            const visualEditor = `ct-tool-visual-editor`;
-            const tab = `ct-workbox .tab`;
-            const activeTab = `ct-workbox .tab.active`;
-            const docker = `[data-test="docker-pull-input"]`;
-            const contextMenu = `ct-menu`;
+            const visualEditor    = `ct-tool-visual-editor`;
+            const tab             = `ct-workbox .tab`;
+            const activeTab       = `ct-workbox .tab.active`;
+            const docker          = `[data-test="docker-pull-input"]`;
+            const contextMenu     = `ct-menu`;
             const contextMenuItem = `ct-menu-item`;
-            const modalConfirm = `ct-modal-confirm`;
+
+            await client.waitForVisible(visualEditor);
+            await client.waitForVisible(docker);
+
+            await client.setValue(docker, "someText");
+
+            // Wait until tab is dirty
+            await waitUntilTabBecomeDirty(client, activeTab);
+
+            // Right click on active tab (second one is active) to open the context menu
+            await client.rightClick(activeTab);
+            await client.waitForVisible(contextMenu);
+
+            // Click on Close others menu item
+            await client.click(`${contextMenuItem}:nth-of-type(1)`);
+
+            const tabs = await client.elements(tab);
+            assert.equal(tabs.value.length, 1, "One tab should be open.");
+        });
+
+        it("Close others tab menu item should show modal if there are dirty tabs", async function () {
+            app = await boot(this, {
+                prepareTestData: [{
+                    name: "demo-app-tool1.json",
+                    content: localTool
+                },
+                    {
+                        name: "demo-app-tool2.json",
+                        content: localTool
+                    }],
+                localRepository: {
+                    credentials: [user],
+                    activeCredentials: user,
+                    openTabs: [{
+                        id: "test:/demo-app-tool1.json",
+                        type: "CommandLineTool",
+                        label: "My Demo App",
+                        isWritable: true
+                    },
+                        {
+                            id: "test:/demo-app-tool2.json",
+                            type: "CommandLineTool",
+                            label: "My Demo App",
+                            isWritable: true
+                        }]
+                },
+                platformRepositories: {
+                    [user.id]: {
+                        projects: [project],
+                        openProjects: [project.id]
+                    }
+                }
+            });
+
+            const client = app.client;
+
+            const visualEditor    = `ct-tool-visual-editor`;
+            const tab             = `ct-workbox .tab`;
+            const activeTab       = `ct-workbox .tab.active`;
+            const docker          = `[data-test="docker-pull-input"]`;
+            const contextMenu     = `ct-menu`;
+            const contextMenuItem = `ct-menu-item`;
+            const modalConfirm    = `ct-modal-confirm`;
 
             await client.waitForVisible(visualEditor);
             await client.waitForVisible(docker);
@@ -399,11 +399,11 @@ describe("dirty checking", async () => {
         it("Close all tabs context menu item should close all tabs if there is no dirty ones", async function () {
             app = await boot(this, {
                 prepareTestData: [{
-                    name: "/demo-app-tool1.json",
+                    name: "demo-app-tool1.json",
                     content: localTool
                 },
                     {
-                        name: "/demo-app-tool2.json",
+                        name: "demo-app-tool2.json",
                         content: localTool
                     }],
                 localRepository: {
@@ -432,10 +432,10 @@ describe("dirty checking", async () => {
 
             const client = app.client;
 
-            const visualEditor = `ct-tool-visual-editor`;
-            const tab = `ct-workbox .tab`;
-            const activeTab = `ct-workbox .tab.active`;
-            const contextMenu = `ct-menu`;
+            const visualEditor    = `ct-tool-visual-editor`;
+            const tab             = `ct-workbox .tab`;
+            const activeTab       = `ct-workbox .tab.active`;
+            const contextMenu     = `ct-menu`;
             const contextMenuItem = `ct-menu-item`;
 
             await client.waitForVisible(visualEditor);
@@ -456,7 +456,7 @@ describe("dirty checking", async () => {
         it("modifing content should make tab dirty", async function () {
             app = await boot(this, {
                 prepareTestData: [{
-                    name: "/demo-file.json",
+                    name: "demo-file.json",
                     content: localFile
                 }],
                 localRepository: {
@@ -477,10 +477,10 @@ describe("dirty checking", async () => {
                 }
             });
 
-            const client = app.client;
-            const tab = `ct-workbox .tab`;
-            const fileEditor = `ct-file-editor`;
-            const modal = `ct-modal-closing-dirty-apps`;
+            const client           = app.client;
+            const tab              = `ct-workbox .tab`;
+            const fileEditor       = `ct-file-editor`;
+            const modal            = `ct-modal-closing-dirty-apps`;
             const aceEditorContent = `.ace_content`;
 
             await client.waitForVisible(fileEditor);
@@ -505,7 +505,7 @@ describe("dirty checking", async () => {
         it("Changing Code editor content should make tab dirty", async function () {
             app = await boot(this, {
                 prepareTestData: [{
-                    name: "/demo-app-tool.json",
+                    name: "demo-app-tool.json",
                     content: localTool
                 }],
                 localRepository: {
@@ -528,10 +528,10 @@ describe("dirty checking", async () => {
 
             const client = app.client;
 
-            const visualEditor = `ct-tool-visual-editor`;
-            const tab = `ct-workbox .tab`;
-            const codeTab = `[data-test="code-tab"]`;
-            const codeTabContent = `ct-code-editor`;
+            const visualEditor     = `ct-tool-visual-editor`;
+            const tab              = `ct-workbox .tab`;
+            const codeTab          = `[data-test="tool-code-tab"]`;
+            const codeTabContent   = `ct-code-editor`;
             const aceEditorContent = `.ace_content`;
 
             await client.waitForVisible(visualEditor);
@@ -555,7 +555,7 @@ describe("dirty checking", async () => {
         it("Changing App info content should make tab dirty", async function () {
             app = await boot(this, {
                 prepareTestData: [{
-                    name: "/demo-app.json",
+                    name: "demo-app.json",
                     content: localTool
                 }],
                 localRepository: {
@@ -578,11 +578,11 @@ describe("dirty checking", async () => {
 
             const client = app.client;
 
-            const visualEditor = `ct-tool-visual-editor`;
-            const tab = `ct-workbox .tab`;
-            const infoTab = `[data-test="info-tab"]`;
+            const visualEditor   = `ct-tool-visual-editor`;
+            const tab            = `ct-workbox .tab`;
+            const infoTab        = `[data-test="tool-info-tab"]`;
             const infoTabSection = `ct-app-info`;
-            const inlineEditor = `ct-inline-editor`;
+            const inlineEditor   = `ct-inline-editor`;
 
             await client.waitForVisible(visualEditor);
 
@@ -639,12 +639,12 @@ describe("dirty checking", async () => {
                 ]
             });
 
-            const client = app.client;
-            const visualEditor = `ct-tool-visual-editor`;
-            const tab = `ct-workbox .tab`;
-            const docker = `[data-test="docker-pull-input"]`;
-            const revisionBtn = `[data-test="revision-btn"]`;
-            const revisionComponent = `ct-revision-list`;
+            const client                = app.client;
+            const visualEditor          = `ct-tool-visual-editor`;
+            const tab                   = `ct-workbox .tab`;
+            const docker                = `[data-test="docker-pull-input"]`;
+            const revisionBtn           = `[data-test="revision-button"]`;
+            const revisionComponent     = `ct-revision-list`;
             const closingDirtyAppsModal = `ct-modal-closing-dirty-apps`;
 
             await client.waitForVisible(visualEditor);
@@ -668,7 +668,7 @@ describe("dirty checking", async () => {
             await client.waitForVisible(closingDirtyAppsModal);
 
             // Click on cancel button
-            await client.click(`${closingDirtyAppsModal} [data-test="cancel-btn"]`);
+            await client.click(`${closingDirtyAppsModal} [data-test="dirty-app-modal-cancel-button"]`);
 
             // Tab should be still dirty
             await waitUntilTabBecomeDirty(client, tab);
@@ -677,7 +677,7 @@ describe("dirty checking", async () => {
             await client.click(`${revisionComponent} .revision-entry:nth-of-type(2)`);
 
             // Click on discard button
-            await client.click(`${closingDirtyAppsModal} [data-test="discard-btn"]`);
+            await client.click(`${closingDirtyAppsModal} [data-test="dirty-app-modal-discard-button"]`);
 
             // Tab should not be dirty anymore
             await waitUntilTabBecomeDirty(client, tab, false);
@@ -691,7 +691,7 @@ describe("dirty checking", async () => {
         it("Changing App info content should make tab dirty", async function () {
             app = await boot(this, {
                 prepareTestData: [{
-                    name: "/demo-workflow.json",
+                    name: "demo-workflow.json",
                     content: localWorkflow
                 }],
                 localRepository: {
@@ -714,11 +714,11 @@ describe("dirty checking", async () => {
 
             const client = app.client;
 
-            const visualEditor = `ct-workflow-graph-editor`;
-            const tab = `ct-workbox .tab`;
-            const infoTab = `[data-test="info-tab"]`;
+            const visualEditor   = `ct-workflow-graph-editor`;
+            const tab            = `ct-workbox .tab`;
+            const infoTab        = `[data-test="workflow-info-tab"]`;
             const infoTabSection = `ct-app-info`;
-            const inlineEditor = `ct-inline-editor`;
+            const inlineEditor   = `ct-inline-editor`;
 
             await client.waitForVisible(visualEditor);
 
@@ -767,8 +767,8 @@ describe("dirty checking", async () => {
             const client = app.client;
 
             const visualEditor = `ct-workflow-graph-editor`;
-            const tab = `ct-workbox .tab`;
-            const arrange = `[data-test="auto-arrange-btn"]`;
+            const tab          = `ct-workbox .tab`;
+            const arrange      = `[data-test="workflow-graph-arrange-button"]`;
 
             await client.waitForVisible(visualEditor);
 
@@ -783,7 +783,7 @@ describe("dirty checking", async () => {
         it("Changing Code editor content should make tab dirty", async function () {
             app = await boot(this, {
                 prepareTestData: [{
-                    name: "/demo-workflow.json",
+                    name: "demo-workflow.json",
                     content: localWorkflow
                 }],
                 localRepository: {
@@ -806,10 +806,10 @@ describe("dirty checking", async () => {
 
             const client = app.client;
 
-            const visualEditor = `ct-workflow-graph-editor`;
-            const tab = `ct-workbox .tab`;
-            const codeTab = `[data-test="code-tab"]`;
-            const codeTabContent = `ct-code-editor`;
+            const visualEditor     = `ct-workflow-graph-editor`;
+            const tab              = `ct-workbox .tab`;
+            const codeTab          = `[data-test="workflow-code-tab"]`;
+            const codeTabContent   = `ct-code-editor`;
             const aceEditorContent = `.ace_content`;
 
             await client.waitForVisible(visualEditor);
@@ -866,12 +866,12 @@ describe("dirty checking", async () => {
                 ]
             });
 
-            const client = app.client;
-            const visualEditor = `ct-workflow-graph-editor`;
-            const tab = `ct-workbox .tab`;
-            const arrange = `[data-test="auto-arrange-btn"]`;
-            const revisionBtn = `[data-test="revision-btn"]`;
-            const revisionComponent = `ct-revision-list`;
+            const client                = app.client;
+            const visualEditor          = `ct-workflow-graph-editor`;
+            const tab                   = `ct-workbox .tab`;
+            const arrange               = `[data-test="workflow-graph-arrange-button"]`;
+            const revisionBtn           = `[data-test="revision-button"]`;
+            const revisionComponent     = `ct-revision-list`;
             const closingDirtyAppsModal = `ct-modal-closing-dirty-apps`;
 
             await client.waitForVisible(visualEditor, 5000);
@@ -895,7 +895,7 @@ describe("dirty checking", async () => {
             await client.waitForVisible(closingDirtyAppsModal, 5000);
 
             // Click on cancel button
-            await client.click(`${closingDirtyAppsModal} [data-test="cancel-btn"]`);
+            await client.click(`${closingDirtyAppsModal} [data-test="dirty-app-modal-cancel-button"]`);
 
             // Tab should be still dirty
             await waitUntilTabBecomeDirty(client, tab);
@@ -904,7 +904,7 @@ describe("dirty checking", async () => {
             await client.click(`${revisionComponent} .revision-entry:nth-of-type(2)`);
 
             // Click on discard button
-            await client.click(`${closingDirtyAppsModal} [data-test="discard-btn"]`);
+            await client.click(`${closingDirtyAppsModal} [data-test="dirty-app-modal-discard-button"]`);
 
             // Tab should not be dirty anymore
             await waitUntilTabBecomeDirty(client, tab, false);
@@ -916,7 +916,7 @@ describe("dirty checking", async () => {
 
 async function waitUntilTabBecomeDirty(client, tab, dirty = true) {
     return await client.waitUntil(async () => {
-       const has =  await hasClass(client, tab);
+        const has = await hasClass(client, tab);
         return dirty ? has : !has;
     }, 5000, `Tab should${!dirty ? " not " : ""}be dirty`);
 }

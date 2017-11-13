@@ -5,6 +5,9 @@
         "baseUrl": "./",
         "module": "commonjs",
         "target": "es5",
+        "paths": {
+            "cwl-svg": ["../node_modules/cwl-svg"]
+        },
         "types": [
             "jasmine",
             "node"

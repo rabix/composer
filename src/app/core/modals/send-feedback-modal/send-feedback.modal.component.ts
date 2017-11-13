@@ -10,7 +10,7 @@ import {ErrorWrapper} from "../../helpers/error-wrapper";
     selector: "ct-send-feedback-modal",
     styleUrls: ["./send-feedback.modal.component.scss"],
     template: `
-        <div class="body">
+        <div class="body" data-test="send-feedback-modal">
 
             <div class="dialog-content">
 
@@ -20,7 +20,7 @@ import {ErrorWrapper} from "../../helpers/error-wrapper";
                 <div class="feedback-type">
 
                     <!--Idea-->
-                    <div data-test="idea-region" class="feedback clickable"
+                    <div data-test="send-feedback-modal-idea-region" class="feedback clickable"
                          [class.active]="form.get('type').value === 'idea'"
                          (click)="selectFeedbackType('idea')">
 
@@ -35,7 +35,7 @@ import {ErrorWrapper} from "../../helpers/error-wrapper";
                     </div>
 
                     <!--Problem-->
-                    <div data-test="problem-region" class="feedback clickable"
+                    <div data-test="send-feedback-modal-problem-region" class="feedback clickable"
                          [class.active]="form.get('type').value === 'problem'"
                          (click)="selectFeedbackType('problem')">
 
@@ -51,7 +51,7 @@ import {ErrorWrapper} from "../../helpers/error-wrapper";
                     </div>
 
                     <!--Thought-->
-                    <div data-test="thought-region" class="feedback clickable"
+                    <div data-test="send-feedback-modal-thought-region" class="feedback clickable"
                          [class.active]="form.get('type').value === 'thought'"
                          (click)="selectFeedbackType('thought')">
 
@@ -96,7 +96,7 @@ import {ErrorWrapper} from "../../helpers/error-wrapper";
 
                 <!--Feedback text-area-->
                 <div class="form-group">
-                    <textarea data-test="feedback-text" [formControl]="form.get('text')" class="form-control" rows="6">                    
+                    <textarea data-test="send-feedback-modal-feedback-text" [formControl]="form.get('text')" class="form-control" rows="6">                    
                     </textarea>
                 </div>
 
@@ -111,11 +111,11 @@ import {ErrorWrapper} from "../../helpers/error-wrapper";
 
             <!--Footer-->
             <div class="footer pr-1 pb-1">
-                <button type="button" class="btn btn-secondary" data-test='cancel-button'
+                <button type="button" class="btn btn-secondary" data-test='send-feedback-modal-cancel-button'
                         (click)="closeModal()">Cancel
                 </button>
 
-                <button type="button" class="btn btn-primary" data-test='send-button'
+                <button type="button" class="btn btn-primary" data-test='send-feedback-modal-send-button'
                         [disabled]="!form.valid || isSending"
                         (click)="onSendFeedback()">
                     <ct-loader-button-content [isLoading]="isSending">Send</ct-loader-button-content>

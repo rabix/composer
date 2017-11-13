@@ -7,66 +7,73 @@ import {
     OnInit,
     Output
 } from "@angular/core";
-import {Workflow} from "cwl-svg";
-import {StepModel, WorkflowModel, WorkflowStepInputModel} from "cwlts/models";
 import {Subject} from "rxjs/Subject";
+import {StepModel, WorkflowModel, WorkflowStepInputModel} from "cwlts/models";
 import {ObjectHelper as OH} from "../../../../helpers/object.helper";
 import {StatusBarService} from "../../../../layout/status-bar/status-bar.service";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
 @Component({
-    selector: "ct-workflow-step-inspector-inputs",
-    // @todo: temporarily removing ChangeDetectionStrategy.OnPush because model is being changed externally by graph
-    styleUrls: ["./step-tab-inputs.component.scss"],
+    selector: "ct-step-inputs-inspector",
+    styleUrls: ["./step-inputs-inspector.component.scss"],
     template: `
         <div *ngFor="let group of inputGroups">
 
             <ct-form-panel class="borderless">
+
                 <div class="tc-header">{{ group.name }}</div>
+
                 <div class="tc-body">
                     <form (change)="onInputsFormChange($event)">
+
                         <div *ngFor="let input of group.inputs" class="input-box">
 
                             <!--Label and port options-->
                             <div class="input-title flex-baseline">
 
                                 <label class="input-label" title="{{ input.label || input.id }}">
-                                    <span class="text-danger"
-                                          *ngIf="!input.type.isNullable">*</span>
+
+                                    <span *ngIf="!input.type.isNullable" class="text-danger">*</span>
+
                                     <i class="fa fa-info-circle text-muted"
                                        *ngIf="hasMetadata(input)"
                                        [ct-tooltip]="ctt"
                                        [tooltipPlacement]="'bottom'"></i>
                                     {{ input.label || input.id }}
+
                                 </label>
 
                                 <!--Port options for File and array of Files-->
                                 <div *ngIf="isType(input, ['File', 'Directory'])" class="port-controls">
+
                                     <ct-toggle-slider
                                         (valueChange)="onPortOptionChange(input, $event ? 'port' : 'editable')"
                                         *ngIf="input.type.isNullable"
                                         [disabled]="readonly"
-                                        [on]="'Show'"
-                                        [off]="'Hide'"
+                                        on="Show"
+                                        off="Hide"
                                         [value]="input.isVisible">
                                     </ct-toggle-slider>
+
                                 </div>
 
                                 <!--Port options for all other types-->
                                 <div *ngIf="!isType(input, ['File', 'Directory'])" class="input-control">
 
                                     <ct-generic-dropdown-menu [ct-menu]="menu" menuAlign="left"
-                                                              [menuState]="openStatus" [readonly]="readonly">
-                                        <button type="button" class="btn btn-unstyled">
+                                                              #portChangeDropDown>
+                                        <button type="button" [disabled]="readonly" class="btn btn-unstyled" 
+                                                (click)="portChangeDropDown.toggleMenu()">
                                             <span>
-                                                {{ input.status }} <i class="fa fa-chevron-down fa-fw settings-icon"></i>
+                                                {{ input.status }} <i
+                                                class="fa fa-chevron-down fa-fw settings-icon"></i>
                                             </span>
                                         </button>
 
                                     </ct-generic-dropdown-menu>
 
                                     <ng-template #menu class="mr-1">
-                                        <ul class="list-unstyled">
+                                        <ul class="list-unstyled" (click)="portChangeDropDown.hide()">
                                             <li *ngFor="let c of dropDownPortOptions"
                                                 [class.active]="input.status === c.value"
                                                 (click)="onPortOptionChange(input, c.value)"
@@ -98,12 +105,13 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
                                 <!--No connections-->
                                 <div *ngIf="input.source.length === 0 && input.isVisible">
-                                    <span class="text-warning" *ngIf="input.type.isNullable">
-                                        <i class="fa fa-warning fa-fw"></i> This port is not connected
-                                    </span>
+                            <span class="text-warning" *ngIf="input.type.isNullable">
+                                <i class="fa fa-warning fa-fw"></i> This port is not connected
+                            </span>
+
                                     <span class="text-danger" *ngIf="!input.type.isNullable">
-                                        <i class="fa fa-times-circle fa-fw"></i> This required port is not connected
-                                    </span>
+                                <i class="fa fa-times-circle fa-fw"></i> This required port is not connected
+                            </span>
                                 </div>
 
                                 <!--List of connections-->
@@ -123,13 +131,11 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                                         {{input.description}}
                                
                                 </div>
-
-                                <div *ngIf="input.customProps['sbg:toolDefaultValue']">
-                                    <span class="title">
-                                        Suggested Value:
-                                    </span>
-                                        <span class="value indent">
-                                        {{input.customProps["sbg:toolDefaultValue"]}}
+    <div *ngIf="input.customProps['sbg:toolDefaultValue']">                                    <span class="title">
+                                            Suggested Value:
+                                        </span>
+                                    <span class="valueindent">
+                                            {{input.customProps["sbg:toolDefaultValue"]}}
                                     </span>
                                 </div>
 
@@ -149,7 +155,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                                     </span>
                                         <span class="value indent">
                                         {{input.customProps["sbg:altPrefix"]}}
-                                    </span>
+                                        </span>
                                 </div>
                                 
                             </ct-tooltip-content>
@@ -159,13 +165,25 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                 </div>
             </ct-form-panel>
         </div>
+
     `
 })
-export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase implements OnInit, OnChanges {
+export class StepInputsInspectorComponent extends DirectiveBase implements OnInit, OnChanges {
 
-    openStatus = new Subject<boolean>();
+    @Input()
+    readonly = false;
 
-    public dropDownPortOptions = [
+    @Input()
+    workflowModel: WorkflowModel;
+
+    @Input()
+    step: StepModel;
+
+    @Output()
+    change = new EventEmitter();
+
+
+    dropDownPortOptions = [
         {
             value: "editable",
             caption: "Editable",
@@ -183,27 +201,9 @@ export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase imple
         }
     ];
 
-    @Input()
-    public readonly = false;
+    group = [];
 
-    @Input()
-    public workflowModel: WorkflowModel;
-
-    @Input()
-    public step: StepModel;
-
-    @Input()
-    public inputs: WorkflowStepInputModel [] = [];
-
-    @Input()
-    public graph: Workflow;
-
-    @Output()
-    public change = new EventEmitter();
-
-    public group = [];
-
-    public inputGroups: { name: string, inputs: WorkflowStepInputModel[] }[] = [];
+    inputGroups: { name: string, inputs: WorkflowStepInputModel[] }[] = [];
 
     constructor(private statusBar: StatusBarService, private cdr: ChangeDetectorRef) {
         super();
@@ -214,21 +214,16 @@ export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase imple
      */
     onPortOptionChange(input, value) {
         switch (value) {
-            case"editable":
+            case "editable":
                 this.workflowModel.clearPort(input);
-                this.graph.redraw();
                 break;
-            case"exposed":
+            case "exposed":
                 this.workflowModel.exposePort(input);
-                this.graph.redraw();
                 break;
-            case"port":
+            case "port":
                 this.workflowModel.includePort(input);
-                this.graph.redraw();
                 break;
         }
-
-        this.openStatus.next(false);
     }
 
     /**
@@ -297,21 +292,15 @@ export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase imple
         this.change.emit();
     }
 
-    private handleConnectionChange = (src, dest) => {
-        if (dest && dest.parentStep && dest.parentStep.id === this.step.id) {
-            this.cdr.markForCheck();
-        }
-    }
-
     ngOnInit() {
-        this.tracked = this.workflowModel.on("connection.create", this.handleConnectionChange.bind(this));
-        this.tracked = this.workflowModel.on("connection.remove", this.handleConnectionChange.bind(this));
+        this.tracked = this.workflowModel.on("connection.create", (src, dst) => this.onConnectionChange(src, dst));
+        this.tracked = this.workflowModel.on("connection.remove", (src, dst) => this.onConnectionChange(src, dst));
     }
 
     ngOnChanges() {
 
         // Whenever inputs are updated, regroup them and sort them for display
-        const grouped = this.inputs.reduce((acc, item) => {
+        const grouped    = this.step.in.reduce((acc, item) => {
             const group = this.isType(item, "File") ? "Files" : "App parameters";
             return Object.assign(acc, group ? {[group]: (acc[group] || []).concat(item)} : null);
 
@@ -333,6 +322,12 @@ export class WorkflowStepInspectorTabInputsComponent extends DirectiveBase imple
             return input.type.type === type || input.type.items === type;
         });
     }
+
+    private onConnectionChange(src, dest) {
+        if (dest && dest.parentStep && dest.parentStep.id === this.step.id) {
+            this.cdr.markForCheck();
+        }
+    };
 
     hasMetadata(input: WorkflowStepInputModel): boolean {
         return input.description || input.fileTypes.length || input.customProps["sbg:toolDefaultValue"] || input.customProps["sbg:altPrefix"];

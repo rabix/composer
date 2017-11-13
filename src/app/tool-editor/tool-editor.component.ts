@@ -1,6 +1,9 @@
 import {Component, Injector, OnInit} from "@angular/core";
 import {FormGroup} from "@angular/forms";
-import {CommandLineToolModel} from "cwlts/models";
+import {
+    CommandInputParameterModel, CommandLineToolModel, isFileType, WorkflowFactory,
+    WorkflowModel, WorkflowStepInputModel
+} from "cwlts/models";
 import {CommandLineToolFactory} from "cwlts/models/generic/CommandLineToolFactory";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
 import {ReplaySubject} from "rxjs/ReplaySubject";
@@ -22,6 +25,7 @@ import {PlatformRepositoryService} from "../repository/platform-repository.servi
 import {IpcService} from "../services/ipc.service";
 import {ModalService} from "../ui/modal/modal.service";
 import {LocalRepositoryService} from "../repository/local-repository.service";
+import {Process} from "cwlts/models/generic/Process";
 
 export function appSaverFactory(comp: ToolEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -58,6 +62,8 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
 
     /** Model that's recreated on document change */
     dataModel: CommandLineToolModel;
+
+    workflowWrapper: WorkflowModel;
 
     /** Sorted array of resulting command line parts */
     commandLineParts: Subject<CommandLinePart[]> = new ReplaySubject(1);
@@ -129,5 +135,17 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
         this.dataModel.updateCommandLine();
         this.dataModel.setValidationCallback(this.afterModelValidation.bind(this));
         this.dataModel.validate().then(this.afterModelValidation.bind(this));
+
+        // @fixme(batic): move this somewhere more optimal and useful
+        this.workflowWrapper = WorkflowFactory.from({cwlVersion: this.dataModel.cwlVersion} as any);
+        this.workflowWrapper.addStepFromProcess(json as Process);
+        this.workflowWrapper.steps[0].in.forEach((input: WorkflowStepInputModel) => {
+
+            if (isFileType(input)) {
+                this.workflowWrapper.createInputFromPort(input);
+            } else {
+                this.workflowWrapper.exposePort(input);
+            }
+        });
     }
 }

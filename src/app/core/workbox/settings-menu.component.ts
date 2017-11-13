@@ -1,6 +1,5 @@
 import {Component} from "@angular/core";
 import {Observable} from "rxjs/Observable";
-import {Subject} from "rxjs/Subject";
 import {AuthService} from "../../auth/auth.service";
 import {AuthCredentials} from "../../auth/model/auth-credentials";
 import {SystemService} from "../../platform-providers/system.service";
@@ -16,10 +15,13 @@ import {WorkboxService} from "./workbox.service";
     selector: "ct-settings-menu",
     styleUrls: ["./settings-menu.component.scss"],
     template: `
-        <ct-generic-dropdown-menu [ct-menu]="menu" menuAlign="left" [menuState]="openStatus"
-                                  [class.update-available]="global.platformIsOutdated">
+        <ct-generic-dropdown-menu [ct-menu]="menu" menuAlign="left"
+                                  [class.update-available]="global.platformIsOutdated" #settingsDropDown>
 
-            <button type="button" class="btn btn-unstyled">
+            <button type="button" 
+                    class="btn btn-unstyled" 
+                    data-test="settings-menu-button" 
+                    (click)="settingsDropDown.toggleMenu()">
                 <span *ngIf="active">{{ userLabel }}</span>
                 <i class="fa fa-chevron-down fa-fw settings-icon"> </i>
             </button>
@@ -27,7 +29,7 @@ import {WorkboxService} from "./workbox.service";
         </ct-generic-dropdown-menu>
 
         <ng-template #menu class="mr-1">
-            <ul class="list-unstyled">
+            <ul class="list-unstyled" (click)="settingsDropDown.hide()">
                 <li *ngFor="let c of credentials | async" (click)="setActiveUser(c)">
                     <span>
                         {{ c.user.username }} 
@@ -35,8 +37,9 @@ import {WorkboxService} from "./workbox.service";
                     </span>
                     <span class="text-muted d-block small">{{ getPlatformLabel(c.url) }}</span>
                 </li>
-                <li (click)="openSettings()"><i class="fa fa-cog fa-fw"></i> Settings</li>
-                <li (click)="openFeedback()"><i class="fa fa-bullhorn fa-fw"></i> Send Feedback</li>
+                <li (click)="openSettings()" data-test="settings-button"><i class="fa fa-cog fa-fw"></i> Settings</li>
+                <li (click)="openDocumentation()" data-test="documentation-button"><i class="fa fa-question-circle fa-fw"></i> Documentation</li>
+                <li (click)="openFeedback()" data-test="send-feedback-button"><i class="fa fa-bullhorn fa-fw"></i> Send Feedback</li>
                 <li (click)="checkForPlatformUpdates()" *ngIf="global.platformIsOutdated" class="outdated-update"
                     data-test="updates-available">
 
@@ -57,8 +60,6 @@ export class SettingsMenuComponent extends DirectiveBase {
     active: AuthCredentials;
 
     userLabel: string;
-
-    openStatus = new Subject<boolean>();
 
     credentials: Observable<AuthCredentials[]>;
 
@@ -85,7 +86,10 @@ export class SettingsMenuComponent extends DirectiveBase {
 
     openSettings(): void {
         this.workbox.openSettingsTab();
-        this.openStatus.next(false);
+    }
+
+    openDocumentation(): void {
+        this.system.openLink("http://docs.rabix.io/rabix-composer-home");
     }
 
     openFeedback(): void {
@@ -95,15 +99,12 @@ export class SettingsMenuComponent extends DirectiveBase {
         }
 
         this.modal.fromComponent(SendFeedbackModalComponent, {title: "Send Feedback"});
-
-        this.openStatus.next(false);
     }
 
     setActiveUser(c): void {
 
         // If we click on a user that is already active, nothing should be done.
         if (this.active === c) {
-            this.openStatus.next(false);
             return;
         }
 
@@ -113,13 +114,10 @@ export class SettingsMenuComponent extends DirectiveBase {
             }
             this.workbox.forceReloadTabs();
         });
-
-        this.openStatus.next(false);
     }
 
     checkForPlatformUpdates() {
         this.global.checkForPlatformUpdates(true).catch(console.warn);
-        this.openStatus.next(false);
     }
 
     getPlatformLabel(url: string): string {

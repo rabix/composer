@@ -97,7 +97,7 @@ export class ToolOutputInspectorComponent extends DirectiveBase implements OnCha
             outputEval: [{value: this.output, disabled: this.readonly}]
         });
 
-        if (this.output.outputBinding.hasMetadata && this.output.outputBinding.hasInheritMetadata) {
+        if (this.output.outputBinding.hasMetadata || this.output.outputBinding.hasInheritMetadata) {
             this.form.addControl("metaData", new FormControl({value: this.output, disabled: this.readonly}));
         }
 

@@ -6,7 +6,7 @@ import {RecentAppTab} from "../../../electron/src/storage/types/recent-app-tab";
 import {AuthCredentials} from "../auth/model/auth-credentials";
 import {TabData} from "../../../electron/src/storage/types/tab-data-interface";
 import {IpcService} from "../services/ipc.service";
-import {AppMeta} from "../../../electron/src/storage/types/app-meta";
+import {AppMeta, AppMetaEntry} from "../../../electron/src/storage/types/app-meta";
 
 @Injectable()
 export class LocalRepositoryService {
@@ -29,7 +29,7 @@ export class LocalRepositoryService {
         this.listen("recentApps").subscribe(this.recentApps);
         this.listen("localFolders").subscribe(this.localFolders);
         this.listen("expandedNodes").subscribe(this.expandedFolders);
-        this.listen("executorConfig").do(data => console.log("Passing executor config", data)).subscribe(this.executorConfig);
+        this.listen("executorConfig").subscribe(this.executorConfig);
         this.listen("selectedAppsPanel").subscribe(this.selectedAppsPanel);
         this.listen("publicAppsGrouping").subscribe(this.publicAppsGrouping);
         this.listen("activeCredentials").map(cred => AuthCredentials.from(cred)).subscribe(this.activeCredentials);
@@ -196,7 +196,7 @@ export class LocalRepositoryService {
         return this.patch({executorConfig}).take(1).toPromise();
     }
 
-    getAppMeta<T>(appID: string, key?: string): Observable<AppMeta> {
+    getAppMeta<T>(appID: string, key?: keyof AppMeta): Observable<AppMeta> {
         return this.appMeta.map(meta => {
                 const data = meta[appID];
 
@@ -209,7 +209,7 @@ export class LocalRepositoryService {
             });
     }
 
-    patchAppMeta(appID: string, key: keyof AppMeta, value: any): Promise<any> {
+    patchAppMeta(appID: string, key: keyof AppMetaEntry, value: any): Promise<any> {
         return this.ipc.request("patchAppMeta", {
             profile: "local",
             appID,
