@@ -19,7 +19,7 @@
         "build": "yarn run compile:electron && yarn run compile:angular && yarn run package",
         "changelog": "./node_modules/.bin/git-changelog",
         "compile:angular": "node --max-old-space-size=4096 ./node_modules/.bin/ng build -prod -aot",
-        "compile:electron": "./node_modules/.bin/tsc -p electron && cp -R electron/src/splash electron/dist/src",
+        "compile:electron": "./node_modules/.bin/tsc -p electron && node build-scripts/splash-copy.js",
         "compile:electron:watch": "./node_modules/.bin/tsc -p electron --watch",
         "debug:electron": "./node_modules/.bin/electron ./electron --inspect-brk",
         "lint": "./node_modules/.bin/ng lint",
