@@ -92,26 +92,6 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
         );
 
         this.inspectorService = inspector;
-
-        this.updateService.update
-            .filter(data => {
-                return this.dataModel.steps.filter(step => {
-                    if (this.tabData.dataSource === "local") {
-                        return this.codeEditorContent.value.indexOf("run: " + data["id"]) > -1;
-                    } else {
-                        return AppHelper.getRevisionlessID(step.run.customProps["sbg:id"] || "") === AppHelper.getRevisionlessID(data["sbg:id"]);
-                    }
-                }).length > 0;
-            })
-            .subscribeTracked(this, (data) => {
-                if (this.tabData.dataSource === "local") {
-                    this.syncModelAndCode(false).then(() => {
-                        this.resolveToModel(this.codeEditorContent.value);
-                    }, err => console.warn);
-                } else {
-                    this.getStepUpdates();
-                }
-            });
     }
 
     protected getPreferredTab(): string {
@@ -147,6 +127,30 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
             this.graphDrawQueue.push(() => {
                 this.graphEditor.setGraphManipulationsLock(locked);
             });
+        }
+    }
+
+    protected afterModelCreated(isFirstCreation: boolean): void {
+        if (isFirstCreation) {
+            this.updateService.update
+                .filter(data => {
+                    return this.dataModel.steps.filter(step => {
+                        if (this.tabData.dataSource === "local") {
+                            return this.codeEditorContent.value.indexOf("run: " + data["id"]) > -1;
+                        } else {
+                            return AppHelper.getRevisionlessID(step.run.customProps["sbg:id"] || "") === AppHelper.getRevisionlessID(data["sbg:id"]);
+                        }
+                    }).length > 0;
+                })
+                .subscribeTracked(this, (data) => {
+                    if (this.tabData.dataSource === "local") {
+                        this.syncModelAndCode(false).then(() => {
+                            this.resolveToModel(this.codeEditorContent.value);
+                        }, err => console.warn);
+                    } else {
+                        this.graphEditor.getStepUpdates();
+                    }
+                });
         }
     }
 
