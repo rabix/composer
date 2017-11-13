@@ -186,6 +186,7 @@ available types: {[label: string]: string | number} | string[]`);
 
         if (reset) {
             this._value.setValue("", this.type);
+            this.onChange(this._value);
         }
     }
 

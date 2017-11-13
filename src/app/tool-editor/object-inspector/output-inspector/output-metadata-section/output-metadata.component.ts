@@ -1,17 +1,21 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
-import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {CommandInputParameterModel} from "cwlts/models";
+import {
+    ControlValueAccessor, FormBuilder, FormControl, FormGroup,
+    NG_VALUE_ACCESSOR
+} from "@angular/forms";
+import {CommandInputParameterModel, CommandOutputParameterModel} from "cwlts/models";
 import {SBDraft2CommandOutputParameterModel, SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 import {noop} from "../../../../lib/utils.lib";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-output-metadata-section",
-    styleUrls: ["./output-metadata.component.scss"],
     providers: [
-        {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => OutputMetaDataSectionComponent), multi: true}
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => OutputMetaDataSectionComponent),
+            multi: true
+        }
     ],
     template: `
         <ct-form-panel
@@ -24,12 +28,12 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <form>
 
                         <!--Inherit Metadata field-->
-                        <div class="form-group">
+                        <div class="form-group" *ngIf="metadataForm.controls['inheritMetadata']">
                             <label class="form-control-label">Inherit</label>
                             <select class="form-control"
                                     [formControl]="metadataForm.controls['inheritMetadata']">
                                 <option value="" [disabled]="readonly">-- none --</option>
-                                <option *ngFor="let item of inputs" 
+                                <option *ngFor="let item of inputs"
                                         [disabled]="readonly"
                                         [value]="item.id">
                                     {{item.id}}
@@ -37,15 +41,16 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                             </select>
                         </div>
 
+
+                        <!--@todo Replace this key-value-list-->
+                        <ct-key-value-list
+                                *ngIf="metadataForm.controls['metadataList']"
+                                [addEntryText]="'Add Metadata'"
+                                [emptyListText]="'No metadata defined.'"
+                                [formControl]="metadataForm.controls['metadataList']">
+                        </ct-key-value-list>
+
                     </form>
-
-
-                    <!--@todo Replace this key-value-list-->
-                    <ct-key-value-list
-                            [addEntryText]="'Add Metadata'"
-                            [emptyListText]="'No metadata defined.'"
-                            [formControl]="metadataForm.controls['metadataList']">
-                    </ct-key-value-list>
                 </div>
             </div>
 
@@ -55,18 +60,17 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 export class OutputMetaDataSectionComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
-    public inputs: CommandInputParameterModel[] = [];
+    inputs: CommandInputParameterModel[] = [];
 
-    /** The currently displayed property */
-    public output: SBDraft2CommandOutputParameterModel;
+    output: CommandOutputParameterModel;
 
     private onTouched = noop;
 
     private propagateChange = noop;
 
-    public metadataForm: FormGroup;
+    metadataForm: FormGroup;
 
-    private readonly = false;
+    readonly = false;
 
     private keyValueFormList: { key: string, value: string | SBDraft2ExpressionModel }[] = [];
 
@@ -75,20 +79,29 @@ export class OutputMetaDataSectionComponent extends DirectiveBase implements Con
     }
 
     writeValue(output: SBDraft2CommandOutputParameterModel): void {
-        this.output = output;
+        this.output       = output;
+        this.metadataForm = new FormGroup({});
 
-        this.keyValueFormList = Object.keys(this.output.outputBinding.metadata)
-            .map(key => {
-                return {
-                    key: key,
-                    value: this.output.outputBinding.metadata[key]
-                };
-            });
+        if (output.outputBinding.hasMetadata) {
+            this.keyValueFormList = Object.keys(this.output.outputBinding.metadata)
+                .map(key => {
+                    return {
+                        key: key,
+                        value: this.output.outputBinding.metadata[key]
+                    };
+                });
 
-        this.metadataForm = this.formBuilder.group({
-            inheritMetadata: [this.output.outputBinding.inheritMetadataFrom || ""],
-            metadataList: [{value: this.keyValueFormList, disabled: this.readonly}]
-        });
+            this.metadataForm.addControl("metadataList", new FormControl({
+                value: this.keyValueFormList,
+                disabled: this.readonly
+            }));
+        }
+
+        if (output.outputBinding.hasInheritMetadata) {
+            this.metadataForm.addControl("inheritMetadata",
+                new FormControl(this.output.outputBinding.inheritMetadataFrom));
+        }
+
 
         this.listenToFormChanges();
     }
@@ -105,15 +118,27 @@ export class OutputMetaDataSectionComponent extends DirectiveBase implements Con
         this.tracked = this.metadataForm.valueChanges
             .debounceTime(300)
             .subscribe(change => {
-                const metadataObject = {};
+                let hasChanged = false;
 
-                change.metadataList.forEach((item: { key: string, value: SBDraft2ExpressionModel }) => {
-                    metadataObject[item.key] = item.value;
-                });
+                if (change.metadataList) {
+                    const metadataObject = {};
 
-                this.output.outputBinding.metadata = metadataObject;
-                this.output.outputBinding.inheritMetadataFrom = change.inheritMetadata;
-                this.propagateChange(change);
+                    change.metadataList.forEach((item: { key: string, value: SBDraft2ExpressionModel }) => {
+                        metadataObject[item.key] = item.value;
+                    });
+
+                    this.output.outputBinding.metadata = metadataObject;
+                    hasChanged = true;
+                }
+
+                if (change.inheritMetadata || this.output.outputBinding.hasInheritMetadata) {
+                    this.output.outputBinding.setInheritMetadataFrom(change.inheritMetadata);
+                    hasChanged = true;
+                }
+
+                if (hasChanged) {
+                    this.propagateChange(change);
+                }
             });
     }
 

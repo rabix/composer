@@ -1,4 +1,13 @@
-import {AfterViewInit, ChangeDetectorRef, Component, HostBinding, Input, OnInit, Output, ViewChild} from "@angular/core";
+import {
+    AfterViewInit,
+    ChangeDetectorRef,
+    Component,
+    HostBinding,
+    Input,
+    OnInit,
+    Output,
+    ViewChild
+} from "@angular/core";
 import {FormControl} from "@angular/forms";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
@@ -34,7 +43,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
             </div>
         </div>
         <div class="modal-footer pb-1 pt-1 pr-1">
-            <button *ngIf="!readonly" (click)="action.next('save')" class="btn btn-primary ml-1" type="button">Save</button>
+            <button *ngIf="!readonly" (click)="action.next('save')" class="btn btn-primary ml-1" type="button" [disabled]="disableSave">Save</button>
             <button (click)="action.next('close')" class="btn btn-secondary " type="button mr-1">Cancel</button>
         </div>
     `
@@ -84,6 +93,8 @@ export class ExpressionEditorComponent extends DirectiveBase implements OnInit, 
 
     contextNodes: TreeNode<any>[];
 
+    disableSave: boolean;
+
     @ViewChild("editor", {read: CodeEditorComponent})
     private editor: CodeEditorComponent;
 
@@ -102,12 +113,13 @@ export class ExpressionEditorComponent extends DirectiveBase implements OnInit, 
             enableBasicAutocompletion: true,
         };
 
-        this.tracked = this.editorControl.valueChanges.debounceTime(500)
+        this.editorControl.valueChanges.do(() => this.disableSave = true).debounceTime(500)
             .filter(e => typeof e === "string")
             .distinctUntilChanged()
-            .subscribe(content => {
+            .subscribeTracked(this, content => {
                 this.evaluator(content).then((res: any) => {
                     this.status = null;
+                    this.disableSave = false;
 
                     if (typeof res === "object") {
                         this.status = res.type;
@@ -171,9 +183,9 @@ export class ExpressionEditorComponent extends DirectiveBase implements OnInit, 
                 node.iconExpanded = "fa-angle-down";
             }
 
-            node.label = key;
-            node.type = "entry";
-            node.typeDisplay = typeDisplay;
+            node.label            = key;
+            node.type             = "entry";
+            node.typeDisplay      = typeDisplay;
             node.toggleOnIconOnly = true;
 
             const trace = [path, key].filter(e => e).join(".");
