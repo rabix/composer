@@ -1,7 +1,8 @@
-import {User} from "../../sbg-api-client/interfaces/user";
+import {User} from "../../sbg-api-client/interfaces";
 import {ExecutorConfig} from "./executor-config";
 import {RepositoryType} from "./repository-type";
 import {TabData} from "./tab-data-interface";
+import * as path from "path";
 
 export interface CredentialsCache {
     id: string;
@@ -25,7 +26,8 @@ export class LocalRepository extends RepositoryType {
     sidebarHidden = false;
 
     executorConfig: ExecutorConfig = {
-        path: ""
+        path: path.resolve(__dirname + "/../../../../executor/lib/rabix-cli.jar"),
+        choice: "bundled"
     };
 
     openTabs: TabData<any> [] = [{

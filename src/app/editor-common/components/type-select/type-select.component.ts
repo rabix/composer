@@ -46,19 +46,19 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 })
 export class InputTypeSelectComponent extends DirectiveBase implements ControlValueAccessor {
 
-    public paramType: ParameterTypeModel;
+    paramType: ParameterTypeModel;
 
-    public types = ["array", "enum", "record", "File", "string", "int", "float", "boolean", "map"];
+    types = ["array", "enum", "record", "File", "string", "int", "float", "boolean", "map"];
 
-    public itemTypes = ["enum", "record", "File", "string", "int", "float", "boolean", "map"];
+    itemTypes = ["enum", "record", "File", "string", "int", "float", "boolean", "map"];
 
-    public form: FormGroup = new FormGroup({
+    form: FormGroup = new FormGroup({
         type: new FormControl(null),
         items: new FormControl(null),
         isItemOrArray: new FormControl(null)
     });
 
-    private readonly = false;
+    readonly = false;
 
     private onTouched = noop;
 

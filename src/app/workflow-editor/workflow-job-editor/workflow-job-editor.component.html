@@ -1,0 +1,24 @@
+<svg #canvas class="cwl-workflow" tabindex="-1"
+     (dblclick)="openInspector($event)"
+     [ct-drop-enabled]="true"
+     [ct-drag-over]="true"
+     [ct-drop-zones]="['job-editor']"
+     (onDropSuccess)="onDrop($event.detail.data.event, $event.detail.data.transfer_data, $event)"
+></svg>
+
+<ng-template #inspector>
+    <ct-editor-inspector-content>
+        <div class="tc-header">
+            {{ inspectedNode.label || inspectedNode.id || inspectedNode.loc || typeOfInspectedNode()}}
+        </div>
+        <div class="tc-body">
+
+            <ct-workflow-job-step-inspector
+                [formControl]="jobControl"
+                [stepInputs]="inspectedInputs"
+                [workflowModel]="model">
+            </ct-workflow-job-step-inspector>
+
+        </div>
+    </ct-editor-inspector-content>
+</ng-template>

@@ -1,0 +1,82 @@
+<div *ngFor="let group of inputGroups">
+
+    <ct-form-panel class="borderless">
+
+        <div class="tc-header">{{ group.name }}</div>
+
+        <div class="tc-body">
+
+            <form (change)="onInputsFormChange($event)" [formGroup]="jobGroup">
+
+                <div *ngFor="let input of group.inputs" class="input-box">
+
+                    <!--Label and port options-->
+                    <div class="input-title flex-baseline">
+
+                        <label class="input-label" title="{{ input.label || input.id }}">
+
+                            <span *ngIf="!input.type.isNullable" class="text-danger">*</span>
+
+                            <i class="fa fa-info-circle text-muted"
+                               *ngIf="input.description"
+                               [ct-tooltip]="ctt"
+                               tooltipPlacement="top">
+                            </i>
+
+                            {{ input.label || input.id }}
+
+                        </label>
+
+                    </div>
+
+                    <!--Input-->
+                    <ct-step-inspector-entry-2 [formControl]="jobGroup.get(input.id)"
+                                               [inputType]="input.type.type"
+                                               [inputArrayItemsType]="input.type.items"
+                                               [inputEnumSymbols]="input.type.symbols"
+                                               [inputRecordFields]="input.type.fields"
+                                               class="mb-0">
+                    </ct-step-inspector-entry-2>
+
+                    <!--Connections-->
+                    <!--Only steps have sources, inputs and outputs don't-->
+                    <div *ngIf="input.source">
+
+                        <!--No connections-->
+                        <div *ngIf="input.source.length === 0 && input.isVisible">
+
+                                    <span class="text-warning" *ngIf="input.type.isNullable">
+                                        <i class="fa fa-warning fa-fw"></i> This port is not connected
+                                    </span>
+
+                            <span class="text-danger" *ngIf="!input.type.isNullable">
+                                        <i class="fa fa-times-circle fa-fw"></i> This required port is not connected
+                                    </span>
+
+                        </div>
+
+                        <!--List of connections-->
+                        <div *ngIf="input.source.length > 0" class="text-muted">
+                            Connections: {{ input.source.join(", ") }}
+                        </div>
+
+                    </div>
+
+                    <!--Tooltip-->
+                    <ct-tooltip-content [maxWidth]="500" #ctt>
+
+                        <h4>{{input.label || input.id}}</h4>
+
+                        <!--Description-->
+                        <div>
+                            <span class="title">Description:</span>
+                            <span class="value">{{ input.description }}</span>
+                        </div>
+
+                    </ct-tooltip-content>
+
+                </div>
+            </form>
+        </div>
+    </ct-form-panel>
+</div>

@@ -61,7 +61,7 @@ import {SendFeedbackModalComponent} from "../modals/send-feedback-modal/send-fee
                 <p>If you have problems, ideas, or other comments, let us know.</p>
                 <p>
                     <button type="button"
-                            data-test="get-support-btn"
+                            data-test="get-support-button"
                             class="btn btn-primary"
                             (click)="initiateFeedbackDialog();">
                         Get in Touch

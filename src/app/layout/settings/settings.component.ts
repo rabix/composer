@@ -12,17 +12,12 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
     styleUrls: ["./settings.component.scss"],
     template: `
 
-        <ct-action-bar>
-            <ct-tab-selector distribute="auto" active="auth">
-                <ct-tab-selector-entry tabName="auth">Authentication</ct-tab-selector-entry>
-                <ct-tab-selector-entry tabName="bunnyConfig">Rabix Executor</ct-tab-selector-entry>
-            </ct-tab-selector>
-        </ct-action-bar>
+        <ct-action-bar></ct-action-bar>
 
-        <ct-form-panel *ngIf="viewMode === 'auth'" class="m-2">
+        <ct-form-panel class="m-2">
             <div class="tc-header">Authentication</div>
-            <div class="tc-body">
 
+            <div class="tc-body">
                 <table class="table table-striped">
                     <thead>
                     <tr>
@@ -38,19 +33,26 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                         
                         <td class="align-middle">
                             {{ entry.user.username }}
-                            <span *ngIf="(auth.getActive() | async) === entry" class="tag tag-primary">active</span>
+                            <span *ngIf="(auth.getActive() | async) === entry" class="tag tag-primary" data-test="activa-user-tag">active</span>
                         </td>
                         
                         <td class="text-xs-right">
                             <button *ngIf="(auth.getActive() | async) === entry; else deactivate;"
-                                    (click)="setActiveCredentials(undefined)"
-                                    class="btn btn-secondary">Deactivate
+                                    class="btn btn-secondary"
+                                    data-test="authentication-deactivate-button"
+                                    (click)="setActiveCredentials(undefined)">Deactivate
                             </button>
                             <ng-template #deactivate>
-                                <button class="btn btn-secondary" (click)="setActiveCredentials(entry)">Activate</button>
+                                <button class="btn btn-secondary"
+                                        data-test="authentication-activate-button"
+                                        (click)="setActiveCredentials(entry)" >Activate</button>
                             </ng-template>
-                            <button class="btn btn-secondary" (click)="editCredentials(entry)">Edit</button>
-                            <button class="btn btn-secondary" (click)="auth.removeCredentials(entry)">Remove</button>
+                            <button class="btn btn-secondary"
+                                    data-test="authentication-edit-button"
+                                    (click)="editCredentials(entry)">Edit</button>
+                            <button class="btn btn-secondary"
+                                    data-test="authentication-remove-button"
+                                    (click)="auth.removeCredentials(entry)">Remove</button>
                         </td>
                         
                     </tr>
@@ -62,8 +64,8 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
             </div>
         </ct-form-panel>
 
-        <ct-form-panel *ngIf="viewMode === 'bunnyConfig'" class="m-2">
-            <div class="tc-header">Rabix Executor Configuration</div>
+        <ct-form-panel class="m-2">
+            <div class="tc-header">Rabix Executor</div>
             <div class="tc-body p-1">
                 <ct-executor-config></ct-executor-config>
             </div>
@@ -83,14 +85,13 @@ export class SettingsComponent extends DirectiveBase {
     }
 
     openCredentialsForm() {
-         this.modal.fromComponent(PlatformCredentialsModalComponent,  "Add Connection"
-        );
+        this.modal.fromComponent(PlatformCredentialsModalComponent, "Add Connection");
     }
 
     editCredentials(edited: AuthCredentials) {
-        const modal = this.modal.fromComponent(PlatformCredentialsModalComponent,  "Edit Connection");
+        const modal = this.modal.fromComponent(PlatformCredentialsModalComponent, "Edit Connection");
 
-        modal.prepareEdit( edited );
+        modal.prepareEdit(edited);
     }
 
     setActiveCredentials(credentials?: AuthCredentials) {

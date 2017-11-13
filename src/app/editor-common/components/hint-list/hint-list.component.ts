@@ -4,12 +4,14 @@ import {CommandLineToolModel, StepModel, WorkflowModel} from "cwlts/models";
 import {Subscription} from "rxjs/Subscription";
 import {SystemService} from "../../../platform-providers/system.service";
 import {ModalService} from "../../../ui/modal/modal.service";
+import {ErrorCode} from "cwlts/models/helpers/validation";
 
 @Component({
     selector: "ct-hint-list",
     template: `
             <!--Blank Tool Screen-->
-            <ct-blank-tool-state *ngIf="!readonly && !model.hints.length" 
+            <ct-blank-tool-state *ngIf="!readonly && !model.hints.length"
+                                 data-test="tool-add-hint-button"
                                  [buttonText]="'Add a Hint'"
                                  [description]=[blankStateDescription]
                                  [learnMoreURL]="'http://docs.sevenbridges.com/docs/list-of-execution-hints'"
@@ -56,7 +58,8 @@ import {ModalService} from "../../../ui/modal/modal.service";
             <button *ngIf="!readonly && !!model.hints.length"
                     (click)="addEntry()"
                     type="button"
-                    class="btn pl-0 btn-link no-outline no-underline-hover">
+                    class="btn pl-0 btn-link no-outline no-underline-hover"
+                    data-test="tool-add-hint-button-small">
                 <i class="fa fa-plus"></i> Add a Hint
             </button>
 
@@ -122,7 +125,7 @@ export class HintsComponent implements OnChanges {
 
     removeEntry(i: number) {
         this.modal.delete("hint").then(() => {
-            this.model.hints[i].cleanValidity();
+            this.model.hints[i].clearIssue(ErrorCode.EXPR_ALL);
             this.model.hints.splice(i, 1);
             (this.form.get("hints") as FormArray).removeAt(i);
             this.update.emit(this.model.hints);

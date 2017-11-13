@@ -4,6 +4,7 @@ import {Subject} from "rxjs/Subject";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {ErrorCode} from "cwlts/models/helpers/validation/ErrorCode";
 
 @Component({
     selector: "ct-file-def-list",
@@ -17,6 +18,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
                 <!--Blank Tool Screen-->
                 <ct-blank-tool-state *ngIf="!readonly && !fileRequirement.listing?.length"
+                                     data-test="tool-add-file-button"
                                      [buttonText]="'Create a file'"
                                      [description]="blankStateDescription"
                                      (buttonClick)="addDirent()">
@@ -116,7 +118,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                     <!--If draft2 show button-->
                     <button *ngIf="isSBDraft2; else v1Template" (click)="addDirent()"
                             type="button"
-                            class="btn pl-0 btn-link no-outline no-underline-hover">
+                            class="btn pl-0 btn-link no-outline no-underline-hover"
+                            data-test="tool-add-file-button-small">
                         <i class="fa fa-plus"></i> Add a File
                     </button>
 
@@ -132,11 +135,11 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                         <!--Template for add item dropdown -->
                         <ng-template #menu class="mr-1">
                             <ul class="list-unstyled" (click)="addItemDropDown.hide()">
-                                <li (click)="addDirent()">
+                                <li (click)="addDirent()" data-test="tool-v1-add-file">
                                     File
                                 </li>
 
-                                <li (click)="addExpression()">
+                                <li (click)="addExpression()" data-test="tool-v1-add-expression">
                                     Expression
                                 </li>
                             </ul>
@@ -216,12 +219,12 @@ export class FileDefListComponent extends DirectiveBase implements OnInit {
             }
 
             if (entryFromList instanceof ExpressionModel) {
-                entryFromList.cleanValidity();
+                entryFromList.clearIssue(ErrorCode.ALL);
             } else if (entryFromList instanceof DirentModel) {
 
                 const {entry, entryName} = entryFromList;
-                entry.cleanValidity();
-                entryName.cleanValidity();
+                entry.clearIssue(ErrorCode.ALL);
+                entryName.clearIssue(ErrorCode.ALL);
 
             }
 
