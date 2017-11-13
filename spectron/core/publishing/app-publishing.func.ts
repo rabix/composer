@@ -111,8 +111,8 @@ describe("app publishing", () => {
         const project = generatePlatformProject({id: "test-user/test-project"});
 
         const demoApp = fs.readFileSync(__dirname + "/stub/demo-app.json", "utf-8");
-        const demoAppWithRevision1 = fs.readFileSync(__dirname + "/stub/demo-app-with-revision-1.json", 'utf-8');
-        const demoAppWithRevision2 = fs.readFileSync(__dirname + "/stub/demo-app-with-revision-2.json", 'utf-8');
+        const demoAppWithRevision1Filepath = __dirname + "/stub/demo-app-with-revision-1.json";
+        const demoAppWithRevision2Filepath = __dirname + "/stub/demo-app-with-revision-2.json";
 
         app = await boot(this, {
             localRepository: {
@@ -156,27 +156,27 @@ describe("app publishing", () => {
                     module: "./sbg-api-client/sbg-client",
                     override: {
                         SBGClient: mockSBGClient({
-                            saveAppRevision: proxerialize((appContent) => {
+                            saveAppRevision: proxerialize((appFilepath: string) => {
 
                                 return (appID: string, content: string) => {
-                                    return Promise.resolve(appContent);
+                                    return Promise.resolve(fs.readFileSync(appFilepath, "utf-8"));
                                 };
-                            }, demoAppWithRevision2),
-                            getApp: proxerialize((appRev1Content, appRev2Content, $callCount) => {
+                            }, demoAppWithRevision2Filepath),
+                            getApp: proxerialize((appRev1Filepath: string, appRev2Filepath: string, $callCount) => {
 
                                 return (appID: string) => {
 
                                     $callCount++;
                                     if (appID.startsWith("test-user/test-project/test-app-update") && $callCount == 1) {
-                                        return Promise.resolve({raw: JSON.parse(appRev1Content)});
+                                        return Promise.resolve({raw: JSON.parse(fs.readFileSync(appRev1Filepath, "utf-8"))});
                                     }
                                     if (appID.startsWith("test-user/test-project/test-app-update") && $callCount > 2) {
-                                        return Promise.resolve({raw: JSON.parse(appRev2Content)});
+                                        return Promise.resolve({raw: JSON.parse(fs.readFileSync(appRev2Filepath, "utf-8"))});
                                     }
 
-                                    return Promise.resolve({raw: JSON.parse(appRev1Content)});
+                                    return Promise.resolve({raw: JSON.parse(fs.readFileSync(appRev1Filepath, "utf-8"))});
                                 };
-                            }, demoAppWithRevision1, demoAppWithRevision2)
+                            }, demoAppWithRevision1Filepath, demoAppWithRevision2Filepath)
                         }),
                     }
 
@@ -236,9 +236,9 @@ describe("app publishing", () => {
         const project = generatePlatformProject({id: "test-user/test-project"});
 
         const demoApp = fs.readFileSync(__dirname + "/stub/demo-app.json", "utf-8");
-        const demoAppWithRevision1 = fs.readFileSync(__dirname + "/stub/demo-app-with-revision-1.json", 'utf-8');
-        const demoAppWithRevision2 = fs.readFileSync(__dirname + "/stub/demo-app-with-revision-2.json", 'utf-8');
-        const demoWorkflowWithEmbeddedApp = fs.readFileSync(__dirname + "/stub/demo-workflow-with-embedded-demo-app.json", 'utf-8');
+        const demoAppWithRevision1Filepath = __dirname + "/stub/demo-app-with-revision-1.json";
+        const demoAppWithRevision2Filepath = __dirname + "/stub/demo-app-with-revision-2.json";
+        const demoWorkflowWithEmbeddedAppFilepath = __dirname + "/stub/demo-workflow-with-embedded-demo-app.json";
 
         app = await boot(this, {
             localRepository: {
@@ -285,24 +285,24 @@ describe("app publishing", () => {
                             saveAppRevision: proxerialize((appContent) => {
 
                                 return (appID: string, content: string) => {
-                                    return Promise.resolve(appContent);
+                                    return Promise.resolve(fs.readFileSync(appContent, "utf-8"));
                                 };
-                            }, demoAppWithRevision2),
-                            getApp: proxerialize((workflowContent, appContent, $callCount) => {
+                            }, demoAppWithRevision2Filepath),
+                            getApp: proxerialize((workflowFilepath: string, appFilepath: string, $callCount) => {
 
                                 return (appID: string) => {
 
                                     $callCount++;
                                     if (appID.startsWith("test-user/test-project/demo-workflow-with-embedded-demo-app") && $callCount == 1) {
-                                        return Promise.resolve({raw: JSON.parse(workflowContent)});
+                                        return Promise.resolve({raw: JSON.parse(fs.readFileSync(workflowFilepath, "utf-8"))});
                                     }
                                     if (appID.startsWith("test-user/test-project/test-app-update") && $callCount > 2) {
-                                        return Promise.resolve({raw: JSON.parse(appContent)});
+                                        return Promise.resolve({raw: JSON.parse(fs.readFileSync(appFilepath, "utf-8"))});
                                     }
 
-                                    return Promise.resolve({raw: JSON.parse(appContent)});
+                                    return Promise.resolve({raw: JSON.parse(fs.readFileSync(appFilepath, "utf-8"))});
                                 };
-                            }, demoWorkflowWithEmbeddedApp, demoAppWithRevision1),
+                            }, demoWorkflowWithEmbeddedAppFilepath, demoAppWithRevision1Filepath),
                             getAllUserApps: proxerialize((content) => {
 
                                 return (appIDs: string[]) =>  {

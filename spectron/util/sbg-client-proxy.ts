@@ -14,6 +14,7 @@ export function mockSBGClient(methods: Partial<SBGClient> = {}) {
     // language=JavaScript 1.8
     return `(function () {
         const client = require("./sbg-api-client/sbg-client").SBGClient;
+        const fs     = require("fs");
 
         function MockSBGClient() {
         }
