@@ -29,20 +29,22 @@ import {CustomValidators} from "../../../validators/custom.validator";
                             [readonly]="readonly">
                     </ct-expression-input>
 
-                    <div *ngIf="!readonly" class="remove-icon clickable" (click)="removeExpressionModel(item)">
+                    <div *ngIf="!readonly" class="remove-icon clickable"
+                         (click)="removeExpressionModel(item)">
                         <i [ct-tooltip]="'Delete'" class="fa fa-trash text-hover-danger"></i>
                     </div>
                 </li>
             </ol>
 
-            <ct-blank-tool-state *ngIf="!formList.length"
-                                 [title]="emptyListText"
-                                 [buttonText]="addButtonText"
-                                 [readonly]="readonly"
-                                 (buttonClick)="addExpressionModel()">
-            </ct-blank-tool-state>
+            <ct-blank-state *ngIf="!formList.length"
+                            [title]="emptyListText"
+                            [buttonText]="addButtonText"
+                            [readonly]="readonly"
+                            (buttonClick)="addExpressionModel()">
+            </ct-blank-state>
 
-            <button type="button" *ngIf="formList.length && !readonly" class="btn btn-link add-btn-link no-underline-hover"
+            <button type="button" *ngIf="formList.length && !readonly"
+                    class="btn btn-link add-btn-link no-underline-hover"
                     (click)="addExpressionModel()">
                 <i class="fa fa-plus"></i> {{addButtonText}}
             </button>

@@ -21,14 +21,14 @@ import {SendFeedbackModalComponent} from "../modals/send-feedback-modal/send-fee
                 <p>
                     Learn how to set up your workspace by
                     <a #localWorkspaceLink
-                       href="https://github.com/rabix/composer/wiki/Configuration#adding-a-local-workspace"
+                       href="http://docs.rabix.io/rabix-composer-configuration#add-a-local-workspace"
                        (click)="system.openLink(localWorkspaceLink.href, $event)"
                        data-test="local-workspace-link">
                         adding a local workspace
                     </a>
                     and
                     <a #connectingPlatformLink
-                       href="https://github.com/rabix/composer/wiki/Configuration#connecting-a-platform-account"
+                       href="http://docs.rabix.io/rabix-composer-configuration#connect-a-platform-account"
                        (click)="system.openLink(connectingPlatformLink.href, $event)"
                        data-test="connecting-platform-link">
                         connecting your Platform account.
@@ -40,13 +40,13 @@ import {SendFeedbackModalComponent} from "../modals/send-feedback-modal/send-fee
             <div class="item">
                 <p class="subtitle">Build tools and workflows</p>
                 <p>
-                    <a #toolLink href="https://github.com/rabix/composer/wiki/Tool-editor-tutorial-1"
+                    <a #toolLink href="http://docs.rabix.io/tutorial-1-wrapping-samtools-sort"
                        data-test="tool-docs-link"
                        (click)="system.openLink(toolLink.href, $event)">
                          Wrap your command line tool
                     </a>
                     using the Common Workflow Language.
-                    <a #platformWorkflowLink href="https://github.com/rabix/composer/wiki/Workflow-editor-tutorial-1"
+                    <a #platformWorkflowLink href="http://docs.rabix.io/tutorial-1-a-platform-workflow"
                        data-test="platform-workflow-link"
                        (click)="system.openLink(platformWorkflowLink.href, $event)">
                          Edit a Platform workflow

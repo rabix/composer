@@ -9,59 +9,59 @@ import {ErrorCode} from "cwlts/models/helpers/validation";
 @Component({
     selector: "ct-hint-list",
     template: `
-            <!--Blank Tool Screen-->
-            <ct-blank-tool-state *ngIf="!readonly && !model.hints.length"
-                                 data-test="tool-add-hint-button"
-                                 [buttonText]="'Add a Hint'"
-                                 [description]=[blankStateDescription]
-                                 [learnMoreURL]="'http://docs.sevenbridges.com/docs/list-of-execution-hints'"
-                                 (buttonClick)="addEntry()">
-            </ct-blank-tool-state>
-    
-            <div *ngIf="readonly && !model.hints.length" class="text-xs-center">
-                This tool doesn't specify any hints
-            </div>
-    
-            <!--List Header Row-->
-            <div class="editor-list-title" *ngIf="!!model.hints.length">
-                <div class="col-xs-6">
-                    Class
-                </div>
-                <div class="col-xs-6">
-                    Value
-                </div>
-            </div>
-    
-            <form [formGroup]="form" *ngIf="form">
-                <ul class="editor-list" formArrayName="hints">
-                    <li *ngFor="let control of form.controls['hints'].controls; let i = index">
-                        <div class="flex-row">
-                            <ct-requirement-input [formControl]="control"
-                                                  [context]="context"
-                                                  [formControlName]="i"
-                                                  [classSuggest]="classSuggest"
-                                                  [readonly]="readonly">
-                            </ct-requirement-input>
+        <!--Blank Tool Screen-->
+        <ct-blank-state *ngIf="!readonly && !model.hints.length"
+                        data-test="tool-add-hint-button"
+                        [buttonText]="'Add a Hint'"
+                        [description]=[blankStateDescription]
+                        [learnMoreURL]="'http://docs.sevenbridges.com/docs/list-of-execution-hints'"
+                        (buttonClick)="addEntry()">
+        </ct-blank-state>
 
-                            <!--Actions Column-->
-                            <div *ngIf="!readonly" class="remove-icon">
-                                <i [ct-tooltip]="'Delete'"
-                                   class="fa fa-trash clickable"
-                                   (click)="removeEntry(i)"></i>
-                            </div>
+        <div *ngIf="readonly && !model.hints.length" class="text-xs-center">
+            This tool doesn't specify any hints
+        </div>
+
+        <!--List Header Row-->
+        <div class="editor-list-title" *ngIf="!!model.hints.length">
+            <div class="col-xs-6">
+                Class
+            </div>
+            <div class="col-xs-6">
+                Value
+            </div>
+        </div>
+
+        <form [formGroup]="form" *ngIf="form">
+            <ul class="editor-list" formArrayName="hints">
+                <li *ngFor="let control of form.controls['hints'].controls; let i = index">
+                    <div class="flex-row">
+                        <ct-requirement-input [formControl]="control"
+                                              [context]="context"
+                                              [formControlName]="i"
+                                              [classSuggest]="classSuggest"
+                                              [readonly]="readonly">
+                        </ct-requirement-input>
+
+                        <!--Actions Column-->
+                        <div *ngIf="!readonly" class="remove-icon">
+                            <i [ct-tooltip]="'Delete'"
+                               class="fa fa-trash clickable"
+                               (click)="removeEntry(i)"></i>
                         </div>
-                    </li>
-                </ul>
-            </form>
-    
-            <!--Add entry link-->
-            <button *ngIf="!readonly && !!model.hints.length"
-                    (click)="addEntry()"
-                    type="button"
-                    class="btn pl-0 btn-link no-outline no-underline-hover"
-                    data-test="tool-add-hint-button-small">
-                <i class="fa fa-plus"></i> Add a Hint
-            </button>
+                    </div>
+                </li>
+            </ul>
+        </form>
+
+        <!--Add entry link-->
+        <button *ngIf="!readonly && !!model.hints.length"
+                (click)="addEntry()"
+                type="button"
+                class="btn pl-0 btn-link no-outline no-underline-hover"
+                data-test="tool-add-hint-button-small">
+            <i class="fa fa-plus"></i> Add a Hint
+        </button>
 
     `,
     styleUrls: ["./hint-list.component.scss"]

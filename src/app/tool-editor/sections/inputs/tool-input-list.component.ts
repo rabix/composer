@@ -10,11 +10,11 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
     template: `
         <div>
             <!--Blank Tool Screen-->
-            <ct-blank-tool-state *ngIf="!readonly && !entries.length && isField"
-                                 [title]="'Click the button to define a field for record.'"
-                                 [buttonText]="'Add field'"
-                                 (buttonClick)="addEntry()">
-            </ct-blank-tool-state>
+            <ct-blank-state *ngIf="!readonly && !entries.length && isField"
+                            [title]="'Click the button to define a field for record.'"
+                            [buttonText]="'Add field'"
+                            (buttonClick)="addEntry()">
+            </ct-blank-state>
 
             <div *ngIf="readonly && !entries.length" class="text-xs-center">
                 This tool doesn't specify any inputs
@@ -48,7 +48,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                             <!--ID Column-->
                             <div class="col-xs-4 ellipsis">
                                 <ct-validation-preview
-                                    [entry]="entry"></ct-validation-preview>
+                                        [entry]="entry"></ct-validation-preview>
                                 {{ entry.id }}
                             </div>
 
@@ -69,10 +69,10 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                 <div class="tc-header">{{ entry.id || entry.loc || "Input" }}</div>
                                 <div class="tc-body">
                                     <ct-tool-input-inspector
-                                        [model]="model"
-                                        [input]="entry"
-                                        (save)="updateInput($event, 'inspector')"
-                                        [readonly]="readonly">
+                                            [model]="model"
+                                            [input]="entry"
+                                            (save)="updateInput($event, 'inspector')"
+                                            [readonly]="readonly">
                                     </ct-tool-input-inspector>
                                 </div>
                             </ct-editor-inspector-content>

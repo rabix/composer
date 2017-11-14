@@ -14,11 +14,11 @@ import {ErrorCode} from "cwlts/models/helpers/validation";
             <div class="tc-header">Secondary Files</div>
             <div class="tc-body">
                 <form [formGroup]="form">
-                    <ct-blank-tool-state *ngIf="!readonly && !secondaryFiles.length"
-                                         [buttonText]="'Add secondary file'"
-                                         [description]="'No Secondary Files defined.'"
-                                         (buttonClick)="addFile()">                        
-                    </ct-blank-tool-state>
+                    <ct-blank-state *ngIf="!readonly && !secondaryFiles.length"
+                                    [buttonText]="'Add secondary file'"
+                                    [description]="'No Secondary Files defined.'"
+                                    (buttonClick)="addFile()">
+                    </ct-blank-state>
 
                     <div *ngIf="readonly && !secondaryFiles.length" class="text-xs-center">
                         No Secondary Files defined.

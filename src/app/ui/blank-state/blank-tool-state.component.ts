@@ -2,7 +2,7 @@ import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from "@
 import {SystemService} from "../../platform-providers/system.service";
 
 @Component({
-    selector: "ct-blank-tool-state",
+    selector: "ct-blank-state",
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <div>
@@ -40,7 +40,7 @@ import {SystemService} from "../../platform-providers/system.service";
         </div>
     `
 })
-export class BlankToolStateComponent {
+export class BlankStateComponent {
 
     @Input()
     readonly = false;

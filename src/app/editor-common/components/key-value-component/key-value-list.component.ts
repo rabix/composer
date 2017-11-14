@@ -23,14 +23,14 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         <div>
 
             <!--Blank Tool Screen-->
-            <ct-blank-tool-state *ngIf="!readonly && !keyValueFormList.length"
-                                 [title]="emptyListText"
-                                 [buttonText]="addEntryText"
-                                 [learnMoreURL]="helpLink"
-                                 (buttonClick)="addEntry()">
-            </ct-blank-tool-state>
+            <ct-blank-state *ngIf="!readonly && !keyValueFormList.length"
+                            [title]="emptyListText"
+                            [buttonText]="addEntryText"
+                            [learnMoreURL]="helpLink"
+                            (buttonClick)="addEntry()">
+            </ct-blank-state>
 
-            
+
             <!--List Header Row-->
             <div class="editor-list-title row" *ngIf="!!keyValueFormList.length">
                 <div class="col-sm-5">{{keyColumnText}}</div>
@@ -48,13 +48,14 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                          [class.invalid-entry]="duplicateKeys.has(form.controls[entry.id].value.key)">
 
                         <ct-key-value-input
-                            [context]="context"
-                            [formControl]="form.controls[entry.id]"
-                            [keyValidator]="keyValidator"
-                            [isDuplicate]="duplicateKeys.has(form.controls[entry.id].value.key)">
+                                [context]="context"
+                                [formControl]="form.controls[entry.id]"
+                                [keyValidator]="keyValidator"
+                                [isDuplicate]="duplicateKeys.has(form.controls[entry.id].value.key)">
 
                             <div *ngIf="!!entry" class="col-sm-1 align-right">
-                                <i title="Delete" class="fa fa-trash text-hover-danger" (click)="removeEntry(entry)"></i>
+                                <i title="Delete" class="fa fa-trash text-hover-danger"
+                                   (click)="removeEntry(entry)"></i>
                             </div>
                         </ct-key-value-input>
                     </div>
