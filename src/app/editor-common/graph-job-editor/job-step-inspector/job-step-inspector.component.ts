@@ -4,7 +4,6 @@ import {
     Component,
     EventEmitter,
     forwardRef,
-    Inject,
     Input,
     OnChanges,
     OnInit,
@@ -13,24 +12,22 @@ import {
 } from "@angular/core";
 import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {WorkflowModel, WorkflowStepInputModel} from "cwlts/models";
-import {DirectiveBase} from "../../../util/directive-base/directive-base";
-import {JobService} from "../../services/job/job.service";
-import {JOB_SERVICE_TOKEN} from "../../services/job/job.service.factory";
 import {WorkflowInputParameterModel} from "cwlts/models/generic/WorkflowInputParameterModel";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
-    selector: "ct-workflow-job-step-inspector",
-    styleUrls: ["../step-inspector/step-inputs-inspector/step-inputs-inspector.component.scss"],
+    selector: "ct-job-step-inspector",
+    styleUrls: ["../../../workflow-editor/object-inspector/step-inspector/step-inputs-inspector/step-inputs-inspector.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    templateUrl: "./workflow-job-step-inspector.component.html",
+    templateUrl: "./job-step-inspector.component.html",
     providers: [{
         provide: NG_VALUE_ACCESSOR,
-        useExisting: forwardRef(() => WorkflowJobStepInspector),
+        useExisting: forwardRef(() => JobStepInspectorComponent),
         multi: true
     }]
 
 })
-export class WorkflowJobStepInspector extends DirectiveBase implements OnInit, OnChanges, AfterViewInit, ControlValueAccessor {
+export class JobStepInspectorComponent extends DirectiveBase implements OnInit, OnChanges, AfterViewInit, ControlValueAccessor {
 
     @Input() readonly = false;
 
@@ -51,12 +48,6 @@ export class WorkflowJobStepInspector extends DirectiveBase implements OnInit, O
     private propagateChange: any;
 
     private jobValue: Object;
-
-    constructor(@Inject(JOB_SERVICE_TOKEN)
-                private jobService: JobService) {
-        super();
-
-    }
 
     writeValue(obj: any): void {
         this.jobValue = obj;

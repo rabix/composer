@@ -1,4 +1,4 @@
-@import "./../../../assets/sass/variables";
+@import "../../../assets/sass/variables";
 
 :host {
 
@@ -14,7 +14,7 @@
     );
 
     /deep/ {
-        @import "./../svg-plugins/job-file-drop/job-file-drop";
+        @import "../../workflow-editor/svg-plugins/job-file-drop/job-file-drop";
     }
 
     .cwl-workflow {

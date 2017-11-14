@@ -9,16 +9,16 @@ import {JobHelper} from "cwlts/models/helpers/JobHelper";
 import {AppMetaManager} from "../../core/app-meta/app-meta-manager";
 import {APP_META_MANAGER} from "../../core/app-meta/app-meta-manager-factory";
 import {AppHelper} from "../../core/helpers/AppHelper";
-import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
-import {SVGJobFileDropPlugin} from "../svg-plugins/job-file-drop/job-file-drop";
+import {SVGJobFileDropPlugin} from "../../workflow-editor/svg-plugins/job-file-drop/job-file-drop";
+import {EditorInspectorService} from "../inspector/editor-inspector.service";
 
 @Component({
-    selector: "ct-workflow-job-editor",
-    templateUrl: "./workflow-job-editor.component.html",
-    styleUrls: ["./workflow-job-editor.component.scss"],
+    selector: "ct-graph-job-editor",
+    templateUrl: "./graph-job-editor.component.html",
+    styleUrls: ["./graph-job-editor.component.scss"]
 })
-export class WorkflowJobEditorComponent extends DirectiveBase implements OnInit, AfterViewInit {
+export class GraphJobEditorComponent extends DirectiveBase implements OnInit, AfterViewInit {
 
     @Input()
     appID: string;
@@ -48,7 +48,7 @@ export class WorkflowJobEditorComponent extends DirectiveBase implements OnInit,
         super();
     }
 
-    onDrop(event, data: {name: string, type: "cwl" | "file" | "directory"}) {
+    onDrop(event, data: { name: string, type: "cwl" | "file" | "directory" }) {
 
         if (!AppHelper.isLocal(data.name)) {
             return;
@@ -58,7 +58,7 @@ export class WorkflowJobEditorComponent extends DirectiveBase implements OnInit,
         const directoryInput = this.findParentInputOfType(dropElement, "Directory");
         const fileInput      = this.findParentInputOfType(dropElement, "File");
 
-        let type = directoryInput ? "Directory" : (fileInput ? "File" : null);
+        const type = (directoryInput && "Directory") || (fileInput && "File");
 
         if (type) {
 

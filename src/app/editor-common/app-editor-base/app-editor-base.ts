@@ -4,9 +4,6 @@ import {CommandLineToolModel, WorkflowModel} from "cwlts/models";
 
 import * as Yaml from "js-yaml";
 import {LoadOptions} from "js-yaml";
-import "rxjs/add/observable/of";
-import "rxjs/add/operator/do";
-import "rxjs/add/operator/switchMap";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {EXECUTOR_OUTDIR_PREFIX} from "../../../../electron/src/constants";
@@ -394,7 +391,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     ngAfterViewInit() {
         this.inspector.setHostView(this.inspectorHostView);
         super.ngAfterViewInit();
-        console.log("After init, report panel", this.reportPanelComponent);
         this.executionPreview = this.reportPanelComponent.getAppExecutionPreview();
 
         this.bindExecutionQueue();
@@ -515,9 +511,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             this.reportPanel = this.reportPanel === panel ? undefined : panel;
 
         }
-
-        console.log("Toggled report panel", this.reportPanel);
-
 
         // Force browser reflow, heights and scroll bar size gets inconsistent otherwise
         setTimeout(() => window.dispatchEvent(new Event("resize")));
