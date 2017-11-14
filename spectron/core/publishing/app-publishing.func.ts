@@ -10,10 +10,10 @@ describe("app publishing", () => {
 
     afterEach(() => shutdown(app));
 
-    it("opens newly published app in a new tab", async function () {
+    const user    = generateAuthCredentials("test-user", "https://api.sbgenomics.com");
+    const project = generatePlatformProject({id: "test-user/test-project"});
 
-        const user    = generateAuthCredentials("test-user", "https://api.sbgenomics.com");
-        const project = generatePlatformProject({id: "test-user/test-project"});
+    it("opens newly published app in a new tab", async function () {
 
         const demoAppContent = fs.readFileSync(__dirname + "/stub/demo-app.json", "utf-8");
 
@@ -96,9 +96,6 @@ describe("app publishing", () => {
     });
 
     it("adds new revision to published app if app is already open", async function() {
-        const user    = generateAuthCredentials("test-user", "https://api.sbgenomics.com");
-        const project = generatePlatformProject({id: "test-user/test-project"});
-
         const demoApp = fs.readFileSync(__dirname + "/stub/demo-app.json", "utf-8");
         const demoAppWithRevision1Filepath = __dirname + "/stub/demo-app-with-revision-1.json";
         const demoAppWithRevision2Filepath = __dirname + "/stub/demo-app-with-revision-2.json";
@@ -181,7 +178,7 @@ describe("app publishing", () => {
         const projectControl  = `${modal} [formControlName=project]`;
         const projectOption   = `${projectControl} .option[data-value='test-user/test-project']`;
 
-        const publishBtn = `[data-test=publish-btn]`;
+        const publishBtn = `[data-test=publish-button]`;
 
         const revisionsButton = `ct-common-document-controls div button:nth-child(2)`;
 
@@ -221,9 +218,6 @@ describe("app publishing", () => {
     });
 
     it("publishing app causes platform workflows that contain the published app to check for updates", async function () {
-        const user    = generateAuthCredentials("test-user", "https://api.sbgenomics.com");
-        const project = generatePlatformProject({id: "test-user/test-project"});
-
         const demoApp = fs.readFileSync(__dirname + "/stub/demo-app.json", "utf-8");
         const demoAppWithRevision1Filepath = __dirname + "/stub/demo-app-with-revision-1.json";
         const demoAppWithRevision2Filepath = __dirname + "/stub/demo-app-with-revision-2.json";
@@ -313,7 +307,7 @@ describe("app publishing", () => {
         const projectControl  = `${modal} [formControlName=project]`;
         const projectOption   = `${projectControl} .option[data-value='test-user/test-project']`;
 
-        const publishBtn = `[data-test=publish-btn]`;
+        const publishBtn = `[data-test=publish-button]`;
 
         const localAppTab = `ct-workbox .tab-bar .tab:first-child`;
         await client.waitForVisible(localAppTab, 5000);
