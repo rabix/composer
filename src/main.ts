@@ -14,4 +14,5 @@ if (environment.production) {
 platformBrowserDynamic([{
     provide: SystemService,
     useClass: ElectronSystemService,
+    deps: []
 }]).bootstrapModule(AppModule);

@@ -8,12 +8,22 @@ import EventEmitter = NodeJS.EventEmitter;
 
 export type ProcessCallback = (err?: Error, stdout?: string, stderr?: string) => void;
 
+export function findDefaultExecutorJar() {
+    const basePath    = path.normalize(__dirname + "/../../executor/lib/rabix-cli.jar");
+    const fixedAsar   = basePath.replace("app.asar", "app.asar.unpacked");
+    const fixedDevEnv = fixedAsar.replace(
+        ["electron", "dist", "executor", "lib"].join(path.sep),
+        ["electron", "executor", "lib"].join(path.sep)
+    );
+    return fixedDevEnv;
+}
+
 export class RabixExecutor {
 
     jarPath = "";
     jrePath = "java";
 
-    constructor(jarPath = __dirname + "/../../executor/lib/rabix-cli.jar") {
+    constructor(jarPath = findDefaultExecutorJar()) {
         this.jarPath = path.normalize(jarPath);
     }
 
@@ -115,7 +125,9 @@ export class RabixExecutor {
 
                 if (err) return reject(err);
 
-                fs.writeFile(tmpPath, content, "utf8", (err) => {
+                fs.writeFile(tmpPath, content, {
+                    encoding: "utf8"
+                }, (err) => {
                     if (err) return reject(err);
 
                     resolve(tmpPath);
