@@ -3,15 +3,14 @@ import * as fs from "fs-extra";
 import * as spectron from "spectron";
 import {generateAuthCredentials, generatePlatformProject} from "../../util/generator";
 import {mockSBGClient} from "../../util/sbg-client-proxy";
-import {boot, getTestDir, proxerialize, shutdown} from "../../util/util";
+import {boot, getTestDir, partialProxy, proxerialize, shutdown} from "../../util/util";
 
 describe("app publishing", () => {
     let app: spectron.Application;
 
-    afterEach((done) => done());
     afterEach(() => shutdown(app));
 
-    it.only("opens newly published app in a new tab", async function () {
+    it("opens newly published app in a new tab", async function () {
 
         const user    = generateAuthCredentials("test-user", "https://api.sbgenomics.com");
         const project = generatePlatformProject({id: "test-user/test-project"});
