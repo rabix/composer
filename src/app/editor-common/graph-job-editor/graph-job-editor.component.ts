@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output, TemplateRef, ViewChild} from "@angular/core";
 import {FormControl} from "@angular/forms";
-import {SelectionPlugin, SVGEdgeHoverPlugin, SVGNodeMovePlugin, Workflow as WorkflowGraph, ZoomPlugin} from "cwl-svg";
+import {SelectionPlugin, SVGArrangePlugin, SVGEdgeHoverPlugin, SVGNodeMovePlugin, Workflow as WorkflowGraph, ZoomPlugin} from "cwl-svg";
 import {StepModel} from "cwlts/models/generic/StepModel";
 import {WorkflowInputParameterModel} from "cwlts/models/generic/WorkflowInputParameterModel";
 import {WorkflowModel} from "cwlts/models/generic/WorkflowModel";
@@ -90,7 +90,9 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
                 new SelectionPlugin(),
                 new ZoomPlugin(),
                 new SVGNodeMovePlugin(),
-                new SVGJobFileDropPlugin()
+                new SVGJobFileDropPlugin(),
+                new SVGArrangePlugin()
+
             ]
         });
 
