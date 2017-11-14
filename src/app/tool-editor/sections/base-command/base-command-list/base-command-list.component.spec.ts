@@ -68,6 +68,9 @@ describe("BaseCommandListComponent", () => {
         mockModel = {
             baseCommand: [d2expr, d2expr, d2expr],
             addBaseCommand: () => {
+            },
+            updateBaseCommand: () => {
+
             }
         };
 
@@ -87,6 +90,7 @@ describe("BaseCommandListComponent", () => {
 
     it("should load a list of draft-2 expression models", () => {
         component.baseCommand = mockModel.baseCommand;
+        component.model       = mockModel;
         component.ngOnChanges();
         fixture.detectChanges();
 
@@ -140,6 +144,7 @@ describe("BaseCommandListComponent", () => {
 
     it("should trigger change event on form changes", () => {
         component.baseCommand = mockModel.baseCommand;
+        component.model       = mockModel;
         component.ngOnChanges();
         fixture.detectChanges();
 

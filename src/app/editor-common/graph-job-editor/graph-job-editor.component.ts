@@ -57,15 +57,14 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
             return;
         }
 
+        let type = data.type === "directory" ? "Directory" : "File";
+
         const dropElement    = event.ctData.preHoveredElement;
-        const directoryInput = this.findParentInputOfType(dropElement, "Directory");
-        const fileInput      = this.findParentInputOfType(dropElement, "File");
+        const inputEl = this.findParentInputOfType(dropElement, type);
 
-        const type = (directoryInput && "Directory") || (fileInput && "File");
+        if (inputEl) {
 
-        if (type) {
-
-            const inputID   = (fileInput || directoryInput).getAttribute("data-id");
+            const inputID   = inputEl.getAttribute("data-id");
             const jobValue  = this.jobControl.value;
             const fileValue = jobValue[inputID];
             const isArray   = Array.isArray(fileValue);

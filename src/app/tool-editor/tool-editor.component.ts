@@ -142,7 +142,6 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
         this.workflowWrapper = WorkflowFactory.from({cwlVersion: this.dataModel.cwlVersion} as any);
         this.workflowWrapper.addStepFromProcess(json as Process);
 
-        console.log("Wrapper", this.workflowWrapper);
         this.workflowWrapper.steps[0].in.forEach((input: WorkflowStepInputModel) => {
 
             if (isFileType(input)) {
