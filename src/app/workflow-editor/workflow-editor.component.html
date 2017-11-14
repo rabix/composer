@@ -37,14 +37,14 @@
                               [readonly]="isReadonly"
                               [(model)]="dataModel"
                               (change)="syncModelAndCode(false)"
-                              (draw)="onGraphDraw()"
+                              (draw)="onGraphDraw($event)"
                               class="editor-main">
     </ct-workflow-graph-editor>
 
     <ct-workflow-job-editor *ngIf="viewMode === 'test' && !isLoading && dataModel"
                             [appID]="this.tabData.id"
                             [model]="dataModel"
-                            (draw)="onGraphDraw()">
+                            (draw)="onGraphDraw($event)">
     </ct-workflow-job-editor>
 
     <ct-app-info *ngIf="viewMode === 'info' && !isLoading && dataModel"

@@ -152,6 +152,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
         try {
             this.graph.fitToViewport();
+            this.draw.emit(this);
         } catch (ex) {
             setTimeout(() => {
                 console.warn("Workflow should be able to fit in by now...");

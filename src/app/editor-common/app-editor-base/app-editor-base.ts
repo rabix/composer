@@ -594,7 +594,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             try {
                 const json = Yaml.safeLoad(codeVal, {json: true} as LoadOptions);
                 this.recreateModel(json);
-                this.afterModelCreated(!this.modelCreated);
+                if (!this.modelCreated) {
+                    this.onFirstModelCreation();
+                }
                 this.modelCreated = true;
 
                 return Promise.resolve();
@@ -642,7 +644,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         const tryModelCreation = (text, resolve, reject) => {
             try {
                 this.recreateModel(text); // throws exception when generating graph
-                this.afterModelCreated(!this.modelCreated);
+                if (!this.modelCreated) {
+                    this.onFirstModelCreation();
+                }
                 this.modelCreated = true;
 
                 resolve(text);
@@ -716,7 +720,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         return undefined;
     }
 
-    protected afterModelCreated(isFirstCreation: boolean): void {
+    protected onFirstModelCreation(): void {
     }
 
     protected updateSavingAvailability() {

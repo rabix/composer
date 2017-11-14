@@ -16,7 +16,6 @@ describe("app publishing", () => {
     it("opens newly published app in a new tab", async function () {
 
         const demoAppContent = fs.readFileSync(__dirname + "/stub/demo-app.json", "utf-8");
-
         const demoAppTestPath = getTestDir(this, "demo-app.json");
 
         app = await boot(this, {
@@ -96,7 +95,8 @@ describe("app publishing", () => {
     });
 
     it("adds new revision to published app if app is already open", async function() {
-        const demoApp = fs.readFileSync(__dirname + "/stub/demo-app.json", "utf-8");
+        const demoAppContent = fs.readFileSync(__dirname + "/stub/demo-app.json", "utf-8");
+        const demoAppTestPath = getTestDir(this, "demo-app.json");
         const demoAppWithRevision1Filepath = __dirname + "/stub/demo-app-with-revision-1.json";
         const demoAppWithRevision2Filepath = __dirname + "/stub/demo-app-with-revision-2.json";
 
@@ -105,7 +105,7 @@ describe("app publishing", () => {
                 credentials: [user],
                 activeCredentials: user,
                 openTabs: [{
-                    id: "/demo-app.json",
+                    id: demoAppTestPath,
                     type: "CommandLineTool",
                     label: "My Demo App"
                 }]
@@ -121,23 +121,11 @@ describe("app publishing", () => {
                     }]
                 }
             },
+            prepareTestData: [{
+                name: "demo-app.json",
+                content: demoAppContent
+            }],
             overrideModules: [
-                {
-                    module: "fs-extra",
-                    override: partialProxy("fs-extra", {
-                        readFile: proxerialize((fileContent) => {
-                            return (target, context, args) => {
-                                const filepath = args[0];
-                                const callback = args[args.length - 1];
-                                if (filepath === "/demo-app.json") {
-                                    return callback(null, fileContent);
-                                }
-
-                                return target(...args);
-                            };
-                        }, demoApp)
-                    })
-                },
                 {
                     module: "./sbg-api-client/sbg-client",
                     override: {
@@ -218,7 +206,8 @@ describe("app publishing", () => {
     });
 
     it("publishing app causes platform workflows that contain the published app to check for updates", async function () {
-        const demoApp = fs.readFileSync(__dirname + "/stub/demo-app.json", "utf-8");
+        const demoAppContent = fs.readFileSync(__dirname + "/stub/demo-app.json", "utf-8");
+        const demoAppTestPath = getTestDir(this, "demo-app.json");
         const demoAppWithRevision1Filepath = __dirname + "/stub/demo-app-with-revision-1.json";
         const demoAppWithRevision2Filepath = __dirname + "/stub/demo-app-with-revision-2.json";
         const demoWorkflowWithEmbeddedAppFilepath = __dirname + "/stub/demo-workflow-with-embedded-demo-app.json";
@@ -228,7 +217,7 @@ describe("app publishing", () => {
                 credentials: [user],
                 activeCredentials: user,
                 openTabs: [{
-                    id: "/demo-app.json",
+                    id: demoAppTestPath,
                     type: "CommandLineTool",
                     label: "My Demo App"
                 }]
@@ -244,23 +233,11 @@ describe("app publishing", () => {
                     }]
                 }
             },
+            prepareTestData: [{
+                name: "demo-app.json",
+                content: demoAppContent
+            }],
             overrideModules: [
-                {
-                    module: "fs-extra",
-                    override: partialProxy("fs-extra", {
-                        readFile: proxerialize((fileContent) => {
-                            return (target, context, args) => {
-                                const filepath = args[0];
-                                const callback = args[args.length - 1];
-                                if (filepath === "/demo-app.json") {
-                                    return callback(null, fileContent);
-                                }
-
-                                return target(...args);
-                            };
-                        }, demoApp)
-                    })
-                },
                 {
                     module: "./sbg-api-client/sbg-client",
                     override: {
@@ -333,7 +310,10 @@ describe("app publishing", () => {
         await client.waitForVisible(tabSelector, 10000);
         await client.click(tabSelector);
 
-        const updatedNode = `ct-workflow-graph-editor .node.hasUpdate`;
+        const svg = `ct-workflow-graph-editor .cwl-workflow`;
+        await client.waitForVisible(svg, 5000);
+
+        const updatedNode = `ct-workflow-graph-editor .node.__update-has-update`;
         await client.waitForVisible(updatedNode, 10000);
 
         const updatedNodeExists =  await client.isExisting(updatedNode);
