@@ -1,9 +1,9 @@
 import * as assert from "assert";
 import * as fs from "fs-extra";
 import * as spectron from "spectron";
-import {generateAuthCredentials,  generatePlatformProject} from "../../util/generator";
+import {generateAuthCredentials, generatePlatformProject} from "../../util/generator";
 import {mockSBGClient} from "../../util/sbg-client-proxy";
-import {boot, partialProxy, proxerialize, shutdown} from "../../util/util";
+import {boot, getTestDir, proxerialize, shutdown} from "../../util/util";
 
 describe("app publishing", () => {
     let app: spectron.Application;
@@ -15,14 +15,16 @@ describe("app publishing", () => {
         const user    = generateAuthCredentials("test-user", "https://api.sbgenomics.com");
         const project = generatePlatformProject({id: "test-user/test-project"});
 
-        const demoApp = fs.readFileSync(__dirname + "/stub/demo-app.json", "utf-8");
+        const demoAppContent = fs.readFileSync(__dirname + "/stub/demo-app.json", "utf-8");
+
+        const demoAppTestPath = getTestDir(this, "demo-app.json");
 
         app = await boot(this, {
             localRepository: {
                 credentials: [user],
                 activeCredentials: user,
                 openTabs: [{
-                    id: "/demo-app.json",
+                    id: demoAppTestPath,
                     type: "CommandLineTool",
                     label: "My Demo App"
                 }]
@@ -33,23 +35,11 @@ describe("app publishing", () => {
                     openProjects: [project.id]
                 }
             },
+            prepareTestData: [{
+                name: "demo-app.json",
+                content: demoAppContent
+            }],
             overrideModules: [
-                {
-                    module: "fs-extra",
-                    override: partialProxy("fs-extra", {
-                        readFile: proxerialize((fileContent) => {
-                            return (target, context, args) => {
-                                const filepath = args[0];
-                                const callback = args[args.length - 1];
-                                if (filepath === "/demo-app.json") {
-                                    return callback(null, fileContent);
-                                }
-
-                                return target(...args);
-                            };
-                        }, demoApp)
-                    })
-                },
                 {
                     module: "./sbg-api-client/sbg-client",
                     override: {
@@ -65,7 +55,7 @@ describe("app publishing", () => {
 
                                     return Promise.resolve(appContent);
                                 };
-                            }, demoApp)
+                            }, demoAppContent)
                         }),
                     }
 

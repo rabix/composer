@@ -8,7 +8,6 @@ import {ModelExpressionEditorComponent} from "../../expression-editor/model-expr
 
 @Component({
     encapsulation: ViewEncapsulation.None,
-
     selector: "ct-expression-input",
     styleUrls: ["./expression-input.component.scss"],
     providers: [
@@ -21,11 +20,11 @@ import {ModelExpressionEditorComponent} from "../../expression-editor/model-expr
     template: `
         <div *ngIf="model" class="expression-input-group clickable"
              [ct-validation-class]="model"
-             [class.expr]="isExpr || disableLiteralTextInput">
+             [class.expr]="model?.isExpression || disableLiteralTextInput">
 
             <ct-validation-preview [entry]="model"></ct-validation-preview>
             <b class="validation-icon result"
-               *ngIf="isExpr && !(model?.hasErrors || model?.hasWarnings)"
+               *ngIf="model?.isExpression && !(model?.errors.length || model?.warnings.length)"
                [title]="result">E:</b>
 
             <div class="input-group">
@@ -33,20 +32,20 @@ import {ModelExpressionEditorComponent} from "../../expression-editor/model-expr
                 <input class="form-control"
                        data-test="expression-input"
                        #input
-                       [type]="isExpr ? 'text' : type"
+                       [type]="model?.isExpression ? 'text' : type"
                        [value]="model?.toString() || ''"
-                       [readonly]="isExpr || disableLiteralTextInput || readonly"
+                       [readonly]="model?.isExpression || disableLiteralTextInput || readonly"
                        (blur)="onTouch()"
-                       (click)="editExpr(isExpr || disableLiteralTextInput && !readonly ? 'edit' : null, $event)"
+                       (click)="editExpr(model?.isExpression || disableLiteralTextInput && !readonly ? 'edit' : null, $event)"
                        (change)="editString(input.value)"/>
 
                 <span class="input-group-btn" *ngIf="!readonly">
                         <button type="button"
                                 class="btn btn-secondary btn-icon"
-                                (click)="editExpr(isExpr ? 'clear' : 'edit', $event)">
+                                (click)="editExpr(model?.isExpression ? 'clear' : 'edit', $event)">
                             <i class="fa"
-                               [ngClass]="{'fa-times': isExpr,
-                                            'fa-code': !isExpr}"></i>
+                               [ngClass]="{'fa-times': model?.isExpression,
+                                            'fa-code': !model?.isExpression}"></i>
                         </button>
                     </span>
             </div>
@@ -69,9 +68,6 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
 
     @Input()
     readonly = false;
-
-    /** Flag if model is expression or primitive */
-    isExpr = false;
 
     /**
      * Internal ExpressionModel on which changes are made
@@ -106,8 +102,6 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
 
         if (obj) {
             this.model  = obj;
-            this.isExpr = obj.isExpression;
-            this.model.validate(this.context).then(noop, noop);
         }
     }
 
@@ -140,7 +134,6 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
             str = Number(str);
         }
 
-        this.model.cleanValidity();
         this.model.setValue(str, this.type);
         this.onChange(this.model);
     }
@@ -178,11 +171,7 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
                     }
 
                     this.model.cloneStatus(editor.model);
-
-                    this.isExpr = this.model.isExpression;
-                    this.model.validate(this.context).then(() => {
-                        this.onChange(this.model);
-                    }, err => console.warn);
+                    this.onChange(this.model);
                 }
 
                 this.modal.close();
@@ -191,14 +180,9 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
 
         if (action === "clear") {
             this.modal.delete("expression").then(() => {
-                this.model.cleanValidity();
                 this.model.setValue("", this.type);
-                this.model.result = null;
-                this.isExpr       = false;
+                this.onChange(this.model);
                 event.stopPropagation();
-                this.model.validate(this.context).then(() => {
-                    this.onChange(this.model);
-                }, err => console.warn);
             }, err => console.warn);
         }
     }

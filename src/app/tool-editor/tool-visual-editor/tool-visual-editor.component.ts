@@ -164,14 +164,6 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
                 this.model.setRequirement(req);
 
             } else if (this.model.cwlVersion === "sbg:draft-2") {
-                this.model.setRequirement(<SBGCPURequirement>{
-                    "class": "sbg:CPURequirement",
-                    value: data.cores.serialize()
-                });
-                this.model.setRequirement(<SBGMemRequirement>{
-                    "class": "sbg:MemRequirement",
-                    value: data.mem.serialize()
-                });
 
                 let {mem, cpu} = this.context.$job.allocatedResources;
 

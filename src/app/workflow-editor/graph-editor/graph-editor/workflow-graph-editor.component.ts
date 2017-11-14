@@ -12,18 +12,20 @@ import {
     ViewChild,
     ViewEncapsulation
 } from "@angular/core";
+
 import {
-    SVGArrangePlugin, SVGEdgeHoverPlugin, SVGNodeMovePlugin, SVGPortDragPlugin, SVGValidatePlugin,
-    SelectionPlugin, Workflow, DeletionPlugin
+    DeletionPlugin,
+    SelectionPlugin,
+    SVGArrangePlugin,
+    SVGEdgeHoverPlugin,
+    SVGNodeMovePlugin,
+    SVGPortDragPlugin,
+    SVGValidatePlugin,
+    ZoomPlugin,
+    Workflow
 } from "cwl-svg";
-import {ZoomPlugin} from "cwl-svg/src/plugins/zoom";
-import {
-    StepModel,
-    WorkflowFactory,
-    WorkflowInputParameterModel,
-    WorkflowModel,
-    WorkflowOutputParameterModel
-} from "cwlts/models";
+
+import {StepModel, WorkflowFactory, WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
 import {Process} from "cwlts/models/generic/Process";
 import {Observable} from "rxjs/Observable";
 import {DataGatewayService} from "../../../core/data-gateway/data-gateway.service";
@@ -38,8 +40,8 @@ import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {IpcService} from "../../../services/ipc.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
-import {WorkflowEditorService} from "../../workflow-editor.service";
 import {WorkflowEditorComponent} from "../../workflow-editor.component";
+import {WorkflowEditorService} from "../../workflow-editor.service";
 import {SvgDumper} from "../svg-dumper/svg-dumper";
 import {UpdatePlugin} from "../update-plugin/update-plugin";
 
@@ -321,20 +323,20 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     /**
      * Triggers when app is dropped on canvas
      */
-    onDrop(ev: MouseEvent, nodeID: string) {
-        if (this.readonly) {
+    onDrop(ev: MouseEvent, nodeData: {name: string, type: "cwl" | "directory" | "file"}) {
+        if (this.readonly || nodeData.type !== "cwl") {
             return;
         }
 
-        const statusProcess = this.statusBar.startProcess(`Adding ${nodeID} to Workflow...`);
+        const statusProcess = this.statusBar.startProcess(`Adding ${nodeData.name} to Workflow...`);
 
-        const isLocal = AppHelper.isLocal(nodeID);
+        const isLocal = AppHelper.isLocal(nodeData.name);
 
         const fetch: Promise<string> = isLocal
-            ? this.fileRepository.fetchFile(nodeID)
-            : this.platformRepository.getApp(nodeID).then(app => JSON.stringify(app));
+            ? this.fileRepository.fetchFile(nodeData.name)
+            : this.platformRepository.getApp(nodeData.name).then(app => JSON.stringify(app));
 
-        fetch.then(result => this.gateway.resolveContent(result, nodeID).toPromise())
+        fetch.then(result => this.gateway.resolveContent(result, nodeData.name).toPromise())
             .then(resolved => {
                 return this.appValidator.createValidator(Observable.of(JSON.stringify(resolved)))
                     .filter(val => !val.isPending)
@@ -351,7 +353,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             .then((resolved: Process) => {
                 // if the app is local, give it an id that's the same as its filename (if doesn't exist)
                 if (isLocal) {
-                    resolved.id = resolved.id || AppHelper.getBasename(nodeID, true);
+                    resolved.id = resolved.id || AppHelper.getBasename(nodeData.name, true);
                 }
 
                 this.workflowEditorService.putInHistory(this.model);
@@ -366,20 +368,20 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
                 // add local source so step can be serialized without embedding
                 if (isLocal) {
-                    step.customProps["sbg:rdfSource"] = nodeID;
-                    step.customProps["sbg:rdfId"]     = nodeID;
+                    step.customProps["sbg:rdfSource"] = nodeData.name;
+                    step.customProps["sbg:rdfId"]     = nodeData.name;
                 }
 
                 this.change.emit();
                 this.setFocusOnCanvas();
 
-            this.statusBar.stopProcess(statusProcess, `Added ${step.label}`);
-        }).then(() => {
+                this.statusBar.stopProcess(statusProcess, `Added ${step.label}`);
+            }).then(() => {
             // Resolve model current content in order to prevent nesting recursion
             this.host.resolveCurrentContent();
-        }).catch( err => {
+        }).catch(err => {
             this.statusBar.stopProcess(statusProcess);
-            this.notificationBar.showNotification(`Failed to add ${nodeID} to workflow. ${new ErrorWrapper(err)}`);
+            this.notificationBar.showNotification(`Failed to add ${nodeData.name} to workflow. ${new ErrorWrapper(err)}`);
         });
     }
 

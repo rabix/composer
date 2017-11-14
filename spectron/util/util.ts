@@ -21,10 +21,10 @@ interface FnTestConfig {
     retries: number;
     skipFetch: boolean;
     skipUpdateCheck: boolean;
-    prepareTestData: [{
+    prepareTestData: {
         name: string,
         content: string
-    }];
+    }[];
 }
 
 function isDevServer() {
@@ -44,6 +44,14 @@ function findAppBinary() {
     }
 }
 
+export function getTestDir(context: ITestCallbackContext, appendPath?: string): string {
+    const title          = context.test.fullTitle();
+    const testRoot       = path.resolve(`${__dirname}/../../.testrun`);
+    const currentTestDir = [testRoot, title, appendPath].filter(v => v).join(path.sep).replace(/\s/g, "-");
+
+    return currentTestDir;
+}
+
 export function boot(context: ITestCallbackContext, testConfig: Partial<FnTestConfig> = {}): Promise<spectron.Application> {
 
     context.retries(testConfig.retries || 0);
@@ -52,13 +60,11 @@ export function boot(context: ITestCallbackContext, testConfig: Partial<FnTestCo
     const skipFetch       = testConfig.skipFetch !== false;
     const skipUpdateCheck = testConfig.skipUpdateCheck !== false;
 
-    const testTitle      = context.test.fullTitle();
-    const globalTestDir  = path.resolve(`${__dirname}/../../.testrun`);
-    const currentTestDir = `${globalTestDir}/${testTitle}`.replace(/\s/g, "-");
+    const currentTestDir = getTestDir(context);
 
     if (testConfig.prepareTestData) {
         testConfig.prepareTestData.forEach((data) => {
-            fs.outputFileSync(currentTestDir + data.name, data.content);
+            fs.outputFileSync([currentTestDir, data.name].join(path.sep), data.content);
         });
     }
 
@@ -126,11 +132,14 @@ export function shutdown(app: spectron.Application) {
         return;
     }
 
-    if (app.hasOwnProperty("testdir")) {
-        rimraf.sync(app["testdir"]);
-    }
-
-    return app.stop();
+    return app.stop().then(() => {
+        return new Promise((resolve, reject) => {
+            rimraf(app["testdir"], {maxBusyTries: 5}, (err) => {
+                if (err) return reject(err);
+                resolve();
+            });
+        });
+    });
 }
 
 export function partialProxy(module: string, overrides: Object = {}) {

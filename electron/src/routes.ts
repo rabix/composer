@@ -7,7 +7,7 @@ import {RabixExecutor} from "./rabix-executor/rabix-executor";
 import {AppQueryParams} from "./sbg-api-client/interfaces/queries";
 import {SBGClient} from "./sbg-api-client/sbg-client";
 import {DataRepository} from "./storage/data-repository";
-import {Executor} from "./storage/hooks/executor-config-hook";
+import {ExecutorDefaultPathLoader} from "./storage/hooks/executor-config-hook";
 import {AppMetaEntry} from "./storage/types/app-meta";
 import {CredentialsCache, LocalRepository} from "./storage/types/local-repository";
 import {UserRepository} from "./storage/types/user-repository";
@@ -49,7 +49,7 @@ const ensurePlatformUser = () => {
 export function loadDataRepository() {
     repository = new DataRepository(app.getPath("userData") + path.sep + "profiles");
 
-    repository.attachHook(new Executor());
+    repository.attachHook(new ExecutorDefaultPathLoader());
 
     repositoryLoad = new Promise((resolve, reject) => {
         repository.load(err => {
@@ -604,7 +604,11 @@ export function executeApp(data: {
     repositoryLoad.then(() => {
         const {appID, content, appSource, options} = data;
 
-        const rabix = new RabixExecutor(repository.local.executorConfig.path);
+        const execConf = repository.local.executorConfig;
+
+        const execPath = execConf.choice === "bundled" ? undefined : execConf.path;
+
+        const rabix = new RabixExecutor(execPath);
 
         let userID = "local";
         if (appSource !== "local") {

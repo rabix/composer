@@ -3,7 +3,7 @@
 <svg #canvas class="cwl-workflow" tabindex="-1"
      ct-click
      [ct-drop-enabled]="true"
-     [ct-drop-zones]="['zone1']"
+     [ct-drop-zones]="['graph-editor']"
      (dblclick)="openInspector($event)"
      (onMouseClick)="setFocusOnCanvas()"
      (onDropSuccess)="onDrop($event.detail.data.event, $event.detail.data.transfer_data)"></svg>

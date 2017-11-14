@@ -4,6 +4,7 @@ import {CommandInputParameterModel, CommandOutputParameterModel, ExpressionModel
 import {Subscription} from "rxjs/Subscription";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {ErrorCode} from "cwlts/models/helpers/validation";
 
 @Component({
     styleUrls: ["./secondary-files.component.scss"],
@@ -85,7 +86,7 @@ export class SecondaryFilesComponent extends DirectiveBase implements OnChanges,
     removeFile(i) {
         this.modal.delete("secondary file").then(() => {
             // reset the expression's validity
-            this.secondaryFiles[i].cleanValidity();
+            this.secondaryFiles[i].clearIssue(ErrorCode.EXPR_ALL);
             (this.form.get("list") as FormArray).removeAt(i);
         }, err => {
             console.warn(err);
@@ -136,7 +137,7 @@ export class SecondaryFilesComponent extends DirectiveBase implements OnChanges,
             if (list) {
                 this.port.updateSecondaryFiles(list);
                 this.updateFileList();
-                this.secondaryFiles.forEach(file => file.validate(this.context));
+                this.updateFormArray();
                 this.update.emit(list);
             }
         });

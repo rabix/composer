@@ -3,6 +3,8 @@ import {FormArray, FormControl, FormGroup} from "@angular/forms";
 import {CommandLineToolModel, ExpressionModel} from "cwlts/models";
 import {Subscription} from "rxjs/Subscription";
 import {ModalService} from "../../../../ui/modal/modal.service";
+import {ErrorCode} from "cwlts/models/helpers/validation/ErrorCode";
+import {SBDraft2CommandLineToolModel, SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 
 @Component({
     selector: "ct-base-command-list",
@@ -51,10 +53,10 @@ export class BaseCommandListComponent implements OnInit, OnChanges, OnDestroy {
     form = new FormGroup({list: new FormArray([])});
 
     @Input()
-    baseCommand: ExpressionModel[] = [];
+    baseCommand: SBDraft2ExpressionModel[] = [];
 
     @Input()
-    model: CommandLineToolModel;
+    model: SBDraft2CommandLineToolModel;
 
     @Input()
     readonly = false;
@@ -89,7 +91,7 @@ export class BaseCommandListComponent implements OnInit, OnChanges, OnDestroy {
     public removeBaseCommand(i: number) {
         this.modal.delete("base command").then(() => {
             // reset the expression's validity
-            this.baseCommand[i].cleanValidity();
+            this.baseCommand[i].clearIssue(ErrorCode.EXPR_ALL);
             (this.form.get("list") as FormArray).removeAt(i);
         }, err => {
             console.warn(err);
@@ -119,6 +121,7 @@ export class BaseCommandListComponent implements OnInit, OnChanges, OnDestroy {
 
         // re-subscribe update output to form changes
         this.subscription = this.form.valueChanges.map(form => (form.list || [])).subscribe((list) => {
+            this.model.updateBaseCommand(list);
             this.update.emit(list);
         });
     }
