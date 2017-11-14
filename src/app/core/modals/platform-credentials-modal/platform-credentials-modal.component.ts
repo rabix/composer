@@ -23,7 +23,7 @@ import {GetStartedNotificationComponent} from "../../../layout/notification-bar/
                     <label class="col-xs-4 col-form-label">Platform:</label>
                     <div class="col-xs-8">
                         <ct-auto-complete [mono]="true"
-                                          [create]="false"
+                                          [create]="true"
                                           [sortField]="false"
                                           formControlName="url"
                                           [options]="platformList"
@@ -108,10 +108,10 @@ export class PlatformCredentialsModalComponent implements OnInit {
     form: FormGroup;
 
     platformList = [
-        {text: "Seven Bridges (Default)", value: "https://api.sbgenomics.com", dataTest: "igor-platform" },
-        {text: "Seven Bridges (EU)", value: "https://eu-api.sbgenomics.com", dataTest: "eu-platform" },
-        {text: "Cancer Genomics Cloud", value: "https://cgc-api.sbgenomics.com", dataTest: "cgc-platform" },
-        {text: "Cavatica", value: "https://pgc-api.sbgenomics.com", dataTest: "pgc-platform" },
+        {text: "Seven Bridges (Default)", value: "https://api.sbgenomics.com" },
+        {text: "Seven Bridges (EU)", value: "https://eu-api.sbgenomics.com" },
+        {text: "Cancer Genomics Cloud", value: "https://cgc-api.sbgenomics.com" },
+        {text: "Cavatica", value: "https://pgc-api.sbgenomics.com" },
     ];
 
     constructor(private system: SystemService,
@@ -199,12 +199,21 @@ export class PlatformCredentialsModalComponent implements OnInit {
                 url: new FormControl(this.platform, [
                     Validators.required,
                     (ctrl: AbstractControl) => {
-                        const val = ctrl.value || "";
+                        const val = ctrl.value;
                         if (this.platformList.map(e => e.value).indexOf(val) === -1) {
-                            return {name: true};
+                            try {
+                                const url = new URL(val);
+                                if(url.hostname.endsWith("-vayu.sbgenomics.com")){
+                                    return null;
+                                } else {
+                                    return {name: true};
+                                }
+                            } catch(ex){
+                                return {name: true}
+                            }
+                        } else {
+                            return null;
                         }
-
-                        return null;
                     }
                 ]),
                 token: new FormControl(this.token, [
