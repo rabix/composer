@@ -1,4 +1,7 @@
-import {AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output, TemplateRef, ViewChild} from "@angular/core";
+import {
+    AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output, TemplateRef, ViewChild,
+    ViewEncapsulation
+} from "@angular/core";
 import {FormControl} from "@angular/forms";
 import {SelectionPlugin, SVGArrangePlugin, SVGEdgeHoverPlugin, SVGNodeMovePlugin, Workflow as WorkflowGraph, ZoomPlugin} from "cwl-svg";
 import {StepModel} from "cwlts/models/generic/StepModel";
