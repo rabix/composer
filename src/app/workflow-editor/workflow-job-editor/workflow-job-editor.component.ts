@@ -54,15 +54,14 @@ export class WorkflowJobEditorComponent extends DirectiveBase implements OnInit,
             return;
         }
 
+        let type = data.type === "directory" ? "Directory" : "File";
+
         const dropElement    = event.ctData.preHoveredElement;
-        const directoryInput = this.findParentInputOfType(dropElement, "Directory");
-        const fileInput      = this.findParentInputOfType(dropElement, "File");
+        const inputEl = this.findParentInputOfType(dropElement, type);
 
-        let type = directoryInput ? "Directory" : (fileInput ? "File" : null);
+        if (inputEl) {
 
-        if (type) {
-
-            const inputID   = (fileInput || directoryInput).getAttribute("data-id");
+            const inputID   = inputEl.getAttribute("data-id");
             const jobValue  = this.jobControl.value;
             const fileValue = jobValue[inputID];
             const isArray   = Array.isArray(fileValue);
