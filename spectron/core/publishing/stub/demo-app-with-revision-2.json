@@ -1,0 +1,38 @@
+{
+    "id": "test-app-update",
+    "label": "My Published App",
+    "cwlVersion": "v1.0",
+    "class": "CommandLineTool",
+    "baseCommand": "cat",
+    "inputs": {
+        "message": {
+            "type": "string",
+            "inputBinding": {
+                "position": 1
+            }
+        }
+    },
+    "outputs": [],
+    "sbg:id": "test-user/test-project/test-app-update",
+    "sbg:revisionsInfo": [
+        {
+            "sbg:revisionNotes": null,
+            "sbg:modifiedBy": "test-user",
+            "sbg:modifiedOn": 1497667470,
+            "sbg:revision": 0
+        },
+        {
+            "sbg:revisionNotes": "",
+            "sbg:modifiedBy": "test-user",
+            "sbg:modifiedOn": 1507667470,
+            "sbg:revision": 1
+        },
+        {
+            "sbg:revisionNotes": "",
+            "sbg:modifiedBy": "test-user",
+            "sbg:modifiedOn": 1517667470,
+            "sbg:revision": 2
+        }
+    ],
+    "sbg:latestRevision": 2
+}

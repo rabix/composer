@@ -34,6 +34,7 @@ import {AppValidatorService, AppValidityState} from "../app-validator/app-valida
 import {PlatformAppService} from "../components/platform-app-common/platform-app.service";
 import {RevisionListComponent} from "../components/revision-list/revision-list.component";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
+import {AppUpdateService} from "../services/app-update/app-updating.service";
 import {APP_SAVER_TOKEN, AppSaver} from "../services/app-saving/app-saver.interface";
 import {CommonReportPanelComponent} from "../template-common/common-preview-panel/common-report-panel.component";
 
@@ -139,7 +140,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 protected platformRepository: PlatformRepositoryService,
                 protected localRepository: LocalRepositoryService,
                 protected workbox: WorkboxService,
-                protected executor: ExecutorService) {
+                protected executor: ExecutorService,
+                protected updateService: AppUpdateService) {
 
         super();
 
@@ -304,6 +306,12 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 this.isDirty = !!isModified;
             });
         }
+
+        if (this.tabData.dataSource !== "local") {
+            this.updateService.update
+                .filter(data => AppHelper.getRevisionlessID(data["sbg:id"] || "") === this.tabData.id)
+                .subscribeTracked(this, data => this.dataModel.customProps["sbg:revisionsInfo"] = data["sbg:revisionsInfo"]);
+        }
     }
 
     setAppDirtyState(isModified: boolean) {
@@ -343,6 +351,10 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
 
                 this.statusBar.stopProcess(proc, `Saved: ${appName}`);
+
+                if (this.tabData.dataSource === "local") {
+                    this.updateService.updateApps({id: this.tabData.id});
+                }
             }, err => {
                 if (!err || !err.message) {
                     this.statusBar.stopProcess(proc);
@@ -367,13 +379,14 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             const originalSubmit = modal.onSubmit;
 
             modal.onSubmit = (...args: any[]) => {
-                return originalSubmit.apply(modal, args).then(appID => {
+                return originalSubmit.apply(modal, args).then(obj => {
+                    this.updateService.updateApps(obj.app);
 
                     // After new revision is load, app state is not Dirty any more
                     this.setAppDirtyState(false);
 
                     const tab = this.workbox.getOrCreateAppTab({
-                        id: AppHelper.getRevisionlessID(appID),
+                        id: AppHelper.getRevisionlessID(obj.id),
                         type: this.dataModel.class,
                         label: modal.inputForm.get("name").value,
                         isWritable: true,

@@ -551,4 +551,8 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     private canDraw(): boolean {
         return Workflow.canDrawIn(this.canvas.nativeElement);
     }
+
+    getStepUpdates() {
+        this.graph.getPlugin(UpdatePlugin).getStepUpdates();
+    }
 }

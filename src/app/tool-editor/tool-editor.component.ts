@@ -25,6 +25,7 @@ import {PlatformRepositoryService} from "../repository/platform-repository.servi
 import {IpcService} from "../services/ipc.service";
 import {ModalService} from "../ui/modal/modal.service";
 import {LocalRepositoryService} from "../repository/local-repository.service";
+import {AppUpdateService} from "../editor-common/services/app-update/app-updating.service";
 import {Process} from "cwlts/models/generic/Process";
 
 export function appSaverFactory(comp: ToolEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
@@ -82,7 +83,8 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
                 platformAppService: PlatformAppService,
                 localRepository: LocalRepositoryService,
                 workbox: WorkboxService,
-                executor: ExecutorService) {
+                executor: ExecutorService,
+                updateService: AppUpdateService) {
 
         super(
             statusBar,
@@ -97,7 +99,8 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
             platformRepository,
             localRepository,
             workbox,
-            executor
+            executor,
+            updateService
         );
     }
 
