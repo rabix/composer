@@ -380,7 +380,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
             modal.onSubmit = (...args: any[]) => {
                 return originalSubmit.apply(modal, args).then(obj => {
-                    this.updateService.updateApps(obj.app);
+                    this.updateService.updateApps({ id: obj.app["sbg:id"], app: obj.app });
 
                     // After new revision is load, app state is not Dirty any more
                     this.setAppDirtyState(false);

@@ -43,8 +43,7 @@
 
     <ct-workflow-job-editor *ngIf="viewMode === 'test' && !isLoading && dataModel"
                             [appID]="this.tabData.id"
-                            [model]="dataModel"
-                            (draw)="onGraphDraw($event)">
+                            [model]="dataModel">
     </ct-workflow-job-editor>
 
     <ct-app-info *ngIf="viewMode === 'info' && !isLoading && dataModel"
