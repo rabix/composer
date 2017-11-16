@@ -136,7 +136,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                 let filterFn = (step) => false;
                 if (this.tabData.dataSource === "local") {
                     filterFn = () => this.codeEditorContent.value.indexOf("run: " + data.id) > -1;
-                } else if (data.id) {
+                } else if (data.id && !AppHelper.isLocal(data.id)) {
                     filterFn = (step) => AppHelper.getRevisionlessID(step.run.customProps["sbg:id"] || "") === AppHelper.getRevisionlessID(data.id);
                 }
                 return this.dataModel.steps.filter(filterFn).length > 0;

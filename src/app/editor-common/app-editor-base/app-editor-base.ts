@@ -309,8 +309,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
         if (this.tabData.dataSource !== "local") {
             this.updateService.update
-                .filter(data => AppHelper.getRevisionlessID(data["sbg:id"] || "") === this.tabData.id)
-                .subscribeTracked(this, data => this.dataModel.customProps["sbg:revisionsInfo"] = data["sbg:revisionsInfo"]);
+                .filter(data => AppHelper.getRevisionlessID(data.id || "") === this.tabData.id)
+                .subscribeTracked(this, data => this.dataModel.customProps["sbg:revisionsInfo"] = data.app["sbg:revisionsInfo"]);
         }
     }
 
