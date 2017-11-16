@@ -353,7 +353,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 this.statusBar.stopProcess(proc, `Saved: ${appName}`);
 
                 if (this.tabData.dataSource === "local") {
-                    this.updateService.updateApps({id: this.tabData.id});
+                    this.updateService.updateApps({id: this.tabData.id, app: Yaml.safeLoad(update, {json: true} as LoadOptions)});
                 }
             }, err => {
                 if (!err || !err.message) {

@@ -133,21 +133,24 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
     protected onFirstModelCreation(): void {
         this.updateService.update
             .filter(data => {
-                return this.dataModel.steps.filter(step => {
-                    if (this.tabData.dataSource === "local") {
-                        return this.codeEditorContent.value.indexOf("run: " + data["id"]) > -1;
-                    } else {
-                        return AppHelper.getRevisionlessID(step.run.customProps["sbg:id"] || "") === AppHelper.getRevisionlessID(data["sbg:id"]);
-                    }
-                }).length > 0;
+                let filterFn: (step) => {};
+                if (this.tabData.dataSource === "local") {
+                    filterFn = () => this.codeEditorContent.value.indexOf("run: " + data["id"]) > -1;
+                } else if (data["sbg:id"]) {
+                    filterFn = (step) => AppHelper.getRevisionlessID(step.run.customProps["sbg:id"] || "") === AppHelper.getRevisionlessID(data["sbg:id"]);
+                } else {
+                    filterFn = () => false;
+                }
+                return this.dataModel.steps.filter(filterFn).length > 0;
             })
             .subscribeTracked(this, (data) => {
                 if (this.tabData.dataSource === "local") {
+                    const steps = this.dataModel.steps.filter(step => this.codeEditorContent.value.indexOf("run: " + data["id"]) > -1);
+                    steps.forEach(step => step.setRunProcess(data.app));
                     this.syncModelAndCode(false).then(() => {
                         this.resolveToModel(this.codeEditorContent.value);
                     }, err => console.warn);
                 } else {
-
                     if (this.graphEditor) {
                         this.graphEditor.getStepUpdates();
                     } else {
