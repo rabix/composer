@@ -5,6 +5,5 @@
 
 export const environment = {
   production: false,
-  browser: false,
-  arvadosConfig: 'arvados-configuration.yml'
+  browser: false
 };
