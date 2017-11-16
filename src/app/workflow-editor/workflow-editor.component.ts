@@ -133,13 +133,11 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
     protected onFirstModelCreation(): void {
         this.updateService.update
             .filter(data => {
-                let filterFn: (step) => {};
+                let filterFn = (step) => false;
                 if (this.tabData.dataSource === "local") {
                     filterFn = () => this.codeEditorContent.value.indexOf("run: " + data["id"]) > -1;
                 } else if (data["sbg:id"]) {
                     filterFn = (step) => AppHelper.getRevisionlessID(step.run.customProps["sbg:id"] || "") === AppHelper.getRevisionlessID(data["sbg:id"]);
-                } else {
-                    filterFn = () => false;
                 }
                 return this.dataModel.steps.filter(filterFn).length > 0;
             })
