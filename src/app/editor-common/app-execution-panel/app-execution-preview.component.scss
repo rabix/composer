@@ -36,6 +36,7 @@
 
     .job-preview {
         border-right: 1px solid $layout-section-background;
+        white-space: pre;
     }
 
     /deep/ .text-error {

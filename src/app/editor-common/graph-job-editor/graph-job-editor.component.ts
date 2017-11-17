@@ -1,7 +1,4 @@
-import {
-    AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output, TemplateRef, ViewChild,
-    ViewEncapsulation
-} from "@angular/core";
+import {AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output, TemplateRef, ViewChild} from "@angular/core";
 import {FormControl} from "@angular/forms";
 import {SelectionPlugin, SVGArrangePlugin, SVGEdgeHoverPlugin, SVGNodeMovePlugin, Workflow as WorkflowGraph, ZoomPlugin} from "cwl-svg";
 import {StepModel} from "cwlts/models/generic/StepModel";
@@ -42,7 +39,7 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
 
     private graph: WorkflowGraph;
 
-    private jobControl      = new FormControl({});
+    private jobControl = new FormControl({});
 
     private inspectedInputs = [];
 
@@ -59,8 +56,8 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
 
         let type = data.type === "directory" ? "Directory" : "File";
 
-        const dropElement    = event.ctData.preHoveredElement;
-        const inputEl = this.findParentInputOfType(dropElement, type);
+        const dropElement = event.ctData.preHoveredElement;
+        const inputEl     = this.findParentInputOfType(dropElement, type);
 
         if (inputEl) {
 
@@ -109,11 +106,26 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
 
         this.metaManager.getAppMeta("job").take(1).subscribeTracked(this, storedJob => {
 
-            const jobTemplate  = JobHelper.getNullJobInputs(this.model);
-            const controlValue = Object.assign(jobTemplate, storedJob || {});
+            const nullJob = JobHelper.getNullJobInputs(this.model);
+            const job     = storedJob || {};
+
+            // Clean abundant keys from stored job
+            Object.keys(job).forEach(key => {
+                if (!(key in nullJob)) {
+                    delete job[key];
+                }
+            });
+
+            const controlValue = Object.assign(nullJob, job);
 
             this.jobControl.patchValue(controlValue, {emitEvent: false});
+
             this.graph.getPlugin(SVGJobFileDropPlugin).updateToJobState(controlValue);
+
+            // If we modified the job, push the update back
+            if (JSON.stringify(job) !== JSON.stringify(storedJob)) {
+                this.metaManager.patchAppMeta("job", job);
+            }
         });
     }
 
