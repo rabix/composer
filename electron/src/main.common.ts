@@ -4,6 +4,7 @@ import * as openExternalFileProxy from "./open-external-file-proxy";
 import * as path from "path";
 
 const {app, Menu, BrowserWindow} = require("electron");
+const {registerProtocolForLinux} = require("./register-protocols");
 const deepLinkingController = require("./controllers/open-external-file/deep-linking-protocol-controller");
 const localFileController = require("./controllers/open-external-file/open-file-handler-controller");
 
@@ -157,6 +158,11 @@ function start(config: { devTools: boolean, url: string }) {
 export = {
     start: (config) => {
 
+        // Register protocol for linux (update .desktop and mimeapps.list files)
+        if (process.platform === "linux") {
+            registerProtocolForLinux();
+        }
+
         // Protocol handler for darwin
         app.setAsDefaultProtocolClient("rabix-composer");
         app.on("open-url", function (event, url) {
@@ -170,18 +176,18 @@ export = {
             focusMainWindow();
         });
 
-        // Initial File handler for win32
-        if (process.platform === "win32") {
+        // Initial File handler for win32 and linux
+        if (process.platform === "win32" || process.platform === "linux") {
             openExternalFiles(...getFilePathsFromArgs(process.argv.slice(1)));
         }
 
-        // File/Protocol handler for win32
+        // File/Protocol handler for win32 and linux
         const shouldQuit = app.makeSingleInstance((argv) => {
             // Someone tried to run a second instance, we should focus our window.
 
-            // Protocol handler for win32
+            // Protocol handler for win32 and linux
             // argv: An array of the second instance’s (command line / deep linked) arguments
-            if (process.platform === "win32") {
+            if (process.platform === "win32" || process.platform === "linux") {
                 // Keep only command line / deep linked arguments
                 openExternalFiles(...getFilePathsFromArgs(argv.slice(1)));
             }
