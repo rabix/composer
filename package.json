@@ -25,7 +25,7 @@
         "lint": "./node_modules/@angular/cli/bin/ng lint",
         "package": "node ./electron-build.js",
         "postinstall": "node build-scripts/bundle-executor.js && cd electron && yarn install",
-        "serve": "node --max-old-space-size=4096 ./node_modules/@angular/cli/bin/ng serve",
+        "serve": "node --max-old-space-size=4096 ./node_modules/@angular/cli/bin/ng serve -aot",
         "start:electron": "./node_modules/.bin/electron ./electron",
         "test": "yarn run test:electron && yarn run test:angular && yarn run test:spectron",
         "test:angular": "./node_modules/@angular/cli/bin/ng test --watch false",

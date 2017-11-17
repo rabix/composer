@@ -11,8 +11,6 @@
 
     flex-direction: row;
 
-
-
     .controls {
         flex-basis: $barWidth;
         background: $layout-section-background;
@@ -20,19 +18,24 @@
         .btn {
             width: $barWidth;
             height: $barWidth;
-            padding: 0 0.5rem;
+            padding: 0;
             background: transparent;
             border-radius: 2px;
             border-color: transparent;
             color: #999;
         }
     }
-    .output {
+    .output,
+    .job-preview {
         overflow: auto;
         flex: 1;
         padding: .2em .5em;
         word-wrap: break-word;
         white-space: pre-wrap;
+    }
+
+    .job-preview {
+        border-right: 1px solid $layout-section-background;
     }
 
     /deep/ .text-error {

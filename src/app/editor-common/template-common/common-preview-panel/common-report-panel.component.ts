@@ -19,6 +19,7 @@ import {AppExecutionPreviewComponent} from "../../app-execution-panel/app-execut
         <!--Common Execution Preview-->
         <ct-app-execution-preview [hidden]="host.reportPanel !== 'execution'" #executionPreview
                                   (stopExecution)="host.stopExecution()"
+                                  [job]="host.executionJob"
                                   [isRunning]="host.isExecuting">
         </ct-app-execution-preview>
 

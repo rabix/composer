@@ -42,8 +42,8 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
 
     private graph: WorkflowGraph;
 
-
     private jobControl      = new FormControl({});
+
     private inspectedInputs = [];
 
     constructor(private inspector: EditorInspectorService,
@@ -108,8 +108,6 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
         });
 
         this.metaManager.getAppMeta("job").take(1).subscribeTracked(this, storedJob => {
-
-            console.log("Initial job state", storedJob);
 
             const jobTemplate  = JobHelper.getNullJobInputs(this.model);
             const controlValue = Object.assign(jobTemplate, storedJob || {});
