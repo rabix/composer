@@ -73,7 +73,7 @@ builder.build({
             target: ["nsis"],
         },
         linux: {
-            target: ["zip", "dir"],
+            target: ["AppImage"],
         },
         nsis: {
             perMachine: true
