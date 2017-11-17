@@ -13,6 +13,7 @@ import {WorkboxService} from "../core/workbox/workbox.service";
 import {AppEditorBase} from "../editor-common/app-editor-base/app-editor-base";
 import {AppValidatorService} from "../editor-common/app-validator/app-validator.service";
 import {PlatformAppService} from "../editor-common/components/platform-app-common/platform-app.service";
+import {GraphJobEditorComponent} from "../editor-common/graph-job-editor/graph-job-editor.component";
 import {EditorInspectorService} from "../editor-common/inspector/editor-inspector.service";
 import {APP_SAVER_TOKEN} from "../editor-common/services/app-saving/app-saver.interface";
 import {LocalFileSavingService} from "../editor-common/services/app-saving/local-file-saving.service";
@@ -150,5 +151,9 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
                 this.workflowWrapper.exposePort(input);
             }
         });
+    }
+
+    onGraphJobEditorDraw(editor: GraphJobEditorComponent) {
+        editor.inspectStep(this.workflowWrapper.steps[0].connectionId);
     }
 }

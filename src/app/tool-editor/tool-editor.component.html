@@ -43,7 +43,9 @@
 
     <!--Test Editor-->
     <ct-graph-job-editor *ngIf="viewMode === 'test' && !isLoading && workflowWrapper"
-                         [appID]="tabData.id" [model]="workflowWrapper">
+                         (draw)="onGraphJobEditorDraw($event)"
+                         [appID]="tabData.id"
+                         [model]="workflowWrapper">
     </ct-graph-job-editor>
 
     <ct-app-info *ngIf="viewMode === 'info' && !isLoading && dataModel"

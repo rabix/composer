@@ -205,4 +205,22 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
         this.inspector.show(this.inspectorTemplate, this.inspectedNode.id);
     }
 
+    inspectStep(nodeID: string) {
+        const el = this.graph.svgRoot.querySelector(`[data-connection-id="${nodeID}"]`);
+        if (el) {
+            this.openNodeInInspector(el);
+        }
+
+
+        const selectionPlugin = this.graph.getPlugin(SelectionPlugin);
+        if (selectionPlugin) {
+            selectionPlugin.selectStep(nodeID);
+        }
+    }
+
+
+    ngOnDestroy(): void {
+        super.ngOnDestroy();
+        this.inspector.hide();
+    }
 }
