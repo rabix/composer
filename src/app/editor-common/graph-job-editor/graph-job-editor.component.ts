@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output, TemplateRef, ViewChild} from "@angular/core";
 import {FormControl} from "@angular/forms";
-import {SelectionPlugin, SVGEdgeHoverPlugin, SVGNodeMovePlugin, Workflow as WorkflowGraph, ZoomPlugin} from "cwl-svg";
+import {SelectionPlugin, SVGArrangePlugin, SVGEdgeHoverPlugin, SVGNodeMovePlugin, Workflow as WorkflowGraph, ZoomPlugin} from "cwl-svg";
 import {StepModel} from "cwlts/models/generic/StepModel";
 import {WorkflowInputParameterModel} from "cwlts/models/generic/WorkflowInputParameterModel";
 import {WorkflowModel} from "cwlts/models/generic/WorkflowModel";
@@ -9,16 +9,16 @@ import {JobHelper} from "cwlts/models/helpers/JobHelper";
 import {AppMetaManager} from "../../core/app-meta/app-meta-manager";
 import {APP_META_MANAGER} from "../../core/app-meta/app-meta-manager-factory";
 import {AppHelper} from "../../core/helpers/AppHelper";
-import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
-import {SVGJobFileDropPlugin} from "../svg-plugins/job-file-drop/job-file-drop";
+import {SVGJobFileDropPlugin} from "../../workflow-editor/svg-plugins/job-file-drop/job-file-drop";
+import {EditorInspectorService} from "../inspector/editor-inspector.service";
 
 @Component({
-    selector: "ct-workflow-job-editor",
-    templateUrl: "./workflow-job-editor.component.html",
-    styleUrls: ["./workflow-job-editor.component.scss"],
+    selector: "ct-graph-job-editor",
+    templateUrl: "./graph-job-editor.component.html",
+    styleUrls: ["./graph-job-editor.component.scss"]
 })
-export class WorkflowJobEditorComponent extends DirectiveBase implements OnInit, AfterViewInit {
+export class GraphJobEditorComponent extends DirectiveBase implements OnInit, AfterViewInit {
 
     @Input()
     appID: string;
@@ -39,8 +39,8 @@ export class WorkflowJobEditorComponent extends DirectiveBase implements OnInit,
 
     private graph: WorkflowGraph;
 
+    private jobControl = new FormControl({});
 
-    private jobControl      = new FormControl({});
     private inspectedInputs = [];
 
     constructor(private inspector: EditorInspectorService,
@@ -48,7 +48,7 @@ export class WorkflowJobEditorComponent extends DirectiveBase implements OnInit,
         super();
     }
 
-    onDrop(event, data: {name: string, type: "cwl" | "file" | "directory"}) {
+    onDrop(event, data: { name: string, type: "cwl" | "file" | "directory" }) {
 
         if (!AppHelper.isLocal(data.name)) {
             return;
@@ -56,8 +56,8 @@ export class WorkflowJobEditorComponent extends DirectiveBase implements OnInit,
 
         let type = data.type === "directory" ? "Directory" : "File";
 
-        const dropElement    = event.ctData.preHoveredElement;
-        const inputEl = this.findParentInputOfType(dropElement, type);
+        const dropElement = event.ctData.preHoveredElement;
+        const inputEl     = this.findParentInputOfType(dropElement, type);
 
         if (inputEl) {
 
@@ -89,7 +89,9 @@ export class WorkflowJobEditorComponent extends DirectiveBase implements OnInit,
                 new SelectionPlugin(),
                 new ZoomPlugin(),
                 new SVGNodeMovePlugin(),
-                new SVGJobFileDropPlugin()
+                new SVGJobFileDropPlugin(),
+                new SVGArrangePlugin()
+
             ]
         });
 
@@ -104,13 +106,26 @@ export class WorkflowJobEditorComponent extends DirectiveBase implements OnInit,
 
         this.metaManager.getAppMeta("job").take(1).subscribeTracked(this, storedJob => {
 
-            console.log("Initial job state", storedJob);
+            const nullJob = JobHelper.getNullJobInputs(this.model);
+            const job     = storedJob || {};
 
-            const jobTemplate  = JobHelper.getNullJobInputs(this.model);
-            const controlValue = Object.assign(jobTemplate, storedJob || {});
+            // Clean abundant keys from stored job
+            Object.keys(job).forEach(key => {
+                if (!(key in nullJob)) {
+                    delete job[key];
+                }
+            });
+
+            const controlValue = Object.assign(nullJob, job);
 
             this.jobControl.patchValue(controlValue, {emitEvent: false});
+
             this.graph.getPlugin(SVGJobFileDropPlugin).updateToJobState(controlValue);
+
+            // If we modified the job, push the update back
+            if (JSON.stringify(job) !== JSON.stringify(storedJob)) {
+                this.metaManager.patchAppMeta("job", job);
+            }
         });
     }
 
@@ -190,4 +205,22 @@ export class WorkflowJobEditorComponent extends DirectiveBase implements OnInit,
         this.inspector.show(this.inspectorTemplate, this.inspectedNode.id);
     }
 
+    inspectStep(nodeID: string) {
+        const el = this.graph.svgRoot.querySelector(`[data-connection-id="${nodeID}"]`);
+        if (el) {
+            this.openNodeInInspector(el);
+        }
+
+
+        const selectionPlugin = this.graph.getPlugin(SelectionPlugin);
+        if (selectionPlugin) {
+            selectionPlugin.selectStep(nodeID);
+        }
+    }
+
+
+    ngOnDestroy(): void {
+        super.ngOnDestroy();
+        this.inspector.hide();
+    }
 }

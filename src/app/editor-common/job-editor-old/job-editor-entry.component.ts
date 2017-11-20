@@ -14,10 +14,13 @@ import {JobHelper} from "cwlts/models/helpers/JobHelper";
 import {ObjectHelper} from "../../helpers/object.helper";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
 
+/**
+ * @deprecated
+ */
 @Component({
     encapsulation: ViewEncapsulation.None,
 
-    selector: "ct-job-editor-entry",
+    selector: "ct-job-editor-entry-old",
     styleUrls: ["./job-editor-entry.component.scss"],
 
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -109,9 +112,9 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
                             <div class="tc-header">{{ input?.id }}</div>
                             <div class="tc-body">
                                 <ct-file-input-inspector
-                                                         [path]="value?.path"   
-                                                         [input]="value || {}"
-                                                         (update)="updateFile($event)">
+                                    [path]="value?.path"
+                                    [input]="value || {}"
+                                    (update)="updateFile($event)">
                                 </ct-file-input-inspector>
                             </div>
                         </ct-editor-inspector-content>
@@ -135,9 +138,9 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
                             <div class="tc-header">{{ input?.id }}</div>
                             <div class="tc-body">
                                 <ct-directory-input-inspector
-                                                        [path]="value?.path"
-                                                        [input]="value || {}"
-                                                         (update)="updateDirectory($event)">
+                                    [path]="value?.path"
+                                    [input]="value || {}"
+                                    (update)="updateDirectory($event)">
                                 </ct-directory-input-inspector>
                             </div>
                         </ct-editor-inspector-content>
@@ -161,10 +164,10 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
                                                              [ct-tooltip]="ctt"
                                                              [tooltipPlacement]="'top'"></i>
                     </label>
-                    <ct-job-editor-entry [prefix]="prefix + '.' + entry.id"
-                                         [input]="entry"
-                                         (update)="updateRecord(entry.id, $event)"
-                                         [value]="value ? value[entry.id] : undefined"></ct-job-editor-entry>
+                    <ct-job-editor-entry-old [prefix]="prefix + '.' + entry.id"
+                                             [input]="entry"
+                                             (update)="updateRecord(entry.id, $event)"
+                                             [value]="value ? value[entry.id] : undefined"></ct-job-editor-entry-old>
 
                     <ct-tooltip-content #ctt>
                         <div class="tooltip-info">
@@ -177,12 +180,12 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
 
             <!--Arrays-->
             <ng-template ngSwitchCase="array">
-                <ct-job-editor-entry *ngFor="let entry of value; let i = index"
-                                     [prefix]="prefix + '.[' + i +']'"
-                                     [index]="i"
-                                     [input]="arrayModifiedInput"
-                                     (update)="updateArray(i, $event)"
-                                     [value]="entry"></ct-job-editor-entry>
+                <ct-job-editor-entry-old *ngFor="let entry of value; let i = index"
+                                         [prefix]="prefix + '.[' + i +']'"
+                                         [index]="i"
+                                         [input]="arrayModifiedInput"
+                                         (update)="updateArray(i, $event)"
+                                         [value]="entry"></ct-job-editor-entry-old>
 
                 <button (click)="addArrayEntry(input)"
                         type="button"
@@ -198,7 +201,7 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
         </div>
     `
 })
-export class JobEditorEntryComponent implements OnChanges, OnInit {
+export class JobEditorEntryOldComponent implements OnChanges, OnInit {
 
     @Input()
     input: CommandInputParameterModel;

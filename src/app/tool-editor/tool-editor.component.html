@@ -41,11 +41,12 @@
                            [formGroup]="toolGroup"
                            [model]="dataModel"></ct-tool-visual-editor>
 
-    <ct-job-editor *ngIf="viewMode === 'test' && !isLoading && dataModel"
-                   class="flex-col"
-                   [model]="dataModel"
-                   (update)="onJobUpdate($event)"
-                   (reset)="syncModelAndCode(false)"></ct-job-editor>
+    <!--Test Editor-->
+    <ct-graph-job-editor *ngIf="viewMode === 'test' && !isLoading && workflowWrapper"
+                         (draw)="onGraphJobEditorDraw($event)"
+                         [appID]="tabData.id"
+                         [model]="workflowWrapper">
+    </ct-graph-job-editor>
 
     <ct-app-info *ngIf="viewMode === 'info' && !isLoading && dataModel"
                  class="gui-editor-component p-2"

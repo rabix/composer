@@ -21,7 +21,6 @@ import {PlatformRepositoryService} from "../repository/platform-repository.servi
 import {IpcService} from "../services/ipc.service";
 import {ModalService} from "../ui/modal/modal.service";
 import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow-graph-editor.component";
-import {JOB_SERVICE_TOKEN, jobServiceFactory} from "./services/job/job.service.factory";
 import {WorkflowEditorService} from "./workflow-editor.service";
 import {AppUpdateService} from "../editor-common/services/app-update/app-updating.service";
 
@@ -41,10 +40,6 @@ export function appSaverFactory(comp: WorkflowEditorComponent, ipc: IpcService, 
             provide: APP_SAVER_TOKEN,
             useFactory: appSaverFactory,
             deps: [WorkflowEditorComponent, IpcService, ModalService, PlatformRepositoryService]
-        }, {
-            provide: JOB_SERVICE_TOKEN,
-            useFactory: jobServiceFactory,
-            deps: [WorkflowEditorComponent, LocalRepositoryService, PlatformRepositoryService]
         }, {
             provide: APP_META_MANAGER,
             useFactory: appMetaManagerFactory,
