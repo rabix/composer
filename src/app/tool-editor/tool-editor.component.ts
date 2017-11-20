@@ -25,6 +25,8 @@ import {LocalRepositoryService} from "../repository/local-repository.service";
 import {PlatformRepositoryService} from "../repository/platform-repository.service";
 import {IpcService} from "../services/ipc.service";
 import {ModalService} from "../ui/modal/modal.service";
+import {JobHelper} from "cwlts/models/helpers/JobHelper";
+import {AppMetaManager} from "../core/app-meta/app-meta-manager";
 
 export function appSaverFactory(comp: ToolEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -113,10 +115,18 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
         return super.openRevision(revisionNumber).then(() => this.toolGroup.reset());
     }
 
-    onJobUpdate(job) {
-        this.dataModel.setJobInputs(job.inputs);
-        this.dataModel.setRuntime(job.allocatedResources);
-        this.dataModel.updateCommandLine();
+    switchTab(tabName): void {
+        super.switchTab(tabName);
+
+        if (!this.dataModel) return;
+
+        if (tabName === "test") {
+            (this.injector.get(APP_META_MANAGER) as AppMetaManager).getAppMeta("job").subscribeTracked(this, (job) => {
+                this.dataModel.setJobInputs(job);
+            });
+        } else {
+            this.dataModel.setJobInputs(JobHelper.getJobInputs(this.dataModel));
+        }
     }
 
     protected getPreferredTab(): string {
