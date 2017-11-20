@@ -1,6 +1,7 @@
 import {
     AfterViewInit,
-    ChangeDetectionStrategy, ChangeDetectorRef,
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
     Component,
     ElementRef,
     forwardRef,
@@ -13,20 +14,20 @@ import {
 } from "@angular/core";
 import {AbstractControl, ControlValueAccessor, FormArray, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {InputParameterModel} from "cwlts/models/generic/InputParameterModel";
-import {DirectiveBase} from "../../../../util/directive-base/directive-base";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
-    selector: "ct-step-inspector-entry-2",
+    selector: "ct-job-step-inspector-entry",
     changeDetection: ChangeDetectionStrategy.OnPush,
-    templateUrl: "./step-inspector-entry.component.html",
-    styleUrls: ["./step-inspector-entry.component.scss"],
+    templateUrl: "./job-step-inspector-entry.component.html",
+    styleUrls: ["./job-step-inspector-entry.component.scss"],
     providers: [{
         provide: NG_VALUE_ACCESSOR,
-        useExisting: forwardRef(() => StepInspectorEntry2Component),
+        useExisting: forwardRef(() => JobStepInspectorEntryComponent),
         multi: true
     }]
 })
-export class StepInspectorEntry2Component extends DirectiveBase implements OnChanges, AfterViewInit, ControlValueAccessor {
+export class JobStepInspectorEntryComponent extends DirectiveBase implements OnChanges, AfterViewInit, ControlValueAccessor {
 
     @Input() readonly = false;
 
@@ -45,8 +46,8 @@ export class StepInspectorEntry2Component extends DirectiveBase implements OnCha
      */
     warning: string;
 
-    @ViewChildren("arrayItem", {read: StepInspectorEntry2Component})
-    private arrayElements: QueryList<StepInspectorEntry2Component>;
+    @ViewChildren("arrayItem", {read: JobStepInspectorEntryComponent})
+    private arrayElements: QueryList<JobStepInspectorEntryComponent>;
 
     @ViewChild("input", {read: ElementRef})
 
@@ -58,7 +59,7 @@ export class StepInspectorEntry2Component extends DirectiveBase implements OnCha
 
     private control: AbstractControl;
 
-    constructor(private cdr: ChangeDetectorRef){
+    constructor(private cdr: ChangeDetectorRef) {
         super();
     }
 

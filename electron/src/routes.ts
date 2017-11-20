@@ -609,8 +609,6 @@ export function executeApp(data: {
             }
 
         }).then((content: string) => {
-            console.log("Executing job", appJob, "with content", content);
-
 
             rabix.execute(content, appJob, options, callback, emitter);
 

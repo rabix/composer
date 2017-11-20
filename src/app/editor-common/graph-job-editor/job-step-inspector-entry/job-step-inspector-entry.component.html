@@ -79,14 +79,14 @@
 
             </label>
 
-            <ct-step-inspector-entry-2
+            <ct-job-step-inspector-entry
                 [formControl]="control.get(entry.id)"
                 [readonly]="readonly"
                 [inputType]="entry.type.type"
                 [inputArrayItemsType]="entry.type.items"
                 [inputEnumSymbols]="entry.type.symbols"
                 [inputRecordFields]="entry.type.fields">
-            </ct-step-inspector-entry-2>
+            </ct-job-step-inspector-entry>
 
             <ct-tooltip-content #ctt>
                 <div class="tooltip-info">{{ entry.description }}</div>
@@ -99,12 +99,12 @@
 
         <div *ngFor="let ctrl of control.controls; let idx = index;" class="array-row">
 
-            <ct-step-inspector-entry-2 #arrayItem
-                                       [inputType]="inputArrayItemsType"
-                                       [inputEnumSymbols]="inputEnumSymbols"
-                                       [readonly]="readonly"
-                                       [formControl]="ctrl">
-            </ct-step-inspector-entry-2>
+            <ct-job-step-inspector-entry #arrayItem
+                                         [inputType]="inputArrayItemsType"
+                                         [inputEnumSymbols]="inputEnumSymbols"
+                                         [readonly]="readonly"
+                                         [formControl]="ctrl">
+            </ct-job-step-inspector-entry>
 
             <!--Every element that's a part of the array can be deleted, so we add a deletion button to it-->
             <span class="input-group-btn delete-btn-group">

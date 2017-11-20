@@ -1,5 +1,4 @@
 import {Component, OnInit, ViewChild, ViewContainerRef} from "@angular/core";
-import {Observable} from "rxjs/Observable";
 import {LayoutService} from "../../core/layout/layout.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {StatusBarService} from "./status-bar.service";

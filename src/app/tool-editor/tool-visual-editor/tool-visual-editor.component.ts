@@ -1,8 +1,6 @@
 import {Component, EventEmitter, Input, OnChanges, OnDestroy, Output} from "@angular/core";
 import {FormGroup} from "@angular/forms";
 import {ProcessRequirement} from "cwlts/mappings/d2sb/ProcessRequirement";
-import {SBGCPURequirement} from "cwlts/mappings/d2sb/SBGCPURequirement";
-import {SBGMemRequirement} from "cwlts/mappings/d2sb/SBGMemRequirement";
 import {ResourceRequirement} from "cwlts/mappings/v1.0";
 
 import {CommandLineToolModel, ExpressionModel} from "cwlts/models";
@@ -62,7 +60,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                            [readonly]="readonly">
             </ct-tool-hints>
 
-            <ct-file-def-list [model]="model"  
+            <ct-file-def-list [model]="model"
                               [fileRequirement]="model.fileRequirement || {}"
                               [location]="model.fileRequirement?.loc"
                               (update)="updateModel('fileRequirement', $event)"
@@ -134,7 +132,7 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
             }
         } else if (category === "resources") {
             const memValue = parseInt(data.mem.value, 10);
-            const cpuValue   = parseInt(data.cores.value, 10);
+            const cpuValue = parseInt(data.cores.value, 10);
 
             if (this.model.cwlVersion === "v1.0") {
                 // extending the data object gotten to recapture any other requirement properties (ramMax, coresMax, etc)
@@ -191,7 +189,10 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
         this.change.emit();
     }
 
-    ngOnDestroy() {
+
+    ngOnDestroy(): void {
+        super.ngOnDestroy();
+
         /* Close object inspector*/
         if (this.inspector.inspectedObject.getValue() !== "revisions") {
             this.inspector.hide();

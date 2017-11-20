@@ -2,8 +2,9 @@ import {spawn} from "child_process";
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as tmp from "tmp";
-import {EXECUTOR_OUTDIR_PREFIX, IPC_EOS_MARK} from "../constants";
+import {IPC_EOS_MARK} from "../constants";
 import {ExecutorParamsConfig} from "../storage/types/executor-config";
+import {ExecutorOutput, MessageType} from "./executor-output";
 import EventEmitter = NodeJS.EventEmitter;
 
 export type ProcessCallback = (err?: Error, stdout?: string, stderr?: string) => void;
@@ -165,20 +166,36 @@ export class RabixExecutor {
         const cleanup         = () => cleanupHandlers.forEach(c => c());
 
         const appTempFile = this.storeToTempFile(content).then(fpath => {
-            cleanupHandlers.push(() => fs.unlink(fpath));
+            cleanupHandlers.push(() => fs.unlink(fpath, err => void 0));
             return fpath;
         });
 
         const appJobFile = this.storeToTempFile(JSON.stringify(jobValue)).then(fpath => {
-            cleanupHandlers.push(() => fs.unlink(fpath));
+            cleanupHandlers.push(() => fs.unlink(fpath, err => void 0));
             return fpath;
         });
 
 
+        const stdoutLogPath   = executionParams.outDir + "/stdout.log";
+        const stderrLogPath   = executionParams.outDir + "/stderr.log";
+        const logFilesCreated = Promise.all([
+            new Promise((resolve, reject) => fs.ensureFile(stdoutLogPath, err => err ? reject(err) : resolve())),
+            new Promise((resolve, reject) => fs.ensureFile(stderrLogPath, err => err ? reject(err) : resolve())),
+        ]);
+
         Promise.all([
             appTempFile,
-            appJobFile
-        ]).then((filePaths: [string, string]) => {
+            appJobFile,
+            logFilesCreated
+        ]).then((filePaths: [string, string, any]) => {
+
+            const stdoutWriteStream = fs.createWriteStream(stdoutLogPath, {autoClose: true, encoding: "utf8"});
+            const stderrWriteStream = fs.createWriteStream(stderrLogPath, {autoClose: true, encoding: "utf8"});
+            cleanupHandlers.push(() => {
+                stdoutWriteStream.close();
+                stderrWriteStream.close();
+            });
+
             const [appFilePath, jobFilePath] = filePaths;
 
             const processCommand = "java";
@@ -190,7 +207,10 @@ export class RabixExecutor {
                 ...this.parseExecutorParamsToArgs(executionParams)
             ];
 
+
             const rabixProcess = spawn(this.jrePath, executorArgs, {});
+
+
             if (emitter) {
                 emitter.on("stop", () => {
 
@@ -204,28 +224,32 @@ export class RabixExecutor {
 
             const processCommandLine = [processCommand, ...executorArgs].join(" ");
 
-            dataCallback(null, `Running “${processCommandLine}”`);
+            dataCallback(null, {message: `Running “${processCommandLine}”`} as ExecutorOutput);
 
+            rabixProcess.stdout.pipe(stdoutWriteStream);
             rabixProcess.stdout.on("data", (data) => {
 
-                const out = data.toString();
+                const out = this.parseExecutorOutput(data.toString());
 
-                try {
-                    const json = JSON.parse(out);
-                    dataCallback(null, json);
-                } catch (err) {
-                    dataCallback(null, out);
-                }
-
+                dataCallback(null, out);
             });
 
+
+            rabixProcess.stderr.pipe(stderrWriteStream);
             rabixProcess.stderr.on("data", data => {
+
+                const out = this.parseExecutorOutput(data.toString());
+
+
                 /**
-                 * This “ERR: ” prefix is important because client listener uses it to determine how to treat incoming data
-                 * @name RabixExecutor.__errorPrefixing
-                 * @see AppEditorBase.__errorDiscriminator
+                 * Error logs from Bunny are huge Java stack traces, and this might flush hundreds of them each second.
+                 * DOM would blow up when we try to show those, so we'll pipe them to a file.
                  */
-                dataCallback(null, "ERR: " + data);
+                if (out.type === "ERROR") {
+                    // @FIXME: pipe this to a file
+                } else {
+                    dataCallback(null, out);
+                }
             });
 
             // when the spawn child process exits, check if there were any errors and close the writeable stream
@@ -233,11 +257,17 @@ export class RabixExecutor {
 
                 cleanup();
 
+
+                dataCallback(null, {
+                    type: "OUTDIR",
+                    message: executionParams.outDir
+                } as ExecutorOutput);
+
                 if (code !== 0) {
                     return dataCallback(new Error("Execution failed with non-zero exit code."));
                 }
 
-                dataCallback(null, "Gathering outputs...");
+                dataCallback(null, {message: "Gathering outputs..."} as ExecutorOutput);
 
                 const tempBasename = path.basename(appFilePath, ".tmp");
                 const outputRoot   = path.dirname(jobFilePath);
@@ -252,16 +282,17 @@ export class RabixExecutor {
                         if (files[i].startsWith(tempBasename)) {
                             const fullOutputDir = outputRoot + path.sep + files[i];
 
-                            fs.move(fullOutputDir, executionParams.outDir, {
-                                overwrite: true
-                            }, (err) => {
+                            fs.move(fullOutputDir, executionParams.outDir, (err) => {
 
                                 if (err) {
                                     return dataCallback(err);
                                 }
 
-                                dataCallback(null, EXECUTOR_OUTDIR_PREFIX + executionParams.outDir);
-                                dataCallback(null, "Done.");
+                                dataCallback(null, {
+                                    type: "DONE",
+                                    message: "Execution completed."
+                                });
+
                                 dataCallback(null, IPC_EOS_MARK);
                             });
 
@@ -286,5 +317,32 @@ export class RabixExecutor {
     private probeBinary(path = "", callback = (err?: Error) => void 0) {
         fs.access(path, fs.constants.X_OK, callback);
     }
+
+    /**
+     * Parses output messages according to config specified in logback.xml
+     * [%d{yyyy-MM-dd HH:mm:ss.SSS}] [%level] %msg%n
+     */
+    private parseExecutorOutput(output: string): ExecutorOutput {
+
+        const matcher = /\[(.*?)\]\s\[(.*?)\]\s(.*)/g;
+
+        const matched = matcher.exec(output);
+
+        if (matched === null) {
+            return {
+                message: output
+            }
+        }
+
+        const [input, timestamp, type, message] = matched;
+
+        return {
+            type: type as MessageType,
+            message,
+            timestamp
+        }
+
+    }
+
 
 }

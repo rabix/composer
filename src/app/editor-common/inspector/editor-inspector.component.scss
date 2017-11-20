@@ -5,7 +5,15 @@
     display: flex;
     overflow-y: auto;
     overflow-x: hidden;
-    //border: 1px solid transparent;
-    background: $toolbar-header-bg;
-    //border-left-color: $gui-section-border;
+    background: $gray;
+    border-left: 1px solid $black;
+    flex-shrink: 0;
+
+    .resizer {
+        float: left;
+        height: 100%;
+        width: 6px;
+        cursor: ew-resize;
+    }
+
 }

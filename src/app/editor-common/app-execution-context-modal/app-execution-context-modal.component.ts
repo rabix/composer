@@ -12,42 +12,8 @@ const {dialog} = window["require"]("electron").remote;
         <form [formGroup]="form" (submit)="onSubmit(form.getRawValue())">
 
             <div class="p-1">
-
-                <!--Job File Path-->
-                <label>Job File Path:</label>
-                <div class="form-group col-xs-10 pl-0" [class.has-warning]="!form.get('jobPath').valid">
-                    <input autofocus
-                           #jobPathInput
-                           class="form-control form-control-warning"
-                           [class.has-warning]="!form.get('jobPath').valid"
-                           formControlName="jobPath"/>
-                </div>
-                <div class="form-group">
-                    <button type="button" class="btn btn-secondary" (click)="browseJobFile()">Browse</button>
-                </div>
-
+                
                 <div formGroupName="executionParams">
-
-                    <!--Base Directory-->
-                    <label>Base Directory:</label>
-                    <div class="form-group col-xs-10 pl-0" [class.has-warning]="!form.get('executionParams.baseDir').valid">
-                        <input autofocus class="form-control"
-                               [class.form-control-warning]="!form.get('executionParams.baseDir').valid"
-                               formControlName="baseDir"
-                               #baseDirInput/>
-                    </div>
-                    <div class="form-group">
-                        <button type="button" class="btn btn-secondary" (click)="browseFolder('executionParams.baseDir')">Browse</button>
-                    </div>
-
-                    <!--Output Directory-->
-                    <!--<label>Output Directory:</label>-->
-                    <!--<div class="form-group col-xs-10 pl-0">-->
-                    <!--<input class="form-control" formControlName="outDir"/>-->
-                    <!--</div>-->
-                    <!--<div class="form-group">-->
-                    <!--<button type="button" class="btn btn-secondary" (click)="browseFolder('executionParams.outDir')">Browse</button>-->
-                    <!--</div>-->
 
                     <!--Configuration Directory-->
                     <label>Configuration Directory:</label>

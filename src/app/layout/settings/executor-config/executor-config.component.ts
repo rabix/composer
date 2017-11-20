@@ -21,7 +21,7 @@ import {NotificationBarService} from "../../notification-bar/notification-bar.se
                 <div class="form-group">
                     <label class="form-check-label">
                         <input type="radio" class="form-check-input" value="bundled" formControlName="choice" name="choice"/>
-                        Bundled (v1.0.2)
+                        Bundled (v1.0.3)
                     </label>
                 </div>
 
