@@ -163,8 +163,6 @@ export class AppExecutionContextModalComponent implements OnInit {
                 return;
             }
 
-            console.log("FormFieldNAme", formFieldName, formFieldName.split("."));
-
             this.form.get(formFieldName).patchValue(path[0]);
         });
     }

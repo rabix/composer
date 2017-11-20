@@ -119,7 +119,6 @@ export class AppExecutionPreviewComponent extends DirectiveBase {
                 link.className = "btn btn-unstyled btn-link outdir-link";
 
                 link.addEventListener("click", () => {
-                    console.log("Trying to open folder:", content);
                     this.native.exploreFolder(content);
                 });
 

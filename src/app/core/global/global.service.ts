@@ -35,7 +35,6 @@ export class GlobalService {
             this.statusBar.stopProcess(process, "Fetched platform data");
 
         }, err => {
-            console.log("Error", err);
             this.notificationBar.showNotification("Cannot sync platform data. " + new ErrorWrapper(err));
             this.statusBar.stopProcess(process, "Failed to fetch platform data.");
         });

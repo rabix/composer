@@ -175,6 +175,27 @@ export class RabixExecutor {
             return fpath;
         });
 
+        const dockerIsRunning = new Promise((resolve, reject) => {
+            const docker = spawn("docker", ["version"]);
+            docker.on("close", (exitCode) => {
+
+                if (exitCode !== 0) {
+                    dataCallback(new Error("Docker needs to be running in order to execute apps."));
+                    cleanup();
+                    reject();
+                    return;
+                }
+
+                resolve();
+            });
+            docker.on("error", (d) => {
+                dataCallback(new Error("Docker seems to be missing from your system. Please install it in order to execute apps."));
+                cleanup();
+                reject();
+            });
+
+        });
+
 
         const stdoutLogPath   = executionParams.outDir + "/stdout.log";
         const stderrLogPath   = executionParams.outDir + "/stderr.log";
@@ -183,11 +204,11 @@ export class RabixExecutor {
             new Promise((resolve, reject) => fs.ensureFile(stderrLogPath, err => err ? reject(err) : resolve())),
         ]);
 
-        Promise.all([
+        dockerIsRunning.then(() => Promise.all([
             appTempFile,
             appJobFile,
             logFilesCreated
-        ]).then((filePaths: [string, string, any]) => {
+        ])).then((filePaths: [string, string, any]) => {
 
             const stdoutWriteStream = fs.createWriteStream(stdoutLogPath, {autoClose: true, encoding: "utf8"});
             const stderrWriteStream = fs.createWriteStream(stderrLogPath, {autoClose: true, encoding: "utf8"});
@@ -198,8 +219,7 @@ export class RabixExecutor {
 
             const [appFilePath, jobFilePath] = filePaths;
 
-            const processCommand = "java";
-            const executorArgs   = [
+            const executorArgs = [
                 "-jar",
                 this.jarPath,
                 appFilePath,
@@ -207,23 +227,32 @@ export class RabixExecutor {
                 ...this.parseExecutorParamsToArgs(executionParams)
             ];
 
-
             const rabixProcess = spawn(this.jrePath, executorArgs, {});
 
+            const terminate = (err?: Error) => {
+
+                rabixProcess.stdout.removeAllListeners();
+                rabixProcess.stderr.removeAllListeners();
+
+                rabixProcess.kill();
+                if (err) {
+                    dataCallback(err);
+                }
+                cleanup();
+            };
 
             if (emitter) {
-                emitter.on("stop", () => {
-
-                    rabixProcess.stdout.removeAllListeners();
-                    rabixProcess.stderr.removeAllListeners();
-
-                    rabixProcess.kill();
-                    cleanup();
-                });
+                emitter.on("stop", () => terminate());
             }
 
-            const processCommandLine = [processCommand, ...executorArgs].join(" ");
+            rabixProcess.on("error", (err: any) => {
+                if (err.code === "ENOENT" && err.path === this.jrePath) {
+                    return terminate(new Error("Cannot run Java process. Please check if it is properly installed. "))
+                }
+                terminate(err);
+            });
 
+            const processCommandLine = [this.jrePath, ...executorArgs].join(" ");
             dataCallback(null, {message: `Running “${processCommandLine}”`} as ExecutorOutput);
 
             rabixProcess.stdout.pipe(stdoutWriteStream);
