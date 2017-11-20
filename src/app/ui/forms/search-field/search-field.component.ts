@@ -9,7 +9,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
             <i class="icon fa fa-fw fa-search"></i>
             <input #input class="form-control"
-                   [attr.data-test]="dataTest"
+                   data-test="search-field"
                    [attr.placeholder]="placeholder"
                    [value]="value"
                    (keyup)="valueChange.emit(input.value); onChange(input.value)"
@@ -33,9 +33,6 @@ export class SearchFieldComponent extends DirectiveBase implements ControlValueA
 
     @Input()
     value = "";
-
-    @Input()
-    dataTest = "";
 
     @Output()
     valueChange = new EventEmitter<string>();

@@ -108,10 +108,10 @@ export class PlatformCredentialsModalComponent implements OnInit {
     form: FormGroup;
 
     platformList = [
-        {text: "Seven Bridges (Default)", value: "https://api.sbgenomics.com", dataTest: "igor-platform" },
-        {text: "Seven Bridges (EU)", value: "https://eu-api.sbgenomics.com", dataTest: "eu-platform" },
-        {text: "Cancer Genomics Cloud", value: "https://cgc-api.sbgenomics.com", dataTest: "cgc-platform" },
-        {text: "Cavatica", value: "https://pgc-api.sbgenomics.com", dataTest: "pgc-platform" },
+        {text: "Seven Bridges (Default)", value: "https://api.sbgenomics.com"},
+        {text: "Seven Bridges (EU)", value: "https://eu-api.sbgenomics.com"},
+        {text: "Cancer Genomics Cloud", value: "https://cgc-api.sbgenomics.com"},
+        {text: "Cavatica", value: "https://pgc-api.sbgenomics.com"},
     ];
 
     constructor(private system: SystemService,
