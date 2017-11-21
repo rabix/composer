@@ -182,7 +182,7 @@ export = {
         }
 
         // File/Protocol handler for win32 and linux
-        const shouldQuit = app.makeSingleInstance((argv) => {
+        const runningInstanceExists = app.makeSingleInstance((argv) => {
             // Someone tried to run a second instance, we should focus our window.
 
             // Protocol handler for win32 and linux
@@ -195,7 +195,8 @@ export = {
             focusMainWindow();
         });
 
-        if (shouldQuit) {
+        // If there is already a running instance of Composer, shut down this new one and let the existing one handle incoming data
+        if (runningInstanceExists) {
             app.quit();
             return
         }

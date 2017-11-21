@@ -146,10 +146,10 @@ export class OpenExternalFileService {
         return Observable.fromPromise(this.modalService.wrapPromise((resolve) => {
             const modal = this.modalService.fromComponent(PlatformCredentialsModalComponent, "Add Connection");
 
-            modal.user                          = {username: username};
-            modal.platform                      = url;
-            modal.forceSetActiveInTokenOnlyMode = true;
-            modal.tokenOnly                     = true;
+            modal.user              = {username: username};
+            modal.platform          = url;
+            modal.tokenOnly         = true;
+            modal.forceActivateUser = true;
 
             modal.submit.take(1).subscribe(() => {
                 resolve();

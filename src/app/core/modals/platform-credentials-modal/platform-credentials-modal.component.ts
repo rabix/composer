@@ -96,7 +96,7 @@ export class PlatformCredentialsModalComponent implements OnInit {
     @Input() tokenOnly = false;
 
     /** Force user to be the active one in token only mode (when modal is open in order to add a specific user) */
-    @Input() forceSetActiveInTokenOnlyMode = false;
+    @Input() forceActivateUser = false;
 
     /** Public API url */
     @Input() platform = "https://api.sbgenomics.com";
@@ -152,7 +152,7 @@ export class PlatformCredentialsModalComponent implements OnInit {
                 let maybeUserUpdate = Promise.resolve();
 
                 if (isEditing) {
-                    if (editedCredentials.equals(active) || this.forceSetActiveInTokenOnlyMode) {
+                    if (editedCredentials.equals(active) || this.forceActivateUser) {
                         // If we are editing credentials that appear to be active, update it
                         maybeUserUpdate = this.auth.setActiveCredentials(editedCredentials);
                     }
