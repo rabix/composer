@@ -51,6 +51,10 @@ export class WelcomeTabComponent {
     }
 
     onConnectButtonClick() {
-        this.modal.fromComponent(PlatformCredentialsModalComponent, "Add Connection");
+        const modal = this.modal.fromComponent(PlatformCredentialsModalComponent, "Add Connection");
+
+        modal.submit.take(1).subscribe(() => {
+            modal.close();
+        });
     }
 }

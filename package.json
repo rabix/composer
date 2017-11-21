@@ -21,7 +21,7 @@
         "compile:angular": "node --max-old-space-size=4096 ./node_modules/@angular/cli/bin/ng build -prod -aot",
         "compile:electron": "./node_modules/.bin/tsc -p electron && node build-scripts/splash-copy.js",
         "compile:electron:watch": "./node_modules/.bin/tsc -p electron --watch",
-        "debug:electron": "./node_modules/.bin/electron ./electron --inspect-brk",
+        "debug:electron": "./node_modules/.bin/electron ./electron --inspect-brk --dev-mode",
         "lint": "./node_modules/@angular/cli/bin/ng lint",
         "package": "node ./electron-build.js",
         "postinstall": "node build-scripts/bundle-executor.js && cd electron && yarn install",

@@ -20,9 +20,11 @@ export type IPCRoute =
     | "fetchPlatformData"
     | "getApps"
     | "getAppUpdates"
+    | "getFileOutputInfo"
     | "getLocalFileContent"
     | "getLocalRepository"
     | "getPlatformApp"
+    | "getProject"
     | "getProjects"
     | "getSetting"
     | "getUserByToken"
@@ -53,7 +55,9 @@ export type IPCListeners =
     "watchLocalRepository" |
     "watchUserRepository" |
     "executeApp" |
-    "accelerator";
+    "accelerator" |
+    "deepLinkingHandler" |
+    "openFileHandler";
 
 @Injectable()
 export class IpcService {
@@ -159,7 +163,7 @@ export class IpcService {
                 });
 
                 msgSubscription.unsubscribe();
-            }
+            };
         });
 
         return clientObservable;
