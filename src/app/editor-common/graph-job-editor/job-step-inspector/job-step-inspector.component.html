@@ -30,13 +30,13 @@
                     </div>
 
                     <!--Input-->
-                    <ct-step-inspector-entry-2 [formControl]="jobGroup.get(input.id)"
-                                               [inputType]="input.type.type"
-                                               [inputArrayItemsType]="input.type.items"
-                                               [inputEnumSymbols]="input.type.symbols"
-                                               [inputRecordFields]="input.type.fields"
-                                               class="mb-0">
-                    </ct-step-inspector-entry-2>
+                    <ct-job-step-inspector-entry [formControl]="jobGroup.get(input.id)"
+                                                 [inputType]="input.type.type"
+                                                 [inputArrayItemsType]="input.type.items"
+                                                 [inputEnumSymbols]="input.type.symbols"
+                                                 [inputRecordFields]="input.type.fields"
+                                                 class="mb-0">
+                    </ct-job-step-inspector-entry>
 
                     <!--Connections-->
                     <!--Only steps have sources, inputs and outputs don't-->

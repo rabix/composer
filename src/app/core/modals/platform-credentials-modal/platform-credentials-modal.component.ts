@@ -108,10 +108,10 @@ export class PlatformCredentialsModalComponent implements OnInit {
     form: FormGroup;
 
     platformList = [
-        {text: "Seven Bridges (Default)", value: "https://api.sbgenomics.com" },
-        {text: "Seven Bridges (EU)", value: "https://eu-api.sbgenomics.com" },
-        {text: "Cancer Genomics Cloud", value: "https://cgc-api.sbgenomics.com" },
-        {text: "Cavatica", value: "https://pgc-api.sbgenomics.com" },
+        {text: "Seven Bridges (Default)", value: "https://api.sbgenomics.com"},
+        {text: "Seven Bridges (EU)", value: "https://eu-api.sbgenomics.com"},
+        {text: "Cancer Genomics Cloud", value: "https://cgc-api.sbgenomics.com"},
+        {text: "Cavatica", value: "https://pgc-api.sbgenomics.com"},
     ];
 
     constructor(private system: SystemService,
@@ -199,21 +199,12 @@ export class PlatformCredentialsModalComponent implements OnInit {
                 url: new FormControl(this.platform, [
                     Validators.required,
                     (ctrl: AbstractControl) => {
-                        const val = ctrl.value;
+                        const val = ctrl.value || "";
                         if (this.platformList.map(e => e.value).indexOf(val) === -1) {
-                            try {
-                                const url = new URL(val);
-                                if(url.hostname.endsWith("-vayu.sbgenomics.com")){
-                                    return null;
-                                } else {
-                                    return {name: true};
-                                }
-                            } catch(ex){
-                                return {name: true}
-                            }
-                        } else {
-                            return null;
+                            return {name: true};
                         }
+
+                        return null;
                     }
                 ]),
                 token: new FormControl(this.token, [

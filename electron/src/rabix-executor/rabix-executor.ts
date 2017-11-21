@@ -2,8 +2,9 @@ import {spawn} from "child_process";
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as tmp from "tmp";
-import {EXECUTOR_OUTDIR_PREFIX, IPC_EOS_MARK} from "../constants";
+import {IPC_EOS_MARK} from "../constants";
 import {ExecutorParamsConfig} from "../storage/types/executor-config";
+import {ExecutorOutput, MessageType} from "./executor-output";
 import EventEmitter = NodeJS.EventEmitter;
 
 export type ProcessCallback = (err?: Error, stdout?: string, stderr?: string) => void;
@@ -165,24 +166,60 @@ export class RabixExecutor {
         const cleanup         = () => cleanupHandlers.forEach(c => c());
 
         const appTempFile = this.storeToTempFile(content).then(fpath => {
-            cleanupHandlers.push(() => fs.unlink(fpath));
+            cleanupHandlers.push(() => fs.unlink(fpath, err => void 0));
             return fpath;
         });
 
         const appJobFile = this.storeToTempFile(JSON.stringify(jobValue)).then(fpath => {
-            cleanupHandlers.push(() => fs.unlink(fpath));
+            cleanupHandlers.push(() => fs.unlink(fpath, err => void 0));
             return fpath;
         });
 
+        const dockerIsRunning = new Promise((resolve, reject) => {
+            const docker = spawn("docker", ["version"]);
+            docker.on("close", (exitCode) => {
 
-        Promise.all([
+                if (exitCode !== 0) {
+                    dataCallback(new Error("Docker needs to be running in order to execute apps."));
+                    cleanup();
+                    reject();
+                    return;
+                }
+
+                resolve();
+            });
+            docker.on("error", (d) => {
+                dataCallback(new Error("Docker seems to be missing from your system. Please install it in order to execute apps."));
+                cleanup();
+                reject();
+            });
+
+        });
+
+
+        const stdoutLogPath   = executionParams.outDir + "/stdout.log";
+        const stderrLogPath   = executionParams.outDir + "/stderr.log";
+        const logFilesCreated = Promise.all([
+            new Promise((resolve, reject) => fs.ensureFile(stdoutLogPath, err => err ? reject(err) : resolve())),
+            new Promise((resolve, reject) => fs.ensureFile(stderrLogPath, err => err ? reject(err) : resolve())),
+        ]);
+
+        dockerIsRunning.then(() => Promise.all([
             appTempFile,
-            appJobFile
-        ]).then((filePaths: [string, string]) => {
+            appJobFile,
+            logFilesCreated
+        ])).then((filePaths: [string, string, any]) => {
+
+            const stdoutWriteStream = fs.createWriteStream(stdoutLogPath, {autoClose: true, encoding: "utf8"});
+            const stderrWriteStream = fs.createWriteStream(stderrLogPath, {autoClose: true, encoding: "utf8"});
+            cleanupHandlers.push(() => {
+                stdoutWriteStream.close();
+                stderrWriteStream.close();
+            });
+
             const [appFilePath, jobFilePath] = filePaths;
 
-            const processCommand = "java";
-            const executorArgs   = [
+            const executorArgs = [
                 "-jar",
                 this.jarPath,
                 appFilePath,
@@ -191,41 +228,57 @@ export class RabixExecutor {
             ];
 
             const rabixProcess = spawn(this.jrePath, executorArgs, {});
+
+            const terminate = (err?: Error) => {
+
+                rabixProcess.stdout.removeAllListeners();
+                rabixProcess.stderr.removeAllListeners();
+
+                rabixProcess.kill();
+                if (err) {
+                    dataCallback(err);
+                }
+                cleanup();
+            };
+
             if (emitter) {
-                emitter.on("stop", () => {
-
-                    rabixProcess.stdout.removeAllListeners();
-                    rabixProcess.stderr.removeAllListeners();
-
-                    rabixProcess.kill();
-                    cleanup();
-                });
+                emitter.on("stop", () => terminate());
             }
 
-            const processCommandLine = [processCommand, ...executorArgs].join(" ");
-
-            dataCallback(null, `Running “${processCommandLine}”`);
-
-            rabixProcess.stdout.on("data", (data) => {
-
-                const out = data.toString();
-
-                try {
-                    const json = JSON.parse(out);
-                    dataCallback(null, json);
-                } catch (err) {
-                    dataCallback(null, out);
+            rabixProcess.on("error", (err: any) => {
+                if (err.code === "ENOENT" && err.path === this.jrePath) {
+                    return terminate(new Error("Cannot run Java process. Please check if it is properly installed. "))
                 }
-
+                terminate(err);
             });
 
+            const processCommandLine = [this.jrePath, ...executorArgs].join(" ");
+            dataCallback(null, {message: `Running “${processCommandLine}”`} as ExecutorOutput);
+
+            rabixProcess.stdout.pipe(stdoutWriteStream);
+            rabixProcess.stdout.on("data", (data) => {
+
+                const out = this.parseExecutorOutput(data.toString());
+
+                dataCallback(null, out);
+            });
+
+
+            rabixProcess.stderr.pipe(stderrWriteStream);
             rabixProcess.stderr.on("data", data => {
+
+                const out = this.parseExecutorOutput(data.toString());
+
+
                 /**
-                 * This “ERR: ” prefix is important because client listener uses it to determine how to treat incoming data
-                 * @name RabixExecutor.__errorPrefixing
-                 * @see AppEditorBase.__errorDiscriminator
+                 * Error logs from Bunny are huge Java stack traces, and this might flush hundreds of them each second.
+                 * DOM would blow up when we try to show those, so we'll pipe them to a file.
                  */
-                dataCallback(null, "ERR: " + data);
+                if (out.type === "ERROR") {
+                    // @FIXME: pipe this to a file
+                } else {
+                    dataCallback(null, out);
+                }
             });
 
             // when the spawn child process exits, check if there were any errors and close the writeable stream
@@ -233,11 +286,17 @@ export class RabixExecutor {
 
                 cleanup();
 
+
+                dataCallback(null, {
+                    type: "OUTDIR",
+                    message: executionParams.outDir
+                } as ExecutorOutput);
+
                 if (code !== 0) {
                     return dataCallback(new Error("Execution failed with non-zero exit code."));
                 }
 
-                dataCallback(null, "Gathering outputs...");
+                dataCallback(null, {message: "Gathering outputs..."} as ExecutorOutput);
 
                 const tempBasename = path.basename(appFilePath, ".tmp");
                 const outputRoot   = path.dirname(jobFilePath);
@@ -252,16 +311,17 @@ export class RabixExecutor {
                         if (files[i].startsWith(tempBasename)) {
                             const fullOutputDir = outputRoot + path.sep + files[i];
 
-                            fs.move(fullOutputDir, executionParams.outDir, {
-                                overwrite: true
-                            }, (err) => {
+                            fs.move(fullOutputDir, executionParams.outDir, (err) => {
 
                                 if (err) {
                                     return dataCallback(err);
                                 }
 
-                                dataCallback(null, EXECUTOR_OUTDIR_PREFIX + executionParams.outDir);
-                                dataCallback(null, "Done.");
+                                dataCallback(null, {
+                                    type: "DONE",
+                                    message: "Execution completed."
+                                });
+
                                 dataCallback(null, IPC_EOS_MARK);
                             });
 
@@ -286,5 +346,32 @@ export class RabixExecutor {
     private probeBinary(path = "", callback = (err?: Error) => void 0) {
         fs.access(path, fs.constants.X_OK, callback);
     }
+
+    /**
+     * Parses output messages according to config specified in logback.xml
+     * [%d{yyyy-MM-dd HH:mm:ss.SSS}] [%level] %msg%n
+     */
+    private parseExecutorOutput(output: string): ExecutorOutput {
+
+        const matcher = /\[(.*?)\]\s\[(.*?)\]\s(.*)/g;
+
+        const matched = matcher.exec(output);
+
+        if (matched === null) {
+            return {
+                message: output
+            }
+        }
+
+        const [input, timestamp, type, message] = matched;
+
+        return {
+            type: type as MessageType,
+            message,
+            timestamp
+        }
+
+    }
+
 
 }

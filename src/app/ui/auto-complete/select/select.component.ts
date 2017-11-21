@@ -209,12 +209,7 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
                     field: this.sortField,
                     direction: this.sortDirection || "asc"
                 } : undefined,
-                onChange: this.onChange.bind(this),
-                render: {
-                    option: function (data) {
-                        return `<div class="option" data-selectable data-value="${data.value}" data-test="dropdown-option">${data.text}</div>`;
-                    }
-                }
+                onChange: this.onChange.bind(this)
             };
 
             this.component = jQuery(this.el.nativeElement).selectize(selectizeOptions)[0].selectize;

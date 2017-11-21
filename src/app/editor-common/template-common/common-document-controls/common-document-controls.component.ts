@@ -94,23 +94,23 @@ import {Component, Input} from "@angular/core";
                 </ng-template>
             </button>
 
-            <ct-generic-dropdown-menu [ct-menu]="moreActionsMenu" menuAlign="left" #moreActionsDropdown>
-                <button class="btn control-button"
-                        *ngIf="host.appIsRunnable()"
-                        ct-tooltip="See More Actions"
-                        tooltipPlacement="bottom"
-                        (click)="moreActionsDropdown.show()">
-                    <i class="fa fa-fw fa-ellipsis-v"></i>
-                </button>
-            </ct-generic-dropdown-menu>
+            <!--<ct-generic-dropdown-menu [ct-menu]="moreActionsMenu" menuAlign="left" #moreActionsDropdown>-->
+                <!--<button class="btn control-button"-->
+                        <!--*ngIf="host.appIsRunnable()"-->
+                        <!--ct-tooltip="See More Actions"-->
+                        <!--tooltipPlacement="bottom"-->
+                        <!--(click)="moreActionsDropdown.show()">-->
+                    <!--<i class="fa fa-fw fa-ellipsis-v"></i>-->
+                <!--</button>-->
+            <!--</ct-generic-dropdown-menu>-->
 
-            <ng-template #moreActionsMenu class="mr-1">
-                <ul class="list-unstyled dropdown-list">
-                    <li class="list-item" (click)="moreActionsDropdown.hide(); host.editRunConfiguration()">
-                        Edit Run Configuration
-                    </li>
-                </ul>
-            </ng-template>
+            <!--<ng-template #moreActionsMenu class="mr-1">-->
+                <!--<ul class="list-unstyled dropdown-list">-->
+                    <!--<li class="list-item" (click)="moreActionsDropdown.hide(); host.editRunConfiguration()">-->
+                        <!--Edit Run Configuration-->
+                    <!--</li>-->
+                <!--</ul>-->
+            <!--</ng-template>-->
 
         </div>
     `,

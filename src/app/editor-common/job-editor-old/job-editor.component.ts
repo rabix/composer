@@ -16,10 +16,11 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
 
 /**
  * Job Editor modifies the test values of the job json.
+ * @deprecated use new job editor (with job-step-inspector-entry.component)
  */
 @Component({
     styleUrls: ["job-editor.component.scss"],
-    selector: "ct-job-editor",
+    selector: "ct-job-editor-old",
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <ct-form-panel>
@@ -57,16 +58,16 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
                         <div *ngFor="let input of group.inputs">
 
                             <label>{{ input?.label || input.id }} <i
-                                    class="fa fa-info-circle text-muted"
-                                    *ngIf="input.description"
-                                    [ct-tooltip]="ctt"
-                                    [tooltipPlacement]="'top'"></i>
+                                class="fa fa-info-circle text-muted"
+                                *ngIf="input.description"
+                                [ct-tooltip]="ctt"
+                                [tooltipPlacement]="'top'"></i>
                             </label>
-                            <ct-job-editor-entry [prefix]="input.id"
-                                                 [input]="input"
-                                                 [value]="job.inputs[input.id]"
-                                                 (update)="jobValueUpdate(input.id, $event)">
-                            </ct-job-editor-entry>
+                            <ct-job-editor-entry-old [prefix]="input.id"
+                                                     [input]="input"
+                                                     [value]="job.inputs[input.id]"
+                                                     (update)="jobValueUpdate(input.id, $event)">
+                            </ct-job-editor-entry-old>
 
                             <ct-tooltip-content #ctt>
                                 <div class="tooltip-info">
@@ -81,14 +82,13 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
         </div>
 
         <div class="block mb-1">
-            <button class="btn btn-secondary pull-right"
-                    (click)="resetToMockValues()">
+            <button class="btn btn-secondary pull-right" (click)="resetToMockValues()">
                 Reset to mock values
             </button>
         </div>
     `
 })
-export class JobEditorComponent implements OnChanges, OnDestroy {
+export class JobEditorOldComponent implements OnChanges, OnDestroy {
 
     /**
      * Existing CWL job metadata.

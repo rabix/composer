@@ -4,13 +4,12 @@ import {CommandLineToolModel, WorkflowModel} from "cwlts/models";
 
 import * as Yaml from "js-yaml";
 import {LoadOptions} from "js-yaml";
-import "rxjs/add/observable/of";
-import "rxjs/add/operator/do";
-import "rxjs/add/operator/switchMap";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
-import {EXECUTOR_OUTDIR_PREFIX} from "../../../../electron/src/constants";
+import {ExecutorOutput} from "../../../../electron/src/rabix-executor/executor-output";
 import {AppExecutionContext} from "../../../../electron/src/storage/types/executor-config";
+import {AppMetaManager} from "../../core/app-meta/app-meta-manager";
+import {APP_META_MANAGER} from "../../core/app-meta/app-meta-manager-factory";
 import {CodeSwapService} from "../../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../../core/data-gateway/data-gateway.service";
 import {AppHelper} from "../../core/helpers/AppHelper";
@@ -66,6 +65,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     reportPanel: "validation" | string;
 
+    showExecutionReportPanel = false;
+
     /** Flag to indicate if resolving content is in progress */
     isResolvingContent = false;
 
@@ -89,6 +90,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     executionQueue = new Subject<any>();
 
+    executionJob: Object;
 
     @ViewChild("reportPanelComponent", {read: CommonReportPanelComponent})
     private reportPanelComponent: CommonReportPanelComponent;
@@ -394,7 +396,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     ngAfterViewInit() {
         this.inspector.setHostView(this.inspectorHostView);
         super.ngAfterViewInit();
-        console.log("After init, report panel", this.reportPanelComponent);
         this.executionPreview = this.reportPanelComponent.getAppExecutionPreview();
 
         this.bindExecutionQueue();
@@ -516,9 +517,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
         }
 
-        console.log("Toggled report panel", this.reportPanel);
-
-
         // Force browser reflow, heights and scroll bar size gets inconsistent otherwise
         setTimeout(() => window.dispatchEvent(new Event("resize")));
     }
@@ -530,6 +528,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     editRunConfiguration() {
         const appID     = this.tabData.id;
         const appConfig = this.executor.getAppConfig(appID).take(1);
+
         appConfig.take(1).subscribeTracked(this, (context) => {
 
             const modal = this.modal.fromComponent(AppExecutionContextModalComponent, {
@@ -777,7 +776,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 return this.runOnExecutor()
 
                 // Messages will be coming in but we need to unsubscribe at some point, so wait for the execution stream to emit
-                    .takeUntil(this.executionStop.do(() => this.executionPreview.addMessage("Execution Stopped")))
+                    .takeUntil(this.executionStop.do(() => this.executionPreview.addMessage("Execution stopped")))
 
                     // When done, turn off the UI flag
                     .finally(() => this.isExecuting = false)
@@ -785,42 +784,37 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     // We need to catch the error here, because if we catch it in the end, this whole queue will terminate
                     .catch(err => {
                         const wrappedError = new ErrorWrapper(err).toString();
-                        this.executionPreview.addMessage(wrappedError, "error");
+                        this.executionPreview.addMessage(wrappedError, "ERROR");
                         return Observable.empty();
                     });
             })
-            .subscribeTracked(this, (output: string | Object) => {
+            .subscribeTracked(this, (output: ExecutorOutput) => {
 
                 // Output result comes as a JSON object with info about execution results
                 // Otherwise, it's a string, most likely an [INFO] log from stderr, which we should print out
-                let localOutput = "";
-                if (typeof output === "object") {
-                    localOutput = JSON.stringify(output, null, 4);
-                } else if (typeof output === "string") {
-                    localOutput = output;
+
+                let outputMessage = "";
+
+                if (typeof output.message === "object") {
+                    outputMessage += JSON.stringify(output, null, 4);
                 } else {
-                    return;
+                    outputMessage += output.message || "";
                 }
 
-                /**
-                 * Relies on custom-added prefix to wrap up error messages
-                 * @name AppEditorBase.__errorDiscriminator
-                 * @see RabixExecutor.__errorPrefixing
-                 */
-                if (localOutput.startsWith("ERR: ")) {
-                    this.executionPreview.addMessage(localOutput.slice(5), "error");
-                } else if (localOutput.startsWith(EXECUTOR_OUTDIR_PREFIX)) {
-                    this.executionPreview.addMessage(localOutput.slice(EXECUTOR_OUTDIR_PREFIX.length), "outdir");
-                } else {
-                    this.executionPreview.addMessage(localOutput);
-                }
+                this.executionPreview.addMessage(outputMessage, output.type);
 
 
             });
 
         // Whenever a new app queues for execution, toggle the “isExecuting” GUI flag
-        this.executionQueue.subscribeTracked(this, () => {
+        this.executionQueue.flatMap(() => {
+            const metaManager = this.injector.get(APP_META_MANAGER) as AppMetaManager;
+            return metaManager.getAppMeta("job").take(1);
+        }).subscribeTracked(this, job => {
             this.executionPreview.clear();
+            this.executionPreview.job = job;
+
+            this.showExecutionReportPanel = true;
             this.toggleReport("execution", true);
 
             this.isExecuting = true;
