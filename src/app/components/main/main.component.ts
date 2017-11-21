@@ -2,14 +2,14 @@ import {Component, ViewContainerRef, ViewEncapsulation} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {AuthService} from "../../auth/auth.service";
 import {GlobalService} from "../../core/global/global.service";
+import {OpenExternalFileService} from "../../core/open-external-file/open-external-file.service";
+import {ElectronProxyService} from "../../native/proxy/electron-proxy.service";
 import {SystemService} from "../../platform-providers/system.service";
 import {IpcService} from "../../services/ipc.service";
 import {JavascriptEvalService} from "../../services/javascript-eval/javascript-eval.service";
 import {ContextService} from "../../ui/context/context.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {UrlValidator} from "../../validators/url.validator";
-import {ElectronProxyService} from "../../native/proxy/electron-proxy.service";
-import {OpenExternalFileService} from "../../core/open-external-file/open-external-file.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -37,11 +37,13 @@ export class MainComponent {
                 ipc: IpcService,
                 global: GlobalService,
                 electron: ElectronProxyService,
-                // DON'T REMOVE THIS PLEASE I KNOW IT DOESN'T HAVE ANY USAGES
                 openExternalFileService: OpenExternalFileService,
+                // DON'T REMOVE THIS PLEASE I KNOW IT DOESN'T HAVE ANY USAGES
                 js: JavascriptEvalService) {
 
         system.boot();
+
+        openExternalFileService.watchDeepLinks();
 
         // When we first get active credentials (might be undefined if no user is active), sync data with the platform
         auth.getActive().take(1).filter(creds => {
