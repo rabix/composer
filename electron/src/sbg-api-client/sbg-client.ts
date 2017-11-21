@@ -1,3 +1,5 @@
+import * as os from "os";
+import {app} from "electron";
 import {IncomingMessage} from "http";
 import {reject} from "q";
 import {RequestAPI} from "request";
@@ -38,7 +40,8 @@ export class SBGClient {
             json: true,
             headers: {
                 "X-SBG-Auth-Token": token,
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "User-Agent": `Rabix Composer ${app.getVersion()} (${os.type()} ${os.release()})`
             },
         });
     }
@@ -47,6 +50,10 @@ export class SBGClient {
         return this.apiRequest("user", {
             timeout: 30000
         });
+    }
+
+    getProject(projectSlug: string): Promise<Project> {
+        return this.apiRequest(`projects/${projectSlug}`);
     }
 
     getAllProjects(): Promise<Project[]> {

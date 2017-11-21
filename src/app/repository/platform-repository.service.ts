@@ -234,6 +234,10 @@ export class PlatformRepositoryService {
         return this.ipc.request("getPlatformApp", {id, forceFetch}).toPromise();
     }
 
+    getProject(projectSlug: string): Promise<Project> {
+        return this.ipc.request("getProject", projectSlug).toPromise();
+    }
+
     searchAppsFromOpenProjects(substring?: string): Observable<App[]> {
 
         const term = substring.toLowerCase();
