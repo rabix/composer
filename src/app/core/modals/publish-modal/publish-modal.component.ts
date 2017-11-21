@@ -8,6 +8,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {FormAsyncValidator} from "../../forms/helpers/form-async-validator";
 import {ErrorWrapper} from "../../helpers/error-wrapper";
+import {LoadOptions} from "js-yaml";
+import * as Yaml from "js-yaml";
 
 @Component({
     selector: "ct-publish-modal",
@@ -143,7 +145,7 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
         return saveCall.then((str) => {
             this.isPublishing = false;
             this.close();
-            return { app: JSON.parse(str), id: appID};
+            return {id: appID, app: Yaml.safeLoad(str, {json: true} as LoadOptions)};
         }, (err) => {
             this.error        = "Failed to push the app. " + new ErrorWrapper(err);
             this.isPublishing = false;

@@ -127,27 +127,27 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
 
     protected onFirstModelCreation(): void {
         this.updateService.update
-            .filter((data: {id: string, app: any}) => {
+            .filter((data: {id: string, app: any, isValidCWL?: boolean}) => {
                 let filterFn = (step) => false;
                 if (this.tabData.dataSource === "local") {
-                    filterFn = () => this.codeEditorContent.value.indexOf("run: " + data.id) > -1;
+                    filterFn = (step) => step.customProps["sbg:rdfId"] === data.id || step.runPath === data.id;
                 } else if (data.id && !AppHelper.isLocal(data.id)) {
                     filterFn = (step) => AppHelper.getRevisionlessID(step.run.customProps["sbg:id"] || "") === AppHelper.getRevisionlessID(data.id);
                 }
                 return this.dataModel.steps.filter(filterFn).length > 0;
             })
-            .subscribeTracked(this, (data: {id: string, app: any}) => {
+            .subscribeTracked(this, (data: {id: string, app: any, isValidCWL?: boolean}) => {
                 if (this.tabData.dataSource === "local") {
-                    const steps = this.dataModel.steps.filter(step => this.codeEditorContent.value.indexOf("run: " + data.id) > -1);
-                    steps.forEach(step => step.setRunProcess(data.app));
-                    this.syncModelAndCode(false).then(() => {
-                        this.resolveToModel(this.codeEditorContent.value);
-                    }, err => console.warn);
+                    if (data.app) {
+                        const steps = this.dataModel.steps.filter(step => step.customProps["sbg:rdfId"] === data.id);
+                        steps.forEach(step => step.setRunProcess(data.app));
+                    }
+                    this.syncModelAndCode(!data.app).then(() => {}, err => console.warn);
                 } else {
                     if (this.graphEditor) {
                         this.graphEditor.getStepUpdates();
                     } else {
-                        this.graphDrawQueue.push(() => this.graphEditor.getStepUpdates())
+                        this.graphDrawQueue.push(() => this.graphEditor.getStepUpdates());
                     }
                 }
             });

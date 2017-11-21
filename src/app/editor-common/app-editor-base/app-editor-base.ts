@@ -354,9 +354,14 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
                 this.statusBar.stopProcess(proc, `Saved: ${appName}`);
 
-                if (this.tabData.dataSource === "local") {
-                    this.updateService.updateApps({id: this.tabData.id, app: Yaml.safeLoad(update, {json: true} as LoadOptions)});
+                if (this.validationState.isValidCWL) {
+                    const app = Yaml.safeLoad(update, {json: true} as LoadOptions);
+                    const id = this.tabData.dataSource === "local" ? this.tabData.id : app["sbg:id"];
+                    this.updateService.updateApps({id: id, app: app});
+                } else {
+                    this.updateService.updateApps({id: this.tabData.id, app: null});
                 }
+
             }, err => {
                 if (!err || !err.message) {
                     this.statusBar.stopProcess(proc);
@@ -677,7 +682,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         }).then(result => {
             return result;
         }, err => {
-
             this.notificationBar.showNotification(err.message || "An error has occurred");
 
             this.validationState.isValidCWL = false;
