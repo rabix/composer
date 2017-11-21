@@ -18,60 +18,61 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
             <div class="tc-header">Authentication</div>
 
             <div class="tc-body">
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Platform</th>
-                        <th colspan="2">User</th>
-                    </tr>
-                    </thead>
-                    <tbody>
+                <div *ngIf="(auth.getCredentials() | async).length; else blankState">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Platform</th>
+                            <th colspan="2">User</th>
+                        </tr>
+                        </thead>
+                        <tbody>
 
                     <tr *ngFor="let entry of (auth.getCredentials() | async)" class="align-middle">
-
+                        
                         <td class="align-middle">{{ getPlatformLabel(entry.url) }}</td>
-
+                        
                         <td class="align-middle">
                             {{ entry.user.username }}
-                            <span *ngIf="(auth.getActive() | async) === entry" class="tag tag-primary"
-                                  data-test="activa-user-tag">active</span>
+                            <span *ngIf="(auth.getActive() | async) === entry" class="tag tag-primary" data-test="activa-user-tag">active</span>
                         </td>
-
+                        
                         <td class="text-xs-right">
-                            
                             <button *ngIf="(auth.getActive() | async) === entry; else deactivate;"
                                     class="btn btn-secondary"
                                     data-test="authentication-deactivate-button"
                                     (click)="setActiveCredentials(undefined)">Deactivate
                             </button>
-                            
                             <ng-template #deactivate>
                                 <button class="btn btn-secondary"
                                         data-test="authentication-activate-button"
-                                        (click)="setActiveCredentials(entry)">Activate
-                                </button>
+                                        (click)="setActiveCredentials(entry)" >Activate</button>
                             </ng-template>
-                            
                             <button class="btn btn-secondary"
                                     data-test="authentication-edit-button"
-                                    (click)="editCredentials(entry)">Edit
-                            </button>
-
-                            <button class="btn btn-secondary" 
+                                    (click)="editCredentials(entry)">Edit</button>
+                            <button class="btn btn-secondary"
                                     data-test="authentication-remove-button"
-                                    (click)="auth.removeCredentials(entry)">Remove
-                            </button>
+                                    (click)="auth.removeCredentials(entry)">Remove</button>
                         </td>
-
+                        
                     </tr>
                     </tbody>
                 </table>
-                
                 <div class="text-xs-right">
-                    <button class="btn btn-primary" (click)="openCredentialsForm()">Add a Connection</button>
+                    <button class="btn btn-primary" (click)="openCredentialsForm()">Add a Connection</button></div>
                 </div>
                 
             </div>
+
+            <ng-template #blankState>
+                <ct-blank-state data-test="settings-blank-state-add-button"
+                                [buttonText]="'Add a Connection'"
+                                [learnMoreURL]="'http://docs.rabix.io/rabix-composer-configuration#connect-a-platform-account'"
+                                [description]="'Create a connection to one of the Seven Bridges platforms to be able to create, edit and sync platform apps.'"
+                                (buttonClick)="openCredentialsForm()">
+                </ct-blank-state>
+            </ng-template>
         </ct-form-panel>
 
         <ct-form-panel class="m-2">

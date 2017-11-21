@@ -15,14 +15,14 @@ import {ToolOutputListComponent} from "./tool-output-list.component";
             <div class="tc-body">
 
                 <!--Blank Tool Screen-->
-                <ct-blank-tool-state *ngIf="!readonly && !model?.outputs.length"
-                                     data-test="tool-add-output-button"
-                                     [buttonText]="'Add an Output'"
-                                     [learnMoreURL]="helpLink"
-                                     [description]="blankStateDescription"
-                                     (buttonClick)="addEntry()">
+                <ct-blank-state *ngIf="!readonly && !model?.outputs.length"
+                                data-test="tool-add-output-button"
+                                [buttonText]="'Add an Output'"
+                                [learnMoreURL]="'http://docs.rabix.io/the-tool-editor#output-ports'"
+                                [description]="blankStateDescription"
+                                (buttonClick)="addEntry()">
 
-                </ct-blank-tool-state>
+                </ct-blank-state>
 
                 <!--List of entries-->
                 <ct-tool-output-list [inputs]="inputs"
@@ -66,8 +66,6 @@ export class ToolOutputsComponent extends DirectiveBase {
     readonly update = new EventEmitter();
 
     @ViewChild(ToolOutputListComponent) outputList: ToolOutputListComponent;
-
-    helpLink = ExternalLinks.toolOutput;
 
     blankStateDescription = `The connections to tool outputs. Create an output port for each output file and data item,
      and also intermediate files if they need to be saved for later. Add secondary files to file ports for related index files.`;
