@@ -294,7 +294,7 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
         if (component.isDirty) {
 
             const modal = this.modal.fromComponent(ClosingDirtyAppsModalComponent, {
-                title: "Remove tab"
+                title: "Save changes?"
             });
 
             modal.confirmationLabel = "Save";

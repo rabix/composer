@@ -8,8 +8,8 @@ import {ModalService} from "../../../ui/modal/modal.service";
     template: `
         <form (ngSubmit)="decision.next(true)">
             <div class="body p-1">
-                <span> Do you want to save the changes made to the document?<br/>
-                Your changes will be lost if you don't save them.</span>
+                <span>Do you want to save the changes you've made to the document?<br/>
+                    Once you close this tab, your changes will be lost if you don't save them.</span>
             </div>
             
             <div class="modal-footer">
