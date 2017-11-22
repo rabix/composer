@@ -24,7 +24,7 @@ import {SystemService} from "../../platform-providers/system.service";
                             class="btn btn-primary" 
                             type="button" 
                             (click)="buttonClick.emit(true)"
-                            data-test="tool-add-button">
+                            data-test="blank-state-add-button">
                         {{ buttonText }}
                     </button>
 
