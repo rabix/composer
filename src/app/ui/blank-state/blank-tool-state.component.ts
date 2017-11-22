@@ -21,7 +21,10 @@ import {SystemService} from "../../platform-providers/system.service";
                     </div>
 
                     <button *ngIf="contentWrapper.children.length == 0"
-                            class="btn btn-primary" type="button" (click)="buttonClick.emit(true)">
+                            class="btn btn-primary" 
+                            type="button" 
+                            (click)="buttonClick.emit(true)"
+                            data-test="tool-add-button">
                         {{ buttonText }}
                     </button>
 
