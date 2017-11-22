@@ -1,3 +1,4 @@
+import {environment} from './../../../environments/environment';
 import {Component, ViewContainerRef, ViewEncapsulation} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {AuthService} from "../../auth/auth.service";
@@ -17,7 +18,6 @@ import {ElectronProxyService} from "../../native/proxy/electron-proxy.service";
     template: `
         <ct-layout data-test="layout"></ct-layout>
         <div id="runnix" [class.active]="runnix | async"></div>
-
     `,
     styleUrls: ["./../../../assets/sass/main.scss", "./main.component.scss"],
     providers: [
@@ -55,21 +55,23 @@ export class MainComponent {
          * {@link ModalService.rootViewRef}
          */
         modal.setViewContainer(vcRef);
+        
+        if ( ! environment.browser ) {
+            /**
+             * This has to be after  modal.setViewContainer(vcRef) in order to show the modal.
+             */
+            if (electron.getRemote().process.argv.indexOf("--no-update-check") === -1) {
+                global.checkForPlatformUpdates().catch(console.warn);
+            }
 
-        /**
-         * This has to be after  modal.setViewContainer(vcRef) in order to show the modal.
-         */
-        if (electron.getRemote().process.argv.indexOf("--no-update-check") === -1) {
-            global.checkForPlatformUpdates().catch(console.warn);
+            ipc.watch("accelerator", "checkForPlatformUpdates").subscribe(() => {
+                global.checkForPlatformUpdates(true).catch(console.warn);
+            });
+
+            ipc.watch("accelerator", "showAboutPageModal").subscribe(() => {
+                global.showAboutPageModal();
+            });
         }
-
-        ipc.watch("accelerator", "checkForPlatformUpdates").subscribe(() => {
-            global.checkForPlatformUpdates(true).catch(console.warn);
-        });
-
-        ipc.watch("accelerator", "showAboutPageModal").subscribe(() => {
-            global.showAboutPageModal();
-        });
 
         this.runnix = Observable.fromEvent(document, "keyup").map((e: KeyboardEvent) => e.keyCode).bufferCount(10, 1)
             .filter(seq => seq.toString() === [38, 38, 40, 40, 37, 39, 37, 39, 66, 65].toString())

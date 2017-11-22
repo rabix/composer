@@ -29,8 +29,12 @@ import {PlatformRepositoryService} from "../../../repository/platform-repository
 import {IpcService} from "../../../services/ipc.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {WorkflowEditorService} from "../../workflow-editor.service";
+import {environment} from './../../../../environments/environment';
 
-const {dialog} = window["require"]("electron").remote;
+declare var dialog:any;
+if ( ! environment.browser ) {
+    const {dialog} = window["require"]("electron").remote;
+}
 
 @Component({
     selector: "ct-workflow-graph-editor",

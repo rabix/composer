@@ -45,3 +45,15 @@ yarn test
 ## Documentation
 
 Now you can read the [Rabix Composer documentation](https://github.com/rabix/composer/wiki) to learn more about Rabix Composer.
+
+
+
+## Composer web environment
+
+1. Install nodejs(latest version)
+2. check out feature/webapp branch
+3. Install yarn
+4. execute: "yarn install"
+5. execute: "npm run serve"
+6. visit http://localhost:4200 
+
