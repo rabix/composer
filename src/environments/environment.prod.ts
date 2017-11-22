@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  browser: false
+  browser: false,
+  configPath: ''
 };
