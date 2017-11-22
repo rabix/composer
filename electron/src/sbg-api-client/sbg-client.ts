@@ -52,6 +52,10 @@ export class SBGClient {
         });
     }
 
+    getProject(projectSlug: string): Promise<Project> {
+        return this.apiRequest(`projects/${projectSlug}`);
+    }
+
     getAllProjects(): Promise<Project[]> {
         return this.fetchAll<Project>("projects?fields=_all")
             .then((projects: Project[]) => {

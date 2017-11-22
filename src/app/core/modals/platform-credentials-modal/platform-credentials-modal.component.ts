@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
 import {AbstractControl, FormControl, FormGroup, Validators} from "@angular/forms";
 import {Observable} from "rxjs/Observable";
 import {User} from "../../../../../electron/src/sbg-api-client/interfaces/user";
@@ -15,7 +15,7 @@ import {GetStartedNotificationComponent} from "../../../layout/notification-bar/
     selector: "ct-platform-credentials-modal",
     template: `
 
-        <form class="auth-form" data-test="credentials-modal-form" (ngSubmit)="form.valid && submit()" [formGroup]="form">
+        <form class="auth-form" data-test="credentials-modal-form" (ngSubmit)="form.valid && applyChanges()" [formGroup]="form">
             <div class="m-2">
                 <input type="hidden" formControlName="user"/>
 
@@ -95,6 +95,9 @@ export class PlatformCredentialsModalComponent implements OnInit {
     /** Allow only token update. If this is true, platform will be disabled and username of the new token must match the old one. */
     @Input() tokenOnly = false;
 
+    /** Force user to be the active one in token only mode (when modal is open in order to add a specific user) */
+    @Input() forceActivateUser = false;
+
     /** Public API url */
     @Input() platform = "https://api.sbgenomics.com";
 
@@ -103,6 +106,9 @@ export class PlatformCredentialsModalComponent implements OnInit {
 
     /** Modal can be given preset with a token */
     @Input() token: string;
+
+    /** Submit (Apply) button stream */
+    @Output() submit = new EventEmitter();
 
     /** FormGroup for modal inputs */
     form: FormGroup;
@@ -122,7 +128,7 @@ export class PlatformCredentialsModalComponent implements OnInit {
                 private modal: ModalService) {
     }
 
-    submit(): void {
+    applyChanges(): void {
 
         const {url, token, user} = this.form.getRawValue();
         const credentials        = new AuthCredentials(url, token, user);
@@ -146,7 +152,7 @@ export class PlatformCredentialsModalComponent implements OnInit {
                 let maybeUserUpdate = Promise.resolve();
 
                 if (isEditing) {
-                    if (editedCredentials.equals(active)) {
+                    if (editedCredentials.equals(active) || this.forceActivateUser) {
                         // If we are editing credentials that appear to be active, update it
                         maybeUserUpdate = this.auth.setActiveCredentials(editedCredentials);
                     }
@@ -168,8 +174,7 @@ export class PlatformCredentialsModalComponent implements OnInit {
 
                 maybeUserUpdate.then(() => this.global.reloadPlatformData());
 
-                this.modal.close();
-
+                this.submit.next(true);
             });
 
     }

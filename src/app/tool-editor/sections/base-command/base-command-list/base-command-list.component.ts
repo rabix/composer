@@ -10,11 +10,12 @@ import {SBDraft2CommandLineToolModel, SBDraft2ExpressionModel} from "cwlts/model
     selector: "ct-base-command-list",
     template: `
         <form [formGroup]="form">
-            <ct-blank-tool-state *ngIf="!readonly && !baseCommand.length"
-                                 [buttonText]="'Add base command'"
-                                 [description]="blankStateDescription"
-                                 (buttonClick)="addBaseCommand()">
-            </ct-blank-tool-state>
+            <ct-blank-state *ngIf="!readonly && !baseCommand.length"
+                            [buttonText]="'Add base command'"
+                            [learnMoreURL]="'http://docs.rabix.io/the-tool-editor#base-command'"
+                            [description]="blankStateDescription"
+                            (buttonClick)="addBaseCommand()">
+            </ct-blank-state>
 
             <div *ngIf="readonly && !baseCommand.length" class="text-xs-center">
                 This tool doesn't specify any baseCommands
