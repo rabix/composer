@@ -17,15 +17,17 @@ import {ErrorCode} from "cwlts/models/helpers/validation/ErrorCode";
             <div class="tc-body">
 
                 <!--Blank Tool Screen-->
-                <ct-blank-tool-state *ngIf="!readonly && !fileRequirement.listing?.length"
-                                     data-test="tool-add-file-button"
-                                     [buttonText]="'Create a file'"
-                                     [description]="blankStateDescription"
-                                     (buttonClick)="addDirent()">
-                    
+                <ct-blank-state *ngIf="!readonly && !fileRequirement.listing?.length"
+                                data-test="tool-add-file-button"
+                                [buttonText]="'Create a file'"
+                                [learnMoreURL]="'http://docs.rabix.io/the-tool-editor#files'"
+                                [description]="blankStateDescription"
+                                (buttonClick)="addDirent()">
+
                     <!--In case that tool is not draft2 then show dropdown for adding items-->
                     <ct-generic-dropdown-menu *ngIf="!isSBDraft2" [ct-menu]="menu" #addItemDropDown>
-                        <button class="btn btn-primary" type="button" (click)="addItemDropDown.toggleMenu()">
+                        <button class="btn btn-primary" type="button"
+                                (click)="addItemDropDown.toggleMenu()">
                             Add
                         </button>
                     </ct-generic-dropdown-menu>
@@ -43,7 +45,7 @@ import {ErrorCode} from "cwlts/models/helpers/validation/ErrorCode";
                         </ul>
                     </ng-template>
 
-                </ct-blank-tool-state>
+                </ct-blank-state>
 
                 <div *ngIf="readonly && !fileRequirement.listing?.length" class="text-xs-center ">
                     This tool doesn't create any file requirements
@@ -53,19 +55,21 @@ import {ErrorCode} from "cwlts/models/helpers/validation/ErrorCode";
                 <ul class="editor-list">
 
                     <!--List Entry-->
-                    <li *ngFor="let entry of fileRequirement.listing; let i = index" class="input-list-items">
+                    <li *ngFor="let entry of fileRequirement.listing; let i = index"
+                        class="input-list-items">
 
                         <!--If entry is ExpressionModel-->
-                        <ct-expression-input *ngIf="isExpressionModel(entry); else notExpressionModel"
-                                             [context]="context"
-                                             [ngModel]="entry"
-                                             (ngModelChange)="onExpressionEntryChanges()"
-                                             [readonly]="readonly">
+                        <ct-expression-input
+                                *ngIf="isExpressionModel(entry); else notExpressionModel"
+                                [context]="context"
+                                [ngModel]="entry"
+                                (ngModelChange)="onExpressionEntryChanges()"
+                                [readonly]="readonly">
                         </ct-expression-input>
 
                         <!--If entry is Dirent Model-->
                         <ng-template #notExpressionModel>
-                            
+
                             <!--List item-->
                             <div class="editor-list-item clickable form-control"
                                  [ct-validation-class]="entry"
@@ -101,10 +105,10 @@ import {ErrorCode} from "cwlts/models/helpers/validation/ErrorCode";
                                 <div class="tc-header">{{ entry.loc || "FileDef" }}</div>
                                 <div class="tc-body">
                                     <ct-file-def-inspector
-                                        (save)="updateFileDef($event, i)"
-                                        [context]="context"
-                                        [dirent]="entry"
-                                        [readonly]="readonly">
+                                            (save)="updateFileDef($event, i)"
+                                            [context]="context"
+                                            [dirent]="entry"
+                                            [readonly]="readonly">
                                     </ct-file-def-inspector>
                                 </div>
                             </ct-editor-inspector-content>
@@ -147,7 +151,7 @@ import {ErrorCode} from "cwlts/models/helpers/validation/ErrorCode";
                     </ng-template>
 
                 </ng-container>
-                
+
             </div>
         </ct-form-panel>
     `

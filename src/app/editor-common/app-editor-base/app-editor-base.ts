@@ -811,7 +811,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             const metaManager = this.injector.get(APP_META_MANAGER) as AppMetaManager;
             return metaManager.getAppMeta("job").take(1);
         }).subscribeTracked(this, job => {
-            console.log("Executing with job", job);
             this.executionPreview.clear();
             this.executionPreview.job = job;
 

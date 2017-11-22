@@ -7,7 +7,6 @@ import {AppExecutionContextModalComponent} from "./app-execution-context-modal/a
 import {AppExecutionPreviewComponent} from "./app-execution-panel/app-execution-preview.component";
 import {AppValidatorService} from "./app-validator/app-validator.service";
 import {AppInfoComponent} from "./components/app-info/app-info.component";
-import {BlankToolStateComponent} from "./components/blank-tool-state.component";
 import {CompactListComponent} from "./components/compact-list/compact-list.component";
 import {ExpressionInputComponent} from "./components/expression-input/expression-input.component";
 import {ExpressionModelListComponent} from "./components/expression-model-list/expression-model-list.component";
@@ -51,7 +50,6 @@ import {CommonStatusControlsComponent} from "./template-common/common-status-con
         AppExecutionContextModalComponent,
         AppExecutionPreviewComponent,
         AppInfoComponent,
-        BlankToolStateComponent,
         CommonDocumentControlsComponent,
         CommonReportPanelComponent,
         CommonStatusControlsComponent,
@@ -93,9 +91,9 @@ import {CommonStatusControlsComponent} from "./template-common/common-status-con
     exports: [
         AppExecutionPreviewComponent,
         AppInfoComponent,
-        BlankToolStateComponent,
         CommonDocumentControlsComponent,
         CommonReportPanelComponent,
+        MapListComponent,
         CommonStatusControlsComponent,
         CompactListComponent,
         EditableDirective,
