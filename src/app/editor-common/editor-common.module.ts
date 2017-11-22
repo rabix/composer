@@ -35,8 +35,6 @@ import {FileInputInspectorComponent} from "./inspector-forms/file-input-inspecto
 import {EditorInspectorContentComponent} from "./inspector/editor-inspector-content.component";
 import {EditorInspectorComponent} from "./inspector/editor-inspector.component";
 import {EditorInspectorDirective} from "./inspector/editor-inspector.directive";
-import {JobEditorEntryOldComponent} from "./job-editor-old/job-editor-entry.component";
-import {JobEditorOldComponent} from "./job-editor-old/job-editor.component";
 import {EditorPanelComponent} from "./layout/editor-panel/editor-panel.component";
 import {FileDefContentPipe} from "./pipes/file-def-content.pipe";
 import {FileDefNamePipe} from "./pipes/file-def-name.pipe";
@@ -70,8 +68,6 @@ import {CommonStatusControlsComponent} from "./template-common/common-status-con
         GraphJobEditorComponent,
         HintsComponent,
         InputTypeSelectComponent,
-        JobEditorEntryOldComponent,
-        JobEditorOldComponent,
         JobStepInspectorEntryComponent,
         KeyValueInputComponent,
         KeyValueListComponent,
@@ -110,7 +106,6 @@ import {CommonStatusControlsComponent} from "./template-common/common-status-con
         GraphJobEditorComponent,
         HintsComponent,
         InputTypeSelectComponent,
-        JobEditorOldComponent,
         JobStepInspectorComponent,
         JobStepInspectorEntryComponent,
         KeyValueInputComponent,

@@ -51,7 +51,7 @@ import {TreeNodeLabelDirective} from "./tree-view/tree-node-label-directive";
 import {TreeNodeComponent} from "./tree-view/tree-node/tree-node.component";
 import {TreeViewComponent} from "./tree-view/tree-view.component";
 import {NativeFileBrowserFormFieldComponent} from "./native-file-browser-form-field/native-file-browser-form-field.component";
-import {BlankStateComponent} from "./blank-state/blank-tool-state.component";
+import {BlankStateComponent} from "./blank-state/blank-state.component";
 
 @NgModule({
     imports: [
