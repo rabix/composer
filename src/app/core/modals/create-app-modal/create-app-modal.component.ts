@@ -35,7 +35,7 @@ import {WorkboxService} from "../../workbox/workbox.service";
                          data-test="new-app-remote-tab"
                          [class.active]="destination === 'remote'"
                          (click)="destination = 'remote'">
-                        <span><i class="fa fa-globe"></i> Remote</span>
+                        <span><i class="fa fa-globe"></i> Platform</span>
                     </div>
                 </div>
 

@@ -144,7 +144,7 @@ export class OpenExternalFileService {
     private promptCredentials(username: string, url: string) {
 
         return Observable.fromPromise(this.modalService.wrapPromise((resolve) => {
-            const modal = this.modalService.fromComponent(PlatformCredentialsModalComponent, "Add Connection");
+            const modal = this.modalService.fromComponent(PlatformCredentialsModalComponent, "Add an Account");
 
             modal.user              = {username: username};
             modal.platform          = url;

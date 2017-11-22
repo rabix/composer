@@ -11,6 +11,7 @@ import {APP_META_MANAGER} from "../../core/app-meta/app-meta-manager-factory";
 import {AppHelper} from "../../core/helpers/AppHelper";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {SVGJobFileDropPlugin} from "../../workflow-editor/svg-plugins/job-file-drop/job-file-drop";
+import {SVGRequiredInputMarkup} from "../../workflow-editor/svg-plugins/required-input-markup/required-input-markup";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
 
 @Component({
@@ -91,7 +92,6 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
                 new SVGNodeMovePlugin(),
                 new SVGJobFileDropPlugin(),
                 new SVGArrangePlugin()
-
             ]
         });
 
@@ -99,7 +99,6 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
         this.draw.emit(this);
 
         this.jobControl.valueChanges.subscribeTracked(this, changes => {
-
             this.graph.getPlugin(SVGJobFileDropPlugin).updateToJobState(changes);
             this.metaManager.patchAppMeta("job", changes);
         });

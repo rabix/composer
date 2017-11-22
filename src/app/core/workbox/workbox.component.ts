@@ -314,11 +314,7 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
      * Opens a new file tab
      */
     openNewFileTab() {
-        this.workbox.openTab({
-            id: "?newFile",
-            label: "New File",
-            type: "NewFile"
-        }, false);
+        this.workbox.openTab(this.workbox.homeTabData, false);
     }
 
     /**
