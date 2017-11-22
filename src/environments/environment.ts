@@ -5,5 +5,6 @@
 
 export const environment = {
   production: false,
-  browser: false
+  browser: false,
+  configPath: ''
 };

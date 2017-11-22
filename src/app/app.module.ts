@@ -32,8 +32,8 @@ import {environment} from './../environments/environment';
 import {CookieModule} from 'ngx-cookie';
 
 export function initConfiguration(_configurationService: ConfigurationService) {
-    if (!environment.browser) { return; }
-    return () => _configurationService.load(environment.arvadosConfig);
+    if (!environment.browser || !environment.configPath) { return; }
+    return () => _configurationService.load(environment.configPath);
 }
 
 @NgModule({
