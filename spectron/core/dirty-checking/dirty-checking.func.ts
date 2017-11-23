@@ -530,7 +530,7 @@ describe("dirty checking", async () => {
 
             const visualEditor     = `ct-tool-visual-editor`;
             const tab              = `ct-workbox .tab`;
-            const codeTab          = `[data-test="tool-code-tab"]`;
+            const codeTab          = `[data-test="code-tab"]`;
             const codeTabContent   = `ct-code-editor`;
             const aceEditorContent = `.ace_content`;
 
@@ -580,7 +580,7 @@ describe("dirty checking", async () => {
 
             const visualEditor   = `ct-tool-visual-editor`;
             const tab            = `ct-workbox .tab`;
-            const infoTab        = `[data-test="tool-info-tab"]`;
+            const infoTab        = `[data-test="info-tab"]`;
             const infoTabSection = `ct-app-info`;
             const inlineEditor   = `ct-inline-editor`;
 
@@ -716,7 +716,7 @@ describe("dirty checking", async () => {
 
             const visualEditor   = `ct-workflow-graph-editor`;
             const tab            = `ct-workbox .tab`;
-            const infoTab        = `[data-test="workflow-info-tab"]`;
+            const infoTab        = `[data-test="info-tab"]`;
             const infoTabSection = `ct-app-info`;
             const inlineEditor   = `ct-inline-editor`;
 
@@ -808,7 +808,7 @@ describe("dirty checking", async () => {
 
             const visualEditor     = `ct-workflow-graph-editor`;
             const tab              = `ct-workbox .tab`;
-            const codeTab          = `[data-test="workflow-code-tab"]`;
+            const codeTab          = `[data-test="code-tab"]`;
             const codeTabContent   = `ct-code-editor`;
             const aceEditorContent = `.ace_content`;
 
