@@ -144,6 +144,7 @@ export class OutputMetaDataSectionComponent extends DirectiveBase implements Con
 
     setDisabledState(isDisabled: boolean): void {
         this.readonly = isDisabled;
-        isDisabled ? this.metadataForm.controls["metadataList"].disable() : this.metadataForm.controls["metadataList"].enable();
+        isDisabled ? this.metadataForm.controls["metadataList"].disable({onlySelf: true, emitEvent: false})
+            : this.metadataForm.controls["metadataList"].enable({onlySelf: true, emitEvent: false});
     }
 }

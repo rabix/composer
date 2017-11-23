@@ -153,7 +153,8 @@ export class ArgumentInspectorComponent extends DirectiveBase implements OnInit 
     setDisabledState(isDisabled: boolean) {
         Object.keys(this.form.controls).forEach((item) => {
             const control = this.form.controls[item];
-            isDisabled ? control.disable({emitEvent: false}) : control.enable({emitEvent: false});
+            isDisabled ? control.disable({onlySelf: true, emitEvent: false})
+                : control.enable({onlySelf: true, emitEvent: false});
         });
     }
 }

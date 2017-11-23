@@ -115,6 +115,7 @@ export class StageInputSectionComponent extends DirectiveBase implements Control
 
     setDisabledState(isDisabled: boolean): void {
         this.readonly = isDisabled;
-        isDisabled ? this.form.controls["loadContent"].disable({emitEvent: false}) : this.form.controls["loadContent"].enable({emitEvent: false});
+        isDisabled ? this.form.controls["loadContent"].disable({onlySelf: true, emitEvent: false})
+            : this.form.controls["loadContent"].enable({onlySelf: true, emitEvent: false});
     }
 }

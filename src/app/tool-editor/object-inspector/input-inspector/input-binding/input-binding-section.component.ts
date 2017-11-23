@@ -22,6 +22,7 @@ import {V1CommandInputParameterModel} from "cwlts/models/v1.0";
                 <label class="form-control-label">Value</label>
                 <ct-expression-input
                         [context]="context"
+                        [readonly]="readonly"
                         [formControl]="form.controls['valueFrom']"
                         [disableLiteralTextInput]="version === 'sbg:draft-2'">
                 </ct-expression-input>
@@ -191,7 +192,8 @@ export class InputBindingSectionComponent extends DirectiveBase implements Contr
         this.readonly = isDisabled;
         Object.keys(this.form.controls).forEach((item) => {
             const control = this.form.controls[item];
-            isDisabled ? control.disable() : control.enable();
+            isDisabled ? control.disable({onlySelf: true, emitEvent: false})
+                : control.enable({onlySelf: true, emitEvent: false});
         });
     }
 }
