@@ -1,7 +1,9 @@
-#!/usb/bin/env node
 const path = require("path");
 const builder = require("electron-builder");
 const fs = require("fs-extra");
+const archiver = require("archiver");
+const glob = require("glob");
+
 
 const projectRoot = path.resolve(__dirname + "/");
 const ngDistDir = projectRoot + "/ng-dist";
@@ -50,6 +52,7 @@ fs.copySync(electronDir + "/node_modules", appDistDir + "/node_modules", {
 });
 
 console.log("Starting build process...");
+
 builder.build({
     config: {
         appId: "io.rabix.composer",
@@ -77,7 +80,7 @@ builder.build({
         },
         nsis: {
             oneClick: false,
-            perMachine: false,
+            perMachine: true,
             allowElevation: true,
             allowToChangeInstallationDirectory: true,
         },
@@ -87,5 +90,41 @@ builder.build({
         }]
 
     }
+}).then(() => {
+    /**
+     * For Windows, we can't take a single-file artifact because of missing libraries.
+     * We need to pack the installer with other stuff that come with the build (.dll libs)
+     */
+    if (process.platform === "win32") {
+        console.log("Archiving Windows installer...")
+        const [installerFilepath] = glob.sync("*.exe", {cwd: "build"});
 
+        if (!installerFilepath) {
+            throw new Error("Cannot find installer binary.");
+        }
+
+        const zipPath = "build/" + installerFilepath.slice(0, -3) + "zip";
+        const buildInfoPath = "latest.yml";
+        const unpackedDir = "win-unpacked";
+
+        const output = fs.createWriteStream(zipPath);
+        const archive = archiver("zip");
+
+        output.on("close", () => {
+            console.log("Archived " + archive.pointer() + " bytes");
+        });
+
+        archive.on("error", err => {
+            throw err;
+        });
+
+        archive.pipe(output);
+
+        archive.file(`build/${installerFilepath}`, {name: installerFilepath});
+        archive.file(`build/${buildInfoPath}`, {name: buildInfoPath});
+        archive.directory(`build/${unpackedDir}`, {name: unpackedDir});
+        return archive.finalize();
+    }
 });
+
+
