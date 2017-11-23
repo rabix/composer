@@ -91,6 +91,8 @@ builder.build({
 
     }
 }).then((data) => {
+
+    console.log("Build completed", data);
     /**
      * For Windows, we can't take a single-file artifact because of missing libraries.
      * We need to pack the installer with other stuff that come with the build (.dll libs)
@@ -102,7 +104,7 @@ builder.build({
     }
 
 
-    console.log("Archiving Windows installer...")
+    console.log("Archiving Windows installer...");
     const [installerFilepath] = glob.sync("*.exe", {cwd: "build"});
 
     if (!installerFilepath) {
@@ -133,4 +135,5 @@ builder.build({
 
 });
 
+console.log("Started building.");
 
