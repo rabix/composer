@@ -53,7 +53,7 @@ console.log("Starting build process...");
 builder.build({
     config: {
         appId: "io.rabix.composer",
-        productName: "rabix-composer",
+        productName: "Rabix Composer",
         asar: true,
         asarUnpack: ["executor/**"],
         directories: {
@@ -76,7 +76,10 @@ builder.build({
             target: ["AppImage"],
         },
         nsis: {
-            perMachine: true
+            oneClick: false,
+            perMachine: false,
+            allowElevation: true,
+            allowToChangeInstallationDirectory: true,
         },
         fileAssociations: [{
             ext: "cwl",
