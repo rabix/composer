@@ -79,7 +79,8 @@ builder.build({
             target: ["AppImage"],
         },
         nsis: {
-            oneClick: true
+            oneClick: true,
+            perMachine: true
         },
         fileAssociations: [{
             ext: "cwl",
