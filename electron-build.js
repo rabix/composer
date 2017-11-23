@@ -56,7 +56,7 @@ console.log("Starting build process...");
 builder.build({
     config: {
         appId: "io.rabix.composer",
-        productName: "rabix-composer",
+        productName: "Rabix Composer",
         asar: true,
         asarUnpack: ["executor/**"],
         directories: {
