@@ -90,41 +90,47 @@ builder.build({
         }]
 
     }
-}).then(() => {
+}).then((data) => {
     /**
      * For Windows, we can't take a single-file artifact because of missing libraries.
      * We need to pack the installer with other stuff that come with the build (.dll libs)
      */
-    if (process.platform === "win32") {
-        console.log("Archiving Windows installer...")
-        const [installerFilepath] = glob.sync("*.exe", {cwd: "build"});
+    console.log("Platform: " + process.platform);
 
-        if (!installerFilepath) {
-            throw new Error("Cannot find installer binary.");
-        }
-
-        const zipPath = "build/" + installerFilepath.slice(0, -3) + "zip";
-        const buildInfoPath = "latest.yml";
-        const unpackedDir = "win-unpacked";
-
-        const output = fs.createWriteStream(zipPath);
-        const archive = archiver("zip");
-
-        output.on("close", () => {
-            console.log("Archived " + archive.pointer() + " bytes");
-        });
-
-        archive.on("error", err => {
-            throw err;
-        });
-
-        archive.pipe(output);
-
-        archive.file(`build/${installerFilepath}`, {name: installerFilepath});
-        archive.file(`build/${buildInfoPath}`, {name: buildInfoPath});
-        archive.directory(`build/${unpackedDir}`, {name: unpackedDir});
-        return archive.finalize();
+    if (process.platform !== "win32") {
+        return data;
     }
+
+
+    console.log("Archiving Windows installer...")
+    const [installerFilepath] = glob.sync("*.exe", {cwd: "build"});
+
+    if (!installerFilepath) {
+        throw new Error("Cannot find installer binary.");
+    }
+
+    const zipPath = "build/" + installerFilepath.slice(0, -3) + "zip";
+    const buildInfoPath = "latest.yml";
+    const unpackedDir = "win-unpacked";
+
+    const output = fs.createWriteStream(zipPath);
+    const archive = archiver("zip");
+
+    output.on("close", () => {
+        console.log("Archived " + archive.pointer() + " bytes");
+    });
+
+    archive.on("error", err => {
+        throw err;
+    });
+
+    archive.pipe(output);
+
+    archive.file(`build/${installerFilepath}`, {name: installerFilepath});
+    archive.file(`build/${buildInfoPath}`, {name: buildInfoPath});
+    archive.directory(`build/${unpackedDir}`, {name: unpackedDir});
+    return archive.finalize();
+
 });
 
 
