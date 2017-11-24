@@ -53,57 +53,46 @@ fs.copySync(electronDir + "/node_modules", appDistDir + "/node_modules", {
 
 console.log("Starting build process...");
 
-try {
-    await(async () => {
-        return builder.build({
-            config: {
-                appId: "io.rabix.composer",
-                productName: "Rabix Composer",
-                asar: true,
-                asarUnpack: ["executor/**"],
-                directories: {
-                    output: "build",
-                    app: "dist",
-                    buildResources: "build-resources"
-                },
-                protocols: [{
-                    "name": "rabix-composer",
-                    "role": "Editor",
-                    "schemes": ["rabix-composer"]
-                }],
-                mac: {
-                    target: ["dmg"],
-                },
-                win: {
-                    target: ["nsis"],
-                },
-                linux: {
-                    target: ["AppImage"],
-                },
-                nsis: {
-                    oneClick: false,
-                    perMachine: true,
-                    allowElevation: true,
-                    allowToChangeInstallationDirectory: true
-                },
-                fileAssociations: [{
-                    ext: "cwl",
-                    name: "CWL"
-                }]
+builder.build({
+    config: {
+        appId: "io.rabix.composer",
+        productName: "Rabix Composer",
+        asar: true,
+        asarUnpack: ["executor/**"],
+        directories: {
+            output: "build",
+            app: "dist",
+            buildResources: "build-resources"
+        },
+        protocols: [{
+            "name": "rabix-composer",
+            "role": "Editor",
+            "schemes": ["rabix-composer"]
+        }],
+        mac: {
+            target: ["dmg"],
+        },
+        win: {
+            target: ["nsis"],
+        },
+        linux: {
+            target: ["AppImage"],
+        },
+        nsis: {
+            oneClick: false,
+            perMachine: true,
+            allowElevation: true,
+            allowToChangeInstallationDirectory: true
+        },
+        fileAssociations: [{
+            ext: "cwl",
+            name: "CWL"
+        }]
 
-            }
-        }).then(data => {
-            console.log("Building succeeded!", data);
-            return maybeZipWindowsInstaller();
-        }).catch(err => {
-            console.log("Building errored!", err);
-            maybeZipWindowsInstaller();
-        });
-    })();
-} catch (ex) {
+    }
+});
 
-}
-maybeZipWindowsInstaller();
+// maybeZipWindowsInstaller();
 
 
 function maybeZipWindowsInstaller() {
