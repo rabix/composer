@@ -82,6 +82,7 @@ builder.build({
             oneClick: false,
             perMachine: true,
             allowElevation: true,
+            allowToChangeInstallationDirectory: true
         },
         fileAssociations: [{
             ext: "cwl",
