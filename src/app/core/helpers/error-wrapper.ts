@@ -12,6 +12,10 @@ export class ErrorWrapper {
             return "You are offline.";
         }
 
+        if (this.err.error && this.err.error.code === "ENOTFOUND") {
+            return "There is a problem with your internet connection.";
+        }
+
         if (this.err.code && this.err.code === "ENOENT") {
             return `No such file or directory: ${this.err.path}`;
         }

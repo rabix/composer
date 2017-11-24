@@ -7,5 +7,9 @@
         padding-right: .5em;
     }
 
-
+    .editor-layout {
+        position: relative;
+        display: flex;
+        flex: 1;
+    }
 }
