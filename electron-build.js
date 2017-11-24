@@ -59,7 +59,6 @@ builder.build({
         productName: "Rabix Composer",
         asar: true,
         asarUnpack: ["executor/**"],
-        publish: "never",
         directories: {
             output: "build",
             app: "dist",
