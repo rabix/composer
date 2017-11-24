@@ -90,15 +90,19 @@ builder.build({
         }]
 
     }
-}).then((data) => {
+}).then(data => {
+    console.log("Building succeeded!", data);
+    return maybeZipWindowsInstaller();
+}).catch(err => {
+    console.log("Building errored!", err);
+    maybeZipWindowsInstaller();
+});
 
-    console.log("Build completed", data);
+function maybeZipWindowsInstaller() {
     /**
      * For Windows, we can't take a single-file artifact because of missing libraries.
      * We need to pack the installer with other stuff that come with the build (.dll libs)
      */
-    console.log("Platform: " + process.platform);
-
     if (process.platform !== "win32") {
         return data;
     }
@@ -132,8 +136,6 @@ builder.build({
     archive.file(`build/${buildInfoPath}`, {name: buildInfoPath});
     archive.directory(`build/${unpackedDir}`, {name: unpackedDir});
     return archive.finalize();
+}
 
-});
-
-console.log("Started building.");
 
