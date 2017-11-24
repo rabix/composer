@@ -16,8 +16,8 @@ import {ErrorWrapper} from "../../core/helpers/error-wrapper";
     providers: [CodeSwapService],
     template: `
         <ct-action-bar>
-            <div class="document-controls" *ngIf="!unavailableError">
-                <button [disabled]="!tabData.isWritable"
+            <div class="document-controls">
+                <button [disabled]="!tabData.isWritable || unavailableError"
                         class="btn btn-secondary btn-sm"
                         tooltipPlacement="bottom"
                         ct-tooltip="Save"
