@@ -1,0 +1,157 @@
+{
+    "sbg:project": "marijan_lekic/marijan-lekic-s-demo-project",
+    "sbg:revisionNotes": "",
+    "outputs": [],
+    "sbg:validationErrors": [],
+    "sbg:modifiedOn": 1507885971,
+    "sbg:id": "marijan_lekic/marijan-lekic-s-demo-project/wf1/2",
+    "steps": [
+        {
+            "id": "gorski_vijenac_1",
+            "in": [
+                {
+                    "id": "input2",
+                    "source": [
+                        "input2"
+                    ]
+                }
+            ],
+            "run": {
+                "sbg:id": "marijan_lekic/marijan-lekic-s-demo-project/gorski-vijenac-1/2",
+                "sbg:revisionNotes": "",
+                "outputs": [],
+                "sbg:validationErrors": [],
+                "sbg:modifiedOn": 1507885953,
+                "sbg:project": "marijan_lekic/marijan-lekic-s-demo-project",
+                "sbg:job": {
+                    "runtime": {
+                        "ram": 1000,
+                        "cores": 1
+                    },
+                    "inputs": {
+                        "input2": {
+                            "class": "File",
+                            "nameroot": "input",
+                            "size": 0,
+                            "contents": "file contents",
+                            "basename": "input.ext",
+                            "nameext": ".ext",
+                            "path": "/path/to/input.ext",
+                            "secondaryFiles": []
+                        }
+                    }
+                },
+                "sbg:revision": 2,
+                "class": "CommandLineTool",
+                "requirements": [
+                    {
+                        "class": "DockerRequirement",
+                        "dockerPull": "asd"
+                    }
+                ],
+                "sbg:sbgMaintained": false,
+                "inputs": [
+                    {
+                        "id": "input2",
+                        "inputBinding": {
+                            "position": 0
+                        },
+                        "type": "File?"
+                    }
+                ],
+                "baseCommand": [
+                    "asd"
+                ],
+                "sbg:revisionsInfo": [
+                    {
+                        "sbg:modifiedOn": 1498827734,
+                        "sbg:modifiedBy": "marijan_lekic",
+                        "sbg:revisionNotes": null,
+                        "sbg:revision": 0
+                    },
+                    {
+                        "sbg:modifiedOn": 1498827743,
+                        "sbg:modifiedBy": "marijan_lekic",
+                        "sbg:revisionNotes": "",
+                        "sbg:revision": 1
+                    },
+                    {
+                        "sbg:modifiedOn": 1507885953,
+                        "sbg:modifiedBy": "marijan_lekic",
+                        "sbg:revisionNotes": "",
+                        "sbg:revision": 2
+                    }
+                ],
+                "sbg:projectName": "marijan_lekic's Demo Project",
+                "sbg:latestRevision": 2,
+                "label": "Gorski vijenac 1",
+                "sbg:appVersion": [
+                    "v1.0"
+                ],
+                "sbg:modifiedBy": "marijan_lekic",
+                "id": "marijan_lekic/marijan-lekic-s-demo-project/gorski-vijenac-1/2",
+                "sbg:createdBy": "marijan_lekic",
+                "cwlVersion": "v1.0",
+                "sbg:modified": true,
+                "sbg:createdOn": 1498827734,
+                "sbg:publisher": "sbg",
+                "sbg:contributors": [
+                    "marijan_lekic"
+                ],
+                "sbg:image_url": null,
+                "description": ""
+            },
+            "sbg:y": -289,
+            "out": [],
+            "label": "Gorski vijenac 1",
+            "sbg:x": -254.39886474609375
+        }
+    ],
+    "inputs": [
+        {
+            "id": "input2",
+            "sbg:y": -505.5,
+            "sbg:x": -550.796875,
+            "type": "File?"
+        }
+    ],
+    "class": "Workflow",
+    "sbg:sbgMaintained": false,
+    "sbg:revision": 2,
+    "sbg:revisionsInfo": [
+        {
+            "sbg:modifiedOn": 1507885921,
+            "sbg:modifiedBy": "marijan_lekic",
+            "sbg:revisionNotes": null,
+            "sbg:revision": 0
+        },
+        {
+            "sbg:modifiedOn": 1507885932,
+            "sbg:modifiedBy": "marijan_lekic",
+            "sbg:revisionNotes": "REv1",
+            "sbg:revision": 1
+        },
+        {
+            "sbg:modifiedOn": 1507885971,
+            "sbg:modifiedBy": "marijan_lekic",
+            "sbg:revisionNotes": "",
+            "sbg:revision": 2
+        }
+    ],
+    "sbg:projectName": "marijan_lekic's Demo Project",
+    "sbg:latestRevision": 2,
+    "label": "WF1",
+    "sbg:appVersion": [
+        "v1.0"
+    ],
+    "sbg:modifiedBy": "marijan_lekic",
+    "id": "https://api.sbgenomics.com/v2/apps/marijan_lekic/marijan-lekic-s-demo-project/wf1/2/raw/",
+    "sbg:createdBy": "marijan_lekic",
+    "cwlVersion": "v1.0",
+    "sbg:contributors": [
+        "marijan_lekic"
+    ],
+    "sbg:createdOn": 1507885921,
+    "sbg:publisher": "sbg",
+    "sbg:image_url": null
+}

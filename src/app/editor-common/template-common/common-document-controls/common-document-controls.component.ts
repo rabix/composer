@@ -8,7 +8,7 @@ import {Component, Input} from "@angular/core";
 
             <!--Run-->
             <button type="button" class="btn btn-secondary"
-                    *ngIf="(host.executor.getExecutorState() | async) !== 'UNSET'"
+                    *ngIf="(host.executor.getExecutorState() | async) !== 'UNSET' && host.viewMode === 'test'"
                     [disabled]="!host.appIsRunnable() && (host.executor.getExecutorState() | async) === 'INVALID'"
                     ct-tooltip="Run with Rabix Executor"
                     tooltipPlacement="bottom"
@@ -34,7 +34,7 @@ import {Component, Input} from "@angular/core";
                     *ngIf="host.viewMode === 'code' && host.tabData.dataSource === 'local'"
                     ct-tooltip="Resolve"
                     tooltipPlacement="bottom"
-                    (click)="host.resolveButtonClick()">
+                    (click)="host.resolveCurrentContent()">
                 <i class="fa fa-fw fa-refresh"></i>
             </button>
 
@@ -56,12 +56,13 @@ import {Component, Input} from "@angular/core";
                     (click)="host.save()"
                     ct-tooltip="Save"
                     tooltipPlacement="bottom"
+                    data-test="save-button"
                     class="btn control-button" type="button">
                 <i class="fa fa-fw fa-save"></i>
             </button>
 
             <!--Push to Platform-->
-            <button class="btn control-button" data-test="publish-btn"
+            <button class="btn control-button" data-test="publish-button"
                     [disabled]="!host.appIsPublishable()"
                     *ngIf="host.tabData.dataSource === 'local'"
                     ct-tooltip="Push to Platform"
@@ -74,6 +75,7 @@ import {Component, Input} from "@angular/core";
             <!--Revisions-->
             <button
                 *ngIf="host.tabData.dataSource !== 'local' && host.dataModel && host.dataModel.customProps['sbg:revisionsInfo']"
+                data-test="revision-button"
                 class="btn control-button" type="button"
                 ct-tooltip="See Revision History"
                 tooltipPlacement="bottom"
@@ -85,29 +87,30 @@ import {Component, Input} from "@angular/core";
                 <ng-template #revisions>
                     <ct-revision-list *ngIf="host.dataModel" [active]="host.dataModel.customProps['sbg:revision']"
                                       #revisionList
+                                      [beforeChange]="host.showModalIfAppIsDirtyBound"
                                       [revisions]="host.dataModel.customProps['sbg:revisionsInfo']"
                                       (select)="host.openRevision($event)">
                     </ct-revision-list>
                 </ng-template>
             </button>
 
-            <ct-generic-dropdown-menu [ct-menu]="moreActionsMenu" menuAlign="left" #moreActionsDropdown>
-                <button class="btn btn-unstyled control-button"
-                        *ngIf="host.appIsRunnable()"
-                        ct-tooltip="See More Actions"
-                        tooltipPlacement="bottom"
-                        (click)="moreActionsDropdown.show()">
-                    <i class="fa fa-fw fa-ellipsis-v"></i>
-                </button>
-            </ct-generic-dropdown-menu>
+            <!--<ct-generic-dropdown-menu [ct-menu]="moreActionsMenu" menuAlign="left" #moreActionsDropdown>-->
+                <!--<button class="btn control-button"-->
+                        <!--*ngIf="host.appIsRunnable()"-->
+                        <!--ct-tooltip="See More Actions"-->
+                        <!--tooltipPlacement="bottom"-->
+                        <!--(click)="moreActionsDropdown.show()">-->
+                    <!--<i class="fa fa-fw fa-ellipsis-v"></i>-->
+                <!--</button>-->
+            <!--</ct-generic-dropdown-menu>-->
 
-            <ng-template #moreActionsMenu class="mr-1">
-                <ul class="list-unstyled dropdown-list">
-                    <li class="list-item" (click)="moreActionsDropdown.hide(); host.editRunConfiguration()">
-                        Edit Run Configuration
-                    </li>
-                </ul>
-            </ng-template>
+            <!--<ng-template #moreActionsMenu class="mr-1">-->
+                <!--<ul class="list-unstyled dropdown-list">-->
+                    <!--<li class="list-item" (click)="moreActionsDropdown.hide(); host.editRunConfiguration()">-->
+                        <!--Edit Run Configuration-->
+                    <!--</li>-->
+                <!--</ul>-->
+            <!--</ng-template>-->
 
         </div>
     `,

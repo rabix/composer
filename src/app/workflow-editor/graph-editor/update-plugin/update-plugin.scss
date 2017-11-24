@@ -1,0 +1,8 @@
+$node-update-fill: #f89406;
+
+svg.cwl-workflow.__plugin-update .workflow {
+
+    .node.__update-has-update .inner {
+        fill: $node-update-fill;
+    }
+}

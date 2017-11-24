@@ -6,8 +6,8 @@ import {NativeModule} from "../../native/native.module";
 import {SystemService} from "../../platform-providers/system.service";
 
 import {ModalService} from "../../ui/modal/modal.service";
-import {AddSourceModalComponent} from "../modals/add-source-modal/add-source-modal.component";
 import {WelcomeTabComponent} from "./welcome.component";
+import {PlatformCredentialsModalComponent} from "../modals/platform-credentials-modal/platform-credentials-modal.component";
 
 describe("WelcomeComponent", () => {
     let component: WelcomeTabComponent;
@@ -54,16 +54,16 @@ describe("WelcomeComponent", () => {
         expect(firstArg.startsWith("http://rabix.io")).toBe(true);
     });
 
-    it("should open modal when click on 'Open a Project' button", () => {
+    it("should open modal when click on 'Connect to Platform' button", () => {
 
         const modal = fixture.debugElement.injector.get(ModalService);
 
         const modalSpy       = spyOn(modal, "fromComponent");
-        const openProjectBtn = fixture.debugElement.query(By.css("[data-test='open-project-btn']"));
+        const openProjectBtn = fixture.debugElement.query(By.css("[data-test='connect-to-platform-btn']"));
 
         openProjectBtn.triggerEventHandler("click", {});
 
         expect(modalSpy).toHaveBeenCalledTimes(1);
-        expect(modalSpy).toHaveBeenCalledWith(AddSourceModalComponent, jasmine.anything());
+        expect(modalSpy).toHaveBeenCalledWith(PlatformCredentialsModalComponent, jasmine.anything());
     });
 });

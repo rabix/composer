@@ -4,6 +4,7 @@ import {CommandInputParameterModel, CommandOutputParameterModel, ExpressionModel
 import {Subscription} from "rxjs/Subscription";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {ErrorCode} from "cwlts/models/helpers/validation";
 
 @Component({
     styleUrls: ["./secondary-files.component.scss"],
@@ -13,11 +14,11 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             <div class="tc-header">Secondary Files</div>
             <div class="tc-body">
                 <form [formGroup]="form">
-                    <ct-blank-tool-state *ngIf="!readonly && !secondaryFiles.length"
-                                         [buttonText]="'Add secondary file'"
-                                         (buttonClick)="addFile()">
-                        No Secondary Files defined.
-                    </ct-blank-tool-state>
+                    <ct-blank-state *ngIf="!readonly && !secondaryFiles.length"
+                                    [buttonText]="'Add secondary file'"
+                                    [description]="'No Secondary Files defined.'"
+                                    (buttonClick)="addFile()">
+                    </ct-blank-state>
 
                     <div *ngIf="readonly && !secondaryFiles.length" class="text-xs-center">
                         No Secondary Files defined.
@@ -34,10 +35,10 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                     [readonly]="readonly">
                             </ct-expression-input>
 
-                            <div *ngIf="!readonly" class="remove-icon clickable ml-1 text-hover-danger"
+                            <div *ngIf="!readonly" class="remove-icon"
                                  [ct-tooltip]="'Delete'"
                                  (click)="removeFile(i)">
-                                <i class="fa fa-trash"></i>
+                                <i class="fa fa-trash clickable"></i>
                             </div>
                         </li>
                     </ol>
@@ -85,7 +86,7 @@ export class SecondaryFilesComponent extends DirectiveBase implements OnChanges,
     removeFile(i) {
         this.modal.delete("secondary file").then(() => {
             // reset the expression's validity
-            this.secondaryFiles[i].cleanValidity();
+            this.secondaryFiles[i].clearIssue(ErrorCode.EXPR_ALL);
             (this.form.get("list") as FormArray).removeAt(i);
         }, err => {
             console.warn(err);
@@ -136,7 +137,7 @@ export class SecondaryFilesComponent extends DirectiveBase implements OnChanges,
             if (list) {
                 this.port.updateSecondaryFiles(list);
                 this.updateFileList();
-                this.secondaryFiles.forEach(file => file.validate(this.context));
+                this.updateFormArray();
                 this.update.emit(list);
             }
         });

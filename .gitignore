@@ -60,3 +60,5 @@ npm-debug.log
 electron/dist
 electron/node_modules
 .testrun
+
+electron/executor

@@ -40,6 +40,7 @@ import {SettingsMenuComponent} from "./workbox/settings-menu.component";
 import {WorkBoxTabComponent} from "./workbox/workbox-tab.component";
 import {WorkBoxComponent} from "./workbox/workbox.component";
 import {WorkboxService} from "./workbox/workbox.service";
+import {ClosingDirtyAppsModalComponent} from "./modals/closing-dirty-apps/closing-dirty-apps-modal.component";
 import {LogoutComponent} from "../logout/logout.component";
 
 export function errorHandlerFactory(modal: ModalService) {
@@ -59,6 +60,7 @@ export function errorHandlerFactory(modal: ModalService) {
         HintsModalComponent,
         PlatformCredentialsModalComponent,
         UpdatePlatformModalComponent,
+        ClosingDirtyAppsModalComponent
     ],
     declarations: [
         AboutPageModalComponent,
@@ -85,11 +87,12 @@ export function errorHandlerFactory(modal: ModalService) {
         HintsModalComponent,
         PlatformCredentialsModalComponent,
         UpdatePlatformModalComponent,
-        LogoutComponent,
+        ClosingDirtyAppsModalComponent,
+        LogoutComponent
     ],
     exports: [
         LogoComponent,
-        LayoutComponent,
+        LayoutComponent
     ],
     providers: [
         WebWorkerBuilderService,

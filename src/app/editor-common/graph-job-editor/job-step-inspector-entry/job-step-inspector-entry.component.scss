@@ -1,0 +1,18 @@
+:host {
+    display: inline-block;
+    width: 100%;
+
+    .array-row {
+        display: flex;
+
+        .delete-btn-group {
+            flex-basis: 44px
+        }
+
+        ct-job-step-inspector-entry {
+            flex: 1;
+        }
+    }
+
+
+}

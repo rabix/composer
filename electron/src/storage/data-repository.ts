@@ -1,13 +1,13 @@
+import * as path from "path";
 import * as ReadWriteLock from "rwlock";
-import {decodeBase64, encodeBase64} from "../security/encoder";
 import {RepositoryHook} from "./hooks/repository-hook";
 import {LocalRepository} from "./types/local-repository";
 import {RepositoryType} from "./types/repository-type";
 import {UserRepository} from "./types/user-repository";
 
-const fs       = require("fs-extra");
-const keychain = require("../keychain");
-const logger   = require("../logger").Log;
+const fs     = require("fs-extra");
+const logger = require("../logger").Log;
+
 type UpdateChange = {
     newValue: any;
     oldValue: any;
@@ -23,7 +23,6 @@ export class DataRepository {
     private listeners = {};
     private hooks     = new Set<RepositoryHook>();
     private profileDirectory: string;
-
 
     constructor(profileDirectory: string) {
 
@@ -55,33 +54,16 @@ export class DataRepository {
             });
         });
 
-        this.on("update.local", (_, changes) => {
-            /**
-             * When credentials in local profile get updated, we might have to remove some tokens from the keychain.
-             */
-            if (changes && changes.has("credentials")) {
-                const {oldValue, newValue} = changes.get("credentials");
+        this.on("update.local.executorConfig", () => {
 
-                const oldIDs = oldValue.map(c => c.id);
-                const newIDs = newValue.map(c => c.id);
-
-                // Get all ids that existed earlier, but not anymore.
-                const prune = oldIDs.filter(id => newIDs.indexOf(id) === -1);
-
-                prune.forEach(cid => keychain.remove(cid).catch(err => {
-                    logger.error("Failed to remove token from keychain.", err);
-                }));
+            if (this.local.executorConfig.choice === "bundled") {
+                const executorPath             = path.resolve(__dirname + "/../../../executor/lib/rabix-cli.jar");
+                this.local.executorConfig.path = executorPath;
             }
+
         });
 
         this.on("update.local.credentials", () => {
-
-            this.local.credentials.forEach(c => {
-
-                keychain.set(c.id, c.token).catch(ex => {
-                    logger.error("Keychain error", ex);
-                });
-            });
 
             this.cleanProfiles();
         });
@@ -115,36 +97,27 @@ export class DataRepository {
                 })();
             });
 
-            // Load tokens
-            const keychainTokens = Promise.all(this.local.credentials.map(c => keychain.get(c.id)));
+            hooksLoaded.then(() => {
 
-            hooksLoaded
-                .then(() => keychainTokens)
-                .then(tokens => {
-                    this.local.credentials.forEach((c, idx) => {
-                        c.token = tokens[idx];
-                    });
 
-                    // If there are no active credentials, there are no other profiles to load, so break here
-                    if (!localData.activeCredentials) {
-                        callback();
+                // If there are no active credentials, there are no other profiles to load, so break here
+                if (!localData.activeCredentials) {
+                    callback();
+                    return;
+                }
+
+                this.loadProfile(localData.activeCredentials.id, new UserRepository(), (err, userData) => {
+                    if (err) {
+                        callback(err);
                         return;
                     }
 
-                    // If there are active credentials, patch it's token from keychain as well
-                    this.local.activeCredentials.token = this.local.credentials.find(cred => cred.id === this.local.activeCredentials.id).token;
-                    this.loadProfile(localData.activeCredentials.id, new UserRepository(), (err, userData) => {
-                        if (err) {
-                            callback(err);
-                            return;
-                        }
+                    this.user = userData;
 
-                        this.user = userData;
+                    callback();
+                });
 
-                        callback();
-                    });
-                }, callback);
-
+            }, callback);
         });
     }
 
@@ -292,8 +265,8 @@ export class DataRepository {
         return this.local.activeCredentials && profile === this.local.activeCredentials.id;
     }
 
-    private getProfileFilePath(profile: string): string {
-        return `${this.profileDirectory}/${profile}.json`;
+    getProfileFilePath(profile: string): string {
+        return `${this.profileDirectory}/${profile}`;
     }
 
     /**
@@ -350,10 +323,8 @@ export class DataRepository {
                     return callback(err);
                 }
 
-                const text = decodeBase64(content);
                 try {
-
-                    const parsed = JSON.parse(text);
+                    const parsed = JSON.parse(content);
                     callback(null, parsed);
 
                 } catch (err) {
@@ -368,28 +339,11 @@ export class DataRepository {
 
         const copy = Object.assign({}, input);
 
-        if (copy.credentials) {
-            Object.assign(copy, {
-                credentials: copy.credentials.map(c => Object.assign({}, c, {
-                    token: null
-                }))
-            });
-        }
-
-        if (copy.activeCredentials) {
-            Object.assign(copy, {
-                activeCredentials: Object.assign({}, copy.activeCredentials, {
-                    token: null
-                })
-            });
-        }
-
         const frozen = JSON.stringify(copy, null, 4);
 
         this.lock.writeLock(filePath, (release) => {
-            const b64 = encodeBase64(frozen);
 
-            fs.outputFile(filePath, b64, "utf8", (err, data) => {
+            fs.outputFile(filePath, frozen, "utf8", (err, data) => {
                 release();
                 callback(err, data);
             });
@@ -422,4 +376,6 @@ export class DataRepository {
             Promise.all(deletables).then(r => callback(null, r), callback);
         });
     }
+
+
 }

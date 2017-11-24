@@ -4,64 +4,63 @@ import {CommandLineToolModel, StepModel, WorkflowModel} from "cwlts/models";
 import {Subscription} from "rxjs/Subscription";
 import {SystemService} from "../../../platform-providers/system.service";
 import {ModalService} from "../../../ui/modal/modal.service";
+import {ErrorCode} from "cwlts/models/helpers/validation";
 
 @Component({
     selector: "ct-hint-list",
     template: `
-            <!--Blank Tool Screen-->
-            <ct-blank-tool-state *ngIf="!readonly && !model.hints.length" 
-                                 [buttonText]="'Add a Hint'"
-                                 [learnMoreURL]="'http://docs.sevenbridges.com/docs/list-of-execution-hints'"
-                                 (buttonClick)="addEntry()">
-                
-                Execution hints and their values, which specify execution requirements and suggestions, for example, the AWS instance
-                type to use.
-            </ct-blank-tool-state>
-    
-            <div *ngIf="readonly && !model.hints.length" class="text-xs-center">
-                This tool doesn't specify any hints
+        <!--Blank Tool Screen-->
+        <ct-blank-state *ngIf="!readonly && !model.hints.length"
+                        [buttonText]="'Add a Hint'"
+                        [description]=[blankStateDescription]
+                        [learnMoreURL]="'http://docs.sevenbridges.com/docs/list-of-execution-hints'"
+                        (buttonClick)="addEntry()">
+        </ct-blank-state>
+
+        <div *ngIf="readonly && !model.hints.length" class="text-xs-center">
+            This tool doesn't specify any hints
+        </div>
+
+        <!--List Header Row-->
+        <div class="editor-list-title" *ngIf="!!model.hints.length">
+            <div class="col-xs-6">
+                Class
             </div>
-    
-            <!--List Header Row-->
-            <div class="editor-list-title" *ngIf="!!model.hints.length">
-                <div class="col-xs-6">
-                    Class
-                </div>
-                <div class="col-xs-6">
-                    Value
-                </div>
+            <div class="col-xs-6">
+                Value
             </div>
-    
-            <form [formGroup]="form" *ngIf="form">
-                <ul class="editor-list" formArrayName="hints">
-                    <li *ngFor="let control of form.controls['hints'].controls; let i = index">
-                        <div class="flex-row">
-                            <ct-requirement-input [formControl]="control"
-                                                  [context]="context"
-                                                  class="mr-1"
-                                                  [formControlName]="i"
-                                                  [classSuggest]="classSuggest"
-                                                  [readonly]="readonly">
-                            </ct-requirement-input>
-    
-                            <!--Actions Column-->
-                            <div *ngIf="!readonly" class="mr-1 mb-1">
-                                <i [ct-tooltip]="'Delete'"
-                                   class="fa fa-trash text-hover-danger clickable"
-                                   (click)="removeEntry(i)"></i>
-                            </div>
+        </div>
+
+        <form [formGroup]="form" *ngIf="form">
+            <ul class="editor-list" formArrayName="hints">
+                <li *ngFor="let control of form.controls['hints'].controls; let i = index">
+                    <div class="flex-row">
+                        <ct-requirement-input [formControl]="control"
+                                              [context]="context"
+                                              [formControlName]="i"
+                                              [classSuggest]="classSuggest"
+                                              [readonly]="readonly">
+                        </ct-requirement-input>
+
+                        <!--Actions Column-->
+                        <div *ngIf="!readonly" class="remove-icon">
+                            <i [ct-tooltip]="'Delete'"
+                               class="fa fa-trash clickable"
+                               (click)="removeEntry(i)"></i>
                         </div>
-                    </li>
-                </ul>
-            </form>
-    
-            <!--Add entry link-->
-            <button *ngIf="!readonly && !!model.hints.length"
-                    (click)="addEntry()"
-                    type="button"
-                    class="btn pl-0 btn-link no-outline no-underline-hover">
-                <i class="fa fa-plus"></i> Add a Hint
-            </button>
+                    </div>
+                </li>
+            </ul>
+        </form>
+
+        <!--Add entry link-->
+        <button *ngIf="!readonly && !!model.hints.length"
+                (click)="addEntry()"
+                type="button"
+                class="btn pl-0 btn-link no-outline no-underline-hover"
+                data-test="tool-add-hint-button-small">
+            <i class="fa fa-plus"></i> Add a Hint
+        </button>
 
     `,
     styleUrls: ["./hint-list.component.scss"]
@@ -87,6 +86,9 @@ export class HintsComponent implements OnChanges {
 
     @Output()
     update = new EventEmitter();
+
+    blankStateDescription = `Execution hints and their values, which specify
+     execution requirements and suggestions, for example, the AWS instancetype to use.`;
 
     private sub: Subscription;
 
@@ -122,7 +124,7 @@ export class HintsComponent implements OnChanges {
 
     removeEntry(i: number) {
         this.modal.delete("hint").then(() => {
-            this.model.hints[i].cleanValidity();
+            this.model.hints[i].clearIssue(ErrorCode.EXPR_ALL);
             this.model.hints.splice(i, 1);
             (this.form.get("hints") as FormArray).removeAt(i);
             this.update.emit(this.model.hints);

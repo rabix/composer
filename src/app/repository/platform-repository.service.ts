@@ -10,9 +10,9 @@ import {Project} from "../../../electron/src/sbg-api-client/interfaces/project";
 import {RawApp} from "../../../electron/src/sbg-api-client/interfaces/raw-app";
 import {AppMeta} from "../../../electron/src/storage/types/app-meta";
 import {RecentAppTab} from "../../../electron/src/storage/types/recent-app-tab";
-import {TabData} from "../core/workbox/tab-data.interface";
+import {TabData} from "../../../electron/src/storage/types/tab-data-interface";
 import {IpcService} from "../services/ipc.service";
-import {AppMetadata} from "../../../electron/src/storage/types/local-repository";
+import {AuthService} from "../auth/auth.service";
 
 @Injectable()
 export class PlatformRepositoryService {
@@ -26,7 +26,7 @@ export class PlatformRepositoryService {
     private recentApps: ReplaySubject<RecentAppTab[]> = new ReplaySubject(1);
     private appMeta: ReplaySubject<AppMeta[]>         = new ReplaySubject(1);
 
-    constructor(private ipc: IpcService) {
+    constructor(private ipc: IpcService, private auth: AuthService) {
 
         this.listen("apps").subscribe(this.apps);
         this.listen("projects").subscribe(this.projects);
@@ -80,11 +80,13 @@ export class PlatformRepositoryService {
                 }
 
                 const [all, open] = data;
-                if (open.length === 0) return [];
+                if (open.length === 0) {
+                    return [];
+                }
 
                 const mapped = all.reduce((acc, item) => ({...acc, [item.id]: item}), {});
                 return open.map(id => mapped[id] || undefined).filter(v => v);
-            })
+            });
     }
 
     getClosedProjects(): Observable<Project[]> {
@@ -98,7 +100,9 @@ export class PlatformRepositoryService {
 
                 const [all, open] = data;
 
-                if (open.length === 0) return all;
+                if (open.length === 0) {
+                    return all;
+                }
 
                 return all.filter(p => open.indexOf(p.id) === -1);
             });
@@ -112,39 +116,49 @@ export class PlatformRepositoryService {
         return this.ipc.request("patchUserRepository", data);
     }
 
-    setNodeExpansion(id: string, isExpanded: boolean): void {
+    setNodeExpansion(nodesToExpand: string | string [], isExpanded: boolean): void {
         this.expandedNodes.take(1).subscribe(expandedNodes => {
-            const index = expandedNodes.indexOf(id);
 
-            const shouldBeAdded   = isExpanded && index === -1;
-            const shouldBeRemoved = !isExpanded && index !== -1;
+            const patch = new Set(expandedNodes);
+            let modified = false;
 
-            const patch = expandedNodes.slice();
+            [].concat(nodesToExpand).forEach((item) => {
+                const oldSize = patch.size;
 
-            if (shouldBeAdded) {
-                patch.push(id);
-            } else if (shouldBeRemoved) {
-                patch.splice(index, 1);
-            }
+                isExpanded ? patch.add(item) : patch.delete(item);
 
-            if (shouldBeAdded || shouldBeRemoved) {
+                if (oldSize !== patch.size) {
+                    modified = true;
+                }
+            });
+
+            if (modified) {
                 this.patch({
-                    expandedNodes: patch
+                    expandedNodes: Array.from(patch)
                 });
             }
+
         });
     }
 
-    addOpenProjects(...projectIDs: string[]) {
+    addOpenProjects(projectIDs: string[], expandNodes: boolean = false) {
         return this.openProjects.take(1).toPromise().then(openProjects => {
 
             const missing = projectIDs.filter(id => openProjects.indexOf(id) === -1);
 
-            if (missing.length) {
-                return this.patch({openProjects: openProjects.concat(missing)}).toPromise();
+            if (missing.length === 0) {
+                return Promise.resolve();
             }
 
-            return Promise.resolve();
+            if (expandNodes) {
+                this.auth.getActive().take(1).subscribe((active) => {
+                    // Expand added projects
+                    this.setNodeExpansion(missing.concat(active.getHash()), true);
+                });
+            }
+
+            return this.patch({openProjects: openProjects.concat(missing)}).toPromise();
+
         });
     }
 
@@ -216,6 +230,14 @@ export class PlatformRepositoryService {
         });
     }
 
+    getAppContent(id: string, forceFetch = false): Promise<string> {
+        return this.ipc.request("getPlatformApp", {id, forceFetch}).toPromise();
+    }
+
+    getProject(projectSlug: string): Promise<Project> {
+        return this.ipc.request("getProject", projectSlug).toPromise();
+    }
+
     searchAppsFromOpenProjects(substring?: string): Observable<App[]> {
 
         const term = substring.toLowerCase();
@@ -265,24 +287,30 @@ export class PlatformRepositoryService {
         });
     }
 
-    patchAppMeta(appID: string, key: string, value: any): Promise<any> {
+    getAppMeta<T>(appID: string, key?: string): Observable<AppMeta> {
+        return this.appMeta.map(meta => {
+
+                if (meta === null) {
+                    return meta;
+                }
+
+                const data = meta[appID];
+
+                if (key && data) {
+                    return data[key];
+                }
+
+                return data;
+
+            });
+    }
+
+    patchAppMeta(appID: string, key: keyof AppMeta, value: any): Promise<any> {
         return this.ipc.request("patchAppMeta", {
             profile: "user",
             appID,
             key,
             value
         }).toPromise();
-    }
-
-    getAppMeta<T>(appID: string, key?: any): Observable<AppMetadata> {
-        return this.appMeta
-            .map(meta => {
-                const data = (meta || {})[appID];
-                if (key && data) {
-                    return data[key];
-                }
-
-                return data;
-            });
     }
 }

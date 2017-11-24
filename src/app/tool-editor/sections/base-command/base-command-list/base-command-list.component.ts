@@ -3,21 +3,19 @@ import {FormArray, FormControl, FormGroup} from "@angular/forms";
 import {CommandLineToolModel, ExpressionModel} from "cwlts/models";
 import {Subscription} from "rxjs/Subscription";
 import {ModalService} from "../../../../ui/modal/modal.service";
+import {ErrorCode} from "cwlts/models/helpers/validation/ErrorCode";
+import {SBDraft2CommandLineToolModel, SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 
 @Component({
     selector: "ct-base-command-list",
     template: `
         <form [formGroup]="form">
-            <ct-blank-tool-state *ngIf="!readonly && !baseCommand.length"
-                                 [buttonText]="'Add base command'"
-                                 (buttonClick)="addBaseCommand()">
-
-                The part of the command that comes before any tool parameters or options. You can also
-                include parameters or options
-                that you want to be fixed for every execution of the tool (provided they can be placed
-                before any variable
-                parameters and options in the command line), or these can be set as arguments below.
-            </ct-blank-tool-state>
+            <ct-blank-state *ngIf="!readonly && !baseCommand.length"
+                            [buttonText]="'Add base command'"
+                            [learnMoreURL]="'http://docs.rabix.io/the-tool-editor#base-command'"
+                            [description]="blankStateDescription"
+                            (buttonClick)="addBaseCommand()">
+            </ct-blank-state>
 
             <div *ngIf="readonly && !baseCommand.length" class="text-xs-center">
                 This tool doesn't specify any baseCommands
@@ -34,10 +32,10 @@ import {ModalService} from "../../../../ui/modal/modal.service";
                             [readonly]="readonly">
                     </ct-expression-input>
 
-                    <div *ngIf="!readonly" class="remove-icon clickable ml-1 text-hover-danger"
-                         [ct-tooltip]="'Delete'"
-                         (click)="removeBaseCommand(i)">
-                        <i class="fa fa-trash"></i>
+                    <div *ngIf="!readonly" class="remove-icon">
+                        <i [ct-tooltip]="'Delete'"
+                           class="fa fa-trash clickable"
+                           (click)="removeBaseCommand(i)"></i>
                     </div>
                 </li>
             </ol>
@@ -56,10 +54,10 @@ export class BaseCommandListComponent implements OnInit, OnChanges, OnDestroy {
     form = new FormGroup({list: new FormArray([])});
 
     @Input()
-    baseCommand: ExpressionModel[] = [];
+    baseCommand: SBDraft2ExpressionModel[] = [];
 
     @Input()
-    model: CommandLineToolModel;
+    model: SBDraft2CommandLineToolModel;
 
     @Input()
     readonly = false;
@@ -69,6 +67,12 @@ export class BaseCommandListComponent implements OnInit, OnChanges, OnDestroy {
 
     @Output()
     update = new EventEmitter<ExpressionModel[]>();
+
+    blankStateDescription = `The part of the command that comes before any tool parameters or options. You can also
+                include parameters or options
+                that you want to be fixed for every execution of the tool (provided they can be placed
+                before any variable
+                parameters and options in the command line), or these can be set as arguments below.`;
 
     private subscription: Subscription;
 
@@ -88,7 +92,7 @@ export class BaseCommandListComponent implements OnInit, OnChanges, OnDestroy {
     public removeBaseCommand(i: number) {
         this.modal.delete("base command").then(() => {
             // reset the expression's validity
-            this.baseCommand[i].cleanValidity();
+            this.baseCommand[i].clearIssue(ErrorCode.EXPR_ALL);
             (this.form.get("list") as FormArray).removeAt(i);
         }, err => {
             console.warn(err);
@@ -118,6 +122,7 @@ export class BaseCommandListComponent implements OnInit, OnChanges, OnDestroy {
 
         // re-subscribe update output to form changes
         this.subscription = this.form.valueChanges.map(form => (form.list || [])).subscribe((list) => {
+            this.model.updateBaseCommand(list);
             this.update.emit(list);
         });
     }

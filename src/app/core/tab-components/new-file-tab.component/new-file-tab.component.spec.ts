@@ -55,8 +55,8 @@ describe("NewFileTabComponent", () => {
 
     it("should try to open a modal for workflow/tool creation", () => {
 
-        const createWorkflowButton = fixture.debugElement.query(By.css("[data-test=create-workflow-btn]"));
-        const createToolButton     = fixture.debugElement.query(By.css("[data-test=create-tool-btn]"));
+        const createWorkflowButton = fixture.debugElement.query(By.css("[data-test=create-workflow-button]"));
+        const createToolButton     = fixture.debugElement.query(By.css("[data-test=create-tool-button]"));
 
         const modalMock    = fixture.debugElement.injector.get(ModalService);
         const modalMockSpy = spyOn(modalMock, "fromComponent");

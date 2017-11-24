@@ -2,6 +2,7 @@ import fs = require("fs-extra");
 import yaml = require("js-yaml");
 import request = require("request");
 import {LoadOptions} from "js-yaml";
+import {RecursiveNestingError} from "./errors/recursive-nesting.error";
 
 function isUrl(s) {
     const regexp = /^(ftp|http|https):\/\/.*/i;
@@ -17,7 +18,8 @@ function isLocalFile(filepath: string) {
     return filepath.startsWith("/");
 }
 
-function traverse(data, source, root, graph = {}) {
+function traverse(data, source, root, rootPath, graph = {}, traversedExternalPaths?) {
+
     return new Promise((resolve, reject) => {
 
         const future = [];
@@ -79,9 +81,20 @@ function traverse(data, source, root, graph = {}) {
 
                     let patchFn;
 
+                    // Each root external resource pass Set to nesting structures to avoid infinite recursion
+                    const traversed = traversedExternalPaths || new Set<string>([rootPath]);
+
+                    // Avoid recursive nesting
+                    if (traversed.has(externalPath)) {
+                        throw new RecursiveNestingError(`${externalPath}`);
+                    }
+
+                    traversed.add(externalPath);
+
                     fetch(externalPath, {
                         type: key === "$include" ? "text" : "json"
-                    }).then((content) => {
+                    }, rootPath, traversed).then((content) => {
+
 
                         switch (key) {
 
@@ -122,7 +135,7 @@ function traverse(data, source, root, graph = {}) {
                     }, reject);
                 }));
             } else if (entry && typeof entry === "object") {
-                future.push(traverse(entry, source, root, graph));
+                future.push(traverse(entry, source, root, rootPath, graph, traversedExternalPaths));
             } else {
                 future.push(new Promise(resolve => resolve()));
             }
@@ -142,7 +155,7 @@ function traverse(data, source, root, graph = {}) {
     });
 }
 
-function parseJSON(content, source, root?, graph?) {
+function parseJSON(content, source, rootPath, root?, graph?, traversedExternalPaths?) {
     return new Promise((resolve, reject) => {
         const data = yaml.safeLoad(content, {
             filename: source,
@@ -165,16 +178,18 @@ function parseJSON(content, source, root?, graph?) {
             }
         }
 
-        traverse(data, source, root, graph).then(resolve, reject);
+        traverse(data, source, root, rootPath, graph, traversedExternalPaths).then(resolve, reject);
     });
 }
 
 /**
  * @param filename
  * @param options
+ * @param rootPath
+ * @param traversedExternalPaths
  * @returns {Promise<Object>|Promise}
  */
-function fetch(filename, options) {
+function fetch(filename, options, rootPath, traversedExternalPaths) {
 
     options = Object.assign({
         type: "json"
@@ -200,7 +215,7 @@ function fetch(filename, options) {
         call.then((body) => {
             if (options.type === "json") {
                 try {
-                    parseJSON(body, filename, body).then(resolve, reject);
+                    parseJSON(body, filename, rootPath, body, null, traversedExternalPaths).then(resolve, reject);
                 } catch (ex) {
                     reject(ex);
                 }
@@ -220,7 +235,8 @@ module.exports = {
     resolveContent: (content, path): Promise<Object> => {
         return new Promise((resolve, reject) => {
             try {
-                parseJSON(content, path, content).then(resolve, reject);
+                // Root path is path at this point
+                parseJSON(content, path, path, content).then(resolve, reject);
             } catch (ex) {
                 reject(ex);
             }

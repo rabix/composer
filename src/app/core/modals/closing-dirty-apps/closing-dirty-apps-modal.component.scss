@@ -1,0 +1,11 @@
+@import "../../../../assets/sass/variables";
+
+:host {
+    .footer {
+        text-align: right;
+    }
+
+    .discard-button {
+        float: left;
+    }
+}

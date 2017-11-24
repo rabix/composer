@@ -1,0 +1,54 @@
+@import "../../../../../assets/sass/mixins";
+@import "../../../../../assets/sass/variables";
+
+$grid-gutter-width-half: $grid-gutter-width-base / 2;
+
+:host {
+    .input-box {
+        margin-right: -$grid-gutter-width-half;
+        margin-left: -$grid-gutter-width-half;
+        padding: 1rem $grid-gutter-width-half;
+        border-bottom: 1px solid $toolbar-border;
+
+    }
+
+    .input-title {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: .5rem;
+
+        .input-label {
+            @include ellipsis();
+            display: block;
+            padding-right: 10px;
+        }
+    }
+
+    /deep/.tooltip-inner {
+        padding: 1rem;
+        text-align: left;
+
+        h4 {
+            font-weight: bold;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        .title {
+            margin-bottom: .78571rem;
+            display: block;
+            font-weight: bold;
+        }
+
+        .value {
+            margin-bottom: 1.57143rem;
+            display: block;
+        }
+
+        .indent {
+            padding-left: 1.57143rem;
+        }
+    }
+}

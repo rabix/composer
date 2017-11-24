@@ -1,8 +1,9 @@
-#!/usb/bin/env node
 const path = require("path");
 const builder = require("electron-builder");
 const fs = require("fs-extra");
-const platform = builder.Platform;
+const archiver = require("archiver");
+const glob = require("glob");
+
 
 const projectRoot = path.resolve(__dirname + "/");
 const ngDistDir = projectRoot + "/ng-dist";
@@ -32,8 +33,12 @@ fs.copySync(electronDir + "/dist/main.prod.js", appDistDir + "/main.js", {
 
 
 // Copy compiled electron code to dist
-console.log("Copying electron dist...");
+console.log("Copying electron code...");
 fs.copySync(electronDir + "/dist/src", appDistDir + "/src", {
+    overwrite: true,
+    dereference: true
+});
+fs.copySync(electronDir + "/executor", appDistDir + "/executor", {
     overwrite: true,
     dereference: true
 });
@@ -51,31 +56,83 @@ console.log("Starting build process...");
 builder.build({
     config: {
         appId: "io.rabix.composer",
-        productName: "rabix-composer",
+        productName: "Rabix Composer",
         asar: true,
+        asarUnpack: ["executor/**"],
         directories: {
             output: "build",
             app: "dist",
             buildResources: "build-resources"
         },
+        protocols: [{
+            "name": "rabix-composer",
+            "role": "Editor",
+            "schemes": ["rabix-composer"]
+        }],
         mac: {
-            target: ["zip", "dir", "dmg"],
+            target: ["dmg"],
         },
         win: {
-            target: ["zip", "portable", "dir"],
+            target: ["nsis"],
         },
         linux: {
-            target: ["zip", "dir"],
+            target: ["AppImage"],
         },
+        nsis: {
+            oneClick: false,
+            perMachine: true,
+            allowElevation: true,
+            allowToChangeInstallationDirectory: true
+        },
+        fileAssociations: [{
+            ext: "cwl",
+            name: "CWL"
+        }]
 
     }
-
 });
 
-function getCurrentGitBranchSlug() {
+// maybeZipWindowsInstaller();
 
-    const gitHeadPath = path.join(process.cwd(), '.git/HEAD');
-    const ref = fs.readFileSync(gitHeadPath, "utf8");
-    const branchName = /ref: refs\/heads\/([^\n]+)/.exec(ref)[1];
-    return branchName.replace(/\//g, "-");
+
+function maybeZipWindowsInstaller() {
+    /**
+     * For Windows, we can't take a single-file artifact because of missing libraries.
+     * We need to pack the installer with other stuff that come with the build (.dll libs)
+     */
+    if (process.platform !== "win32") {
+        return data;
+    }
+
+
+    console.log("Archiving Windows installer...");
+    const [installerFilepath] = glob.sync("*.exe", {cwd: "build"});
+
+    if (!installerFilepath) {
+        throw new Error("Cannot find installer binary.");
+    }
+
+    const zipPath = "build/" + installerFilepath.slice(0, -3) + "zip";
+    const buildInfoPath = "latest.yml";
+    const unpackedDir = "win-unpacked";
+
+    const output = fs.createWriteStream(zipPath);
+    const archive = archiver("zip");
+
+    output.on("close", () => {
+        console.log("Archived " + archive.pointer() + " bytes");
+    });
+
+    archive.on("error", err => {
+        throw err;
+    });
+
+    archive.pipe(output);
+
+    archive.file(`build/${installerFilepath}`, {name: installerFilepath});
+    archive.file(`build/${buildInfoPath}`, {name: buildInfoPath});
+    archive.directory(`build/${unpackedDir}`, {name: unpackedDir});
+    return archive.finalize();
 }
+
+

@@ -1,8 +1,9 @@
 <ct-action-bar>
     <ct-tab-selector [distribute]="'auto'" [active]="viewMode" (activeChange)="switchTab($event)">
-        <ct-tab-selector-entry [disabled]="!tabsUnlocked()" [tabName]="'info'">App Info</ct-tab-selector-entry>
-        <ct-tab-selector-entry [disabled]="!tabsUnlocked()" [tabName]="'graph'">Graph View</ct-tab-selector-entry>
-        <ct-tab-selector-entry [tabName]="'code'" [disabled]="!tabsUnlocked() || !!unavailableError">Code
+        <ct-tab-selector-entry [disabled]="!tabsUnlocked()" data-test="info-tab" [tabName]="'info'">App Info</ct-tab-selector-entry>
+        <ct-tab-selector-entry [disabled]="!tabsUnlocked()" data-test="visual-tab" [tabName]="'graph'">Graph View</ct-tab-selector-entry>
+        <ct-tab-selector-entry [disabled]="!tabsUnlocked()" data-test="test-tab"   [tabName]="'test'">Test</ct-tab-selector-entry>
+        <ct-tab-selector-entry data-test="code-tab" [tabName]="'code'" [disabled]="!tabsUnlocked() || !!unavailableError">Code
         </ct-tab-selector-entry>
     </ct-tab-selector>
 
@@ -17,7 +18,7 @@
 
     <div class="full-size-table-display" *ngIf="!!unavailableError">
         <div class="vertically-aligned-cell text-md-center">
-            <p>This workflow is currently unavailable.</p>
+            <p>This app is currently unavailable.</p>
             <p>{{ unavailableError }}</p>
         </div>
     </div>
@@ -31,13 +32,19 @@
     </ct-code-editor>
 
     <ct-workflow-graph-editor *ngIf="viewMode === 'graph' && !isLoading && dataModel"
+                              [host]="this"
                               [data]="tabData"
                               [readonly]="isReadonly"
                               [(model)]="dataModel"
                               (change)="syncModelAndCode(false)"
-                              (draw)="onGraphDraw()"
+                              (draw)="onGraphDraw($event)"
                               class="editor-main">
     </ct-workflow-graph-editor>
+
+    <ct-graph-job-editor *ngIf="viewMode === 'test' && !isLoading && dataModel"
+                         [appID]="this.tabData.id"
+                         [model]="dataModel">
+    </ct-graph-job-editor>
 
     <ct-app-info *ngIf="viewMode === 'info' && !isLoading && dataModel"
                  [readonly]="isReadonly"
@@ -54,7 +61,7 @@
 
 <!--Header & Editor Column-->
 
-<ct-common-report-panel *ngIf="reportPanel" [host]="this"></ct-common-report-panel>
+<ct-common-report-panel [hidden]="!reportPanel" [host]="this" #reportPanelComponent></ct-common-report-panel>
 
 <ng-template #statusControls>
     <ct-common-status-controls [host]="this"></ct-common-status-controls>

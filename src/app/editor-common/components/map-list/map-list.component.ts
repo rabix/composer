@@ -16,29 +16,32 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
     template: `
         <div [formGroup]="formGroup" (change)="onInputsFormChange($event)">
             <div formArrayName="pairs">
-                
-                <ct-blank-tool-state *ngIf="!list.length && !readonly"
-                                     [buttonText]="'Add an Entry'"
-                                     (buttonClick)="add()">
-                    No entries defined.
-                </ct-blank-tool-state>
-                
-                <div *ngFor="let item of getPairControls(); let i = index" [formGroupName]="i" class="list-item">
 
-                       <input class="form-control key-input" formControlName="key" placeholder="key" [readonly]="readonly"/>
-                    
-                        <span class="input-group-addon add-on">:</span>
-                    
-                        <input class="form-control value-input" formControlName="value" placeholder="value" [readonly]="readonly"/>
-                    
-                        <div *ngIf="!readonly" class="remove-icon clickable ml-1 text-hover-danger"
-                             [ct-tooltip]="'Delete'"
-                             (click)="remove(i)">
-                            <i class="fa fa-trash"></i>
-                        </div>
+                <ct-blank-state *ngIf="!list.length && !readonly"
+                                [buttonText]="'Add an Entry'"
+                                [description]="'No entries defined.'"
+                                (buttonClick)="add()">
+                </ct-blank-state>
+
+                <div *ngFor="let item of getPairControls(); let i = index" [formGroupName]="i"
+                     class="list-item">
+
+                    <input class="form-control key-input" formControlName="key" placeholder="key"
+                           [readonly]="readonly"/>
+
+                    <span class="input-group-addon add-on">:</span>
+
+                    <input class="form-control value-input" formControlName="value"
+                           placeholder="value" [readonly]="readonly"/>
+
+                    <div *ngIf="!readonly" class="remove-icon"
+                         [ct-tooltip]="'Delete'"
+                         (click)="remove(i)">
+                        <i class="fa fa-trash clickable"></i>
+                    </div>
 
                 </div>
-                
+
             </div>
 
             <button type="button" *ngIf="list.length && !readonly"

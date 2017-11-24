@@ -1,0 +1,36 @@
+{
+    "class": "Workflow",
+    "cwlVersion": "v1.0",
+    "id": "marijanlekic89/div-nesto-input/wf1/0",
+    "label": "WF1",
+    "inputs": [],
+    "outputs": [],
+    "steps": [],
+    "sbg:project": "marijanlekic89/div-nesto-input",
+    "sbg:validationErrors": [],
+    "sbg:modifiedOn": 1507202390,
+    "sbg:id": "marijanlekic89/div-nesto-input/wf1/0",
+    "sbg:sbgMaintained": false,
+    "sbg:revision": 0,
+    "sbg:revisionsInfo": [
+        {
+            "sbg:modifiedOn": 1507202390,
+            "sbg:modifiedBy": "marijanlekic89",
+            "sbg:revisionNotes": null,
+            "sbg:revision": 0
+        }
+    ],
+    "sbg:projectName": "<div>Nesto <input>",
+    "sbg:latestRevision": 0,
+    "sbg:appVersion": [
+        "v1.0"
+    ],
+    "sbg:modifiedBy": "marijanlekic89",
+    "sbg:createdBy": "marijanlekic89",
+    "sbg:contributors": [
+        "marijanlekic89"
+    ],
+    "sbg:createdOn": 1507202390,
+    "sbg:publisher": "sbg",
+    "sbg:image_url": null
+}

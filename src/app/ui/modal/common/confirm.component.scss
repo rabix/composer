@@ -1,5 +1,13 @@
 :host {
-  .footer {
-    text-align: right;
-  }
+    .footer {
+        text-align: right;
+    }
+
+    .discard-button {
+        float: left;
+    }
+
+    .content {
+        white-space: pre;
+    }
 }

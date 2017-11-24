@@ -1,5 +1,4 @@
 import {Component, OnInit, ViewChild, ViewContainerRef} from "@angular/core";
-import {Observable} from "rxjs/Observable";
 import {LayoutService} from "../../core/layout/layout.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {StatusBarService} from "./status-bar.service";
@@ -13,7 +12,7 @@ import {StatusBarService} from "./status-bar.service";
             
             <!--Sidebar toggle button-->
             <span class="btn-group status-buttons sidebar-toggle-btn-group" >
-                <button class="sidebar-toggle btn btn-sm" data-test="sidebar-toggle"
+                <button class="sidebar-toggle btn btn-sm" data-test="sidebar-toggle-button"
                         [class.active]="layoutService.sidebarHidden"
                         (click)="layoutService.toggleSidebar()">
                     <i class="fa"

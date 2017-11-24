@@ -2,11 +2,11 @@ import {Injectable} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {ExecutorConfig} from "../../../electron/src/storage/types/executor-config";
-import {AppMetadata} from "../../../electron/src/storage/types/local-repository";
 import {RecentAppTab} from "../../../electron/src/storage/types/recent-app-tab";
 import {AuthCredentials} from "../auth/model/auth-credentials";
-import {TabData} from "../core/workbox/tab-data.interface";
+import {TabData} from "../../../electron/src/storage/types/tab-data-interface";
 import {IpcService} from "../services/ipc.service";
+import {AppMeta, AppMetaEntry} from "../../../electron/src/storage/types/app-meta";
 
 @Injectable()
 export class LocalRepositoryService {
@@ -21,6 +21,7 @@ export class LocalRepositoryService {
     private selectedAppsPanel: ReplaySubject<"myApps" | "publicApps"> = new ReplaySubject(1);
     private publicAppsGrouping: ReplaySubject<"toolkit" | "category"> = new ReplaySubject(1);
     private ignoredUpdateVersion: ReplaySubject<string>               = new ReplaySubject(1);
+    private appMeta: ReplaySubject<AppMeta[]>                         = new ReplaySubject(1);
 
     constructor(private ipc: IpcService) {
 
@@ -28,12 +29,13 @@ export class LocalRepositoryService {
         this.listen("recentApps").subscribe(this.recentApps);
         this.listen("localFolders").subscribe(this.localFolders);
         this.listen("expandedNodes").subscribe(this.expandedFolders);
-        this.listen("executorConfig").do(data => console.log("Passing executor config", data)).subscribe(this.executorConfig);
+        this.listen("executorConfig").subscribe(this.executorConfig);
         this.listen("selectedAppsPanel").subscribe(this.selectedAppsPanel);
         this.listen("publicAppsGrouping").subscribe(this.publicAppsGrouping);
         this.listen("activeCredentials").map(cred => AuthCredentials.from(cred)).subscribe(this.activeCredentials);
         this.listen("credentials").map(creds => creds.map(c => AuthCredentials.from(c))).subscribe(this.credentials);
         this.listen("ignoredUpdateVersion").subscribe(this.ignoredUpdateVersion);
+        this.listen("appMeta").subscribe(this.appMeta);
     }
 
     getIgnoredUpdateVersion(): Observable<string> {
@@ -103,30 +105,30 @@ export class LocalRepositoryService {
         }).toPromise();
     }
 
-    setFolderExpansion(nodeID: string, expanded: boolean): void {
+    setFolderExpansion(foldersToExpand: string | string [], isExpanded: boolean): void {
         this.expandedFolders.take(1)
             .subscribe(expandedFolders => {
-                const index = expandedFolders.indexOf(nodeID);
 
-                const shouldBeAdded   = expanded && index === -1;
-                const shouldBeRemoved = !expanded && index !== -1;
+                const patch = new Set(expandedFolders);
+                let modified = false;
 
-                const patch = expandedFolders.slice();
+                [].concat(foldersToExpand).forEach((item) => {
+                    const oldSize = patch.size;
 
-                if (shouldBeAdded) {
-                    patch.push(nodeID);
-                } else if (shouldBeRemoved) {
-                    patch.splice(index, 1);
-                }
+                    isExpanded ? patch.add(item) : patch.delete(item);
 
-                if (shouldBeAdded || shouldBeRemoved) {
+                    if (oldSize !== patch.size) {
+                        modified = true;
+                    }
+                });
+
+                if (modified) {
                     this.patch({
-                        expandedNodes: patch
+                        expandedNodes: Array.from(patch)
                     });
                 }
+
             });
-
-
     }
 
     private listen(key: string) {
@@ -137,12 +139,17 @@ export class LocalRepositoryService {
         return this.ipc.request("patchLocalRepository", data);
     }
 
-    addLocalFolders(...folders): Promise<any> {
+    addLocalFolders(folders, expandFolders: boolean = false): Promise<any> {
         return this.getLocalFolders().take(1).toPromise().then(existingFolders => {
             const missing = folders.filter(folder => existingFolders.indexOf(folder) === -1);
 
             if (missing.length === 0) {
                 return Promise.resolve();
+            }
+
+            if (expandFolders) {
+                // Expand added folders
+                this.setFolderExpansion(missing.concat("local"), true);
             }
 
             return this.patch({
@@ -153,7 +160,6 @@ export class LocalRepositoryService {
 
     removeLocalFolders(...folders): Promise<any> {
         return this.getLocalFolders().take(1).toPromise().then(existing => {
-
             const update = existing.filter(path => folders.indexOf(path) === -1);
 
             if (update.length === existing.length) {
@@ -190,9 +196,8 @@ export class LocalRepositoryService {
         return this.patch({executorConfig}).take(1).toPromise();
     }
 
-    getAppMeta(appID: string, key?: string): Observable<AppMetadata> {
-        return this.listen("appMeta")
-            .map(meta => {
+    getAppMeta<T>(appID: string, key?: keyof AppMeta): Observable<AppMeta> {
+        return this.appMeta.map(meta => {
                 const data = meta[appID];
 
                 if (key && data) {
@@ -204,7 +209,7 @@ export class LocalRepositoryService {
             });
     }
 
-    patchAppMeta(appID: string, key: keyof AppMetadata, value: any): Promise<any> {
+    patchAppMeta(appID: string, key: keyof AppMetaEntry, value: any): Promise<any> {
         return this.ipc.request("patchAppMeta", {
             profile: "local",
             appID,

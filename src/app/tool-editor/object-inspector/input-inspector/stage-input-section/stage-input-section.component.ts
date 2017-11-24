@@ -39,10 +39,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                 <div class="form-group flex-container" *ngIf="isFileType()">
                     <label>Load Content</label>
                     <span class="align-right">
-                    <ct-toggle-slider [formControl]="form.controls['loadContent']"
-                                      [off]="'No'"
-                                      [on]="'Yes'"
-                                      [disabled]="readonly">
+                    <ct-toggle-slider [formControl]="form.controls['loadContent']">
                     </ct-toggle-slider>
                 </span>
                 </div>
@@ -114,5 +111,10 @@ export class StageInputSectionComponent extends DirectiveBase implements Control
 
     registerOnTouched(fn: any): void {
         this.onTouched = fn;
+    }
+
+    setDisabledState(isDisabled: boolean): void {
+        this.readonly = isDisabled;
+        isDisabled ? this.form.controls["loadContent"].disable({emitEvent: false}) : this.form.controls["loadContent"].enable({emitEvent: false});
     }
 }

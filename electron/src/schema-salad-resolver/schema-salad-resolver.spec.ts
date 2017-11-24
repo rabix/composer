@@ -1,4 +1,5 @@
 import chai = require("chai");
+import {RecursiveNestingError} from "./errors/recursive-nesting.error";
 
 const assert   = chai.assert;
 const resolver = require("./schema-salad-resolver");
@@ -102,5 +103,31 @@ describe("Schema salad resolver", () => {
             assert.equal(resolvedSerialized, expectedSerialized);
             done();
         }).catch(done);
-    })
+    });
+
+    it("should detect recursive nesting as invalid cwl", function(done) {
+        const original = {
+            "class": "Workflow",
+            "inputs": [],
+            "outputs": [],
+            "steps": [
+                {
+                    "id": "step",
+                    "run": "test/recursive-workflow-stub.json"
+                }
+            ]
+        };
+
+        const originalSerialized = JSON.stringify(original, null, 4);
+
+        resolver.resolveContent(originalSerialized, __dirname).then(() => {
+            done(new Error("Should detect recursive nesting as invalid cwl"));
+        }, (err) => {
+            assert.instanceOf(err, RecursiveNestingError, "Should be instance of RecursiveNestingError, but instead got " + err.__proto__.constructor.toString());
+            done();
+        });
+
+
+    });
+
 });

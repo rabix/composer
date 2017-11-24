@@ -4,7 +4,7 @@ import {FormBuilder, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {HttpModule} from "@angular/http";
 import {BrowserModule} from "@angular/platform-browser";
 import "rxjs/Rx";
-import {AuthService} from "./auth/auth.service";
+import {AuthService, CREDENTIALS_REGISTRY} from "./auth/auth.service";
 import {MainComponent} from "./components/main/main.component";
 import {PlatformConnectionService} from "./core/auth/platform-connection.service";
 import {CoreModule} from "./core/core.module";
@@ -25,6 +25,7 @@ import {ToolEditorModule} from "./tool-editor/tool-editor.module";
 import {ModalService} from "./ui/modal/modal.service";
 import {UIModule} from "./ui/ui.module";
 import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
+import {OpenExternalFileService} from "./core/open-external-file/open-external-file.service";
 import {ConfigurationService} from "./app.config";
 import {LoginService} from "./services/login/login.service";
 import {LoginComponent} from "./login/login.component";
@@ -38,6 +39,10 @@ export function initConfiguration(_configurationService: ConfigurationService) {
 
 @NgModule({
     providers: [
+        {
+            provide: CREDENTIALS_REGISTRY,
+            useClass: LocalRepositoryService
+        },
         AuthService,
         DataGatewayService,
         DomEventService,
@@ -48,6 +53,7 @@ export function initConfiguration(_configurationService: ConfigurationService) {
         IpcService,
         JavascriptEvalService,
         LocalRepositoryService,
+        OpenExternalFileService,
         ModalService,
         PlatformConnectionService,
         PlatformRepositoryService,

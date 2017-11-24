@@ -4,33 +4,37 @@ import {CommandLineToolModel, WorkflowModel} from "cwlts/models";
 
 import * as Yaml from "js-yaml";
 import {LoadOptions} from "js-yaml";
-import "rxjs/add/observable/of";
-import "rxjs/add/operator/do";
-import "rxjs/add/operator/switchMap";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
+import {ExecutorOutput} from "../../../../electron/src/rabix-executor/executor-output";
 import {AppExecutionContext} from "../../../../electron/src/storage/types/executor-config";
+import {AppMetaManager} from "../../core/app-meta/app-meta-manager";
+import {APP_META_MANAGER} from "../../core/app-meta/app-meta-manager-factory";
 import {CodeSwapService} from "../../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../../core/data-gateway/data-gateway.service";
 import {AppHelper} from "../../core/helpers/AppHelper";
 import {ErrorWrapper} from "../../core/helpers/error-wrapper";
+import {ClosingDirtyAppsModalComponent} from "../../core/modals/closing-dirty-apps/closing-dirty-apps-modal.component";
 import {ProceedToEditingModalComponent} from "../../core/modals/proceed-to-editing-modal/proceed-to-editing-modal.component";
 import {PublishModalComponent} from "../../core/modals/publish-modal/publish-modal.component";
 import {AppTabData} from "../../core/workbox/app-tab-data";
 import {WorkboxService} from "../../core/workbox/workbox.service";
 import {ExecutorService} from "../../executor/executor.service";
-import {ErrorNotification, InfoNotification, NotificationBarService} from "../../layout/notification-bar/notification-bar.service";
+import {NotificationBarService} from "../../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {StatusControlProvider} from "../../layout/status-bar/status-control-provider.interface";
+import {LocalRepositoryService} from "../../repository/local-repository.service";
 import {PlatformRepositoryService} from "../../repository/platform-repository.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {AppExecutionContextModalComponent} from "../app-execution-context-modal/app-execution-context-modal.component";
+import {AppExecutionPreviewComponent} from "../app-execution-panel/app-execution-preview.component";
 import {AppValidatorService, AppValidityState} from "../app-validator/app-validator.service";
 import {PlatformAppService} from "../components/platform-app-common/platform-app.service";
 import {RevisionListComponent} from "../components/revision-list/revision-list.component";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
 import {APP_SAVER_TOKEN, AppSaver} from "../services/app-saving/app-saver.interface";
+import {CommonReportPanelComponent} from "../template-common/common-preview-panel/common-report-panel.component";
 
 export abstract class AppEditorBase extends DirectiveBase implements StatusControlProvider, OnInit, AfterViewInit {
 
@@ -50,6 +54,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     dataModel: CommandLineToolModel | WorkflowModel;
 
+    /** Flag to indicate if document is in Dirty state (when user interacts/modifies) */
+    isDirty = false;
+
     /** Flag to indicate the document is loading */
     isLoading = true;
 
@@ -57,6 +64,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     isValidatingCWL = false;
 
     reportPanel: "validation" | string;
+
+    showExecutionReportPanel = false;
 
     /** Flag to indicate if resolving content is in progress */
     isResolvingContent = false;
@@ -79,9 +88,14 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     isExecuting = false;
 
-    executionOutput = "";
-
     executionQueue = new Subject<any>();
+
+    executionJob: Object;
+
+    @ViewChild("reportPanelComponent", {read: CommonReportPanelComponent})
+    private reportPanelComponent: CommonReportPanelComponent;
+
+    private executionPreview: AppExecutionPreviewComponent;
 
     /** Template of the status controls that will be shown in the status bar */
     @ViewChild("statusControls")
@@ -90,8 +104,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     @ViewChild("inspector", {read: ViewContainerRef})
     protected inspectorHostView: ViewContainerRef;
 
-    protected changeTabLabel: (title: string) => void;
-    protected originalTabLabel: string;
     protected appSavingService: AppSaver;
 
     private modelCreated = false;
@@ -112,6 +124,11 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
      */
     private revisionChangingInProgress = false;
 
+    /**
+     * Show modal when app is dirty when changing revisions to prevent loosing changes
+     */
+    showModalIfAppIsDirtyBound = this.showModalIfAppIsDirty.bind(this);
+
     constructor(protected statusBar: StatusBarService,
                 protected notificationBar: NotificationBarService,
                 protected modal: ModalService,
@@ -122,16 +139,12 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 protected codeSwapService: CodeSwapService,
                 protected platformAppService: PlatformAppService,
                 protected platformRepository: PlatformRepositoryService,
+                protected localRepository: LocalRepositoryService,
                 protected workbox: WorkboxService,
                 protected executor: ExecutorService) {
 
         super();
 
-    }
-
-    registerOnTabLabelChange(update: (label: string) => void, originalLabel: string): void {
-        this.changeTabLabel   = update;
-        this.originalTabLabel = originalLabel;
     }
 
     ngOnInit() {
@@ -191,6 +204,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
          */
         schemaValidation.subscribe(state => {
             this.validationState = state;
+        }, (err) => {
+            console.warn("Error on schema validation", err);
         });
 
         /**
@@ -202,7 +217,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
          * code change that might have been there in the meantime so we know what to use as the base for
          * the model creation.
          */
-        firstValidationEnd.withLatestFrom(externalCodeChanges)
+
+        const validationStateChanges = firstValidationEnd.withLatestFrom(externalCodeChanges)
             .switchMap((data: [AppValidityState, string]) => {
                 const [validationState] = data;
                 return validationCompletion
@@ -210,66 +226,95 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     .map(state => [this.codeEditorContent.value, state]);
             })
             .withLatestFrom(
-                this.platformRepository.getAppMeta(this.tabData.id, "swapUnlocked"),
-                (outer, inner) => [...outer, inner])
-            .subscribeTracked(this, (data: [string, AppValidityState, boolean]) => {
-                const [code, validation, unlocked] = data;
+                AppHelper.isLocal(this.tabData.id) ? Observable.of(true)
+                    : this.platformRepository.getAppMeta(this.tabData.id, "swapUnlocked"),
+                (outer, inner) => [...outer, inner]).share();
 
-                this.isLoading = false;
 
-                if (!validation.isValidCWL) {
-                    return;
-                }
-
-                const continuation: Promise<any> = (
-                    this.viewMode === "code"
-                    || !this.dataModel
-                    || this.revisionChangingInProgress
-                ) ? this.resolveToModel(code) : Promise.resolve();
-
-                continuation.then(() => {
-                    /**
-                     * @name revisionHackFlagSwitchOff
-                     * @see revisionChangingInProgress
-                     * */
-                    this.revisionChangingInProgress = false;
-
-                    // copyOf property really matters only if we are working with the latest revision
-                    // otherwise, apps detached from copy state at some revision will still show locked state
-                    // and notification when switched to an older revision
-                    const props             = this.dataModel.customProps || {};
-                    const hasCopyOfProperty = props["sbg:copyOf"] && (~~props["sbg:revision"] === ~~props["sbg:latestRevision"]);
-
-                    if (!this.tabData.isWritable || this.tabData.dataSource === "local") {
-                        this.isUnlockable = false;
-                    } else if (hasCopyOfProperty && !unlocked) {
-
-                        const originalApp = this.dataModel.customProps["sbg:copyOf"];
-                        this.notificationBar.showNotification(new InfoNotification(`This app is a copy of ${originalApp}`));
-                        this.isUnlockable = true;
-                    }
-
-                    const isUnlockedAndUnlockableCopy = this.isUnlockable && hasCopyOfProperty && !unlocked;
-
-                    if (!this.tabData.isWritable || isUnlockedAndUnlockableCopy) {
-                        this.toggleLock(true);
-                    }
-                }, err => console.warn);
+        // On user interactions (changes) set app state to Dirty
+        validationStateChanges.skip(1).filter(() => this.revisionChangingInProgress === false)
+            .subscribeTracked(this, () => {
+                this.setAppDirtyState(true);
+            }, (err) => {
+                console.warn("Error on dirty checking stream", err);
             });
 
 
-        /** When types something in the code editor for the first time, add a star to the tab label */
-        /** This does not work very well, so disable it for now */
-        // firstDirtyCodeChange.subscribeTracked(this, isDirty => this.changeTabLabel(this.originalTabLabel + (isDirty ? " (modified)" : "")));
+        validationStateChanges.subscribeTracked(this, (data: [string, AppValidityState, boolean]) => {
+            const [code, validation, unlocked] = data;
 
+            this.isLoading = false;
+
+            if (!validation.isValidCWL) {
+                return;
+            }
+
+            const continuation: Promise<any> = (
+                this.viewMode === "code"
+                || !this.dataModel
+                || this.revisionChangingInProgress
+            ) ? this.resolveToModel(code) : Promise.resolve();
+
+            continuation.then(() => {
+                /**
+                 * @name revisionHackFlagSwitchOff
+                 * @see revisionChangingInProgress
+                 * */
+                this.revisionChangingInProgress = false;
+
+                // copyOf property really matters only if we are working with the latest revision
+                // otherwise, apps detached from copy state at some revision will still show locked state
+                // and notification when switched to an older revision
+                const props             = this.dataModel.customProps || {};
+                const hasCopyOfProperty = props["sbg:copyOf"] && (~~props["sbg:revision"] === ~~props["sbg:latestRevision"]);
+
+                if (!this.tabData.isWritable || this.tabData.dataSource === "local") {
+                    this.isUnlockable = false;
+                } else if (hasCopyOfProperty && !unlocked) {
+
+                    const originalApp = this.dataModel.customProps["sbg:copyOf"];
+                    this.notificationBar.showNotification(`This app is a copy of ${originalApp}`, {
+                        type: "info"
+                    });
+                    this.isUnlockable = true;
+                }
+
+                const isUnlockedAndUnlockableCopy = this.isUnlockable && hasCopyOfProperty && !unlocked;
+
+                if (!this.tabData.isWritable || isUnlockedAndUnlockableCopy) {
+                    this.toggleLock(true);
+                }
+            }, err => console.warn);
+        }, (err) => {
+            console.warn("Error on validation state changes", err);
+        });
 
         /** When the first validation ends, turn off the loader and determine which view we can show. Invalid app forces code view */
         firstValidationEnd.subscribe(state => {
             this.viewMode    = state.isValidCWL ? this.getPreferredTab() : "code";
             this.reportPanel = state.isValidCWL ? this.getPreferredReportPanel() : this.reportPanel;
+        }, (err) => {
+            console.warn("Error on first validation end", err);
         });
 
-        this.bindExecutionQueue();
+        if (AppHelper.isLocal(this.tabData.id)) {
+            this.localRepository.getAppMeta(this.tabData.id, "isDirty").subscribeTracked(this, (isModified) => {
+                this.isDirty = !!isModified;
+            });
+        } else {
+            this.platformRepository.getAppMeta(this.tabData.id, "isDirty").subscribeTracked(this, (isModified) => {
+                this.isDirty = !!isModified;
+            });
+        }
+    }
+
+    setAppDirtyState(isModified: boolean) {
+
+        if (AppHelper.isLocal(this.tabData.id)) {
+            this.localRepository.patchAppMeta(this.tabData.id, "isDirty", isModified);
+        } else {
+            this.platformRepository.patchAppMeta(this.tabData.id, "isDirty", isModified);
+        }
     }
 
     save(): void {
@@ -288,9 +333,17 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                  * but the code is actually up to date and the model isn't.
 
                  */
-                this.revisionChangingInProgress = true;
+
+                if (this.tabData.dataSource !== "local") {
+                    this.revisionChangingInProgress = true;
+                }
+
+                // After app is saved, app state is not Dirty any more
+                this.setAppDirtyState(false);
 
                 this.priorityCodeUpdates.next(update);
+
+
                 this.statusBar.stopProcess(proc, `Saved: ${appName}`);
             }, err => {
                 if (!err || !err.message) {
@@ -298,7 +351,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     return;
                 }
 
-                this.notificationBar.showNotification(new ErrorNotification(`Saving failed: ${err.message}`));
+                this.notificationBar.showNotification(`Saving failed: ${err.message}`);
                 this.statusBar.stopProcess(proc, `Could not save ${appName} (${err.message})`);
             });
     }
@@ -306,7 +359,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     publish(): void {
 
         if (!this.validationState.isValidCWL) {
-            this.notificationBar.showNotification(new ErrorNotification(`Cannot push this app because because it's doesn't match the proper JSON schema`));
+            this.notificationBar.showNotification(`Cannot push this app because because it's doesn't match the proper JSON schema`);
             return;
         }
 
@@ -317,6 +370,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
             modal.onSubmit = (...args: any[]) => {
                 return originalSubmit.apply(modal, args).then(appID => {
+
+                    // After new revision is load, app state is not Dirty any more
+                    this.setAppDirtyState(false);
 
                     const tab = this.workbox.getOrCreateAppTab({
                         id: AppHelper.getRevisionlessID(appID),
@@ -340,6 +396,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     ngAfterViewInit() {
         this.inspector.setHostView(this.inspectorHostView);
         super.ngAfterViewInit();
+        this.executionPreview = this.reportPanelComponent.getAppExecutionPreview();
+
+        this.bindExecutionQueue();
     }
 
     unlockEditing(): Promise<boolean> {
@@ -401,13 +460,12 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         return this.dataGateway.fetchFileContent(fid).take(1)
             .toPromise().then(result => {
                 this.priorityCodeUpdates.next(result);
+                this.setAppDirtyState(false);
                 return result;
             }).catch(err => {
                 this.revisionChangingInProgress   = false;
                 this.revisionList.loadingRevision = false;
-                this.notificationBar.showNotification(
-                    new ErrorNotification("Cannot open revision. " + new ErrorWrapper(err))
-                );
+                this.notificationBar.showNotification("Cannot open revision. " + new ErrorWrapper(err));
             });
     }
 
@@ -419,7 +477,12 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
         /** If switching to code mode, serialize the model first and update the editor text */
         if (this.viewMode !== "code" && tabName === "code") {
-            this.priorityCodeUpdates.next(this.getModelText());
+
+            if (this.isDirty) {
+                /** If switching to code mode, serialize only if there are changes made (dirty state) */
+                this.priorityCodeUpdates.next(this.getModelText());
+            }
+
             this.viewMode = tabName;
             return;
         }
@@ -441,10 +504,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         this.viewMode = tabName;
     }
 
-    /**
-     * When click on Resolve button (visible only if app is a local file and you are in Code mode)
-     */
-    resolveButtonClick(): void {
+    resolveCurrentContent(): void {
         this.resolveToModel(this.codeEditorContent.value).then(() => {
         }, err => console.warn);
     }
@@ -468,6 +528,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     editRunConfiguration() {
         const appID     = this.tabData.id;
         const appConfig = this.executor.getAppConfig(appID).take(1);
+
         appConfig.take(1).subscribeTracked(this, (context) => {
 
             const modal = this.modal.fromComponent(AppExecutionContextModalComponent, {
@@ -600,7 +661,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             return result;
         }, err => {
 
-            this.notificationBar.showNotification(new ErrorNotification(err.message || "Error occurred"));
+            this.notificationBar.showNotification(err.message || "An error has occurred");
 
             this.validationState.isValidCWL = false;
             this.validationState.errors     = [{
@@ -618,8 +679,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     protected toggleLock(locked: boolean): void {
 
-        if (locked === false
-        ) {
+        if (locked === false) {
             this.platformRepository.patchAppMeta(this.tabData.id, "swapUnlocked", true);
 
             this.isUnlockable = false;
@@ -674,7 +734,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             .switchMap((context: AppExecutionContext) => {
 
                 // If we have job path set, we can proceed with execution
-                if (context.jobPath) {
+                if (context) {
                     return Observable.of(context);
                 }
 
@@ -682,8 +742,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 const modal = this.modal.fromComponent(AppExecutionContextModalComponent, "Set Execution Parameters");
 
                 modal.confirmLabel = "Run";
-                modal.context = context;
-                modal.appID   = appID;
+                modal.context      = context;
+                modal.appID        = appID;
 
                 return new Observable(observer => {
                     modal.onSubmit = (raw) => {
@@ -708,51 +768,53 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
         // When a new execution is in the line, run it
         this.executionQueue
-            .switchMap(() => {                               // Switch so the execution gets cancelled when new one is scheduled
-                return this.runOnExecutor()                  // Starts the execution process
-                    .takeUntil(this.executionStop.do(() => this.executionOutput += "Execution Stopped"))
-                    .finally(() => {
-                        // When it ends, turn off the UI flag
-                        this.isExecuting = false;
-                    })
+
+        // Switch so the execution gets cancelled when new one is scheduled
+            .switchMap(() => {
+
+                // Starts the execution process
+                return this.runOnExecutor()
+
+                // Messages will be coming in but we need to unsubscribe at some point, so wait for the execution stream to emit
+                    .takeUntil(this.executionStop.do(() => this.executionPreview.addMessage("Execution stopped")))
+
+                    // When done, turn off the UI flag
+                    .finally(() => this.isExecuting = false)
+
+                    // We need to catch the error here, because if we catch it in the end, this whole queue will terminate
                     .catch(err => {
-                        // We need to catch the error here, because if we catch it in the end, queue sub will be disposed
                         const wrappedError = new ErrorWrapper(err).toString();
-                        this.executionOutput += `<div class="text-error">${wrappedError}</div>`;
+                        this.executionPreview.addMessage(wrappedError, "ERROR");
                         return Observable.empty();
                     });
             })
-            .subscribeTracked(this, (output: string | Object) => {
+            .subscribeTracked(this, (output: ExecutorOutput) => {
 
                 // Output result comes as a JSON object with info about execution results
                 // Otherwise, it's a string, most likely an [INFO] log from stderr, which we should print out
-                let localOutput = "";
-                if (typeof output === "object") {
-                    localOutput = JSON.stringify(output, null, 4);
-                } else if (typeof output === "string") {
-                    localOutput = output;
+
+                let outputMessage = "";
+
+                if (typeof output.message === "object") {
+                    outputMessage += JSON.stringify(output, null, 4);
                 } else {
-                    return;
+                    outputMessage += output.message || "";
                 }
 
-                // Replace newlines with html tags because we are colouring lines separately
-                localOutput = localOutput.replace(/\n/g, "<br/>");
+                this.executionPreview.addMessage(outputMessage, output.type);
 
-                /**
-                 * Relies on custom-added prefix to wrap up error messages
-                 * @name AppEditorBase.__errorDiscriminator
-                 * @see RabixExecutor.__errorPrefixing
-                 */
-                if (localOutput.startsWith("ERR: ")) {
-                    this.executionOutput += `<div class="text-error">${localOutput.slice(5)}</div>`;
-                } else {
-                    this.executionOutput += `<div>${localOutput}</div>`;
-                }
+
             });
 
         // Whenever a new app queues for execution, toggle the “isExecuting” GUI flag
-        this.executionQueue.subscribeTracked(this, () => {
-            this.executionOutput = "";
+        this.executionQueue.flatMap(() => {
+            const metaManager = this.injector.get(APP_META_MANAGER) as AppMetaManager;
+            return metaManager.getAppMeta("job").take(1);
+        }).subscribeTracked(this, job => {
+            this.executionPreview.clear();
+            this.executionPreview.job = job;
+
+            this.showExecutionReportPanel = true;
             this.toggleReport("execution", true);
 
             this.isExecuting = true;
@@ -768,15 +830,18 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         return new Observable(obs => {
 
             const modelObject = this.dataModel.serialize();
-            delete modelObject["sbg:job"]; // Bunny traverses mistakenly into this to look for actual inputs
+
+            /** FIXME: Bunny traverses mistakenly into this to look for actual inputs, check if it's resolved */
+            delete modelObject["sbg:job"];
+
             const modelText = Yaml.dump(modelObject, {});
 
             const runner = this.getExecutionContext().switchMap(context => {
+
                 return this.executor
-                    .run(this.tabData.id, modelText, context.jobPath, context.executionParams)
-                    .finally(() => {
-                        obs.complete();
-                    });
+                    .run(this.tabData.id, modelText, context.executionParams)
+                    .finally(() => obs.complete());
+
             }).subscribe(obs);
 
             return () => {
@@ -786,5 +851,34 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         });
     }
 
+    showModalIfAppIsDirty(): Promise<boolean> {
 
+        return new Promise((resolve, reject) => {
+
+            if (!this.isDirty) {
+                return resolve(true);
+            }
+
+            const modal = this.modal.fromComponent(ClosingDirtyAppsModalComponent, {
+                title: "Change revision"
+            });
+
+            modal.confirmationLabel = "Save";
+            modal.discardLabel      = "Change without saving";
+
+            modal.decision.take(1).subscribe((result) => {
+
+                if (result) {
+                    this.modal.close();
+                    this.save();
+                    reject();
+                } else {
+                    resolve(true);
+                    this.modal.close();
+                }
+            });
+
+        });
+
+    }
 }

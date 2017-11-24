@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
 import {AbstractControl, FormControl, FormGroup, Validators} from "@angular/forms";
 import {Observable} from "rxjs/Observable";
 import {User} from "../../../../../electron/src/sbg-api-client/interfaces/user";
@@ -8,12 +8,14 @@ import {SystemService} from "../../../platform-providers/system.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {GlobalService} from "../../global/global.service";
+import {NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
+import {GetStartedNotificationComponent} from "../../../layout/notification-bar/dynamic-notifications/get-started-notification/get-started-notification.component";
 
 @Component({
     selector: "ct-platform-credentials-modal",
     template: `
 
-        <form class="auth-form" data-test="form" (ngSubmit)="form.valid && submit()" [formGroup]="form">
+        <form class="auth-form" data-test="credentials-modal-form" (ngSubmit)="form.valid && applyChanges()" [formGroup]="form">
             <div class="m-2">
                 <input type="hidden" formControlName="user"/>
 
@@ -21,24 +23,26 @@ import {GlobalService} from "../../global/global.service";
                     <label class="col-xs-4 col-form-label">Platform:</label>
                     <div class="col-xs-8">
                         <ct-auto-complete [mono]="true"
-                                          [create]="false"
+                                          [create]="true"
                                           [sortField]="false"
                                           formControlName="url"
                                           [options]="platformList"
                                           [readonly]="tokenOnly"
-                                          data-test="platform-field"></ct-auto-complete>
+                                          data-test="credentials-modal-platform-field"></ct-auto-complete>
                     </div>
                 </div>
 
                 <div class="row form-group" [class.has-warning]="form.get('token').invalid">
                     <label class="col-xs-4 col-form-label">Developer Token:</label>
                     <div class="col-xs-8  form-inline token-form">
-                        <input data-test="token-field"
-                               [formControl]="form.get('token')"
+                        <input data-test="credentials-modal-token-field"
+                               formControlName="token"
                                class="form-control token-control"
                                type="password"/>
 
-                        <button class="ml-1 btn btn-secondary" type="button"
+                        <button class="ml-1 btn btn-secondary" 
+                                type="button"
+                                data-test="credentials-modal-get-token-button"
                                 [disabled]="form.get('url').invalid"
                                 (click)="openTokenPage()">Get Token
                         </button>
@@ -72,8 +76,12 @@ import {GlobalService} from "../../global/global.service";
             </div>
 
             <div class="modal-footer">
-                <button class="btn btn-secondary" type="button" (click)="close()">Cancel</button>
-                <button class="btn btn-primary" type="submit" [class.btn-loader]="form.pending" [disabled]="!form.valid || !form.dirty">
+                <button class="btn btn-secondary" type="button" (click)="close()" data-test="credentials-modal-cancel-button">Cancel</button>
+                <button class="btn btn-primary" 
+                        type="submit"
+                        data-test="credentials-modal-apply-button"
+                        [class.btn-loader]="form.pending" 
+                        [disabled]="!form.valid || !form.dirty">
                     <ng-container *ngIf="!form.pending">Apply</ng-container>
                     <ct-circular-loader class="loader-25" *ngIf="form.pending"></ct-circular-loader>
                 </button>
@@ -87,6 +95,9 @@ export class PlatformCredentialsModalComponent implements OnInit {
     /** Allow only token update. If this is true, platform will be disabled and username of the new token must match the old one. */
     @Input() tokenOnly = false;
 
+    /** Force user to be the active one in token only mode (when modal is open in order to add a specific user) */
+    @Input() forceActivateUser = false;
+
     /** Public API url */
     @Input() platform = "https://api.sbgenomics.com";
 
@@ -96,26 +107,28 @@ export class PlatformCredentialsModalComponent implements OnInit {
     /** Modal can be given preset with a token */
     @Input() token: string;
 
+    /** Submit (Apply) button stream */
+    @Output() submit = new EventEmitter();
+
     /** FormGroup for modal inputs */
     form: FormGroup;
 
     platformList = [
         {text: "Seven Bridges (Default)", value: "https://api.sbgenomics.com"},
-        {text: "Seven Bridges (Google Cloud Platform)", value: "https://gcp-api.sbgenomics.com"},
         {text: "Seven Bridges (EU)", value: "https://eu-api.sbgenomics.com"},
         {text: "Cancer Genomics Cloud", value: "https://cgc-api.sbgenomics.com"},
         {text: "Cavatica", value: "https://pgc-api.sbgenomics.com"},
-        {text: "Blood Profiling Atlas", value: "https://bpa-api.sbgenomics.com"},
     ];
 
     constructor(private system: SystemService,
                 private auth: AuthService,
                 private global: GlobalService,
                 private data: DataGatewayService,
+                private notificationBarService: NotificationBarService,
                 private modal: ModalService) {
     }
 
-    submit(): void {
+    applyChanges(): void {
 
         const {url, token, user} = this.form.getRawValue();
         const credentials        = new AuthCredentials(url, token, user);
@@ -138,20 +151,30 @@ export class PlatformCredentialsModalComponent implements OnInit {
 
                 let maybeUserUpdate = Promise.resolve();
 
-                if (isEditing && editedCredentials.equals(active)) {
-                    // If we are editing credentials that appear to be active, update it
-                    maybeUserUpdate = this.auth.setActiveCredentials(editedCredentials);
+                if (isEditing) {
+                    if (editedCredentials.equals(active) || this.forceActivateUser) {
+                        // If we are editing credentials that appear to be active, update it
+                        maybeUserUpdate = this.auth.setActiveCredentials(editedCredentials);
+                    }
 
-                } else if (all.length === 1) {
-                    // Otherwise, if we added new credentials, and it turns out that it's the first one,
-                    // activate that user
-                    maybeUserUpdate = this.auth.setActiveCredentials(all[0]);
+                } else {
+                    // Activate added credentials
+                    maybeUserUpdate = this.auth.setActiveCredentials(credentials);
+                    const component = this.notificationBarService.showDynamicNotification(GetStartedNotificationComponent, {
+                        type: "info"
+                    });
+
+                    component.environment = AuthCredentials.getPlatformLabel(url);
+                    component.username = user.username;
+
+                    component.dismiss.take(1).subscribe(() => {
+                        this.notificationBarService.dismissDynamicNotification(component);
+                    });
                 }
 
                 maybeUserUpdate.then(() => this.global.reloadPlatformData());
 
-                this.modal.close();
-
+                this.submit.next(true);
             });
 
     }

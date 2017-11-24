@@ -183,9 +183,8 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
     }
 
     ngAfterViewInit() {
-
         this.zone.runOutsideAngular(() => {
-            this.component = jQuery(this.el.nativeElement).selectize({
+            let selectizeOptions = {
                 // Add remove button only if its not a mono-selection (suggested input)
                 plugins: this.maxItems !== 1 ? ["remove_button"] : [],
                 delimiter: this.delimiter,
@@ -211,8 +210,11 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
                     direction: this.sortDirection || "asc"
                 } : undefined,
                 onChange: this.onChange.bind(this)
+            };
 
-            })[0].selectize;
+            this.component = jQuery(this.el.nativeElement).selectize(selectizeOptions)[0].selectize;
+
+            jQuery(".selectize-input").find("input:text").attr("data-test", "dropdown-input-field");
         });
 
 

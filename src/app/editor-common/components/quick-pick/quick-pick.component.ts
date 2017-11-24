@@ -44,9 +44,9 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                  [type]="type">
             </ct-expression-input>
 
-            <span class="remove-icon clickable ml-1 text-hover-danger"
+            <span class="remove-icon"
                   (click)="removeCustom($event, true)">
-                <i *ngIf="!readonly" [ct-tooltip]="'Delete'" class="fa fa-trash"></i>
+                <i *ngIf="!readonly" [ct-tooltip]="'Delete'" class="fa fa-trash clickable"></i>
             </span>
         </div>
     `
@@ -186,6 +186,7 @@ available types: {[label: string]: string | number} | string[]`);
 
         if (reset) {
             this._value.setValue("", this.type);
+            this.onChange(this._value);
         }
     }
 

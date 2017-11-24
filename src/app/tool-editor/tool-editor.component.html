@@ -1,10 +1,10 @@
 <!--Control Header-->
 <ct-action-bar>
     <ct-tab-selector [distribute]="'auto'" [active]="viewMode" (activeChange)="switchTab($event)">
-        <ct-tab-selector-entry [disabled]="!tabsUnlocked()" [tabName]="'info'">App Info</ct-tab-selector-entry>
-        <ct-tab-selector-entry [disabled]="!tabsUnlocked()" [tabName]="'gui'">Visual</ct-tab-selector-entry>
-        <ct-tab-selector-entry [disabled]="!tabsUnlocked()" [tabName]="'test'">Test</ct-tab-selector-entry>
-        <ct-tab-selector-entry [tabName]="'code'" [disabled]="!tabsUnlocked() || !!unavailableError">Code
+        <ct-tab-selector-entry [disabled]="!tabsUnlocked()" data-test="info-tab" [tabName]="'info'">App Info</ct-tab-selector-entry>
+        <ct-tab-selector-entry [disabled]="!tabsUnlocked()" data-test="visual-tab" [tabName]="'gui'">Visual</ct-tab-selector-entry>
+        <ct-tab-selector-entry [disabled]="!tabsUnlocked()" data-test="test-tab" [tabName]="'test'">Test</ct-tab-selector-entry>
+        <ct-tab-selector-entry data-test="code-tab" [tabName]="'code'" [disabled]="!tabsUnlocked() || !!unavailableError">Code
         </ct-tab-selector-entry>
     </ct-tab-selector>
 
@@ -20,7 +20,7 @@
 
     <div class="full-size-table-display" *ngIf="!!unavailableError">
         <div class="vertically-aligned-cell text-md-center">
-            <p>This tool is currently unavailable.</p>
+            <p>This app is currently unavailable.</p>
             <p>{{ unavailableError }}</p>
         </div>
     </div>
@@ -41,11 +41,12 @@
                            [formGroup]="toolGroup"
                            [model]="dataModel"></ct-tool-visual-editor>
 
-    <ct-job-editor *ngIf="viewMode === 'test' && !isLoading && dataModel"
-                   class="flex-col"
-                   [model]="dataModel"
-                   (update)="onJobUpdate($event); syncModelAndCode(false)"
-                   (reset)="syncModelAndCode(false)"></ct-job-editor>
+    <!--Test Editor-->
+    <ct-graph-job-editor *ngIf="viewMode === 'test' && !isLoading && workflowWrapper"
+                         (draw)="onGraphJobEditorDraw($event)"
+                         [appID]="tabData.id"
+                         [model]="workflowWrapper">
+    </ct-graph-job-editor>
 
     <ct-app-info *ngIf="viewMode === 'info' && !isLoading && dataModel"
                  class="gui-editor-component p-2"
@@ -63,7 +64,7 @@
     </ct-editor-inspector>
 </div>
 
-<ct-common-report-panel *ngIf="reportPanel" [host]="this">
+<ct-common-report-panel [hidden]="!reportPanel" [host]="this" #reportPanelComponent>
     <ct-command-line-preview *ngIf="reportPanel === 'commandLinePreview'" [commandLineParts]="commandLineParts | async">
     </ct-command-line-preview>
 </ct-common-report-panel>

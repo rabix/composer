@@ -9,20 +9,19 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
     selector: "ct-tool-input-list",
     template: `
         <div>
-
             <!--Blank Tool Screen-->
-            <ct-blank-tool-state *ngIf="!readonly && !entries.length && isField"
-                                 [title]="'Click the button to define a field for record.'"
-                                 [buttonText]="'Add field'"
-                                 (buttonClick)="addEntry()">
-            </ct-blank-tool-state>
+            <ct-blank-state *ngIf="!readonly && !entries.length && isField"
+                            [title]="'Click the button to define a field for record.'"
+                            [buttonText]="'Add field'"
+                            (buttonClick)="addEntry()">
+            </ct-blank-state>
 
             <div *ngIf="readonly && !entries.length" class="text-xs-center">
                 This tool doesn't specify any inputs
             </div>
 
             <!--List Header Row-->
-            <div class="editor-list-title" *ngIf="!!entries.length">
+            <div class="editor-list-title" [class.editable]="!readonly" *ngIf="!!entries.length">
                 <div class="col-xs-4">ID</div>
                 <div class="col-xs-3">Type</div>
                 <div class="col-xs-4">Binding</div>
@@ -36,61 +35,69 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                     class="input-list-items"
                     [class.record-input]="isRecordType(entry)">
 
-                    <div class="editor-list-item clickable"
-                         [ct-editor-inspector]="inspector"
-                         [ct-editor-inspector-target]="entry.loc"
-                         [ct-editor-inspector-readonly]="readonly"
-                         [ct-validation-class]="entry">
+                    <!--List item container-->
+                    <div class="editor-list-item-container">
 
-                        <!--ID Column-->
-                        <div class="col-xs-4 ellipsis">
-                            <ct-validation-preview
-                                    [entry]="entry"></ct-validation-preview>
-                            {{ entry.id }}
+                        <!--List item-->
+                        <div class="form-control editor-list-item clickable"
+                             [ct-editor-inspector]="inspector"
+                             [ct-editor-inspector-target]="entry.loc"
+                             [ct-editor-inspector-readonly]="readonly"
+                             [ct-validation-class]="entry">
+
+                            <!--ID Column-->
+                            <div class="col-xs-4 ellipsis">
+                                <ct-validation-preview
+                                        [entry]="entry"></ct-validation-preview>
+                                {{ entry.id }}
+                            </div>
+
+                            <!--Type Column-->
+                            <div class="col-xs-3 ellipsis">
+                                {{ entry.type | commandParameterType }}
+                            </div>
+
+                            <!--Binding Column-->
+                            <div class="col-xs-4 ellipsis" [class.col-xs-5]="readonly">
+                                {{ entry.inputBinding | commandInputBinding }}
+                            </div>
                         </div>
 
-                        <!--Type Column-->
-                        <div class="col-xs-3 ellipsis">
-                            {{ entry.type | commandParameterType }}
-                        </div>
+                        <!--Object Inspector Template -->
+                        <ng-template #inspector>
+                            <ct-editor-inspector-content>
+                                <div class="tc-header">{{ entry.id || entry.loc || "Input" }}</div>
+                                <div class="tc-body">
+                                    <ct-tool-input-inspector
+                                            [model]="model"
+                                            [input]="entry"
+                                            (save)="updateInput($event, 'inspector')"
+                                            [readonly]="readonly">
+                                    </ct-tool-input-inspector>
+                                </div>
+                            </ct-editor-inspector-content>
+                        </ng-template>
 
-                        <!--Binding Column-->
-                        <div class="col-xs-4 ellipsis" [class.col-xs-5]="readonly">
-                            {{ entry.inputBinding | commandInputBinding }}
-                        </div>
-
-                        <!--Actions Column-->
-                        <div *ngIf="!readonly" class="col-xs-1 align-right">
-                            <i [ct-tooltip]="'Delete'"
-                               class="fa fa-trash text-hover-danger"
-                               (click)="removeEntry(i)"></i>
+                        <!--Nested entries-->
+                        <div *ngIf="isRecordType(entry)" class="children pl-1 pr-1">
+                            <ct-tool-input-list [(entries)]="entry.type.fields"
+                                                (update)="updateInput(entry, 'recursive')"
+                                                [readonly]="readonly"
+                                                [parent]="entry"
+                                                [model]="model"
+                                                [location]="getFieldsLocation(i)"
+                                                [isField]="true">
+                            </ct-tool-input-list>
+                            <div>
+                            </div>
                         </div>
                     </div>
 
-                    <!--Object Inspector Template -->
-                    <ng-template #inspector>
-                        <ct-editor-inspector-content>
-                            <div class="tc-header">{{ entry.id || entry.loc || "Input" }}</div>
-                            <div class="tc-body">
-                                <ct-tool-input-inspector
-                                        [model]="model"
-                                        [input]="entry"
-                                        (save)="updateInput($event, 'inspector')"
-                                        [readonly]="readonly">
-                                </ct-tool-input-inspector>
-                            </div>
-                        </ct-editor-inspector-content>
-                    </ng-template>
-
-                    <div *ngIf="isRecordType(entry)" class="children pl-1 pr-1">
-                        <ct-tool-input-list [(entries)]="entry.type.fields"
-                                            (update)="updateInput(entry, 'recursive')"
-                                            [readonly]="readonly"
-                                            [parent]="entry"
-                                            [model]="model"
-                                            [location]="getFieldsLocation(i)"
-                                            [isField]="true">
-                        </ct-tool-input-list>
+                    <!--Actions Column-->
+                    <div *ngIf="!readonly" class="remove-icon">
+                        <i [ct-tooltip]="'Delete'"
+                           class="fa fa-trash clickable"
+                           (click)="removeEntry(i)"></i>
                     </div>
 
                 </li>
@@ -101,7 +108,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         <button *ngIf="!readonly && !!entries.length"
                 (click)="addEntry()"
                 type="button"
-                class="btn pl-0 btn-link no-outline no-underline-hover">
+                class="btn pl-0 btn-link no-outline no-underline-hover"
+                data-test="tool-add-input-button-small">
             <i class="fa fa-plus"></i> Add {{ isField ? "a Field" : "an Input" }}
         </button>
 

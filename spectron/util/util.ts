@@ -7,7 +7,6 @@ import {LocalRepository} from "../../electron/src/storage/types/local-repository
 import {UserRepository} from "../../electron/src/storage/types/user-repository";
 import rimraf = require("rimraf");
 import ITestCallbackContext = Mocha.ITestCallbackContext;
-import {encodeBase64} from "../../electron/src/security/encoder";
 
 interface FnTestConfig {
     localRepository: Partial<LocalRepository>;
@@ -21,6 +20,10 @@ interface FnTestConfig {
     retries: number;
     skipFetch: boolean;
     skipUpdateCheck: boolean;
+    prepareTestData: {
+        name: string,
+        content: string
+    }[];
 }
 
 function isDevServer() {
@@ -40,6 +43,14 @@ function findAppBinary() {
     }
 }
 
+export function getTestDir(context: ITestCallbackContext, appendPath?: string): string {
+    const title          = context.test.fullTitle();
+    const testRoot       = path.resolve(`${__dirname}/../../.testrun`);
+    const currentTestDir = [testRoot, title, appendPath].filter(v => v).join(path.sep).replace(/\s/g, "-");
+
+    return currentTestDir;
+}
+
 export function boot(context: ITestCallbackContext, testConfig: Partial<FnTestConfig> = {}): Promise<spectron.Application> {
 
     context.retries(testConfig.retries || 0);
@@ -48,23 +59,35 @@ export function boot(context: ITestCallbackContext, testConfig: Partial<FnTestCo
     const skipFetch       = testConfig.skipFetch !== false;
     const skipUpdateCheck = testConfig.skipUpdateCheck !== false;
 
-    const testTitle      = context.test.fullTitle();
-    const globalTestDir  = path.resolve(`${__dirname}/../../.testrun`);
-    const currentTestDir = `${globalTestDir}/${testTitle}`.replace(/\s/g, "-");
+    const currentTestDir = getTestDir(context);
+
+    if (testConfig.prepareTestData) {
+        testConfig.prepareTestData.forEach((data) => {
+            fs.outputFileSync([currentTestDir, data.name].join(path.sep), data.content);
+        });
+    }
 
     const profilesDirPath  = currentTestDir + "/profiles";
-    const localProfilePath = profilesDirPath + "/local.json";
+    const localProfilePath = profilesDirPath + "/local";
 
     testConfig.localRepository = Object.assign(new LocalRepository(), testConfig.localRepository || {});
 
-    fs.outputFileSync(localProfilePath, encodeBase64(JSON.stringify(testConfig.localRepository)));
+    testConfig.localRepository.openTabs = testConfig.localRepository.openTabs.map((tab) => {
+        if (tab.id.startsWith("test:")) {
+            tab.id = tab.id.replace("test:", currentTestDir);
+        }
+        return tab;
+    });
+
+
+    fs.outputFileSync(localProfilePath, JSON.stringify(testConfig.localRepository));
 
     if (testConfig.platformRepositories) {
         for (const userID in testConfig.platformRepositories) {
-            const profilePath = profilesDirPath + `/${userID}.json`;
+            const profilePath = profilesDirPath + `/${userID}`;
             const profileData = Object.assign(new UserRepository(), testConfig.platformRepositories[userID] || {});
 
-            fs.outputFileSync(profilePath, encodeBase64(JSON.stringify(profileData)));
+            fs.outputFileSync(profilePath, JSON.stringify(profileData));
         }
     }
 
@@ -108,11 +131,14 @@ export function shutdown(app: spectron.Application) {
         return;
     }
 
-    if (app.hasOwnProperty("testdir")) {
-        rimraf.sync(app["testdir"]);
-    }
-
-    return app.stop();
+    return app.stop().then(() => {
+        return new Promise((resolve, reject) => {
+            rimraf(app["testdir"], {maxBusyTries: 5}, (err) => {
+                if (err) return reject(err);
+                resolve();
+            });
+        });
+    });
 }
 
 export function partialProxy(module: string, overrides: Object = {}) {

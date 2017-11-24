@@ -18,19 +18,20 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                 <div>
 
                     <!--Blank Tool Screen-->
-                    <ct-blank-tool-state *ngIf="!readonly && !model.arguments.length"
-                                         [buttonText]="'Add an Argument'"
-                                         (buttonClick)="addEntry()">
-                        Parameters or options that are hard-coded for every execution of the tool. For example, you may 
-                        want to use a fixed name for an output file, so the output file name would be an argument not an input port.
-                    </ct-blank-tool-state>
+                    <ct-blank-state *ngIf="!readonly && !model.arguments.length"
+                                    [buttonText]="'Add an Argument'"
+                                    [learnMoreURL]="'http://docs.rabix.io/the-tool-editor#arguments'"
+                                    [description]="blankStateDescription"
+                                    (buttonClick)="addEntry()">
+                    </ct-blank-state>
 
                     <div *ngIf="readonly && !model.arguments.length" class="text-xs-center">
                         This tool doesn't specify any arguments
                     </div>
 
                     <!--List Header Row-->
-                    <div class="editor-list-title" *ngIf="!!model.arguments.length">
+                    <div class="editor-list-title" [class.editable]="!readonly"
+                         *ngIf="!!model.arguments.length">
                         <div class="col-sm-4">Value</div>
                         <div class="col-sm-3">Prefix</div>
                         <div class="col-sm-3">Separate</div>
@@ -44,7 +45,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                         <li *ngFor="let entry of model.arguments; let i = index"
                             class="input-list-items">
 
-                            <div class="editor-list-item clickable"
+                            <!--List item-->
+                            <div class="form-control editor-list-item clickable"
                                  [ct-validation-class]="entry"
                                  [ct-editor-inspector]="inspector"
                                  [ct-editor-inspector-target]="entry.loc">
@@ -55,13 +57,15 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                     {{ entry.toString() }}
                                     </span>
 
-                                    <ct-code-preview *ngIf="ctt.isIn && entry.valueFrom && entry.valueFrom.isExpression"
-                                                     (viewReady)="ctt.show()"
-                                                     [content]="entry.toString()"></ct-code-preview>
+                                    <ct-code-preview
+                                            *ngIf="ctt.isIn && entry.valueFrom && entry.valueFrom.isExpression"
+                                            (viewReady)="ctt.show()"
+                                            [content]="entry.toString()"></ct-code-preview>
                                 </ct-tooltip-content>
 
                                 <!--Value Column-->
-                                <div class="col-sm-4 ellipsis" [ct-tooltip]="ctt" [tooltipPlacement]="'top'">
+                                <div class="col-sm-4 ellipsis" [ct-tooltip]="ctt"
+                                     [tooltipPlacement]="'top'">
                                     <ct-validation-preview [entry]="entry"></ct-validation-preview>
                                     <span>
                                     {{ entry.toString() }}
@@ -87,14 +91,13 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                 'col-sm-2': readonly
                             }">{{ entry.position || 0 }}
                                 </div>
+                            </div>
 
-                                <!--Actions Column-->
-                                <div *ngIf="!readonly" class="col-sm-1 align-right">
-                                    <i [ct-tooltip]="'Delete'"
-                                       class="fa fa-trash text-hover-danger"
-                                       (click)="removeEntry(i)"></i>
-                                </div>
-
+                            <!--Actions Column-->
+                            <div *ngIf="!readonly" class="remove-icon">
+                                <i [ct-tooltip]="'Delete'"
+                                   class="fa fa-trash clickable"
+                                   (click)="removeEntry(i)"></i>
                             </div>
 
                             <!--Object Inspector Template -->
@@ -103,10 +106,10 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                     <div class="tc-header">{{ entry.loc || "Argument"}}</div>
                                     <div class="tc-body">
                                         <ct-argument-inspector
-                                            (save)="update.emit(model.arguments)"
-                                            [argument]="entry"
-                                            [readonly]="readonly"
-                                            [context]="context">
+                                                (save)="update.emit(model.arguments)"
+                                                [argument]="entry"
+                                                [readonly]="readonly"
+                                                [context]="context">
                                         </ct-argument-inspector>
                                     </div>
                                 </ct-editor-inspector-content>
@@ -120,7 +123,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                 <button *ngIf="!readonly && !!model.arguments.length"
                         (click)="addEntry()"
                         type="button"
-                        class="btn pl-0 btn-link no-outline no-underline-hover">
+                        class="btn pl-0 btn-link no-outline no-underline-hover"
+                        data-test="tool-add-argument-button-small">
                     <i class="fa fa-plus"></i> Add an Argument
                 </button>
             </div>
@@ -148,6 +152,9 @@ export class ArgumentListComponent extends DirectiveBase {
 
     @ViewChildren("inspector", {read: TemplateRef})
     inspectorTemplate: QueryList<TemplateRef<any>>;
+
+    blankStateDescription = `Parameters or options that are hard-coded for every execution of the tool. For example, you may 
+    want to use a fixed name for an output file, so the output file name would be an argument not an input port.`;
 
     constructor(public inspector: EditorInspectorService, private modal: ModalService) {
         super();

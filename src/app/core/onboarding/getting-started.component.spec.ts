@@ -50,7 +50,7 @@ describe("GettingStartedComponent", () => {
 
     it("should open 'adding a local workspace' link in browser", () => {
 
-        const wikiLink = "https://github.com/rabix/composer/wiki/Configuration#adding-a-local-workspace";
+        const wikiLink = "http://docs.rabix.io/rabix-composer-configuration#add-a-local-workspace";
 
         const toolDocsLink = fixture.debugElement.query(By.css("[data-test=local-workspace-link]"));
         const system       = fixture.debugElement.injector.get(SystemService);
@@ -63,7 +63,7 @@ describe("GettingStartedComponent", () => {
 
     it("should open 'connecting your Platform account.' link in browser", () => {
 
-        const wikiLink = "https://github.com/rabix/composer/wiki/Configuration#connecting-a-platform-account";
+        const wikiLink = "http://docs.rabix.io/rabix-composer-configuration#connect-a-platform-account";
 
         const toolDocsLink = fixture.debugElement.query(By.css("[data-test=connecting-platform-link]"));
         const system       = fixture.debugElement.injector.get(SystemService);
@@ -75,7 +75,7 @@ describe("GettingStartedComponent", () => {
     });
 
     it("should open 'Wrap your command line tool' link in browser", () => {
-        const wikiLink = "https://github.com/rabix/composer/wiki/Tool-editor-tutorial-1";
+        const wikiLink = "http://docs.rabix.io/tutorial-1-wrapping-samtools-sort";
 
         const toolDocsLink = fixture.debugElement.query(By.css("[data-test=tool-docs-link]"));
         const system       = fixture.debugElement.injector.get(SystemService);
@@ -87,7 +87,7 @@ describe("GettingStartedComponent", () => {
     });
 
     it("should open 'Edit a Platform workflow' link in browser", () => {
-        const wikiLink = "https://github.com/rabix/composer/wiki/Workflow-editor-tutorial-1";
+        const wikiLink = "http://docs.rabix.io/tutorial-1-a-platform-workflow";
 
         const toolDocsLink = fixture.debugElement.query(By.css("[data-test=platform-workflow-link]"));
         const system       = fixture.debugElement.injector.get(SystemService);
@@ -106,7 +106,7 @@ describe("GettingStartedComponent", () => {
         const system   = fixture.debugElement.injector.get(SystemService);
         const mailLink = spyOn(system, "openLink");
 
-        const getSupportBtn = fixture.debugElement.query(By.css("[data-test=get-support-btn]"));
+        const getSupportBtn = fixture.debugElement.query(By.css("[data-test=get-support-button]"));
         getSupportBtn.triggerEventHandler("click", {});
 
         expect(mailLink).toHaveBeenCalledTimes(1);
@@ -124,7 +124,7 @@ describe("GettingStartedComponent", () => {
         const modal    = fixture.debugElement.injector.get(ModalService);
         const modalSpy = spyOn(modal, "fromComponent");
 
-        const getSupportBtn = fixture.debugElement.query(By.css("[data-test=get-support-btn]"));
+        const getSupportBtn = fixture.debugElement.query(By.css("[data-test=get-support-button]"));
         getSupportBtn.triggerEventHandler("click", {});
 
         expect(modalSpy).toHaveBeenCalledWith(SendFeedbackModalComponent, jasmine.anything());

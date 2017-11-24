@@ -2,6 +2,7 @@
 
 # Rabix Composer
 [![Build Status](https://travis-ci.org/rabix/composer.svg?branch=master)](https://travis-ci.org/rabix/composer)
+[![Build status](https://ci.appveyor.com/api/projects/status/y4ksxv9uah0xmjy9?svg=true)](https://ci.appveyor.com/project/ivanbatic/composer)
 
 
 The Rabix Composer (codename Cottontail) is a graphical and code editor specially designed to work with the [Common Workflow Language](https://github.com/common-workflow-language/common-workflow-language). It is currently in beta testing. This repo includes the code for running Rabix Composer locally in dev mode and for building OS specific binaries.

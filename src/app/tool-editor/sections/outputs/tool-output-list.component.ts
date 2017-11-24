@@ -9,20 +9,19 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
     selector: "ct-tool-output-list",
     template: `
         <div>
-
             <!--Blank Tool Screen-->
-            <ct-blank-tool-state *ngIf="!readonly && !entries.length && isField"
-                                 [title]="'Click the button to define a field for record.'"
-                                 [buttonText]="'Add a field'"
-                                 (buttonClick)="addEntry()">
-            </ct-blank-tool-state>
+            <ct-blank-state *ngIf="!readonly && !entries.length && isField"
+                            [title]="'Click the button to define a field for record.'"
+                            [buttonText]="'Add a field'"
+                            (buttonClick)="addEntry()">
+            </ct-blank-state>
 
             <div *ngIf="readonly && !entries.length" class="text-xs-center">
                 This tool doesn't specify any outputs
             </div>
 
             <!--List Header Row-->
-            <div class="editor-list-title" *ngIf="!!entries.length">
+            <div class="editor-list-title" [class.editable]="!readonly" *ngIf="!!entries.length">
                 <div class="col-xs-4">ID</div>
                 <div class="col-xs-3">Type</div>
                 <div class="col-xs-5">Glob</div>
@@ -36,87 +35,90 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                     class="input-list-items"
                     [class.record-input]="isRecordType(entry)">
 
-                    <div class="editor-list-item clickable"
-                         [ct-editor-inspector]="inspector"
-                         [ct-editor-inspector-target]="entry.loc"
-                         [ct-editor-inspector-readonly]="readonly"
-                         [ct-validation-class]="entry">
+                    <!--List item container-->
+                    <div class="editor-list-item-container">
 
-                        <!--ID Column-->
-                        <div class="col-xs-4 ellipsis" [title]="entry.id">
-                            <ct-validation-preview
-                                    [entry]="entry"></ct-validation-preview>
-                            {{ entry.id }}
-                        </div>
+                        <!--List item-->
+                        <div class="form-control editor-list-item clickable"
+                             [ct-editor-inspector]="inspector"
+                             [ct-editor-inspector-target]="entry.loc"
+                             [ct-editor-inspector-readonly]="readonly"
+                             [ct-validation-class]="entry">
 
-                        <!--Type Column-->
-                        <div class="col-xs-3 ellipsis" [title]="entry.type">
-                            {{ entry.type | commandParameterType }}
-                        </div>
+                            <!--ID Column-->
+                            <div class="col-xs-4 ellipsis" [title]="entry.id">
+                                <ct-validation-preview
+                                        [entry]="entry"></ct-validation-preview>
+                                {{ entry.id }}
+                            </div>
+
+                            <!--Type Column-->
+                            <div class="col-xs-3 ellipsis" [title]="entry.type">
+                                {{ entry.type | commandParameterType }}
+                            </div>
 
 
-                        <!--Tooltip for Glob-->
-                        <ct-tooltip-content #ctt>
+                            <!--Tooltip for Glob-->
+                            <ct-tooltip-content #ctt>
                                 <span *ngIf="entry.outputBinding.glob && !entry.outputBinding.glob?.isExpression">
                                     {{ entry.outputBinding.glob.toString() }}
                                 </span>
 
-                            <ct-code-preview
-                                    *ngIf="ctt.isIn && entry.outputBinding.glob && entry.outputBinding.glob?.isExpression"
-                                    (viewReady)="ctt.show()"
-                                    [content]="entry.outputBinding.glob.toString()"></ct-code-preview>
-                        </ct-tooltip-content>
+                                <ct-code-preview
+                                        *ngIf="ctt.isIn && entry.outputBinding.glob && entry.outputBinding.glob?.isExpression"
+                                        (viewReady)="ctt.show()"
+                                        [content]="entry.outputBinding.glob.toString()"></ct-code-preview>
+                            </ct-tooltip-content>
 
-                        <!--Glob Column-->
-                        <div class="ellipsis"
-                             [ct-tooltip]="ctt"
-                             [tooltipPlacement]="'top'"
-                             [ngClass]="{
+                            <!--Glob Column-->
+                            <div class="ellipsis"
+                                 [ct-tooltip]="ctt"
+                                 [tooltipPlacement]="'top'"
+                                 [ngClass]="{
                                      'col-xs-4': !readonly,
                                      'col-xs-5': readonly
                                  }">
-                            {{ entry.outputBinding.glob | commandOutputGlob}}
-                        </div>
-
-                        <!--Actions Column-->
-                        <div *ngIf="!readonly" class="col-xs-1 align-right">
-                            <i [ct-tooltip]="'Delete'"
-                               class="fa fa-trash text-hover-danger"
-                               (click)="removeEntry(i)"></i>
-                        </div>
-
-                    </div>
-
-                    <!--Object Inspector Template -->
-                    <ng-template #inspector>
-                        <ct-editor-inspector-content>
-                            <div class="tc-header">{{ entry.id || entry.loc || "Output" }}</div>
-                            <div class="tc-body">
-                                <ct-tool-output-inspector
-                                        (save)="updateOutput(entry)"
-                                        [context]="context"
-                                        [model]="model"
-                                        [output]="entry"
-                                        [inputs]="inputs"
-                                        [readonly]="readonly">
-                                </ct-tool-output-inspector>
+                                {{ entry.outputBinding.glob | commandOutputGlob}}
                             </div>
-                        </ct-editor-inspector-content>
-                    </ng-template>
+                        </div>
 
-                    <!--Nested entries-->
-                    <div *ngIf="isRecordType(entry)" class="children pl-1 pr-1">
-                        <ct-tool-output-list [(entries)]="entry.type.fields"
-                                             (update)="updateOutput(entry)"
-                                             [readonly]="readonly"
-                                             [inputs]="inputs"
-                                             [parent]="entry"
-                                             [model]="model"
-                                             [location]="getFieldsLocation(i)"
-                                             [isField]="true">
-                        </ct-tool-output-list>
+                        <!--Object Inspector Template -->
+                        <ng-template #inspector>
+                            <ct-editor-inspector-content>
+                                <div class="tc-header">{{ entry.id || entry.loc || "Output" }}</div>
+                                <div class="tc-body">
+                                    <ct-tool-output-inspector
+                                            (save)="updateOutput(entry)"
+                                            [context]="context"
+                                            [model]="model"
+                                            [output]="entry"
+                                            [inputs]="inputs"
+                                            [readonly]="readonly">
+                                    </ct-tool-output-inspector>
+                                </div>
+                            </ct-editor-inspector-content>
+                        </ng-template>
+
+                        <!--Nested entries-->
+                        <div *ngIf="isRecordType(entry)" class="children pl-1 pr-1">
+                            <ct-tool-output-list [(entries)]="entry.type.fields"
+                                                 (update)="updateOutput(entry)"
+                                                 [readonly]="readonly"
+                                                 [inputs]="inputs"
+                                                 [parent]="entry"
+                                                 [model]="model"
+                                                 [location]="getFieldsLocation(i)"
+                                                 [isField]="true">
+                            </ct-tool-output-list>
+                        </div>
                     </div>
 
+                    <!--Actions Column-->
+                    <div *ngIf="!readonly" class="remove-icon">
+                        <i [ct-tooltip]="'Delete'"
+                           class="fa fa-trash clickable"
+                           (click)="removeEntry(i)"></i>
+                    </div>
                 </li>
             </ul>
         </div>
@@ -125,7 +127,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         <button *ngIf="!readonly && !!entries.length"
                 (click)="addEntry()"
                 type="button"
-                class="btn pl-0 btn-link no-outline no-underline-hover">
+                class="btn pl-0 btn-link no-outline no-underline-hover"
+                data-test="tool-add-output-button-small">
             <i class="fa fa-plus"></i> Add {{ isField ? "a Field" : "an Output" }}
         </button>
 
@@ -217,8 +220,7 @@ export class ToolOutputListComponent extends DirectiveBase {
             && entry.type.fields;
     }
 
-    updateOutput(output: CommandOutputParameterModel) {
-        output.validate(this.model.getContext(output)).then(noop, noop);
+    updateOutput() {
         this.update.emit(this.model.outputs);
     }
 }

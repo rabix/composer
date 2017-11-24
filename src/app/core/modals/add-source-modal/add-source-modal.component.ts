@@ -1,4 +1,4 @@
-import {Component} from "@angular/core";
+import {Component, Input} from "@angular/core";
 import {AuthService} from "../../../auth/auth.service";
 import {NativeSystemService} from "../../../native/system/native-system.service";
 import {LocalRepositoryService} from "../../../repository/local-repository.service";
@@ -14,8 +14,8 @@ import {PlatformCredentialsModalComponent} from "../platform-credentials-modal/p
     template: `
         <div class="header">
             <ct-tab-selector [distribute]="'auto'" [(active)]="activeTab">
-                <ct-tab-selector-entry tabName="local">Local</ct-tab-selector-entry>
-                <ct-tab-selector-entry tabName="platform">Platform</ct-tab-selector-entry>
+                <ct-tab-selector-entry tabName="local" data-test="local-tab">Local</ct-tab-selector-entry>
+                <ct-tab-selector-entry tabName="platform" data-test="platform-tab">Platform</ct-tab-selector-entry>
             </ct-tab-selector>
         </div>
 
@@ -42,7 +42,8 @@ import {PlatformCredentialsModalComponent} from "../platform-credentials-modal/p
                         <div *ngIf="closedProjectOptions.length > 0; else allProjectsAreAdded">
                             <p>Choose projects to add to the workspace:</p>
                             <div>
-                                <ct-auto-complete [(ngModel)]="selectedProjects"
+                                <ct-auto-complete data-test="add-source-modal-add-project"
+                                                  [(ngModel)]="selectedProjects"
                                                   [options]="closedProjectOptions"></ct-auto-complete>
                             </div>
                         </div>
@@ -69,7 +70,11 @@ import {PlatformCredentialsModalComponent} from "../platform-credentials-modal/p
             <ng-template #noUsers>
                 <p>You are not connected to any platform</p>
                 <p>
-                    <button type="button" class="btn btn-primary" (click)="openCredentialsForm()">Add a connection
+                    <button type="button" 
+                            data-test="add-source-modal-connection-button" 
+                            class="btn btn-primary" 
+                            (click)="openCredentialsForm()">
+                        Add a connection
                     </button>
                 </p>
             </ng-template>
@@ -83,8 +88,8 @@ import {PlatformCredentialsModalComponent} from "../platform-credentials-modal/p
             </ng-template>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" (click)="modal.close()">Cancel</button>
-                <button type="button" class="btn btn-primary" [disabled]="selectedProjects.length === 0"
+                <button type="button" class="btn btn-secondary" data-test="add-source-modal-cancel-button" (click)="modal.close()">Cancel</button>
+                <button type="button" class="btn btn-primary" data-test="add-source-modal-apply-button" [disabled]="selectedProjects.length === 0"
                         (click)="onDone()">Done
                 </button>
             </div>
@@ -93,7 +98,9 @@ import {PlatformCredentialsModalComponent} from "../platform-credentials-modal/p
 })
 export class AddSourceModalComponent extends DirectiveBase {
 
-    activeTab                                               = "local";
+    @Input()
+    activeTab: "local" | "platform" = "local";
+
     selectedProjects                                        = [];
     localFoldersToAdd                                       = [];
     closedProjectOptions: { value: string, text: string }[] = null;
@@ -126,7 +133,7 @@ export class AddSourceModalComponent extends DirectiveBase {
                 throw new Error("Trying to open a project, but there is no active platform set.");
             }
 
-            this.platformRepository.addOpenProjects(...this.selectedProjects).then(() => {
+            this.platformRepository.addOpenProjects(this.selectedProjects, true).then(() => {
                 this.modal.close();
             });
 
@@ -134,19 +141,24 @@ export class AddSourceModalComponent extends DirectiveBase {
     }
 
     selectLocalFolders() {
-        this.native.openFolder({
+        this.native.openFolderChoiceDialog({
             buttonLabel: "Add to Workspace"
         }, true).then(paths => {
             this.localFoldersToAdd = paths;
-            this.localRepository.addLocalFolders(...paths);
-            this.modal.close();
+            this.localRepository.addLocalFolders(paths, true).then(() => {
+                this.modal.close();
+            });
         }).catch(() => {
         });
 
     }
 
     openCredentialsForm() {
-        this.modal.fromComponent(PlatformCredentialsModalComponent, "Add Connection");
+        const modal = this.modal.fromComponent(PlatformCredentialsModalComponent, "Add Connection");
+
+        modal.submit.take(1).subscribe(() => {
+            this.modal.close();
+        });
     }
 
     openSettingsTab() {

@@ -305,7 +305,7 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
 
                 // Change id on workflow model so canvas can interact with it
                 this.workflowModel.changeIONodeId(this.port, value);
-                this.graph.redraw();
+                this.graph.draw();
 
                 if (this.isEnumType()) {
                     this.port.type.name = value;
@@ -323,8 +323,13 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
             }
         });
 
+        this.form.controls["typeForm"].valueChanges.subscribeTracked(this, (value) => {
+            this.workflowModel.validateConnectionsForIOPort(this.port);
+        });
+
         this.form.controls["fileTypes"].valueChanges.subscribeTracked(this, (value) => {
             this.port.fileTypes = value || [];
+            this.workflowModel.validateConnectionsForIOPort(this.port);
         });
 
         this.form.controls["description"].valueChanges.subscribeTracked(this, (description) => {
@@ -345,7 +350,7 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
         }
 
         this.port.label = val ? val : undefined;
-        this.graph.redraw();
+        this.graph.draw();
     }
 
     /**

@@ -7,7 +7,6 @@ import {AppExecutionContextModalComponent} from "./app-execution-context-modal/a
 import {AppExecutionPreviewComponent} from "./app-execution-panel/app-execution-preview.component";
 import {AppValidatorService} from "./app-validator/app-validator.service";
 import {AppInfoComponent} from "./components/app-info/app-info.component";
-import {BlankToolStateComponent} from "./components/blank-tool-state.component";
 import {CompactListComponent} from "./components/compact-list/compact-list.component";
 import {ExpressionInputComponent} from "./components/expression-input/expression-input.component";
 import {ExpressionModelListComponent} from "./components/expression-model-list/expression-model-list.component";
@@ -28,13 +27,14 @@ import {EditableDirective} from "./directives/editable.directive";
 import {EditorLayoutComponent} from "./editor-layout/editor-layout.component";
 import {ExpressionEditorComponent} from "./expression-editor/expression-editor.component";
 import {ModelExpressionEditorComponent} from "./expression-editor/model-expression-editor.component";
+import {GraphJobEditorComponent} from "./graph-job-editor/graph-job-editor.component";
+import {JobStepInspectorEntryComponent} from "./graph-job-editor/job-step-inspector-entry/job-step-inspector-entry.component";
+import {JobStepInspectorComponent} from "./graph-job-editor/job-step-inspector/job-step-inspector.component";
 import {DirectoryInputInspectorComponent} from "./inspector-forms/directory-input-inspector/directory-input-inspector.component";
 import {FileInputInspectorComponent} from "./inspector-forms/file-input-inspector.component";
 import {EditorInspectorContentComponent} from "./inspector/editor-inspector-content.component";
 import {EditorInspectorComponent} from "./inspector/editor-inspector.component";
 import {EditorInspectorDirective} from "./inspector/editor-inspector.directive";
-import {JobEditorEntryComponent} from "./job-editor/job-editor-entry.component";
-import {JobEditorComponent} from "./job-editor/job-editor.component";
 import {EditorPanelComponent} from "./layout/editor-panel/editor-panel.component";
 import {FileDefContentPipe} from "./pipes/file-def-content.pipe";
 import {FileDefNamePipe} from "./pipes/file-def-name.pipe";
@@ -45,77 +45,80 @@ import {CommonStatusControlsComponent} from "./template-common/common-status-con
 
 @NgModule({
     declarations: [
-        BlankToolStateComponent,
+        AppExecutionContextModalComponent,
+        AppExecutionPreviewComponent,
+        AppInfoComponent,
+        CommonDocumentControlsComponent,
+        CommonReportPanelComponent,
+        CommonStatusControlsComponent,
         CompactListComponent,
+        DirectoryInputInspectorComponent,
         EditableDirective,
         EditorInspectorComponent,
         EditorInspectorContentComponent,
         EditorInspectorDirective,
+        EditorLayoutComponent,
+        EditorPanelComponent,
         ExpressionEditorComponent,
         ExpressionInputComponent,
         ExpressionModelListComponent,
         FileDefContentPipe,
         FileDefNamePipe,
-        JobEditorComponent,
-        JobEditorEntryComponent,
+        FileInputInspectorComponent,
+        GraphJobEditorComponent,
+        HintsComponent,
+        InputTypeSelectComponent,
+        JobStepInspectorEntryComponent,
         KeyValueInputComponent,
         KeyValueListComponent,
+        MapListComponent,
         ModelExpressionEditorComponent,
         QuickPickComponent,
+        RequirementInputComponent,
         RevisionListComponent,
+        SymbolsComponent,
         ValidationClassDirective,
         ValidationPreviewComponent,
         ValidationReportComponent,
         ValidationTextPipe,
-        FileInputInspectorComponent,
-        MapListComponent,
-        SymbolsComponent,
-        InputTypeSelectComponent,
-        AppInfoComponent,
-        EditorLayoutComponent,
-        EditorPanelComponent,
-        HintsComponent,
-        DirectoryInputInspectorComponent,
-        RequirementInputComponent,
-        AppExecutionPreviewComponent,
-        AppExecutionContextModalComponent,
-        CommonDocumentControlsComponent,
-        CommonStatusControlsComponent,
-        CommonReportPanelComponent,
+        JobStepInspectorComponent
+
     ],
     exports: [
+        AppExecutionPreviewComponent,
+        AppInfoComponent,
+        CommonDocumentControlsComponent,
+        CommonReportPanelComponent,
         MapListComponent,
-        BlankToolStateComponent,
+        CommonStatusControlsComponent,
         CompactListComponent,
-        FileInputInspectorComponent,
         EditableDirective,
         EditorInspectorComponent,
         EditorInspectorContentComponent,
         EditorInspectorDirective,
+        EditorLayoutComponent,
         ExpressionEditorComponent,
         ExpressionInputComponent,
         ExpressionModelListComponent,
         FileDefContentPipe,
         FileDefNamePipe,
-        JobEditorComponent,
+        FileInputInspectorComponent,
+        GraphJobEditorComponent,
+        HintsComponent,
+        InputTypeSelectComponent,
+        JobStepInspectorComponent,
+        JobStepInspectorEntryComponent,
         KeyValueInputComponent,
         KeyValueListComponent,
+        MapListComponent,
         ModelExpressionEditorComponent,
         QuickPickComponent,
+        RequirementInputComponent,
         RevisionListComponent,
+        SymbolsComponent,
         ValidationClassDirective,
         ValidationPreviewComponent,
         ValidationReportComponent,
-        SymbolsComponent,
-        InputTypeSelectComponent,
-        AppInfoComponent,
-        EditorLayoutComponent,
-        HintsComponent,
-        RequirementInputComponent,
-        AppExecutionPreviewComponent,
-        CommonDocumentControlsComponent,
-        CommonStatusControlsComponent,
-        CommonReportPanelComponent
     ],
     entryComponents: [
         EditorInspectorComponent,
