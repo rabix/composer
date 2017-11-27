@@ -148,9 +148,9 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
 
         if (changes.readonly) {
             if (this.readonly) {
-                this.control.disable({emitEvent: false});
+                this.control.disable({onlySelf: true, emitEvent: false});
             } else {
-                this.control.enable({emitEvent: false});
+                this.control.enable({onlySelf: true, emitEvent: false});
             }
 
         }

@@ -42,11 +42,11 @@ export class ToolInputInspectorComponent extends DirectiveBase implements OnInit
         this.disabled = value;
         if (this.form) {
             if (this.disabled) {
-                this.form.controls["basicInputSection"].disable();
-                this.form.controls["description"].disable();
+                this.form.controls["basicInputSection"].disable({onlySelf: true, emitEvent: false});
+                this.form.controls["description"].disable({onlySelf: true, emitEvent: false});
             } else {
-                this.form.controls["basicInputSection"].enable();
-                this.form.controls["description"].enable();
+                this.form.controls["basicInputSection"].enable({onlySelf: true, emitEvent: false});
+                this.form.controls["description"].enable({onlySelf: true, emitEvent: false});
             }
         }
     }
@@ -71,7 +71,7 @@ export class ToolInputInspectorComponent extends DirectiveBase implements OnInit
             stageInputSection: this.input
         });
 
-        this.tracked = this.form.valueChanges.skip(1).subscribe(() => {
+        this.tracked = this.form.valueChanges.subscribe(() => {
             this.save.next(this.input);
         });
     }
