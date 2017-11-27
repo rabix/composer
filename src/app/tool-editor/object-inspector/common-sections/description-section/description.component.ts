@@ -163,7 +163,8 @@ export class DescriptionComponent extends DirectiveBase implements ControlValueA
     setDisabledState(isDisabled: boolean): void {
         Object.keys(this.form.controls).forEach((item) => {
             const control = this.form.controls[item];
-            isDisabled ? control.disable() : control.enable();
-        })
+            isDisabled ? control.disable({onlySelf: true, emitEvent: false})
+                : control.enable({onlySelf: true, emitEvent: false});
+        });
     }
 }

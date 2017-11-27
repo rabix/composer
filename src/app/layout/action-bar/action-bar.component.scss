@@ -13,6 +13,7 @@
         $borderSize: 1px;
         $buttonMargins: 2px;
         $buttonHeight: $action-bar-height - 2*$borderSize - 2*$buttonMargins;
+
         &:not(".text-inherit") {
             font-size: $font-size-base;
         }
@@ -20,19 +21,26 @@
         margin: $buttonMargins 0 $buttonMargins 0;
 
         height: $buttonHeight;
-        background: transparent;
         border-radius: $input-border-radius;
 
-        border-color: transparent;
-        color: $layout-text-color-faded;
+        &.control-button {
 
-        &:hover {
+            border-color: transparent;
+            background: transparent;
             color: $layout-text-color;
-            background: #333;
-            border: $input-btn-border-width solid #6d6d6d;
 
-            &:disabled {
-                border-color: transparent;
+            &:hover {
+                color: $layout-text-color;
+                background: #333;
+                border: $input-btn-border-width solid #6d6d6d;
+
+                &:disabled {
+                    border-color: transparent;
+                }
+            }
+
+            &:active {
+                background: #343434;
             }
         }
 
@@ -41,8 +49,5 @@
             outline: none;
         }
 
-        &:active {
-            background: #343434;
-        }
     }
 }

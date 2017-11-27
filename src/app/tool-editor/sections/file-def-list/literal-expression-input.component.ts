@@ -162,7 +162,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
             const editor = this.modal.fromComponent(ModelExpressionEditorComponent, {
                 backdrop: true,
                 closeOnOutsideClick: false,
-                title: "Edit Expression"
+                title: "Expression Editor"
             });
 
             editor.readonly = this.readonly;

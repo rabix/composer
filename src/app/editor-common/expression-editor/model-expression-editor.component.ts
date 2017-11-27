@@ -40,7 +40,7 @@ export class ModelExpressionEditorComponent implements OnInit {
 
             return this.model.evaluate(this.context).then(res => {
                 if (this.model.getScript() === "") {
-                    return "There is no expression defined.";
+                    return "Expression result will appear here";
                 }
 
                 return JSON.stringify(res, null, 4) || "undefined";

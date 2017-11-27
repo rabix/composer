@@ -91,11 +91,11 @@ export class RequirementInputComponent extends DirectiveBase implements ControlV
             this.editType = "full";
             this.form.controls["class"].setValue(obj.class, {onlySelf: true});
             if (this.readonly) {
-                this.form.controls["class"].disable({onlySelf: true});
+                this.form.controls["class"].disable({onlySelf: true, emitEvent: false});
             }
 
             if (obj.value instanceof ExpressionModel) {
-                this.form.controls["value"].setValue(obj.value, {onlySelf: true});
+                this.form.controls["value"].setValue(obj.value, {onlySelf: true, emitEvent: false});
             } else {
                 this.editType = "half";
                 this.value = JSON.stringify(obj.value);
@@ -103,9 +103,9 @@ export class RequirementInputComponent extends DirectiveBase implements ControlV
 
         } else if (obj.class !== undefined && obj.value === undefined) {
             this.editType = "half";
-            this.form.controls["class"].setValue(obj.class, {onlySelf: true});
+            this.form.controls["class"].setValue(obj.class, {onlySelf: true, emitEvent: false});
             if (this.readonly) {
-                this.form.controls["class"].disable({onlySelf: true});
+                this.form.controls["class"].disable({onlySelf: true, emitEvent: false});
             }
             this.value = JSON.stringify(obj.customProps);
 
