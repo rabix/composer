@@ -25,6 +25,8 @@ import {ModalService} from "./ui/modal/modal.service";
 import {UIModule} from "./ui/ui.module";
 import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
 import {AppUpdateService} from "./editor-common/services/app-update/app-updating.service";
+import {OpenExternalFileService} from "./core/open-external-file/open-external-file.service";
+
 
 @NgModule({
     providers: [
@@ -41,6 +43,7 @@ import {AppUpdateService} from "./editor-common/services/app-update/app-updating
         IpcService,
         JavascriptEvalService,
         LocalRepositoryService,
+        OpenExternalFileService,
         ModalService,
         PlatformConnectionService,
         PlatformRepositoryService,

@@ -15,12 +15,13 @@ import {ToolInputListComponent} from "./tool-input-list.component";
             <div class="tc-body">
 
                 <!--Blank Tool Screen-->
-                <ct-blank-tool-state *ngIf="!readonly && !model?.inputs.length"
-                                     data-test="tool-add-input-button"
-                                     [buttonText]="'Add an Input'"
-                                     [description]="blankStateDescription"
-                                     (buttonClick)="addEntry()">
-                </ct-blank-tool-state>
+                <ct-blank-state *ngIf="!readonly && !model?.inputs.length"
+                                data-test="tool-add-input-button"
+                                [buttonText]="'Add an Input'"
+                                [learnMoreURL]="'http://docs.rabix.io/the-tool-editor#input-ports'"
+                                [description]="blankStateDescription"
+                                (buttonClick)="addEntry()">
+                </ct-blank-state>
 
                 <!--List of entries-->
                 <ct-tool-input-list [(entries)]="model.inputs"

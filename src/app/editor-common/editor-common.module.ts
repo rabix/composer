@@ -7,7 +7,6 @@ import {AppExecutionContextModalComponent} from "./app-execution-context-modal/a
 import {AppExecutionPreviewComponent} from "./app-execution-panel/app-execution-preview.component";
 import {AppValidatorService} from "./app-validator/app-validator.service";
 import {AppInfoComponent} from "./components/app-info/app-info.component";
-import {BlankToolStateComponent} from "./components/blank-tool-state.component";
 import {CompactListComponent} from "./components/compact-list/compact-list.component";
 import {ExpressionInputComponent} from "./components/expression-input/expression-input.component";
 import {ExpressionModelListComponent} from "./components/expression-model-list/expression-model-list.component";
@@ -36,8 +35,6 @@ import {FileInputInspectorComponent} from "./inspector-forms/file-input-inspecto
 import {EditorInspectorContentComponent} from "./inspector/editor-inspector-content.component";
 import {EditorInspectorComponent} from "./inspector/editor-inspector.component";
 import {EditorInspectorDirective} from "./inspector/editor-inspector.directive";
-import {JobEditorEntryOldComponent} from "./job-editor-old/job-editor-entry.component";
-import {JobEditorOldComponent} from "./job-editor-old/job-editor.component";
 import {EditorPanelComponent} from "./layout/editor-panel/editor-panel.component";
 import {FileDefContentPipe} from "./pipes/file-def-content.pipe";
 import {FileDefNamePipe} from "./pipes/file-def-name.pipe";
@@ -51,7 +48,6 @@ import {CommonStatusControlsComponent} from "./template-common/common-status-con
         AppExecutionContextModalComponent,
         AppExecutionPreviewComponent,
         AppInfoComponent,
-        BlankToolStateComponent,
         CommonDocumentControlsComponent,
         CommonReportPanelComponent,
         CommonStatusControlsComponent,
@@ -72,8 +68,6 @@ import {CommonStatusControlsComponent} from "./template-common/common-status-con
         GraphJobEditorComponent,
         HintsComponent,
         InputTypeSelectComponent,
-        JobEditorEntryOldComponent,
-        JobEditorOldComponent,
         JobStepInspectorEntryComponent,
         KeyValueInputComponent,
         KeyValueListComponent,
@@ -93,9 +87,9 @@ import {CommonStatusControlsComponent} from "./template-common/common-status-con
     exports: [
         AppExecutionPreviewComponent,
         AppInfoComponent,
-        BlankToolStateComponent,
         CommonDocumentControlsComponent,
         CommonReportPanelComponent,
+        MapListComponent,
         CommonStatusControlsComponent,
         CompactListComponent,
         EditableDirective,
@@ -112,7 +106,6 @@ import {CommonStatusControlsComponent} from "./template-common/common-status-con
         GraphJobEditorComponent,
         HintsComponent,
         InputTypeSelectComponent,
-        JobEditorOldComponent,
         JobStepInspectorComponent,
         JobStepInspectorEntryComponent,
         KeyValueInputComponent,

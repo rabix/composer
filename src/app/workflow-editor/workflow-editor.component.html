@@ -42,8 +42,8 @@
     </ct-workflow-graph-editor>
 
     <ct-graph-job-editor *ngIf="viewMode === 'test' && !isLoading && dataModel"
-                            [appID]="this.tabData.id"
-                            [model]="dataModel">
+                         [appID]="this.tabData.id"
+                         [model]="dataModel">
     </ct-graph-job-editor>
 
     <ct-app-info *ngIf="viewMode === 'info' && !isLoading && dataModel"

@@ -9,12 +9,12 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
     selector: "ct-tool-output-list",
     template: `
         <div>
-             <!--Blank Tool Screen-->
-            <ct-blank-tool-state *ngIf="!readonly && !entries.length && isField"
-                                 [title]="'Click the button to define a field for record.'"
-                                 [buttonText]="'Add a field'"
-                                 (buttonClick)="addEntry()">
-            </ct-blank-tool-state>
+            <!--Blank Tool Screen-->
+            <ct-blank-state *ngIf="!readonly && !entries.length && isField"
+                            [title]="'Click the button to define a field for record.'"
+                            [buttonText]="'Add a field'"
+                            (buttonClick)="addEntry()">
+            </ct-blank-state>
 
             <div *ngIf="readonly && !entries.length" class="text-xs-center">
                 This tool doesn't specify any outputs
@@ -48,7 +48,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                             <!--ID Column-->
                             <div class="col-xs-4 ellipsis" [title]="entry.id">
                                 <ct-validation-preview
-                                    [entry]="entry"></ct-validation-preview>
+                                        [entry]="entry"></ct-validation-preview>
                                 {{ entry.id }}
                             </div>
 
@@ -65,9 +65,9 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                 </span>
 
                                 <ct-code-preview
-                                    *ngIf="ctt.isIn && entry.outputBinding.glob && entry.outputBinding.glob?.isExpression"
-                                    (viewReady)="ctt.show()"
-                                    [content]="entry.outputBinding.glob.toString()"></ct-code-preview>
+                                        *ngIf="ctt.isIn && entry.outputBinding.glob && entry.outputBinding.glob?.isExpression"
+                                        (viewReady)="ctt.show()"
+                                        [content]="entry.outputBinding.glob.toString()"></ct-code-preview>
                             </ct-tooltip-content>
 
                             <!--Glob Column-->
@@ -88,12 +88,12 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                 <div class="tc-header">{{ entry.id || entry.loc || "Output" }}</div>
                                 <div class="tc-body">
                                     <ct-tool-output-inspector
-                                        (save)="updateOutput(entry)"
-                                        [context]="context"
-                                        [model]="model"
-                                        [output]="entry"
-                                        [inputs]="inputs"
-                                        [readonly]="readonly">
+                                            (save)="updateOutput(entry)"
+                                            [context]="context"
+                                            [model]="model"
+                                            [output]="entry"
+                                            [inputs]="inputs"
+                                            [readonly]="readonly">
                                     </ct-tool-output-inspector>
                                 </div>
                             </ct-editor-inspector-content>

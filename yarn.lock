@@ -1735,9 +1735,9 @@ cwl-svg@1.1.0:
   dependencies:
     core-js "^2.5.1"
 
-cwlts@1.15.8:
-  version "1.15.8"
-  resolved "https://registry.yarnpkg.com/cwlts/-/cwlts-1.15.8.tgz#c31cf7151121b0b2ad470a30a44a010e91bc7315"
+cwlts@1.15.11:
+  version "1.15.11"
+  resolved "https://registry.yarnpkg.com/cwlts/-/cwlts-1.15.11.tgz#e66d515f00e4092d54dfcf784b6fe2d9fb8e6467"
 
 cyclist@~0.2.2:
   version "0.2.2"
