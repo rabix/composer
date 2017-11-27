@@ -11,9 +11,9 @@ export class DisableFormControlDirective {
         if (!this.formControl) {
             return;
         } else if (s) {
-            this.formControl.disable();
+            this.formControl.disable({onlySelf: true, emitEvent: false});
         } else {
-            this.formControl.enable();
+            this.formControl.enable({onlySelf: true, emitEvent: false});
         }
 
     }

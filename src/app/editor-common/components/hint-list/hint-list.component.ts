@@ -11,7 +11,6 @@ import {ErrorCode} from "cwlts/models/helpers/validation";
     template: `
         <!--Blank Tool Screen-->
         <ct-blank-state *ngIf="!readonly && !model.hints.length"
-                        data-test="tool-add-hint-button"
                         [buttonText]="'Add a Hint'"
                         [description]=[blankStateDescription]
                         [learnMoreURL]="'http://docs.sevenbridges.com/docs/list-of-execution-hints'"

@@ -90,13 +90,13 @@ export class InputTypeSelectComponent extends DirectiveBase implements ControlVa
                 this.paramType.items = change.items;
                 if (this.paramType.isItemOrArray) {
                     this.paramType.isItemOrArray = false;
-                    this.form.controls["isItemOrArray"].setValue(false, {onlySelf: true});
+                    this.form.controls["isItemOrArray"].setValue(false, {onlySelf: true, emitEvent: false});
                 }
             }
 
             if (this.paramType.type === "array" && !this.paramType.items) {
                 this.paramType.items = "File";
-                this.form.controls["items"].setValue("File", {onlySelf: true});
+                this.form.controls["items"].setValue("File", {onlySelf: true, emitEvent: false});
             }
 
             this.onChange(this.paramType);
@@ -113,6 +113,7 @@ export class InputTypeSelectComponent extends DirectiveBase implements ControlVa
 
     setDisabledState(isDisabled: boolean): void {
         this.readonly = isDisabled;
-        isDisabled ? this.form.controls["isItemOrArray"].disable({emitEvent: false}) : this.form.controls["isItemOrArray"].enable({emitEvent: false});
+        isDisabled ? this.form.controls["isItemOrArray"].disable({onlySelf: true, emitEvent: false})
+            : this.form.controls["isItemOrArray"].enable({onlySelf: true, emitEvent: false});
     }
 }

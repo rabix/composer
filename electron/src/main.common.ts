@@ -1,14 +1,16 @@
 import * as mock from "mock-require";
+import * as path from "path";
 import * as acceleratorProxy from "./accelerator-proxy";
 import * as openExternalFileProxy from "./open-external-file-proxy";
-import * as path from "path";
+
+require("fix-path")();
 
 const {app, Menu, BrowserWindow} = require("electron");
 const {registerProtocolForLinux} = require("./register-protocols");
-const deepLinkingController = require("./controllers/open-external-file/deep-linking-protocol-controller");
-const localFileController = require("./controllers/open-external-file/open-file-handler-controller");
+const deepLinkingController      = require("./controllers/open-external-file/deep-linking-protocol-controller");
+const localFileController        = require("./controllers/open-external-file/open-file-handler-controller");
 
-const isSpectronRun = ~process.argv.indexOf("--spectron");
+const isSpectronRun       = ~process.argv.indexOf("--spectron");
 const defaultUserDataPath = app.getPath("home") + path.sep + ".sevenbridges/rabix-composer";
 
 app.setPath("userData", defaultUserDataPath);
@@ -237,7 +239,7 @@ function openExternalFiles(...items: string[]) {
     items.forEach((item) => {
         if (item.startsWith("rabix-composer://")) {
             const encoded = item.replace("rabix-composer://", "");
-            const data = deepLinkingController.setMagnetLinkData(encoded);
+            const data    = deepLinkingController.setMagnetLinkData(encoded);
             openExternalFileProxy.passMagnetLink(data);
         } else {
             const filePath = localFileController.setLocalFilePath(item);

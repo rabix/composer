@@ -4,18 +4,21 @@ import {Observable} from "rxjs/Observable";
 import {User} from "../../../../../electron/src/sbg-api-client/interfaces/user";
 import {AuthService} from "../../../auth/auth.service";
 import {AuthCredentials} from "../../../auth/model/auth-credentials";
+import {GetStartedNotificationComponent} from "../../../layout/notification-bar/dynamic-notifications/get-started-notification/get-started-notification.component";
+import {NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
 import {SystemService} from "../../../platform-providers/system.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {GlobalService} from "../../global/global.service";
-import {NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
-import {GetStartedNotificationComponent} from "../../../layout/notification-bar/dynamic-notifications/get-started-notification/get-started-notification.component";
 
 @Component({
     selector: "ct-platform-credentials-modal",
     template: `
 
         <form class="auth-form" data-test="credentials-modal-form" (ngSubmit)="form.valid && applyChanges()" [formGroup]="form">
+
+            Connect your Platform account to create and edit Platform apps.
+
             <div class="m-2">
                 <input type="hidden" formControlName="user"/>
 
@@ -23,7 +26,7 @@ import {GetStartedNotificationComponent} from "../../../layout/notification-bar/
                     <label class="col-xs-4 col-form-label">Platform:</label>
                     <div class="col-xs-8">
                         <ct-auto-complete [mono]="true"
-                                          [create]="false"
+                                          [create]="true"
                                           [sortField]="false"
                                           formControlName="url"
                                           [options]="platformList"
@@ -33,14 +36,14 @@ import {GetStartedNotificationComponent} from "../../../layout/notification-bar/
                 </div>
 
                 <div class="row form-group" [class.has-warning]="form.get('token').invalid">
-                    <label class="col-xs-4 col-form-label">Developer Token:</label>
+                    <label class="col-xs-4 col-form-label">Authentication Token:</label>
                     <div class="col-xs-8  form-inline token-form">
                         <input data-test="credentials-modal-token-field"
                                formControlName="token"
                                class="form-control token-control"
                                type="password"/>
 
-                        <button class="ml-1 btn btn-secondary" 
+                        <button class="ml-1 btn btn-secondary"
                                 type="button"
                                 data-test="credentials-modal-get-token-button"
                                 [disabled]="form.get('url').invalid"
@@ -76,13 +79,14 @@ import {GetStartedNotificationComponent} from "../../../layout/notification-bar/
             </div>
 
             <div class="modal-footer">
-                <button class="btn btn-secondary" type="button" (click)="close()" data-test="credentials-modal-cancel-button">Cancel</button>
-                <button class="btn btn-primary" 
+                <button class="btn btn-secondary" type="button" (click)="close()" data-test="credentials-modal-cancel-button">Cancel
+                </button>
+                <button class="btn btn-primary"
                         type="submit"
                         data-test="credentials-modal-apply-button"
-                        [class.btn-loader]="form.pending" 
+                        [class.btn-loader]="form.pending"
                         [disabled]="!form.valid || !form.dirty">
-                    <ng-container *ngIf="!form.pending">Apply</ng-container>
+                    <ng-container *ngIf="!form.pending">Add</ng-container>
                     <ct-circular-loader class="loader-25" *ngIf="form.pending"></ct-circular-loader>
                 </button>
             </div>
@@ -165,7 +169,7 @@ export class PlatformCredentialsModalComponent implements OnInit {
                     });
 
                     component.environment = AuthCredentials.getPlatformLabel(url);
-                    component.username = user.username;
+                    component.username    = user.username;
 
                     component.dismiss.take(1).subscribe(() => {
                         this.notificationBarService.dismissDynamicNotification(component);

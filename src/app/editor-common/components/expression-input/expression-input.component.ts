@@ -154,7 +154,7 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
                 backdrop: true,
                 closeOnOutsideClick: false,
                 closeOnEscape: false,
-                title: "Edit Expression"
+                title: "Expression Editor"
             });
 
             editor.readonly = this.readonly;

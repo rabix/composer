@@ -141,7 +141,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 protected platformRepository: PlatformRepositoryService,
                 protected localRepository: LocalRepositoryService,
                 protected workbox: WorkboxService,
-                protected executor: ExecutorService) {
+                public executor: ExecutorService) {
 
         super();
 

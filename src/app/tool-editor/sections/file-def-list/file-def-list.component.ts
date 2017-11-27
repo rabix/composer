@@ -18,7 +18,6 @@ import {ErrorCode} from "cwlts/models/helpers/validation/ErrorCode";
 
                 <!--Blank Tool Screen-->
                 <ct-blank-state *ngIf="!readonly && !fileRequirement.listing?.length"
-                                data-test="tool-add-file-button"
                                 [buttonText]="'Create a file'"
                                 [learnMoreURL]="'http://docs.rabix.io/the-tool-editor#files'"
                                 [description]="blankStateDescription"

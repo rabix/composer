@@ -16,7 +16,6 @@ import {ToolInputListComponent} from "./tool-input-list.component";
 
                 <!--Blank Tool Screen-->
                 <ct-blank-state *ngIf="!readonly && !model?.inputs.length"
-                                data-test="tool-add-input-button"
                                 [buttonText]="'Add an Input'"
                                 [learnMoreURL]="'http://docs.rabix.io/the-tool-editor#input-ports'"
                                 [description]="blankStateDescription"

@@ -41,7 +41,7 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                             </div>
 
                             <div class="title" 
-                                 data-test="welcome-tab-title" 
+                                 data-test="tab-title" 
                                  [ct-tooltip]="ctt" 
                                  [tooltipPlacement]="'bottom'">
                                 {{tab.label}}
@@ -57,7 +57,7 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                             <div class="title"
                                  [ct-tooltip]="ctt" 
                                  [tooltipPlacement]="'bottom'" 
-                                 data-test="file-tab-title">
+                                 data-test="tab-title">
                                 {{tab.label}}
                             </div>
                         </ng-template>
@@ -71,7 +71,7 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                             <div class="title" 
                                  [ct-tooltip]="ctt" 
                                  [tooltipPlacement]="'bottom'"
-                                 data-test="workflow-tab-title">
+                                 data-test="tab-title">
                                 {{tabComponents[i]?.dataModel?.label || tab.label}}
                             </div>
                         </ng-template>
@@ -85,7 +85,7 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                             <div class="title" 
                                  [ct-tooltip]="ctt" 
                                  [tooltipPlacement]="'bottom'"
-                                 data-test="tool-tab-title">
+                                 data-test="tab-title">
                                 {{tabComponents[i]?.dataModel?.label || tab.label}}
                             </div>
                         </ng-template>
@@ -97,7 +97,7 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                             </div>
 
                             <div class="title" 
-                                 data-test="new-file-tab-title" 
+                                 data-test="tab-title" 
                                  [ct-tooltip]="ctt" 
                                  [tooltipPlacement]="'bottom'">
                                 {{tab.label}}
@@ -111,7 +111,7 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                             </div>
 
                             <div class="title" 
-                                 data-test="settings-tab-title"
+                                 data-test="tab-title"
                                  [ct-tooltip]="ctt" 
                                  [tooltipPlacement]="'bottom'">
                                 {{tab.label}}
@@ -314,11 +314,7 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
      * Opens a new file tab
      */
     openNewFileTab() {
-        this.workbox.openTab({
-            id: "?newFile",
-            label: "New File",
-            type: "NewFile"
-        }, false);
+        this.workbox.openTab(this.workbox.homeTabData, false);
     }
 
     /**

@@ -3,13 +3,13 @@ import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {RecentAppTab} from "../../../../electron/src/storage/types/recent-app-tab";
+import {TabData} from "../../../../electron/src/storage/types/tab-data-interface";
 import {AuthService} from "../../auth/auth.service";
+import {FileRepositoryService} from "../../file-repository/file-repository.service";
 import {LocalRepositoryService} from "../../repository/local-repository.service";
 import {PlatformRepositoryService} from "../../repository/platform-repository.service";
 import {DataGatewayService} from "../data-gateway/data-gateway.service";
 import {AppHelper} from "../helpers/AppHelper";
-import {FileRepositoryService} from "../../file-repository/file-repository.service";
-import {TabData} from "../../../../electron/src/storage/types/tab-data-interface";
 
 
 @Injectable()
@@ -25,6 +25,8 @@ export class WorkboxService {
 
     closeAllTabsStream = new Subject<TabData<any> []>();
 
+    homeTabData = {id: "?newFile", label: "Home", type: "NewFile"};
+
     private priorityTabUpdate = new Subject();
 
     constructor(private auth: AuthService,
@@ -37,7 +39,7 @@ export class WorkboxService {
         this.auth.getActive()
             .switchMap(() => this.getStoredTabs().take(1))
             // If we have no active tabs, add a "new file"
-            .map(tabDataList => tabDataList.length ? tabDataList : [this.createNewFileTabData()])
+            .map(tabDataList => tabDataList.length ? tabDataList : [this.homeTabData])
             .map(tabDataList => tabDataList.map(tabData => {
                 return this.isUtilityTab(tabData) ? tabData : this.getOrCreateAppTab(tabData, true);
             }))
@@ -106,7 +108,7 @@ export class WorkboxService {
         // When opening an app, we use id with revision number because we can have cases when we can open the same app
         // different revisions (when we push a local file with existing id, new tab is open ...)
         const foundTabIndex = tabs.findIndex(existingTab => existingTab.id === tab.id);
-        const foundTab = tabs[foundTabIndex];
+        const foundTab      = tabs[foundTabIndex];
 
         if (foundTab) {
             if (replaceExistingIfExists) {
@@ -276,7 +278,7 @@ export class WorkboxService {
             return this.platformRepository.getAppContent(id, forceFetch);
         });
 
-        const resolve     = (fcontent: string) => this.dataGateway.resolveContent(fcontent, id);
+        const resolve = (fcontent: string) => this.dataGateway.resolveContent(fcontent, id);
 
         const tab = Object.assign({
             label,
@@ -299,14 +301,6 @@ export class WorkboxService {
 
         return tab;
 
-    }
-
-    private createNewFileTabData(): TabData<any> {
-        return {
-            id: "?newFile",
-            label: "New File",
-            type: "NewFile"
-        };
     }
 }
 
