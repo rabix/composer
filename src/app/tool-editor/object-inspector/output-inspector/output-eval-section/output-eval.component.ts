@@ -101,6 +101,7 @@ export class OutputEvalSectionComponent extends DirectiveBase implements Control
 
     setDisabledState(isDisabled: boolean): void {
         this.readonly = isDisabled;
-        isDisabled ? this.outputEvalFormGroup.controls["loadContents"].disable() : this.outputEvalFormGroup.controls["loadContents"].enable();
+        isDisabled ? this.outputEvalFormGroup.controls["loadContents"].disable({onlySelf: true, emitEvent: false})
+            : this.outputEvalFormGroup.controls["loadContents"].enable({onlySelf: true, emitEvent: false});
     }
 }

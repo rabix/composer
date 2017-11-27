@@ -69,6 +69,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
 
             <ct-secondary-file *ngIf="isType('File') && showSecondaryFiles()"
+                               [readonly]="readonly"
                                [context]="context"
                                [port]="input"
                                [bindingName]="'inputBinding'"
@@ -202,7 +203,8 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
         this.readonly = isDisabled;
         Object.keys(this.form.controls).forEach((item) => {
             const control = this.form.controls[item];
-            isDisabled ? control.disable({emitEvent: false}) : control.enable({emitEvent: false});
+            isDisabled ? control.disable({onlySelf: true, emitEvent: false})
+                : control.enable({onlySelf: true, emitEvent: false});
         });
     }
 }

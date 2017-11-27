@@ -1,7 +1,7 @@
 <ct-action-bar>
     <ct-tab-selector [distribute]="'auto'" [active]="viewMode" (activeChange)="switchTab($event)">
         <ct-tab-selector-entry [disabled]="!tabsUnlocked()" data-test="info-tab" [tabName]="'info'">App Info</ct-tab-selector-entry>
-        <ct-tab-selector-entry [disabled]="!tabsUnlocked()" data-test="visual-tab" [tabName]="'graph'">Graph View</ct-tab-selector-entry>
+        <ct-tab-selector-entry [disabled]="!tabsUnlocked()" data-test="visual-tab" [tabName]="'graph'">Visual Editor</ct-tab-selector-entry>
         <ct-tab-selector-entry [disabled]="!tabsUnlocked()" data-test="test-tab"   [tabName]="'test'">Test</ct-tab-selector-entry>
         <ct-tab-selector-entry data-test="code-tab" [tabName]="'code'" [disabled]="!tabsUnlocked() || !!unavailableError">Code
         </ct-tab-selector-entry>

@@ -1,0 +1,12 @@
+@import "./../../../../assets/sass/variables";
+
+.__plugin-required-input-markup {
+
+    .node.input.__plugin-required-input-markup-required {
+
+        .inner {
+            fill: $brand-warning;
+        }
+
+    }
+}
