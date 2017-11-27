@@ -26,7 +26,7 @@ import {GlobalService} from "../../global/global.service";
                     <label class="col-xs-4 col-form-label">Platform:</label>
                     <div class="col-xs-8">
                         <ct-auto-complete [mono]="true"
-                                          [create]="false"
+                                          [create]="true"
                                           [sortField]="false"
                                           formControlName="url"
                                           [options]="platformList"

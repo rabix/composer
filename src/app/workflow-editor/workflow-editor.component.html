@@ -1,9 +1,9 @@
 <ct-action-bar>
     <ct-tab-selector [distribute]="'auto'" [active]="viewMode" (activeChange)="switchTab($event)">
-        <ct-tab-selector-entry [disabled]="!tabsUnlocked()" data-test="workflow-info-tab" [tabName]="'info'">App Info</ct-tab-selector-entry>
-        <ct-tab-selector-entry [disabled]="!tabsUnlocked()" data-test="workflow-visual-tab" [tabName]="'graph'">Visual Editor</ct-tab-selector-entry>
-        <ct-tab-selector-entry [disabled]="!tabsUnlocked()" data-test="workflow-test-tab"   [tabName]="'test'">Test</ct-tab-selector-entry>
-        <ct-tab-selector-entry data-test="workflow-code-tab" [tabName]="'code'" [disabled]="!tabsUnlocked() || !!unavailableError">Code
+        <ct-tab-selector-entry [disabled]="!tabsUnlocked()" data-test="info-tab" [tabName]="'info'">App Info</ct-tab-selector-entry>
+        <ct-tab-selector-entry [disabled]="!tabsUnlocked()" data-test="visual-tab" [tabName]="'graph'">Visual Editor</ct-tab-selector-entry>
+        <ct-tab-selector-entry [disabled]="!tabsUnlocked()" data-test="test-tab"   [tabName]="'test'">Test</ct-tab-selector-entry>
+        <ct-tab-selector-entry data-test="code-tab" [tabName]="'code'" [disabled]="!tabsUnlocked() || !!unavailableError">Code
         </ct-tab-selector-entry>
     </ct-tab-selector>
 
@@ -37,14 +37,13 @@
                               [readonly]="isReadonly"
                               [(model)]="dataModel"
                               (change)="syncModelAndCode(false)"
-                              (draw)="onGraphDraw()"
+                              (draw)="onGraphDraw($event)"
                               class="editor-main">
     </ct-workflow-graph-editor>
 
     <ct-graph-job-editor *ngIf="viewMode === 'test' && !isLoading && dataModel"
                          [appID]="this.tabData.id"
-                         [model]="dataModel"
-                         (draw)="onGraphDraw()">
+                         [model]="dataModel">
     </ct-graph-job-editor>
 
     <ct-app-info *ngIf="viewMode === 'info' && !isLoading && dataModel"
