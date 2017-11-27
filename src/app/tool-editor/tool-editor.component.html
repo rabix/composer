@@ -4,7 +4,7 @@
         <ct-tab-selector-entry [disabled]="!tabsUnlocked()" data-test="info-tab" [tabName]="'info'">App Info</ct-tab-selector-entry>
         <ct-tab-selector-entry [disabled]="!tabsUnlocked()" data-test="visual-tab" [tabName]="'gui'">Visual</ct-tab-selector-entry>
         <ct-tab-selector-entry [disabled]="!tabsUnlocked()" data-test="test-tab" [tabName]="'test'">Test</ct-tab-selector-entry>
-        <ct-tab-selector-entry [disabled]="!tabsUnlocked() || !!unavailableError" data-test="code-tab" [tabName]="'code'">Code
+        <ct-tab-selector-entry data-test="code-tab" [tabName]="'code'" [disabled]="!tabsUnlocked() || !!unavailableError">Code
         </ct-tab-selector-entry>
     </ct-tab-selector>
 
