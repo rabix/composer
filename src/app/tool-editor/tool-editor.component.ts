@@ -1,8 +1,10 @@
 import {Component, Injector, OnInit} from "@angular/core";
 import {FormGroup} from "@angular/forms";
-import {CommandLineToolModel, isFileType, WorkflowFactory, WorkflowModel, WorkflowStepInputModel} from "cwlts/models";
+import {
+    CommandLineToolModel, isType, WorkflowFactory, WorkflowModel, WorkflowStepInputModel,
+    WorkflowStepOutputModel
+} from "cwlts/models";
 import {CommandLineToolFactory} from "cwlts/models/generic/CommandLineToolFactory";
-import {Process} from "cwlts/models/generic/Process";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {Subject} from "rxjs/Subject";
@@ -129,13 +131,17 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
             // iterate through all inputs of the tool
             this.workflowWrapper.steps[0].in.forEach((input: WorkflowStepInputModel) => {
 
-                if (isFileType(input)) {
+                if (isType(input, ["File", "Directory"])) {
                     // create inputs from file ports
                     this.workflowWrapper.createInputFromPort(input);
                 } else {
                     // everything else should be exposed (show up in the step inspector)
                     this.workflowWrapper.exposePort(input);
                 }
+            });
+
+            this.workflowWrapper.steps[0].out.forEach((output: WorkflowStepOutputModel) => {
+                this.workflowWrapper.createOutputFromPort(output);
             });
 
             // set job on the tool to be the actual job, so the command line is the real thing
