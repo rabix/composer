@@ -33,6 +33,7 @@ import {AppValidatorService, AppValidityState} from "../app-validator/app-valida
 import {PlatformAppService} from "../components/platform-app-common/platform-app.service";
 import {RevisionListComponent} from "../components/revision-list/revision-list.component";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
+import {JobImportExportComponent} from "../job-import-export/job-import-export.component";
 import {APP_SAVER_TOKEN, AppSaver} from "../services/app-saving/app-saver.interface";
 import {CommonReportPanelComponent} from "../template-common/common-preview-panel/common-report-panel.component";
 
@@ -880,5 +881,24 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
         });
 
+    }
+
+    importJob() {
+        const metaManager = this.injector.get<AppMetaManager>(APP_META_MANAGER);
+        const comp        = this.modal.fromComponent(JobImportExportComponent, "Import Job");
+        comp.appID        = this.tabData.id;
+        comp.action       = "import";
+
+    }
+
+    exportJob() {
+        const metaManager = this.injector.get<AppMetaManager>(APP_META_MANAGER);
+
+        metaManager.getAppMeta("job").take(1).subscribeTracked(this, job => {
+            const comp  = this.modal.fromComponent(JobImportExportComponent, "Export Job");
+            comp.action = "export";
+            comp.appID  = this.tabData.id;
+            comp.job    = job;
+        });
     }
 }

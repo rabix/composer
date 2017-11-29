@@ -42,6 +42,7 @@ import {ValidationTextPipe} from "./pipes/validation-text.pipes";
 import {CommonDocumentControlsComponent} from "./template-common/common-document-controls/common-document-controls.component";
 import {CommonReportPanelComponent} from "./template-common/common-preview-panel/common-report-panel.component";
 import {CommonStatusControlsComponent} from "./template-common/common-status-controls/common-status-controls.component";
+import { JobImportExportComponent } from './job-import-export/job-import-export.component';
 
 @NgModule({
     declarations: [
@@ -81,7 +82,8 @@ import {CommonStatusControlsComponent} from "./template-common/common-status-con
         ValidationPreviewComponent,
         ValidationReportComponent,
         ValidationTextPipe,
-        JobStepInspectorComponent
+        JobStepInspectorComponent,
+        JobImportExportComponent
 
     ],
     exports: [
@@ -121,11 +123,12 @@ import {CommonStatusControlsComponent} from "./template-common/common-status-con
         ValidationReportComponent,
     ],
     entryComponents: [
+        AppExecutionContextModalComponent,
         EditorInspectorComponent,
         EditorInspectorContentComponent,
         ExpressionEditorComponent,
+        JobImportExportComponent,
         ModelExpressionEditorComponent,
-        AppExecutionContextModalComponent
     ],
     providers: [
         CwlSchemaValidationWorkerService,
