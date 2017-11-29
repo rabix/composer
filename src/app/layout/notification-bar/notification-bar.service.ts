@@ -3,7 +3,7 @@ import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 
 export type NotificationContent = string | Type<Component>;
-export type NotificationType = "info" | "error" | "warning";
+export type NotificationType = "success" | "info" | "error" | "warning";
 
 export interface NotificationOptions {
     type?: NotificationType;

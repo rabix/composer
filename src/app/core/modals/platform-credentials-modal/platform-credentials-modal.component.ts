@@ -165,7 +165,7 @@ export class PlatformCredentialsModalComponent implements OnInit {
                     // Activate added credentials
                     maybeUserUpdate = this.auth.setActiveCredentials(credentials);
                     const component = this.notificationBarService.showDynamicNotification(GetStartedNotificationComponent, {
-                        type: "info"
+                        type: "success"
                     });
 
                     component.environment = AuthCredentials.getPlatformLabel(url);
