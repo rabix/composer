@@ -25,16 +25,20 @@
         }
     }
 
+    .notification-success {
+        background-color: $brand-success;
+    }
+
+    .notification-info {
+        background-color: $brand-info;
+    }
+
     .notification-error {
         background-color: $brand-danger;
     }
 
     .notification-warning {
         background-color: $brand-warning;
-    }
-
-    .notification-info {
-        background-color: $btn-primary-bg;
     }
 }
 

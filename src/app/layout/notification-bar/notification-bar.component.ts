@@ -10,7 +10,8 @@ import {Notification, NotificationBarService} from "./notification-bar.service";
              class="notification pl-1 notification-{{notification.type}}"
              data-test="notification-bar">
             <i class="fa"
-               [class.fa-check]="notification.type === 'info'"
+               [class.fa-check]="notification.type === 'success'"
+               [class.fa-info-circle]="notification.type === 'info'"
                [class.fa-minus-circle]="notification.type === 'error'"
                [class.fa-exclamation-triangle]="notification.type === 'warning'">
             </i>
