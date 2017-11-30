@@ -1,8 +1,10 @@
 import {Component, Injector, OnInit} from "@angular/core";
 import {FormGroup} from "@angular/forms";
-import {CommandLineToolModel, isFileType, WorkflowFactory, WorkflowModel, WorkflowStepInputModel} from "cwlts/models";
+import {
+    CommandLineToolModel, isType, WorkflowFactory, WorkflowModel, WorkflowStepInputModel,
+    WorkflowStepOutputModel
+} from "cwlts/models";
 import {CommandLineToolFactory} from "cwlts/models/generic/CommandLineToolFactory";
-import {Process} from "cwlts/models/generic/Process";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
 import {JobHelper} from "cwlts/models/helpers/JobHelper";
 import {ReplaySubject} from "rxjs/ReplaySubject";
@@ -121,10 +123,33 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
         if (!this.dataModel) return;
 
         if (tabName === "test") {
+            // create the workflow model that will be displayed on the test tab
+            this.workflowWrapper = WorkflowFactory.from({cwlVersion: this.dataModel.cwlVersion} as any);
+            // add this tool as its only step
+            this.workflowWrapper.addStepFromProcess(this.dataModel.serialize());
+
+            // iterate through all inputs of the tool
+            this.workflowWrapper.steps[0].in.forEach((input: WorkflowStepInputModel) => {
+
+                if (isType(input, ["File", "Directory"])) {
+                    // create inputs from file ports
+                    this.workflowWrapper.createInputFromPort(input);
+                } else {
+                    // everything else should be exposed (show up in the step inspector)
+                    this.workflowWrapper.exposePort(input);
+                }
+            });
+
+            this.workflowWrapper.steps[0].out.forEach((output: WorkflowStepOutputModel) => {
+                this.workflowWrapper.createOutputFromPort(output);
+            });
+
+            // set job on the tool to be the actual job, so the command line is the real thing
             (this.injector.get(APP_META_MANAGER) as AppMetaManager).getAppMeta("job").subscribeTracked(this, (job) => {
                 this.dataModel.setJobInputs(job);
             });
         } else {
+            // set dummy values for the job
             this.dataModel.setJobInputs(JobHelper.getJobInputs(this.dataModel));
         }
     }
@@ -148,19 +173,6 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
         this.dataModel.updateCommandLine();
         this.dataModel.setValidationCallback(this.afterModelValidation.bind(this));
         this.dataModel.validate().then(this.afterModelValidation.bind(this));
-
-        // @fixme(batic): move this somewhere more optimal and useful
-        this.workflowWrapper = WorkflowFactory.from({cwlVersion: this.dataModel.cwlVersion} as any);
-        this.workflowWrapper.addStepFromProcess(json as Process);
-
-        this.workflowWrapper.steps[0].in.forEach((input: WorkflowStepInputModel) => {
-
-            if (isFileType(input)) {
-                this.workflowWrapper.createInputFromPort(input);
-            } else {
-                this.workflowWrapper.exposePort(input);
-            }
-        });
     }
 
     onGraphJobEditorDraw(editor: GraphJobEditorComponent) {
