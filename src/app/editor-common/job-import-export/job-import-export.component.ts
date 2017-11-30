@@ -138,7 +138,9 @@ export class JobImportExportComponent implements OnInit {
         }).then(jobObject => {
             this.import.emit(jobObject);
         }).catch(err => {
-            this.importError = err.message
+            if (err) {
+                this.importError = err.message;
+            }
         });
     }
 
