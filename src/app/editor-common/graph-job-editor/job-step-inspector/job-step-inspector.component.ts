@@ -133,8 +133,8 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
 
     ngOnChanges(changes: SimpleChanges) {
 
-        // For some reason, when opening the inspector, change is triggered, but values are the same
-        if (changes.stepInputs && changes.stepInputs.previousValue !== changes.stepInputs.currentValue) {
+        // I have no idea why step input checking works
+        if (changes.stepInputs && !this.stepInputsAreSame(changes.stepInputs.previousValue, changes.stepInputs.currentValue)) {
 
             this.recreateForms();
 
@@ -190,5 +190,36 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
             name: key,
             inputs: grouped[key]
         }));
+    }
+
+    private stepInputsAreSame(previousValue: any[], currentValue: any[]) {
+        if (previousValue === currentValue) {
+            return true;
+        }
+
+        if (previousValue === undefined && currentValue !== undefined) {
+            return false;
+        }
+
+        if (previousValue !== undefined && currentValue === undefined) {
+            return false;
+        }
+
+        if (previousValue.length === 0 && currentValue.length === 0) {
+            return true;
+        }
+
+        if (previousValue.length !== currentValue.length) {
+            return false;
+        }
+
+        for (let i = 0; i < previousValue.length; i++) {
+            if (previousValue[i] !== currentValue[i]) {
+                return false;
+            }
+        }
+
+        return true;
+
     }
 }
