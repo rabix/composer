@@ -6,7 +6,9 @@
         display: flex;
 
         .delete-btn-group {
-            flex-basis: 44px
+            flex-basis: 30px;
+            padding-left: .5em;
+            padding-top: .1em;
         }
 
         ct-job-step-inspector-entry {
