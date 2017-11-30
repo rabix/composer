@@ -10,6 +10,8 @@ import {AceEditorOptions} from "../../ui/code-editor-new/ace-editor-options";
 import {CodeEditorComponent} from "../../ui/code-editor-new/code-editor.component";
 import {ModalService} from "../../ui/modal/modal.service";
 
+type JobFormat = "json" | "yaml";
+
 @Component({
     selector: "ct-job-import-export",
     templateUrl: "./job-import-export.component.html",
@@ -34,7 +36,7 @@ export class JobImportExportComponent implements OnInit {
     job = {};
 
     @Input()
-    exportFormat: "json" | "yaml" = "yaml";
+    exportFormat: JobFormat = "yaml";
 
     @ViewChild("codeEditor", {read: CodeEditorComponent})
     codeEditor: CodeEditorComponent;
@@ -96,8 +98,8 @@ export class JobImportExportComponent implements OnInit {
         }
     }
 
-    private stringifyJob(): string {
-        if (this.exportFormat === "json") {
+    private stringifyJob(format: JobFormat = this.exportFormat): string {
+        if (format === "json") {
             return JSON.stringify(this.job, null, 4);
         }
 
@@ -117,11 +119,13 @@ export class JobImportExportComponent implements OnInit {
         this.onFormatUpdate();
     }
 
+
     private onFormatUpdate() {
         const yamlMode = "ace/mode/yaml";
         const jsonMode = "ace/mode/json";
 
         this.editorOptions = {mode: this.exportFormat === "json" ? jsonMode : yamlMode};
+        this.codeEditor.getEditorInstance().setOptions(this.editorOptions);
 
         this.jobControl.setValue(this.stringifyJob());
     }
@@ -138,9 +142,9 @@ export class JobImportExportComponent implements OnInit {
         });
     }
 
-    chooseExportFile(type: "json" | "yaml" | string) {
+    chooseExportFile(format: JobFormat) {
 
-        let defaultPath = "job." + type;
+        let defaultPath = "job." + format;
         if (this.appID) {
             if (AppHelper.isLocal(this.appID)) {
                 defaultPath = this.appID.split(".").slice(0, -1).concat(defaultPath).join(".");
@@ -151,27 +155,35 @@ export class JobImportExportComponent implements OnInit {
         }
 
         this.native.createFileChoiceDialog({defaultPath}).then(path => {
-            return this.fileRepository.saveFile(path, this.jobControl.value);
+            const formatted = this.stringifyJob(format);
+            console.log("Saving stringified", formatted);
+
+            return this.fileRepository.saveFile(path, formatted);
         }).then(() => {
             return this.modal.close();
         }).catch(() => void 0);
     }
 
     importCode() {
-        const loaded = Yaml.safeLoad(this.jobControl.value, {json: true} as LoadOptions);
+        const loaded = Yaml.safeLoad(this.jobControl.value);
+        console.log("Importing code", loaded);
         this.import.emit(loaded);
     }
 
     copyToClipboard(event: MouseEvent) {
-        const ace            = this.codeEditor.getEditorInstance();
-        const cursorPos      = ace.getCursorPosition();
-        const selectionRange = ace.selection.getRange();
+        const ace = this.codeEditor.getEditorInstance();
+
+        const cursorPos            = ace.getCursorPosition();
+        const selectionRange       = ace.selection.getRange();
+        const isBackwardsSelection = ace.selection.isBackwards();
+
         ace.selectAll();
         ace.focus();
         document.execCommand("copy");
         ace.clearSelection();
+
         ace.moveCursorToPosition(cursorPos);
-        ace.selection.setRange(selectionRange, false);
+        ace.selection.setRange(selectionRange, isBackwardsSelection);
 
         const btn = event.target as HTMLButtonElement;
 

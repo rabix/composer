@@ -4,8 +4,10 @@ import {CommandLineToolModel, isFileType, WorkflowFactory, WorkflowModel, Workfl
 import {CommandLineToolFactory} from "cwlts/models/generic/CommandLineToolFactory";
 import {Process} from "cwlts/models/generic/Process";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
+import {JobHelper} from "cwlts/models/helpers/JobHelper";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {Subject} from "rxjs/Subject";
+import {AppMetaManager} from "../core/app-meta/app-meta-manager";
 import {APP_META_MANAGER, appMetaManagerFactory} from "../core/app-meta/app-meta-manager-factory";
 import {CodeSwapService} from "../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
@@ -25,8 +27,6 @@ import {LocalRepositoryService} from "../repository/local-repository.service";
 import {PlatformRepositoryService} from "../repository/platform-repository.service";
 import {IpcService} from "../services/ipc.service";
 import {ModalService} from "../ui/modal/modal.service";
-import {JobHelper} from "cwlts/models/helpers/JobHelper";
-import {AppMetaManager} from "../core/app-meta/app-meta-manager";
 
 export function appSaverFactory(comp: ToolEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -102,7 +102,7 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
             platformRepository,
             localRepository,
             workbox,
-            executor
+            executor,
         );
     }
 
