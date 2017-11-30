@@ -32,7 +32,9 @@ import {AppExecutionPreviewComponent} from "../app-execution-panel/app-execution
 import {AppValidatorService, AppValidityState} from "../app-validator/app-validator.service";
 import {PlatformAppService} from "../components/platform-app-common/platform-app.service";
 import {RevisionListComponent} from "../components/revision-list/revision-list.component";
+import {GraphJobEditorComponent} from "../graph-job-editor/graph-job-editor.component";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
+import {JobImportExportComponent} from "../job-import-export/job-import-export.component";
 import {APP_SAVER_TOKEN, AppSaver} from "../services/app-saving/app-saver.interface";
 import {CommonReportPanelComponent} from "../template-common/common-preview-panel/common-report-panel.component";
 
@@ -103,6 +105,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     @ViewChild("inspector", {read: ViewContainerRef})
     protected inspectorHostView: ViewContainerRef;
+
+    @ViewChild(GraphJobEditorComponent)
+    protected jobEditor: GraphJobEditorComponent
 
     protected appSavingService: AppSaver;
 
@@ -880,5 +885,33 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
         });
 
+    }
+
+    importJob() {
+        const metaManager = this.injector.get<AppMetaManager>(APP_META_MANAGER);
+        const comp        = this.modal.fromComponent(JobImportExportComponent, "Import Job");
+        comp.appID        = this.tabData.id;
+        comp.action       = "import";
+
+        comp.import.take(1).subscribeTracked(this, (jobObject) => {
+            metaManager.patchAppMeta("job", jobObject);
+            this.modal.close();
+            if(this.jobEditor){
+                this.jobEditor.updateJob(jobObject);
+            }
+
+        });
+
+    }
+
+    exportJob() {
+        const metaManager = this.injector.get<AppMetaManager>(APP_META_MANAGER);
+
+        metaManager.getAppMeta("job").take(1).subscribeTracked(this, job => {
+            const comp  = this.modal.fromComponent(JobImportExportComponent, "Export Job");
+            comp.action = "export";
+            comp.appID  = this.tabData.id;
+            comp.job    = job;
+        });
     }
 }

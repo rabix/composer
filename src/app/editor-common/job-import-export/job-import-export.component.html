@@ -1,0 +1,78 @@
+<div class="header">
+    <ct-tab-selector class="pull-left" distribute="auto" [(active)]="activeTab">
+
+        <ct-tab-selector-entry tabName="file" data-test="import-file">
+            {{ action === "import" ? "Import" : "Export" }} File
+        </ct-tab-selector-entry>
+
+        <ct-tab-selector-entry tabName="code" data-test="import-code">
+            {{ action === "import" ? "Import" : "Export" }} Code
+        </ct-tab-selector-entry>
+
+    </ct-tab-selector>
+
+    <button *ngIf="activeTab === 'code' && action === 'export'"
+            class="btn btn-link pull-right convert-btn"
+            type="button"
+            (click)="toggleFormat()">
+        Convert to {{ exportFormat === "json" ? "YAML" : "JSON" }}
+    </button>
+</div>
+
+<div class="body">
+
+    <div *ngIf="activeTab === 'file'" class="dialog-centered dialog-content">
+        <p *ngIf="action === 'export'">Choose file format to export to</p>
+        <p *ngIf="action === 'import'">Choose a JSON or YAML file to import</p>
+
+        <p *ngIf="action === 'import'">
+            <button class="btn btn-secondary" (click)="chooseImportFile()">
+                Select a File
+            </button>
+        </p>
+
+        <p *ngIf="importError" class="import-error text-danger m-1">
+            Error: {{ importError }}
+        </p>
+
+        <p *ngIf="action === 'export'">
+            <button class="btn btn-secondary" (click)="chooseExportFile('yaml')">
+                Export as YAML
+            </button>
+            <button class="btn btn-secondary" (click)="chooseExportFile('json')">
+                Export as JSON
+            </button>
+        </p>
+    </div>
+
+    <!--If we want to add a platform projects, we may have multiple steps-->
+    <ng-container *ngIf="activeTab === 'code'">
+        <ct-code-editor #codeEditor [options]="editorOptions" class="code-preview" [formControl]="jobControl"></ct-code-editor>
+    </ng-container>
+
+    <div class="modal-footer" *ngIf="activeTab === 'code'">
+
+
+
+        <span class="text-warning parse-error pull-left" *ngIf="action === 'import' && jobControl.hasError('parse')">
+            {{ jobControl.getError('parse')}}
+        </span>
+
+        <button type="button" class="btn btn-secondary" data-test="modal-close-button" (click)="modal.close()">Cancel
+        </button>
+
+        <button *ngIf="action === 'import'" type="button" class="btn btn-primary" data-test="modal-submit-button"
+                [disabled]="!jobControl.valid"
+                (click)="importCode()">
+            Import
+        </button>
+
+        <button *ngIf="action === 'export'"
+                data-test="copy-to-clipboard-btn"
+                class="btn btn-primary"
+                (click)="copyToClipboard($event)"
+                type="button">Copy to Clipboard
+        </button>
+    </div>
+</div>
+
