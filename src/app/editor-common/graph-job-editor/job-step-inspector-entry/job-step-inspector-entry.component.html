@@ -47,6 +47,7 @@
         <!--Files and array of Files-->
         <ng-template ngSwitchCase="File">
             <ct-native-file-browser-form-field class="input-group"
+                                               [useIcon]="true"
                                                [formControl]="control.get('path')"
                                                selectionType="file">
             </ct-native-file-browser-form-field>
@@ -55,6 +56,7 @@
         <!--Directories and array of Directories-->
         <ng-template ngSwitchCase="Directory">
             <ct-native-file-browser-form-field class="input-group"
+                                               [useIcon]="true"
                                                [formControl]="control.get('path')"
                                                selectionType="directory">
             </ct-native-file-browser-form-field>
@@ -102,13 +104,14 @@
             <ct-job-step-inspector-entry #arrayItem
                                          [inputType]="inputArrayItemsType"
                                          [inputEnumSymbols]="inputEnumSymbols"
+                                         [inputRecordFields]="inputRecordFields"
                                          [readonly]="readonly"
                                          [formControl]="ctrl">
             </ct-job-step-inspector-entry>
 
             <!--Every element that's a part of the array can be deleted, so we add a deletion button to it-->
-            <span class="input-group-btn delete-btn-group">
-                <button type="button" class="btn btn-secondary" (click)="deleteFromArray(idx)" [disabled]="readonly">
+            <span class="delete-btn-group">
+                <button type="button" class="btn array-remove-btn btn-unstyled" (click)="deleteFromArray(idx)" [disabled]="readonly">
                     <i class="fa fa-trash"></i>
                 </button>
             </span>

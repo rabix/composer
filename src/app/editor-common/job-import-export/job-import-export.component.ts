@@ -66,7 +66,6 @@ export class JobImportExportComponent implements OnInit {
                         Yaml.safeLoad(control.value, {json: true} as LoadOptions);
                         resolve(null);
                     } catch (ex) {
-                        console.log("Caught parsing exception", ex);
                         resolve({parse: ex.message})
                     }
                 });
@@ -156,7 +155,6 @@ export class JobImportExportComponent implements OnInit {
 
         this.native.createFileChoiceDialog({defaultPath}).then(path => {
             const formatted = this.stringifyJob(format);
-            console.log("Saving stringified", formatted);
 
             return this.fileRepository.saveFile(path, formatted);
         }).then(() => {
@@ -166,7 +164,6 @@ export class JobImportExportComponent implements OnInit {
 
     importCode() {
         const loaded = Yaml.safeLoad(this.jobControl.value);
-        console.log("Importing code", loaded);
         this.import.emit(loaded);
     }
 

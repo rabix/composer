@@ -113,6 +113,7 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
     }
 
     ngAfterViewInit() {
+
         this.arrayElements.changes.subscribeTracked(this, list => {
 
             const plainInputTypes = ["boolean", "float", "int", "string", "enum"];
@@ -166,7 +167,7 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
                 newControl = new FormArray([]);
                 break;
             case "record":
-                newControl = new FormGroup({});
+                newControl = new FormControl({});
                 break;
             case "string":
                 newControl = new FormControl("");
