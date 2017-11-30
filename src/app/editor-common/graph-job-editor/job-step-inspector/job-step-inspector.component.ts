@@ -129,14 +129,18 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
     }
 
     ngOnInit() {
-
-
     }
 
     ngOnChanges(changes: SimpleChanges) {
 
-        if (changes.stepInputs) {
+        // For some reason, when opening the inspector, change is triggered, but values are the same
+        if (changes.stepInputs && changes.stepInputs.previousValue !== changes.stepInputs.currentValue) {
+
             this.recreateForms();
+
+            if (this.jobValue) {
+                this.jobGroup.patchValue(this.jobValue, {emitEvent: false});
+            }
         }
     }
 
