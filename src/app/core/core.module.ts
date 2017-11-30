@@ -7,6 +7,7 @@ import {AuthModule} from "../auth/auth.module";
 import {EditorCommonModule} from "../editor-common/editor-common.module";
 import {ExecutorService} from "../executor/executor.service";
 import {LayoutModule} from "../layout/layout.module";
+import {NativeModule} from "../native/native.module";
 import {ToolEditorModule} from "../tool-editor/tool-editor.module";
 import {MarkdownService} from "../ui/markdown/markdown.service";
 import {ModalService} from "../ui/modal/modal.service";
@@ -111,6 +112,7 @@ export function errorHandlerFactory(modal: ModalService) {
         FormsModule,
         ReactiveFormsModule,
         AuthModule,
+        NativeModule,
         UIModule,
         EditorCommonModule,
         ToolEditorModule,

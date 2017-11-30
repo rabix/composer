@@ -10,13 +10,13 @@ import EventEmitter = NodeJS.EventEmitter;
 export type ProcessCallback = (err?: Error, stdout?: string, stderr?: string) => void;
 
 export function findDefaultExecutorJar() {
-    const basePath    = path.normalize(__dirname + "/../../executor/lib/rabix-cli.jar");
-    const fixedAsar   = basePath.replace("app.asar", "app.asar.unpacked");
-    const fixedDevEnv = fixedAsar.replace(
+    const basePath  = path.normalize(__dirname + "/../../executor/lib/rabix-cli.jar");
+    const fixedAsar = basePath.replace("app.asar", "app.asar.unpacked");
+
+    return fixedAsar.replace(
         ["electron", "dist", "executor", "lib"].join(path.sep),
         ["electron", "executor", "lib"].join(path.sep)
     );
-    return fixedDevEnv;
 }
 
 export class RabixExecutor {
@@ -67,78 +67,6 @@ export class RabixExecutor {
         }
     }
 
-    private killChild(child, callback?) {
-
-        child.stdout.removeAllListeners();
-        child.stderr.removeAllListeners();
-
-        child.kill();
-
-        if (typeof callback === "function") {
-            callback();
-        }
-    }
-
-    private parseExecutorParamsToArgs(params: Partial<ExecutorParamsConfig> = {}): string[] {
-
-
-        const output = [];
-
-        if (!params) {
-            params = {};
-        }
-
-        if (params.baseDir) {
-            output.push("--basedir", params.baseDir);
-        }
-
-        if (params.verbose) {
-            output.push("--verbose");
-        }
-
-        if (params.quiet) {
-            output.push("--quiet");
-        }
-
-        if (params.noContainer) {
-            output.push("--no-container");
-        }
-
-        if (params.cacheDir) {
-            output.push("--cache-dir", params.cacheDir);
-        }
-
-        if (params.configurationDir) {
-            output.push("--configuration-dir", params.configurationDir);
-        }
-
-        if (params.outDir) {
-            output.push("--outdir", params.outDir);
-        }
-
-        return output;
-    }
-
-    private storeToTempFile(content: string): Promise<string> {
-        return new Promise((resolve, reject) => {
-
-            tmp.tmpName((err, tmpPath) => {
-
-                if (err) return reject(err);
-
-                fs.writeFile(tmpPath, content, {
-                    encoding: "utf8"
-                }, (err) => {
-                    if (err) return reject(err);
-
-                    resolve(tmpPath);
-                });
-
-            });
-
-        });
-    }
-
     /**
      * Executes the CWL app.
      *
@@ -153,26 +81,31 @@ export class RabixExecutor {
      *
      * Rabix sends execution logs to stderr, so we can't distinguish those from actual errors.1
      *
-     * @param path Unused
      * @param {string} content CWL document that describes the app
-     * @param {Object} jobPath Path to the job json file
+     * @param jobValue
      * @param {Partial<ExecutorParamsConfig>} executionParams Rabix executor execution parameters
      * @param dataCallback
      * @param emitter
      */
     execute(content: string, jobValue: Object = {}, executionParams: Partial<ExecutorParamsConfig> = {}, dataCallback, emitter?: EventEmitter) {
 
+        const outdir      = executionParams.outDir;
+        const appFilePath = `${outdir}/app.cwl`;
+        const jobFilePath = `${outdir}/job.json`;
+
         const cleanupHandlers = [] as Function[];
         const cleanup         = () => cleanupHandlers.forEach(c => c());
 
-        const appTempFile = this.storeToTempFile(content).then(fpath => {
-            cleanupHandlers.push(() => fs.unlink(fpath, err => void 0));
-            return fpath;
+        const appFile = new Promise((resolve, reject) => {
+            fs.outputFile(appFilePath, content, err => {
+                err ? reject(err) : resolve(appFilePath);
+            });
         });
 
-        const appJobFile = this.storeToTempFile(JSON.stringify(jobValue)).then(fpath => {
-            cleanupHandlers.push(() => fs.unlink(fpath, err => void 0));
-            return fpath;
+        const jobFile = new Promise((resolve, reject) => {
+            fs.outputJson(jobFilePath, jobValue, {spaces: 4}, err => {
+                err ? reject(err) : resolve(jobFilePath);
+            });
         });
 
         const dockerIsRunning = new Promise((resolve, reject) => {
@@ -205,8 +138,8 @@ export class RabixExecutor {
         ]);
 
         dockerIsRunning.then(() => Promise.all([
-            appTempFile,
-            appJobFile,
+            appFile,
+            jobFile,
             logFilesCreated
         ])).then((filePaths: [string, string, any]) => {
 
@@ -296,44 +229,12 @@ export class RabixExecutor {
                     return dataCallback(new Error("Execution failed with non-zero exit code."));
                 }
 
-                dataCallback(null, {message: "Gathering outputs..."} as ExecutorOutput);
-
-                const tempBasename = path.basename(appFilePath, ".tmp");
-                const outputRoot   = path.dirname(jobFilePath);
-
-                fs.readdir(outputRoot, (err, files) => {
-                    if (err) {
-                        return dataCallback(err);
-                    }
-
-                    for (let i = 0, cnt = files.length; i < cnt; i++) {
-
-                        if (files[i].startsWith(tempBasename)) {
-                            const fullOutputDir = outputRoot + path.sep + files[i];
-
-                            fs.move(fullOutputDir, executionParams.outDir, (err) => {
-
-                                if (err) {
-                                    return dataCallback(err);
-                                }
-
-                                dataCallback(null, {
-                                    type: "DONE",
-                                    message: "Execution completed."
-                                });
-
-                                dataCallback(null, IPC_EOS_MARK);
-                            });
-
-                            return;
-                        }
-
-                    }
-
-                    return dataCallback(new Error("Cannot find job outputs."));
+                dataCallback(null, {
+                    type: "DONE",
+                    message: "Execution completed."
                 });
 
-
+                dataCallback(null, IPC_EOS_MARK);
             });
 
         }).catch(err => {
@@ -341,6 +242,78 @@ export class RabixExecutor {
             dataCallback(err);
         });
 
+    }
+
+    private killChild(child, callback?) {
+
+        child.stdout.removeAllListeners();
+        child.stderr.removeAllListeners();
+
+        child.kill();
+
+        if (typeof callback === "function") {
+            callback();
+        }
+    }
+
+    private parseExecutorParamsToArgs(params: Partial<ExecutorParamsConfig> = {}): string[] {
+
+
+        const output = [];
+
+        if (!params) {
+            params = {};
+        }
+
+        if (params.baseDir) {
+            output.push("--basedir", params.baseDir);
+        }
+
+        if (params.verbose) {
+            output.push("--verbose");
+        }
+
+        if (params.quiet) {
+            output.push("--quiet");
+        }
+
+        if (params.noContainer) {
+            output.push("--no-container");
+        }
+
+        if (params.cacheDir) {
+            output.push("--cache-dir", params.cacheDir);
+        }
+
+        if (params.configurationDir) {
+            output.push("--configuration-dir", params.configurationDir);
+        }
+
+        if (params.outDir) {
+            output.push("--outdir", params.outDir);
+        }
+
+        return output;
+    }
+
+    private storeToTempFile(content: string): Promise<string> {
+        return new Promise((resolve, reject) => {
+
+            tmp.tmpName((err, tmpPath) => {
+
+                if (err) return reject(err);
+
+                fs.writeFile(tmpPath, content, {
+                    encoding: "utf8"
+                }, (err) => {
+                    if (err) return reject(err);
+
+                    resolve(tmpPath);
+                });
+
+            });
+
+        });
     }
 
     private probeBinary(path = "", callback = (err?: Error) => void 0) {
