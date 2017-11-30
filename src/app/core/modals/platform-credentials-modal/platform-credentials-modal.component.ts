@@ -17,9 +17,11 @@ import {GlobalService} from "../../global/global.service";
 
         <form class="auth-form" data-test="credentials-modal-form" (ngSubmit)="form.valid && applyChanges()" [formGroup]="form">
 
-            Connect your Platform account to create and edit Platform apps.
 
             <div class="m-2">
+
+                <p>Connect your Platform account to create and edit Platform apps.</p>
+
                 <input type="hidden" formControlName="user"/>
 
                 <div class="row form-group" [class.has-warning]="form.get('url').invalid">
@@ -71,8 +73,18 @@ import {GlobalService} from "../../global/global.service";
 
                     <span class="text-danger" *ngIf="form.hasError('tokenCheck')">
                         <i class="fa fa-times-circle fa-fw"></i>
-                            <span>Token is not valid for the selected platform. ({{ form.getError("tokenCheck") }})</span>
+                        <span>Token is not valid for the selected platform. ({{ form.getError("tokenCheck") }})</span>
                     </span>
+
+                    <span *ngIf="form.hasError('timeout')" class="text-danger">
+                        <i class="fa fa-times-circle fa-fw"></i>
+                        <span>Connection timed-out while trying to contact the platform.</span>
+                    </span>
+                    <span *ngIf="form.hasError('notfound')" class="text-danger">
+                        <i class="fa fa-times-circle fa-fw"></i>
+                        <span>Cannot connect to the platform. Are you online?</span>
+                    </span>
+
 
                 </div>
 
@@ -121,7 +133,7 @@ export class PlatformCredentialsModalComponent implements OnInit {
         {text: "Seven Bridges (Default)", value: "https://api.sbgenomics.com"},
         {text: "Seven Bridges (EU)", value: "https://eu-api.sbgenomics.com"},
         {text: "Cancer Genomics Cloud", value: "https://cgc-api.sbgenomics.com"},
-        {text: "Cavatica", value: "https://pgc-api.sbgenomics.com"},
+        {text: "Cavatica", value: "https://cavatica-api.sbgenomics.com"},
     ];
 
     constructor(private system: SystemService,
@@ -243,7 +255,17 @@ export class PlatformCredentialsModalComponent implements OnInit {
 
                     return null;
                 }, rejection => {
+                    if(rejection.error){
+
+                        if (rejection.error.code === "ESOCKETTIMEDOUT") {
+                            return {timeout: rejection.message}
+                        } else if (rejection.error.code === "ENOTFOUND"){
+                            return {notfound: rejection.message}
+                        }
+
+                    }
                     return {tokenCheck: rejection.message};
+
                 });
 
             })
