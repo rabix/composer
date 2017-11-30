@@ -89,6 +89,14 @@ import {Component, Input} from "@angular/core";
 
             <ng-template #testControls>
 
+                <button type="button" class="btn control-button" ct-tooltip="Import Job" tooltipPlacement="bottom" (click)="host.importJob()">
+                    <i class="fa fa-fw fa-download"></i>
+                </button>
+                
+                <button type="button" class="btn control-button" ct-tooltip="Export Job" tooltipPlacement="bottom" (click)="host.exportJob()">
+                    <i class="fa fa-fw fa-upload"></i>
+                </button>
+
                 <!--Run-->
                 <button type="button" class="btn btn-primary"
                         *ngIf="!host.isExecuting"
@@ -106,9 +114,8 @@ import {Component, Input} from "@angular/core";
                         (click)="host.stopExecution()">
                     <i class="fa fa-fw fa-square"></i> Stop
                 </button>
-                
-                
-                
+
+
             </ng-template>
 
 

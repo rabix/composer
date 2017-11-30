@@ -11,7 +11,6 @@ import {APP_META_MANAGER} from "../../core/app-meta/app-meta-manager-factory";
 import {AppHelper} from "../../core/helpers/AppHelper";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {SVGJobFileDropPlugin} from "../../workflow-editor/svg-plugins/job-file-drop/job-file-drop";
-import {SVGRequiredInputMarkup} from "../../workflow-editor/svg-plugins/required-input-markup/required-input-markup";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
 
 @Component({
@@ -104,28 +103,34 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
         });
 
         this.metaManager.getAppMeta("job").take(1).subscribeTracked(this, storedJob => {
+            this.updateJob(storedJob)
+        });
+    }
 
-            const nullJob = JobHelper.getNullJobInputs(this.model);
-            const job     = storedJob || {};
 
-            // Clean abundant keys from stored job
-            Object.keys(job).forEach(key => {
-                if (!(key in nullJob)) {
-                    delete job[key];
-                }
-            });
+    updateJob(jobObject = {}) {
+        const nullJob = JobHelper.getNullJobInputs(this.model);
+        const job     = jobObject || {};
 
-            const controlValue = Object.assign(nullJob, job);
-
-            this.jobControl.patchValue(controlValue, {emitEvent: false});
-
-            this.graph.getPlugin(SVGJobFileDropPlugin).updateToJobState(controlValue);
-
-            // If we modified the job, push the update back
-            if (JSON.stringify(job) !== JSON.stringify(storedJob)) {
-                this.metaManager.patchAppMeta("job", job);
+        // Clean abundant keys from stored job
+        Object.keys(job).forEach(key => {
+            if (!(key in nullJob)) {
+                delete job[key];
             }
         });
+
+        const controlValue = Object.assign(nullJob, job);
+
+        this.jobControl.patchValue(controlValue, {emitEvent: false});
+
+        console.log("Updating job state", controlValue);
+
+        this.graph.getPlugin(SVGJobFileDropPlugin).updateToJobState(controlValue);
+
+        // If we modified the job, push the update back
+        if (JSON.stringify(job) !== JSON.stringify(jobObject)) {
+            this.metaManager.patchAppMeta("job", job);
+        }
     }
 
     findParentInputOfType(el: Element, type: string) {
@@ -222,4 +227,5 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
         super.ngOnDestroy();
         this.inspector.hide();
     }
+
 }
