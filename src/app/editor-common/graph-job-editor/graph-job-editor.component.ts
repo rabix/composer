@@ -123,8 +123,6 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
 
         this.jobControl.patchValue(controlValue, {emitEvent: false});
 
-        console.log("Updating job state", controlValue);
-
         this.graph.getPlugin(SVGJobFileDropPlugin).updateToJobState(controlValue);
 
         // If we modified the job, push the update back

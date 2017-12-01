@@ -129,14 +129,18 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
     }
 
     ngOnInit() {
-
-
     }
 
     ngOnChanges(changes: SimpleChanges) {
 
-        if (changes.stepInputs) {
+        // I have no idea why step input checking works
+        if (changes.stepInputs && !this.stepInputsAreSame(changes.stepInputs.previousValue, changes.stepInputs.currentValue)) {
+
             this.recreateForms();
+
+            if (this.jobValue) {
+                this.jobGroup.patchValue(this.jobValue, {emitEvent: false});
+            }
         }
     }
 
@@ -186,5 +190,36 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
             name: key,
             inputs: grouped[key]
         }));
+    }
+
+    private stepInputsAreSame(previousValue: any[], currentValue: any[]) {
+        if (previousValue === currentValue) {
+            return true;
+        }
+
+        if (previousValue === undefined && currentValue !== undefined) {
+            return false;
+        }
+
+        if (previousValue !== undefined && currentValue === undefined) {
+            return false;
+        }
+
+        if (previousValue.length === 0 && currentValue.length === 0) {
+            return true;
+        }
+
+        if (previousValue.length !== currentValue.length) {
+            return false;
+        }
+
+        for (let i = 0; i < previousValue.length; i++) {
+            if (previousValue[i] !== currentValue[i]) {
+                return false;
+            }
+        }
+
+        return true;
+
     }
 }

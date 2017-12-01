@@ -16,7 +16,11 @@ import {NativeSystemService} from "../../native/system/native-system.service";
 
         <span class="input-group-btn">
             <button class="btn btn-secondary" type="button" (click)="onBrowse()">
-                {{ browseLabel }}
+                <i *ngIf="useIcon; else textTpl" class="fa {{ browseIcon }}"></i>
+                
+                <ng-template #textTpl>
+                    {{ browseLabel }}
+                </ng-template>
             </button>
         </span>
     `
@@ -28,6 +32,10 @@ export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor
 
     /** Label of the button that spawns filepicker modal */
     @Input() browseLabel = "Browse";
+
+    @Input() browseIcon = "fa-search";
+
+    @Input() useIcon = false;
 
     @Input() selectionType: "file" | "directory" = "file";
 

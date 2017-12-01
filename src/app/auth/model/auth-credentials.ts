@@ -44,7 +44,7 @@ export class AuthCredentials implements UserPlatformIdentifier {
                 return "EU";
             case "cgc-api":
                 return "CGC";
-            case "pgc-api":
+            case "cavatica-api":
                 return "CAVATICA";
             default:
                 return subdomain.indexOf("vayu.sbgenomics.com") === -1 ? subdomain : subdomain.split(".")[0];
@@ -60,7 +60,7 @@ export class AuthCredentials implements UserPlatformIdentifier {
                 return "Seven Bridges (EU)";
             case "cgc-api":
                 return "Cancer Genomics Cloud";
-            case "pgc-api":
+            case "cavatica-api":
                 return "Cavatica";
             default:
                 return subdomain.indexOf("vayu.sbgenomics.com") === -1 ? subdomain : subdomain.split(".")[0];
