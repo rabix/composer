@@ -143,8 +143,11 @@ export class ExpressionEditorComponent extends DirectiveBase implements OnInit, 
         this.tree = this.treeView.getService();
 
         this.tracked = this.tree.open.subscribe(node => {
-            this.editor.editor.session.insert(this.editor.getEditorInstance().getCursorPosition(), String(node.id));
-            this.editor.setFocus();
+            // If readonly state then adding values from tree should not be possible
+            if (!this.readonly) {
+                this.editor.editor.session.insert(this.editor.getEditorInstance().getCursorPosition(), String(node.id));
+                this.editor.setFocus();
+            }
         });
 
         this.editor.setFocus();
