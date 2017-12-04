@@ -11,7 +11,7 @@ import {noop} from "../../lib/utils.lib";
     template: `
         <label class="clickable">
             {{ value ? on : off }}
-            <div class="switch">
+            <div class="switch" tabindex="0" (keyup.space)="toggleCheck($event)">
                 <input class="toggle-input" #checkbox type="checkbox" [checked]="value" (change)="toggleCheck($event)" [disabled]="disabled">
                 <div class="slider round" [class.disabled]="disabled"></div>
             </div>
