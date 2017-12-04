@@ -46,8 +46,8 @@ export class AuthCredentials implements UserPlatformIdentifier {
                 return "EU";
             case "cgc-api":
                 return "CGC";
-            case "pgc-api":
-                return "CHOP";
+            case "cavatica-api":
+                return "CAVATICA";
             case "bpa-api":
                 return "BPA";
             default:
@@ -66,7 +66,7 @@ export class AuthCredentials implements UserPlatformIdentifier {
                 return "Seven Bridges (EU)";
             case "cgc-api":
                 return "Cancer Genomics Cloud";
-            case "pgc-api":
+            case "cavatica-api":
                 return "Cavatica";
             case "bpa-api":
                 return "Blood Profiling Atlas";
