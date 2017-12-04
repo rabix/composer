@@ -62,7 +62,6 @@
             </ct-native-file-browser-form-field>
         </ng-template>
 
-
     </div>
 
     <!--Records-->
@@ -113,7 +112,8 @@
 
             <!--Every element that's a part of the array can be deleted, so we add a deletion button to it-->
             <span class="delete-btn-group">
-                <button type="button" class="btn array-remove-btn btn-unstyled" (click)="deleteFromArray(idx)" [disabled]="readonly">
+                <button type="button" class="btn array-remove-btn btn-unstyled" (click)="deleteFromArray(idx)"
+                        [disabled]="readonly">
                     <i class="fa fa-trash"></i>
                 </button>
             </span>
@@ -130,4 +130,5 @@
     <ng-template ngSwitchDefault>
         <div class="alert alert-info">Unknown input type: {{ inputType || "null" }}</div>
     </ng-template>
+
 </div>

@@ -1,16 +1,6 @@
 import {
-    AfterViewInit,
-    ChangeDetectionStrategy,
-    ChangeDetectorRef,
-    Component,
-    ElementRef,
-    forwardRef,
-    Input,
-    OnChanges,
-    QueryList,
-    SimpleChanges,
-    ViewChild,
-    ViewChildren
+    AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, QueryList,
+    SimpleChanges, ViewChild, ViewChildren
 } from "@angular/core";
 import {AbstractControl, ControlValueAccessor, FormArray, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {InputParameterModel} from "cwlts/models/generic/InputParameterModel";
@@ -70,28 +60,46 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
         }
 
         this.warning = undefined;
-        let update   = value;
 
+        let update = value;
         switch (this.inputType) {
 
             case "record":
+
                 update = value instanceof Object ? value : {} as InputParameterModel;
                 this.control.patchValue(update);
                 break;
 
             case "array":
+
                 if (this.inputType === "array" && !Array.isArray(value)) {
-                    update = [];
+                    this.patchArrayValue([]);
+                } else {
+                    this.patchArrayValue(update);
                 }
-                this.patchArrayValue(update);
+
+                break;
+
+            case "string":
+                this.control.setValue(update ? String(update) : "");
+                break;
+
+            case "float":
+            case "int":
+                this.control.setValue(~~update);
+                break;
+            case "boolean":
+                this.control.setValue(Boolean(update), {emitEvent: false});
                 break;
 
             case "Directory":
             case "File":
 
                 update = value || {};
-
-                this.control.setValue({class: this.inputType, path: update.path || ""}, {emitEvent: false});
+                this.control.setValue({
+                    class: this.inputType,
+                    path: update.path || ""
+                }, {emitEvent: false});
                 break;
 
             default:
@@ -123,18 +131,22 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
             }
         });
 
-        this.control.valueChanges.subscribeTracked(this, change => {
-            let typecheckedChange = change;
+        this.control.valueChanges
+            .filter(v => this.control.status !== "DISABLED")
+            .subscribeTracked(this, change => {
 
-            if (this.inputType === "int") {
-                typecheckedChange = ~~change;
-            } else if (this.inputType === "float") {
-                typecheckedChange = isNaN(change) ? 0 : parseFloat(change);
-            }
+                let typecheckedChange = change;
 
+                if (this.inputType === "int") {
+                    typecheckedChange = ~~change;
+                } else if (this.inputType === "float") {
+                    typecheckedChange = isNaN(change) ? 0 : parseFloat(change);
+                }
 
-            this.propagateChange(typecheckedChange);
-        });
+                console.log("Value change! ", typecheckedChange);
+
+                this.propagateChange(typecheckedChange);
+            });
     }
 
 
@@ -157,6 +169,10 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
         }
     }
 
+    clear() {
+        this.control.setValue(null);
+    }
+
     addArrayEntry(): void {
         this.warning = undefined;
 
@@ -172,9 +188,17 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
             case "string":
                 newControl = new FormControl("");
                 break;
+            case "int":
+            case "float":
+                newControl = new FormControl(0);
+                break;
+            case "boolean":
+                newControl = new FormControl(false);
+                break;
+            case "Directory":
             case "File":
                 newControl = new FormControl({
-                    class: "File",
+                    class: this.inputArrayItemsType,
                     path: ""
                 });
                 break;
@@ -195,6 +219,8 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
     }
 
     private setupFormControls(): void {
+
+        console.log("Setting up form controls");
         switch (this.inputType) {
 
             case "array":
@@ -245,5 +271,17 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
         }
 
         control.patchValue(update);
+    }
+
+
+    setDisabledState(isDisabled: boolean): void {
+
+        if (isDisabled && this.control.enabled) {
+            this.control.disable();
+        } else if (!isDisabled && this.control.disabled) {
+            this.control.enable();
+        }
+
+        this.cdr.markForCheck();
     }
 }

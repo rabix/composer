@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, ElementRef, forwardRef, Input, Renderer2, ViewChild} from "@angular/core";
+import {ChangeDetectorRef, Component, forwardRef, Input, Renderer2} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {NativeSystemService} from "../../native/system/native-system.service";
 
@@ -12,10 +12,10 @@ import {NativeSystemService} from "../../native/system/native-system.service";
         }
     ],
     template: `
-        <input #pathInput class="form-control" [(ngModel)]="value" (blur)="onTouched()"/>
+        <input #pathInput class="form-control" [(ngModel)]="value" (blur)="onTouched()" [disabled]="isDisabled"/>
 
         <span class="input-group-btn">
-            <button class="btn btn-secondary" type="button" (click)="onBrowse()">
+            <button class="btn btn-secondary" type="button" (click)="onBrowse()" [disabled]="isDisabled">
                 <i *ngIf="useIcon; else textTpl" class="fa {{ browseIcon }}"></i>
                 
                 <ng-template #textTpl>
@@ -58,14 +58,14 @@ export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor
         message?: string;
     } = {};
 
+    isDisabled = false;
+
     onTouched = () => void 0;
 
     onChange = (value: any) => void 0;
 
-    @ViewChild("pathInput", {read: ElementRef})
-    private pathInput: ElementRef;
-
     private _value = "";
+
 
     constructor(private dialog: NativeSystemService, private renderer: Renderer2, private cdr: ChangeDetectorRef) {
     }
@@ -118,6 +118,6 @@ export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor
     }
 
     setDisabledState(isDisabled: boolean): void {
-        this.renderer.setProperty(this.pathInput.nativeElement, "disabled", isDisabled);
+        this.isDisabled = isDisabled;
     }
 }

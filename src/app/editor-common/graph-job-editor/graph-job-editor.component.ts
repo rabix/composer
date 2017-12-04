@@ -97,7 +97,10 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
         this.graph.fitToViewport();
         this.draw.emit(this);
 
-        this.jobControl.valueChanges.subscribeTracked(this, changes => {
+        this.jobControl.valueChanges.map(v => this.normalizeJob(v))
+            .distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
+            .subscribeTracked(this, changes => {
+
             this.graph.getPlugin(SVGJobFileDropPlugin).updateToJobState(changes);
             this.metaManager.patchAppMeta("job", changes);
         });
@@ -107,27 +110,33 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
         });
     }
 
-
-    updateJob(jobObject = {}) {
+    private normalizeJob(jobObject: Object) {
         const nullJob = JobHelper.getNullJobInputs(this.model);
+
         const job     = jobObject || {};
 
-        // Clean abundant keys from stored job
-        Object.keys(job).forEach(key => {
-            if (!(key in nullJob)) {
+        for (const key in job) {
+            if (!nullJob.hasOwnProperty(key)) {
                 delete job[key];
             }
-        });
+        }
 
-        const controlValue = Object.assign(nullJob, job);
+        return {...nullJob, ...job};
+    }
+
+
+    updateJob(jobObject = {}) {
+
+        const normalizedJob = this.normalizeJob(jobObject);
+        const controlValue  = normalizedJob;
 
         this.jobControl.patchValue(controlValue, {emitEvent: false});
 
         this.graph.getPlugin(SVGJobFileDropPlugin).updateToJobState(controlValue);
 
         // If we modified the job, push the update back
-        if (JSON.stringify(job) !== JSON.stringify(jobObject)) {
-            this.metaManager.patchAppMeta("job", job);
+        if (JSON.stringify(normalizedJob) !== JSON.stringify(jobObject)) {
+            this.metaManager.patchAppMeta("job", normalizedJob);
         }
     }
 

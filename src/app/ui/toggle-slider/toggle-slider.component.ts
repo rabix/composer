@@ -12,7 +12,8 @@ import {noop} from "../../lib/utils.lib";
         <label class="clickable">
             {{ value ? on : off }}
             <div class="switch">
-                <input class="toggle-input" #checkbox type="checkbox" [checked]="value" (change)="toggleCheck($event)" [disabled]="disabled">
+                <input class="toggle-input" #checkbox type="checkbox" [checked]="value" (change)="toggleCheck($event)"
+                       [disabled]="disabled">
                 <div class="slider round" [class.disabled]="disabled"></div>
             </div>
         </label>
@@ -62,7 +63,8 @@ export class ToggleSliderComponent implements ControlValueAccessor, OnInit {
     }
 
     writeValue(isChecked: boolean): void {
-        this.value = !!isChecked;
+        console.log("Writing to slider", isChecked);
+        this.value = Boolean(isChecked);
     }
 
     registerOnChange(fn: any): void {
