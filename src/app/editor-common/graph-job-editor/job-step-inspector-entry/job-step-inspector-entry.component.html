@@ -68,6 +68,8 @@
     <!--Records-->
     <ng-template ngSwitchCase="record">
 
+        <ng-container *ngIf="inputRecordFields.length === 0">This record has no fields.</ng-container>
+
         <div *ngFor="let entry of inputRecordFields" class="ml-1">
 
             <label>
