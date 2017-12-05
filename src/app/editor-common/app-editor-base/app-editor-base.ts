@@ -6,6 +6,7 @@ import * as Yaml from "js-yaml";
 import {LoadOptions} from "js-yaml";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
+import {ReplaySubject} from "rxjs/ReplaySubject";
 import {ExecutorOutput} from "../../../../electron/src/rabix-executor/executor-output";
 import {AppExecutionContext} from "../../../../electron/src/storage/types/executor-config";
 import {AppMetaManager} from "../../core/app-meta/app-meta-manager";
@@ -166,8 +167,11 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
         this.codeEditorContent.valueChanges.subscribeTracked(this, content => this.codeSwapService.codeContent.next(content));
 
+        /** Replay subject used here because withLatestFrom operator did not work well for validationStateChanges stream */
+        const externalCodeChanges = new ReplaySubject(1);
+
         /** Changes to the code that did not come from user's typing. */
-        const externalCodeChanges = Observable.merge(this.tabData.fileContent, this.priorityCodeUpdates).distinctUntilChanged();
+        Observable.merge(this.tabData.fileContent, this.priorityCodeUpdates).distinctUntilChanged().subscribeTracked(this, externalCodeChanges);
 
         /** Changes to the code from user's typing, slightly debounced */
         const codeEditorChanges = this.codeEditorContent.valueChanges.debounceTime(300).distinctUntilChanged();
