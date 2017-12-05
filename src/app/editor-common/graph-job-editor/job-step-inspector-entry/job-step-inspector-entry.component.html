@@ -51,6 +51,11 @@
                                                [formControl]="control.get('path')"
                                                selectionType="file">
             </ct-native-file-browser-form-field>
+
+            <button class="btn btn-link file-meta-edit-btn" type="button" (click)="promptFileMetadata()">
+                Add secondary files and metadata
+            </button>
+
         </ng-template>
 
         <!--Directories and array of Directories-->

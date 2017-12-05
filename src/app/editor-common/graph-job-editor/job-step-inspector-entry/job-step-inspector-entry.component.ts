@@ -4,7 +4,9 @@ import {
 } from "@angular/core";
 import {AbstractControl, ControlValueAccessor, FormArray, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {InputParameterModel} from "cwlts/models/generic/InputParameterModel";
+import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {JobFileMetadataModalComponent} from "../job-file-metadata-modal/job-file-metadata-modal.component";
 
 @Component({
     selector: "ct-job-step-inspector-entry",
@@ -49,7 +51,7 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
 
     private control: AbstractControl;
 
-    constructor(private cdr: ChangeDetectorRef) {
+    constructor(private cdr: ChangeDetectorRef, private modal: ModalService) {
         super();
     }
 
@@ -281,5 +283,13 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
         }
 
         this.cdr.markForCheck();
+    }
+
+    promptFileMetadata() {
+        const comp = this.modal.fromComponent(JobFileMetadataModalComponent, "Secondary files and metadata");
+        comp.secondaryFiles = ["first", "second", "third"];
+        comp.submit.take(1).subscribeTracked(this, (data) => {
+            console.log("Received data", data);
+        })
     }
 }

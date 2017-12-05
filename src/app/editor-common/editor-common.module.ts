@@ -43,6 +43,7 @@ import {CommonDocumentControlsComponent} from "./template-common/common-document
 import {CommonReportPanelComponent} from "./template-common/common-preview-panel/common-report-panel.component";
 import {CommonStatusControlsComponent} from "./template-common/common-status-controls/common-status-controls.component";
 import { JobImportExportComponent } from './job-import-export/job-import-export.component';
+import { JobFileMetadataModalComponent } from './graph-job-editor/job-file-metadata-modal/job-file-metadata-modal.component';
 
 @NgModule({
     declarations: [
@@ -69,6 +70,9 @@ import { JobImportExportComponent } from './job-import-export/job-import-export.
         GraphJobEditorComponent,
         HintsComponent,
         InputTypeSelectComponent,
+        JobFileMetadataModalComponent,
+        JobImportExportComponent,
+        JobStepInspectorComponent,
         JobStepInspectorEntryComponent,
         KeyValueInputComponent,
         KeyValueListComponent,
@@ -82,8 +86,6 @@ import { JobImportExportComponent } from './job-import-export/job-import-export.
         ValidationPreviewComponent,
         ValidationReportComponent,
         ValidationTextPipe,
-        JobStepInspectorComponent,
-        JobImportExportComponent
 
     ],
     exports: [
@@ -91,7 +93,6 @@ import { JobImportExportComponent } from './job-import-export/job-import-export.
         AppInfoComponent,
         CommonDocumentControlsComponent,
         CommonReportPanelComponent,
-        MapListComponent,
         CommonStatusControlsComponent,
         CompactListComponent,
         EditableDirective,
@@ -113,6 +114,7 @@ import { JobImportExportComponent } from './job-import-export/job-import-export.
         KeyValueInputComponent,
         KeyValueListComponent,
         MapListComponent,
+        MapListComponent,
         ModelExpressionEditorComponent,
         QuickPickComponent,
         RequirementInputComponent,
@@ -127,6 +129,7 @@ import { JobImportExportComponent } from './job-import-export/job-import-export.
         EditorInspectorComponent,
         EditorInspectorContentComponent,
         ExpressionEditorComponent,
+        JobFileMetadataModalComponent,
         JobImportExportComponent,
         ModelExpressionEditorComponent,
     ],
