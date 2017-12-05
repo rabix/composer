@@ -101,7 +101,9 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
                 update = value || {};
                 this.control.setValue({
                     class: this.inputType,
-                    path: update.path || ""
+                    path: update.path || "",
+                    secondaryFiles: Array.isArray(update.secondaryFiles) || [],
+                    metadata: Object.prototype.isPrototypeOf(update.metadata) || {}
                 }, updateOptions);
                 break;
 
@@ -197,10 +199,18 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
                 newControl = new FormControl(false);
                 break;
             case "Directory":
+                newControl = new FormControl({
+                    class: "Directory",
+                    path: ""
+                });
+                break;
             case "File":
                 newControl = new FormControl({
-                    class: this.inputArrayItemsType,
-                    path: ""
+                    path: "",
+                    class: "File",
+                    metadata: {},
+                    secondaryFiles: [],
+
                 });
                 break;
             default:
@@ -221,17 +231,20 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
 
     private setupFormControls(): void {
 
+        const disabled = this.readonly;
+
         switch (this.inputType) {
 
             case "array":
                 this.control = new FormArray([]);
+                disabled ? this.control.disable() : this.control.enable();
                 break;
 
             case "record":
 
                 const controls = {};
                 for (const field of this.inputRecordFields) {
-                    controls[field.id] = new FormControl({value: undefined, disabled: this.readonly});
+                    controls[field.id] = new FormControl({value: undefined, disabled});
                 }
 
                 this.control = new FormGroup(controls);
@@ -240,8 +253,10 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
             case "File":
 
                 this.control = new FormGroup({
-                    class: new FormControl("File"),
-                    path: new FormControl({value: undefined, disabled: this.readonly})
+                    path: new FormControl({value: undefined, disabled}),
+                    class: new FormControl({value: "File", disabled}),
+                    metadata: new FormControl({value: {}, disabled}),
+                    secondaryFiles: new FormControl({value: [], disabled}),
                 });
                 break;
 
@@ -249,13 +264,14 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
 
                 this.control = new FormGroup({
                     class: new FormControl("Directory"),
-                    path: new FormControl({value: undefined, disabled: this.readonly})
+                    path: new FormControl({value: undefined, disabled})
                 });
 
                 break;
 
             default:
                 this.control = new FormControl();
+                disabled ? this.control.disable() : this.control.enable();
                 break;
         }
     }
@@ -286,7 +302,7 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
     }
 
     promptFileMetadata() {
-        const comp = this.modal.fromComponent(JobFileMetadataModalComponent, "Secondary files and metadata");
+        const comp          = this.modal.fromComponent(JobFileMetadataModalComponent, "Secondary files and metadata");
         comp.secondaryFiles = ["first", "second", "third"];
         comp.submit.take(1).subscribeTracked(this, (data) => {
             console.log("Received data", data);

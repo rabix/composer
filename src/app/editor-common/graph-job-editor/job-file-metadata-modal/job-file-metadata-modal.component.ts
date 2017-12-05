@@ -2,6 +2,10 @@ import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
 import {FormArray, FormControl, FormGroup} from "@angular/forms";
 import {ModalService} from "../../../ui/modal/modal.service";
 
+/**
+ * @TODO: files can also be directories and need to be specified \as CWL file objects ({class: "File" | "Directory"})
+ * @TODO: for each entry, check whether it's a file or a dir on the system
+ */
 @Component({
     selector: "ct-job-file-metadata-modal",
     template: `
