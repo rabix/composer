@@ -61,18 +61,31 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
 
         if (inputEl) {
 
-            const inputID   = inputEl.getAttribute("data-id");
-            const jobValue  = this.jobControl.value;
-            const fileValue = jobValue[inputID];
-            const isArray   = Array.isArray(fileValue);
-            const newEntry  = {class: type, path: data.name};
+            const inputID    = inputEl.getAttribute("data-id");
+            const inputModel = this.model.inputs.find(input => input.id === inputID) as WorkflowInputParameterModel;
+
+            const inputTypeIsArray = inputModel.type.type === "array";
+
+            const job           = this.jobControl.value;
+            const inputJobValue = job[inputID];
+
+            const jobValueIsArray = Array.isArray(inputJobValue);
+
+            const newEntry = {class: type, path: data.name};
 
             const patch = {[inputID]: newEntry} as any;
-            if (isArray) {
-                patch[inputID] = fileValue.concat(newEntry);
+
+            if (jobValueIsArray) {
+                patch[inputID] = inputJobValue.concat(newEntry);
+            } else if (inputTypeIsArray) {
+                patch[inputID] = [newEntry];
+            } else {
+                patch[inputID] = newEntry;
             }
 
-            this.jobControl.patchValue({...jobValue, ...patch});
+            const newJob = {...job, ...patch};
+
+            this.jobControl.patchValue(newJob);
         }
     }
 
@@ -97,13 +110,13 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
         this.graph.fitToViewport();
         this.draw.emit(this);
 
-        this.jobControl.valueChanges.map(v => this.normalizeJob(v))
+        this.jobControl.valueChanges
+            .map(v => this.normalizeJob(v))
             .distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
             .subscribeTracked(this, changes => {
-
-            this.graph.getPlugin(SVGJobFileDropPlugin).updateToJobState(changes);
-            this.metaManager.patchAppMeta("job", changes);
-        });
+                this.graph.getPlugin(SVGJobFileDropPlugin).updateToJobState(changes);
+                this.metaManager.patchAppMeta("job", changes);
+            });
 
         this.metaManager.getAppMeta("job").take(1).subscribeTracked(this, storedJob => {
             this.updateJob(storedJob)
@@ -113,7 +126,7 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
     private normalizeJob(jobObject: Object) {
         const nullJob = JobHelper.getNullJobInputs(this.model);
 
-        const job     = jobObject || {};
+        const job = jobObject || {};
 
         for (const key in job) {
             if (!nullJob.hasOwnProperty(key)) {

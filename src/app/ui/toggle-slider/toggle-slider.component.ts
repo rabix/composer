@@ -63,7 +63,6 @@ export class ToggleSliderComponent implements ControlValueAccessor, OnInit {
     }
 
     writeValue(isChecked: boolean): void {
-        console.log("Writing to slider", isChecked);
         this.value = Boolean(isChecked);
     }
 

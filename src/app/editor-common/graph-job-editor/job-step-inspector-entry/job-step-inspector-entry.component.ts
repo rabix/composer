@@ -59,7 +59,8 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
             return;
         }
 
-        this.warning = undefined;
+        const updateOptions = {emitEvent: false};
+        this.warning        = undefined;
 
         let update = value;
         switch (this.inputType) {
@@ -67,7 +68,7 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
             case "record":
 
                 update = value instanceof Object ? value : {} as InputParameterModel;
-                this.control.patchValue(update);
+                this.control.patchValue(update, updateOptions);
                 break;
 
             case "array":
@@ -81,15 +82,15 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
                 break;
 
             case "string":
-                this.control.setValue(update ? String(update) : "");
+                this.control.setValue(update ? String(update) : "", updateOptions);
                 break;
 
             case "float":
             case "int":
-                this.control.setValue(~~update);
+                this.control.setValue(~~update, updateOptions);
                 break;
             case "boolean":
-                this.control.setValue(Boolean(update), {emitEvent: false});
+                this.control.setValue(Boolean(update), updateOptions);
                 break;
 
             case "Directory":
@@ -99,11 +100,11 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
                 this.control.setValue({
                     class: this.inputType,
                     path: update.path || ""
-                }, {emitEvent: false});
+                }, updateOptions);
                 break;
 
             default:
-                this.control.setValue(update, {emitEvent: false});
+                this.control.setValue(update, updateOptions);
                 break;
 
         }
@@ -126,7 +127,7 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
 
             const plainInputTypes = ["boolean", "float", "int", "string", "enum"];
 
-            if (plainInputTypes.indexOf(this.inputArrayItemsType) !== -1) {
+            if (plainInputTypes.indexOf(this.inputArrayItemsType) !== -1 && list.last) {
                 list.last.focus();
             }
         });
@@ -142,8 +143,6 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
                 } else if (this.inputType === "float") {
                     typecheckedChange = isNaN(change) ? 0 : parseFloat(change);
                 }
-
-                console.log("Value change! ", typecheckedChange);
 
                 this.propagateChange(typecheckedChange);
             });
@@ -220,7 +219,6 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
 
     private setupFormControls(): void {
 
-        console.log("Setting up form controls");
         switch (this.inputType) {
 
             case "array":

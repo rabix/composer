@@ -59,7 +59,7 @@
 
                         <div *ngIf="jobGroup.get(input.id).disabled">
                             Value of this input is set to <i>null</i>.
-                            <button class="btn btn-inline-link text-primary" type="button" (click)="jobGroup.get(input.id).enable()">
+                            <button class="btn btn-inline-link text-primary" type="button" (click)="jobGroup.get(input.id).enable({onlySelf: true})">
                                 Enable
                             </button>
                         </div>

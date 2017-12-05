@@ -120,7 +120,8 @@
         </div>
 
 
-        <button (click)="addArrayEntry()" type="button" class="btn pl-0 btn-link no-outline no-underline-hover"
+        <button *ngIf="control.enabled" (click)="addArrayEntry()" type="button"
+                class="btn pl-0 btn-link no-outline no-underline-hover"
                 [disabled]="readonly">
             <i class="fa fa-plus"></i> New {{ inputArrayItemsType }}
         </button>
@@ -128,7 +129,7 @@
 
     <!--Unknown-->
     <ng-template ngSwitchDefault>
-        <div class="alert alert-info">Unknown input type: {{ inputType || "null" }}</div>
+        Unknown input type: {{ inputType || "null" }}
     </ng-template>
 
 </div>

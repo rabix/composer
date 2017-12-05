@@ -46,17 +46,15 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
         this.jobValue = jobValue;
         this.jobGroup.patchValue(jobValue, {emitEvent: false});
 
-        console.log("Writing values");
-
         for (const controlName in this.jobGroup.controls) {
 
             const control = this.jobGroup.get(controlName);
             const kval    = this.jobValue[controlName];
 
             if (kval === null || kval === undefined) {
-                control.disable({emitEvent: false});
+                control.disable({emitEvent: false, onlySelf: true});
             } else {
-                control.enable({emitEvent: false});
+                control.enable({emitEvent: false, onlySelf: true});
             }
         }
 
@@ -75,13 +73,18 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
         super.ngAfterViewInit();
 
         this.jobGroup.valueChanges
-            .do(data => {
-                console.log("Step value change", data);
+            .map(changes => {
+                const out = {...this.jobValue, ...changes};
+
+                for (const cname in this.jobGroup.controls) {
+                    if (this.jobGroup.controls[cname].disabled) {
+                        out[cname] = null;
+                    }
+                }
+
+                return out;
             })
-            .map(changes => this.jobGroup.status === "DISABLED" ? {} : changes)
-            .subscribeTracked(this, changes => {
-                this.propagateChange(changes);
-            });
+            .subscribeTracked(this, changes => this.propagateChange(changes));
     }
 
     /**
