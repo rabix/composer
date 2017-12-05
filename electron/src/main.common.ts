@@ -221,13 +221,14 @@ export = {
 
         });
 
-        app.on("activate", () => {
-            // On macOS it's common to re-create a window in the App when the
-            // dock icon is clicked and there are no other windows open.
-            if (win === null) {
-                start(config);
-            }
-        });
+        // This is not needed unless we add functionality again of re-creating window from menu bar (macOS)
+        // app.on("activate", () => {
+        //     // On macOS it's common to re-create a window in the App when the
+        //     // dock icon is clicked and there are no other windows open.
+        //     if (win === null) {
+        //         start(config);
+        //     }
+        // });
 
     }
 }
