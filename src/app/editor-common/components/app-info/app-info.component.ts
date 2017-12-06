@@ -130,6 +130,8 @@ import {SystemService} from "../../../platform-providers/system.service";
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
                         <div class="text-title">Links:</div>
                         <ct-inline-editor [value]="model.customProps['sbg:links']"
+                                          keyLabel="URL"
+                                          valueLabel="Label"
                                           [disabled]="readonly"
                                           type="keyvalue"
                                           (saveData)="updateCustomProp('sbg:links', $event)">
