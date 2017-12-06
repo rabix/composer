@@ -11,8 +11,7 @@ import {SystemService} from "../../../platform-providers/system.service";
 
             <div class="header">
                 
-                <div class="logo mb-1">                    
-                </div>
+                <img class="logo mb-1" src="../../../../assets/img/rc_icon_256x256.png">                    
 
                 <div class="header-text">                    
                     <ng-container *ngIf="platformIsOutdated; else upToDate">
